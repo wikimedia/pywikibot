@@ -28,7 +28,10 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, deprecate_arg, issue_deprecation_warning
+from pywikibot.tools import (
+    deprecated, deprecate_arg, issue_deprecation_warning,
+    FrozenDict,
+)
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 
 logger = logging.getLogger("pywiki.wiki.family")
@@ -761,9 +764,14 @@ class Family(object):
 
         # Which language codes no longer exist and by which language code
         # should they be replaced. If for example the language with code xx:
-        # now should get code yy:, add {'xx':'yy'} to obsolete. If all
-        # links to language xx: should be removed, add {'xx': None}.
-        self.obsolete = {}
+        # now should get code yy:, add {'xx':'yy'} to obsolete.
+        if not hasattr(self, 'interwiki_replacements'):
+            self.interwiki_replacements = {}
+
+        # Codes that should be removed, usually because the site has been
+        # taken down.
+        if not hasattr(self, 'interwiki_removals'):
+            self.interwiki_removals = []
 
         # Language codes of the largest wikis. They should be roughly sorted
         # by size.
@@ -1372,10 +1380,75 @@ class Family(object):
         """
         return putText
 
+    @property
+    def obsolete(self):
+        """
+        Old codes that are not part of the family.
+
+        Interwiki replacements override removals for the same code.
+
+        @return: mapping of old codes to new codes (or None)
+        @rtype: dict
+        """
+        data = dict((code, None)
+                    for code in self.interwiki_removals)
+        data.update(self.interwiki_replacements)
+        return FrozenDict(data,
+                          'Family.obsolete not updatable; '
+                          'use Family.interwiki_removals '
+                          'and Family.interwiki_replacements')
+
+    @obsolete.setter
+    def obsolete(self, data):
+        """Split obsolete dict into constituent parts."""
+        self.interwiki_removals[:] = [old for (old, new) in data.items()
+                                      if new is None]
+        self.interwiki_replacements.clear()
+        self.interwiki_replacements.update((old, new)
+                                           for (old, new) in data.items()
+                                           if new is not None)
+
 
 class WikimediaFamily(Family):
 
-    """#Class for all wikimedia families."""
+    """Class for all wikimedia families."""
+
+    # Code mappings which are only an alias, and there is no 'old' wiki.
+    # For all except 'nl_nds', subdomains do exist as a redirect, but that
+    # should not be relied upon.
+    code_aliases = {
+        # Country aliases; see T87002
+        'dk': 'da',  # Wikipedia, Wikibooks and Wiktionary only.
+        'jp': 'ja',
+
+        # Language aliases
+        'nb': 'no',  # T86924
+
+        # Incomplete language code change. T86915
+        'minnan': 'zh-min-nan',
+        'nan': 'zh-min-nan',
+
+        # These two probably only apply to Wikipedia.
+        # Server not found for the other projects.
+        'zh-tw': 'zh',
+        'zh-cn': 'zh',
+
+        # miss-spelling
+        'nl_nds': 'nl-nds',
+    }
+
+    # Not open for edits; stewards can still edit.
+    closed_wikis = []
+    # Completely removed
+    removed_wikis = []
+
+    # Mappings which should be in effect, even for
+    # closed/removed wikis
+    interwiki_replacement_overrides = {
+        # Moldovan projects are closed, however
+        # Romanian was to be the replacement.
+        'mo': 'ro',
+    }
 
     def __init__(self):
         super(WikimediaFamily, self).__init__()
@@ -1388,6 +1461,16 @@ class WikimediaFamily(Family):
             'wikibooks', 'wikidata', 'wikinews', 'wikipedia', 'wikiquote',
             'wikisource', 'wikiversity', 'wiktionary',
         ]
+
+    @property
+    def interwiki_removals(self):
+        return frozenset(self.removed_wikis + self.closed_wikis)
+
+    @property
+    def interwiki_replacements(self):
+        rv = self.code_aliases.copy()
+        rv.update(self.interwiki_replacement_overrides)
+        return FrozenDict(rv)
 
     def shared_image_repository(self, code):
         return ('commons', 'commons')

@@ -12,6 +12,13 @@ class Family(family.WikimediaFamily):
 
     """Family class for Wikisource."""
 
+    closed_wikis = [
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
+        'ang',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
+        'ht',
+    ]
+
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
@@ -32,7 +39,8 @@ class Family(family.WikimediaFamily):
         # '-' is not a valid subdomain.
         self.langs['-'] = 'wikisource.org'
 
-        # Global bot allowed languages on https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # Global bot allowed languages on
+        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
             'ca', 'el', 'fa', 'it', 'ko', 'no', 'pl', 'vi', 'zh',
         ]
@@ -51,17 +59,6 @@ class Family(family.WikimediaFamily):
             'hu': ['en'],
             'pl': self.alphabetic,
             'simple': self.alphabetic
-        }
-
-        self.obsolete = {
-            'ang': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
-            'dk': 'da',
-            'ht': None,   # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
-            'jp': 'ja',
-            'minnan': 'zh-min-nan',
-            'nb': 'no',
-            'zh-tw': 'zh',
-            'zh-cn': 'zh'
         }
 
         self.authornamespaces = {

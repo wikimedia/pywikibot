@@ -12,6 +12,40 @@ class Family(family.WikimediaFamily):
 
     """Family module for Wikipedia."""
 
+    closed_wikis = [
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
+        'aa',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
+        'cho',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
+        'ho',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
+        'hz',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
+        'ii',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
+        'kj',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
+        'kr',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
+        'mh',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
+        'mo',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
+        'mus',
+    ]
+
+    removed_wikis = [
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Ndonga_Wikipedia
+        'ng',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
+        'ru-sib',
+        # Klingon, locked in 2005, and moved to http://klingon.wikia.com/
+        'tlh',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tokipona_Wikipedia
+        'tokipona',
+    ]
+
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
@@ -48,10 +82,11 @@ class Family(family.WikimediaFamily):
             'dz', 'ik', 'tum', 'ch',
         ]
 
-        langs = self.languages_by_size + ['test', 'test2']  # Sites we want to edit but not count as real languages
+        # Sites we want to edit but not count as real languages
+        self.test_codes = ['test', 'test2']
 
-        self.langs = dict([(lang, '%s.wikipedia.org' % lang)
-                           for lang in langs])
+        self.langs = dict((lang, '%s.wikipedia.org' % lang) for lang in
+                          self.languages_by_size + self.test_codes)
 
         self.category_redirect_templates = {
             '_default': (),
@@ -320,31 +355,6 @@ class Family(family.WikimediaFamily):
             'ur': ['ar', 'fa', 'en'] + self.alphabetic,
             'vi': self.alphabetic_revised,
             'yi': ['en', 'he', 'de']
-        }
-
-        self.obsolete = {
-            'aa': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
-            'cho': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
-            'dk': 'da',
-            'ho': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
-            'hz': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
-            'ii': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
-            'kj': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
-            'kr': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
-            'mh': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
-            'minnan': 'zh-min-nan',
-            'mo': 'ro',  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
-            'mus': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
-            'nan': 'zh-min-nan',
-            'nl_nds': 'nl-nds',  # miss-spelling
-            'nb': 'no',
-            'ng': None,  # (not reachable) https://meta.wikimedia.org/wiki/Inactive_wikis
-            'jp': 'ja',
-            'ru-sib': None,  # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
-            'tlh': None,
-            'tokipona': None,
-            'zh-tw': 'zh',
-            'zh-cn': 'zh'
         }
 
         # Languages that used to be coded in iso-8859-1
