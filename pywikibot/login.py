@@ -265,4 +265,5 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         return True
 
     def showCaptchaWindow(self, url):
+        """Open a window to show the captcha for the given URL."""
         pass

@@ -143,6 +143,7 @@ pageCache = []
 
 
 def workon(page):
+    """Change all redirects from the given page to actual links."""
     mysite = pywikibot.Site()
     try:
         text = page.get()

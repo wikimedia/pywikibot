@@ -56,6 +56,7 @@ class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
     """Cosmetic changes bot."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'async': False,
             'summary': u'Robot: Cosmetic changes',
