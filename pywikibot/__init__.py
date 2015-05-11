@@ -41,7 +41,7 @@ from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, SectionError,
     SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
     UnknownExtension,
-    NoUsername, UserBlocked, UserActionRefuse,
+    NoUsername, UserBlocked,
     PageRelatedError, IsRedirectPage, IsNotRedirectPage,
     PageSaveRelatedError, PageNotSaved, OtherPageSaveError,
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
@@ -750,3 +750,7 @@ wrapper._add_deprecated_attr(
     'PageNotFound', pywikibot.exceptions.DeprecatedPageNotFoundError,
     warning_message=('{0}.{1} is deprecated, and no longer '
                      'used by pywikibot; use http.fetch() instead.'))
+wrapper._add_deprecated_attr(
+    'UserActionRefuse', pywikibot.exceptions._EmailUserError,
+    warning_message='UserActionRefuse is deprecated; '
+                    'use UserRightsError and/or NotEmailableError')

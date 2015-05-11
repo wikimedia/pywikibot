@@ -97,6 +97,8 @@ import pywikibot
 
 from pywikibot import pagegenerators as pg
 from pywikibot import i18n
+
+from pywikibot.exceptions import NotEmailableError
 from pywikibot.family import Family
 from pywikibot.tools import deprecated
 
@@ -830,8 +832,8 @@ class checkImagesBot(object):
                                       % self.luser, emailText)
                 emailClass = pywikibot.User(self.site, self.luser)
                 try:
-                    emailClass.sendMail(emailSubj, text_to_send)
-                except pywikibot.UserActionRefuse:
+                    emailClass.send_email(emailSubj, text_to_send)
+                except NotEmailableError:
                     pywikibot.output("User is not mailable, aborted")
                     return
 
