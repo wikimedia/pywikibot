@@ -3394,6 +3394,15 @@ class WikibasePage(BasePage):
         data = {'aliases': aliases}
         self.editEntity(data, **kwargs)
 
+    def set_redirect_target(self, target_page, create=False, force=False,
+                            keep_section=False, save=True, **kwargs):
+        """
+        Set target of a redirect for a Wikibase page.
+
+        Has not been implemented in the Wikibase API yet, except for ItemPage.
+        """
+        raise NotImplementedError
+
 
 class ItemPage(WikibasePage):
 
@@ -3722,6 +3731,29 @@ class ItemPage(WikibasePage):
         @type item: pywikibot.ItemPage
         """
         self.repo.mergeItems(fromItem=self, toItem=item, **kwargs)
+
+    def set_redirect_target(self, target_page, create=False, force=False,
+                            keep_section=False, save=True, **kwargs):
+        """
+        Make the item redirect to another item.
+
+        You need to define an extra argument to make this work, like save=True
+        @param target_page: target of the redirect, this argument is required.
+        @type target_page: pywikibot.Item or string
+        @param force: if true, it sets the redirect target even the page
+            is not redirect.
+        @type force: bool
+        """
+        if isinstance(target_page, basestring):
+            target_page = pywikibot.ItemPage(self.repo, target_page)
+        elif self.repo != target_page.repo:
+            raise pywikibot.InterwikiRedirectPage(self, target_page)
+        if self.exists() and not self.isRedirectPage() and not force:
+            raise pywikibot.IsNotRedirectPage(self)
+        if not save or keep_section or create:
+            raise NotImplementedError
+        self.repo.set_redirect_target(
+            from_item=self, to_item=target_page)
 
 
 class Property():
