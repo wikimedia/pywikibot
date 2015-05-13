@@ -498,7 +498,6 @@ class NoReferencesBot(Bot):
 
         self.generator = pagegenerators.PreloadingGenerator(generator)
         self.site = pywikibot.Site()
-        self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
 
         self.refR = _ref_regex
         self.referencesR = _references_regex
@@ -544,11 +543,17 @@ class NoReferencesBot(Bot):
         Add a references tag into an existing section where it fits into.
 
         If there is no such section, creates a new section containing
-        the references tag.
-        * Returns : The modified pagetext
+        the references tag. Also repair malformed references tags.
+        Set the edit summary accordingly.
 
+        @param oldText: page text to be modified
+        @type oldText: str
+        @return: The modified pagetext
+        @rtype: str
         """
         # Do we have a malformed <reference> tag which could be repaired?
+        # Set the edit summary for this case
+        self.comment = i18n.twtranslate(self.site, 'noreferences-fix-tag')
 
         # Repair two opening tags or a opening and an empty tag
         pattern = re.compile(r'< *references *>(.*?)'
@@ -563,6 +568,8 @@ class NoReferencesBot(Bot):
             return re.sub(pattern, '<references />', oldText)
 
         # Is there an existing section where we can add the references tag?
+        # Set the edit summary for this case
+        self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
         for section in i18n.translate(self.site, referencesSections):
             sectionR = re.compile(r'\r?\n=+ *%s *=+ *\r?\n' % section)
             index = 0
