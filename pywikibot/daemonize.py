@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Module to daemonize the current process on Unix."""
 #
-# (C) Pywikibot team, 2007-2013
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,6 +10,7 @@ __version__ = '$Id$'
 
 import os
 import sys
+import codecs
 
 is_daemon = False
 
@@ -19,13 +20,16 @@ def daemonize(close_fd=True, chdir=True, write_pid=False, redirect_std=None):
     Daemonize the current process.
 
     Only works on POSIX compatible operating systems.
-    The process will fork to the background and return control to the terminal.
+    The process will fork to the background and return control to terminal.
 
-    Arguments:
-        - close_fd: Close the standard streams and replace them by /dev/null
-        - chdir: Change the current working directory to /
-        - write_pid: Write the pid to sys.argv[0] + '.pid'
-        - redirect_std: Filename to redirect stdout and stdin to
+    @param close_fd: Close the standard streams and replace them by /dev/null
+    @type close_fd: bool
+    @param chdir: Change the current working directory to /
+    @type chdir: bool
+    @param write_pid: Write the pid to sys.argv[0] + '.pid'
+    @type write_pid: bool
+    @param redirect_std: Filename to redirect stdout and stdin to
+    @type redirect_std: str
     """
     # Fork away
     if not os.fork():
@@ -54,9 +58,9 @@ def daemonize(close_fd=True, chdir=True, write_pid=False, redirect_std=None):
             return
         else:
             # Write out the pid
-            f = open(os.path.basename(sys.argv[0]) + '.pid', 'w')
-            f.write(str(pid))
-            f.close()
+            path = os.path.basename(sys.argv[0]) + '.pid'
+            with codecs.open(path, 'w', 'utf-8') as f:
+                f.write(str(pid))
             os._exit(0)
     else:
         # Exit to return control to the terminal
