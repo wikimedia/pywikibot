@@ -491,7 +491,7 @@ class TerminalHandler(logging.Handler):
             msg = record.args[0]
             is_useless_source_output = any(
                 s in msg for s in
-                ('warn(', 'exceptions.', 'Warning)', 'Warning,'))
+                (str('warn('), str('exceptions.'), str('Warning)'), str('Warning,')))
 
             if is_useless_source_output:
                 record.args = ('\n'.join(record.args[0].splitlines()[0:-1]),)
