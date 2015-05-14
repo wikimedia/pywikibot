@@ -3359,10 +3359,6 @@ class APISite(BaseSite):
                 raise NoPage(page)
             api.update_page(page, pagedata, rvgen.props)
 
-    def pageinterwiki(self, page):
-        # No such function in the API (this method isn't called anywhere)
-        raise NotImplementedError
-
     def pagelanglinks(self, page, step=None, total=None,
                       include_obsolete=False):
         """Iterate all interlanguage links on page, yielding Link objects.

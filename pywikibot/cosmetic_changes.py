@@ -213,6 +213,7 @@ class CosmeticChangesToolkit:
     @deprecate_arg('debug', 'diff')
     def __init__(self, site, diff=False, redirect=False, namespace=None,
                  pageTitle=None, ignore=CANCEL_ALL):
+        """Constructor."""
         self.site = site
         self.diff = diff
         self.redirect = redirect
@@ -624,6 +625,7 @@ class CosmeticChangesToolkit:
         return text
 
     def removeUselessSpaces(self, text):
+        """Cleanup multiple or trailing spaces."""
         multipleSpacesR = re.compile('  +')
         spaceAtLineEndR = re.compile(' $')
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table',
