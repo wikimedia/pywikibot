@@ -12,8 +12,6 @@ This script understands various command-line arguments:
 
 -purge            Do not touch but purge the page
 
--redir            specifies that the bot should work on redirect pages;
-                  otherwise, they will be skipped. Cannot be used with -purge.
 """
 #
 # (C) Pywikibot team, 2009-2015
@@ -37,26 +35,15 @@ class TouchBot(pywikibot.Bot):
 
     def __init__(self, generator, **kwargs):
         """Initialize a TouchBot instance with the options and generator."""
-        self.availableOptions.update({
-            'redir': False,  # include redirect pages
-        })
-
         super(TouchBot, self).__init__(generator=generator, **kwargs)
 
     def treat(self, page):
         """Touch the given page."""
         try:
-            # get the page, and save it using the unmodified text.
-            # whether or not getting a redirect throws an exception
-            # depends on the variable self.touch_redirects.
-            page.get(get_redirect=self.getOption('redir'))
-            page.save("Pywikibot touch script")
+            page.touch()
         except pywikibot.NoPage:
             pywikibot.error(u"Page %s does not exist."
                             % page.title(asLink=True))
-        except pywikibot.IsRedirectPage:
-            pywikibot.warning(u"Page %s is a redirect; skipping."
-                              % page.title(asLink=True))
         except pywikibot.LockedPage:
             pywikibot.error(u"Page %s is locked."
                             % page.title(asLink=True))
@@ -96,6 +83,9 @@ def main(*args):
     for arg in local_args:
         if arg == '-purge':
             bot_class = PurgeBot
+        elif arg == '-redir':
+            pywikibot.output(u'-redirect option is deprecated, '
+                             'do not use it anymore.')
         elif not genFactory.handleArg(arg) and arg.startswith("-"):
             options[arg[1:].lower()] = True
 
