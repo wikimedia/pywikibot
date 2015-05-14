@@ -320,7 +320,7 @@ def create_user_fixes():
 fixes['example'] = {
     'regex': True,
     'msg': {
-        '_default':u'no summary specified',
+        '_default': u'no summary specified',
     },
     'replacements': [
         (r'\bword\b', u'two words'),
