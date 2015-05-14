@@ -21,9 +21,6 @@
 # mandatory; see README.conversion.txt
 httplib2>=0.9.0
 
-# core option 'daemonize':
-daemonize
-
 # core interwiki_graph.py:
 pydot
 

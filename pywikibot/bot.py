@@ -39,6 +39,7 @@ import pywikibot
 
 from pywikibot import backports
 from pywikibot import config
+from pywikibot import daemonize
 from pywikibot import version
 from pywikibot.tools import deprecated, deprecated_args
 
@@ -795,12 +796,9 @@ def handle_args(args=None, do_help=True):
                 config.debug_log.append(component)
         elif arg in ('-verbose', '-v'):
             config.verbose_output += 1
-        elif arg == '-daemonize':
-            import daemonize
-            daemonize.daemonize()
-        elif arg.startswith('-daemonize:'):
-            import daemonize
-            daemonize.daemonize(redirect_std=arg[len('-daemonize:'):])
+        elif arg.startswith('-daemonize'):
+            redirect_std = arg[len('-daemonize:'):] if ':' in arg else None
+            daemonize.daemonize(redirect_std=redirect_std)
         else:
             # the argument depends on numerical config settings
             # e.g. -maxlag:
@@ -878,8 +876,8 @@ Global arguments available for all bots:
 -user:xyz         Log in as user 'xyz' instead of the default username.
 
 -daemonize:xyz    Immediately return control to the terminal and redirect
-                  stdout and stderr to xyz (only use for bots that require
-                  no input from stdin).
+                  stdout and stderr to file xyz.
+                  (only use for bots that require no input from stdin).
 
 -help             Show this help text.
 
