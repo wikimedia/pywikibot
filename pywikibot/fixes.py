@@ -42,29 +42,7 @@ fixes = {
     # make remaining tags XHTML compliant.
     'HTML': {
         'regex': True,
-        'msg': {
-            'ar':  u'روبوت: تحويل/تصليح HTML',
-            'be':  u'Бот: карэкцыя HTML',
-            'cs':  u'převod/oprava HTML',
-            'en':  u'Robot: Converting/fixing HTML',
-            'eo':  u'Bot: koredtado de HTMLa teksto',
-            'fa':  u'ربات:تبدیل/تصحیح کدهای اچ‌تی‌ام‌ال',
-            'de':  u'Bot: konvertiere/korrigiere HTML',
-            'fr':  u'Robot: convertit/fixe HTML',
-            'he':  u'בוט: ממיר/מתקן HTML',
-            'ja':  u'ロボットによる: HTML転換',
-            'ksh': u'Bot: vun HTML en Wikikood wandelle',
-            'ia':  u'Robot: conversion/reparation de HTML',
-            'lt':  u'robotas: konvertuojamas/taisomas HTML',
-            'nl':  u'Bot: conversie/reparatie HTML',
-            'pl':  u'Robot konwertuje/naprawia HTML',
-            'pt':  u'Bot: Corrigindo HTML',
-            'ru':  u'Бот: коррекция HTML',
-            'sr':  u'Бот: Поправка HTML-а',
-            'sv':  u'Bot: Konverterar/korrigerar HTML',
-            'uk':  u'Бот: корекцiя HTML',
-            'zh':  u'機器人: 轉換HTML',
-        },
+        'msg': 'pywikibot-fixes-html',
         'replacements': [
             # Everything case-insensitive (?i)
             # Keep in mind that MediaWiki automatically converts <br> to <br />
@@ -194,27 +172,7 @@ fixes = {
     # anything.
     'syntax': {
         'regex': True,
-        'msg': {
-            'ar':  u'بوت: تصليح تهيئة الويكي',
-            'be':  u'Бот: Карэкцыя вiкi-сiнтаксiсу',
-            'cs':  u'Oprava wikisyntaxe',
-            'de':  u'Bot: Korrigiere Wiki-Syntax',
-            'en':  u'Robot: Fixing wiki syntax',
-            'eo':  u'Bot: Korektado de vikia sintakso',
-            'fa':  u'ربات:تصحیح قالب ویکی‌نویسی',
-            'fr':  u'Bot: Corrige wiki-syntaxe',
-            'he':  u'בוט: מתקן תחביר ויקי',
-            'ia':  u'Robot: Reparation de syntaxe wiki',
-            'ja':  u'ロボットによる: wiki構文修正',
-            'lt':  u'robotas: Taisoma wiki sintaksė',
-            'nl':  u'Bot: reparatie wikisyntaxis',
-            'pl':  u'Robot poprawia wiki-składnię',
-            'pt':  u'Bot: Corrigindo sintaxe wiki',
-            'ru':  u'Бот: Коррекция вики синтаксиса',
-            'sr':  u'Бот: Поправка вики синтаксе',
-            'uk':  u'Бот: Корекцiя вiкi-синтаксису',
-            'zh':  u'機器人: 修正wiki語法',
-        },
+        'msg': 'pywikibot-fixes-syntax',
         'replacements': [
             # external link in double brackets
             (r'\[\[(?P<url>https?://[^\]]+?)\]\]',   r'[\g<url>]'),
@@ -270,27 +228,7 @@ fixes = {
     # be safe to run automatically.
     'syntax-safe': {
         'regex': True,
-        'msg': {
-            'ar':  u'بوت: تصليح تهيئة الويكي',
-            'be':  u'Бот: Карэкцыя вiкi-сiнтаксiсу',
-            'cs':  u'Oprava wikisyntaxe',
-            'de':  u'Bot: Korrigiere Wiki-Syntax',
-            'en':  u'Robot: Fixing wiki syntax',
-            'eo':  u'Bot: Korektado de vikia sintakso',
-            'fa':  u'ربات:تصحیح قالب ویکی‌نویسی',
-            'fr':  u'Bot: Corrige wiki-syntaxe',
-            'he':  u'בוט: מתקן תחביר ויקי',
-            'ia':  u'Robot: Reparation de syntaxe wiki',
-            'ja':  u'ロボットによる: wiki構文修正',
-            'lt':  u'robotas: Taisoma wiki sintaksė',
-            'nl':  u'Bot: reparatie wikisyntaxis',
-            'pl':  u'Robot poprawia wiki-składnię',
-            'pt':  u'Bot: Corrigindo sintaxe wiki',
-            'ru':  u'Бот: Коррекция вики синтаксиса',
-            'sr':  u'Бот: Поправка вики синтаксе',
-            'uk':  u'Бот: Корекцiя вiкi-синтаксису',
-            'zh':  u'機器人: 修正wiki語法',
-        },
+        'msg': 'pywikibot-fixes-syntax',
         'replacements': [
             # external link in double brackets
             (r'\[\[(?P<url>https?://[^\]]+?)\]\]',   r'[\g<url>]'),
@@ -673,10 +611,7 @@ fixes = {
     #
     'fckeditor': {
         'regex': True,
-        'msg': {
-            'en': u'Robot: Fixing rich-editor html',
-            'fa': u'ربات: تصحیح اچ‌تی‌ام‌ال ویرایشگر پیشرفته',
-        },
+        'msg': 'pywikibot-fixes-fckeditor',
         'replacements': [
             # replace <br> with a new line
             (r'(?i)<br>',                      r'\n'),
