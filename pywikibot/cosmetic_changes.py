@@ -420,15 +420,15 @@ class CosmeticChangesToolkit:
         # wiki links aren't parsed here.
         exceptions = ['nowiki', 'comment', 'math', 'pre']
 
-        for nsNumber in self.site.namespaces():
-            if nsNumber in (0, 2, 3):
+        for namespace in self.site.namespaces.values():
+            if namespace.id in (0, 2, 3):
                 # skip main (article) namespace
                 # skip user namespace, maybe gender is used
                 continue
             # a clone is needed. Won't change the namespace dict
-            namespaces = list(self.site.namespace(nsNumber, all=True))
+            namespaces = list(namespace)
             thisNs = namespaces.pop(0)
-            if nsNumber == 6 and family.name == 'wikipedia':
+            if namespace.id == 6 and family.name == 'wikipedia':
                 if self.site.code in ('en', 'fr') and \
                    MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.14'):
                     # do not change "Image" on en-wiki and fr-wiki

@@ -25,6 +25,7 @@ from pywikibot.data import api
 from tests.aspects import (
     unittest, TestCase, DeprecationTestCase,
     DefaultSiteTestCase,
+    DefaultDrySiteTestCase,
     WikimediaDefaultSiteTestCase,
     WikidataTestCase,
     DefaultWikidataClientTestCase,
@@ -39,7 +40,7 @@ if sys.version_info[0] > 2:
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
 
-    """Test cases for Site deprecated methods."""
+    """Test cases for Site deprecated methods on a live wiki."""
 
     cached = True
     user = True
@@ -67,6 +68,18 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
             self.assertEqual(token, mysite.token(mainpage, ttype))
             self.assertDeprecation("pywikibot.site.APISite.token is deprecated"
                                    ", use the 'tokens' property instead.")
+
+
+class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase):
+
+    """Test cases for Site deprecated methods without a user."""
+
+    def test_namespaces_callable(self):
+        """Test that namespaces is callable and returns itself."""
+        site = self.get_site()
+        self.assertIs(site.namespaces(), site.namespaces)
+        self.assertDeprecation('Calling the namespaces property is deprecated, '
+                               'use it directly instead.')
 
 
 class TestBaseSiteProperties(TestCase):
@@ -212,7 +225,7 @@ class TestSiteObject(DefaultSiteTestCase):
         }
         self.assertTrue(all(mysite.ns_index(b) == builtins[b]
                             for b in builtins))
-        ns = mysite.namespaces()
+        ns = mysite.namespaces
         self.assertIsInstance(ns, dict)
         self.assertTrue(all(x in ns for x in range(0, 16)))
         # built-in namespaces always present
@@ -1807,7 +1820,7 @@ class TestNonEnglishWikipediaSite(TestCase):
     def testNamespaceAliases(self):
         site = self.get_site()
 
-        namespaces = site.namespaces()
+        namespaces = site.namespaces
         image_namespace = namespaces[6]
         self.assertEqual(image_namespace.custom_name, 'Fil')
         self.assertEqual(image_namespace.canonical_name, 'File')

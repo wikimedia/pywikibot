@@ -657,10 +657,18 @@ EMPTY_DEFAULT = EmptyDefault()
 
 class SelfCallMixin(object):
 
-    """Return self when called."""
+    """
+    Return self when called.
+
+    When '_own_desc' is defined it'll also issue a deprecation warning using
+    issue_deprecation_warning('Calling ' + _own_desc, 'it directly').
+    """
 
     def __call__(self):
         """Do nothing and just return itself."""
+        if hasattr(self, '_own_desc'):
+            issue_deprecation_warning('Calling {0}'.format(self._own_desc),
+                                      'it directly', 2)
         return self
 
 

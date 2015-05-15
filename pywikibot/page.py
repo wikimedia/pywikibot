@@ -672,7 +672,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     # Get target (first template argument)
                     try:
                         p = pywikibot.Page(self.site, args[0].strip(), ns=14)
-                        if p.namespace() == 14:
+                        if p.namespace == 14:
                             self._catredirect = p.title()
                         else:
                             pywikibot.warning(
@@ -4722,21 +4722,21 @@ class Link(ComparableMixin):
         """
         ns_id = self.namespace
         ns = self.site.namespaces[ns_id]
-        ns_names = list(ns)
 
         if onsite is None:
             namespace = ns.canonical_name
         else:
             # look for corresponding ns in onsite by name comparison
-            for name in ns_names:
-                onsite_ns = ns.lookup_name(name, namespaces=onsite.namespaces())
-            # not found
-            if onsite_ns is None:
+            for alias in ns:
+                namespace = Namespace.lookup_name(alias, onsite.namespaces)
+                if namespace:
+                    namespace = namespace.custom_name
+                    break
+            else:
+                # not found
                 raise pywikibot.Error(
                     u'No corresponding namespace found for namespace %s on %s.'
                     % (self.site.namespaces[ns_id], onsite))
-            else:
-                namespace = onsite_ns.custom_name
 
         if namespace:
             return u'%s:%s' % (namespace, self.title)
