@@ -861,6 +861,9 @@ def main(*args):
         except KeyError:
             pywikibot.output(u'Available predefined fixes are: %s'
                              % ', '.join(fixes.fixes.keys()))
+            if not fixes.user_fixes_loaded:
+                pywikibot.output('The user fixes file could not be found: '
+                                 '{0}'.format(fixes.filename))
             return
         if "msg" in fix:
             if isinstance(fix['msg'], basestring):
