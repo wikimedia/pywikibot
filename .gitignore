@@ -11,6 +11,7 @@ user-*.py
 logs*
 *apicache*
 *pycache*
+/cache*
 .idea
 pywikibot.egg-info/
 pywikibot/families/
