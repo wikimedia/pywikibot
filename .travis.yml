@@ -89,7 +89,7 @@ matrix:
     - python: '3.4'
       env: LANGUAGE=test FAMILY=wikidata SITE_ONLY=1
     - python: 'nightly'
-      env: LANGUAGE=ar FAMILY=wiktionary
+      env: LANGUAGE=ar FAMILY=wiktionary PYWIKIBOT2_TEST_NO_RC=1
     - python: '2.6'
       env: LANGUAGE=wikidata FAMILY=wikidata SITE_ONLY=1
 
