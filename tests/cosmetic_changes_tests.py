@@ -84,7 +84,7 @@ class TestCosmeticChanges(TestCase):
         Test cleanUpLinks method.
 
         This method fails for the given samples from library. Either the method
-        has to be changed ot the examples must be fixed.
+        has to be changed or the examples must be fixed.
         """
         self.assertEqual('text [[title]] text',
                          self.cct.cleanUpLinks('text[[ title ]]text'))
