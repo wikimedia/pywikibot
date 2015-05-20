@@ -12,10 +12,13 @@ __version__ = '$Id$'
 
 import difflib
 import sys
+
+from collections import Sequence
 if sys.version_info[0] > 2:
     from itertools import zip_longest
 else:
     from itertools import izip_longest as zip_longest
+
 try:
     from bs4 import BeautifulSoup
 except ImportError as bserror:
@@ -23,6 +26,7 @@ except ImportError as bserror:
 
 import pywikibot
 from pywikibot.backports import format_range_unified  # introduced in 2.7.2
+from pywikibot.tools import deprecated_args
 
 
 class Hunk(object):
@@ -72,9 +76,14 @@ class Hunk(object):
 
     def get_header(self):
         """Provide header of unified diff."""
-        a_rng = format_range_unified(*self.a_rng)
-        b_rng = format_range_unified(*self.b_rng)
-        return '@@ -{0} +{1} @@\n'.format(a_rng, b_rng)
+        return self.get_header_text(self.a_rng, self.b_rng) + '\n'
+
+    @staticmethod
+    def get_header_text(a_rng, b_rng, affix='@@'):
+        """Provide header for any ranges."""
+        a_rng = format_range_unified(*a_rng)
+        b_rng = format_range_unified(*b_rng)
+        return '{0} -{1} +{2} {0}'.format(affix, a_rng, b_rng)
 
     def create_diff(self):
         """Generator of diff text for this hunk, without formatting."""
@@ -174,6 +183,22 @@ class Hunk(object):
                % (self.__class__.__name__, self.group)
 
 
+class _SuperHunk(Sequence):
+
+    def __init__(self, hunks):
+        self._hunks = hunks
+        self.a_rng = (self._hunks[0].a_rng[0], self._hunks[-1].a_rng[1])
+        self.b_rng = (self._hunks[0].b_rng[0], self._hunks[-1].b_rng[1])
+        self.pre_context = self._hunks[0].pre_context
+        self.post_context = self._hunks[0].post_context
+
+    def __getitem__(self, idx):
+        return self._hunks[idx]
+
+    def __len__(self):
+        return len(self._hunks)
+
+
 class PatchManager(object):
 
     """Apply patches to text_a to obtain a new text.
@@ -181,15 +206,16 @@ class PatchManager(object):
     If all hunks are approved, text_b will be obtained.
     """
 
-    def __init__(self, text_a, text_b, n=0, by_letter=False):
+    @deprecated_args(n='context')
+    def __init__(self, text_a, text_b, context=0, by_letter=False):
         """Constructor.
 
         @param text_a: base text
         @type text_a: basestring
         @param text_b: target text
         @type text_b: basestring
-        @param n: line of context as defined in difflib.get_grouped_opcodes().
-        @type n: int
+        @param context: number of lines which are context
+        @type context: int
         @param by_letter: if text_a and text_b are single lines, comparison can be done
             letter by letter.
         @type by_letter: bool
@@ -207,11 +233,24 @@ class PatchManager(object):
 
         # groups and hunk have same order (one hunk correspond to one group).
         s = difflib.SequenceMatcher(None, self.a, self.b)
-        self.groups = list(s.get_grouped_opcodes(n))
-        self.hunks = [Hunk(self.a, self.b, group) for group in self.groups]
+        self.groups = list(s.get_grouped_opcodes(0))
+        self.hunks = []
+        previous_hunk = None
+        for group in self.groups:
+            hunk = Hunk(self.a, self.b, group)
+            self.hunks.append(hunk)
+            hunk.pre_context = hunk.a_rng[0]
+            if previous_hunk:
+                hunk.pre_context -= previous_hunk.a_rng[1]
+                previous_hunk.post_context = hunk.pre_context
+            previous_hunk = hunk
+        if self.hunks:
+            self.hunks[-1].post_context = len(self.a) - self.hunks[-1].a_rng[1]
         # blocks are a superset of hunk, as include also parts not
         # included in any hunk.
         self.blocks = self.get_blocks()
+        self.context = context
+        self._super_hunks = self._generate_super_hunks()
 
     def get_blocks(self):
         """Return list with blocks of indexes which compose a and, where applicable, b.
@@ -246,8 +285,60 @@ class PatchManager(object):
 
     def print_hunks(self):
         """Print the headers and diff texts of all hunks to the output."""
-        for hunk in self.hunks:
-            pywikibot.output(hunk.header + hunk.diff_text)
+        if self.hunks:
+            pywikibot.output('\n'.join(self._generate_diff(super_hunk)
+                                       for super_hunk in self._super_hunks))
+
+    def _generate_super_hunks(self, hunks=None):
+        if hunks is None:
+            hunks = self.hunks
+        if self.context:
+            # Determine if two hunks are connected by self.context
+            super_hunk = []
+            super_hunks = [super_hunk]
+            for hunk in hunks:
+                # self.context * 2, because if self.context is 2 the hunks would be
+                # directly adjacent when 4 lines in between and for anything
+                # below 4 they share lines.
+                # not super_hunk == first hunk as any other super_hunk is
+                # created with one hunk
+                if (not super_hunk or
+                        hunk.pre_context <= self.context * 2):
+                    # previous hunk has shared/adjacent self.context lines
+                    super_hunk += [hunk]
+                else:
+                    super_hunk = [hunk]
+                    super_hunks += [super_hunk]
+        else:
+            super_hunks = [[hunk] for hunk in hunks]
+        return [_SuperHunk(sh) for sh in super_hunks]
+
+    def _get_context_range(self, super_hunk):
+        """Dynamically determine context range for a super hunk."""
+        return ((super_hunk.a_rng[0] - min(super_hunk.pre_context, self.context),
+                 super_hunk.a_rng[1] + min(super_hunk.post_context, self.context)),
+                (super_hunk.b_rng[0] - min(super_hunk.pre_context, self.context),
+                 super_hunk.b_rng[1] + min(super_hunk.post_context, self.context)))
+
+    def _generate_diff(self, hunks):
+        """Generate a diff text for the given hunks."""
+        def extend_context(start, end):
+            """Add context lines."""
+            return ''.join('  {0}\n'.format(line.rstrip())
+                           for line in self.a[start:end])
+
+        context_range = self._get_context_range(hunks)
+
+        output = ('\03{aqua}' +
+                  Hunk.get_header_text(*context_range) + '\03{default}\n' +
+                  extend_context(context_range[0][0], hunks[0].a_rng[0]))
+        previous_hunk = None
+        for hunk in hunks:
+            if previous_hunk:
+                output += extend_context(previous_hunk.a_rng[1], hunk.a_rng[0])
+            previous_hunk = hunk
+            output += hunk.diff_text
+        return output + extend_context(hunks[-1].a_rng[1], context_range[0][1])
 
     def review_hunks(self):
         """Review hunks."""
@@ -275,7 +366,7 @@ class PatchManager(object):
 
             hunk = pending.pop(0)
 
-            pywikibot.output(hunk.header + hunk.diff_text)
+            pywikibot.output(self._generate_diff(_SuperHunk([hunk])))
             choice = pywikibot.input_choice(question, answers, default='r',
                                             automatic_quit=False)
 

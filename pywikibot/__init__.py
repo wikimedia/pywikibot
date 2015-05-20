@@ -646,14 +646,14 @@ def setAction(s):
     config.default_edit_summary = s
 
 
-def showDiff(oldtext, newtext):
+def showDiff(oldtext, newtext, context=0):
     """
     Output a string showing the differences between oldtext and newtext.
 
     The differences are highlighted (only on compatible systems) to show which
     changes were made.
     """
-    PatchManager(oldtext, newtext).print_hunks()
+    PatchManager(oldtext, newtext, context=context).print_hunks()
 
 
 # Throttle and thread handling
