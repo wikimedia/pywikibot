@@ -12,7 +12,7 @@ __version__ = '$Id$'
 import os
 import sys
 
-import httplib2
+import requests
 
 import pywikibot
 
@@ -24,13 +24,7 @@ from tests.aspects import unittest, TestCase
 from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
-    from http import cookiejar as cookielib
-    import queue as Queue
-
     unicode = str
-else:
-    import cookielib
-    import Queue
 
 
 class HttpTestCase(TestCase):
@@ -164,23 +158,23 @@ class TestHttpStatus(TestCase):
 
     def test_server_not_found(self):
         """Test server not found exception."""
-        self.assertRaises(httplib2.ServerNotFoundError,
+        self.assertRaises(requests.exceptions.ConnectionError,
                           http.fetch,
                           uri='http://ru-sib.wikipedia.org/w/api.php',
                           default_error_handling=True)
 
     def test_invalid_scheme(self):
         """Test invalid scheme."""
-        # A KeyError is raised within httplib2, in a different thread
-        self.assertRaises(KeyError,
+        # A InvalidSchema is raised within requests
+        self.assertRaises(requests.exceptions.InvalidSchema,
                           http.fetch,
                           uri='invalid://url')
 
     def test_follow_redirects(self):
         """Test follow 301 redirects after an exception works correctly."""
         # It doesnt matter what exception is raised here, provided it
-        # occurs within the httplib2 request method.
-        self.assertRaises(KeyError,
+        # occurs within the requests request method.
+        self.assertRaises(requests.exceptions.InvalidSchema,
                           http.fetch,
                           uri='invalid://url')
 
@@ -188,114 +182,12 @@ class TestHttpStatus(TestCase):
         r = http.fetch(uri='http://en.wikipedia.org/wiki/Main%20Page')
         self.assertEqual(r.status, 200)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page',
-                      r.response_headers['content-location'])
+                      http.session.redirect_cache.get('http://en.wikipedia.org/wiki/Main%20Page'))
 
         r = http.fetch(uri='http://www.gandi.eu')
         self.assertEqual(r.status, 200)
-        self.assertEqual(r.response_headers['content-location'],
+        self.assertEqual(http.session.redirect_cache.get('http://www.gandi.eu/'),
                          'http://www.gandi.net')
-
-    def test_maximum_redirects(self):
-        """Test that maximum redirect exception doesn't hang up."""
-        self.assertRaises(httplib2.RedirectLimit,
-                          http.fetch,
-                          uri='http://httpbin.org/status/300')
-
-
-class ThreadedHttpTestCase(TestCase):
-
-    """Tests for threadedhttp module Http class."""
-
-    sites = {
-        'www-wp': {
-            'hostname': 'www.wikipedia.org',
-        },
-        'wikidata': {
-            'hostname': 'test.wikidata.org',
-        },
-    }
-
-    def test_http(self):
-        """Test threadedhttp.Http.request using http://www.wikipedia.org/."""
-        o = threadedhttp.Http()
-        r = o.request('http://www.wikipedia.org/')
-        self.assertIsInstance(r, tuple)
-        self.assertNotIsInstance(r[0], Exception)
-        self.assertIsInstance(r[0], dict)
-        self.assertIn('status', r[0])
-        self.assertIsInstance(r[0]['status'], str)
-        self.assertEqual(r[0]['status'], '200')
-
-        self.assertIsInstance(r[1], bytes)
-        self.assertIn(b'<html lang="mul"', r[1])
-        self.assertEqual(int(r[0]['content-length']), len(r[1]))
-
-    def test_https(self):
-        """Test threadedhttp.Http.request using https://www.wikipedia.org/."""
-        o = threadedhttp.Http()
-        r = o.request('https://www.wikipedia.org/')
-        self.assertIsInstance(r, tuple)
-        self.assertNotIsInstance(r[0], Exception)
-        self.assertIsInstance(r[0], dict)
-        self.assertIn('status', r[0])
-        self.assertIsInstance(r[0]['status'], str)
-        self.assertEqual(r[0]['status'], '200')
-
-        self.assertIsInstance(r[1], bytes)
-        self.assertIn(b'<html lang="mul"', r[1])
-        self.assertEqual(int(r[0]['content-length']), len(r[1]))
-
-    def test_gzip(self):
-        """Test threadedhttp.Http encodes using gzip."""
-        o = threadedhttp.Http()
-        r = o.request('http://www.wikipedia.org/')
-        self.assertIsInstance(r, tuple)
-        self.assertNotIsInstance(r[0], Exception)
-        self.assertIn('-content-encoding', r[0])
-        self.assertEqual(r[0]['-content-encoding'], 'gzip')
-
-        url = 'https://test.wikidata.org/w/api.php?action=query&meta=siteinfo'
-        r = o.request(url)
-        self.assertIsInstance(r, tuple)
-        self.assertNotIsInstance(r[0], Exception)
-        self.assertIn('-content-encoding', r[0])
-        self.assertEqual(r[0]['-content-encoding'], 'gzip')
-
-
-class ThreadedHttpRequestQueueTestCase(TestCase):
-
-    """Tests for threadedhttp module threaded HttpRequest."""
-
-    sites = {
-        'www-wp': {
-            'hostname': 'www.wikipedia.org',
-        },
-    }
-
-    def test_threading(self):
-        """Test using threadedhttp."""
-        queue = Queue.Queue()
-        cookiejar = cookielib.CookieJar()
-        connection_pool = threadedhttp.ConnectionPool()
-        proc = threadedhttp.HttpProcessor(queue, cookiejar, connection_pool)
-        proc.setDaemon(True)
-        proc.start()
-        r = threadedhttp.HttpRequest('http://www.wikipedia.org/')
-        queue.put(r)
-
-        self.assertNotIsInstance(r.exception, Exception)
-        self.assertIsInstance(r.data, tuple)
-        self.assertIsInstance(r.response_headers, dict)
-        self.assertIn('status', r.response_headers)
-        self.assertIsInstance(r.response_headers['status'], str)
-        self.assertEqual(r.response_headers['status'], '200')
-        self.assertEqual(r.status, 200)
-
-        self.assertIsInstance(r.raw, bytes)
-        self.assertIn(b'<html lang="mul"', r.raw)
-        self.assertEqual(int(r.response_headers['content-length']), len(r.raw))
-
-        queue.put(None)  # Stop the http processor thread
 
 
 class UserAgentTestCase(TestCase):
@@ -354,7 +246,7 @@ class DefaultUserAgentTestCase(TestCase):
 
     def setUp(self):
         self.orig_format = config.user_agent_format
-        config.user_agent_format = '{script_product} ({script_comments}) {pwb} ({revision}) {httplib2} {python}'
+        config.user_agent_format = '{script_product} ({script_comments}) {pwb} ({revision}) {http_backend} {python}'
 
     def tearDown(self):
         config.user_agent_format = self.orig_format
@@ -368,7 +260,7 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertNotIn('()', http.user_agent())
         self.assertNotIn('(;', http.user_agent())
         self.assertNotIn(';)', http.user_agent())
-        self.assertIn('httplib2/', http.user_agent())
+        self.assertIn('requests/', http.user_agent())
         self.assertIn('Python/' + str(sys.version_info[0]), http.user_agent())
 
 
@@ -385,13 +277,19 @@ class CharsetTestCase(TestCase):
     @staticmethod
     def _create_request(charset=None, data=UTF8_BYTES):
         req = threadedhttp.HttpRequest(None, charset=charset)
-        req._data = ({'content-type': 'charset=utf-8'}, data[:])
+        resp = requests.Response()
+        resp.headers = {'content-type': 'charset=utf-8'}
+        resp._content = data[:]
+        req._data = resp
         return req
 
     def test_no_charset(self):
         """Test decoding without explicit charset."""
         req = threadedhttp.HttpRequest(None)
-        req._data = ({'content-type': ''}, CharsetTestCase.LATIN1_BYTES[:])
+        resp = requests.Response()
+        resp.headers = {'content-type': ''}
+        resp._content = CharsetTestCase.LATIN1_BYTES[:]
+        req._data = resp
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
@@ -442,10 +340,11 @@ class CharsetTestCase(TestCase):
 
 class BinaryTestCase(TestCase):
 
-    """Get binary file using httplib2 and pywikibot."""
+    """Get binary file using requests and pywikibot."""
 
     net = True
 
+    hostname = 'upload.wikimedia.org'
     url = 'https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'
 
     @classmethod
@@ -455,22 +354,15 @@ class BinaryTestCase(TestCase):
         with open(os.path.join(_images_dir, 'MP_sounds.png'), 'rb') as f:
             cls.png = f.read()
 
-    def test_httplib2(self):
-        """Test with httplib2, underlying package."""
-        h = httplib2.Http()
-        r = h.request(uri=self.url)
+    def test_requests(self):
+        """Test with requests, underlying package."""
+        s = requests.Session()
+        r = s.get(self.url)
 
-        self.assertEqual(r[0]['content-type'], 'image/png')
-        self.assertEqual(r[1], self.png)
+        self.assertEqual(r.headers['content-type'], 'image/png')
+        self.assertEqual(r.content, self.png)
 
-        next(iter(h.connections.values())).close()
-
-    def test_threadedhttp(self):
-        """Test with threadedhttp, internal layer on top of httplib2."""
-        r = threadedhttp.Http().request(uri=self.url)
-
-        self.assertEqual(r[0]['content-type'], 'image/png')
-        self.assertEqual(r[1], self.png)
+        s.close()
 
     def test_http(self):
         """Test with http, standard http interface for pywikibot."""

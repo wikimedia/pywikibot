@@ -46,6 +46,7 @@ import collections
 import os
 import stat
 import sys
+import re
 
 from warnings import warn
 
@@ -118,7 +119,7 @@ disambiguation_comment = collections.defaultdict(dict)
 # User agent format.
 # For the meaning and more help in customization see:
 # https://www.mediawiki.org/wiki/Manual:Pywikibot/User-agent
-user_agent_format = '{script_product} ({script_comments}) {pwb} ({revision}) {httplib2} {python}'
+user_agent_format = '{script_product} ({script_comments}) {pwb} ({revision}) {http_backend} {python}'
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
@@ -765,11 +766,7 @@ replicate_replace = {}
 
 # Proxy configuration
 
-# For proxy support, install socksipy or httplib2 0.7+
-# then add these three lines to your user-config.py:
-# from httplib2 import ProxyInfo, socks
-# proxy = ProxyInfo(socks.PROXY_TYPE_HTTP, 'localhost', 8000)
-# del ProxyInfo, socks
+# TODO: proxy support
 proxy = None
 
 # Simulate settings
@@ -927,6 +924,16 @@ for _key, _val in list(_uc.items()):
 _modified = [_key for _key in _gl
              if _uc[_key] != globals()[_key] or
              _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
+
+if ('user_agent_format' in _modified):
+    _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
+                                      _uc['user_agent_format'])
+    if _right_user_agent_format != _uc['user_agent_format']:
+        warn('`{httplib2}` in user_agent_format is deprecated, '
+             'will replace `{httplib2}` with `{http_backend}`',
+             _ConfigurationDeprecationWarning)
+        _uc['user_agent_format'] = _right_user_agent_format
+    del _right_user_agent_format
 
 for _key in _modified:
     globals()[_key] = _uc[_key]

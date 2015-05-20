@@ -48,28 +48,9 @@ and follow the instructions and hints.
 so that these dependencies will be loaded automatically when the package is
 installed, and users won't need to worry about this...]
 
-To run pywikibot, you will need the httplib2 package:
-* https://github.com/jcgregorio/httplib2
+To run pywikibot, you will need the requests package:
 
 It may be installed using pip or easy_install.
-
-The minimum requirement is httplib2 0.6.0.
-However setup.py requires httplib2 0.9.0, as that version includes current
-root certificates needed to access Wikimedia servers using HTTPS.
-
-If your operating systems provides a packaged httplib2, it may be
-altered to load the root certificates from the host operating system.
-To check, execute:
-$ python -c 'import httplib2; print httplib2.CA_CERTS'
-
-httplib2 0.8.0 added the ability to define CA_CERTS with a plugin module.
-If you need to use 0.8.0, install module httplib2.ca_certs_locater with pip,
-and contribute fixes as necessary.
-https://pypi.python.org/pypi/httplib2.ca_certs_locater
-https://github.com/dreamhost/httplib2-ca_certs_locater
-
-If you use the pwb.py script, it will attempt to load httplib2 from the
-externals directory, which is a git submodule containing httplib2 0.9.0.
 
 == Page objects ==
 

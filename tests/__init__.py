@@ -13,16 +13,16 @@ import os
 import sys
 import warnings
 
-__all__ = ('httplib2', '_cache_dir', 'TestRequest',
+__all__ = ('requests', '_cache_dir', 'TestRequest',
            'patch_request', 'unpatch_request')
 
 # Verify that the unit tests have a base working environment:
-# - httplib2 is mandatory
+# - requests is mandatory
 # - future is needed as a fallback for python 2.6,
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 try:
-    import httplib2  # noqa
+    import requests  # noqa
 except ImportError as e:
     print("ImportError: %s" % e)
     sys.exit(1)

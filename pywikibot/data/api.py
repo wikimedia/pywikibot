@@ -1547,7 +1547,7 @@ class Request(MutableMapping):
                         use_get = False
                     if use_get:
                         uri = '{0}?{1}'.format(uri, paramstring)
-                        body = None  # default in httplib2
+                        body = None
                     else:
                         body = paramstring
 

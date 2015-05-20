@@ -385,5 +385,9 @@ def execute_pwb(args, data_in=None, timeout=0, error=None):
     @param args: list of arguments for pwb.py
     @type args: list of unicode
     """
-    return execute(command=[sys.executable, _pwb_py] + args,
-                   data_in=data_in, timeout=timeout, error=error)
+    if sys.version_info < (2, 7, 9):
+        return execute(command=[sys.executable, '-W ignore:A true', _pwb_py] + args,
+                       data_in=data_in, timeout=timeout, error=error)
+    else:
+        return execute(command=[sys.executable, _pwb_py] + args,
+                       data_in=data_in, timeout=timeout, error=error)
