@@ -11,6 +11,7 @@ __version__ = '$Id$'
 
 
 import difflib
+import math
 import sys
 
 from collections import Sequence
@@ -198,6 +199,19 @@ class _SuperHunk(Sequence):
     def __len__(self):
         return len(self._hunks)
 
+    def split(self):
+        return [_SuperHunk([hunk]) for hunk in self._hunks]
+
+    @property
+    def reviewed(self):
+        assert(len(set(hunk.reviewed for hunk in self._hunks)) == 1)
+        return self._hunks[0].reviewed
+
+    @reviewed.setter
+    def reviewed(self, reviewed):
+        for hunk in self._hunks:
+            hunk.reviewed = reviewed
+
 
 class PatchManager(object):
 
@@ -342,53 +356,141 @@ class PatchManager(object):
 
     def review_hunks(self):
         """Review hunks."""
-        help_msg = ['y -> accept this hunk',
-                    'n -> do not accept this hunk',
-                    's -> do not accept this hunk and stop reviewing',
-                    'a -> accept this hunk and all other pending',
-                    'r -> review later',
-                    'h -> help',
-                    ]
+        def find_pending(start, end):
+            step = -1 if start > end else +1
+            for pending in range(start, end, step):
+                if super_hunks[pending].reviewed == Hunk.PENDING:
+                    return pending
 
-        question = 'Accept this hunk?'
-        answers = [('yes', 'y'), ('no', 'n'), ('stop', 's'), ('all', 'a'),
-                   ('review', 'r'), ('help', 'h')]
-        actions = {'y': Hunk.APPR,
-                   'n': Hunk.NOT_APPR,
-                   's': Hunk.NOT_APPR,
-                   'a': Hunk.APPR,
-                   'r': Hunk.PENDING,
-                   }
+        # TODO: Missing commands (compared to git --patch): edit and search
+        help_msg = {'y': 'accept this hunk',
+                    'n': 'do not accept this hunk',
+                    'q': 'do not accept this hunk and quit reviewing',
+                    'a': 'accept this hunk and all other pending',
+                    'd': 'do not apply this hunk or any of the later hunks in the file',
+                    'g': 'select a hunk to go to',
+                    'j': 'leave this hunk undecided, see next undecided hunk',
+                    'J': 'leave this hunk undecided, see next hunk',
+                    'k': 'leave this hunk undecided, see previous undecided hunk',
+                    'K': 'leave this hunk undecided, see previous hunk',
+                    's': 'split this hunk into smaller ones',
+                    '?': 'help',
+                    }
 
-        pending = [h for h in self.hunks if h.reviewed == h.PENDING]
+        super_hunks = self._generate_super_hunks(
+            h for h in self.hunks if h.reviewed == Hunk.PENDING)
+        position = 0
 
-        while pending:
+        while any(any(hunk.reviewed == Hunk.PENDING for hunk in super_hunk)
+                  for super_hunk in super_hunks):
 
-            hunk = pending.pop(0)
+            super_hunk = super_hunks[position]
 
-            pywikibot.output(self._generate_diff(_SuperHunk([hunk])))
-            choice = pywikibot.input_choice(question, answers, default='r',
-                                            automatic_quit=False)
+            next_pending = find_pending(position + 1, len(super_hunks))
+            prev_pending = find_pending(position - 1, -1)
 
-            if choice in actions.keys():
-                hunk.reviewed = actions[choice]
-            if choice == 's':
-                while pending:
-                    hunk = pending.pop(0)
-                    hunk.reviewed = hunk.NOT_APPR
-                break
-            elif choice == 'a':
-                while pending:
-                    hunk = pending.pop(0)
-                    hunk.reviewed = hunk.APPR
-                break
-            elif choice == 'h':
-                pywikibot.output(u'\03{purple}%s\03{default}' % u'\n'.join(help_msg))
-                pending.insert(0, hunk)
-            elif choice == 'r':
-                pending.append(hunk)
+            answers = ['y', 'n', 'q', 'a', 'd', 'g']
+            if next_pending is not None:
+                answers += ['j']
+            if position < len(super_hunks) - 1:
+                answers += ['J']
+            if prev_pending is not None:
+                answers += ['k']
+            if position > 0:
+                answers += ['K']
+            if len(super_hunk) > 1:
+                answers += ['s']
+            answers += ['?']
 
-        return
+            pywikibot.output(self._generate_diff(super_hunk))
+            choice = pywikibot.input('Accept this hunk [{0}]?'.format(
+                ','.join(answers)))
+            if choice not in answers:
+                choice = '?'
+
+            if choice == 'y' or choice == 'n':
+                super_hunk.reviewed = Hunk.APPR if choice == 'y' else Hunk.NOT_APPR
+                if next_pending is not None:
+                    position = next_pending
+                else:
+                    position = find_pending(0, position)
+            elif choice == 'q':
+                for super_hunk in super_hunks:
+                    for hunk in super_hunk:
+                        if hunk.reviewed == Hunk.PENDING:
+                            hunk.reviewed = Hunk.NOT_APPR
+            elif choice == 'a' or choice == 'd':
+                for super_hunk in super_hunks[position:]:
+                    for hunk in super_hunk:
+                        if hunk.reviewed == Hunk.PENDING:
+                            hunk.reviewed = Hunk.APPR if choice == 'a' else Hunk.NOT_APPR
+                position = find_pending(0, position)
+            elif choice == 'g':
+                hunk_list = []
+                rng_width = 18
+                for index, super_hunk in enumerate(super_hunks, start=1):
+                    if super_hunk.reviewed == Hunk.PENDING:
+                        status = ' '
+                    elif super_hunk.reviewed == Hunk.APPR:
+                        status = '+'
+                    elif super_hunk.reviewed == Hunk.NOT_APPR:
+                        status = '-'
+                    else:
+                        assert(False)
+                    if super_hunk[0].a_rng[1] - super_hunk[0].a_rng[0] > 0:
+                        mode = '-'
+                        first = self.a[super_hunk[0].a_rng[0]]
+                    else:
+                        mode = '+'
+                        first = self.b[super_hunk[0].b_rng[0]]
+                    hunk_list += [(status, index,
+                                   Hunk.get_header_text(
+                                   *self._get_context_range(super_hunk), affix=''),
+                                   mode, first)]
+                    rng_width = max(len(hunk_list[-1][2]), rng_width)
+                line_template = ('{0}{1} {2: >' +
+                                 str(int(math.log10(len(super_hunks)) + 1)) +
+                                 '}: {3: <' + str(rng_width) + '} {4}{5}')
+                # the last entry is the first changed line which usually ends
+                # with a \n (only the last may not, which is covered by the
+                # if-condition following this block)
+                hunk_list = ''.join(
+                    line_template.format(
+                        '*' if hunk_entry[1] == position + 1 else ' ', *hunk_entry)
+                    for hunk_entry in hunk_list)
+                if hunk_list.endswith('\n'):
+                    hunk_list = hunk_list[:-1]
+                pywikibot.output(hunk_list)
+                next_hunk = pywikibot.input('Go to which hunk?')
+                try:
+                    next_hunk_position = int(next_hunk) - 1
+                except ValueError:
+                    next_hunk_position = False
+                if (next_hunk_position is not False and
+                        0 <= next_hunk_position < len(super_hunks)):
+                    position = next_hunk_position
+                elif next_hunk:  # nothing entered is silently ignored
+                    pywikibot.error('Invalid hunk number "{0}"'.format(next_hunk))
+            elif choice == 'j':
+                position = next_pending
+            elif choice == 'J':
+                position += 1
+            elif choice == 'k':
+                position = prev_pending
+            elif choice == 'K':
+                position -= 1
+            elif choice == 's':
+                super_hunks = (super_hunks[:position] +
+                               super_hunks[position].split() +
+                               super_hunks[position + 1:])
+                pywikibot.output('Split into {0} hunks'.format(len(super_hunk._hunks)))
+            elif choice == '?':
+                pywikibot.output(
+                    '\03{purple}%s\03{default}' % '\n'.join(
+                        '{0} -> {1}'.format(answer, help_msg[answer])
+                        for answer in answers))
+            else:
+                assert(False)
 
     def apply(self):
         """Apply changes. If there are undecided changes, ask to review."""
