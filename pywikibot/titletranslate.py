@@ -98,6 +98,8 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                     u'TitleTranslate: %s was recognized as %s with value %d'
                     % (page.title(), dictName, value))
                 for entryLang, entry in date.formats[dictName].items():
+                    if entryLang not in site.languages():
+                        continue
                     if entryLang != sitelang:
                         if (dictName == 'yearsBC' and
                                 entryLang in date.maxyearBC and
