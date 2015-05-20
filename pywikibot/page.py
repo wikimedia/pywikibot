@@ -64,9 +64,6 @@ from pywikibot import textlib
 
 logger = logging.getLogger("pywiki.wiki.page")
 
-# Pre-compile re expressions
-reNamespace = re.compile("^(.+?) *: *(.*)$")
-
 
 # Note: Link objects (defined later on) represent a wiki-page's title, while
 # Page objects (defined here) represent the page itself, including its contents.
