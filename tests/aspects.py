@@ -931,6 +931,19 @@ if sys.version_info[0] > 2:
     TestCase = six.add_metaclass(MetaTestCaseClass)(TestCase)
 
 
+class SiteAttributeTestCase(TestCase):
+
+    """Add the sites as attributes to the instances."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Add each initialized site as an attribute to cls."""
+        super(SiteAttributeTestCase, cls).setUpClass()
+        for site in cls.sites:
+            if 'site' in cls.sites[site]:
+                setattr(cls, site, cls.sites[site]['site'])
+
+
 class DefaultSiteTestCase(TestCase):
 
     """Run tests against the config specified site."""

@@ -24,10 +24,12 @@ from pywikibot.family import Family
 
 from tests import _images_dir
 from tests.utils import DummySiteinfo
-from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
+from tests.aspects import (
+    unittest, TestCase, DefaultDrySiteTestCase, SiteAttributeTestCase,
+)
 
 
-class DryCachedRequestTests(TestCase):
+class DryCachedRequestTests(SiteAttributeTestCase):
 
     """Test CachedRequest using real site objects."""
 
@@ -46,8 +48,6 @@ class DryCachedRequestTests(TestCase):
 
     def setUp(self):
         super(DryCachedRequestTests, self).setUp()
-        self.basesite = self.get_site('basesite')
-        self.altsite = self.get_site('altsite')
         self.parms = {'site': self.basesite,
                       'action': 'query',
                       'meta': 'userinfo'}

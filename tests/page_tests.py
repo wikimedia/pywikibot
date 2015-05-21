@@ -15,7 +15,9 @@ from pywikibot import config
 from pywikibot import InvalidTitle
 import pywikibot.page
 
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase
+from tests.aspects import (
+    unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
+)
 from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
@@ -23,7 +25,7 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
-class TestLinkObject(TestCase):
+class TestLinkObject(SiteAttributeTestCase):
 
     """Test cases for Link objects."""
 
@@ -51,15 +53,6 @@ class TestLinkObject(TestCase):
     }
 
     cached = True
-
-    @classmethod
-    def setUpClass(cls):
-        super(TestLinkObject, cls).setUpClass()
-        cls.enwiki = cls.get_site('enwiki')
-        cls.frwiki = cls.get_site('frwiki')
-        cls.itwikt = cls.get_site('itwikt')
-        cls.enws = cls.get_site('enws')
-        cls.itws = cls.get_site('itws')
 
     namespaces = {0: [u""],        # en.wikipedia.org namespaces for testing
                   1: [u"Talk:"],   # canonical form first, then others
