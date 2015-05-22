@@ -134,8 +134,7 @@ class GraphDrawer:
 
     def getLabel(self, page):
         """Get label for page."""
-        return (u'"%s:%s"' % (page.site.language(),
-                              page.title())).encode('utf-8')
+        return '"%s:%s"' % (page.site.language(), page.title())
 
     def addNode(self, page):
         """Add a node for page."""

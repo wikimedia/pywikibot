@@ -20,7 +20,7 @@ irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
 extra_deps = {
     # Core library dependencies
     'isbn': ['python-stdnum'],
-    'Graphviz':  ['pydot'],
+    'Graphviz':  ['pydot>=1.0.28'],
     'MySQL': ['oursql'],
     'Yahoo': ['pYsearch'],
     'Google': ['google'],
@@ -63,6 +63,7 @@ dependency_links = [
     'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
     'hg+https://bitbucket.org/TJG/pywin32#egg=pywin32',
     'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
+    'git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29',
 ]
 
 if sys.version_info[0] == 2:
