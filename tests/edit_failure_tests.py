@@ -39,7 +39,7 @@ class TestSaveFailure(TestCase):
 
     def test_protected(self):
         """Test that protected titles raise the appropriate exception."""
-        if self.site._username[1]:
+        if self.site.has_group('sysop'):
             raise unittest.SkipTest('Testing failure of edit protected with a sysop account')
         page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
         self.assertRaises(LockedPage, page.save)
