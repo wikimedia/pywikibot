@@ -68,7 +68,7 @@ class ProofreadPage(pywikibot.Page):
     p_open = re.compile(r'<noinclude>')
     p_close = re.compile(r'(</div>|\n\n\n)?</noinclude>')
 
-    def __init__(self, source, title=u''):
+    def __init__(self, source, title=''):
         """Instantiate a ProofreadPage object.
 
         Raises UnknownExtension if source Site has no ProofreadPage Extension.
@@ -81,7 +81,7 @@ class ProofreadPage(pywikibot.Page):
         super(ProofreadPage, self).__init__(source, title, ns=ns)
         if self.namespace() != site.proofread_page_ns:
             raise ValueError('Page %s must belong to %s namespace'
-                              % (self.title(), ns))
+                             % (self.title(), ns))
 
     def decompose(fn):
         """Decorator.
@@ -133,7 +133,7 @@ class ProofreadPage(pywikibot.Page):
             return self.site.proofread_levels[self.ql]
         except KeyError:
             pywikibot.warning('Not valid status set for %s: quality level = %s'
-                               % (self.title(asLink=True), self.ql))
+                              % (self.title(asLink=True), self.ql))
             return None
 
     def without_text(self):
@@ -252,7 +252,7 @@ class ProofreadPage(pywikibot.Page):
         len_oq = len(open_queue)
         len_cq = len(close_queue)
         if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
-            raise pywikibot.Error(u'ProofreadPage %s: invalid format'
+            raise pywikibot.Error('ProofreadPage %s: invalid format'
                                   % self.title(asLink=True))
 
         f_open, f_close = open_queue[0], close_queue[0]
@@ -265,9 +265,9 @@ class ProofreadPage(pywikibot.Page):
 
     def _compose_page(self):
         """Compose Proofread Page text from header, body and footer."""
-        fmt = (u'{0.open_tag}{0._full_header}{0.close_tag}'
-               u'{0._body}'
-               u'{0.open_tag}{0._footer}</div>{0.close_tag}')
+        fmt = ('{0.open_tag}{0._full_header}{0.close_tag}'
+               '{0._body}'
+               '{0.open_tag}{0._footer}</div>{0.close_tag}')
         self.text = fmt.format(self)
         return self.text
 
