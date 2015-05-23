@@ -531,6 +531,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
         self.site.loadpageinfo(self, preload=True)
         return self._preloadedtext
 
+    def _get_parsed_page(self):
+        """Retrieve parsed text (via action=parse) and cache it."""
+        # Get (cached) parsed text.
+        if not hasattr(self, '_parsed_text'):
+            self._parsed_text = self.site.get_parsed_page(self)
+        return self._parsed_text
+
     def properties(self, force=False):
         """
         Return the properties of the page.
