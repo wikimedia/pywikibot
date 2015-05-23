@@ -29,7 +29,11 @@ __version__ = '$Id$'
 import sys
 import re
 import locale
-import warnings
+import json
+import os
+import pkgutil
+
+from collections import defaultdict
 
 from pywikibot import Error
 from .plural import plural_rules
@@ -43,10 +47,16 @@ if sys.version_info[0] > 2:
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
-# Package name for the translation messages
+# Package name for the translation messages.  The messages data must loaded
+# relative to that package name.  In the top of this package should be
+# directories named after for each script/message bundle, and each directory
+# should contain JSON files called <lang>.json
 _messages_package_name = 'scripts.i18n'
 # Flag to indicate whether translation messages are available
 _messages_available = None
+
+# Cache of translated messages
+_cache = defaultdict(dict)
 
 
 def set_messages_package(package_name):
@@ -70,20 +80,9 @@ def messages_available():
     global _messages_available
     if _messages_available is not None:
         return _messages_available
-    with warnings.catch_warnings():
-        # Ignore 'missing __init__.py' as import looks at the JSON
-        # directories before loading the python file.
-        try:
-            warnings.simplefilter("ignore", ImportWarning)
-            # it's explicitly using str() to bypass unicode_literals in Python 2
-            module = __import__(_messages_package_name, fromlist=[str('pywikibot')])
-        except ImportError:
-            _messages_available = False
-            return False
-
     try:
-        getattr(module, 'pywikibot').msg
-    except AttributeError:
+        __import__(_messages_package_name)
+    except ImportError:
         _messages_available = False
         return False
 
@@ -301,29 +300,29 @@ class TranslationError(Error, ImportError):
     pass
 
 
-def _get_messages_bundle(name):
-    """Load all translation messages for a bundle name."""
-    exception_message = 'Unknown problem'
-    transdict = {}
+def _get_translation(lang, twtitle):
+    """
+    Return message of certain twtitle if exists.
 
-    with warnings.catch_warnings():
-        # Ignore 'missing __init__.py' as import looks at the JSON
-        # directories before loading the python file.
-        warnings.simplefilter("ignore", ImportWarning)
-        try:
-            # it's explicitly using str() to bypass unicode_literals in Python 2
-            transdict = getattr(__import__(_messages_package_name,
-                                           fromlist=[str(name)]),
-                                name).msg
-        except ImportError as e:
-            exception_message = str(e)
-
-    if not transdict:
-        raise TranslationError(
-            'Could not load bundle %s from message package %s: %s'
-            % (name, _messages_package_name, exception_message))
-
-    return transdict
+    For internal use, don't use it directly.
+    """
+    if twtitle in _cache[lang]:
+        return _cache[lang][twtitle]
+    message_bundle = twtitle.split('-')[0]
+    trans_text = None
+    filename = '%s/%s.json' % (message_bundle, lang)
+    try:
+        trans_text = pkgutil.get_data(
+            _messages_package_name, filename).decode('utf-8')
+    except (OSError, IOError):  # file open can cause several exceptions
+        _cache[lang][twtitle] = None
+        return
+    transdict = json.loads(trans_text)
+    _cache[lang].update(transdict)
+    try:
+        return transdict[twtitle]
+    except KeyError:
+        return
 
 
 def _extract_plural(code, message, parameters):
@@ -454,8 +453,7 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     """
     Translate a message.
 
-    The translations are retrieved from i18n.<package>, based on the callers
-    import table.
+    The translations are retrieved from json files in messages_package_name.
 
     fallback parameter must be True for i18n and False for L10N or testing
     purposes.
@@ -469,10 +467,10 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     if not messages_available():
         raise TranslationError(
             'Unable to load messages package %s for bundle %s'
+            '\nIt can happen due to lack of i18n submodule or files. '
+            'Read https://mediawiki.org/wiki/PWB/i18n'
             % (_messages_package_name, twtitle))
 
-    package = twtitle.split("-")[0]
-    transdict = _get_messages_bundle(package)
     code_needed = False
     # If a site is given instead of a code, use its language
     if hasattr(code, 'lang'):
@@ -487,25 +485,18 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
     # modes are caught with the KeyError.
-
-    trans = None
-    try:
-        trans = transdict[lang][twtitle]
-    except KeyError:
-        # try alternative languages and English
-        if fallback:
-            for alt in _altlang(lang) + ['en']:
-                try:
-                    trans = transdict[alt][twtitle]
-                    if code_needed:
-                        lang = alt
-                    break
-                except KeyError:
-                    continue
-            if trans is None:
-                raise TranslationError(
-                    "No English translation has been defined "
-                    "for TranslateWiki key %r" % twtitle)
+    langs = [lang]
+    if fallback:
+        langs += _altlang(lang) + ['en']
+    for alt in langs:
+        trans = _get_translation(alt, twtitle)
+        if trans:
+            break
+    else:
+        raise TranslationError(
+            'No English translation has been defined for TranslateWiki key'
+            ' %r\nIt can happen due to lack of i18n submodule or files. '
+            'Read https://mediawiki.org/wiki/PWB/i18n' % twtitle)
     # send the language code back via the given list
     if code_needed:
         code.append(lang)
@@ -527,23 +518,16 @@ def twntranslate(code, twtitle, parameters=None):
     it takes that variant calculated by the plural_rules depending on the number
     value. Multiple plurals are allowed.
 
-    As an examples, if we had a test dictionary in test.py like::
-
-        msg = {
-            'en': {
-                # number value as format string is allowed
-                'test-plural': u'Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.',
-            },
-            'nl': {
-                # format string inside PLURAL tag is allowed
-                'test-plural': u'Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina\'s}} aan.',
-            },
-            'fr': {
-                # additional string inside or outside PLURAL tag is allowed
-                'test-plural': u'Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.',
-            },
-        }
-
+    As an examples, if we had several json dictionaries in test folder like:
+       en.json:
+       {
+          "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
+       }
+       fr.json
+       {
+          "test-plural": "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
+       }
+       and so on.
     >>> from pywikibot import i18n
     >>> i18n.set_messages_package('tests.i18n')
     >>> # use a number
@@ -602,17 +586,13 @@ def twhas_key(code, twtitle):
     @param code: The language code
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
-    package = twtitle.split("-")[0]
-    transdict = _get_messages_bundle(package)
-    if not transdict:
-        pywikibot.warning('twhas_key: Could not load message bundle %s.%s'
-                          % (_messages_package_name, package))
-        return False
-
     # If a site is given instead of a code, use its language
     if hasattr(code, 'lang'):
         code = code.lang
-    return code in transdict and twtitle in transdict[code]
+    transdict = _get_translation(code, twtitle)
+    if transdict is None:
+        return False
+    return True
 
 
 def twget_keys(twtitle):
@@ -621,9 +601,21 @@ def twget_keys(twtitle):
 
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
+    # obtain the directory containing all the json files for this package
     package = twtitle.split("-")[0]
-    transdict = _get_messages_bundle(package)
-    return (lang for lang in sorted(transdict.keys()) if lang != 'qqq')
+    mod = __import__(_messages_package_name, fromlist=[str('__file__')])
+    pathname = os.path.join(os.path.dirname(mod.__file__), package)
+
+    # build a list of languages in that directory
+    langs = [filename.partition('.')[0]
+             for filename in sorted(os.listdir(pathname))
+             if filename.endswith('.json')]
+
+    # exclude languages does not have this specific message in that package
+    # i.e. an incomplete set of translated messages.
+    return [lang for lang in langs
+            if lang != 'qqq' and
+            _get_translation(lang, twtitle)]
 
 
 def input(twtitle, parameters=None, password=False, fallback_prompt=None):

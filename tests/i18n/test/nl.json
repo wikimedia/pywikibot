@@ -1,0 +1,5 @@
+{
+    "test-localized": "test-localized NL",
+    "test-plural": "Bot: Pas {{PLURAL:num|1 pagina|%(num)d pagina's}} aan.",
+    "test-semi-localized": "test-semi-localized NL"
+}

@@ -1,0 +1,6 @@
+{
+    "test-localized": "test-localized EN",
+    "test-non-localized": "test-non-localized EN",
+    "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
+    "test-semi-localized": "test-semi-localized EN"
+}
