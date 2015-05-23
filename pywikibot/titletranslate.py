@@ -50,13 +50,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                 # we're currently working on ...
                 if page is None:
                     continue
-                ns = page.namespace()
-                if ns:
-                    newname = u'%s:%s' % (site.namespace(ns),
-                                          page.title(withNamespace=False))
-                else:
-                    # article in the main namespace
-                    newname = page.title()
+                newname = page.title(withNamespace=False)
                 # ... unless we do want brackets
                 if removebrackets:
                     newname = re.sub(re.compile(r"\W*?\(.*?\)\W*?",
@@ -72,9 +66,12 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                 else:
                     codes = codes.split(',')
             for newcode in codes:
+
                 if newcode in site.languages():
                     if newcode != site.code:
-                        x = pywikibot.Link(newname, site.getSite(code=newcode))
+                        x = pywikibot.Link(newname,
+                                           site.getSite(code=newcode),
+                                           defaultNamespace=page.namespace())
                         result.add(x)
                 else:
                     if config.verbose_output:
