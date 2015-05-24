@@ -65,8 +65,8 @@ class GraphDrawer:
         self.subject = subject
 
     def getLabel(self, page):
-        return (u'"\"%s:%s\""' % (page.site.language(),
-                                  page.title())).encode('utf-8')
+        return (u'"%s:%s"' % (page.site().language(),
+                              page.title())).encode('utf-8')
 
     def addNode(self, page):
         node = pydot.Node(self.getLabel(page), shape='rectangle')
