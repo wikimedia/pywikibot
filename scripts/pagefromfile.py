@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""
+r"""
 Bot to upload pages from a file.
 
 This bot takes its input from a file that contains a number of
@@ -46,6 +46,11 @@ If the page to be uploaded already exists:
 -appendtop      add the text to the top of it
 -appendbottom   add the text to the bottom of it
 -force          overwrite the existing page
+
+It's possible to define a separator after the 'append' modes which is added
+between the exisiting and new text. For example -appendtop:foo would add 'foo'
+between the parts. The \n (two separate characters) is replaced by the newline
+character.
 """
 #
 # (C) Andre Engels, 2004
@@ -138,16 +143,19 @@ class PageFromFileRobot(Bot):
                     nocontent.lower() in pagecontents):
                 pywikibot.output('Page has %s so it is skipped' % nocontent)
                 return
-            if self.getOption('append') == 'top':
-                pywikibot.output(u"Page %s already exists, appending on top!"
-                                 % title)
-                contents = contents + pagecontents
-                comment = comment_top
-            elif self.getOption('append') == 'bottom':
-                pywikibot.output(u"Page %s already exists, appending on bottom!"
-                                 % title)
-                contents = pagecontents + contents
-                comment = comment_bottom
+            if self.getOption('append'):
+                separator = self.getOption('append')[1]
+                if separator == r'\n':
+                    separator = '\n'
+                if self.getOption('append')[0] == 'top':
+                    above, below = contents, pagecontents
+                    comment = comment_top
+                else:
+                    above, below = pagecontents, contents
+                    comment = comment_bottom
+                pywikibot.output('Page {0} already exists, appending on {1}!'.format(
+                                 title, self.getOption('append')[0]))
+                contents = above + separator + below
             elif self.getOption('force'):
                 pywikibot.output(u"Page %s already exists, ***overwriting!"
                                  % title)
@@ -278,8 +286,10 @@ def main(*args):
             filename = arg[6:]
         elif arg == "-include":
             include = True
-        elif arg.startswith('-append') and arg[7:] in ('top', 'bottom'):
-            options['append'] = arg[7:]
+        elif arg.startswith('-appendbottom'):
+            options['append'] = ('bottom', arg[len('-appendbottom:'):])
+        elif arg.startswith('-appendtop'):
+            options['append'] = ('top', arg[len('-appendtop:'):])
         elif arg == "-force":
             options['force'] = True
         elif arg == "-safe":
