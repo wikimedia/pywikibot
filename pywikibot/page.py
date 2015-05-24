@@ -1440,9 +1440,43 @@ class BasePage(UnicodeMixin, ComparableMixin):
         If this page is not a redirect page, will raise an IsNotRedirectPage
         exception. This method also can raise a NoPage exception.
 
-        @return: Page
+        @rtype: pywikibot.Page
         """
         return self.site.getredirtarget(self)
+
+    @deprecated('moved_target()')
+    def getMovedTarget(self):
+        """Return a Page object for the target this Page was moved to.
+
+        DEPRECATED: Use Page.moved_target().
+
+        If this page was not moved, it will raise a NoPage exception.
+        This method also works if the source was already deleted.
+
+        @rtype: pywikibot.Page
+        @raises NoPage: this page was not moved
+        """
+        try:
+            return self.moved_target()
+        except pywikibot.NoMoveTarget:
+            raise pywikibot.NoPage(self)
+
+    def moved_target(self):
+        """Return a Page object for the target this Page was moved to.
+
+        If this page was not moved, it will raise a PageNotFound exception.
+        This method also works if the source was already deleted.
+
+        @rtype: pywikibot.Page
+        @raises NoMoveTarget: this page was not moved
+        """
+        gen = iter(self.site.logevents(logtype='move', page=self, total=1))
+        try:
+            lastmove = next(gen)
+        except StopIteration:
+            raise pywikibot.NoMoveTarget(self)
+        else:
+            return lastmove.target_page
 
     @deprecated_args(getText='content', reverseOrder='reverse')
     def revisions(self, reverse=False, step=None, total=None, content=False,

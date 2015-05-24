@@ -27,6 +27,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - InterwikiRedirectPage: Page is a redirect to another site
   - SectionError: The section specified by # does not exist
   - NotEmailableError: The target user has disabled email
+  - NoMoveTarget: An expected move target page does not exist
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 (alias: PageNotSaved).
@@ -206,6 +207,15 @@ class NoPage(PageRelatedError):  # noqa
     """Page does not exist"""
 
     message = u"Page %s doesn't exist."
+
+    pass
+
+
+class NoMoveTarget(PageRelatedError):
+
+    """Expected move target page not found."""
+
+    message = "Move target page of %s not found."
 
     pass
 

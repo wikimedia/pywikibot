@@ -38,7 +38,7 @@ from pywikibot.bot import (
     handleArgs,
 )
 from pywikibot.exceptions import (
-    Error, InvalidTitle, BadTitle, NoPage, SectionError,
+    Error, InvalidTitle, BadTitle, NoPage, NoMoveTarget, SectionError,
     SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
     UnknownExtension,
     NoUsername, UserBlocked,
@@ -76,7 +76,8 @@ __all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
            'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
            'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
            'calledModuleName', 'Bot', 'CurrentPageBot', 'WikidataBot',
-           'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'SectionError',
+           'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'NoMoveTarget',
+           'SectionError',
            'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
            'UnknownExtension',
            'NoUsername', 'UserBlocked', 'UserActionRefuse',

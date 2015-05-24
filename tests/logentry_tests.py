@@ -39,15 +39,18 @@ class TestLogentriesBase(TestCase):
     sites = {
         'tewp': {
             'family': 'wikipedia',
-            'code': 'test'
+            'code': 'test',
+            'target': 'Main Page on wheels',
         },
         'dewp': {
             'family': 'wikipedia',
-            'code': 'de'
+            'code': 'de',
+            'target': 'Hauptseite',
         },
         'old': {
             'family': 'lyricwiki',
-            'code': 'en'
+            'code': 'en',
+            'target': None,
         }
     }
 
@@ -184,6 +187,30 @@ class TestLogentryParams(TestLogentriesBase):
         self.assertIsInstance(logentry.previous_id, int)
         self.assertIsInstance(logentry.auto, bool)
 
+    def test_moved_target(self, key):
+        """Test moved_target method."""
+        # main page was moved around
+        mainpage = self.get_mainpage(self.site)
+        if self.sites[key]['target'] is not None:
+            target = mainpage.moved_target()
+            self.assertIsInstance(target, pywikibot.Page)
+            self.assertEqual(target.title(),
+                             self.sites[key]['target'])
+            # main page was moved back again, we test it.
+            self.assertEqual(mainpage, target.moved_target())
+
+    def test_moved_target_fail_old(self):
+        """Test moved_target method failing on older wiki."""
+        site = self.get_site('old')
+        with self.assertRaises(pywikibot.NoMoveTarget):
+            self.get_mainpage(site).moved_target()
+
+    def test_moved_target_fail_de(self):
+        """Test moved_target method failing on de-wiki."""
+        page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
+        with self.assertRaises(pywikibot.NoMoveTarget):
+            page.moved_target()
+
 
 class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
@@ -194,6 +221,12 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.new_ns(), int)
         self.assertEqual(logentry.new_title(), logentry.target_page)
+
+        self._do_test_warning_filename = False
+        self.assertDeprecation('pywikibot.logentries.MoveEntry.new_ns is '
+                               'deprecated, use target_ns.id instead.')
+        self.assertDeprecation('pywikibot.logentries.MoveEntry.new_title is '
+                               'deprecated, use target_page instead.')
 
     def test_LogEntry_title(self, key):
         """Test title and page return the same instance."""
@@ -207,6 +240,35 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
                 self.assertRaises(KeyError, logentry.title)
             self.assertDeprecation()
             self._reset_messages()
+
+    def test_getMovedTarget(self, key):
+        """Test getMovedTarget method."""
+        # main page was moved around
+        if self.sites[key]['target'] is None:
+            raise unittest.SkipTest('No moved target')
+        mainpage = self.get_mainpage(self.site)
+        target = mainpage.getMovedTarget()
+        self.assertIsInstance(target, pywikibot.Page)
+        self.assertEqual(target.title(),
+                         self.sites[key]['target'])
+        # main page was moved back again, we test it.
+        self.assertEqual(mainpage, target.getMovedTarget())
+
+        self._do_test_warning_filename = False
+        self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
+                               'deprecated, use moved_target() instead.')
+
+    def test_moved_target_fail_old(self):
+        """Test getMovedTarget method failing on older wiki."""
+        site = self.get_site('old')
+        with self.assertRaises(pywikibot.NoPage):
+            self.get_mainpage(site).getMovedTarget()
+
+    def test_moved_target_fail_de(self):
+        """Test getMovedTarget method failing on de-wiki."""
+        page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
+        with self.assertRaises(pywikibot.NoPage):
+            page.getMovedTarget()
 
 
 if __name__ == '__main__':
