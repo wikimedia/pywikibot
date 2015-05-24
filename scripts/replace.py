@@ -137,7 +137,6 @@ import collections
 import re
 import time
 import sys
-import unicodedata
 
 import pywikibot
 from pywikibot import i18n, textlib, pagegenerators, Bot
@@ -145,6 +144,8 @@ from pywikibot import editor as editarticle
 
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
+
+from pywikibot.tools import chars
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -667,11 +668,6 @@ def prepareRegexForMySQL(pattern):
     return pattern
 
 
-def contains_format_characters(text):
-    """Return True when there are format characters (e.g. U+200E) in text."""
-    return any(unicodedata.category(char) == 'Cf' for char in text)
-
-
 def main(*args):
     """
     Process command line arguments and invoke bot.
@@ -881,12 +877,14 @@ def main(*args):
                                           set_summary)
         for replacement in fix['replacements']:
             summary = None if len(replacement) < 3 else replacement[2]
-            if contains_format_characters(replacement[0]):
+            if chars.contains_invisible(replacement[0]):
                 pywikibot.warning('The old string "{0}" contains formatting '
-                                  'characters like U+200E'.format(replacement[0]))
-            if contains_format_characters(replacement[1]):
+                                  'characters like U+200E'.format(
+                    chars.replace_invisible(replacement[0])))
+            if chars.contains_invisible(replacement[1]):
                 pywikibot.warning('The new string "{0}" contains formatting '
-                                  'characters like U+200E'.format(replacement[1]))
+                                  'characters like U+200E'.format(
+                    chars.replace_invisible(replacement[1])))
             replacements.append(ReplacementListEntry(
                 old=replacement[0],
                 new=replacement[1],
