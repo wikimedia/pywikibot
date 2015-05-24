@@ -253,6 +253,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     index = 0
     markerpos = len(text)
     while True:
+        if index > len(text):
+            break
         match = old.search(text, index)
         if not match:
             # nothing left to replace
@@ -318,6 +320,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 index = match.start() + 1
             else:
                 index = match.start() + len(replacement)
+            if not match.group():
+                # When the regex allows to match nothing, shift by one character
+                index += 1
             markerpos = match.start() + len(replacement)
     text = text[:markerpos] + marker + text[markerpos:]
 
