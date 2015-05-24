@@ -12,7 +12,7 @@ Welcome to pywikibot!
 
 Pywikibot is a full-stack framework for editing `MediaWiki <https://mediawiki.org>`_ wiki's. (more intro)
 
-Pywikibot supports Python 2.6.5 and 2.7; Python 3 support is under way.
+Pywikibot supports Python 2.6.5, 2.7 and 3.2+.
 
 Pywikibot is licensed under the :ref:`MIT license <licenses-MIT>`; the documentation is licensed under the :ref:`CC-BY-SA-3.0 <licenses-CCBYSA>` license.
 
