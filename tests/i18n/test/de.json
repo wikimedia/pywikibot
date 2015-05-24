@@ -1,0 +1,4 @@
+{
+    "test-multiple-plurals": "Bot: %(action)s %(line)s {{PLURAL:line|Zeile|Zeilen}} von {{PLURAL:%(page)d|einer|mehreren}} {{PLURAL:page|Seite|Seiten}}.",
+    "test-plural": "Bot: Ändere %(num)d {{PLURAL:num|Seite|Seiten}}."
+}
