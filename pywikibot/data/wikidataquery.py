@@ -252,7 +252,7 @@ class HasClaim(Query):
         """Constructor."""
         self.prop = self.convertWDType(prop)
 
-        if isinstance(items, Tree):
+        if isinstance(items, Query):
             self.items = items
         elif isinstance(self, StringClaim):
             self.items = listify(items)
@@ -269,12 +269,12 @@ class HasClaim(Query):
         return res
 
     def validate(self):
-        return self.isOrContainsOnlyTypes(self.items, [int, Tree])
+        return self.isOrContainsOnlyTypes(self.items, [int, Query])
 
     def __str__(self):
         if isinstance(self.items, list):
             return "%s[%s%s]" % (self.queryType, self.prop, self.formatItems())
-        elif isinstance(self.items, Tree):  # maybe Query?
+        elif isinstance(self.items, Query):
             return "%s[%s:(%s)]" % (self.queryType, self.prop, self.items)
 
 
