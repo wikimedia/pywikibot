@@ -98,11 +98,6 @@ if sys.version_info[0] == 3:
         print("ERROR: Python 3.3 or higher is required!")
         sys.exit(1)
 
-if os.name != 'nt':
-    # See bug 66010, Windows users will have issues
-    # when trying to build the C modules.
-    dependencies += extra_deps['mwparserfromhell']
-
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
 # which depends on pywin32.
