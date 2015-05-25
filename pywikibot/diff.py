@@ -26,6 +26,8 @@ except ImportError as bserror:
     BeautifulSoup = False
 
 import pywikibot
+from pywikibot.tools import chars
+
 from pywikibot.backports import format_range_unified  # introduced in 2.7.2
 from pywikibot.tools import deprecated_args
 
@@ -221,7 +223,8 @@ class PatchManager(object):
     """
 
     @deprecated_args(n='context')
-    def __init__(self, text_a, text_b, context=0, by_letter=False):
+    def __init__(self, text_a, text_b, context=0, by_letter=False,
+                 replace_invisible=False):
         """Constructor.
 
         @param text_a: base text
@@ -233,6 +236,9 @@ class PatchManager(object):
         @param by_letter: if text_a and text_b are single lines, comparison can be done
             letter by letter.
         @type by_letter: bool
+        @param replace_invisible: Replace invisible characters like U+200e with
+            the charnumber in brackets (e.g. <200e>).
+        @type replace_invisible: bool
         """
         if '\n' in text_a or '\n' in text_b:
             self.a = text_a.splitlines(1)
@@ -265,6 +271,7 @@ class PatchManager(object):
         self.blocks = self.get_blocks()
         self.context = context
         self._super_hunks = self._generate_super_hunks()
+        self._replace_invisible = replace_invisible
 
     def get_blocks(self):
         """Return list with blocks of indexes which compose a and, where applicable, b.
@@ -352,7 +359,10 @@ class PatchManager(object):
                 output += extend_context(previous_hunk.a_rng[1], hunk.a_rng[0])
             previous_hunk = hunk
             output += hunk.diff_text
-        return output + extend_context(hunks[-1].a_rng[1], context_range[0][1])
+        output += extend_context(hunks[-1].a_rng[1], context_range[0][1])
+        if self._replace_invisible:
+            output = chars.replace_invisible(output)
+        return output
 
     def review_hunks(self):
         """Review hunks."""
