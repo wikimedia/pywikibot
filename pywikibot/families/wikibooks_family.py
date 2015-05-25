@@ -110,12 +110,12 @@ class Family(family.WikimediaFamily):
 
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'he',
-            'vi', 'id', 'sq', 'ca', 'fi', 'ru', 'fa', 'cs', 'zh', 'sv', 'da',
-            'hr', 'tr', 'no', 'th', 'sr', 'ar', 'gl', 'ko', 'ta', 'mk', 'tl',
-            'ro', 'is', 'ka', 'tt', 'lt', 'az', 'eo', 'uk', 'bg', 'sk', 'sl',
-            'el', 'hy', 'ms', 'si', 'li', 'la', 'ml', 'ur', 'ang', 'ia', 'cv',
-            'et', 'bn', 'km', 'hi', 'mr', 'sa', 'oc', 'kk', 'eu', 'ne', 'fy',
-            'ie', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'mg', 'be', 'cy',
+            'vi', 'ca', 'id', 'sq', 'fi', 'ru', 'fa', 'cs', 'zh', 'sv', 'hr',
+            'tr', 'ro', 'sr', 'ar', 'no', 'th', 'ko', 'gl', 'da', 'ta', 'mk',
+            'az', 'tl', 'is', 'ka', 'lt', 'tt', 'uk', 'eo', 'bg', 'sk', 'sl',
+            'el', 'hy', 'ms', 'sa', 'si', 'li', 'la', 'ml', 'ur', 'bn', 'ang',
+            'ia', 'cv', 'et', 'hi', 'km', 'mr', 'eu', 'oc', 'kk', 'fy', 'ne',
+            'ie', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'be', 'mg', 'cy',
             'zh-min-nan', 'ku', 'uz',
         ]
 

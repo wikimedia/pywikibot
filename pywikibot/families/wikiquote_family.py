@@ -67,13 +67,13 @@ class Family(family.WikimediaFamily):
         self.name = 'wikiquote'
 
         self.languages_by_size = [
-            'pl', 'en', 'it', 'ru', 'de', 'pt', 'es', 'fr', 'cs', 'sk', 'bg',
-            'bs', 'tr', 'uk', 'he', 'sl', 'fa', 'lt', 'eo', 'el', 'ca', 'zh',
-            'id', 'hu', 'fi', 'sv', 'li', 'nl', 'hr', 'nn', 'ja', 'no', 'az',
-            'sa', 'hy', 'ar', 'et', 'ko', 'gl', 'ml', 'cy', 'ka', 'sr', 'ro',
-            'ku', 'te', 'th', 'da', 'eu', 'ta', 'is', 'vi', 'af', 'sq', 'hi',
-            'kn', 'la', 'be', 'br', 'mr', 'ur', 'uz', 'zh-min-nan', 'gu', 'su',
-            'wo', 'ky', 'am',
+            'en', 'pl', 'it', 'ru', 'de', 'pt', 'cs', 'es', 'fr', 'sk', 'bs',
+            'tr', 'fa', 'uk', 'lt', 'he', 'bg', 'eo', 'sl', 'ca', 'el', 'nn',
+            'id', 'zh', 'hu', 'li', 'hr', 'hy', 'nl', 'ko', 'ja', 'su', 'sv',
+            'ur', 'te', 'fi', 'cy', 'la', 'ar', 'no', 'ml', 'et', 'gl', 'az',
+            'th', 'ku', 'sr', 'kn', 'ta', 'eu', 'ka', 'sa', 'ro', 'is', 'da',
+            'vi', 'hi', 'sq', 'be', 'mr', 'br', 'uz', 'af', 'gu', 'zh-min-nan',
+            'am', 'wo', 'ky',
         ]
 
         self.langs = dict([(lang, '%s.wikiquote.org' % lang)

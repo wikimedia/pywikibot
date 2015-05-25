@@ -64,10 +64,9 @@ class Family(family.Family):
         self.name = 'anarchopedia'
 
         self.languages_by_size = [
-            'ar', 'en', 'de', 'nl', 'el', 'it', 'fa', 'fi', 'fr', 'he',
-            'es', 'hy', 'id', 'meta', 'ja', 'ko', 'lv', 'lt', 'no', 'hr',
-            'pl', 'pt', 'ro', 'ru', 'sr', 'sq', 'da', 'sv', 'tr', 'zh',
-            'eo',
+            'ar', 'en', 'de', 'nl', 'el', 'it', 'fa', 'fi', 'fr', 'he', 'es',
+            'hy', 'id', 'meta', 'ja', 'ko', 'lv', 'lt', 'no', 'hr', 'pl', 'pt',
+            'ro', 'ru', 'hrv', 'sq', 'sr', 'sv', 'tr', 'zh', 'eo', 'da',
         ]
         for l in self.languages_by_size:
             self.langs[l] = '%s.anarchopedia.org' % l
