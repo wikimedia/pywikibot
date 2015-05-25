@@ -1,4 +1,46 @@
 
+Release 2.0rc1 (25 May 2015)
+
+Major improvements include:
+- Sphinx documentation at https://doc.wikimedia.org/pywikibot/
+- Initial ProofreadPage support
+- Improved diff output, with context
+- Batch upload support
+- Compat scripts patrol.py and piper.py ported
+- isbn.py now supports wikibase
+- RecentChanges stream (rcstream) support
+
+Pywikibot API improvements include:
+- Python 3 ipaddress support
+- Support for Python warning system
+- Wikibase:
+  - added ISBN support
+  - added redirect support
+- Optionally uses external library for improved isbn validation
+- Automatically generating user files when -user, -family and -lang are
+  provided to a script
+- Page.content_model added
+- Page.contributors() and Page.revision_count() added
+- APISite.compare added
+- Site.undelete and Page.undelete added
+- DataSite.search_entities support
+- FilePage.latest_file_info and FilePage.oldest_file_info added
+- ItemClaimFilterPageGenerator added
+
+Low-level changes include:
+- Switch to JSON-based i18n data format
+- Unicode_literals used throughout source code
+- API badtoken recovery
+- API client side prevention of anonymous writes
+- API layer support for boolean and date datatypes
+- Improved MediaWiki version detection
+
+Other changes include:
+- Python 3 support fixes
+- Daemonize support
+- Allow pywikibot to load without i18n data
+- Appveyor CI Win32 builds
+
 Release 2.0b3 (30 November 2014)
 
 Major changes include:
