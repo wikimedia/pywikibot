@@ -2,7 +2,7 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
-# (C) xqt, 2010-2014
+# (C) xqt, 2010-2015
 # (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
@@ -141,36 +141,39 @@ def svn_rev_info(path):
         path = os.path.join(path, '..')
 
     _program_dir = path
+    filename = os.path.join(_program_dir, '.svn/entries')
+    if os.path.isfile(filename):
+        with open(filename) as entries:
+            version = entries.readline().strip()
+            if version != '12':
+                for i in range(3):
+                    entries.readline()
+                tag = entries.readline().strip()
+                t = tag.split('://')
+                t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/',
+                                    '')
+                tag = '[%s] %s' % (t[0], t[1])
+                for i in range(4):
+                    entries.readline()
+                date = time.strptime(entries.readline()[:19],
+                                     '%Y-%m-%dT%H:%M:%S')
+                rev = entries.readline()[:-1]
+                return tag, rev, date
 
-    entries = open(os.path.join(_program_dir, '.svn/entries'))
-    version = entries.readline().strip()
-    # use sqlite table for new entries format
-    if version == "12":
-        entries.close()
-        from sqlite3 import dbapi2 as sqlite
-        con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
-        cur = con.cursor()
-        cur.execute("""select
+    # We haven't found the information in entries file.
+    # Use sqlite table for new entries format
+    from sqlite3 import dbapi2 as sqlite
+    con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
+    cur = con.cursor()
+    cur.execute("""select
 local_relpath, repos_path, revision, changed_date, checksum from nodes
 order by revision desc, changed_date desc""")
-        name, tag, rev, date, checksum = cur.fetchone()
-        cur.execute("select root from repository")
-        tag, = cur.fetchone()
-        con.close()
-        tag = os.path.split(tag)[1]
-        date = time.gmtime(date / 1000000)
-    else:
-        for i in range(3):
-            entries.readline()
-        tag = entries.readline().strip()
-        t = tag.split('://')
-        t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/', '')
-        tag = '[%s] %s' % (t[0], t[1])
-        for i in range(4):
-            entries.readline()
-        date = time.strptime(entries.readline()[:19], '%Y-%m-%dT%H:%M:%S')
-        rev = entries.readline()[:-1]
-        entries.close()
+    name, tag, rev, date, checksum = cur.fetchone()
+    cur.execute("select root from repository")
+    tag, = cur.fetchone()
+    con.close()
+    tag = os.path.split(tag)[1]
+    date = time.gmtime(date / 1000000)
     return tag, rev, date
 
 
@@ -244,7 +247,14 @@ def getversion_svn(path=None):
     _program_dir = path or _get_program_dir()
     tag, rev, date = svn_rev_info(_program_dir)
     hsh, date2 = github_svn_rev2hash(tag, rev)
-    assert(date == date2)
+    if date.tm_isdst >= 0 and date2.tm_isdst >= 0:
+        assert(date == date2)
+    # date.tm_isdst is -1 means unknown state
+    # compare its contents except daylight saving time status
+    else:
+        for i in range(date.n_fields - 1):
+            assert(date[i] == date2[i])
+
     rev = 's%s' % rev
     if (not date or not tag or not rev) and not path:
         raise ParseError
