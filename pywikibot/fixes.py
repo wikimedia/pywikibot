@@ -7,6 +7,8 @@
 #
 from __future__ import unicode_literals
 
+import os.path
+
 from pywikibot import config
 
 __version__ = '$Id$'
@@ -629,10 +631,11 @@ fixes = {
 
 #
 # Load the user fixes file.
-try:
-    filename = config.datafilepath('user-fixes.py')
+filename = config.datafilepath('user-fixes.py')
+if os.path.exists(filename):
     # load binary, to let compile decode it according to the file header
     with open(filename, 'rb') as f:
         exec(compile(f.read(), filename, 'exec'))
-except IOError:
-    pass
+    user_fixes_loaded = True
+else:
+    user_fixes_loaded = False
