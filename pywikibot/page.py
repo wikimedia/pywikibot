@@ -4461,17 +4461,23 @@ class Link(ComparableMixin):
         @type text: unicode
         @param source: the Site on which the link was found (not necessarily
             the site to which the link refers)
-        @type source: Site
+        @type source: Site or BasePage
         @param defaultNamespace: a namespace to use if the link does not
             contain one (defaults to 0)
         @type defaultNamespace: int
 
         """
-        assert source is None or isinstance(source, pywikibot.site.BaseSite), \
-            "source parameter should be a Site object"
+        source_is_page = isinstance(source, BasePage)
+
+        assert source is None or source_is_page or isinstance(source, pywikibot.site.BaseSite), \
+            "source parameter should be either a Site or Page object"
+
+        if source_is_page:
+            self._source = source.site
+        else:
+            self._source = source or pywikibot.Site()
 
         self._text = text
-        self._source = source or pywikibot.Site()
         self._defaultns = defaultNamespace
 
         # preprocess text (these changes aren't site-dependent)
@@ -4513,6 +4519,9 @@ class Link(ComparableMixin):
         # Remove left-to-right and right-to-left markers.
         t = t.replace(u"\u200e", u"").replace(u"\u200f", u"")
         self._text = t
+
+        if source_is_page:
+            self._text = source.title(withSection=False) + self._text
 
     def __repr__(self):
         """Return a more complete string representation."""
