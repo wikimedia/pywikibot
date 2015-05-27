@@ -4752,7 +4752,7 @@ class APISite(BaseSite):
         Block a user for certain amount of time and for a certain reason.
 
         @param user: The username/IP to be blocked without a namespace.
-        @type user: User
+        @type user: L{pywikibot.User}
         @param expiry: The length or date/time when the block expires. If
             'never', 'infinite', 'indefinite' it never does. If the value is
             given as a basestring it's parsed by php's strtotime function:
@@ -4798,7 +4798,7 @@ class APISite(BaseSite):
         Remove the block for the user.
 
         @param user: The username/IP without a namespace.
-        @type user: User
+        @type user: L{pywikibot.User}
         @param reason: Reason for the unblock.
         @type reason: basestring
         """
