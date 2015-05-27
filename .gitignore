@@ -4,7 +4,7 @@ user-*.py
 *.bak
 *.pyc
 *.pyo
-*.py~
+*.*~
 /.tox
 /*.egg
 /data*
