@@ -36,18 +36,12 @@ class CharsTestCase(TestCase):
     def test_category_cf(self):
         """Test that all characters in _category_cf are actually in Cf."""
         invalid = {}
+        # Cn are undefined characters (and were defined later in Unicode)
         for char in chars._category_cf:
             cat = unicodedata.category(char)
-            if cat != 'Cf':
+            if cat not in ('Cf', 'Cn'):
                 invalid[char] = cat
         if sys.version_info[0] == 2:
-            # These weren't defined in Unicode 5.2 (which is what Py2 is using)
-            self.assertEqual(invalid.pop('\u0604'), 'Cn')
-            self.assertEqual(invalid.pop('\u061c'), 'Cn')
-            self.assertEqual(invalid.pop('\u2066'), 'Cn')
-            self.assertEqual(invalid.pop('\u2067'), 'Cn')
-            self.assertEqual(invalid.pop('\u2068'), 'Cn')
-            self.assertEqual(invalid.pop('\u2069'), 'Cn')
             # This category has changed between Unicode 6 and 7 to Cf
             self.assertEqual(invalid.pop('\u180e'), 'Zs')
         self.assertCountEqual(invalid.items(), [])
