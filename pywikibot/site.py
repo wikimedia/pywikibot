@@ -2494,7 +2494,9 @@ class APISite(BaseSite):
         """
         Load Flow-related information about a given page.
 
-        FIXME: Assumes that the Flow extension is installed.
+        Assumes that the Flow extension is installed.
+
+        @raises APIError: Flow extension is not installed
         """
         title = page.title(withSection=False)
         query = self._generator(api.PropertyGenerator,
