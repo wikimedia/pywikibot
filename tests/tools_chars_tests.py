@@ -9,8 +9,9 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
-import sys
 import unicodedata
+
+from distutils.version import StrictVersion
 
 from pywikibot.tools import chars
 
@@ -41,8 +42,8 @@ class CharsTestCase(TestCase):
             cat = unicodedata.category(char)
             if cat not in ('Cf', 'Cn'):
                 invalid[char] = cat
-        if sys.version_info[0] == 2:
-            # This category has changed between Unicode 6 and 7 to Cf
+        if StrictVersion(unicodedata.unidata_version) < StrictVersion('6.3'):
+            # This category has changed with Unicode 6.3 to Cf
             self.assertEqual(invalid.pop('\u180e'), 'Zs')
         self.assertCountEqual(invalid.items(), [])
 
