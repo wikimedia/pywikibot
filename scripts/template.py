@@ -3,7 +3,7 @@
 """
 Very simple script to replace a template with another one.
 
-It also converts the old MediaWiki boilerplate format to the new template format.
+It also converts the old MediaWiki boilerplate format to the new format.
 
 Syntax: python template.py [-remove] [xml[:filename]] oldTemplate [newTemplate]
 
@@ -44,7 +44,7 @@ Command line options:
 
 -always      Don't bother asking to confirm any of the changes, Just Do It.
 
--category:   Appends the given category to every page that is edited.  This is
+-addcat:     Appends the given category to every page that is edited.  This is
              useful when a category is being broken out from a template
              parameter or when templates are being upmerged but more information
              must be preserved.
@@ -112,10 +112,12 @@ __version__ = '$Id$'
 
 import re
 
+from warnings import warn
+
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, xmlreader, Bot
-
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
@@ -310,6 +312,13 @@ def main(*args):
 
     # read command line parameters
     local_args = pywikibot.handle_args(args)
+
+    # Avoid conflicts with pagegenerators.py parameters.
+    if any(arg.startswith('-category:') for arg in local_args):
+        warn('-category (to append a category to each edited page) has been'
+             ' renamed to -addcat; make sure you are using the correct param.',
+             ArgumentDeprecationWarning)
+
     site = pywikibot.Site()
     genFactory = pagegenerators.GeneratorFactory()
     for arg in local_args:
@@ -327,8 +336,8 @@ def main(*args):
                     u'Please enter the XML dump\'s filename: ')
             else:
                 xmlfilename = arg[5:]
-        elif arg.startswith('-category:'):
-            options['addedCat'] = arg[len('-category:'):]
+        elif arg.startswith('-addcat:'):
+            options['addedCat'] = arg[len('-addcat:'):]
         elif arg.startswith('-summary:'):
             options['summary'] = arg[len('-summary:'):]
         elif arg.startswith('-user:'):
