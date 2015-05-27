@@ -1,27 +1,34 @@
-comms Package
-=============
-
-:mod:`comms` Package
---------------------
+pywikibot.comms package
+=======================
 
 .. automodule:: pywikibot.comms
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`http` Module
-------------------
+Submodules
+----------
+
+pywikibot.comms.http module
+---------------------------
 
 .. automodule:: pywikibot.comms.http
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`threadedhttp` Module
---------------------------
+pywikibot.comms.rcstream module
+-------------------------------
+
+.. automodule:: pywikibot.comms.rcstream
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pywikibot.comms.threadedhttp module
+-----------------------------------
 
 .. automodule:: pywikibot.comms.threadedhttp
     :members:
     :undoc-members:
     :show-inheritance:
-

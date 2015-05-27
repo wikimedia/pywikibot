@@ -1,35 +1,34 @@
-compat Package
-==============
-
-:mod:`compat` Package
----------------------
+pywikibot.compat package
+========================
 
 .. automodule:: pywikibot.compat
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`catlib` Module
---------------------
+Submodules
+----------
+
+pywikibot.compat.catlib module
+------------------------------
 
 .. automodule:: pywikibot.compat.catlib
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`query` Module
--------------------
+pywikibot.compat.query module
+-----------------------------
 
 .. automodule:: pywikibot.compat.query
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`userlib` Module
----------------------
+pywikibot.compat.userlib module
+-------------------------------
 
 .. automodule:: pywikibot.compat.userlib
     :members:
     :undoc-members:
     :show-inheritance:
-
