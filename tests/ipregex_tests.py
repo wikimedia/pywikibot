@@ -2,7 +2,7 @@
 """Test IP regex."""
 # -*- coding: utf-8  -*-
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2015
 #
 # Distributed under the terms of the MIT license.
 from __future__ import unicode_literals
@@ -12,6 +12,7 @@ __version__ = '$Id$'
 from pywikibot.tools import ip
 
 from tests.aspects import unittest, TestCase
+from tests.utils import expected_failure_if
 
 
 class TestIPBase(TestCase):
@@ -620,6 +621,12 @@ class TestIPBase(TestCase):
         self.ipv6test(True, "a:b:c:d:e:f:0::")
         self.ipv6test(False, "':10.0.0.1")
 
+    def _test_T76286_failures(self):
+        """Test known bugs in the ipaddress module."""
+        # The following fail with the ipaddress module. See T76286
+        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
+        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
+
 
 class IPRegexTestCase(TestIPBase):
 
@@ -631,9 +638,7 @@ class IPRegexTestCase(TestIPBase):
     def test_regex(self):
         """Test IP regex."""
         self._run_tests()
-        # The following only work with the IP regex.  See below.
-        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
-        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
+        self._test_T76286_failures()
         self.assertEqual(self.fail, 0)
 
 
@@ -647,21 +652,22 @@ class IPAddressModuleTestCase(TestIPBase):
     @classmethod
     def setUpClass(cls):
         """Check ipaddress module is available."""
-        if hasattr(ip.ip_address, '__fake__'):
+        if ip.ip_address.__name__ == 'ip_address_fake':
             raise unittest.SkipTest('module ipaddress not available')
+
         super(IPAddressModuleTestCase, cls).setUpClass()
 
     def test_ipaddress_module(self):
         """Test ipaddress module."""
+        print('testing %s' % ip.ip_address.__module__)
         self._run_tests()
         self.assertEqual(self.fail, 0)
 
-    @unittest.expectedFailure
-    def test_ipaddress_module_failures(self):
+    @expected_failure_if(ip.ip_address.__module__ == 'ipaddress' or
+                         ip.ip_address.__name__ == 'ip_address_patched')
+    def test_T76286_failures(self):
         """Test known bugs in the ipaddress module."""
-        # The following fail with the ipaddress module. See T76286
-        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
-        self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
+        self._test_T76286_failures()
         self.assertEqual(self.fail, 0)
 
 if __name__ == "__main__":
