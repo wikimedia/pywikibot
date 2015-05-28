@@ -20,7 +20,6 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import config
-from pywikibot.tools import SelfCallDict
 from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
@@ -200,13 +199,13 @@ class DrySite(pywikibot.site.APISite):
         self._siteinfo._cache['case'] = (
             'case-sensitive' if self.family.name == 'wiktionary' else
             'first-letter', True)
-        self._namespaces = SelfCallDict(
-            Namespace.builtin_namespaces(
-                case=self.siteinfo['case']))
         extensions = []
         if self.family.name == 'wikisource':
             extensions.append({'name': 'ProofreadPage'})
         self._siteinfo._cache['extensions'] = (extensions, True)
+
+    def _build_namespaces(self):
+        return Namespace.builtin_namespaces(case=self.siteinfo['case'])
 
     def __repr__(self):
         """Override default so warnings and errors indicate test is dry."""
@@ -244,19 +243,14 @@ class DryDataSite(DrySite, pywikibot.site.DataSite):
 
     """Dummy class to use instead of L{pywikibot.site.DataSite}."""
 
-    def __init__(self, code, fam, user, sysop):
-        """Constructor."""
-        super(DryDataSite, self).__init__(code, fam, user, sysop)
-
-        self._namespaces[0].defaultcontentmodel = 'wikibase-item'
-
-        self._namespaces.update(
-            {
-                120: Namespace(id=120,
-                               case='first-letter',
-                               canonical_name='Property',
-                               defaultcontentmodel='wikibase-property')
-            })
+    def _build_namespaces(self):
+        namespaces = super(DryDataSite, self)._build_namespaces()
+        namespaces[0].defaultcontentmodel = 'wikibase-item'
+        namespaces[120] = Namespace(id=120,
+                                    case='first-letter',
+                                    canonical_name='Property',
+                                    defaultcontentmodel='wikibase-property')
+        return namespaces
 
 
 def execute(command, data_in=None, timeout=0, error=None):

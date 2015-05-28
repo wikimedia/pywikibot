@@ -491,6 +491,14 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         return result
 
 
+# This class can be removed after self-callability has been removed
+class _NamespacesDict(SelfCallDict):
+
+    """A wrapper to add a deprecation message when called."""
+
+    _own_desc = 'the namespaces property'
+
+
 class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
@@ -694,7 +702,7 @@ class BaseSite(ComparableMixin):
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
-        nsnames = [name for name in self.namespaces().values()]
+        nsnames = [name for name in self.namespaces.values()]
         return [lang for lang in self.languages()
                 if first_upper(lang) not in nsnames]
 
@@ -786,13 +794,16 @@ class BaseSite(ComparableMixin):
     getNamespaceIndex = redirect_func(ns_index, old_name='getNamespaceIndex',
                                       class_name='BaseSite')
 
+    def _build_namespaces(self):
+        """Create default namespaces."""
+        use_image_name = MediaWikiVersion(self.version()) < MediaWikiVersion("1.14")
+        return Namespace.builtin_namespaces(use_image_name)
+
     @property
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         if not hasattr(self, '_namespaces'):
-            use_image_name = MediaWikiVersion(self.version()) < MediaWikiVersion("1.14")
-            self._namespaces = SelfCallDict(
-                Namespace.builtin_namespaces(use_image_name))
+            self._namespaces = _NamespacesDict(self._build_namespaces())
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -1820,7 +1831,7 @@ class APISite(BaseSite):
             self._useroptions['_name'] = (
                 None if 'anon' in uidata['query']['userinfo'] else
                 uidata['query']['userinfo']['name'])
-        return set(ns for ns in self.namespaces().values() if ns.id >= 0 and
+        return set(ns for ns in self.namespaces.values() if ns.id >= 0 and
                    self._useroptions['searchNs{0}'.format(ns.id)] in ['1', True])
 
     def assert_valid_iter_params(self, msg_prefix, start, end, reverse):
@@ -2138,7 +2149,7 @@ class APISite(BaseSite):
         return self.getmagicwords("pagenamee")
 
     def _build_namespaces(self):
-        _namespaces = SelfCallDict()
+        _namespaces = {}
 
         # In MW 1.14, API siprop 'namespaces' added 'canonical',
         # and Image became File with Image as an alias.
@@ -2174,7 +2185,7 @@ class APISite(BaseSite):
             if item['*'] not in _namespaces[ns]:
                 _namespaces[ns].aliases.append(item['*'])
 
-        self._namespaces = _namespaces
+        return _namespaces
 
     @need_version("1.14")
     @deprecated("has_extension")
@@ -2368,13 +2379,6 @@ class APISite(BaseSite):
         if not hasattr(self, '_proofread_levels'):
             self._cache_proofreadinfo()
         return self._proofread_levels
-
-    @property
-    def namespaces(self):
-        """Return dict of valid namespaces on this wiki."""
-        if not hasattr(self, '_namespaces'):
-            self._build_namespaces()
-        return self._namespaces
 
     def namespace(self, num, all=False):
         """Return string containing local name of namespace 'num'.
@@ -3161,7 +3165,7 @@ class APISite(BaseSite):
 
             # Covert namespaces to a known type
             namespaces = set(Namespace.resolve(namespaces or [],
-                                               self.namespaces()))
+                                               self.namespaces))
 
             if 'page' in member_type:
                 excluded_namespaces = set()
@@ -3184,7 +3188,7 @@ class APISite(BaseSite):
                     # namespaces requested is higher than available, and split
                     # the request into several batches.
                     excluded_namespaces.add([-1, -2])
-                    namespaces = set(self.namespaces()) - excluded_namespaces
+                    namespaces = set(self.namespaces) - excluded_namespaces
             else:
                 if 'file' in member_type:
                     namespaces.add(6)
@@ -3912,7 +3916,7 @@ class APISite(BaseSite):
         if where not in ("text", "titles"):
             raise Error("search: unrecognized 'where' value: %s" % where)
         if namespaces == []:
-            namespaces = [ns for ns in list(self.namespaces().keys()) if ns >= 0]
+            namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
         if not namespaces:
             pywikibot.warning(u"search: namespaces cannot be empty; using [0].")
             namespaces = [0]
@@ -5511,7 +5515,7 @@ class DataSite(APISite):
         self._item_namespace = False
         self._property_namespace = False
 
-        for namespace in self.namespaces().values():
+        for namespace in self.namespaces.values():
             if not hasattr(namespace, 'defaultcontentmodel'):
                 continue
 
