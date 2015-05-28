@@ -13,7 +13,7 @@ import sys
 
 import pywikibot
 
-from pywikibot import i18n, bot
+from pywikibot import i18n, bot, plural
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase, PwbTestCase
 
@@ -310,6 +310,26 @@ class TestTWNTranslate(TWNTestCaseBase):
                                   {'line': 1, 'page': 1})
                 % {'action': u'Ändere'},
                 u'Bot: Ändere 1 Zeile von einer Seite.')
+
+    def test_fallback_lang(self):
+        """
+        Test that twntranslate uses the translation's language.
+
+        twntranslate calls _twtranslate which might return the translation for
+        a different language and then the plural rules from that language need
+        to be applied.
+        """
+        # co has fr as altlang but has no plural rules defined (otherwise this
+        # test might not catch problems) so it's using the plural variant for 0
+        # although French uses the plural variant for numbers > 1 (so not 0)
+        assert('co' not in plural.plural_rules)
+        assert(plural.plural_rules['fr']['plural'](0) is False)
+        self.assertEqual(
+            i18n.twntranslate('co', 'test-plural', {'num': 0, 'descr': 'seulement'}),
+            u'Robot: Changer seulement une page.')
+        self.assertEqual(
+            i18n.twntranslate('co', 'test-plural', {'num': 1, 'descr': 'seulement'}),
+            u'Robot: Changer seulement une page.')
 
 
 class ScriptMessagesTestCase(TWNTestCaseBase):

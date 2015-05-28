@@ -499,7 +499,7 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
             'Read https://mediawiki.org/wiki/PWB/i18n' % twtitle)
     # send the language code back via the given list
     if code_needed:
-        code.append(lang)
+        code.append(alt)
     if parameters:
         return trans % parameters
     else:
