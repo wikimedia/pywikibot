@@ -384,6 +384,22 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(
             textlib.replaceExcept('', r'(a)?', r'\1\1', [], site=self.site),
             '')
+        self.assertEqual(
+            textlib.replaceExcept('A123B', r'A(\d)2(\d)B', r'A\g<1>x\g<2>B',
+                                  [], site=self.site),
+            'A1x3B')
+        self.assertEqual(
+            textlib.replaceExcept('A123B', r'A(?P<a>\d)2(?P<b>\d)B',
+                                  r'A\g<a>x\g<b>B', [], site=self.site),
+            'A1x3B')
+        self.assertEqual(
+            textlib.replaceExcept('A123B', r'A(?P<a>\d)2(\d)B',
+                                  r'A\g<a>x\g<2>B', [], site=self.site),
+            'A1x3B')
+        self.assertEqual(
+            textlib.replaceExcept('A123B', r'A(?P<a>\d)2(\d)B',
+                                  r'A\g<a>x\2B', [], site=self.site),
+            'A1x3B')
 
     def test_case_sensitive(self):
         self.assertEqual(textlib.replaceExcept('AxB', 'x', 'y', [],
@@ -512,6 +528,17 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept(template_sample, 'a', 'X',
                                                ['template'], site=self.site),
                          template_sample)
+
+    def test_replace_source_reference(self):
+        """Test replacing in text which contains back references."""
+        # Don't use a valid reference number in the original string, in case it
+        # tries to apply that as a reference.
+        self.assertEqual(textlib.replaceExcept(r'\42', r'^(.*)$', r'X\1X',
+                                               [], site=self.site),
+                         r'X\42X')
+        self.assertEqual(textlib.replaceExcept(r'\g<bar>', r'^(?P<foo>.*)$',
+                                               r'X\g<foo>X', [], site=self.site),
+                         r'X\g<bar>X')
 
 
 if __name__ == '__main__':

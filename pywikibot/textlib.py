@@ -296,23 +296,26 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 #  text = text[:match.start()] + replacement + text[match.end():]
 
                 # So we have to process the group references manually.
-                replacement = new
+                replacement = ''
 
-                groupR = re.compile(r'\\(?P<number>\d+)|\\g<(?P<name>.+?)>')
-                while True:
-                    groupMatch = groupR.search(replacement)
-                    if not groupMatch:
-                        break
-                    groupID = (groupMatch.group('name') or
-                               int(groupMatch.group('number')))
+                group_regex = re.compile(r'\\(\d+)|\\g<(.+?)>')
+                last = 0
+                for group_match in group_regex.finditer(new):
+                    group_id = group_match.group(1) or group_match.group(2)
                     try:
-                        replacement = (replacement[:groupMatch.start()] +
-                                       (match.group(groupID) or '') +
-                                       replacement[groupMatch.end():])
+                        group_id = int(group_id)
+                    except ValueError:
+                        pass
+                    try:
+                        replacement += new[last:group_match.start()]
+                        replacement += match.group(group_id) or ''
                     except IndexError:
-                        pywikibot.output('\nInvalid group reference: %s' % groupID)
+                        pywikibot.output('\nInvalid group reference: %s' % group_id)
                         pywikibot.output('Groups found:\n%s' % match.groups())
                         raise IndexError
+                    last = group_match.end()
+                replacement += new[last:]
+
             text = text[:match.start()] + replacement + text[match.end():]
 
             # continue the search on the remaining text
