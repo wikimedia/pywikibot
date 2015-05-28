@@ -374,6 +374,16 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                r'A(\d)2(\d)B', r'A\1x\2B', [],
                                                site=self.site),
                          'A1x3B')
+        self.assertEqual(
+            textlib.replaceExcept('', r'(a?)', r'\1B', [], site=self.site),
+            'B')
+        self.assertEqual(
+            textlib.replaceExcept('abc', r'x*', r'-', [], site=self.site),
+            '-a-b-c-')
+        # This is different from re.sub() as re.sub() doesn't allow None groups
+        self.assertEqual(
+            textlib.replaceExcept('', r'(a)?', r'\1\1', [], site=self.site),
+            '')
 
     def test_case_sensitive(self):
         self.assertEqual(textlib.replaceExcept('AxB', 'x', 'y', [],
