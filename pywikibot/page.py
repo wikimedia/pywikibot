@@ -669,7 +669,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     # Get target (first template argument)
                     try:
                         p = pywikibot.Page(self.site, args[0].strip(), ns=14)
-                        if p.namespace == 14:
+                        if p.namespace() == 14:
                             self._catredirect = p.title()
                         else:
                             pywikibot.warning(
