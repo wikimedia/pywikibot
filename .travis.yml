@@ -96,10 +96,6 @@ matrix:
     - python: '2.6'
       env: LANGUAGE=wikidata FAMILY=wikidata SITE_ONLY=1
 
-  allow_failures:
-    - python: '2.6'
-      env: LANGUAGE=wikidata FAMILY=wikidata SITE_ONLY=1
-
 notifications:
   email:
     recipients:
