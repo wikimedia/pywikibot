@@ -425,6 +425,7 @@ class ReplaceRobot(Bot):
                              replaced.
             * addedCat     - If set to a value, add this category to every page
                              touched.
+                             It can be a string or a Category object.
 
         Structure of the exceptions dictionary:
         This dictionary can have these keys:
@@ -462,10 +463,13 @@ class ReplaceRobot(Bot):
         self.recursive = recursive
         if site:
             self.site = site
+
         if addedCat:
-            cat_ns = site.category_namespaces()[0]
-            self.addedCat = pywikibot.Page(self.site,
-                                           cat_ns + ':' + addedCat)
+            if isinstance(addedCat, pywikibot.Category):
+                self.addedCat = addedCat
+            else:
+                self.addedCat = pywikibot.Category(self.site, addedCat)
+
         self.sleep = sleep
         self.summary = summary
         self.changed_pages = 0
@@ -595,8 +599,10 @@ class ReplaceRobot(Bot):
                     pywikibot.output(u'No changes were necessary in %s'
                                      % page.title(asLink=True))
                     break
-                if hasattr(self, "addedCat"):
-                    cats = page.categories(nofollow_redirects=True)
+                if hasattr(self, 'addedCat'):
+                    # Fetch only categories in wikitext, otherwise the others will
+                    # be explicitly added.
+                    cats = textlib.getCategoryLinks(original_text)
                     if self.addedCat not in cats:
                         cats.append(self.addedCat)
                         new_text = textlib.replaceCategoryLinks(new_text,
