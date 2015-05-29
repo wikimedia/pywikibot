@@ -380,6 +380,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def testLinkMethods(self):
         """Test site methods for getting links to and from a page."""
+        if self.site.family.name == 'wpbeta':
+            raise unittest.SkipTest('Test fails on betawiki; T69931')
         mysite = self.get_site()
         mainpage = self.get_mainpage()
         backlinks = set(mysite.pagebacklinks(mainpage, namespaces=[0]))
