@@ -17,7 +17,8 @@ the -include option.
 
 Specific arguments:
 
--start:xxx      Specify the text that marks the beginning of a page
+-begin:xxx      Specify the text that marks the beginning of a page
+-start:xxx      (deprecated)
 -end:xxx        Specify the text that marks the end of a page
 -file:xxx       Give the filename we are getting our material from
                 (default: dict.txt)
@@ -54,7 +55,7 @@ character.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2014
+# (C) Pywikibot team, 2005-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,9 +67,11 @@ __version__ = '$Id$'
 import os
 import re
 import codecs
+from warnings import warn
 
 import pywikibot
 from pywikibot import config, Bot, i18n
+from pywikibot.exceptions import ArgumentDeprecationWarning
 
 
 class NoTitle(Exception):
@@ -278,8 +281,13 @@ def main(*args):
     notitle = False
 
     for arg in pywikibot.handle_args(args):
-        if arg.startswith("-start:"):
+        if arg.startswith('-start:'):
             pageStartMarker = arg[7:]
+            warn('-start param (text that marks the beginning) of a page has been '
+                 'deprecated in favor of begin; make sure to use the updated param.',
+                 ArgumentDeprecationWarning)
+        elif arg.startswith('-begin:'):
+            pageStartMarker = arg[len('-begin:'):]
         elif arg.startswith("-end:"):
             pageEndMarker = arg[5:]
         elif arg.startswith("-file:"):
