@@ -29,7 +29,7 @@ import pywikibot
 
 from pywikibot import config2 as config
 from pywikibot.tools import (
-    deprecated, deprecate_arg, issue_deprecation_warning,
+    deprecated, deprecated_args, issue_deprecation_warning,
     FrozenDict,
 )
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
@@ -885,7 +885,7 @@ class Family(object):
         return super(Family, self).__getattribute__(name)
 
     @staticmethod
-    @deprecate_arg('fatal', None)
+    @deprecated_args(fatal=None)
     def load(fam=None):
         """Import the named family.
 
@@ -1125,6 +1125,10 @@ class Family(object):
 
     def rcstream_host(self, code):
         raise NotImplementedError("This family does not support RCStream")
+
+    @deprecated_args(name='title')
+    def get_address(self, code, title):
+        return '%s?title=%s&redirect=no' % (self.path(code), title)
 
     def nice_get_address(self, code, title):
         return '%s%s' % (self.nicepath(code), title)
