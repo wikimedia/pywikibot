@@ -24,21 +24,20 @@ Example commands:
 
 # Transfer all pages in category "Query service" from the Toolserver wiki to
 # wikitech, adding Nova_Resource:Tools/Tools/ as prefix
-from __future__ import unicode_literals
-
 transferbot.py -v -family:toolserver -tofamily:wikitech -cat:"Query service" -prefix:Nova_Resource:Tools/Tools/
 
 # Copy the template "Query service" from the Toolserver wiki to wikitech
 transferbot.py -v -family:toolserver -tofamily:wikitech -page:"Template:Query service"
 
 """
-
 #
 # (C) Merlijn van Deen, 2014
 # (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import unicode_literals
+
 __version__ = '$Id$'
 #
 
