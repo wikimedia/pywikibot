@@ -17,6 +17,7 @@ os:
 addons:
   apt:
     packages:
+      - graphviz
       - liblua5.1-0-dev
 
 install:

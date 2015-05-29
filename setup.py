@@ -21,8 +21,6 @@ extra_deps = {
     # Core library dependencies
     'isbn': ['python-stdnum'],
     'Graphviz':  ['pydot>=1.0.28'],
-    'MySQL': ['oursql'],
-    'Yahoo': ['pYsearch'],
     'Google': ['google'],
     'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
@@ -32,8 +30,12 @@ extra_deps = {
 }
 
 if sys.version_info[0] == 2:
-    # csv is used by wikistats and script data_ingestion
-    extra_deps['csv'] = ['unicodecsv']
+    # Additional core library dependencies which are only available on Python 2
+    extra_deps.update({
+        'csv': ['unicodecsv'],
+        'MySQL': ['oursql'],
+        'Yahoo': ['pYsearch'],
+    })
 
 script_deps = {
     'flickrripper.py': ['Pillow'],
@@ -86,6 +88,8 @@ if sys.version_info[0] == 2:
     # Other backports are likely broken.
     dependencies.append('ipaddress')
 
+    script_deps['data_ingestion.py'] = extra_deps['csv']
+
     # mwlib is not available for py3
     script_deps['patrol'] = ['mwlib']
 
@@ -116,17 +120,20 @@ if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
 
 extra_deps.update(script_deps)
 
-# Add all script dependencies as test dependencies,
+# Add all dependencies as test dependencies,
 # so all scripts can be compiled for script_tests, etc.
 if 'PYSETUP_TEST_EXTRAS' in os.environ:
-    test_deps += list(itertools.chain(*(script_deps.values())))
+    test_deps += list(itertools.chain(*(extra_deps.values())))
+    # mwlib requires 'pyparsing>=1.4.11,<1.6', which conflicts with
+    # pydot's requirement for pyparsing>=2.0.1.
+    if 'mwlib' in test_deps:
+        test_deps.remove('mwlib')
 
-# These extra dependencies enable some tests to run on all builds
+# These extra dependencies are needed other unittest fails to load tests.
 if sys.version_info[0] == 2:
     test_deps += extra_deps['csv']
 else:
     test_deps += ['six']
-test_deps += extra_deps['rcstream']
 
 # late import of setuptools due to monkey-patching above
 from ez_setup import use_setuptools
