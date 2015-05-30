@@ -108,6 +108,9 @@ a username and password to travis:
    the password does not leak into the build logs.
 4. The next build should run tests that require a logged in user
 
+If the username does not exist on one of the Travis build sites, user tests
+will not be run on that build site.
+
 While passwords in travis-ci environment variables are not leaked in normal
 operations, you are responsible for your own passwords.
 

@@ -41,7 +41,10 @@ if sys.version_info[0] > 2:
 
 import pywikibot
 
-from pywikibot import config, log, ServerError, Site
+import pywikibot.config2 as config
+
+from pywikibot import log, Site
+from pywikibot.exceptions import ServerError, NoUsername
 from pywikibot.site import BaseSite
 from pywikibot.family import WikimediaFamily
 from pywikibot.comms import http
@@ -586,11 +589,14 @@ class RequireUserMixin(TestCaseBase):
         for site in cls.sites.values():
             cls.require_site_user(site['family'], site['code'], sysop)
 
-            site['site'].login(sysop)
+            try:
+                site['site'].login(sysop)
+            except NoUsername:
+                pass
 
             if not site['site'].user():
                 raise unittest.SkipTest(
-                    '%s: Unable able to login to %s as %s'
+                    '%s: Not able to login to %s as %s'
                     % (cls.__name__,
                        'sysop' if sysop else 'bot',
                        site['site']))
