@@ -16,14 +16,17 @@ To prevent these warnings, set PYWIKIBOT2_NO_USER_CONFIG=2.
 
 Provides two functions to register family classes which can be used in
 the user-config:
+
  - register_family_file
  - register_families_folder
 
 Other functions made available to user-config:
+
  - user_home_path
 
 Sets module global base_dir and provides utility methods to
 build paths relative to base_dir:
+
  - makepath
  - datafilepath
  - shortpath

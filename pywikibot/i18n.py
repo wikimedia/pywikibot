@@ -519,15 +519,21 @@ def twntranslate(code, twtitle, parameters=None):
     value. Multiple plurals are allowed.
 
     As an examples, if we had several json dictionaries in test folder like:
-       en.json:
-       {
+
+    en.json:
+
+      {
           "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
-       }
-       fr.json
-       {
+      }
+
+    fr.json:
+
+      {
           "test-plural": "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
-       }
-       and so on.
+      }
+
+    and so on.
+
     >>> from pywikibot import i18n
     >>> i18n.set_messages_package('tests.i18n')
     >>> # use a number

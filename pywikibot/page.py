@@ -1943,7 +1943,6 @@ class Page(BasePage):
         @return: a generator that yields a tuple for each use of a template
         in the page, with the template Page as the first entry and a list of
         parameters as the second entry.
-
         """
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
@@ -2436,12 +2435,11 @@ class Category(Page):
         @param cat: New category title (without namespace) or Category object
         @type cat: unicode or Category
         @param message: message to use for category creation message
-        If two %s are provided in message, will be replaced
-        by (self.title, authorsList)
+            If two %s are provided in message, will be replaced
+            by (self.title, authorsList)
         @type message: unicode
         @return: True if copying was successful, False if target page
             already existed.
-
         """
         # This seems far too specialized to be in the top-level framework
         # move to category.py? (Although it doesn't seem to be used there,
