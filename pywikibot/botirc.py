@@ -7,7 +7,7 @@ http://python-irclib.sourceforge.net/
 """
 #
 # (C) Balasyum, 2008
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,17 @@ __version__ = '$Id$'
 
 import re
 
-from ircbot import SingleServerIRCBot
+try:
+    from ircbot import SingleServerIRCBot
+except ImportError as e:
+    class SingleServerIRCBot(object):
+
+        """Fake SingleServerIRCBot."""
+
+        def __init__(*args, **kwargs):
+            """Report import exception."""
+            raise e
+
 
 _logger = "botirc"
 
