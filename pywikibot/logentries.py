@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2013
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,8 +10,14 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
-from pywikibot.exceptions import Error
+import sys
+
 import pywikibot
+from pywikibot.exceptions import Error
+from pywikibot.tools import deprecated
+
+if sys.version_info[0] > 2:
+    basestring = (str, )
 
 _logger = "wiki"
 
@@ -51,6 +57,22 @@ class LogEntry(object):
     def __hash__(self):
         return self.logid()
 
+    @property
+    def _params(self):
+        """
+        Additional data for some log entry types.
+
+        @rtype: dict or None
+        """
+        if 'params' in self.data:
+            return self.data['params']
+        else:  # try old mw style preceding mw 1.19
+            try:
+                return self.data[self._expectedType]
+            except KeyError:
+                raise Error("action='%s': this log entry has no params details "
+                            "for type %s." % (self.action(), self.type))
+
     def logid(self):
         return self.data['logid']
 
@@ -61,7 +83,12 @@ class LogEntry(object):
         return self.data['ns']
 
     def title(self):
-        """Page on which action was performed."""
+        """
+        Page on which action was performed.
+
+        Note: title may be missing in data dict e.g. by oversight action to
+              hide the title. In that case a KeyError exception will raise
+        """
         if not hasattr(self, '_title'):
             self._title = pywikibot.Page(self.site, self.data['title'])
         return self._title
@@ -79,7 +106,8 @@ class LogEntry(object):
     def timestamp(self):
         """Timestamp object corresponding to event timestamp."""
         if not hasattr(self, '_timestamp'):
-            self._timestamp = pywikibot.Timestamp.fromISOformat(self.data['timestamp'])
+            self._timestamp = pywikibot.Timestamp.fromISOformat(
+                self.data['timestamp'])
         return self._timestamp
 
     def comment(self):
@@ -118,27 +146,19 @@ class BlockEntry(LogEntry):
         else:
             return super(BlockEntry, self).title()
 
-    def isAutoblockRemoval(self):
-        return self.isAutoblockRemoval
-
-    def _getBlockDetails(self):
-        try:
-            return self.data['block']
-        except KeyError:
-            # No 'block' key means this is an unblocking log entry
-            if self.action() == 'unblock':
-                raise Error("action='unblock': this log entry has no block details such as flags, duration, or expiry!")
-            raise
-
     def flags(self):
         """
         Return a list of (str) flags associated with the block entry.
 
         It raises an Error if the entry is an unblocking log entry.
+
+        @rtype: list of flag strings
         """
-        if hasattr(self, '_flags'):
-            return self._flags
-        self._flags = self._getBlockDetails()['flags'].split(',')
+        if not hasattr(self, '_flags'):
+            self._flags = self._params['flags']
+            # pre mw 1.19 returned a delimited string.
+            if self._flags and isinstance(self._flags, basestring):
+                self._flags = self._flags.split(',')
         return self._flags
 
     def duration(self):
@@ -146,26 +166,27 @@ class BlockEntry(LogEntry):
         Return a datetime.timedelta representing the block duration.
 
         @return: datetime.timedelta, or None if block is indefinite.
-        @raises Error: the entry is an unblocking log entry.
         """
-        if hasattr(self, '_duration'):
-            return self._duration
-        if self._getBlockDetails()['duration'] == 'indefinite':
-            self._duration = None
-        else:
-            # Doing the difference is easier than parsing the string
-            self._duration = self.expiry() - self.timestamp()
+        if not hasattr(self, '_duration'):
+            if self.expiry() is None:
+                self._duration = None
+            else:
+                # Doing the difference is easier than parsing the string
+                self._duration = self.expiry() - self.timestamp()
         return self._duration
 
     def expiry(self):
         """
         Return a Timestamp representing the block expiry date.
 
-        @raises Error: the entry is an unblocking log entry.
+        @rtype: pywikibot.Timestamp or None
         """
-        if hasattr(self, '_expiry'):
-            return self._expiry
-        self._expiry = pywikibot.Timestamp.fromISOformat(self._getBlockDetails()['expiry'])
+        if not hasattr(self, '_expiry'):
+            details = self._params.get('expiry')
+            if details:
+                self._expiry = pywikibot.Timestamp.fromISOformat(details)
+            else:
+                self._expiry = None  # for infinite blocks
         return self._expiry
 
 
@@ -181,6 +202,20 @@ class RightsEntry(LogEntry):
     """Rights log entry."""
 
     _expectedType = 'rights'
+
+    @property
+    def oldgroups(self):
+        """Return old rights groups."""
+        if 'old' in self._params:  # old mw style
+            return self._params['old'].split(',') if self._params['old'] else []
+        return self._params['oldgroups']
+
+    @property
+    def newgroups(self):
+        """Return new rights groups."""
+        if 'new' in self._params:  # old mw style
+            return self._params['new'].split(',') if self._params['new'] else []
+        return self._params['newgroups']
 
 
 class DeleteEntry(LogEntry):
@@ -203,14 +238,38 @@ class MoveEntry(LogEntry):
 
     _expectedType = 'move'
 
+    @deprecated('target_ns.id')
     def new_ns(self):
-        return self.data['move']['new_ns']
+        """Return namespace id of target page."""
+        return self.target_ns.id
 
+    @property
+    def target_ns(self):
+        """Return namespace object of target page."""
+        # key has been changed in mw 1.19
+        return self.site.namespaces[self._params['target_ns']
+                                    if 'target_ns' in self._params
+                                    else self._params['new_ns']]
+
+    @deprecated('target_page')
     def new_title(self):
         """Return page object of the new title."""
-        if not hasattr(self, '_new_title'):
-            self._new_title = pywikibot.Page(self.site, self.data['move']['new_title'])
-        return self._new_title
+        return self.target_page
+
+    @property
+    def target_title(self):
+        """Return the target title."""
+        # key has been changed in mw 1.19
+        return (self._params['target_title']
+                if 'target_title' in self._params
+                else self._params['new_title'])
+
+    @property
+    def target_page(self):
+        """Return target page object."""
+        if not hasattr(self, '_target_page'):
+            self._target_page = pywikibot.Page(self.site, self.target_title)
+        return self._target_page
 
     def suppressedredirect(self):
         """
@@ -219,7 +278,7 @@ class MoveEntry(LogEntry):
         @rtype: bool
         """
         # Introduced in MW r47901
-        return 'suppressedredirect' in self.data['move']
+        return 'suppressedredirect' in self._params
 
 
 class ImportEntry(LogEntry):
@@ -234,6 +293,25 @@ class PatrolEntry(LogEntry):
     """Patrol log entry."""
 
     _expectedType = 'patrol'
+
+    @property
+    def current_id(self):
+        """Return the current id."""
+        # key has been changed in mw 1.19; try the new mw style first
+        return (self._params['curid']
+                if 'curid' in self._params else self._params['cur'])
+
+    @property
+    def previous_id(self):
+        # key has been changed in mw 1.19; try the new mw style first
+        """Return the previous id."""
+        return (self._params['previd']
+                if 'previd' in self._params else self._params['prev'])
+
+    @property
+    def auto(self):
+        """Return auto patrolled."""
+        return 'auto' in self._params and self._params['auto'] != 0
 
 
 class NewUsersEntry(LogEntry):
