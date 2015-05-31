@@ -548,7 +548,6 @@ def input(question, password=False, default='', force=False):
     @param force: Automatically use the default
     @type force: bool
     @rtype: unicode
-    @rtype: unicode
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
