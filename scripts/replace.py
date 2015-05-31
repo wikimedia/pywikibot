@@ -605,7 +605,7 @@ class ReplaceRobot(Bot):
                 if hasattr(self, 'addedCat'):
                     # Fetch only categories in wikitext, otherwise the others will
                     # be explicitly added.
-                    cats = textlib.getCategoryLinks(new_text)
+                    cats = textlib.getCategoryLinks(new_text, site=page.site)
                     if self.addedCat not in cats:
                         cats.append(self.addedCat)
                         new_text = textlib.replaceCategoryLinks(new_text,
