@@ -139,13 +139,14 @@ import time
 import sys
 
 import pywikibot
+
 from pywikibot import i18n, textlib, pagegenerators, Bot
 from pywikibot import editor as editarticle
 
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
 
-from pywikibot.tools import chars
+from pywikibot.tools import chars, deprecated_args
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -405,9 +406,10 @@ class ReplaceRobot(Bot):
 
     """A bot that can do text replacements."""
 
+    @deprecated_args(acceptall='always')
     def __init__(self, generator, replacements, exceptions={},
-                 acceptall=False, allowoverlap=False, recursive=False,
-                 addedCat=None, sleep=None, summary='', site=None):
+                 always=False, allowoverlap=False, recursive=False,
+                 addedCat=None, sleep=None, summary='', **kwargs):
         """
         Constructor.
 
@@ -419,7 +421,7 @@ class ReplaceRobot(Bot):
                              string).
             * exceptions   - A dictionary which defines when not to change an
                              occurrence. See below.
-            * acceptall    - If True, the user won't be prompted before changes
+            * always       - If True, the user won't be prompted before changes
                              are made.
             * allowoverlap - If True, when matches overlap, all of them are
                              replaced.
@@ -446,7 +448,10 @@ class ReplaceRobot(Bot):
                 exceptionRegexes dictionary in textlib.replaceExcept().
 
         """
-        super(ReplaceRobot, self).__init__(generator=generator)
+        super(ReplaceRobot, self).__init__(generator=generator,
+                                           always=always,
+                                           **kwargs)
+
         for i, replacement in enumerate(replacements):
             if isinstance(replacement, collections.Sequence):
                 if len(replacement) != 2:
@@ -458,11 +463,9 @@ class ReplaceRobot(Bot):
                                                             replacement[1])
         self.replacements = replacements
         self.exceptions = exceptions
-        self.acceptall = acceptall
+        self.acceptall = always  # deprecated
         self.allowoverlap = allowoverlap
         self.recursive = recursive
-        if site:
-            self.site = site
 
         if addedCat:
             if isinstance(addedCat, pywikibot.Category):
@@ -613,7 +616,7 @@ class ReplaceRobot(Bot):
                 pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                                  % page.title())
                 pywikibot.showDiff(original_text, new_text)
-                if self.acceptall:
+                if self.getOption('always'):
                     break
                 choice = pywikibot.input_choice(
                     u'Do you want to accept these changes?',
@@ -638,12 +641,12 @@ class ReplaceRobot(Bot):
                     new_text = original_text
                     continue
                 if choice == 'a':
-                    self.acceptall = True
+                    self.options['always'] = True
                 if choice == 'y':
                     page.put_async(new_text, self.generate_summary(applied), callback=self.count_changes)
                 # choice must be 'N'
                 break
-            if self.acceptall and new_text != original_text:
+            if self.getOption('always') and new_text != original_text:
                 try:
                     page.put(new_text, self.generate_summary(applied), callback=self.count_changes)
                 except pywikibot.EditConflict:
