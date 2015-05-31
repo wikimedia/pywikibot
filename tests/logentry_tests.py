@@ -24,9 +24,16 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
-def get_logentry(site, logtype):
-    """Global method to retriev a single log entry."""
-    return next(iter(site.logevents(logtype=logtype, total=1)))
+class TestLogentriesBase(TestCase):
+
+    """Base class for log entry tests."""
+
+    family = 'wikipedia'
+    code = 'de'
+
+    def _get_logentry(self, logtype):
+        """Retrieve a single log entry."""
+        return next(iter(self.site.logevents(logtype=logtype, total=1)))
 
 
 class TestLogentriesMeta(MetaTestCaseClass):
@@ -35,13 +42,11 @@ class TestLogentriesMeta(MetaTestCaseClass):
 
     def __new__(cls, name, bases, dct):
         """Create the new class."""
-        cls.site = pywikibot.Site('de', 'wikipedia')
-
         def test_method(logtype):
 
             def test_logevent(self):
                 """Test a single logtype entry."""
-                logentry = get_logentry(cls.site, logtype)
+                logentry = self._get_logentry(logtype)
                 self.assertEqual(logtype, logentry._expectedType)
                 self.assertIsInstance(logentry.action(), unicode)
                 self.assertIsInstance(logentry.comment(), unicode)
@@ -63,27 +68,24 @@ class TestLogentriesMeta(MetaTestCaseClass):
             test_name = str('test_%sEntry' % logtype.title())
             dct[test_name] = test_method(logtype)
 
-        return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
+        return super(TestLogentriesMeta, cls).__new__(cls, name, bases, dct)
 
 
 @add_metaclass
-class TestLogentries(TestCase):
+class TestLogentries(TestLogentriesBase):
 
-    """Test TestLogentries processed by unittest."""
+    """Test general LogEntry properties."""
 
     __metaclass__ = TestLogentriesMeta
 
 
-class TestLogentryParams(TestCase):
+class TestLogentryParams(TestLogentriesBase):
 
-    """Test Logentry params."""
-
-    family = 'wikipedia'
-    code = 'de'
+    """Test LogEntry properties specific to their action."""
 
     def test_BlockEntry(self):
         """Test BlockEntry methods."""
-        logentry = get_logentry(self.site, 'block')
+        logentry = self._get_logentry('block')
         if logentry.action() == 'block':
             self.assertIsInstance(logentry.flags(), list)
         if logentry.expiry() is not None:
@@ -91,14 +93,14 @@ class TestLogentryParams(TestCase):
             self.assertIsInstance(logentry.duration(), datetime.timedelta)
 
     def test_RightsEntry(self):
-        """Test MoveEntry methods."""
-        logentry = get_logentry(self.site, 'rights')
+        """Test RightsEntry methods."""
+        logentry = self._get_logentry('rights')
         self.assertIsInstance(logentry.oldgroups, list)
         self.assertIsInstance(logentry.newgroups, list)
 
     def test_MoveEntry(self):
         """Test MoveEntry methods."""
-        logentry = get_logentry(self.site, 'move')
+        logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.target_ns, pywikibot.site.Namespace)
         self.assertEqual(logentry.target_page.namespace(),
                          logentry.target_ns.id)
@@ -107,23 +109,20 @@ class TestLogentryParams(TestCase):
         self.assertIsInstance(logentry.suppressedredirect(), bool)
 
     def test_PatrolEntry(self):
-        """Test MoveEntry methods."""
-        logentry = get_logentry(self.site, 'patrol')
+        """Test PatrolEntry methods."""
+        logentry = self._get_logentry('patrol')
         self.assertIsInstance(logentry.current_id, int)
         self.assertIsInstance(logentry.previous_id, int)
         self.assertIsInstance(logentry.auto, bool)
 
 
-class TestDeprecatedMethods(DeprecationTestCase):
+class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
     """Test cases for deprecated logentry methods."""
 
-    family = 'wikipedia'
-    code = 'de'
-
     def test_MoveEntry(self):
-        """Test MoveEntry methods."""
-        logentry = get_logentry(self.site, 'move')
+        """Test deprecated MoveEntry methods."""
+        logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.new_ns(), int)
         self.assertEqual(logentry.new_title(), logentry.target_page)
 
