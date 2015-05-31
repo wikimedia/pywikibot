@@ -15,7 +15,7 @@ from pywikibot import config
 
 from tests import _root_dir
 from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
-from tests.utils import allowed_failure, execute_pwb
+from tests.utils import allowed_failure, execute_pwb, add_metaclass
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -386,6 +386,7 @@ class TestScriptMeta(MetaTestCaseClass):
         return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
 
 
+@add_metaclass
 class TestScript(DefaultSiteTestCase, PwbTestCase):
 
     """Test cases for scripts.
@@ -400,10 +401,6 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
 
     user = True
 
-
-if sys.version_info[0] > 2:
-    import six
-    TestScript = six.add_metaclass(TestScriptMeta)(TestScript)
 
 if __name__ == '__main__':
     try:

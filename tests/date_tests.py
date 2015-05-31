@@ -10,7 +10,9 @@ from __future__ import unicode_literals
 from datetime import datetime
 
 from pywikibot import date
+
 from tests.aspects import unittest, MetaTestCaseClass, TestCase
+from tests.utils import add_metaclass
 
 
 class TestDateMeta(MetaTestCaseClass):
@@ -54,6 +56,7 @@ class TestDateMeta(MetaTestCaseClass):
         return type.__new__(cls, name, bases, dct)
 
 
+@add_metaclass
 class TestDate(TestCase):
 
     """Test cases for date library processed by unittest."""

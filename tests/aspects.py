@@ -36,9 +36,6 @@ import sys
 import time
 import warnings
 
-if sys.version_info[0] > 2:
-    import six
-
 import pywikibot
 
 from pywikibot import config, log, ServerError, Site
@@ -50,7 +47,7 @@ from pywikibot.data.api import Request as _original_Request
 import tests
 
 from tests import unittest, patch_request, unpatch_request
-from tests.utils import execute_pwb, DrySite, DryRequest
+from tests.utils import execute_pwb, DrySite, DryRequest, add_metaclass
 
 
 class TestCaseBase(unittest.TestCase):
@@ -794,6 +791,7 @@ class MetaTestCaseClass(type):
         return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
 
 
+@add_metaclass
 class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
 
     """Run tests on pre-defined sites."""
@@ -925,10 +923,6 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
             raise unittest.SkipTest("Did not find a page that does not exist.")
 
         return page
-
-
-if sys.version_info[0] > 2:
-    TestCase = six.add_metaclass(MetaTestCaseClass)(TestCase)
 
 
 class SiteAttributeTestCase(TestCase):

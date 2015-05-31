@@ -10,10 +10,12 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import re
-from tests.aspects import unittest, MetaTestCaseClass, TestCase
+
 import pywikibot
 from pywikibot import i18n
 
+from tests.aspects import unittest, MetaTestCaseClass, TestCase
+from tests.utils import add_metaclass
 
 PACKAGES = (
     'redirect-broken-redirect-template',  # speedy deletion template
@@ -62,11 +64,13 @@ class TestValidTemplateMeta(MetaTestCaseClass):
         return type.__new__(cls, name, bases, dct)
 
 
+@add_metaclass
 class TestValidTemplate(TestCase):
 
     """Test cases L10N message templates processed by unittest."""
 
     __metaclass__ = TestValidTemplateMeta
+
     net = True  # magic flag tells jenkins to not run the test.
 
 

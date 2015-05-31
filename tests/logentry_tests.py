@@ -18,6 +18,7 @@ from pywikibot.logentries import LogEntryFactory
 from tests.aspects import (
     unittest, MetaTestCaseClass, TestCase, DeprecationTestCase
 )
+from tests.utils import add_metaclass
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -65,6 +66,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
         return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
 
 
+@add_metaclass
 class TestLogentries(TestCase):
 
     """Test TestLogentries processed by unittest."""

@@ -17,6 +17,9 @@ import traceback
 
 from warnings import warn
 
+if sys.version_info[0] > 2:
+    import six
+
 import pywikibot
 
 from pywikibot import config
@@ -88,6 +91,15 @@ def allowed_failure_if(expect):
         return allowed_failure
     else:
         return lambda orig: orig
+
+
+def add_metaclass(cls):
+    """Call six's add_metaclass with the site's __metaclass__ in Python 3."""
+    if sys.version_info[0] > 2:
+        return six.add_metaclass(cls.__metaclass__)(cls)
+    else:
+        assert(cls.__metaclass__)
+        return cls
 
 
 class DryParamInfo(dict):
