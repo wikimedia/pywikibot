@@ -45,7 +45,7 @@ botList = {
 }
 
 
-class LoginManager:
+class LoginManager(object):
 
     """Site login manager."""
 
@@ -58,11 +58,13 @@ class LoginManager:
 
         @param site: Site object to log into
         @type site: BaseSite
-        @param user: username to use
+        @param user: username to use.
+            If user is None, the username is loaded from config.usernames.
         @type user: basestring
         @param password: password to use
         @type password: basestring
-        @param sysop: login as sysop account
+        @param sysop: login as sysop account.
+            The sysop username is loaded from config.sysopnames.
         @type sysop: bool
 
         @raises NoUsername: No username is configured for the requested site.

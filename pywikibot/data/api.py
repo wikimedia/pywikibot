@@ -2533,6 +2533,7 @@ class LoginManager(login.LoginManager):
                                   % diff.seconds)
                 time.sleep(diff.seconds)
         login_request = Request(site=self.site,
+                                use_get=False,
                                 action="login",
                                 lgname=self.username,
                                 lgpassword=self.password)
