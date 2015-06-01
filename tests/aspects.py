@@ -641,6 +641,7 @@ class MetaTestCaseClass(type):
 
             def wrapped_method(self):
                 sitedata = self.sites[key]
+                self.site_key = key
                 self.family = sitedata['family']
                 self.code = sitedata['code']
                 self.site = sitedata['site']
