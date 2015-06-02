@@ -5780,6 +5780,33 @@ class DataSite(APISite):
         return data
 
     @must_be(group='user')
+    def save_claim(self, claim, **kwargs):
+        """
+        Save the whole claim to the wikibase site.
+
+        @param claim: The claim to save
+        @type claim: Claim
+        """
+        if claim.isReference or claim.isQualifier:
+            raise NotImplementedError
+        if not claim.snak:
+            # We need to already have the snak value
+            raise NoPage(claim)
+        params = {'action': 'wbsetclaim',
+                  'claim': json.dumps(claim.toJSON()),
+                  'token': self.tokens['edit'],
+                  'baserevid': claim.on_item.lastrevid,
+                  }
+        if 'bot' not in kwargs or kwargs['bot']:
+            params['bot'] = True
+        if 'summary' in kwargs:
+            params['summary'] = kwargs['summary']
+
+        req = api.Request(site=self, **params)
+        data = req.submit()
+        return data
+
+    @must_be(group='user')
     def editSource(self, claim, source, new=False, bot=True, **kwargs):
         """
         Create/Edit a source.

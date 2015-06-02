@@ -4148,13 +4148,14 @@ class Claim(Property):
         """Return the rank of the Claim."""
         return self.rank
 
-    def setRank(self):
-        """
-        Set the rank of the Claim.
+    def setRank(self, rank):
+        """Set the rank of the Claim."""
+        self.rank = rank
 
-        Has not been implemented in the Wikibase API yet
-        """
-        raise NotImplementedError
+    def changeRank(self, rank):
+        """Change the rank of the Claim and save."""
+        self.rank = rank
+        return self.repo.save_claim(self)
 
     def changeSnakType(self, value=None, **kwargs):
         """

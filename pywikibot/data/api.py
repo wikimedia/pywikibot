@@ -1136,7 +1136,7 @@ class Request(MutableMapping):
             "wbeditentity", "wbsetlabel", "wbsetdescription",
             "wbsetaliases", "wblinktitles", "wbsetsitelink",
             "wbcreateclaim", "wbremoveclaims", "wbsetclaimvalue",
-            "wbsetreference", "wbremovereferences"
+            "wbsetreference", "wbremovereferences", "wbsetclaim",
         )
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
