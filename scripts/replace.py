@@ -409,7 +409,7 @@ class ReplaceRobot(Bot):
     @deprecated_args(acceptall='always')
     def __init__(self, generator, replacements, exceptions={},
                  always=False, allowoverlap=False, recursive=False,
-                 addedCat=None, sleep=None, summary='', **kwargs):
+                 addedCat=None, sleep=None, summary='', site=None, **kwargs):
         """
         Constructor.
 
@@ -450,6 +450,7 @@ class ReplaceRobot(Bot):
         """
         super(ReplaceRobot, self).__init__(generator=generator,
                                            always=always,
+                                           site=site,
                                            **kwargs)
 
         for i, replacement in enumerate(replacements):
