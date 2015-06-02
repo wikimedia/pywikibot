@@ -77,7 +77,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     reading from or writing to the wiki.  All other methods are delegated
     to the Site object.
 
-    Will be subclassed by Page and WikibasePage.
+    Will be subclassed by Page, WikibasePage, and FlowPage.
 
     """
 
