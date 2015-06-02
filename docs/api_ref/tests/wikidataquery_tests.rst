@@ -6,7 +6,9 @@ wikidataquery_tests
 ---------------
 Available tests
 ---------------
-    .. autoclass:: tests.wikidataquery_tests.TestApiFunctions
+    .. autoclass:: tests.wikidataquery_tests.TestDryApiFunctions
+        :members:
+    .. autoclass:: tests.wikidataquery_tests.TestLiveApiFunctions
         :members:
     .. autoclass:: tests.wikidataquery_tests.TestApiSlowFunctions
         :members:
