@@ -16,6 +16,7 @@ import pywikibot.data.api as api
 import pywikibot.family
 import pywikibot.login
 import pywikibot.site
+
 from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import (
