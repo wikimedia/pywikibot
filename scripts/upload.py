@@ -226,7 +226,8 @@ class UploadRobot:
         forbidden = ':*?/\\'  # to be extended
         allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
                            u'ogg', u'png', u'svg', u'xcf', u'djvu',
-                           u'ogv', u'oga', u'tif', u'tiff')
+                           u'ogv', u'oga', u'tif', u'tiff', u'webm',
+                           u'flac', u'wav')
         # ask until it's valid
         first_check = True
         while True:
