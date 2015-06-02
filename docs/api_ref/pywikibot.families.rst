@@ -1,235 +1,234 @@
-families Package
-================
-
-:mod:`families` Package
------------------------
+pywikibot.families package
+==========================
 
 .. automodule:: pywikibot.families
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`anarchopedia_family` Module
----------------------------------
+Submodules
+----------
+
+pywikibot.families.anarchopedia_family module
+---------------------------------------------
 
 .. automodule:: pywikibot.families.anarchopedia_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`battlestarwiki_family` Module
------------------------------------
+pywikibot.families.battlestarwiki_family module
+-----------------------------------------------
 
 .. automodule:: pywikibot.families.battlestarwiki_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`commons_family` Module
-----------------------------
+pywikibot.families.commons_family module
+----------------------------------------
 
 .. automodule:: pywikibot.families.commons_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`i18n_family` Module
--------------------------
+pywikibot.families.i18n_family module
+-------------------------------------
 
 .. automodule:: pywikibot.families.i18n_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`incubator_family` Module
-------------------------------
+pywikibot.families.incubator_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.incubator_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`lyricwiki_family` Module
-------------------------------
+pywikibot.families.lyricwiki_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.lyricwiki_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`mediawiki_family` Module
-------------------------------
+pywikibot.families.mediawiki_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.mediawiki_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`meta_family` Module
--------------------------
+pywikibot.families.meta_family module
+-------------------------------------
 
 .. automodule:: pywikibot.families.meta_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`omegawiki_family` Module
-------------------------------
+pywikibot.families.omegawiki_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.omegawiki_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`osm_family` Module
-------------------------
+pywikibot.families.osm_family module
+------------------------------------
 
 .. automodule:: pywikibot.families.osm_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`outreach_family` Module
------------------------------
+pywikibot.families.outreach_family module
+-----------------------------------------
 
 .. automodule:: pywikibot.families.outreach_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`species_family` Module
-----------------------------
+pywikibot.families.species_family module
+----------------------------------------
 
 .. automodule:: pywikibot.families.species_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`strategy_family` Module
------------------------------
+pywikibot.families.strategy_family module
+-----------------------------------------
 
 .. automodule:: pywikibot.families.strategy_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`test_family` Module
--------------------------
+pywikibot.families.test_family module
+-------------------------------------
 
 .. automodule:: pywikibot.families.test_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`vikidia_family` Module
-----------------------------
+pywikibot.families.vikidia_family module
+----------------------------------------
 
 .. automodule:: pywikibot.families.vikidia_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikia_family` Module
---------------------------
+pywikibot.families.wikia_family module
+--------------------------------------
 
 .. automodule:: pywikibot.families.wikia_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikibooks_family` Module
-------------------------------
+pywikibot.families.wikibooks_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.wikibooks_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikidata_family` Module
------------------------------
+pywikibot.families.wikidata_family module
+-----------------------------------------
 
 .. automodule:: pywikibot.families.wikidata_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikimedia_family` Module
-------------------------------
+pywikibot.families.wikimedia_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.wikimedia_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikinews_family` Module
------------------------------
+pywikibot.families.wikinews_family module
+-----------------------------------------
 
 .. automodule:: pywikibot.families.wikinews_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikipedia_family` Module
-------------------------------
+pywikibot.families.wikipedia_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.wikipedia_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikiquote_family` Module
-------------------------------
+pywikibot.families.wikiquote_family module
+------------------------------------------
 
 .. automodule:: pywikibot.families.wikiquote_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikisource_family` Module
--------------------------------
+pywikibot.families.wikisource_family module
+-------------------------------------------
 
 .. automodule:: pywikibot.families.wikisource_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikitech_family` Module
------------------------------
+pywikibot.families.wikitech_family module
+-----------------------------------------
 
 .. automodule:: pywikibot.families.wikitech_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikiversity_family` Module
---------------------------------
+pywikibot.families.wikiversity_family module
+--------------------------------------------
 
 .. automodule:: pywikibot.families.wikiversity_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikivoyage_family` Module
--------------------------------
+pywikibot.families.wikivoyage_family module
+-------------------------------------------
 
 .. automodule:: pywikibot.families.wikivoyage_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wiktionary_family` Module
--------------------------------
+pywikibot.families.wiktionary_family module
+-------------------------------------------
 
 .. automodule:: pywikibot.families.wiktionary_family
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wowwiki_family` Module
-----------------------------
+pywikibot.families.wowwiki_family module
+----------------------------------------
 
 .. automodule:: pywikibot.families.wowwiki_family
     :members:
     :undoc-members:
     :show-inheritance:
-

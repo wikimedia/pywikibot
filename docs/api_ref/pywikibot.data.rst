@@ -1,27 +1,34 @@
-data Package
-============
-
-:mod:`data` Package
--------------------
+pywikibot.data package
+======================
 
 .. automodule:: pywikibot.data
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`api` Module
------------------
+Submodules
+----------
+
+pywikibot.data.api module
+-------------------------
 
 .. automodule:: pywikibot.data.api
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`wikidataquery` Module
----------------------------
+pywikibot.data.wikidataquery module
+-----------------------------------
 
 .. automodule:: pywikibot.data.wikidataquery
     :members:
     :undoc-members:
     :show-inheritance:
 
+pywikibot.data.wikistats module
+-------------------------------
+
+.. automodule:: pywikibot.data.wikistats
+    :members:
+    :undoc-members:
+    :show-inheritance:
