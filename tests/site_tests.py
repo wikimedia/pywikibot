@@ -17,7 +17,9 @@ from datetime import datetime
 import re
 
 import pywikibot
+
 from pywikibot import config
+from pywikibot import async_request, page_put_queue
 from pywikibot.comms import http
 from pywikibot.tools import MediaWikiVersion
 from pywikibot.data import api
@@ -1635,6 +1637,18 @@ class TestSiteInfo(WikimediaDefaultSiteTestCase):
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).items()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).values()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
+
+
+class TestSiteinfoAsync(DefaultSiteTestCase):
+
+    """Test asynchronous siteinfo fetch."""
+
+    def test_async_request(self):
+        self.assertTrue(page_put_queue.empty())
+        self.assertTrue('statistics' not in self.site.siteinfo)
+        async_request(self.site.siteinfo.get, 'statistics')
+        page_put_queue.join()
+        self.assertIn('statistics', self.site.siteinfo)
 
 
 class TestSiteLoadRevisions(TestCase):

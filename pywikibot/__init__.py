@@ -721,6 +721,7 @@ def async_manager():
         if request is None:
             break
         request(*args, **kwargs)
+        page_put_queue.task_done()
 
 
 def async_request(request, *args, **kwargs):
