@@ -145,8 +145,8 @@ class TestHttpStatus(TestCase):
     """Test HTTP status code handling and errors."""
 
     sites = {
-        'getstatuscode': {
-            'hostname': 'getstatuscode.com',
+        'httpbin': {
+            'hostname': 'httpbin.org',
         },
         'enwp': {
             'hostname': 'en.wikipedia.org',
@@ -160,7 +160,7 @@ class TestHttpStatus(TestCase):
         """Test that a HTTP 504 raises the correct exception."""
         self.assertRaises(pywikibot.Server504Error,
                           http.fetch,
-                          uri='http://getstatuscode.com/504')
+                          uri='http://httpbin.org/status/504')
 
     def test_server_not_found(self):
         """Test server not found exception."""
@@ -199,7 +199,7 @@ class TestHttpStatus(TestCase):
         """Test that maximum redirect exception doesn't hang up."""
         self.assertRaises(httplib2.RedirectLimit,
                           http.fetch,
-                          uri='http://getstatuscode.com/300')
+                          uri='http://httpbin.org/status/300')
 
 
 class ThreadedHttpTestCase(TestCase):
