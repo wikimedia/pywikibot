@@ -14,6 +14,7 @@ import sys
 
 import pywikibot
 from pywikibot.logentries import LogEntryFactory
+from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import (
     unittest, MetaTestCaseClass, TestCase, DeprecationTestCase
@@ -26,13 +27,38 @@ if sys.version_info[0] > 2:
 
 class TestLogentriesBase(TestCase):
 
-    """Base class for log entry tests."""
+    """
+    Base class for log entry tests.
 
-    family = 'wikipedia'
-    code = 'de'
+    It uses the German Wikipedia for a current representation of the log entries
+    and the test Wikipedia for the future representation. It also tests on a
+    wiki with MW 1.19 or older to check that it can still read the older format.
+    It currently uses lyricwiki which as of this commit uses 1.19.24.
+    """
+
+    sites = {
+        'tewp': {
+            'family': 'wikipedia',
+            'code': 'test'
+        },
+        'dewp': {
+            'family': 'wikipedia',
+            'code': 'de'
+        },
+        'old': {
+            'family': 'lyricwiki',
+            'code': 'en'
+        }
+    }
 
     def _get_logentry(self, logtype):
         """Retrieve a single log entry."""
+        if self.site_key == 'old':
+            # This is an assertion as the tests don't make sense with newer
+            # MW versions and otherwise it might not be visible that the test
+            # isn't run on an older wiki.
+            self.assertLess(MediaWikiVersion(self.site.version()),
+                            MediaWikiVersion('1.20'))
         return next(iter(self.site.logevents(logtype=logtype, total=1)))
 
 
@@ -44,10 +70,14 @@ class TestLogentriesMeta(MetaTestCaseClass):
         """Create the new class."""
         def test_method(logtype):
 
-            def test_logevent(self):
+            def test_logevent(self, key):
                 """Test a single logtype entry."""
                 logentry = self._get_logentry(logtype)
                 self.assertEqual(logtype, logentry._expectedType)
+                if key == 'old':
+                    self.assertNotIn('params', logentry.data)
+                else:
+                    self.assertNotIn(logentry.type(), logentry.data)
                 self.assertIsInstance(logentry.action(), unicode)
                 self.assertIsInstance(logentry.comment(), unicode)
                 self.assertIsInstance(logentry.logid(), int)
@@ -83,7 +113,7 @@ class TestLogentryParams(TestLogentriesBase):
 
     """Test LogEntry properties specific to their action."""
 
-    def test_BlockEntry(self):
+    def test_BlockEntry(self, key):
         """Test BlockEntry methods."""
         logentry = self._get_logentry('block')
         if logentry.action() == 'block':
@@ -92,13 +122,13 @@ class TestLogentryParams(TestLogentriesBase):
             self.assertIsInstance(logentry.expiry(), pywikibot.Timestamp)
             self.assertIsInstance(logentry.duration(), datetime.timedelta)
 
-    def test_RightsEntry(self):
+    def test_RightsEntry(self, key):
         """Test RightsEntry methods."""
         logentry = self._get_logentry('rights')
         self.assertIsInstance(logentry.oldgroups, list)
         self.assertIsInstance(logentry.newgroups, list)
 
-    def test_MoveEntry(self):
+    def test_MoveEntry(self, key):
         """Test MoveEntry methods."""
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.target_ns, pywikibot.site.Namespace)
@@ -108,7 +138,7 @@ class TestLogentryParams(TestLogentriesBase):
         self.assertIsInstance(logentry.target_page, pywikibot.Page)
         self.assertIsInstance(logentry.suppressedredirect(), bool)
 
-    def test_PatrolEntry(self):
+    def test_PatrolEntry(self, key):
         """Test PatrolEntry methods."""
         logentry = self._get_logentry('patrol')
         self.assertIsInstance(logentry.current_id, int)
@@ -120,7 +150,7 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
     """Test cases for deprecated logentry methods."""
 
-    def test_MoveEntry(self):
+    def test_MoveEntry(self, key):
         """Test deprecated MoveEntry methods."""
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.new_ns(), int)
