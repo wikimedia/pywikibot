@@ -11,7 +11,7 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import config2 as config
-from pywikibot.page import Link
+from pywikibot.page import Link, Page
 from pywikibot.exceptions import Error, InvalidTitle
 from tests.aspects import (
     unittest,
@@ -108,6 +108,21 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertRaises(InvalidTitle, Link('Category: ', self.get_site()).parse)
         self.assertRaises(InvalidTitle, Link('Category: #bar', self.get_site()).parse)
 
+    def test_relative(self):
+        """Test that relative links are handled properly."""
+        # Subpage
+        p = Page(self.get_site(), 'Foo')
+        l = Link('/bar', p)
+        self.assertEquals(l.title, 'Foo/bar')
+        self.assertEquals(l.site, self.get_site())
+        # Subpage of Page with section
+        p = Page(self.get_site(), 'Foo#Baz')
+        l = Link('/bar', p)
+        self.assertEquals(l.title, 'Foo/bar')
+        self.assertEquals(l.site, self.get_site())
+        # Non-subpage link text beginning with slash
+        l = Link('/bar', self.get_site())
+        self.assertEquals(l.title, '/bar')
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 
