@@ -16,7 +16,7 @@ The following parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,8 +26,9 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import pagegenerators
-from pywikibot import i18n
+from pywikibot import i18n, pagegenerators, Bot
+
+from pywikibot.tools import issue_deprecation_warning
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -36,7 +37,7 @@ docuReplacements = {
 }
 
 
-class BasicBot:
+class BasicBot(Bot):
 
     """An incomplete sample bot."""
 
@@ -44,29 +45,26 @@ class BasicBot:
     # The file containing these messages should have the same name as the caller
     # script (i.e. basic.py in this case)
 
-    def __init__(self, generator, dry):
+    def __init__(self, generator, dry=False, **kwargs):
         """
         Constructor.
 
-        Parameters:
-            @param generator: The page generator that determines on which pages
-                              to work.
-            @type generator: generator.
-            @param dry: If True, doesn't do any real changes, but only shows
-                        what would have been changed.
-            @type dry: boolean.
+        @param generator: the page generator that determines on which pages
+            to work
+        @type generator: generator
+        @param dry: if True, doesn't do any real changes, but only shows
+            what would have been changed
+        @type dry: bool
         """
+        if dry:
+            issue_deprecation_warning('dry argument', 'pywikibot.config.simulate', 1)
+            pywikibot.config.simulate = True
+        super(BasicBot, self).__init__(**kwargs)
         self.generator = generator
-        self.dry = dry
 
         # Set the edit summary message
         site = pywikibot.Site()
         self.summary = i18n.twtranslate(site, 'basic-changing')
-
-    def run(self):
-        """Process each page from the generator."""
-        for page in self.generator:
-            self.treat(page)
 
     def treat(self, page):
         """Load the given page, does some changes, and saves it."""
@@ -82,13 +80,13 @@ class BasicBot:
         # Example: This puts the text 'Test' at the beginning of the page.
         text = 'Test ' + text
 
-        if not self.save(text, page, self.summary):
+        if not self.userPut(page, page.text, text, summary=self.summary,
+                            ignore_save_related_errors=True):
             pywikibot.output(u'Page %s not saved.' % page.title(asLink=True))
 
     def load(self, page):
         """Load the text of the given page."""
         try:
-            # Load the page
             text = page.get()
         except pywikibot.NoPage:
             pywikibot.output(u"Page %s does not exist; skipping."
@@ -99,42 +97,6 @@ class BasicBot:
         else:
             return text
         return None
-
-    def save(self, text, page, comment=None, minorEdit=True,
-             botflag=True):
-        """Update the given page with new text."""
-        # only save if something was changed
-        if text != page.get():
-            # Show the title of the page we're working on.
-            # Highlight the title in purple.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % page.title())
-            # show what was changed
-            pywikibot.showDiff(page.get(), text)
-            pywikibot.output(u'Comment: %s' % comment)
-            if not self.dry:
-                if pywikibot.input_yn(
-                        u'Do you want to accept these changes?',
-                        default=False, automatic_quit=False):
-                    try:
-                        page.text = text
-                        # Save the page
-                        page.save(summary=comment or self.comment,
-                                  minor=minorEdit, botflag=botflag)
-                    except pywikibot.LockedPage:
-                        pywikibot.output(u"Page %s is locked; skipping."
-                                         % page.title(asLink=True))
-                    except pywikibot.EditConflict:
-                        pywikibot.output(
-                            u'Skipping %s because of edit conflict'
-                            % (page.title()))
-                    except pywikibot.SpamfilterError as error:
-                        pywikibot.output(
-                            u'Cannot change %s because of spam blacklist entry %s'
-                            % (page.title(), error.url))
-                    else:
-                        return True
-        return False
 
 
 def main(*args):
@@ -153,26 +115,21 @@ def main(*args):
     # that are also used by other scripts and that determine on which pages
     # to work on.
     genFactory = pagegenerators.GeneratorFactory()
-    # The generator gives the pages that should be worked upon.
-    gen = None
-    # If dry is True, doesn't do any real changes, but only show
-    # what would have been changed.
-    dry = False
 
     # Parse command line arguments
     for arg in local_args:
-        if arg.startswith("-dry"):
-            dry = True
+        if arg == '-dry':
+            issue_deprecation_warning('-dry option', '-simulate', 1)
+            pywikibot.config.simulate = True
         else:
             genFactory.handleArg(arg)
 
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator()
     if gen:
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
-        bot = BasicBot(gen, dry)
+        bot = BasicBot(gen)
         bot.run()
     else:
         pywikibot.showHelp()

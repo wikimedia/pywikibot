@@ -1112,6 +1112,9 @@ class Bot(object):
         * 'show_diff' - show changes between oldtext and newtext (enabled)
         * 'ignore_save_related_errors' - report and ignore (disabled)
         * 'ignore_server_errors' - report and ignore (disabled)
+
+        @return: whether the page was saved successfully
+        @rtype: bool
         """
         if oldtext == newtext:
             pywikibot.output(u'No changes were needed on %s'
@@ -1129,7 +1132,7 @@ class Bot(object):
             pywikibot.output(u'Edit summary: %s' % kwargs['summary'])
 
         page.text = newtext
-        self._save_page(page, page.save, **kwargs)
+        return self._save_page(page, page.save, **kwargs)
 
     def _save_page(self, page, func, *args, **kwargs):
         """
@@ -1145,6 +1148,8 @@ class Bot(object):
         @kwarg ignore_save_related_errors: if True, errors related to
         page save will be reported and ignored (default: False)
         @kwtype ignore_save_related_errors: bool
+        @return: whether the page was saved successfully
+        @rtype: bool
         """
         if not self.user_confirm('Do you want to accept these changes?'):
             return
@@ -1181,6 +1186,9 @@ class Bot(object):
                 raise
             pywikibot.error(u'Server Error while processing %s: %s'
                             % (page.title(), e))
+        else:
+            return True
+        return False
 
     def quit(self):
         """Cleanup and quit processing."""
