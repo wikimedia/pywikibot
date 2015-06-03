@@ -15,11 +15,12 @@ where action can be one of these:
 double         Fix redirects which point to other redirects.
 do             Shortcut action command is "do".
 
-broken         Tries to fix broken redirect to the last moved target of the
-br             destination page. If this fails and -delete option is given
-               it deletes redirects where targets don't exist if bot has
-               admin rights otherwise it marks the page with a speedy deletion
-               template if available. Shortcut action command is "br".
+broken         Tries to fix redirect which point to nowhere by using the last
+br             moved target of the destination page. If this fails and the
+               -delete option is set, it either deletes the page or marks it for
+               deletion depending on whether the account has admin rights. It
+               will mark the redirect not for deletion if there is no speedy
+               deletion template available. Shortcut action command is "br".
 
 both           Both of the above. Retrieves redirect pages from live wiki,
                not from a special page.
@@ -60,7 +61,9 @@ and arguments can be:
 -total:n       The maximum count of redirects to work upon. If omitted, there
                is no limit.
 
--delete        Enables deletion of broken redirects.
+-delete        Prompt the user whether broken redirects should be deleted (or
+               marked for deletion if the account has no admin rights) instead
+               of just skipping them.
 
 -always        Don't prompt you for each replacement.
 
