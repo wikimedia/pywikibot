@@ -44,12 +44,12 @@ import sys
 
 import pywikibot
 from pywikibot import pagegenerators, textlib
+from pywikibot.comms.http import fetch
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlencode
-    from urllib.request import urlopen
 else:
-    from urllib import urlencode, urlopen
+    from urllib import urlencode
 
 
 category_blacklist = []
@@ -164,10 +164,10 @@ def getCommonshelperCats(imagepage):
         try:
             if tries < maxtries:
                 tries += 1
-                commonsHelperPage = urlopen(
+                commonsHelperPage = fetch(
                     "https://toolserver.org/~daniel/WikiSense/CommonSense.php?%s" % parameters)
                 matches = commonsenseRe.search(
-                    commonsHelperPage.read().decode('utf-8'))
+                    commonsHelperPage.content)
                 gotInfo = True
             else:
                 break
@@ -229,8 +229,8 @@ def getOpenStreetMap(latitude, longitude):
     parameters = urlencode({'lat': latitude, 'lon': longitude, 'accept-language': 'en'})
     while not gotInfo:
         try:
-            page = urlopen("https://nominatim.openstreetmap.org/reverse?format=xml&%s" % parameters)
-            et = xml.etree.ElementTree.parse(page)
+            page = fetch('https://nominatim.openstreetmap.org/reverse?format=xml&%s' % parameters)
+            et = xml.etree.ElementTree.fromstring(page.content)
             gotInfo = True
         except IOError:
             pywikibot.output(u'Got an IOError, let\'s try again')
@@ -382,10 +382,10 @@ def filterParents(categories):
                                    'bot': '1'})
     filterCategoriesRe = re.compile(r'\[\[Category:([^\]]*)\]\]')
     try:
-        filterCategoriesPage = urlopen(
+        filterCategoriesPage = fetch(
             "https://toolserver.org/~multichill/filtercats.php?%s" % parameters)
         result = filterCategoriesRe.findall(
-            filterCategoriesPage.read().decode('utf-8'))
+            filterCategoriesPage.content)
     except IOError:
         # Something is wrong, forget about this filter, and return the input
         return categories
