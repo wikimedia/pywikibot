@@ -11,7 +11,7 @@ Bot examines backlinks (Special:WhatLinksHere) to TEMPLATE_PAGE.
 Then goes through all pages (unless a specific page specified using options)
 and archives old discussions. This is done by breaking a page into threads,
 then scanning each thread for timestamps. Threads older than a specified
-treshold are then moved to another page (the archive), which can be named
+threshold are then moved to another page (the archive), which can be named
 either basing on the thread's name or then name can contain a counter which
 will be incremented when the archive reaches a certain size.
 
@@ -213,7 +213,7 @@ def template_title_regex(tpl_page):
     Return a regex that matches to variations of the template title.
 
     It supports the transcluding variant as well as localized namespaces and
-    case-insensitivity depending on the namspace.
+    case-insensitivity depending on the namespace.
 
     @param tpl_page: The template page
     @type tpl_page: Page
@@ -680,7 +680,7 @@ def main(*args):
                 archiver.run()
                 time.sleep(10)
             except Exception:
-                pywikibot.error(u'Error occured while processing page %s' % pg)
+                pywikibot.error(u'Error occurred while processing page %s' % pg)
                 pywikibot.exception(tb=True)
 
 

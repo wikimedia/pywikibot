@@ -18,7 +18,7 @@ The following parameters are supported:
                   the predefined message texts with original and replacements
                   inserted.
 
--ignore:          Ignores if an error occured and either skips the page or
+-ignore:          Ignores if an error occurred and either skips the page or
                   only that method. It can be set to 'page' or 'method'.
 
 &warning;
@@ -80,7 +80,7 @@ class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
             pywikibot.output("Page %s is locked?!"
                              % self.current_page.title(asLink=True))
         except pywikibot.EditConflict:
-            pywikibot.output("An edit conflict has occured at %s."
+            pywikibot.output("An edit conflict has occurred at %s."
                              % self.current_page.title(asLink=True))
 
 

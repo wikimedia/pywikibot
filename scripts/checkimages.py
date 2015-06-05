@@ -1709,7 +1709,7 @@ def main(*args):
         elif arg.startswith('-start'):
             if len(arg) == 6:
                 firstPageTitle = pywikibot.input(
-                    u'From witch page do you want to start?')
+                    u'From which page do you want to start?')
             elif len(arg) > 6:
                 firstPageTitle = arg[7:]
             firstPageTitle = firstPageTitle.split(":")[1:]

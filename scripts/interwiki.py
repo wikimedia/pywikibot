@@ -2174,7 +2174,7 @@ class InterwikiBot(object):
                     try:
                         page = next(self.pageGenerator)
                     except IOError:
-                        pywikibot.output(u'IOError occured; skipping')
+                        pywikibot.output(u'IOError occurred; skipping')
                         continue
                     if page in globalvar.skip:
                         pywikibot.output(u'Skipping: %s is in the skip list' % page)

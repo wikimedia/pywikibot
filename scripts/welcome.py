@@ -676,7 +676,7 @@ class WelcomeBot(object):
                                                    'welcome-updating'))
                 return True
             except pywikibot.EditConflict:
-                pywikibot.output(u'An edit conflict has occured. Pausing for '
+                pywikibot.output(u'An edit conflict has occurred. Pausing for '
                                  u'10 seconds before continuing.')
                 time.sleep(10)
 
@@ -789,7 +789,7 @@ class WelcomeBot(object):
                             self.welcomed_users.append(users)
                         except pywikibot.EditConflict:
                             showStatus(4)
-                            pywikibot.output(u'An edit conflict has occured, '
+                            pywikibot.output(u'An edit conflict has occurred, '
                                              u'skipping this user.')
 
                     if globalvar.makeWelcomeLog and \

@@ -278,7 +278,7 @@ class CosmeticChangesToolkit:
             new_text = self._change(text)
         except Exception as e:
             if self.ignore == CANCEL_PAGE:
-                pywikibot.warning(u'Skipped "{0}", because an error occured.'.format(self.title))
+                pywikibot.warning(u'Skipped "{0}", because an error occurred.'.format(self.title))
                 pywikibot.exception(e)
                 return False
             else:
