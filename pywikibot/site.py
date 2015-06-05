@@ -1122,6 +1122,31 @@ def need_version(version):
     return decorator
 
 
+def need_extension(extension):
+    """Decorator to require a certain MediaWiki extension.
+
+    @param extension: the MediaWiki extension required
+    @type extension: unicode
+    @return: a decorator to make sure the requirement is satisfied when
+        the decorated function is called.
+    """
+    def decorator(fn):
+        def callee(self, *args, **kwargs):
+            if not self.has_extension(extension):
+                raise UnknownExtension(
+                    'Method "%s" is not implemented without the extension %s'
+                    % (fn.__name__, extension))
+            return fn(self, *args, **kwargs)
+
+        if not __debug__:
+            return fn
+
+        manage_wrapping(callee, fn)
+
+        return callee
+    return decorator
+
+
 class Siteinfo(Container):
 
     """
@@ -1876,38 +1901,38 @@ class APISite(BaseSite):
             self.login(sysop)
         return 'hasmsg' in self._userinfo
 
+    @need_extension('Echo')
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension."""
-        if self.has_extension('Echo'):
-            params = dict(site=self, action='query',
-                          meta='notifications',
-                          notprop='list', notformat='text')
+        params = dict(site=self, action='query',
+                      meta='notifications',
+                      notprop='list', notformat='text')
 
-            for key in kwargs:
-                params['not' + key] = kwargs[key]
+        for key in kwargs:
+            params['not' + key] = kwargs[key]
 
-            data = api.Request(**params).submit()
-            for notif in data['query']['notifications']['list'].values():
-                yield Notification.fromJSON(self, notif)
+        data = api.Request(**params).submit()
+        for notif in data['query']['notifications']['list'].values():
+            yield Notification.fromJSON(self, notif)
 
+    @need_extension('Echo')
     def notifications_mark_read(self, **kwargs):
         """Mark selected notifications as read.
 
         @return: whether the action was successful
         @rtype: bool
         """
-        if self.has_extension('Echo'):
-            # TODO: ensure that the 'echomarkread' action
-            # is supported by the site
-            req = api.Request(site=self,
-                              action='echomarkread',
-                              token=self.tokens['edit'],
-                              **kwargs)
-            data = req.submit()
-            try:
-                return data['query']['echomarkread']['result'] == 'success'
-            except KeyError:
-                return False
+        # TODO: ensure that the 'echomarkread' action
+        # is supported by the site
+        req = api.Request(site=self,
+                          action='echomarkread',
+                          token=self.tokens['edit'],
+                          **kwargs)
+        data = req.submit()
+        try:
+            return data['query']['echomarkread']['result'] == 'success'
+        except KeyError:
+            return False
 
     def mediawiki_messages(self, keys):
         """Fetch the text of a set of MediaWiki messages.
@@ -2310,6 +2335,7 @@ class APISite(BaseSite):
         return self.siteinfo["articlepath"].replace("$1", title)
 
     @need_version('1.21')
+    @need_extension('ProofreadPage')
     def _cache_proofreadinfo(self, expiry=False):
         """Retrieve proofreadinfo from site and cache response.
 
@@ -2332,10 +2358,6 @@ class APISite(BaseSite):
         @rtype: Namespace, Namespace, dict
 
         """
-        if not self.has_extension('ProofreadPage'):
-            raise UnknownExtension('ProofreadPage extension is not installed on %s'
-                                    % self)
-
         if (not hasattr(self, '_proofread_index_ns') or
                 not hasattr(self, '_proofread_page_ns') or
                 not hasattr(self, '_proofread_levels')):
