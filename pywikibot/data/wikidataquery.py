@@ -565,11 +565,20 @@ class WikidataQuery():
             pywikibot.warning(u"Failed to retrieve %s" % url)
             raise
 
+        data = resp.content
+        if not data:
+            pywikibot.warning('No data received for %s' % url)
+            raise pywikibot.ServerError('No data received for %s' % url)
+
         try:
-            data = json.loads(resp.content)
+            data = json.loads(data)
         except ValueError:
-            pywikibot.warning(u"Data received from host but no JSON could be decoded")
-            raise pywikibot.ServerError("Data received from host but no JSON could be decoded")
+            pywikibot.warning(
+                'Data received for %s but no JSON could be decoded: %r'
+                % (url, data))
+            raise pywikibot.ServerError(
+                'Data received for %s but no JSON could be decoded: %r'
+                % (url, data))
 
         return data
 
