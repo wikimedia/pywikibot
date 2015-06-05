@@ -1667,8 +1667,8 @@ class Request(MutableMapping):
         if self.action == 'query':
             meta = self._params.get("meta", [])
             if "userinfo" not in meta:
-                meta.append("userinfo")
-                self._params["meta"] = meta
+                meta = set(meta + ['userinfo'])
+                self._params['meta'] = list(meta)
             uiprop = self._params.get("uiprop", [])
             uiprop = set(uiprop + ["blockinfo", "hasmsg"])
             self._params["uiprop"] = list(sorted(uiprop))
@@ -1677,6 +1677,10 @@ class Request(MutableMapping):
                     inprop = self._params.get("inprop", [])
                     info = set(inprop + ["protection", "talkid", "subjectid"])
                     self._params["info"] = list(info)
+            if 'prop' in self._params:
+                if self.site.has_extension('ProofreadPage'):
+                    prop = set(self._params['prop'] + ['proofread'])
+                    self._params['prop'] = list(prop)
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'.
@@ -2839,12 +2843,6 @@ class PageGenerator(QueryGenerator):
         parameters['generator'] = generator
         QueryGenerator.__init__(self, **kwargs)
         self.resultkey = "pages"  # element to look for in result
-
-        # TODO: Bug T91912 when using step > 50 with proofread, with queries
-        # returning Pages from Page ns.
-        if self.site.has_extension('ProofreadPage'):
-            self.request['prop'].append('proofread')
-
         self.props = self.request['prop']
 
     def result(self, pagedata):
