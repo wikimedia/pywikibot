@@ -2423,7 +2423,7 @@ class APISite(BaseSite):
             never from the cache.
         @type force: bool
         @return: A tuple containing the major, minor version number and any
-            text after that. If an error occured (0, 0, 0) is returned.
+            text after that. If an error occurred (0, 0, 0) is returned.
         @rtype: int, int, str
         """
         try:

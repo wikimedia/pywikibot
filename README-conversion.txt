@@ -116,7 +116,7 @@ The User object has been moved from the userlib module to the pywikibot
 namespace. Any references to "userlib.User" can be replaced by
 "pywikibot.User", but the old form is retained for backwards-compatibility.
 
-The following changes have occured in the User object:
+The following changes have occurred in the User object:
 
 - contributions(): returns a pywikibot.Timestamp object instead of a Mediawiki one
 

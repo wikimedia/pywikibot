@@ -829,8 +829,8 @@ def handle_args(args=None, do_help=True):
         if m:
             pywikibot.output(u'Pywikibot r%s' % m.group(1))
         else:
-            # Version ID not availlable on SVN repository.
-            # Maybe these informations should be imported from version.py
+            # Version ID not available on SVN repository.
+            # Maybe this information should be imported from version.py
             pywikibot.output(u'Pywikibot SVN repository')
         pywikibot.output(u'Python %s' % sys.version)
 
@@ -1366,7 +1366,7 @@ class FollowRedirectPageBot(CurrentPageBot):
 
 class CreatingPageBot(CurrentPageBot):
 
-    """A CurrentPageBot class which only treats not exisiting pages."""
+    """A CurrentPageBot class which only treats nonexistent pages."""
 
     def treat(self, page):
         """Treat page if doesn't exist."""
