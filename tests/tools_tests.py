@@ -116,6 +116,43 @@ class OpenCompressedTestCase(TestCase):
         self.assertRaises(OSError, self._get_content, self.base_file + '_invalid.7z', True)
 
 
+class MergeUniqueDicts(TestCase):
+
+    """Test merge_unique_dicts."""
+
+    net = False
+    dct1 = {'foo': 'bar', '42': 'answer'}
+    dct2 = {47: 'Star', 74: 'Trek'}
+    dct_both = dct1.copy()
+    dct_both.update(dct2)
+
+    def test_single(self):
+        """Test that it returns the dict itself when there is only one."""
+        self.assertEqual(tools.merge_unique_dicts(self.dct1), self.dct1)
+        self.assertEqual(tools.merge_unique_dicts(**self.dct1), self.dct1)
+
+    def test_multiple(self):
+        """Test that it actually merges dicts."""
+        self.assertEqual(tools.merge_unique_dicts(self.dct1, self.dct2),
+                         self.dct_both)
+        self.assertEqual(tools.merge_unique_dicts(self.dct2, **self.dct1),
+                         self.dct_both)
+
+    def test_different_type(self):
+        """Test that the keys can be different types."""
+        self.assertEqual(tools.merge_unique_dicts({'1': 'str'}, {1: 'int'}),
+                         {'1': 'str', 1: 'int'})
+
+    def test_conflict(self):
+        """Test that it detects conflicts."""
+        self.assertRaisesRegex(
+            ValueError, '42', tools.merge_unique_dicts, self.dct1, **{'42': 'bad'})
+        self.assertRaisesRegex(
+            ValueError, '42', tools.merge_unique_dicts, self.dct1, self.dct1)
+        self.assertRaisesRegex(
+            ValueError, '42', tools.merge_unique_dicts, self.dct1, **self.dct1)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()

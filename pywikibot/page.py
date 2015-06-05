@@ -2856,7 +2856,7 @@ class User(Page):
         }
         if ccme:
             params['ccme'] = 1
-        mailrequest = pywikibot.data.api.Request(site=self.site, **params)
+        mailrequest = self.site._simple_request(**params)
         maildata = mailrequest.submit()
 
         if 'emailuser' in maildata:

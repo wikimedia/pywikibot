@@ -190,6 +190,11 @@ class DryRequest(CachedRequest):
         """Constructor."""
         _original_Request.__init__(self, *args, **kwargs)
 
+    @classmethod
+    def create_simple(cls, **kwargs):
+        """Skip CachedRequest implementation."""
+        return _original_Request.create_simple(**kwargs)
+
     def _expired(self, dt):
         """Never invalidate cached data."""
         return False

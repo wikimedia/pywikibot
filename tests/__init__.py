@@ -209,6 +209,12 @@ class TestRequest(CachedRequest):
         """Constructor."""
         super(TestRequest, self).__init__(0, *args, **kwargs)
 
+    @classmethod
+    def create_simple(cls, **kwargs):
+        """Circumvent CachedRequest implementation."""
+        site = kwargs.pop('site')
+        return cls(site=site, parameters=kwargs)
+
     def _expired(self, dt):
         """Never invalidate cached data."""
         return False
