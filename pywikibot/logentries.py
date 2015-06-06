@@ -298,15 +298,17 @@ class PatrolEntry(LogEntry):
     def current_id(self):
         """Return the current id."""
         # key has been changed in mw 1.19; try the new mw style first
-        return (self._params['curid']
-                if 'curid' in self._params else self._params['cur'])
+        # sometimes it returns strs sometimes ints
+        return int(self._params['curid']
+                   if 'curid' in self._params else self._params['cur'])
 
     @property
     def previous_id(self):
-        # key has been changed in mw 1.19; try the new mw style first
         """Return the previous id."""
-        return (self._params['previd']
-                if 'previd' in self._params else self._params['prev'])
+        # key has been changed in mw 1.19; try the new mw style first
+        # sometimes it returns strs sometimes ints
+        return int(self._params['previd']
+                   if 'previd' in self._params else self._params['prev'])
 
     @property
     def auto(self):
