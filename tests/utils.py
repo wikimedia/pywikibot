@@ -512,12 +512,26 @@ def execute(command, data_in=None, timeout=0, error=None):
             'stderr': (stderr_lines + data_out[1]).decode(config.console_encoding)}
 
 
-def execute_pwb(args, data_in=None, timeout=0, error=None):
+def execute_pwb(args, data_in=None, timeout=0, error=None, overrides=None):
     """
     Execute the pwb.py script and capture outputs.
 
     @param args: list of arguments for pwb.py
     @type args: list of unicode
+    @param overrides: mapping of pywikibot symbols to test replacements
+    @type overrides: dict
     """
-    return execute(command=[sys.executable, _pwb_py] + args,
+    command = [sys.executable]
+
+    if overrides:
+        command.append('-c')
+        overrides = '; '.join(
+            '%s = %s' % (key, value) for key, value in overrides.items())
+        command.append(
+            'import pwb; import pywikibot; %s; pwb.main()'
+            % overrides)
+    else:
+        command.append(_pwb_py)
+
+    return execute(command=command + args,
                    data_in=data_in, timeout=timeout, error=error)

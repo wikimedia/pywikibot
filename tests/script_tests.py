@@ -11,8 +11,6 @@ __version__ = '$Id$'
 import os
 import sys
 
-from pywikibot import config
-
 from tests import _root_dir
 from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import allowed_failure, execute_pwb, add_metaclass
@@ -63,6 +61,7 @@ failed_dep_script_list = [name
                           if not check_script_deps(name)]
 
 unrunnable_script_list = [
+    'version',  # does not use global args
     'script_wui',   # depends on lua compiling
 ]
 
@@ -145,7 +144,6 @@ no_args_expected_results = {
     'spamremove': 'No spam site specified',
     'transferbot': 'Target site not different from source site',  # Bug 68662
     'unusedfiles': ('Working on', None),
-    'version': 'unicode test: ',
     'watchlist': 'Retrieving watchlist',
 
     # The following auto-run and typically cant be validated,
@@ -180,21 +178,27 @@ def collector(loader=unittest.loader.defaultTestLoader):
               '(set PYWIKIBOT2_TEST_AUTORUN=1 to enable):\n  %r'
               % auto_run_script_list)
 
-    tests = (['test__login_help'] +
-             ['test_' + name + '_help'
+    tests = (['test__login'] +
+             ['test_' + name
               for name in sorted(script_list)
-              if name != 'login'] +
-             ['test__login_simulate'])
+              if name != 'login' and
+              name not in unrunnable_script_list
+              ])
 
-    tests += ['test_' + name + '_simulate'
+    test_list = ['tests.script_tests.TestScriptHelp.' + name
+                 for name in tests]
+
+    tests = (['test__login'] +
+             ['test_' + name
               for name in sorted(script_list)
               if name != 'login' and
               name not in failed_dep_script_list and
               name not in unrunnable_script_list and
-              (enable_autorun_tests or name not in auto_run_script_list)]
+              (enable_autorun_tests or name not in auto_run_script_list)
+              ])
 
-    test_list = ['tests.script_tests.TestScript.' + name
-                 for name in tests]
+    test_list += ['tests.script_tests.TestScriptSimulate.' + name
+                  for name in tests]
 
     tests = loader.loadTestsFromNames(test_list)
     suite = unittest.TestSuite()
@@ -214,7 +218,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
     def __new__(cls, name, bases, dct):
         """Create the new class."""
-        def test_execution(script_name, args=[], expected_results=None):
+        def test_execution(script_name, args=[]):
             is_autorun = '-help' not in args and script_name in auto_run_script_list
 
             def test_skip_script(self):
@@ -234,8 +238,8 @@ class TestScriptMeta(MetaTestCaseClass):
                 if is_autorun:
                     timeout = 5
 
-                if expected_results and script_name in expected_results:
-                    error = expected_results[script_name]
+                if self._results and script_name in self._results:
+                    error = self._results[script_name]
                     if isinstance(error, basestring):
                         stdout = None
                     else:
@@ -244,7 +248,12 @@ class TestScriptMeta(MetaTestCaseClass):
                     stdout = None
                     error = None
 
-                result = execute_pwb(cmd, data_in, timeout=timeout, error=error)
+                test_overrides = {}
+                if not hasattr(self, 'net') or not self.net:
+                    test_overrides['pywikibot.Site'] = 'None'
+
+                result = execute_pwb(cmd, data_in, timeout=timeout, error=error,
+                                     overrides=test_overrides)
 
                 stderr = result['stderr'].split('\n')
                 stderr_sleep = [l for l in stderr
@@ -307,6 +316,8 @@ class TestScriptMeta(MetaTestCaseClass):
                 return test_skip_script
             return testScript
 
+        argument = dct['_argument']
+
         for script_name in script_list:
             # force login to be the first, alphabetically, so the login
             # message does not unexpectedly occur during execution of
@@ -314,66 +325,51 @@ class TestScriptMeta(MetaTestCaseClass):
             # unrunnable script tests are disabled by default in load_tests()
 
             if script_name == 'login':
-                test_name = 'test__' + script_name + '_help'
+                test_name = 'test__login'
             else:
-                test_name = 'test_' + script_name + '_help'
+                test_name = 'test_' + script_name
+
             # it's explicitly using str() because __name__ must be str
             test_name = str(test_name)
-            dct[test_name] = test_execution(script_name, ['-help'])
-            if script_name in ['version',
-                               'script_wui',      # Failing on travis-ci
-                               ] + failed_dep_script_list:
-                dct[test_name] = unittest.expectedFailure(dct[test_name])
-            dct[test_name].__doc__ = 'Test running ' + script_name + ' -help'
-            dct[test_name].__name__ = test_name
+            dct[test_name] = test_execution(script_name, ['-' + argument])
 
-            # Ideally all scripts should execute -help without
-            # connecting to a site.
-            # TODO: after bug 68611 and 68664 (and makecat), split -help
-            # execution to a separate test class which uses site=False.
-
-            if script_name == 'login':
-                test_name = 'test__' + script_name + '_simulate'
-            else:
-                test_name = 'test_' + script_name + '_simulate'
-            # it's explicitly using str() because __name__ must be str
-            test_name = str(test_name)
-            dct[test_name] = test_execution(script_name, ['-simulate'],
-                                            no_args_expected_results)
-            if script_name in ['catall',          # stdout user interaction
-                               'flickrripper',    # Requires a flickr api key
-                               'script_wui',      # Error on any user except DrTrigonBot
-                               'upload',          # raises custom ValueError
-                               ] + failed_dep_script_list or (
-                    (config.family == 'wikipedia' and script_name == 'disambredir') or
-                    (config.family != 'wikidata' and script_name == 'checkimages') or
-                    (config.family == 'wikipedia' and config.mylang != 'en' and script_name == 'misspelling')):  # T94681
+            if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
-            elif script_name in ['watchlist',     # T77965
-                                 'lonelypages',   # uses exit code 1; T94680
-                                 ]:
+            elif script_name in dct['_allowed_failures']:
                 dct[test_name] = allowed_failure(dct[test_name])
-            dct[test_name].__doc__ = \
-                'Test running ' + script_name + ' -simulate.'
+
+            dct[test_name].__doc__ = 'Test running %s -%s.' % (script_name,
+                                                               argument)
             dct[test_name].__name__ = test_name
 
             # Disable test by default in nosetests
             if script_name in unrunnable_script_list:
                 dct[test_name].__test__ = False
 
-            # TODO: Ideally any script not on the auto_run_script_list
-            # can be set as 'not a site' test, but that will require
-            # auditing all code in main() to ensure it exits without
-            # connecting to a site.  There are outstanding bugs about
-            # connections during initialisation.
-            #
-            # dct[test_name].site = True
-
         return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
 
 
 @add_metaclass
-class TestScript(DefaultSiteTestCase, PwbTestCase):
+class TestScriptHelp(PwbTestCase):
+
+    """Test cases for running scripts with -help.
+
+    All scripts should not create a Site for -help, so net = False.
+    """
+
+    __metaclass__ = TestScriptMeta
+
+    net = False
+
+    _expected_failures = failed_dep_script_list
+    _allowed_failures = []
+
+    _argument = 'help'
+    _results = None
+
+
+@add_metaclass
+class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
     """Test cases for scripts.
 
@@ -386,6 +382,26 @@ class TestScript(DefaultSiteTestCase, PwbTestCase):
     __metaclass__ = TestScriptMeta
 
     user = True
+
+    _expected_failures = [
+        'catall',          # stdout user interaction
+        'flickrripper',    # Requires a flickr api key
+        'upload',          # raises custom ValueError
+    ] + failed_dep_script_list
+
+    _allowed_failures = [
+        'checkimages',
+        'disambredir',
+        # T94681
+        'misspelling',
+        # T77965
+        'watchlist',
+        # T94680: uses exit code 1
+        'lonelypages',
+    ]
+
+    _argument = 'simulate'
+    _results = no_args_expected_results
 
 
 if __name__ == '__main__':
