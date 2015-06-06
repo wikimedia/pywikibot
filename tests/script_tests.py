@@ -66,10 +66,6 @@ unrunnable_script_list = [
     'script_wui',   # depends on lua compiling
 ]
 
-deadlock_script_list = [
-    'makecat',      # bug 69781
-]
-
 script_list = (['login'] +
                [name[0:-3] for name in os.listdir(scripts_path)  # strip '.py'
                 if name.endswith('.py') and
@@ -173,10 +169,6 @@ def collector(loader=unittest.loader.defaultTestLoader):
     # cause the loader to fallback to its own
     # discover() ordering of unit tests.
 
-    if deadlock_script_list:
-        print('Skipping deadlock scripts:\n  %s'
-              % ', '.join(deadlock_script_list))
-
     if unrunnable_script_list:
         print('Skipping execution of unrunnable scripts:\n  %r'
               % unrunnable_script_list)
@@ -189,14 +181,12 @@ def collector(loader=unittest.loader.defaultTestLoader):
     tests = (['test__login_help'] +
              ['test_' + name + '_help'
               for name in sorted(script_list)
-              if name != 'login' and
-              name not in deadlock_script_list] +
+              if name != 'login'] +
              ['test__login_simulate'])
 
     tests += ['test_' + name + '_simulate'
               for name in sorted(script_list)
               if name != 'login' and
-              name not in deadlock_script_list and
               name not in failed_dep_script_list and
               name not in unrunnable_script_list and
               (enable_autorun_tests or name not in auto_run_script_list)]
@@ -343,9 +333,6 @@ class TestScriptMeta(MetaTestCaseClass):
             # TODO: after bug 68611 and 68664 (and makecat), split -help
             # execution to a separate test class which uses site=False.
 
-            if script_name in deadlock_script_list:
-                dct[test_name].__test__ = False
-
             if script_name == 'login':
                 test_name = 'test__' + script_name + '_simulate'
             else:
@@ -372,7 +359,7 @@ class TestScriptMeta(MetaTestCaseClass):
             dct[test_name].__name__ = test_name
 
             # Disable test by default in nosetests
-            if script_name in unrunnable_script_list + deadlock_script_list:
+            if script_name in unrunnable_script_list:
                 dct[test_name].__test__ = False
 
             # TODO: Ideally any script not on the auto_run_script_list

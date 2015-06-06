@@ -194,7 +194,7 @@ try:
     main = True
     workingcatname = ''
     tocheck = DequeGenerator()
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args():
         if arg.startswith('-nodate'):
             skipdates = True
         elif arg.startswith('-forward'):
