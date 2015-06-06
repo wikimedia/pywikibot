@@ -994,6 +994,9 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                    showPatrolled=showPatrolled,
                                    topOnly=topOnly, step=step, total=total,
                                    user=user, excludeuser=excludeuser):
+        # The title in a log entry may have been suppressed
+        if 'title' not in item and item['type'] == 'log':
+            continue
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
 
 
@@ -2047,6 +2050,9 @@ def LiveRCPageGenerator(site=None, total=None):
     from pywikibot.comms.rcstream import site_rc_listener
 
     for entry in site_rc_listener(site, total=total):
+        # The title in a log entry may have been suppressed
+        if 'title' not in entry and entry['type'] == 'log':
+            continue
         page = pywikibot.Page(site, entry['title'], entry['namespace'])
         page._rcinfo = entry
         yield page
