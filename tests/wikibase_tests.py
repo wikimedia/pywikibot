@@ -18,10 +18,19 @@ import pywikibot
 
 from pywikibot import pagegenerators
 from pywikibot.tools import SelfCallDict
-from pywikibot.page import WikibasePage
+from pywikibot.page import WikibasePage, ItemPage
 from pywikibot.site import Namespace
 
-from tests.aspects import unittest, WikidataTestCase, TestCase
+from tests.aspects import (
+    unittest, TestCase,
+    WikidataTestCase,
+    DeprecationTestCase,
+)
+
+from tests.basepage_tests import (
+    BasePageMethodsTestBase,
+    BasePageLoadRevisionsCachingTestBase,
+)
 
 
 # fetch a page which is very likely to be unconnected, which doesnt have
@@ -33,6 +42,54 @@ def _get_test_unconnected_page(site):
     for page in gen:
         if not page.properties().get('wikibase_item'):
             return page
+
+
+class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
+                               WikidataTestCase):
+
+    """Test site.loadrevisions() caching."""
+
+    def setUp(self):
+        self._page = ItemPage(self.get_repo(), 'Q60')
+        super(TestLoadRevisionsCaching, self).setUp()
+
+    def test_page_text(self):
+        """Test site.loadrevisions() with Page.text."""
+        self._test_page_text()
+
+
+class TestDeprecatedAttributes(WikidataTestCase, DeprecationTestCase):
+
+    """Test deprecated lastrevid."""
+
+    def test_lastrevid(self):
+        """Test deprecated lastrevid."""
+        item = ItemPage(self.get_repo(), 'Q60')
+        self.assertFalse(hasattr(item, 'lastrevid'))
+        item.get()
+        self.assertTrue(hasattr(item, 'lastrevid'))
+        self.assertIsInstance(item.lastrevid, int)
+        self.assertDeprecation()
+        self._reset_messages()
+
+        item.lastrevid = 1
+        self.assertTrue(hasattr(item, 'lastrevid'))
+        self.assertTrue(hasattr(item, '_revid'))
+        self.assertEqual(item.lastrevid, 1)
+        self.assertEqual(item._revid, 1)
+        self.assertDeprecation()
+
+    def test_lastrevid_del(self):
+        """Test del with deprecated lastrevid."""
+        item = ItemPage(self.get_repo(), 'Q60')
+        item.get()
+        self.assertTrue(hasattr(item, 'lastrevid'))
+        self.assertTrue(hasattr(item, '_revid'))
+
+        del item.lastrevid
+        self.assertFalse(hasattr(item, 'lastrevid'))
+        self.assertFalse(hasattr(item, '_revid'))
+        self.assertDeprecation()
 
 
 class TestGeneral(WikidataTestCase):
@@ -540,27 +597,32 @@ class TestClaimSetValue(WikidataTestCase):
         self.assertRaises(ValueError, claim.setTarget, pywikibot.WbTime(2001, site=wikidata))
 
 
-class TestPageMethods(WikidataTestCase):
+class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
 
-    """Test behavior of WikibasePage methods inherited from BasePage."""
+    """Test behavior of ItemPage methods inherited from BasePage."""
 
-    def test_page_methods(self):
+    def setUp(self):
+        self._page = ItemPage(self.get_repo(), 'Q60')
+        super(TestItemBasePageMethods, self).setUp()
+
+    def test_basepage_methods(self):
         """Test ItemPage methods inherited from superclass BasePage."""
-        self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
-        self.wdp.previousRevision()
-        self.assertEqual(self.wdp.langlinks(), [])
-        self.assertEqual(self.wdp.templates(), [])
-        self.assertFalse(self.wdp.isCategoryRedirect())
+        self._test_invoke()
+        self._test_no_wikitext()
 
-    def test_item_bot_may_edit(self):
-        """Test botMayEdit."""
-        site = self.get_site()
-        page = pywikibot.Page(site, 'Q60')
-        self.assertTrue(page.botMayEdit())
 
-        repo = self.get_repo()
-        item = pywikibot.ItemPage(repo, 'Q60')
-        self.assertTrue(item.botMayEdit())
+class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
+
+    """Test behavior of Page methods for wikibase item."""
+
+    def setUp(self):
+        self._page = pywikibot.Page(self.site, 'Q60')
+        super(TestPageMethodsWithItemTitle, self).setUp()
+
+    def test_basepage_methods(self):
+        """Test Page methods inherited from superclass BasePage with Q60."""
+        self._test_invoke()
+        self._test_no_wikitext()
 
 
 class TestLinks(WikidataTestCase):

@@ -896,12 +896,19 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
         # Create an instance method named the same as the class method
         self.get_site = lambda name=None: self.__class__.get_site(name)
 
-    def get_mainpage(self, site=None):
-        """Create a Page object for the sites main page."""
+    def get_mainpage(self, site=None, force=False):
+        """Create a Page object for the sites main page.
+
+        @param site: Override current site, obtained using L{get_site}.
+        @type site: APISite or None
+        @param force: Get an unused Page object
+        @type force: bool
+        @rtype: Page
+        """
         if not site:
             site = self.get_site()
 
-        if hasattr(self, '_mainpage'):
+        if hasattr(self, '_mainpage') and not force:
             # For multi-site test classes, or site is specified as a param,
             # the cached mainpage object may not be the desired site.
             if self._mainpage.site == site:
@@ -910,6 +917,9 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
         mainpage = pywikibot.Page(site, site.siteinfo['mainpage'])
         if mainpage.isRedirectPage():
             mainpage = mainpage.getRedirectTarget()
+
+        if force:
+            mainpage = pywikibot.Page(self.site, mainpage.title())
 
         self._mainpage = mainpage
 

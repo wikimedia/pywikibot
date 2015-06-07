@@ -235,6 +235,11 @@ class ProofreadPage(pywikibot.Page):
         if not self._text:
             self._create_empty_page()
 
+    @text.deleter
+    def text(self):
+        if hasattr(self, '_text'):
+            del self._text
+
     def _decompose_page(self):
         """Split Proofread Page text in header, body and footer.
 
