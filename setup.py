@@ -81,12 +81,14 @@ if sys.version_info[0] == 2:
         script_deps['replicate_wiki.py'] = ['argparse']
         dependencies.append('future')  # provides collections backports
 
-    # tools.ip does not depend on an ipaddress module, as it falls back to
-    # using regexes if not available, however the pywikibot package should use
-    # the functional backport of py3 ipaddress, which is:
+    # tools.ip does not have a hard dependency on an IP address module,
+    # as it falls back to using regexes if one is not available.
+    # The functional backport of py3 ipaddress is acceptable:
     # https://pypi.python.org/pypi/ipaddress
+    # However the Debian package python-ipaddr is also supported:
+    # https://pypi.python.org/pypi/ipaddr
     # Other backports are likely broken.
-    dependencies.append('ipaddress')
+    dependencies.append('ipaddr')
 
     script_deps['data_ingestion.py'] = extra_deps['csv']
 

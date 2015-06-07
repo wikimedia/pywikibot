@@ -18,8 +18,22 @@ from warnings import warn
 
 from pywikibot.tools import LazyRegex
 
+ipaddress_e = ipaddr_e = None
+
 try:
     from ipaddress import ip_address
+except ImportError as ipaddress_e:
+    ip_address = None
+    pass
+
+if not ip_address or sys.version_info[0] < 3:
+    try:
+        from ipaddr import IPAddress as ip_address
+        ip_address.__T76286__ = False
+    except ImportError as ipaddr_e:
+        pass
+
+if ip_address and ip_address.__module__ == 'ipaddress':
     if sys.version_info[0] < 3:
         # This backport fails many tests
         # https://pypi.python.org/pypi/py2-ipaddress
@@ -27,7 +41,7 @@ try:
         try:
             ip_address(u'1111')
             ip_address = None
-            raise ImportError('ipaddress backport is broken')
+            raise ImportError('ipaddress backport is broken; install ipaddr')
         except ValueError:
             pass
 
@@ -36,28 +50,32 @@ try:
         # However while it rejects u'1111', it will consider '1111' valid
         try:
             ip_address(b'1111')
-            warn('ipaddress backport is defective; patching.', ImportWarning)
+            warn('ipaddress backport is defective; patching; install ipaddr',
+                 ImportWarning)
             orig_ip_address = ip_address
             # force all input to be a unicode object so it validates correctly
 
-            def ip_address(IP):
+            def ip_address_patched(IP):
                 """Safe ip_address."""
                 return orig_ip_address(unicode(IP))  # noqa
+
+            ip_address = ip_address_patched
         except ValueError:
             # This means ipaddress has correctly determined '1111' is invalid
             pass
-except ImportError as e:
-    warn('Importing ipaddress.ip_address failed: %s' % e,
-         ImportWarning)
+elif not ip_address:
+    warn('Importing ipaddr.IPAddress failed: %s\n'
+         'Importing ipaddress.ip_address failed: %s\n'
+         'Please install ipaddr.'
+         % (ipaddr_e, ipaddress_e), ImportWarning)
 
-    def ip_address(IP):
+    def ip_address_fake(IP):
         """Fake ip_address method."""
         warn('ipaddress backport not available.', DeprecationWarning)
         if ip_regexp.match(IP) is None:
             raise ValueError('Invalid IP address')
 
-    # The following flag is used by the unit tests
-    ip_address.__fake__ = True
+    ip_address = ip_address_fake
 
 # deprecated IP detector
 ip_regexp = LazyRegex()
