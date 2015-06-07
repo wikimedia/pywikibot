@@ -750,22 +750,25 @@ def open_compressed(filename, use_extension=False):
     they are always available. 7zip is only available when a 7za program is
     available.
 
-    The compression is selected via the file ending.
+    The compression is either selected via the magic number or file ending.
 
     @param filename: The filename.
     @type filename: str
+    @param use_extension: Use the file extension instead of the magic number
+        to determine the type of compression (default False).
+    @type use_extension: bool
     @raises ValueError: When 7za is not available.
     @raises OSError: When it's not a 7z archive but the file extension is 7z.
         It is also raised by bz2 when its content is invalid. gzip does not
         immediately raise that error but only on reading it.
-    @return: A file like object returning the uncompressed data in binary mode.
-        Before Python 2.7 it's wrapping the object returned by BZ2File and gzip
-        in a ContextManagerWrapper so it's advantages/disadvantages apply there.
-    @rtype: file like object
+    @return: A file-like object returning the uncompressed data in binary mode.
+        Before Python 2.7 the GzipFile object and before 2.7.1 the BZ2File are
+        wrapped in a ContextManagerWrapper with its advantages/disadvantages.
+    @rtype: file-like object
     """
-    def wrap(wrapped):
+    def wrap(wrapped, sub_ver):
         """Wrap in a wrapper when this is below Python version 2.7."""
-        if sys.version_info < (2, 7):
+        if sys.version_info < (2, 7, sub_ver):
             return ContextManagerWrapper(wrapped)
         else:
             return wrapped
@@ -787,9 +790,9 @@ def open_compressed(filename, use_extension=False):
             extension = ''
 
     if extension == 'bz2':
-        return wrap(bz2.BZ2File(filename))
+        return wrap(bz2.BZ2File(filename), 1)
     elif extension == 'gz':
-        return wrap(gzip.open(filename))
+        return wrap(gzip.open(filename), 0)
     elif extension == '7z':
         try:
             process = subprocess.Popen(['7za', 'e', '-bd', '-so', filename],

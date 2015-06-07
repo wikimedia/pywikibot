@@ -24,26 +24,26 @@ class ContextManagerWrapperTestCase(TestCase):
 
     """Test that ContextManagerWrapper is working correctly."""
 
+    class DummyClass(object):
+
+        """A dummy class which has some values and a close method."""
+
+        class_var = 42
+
+        def __init__(self):
+            """Create instance with dummy values."""
+            self.instance_var = 1337
+            self.closed = False
+
+        def close(self):
+            """Just store that it has been closed."""
+            self.closed = True
+
     net = False
 
     def test_wrapper(self):
         """Create a test instance and verify the wrapper redirects."""
-        class DummyClass(object):
-
-            """A dummy class which has some values and a close method."""
-
-            class_var = 42
-
-            def __init__(self):
-                """Create instance with dummy values."""
-                self.instance_var = 1337
-                self.closed = False
-
-            def close(self):
-                """Just store that it has been closed."""
-                self.closed = True
-
-        obj = DummyClass()
+        obj = self.DummyClass()
         wrapped = tools.ContextManagerWrapper(obj)
         self.assertIs(wrapped.class_var, obj.class_var)
         self.assertIs(wrapped.instance_var, obj.instance_var)
@@ -52,7 +52,18 @@ class ContextManagerWrapperTestCase(TestCase):
         with wrapped as unwrapped:
             self.assertFalse(obj.closed)
             self.assertIs(unwrapped, obj)
+            unwrapped.class_var = 47
         self.assertTrue(obj.closed)
+        self.assertEqual(wrapped.class_var, 47)
+
+    def test_exec_wrapper(self):
+        """Check that the wrapper permits exceptions."""
+        wrapper = tools.ContextManagerWrapper(self.DummyClass())
+        self.assertFalse(wrapper.closed)
+        with self.assertRaises(ZeroDivisionError):
+            with wrapper:
+                1 / 0
+        self.assertTrue(wrapper.closed)
 
 
 class OpenCompressedTestCase(TestCase):
@@ -82,12 +93,18 @@ class OpenCompressedTestCase(TestCase):
         with tools.open_compressed(*args) as f:
             return f.read()
 
-    def test_open_compressed(self):
-        """Test open_compressed with all compressors in the standard library."""
+    def test_open_compressed_normal(self):
+        """Test open_compressed with no compression in the standard library."""
         self.assertEqual(self._get_content(self.base_file), self.original_content)
+
+    def test_open_compressed_bz2(self):
+        """Test open_compressed with bz2 compressor in the standard library."""
         self.assertEqual(self._get_content(self.base_file + '.bz2'), self.original_content)
-        self.assertEqual(self._get_content(self.base_file + '.gz'), self.original_content)
         self.assertEqual(self._get_content(self.base_file + '.bz2', True), self.original_content)
+
+    def test_open_compressed_gz(self):
+        """Test open_compressed with gz compressor in the standard library."""
+        self.assertEqual(self._get_content(self.base_file + '.gz'), self.original_content)
 
     def test_open_compressed_7z(self):
         """Test open_compressed with 7za if installed."""
