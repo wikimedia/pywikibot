@@ -23,6 +23,8 @@ from pywikibot import (
     LockedPage,
     SpamfilterError,
     OtherPageSaveError,
+    NoCreateError,
+    PageCreatedConflict,
 )
 from tests.aspects import unittest, TestCase, WikibaseTestCase
 
@@ -63,6 +65,22 @@ class TestSaveFailure(TestCase):
         page.touch()
         new_text = page.get(force=True)
         self.assertEqual(old_text, new_text)
+
+    def test_createonly(self):
+        """Test that Page.save with createonly fails if page exists."""
+        page = pywikibot.Page(self.site, 'User:Xqt/sandbox')
+        self.assertRaises(PageCreatedConflict, page.save, createonly=True)
+
+    def test_nocreate(self):
+        """Test that Page.save with nocreate fails if page does not exist."""
+        page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
+        self.assertRaises(NoCreateError, page.save, nocreate=True)
+
+    def test_no_recreate(self):
+        """Test that Page.save with recreate disabled fails if page existed."""
+        page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
+        self.assertRaisesRegex(OtherPageSaveError, 'Page .* doesn\'t exist',
+                               page.save, recreate=False)
 
 
 class TestActionFailure(TestCase):
