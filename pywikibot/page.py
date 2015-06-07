@@ -3,10 +3,11 @@
 Objects representing various types of MediaWiki, including Wikibase, pages.
 
 This module also includes objects:
-* Link: an internal or interwiki link in wikitext.
-* Revision: a single change to a wiki page.
 * Property: a type of semantic data.
 * Claim: an instance of a semantic assertion.
+* Revision: a single change to a wiki page.
+* FileInfo: a structure holding imageinfo of latest rev. of FilePage
+* Link: an internal or interwiki link in wikitext.
 
 """
 #
