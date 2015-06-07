@@ -31,6 +31,12 @@ class TestGeneralWrite(TestCase):
     user = True
     write = True
 
+    def test_createonly(self):
+        """Test save with createonly enforced."""
+        ts = str(time.time())
+        p = pywikibot.Page(self.site, 'User:John Vandenberg/createonly/' + ts)
+        p.save(createonly=True)
+
     def test_async(self):
         """Test writing to a page."""
         global called_back
