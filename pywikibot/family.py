@@ -46,6 +46,7 @@ class Family(object):
     """Parent class for all wiki families."""
 
     def __init__(self):
+        """Constructor."""
         if not hasattr(self, 'name'):
             self.name = None
 

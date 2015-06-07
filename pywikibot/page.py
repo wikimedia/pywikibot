@@ -1858,6 +1858,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     @deprecated('Page.is_flow_page()')
     def isFlowPage(self):
+        """DEPRECATED: use self.is_flow_page instead."""
         return self.is_flow_page()
 
     def is_flow_page(self):

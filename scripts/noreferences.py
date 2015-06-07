@@ -463,6 +463,7 @@ class XmlDumpNoReferencesPageGenerator:
         self.referencesR = re.compile('<references.*?/>', re.IGNORECASE)
 
     def __iter__(self):
+        """XML iterator."""
         from pywikibot import xmlreader
         dump = xmlreader.XmlDump(self.xmlFilename)
         for entry in dump.parse():
@@ -636,6 +637,7 @@ class NoReferencesBot(Bot):
         return self.createReferenceSection(oldText, index)
 
     def createReferenceSection(self, oldText, index, ident='=='):
+        """Create a reference section and insert it into the given text."""
         if self.site.language() in noTitleRequired:
             newSection = u'\n%s\n' % (self.referencesText)
         else:
@@ -647,7 +649,7 @@ class NoReferencesBot(Bot):
         return oldText[:index] + newSection + oldText[index:]
 
     def run(self):
-
+        """Run the bot."""
         for page in self.generator:
             self.current_page = page
             try:
