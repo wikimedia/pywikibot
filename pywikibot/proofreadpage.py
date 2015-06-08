@@ -1,6 +1,8 @@
 # -*- coding: utf-8  -*-
 """
-Objects representing objects used with ProofreadPage Extensions.
+Objects representing objects used with ProofreadPage Extension.
+
+The extension is supported by MW 1.21+.
 
 This module includes objects:
 * ProofreadPage(Page)
@@ -18,6 +20,7 @@ __version__ = '$Id$'
 #
 
 import re
+import json
 
 import pywikibot
 
@@ -36,9 +39,9 @@ class FullHeader(object):
 
     def __init__(self, text=None):
         """Constructor."""
-        self.text = text or ''
+        self._text = text or ''
 
-        m = self.p_header.search(self.text)
+        m = self.p_header.search(self._text)
         if m:
             self.ql = int(m.group('ql'))
             self.user = m.group('user')
@@ -165,6 +168,7 @@ class ProofreadPage(pywikibot.Page):
         return self._full_header.header
 
     @header.setter
+    @decompose
     def header(self, value):
         """Set editable part of Page header."""
         self._full_header.header = value
@@ -198,6 +202,7 @@ class ProofreadPage(pywikibot.Page):
         self._full_header = FullHeader()
         self._body = ''
         self._footer = ''
+        self.user = self.site.username()  # Fill user field in empty header.
         self._compose_page()
 
     @property
@@ -211,17 +216,20 @@ class ProofreadPage(pywikibot.Page):
         if hasattr(self, '_text'):
             return self._text
         # If page does not exist, preload it
-        if not self.exists():
+        if self.exists():
+            # If page exists, load it
+            super(ProofreadPage, self).text
+        else:
             self._text = self.preloadText()
-        # If page exists, load it
-        super(ProofreadPage, self).text
+            self.user = self.site.username()  # Fill user field in empty header.
         return self._text
 
     @text.setter
     def text(self, value):
-        """Update the current text.
+        """Update current text.
 
         Mainly for use within the class, called by other methods.
+        Use self.header, self.body and self.footer to set page content,
 
         @param value: New value or None
         @param value: basestring
@@ -231,12 +239,14 @@ class ProofreadPage(pywikibot.Page):
                            extension.
         """
         self._text = value
-        self._decompose_page()
-        if not self._text:
+        if self._text:
+            self._decompose_page()
+        else:
             self._create_empty_page()
 
     @text.deleter
     def text(self):
+        """Delete current text."""
         if hasattr(self, '_text'):
             del self._text
 
@@ -247,12 +257,12 @@ class ProofreadPage(pywikibot.Page):
         exception Error:   the page is not formatted according to ProofreadPage
                            extension.
         """
-        if not self.text:
+        if not self.text:  # Property force page text loading.
             self._create_empty_page()
             return
 
-        open_queue = list(self.p_open.finditer(self.text))
-        close_queue = list(self.p_close.finditer(self.text))
+        open_queue = list(self.p_open.finditer(self._text))
+        close_queue = list(self.p_close.finditer(self._text))
 
         len_oq = len(open_queue)
         len_cq = len(close_queue)
@@ -261,27 +271,48 @@ class ProofreadPage(pywikibot.Page):
                                   % self.title(asLink=True))
 
         f_open, f_close = open_queue[0], close_queue[0]
-        self._full_header = FullHeader(self.text[f_open.end():f_close.start()])
+        self._full_header = FullHeader(self._text[f_open.end():f_close.start()])
 
         l_open, l_close = open_queue[-1], close_queue[-1]
-        self._footer = self.text[l_open.end():l_close.start()]
+        self._footer = self._text[l_open.end():l_close.start()]
 
-        self._body = self.text[f_close.end():l_open.start()]
+        self._body = self._text[f_close.end():l_open.start()]
 
     def _compose_page(self):
         """Compose Proofread Page text from header, body and footer."""
         fmt = ('{0.open_tag}{0._full_header}{0.close_tag}'
                '{0._body}'
                '{0.open_tag}{0._footer}</div>{0.close_tag}')
-        self.text = fmt.format(self)
-        return self.text
+        self._text = fmt.format(self)
+        return self._text
+
+    def _page_to_json(self):
+        """Convert page text to json format.
+
+        This is the format accepted by action=edit specifying
+        contentformat=application/json. This format is recommended to save the
+        page, as it is not subject to possible errors done in composing the
+        wikitext header and footer of the page or changes in the ProofreadPage
+        extension format.
+        """
+        page_dict = {'header': self.header,
+                     'body': self.body,
+                     'footer': self.footer,
+                     'level': {'level': self.ql, 'user': self.user},
+                     }
+        # ensure_ascii=False returns a unicode
+        return json.dumps(page_dict, ensure_ascii=False)
 
     def save(self, *args, **kwargs):  # see Page.save()
         """Save page content after recomposing the page."""
-        self._compose_page()
         summary = kwargs.pop('summary', '')
         summary = self.pre_summary + summary
-        super(ProofreadPage, self).save(*args, summary=summary, **kwargs)
+        # Save using contentformat='application/json'
+        kwargs['contentformat'] = 'application/json'
+        kwargs['contentmodel'] = 'proofread-page'
+        text = self._page_to_json()
+        super(ProofreadPage, self).save(*args, text=text, summary=summary,
+                                        **kwargs)
 
     @property
     def pre_summary(self):

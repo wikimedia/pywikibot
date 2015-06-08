@@ -9,9 +9,12 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
-import pywikibot
-from pywikibot.proofreadpage import ProofreadPage
+import json
 
+import pywikibot
+
+from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.data import api
 from tests.aspects import unittest, TestCase
 
 from tests.basepage_tests import (
@@ -43,6 +46,7 @@ class TestBasePageMethods(BasePageMethodsTestBase):
     code = 'en'
 
     def setUp(self):
+        """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
         super(TestBasePageMethods, self).setUp()
@@ -61,6 +65,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
     code = 'en'
 
     def setUp(self):
+        """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
         super(TestLoadRevisionsCaching, self).setUp()
@@ -158,18 +163,44 @@ class TestProofreadPageValidSite(TestCase):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'dummy test page')
         self.assertEqual(page.text,
-                         '<noinclude><pagequality level="1" user="" />'
+                         '<noinclude><pagequality level="1" user="%s" />'
                          '<div class="pagetext">\n\n\n</noinclude>'
-                         '<noinclude><references/></div></noinclude>')
+                         '<noinclude><references/></div></noinclude>'
+                         % self.site.username())
 
     def test_preload_from_empty_text(self):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'dummy test page')
         page.text = ''
         self.assertEqual(page.text,
-                         '<noinclude><pagequality level="1" user="" />'
+                         '<noinclude><pagequality level="1" user="%s" />'
                          '<div class="pagetext">\n\n\n</noinclude>'
-                         '<noinclude></div></noinclude>')
+                         '<noinclude></div></noinclude>'
+                         % self.site.username())
+
+    def test_json_format(self):
+        """Test conversion to json format."""
+        page = ProofreadPage(self.site, self.valid['title'])
+
+        rvargs = {'rvprop': 'ids|flags|timestamp|user|comment|content',
+                  'rvcontentformat': 'application/json',
+                  'titles': page,
+                  }
+
+        rvgen = self.site._generator(api.PropertyGenerator,
+                                     type_arg='info|revisions',
+                                     total=1, **rvargs)
+        rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
+
+        try:
+            pagedict = next(iter(rvgen))
+            loaded_text = pagedict.get('revisions')[0].get('*')
+        except (StopIteration, TypeError, KeyError, ValueError, IndexError):
+            page_text = ''
+
+        page_text = page._page_to_json()
+        self.assertEqual(json.loads(page_text), json.loads(loaded_text))
+
 
 if __name__ == '__main__':
     try:
