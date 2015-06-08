@@ -322,8 +322,8 @@ class TestTWNTranslate(TWNTestCaseBase):
         # co has fr as altlang but has no plural rules defined (otherwise this
         # test might not catch problems) so it's using the plural variant for 0
         # although French uses the plural variant for numbers > 1 (so not 0)
-        assert('co' not in plural.plural_rules)
-        assert(plural.plural_rules['fr']['plural'](0) is False)
+        assert 'co' not in plural.plural_rules
+        assert plural.plural_rules['fr']['plural'](0) is False
         self.assertEqual(
             i18n.twntranslate('co', 'test-plural', {'num': 0, 'descr': 'seulement'}),
             u'Robot: Changer seulement une page.')

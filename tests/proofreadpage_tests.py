@@ -111,7 +111,7 @@ class TestProofreadPageValidSite(TestCase):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, self.valid['title'])
         plain_text = pywikibot.Page(self.site, self.valid['title']).text
-        assert(page.text)
+        assert page.text
         self.assertEqual(plain_text, page.text)
 
     def test_preload_from_not_existing_page(self):

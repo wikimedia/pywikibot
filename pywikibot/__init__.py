@@ -552,7 +552,9 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @type url: string
     """
     # Either code and fam or only url
-    assert(not url or (not code and not fam))
+    if url and (code or fam):
+        raise ValueError('URL to the wiki OR a pair of code and family name '
+                         'should be provided')
     _logger = "wiki"
 
     if url:

@@ -2561,7 +2561,8 @@ class Category(Page):
                                                 total - len(cached)]
                 if total and len(cached) >= total:
                     break  # already got enough
-            assert(total is None or len(cached) <= total)
+            assert total is None or len(cached) <= total, \
+                'Number of caches is more than total number requested'
             return cached
 
         # all pages which have been checked but where created before the
@@ -2579,7 +2580,8 @@ class Category(Page):
                 cmtitle=self.title()):
             # TODO: Upcast to suitable class
             page = pywikibot.Page(self.site, member['title'])
-            assert(page.namespace() == member['ns'])
+            assert page.namespace() == member['ns'], \
+                'Namespace of the page is not consistent'
             cached = check_cache(pywikibot.Timestamp.fromISOformat(
                 member['timestamp']))
             for cached_page in cached:
@@ -2591,7 +2593,8 @@ class Category(Page):
             cache[page.oldest_revision.timestamp] += [page]
         else:
             # clear cache
-            assert(total is None or total > 0)
+            assert total is None or total > 0, \
+                'As many items as given in total already returned'
             for cached_page in check_cache(pywikibot.Timestamp.min):
                 yield cached_page
 
@@ -3221,7 +3224,7 @@ class WikibasePage(BasePage):
                 }
 
     def _diff_to(self, type_key, key_name, value_name, diffto, data):
-        assert(type_key not in data)
+        assert type_key not in data, 'Key type must be defined in data'
         source = self._normalizeLanguages(getattr(self, type_key)).copy()
         diffto = {} if not diffto else diffto.get(type_key, {})
         new = set(source.keys())

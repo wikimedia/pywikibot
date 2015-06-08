@@ -205,7 +205,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
             if not canonical_name:
                 canonical_name = self.canonical_namespaces[id]
 
-        assert(custom_name is not None or canonical_name is not None)
+        assert custom_name is not None or canonical_name is not None, \
+            'Namespace needs to have at least one name'
 
         self.custom_name = custom_name if custom_name is not None else canonical_name
         self.canonical_name = canonical_name if canonical_name is not None else custom_name
@@ -753,7 +754,7 @@ class BaseSite(ComparableMixin):
         @rtype: list (guaranteed to be not empty)
         @raise KeyError: if there is no interwiki prefix for that site.
         """
-        assert(site is not None)
+        assert site is not None, 'Site must not be None'
         self._cache_interwikimap()
         prefixes = set([prefix
                         for prefix, cache_entry in self._iw_sites.items()
@@ -1446,7 +1447,7 @@ class TokenWallet(object):
             in one request.
         @type all: bool
         """
-        assert(self.site.user())
+        assert self.site.user(), 'User must login in this site'
 
         self._tokens.setdefault(self.site.user(), {}).update(
             self.site.get_tokens(types, all=all))
@@ -1462,7 +1463,7 @@ class TokenWallet(object):
 
     def __getitem__(self, key):
         """Get token value for the given key."""
-        assert(self.site.user())
+        assert self.site.user(), 'User must login in this site'
 
         user_tokens = self._tokens.setdefault(self.site.user(), {})
         # always preload all for users without tokens
@@ -2198,7 +2199,8 @@ class APISite(BaseSite):
             if 'case' not in nsdata:
                 nsdata['case'] = default_case or self.siteinfo['case']
             elif default_case is not None:
-                assert(default_case == nsdata['case'])
+                assert default_case == nsdata['case'], \
+                    'Default case is not consistent'
 
             namespace = Namespace(ns, canonical_name, custom_name,
                                   use_image_name=not is_mw114,
@@ -4283,7 +4285,7 @@ class APISite(BaseSite):
                     % err.code,
                     _logger)
                 raise
-            assert ("edit" in result and "result" in result["edit"]), result
+            assert "edit" in result and "result" in result["edit"], result
             if result["edit"]["result"] == "Success":
                 self.unlock_page(page)
                 if "nochange" in result["edit"]:
@@ -5463,7 +5465,8 @@ class APISite(BaseSite):
         """
         namespaces = Namespace.resolve(namespace, self.namespaces)
         # always assert that, so we are be sure that type could be 'create'
-        assert('create' in self.protection_types())
+        assert 'create' in self.protection_types(), \
+            "'create' should be a valid protection type."
         if type == 'create':
             return self._generator(
                 api.PageGenerator, type_arg='protectedtitles',
@@ -5677,7 +5680,8 @@ class DataSite(APISite):
                     for key in ident:
                         req[key].append(ident[key])
                 else:
-                    assert(p.site.has_data_repository)
+                    assert p.site.has_data_repository, \
+                        'Site must have a data repository'
                     if (p.site == p.site.data_repository() and
                             p.namespace() == p.data_repository.item_namespace):
                         req['ids'].append(p.title(withNamespace=False))

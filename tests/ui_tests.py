@@ -148,8 +148,8 @@ def patched_print(text, targetStream):
     try:
         stream = patched_streams[targetStream]
     except KeyError:
-        assert(isinstance(targetStream, pywikibot.userinterfaces.win32_unicode.UnicodeOutput))
-        assert(targetStream._stream)
+        assert isinstance(targetStream, pywikibot.userinterfaces.win32_unicode.UnicodeOutput)
+        assert targetStream._stream
         stream = patched_streams[targetStream._stream]
     org_print(text, stream)
 

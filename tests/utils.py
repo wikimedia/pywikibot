@@ -98,7 +98,7 @@ def add_metaclass(cls):
     if sys.version_info[0] > 2:
         return six.add_metaclass(cls.__metaclass__)(cls)
     else:
-        assert(cls.__metaclass__)
+        assert cls.__metaclass__
         return cls
 
 

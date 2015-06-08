@@ -1594,7 +1594,8 @@ def PreloadingGenerator(generator, step=50):
 
 def DequePreloadingGenerator(generator, step=50):
     """Preload generator of type DequeGenerator."""
-    assert(isinstance(generator, DequeGenerator))
+    assert isinstance(generator, DequeGenerator), \
+        'generator must be a DequeGenerator object'
 
     while True:
         page_count = min(len(generator), step)
