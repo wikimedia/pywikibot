@@ -2599,6 +2599,10 @@ def update_page(page, pagedict, props=[]):
     if 'touched' in pagedict:
         page._timestamp = pagedict['touched']
     if 'protection' in pagedict:
+        if 'restrictiontypes' in pagedict:
+            page._applicable_protections = set(pagedict['restrictiontypes'])
+        else:
+            page._applicable_protections = None
         page._protection = {}
         for item in pagedict['protection']:
             page._protection[item['type']] = item['level'], item['expiry']

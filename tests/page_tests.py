@@ -793,6 +793,38 @@ class TestPageDelete(TestCase):
         self.assertEqual(revs[1].revid, revid)
 
 
+class TestApplicablePageProtections(TestCase):
+
+    """Test applicable restriction types."""
+
+    family = 'test'
+    code = 'test'
+
+    def test_applicable_protections(self):
+        """Test Page.applicable_protections."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Unicodesnowman/NonexistentPage')
+        p2 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
+        p3 = pywikibot.Page(site, u'File:Wiki.png')
+
+        # from the API, since 1.25wmf14
+        pp1 = p1.applicable_protections()
+        pp2 = p2.applicable_protections()
+        pp3 = p3.applicable_protections()
+
+        self.assertEqual(pp1, set(['create']))
+        self.assertIn('edit', pp2)
+        self.assertNotIn('create', pp2)
+        self.assertNotIn('upload', pp2)
+        self.assertIn('upload', pp3)
+
+        # inferred
+        site.version = lambda: '1.24'
+        self.assertEqual(pp1, p1.applicable_protections())
+        self.assertEqual(pp2, p2.applicable_protections())
+        self.assertEqual(pp3, p3.applicable_protections())
+
+
 class TestPageProtect(TestCase):
 
     """Test page protect / unprotect actions."""
@@ -802,19 +834,6 @@ class TestPageProtect(TestCase):
 
     write = True
     sysop = True
-
-    def test_applicable_protections(self):
-        """Test Page.applicable_protections."""
-        site = self.get_site()
-        p1 = pywikibot.Page(site, u'User:Unicodesnowman/NonexistentPage')
-        p2 = pywikibot.Page(site, u'User:Unicodesnowman/ProtectTest')
-        p3 = pywikibot.Page(site, u'File:Wiki.png')
-
-        self.assertEqual(p1.applicable_protections(), set(['create']))
-        self.assertIn('edit', p2.applicable_protections())
-        self.assertNotIn('create', p2.applicable_protections())
-        self.assertNotIn('upload', p2.applicable_protections())
-        self.assertIn('upload', p3.applicable_protections())
 
     @unittest.expectedFailure
     def test_protect(self):
