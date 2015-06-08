@@ -34,7 +34,8 @@ import pywikibot.family
 from pywikibot.tools import (
     itergroup, UnicodeMixin, ComparableMixin, SelfCallDict, SelfCallString,
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
-    redirect_func, manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
+    redirect_func, issue_deprecation_warning,
+    manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
 )
 from pywikibot.tools.ip import is_IP
 from pywikibot.throttle import Throttle
@@ -1424,6 +1425,15 @@ class Siteinfo(Container):
             return self._get_cached(key)[1]
         except KeyError:
             return None
+
+    def __call__(self, key='general', force=False, dump=False):
+        """DEPRECATED: Return the entry for key or dump the complete cache."""
+        issue_deprecation_warning('Calling siteinfo', 'itself', 2)
+        if not dump:
+            return self.get(key, expiry=0 if force else False)
+        else:
+            self.get(key, expiry=0 if force else False)
+            return self._cache
 
 
 class TokenWallet(object):

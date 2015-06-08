@@ -71,6 +71,21 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
             self.assertDeprecation("pywikibot.site.APISite.token is deprecated"
                                    ", use the 'tokens' property instead.")
 
+    def test_siteinfo_normal_call(self):
+        """Test calling the Siteinfo without setting dump."""
+        # This basically checks that the time is different
+        old = self.site.siteinfo('general')
+        self.assertIn('time', old)
+        self.assertEqual(old, self.site.siteinfo['general'])
+        self.assertEqual(self.site.siteinfo('general'), old)
+        self.assertNotEqual(self.site.siteinfo('general', force=True), old)
+        self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
+
+    def test_siteinfo_dump(self):
+        """Test calling the Siteinfo with dump=True."""
+        self.assertIn('statistics', self.site.siteinfo('statistics', dump=True))
+        self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
+
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase):
 
