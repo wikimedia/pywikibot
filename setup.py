@@ -126,6 +126,9 @@ if 'PYSETUP_TEST_EXTRAS' in os.environ:
     if 'mwlib' in test_deps:
         test_deps.remove('mwlib')
 
+    if 'oursql' in test_deps and os.name == 'nt':
+        test_deps.remove('oursql')  # depends on Cython
+
 # These extra dependencies are needed other unittest fails to load tests.
 if sys.version_info[0] == 2:
     test_deps += extra_deps['csv']
