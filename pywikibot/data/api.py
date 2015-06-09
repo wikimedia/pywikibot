@@ -2772,7 +2772,12 @@ def update_page(page, pagedict, props=[]):
         for item in pagedict['protection']:
             page._protection[item['type']] = item['level'], item['expiry']
     if 'revisions' in pagedict:
+        # TODO: T102735: Use the page content model for <1.21
+        # TODO: Add rvprop 'contentmodel' to all revisions calls, but only
+        # on 1.21+ otherwise it causes API warnings
         for rev in pagedict['revisions']:
+            assert 'parentid' in rev, 'parentid missing in revision %r' % rev
+
             revision = pywikibot.page.Revision(
                 revid=rev['revid'],
                 timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
@@ -2781,7 +2786,9 @@ def update_page(page, pagedict, props=[]):
                 comment=rev.get('comment', u''),
                 minor='minor' in rev,
                 text=rev.get('*', None),
-                rollbacktoken=rev.get('rollbacktoken', None)
+                rollbacktoken=rev.get('rollbacktoken', None),
+                parentid=rev.get('parentid'),
+                contentmodel=rev.get('contentmodel', None),
             )
             page._revisions[revision.revid] = revision
 
