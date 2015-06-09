@@ -2400,7 +2400,7 @@ def apply_month_delta(date, month_delta=1, add_overlap=False):
     day = min(date.day, calendar.monthrange(year, month)[1])
     new_date = date.replace(year, month, day)
     if add_overlap and day != date.day:
-        assert(date.day > day)
+        assert date.day > day, 'Day must not be more than length of the month'
         new_date += datetime.timedelta(days=date.day - day)
     return new_date
 

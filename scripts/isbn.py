@@ -1577,7 +1577,7 @@ class IsbnWikibaseBot(WikidataBot):
                 if old_isbn == new_isbn:
                     continue
                 # remove 'ISBN ' prefix
-                assert(new_isbn.startswith('ISBN '))
+                assert new_isbn.startswith('ISBN '), 'ISBN should start with "ISBN"'
                 new_isbn = new_isbn[5:]
                 claim.setTarget(new_isbn)
                 change_messages.append('Changing %s (%s --> %s)' %

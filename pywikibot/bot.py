@@ -117,7 +117,8 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         # The same context details are provided by Python 3.X, but need to
         # be extracted from the warning message for Python <= 2.7.
         if record.name == 'py.warnings' and 'caller_file' not in record.__dict__:
-            assert(len(record.args) == 1)
+            assert len(record.args) == 1, \
+                'Arguments for record is not correctly set'
             msg = record.args[0]
 
             if sys.version_info[0] < 3:
@@ -125,7 +126,8 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
                 record.lineno = msg.partition(':')[2].partition(':')[0]
                 record.module = msg.rpartition('/')[2].rpartition('.')[0]
             else:
-                assert(msg.startswith(record.pathname + ':'))
+                assert msg.startswith(record.pathname + ':'), \
+                    'Record argument should start with path'
 
             record.__dict__['caller_file'] = record.pathname
             record.__dict__['caller_name'] = record.module
@@ -618,7 +620,8 @@ def input_yn(question, default=None, automatic_quit=True, force=False):
             default = 'y'
         elif default is not None:
             default = 'n'
-    assert default in ['y', 'Y', 'n', 'N', None]
+    assert default in ['y', 'Y', 'n', 'N', None], \
+        'Default choice must be one of YyNn or default'
 
     return input_choice(question, [('Yes', 'y'), ('No', 'n')], default,
                         automatic_quit=automatic_quit, force=force) == 'y'
@@ -1587,4 +1590,4 @@ class WikidataBot(Bot):
                 pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
                                  self.__class__.__name__)
         except Exception as e:
-                pywikibot.exception(msg=e, tb=True)
+            pywikibot.exception(msg=e, tb=True)

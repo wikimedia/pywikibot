@@ -190,7 +190,7 @@ class TestCaseBase(unittest.TestCase):
         if isinstance(namespaces, int):
             namespaces = set([namespaces])
         else:
-            assert(isinstance(namespaces, set))
+            assert isinstance(namespaces, set)
 
         page_namespaces = [page.namespace() for page in gen]
 
@@ -532,7 +532,7 @@ class SiteWriteMixin(TestCaseBase):
         super(SiteWriteMixin, cls).setUpClass()
 
         site = cls.get_site()
-        assert('test' in (site.family.name, site.code))
+        assert 'test' in (site.family.name, site.code)
 
         if cls.write == -1:
             env_var = 'PYWIKIBOT2_TEST_WRITE_FAIL'
@@ -868,7 +868,7 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
                             % (name, cls.__name__))
 
         if isinstance(cls.site, BaseSite):
-            assert(cls.sites[name]['site'] == cls.site)
+            assert cls.sites[name]['site'] == cls.site
             return cls.site
 
         return cls.sites[name]['site']
@@ -1021,9 +1021,9 @@ class WikimediaDefaultSiteTestCase(DefaultSiteTestCase, WikimediaSiteTestCase):
         """
         super(WikimediaDefaultSiteTestCase, cls).setUpClass()
 
-        assert(hasattr(cls, 'site') and hasattr(cls, 'sites'))
+        assert hasattr(cls, 'site') and hasattr(cls, 'sites')
 
-        assert(len(cls.sites) == 1)
+        assert len(cls.sites) == 1
 
         site = cls.get_site()
 

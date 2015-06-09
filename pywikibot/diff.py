@@ -206,7 +206,8 @@ class _SuperHunk(Sequence):
 
     @property
     def reviewed(self):
-        assert(len(set(hunk.reviewed for hunk in self._hunks)) == 1)
+        assert len(set(hunk.reviewed for hunk in self._hunks)) == 1, \
+            'All hunks should have the same review status'
         return self._hunks[0].reviewed
 
     @reviewed.setter
@@ -446,7 +447,8 @@ class PatchManager(object):
                     elif super_hunk.reviewed == Hunk.NOT_APPR:
                         status = '-'
                     else:
-                        assert(False)
+                        assert False, "The super hunk's review status is " \
+                                      "unknown."
                     if super_hunk[0].a_rng[1] - super_hunk[0].a_rng[0] > 0:
                         mode = '-'
                         first = self.a[super_hunk[0].a_rng[0]]
@@ -500,7 +502,7 @@ class PatchManager(object):
                         '{0} -> {1}'.format(answer, help_msg[answer])
                         for answer in answers))
             else:
-                assert(False)
+                assert False, '%s is not a valid option' % choice
 
     def apply(self):
         """Apply changes. If there are undecided changes, ask to review."""

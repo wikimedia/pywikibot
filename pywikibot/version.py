@@ -248,12 +248,12 @@ def getversion_svn(path=None):
     tag, rev, date = svn_rev_info(_program_dir)
     hsh, date2 = github_svn_rev2hash(tag, rev)
     if date.tm_isdst >= 0 and date2.tm_isdst >= 0:
-        assert(date == date2)
+        assert date == date2, 'Date of version is not consistent'
     # date.tm_isdst is -1 means unknown state
     # compare its contents except daylight saving time status
     else:
         for i in range(date.n_fields - 1):
-            assert(date[i] == date2[i])
+            assert date[i] == date2[i], 'Date of version is not consistent'
 
     rev = 's%s' % rev
     if (not date or not tag or not rev) and not path:
@@ -526,7 +526,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
                 path = path.decode(sys.getfilesystemencoding())
 
             info['path'] = path
-            assert(path not in paths)
+            assert path not in paths, 'Path of the package is in defined paths'
             paths[path] = name
 
         if '__version__' in package.__dict__:

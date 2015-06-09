@@ -898,7 +898,8 @@ class Family(object):
         if fam is None:
             fam = config.family
 
-        assert(all(x in NAME_CHARACTERS for x in fam))
+        assert all(x in NAME_CHARACTERS for x in fam), \
+            'Name of family must be ASCII character'
 
         if fam in Family._families:
             return Family._families[fam]
