@@ -53,7 +53,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.tools import (
-    UnicodeMixin, DotReadableDict,
+    MediaWikiVersion, UnicodeMixin, DotReadableDict,
     ComparableMixin, deprecated, deprecate_arg, deprecated_args,
     first_upper, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
@@ -926,8 +926,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @return: set of unicode
         """
-        # Currently hard coded, but a future API update might allow us to
-        # properly determine the applicable protection types
+        # New API since commit 32083235eb332c419df2063cf966b3400be7ee8a
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.25wmf14'):
+            self.site.loadpageinfo(self)
+            return self._applicable_protections
+
         p_types = set(self.site.protection_types())
         if not self.exists():
             return set(['create']) if 'create' in p_types else set()
