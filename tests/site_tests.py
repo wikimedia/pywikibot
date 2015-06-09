@@ -15,6 +15,7 @@ import os
 from collections import Iterable
 from datetime import datetime
 import re
+import time
 
 import pywikibot
 
@@ -78,6 +79,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertIn('time', old)
         self.assertEqual(old, self.site.siteinfo['general'])
         self.assertEqual(self.site.siteinfo('general'), old)
+        time.sleep(1)
         self.assertNotEqual(self.site.siteinfo('general', force=True), old)
         self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
 
