@@ -21,7 +21,13 @@ from pywikibot.version import getversion
 try:
     import requests
 except ImportError:
-    requests = {'__version__': 'n/a'}
+    class DummyRequests(object):
+
+        """Fake requests instance."""
+
+        __version__ = 'n/a'
+
+    requests = DummyRequests()
 
 WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
