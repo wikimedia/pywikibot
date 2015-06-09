@@ -26,7 +26,7 @@ pydot
 
 # core pagegenerators
 pYsearch
-google
+# google #  removed until https://github.com/MarioVilas/google/pull/12 is merged
 
 # scripts/script_wui.py:
 crontab
