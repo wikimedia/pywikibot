@@ -4959,7 +4959,7 @@ class APISite(BaseSite):
     @deprecate_arg('imagepage', 'filepage')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
-               chunk_size=0):
+               chunk_size=0, _file_key=None, _offset=0):
         """Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
@@ -4981,6 +4981,13 @@ class APISite(BaseSite):
             will only upload in chunks, if the version number is 1.20 or higher
             and the chunk size is positive but lower than the file size.
         @type chunk_size: int
+        @param _file_key: Reuses an already uploaded file using the filekey. If
+            None (default) it will upload the file.
+        @type _file_key: str or None
+        @param _offset: When file_key is not None this can be an integer to
+            continue a previously canceled chunked upload. If False it treats
+            that as a finished upload. By default starts at 0.
+        @type _offset: int or bool
         """
         upload_warnings = {
             # map API warning codes to user error messages
@@ -4996,6 +5003,8 @@ class APISite(BaseSite):
                                  '"%(msg)s".',
         }
 
+        # An offset != 0 doesn't make sense without a file key
+        assert(_offset == 0 or _file_key is not None)
         # check for required user right
         if "upload" not in self.userinfo["rights"]:
             raise Error(
@@ -5017,7 +5026,15 @@ class APISite(BaseSite):
         token = self.tokens['edit']
         result = None
         file_page_title = filepage.title(withNamespace=False)
-        if source_filename:
+        if _file_key and _offset is False:
+            pywikibot.log('Reused already upload file using '
+                          'filekey "{0}"'.format(_file_key))
+            # TODO: Use sessionkey instead of filekey if necessary
+            req = api.Request(site=self, action='upload', token=token,
+                              filename=file_page_title,
+                              comment=comment, text=text,
+                              filekey=_file_key)
+        elif source_filename:
             # TODO: Dummy value to allow also Unicode names, see bug 73661
             mime_filename = 'FAKE-NAME'
             # upload local file
@@ -5032,8 +5049,10 @@ class APISite(BaseSite):
                               MediaWikiVersion(self.version()) >= MediaWikiVersion('1.20'))
             with open(source_filename, 'rb') as f:
                 if chunked_upload:
-                    offset = 0
-                    file_key = None
+                    offset = _offset
+                    if offset > 0:
+                        pywikibot.log('Continuing upload from byte '
+                                      '{0}'.format(offset))
                     while True:
                         f.seek(offset)
                         chunk = f.read(chunk_size)
@@ -5045,8 +5064,8 @@ class APISite(BaseSite):
                         req.mime_params['chunk'] = (chunk,
                                                     ("application", "octet-stream"),
                                                     {'filename': mime_filename})
-                        if file_key:
-                            req['filekey'] = file_key
+                        if _file_key:
+                            req['filekey'] = _file_key
                         try:
                             data = req.submit()['upload']
                             self._uploaddisabled = False
@@ -5058,18 +5077,23 @@ class APISite(BaseSite):
                         if 'warnings' in data and not ignore_warnings:
                             result = data
                             break
-                        file_key = data['filekey']
+                        _file_key = data['filekey']
                         throttle = False
                         if 'offset' in data:
                             new_offset = int(data['offset'])
                             if offset + len(chunk) != new_offset:
+                                pywikibot.log('Old offset: {0}; Returned '
+                                              'offset: {1}; Chunk size: '
+                                              '{2}'.format(offset, new_offset,
+                                                           len(chunk)))
                                 pywikibot.warning('Unexpected offset.')
                             offset = new_offset
                         else:
                             pywikibot.warning('Offset was not supplied.')
                             offset += len(chunk)
                         if data['result'] != 'Continue':  # finished
-                            additional_parameters['filekey'] = file_key
+                            pywikibot.log('Finished uploading last chunk.')
+                            additional_parameters['filekey'] = _file_key
                             break
                 else:  # not chunked upload
                     file_contents = f.read()
@@ -5113,8 +5137,19 @@ class APISite(BaseSite):
             # TODO: Handle multiple warnings at the same time
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
+            if 'filekey' in result:
+                _file_key = result['filekey']
+            elif 'sessionkey' in result:
+                # TODO: Probably needs to be reflected in the API call above
+                _file_key = result['sessionkey']
+                pywikibot.warning('Using sessionkey instead of filekey.')
+            else:
+                _file_key = None
+                pywikibot.warning('No filekey defined.')
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]
-                                          % {'msg': message})
+                                          % {'msg': message},
+                                          file_key=_file_key,
+                                          offset=result['offset'] if 'offset' in result else 0)
         elif "result" not in result:
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
