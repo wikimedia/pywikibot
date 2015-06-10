@@ -113,9 +113,20 @@ class UploadWarning(APIError):
 
     """Upload failed with a warning message (passed as the argument)."""
 
-    def __init__(self, code, message):
-        """Constructor."""
+    def __init__(self, code, message, filekey=None, offset=0):
+        """
+        Create a new UploadWarning instance.
+
+        @param filekey: The filekey of the uploaded file to reuse it later. If
+            no key is known or it is an incomplete file it may be None.
+        @type filekey: str or None
+        @param offset: The starting offset for a chunked upload. Is False when
+            there is no offset.
+        @type offset: int or bool
+        """
         super(UploadWarning, self).__init__(code, message)
+        self.filekey = filekey
+        self.offset = offset
 
     @property
     def message(self):

@@ -333,7 +333,7 @@ class UploadRobot:
         """Upload image."""
         self.upload_file(self.url, debug)
 
-    def upload_file(self, file_url, debug=False):
+    def upload_file(self, file_url, debug=False, _file_key=None, _offset=0):
         """Upload the image at file_url to the target wiki.
 
         Return the filename that was used to upload the image.
@@ -357,7 +357,8 @@ class UploadRobot:
                 apiIgnoreWarnings = True
             if self.uploadByUrl:
                 site.upload(imagepage, source_url=file_url,
-                            ignore_warnings=apiIgnoreWarnings)
+                            ignore_warnings=apiIgnoreWarnings,
+                            _file_key=_file_key, _offset=_offset)
             else:
                 if "://" in file_url:
                     temp = self.read_file_content(file_url)
@@ -365,7 +366,8 @@ class UploadRobot:
                     temp = file_url
                 site.upload(imagepage, source_filename=temp,
                             ignore_warnings=apiIgnoreWarnings,
-                            chunk_size=self.chunk_size)
+                            chunk_size=self.chunk_size,
+                            _file_key=_file_key, _offset=_offset)
 
         except pywikibot.data.api.UploadWarning as warn:
             pywikibot.output(
@@ -380,7 +382,7 @@ class UploadRobot:
             if answer:
                 self.ignoreWarning = True
                 self.keepFilename = True
-                return self.upload_file(file_url, debug)
+                return self.upload_file(file_url, debug, warn.file_key, warn.offset)
             else:
                 pywikibot.output(u"Upload aborted.")
                 return
