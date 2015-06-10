@@ -118,6 +118,8 @@ class TestLogentryParams(TestLogentriesBase):
         logentry = self._get_logentry('block')
         if logentry.action() == 'block':
             self.assertIsInstance(logentry.flags(), list)
+            # Check that there are no empty strings
+            self.assertTrue(all(logentry.flags()))
         if logentry.expiry() is not None:
             self.assertIsInstance(logentry.expiry(), pywikibot.Timestamp)
             self.assertIsInstance(logentry.duration(), datetime.timedelta)

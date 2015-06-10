@@ -157,8 +157,11 @@ class BlockEntry(LogEntry):
         if not hasattr(self, '_flags'):
             self._flags = self._params['flags']
             # pre mw 1.19 returned a delimited string.
-            if self._flags and isinstance(self._flags, basestring):
-                self._flags = self._flags.split(',')
+            if isinstance(self._flags, basestring):
+                if self._flags:
+                    self._flags = self._flags.split(',')
+                else:
+                    self._flags = []
         return self._flags
 
     def duration(self):
