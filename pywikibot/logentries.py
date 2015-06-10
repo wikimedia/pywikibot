@@ -116,7 +116,12 @@ class LogEntry(object):
 
 class BlockEntry(LogEntry):
 
-    """Block log entry."""
+    """
+    Block or unblock log entry.
+
+    It might contain a block or unblock depending on the action. The duration,
+    expiry and flags are not available on unblock log entries.
+    """
 
     _expectedType = 'block'
 
