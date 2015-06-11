@@ -11,7 +11,16 @@ __version__ = '$Id$'
 
 import logging
 
+from pywikibot.exceptions import NoPage, UnknownExtension
 from pywikibot.page import BasePage
+from pywikibot.tools import PY2
+
+if not PY2:
+    unicode = str
+    basestring = (str,)
+    from urllib.parse import urlparse, parse_qs
+else:
+    from urlparse import urlparse, parse_qs
 
 
 logger = logging.getLogger('pywiki.wiki.flow')
@@ -43,7 +52,7 @@ class FlowPage(BasePage):
         super(FlowPage, self).__init__(source, title)
 
         if not self.site.has_extension('Flow'):
-            raise ValueError('site is not Flow-enabled')
+            raise UnknownExtension('site is not Flow-enabled')
 
     def _load_uuid(self):
         """Load and save the UUID of the page."""
@@ -60,6 +69,13 @@ class FlowPage(BasePage):
             self._load_uuid()
         return self._uuid
 
+    def get(self, force=False, get_redirect=False, sysop=False):
+        if get_redirect or force or sysop:
+            raise NotImplementedError
+
+        # TODO: Return more useful data
+        return self._data
+
 
 class Board(FlowPage):
 
@@ -70,6 +86,57 @@ class Board(FlowPage):
         if not hasattr(self, '_data'):
             self._data = self.site.load_board(self)
         return self._data
+
+    def _parse_url(self, links):
+        """Parse a URL retrieved from the API."""
+        rule = links['fwd']
+        parsed_url = urlparse(rule['url'])
+        params = parse_qs(parsed_url.query)
+        new_params = {}
+        for key, value in params.items():
+            if key != 'title':
+                key = key.replace('topiclist_', '').replace('-', '_')
+                if key == 'offset_dir':
+                    new_params['reverse'] = (value == 'rev')
+                else:
+                    new_params[key] = value
+        return new_params
+
+    def topics(self, format='wikitext', limit=100, sort_by='newest',
+                offset=None, offset_uuid='', reverse=False,
+                include_offset=False, toc_only=False):
+        """Load this board's topics.
+
+        @param format: The content format to request the data in.
+        @type format: str (either 'wikitext', 'html', or 'fixed-html')
+        @param limit: The number of topics to fetch in each request.
+        @type limit: int
+        @param sort_by: Algorithm to sort topics by.
+        @type sort_by: str (either 'newest' or 'updated')
+        @param offset: The timestamp to start at (when sortby is 'updated').
+        @type offset: Timestamp or equivalent str
+        @param offset_uuid: The UUID to start at (when sortby is 'newest').
+        @type offset_uuid: str (in the form of a UUID)
+        @param reverse: Whether to reverse the topic ordering.
+        @type reverse: bool
+        @param include_offset: Whether to include the offset topic.
+        @type include_offset: bool
+        @param toc_only: Whether to only include information for the TOC.
+        @type toc_only: bool
+        @return: A generator of this board's topics.
+        @rtype: generator of Topic objects
+        """
+        data = self.site.load_topiclist(self, format=format, limit=limit,
+                                        sortby=sort_by, toconly=toc_only,
+                                        offset=offset, offset_id=offset_uuid,
+                                        reverse=reverse,
+                                        include_offset=include_offset)
+        while data['roots']:
+            for root in data['roots']:
+                topic = Topic.from_topiclist_data(self, root, data)
+                yield topic
+            cont_args = self._parse_url(data['links']['pagination'])
+            data = self.site.load_topiclist(self, **cont_args)
 
 
 class Topic(FlowPage):
@@ -82,8 +149,52 @@ class Topic(FlowPage):
             self._data = self.site.load_topic(self)
         return self._data
 
+    @classmethod
+    def from_topiclist_data(cls, board, root_uuid, topiclist_data):
+        """Create a Topic object from API data.
 
-# Flow non-page-like objects (currently just posts)
+        @param board: The topic's parent Flow board
+        @type board: Board
+        @param root_uuid: The UUID of the topic and its root post
+        @type root_uuid: unicode
+        @param topiclist_data: The data returned by view-topiclist
+        @type topiclist_data: dict
+        @return: A Topic object derived from the supplied data
+        @rtype: Topic
+        @raise TypeError: any passed parameters have wrong types
+        @raise ValueError: the passed topiclist_data is missing required data
+        """
+        if not isinstance(board, Board):
+            raise TypeError('board must be a pywikibot.flow.Board object.')
+        if not isinstance(root_uuid, basestring):
+            raise TypeError('Topic/root UUID must be a string.')
+
+        topic = cls(board.site, 'Topic:' + root_uuid)
+        topic._root = Post.fromJSON(topic, root_uuid, topiclist_data)
+        topic._uuid = root_uuid
+        return topic
+
+    @property
+    def root(self):
+        """The root post of this topic."""
+        if not hasattr(self, '_root'):
+            self._root = Post.fromJSON(self, self.uuid, self._data)
+        return self._root
+
+    def replies(self, format='wikitext', force=False):
+        """A list of replies to this topic's root post.
+
+        @param format: Content format to return contents in
+        @type format: str ('wikitext', 'html', or 'fixed-html')
+        @param force: Whether to reload from the API instead of using the cache
+        @type force: bool
+        @return: The replies of this topic's root post
+        @rtype: list of Posts
+        """
+        return self.root.replies(format=format, force=force)
+
+
+# Flow non-page-like objects
 class Post(object):
 
     """A post to a Flow discussion topic."""
@@ -92,22 +203,81 @@ class Post(object):
         """
         Constructor.
 
-        @param page: Flow topic or board
-        @type page: FlowPage
+        @param page: Flow topic
+        @type page: Topic
         @param uuid: UUID of a Flow post
         @type uuid: unicode
 
         @raise TypeError: incorrect types of parameters
-        @raise ValueError: use of non-Flow-enabled Site or invalid UUID
         """
-        if not isinstance(page, FlowPage):
-            raise TypeError('page must be a FlowPage object')
-
-        if not uuid:
-            raise ValueError('post UUID must be provided')
+        if not isinstance(page, Topic):
+            raise TypeError('Page must be a Topic object')
+        if not page.exists():
+            raise NoPage(page, 'Topic must exist: %s')
+        if not isinstance(uuid, basestring):
+            raise TypeError('Post UUID must be a string')
 
         self._page = page
         self._uuid = uuid
+
+        self._content = {}
+
+    @classmethod
+    def fromJSON(cls, page, post_uuid, data):
+        """
+        Create a Post object using the data returned from the API call.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param post_uuid: The UUID of the post
+        @type post_uuid: unicode
+        @param data: The JSON data returned from the API
+        @type data: dict
+
+        @return: A Post object
+        @raise TypeError: data is not a dict
+        @raise ValueError: data is missing required entries
+        """
+        post = cls(page, post_uuid)
+        post._set_data(data)
+
+        return post
+
+    def _set_data(self, data):
+        """Set internal data and cache content.
+
+        @param data: The data to store internally
+        @type data: dict
+        @raise TypeError: data is not a dict
+        @raise ValueError: missing data entries or post/revision not found
+        """
+        if not isinstance(data, dict):
+            raise TypeError('Illegal post data (must be a dictionary).')
+        if ('posts' not in data) or ('revisions' not in data):
+            raise ValueError('Illegal post data (missing required data).')
+        if self.uuid not in data['posts']:
+            raise ValueError('Post not found in supplied data.')
+
+        self._data = data
+        current_revision_id = data['posts'][self.uuid][0]
+
+        if current_revision_id not in data['revisions']:
+            raise ValueError('Current revision of post'
+                             'not found in supplied data.')
+
+        self._current_revision = data['revisions'][current_revision_id]
+        if 'content' in self._current_revision:
+            content = self._current_revision.pop('content')
+            assert isinstance(content, dict)
+            assert isinstance(content['content'], unicode)
+            self._content[content['format']] = content['content']
+
+    def _load(self, format='wikitext'):
+        """Load and cache the Post's data using the given content format."""
+        data = self.site.load_post_current_revision(self.page, self.uuid,
+                                                    format)
+        self._set_data(data)
+        return self._data
 
     @property
     def uuid(self):
@@ -135,3 +305,47 @@ class Post(object):
         @rtype: FlowPage
         """
         return self._page
+
+    def get(self, format='wikitext', force=False, sysop=False):
+        """Return the contents of the post in the given format.
+
+        @param force: Whether to reload from the API instead of using the cache
+        @type force: bool
+        @param sysop: Whether to load using sysop rights. Implies force.
+        @type sysop: bool
+        @param format: Content format to return contents in
+        @type format: unicode
+        @return: The contents of the post in the given content format
+        @rtype: unicode
+        @raise NotImplementedError: use of 'sysop'
+        """
+        if sysop:
+            raise NotImplementedError
+
+        if format not in self._content or force:
+            self._load(format)
+        return self._content[format]
+
+    def replies(self, format='wikitext', force=False):
+        """Return this post's replies.
+
+        @param format: Content format to return contents in
+        @type format: str ('wikitext', 'html', or 'fixed-html')
+        @param force: Whether to reload from the API instead of using the cache
+        @type force: bool
+        @return This post's replies
+        @rtype: list of Posts
+        """
+        if format not in ('wikitext', 'html', 'fixed-html'):
+            raise ValueError('Invalid content format.')
+
+        if hasattr(self, '_replies') and not force:
+            return self._replies
+
+        if not hasattr(self, '_current_revision') or force:
+            self._load(format)
+
+        reply_uuids = self._current_revision['replies']
+        self._replies = [Post(self.page, uuid) for uuid in reply_uuids]
+
+        return self._replies

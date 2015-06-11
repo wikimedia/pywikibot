@@ -5771,11 +5771,52 @@ class APISite(BaseSite):
 
         @param page: A Flow board
         @type page: Board
-        @return: A dict representing the board's data.
+        @return: A dict representing the board's metadata.
         @rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topiclist')
+                                   submodule='view-topiclist',
+                                   vtllimit=1)
+        data = req.submit()
+        return data['flow']['view-topiclist']['result']['topiclist']
+
+    @need_extension('Flow')
+    def load_topiclist(self, page, format='wikitext', limit=100,
+                         sortby='newest', toconly=False, offset=None,
+                         offset_id=None, reverse=False, include_offset=False):
+        """Retrieve the topiclist of a Flow board.
+
+        @param page: A Flow board
+        @type page: Board
+        @param format: The content format to request the data in.
+        @type format: str (either 'wikitext', 'html', or 'fixed-html')
+        @param limit: The number of topics to fetch in each request.
+        @type limit: int
+        @param sortby: Algorithm to sort topics by.
+        @type sortby: str (either 'newest' or 'updated')
+        @param toconly: Whether to only include information for the TOC.
+        @type toconly: bool
+        @param offset: The timestamp to start at (when sortby is 'updated').
+        @type offset: Timestamp or equivalent str
+        @param offset_id: The topic UUID to start at (when sortby is 'newest').
+        @type offset_id: str (in the form of a UUID)
+        @param reverse: Whether to reverse the topic ordering.
+        @type reverse: bool
+        @param include_offset: Whether to include the offset topic.
+        @type include_offset: bool
+        @return: A dict representing the board's topiclist.
+        @rtype: dict
+        """
+        if offset:
+            offset = pywikibot.Timestamp.fromtimestampformat(offset)
+        offset_dir = reverse and 'rev' or 'fwd'
+
+        params = {'action': 'flow', 'submodule': 'view-topiclist', 'page': page,
+                  'vtlformat': format, 'vtlsortby': sortby,
+                  'vtllimit': limit, 'vtloffset-dir': offset_dir,
+                  'vtloffset': offset, 'vtloffset-id': offset_id,
+                  'vtlinclude-offset': include_offset, 'vtltoconly': toconly}
+        req = self._request(parameters=params)
         data = req.submit()
         return data['flow']['view-topiclist']['result']['topiclist']
 
@@ -5792,6 +5833,25 @@ class APISite(BaseSite):
                                    submodule='view-topic')
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
+
+    @need_extension('Flow')
+    def load_post_current_revision(self, page, post_id, format):
+        """Retrieve the data for a post to a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param post_id: The UUID of the Post
+        @type post_id: unicode
+        @param format: The content format used for the returned content
+        @type format: unicode (either 'wikitext', 'html', or 'fixed-html')
+        @return: A dict representing the post data for the given UUID.
+        @rtype: dict
+        """
+        req = self._simple_request(action='flow', page=page,
+                                   submodule='view-post', vppostId=post_id,
+                                   vpformat=format)
+        data = req.submit()
+        return data['flow']['view-post']['result']['topic']
 
     def watched_pages(self, sysop=False, force=False, step=None, total=None):
         """
