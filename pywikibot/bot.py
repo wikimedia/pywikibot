@@ -680,6 +680,154 @@ def input_list_choice(question, answers, default=None,
                                 force=force)
 
 
+class InteractiveReplace(object):
+
+    """
+    A callback class for textlib's replace_links.
+
+    It shows various options which can be switched on and off:
+    * allow_skip_link = True (skip the current link)
+    * allow_unlink = True (unlink)
+    * allow_replace = True (just replace target, keep section and label)
+    * allow_replace_section = False (replace target and section, keep label)
+    * allow_replace_label = False (replace target and label, keep section)
+    * allow_replace_all = False (replace target, section and label)
+    (The boolean values are the default values)
+
+    It has also a 'context' attribute which must be a non-negative integer. If
+    it is greater 0 it shows that many characters before and after the link in
+    question.
+
+    Subclasses may overwrite build_choices and handle_answer to add custom made
+    answers.
+    """
+
+    def __init__(self, old_link, new_link, default=None, automatic_quit=True,
+                 yes_shortcut=True):
+        """
+        Constructor.
+
+        @param old_link: The old link which is searched. The label and section
+            are ignored.
+        @type old_link: Link or Page
+        @param new_link: The new link with which it should be replaced.
+            Depending on the replacement mode it'll use this link's label and
+            section.
+        @type new_link: Link or Page
+        @param default: The default answer as the shortcut
+        @type default: None or str
+        @param automatic_quit: Add an option to quit and raise a
+            QuitKeyboardException.
+        @type automatic_quit: bool
+        @param yes_shortcut: Make the first replacement option accessible via
+            'y' shortcut (does not apply to unlink).
+        @type yes_shortcut: bool
+        """
+        if isinstance(old_link, pywikibot.Page):
+            self._old = old_link._link
+        else:
+            self._old = old_link
+        if isinstance(new_link, pywikibot.Page):
+            self._new = new_link._link
+        else:
+            self._new = new_link
+        self._default = default
+        self._quit = automatic_quit
+        self._yes = yes_shortcut
+        self.context = 30
+        self.allow_skip_link = True
+        self.allow_unlink = True
+        self.allow_replace = True
+        self.allow_replace_section = False
+        self.allow_replace_label = False
+        self.allow_replace_all = False
+
+    def build_choices(self):
+        """
+        Return the choices and what the shortcut 'y' actually means.
+
+        The shortcut alias for 'y' may be either what yes_shortcut is in the
+        constructor negated or the actual shortcut used. So if it didn't use 'y'
+        at all it's a boolean (True if there are replacements and it was
+        disabled, False if there are no replacements and it is enabled) and
+        otherwise it's one character.
+        """
+        choices = []
+        if self.allow_skip_link:
+            choices += [('Do not change', 'n')]
+        if self.allow_unlink:
+            choices += [('Unlink', 'u')]
+        yes_used = not self._yes
+        if self.allow_replace:
+            choices += [('Change link target', 't' if yes_used else 'y')]
+            yes_used = 't'
+        if self.allow_replace_section:
+            choices += [('Change link target and section', 's' if yes_used else 'y')]
+            yes_used = 's'
+        if self.allow_replace_label:
+            choices += [('Change link target and label', 'l' if yes_used else 'y')]
+            yes_used = 'l'
+        if self.allow_replace_all:
+            choices += [('Change complete link', 'c' if yes_used else 'y')]
+            yes_used = 'c'
+        # 'y' was disabled in the constructor so return False as it was actually
+        # not used
+        if yes_used is True:
+            yes_used = False
+        return choices, yes_used
+
+    def handle_answer(self, choice, link):
+        """Return the result for replace_links."""
+        if choice == 'n':
+            return None
+        elif choice == 'u':
+            return False
+        elif choice == 't':
+            return self._new.canonical_title()
+        elif choice == 's':
+            return pywikibot.Link.create_separated(
+                self._new.canonical_title(), self._new.site,
+                section=self._new.section, label=link.anchor)
+        elif choice == 'l':
+            return pywikibot.Link.create_separated(
+                self._new.canonical_title(), self._new.site,
+                section=link.section, label=self._new.anchor)
+        else:
+            assert choice == 'c', 'Invalid choice {0}'.format(choice)
+            return self._new
+
+    def __call__(self, link, text, groups, rng):
+        """Ask user how the selected link should be replaced."""
+        if self._old == link:
+            if self.context > 0:
+                # at the beginning of the link, start red color.
+                # at the end of the link, reset the color to default
+                pywikibot.output(text[max(0, rng[0] - self.context): rng[0]] +
+                                 '\03{lightred}' + text[rng[0]: rng[1]] +
+                                 '\03{default}' + text[rng[1]: rng[1] + self.context])
+                question = ('Should the link target to '
+                            '\03{{lightpurple}}{0}\03{{default}}?')
+            else:
+                question = ('Should the link \03{{lightred}}{1}\03{{default}} '
+                            'target to \03{{lightpurple}}{0}\03{{default}}?')
+            choices, yes_alias = self.build_choices()
+            if yes_alias and self._default == yes_alias:
+                default = 'y'
+            else:
+                default = self._default
+
+            choice = pywikibot.input_choice(
+                question.format(self._new.canonical_title(),
+                                self._old.canonical_title()),
+                choices, default=default, automatic_quit=self._quit)
+            if yes_alias and choice == 'y':
+                choice = yes_alias
+
+            return self.handle_answer(choice, link)
+        else:
+            return None
+
+
 # Command line parsing and help
 def calledModuleName():
     """Return the name of the module calling this function.
