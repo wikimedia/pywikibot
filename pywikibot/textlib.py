@@ -16,6 +16,7 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
+import collections
 import datetime
 import re
 import sys
@@ -30,6 +31,7 @@ else:
 import pywikibot
 
 from pywikibot import config2 as config
+from pywikibot.exceptions import InvalidTitle
 from pywikibot.family import Family
 from pywikibot.tools import OrderedDict
 
@@ -445,6 +447,219 @@ def expandmarker(text, marker='', separator=''):
                 striploopcontinue = True
         marker = text[firstinseparator:firstinmarker] + marker
     return marker
+
+
+def replace_links(text, replace, site=None):
+    """
+    Replace wikilinks selectively.
+
+    The text is searched for a link and on each link it replaces the text
+    depending on the result for that link. If the result is just None it skips
+    that link. When it's False it unlinks it and just inserts the label. When it
+    is a Link instance it'll use the target, section and label from that Link
+    instance. If it's a string or Page instance it'll use just the target from
+    the replacement and the section and label from the original link.
+
+    If either the section or label should be used the replacement can be a
+    function which returns a Link instance and copies the value which should
+    remaining.
+
+    @param text: the text in which to replace links
+    @type  text: basestring
+    @param replace: either a callable which reacts like described above.
+        The callable must accept four parameters link, text, groups, rng and
+        allows for user interaction. The groups are a dict containing 'title',
+        'section', 'label' and 'linktrail' and the rng are the start and end
+        position of the link. The 'label' in groups contains everything after
+        the first pipe which might contain additional data which is used in File
+        namespace for example.
+        Alternatively it can be a sequence containing two items where the first
+        must be a Link or Page and the second has the same meaning as the result
+        by the callable. It'll convert that into a callable where the first item
+        (the Link or Page) has to be equal to the found link and in that case it
+        will apply the second value from the sequence.
+    @type  replace: sequence of pywikibot.Page/pywikibot.Link/str or
+        callable
+    @param site: a Site object to use if replace is not a sequence or the link
+        to be replaced is not a Link or Page instance.
+    @type  site: pywikibot.APISite
+    """
+    def to_link(source):
+        """Return the link from source when it's a Page otherwise itself."""
+        if isinstance(source, pywikibot.Page):
+            return pywikibot.Page._link
+        elif isinstance(source, basestring):
+            return pywikibot.Link(source, site)
+        else:
+            return source
+
+    def sequence_replace(link, text, groups, rng):
+        if replace_items[0] == link:
+            return replace_items[1]
+        else:
+            return None
+
+    def check_replacement_class(replacement):
+        """Normalize the replacement into a list."""
+        # separate checks as basestring is a type in Python 2
+        if (not isinstance(replacement, (pywikibot.Page, pywikibot.Link)) and
+                not isinstance(replacement, basestring)):
+            raise ValueError('The replacement must be None, False, '
+                             'a sequence, a Link or a basestring but '
+                             'is "{0}"'.format(type(replacement)))
+
+    if isinstance(replace, collections.Sequence):
+        if len(replace) != 2:
+            raise ValueError('When used as a sequence, the "replace" '
+                             'argument must contain exactly 2 items.')
+        replace_items = [to_link(replace[0]), replace[1]]
+        if not isinstance(replace_items[0], pywikibot.Link):
+            raise ValueError(
+                'The original value must be either basestring, Link or Page '
+                'but is "{0}"'.format(type(replace_items[0])))
+        if replace_items[1] is not False and replace_items[1] is not None:
+            check_replacement_class(replace_items[0])
+            if (not isinstance(replace_items[1], basestring) and
+                    replace_items[0].site != replace_items[1].site):
+                raise ValueError('Both pages in the "replace" argument '
+                                 'must belong to the same site.')
+        site = replace_items[0].site
+        replace = sequence_replace
+    elif site is None:
+        raise ValueError('If "replace" is not a tuple or list of pages, '
+                         'the "site" argument must be provided.')
+
+    linktrail = site.linktrail()
+    link_pattern = re.compile(
+        r'\[\[(?P<title>.*?)(#(?P<section>.*?))?(\|(?P<label>.*?))?\]\]'
+        r'(?P<linktrail>%s)' % linktrail)
+    extended_label_pattern = re.compile(r'(.*?\]\])({0})'.format(linktrail))
+    linktrail = re.compile(linktrail)
+    curpos = 0
+    # This loop will run until we have finished the current page
+    while True:
+        m = link_pattern.search(text, pos=curpos)
+        if not m:
+            break
+        # ignore links to sections of the same page
+        if not m.group('title').strip():
+            curpos = m.end()
+            continue
+        groups = m.groupdict()
+        if groups['label'] and '[[' in groups['label']:
+            # TODO: Work on the link within the label too
+            # A link within a link, extend the label to the ]] after it
+            extended_match = extended_label_pattern.search(text, pos=m.end())
+            if not extended_match:
+                # TODO: Unclosed link label, what happens there?
+                curpos = m.end()
+                continue
+            groups['label'] += groups['linktrail'] + extended_match.group(1)
+            groups['linktrail'] = extended_match.group(2)
+            end = extended_match.end()
+        else:
+            end = m.end()
+        rng = (m.start(), end)
+        # Since this point the m variable shouldn't be used as it may not
+        # contain all contents
+        del m
+        try:
+            link = pywikibot.Link.create_separated(
+                groups['title'], site, section=groups['section'],
+                label=groups['label'])
+        except pywikibot.SiteDefinitionError:
+            # unrecognized iw prefix
+            curpos = rng[1]
+            continue
+        # ignore interwiki links
+        if link.site != site:
+            curpos = rng[1]
+            continue
+
+        # Check whether the link found should be replaced.
+        # Either None, False or tuple(Link, bool)
+        replacement = replace(link, text, groups.copy(), rng)
+        if replacement is None:
+            curpos = rng[1]
+            continue
+
+        # The link looks like this:
+        # [[page_title|link_text]]trailing_chars
+        page_title = groups['title']
+        link_text = groups['label']
+
+        if not link_text:
+            # or like this: [[page_title]]trailing_chars
+            link_text = page_title
+            # remove preleading ":" from the link text
+            if link_text[0] == ':':
+                link_text = link_text[1:]
+        trailing_chars = groups['linktrail']
+        if trailing_chars:
+            link_text += trailing_chars
+
+        if replacement is False:
+            # unlink - we remove the section if there's any
+            text = text[:rng[0]] + link_text + text[rng[1]:]
+            # Make sure that next time around we will not find this same hit.
+            curpos = rng[0] + len(link_text)
+            continue
+
+        # Verify that it's either Link, Page or basestring
+        check_replacement_class(replacement)
+        # Use section and label if it's a Link and not otherwise
+        if isinstance(replacement, pywikibot.Link):
+            is_link = True
+        else:
+            if isinstance(replacement, pywikibot.Page):
+                replacement = replacement._link
+            else:
+                replacement = pywikibot.Link(replacement, site)
+            is_link = False
+
+        new_page_title = replacement.canonical_title()
+
+        if is_link:
+            # Use link's label
+            link_text = replacement.anchor
+            if link_text is None:
+                link_text = new_page_title
+                must_piped = False
+            else:
+                must_piped = True
+            section = replacement.section
+        else:
+            must_piped = True
+            section = groups['section']
+
+        if section:
+            section = '#' + section
+        else:
+            section = ''
+
+        # Parse the link text and check if it points to the same page
+        parsed_link_text = pywikibot.Link(link_text, replacement.site)
+        try:
+            parsed_link_text.parse()
+        except InvalidTitle:
+            pass
+        else:
+            # compare title, but only with parts if linktrail works
+            if not linktrail.sub('', parsed_link_text.title[len(replacement.title):]):
+                # TODO: This must also compare everything that was used as a
+                #       prefix (in case insensitive)
+                must_piped = (not parsed_link_text.title.startswith(replacement.title) or
+                              parsed_link_text.namespace != replacement.namespace)
+
+        if section or must_piped:
+            newlink = '[[{0}{1}|{2}]]'.format(new_page_title, section, link_text)
+        else:
+            newlink = '[[{0}]]{1}'.format(link_text[:len(new_page_title)],
+                                          link_text[len(new_page_title):])
+        text = text[:rng[0]] + newlink + text[rng[1]:]
+        # Make sure that next time around we will not find this same hit.
+        curpos = rng[0] + len(newlink)
+    return text
 
 
 # -----------------------------------------------
