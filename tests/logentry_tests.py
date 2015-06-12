@@ -115,14 +115,20 @@ class TestLogentryParams(TestLogentriesBase):
 
     def test_BlockEntry(self, key):
         """Test BlockEntry methods."""
-        logentry = self._get_logentry('block')
-        if logentry.action() == 'block':
-            self.assertIsInstance(logentry.flags(), list)
-            # Check that there are no empty strings
-            self.assertTrue(all(logentry.flags()))
-        if logentry.expiry() is not None:
-            self.assertIsInstance(logentry.expiry(), pywikibot.Timestamp)
-            self.assertIsInstance(logentry.duration(), datetime.timedelta)
+        # only 'block' entries can be tested
+        for logentry in self.site.logevents(logtype='block', total=5):
+            if logentry.action() == 'block':
+                self.assertIsInstance(logentry.flags(), list)
+                # Check that there are no empty strings
+                self.assertTrue(all(logentry.flags()))
+                if logentry.expiry() is not None:
+                    self.assertIsInstance(logentry.expiry(), pywikibot.Timestamp)
+                    self.assertIsInstance(logentry.duration(), datetime.timedelta)
+                    self.assertEqual(logentry.timestamp() + logentry.duration(),
+                                     logentry.expiry())
+                else:
+                    self.assertIsNone(logentry.duration())
+                break
 
     def test_RightsEntry(self, key):
         """Test RightsEntry methods."""
