@@ -16,7 +16,7 @@ import re
 import pywikibot
 import pywikibot.textlib as textlib
 
-from pywikibot import config
+from pywikibot import config, UnknownSite
 from pywikibot.tools import OrderedDict
 
 from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
@@ -323,6 +323,230 @@ class TestTemplateParams(TestCase):
     def test_extract_templates_params(self):
         self._extract_templates_params(
             textlib.extract_templates_and_params)
+
+
+class TestReplaceLinks(TestCase):
+
+    """Test the replace_links function in textlib."""
+
+    sites = {
+        'wt': {
+            'family': 'wiktionary',
+            'code': 'en',
+        },
+        'wp': {
+            'family': 'wikipedia',
+            'code': 'en',
+        }
+    }
+
+    dry = True
+
+    text = ('Hello [[World]], [[how|are]] [[you#section|you]]? Are [[you]] a '
+            '[[bug:1337]]?')
+
+    @staticmethod
+    def _dummy_cache(force=False):
+        pass
+
+    @classmethod
+    def setUpClass(cls):
+        super(TestReplaceLinks, cls).setUpClass()
+        # make APISite.interwiki work, as long as it doesn't call
+        # _cache_interwikimap with force=True
+        for site in cls.sites.values():
+            site['site']._cache_interwikimap = cls._dummy_cache
+            site['site']._iw_sites = dict((iw['family'], (iw['site'], True))
+                                          for iw in cls.sites.values())
+            site['site']._iw_sites['bug'] = (UnknownSite('Not a wiki'),
+                                             False)
+            site['site']._iw_sites['en'] = (site['site'], True)
+        cls.wp_site = cls.get_site('wp')
+
+    def test_replacements_function(self):
+        """Test a dynamic function as the replacements."""
+        def callback(link, text, groups, rng):
+            self.assertEqual(link.site, self.wp_site)
+            if link.title == 'World':
+                return pywikibot.Link('Homeworld', link.site)
+            elif link.title.lower() == 'you':
+                return False
+        self.assertEqual(
+            textlib.replace_links(self.text, callback, self.wp_site),
+            'Hello [[Homeworld]], [[how|are]] you? Are you a [[bug:1337]]?')
+
+    def test_replacements_once(self):
+        """Test dynamic replacement."""
+        def callback(link, text, groups, rng):
+            if link.title.lower() == 'you':
+                self._count += 1
+                if link.section:
+                    return pywikibot.Link(
+                        '{0}#{1}'.format(self._count, link.section), link.site)
+                else:
+                    return pywikibot.Link('{0}'.format(self._count), link.site)
+        self._count = 0  # buffer number of found instances
+        self.assertEqual(
+            textlib.replace_links(self.text, callback, self.wp_site),
+            'Hello [[World]], [[how|are]] [[1#section|1]]? Are [[2]] a '
+            '[[bug:1337]]?')
+        del self._count
+
+    def test_unlink_all(self):
+        """Test unlinking."""
+        def callback(link, text, groups, rng):
+            self.assertEqual(link.site, self.wp_site)
+            return False
+        self.assertEqual(
+            textlib.replace_links(self.text, callback, self.wp_site),
+            'Hello World, are you? Are you a [[bug:1337]]?')
+
+    def test_unlink_some(self):
+        """Test unlinking only some links."""
+        self.assertEqual(
+            textlib.replace_links(self.text, ('World', False), self.wp_site),
+            'Hello World, [[how|are]] [[you#section|you]]? Are [[you]] a '
+            '[[bug:1337]]?')
+        self.assertEqual(
+            textlib.replace_links('[[User:Namespace|Label]]\n'
+                                  '[[User:Namespace#Section|Labelz]]\n'
+                                  '[[Nothing]]',
+                                  ('User:Namespace', False),
+                                  self.wp_site),
+            'Label\nLabelz\n[[Nothing]]')
+
+    def test_replace_neighbour(self):
+        """Test that it replaces two neighbouring links."""
+        self.assertEqual(
+            textlib.replace_links('[[A]][[A]][[C]]',
+                                  ('A', 'B'),
+                                  self.wp_site),
+            '[[B|A]][[B|A]][[C]]')
+
+    def test_replacements_simplify(self):
+        """Test a tuple as a replacement removing the need for a piped link."""
+        self.assertEqual(
+            textlib.replace_links(self.text,
+                                  ('how', 'are'),
+                                  self.wp_site),
+            'Hello [[World]], [[are]] [[you#section|you]]? Are [[you]] a '
+            '[[bug:1337]]?')
+
+    def test_replace_file(self):
+        """Test that it respects the namespace."""
+        self.assertEqual(
+            textlib.replace_links(
+                '[[File:Meh.png|thumb|Description of [[fancy]]]] [[Fancy]]...',
+                ('File:Meh.png', 'File:Fancy.png'),
+                self.wp_site),
+            '[[File:Fancy.png|thumb|Description of [[fancy]]]] [[Fancy]]...')
+
+    def test_replace_strings(self):
+        """Test if strings can be used."""
+        self.assertEqual(
+            textlib.replace_links(self.text, ('how', 'are'), self.wp_site),
+            'Hello [[World]], [[are]] [[you#section|you]]? Are [[you]] a '
+            '[[bug:1337]]?')
+
+    def test_replace_invalid_link_text(self):
+        """Test that it doesn't pipe a link when it's an invalid link."""
+        self.assertEqual(
+            textlib.replace_links('[[Target|Foo:]]', ('Target', 'Foo'), self.wp_site),
+            '[[Foo|Foo:]]')
+
+    def test_replace_modes(self):
+        """Test replacing with or without label and section."""
+        source_text = '[[Foo#bar|baz]]'
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'Bar'), self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Page(self.wp_site, 'Bar')),
+                                  self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Link('Bar', self.wp_site)),
+                                  self.wp_site),
+            '[[Bar]]')
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'Bar#snafu'), self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Page(self.wp_site, 'Bar#snafu')),
+                                  self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Link('Bar#snafu', self.wp_site)),
+                                  self.wp_site),
+            '[[Bar#snafu|Bar]]')
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'Bar|foo'), self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Page(self.wp_site, 'Bar|foo')),
+                                  self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Link('Bar|foo', self.wp_site)),
+                                  self.wp_site),
+            '[[Bar|foo]]')
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'Bar#snafu|foo'), self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Page(self.wp_site, 'Bar#snafu|foo')),
+                                  self.wp_site),
+            '[[Bar#bar|baz]]')
+        self.assertEqual(
+            textlib.replace_links(source_text,
+                                  ('Foo', pywikibot.Link('Bar#snafu|foo', self.wp_site)),
+                                  self.wp_site),
+            '[[Bar#snafu|foo]]')
+
+    def test_replace_different_case(self):
+        """Test that it uses piped links when the case is different."""
+        source_text = '[[Foo|Bar]] and [[Foo|bar]]'
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'bar'), self.get_site('wp')),
+            '[[Bar]] and [[bar]]')
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'bar'), self.get_site('wt')),
+            '[[bar|Bar]] and [[bar]]')
+        self.assertEqual(
+            textlib.replace_links(source_text, ('Foo', 'Bar'), self.get_site('wt')),
+            '[[Bar]] and [[Bar|bar]]')
+
+    @unittest.expectedFailure
+    def test_label_diff_namespace(self):
+        """Test that it uses the old label when the new doesn't match."""
+        # These tests require to get the actual part which is before the title
+        # (interwiki and namespace prefixes) which could be then compared
+        # case insensitive.
+        self.assertEqual(
+            textlib.replace_links('[[Image:Foobar]]', ('File:Foobar', 'File:Foo'), self.wp_site),
+            '[[File:Foo|Image:Foobar]]')
+        self.assertEqual(
+            textlib.replace_links('[[en:File:Foobar]]', ('File:Foobar', 'File:Foo'), self.wp_site),
+            '[[File:Foo|en:File:Foobar]]')
+
+    def test_linktrails(self):
+        """Test that the linktrails are used or applied."""
+        self.assertEqual(
+            textlib.replace_links('[[Foobar]]', ('Foobar', 'Foo'), self.wp_site),
+            '[[Foo]]bar')
+        self.assertEqual(
+            textlib.replace_links('[[Talk:test]]s', ('Talk:Test', 'Talk:Tests'), self.wp_site),
+            '[[Talk:tests]]')
+        self.assertEqual(
+            textlib.replace_links('[[Talk:test]]s', ('Talk:Test', 'Project:Tests'), self.wp_site),
+            '[[Project:Tests|Talk:tests]]')
 
 
 class TestLocalDigits(TestCase):

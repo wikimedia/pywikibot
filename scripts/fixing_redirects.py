@@ -23,12 +23,10 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 #
-import re
 import sys
 import pywikibot
 from pywikibot import pagegenerators
 from pywikibot import i18n
-from pywikibot.tools import first_lower, first_upper as firstcap
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -58,86 +56,6 @@ featured_articles = {
     'zh': u'Wikipedia:特色条目',
 }
 
-
-def treat(text, linkedPage, targetPage):
-    """Based on the method of the same name in solve_disambiguation.py."""
-    mysite = pywikibot.Site()
-    linktrail = mysite.linktrail()
-
-    # make a backup of the original text so we can show the changes later
-    linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?'
-                       r'(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
-    curpos = 0
-    # This loop will run until we have finished the current page
-    while True:
-        m = linkR.search(text, pos=curpos)
-        if not m:
-            break
-        # Make sure that next time around we will not find this same hit.
-        curpos = m.start() + 1
-        # ignore interwiki links and links to sections of the same page
-        if m.group('title').strip() == '' or \
-           mysite.isInterwikiLink(m.group('title')):
-            continue
-        else:
-            actualLinkPage = pywikibot.Page(targetPage.site, m.group('title'))
-            # Check whether the link found is to page.
-            if actualLinkPage != linkedPage:
-                continue
-
-        choice = 'y'
-
-        # The link looks like this:
-        # [[page_title|link_text]]trailing_chars
-        page_title = m.group('title')
-        link_text = m.group('label')
-
-        if not link_text:
-            # or like this: [[page_title]]trailing_chars
-            link_text = page_title
-        if m.group('section') is None:
-            section = ''
-        else:
-            section = m.group('section')
-        trailing_chars = m.group('linktrail')
-        if trailing_chars:
-            link_text += trailing_chars
-
-        if choice in "uU":
-            # unlink - we remove the section if there's any
-            text = text[:m.start()] + link_text + text[m.end():]
-            continue
-        replaceit = choice in "rR"
-
-        # remove preleading ":"
-        if link_text[0] == ':':
-            link_text = link_text[1:]
-        if link_text[0].isupper():
-            new_page_title = targetPage.title()
-        else:
-            new_page_title = first_lower(targetPage.title())
-
-        # remove preleading ":"
-        if new_page_title[0] == ':':
-            new_page_title = new_page_title[1:]
-
-        if replaceit and trailing_chars:
-            newlink = "[[%s%s]]%s" % (new_page_title, section, trailing_chars)
-        elif replaceit or (new_page_title == link_text and not section):
-            newlink = "[[%s]]" % new_page_title
-        # check if we can create a link with trailing characters instead of a
-        # pipelink
-        elif len(new_page_title) <= len(link_text) and \
-             firstcap(link_text[:len(new_page_title)]) == \
-             firstcap(new_page_title) and \
-             re.sub(re.compile(linktrail), '', link_text[len(new_page_title):]) == '' and not section:
-            newlink = "[[%s]]%s" % (link_text[:len(new_page_title)],
-                                    link_text[len(new_page_title):])
-        else:
-            newlink = "[[%s%s|%s]]" % (new_page_title, section, link_text)
-        text = text[:m.start()] + newlink + text[m.end():]
-        continue
-    return text
 
 pageCache = []
 
@@ -176,7 +94,7 @@ def workon(page):
         # no fix to user namespaces
         if target.namespace() in [0, 1] and not page2.namespace() in [0, 1]:
             continue
-        text = treat(text, page2, target)
+        text = pywikibot.textlib.replace_links(text, [page2, target])
     if text != page.get():
         comment = i18n.twtranslate(mysite, 'fixing_redirects-fixing')
         pywikibot.showDiff(page.get(), text)

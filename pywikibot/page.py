@@ -4911,6 +4911,39 @@ class Link(ComparableMixin):
         link._title = title
         return link
 
+    @classmethod
+    def create_separated(cls, link, source, default_namespace=0, section=None,
+                         label=None):
+        """
+        Create a new instance but overwrite section or label.
+
+        The returned Link instance is already parsed.
+
+        @param link: The original link text.
+        @type link: str
+        @param source: The source of the link.
+        @type source: Site
+        @param default_namespace: The namespace this link uses when no namespace
+            is defined in the link text.
+        @type default_namespace: int
+        @param section: The new section replacing the one in link. If None
+            (default) it doesn't replace it.
+        @type section: None or str
+        @param label: The new label replacing the one in link. If None (default)
+            it doesn't replace it.
+        """
+        link = cls(link, source, default_namespace)
+        link.parse()
+        if section:
+            link._section = section
+        elif section is not None:
+            link._section = None
+        if label:
+            link._label = label
+        elif label is not None:
+            link._label = ''
+        return link
+
 
 # Utility functions for parsing page titles
 
