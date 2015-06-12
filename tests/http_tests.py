@@ -171,22 +171,17 @@ class TestHttpStatus(TestCase):
                           uri='invalid://url')
 
     def test_follow_redirects(self):
-        """Test follow 301 redirects after an exception works correctly."""
-        # It doesnt matter what exception is raised here, provided it
-        # occurs within the requests request method.
-        self.assertRaises(requests.exceptions.InvalidSchema,
-                          http.fetch,
-                          uri='invalid://url')
-
+        """Test follow 301 redirects correctly."""
         # The following will redirect from ' ' -> '_', and maybe to https://
         r = http.fetch(uri='http://en.wikipedia.org/wiki/Main%20Page')
         self.assertEqual(r.status, 200)
+        self.assertIsNotNone(r.data.history)
         self.assertIn('//en.wikipedia.org/wiki/Main_Page',
-                      http.session.redirect_cache.get('http://en.wikipedia.org/wiki/Main%20Page'))
+                      r.data.url)
 
         r = http.fetch(uri='http://www.gandi.eu')
         self.assertEqual(r.status, 200)
-        self.assertEqual(http.session.redirect_cache.get('http://www.gandi.eu/'),
+        self.assertEqual(r.data.url,
                          'http://www.gandi.net')
 
 
