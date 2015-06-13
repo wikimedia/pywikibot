@@ -22,7 +22,7 @@ __version__ = '$Id$'
 import pywikibot
 
 from pywikibot import i18n, textlib, pagegenerators
-from pywikibot.bot import InteractiveReplace
+from pywikibot.bot import CurrentPageBot, InteractiveReplace
 
 msg = {
     'ar': u'تغيير التحويلات في صفحة توضيح',
@@ -40,27 +40,33 @@ msg = {
 }
 
 
-def workon(page, links):
-    """Execute treat for the given page which is linking to the given links."""
-    text = page.get()
-    # Show the title of the page we're working on.
-    # Highlight the title in purple.
-    pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                     % page.title())
-    for page2 in links:
-        try:
-            target = page2.getRedirectTarget()
-        except (pywikibot.Error, pywikibot.SectionError):
-            continue
+class DisambiguationRedirectBot(CurrentPageBot):
+
+    """Change redirects from disambiguation pages."""
+
+    def _create_callback(self, old, new):
         replace_callback = InteractiveReplace(
-            page2, target, default='n', automatic_quit=False, yes_shortcut=True)
+            old, new, default='n', automatic_quit=False, yes_shortcut=True)
         replace_callback.allow_replace_label = True
-        # TODO: Work on all links at the same time (would mean that the user
-        # doesn't get them ordered like in links but how they appear in the page)
-        text = textlib.replace_links(text, replace_callback, page.site)
-    if text != page.get():
-        comment = i18n.translate(page.site, msg, fallback=True)
-        page.put(text, comment)
+        return replace_callback
+
+    def treat_page(self):
+        """Iterate over the linked pages and replace redirects conditionally."""
+        text = self.current_page.text
+        for linked_page in self.current_page.linkedPages():
+            try:
+                target = linked_page.getRedirectTarget()
+            except (pywikibot.Error, pywikibot.SectionError):
+                continue
+            # TODO: Work on all links at the same time (would mean that the user
+            # doesn't get them ordered like in links but how they appear in the page)
+            text = textlib.replace_links(
+                text, self._create_callback(linked_page, target),
+                self.current_page.site)
+
+        if text != self.current_page.get():
+            summary = i18n.translate(self.current_page.site, msg, fallback=True)
+            self.put_current(text, summary=summary)
 
 
 def main(*args):
@@ -87,21 +93,8 @@ def main(*args):
     generator = pagegenerators.CategorizedPageGenerator(
         mysite.disambcategory(), start=start, content=True, namespaces=[0])
 
-    # only work on articles
-    pagestodo = []
-    pagestoload = []
-    for page in generator:
-        if page.isRedirectPage():
-            continue
-        linked = page.linkedPages()
-        pagestodo.append((page, linked))
-        pagestoload += linked
-        if len(pagestoload) > 49:
-            pagestoload = pagegenerators.PreloadingGenerator(pagestoload)
-            for page, links in pagestodo:
-                workon(page, links)
-            pagestoload = []
-            pagestodo = []
+    bot = DisambiguationRedirectBot(generator=generator)
+    bot.run()
 
 
 if __name__ == "__main__":

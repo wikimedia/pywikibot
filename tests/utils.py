@@ -102,6 +102,15 @@ def add_metaclass(cls):
         return cls
 
 
+def fixed_generator(iterable):
+    """Return a dummy generator ignoring all parameters."""
+    def gen(*args, **kwargs):
+        for item in iterable:
+            yield item
+
+    return gen
+
+
 class DryParamInfo(dict):
 
     """Dummy class to use instead of L{pywikibot.data.api.ParamInfo}."""
