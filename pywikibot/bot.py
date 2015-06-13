@@ -1351,6 +1351,27 @@ class Bot(object):
         """Cleanup and quit processing."""
         raise QuitKeyboardInterrupt
 
+    def exit(self):
+        """
+        Cleanup and exit processing.
+
+        Invoked when Bot.run() is finished.
+        Prints treat and save counters and informs whether the script
+        terminated gracefully or was halted by exception.
+        May be overridden by subclasses.
+        """
+        pywikibot.output("\n%i pages read"
+                         "\n%i pages written"
+                         % (self._treat_counter, self._save_counter))
+
+        # exc_info contains exception from self.run() while terminating
+        exc_info = sys.exc_info()
+        if exc_info[0] is None:
+            pywikibot.output("Script terminated successfully.")
+        else:
+            pywikibot.output("Script terminated by exception:\n")
+            pywikibot.exception()
+
     def treat(self, page):
         """Process one page (Abstract method)."""
         raise NotImplementedError('Method %s.treat() not implemented.'
@@ -1442,6 +1463,8 @@ class Bot(object):
             else:
                 pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
                                  self.__class__.__name__)
+        finally:
+            self.exit()
 
 
 class CurrentPageBot(Bot):
