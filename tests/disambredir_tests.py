@@ -18,11 +18,12 @@ import pywikibot
 
 from scripts import disambredir
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest
+from tests.bot_tests import FakeSaveBotTestCase
 from tests.utils import fixed_generator
 
 
-class TestDisambigurationRedirectBot(TestCase):
+class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
 
     """
     Test cases for DisambigurationRedirectBot.
@@ -62,70 +63,61 @@ class TestDisambigurationRedirectBot(TestCase):
     def setUpClass(cls):
         """Initialize page variable."""
         super(TestDisambigurationRedirectBot, cls).setUpClass()
+        # Patch the page to be independent of the actual site
         cls.page = pywikibot.Page(cls.site, 'User:BobBot/Test disambig')
+        cls.page.linkedPages = fixed_generator(
+            [pywikibot.Page(cls.site, 'User:BobBot/Redir'),
+             pywikibot.Page(cls.site, 'Main Page')])
+
+    def bot_save(self, page, *args, **kwargs):
+        """Check if the page matches."""
+        self.assertIs(page, self.page)
+        return super(TestDisambigurationRedirectBot, self).bot_save(
+            page, *args, **kwargs)
 
     def setUp(self):
         """Set up the test page."""
-        def _save_page(*args, **kwargs):
-            self.assertIs(args[0], self.page)
-            self.save_called = True
-            return  # avert actually saving
-
         super(TestDisambigurationRedirectBot, self).setUp()
         self.page.text = ('[[User:BobBot/Redir#Foo|Bar]]\n'
                           '[[User:BobBot/Redir|Baz]]\n'
                           '[[Main Page|Label]]\n')
         self.bot = disambredir.DisambiguationRedirectBot(generator=[self.page])
-        self.bot.options['always'] = True
-        # Patch the page and bot to not actually save anything
-        self.page.linkedPages = fixed_generator(
-            [pywikibot.Page(self.site, 'User:BobBot/Redir'),
-             pywikibot.Page(self.site, 'Main Page')])
-        self.save_called = False
-        self.bot._save_page = _save_page
 
     def test_unchanged(self):
         """Test no change."""
+        # No changes needed, won't call the save method
+        self.assert_saves = 0
         self._patch_create_callback('n')
-        self.assertFalse(self.save_called)
         self.bot.run()
         self.assertEqual(self.page.text,
                          '[[User:BobBot/Redir#Foo|Bar]]\n'
                          '[[User:BobBot/Redir|Baz]]\n'
                          '[[Main Page|Label]]\n')
-        # No changes needed, won't call the save method
-        self.assertFalse(self.save_called)
 
     def test_unlink(self):
         """Test unlinking."""
         self._patch_create_callback('u')
-        self.assertFalse(self.save_called)
         self.bot.run()
         self.assertEqual(self.page.text,
                          'Bar\nBaz\n[[Main Page|Label]]\n')
-        self.assertTrue(self.save_called)
 
     def test_replace_target(self):
         """Test replacing just target page."""
         self._patch_create_callback('t')
-        self.assertFalse(self.save_called)
         self.bot.run()
         self.assertEqual(self.page.text,
                          '[[Main Page#Foo|Bar]]\n'
                          '[[Main Page|Baz]]\n'
                          '[[Main Page|Label]]\n')
-        self.assertTrue(self.save_called)
 
     def test_replace_all(self):
         """Test replacing target and label."""
         self._patch_create_callback('l')
-        self.assertFalse(self.save_called)
         self.bot.run()
         self.assertEqual(self.page.text,
                          '[[Main Page#Foo|Main Page]]\n'
                          '[[Main Page]]\n'
                          '[[Main Page|Label]]\n')
-        self.assertTrue(self.save_called)
 
 
 if __name__ == '__main__':
