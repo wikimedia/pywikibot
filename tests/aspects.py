@@ -32,6 +32,7 @@ __version__ = '$Id$'
 import inspect
 import itertools
 import os
+import re
 import sys
 import time
 import warnings
@@ -1230,6 +1231,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     """Test cases for deprecation function in the tools module."""
 
+    _generic_match = re.compile(r'.* is deprecated(, use .* instead)?\.')
+
     def __init__(self, *args, **kwargs):
         super(DeprecationTestCase, self).__init__(*args, **kwargs)
         self.warning_log = []
@@ -1251,8 +1254,12 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         messages = [str(item.message) for item in self.warning_log]
         return messages
 
-    def assertDeprecation(self, msg):
-        self.assertIn(msg, self.deprecation_messages)
+    def assertDeprecation(self, msg=None):
+        if msg is None:
+            self.assertGreater(sum(1 for msg in self.deprecation_messages
+                                   if self._generic_match.match(msg)), 0)
+        else:
+            self.assertIn(msg, self.deprecation_messages)
         if self._do_test_warning_filename:
             self.assertDeprecationFile(self.expect_warning_filename)
 
