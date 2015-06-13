@@ -113,7 +113,7 @@ class UploadWarning(APIError):
 
     """Upload failed with a warning message (passed as the argument)."""
 
-    def __init__(self, code, message, filekey=None, offset=0):
+    def __init__(self, code, message, file_key=None, offset=0):
         """
         Create a new UploadWarning instance.
 
@@ -125,7 +125,7 @@ class UploadWarning(APIError):
         @type offset: int or bool
         """
         super(UploadWarning, self).__init__(code, message)
-        self.filekey = filekey
+        self.file_key = file_key
         self.offset = offset
 
     @property
