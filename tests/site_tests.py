@@ -55,6 +55,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertIsInstance(ver, tuple)
         self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
         self.assertIsInstance(ver[2], basestring)
+        self.assertDeprecation()
 
     def test_token(self):
         """Test ability to get page tokens."""
