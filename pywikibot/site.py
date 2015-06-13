@@ -5561,6 +5561,37 @@ class APISite(BaseSite):
         comparison = data['compare']['*']
         return comparison
 
+    # Flow API calls
+    @need_extension('Flow')
+    def load_board(self, page):
+        """Retrieve the data for a Flow board.
+
+        @param page: A Flow board
+        @type page: Board
+        @return: A dict representing the board's data.
+        @rtype: dict
+        """
+        title = page.title(withSection=False)
+        req = api.Request(site=self, action='flow', page=title,
+                          submodule='view-topiclist')
+        data = req.submit()
+        return data['flow']['view-topiclist']['result']['topiclist']
+
+    @need_extension('Flow')
+    def load_topic(self, page):
+        """Retrieve the data for a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @return: A dict representing the topic's data.
+        @rtype: dict
+        """
+        title = page.title(withSection=False)
+        req = api.Request(site=self, action='flow', page=title,
+                          submodule='view-topic')
+        data = req.submit()
+        return data['flow']['view-topic']['result']['topic']
+
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
                               class_name='APISite')

@@ -22,8 +22,6 @@ Available tests
         :members:
     .. autoclass:: tests.page_tests.TestPageRedirects
         :members:
-    .. autoclass:: tests.page_tests.TestFlow
-        :members:
     .. autoclass:: tests.page_tests.TestPageUserAction
         :members:
     .. autoclass:: tests.page_tests.TestPageDelete

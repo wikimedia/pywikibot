@@ -714,30 +714,6 @@ class TestPageRedirects(TestCase):
         self.assertRaises(pywikibot.exceptions.NoPage, p3.get)
 
 
-class TestFlow(TestCase):
-
-    """Test Flow pages using Page layer."""
-
-    family = 'mediawiki'
-    code = 'mediawiki'
-
-    cached = True
-
-    def test_methods(self):
-        """Test basic Page methods on a Flow page."""
-        site = self.get_site()
-        page = pywikibot.Page(site, u'Talk:Sandbox')
-        self.assertEqual(page.exists(), True)
-        page.get()
-        self.assertEqual(page.isRedirectPage(), False)
-
-    def test_content_model(self):
-        """Test Flow page content model."""
-        site = self.get_site()
-        page = pywikibot.Page(site, u'Talk:Sandbox')
-        self.assertEqual(page.content_model, 'flow-board')
-
-
 class TestPageUserAction(DefaultSiteTestCase):
 
     """Test page user actions."""
