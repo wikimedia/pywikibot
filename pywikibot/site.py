@@ -5076,6 +5076,8 @@ class APISite(BaseSite):
                             raise error
                         if 'warnings' in data and not ignore_warnings:
                             result = data
+                            if 'offset' not in result:
+                                result['offset'] = 0
                             break
                         _file_key = data['filekey']
                         throttle = False
@@ -5149,7 +5151,8 @@ class APISite(BaseSite):
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]
                                           % {'msg': message},
                                           file_key=_file_key,
-                                          offset=result['offset'] if 'offset' in result else 0)
+                                          offset=result['offset']
+                                                 if 'offset' in result else False)
         elif "result" not in result:
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
