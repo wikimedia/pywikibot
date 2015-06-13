@@ -36,6 +36,7 @@ from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
     redirect_func, issue_deprecation_warning,
     manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
+    merge_unique_dicts,
 )
 from pywikibot.tools.ip import is_IP
 from pywikibot.throttle import Throttle
@@ -1234,12 +1235,14 @@ class Siteinfo(Container):
             raise ValueError('At least one property name must be provided.')
         invalid_properties = []
         try:
-            request = pywikibot.data.api.CachedRequest(
+            request = self._site._request(
                 expiry=pywikibot.config.API_config_expiry if expiry is False else expiry,
-                site=self._site,
-                action='query',
-                meta='siteinfo',
-                siprop=props)
+                parameters=dict(
+                    action='query',
+                    meta='siteinfo',
+                    siprop=props
+                )
+            )
             # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
             # continue anyway we just always use continue.
             request['continue'] = True
@@ -1582,9 +1585,9 @@ class APISite(BaseSite):
     @classmethod
     def fromDBName(cls, dbname):
         # TODO this only works for some WMF sites
-        req = api.CachedRequest(datetime.timedelta(days=10),
-                                site=pywikibot.Site('meta', 'meta'),
-                                action='sitematrix')
+        site = pywikibot.Site('meta', 'meta')
+        req = site._request(expiry=datetime.timedelta(days=10),
+                            parameters={'action': 'sitematrix'})
         data = req.submit()
         for key, val in data['sitematrix'].items():
             if key == 'count':
@@ -1606,8 +1609,9 @@ class APISite(BaseSite):
                    step=None, total=None, **args):
         """Convenience method that returns an API generator.
 
-        All keyword args not listed below are passed to the generator's
-        constructor unchanged.
+        All generic keyword arguments are passed as MW API parameter except for
+        'g_content' which is passed as a normal parameter to the generator's
+        constructor.
 
         @param gen_class: the type of generator to construct (must be
             a subclass of pywikibot.data.api.QueryGenerator)
@@ -1630,10 +1634,14 @@ class APISite(BaseSite):
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
+        # TODO: Support parameters/simple modes?
+        req_args = {'site': self, 'parameters': args}
+        if 'g_content' in args:
+            req_args['g_content'] = args.pop('g_content')
         if type_arg is not None:
-            gen = gen_class(type_arg, site=self, **args)
+            gen = gen_class(type_arg, **req_args)
         else:
-            gen = gen_class(site=self, **args)
+            gen = gen_class(**req_args)
         if namespaces is not None:
             gen.set_namespace(namespaces)
         if step is not None and int(step) > 0:
@@ -1641,6 +1649,30 @@ class APISite(BaseSite):
         if total is not None and int(total) > 0:
             gen.set_maximum_items(int(total))
         return gen
+
+    def _request_class(self, kwargs):
+        """
+        Get the appropriate class.
+
+        Inside this class kwargs use the parameters mode but QueryGenerator may
+        use the old kwargs mode.
+        """
+        # This checks expiry in kwargs and not kwargs['parameters'] so it won't
+        # create a CachedRequest when there is an expiry in an API parameter
+        # and kwargs here are actually in parameters mode.
+        if 'expiry' in kwargs:
+            return api.CachedRequest
+        else:
+            return api.Request
+
+    def _request(self, **kwargs):
+        """Create a request by forwarding all parameters directly."""
+        return self._request_class(kwargs)(site=self, **kwargs)
+
+    def _simple_request(self, **kwargs):
+        """Create a request by defining all kwargs as parameters."""
+        return self._request_class({'parameters': kwargs}).create_simple(
+            site=self, **kwargs)
 
     def logged_in(self, sysop=False):
         """Verify the bot is logged into the site as the expected user.
@@ -1736,7 +1768,7 @@ class APISite(BaseSite):
 
         Also logs out of the global account if linked to the user.
         """
-        uirequest = api.Request(site=self, action="logout")
+        uirequest = self._simple_request(action='logout')
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
         if hasattr(self, "_userinfo"):
@@ -1760,8 +1792,7 @@ class APISite(BaseSite):
         if (not hasattr(self, '_userinfo') or
                 'rights' not in self._userinfo or
                 self._userinfo['name'] != self._username['sysop' in self._userinfo['groups']]):
-            uirequest = api.Request(
-                site=self,
+            uirequest = self._simple_request(
                 action="query",
                 meta="userinfo",
                 uiprop="blockinfo|hasmsg|groups|rights"
@@ -1790,8 +1821,7 @@ class APISite(BaseSite):
 
         """
         if not hasattr(self, "_globaluserinfo"):
-            uirequest = api.Request(
-                site=self,
+            uirequest = self._simple_request(
                 action="query",
                 meta="globaluserinfo",
                 guiprop="groups|rights|editcount"
@@ -1851,8 +1881,7 @@ class APISite(BaseSite):
         # TODO: Integrate into _userinfo
         if (force or not hasattr(self, '_useroptions') or
                 self.user() != self._useroptions['_name']):
-            uirequest = api.Request(
-                site=self,
+            uirequest = self._simple_request(
                 action="query",
                 meta="userinfo",
                 uiprop="options"
@@ -1915,14 +1944,14 @@ class APISite(BaseSite):
     @need_extension('Echo')
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension."""
-        params = dict(site=self, action='query',
+        params = dict(action='query',
                       meta='notifications',
                       notprop='list', notformat='text')
 
         for key in kwargs:
             params['not' + key] = kwargs[key]
 
-        data = api.Request(**params).submit()
+        data = self._simple_request(**params).submit()
         for notif in data['query']['notifications']['list'].values():
             yield Notification.fromJSON(self, notif)
 
@@ -1935,10 +1964,9 @@ class APISite(BaseSite):
         """
         # TODO: ensure that the 'echomarkread' action
         # is supported by the site
-        req = api.Request(site=self,
-                          action='echomarkread',
-                          token=self.tokens['edit'],
-                          **kwargs)
+        kwargs = merge_unique_dicts(kwargs, action='echomarkread',
+                                    token=self.tokens['edit'])
+        req = self._simple_request(**kwargs)
         data = req.submit()
         try:
             return data['query']['echomarkread']['result'] == 'success'
@@ -2095,7 +2123,7 @@ class APISite(BaseSite):
             raise ValueError('text must be a string')
         if not text:
             return ''
-        req = api.Request(site=self, action='expandtemplates', text=text)
+        req = self._simple_request(action='expandtemplates', text=text)
         if title is not None:
             req['title'] = title
         if includecomments is True:
@@ -2374,12 +2402,13 @@ class APISite(BaseSite):
                 not hasattr(self, '_proofread_page_ns') or
                 not hasattr(self, '_proofread_levels')):
 
-            pirequest = api.CachedRequest(
-                site=self,
+            pirequest = self._request(
                 expiry=pywikibot.config.API_config_expiry if expiry is False else expiry,
-                action='query',
-                meta='proofreadinfo',
-                piprop='namespaces|qualitylevels'
+                parameters=dict(
+                    action='query',
+                    meta='proofreadinfo',
+                    piprop='namespaces|qualitylevels'
+                )
             )
 
             pidata = pirequest.submit()
@@ -2601,10 +2630,12 @@ class APISite(BaseSite):
             return page._redirtarget
 
         title = page.title(withSection=False)
-        query = api.Request(site=self, action="query", prop="info",
-                            inprop="protection|talkid|subjectid",
-                            titles=title.encode(self.encoding()),
-                            redirects="")
+        query = self._simple_request(
+            action='query',
+            prop='info',
+            inprop=['protection', 'talkid', 'subjectid'],
+            titles=title,
+            redirects=True)
         result = query.submit()
         if "query" not in result or "redirects" not in result["query"]:
             raise RuntimeError(
@@ -2835,9 +2866,9 @@ class APISite(BaseSite):
                 if MediaWikiVersion('1.14') <= _version < MediaWikiVersion('1.17'):
                     user_tokens['patrol'] = user_tokens['edit']
                 else:
-                    req = api.Request(site=self, action='query',
-                                      list='recentchanges',
-                                      rctoken='patrol', rclimit=1)
+                    req = self._simple_request(action='query',
+                                               list='recentchanges',
+                                               rctoken='patrol', rclimit=1)
 
                     req._warning_handler = warn_handler
                     data = req.submit()
@@ -2855,16 +2886,16 @@ class APISite(BaseSite):
                     types_wiki = self._paraminfo.parameter('tokens',
                                                            'type')['type']
                     types.extend(types_wiki)
-                req = api.Request(site=self, action='tokens',
-                                   type='|'.join(self.validate_tokens(types)))
+                req = self._simple_request(action='tokens',
+                                           type=self.validate_tokens(types))
             else:
                 if all is not False:
                     types_wiki = self._paraminfo.parameter('query+tokens',
                                                            'type')['type']
                     types.extend(types_wiki)
 
-                req = api.Request(site=self, action='query', meta='tokens',
-                                   type='|'.join(self.validate_tokens(types)))
+                req = self._simple_request(action='query', meta='tokens',
+                                           type=self.validate_tokens(types))
 
             req._warning_handler = warn_handler
             data = req.submit()
@@ -4242,8 +4273,7 @@ class APISite(BaseSite):
         if bot is None:
             bot = ("bot" in self.userinfo["rights"])
         self.lock_page(page)
-        params = dict(action="edit",
-                      title=page.title(withSection=False),
+        params = dict(action='edit', title=page,
                       text=text, token=token, summary=summary, bot=bot,
                       recreate=recreate, createonly=createonly,
                       nocreate=nocreate, minor=minor,
@@ -4266,7 +4296,7 @@ class APISite(BaseSite):
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
                 % locals())
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         while True:
             try:
                 result = req.submit()
@@ -4410,9 +4440,12 @@ class APISite(BaseSite):
                          "does not exist on %(site)s.")
         token = self.tokens['move']
         self.lock_page(page)
-        req = api.Request(site=self, action="move", to=newtitle,
-                          token=token, reason=summary, movetalk=movetalk,
-                          noredirect=noredirect)
+        req = self._simple_request(action='move',
+                                   noredirect=noredirect,
+                                   reason=summary,
+                                   movetalk=movetalk,
+                                   token=token,
+                                   to=newtitle)
         req['from'] = oldtitle  # "from" is a python keyword
         try:
             result = req.submit()
@@ -4501,13 +4534,12 @@ class APISite(BaseSite):
             raise Error(
                 u"Rollback of %s aborted; only one user in revision history."
                 % page.title(asLink=True))
-        token = self.tokens["rollback"]
+        parameters = merge_unique_dicts(kwargs, action='rollback',
+                                        title=page,
+                                        token=self.tokens['rollback'],
+                                        user=last_user)
         self.lock_page(page)
-        req = api.Request(site=self, action="rollback",
-                          title=page.title(withSection=False),
-                          user=last_user,
-                          token=token,
-                          **kwargs)
+        req = self._simple_request(**parameters)
         try:
             req.submit()
         except api.APIError as err:
@@ -4549,9 +4581,10 @@ class APISite(BaseSite):
         """
         token = self.tokens['delete']
         self.lock_page(page)
-        req = api.Request(site=self, action="delete", token=token,
-                          title=page.title(withSection=False),
-                          reason=reason)
+        req = self._simple_request(action='delete',
+                                   token=token,
+                                   title=page,
+                                   reason=reason)
         try:
             req.submit()
         except api.APIError as err:
@@ -4585,13 +4618,11 @@ class APISite(BaseSite):
         token = self.tokens['undelete']
         self.lock_page(page)
 
-        if revisions is None:
-            req = api.Request(site=self, action='undelete', token=token,
-                              title=page.title(withSection=False), reason=reason)
-        else:
-            req = api.Request(site=self, action='undelete', token=token,
-                              title=page.title(withSection=False),
-                              timestamps=revisions, reason=reason)
+        req = self._simple_request(action='undelete',
+                                   title=page,
+                                   reason=reason,
+                                   token=token,
+                                   timestamps=revisions)
         try:
             req.submit()
         except api.APIError as err:
@@ -4662,13 +4693,12 @@ class APISite(BaseSite):
 
         protectList = [ptype + '=' + level for ptype, level in protections.items()
                        if level is not None]
-        req = api.Request(site=self, action='protect', token=token,
-                          title=page.title(withSection=False),
-                          protections=protectList,
-                          reason=reason,
-                          **kwargs)
-        if expiry:
-            req['expiry'] = expiry
+        parameters = merge_unique_dicts(kwargs, action='protect', title=page,
+                                        token=token,
+                                        protections=protectList, reason=reason,
+                                        expiry=expiry)
+
+        req = self._simple_request(**parameters)
         try:
             req.submit()
         except api.APIError as err:
@@ -4754,8 +4784,9 @@ class APISite(BaseSite):
         token = self.tokens['patrol']
 
         for idvalue, idtype in gen:
-            req = api.Request(site=self, action='patrol',
-                              token=token, **{idtype: idvalue})
+            req = self._request(parameters={'action': 'patrol',
+                                            'token': token,
+                                            idtype: idvalue})
 
             try:
                 result = req.submit()
@@ -4817,11 +4848,11 @@ class APISite(BaseSite):
         token = self.tokens['block']
         if expiry is False:
             expiry = 'never'
-        req = api.Request(site=self, action='block', user=user.username,
-                          expiry=expiry, reason=reason, token=token,
-                          anononly=anononly, nocreate=nocreate,
-                          autoblock=autoblock, noemail=noemail,
-                          reblock=reblock)
+        req = self._simple_request(action='block', user=user.username,
+                                   expiry=expiry, reason=reason, token=token,
+                                   anononly=anononly, nocreate=nocreate,
+                                   autoblock=autoblock, noemail=noemail,
+                                   reblock=reblock)
 
         data = req.submit()
         return data
@@ -4836,9 +4867,10 @@ class APISite(BaseSite):
         @param reason: Reason for the unblock.
         @type reason: basestring
         """
-        token = self.tokens['block']
-        req = api.Request(site=self, action='unblock', user=user.username,
-                          reason=reason, token=token)
+        req = self._simple_request(action='unblock',
+                                   user=user.username,
+                                   token=self.tokens['block'],
+                                   reason=reason)
 
         data = req.submit()
         return data
@@ -4852,9 +4884,13 @@ class APISite(BaseSite):
         @return: True if API returned expected response; False otherwise
 
         """
-        token = self.tokens['watch']
-        req = api.Request(site=self, action='watch', token=token,
-                          title=page.title(withSection=False), unwatch=unwatch)
+        # TODO: Separated parameters to allow easy conversion to 'watchpages'
+        # as the API now allows 'titles'.
+        parameters = {'action': 'watch',
+                      'title': page,
+                      'token': self.tokens['watch'],
+                      'unwatch': unwatch}
+        req = self._simple_request(**parameters)
         result = req.submit()
         if "watch" not in result:
             pywikibot.error(u"watchpage: Unexpected API response:\n%s" % result)
@@ -4869,8 +4905,8 @@ class APISite(BaseSite):
         @return: True if API returned expected response; False otherwise
 
         """
-        req = api.Request(site=self, action='purge')
-        req['titles'] = [page.title(withSection=False) for page in set(pages)]
+        req = self._simple_request(action='purge',
+                                   titles=[page for page in set(pages)])
         linkupdate = False
         linkupdate_args = ['forcelinkupdate', 'forcerecursivelinkupdate']
         for arg in kwargs:
@@ -4939,9 +4975,9 @@ class APISite(BaseSite):
             #    filekey, file, url, statuskey is required
             # TODO: is there another way?
             try:
-                token = self.tokens['edit']
-                req = api.Request(site=self, action="upload",
-                                  token=token, throttle=False)
+                req = self._request(throttle=False,
+                                    parameters={'action': 'upload',
+                                                'token': self.tokens['edit']})
                 req.submit()
             except api.APIError as error:
                 if error.code == u'uploaddisabled':
@@ -5030,10 +5066,10 @@ class APISite(BaseSite):
             pywikibot.log('Reused already upload file using '
                           'filekey "{0}"'.format(_file_key))
             # TODO: Use sessionkey instead of filekey if necessary
-            req = api.Request(site=self, action='upload', token=token,
-                              filename=file_page_title,
-                              comment=comment, text=text,
-                              filekey=_file_key)
+            final_request = self._simple_request(action='upload', token=token,
+                                                 filename=file_page_title,
+                                                 comment=comment, text=text,
+                                                 filekey=_file_key)
         elif source_filename:
             # TODO: Dummy value to allow also Unicode names, see bug 73661
             mime_filename = 'FAKE-NAME'
@@ -5042,12 +5078,15 @@ class APISite(BaseSite):
             if not os.path.isfile(source_filename):
                 raise ValueError("File '%s' does not exist."
                                  % source_filename)
-            additional_parameters = {}
             throttle = True
             filesize = os.path.getsize(source_filename)
             chunked_upload = (chunk_size > 0 and chunk_size < filesize and
                               MediaWikiVersion(self.version()) >= MediaWikiVersion('1.20'))
             with open(source_filename, 'rb') as f:
+                final_request = self._request(
+                    throttle=throttle, parameters={
+                        'action': 'upload', 'token': token, 'text': text,
+                        'filename': file_page_title, 'comment': comment})
                 if chunked_upload:
                     offset = _offset
                     if offset > 0:
@@ -5056,11 +5095,16 @@ class APISite(BaseSite):
                     while True:
                         f.seek(offset)
                         chunk = f.read(chunk_size)
-                        req = api.Request(site=self, action='upload', token=token,
-                                          stash=True, offset=offset, filesize=filesize,
-                                          filename=file_page_title,
-                                          ignorewarnings=ignore_warnings,
-                                          mime_params={}, throttle=throttle)
+                        req = self._request(
+                            throttle=throttle, mime=True,
+                            parameters={
+                                'action': 'upload',
+                                'token': token,
+                                'stash': True,
+                                'filesize': filesize,
+                                'offset': offset,
+                                'filename': file_page_title,
+                                'ignorewarnings': ignore_warnings})
                         req.mime_params['chunk'] = (chunk,
                                                     ("application", "octet-stream"),
                                                     {'filename': mime_filename})
@@ -5095,37 +5139,30 @@ class APISite(BaseSite):
                             offset += len(chunk)
                         if data['result'] != 'Continue':  # finished
                             pywikibot.log('Finished uploading last chunk.')
-                            additional_parameters['filekey'] = _file_key
+                            final_request['filekey'] = _file_key
                             break
                 else:  # not chunked upload
                     file_contents = f.read()
                     filetype = (mimetypes.guess_type(source_filename)[0] or
                                 'application/octet-stream')
-                    additional_parameters = {
-                        'mime_params': {
-                            'file': (file_contents,
-                                     filetype.split('/'),
-                                     {'filename': mime_filename})
-                        }
+                    final_request.mime_params = {
+                        'file': (file_contents, filetype.split('/'),
+                                 {'filename': mime_filename})
                     }
-            req = api.Request(site=self, action="upload", token=token,
-                              filename=file_page_title,
-                              comment=comment, text=text, throttle=throttle,
-                              **additional_parameters)
         else:
             # upload by URL
             if "upload_by_url" not in self.userinfo["rights"]:
                 raise Error(
                     "User '%s' is not authorized to upload by URL on site %s."
                     % (self.user(), self))
-            req = api.Request(site=self, action="upload", token=token,
-                              filename=file_page_title,
-                              url=source_url, comment=comment, text=text)
+            final_request = self._simple_request(
+                action='upload', filename=file_page_title,
+                url=source_url, comment=comment, text=text, token=token)
         if not result:
-            req['watch'] = watch
-            req['ignorewarnings'] = ignore_warnings
+            final_request['watch'] = watch
+            final_request['ignorewarnings'] = ignore_warnings
             try:
-                result = req.submit()
+                result = final_request.submit()
                 self._uploaddisabled = False
             except api.APIError as error:
                 # TODO: catch and process foreseeable errors
@@ -5556,10 +5593,11 @@ class APISite(BaseSite):
         if not diff:
             raise TypeError('diff parameter is of invalid type')
 
-        params = {'from{0}'.format(old[0]): old[1],
+        params = {'action': 'compare',
+                  'from{0}'.format(old[0]): old[1],
                   'to{0}'.format(diff[0]): diff[1]}
 
-        req = api.Request(site=self, action='compare', **params)
+        req = self._simple_request(**params)
         data = req.submit()
         comparison = data['compare']['*']
         return comparison
@@ -5574,9 +5612,8 @@ class APISite(BaseSite):
         @return: A dict representing the board's data.
         @rtype: dict
         """
-        title = page.title(withSection=False)
-        req = api.Request(site=self, action='flow', page=title,
-                          submodule='view-topiclist')
+        req = self._simple_request(action='flow', page=page,
+                                   submodule='view-topiclist')
         data = req.submit()
         return data['flow']['view-topiclist']['result']['topiclist']
 
@@ -5589,9 +5626,8 @@ class APISite(BaseSite):
         @return: A dict representing the topic's data.
         @rtype: dict
         """
-        title = page.title(withSection=False)
-        req = api.Request(site=self, action='flow', page=title,
-                          submodule='view-topic')
+        req = self._simple_request(action='flow', page=page,
+                                   submodule='view-topic')
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
 
@@ -5702,8 +5738,8 @@ class DataSite(APISite):
         if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)
-            wbrequest = api.Request(site=self, action="wbgetentities", ids=ids,
-                                    **params)
+            params = merge_unique_dicts(params, action='wbgetentities', ids=ids)
+            wbrequest = self._simple_request(**params)
             wbdata = wbrequest.submit()
             assert 'success' in wbdata, \
                    "API wbgetentities response lacks 'success' key"
@@ -5730,11 +5766,12 @@ class DataSite(APISite):
         @type identification: dict
         @param props: the optional properties to fetch.
         """
-        params = dict(**identification)
-        params['action'] = 'wbgetentities'
-        if props:
-            params['props'] = '|'.join(props)
-        req = api.Request(site=self, **params)
+        params = merge_unique_dicts(identification, action='wbgetentities',
+                                    # TODO: When props is empty it results in
+                                    # an empty string ('&props=') but it should
+                                    # result in a missing entry.
+                                    props=props if props else False)
+        req = self._simple_request(**params)
         data = req.submit()
         if 'success' not in data:
             raise api.APIError(data['errors'])
@@ -5768,7 +5805,7 @@ class DataSite(APISite):
                         req['sites'].append(p.site.dbName())
                         req['titles'].append(p._link._text)
 
-            req = api.Request(site=self, action='wbgetentities', **req)
+            req = self._simple_request(action='wbgetentities', **req)
             data = req.submit()
             for qid in data['entities']:
                 item = pywikibot.ItemPage(self, qid)
@@ -5789,7 +5826,7 @@ class DataSite(APISite):
         )
         expiry = datetime.timedelta(days=365 * 100)
         # Store it for 100 years
-        req = api.CachedRequest(expiry, site=self, **params)
+        req = self._request(expiry=expiry, parameters=params)
         data = req.submit()
 
         # the IDs returned from the API can be upper or lowercase, depending
@@ -5820,7 +5857,7 @@ class DataSite(APISite):
             if arg in ['clear', 'data', 'exclude', 'summary']:
                 params[arg] = kwargs[arg]
         params['data'] = json.dumps(data)
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -5840,7 +5877,7 @@ class DataSite(APISite):
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
         params['token'] = self.tokens['edit']
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         claim.snak = data['claim']['id']
         # Update the item
@@ -5878,7 +5915,7 @@ class DataSite(APISite):
             params['value'] = json.dumps(claim._formatValue())
 
         params['baserevid'] = claim.on_item.lastrevid
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -5905,7 +5942,7 @@ class DataSite(APISite):
         if 'summary' in kwargs:
             params['summary'] = kwargs['summary']
 
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -5959,7 +5996,7 @@ class DataSite(APISite):
             if arg in ['baserevid', 'summary']:
                 params[arg] = kwargs[arg]
 
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -5997,7 +6034,7 @@ class DataSite(APISite):
             if arg in ['baserevid', 'summary']:
                 params[arg] = kwargs[arg]
 
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -6011,7 +6048,7 @@ class DataSite(APISite):
         for kwarg in kwargs:
             if kwarg in ['baserevid', 'summary']:
                 params[kwarg] = kwargs[kwarg]
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -6034,7 +6071,7 @@ class DataSite(APISite):
         for kwarg in kwargs:
             if kwarg in ['baserevid', 'summary']:
                 params[kwarg] = kwargs[kwarg]
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -6059,7 +6096,7 @@ class DataSite(APISite):
         }
         if bot:
             params['bot'] = 1
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -6082,7 +6119,7 @@ class DataSite(APISite):
         for kwarg in kwargs:
             if kwarg in ['ignoreconflicts', 'summary']:
                 params[kwarg] = kwargs[kwarg]
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 
@@ -6101,7 +6138,7 @@ class DataSite(APISite):
             'to': to_item.getID(),
             'token': self.tokens['edit']
         }
-        req = api.Request(site=self, **params)
+        req = self._simple_request(**params)
         data = req.submit()
         return data
 

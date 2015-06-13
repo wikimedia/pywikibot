@@ -229,8 +229,10 @@ class RedirectGenerator:
                 where chain or loop detecton was halted, or None if unknown
         """
         for apiQ in self._next_redirect_group():
-            gen = pywikibot.data.api.Request(site=self.site, action='query',
-                                             redirects=True, pageids=apiQ)
+            gen = pywikibot.data.api.Request(
+                site=self.site, parameters={'action': 'query',
+                                            'redirects': True,
+                                            'pageids': apiQ})
             data = gen.submit()
             if 'error' in data:
                 raise RuntimeError("API query error: %s" % data)

@@ -25,6 +25,7 @@ from warnings import warn
 if sys.version_info[0] > 2:
     import queue as Queue
     basestring = (str,)
+    unicode = str
 else:
     import Queue
 
@@ -814,6 +815,25 @@ def open_compressed(filename, use_extension=False):
     else:
         # assume it's an uncompressed XML file
         return open(filename, 'rb')
+
+
+def merge_unique_dicts(*args, **kwargs):
+    """
+    Return a merged dict and making sure that the original dicts had unique keys.
+
+    The positional arguments are the dictionaries to be merged. It is also
+    possible to define an additional dict using the keyword arguments.
+    """
+    args = list(args) + [dict(kwargs)]
+    conflicts = set()
+    result = {}
+    for arg in args:
+        conflicts |= set(arg.keys()) & set(result.keys())
+        result.update(arg)
+    if conflicts:
+        raise ValueError('Multiple dicts contain the same keys: '
+                         '{0}'.format(', '.join(sorted(unicode(key) for key in conflicts))))
+    return result
 
 
 # Decorators

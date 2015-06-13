@@ -14,6 +14,7 @@ from pywikibot.comms import http
 from email.mime.nonmultipart import MIMENonMultipart
 import datetime
 import hashlib
+import inspect
 import json
 import os
 try:
@@ -315,8 +316,9 @@ class ParamInfo(Container):
         # paraminfo only exists 1.12+.
 
         # Request need ParamInfo to determine use_get
-        request = CachedRequest(expiry=config.API_config_expiry,
-                                use_get=True, site=self.site, action='help')
+        request = self.site._request(expiry=config.API_config_expiry,
+                                     use_get=True,
+                                     parameters={'action': 'help'})
         result = request.submit()
 
         assert('help' in result)
@@ -564,9 +566,6 @@ class ParamInfo(Container):
                     self.preloaded_modules |= set(['query'])
 
             params = {
-                'expiry': config.API_config_expiry,
-                'use_get': True,  # Request need ParamInfo to determine use_get
-                'site': self.site,
                 'action': 'paraminfo',
             }
 
@@ -582,7 +581,10 @@ class ParamInfo(Container):
                 for mod in set(module_batch) & self.root_modules:
                     params[mod + 'module'] = 1
 
-            request = CachedRequest(**params)
+            # Request need ParamInfo to determine use_get
+            request = self.site._request(expiry=config.API_config_expiry,
+                                         use_get=True,
+                                         parameters=params)
             result = request.submit()
 
             normalized_result = self.normalize_paraminfo(result)
@@ -1063,7 +1065,7 @@ class Request(MutableMapping):
 
     Example:
 
-    >>> r = Request(action="query", meta="userinfo")
+    >>> r = Request(parameters={'action': 'query', 'meta': 'userinfo'})
     >>> # This is equivalent to
     >>> # https://{path}/api.php?action=query&meta=userinfo&format=json
     >>> # change a parameter
@@ -1093,47 +1095,103 @@ class Request(MutableMapping):
 
     """
 
-    def __init__(self, **kwargs):
-        """
-        Constructor.
+    # To make sure the default value of 'parameters' can be identified.
+    _PARAM_DEFAULT = object()
 
-        @kwarg site: The Site to which the request will be submitted. If not
+    def __init__(self, site=None, mime=None, throttle=True, mime_params=None,
+                 max_retries=None, retry_wait=None, use_get=None,
+                 parameters=_PARAM_DEFAULT, **kwargs):
+        """
+        Create a new Request instance with the given parameters.
+
+        The parameters for the request can be defined via eiter the 'parameters'
+        parameter or the keyword arguments. The keyword arguments were the
+        previous implementation but could cause problems when there are
+        arguments to the API named the same as normal arguments to this class.
+        So the second parameter 'parameters' was added which just contains all
+        parameters. When a Request instance is created it must use either one
+        of them and not both at the same time. To have backwards compatibility
+        it adds a parameter named 'parameters' to kwargs when both parameters
+        are set as that indicates an old call and 'parameters' was originally
+        supplied as a keyword parameter.
+
+        If undefined keyword arguments were given AND the 'parameters'
+        parameter was supplied as a positional parameter it still assumes
+        'parameters' were part of the keyword arguments.
+
+        If a class is using Request and is directly forwarding the parameters,
+        L{Request.clean_kwargs} can be used to automatically convert the old
+        kwargs mode into the new parameter mode. This normalizes the arguments
+        so that when the API parameters are modified the changes can always be
+        applied to the 'parameters' parameter.
+
+        @param parameters: The parameters used for the request to the API.
+        @type parameters: dict
+        @param site: The Site to which the request will be submitted. If not
                supplied, uses the user's configured default Site.
-        @kwarg mime: If true, send in "multipart/form-data" format (default False)
-        @kwarg mime_params: A dictionary of parameter which should only be
-               transferred via mime mode. If not None sets mime to True.
-        @kwarg max_retries: (optional) Maximum number of times to retry after
+        @param mime: If true, send in "multipart/form-data" format (default
+               False). Parameters which should only be transferred via mime mode
+               can be defined via that parameter too (an empty dict acts like
+               'True' not like 'False'!).
+        @type mime: bool or dict
+        @param mime_params: DEPRECATED! A dictionary of parameter which should
+               only be transferred via mime mode. If not None sets mime to True.
+        @param max_retries: (optional) Maximum number of times to retry after
                errors, defaults to 25
-        @kwarg retry_wait: (optional) Minimum time to wait after an error,
+        @param retry_wait: (optional) Minimum time to wait after an error,
                defaults to 5 seconds (doubles each retry until max of 120 is
                reached)
-        @kwarg use_get: (optional) Use HTTP GET request if possible. If False
+        @param use_get: (optional) Use HTTP GET request if possible. If False
                it uses a POST request. If None, it'll try to determine via
                action=paraminfo if the action requires a POST.
-        @kwarg format: (optional) Defaults to "json"
+        @param kwargs: The parameters used for the request to the API.
         """
-        try:
-            self.site = kwargs.pop("site")
-        except KeyError:
+        if site is None:
             self.site = pywikibot.Site()
             warn('Request() invoked without a site', RuntimeWarning, 2)
-        if 'mime_params' in kwargs:
-            self.mime_params = kwargs.pop('mime_params')
+        else:
+            self.site = site
+        if mime_params is not None:
             # mime may not be different from mime_params
-            if 'mime' in kwargs and kwargs.pop('mime') != self.mime:
+            if mime is not None and mime is not True:
                 raise ValueError('If mime_params is set, mime may not differ '
                                  'from it.')
+            warn('Use the "mime" parameter instead of the "mime_params".')
+            mime = mime_params
+        self.mime = mime  # this also sets self.mime_params
+        self.throttle = throttle
+        self.use_get = use_get
+        if max_retries is None:
+            self.max_retries = pywikibot.config.max_retries
         else:
-            self.mime = kwargs.pop('mime', False)
-        self.throttle = kwargs.pop('throttle', True)
-        self.use_get = kwargs.pop('use_get', None)
-        self.max_retries = kwargs.pop("max_retries", pywikibot.config.max_retries)
-        self.retry_wait = kwargs.pop("retry_wait", pywikibot.config.retry_wait)
+            self.max_retries = max_retries
+        if retry_wait is None:
+            self.retry_wait = pywikibot.config.retry_wait
+        else:
+            self.retry_wait = retry_wait
+        # The only problem with that system is that it won't detect when
+        # 'parameters' is actually the only parameter for the request as it then
+        # assumes it's using the new mode (and the parameters are actually in
+        # the parameter 'parameters' not that the parameter 'parameters' is
+        # actually a parameter for the request). But that is invalid anyway as
+        # it MUST have at least an action parameter for the request which would
+        # be in kwargs if it's using the old mode.
+        if kwargs:
+            if parameters is not self._PARAM_DEFAULT:
+                # 'parameters' AND kwargs is set. In that case think of 'parameters'
+                # being an old kwarg which is now filled in an actual parameter
+                self._warn_both()
+                kwargs['parameters'] = parameters
+            # When parameters wasn't set it's likely that kwargs-mode was used
+            self._warn_kwargs()
+            parameters = kwargs
+        elif parameters is self._PARAM_DEFAULT:
+            parameters = {}
         self._params = {}
-        if "action" not in kwargs:
+        if "action" not in parameters:
             raise ValueError("'action' specification missing from Request.")
-        self.action = kwargs['action']
-        self.update(**kwargs)
+        self.action = parameters['action']
+        self.update(parameters)
         self._warning_handler = None
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
@@ -1188,20 +1246,96 @@ class Request(MutableMapping):
             self.site = EnableSSLSiteWrapper(self.site)
 
     @classmethod
-    def _format_value(cls, value):
+    def create_simple(cls, site, **kwargs):
+        """Create a new instance using all arguments except site for the API."""
+        # This ONLY support site so that any caller can be sure there will be
+        # no conflict with PWB parameters
+        # TODO: Use ParamInfo request to determine valid parameters
+        if isinstance(kwargs.get('parameters'), dict):
+            warn('The request contains already a "parameters" entry which is a '
+                 'dict.')
+        return cls(site, parameters=kwargs)
+
+    @classmethod
+    def _warn_both(cls):
+        """Warn that kwargs mode was used but parameters was set too."""
+        warn('Both kwargs and parameters are set in Request.__init__. It '
+             'assumes that "parameters" is actually a parameter of the '
+             'Request and is added to kwargs.', DeprecationWarning, 3)
+
+    @classmethod
+    def _warn_kwargs(cls):
+        """Warn that kwargs was used instead of parameters."""
+        warn('Instead of using kwargs from Request.__init__, parameters '
+             'for the request to the API should be added via the '
+             '"parameters" parameter.', DeprecationWarning, 3)
+
+    @classmethod
+    def clean_kwargs(cls, kwargs):
+        """
+        Convert keyword arguments into new parameters mode.
+
+        If there are no other arguments in kwargs apart from the used arguments
+        by the class' constructor it'll just return kwargs and otherwise remove
+        those which aren't in the constructor and put them in a dict which is
+        added as a 'parameters' keyword. It will always create a shallow copy.
+
+        @param kwargs: The original keyword arguments which is not modified.
+        @type kwargs: dict
+        @return: The normalized keyword arguments.
+        @rtype: dict
+        """
+        args = set()
+        for super_cls in inspect.getmro(cls):
+            if not super_cls.__name__.endswith('Request'):
+                break
+            args |= set(inspect.getargspec(super_cls.__init__)[0])
+        else:
+            raise ValueError('Request was not a super class of '
+                             '{0!r}'.format(cls))
+        args -= set(['self'])
+        old_kwargs = set(kwargs)
+        # all kwargs defined above but not in args indicate 'kwargs' mode
+        if old_kwargs - args:
+            # Move all kwargs into parameters
+            parameters = dict((name, value) for name, value in kwargs.items()
+                              if name not in args or name == 'parameters')
+            if 'parameters' in parameters:
+                cls._warn_both()
+            # Copy only arguments and not the parameters
+            kwargs = dict((name, value) for name, value in kwargs.items()
+                          if name in args or name == 'self')
+            kwargs['parameters'] = parameters
+            # Make sure that all arguments have remained
+            assert(old_kwargs | set(['parameters']) ==
+                   set(kwargs) | set(kwargs['parameters']))
+            assert(('parameters' in old_kwargs) is
+                   ('parameters' in kwargs['parameters']))
+            cls._warn_kwargs()
+        else:
+            kwargs = dict(kwargs)
+            if 'parameters' not in kwargs:
+                kwargs['parameters'] = {}
+        return kwargs
+
+    def _format_value(self, value):
         """
         Format the MediaWiki API request parameter.
 
         Converts from Python datatypes to MediaWiki API parameter values.
 
         Supports:
-         * datetime.datetime
+         * datetime.datetime (using strftime and ISO8601 format)
+         * pywikibot.page.BasePage (using title (+namespace; -section))
 
         All other datatypes are converted to string using unicode() on Python 2
         and str() on Python 3.
         """
         if isinstance(value, datetime.datetime):
             return value.strftime(pywikibot.Timestamp.ISO8601Format)
+        elif isinstance(value, pywikibot.page.BasePage):
+            assert(value.site == self.site)
+            return value.title(withSection=False)
         else:
             return unicode(value)
 
@@ -1775,6 +1909,11 @@ class CachedRequest(Request):
         self._cachetime = None
 
     @classmethod
+    def create_simple(cls, site, **kwargs):
+        """Unsupported as it requires at least two parameters."""
+        raise NotImplementedError('CachedRequest cannot be created simply.')
+
+    @classmethod
     def _get_cache_dir(cls):
         """Return the base directory path for cache entries.
 
@@ -2028,26 +2167,24 @@ class QueryGenerator(object):
         documentation for values. 'action'='query' is assumed.
 
         """
-        if "action" in kwargs and kwargs["action"] != "query":
+        if not hasattr(self, 'site'):
+            kwargs = self._clean_kwargs(kwargs)  # hasn't been called yet
+        parameters = kwargs['parameters']
+        if 'action' in parameters and parameters['action'] != 'query':
             raise Error("%s: 'action' must be 'query', not %s"
                         % (self.__class__.__name__, kwargs["action"]))
         else:
-            kwargs["action"] = "query"
-        try:
-            self.site = kwargs["site"]
-        except KeyError:
-            self.site = pywikibot.Site()
-            kwargs["site"] = self.site
+            parameters['action'] = 'query'
         # make sure request type is valid, and get limit key if any
         for modtype in ("generator", "list", "prop", "meta"):
-            if modtype in kwargs:
-                self.modules = kwargs[modtype].split('|')
+            if modtype in parameters:
+                self.modules = parameters[modtype].split('|')
                 break
         else:
             raise Error("%s: No query module name found in arguments."
                         % self.__class__.__name__)
 
-        kwargs['indexpageids'] = True  # always ask for list of pageids
+        parameters['indexpageids'] = True  # always ask for list of pageids
         if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
             self.continue_name = 'query-continue'
             self.continue_update = self._query_continue
@@ -2055,8 +2192,8 @@ class QueryGenerator(object):
             self.continue_name = 'continue'
             self.continue_update = self._continue
             # Explicitly enable the simplified continuation
-            kwargs['continue'] = True
-        self.request = Request(**kwargs)
+            parameters['continue'] = True
+        self.request = self.request_class(**kwargs)
 
         # This forces all paraminfo for all query modules to be bulk loaded.
         limited_modules = (
@@ -2098,12 +2235,12 @@ class QueryGenerator(object):
             self.prefix = self.site._paraminfo['query+' + self.limited_module]['prefix']
             self._update_limit()
 
-        if self.api_limit is not None and "generator" in kwargs:
+        if self.api_limit is not None and 'generator' in parameters:
             self.prefix = "g" + self.prefix
 
         self.limit = None
         self.query_limit = self.api_limit
-        if "generator" in kwargs:
+        if 'generator' in parameters:
             self.resultkey = "pages"        # name of the "query" subelement key
         else:                               # to look for when iterating
             self.resultkey = self.modules[0]
@@ -2117,6 +2254,18 @@ class QueryGenerator(object):
         #     "templates":{"tlcontinue":"310820|828|Namespace_detect"}}
         # self.continuekey is a list
         self.continuekey = self.modules
+
+    def _clean_kwargs(self, kwargs, **mw_api_args):
+        """Clean kwargs, define site and request class."""
+        if 'site' not in kwargs:
+            warn('QueryGenerator() invoked without a site', RuntimeWarning, 3)
+            kwargs['site'] = pywikibot.Site()
+        assert(not hasattr(self, 'site') or self.site == kwargs['site'])
+        self.site = kwargs['site']
+        self.request_class = kwargs['site']._request_class(kwargs)
+        kwargs = self.request_class.clean_kwargs(kwargs)
+        kwargs['parameters'].update(mw_api_args)
+        return kwargs
 
     def set_query_increment(self, value):
         """Set the maximum number of items to be retrieved per API query.
@@ -2386,16 +2535,19 @@ class PageGenerator(QueryGenerator):
                 params[key] += '|' + value
             else:
                 params[key] = value
+        kwargs = self._clean_kwargs(kwargs)
+        parameters = kwargs['parameters']
         # get some basic information about every page generated
-        appendParams(kwargs, 'prop', 'info|imageinfo|categoryinfo')
+        appendParams(parameters, 'prop', 'info|imageinfo|categoryinfo')
         if g_content:
             # retrieve the current revision
-            appendParams(kwargs, 'prop', 'revisions')
-            appendParams(kwargs, 'rvprop', 'ids|timestamp|flags|comment|user|content')
-        if not ('inprop' in kwargs and 'protection' in kwargs['inprop']):
-            appendParams(kwargs, 'inprop', 'protection')
-        appendParams(kwargs, 'iiprop', 'timestamp|user|comment|url|size|sha1|metadata')
-        QueryGenerator.__init__(self, generator=generator, **kwargs)
+            appendParams(parameters, 'prop', 'revisions')
+            appendParams(parameters, 'rvprop', 'ids|timestamp|flags|comment|user|content')
+        if not ('inprop' in parameters and 'protection' in parameters['inprop']):
+            appendParams(parameters, 'inprop', 'protection')
+        appendParams(parameters, 'iiprop', 'timestamp|user|comment|url|size|sha1|metadata')
+        parameters['generator'] = generator
+        QueryGenerator.__init__(self, **kwargs)
         self.resultkey = "pages"  # element to look for in result
 
         # TODO: Bug T91912 when using step > 50 with proofread, with queries
@@ -2465,7 +2617,8 @@ class PropertyGenerator(QueryGenerator):
         @type prop: str
 
         """
-        QueryGenerator.__init__(self, prop=prop, **kwargs)
+        kwargs = self._clean_kwargs(kwargs, prop=prop)
+        QueryGenerator.__init__(self, **kwargs)
         self._props = frozenset(prop.split('|'))
         self.resultkey = "pages"
 
@@ -2502,7 +2655,8 @@ class ListGenerator(QueryGenerator):
         @type listaction: str
 
         """
-        QueryGenerator.__init__(self, list=listaction, **kwargs)
+        kwargs = self._clean_kwargs(kwargs, list=listaction)
+        QueryGenerator.__init__(self, **kwargs)
 
 
 class LogEntryListGenerator(ListGenerator):
@@ -2543,11 +2697,11 @@ class LoginManager(login.LoginManager):
                 pywikibot.warning(u"Too many tries, waiting %s seconds before retrying."
                                   % diff.seconds)
                 time.sleep(diff.seconds)
-        login_request = Request(site=self.site,
-                                use_get=False,
-                                action="login",
-                                lgname=self.username,
-                                lgpassword=self.password)
+        login_request = self.site._request(
+            use_get=False,
+            parameters=dict(action='login',
+                            lgname=self.username,
+                            lgpassword=self.password))
         self.site._loginstatus = -2
         while True:
             login_result = login_request.submit()

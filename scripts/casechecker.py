@@ -267,7 +267,7 @@ class CaseChecker(object):
                 'pllimit': 'max',
             }
 
-            req = api.Request(site=self.site, **wlparams)
+            req = api.Request(site=self.site, parameters=wlparams)
             data = req.submit()
             if len(data['query']['pageids']) == 1:
                 pageid = data['query']['pageids'][0]
@@ -728,7 +728,7 @@ class CaseChecker(object):
             'bllimit': '50',
         }
 
-        req = api.Request(**params)
+        req = api.Request(site=self.site, parameters=params)
         data = req.submit()
         cl = 0
         redirs = 0

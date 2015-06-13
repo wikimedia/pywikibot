@@ -61,6 +61,16 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
         for item in req.items():
             self.assertEqual(len(item), 2, item)
 
+    def test_mixed_mode(self):
+        """Test if parameters is used with kwargs."""
+        req1 = api.Request(site=self.site, action='test', parameters='foo')
+        self.assertIn('parameters', req1._params)
+
+        req2 = api.Request(site=self.site, parameters={'action': 'test',
+                                                       'parameters': 'foo'})
+        self.assertEqual(req2['parameters'], ['foo'])
+        self.assertEqual(req1._params, req2._params)
+
 
 class TestParamInfo(DefaultSiteTestCase):
 
