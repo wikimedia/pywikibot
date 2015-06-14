@@ -367,7 +367,11 @@ def writelogheader():
     all_modules = sys.modules.keys()
 
     # These are the main dependencies of pywikibot.
-    check_package_list = ['requests', 'mwparserfromhell']
+    check_package_list = [
+        'requests',
+        'mwparserfromhell',
+        'unicodedata', 'unicodedata2',  # T102461
+    ]
 
     # report all imported packages
     if config.verbose_output:

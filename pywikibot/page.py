@@ -24,7 +24,11 @@ import hashlib
 import logging
 import re
 import sys
-import unicodedata
+
+try:
+    import unicodedata2 as unicodedata
+except ImportError:
+    import unicodedata
 
 from collections import defaultdict, namedtuple
 from warnings import warn
@@ -53,6 +57,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.tools import (
+    PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     first_upper, remove_last_args, _NotImplementedWarning,
@@ -4632,6 +4637,10 @@ class Link(ComparableMixin):
             contain one (defaults to 0)
         @type defaultNamespace: int
 
+        @raises UnicodeError: text could not be converted to unicode.
+            On Python 2.6.6 without unicodedata2, this could also be raised
+            if the text contains combining characters.
+            See https://phabricator.wikimedia.org/T102461
         """
         source_is_page = isinstance(source, BasePage)
 
@@ -4663,10 +4672,17 @@ class Link(ComparableMixin):
         t = html2unicode(self._text)
 
         # Normalize unicode string to a NFC (composed) format to allow
-        # proper string comparisons. According to
-        # https://svn.wikimedia.org/viewvc/mediawiki/branches/REL1_6/phase3/includes/normal/UtfNormal.php?view=markup
-        # the MediaWiki code normalizes everything to NFC, not NFKC
-        # (which might result in information loss).
+        # proper string comparisons to strings output from MediaWiki API.
+        # Due to Python issue 10254, this is not possible on Python 2.6.6
+        # if the string contains combining characters.  See T102461.
+        if (PYTHON_VERSION == (2, 6, 6) and
+                unicodedata.__name__ != 'unicodedata2' and
+                any(unicodedata.combining(c) for c in t)):
+            raise UnicodeError(
+                'Link(%r, %s): combining characters detected, which are '
+                'not supported by Pywikibot on Python 2.6.6. See '
+                'https://phabricator.wikimedia.org/T102461'
+                % (t, self._source))
         t = unicodedata.normalize('NFC', t)
 
         # This code was adapted from Title.php : secureAndSplit()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,9 +10,12 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import pywikibot
+
 from pywikibot import config2 as config
 from pywikibot.page import Link, Page
 from pywikibot.exceptions import Error, InvalidTitle
+from pywikibot.tools import PYTHON_VERSION
+
 from tests.aspects import (
     unittest,
     AlteredDefaultSiteTestCase as LinkTestCase,
@@ -153,6 +156,35 @@ class TestLink(DefaultDrySiteTestCase):
         # Non-subpage link text beginning with slash
         l = Link('/bar', self.get_site())
         self.assertEquals(l.title, '/bar')
+
+
+class Issue10254TestCase(DefaultDrySiteTestCase):
+
+    """Test T102461 (Python issue 10254)."""
+
+    def setUp(self):
+        """Set up test case."""
+        super(Issue10254TestCase, self).setUp()
+        self._orig_unicodedata = pywikibot.page.unicodedata
+
+    def tearDown(self):
+        """Tear down test case."""
+        pywikibot.page.unicodedata = self._orig_unicodedata
+        super(Issue10254TestCase, self).tearDown()
+
+    def test_no_change(self):
+        """Test T102461 (Python issue 10254) is not encountered."""
+        title = 'Li̍t-sṳ́'
+        l = Link(title, self.site)
+        self.assertEqual(l.title, 'Li̍t-sṳ́')
+
+    @unittest.skipIf(PYTHON_VERSION != (2, 6, 6), 'Python 2.6.6-only test')
+    def test_py266_bug_exception(self):
+        """Test Python issue 10254 causes an exception."""
+        pywikibot.page.unicodedata = __import__('unicodedata')
+        title = 'Li̍t-sṳ́'
+        self.assertRaises(UnicodeError, Link, title, self.site)
+
 
 # ---- The first set of tests are explicit links, starting with a ':'.
 

@@ -29,6 +29,30 @@ import types
 
 from warnings import warn
 
+PYTHON_VERSION = sys.version_info[:3]
+PY2 = (PYTHON_VERSION[0] == 2)
+PY26 = (PYTHON_VERSION < (2, 7))
+
+versions_required_message = """
+Pywikibot not available on:
+%s
+
+Pywikibot is only supported under Python 2.6.5+, 2.7.2+ or 3.3+
+"""
+
+
+def python_is_supported():
+    """Check that Python is supported."""
+    # Any change to this must be copied to setup.py
+    return (PYTHON_VERSION >= (3, 3, 0) or
+            (PY2 and PYTHON_VERSION >= (2, 7, 2)) or
+            (PY26 and PYTHON_VERSION >= (2, 6, 5)))
+
+
+if not python_is_supported():
+    print(versions_required_message % sys.version)
+    sys.exit(1)
+
 pwb = None
 
 
@@ -106,17 +130,6 @@ def abspath(path):
         path = path[0].upper() + path[1:]
     return path
 
-
-if sys.version_info[0] not in (2, 3):
-    raise RuntimeError("ERROR: Pywikibot only runs under Python 2 "
-                       "or Python 3")
-version = tuple(sys.version_info)[:3]
-if version < (2, 6, 5):
-    raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 "
-                       "or higher")
-if version >= (3, ) and version < (3, 3):
-    raise RuntimeError("ERROR: Pywikibot only runs under Python 3.3 "
-                       "or higher")
 
 # Establish a normalised path for the directory containing pwb.py.
 # Either it is '.' if the user's current working directory is the same,

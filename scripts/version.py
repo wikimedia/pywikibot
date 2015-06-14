@@ -63,13 +63,7 @@ if __name__ == '__main__':
             '  Please reinstall requests!')
 
     pywikibot.output('Python: %s' % sys.version)
-    normalize_text = u'\u092e\u093e\u0930\u094d\u0915 \u091c\u093c\u0941\u0915\u0947\u0930\u092c\u0930\u094d\u0917'
 
-    if normalize_text != __import__('unicodedata').normalize(
-            'NFC', normalize_text):
-        pywikibot.output(u'  unicode test: triggers problem #3081100')
-    else:
-        pywikibot.output(u'  unicode test: ok')
     check_environ('PYWIKIBOT2_DIR')
     check_environ('PYWIKIBOT2_DIR_PWB')
     check_environ('PYWIKIBOT2_NO_USER_CONFIG')

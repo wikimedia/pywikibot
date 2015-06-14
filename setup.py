@@ -10,6 +10,29 @@ import itertools
 import os
 import sys
 
+PYTHON_VERSION = sys.version_info[:3]
+PY2 = (PYTHON_VERSION[0] == 2)
+PY26 = (PYTHON_VERSION < (2, 7))
+
+versions_required_message = """
+Pywikibot not available on:
+%s
+
+Pywikibot is only supported under Python 2.6.5+, 2.7.2+ or 3.3+
+"""
+
+
+def python_is_supported():
+    """Check that Python is supported."""
+    # Any change to this must be copied to pwb.py
+    return (PYTHON_VERSION >= (3, 3, 0) or
+            (PY2 and PYTHON_VERSION >= (2, 7, 2)) or
+            (PY26 and PYTHON_VERSION >= (2, 6, 5)))
+
+
+if not python_is_supported():
+    raise RuntimeError(versions_required_message % sys.version)
+
 test_deps = []
 
 dependencies = ['requests']
@@ -28,9 +51,10 @@ extra_deps = {
     # 0.6.1 supports socket.io 1.0, but WMF is using 0.9 (T91393 and T85716)
     'rcstream': ['socketIO-client<0.6.1'],
     'security': ['requests[security]'],
+    'unicode7': ['unicodedata2'],
 }
 
-if sys.version_info[0] == 2:
+if PY2:
     # Additional core library dependencies which are only available on Python 2
     extra_deps.update({
         'csv': ['unicodecsv'],
@@ -69,21 +93,23 @@ dependency_links = [
 ]
 
 if sys.version_info[0] == 2:
-    if sys.version_info < (2, 6, 5):
-        raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
-    elif sys.version_info[1] == 6:
+    if PY26:
         # requests security extra includes pyOpenSSL. cryptography is the
         # dependency of pyOpenSSL. 0.8.2 is the newest and compatible version
         # for Python 2.6, which won't raise unexpected DeprecationWarning.
         extra_deps['security'].append('cryptography<=0.8.2')
         # work around distutils hardcoded unittest dependency
         import unittest  # noqa
-        if 'test' in sys.argv and sys.version_info < (2, 7):
+        if 'test' in sys.argv:
             import unittest2
             sys.modules['unittest'] = unittest2
 
         script_deps['replicate_wiki.py'] = ['argparse']
         dependencies.append('future')  # provides collections backports
+        dependency_links.append(
+            'git+https://github.com/jayvdb/unicodedata2@issue_2#egg=unicodedata2-7.0.0')
+
+        dependencies += extra_deps['unicode7']  # T102461 workaround
 
     # tools.ip does not have a hard dependency on an IP address module,
     # as it falls back to using regexes if one is not available.
@@ -108,11 +134,6 @@ if sys.version_info[0] == 2:
 
     # mwlib is not available for py3
     script_deps['patrol'] = ['mwlib']
-
-if sys.version_info[0] == 3:
-    if sys.version_info[1] < 3:
-        print("ERROR: Python 3.3 or higher is required!")
-        sys.exit(1)
 
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
