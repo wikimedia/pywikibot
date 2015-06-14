@@ -350,7 +350,7 @@ class CosmeticChangesToolkit:
         interwikiLinks = None
         allstars = []
 
-        # The PyWikipediaBot is no longer allowed to touch categories on the
+        # Pywikibot is no longer allowed to touch categories on the
         # German Wikipedia. See
         # https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
         # ignoring nn-wiki of cause of the comment line above iw section
