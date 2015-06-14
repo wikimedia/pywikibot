@@ -14,6 +14,11 @@ from pywikibot.proofreadpage import ProofreadPage
 
 from tests.aspects import unittest, TestCase
 
+from tests.basepage_tests import (
+    BasePageMethodsTestBase,
+    BasePageLoadRevisionsCachingTestBase,
+)
+
 
 class TestProofreadPageInvalidSite(TestCase):
 
@@ -28,6 +33,41 @@ class TestProofreadPageInvalidSite(TestCase):
         """Test ProofreadPage from invalid Site as source."""
         self.assertRaises(pywikibot.UnknownExtension,
                           ProofreadPage, self.site, 'title')
+
+
+class TestBasePageMethods(BasePageMethodsTestBase):
+
+    """Test behavior of ProofreadPage methods inherited from BasePage."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    def setUp(self):
+        self._page = ProofreadPage(
+            self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
+        super(TestBasePageMethods, self).setUp()
+
+    def test_basepage_methods(self):
+        """Test ProofreadPage methods inherited from superclass BasePage."""
+        self._test_invoke()
+        self._test_return_datatypes()
+
+
+class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
+
+    """Test site.loadrevisions() caching."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    def setUp(self):
+        self._page = ProofreadPage(
+            self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
+        super(TestLoadRevisionsCaching, self).setUp()
+
+    def test_page_text(self):
+        """Test site.loadrevisions() with Page.text."""
+        self._test_page_text()
 
 
 class TestProofreadPageValidSite(TestCase):

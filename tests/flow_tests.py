@@ -16,29 +16,50 @@ from tests.aspects import (
     TestCase,
 )
 
+from tests.basepage_tests import (
+    BasePageMethodsTestBase,
+    BasePageLoadRevisionsCachingTestBase,
+)
 
-class TestFlowBasePage(TestCase):
+
+class TestBoardBasePageMethods(BasePageMethodsTestBase):
 
     """Test Flow pages using BasePage-defined methods."""
 
     family = 'mediawiki'
     code = 'mediawiki'
 
-    cached = True
+    def setUp(self):
+        self._page = pywikibot.flow.Board(
+            self.site, 'Talk:Sandbox')
+        super(TestBoardBasePageMethods, self).setUp()
 
-    def test_methods(self):
+    def test_basepage_methods(self):
         """Test basic Page methods on a Flow page."""
-        site = self.get_site()
-        page = pywikibot.Page(site, u'Talk:Sandbox')
-        self.assertEqual(page.exists(), True)
-        page.get()
-        self.assertEqual(page.isRedirectPage(), False)
+        self._test_invoke()
+        self._test_return_datatypes()
+        self.assertEqual(self._page.isRedirectPage(), False)
 
     def test_content_model(self):
         """Test Flow page content model."""
-        site = self.get_site()
-        page = pywikibot.Page(site, u'Talk:Sandbox')
-        self.assertEqual(page.content_model, 'flow-board')
+        self.assertEqual(self._page.content_model, 'flow-board')
+
+
+class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
+
+    """Test site.loadrevisions() caching."""
+
+    family = 'mediawiki'
+    code = 'mediawiki'
+
+    def setUp(self):
+        self._page = pywikibot.flow.Board(
+            self.site, 'Talk:Sandbox')
+        super(TestLoadRevisionsCaching, self).setUp()
+
+    def test_page_text(self):
+        """Test site.loadrevisions() with Page.text."""
+        self._test_page_text()
 
 
 class TestFlowLoading(TestCase):
