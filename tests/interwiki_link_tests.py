@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test Interwiki Link functionality."""
 #
-# (C) Pywikipedia bot team, 2014
+# (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 #
