@@ -2838,19 +2838,3 @@ def update_page(page, pagedict, props=[]):
 
     if "flowinfo" in pagedict:
         page._flowinfo = pagedict['flowinfo']['flow']
-
-
-if __name__ == "__main__":
-    import logging
-    from pywikibot import Site
-    logging.getLogger("pywiki.data.api").setLevel(logging.DEBUG)
-    mysite = Site("en", "wikipedia")
-    pywikibot.output(u"starting test....")
-
-    def _test():
-        import doctest
-        doctest.testmod()
-    try:
-        _test()
-    finally:
-        pywikibot.stopme()

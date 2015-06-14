@@ -1351,10 +1351,3 @@ class ModuleDeprecationWrapper(types.ModuleType):
             if self._deprecated[attr][1]:
                 return self._deprecated[attr][1]
         return getattr(self._module, attr)
-
-
-if __name__ == "__main__":
-    def _test():
-        import doctest
-        doctest.testmod()
-    _test()
