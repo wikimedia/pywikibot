@@ -35,11 +35,6 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# Ported from compat to core by Allen Guo <Guoguo12@gmail.com>
-# November 2013
-#
-# (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2019
 # (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.

@@ -88,7 +88,6 @@ will not add duplicate claims for the same member:
         -multi
 """
 #
-# (C) Multichill, Amir, 2013
 # (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of MIT License.

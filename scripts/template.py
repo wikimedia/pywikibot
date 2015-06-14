@@ -106,10 +106,7 @@ user talk pages (namespace #3):
 
 """
 #
-# (C) Daniel Herding, 2004
-# (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #

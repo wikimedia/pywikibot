@@ -12,10 +12,7 @@ Parameters:
                 If not used, all pages are used.
 """
 #
-# (C) Leonardo Gregianin, 2007
-# (C) Filnik, 2008
-# (c) xqt, 2011-2019
-# (C) Pywikibot team, 2013-2019
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #

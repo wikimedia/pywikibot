@@ -5,7 +5,6 @@
 Do not import classes directly from here but from specialbots.
 """
 #
-# (C) Rob W.W. Hooft, Andre Engels 2003-2004
 # (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.

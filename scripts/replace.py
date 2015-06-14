@@ -136,7 +136,6 @@ Please type "python pwb.py replace -help | more" if you can't read
 the top of the help.
 """
 #
-# (C) Daniel Herding, 2004-2012
 # (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.

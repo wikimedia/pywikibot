@@ -78,10 +78,7 @@ Todo
 
 """
 #
-# (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
-# (C) Siebrand Mazeland, 2007-2010
-# (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #

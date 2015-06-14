@@ -12,7 +12,6 @@ The following command line parameters are supported:
                 working on an image multiple times.
 """
 #
-# (C) Multichill, 2008-2011
 # (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.

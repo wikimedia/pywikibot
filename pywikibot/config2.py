@@ -32,7 +32,6 @@ build paths relative to base_dir:
  - shortpath
 """
 #
-# (C) Rob W.W. Hooft, 2003
 # (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.

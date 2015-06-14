@@ -38,7 +38,6 @@ The following generators and filters are supported:
 
 &params;
 """
-# (C) Nicolas Dumazet (NicDumZ), 2008
 # (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.

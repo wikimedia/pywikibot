@@ -19,7 +19,6 @@ The following parameters are supported:
  -autonomous        run bot in autonomous mode
 """
 #
-# (C) Multichill, 2009
 # (C) Pywikibot team, 2009-2020
 #
 # Distributed under the terms of the MIT license.

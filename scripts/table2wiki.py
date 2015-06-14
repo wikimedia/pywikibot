@@ -43,7 +43,6 @@ Broken HTML tables will most likely result in broken wiki tables!
 Please check every article you change.
 """
 #
-# (C) 2003 Thomas R. Koll, <tomk32@tomk32.de>
 # (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.

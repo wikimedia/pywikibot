@@ -21,8 +21,7 @@ Example:
     python pwb.py capitalize_redirects -start:B -always
 """
 #
-# (C) Yrithinnd, 2006
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #

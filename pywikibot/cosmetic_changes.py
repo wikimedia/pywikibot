@@ -52,7 +52,6 @@ or by adding a list to the given one:
                                      'your_script_name_2']
 """
 #
-# (C) xqt, 2009-2020
 # (C) Pywikibot team, 2006-2020
 #
 # Distributed under the terms of the MIT license.

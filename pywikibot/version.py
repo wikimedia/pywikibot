@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
-# (C) Merlijn 'valhallasw' van Deen, 2007-2014
-# (C) xqt, 2010-2019
 # (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.

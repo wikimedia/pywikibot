@@ -15,7 +15,6 @@ This script supports the following command line parameters:
 """
 #
 # (C) Pywikibot team, 2017-2019
-# (C) Yifei He, 2017
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,13 +1,7 @@
 # -*- coding: utf-8 -*-
 """Date data and manipulation module."""
 #
-# (C) Rob W.W. Hooft, 2003
-# (C) Daniel Herding, 2004
-# (C) Ævar Arnfjörð Bjarmason, 2004
-# (C) Andre Engels, 2004-2005
-# (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
-#       (years/decades/centuries/millenniums str <=> int conversions)
-# (C) Pywikibot team, 2004-2020
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #

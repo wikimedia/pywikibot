@@ -76,10 +76,6 @@ To complete a move of a page, one can use:
 
 """
 #
-# (C) Rob W.W. Hooft, 2003
-# (C) Daniel Herding, 2004
-# (C) Andre Engels, 2003-2004
-# (C) WikiWichtel, 2004
 # (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.

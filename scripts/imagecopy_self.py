@@ -32,20 +32,7 @@ Use -nochecktemplate if you don't want to add the check template. Be sure to
 check it yourself.
 """
 #
-# Based on upload.py by:
-# (C) Rob W.W. Hooft, Andre Engels 2003-2007
-# (C) Wikipedian, Keichwa, Leogregianin, Rikwade, Misza13 2003-2007
-#
-# New bot by:
-# (C) Kyle/Orgullomoore, Siebrand Mazeland 2007
-#
-# Another rewrite by:
-# (C) Multichill 2008
-#
-# English Wikipedia specific bot by:
-# (C) Multichill 2010-2012
-#
-# (C) Pywikibot team, 2010-2020
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #

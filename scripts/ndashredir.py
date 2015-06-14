@@ -26,7 +26,6 @@ The following generators and filters are supported:
 &params;
 """
 #
-# (C) Bináris, 2012
 # (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.

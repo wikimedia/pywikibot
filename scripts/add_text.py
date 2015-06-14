@@ -55,7 +55,6 @@ Warning! Put it in one line, otherwise it won't work correctly:
 """
 
 #
-# (C) Filnik, 2007-2010
 # (C) Pywikibot team, 2007-2020
 #
 # Distributed under the terms of the MIT license.

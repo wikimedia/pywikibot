@@ -11,7 +11,6 @@ If no starting name is provided, the bot starts at '!'.
 
 """
 #
-# (C) André Engels, 2006-2009
 # (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.

@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """Text editor class for your favourite editor."""
 #
-# (C) Gerrit Holl, 2004
 # (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.

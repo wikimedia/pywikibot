@@ -23,8 +23,7 @@ and pagegenerator can be one of these:
 &params;
 """
 #
-# (C) Leonardo Gregianin, 2006
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #

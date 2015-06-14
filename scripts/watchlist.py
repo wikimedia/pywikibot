@@ -17,7 +17,6 @@ Command line options:
              user-config.py
 """
 #
-# (C) Daniel Herding, 2005
 # (C) Pywikibot team, 2005-2020
 #
 # Distributed under the terms of the MIT license.

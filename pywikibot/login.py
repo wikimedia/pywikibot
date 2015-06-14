@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """Library to log the bot in to a wiki account."""
 #
-# (C) Rob W.W. Hooft, 2003
 # (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.

@@ -54,9 +54,6 @@ Option commands:
 
 """
 #
-# (C) Maxim Razin, 2005
-# (C) Leonardo Gregianin, 2005-2008
-# (C) xqt, 2009-2019
 # (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.

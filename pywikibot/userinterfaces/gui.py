@@ -5,10 +5,7 @@ A window with a unicode textfield where the user can edit.
 Useful for editing the contents of an article.
 """
 #
-# (C) Rob W.W. Hooft, 2003
-# (C) Daniel Herding, 2004
-#     Wikiwichtel
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #

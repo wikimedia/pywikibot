@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Module containing plural rules of various languages."""
 #
-# (C) xqt, 2011-2020
 # (C) Pywikibot team, 2011-2020
 #
 # Distributed under the terms of the MIT license.

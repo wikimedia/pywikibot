@@ -14,7 +14,6 @@ The script takes a single parameter:
            default: fb2w.nt.gz
 """
 #
-# (C) Denny Vrandecic, 2013
 # (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.

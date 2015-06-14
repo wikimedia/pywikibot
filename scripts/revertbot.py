@@ -37,7 +37,6 @@ and override its `callback` method. Here is a sample:
 
 """
 #
-# (C) Bryan Tong Minh, 2008
 # (C) Pywikibot team, 2008-2019
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per

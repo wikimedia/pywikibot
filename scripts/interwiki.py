@@ -337,11 +337,7 @@ that you have to break it off, use "-continue" next time.
 
 """
 #
-# (C) Rob W.W. Hooft, 2003
-# (C) Daniel Herding, 2004
-# (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2020
-# (C) Pywikibot team, 2007-2020
+# (C) Pywikibot team, 2003-2020
 #
 # Distributed under the terms of the MIT license.
 #

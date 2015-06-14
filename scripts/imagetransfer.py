@@ -28,7 +28,6 @@ used on a page reachable via interwiki links.
 &params;
 """
 #
-# (C) Andre Engels, 2004
 # (C) Pywikibot team, 2004-2020
 #
 # Distributed under the terms of the MIT license.
