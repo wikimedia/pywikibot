@@ -1985,12 +1985,11 @@ class APISite(BaseSite):
         @return: dict
         """
         if not all(_key in self._msgcache for _key in keys):
-            msg_query = api.QueryGenerator(
-                site=self,
-                meta="allmessages",
-                ammessages='|'.join(keys),
-                amlang=self.lang,
-            )
+            parameters = {'meta': 'allmessages',
+                          'ammessages': keys,
+                          'amlang': self.lang,
+                          }
+            msg_query = api.QueryGenerator(site=self, parameters=parameters)
 
             for msg in msg_query:
                 if 'missing' not in msg:
