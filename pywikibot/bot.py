@@ -57,6 +57,21 @@ ui = uiModule.UI()
 pywikibot.argvu = ui.argvu()
 
 
+# It's not possible to use pywikibot.exceptions.PageRelatedError as that is
+# importing pywikibot.data.api which then needs pywikibot.bot
+class SkipPageError(Exception):
+
+    """Skipped page in run."""
+
+    message = 'Page "{0}" skipped due to {1}.'
+
+    def __init__(self, page, reason):
+        """Constructor."""
+        super(SkipPageError, self).__init__(self.message.format(page, reason))
+        self.reason = reason
+        self.page = page
+
+
 # Logging module configuration
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
@@ -1124,7 +1139,7 @@ class QuitKeyboardInterrupt(KeyboardInterrupt):
     """The user has cancelled processing at a prompt."""
 
 
-class Bot(object):
+class BaseBot(object):
 
     """
     Generic Bot to be subclassed.
@@ -1159,11 +1174,6 @@ class Bot(object):
         """
         if 'generator' in kwargs:
             self.generator = kwargs.pop('generator')
-
-        # TODO: add warning if site is specified and generator
-        # contains pages from a different site.
-        self._site = kwargs.pop('site', None)
-        self._sites = set([self._site] if self._site else [])
 
         self.setOptions(**kwargs)
 
@@ -1377,12 +1387,81 @@ class Bot(object):
         raise NotImplementedError('Method %s.treat() not implemented.'
                                   % self.__class__.__name__)
 
+    def init_page(self, page):
+        """Return whether treat should be executed for the page."""
+        pass
+
+    def run(self):
+        """Process all pages in generator."""
+        if not hasattr(self, 'generator'):
+            raise NotImplementedError('Variable %s.generator not set.'
+                                      % self.__class__.__name__)
+
+        maxint = 0
+        if sys.version_info[0] == 2:
+            maxint = sys.maxint
+
+        try:
+            for page in self.generator:
+                try:
+                    self.init_page(page)
+                except SkipPageError as e:
+                    pywikibot.warning('Skipped "{0}" due to: {1}'.format(
+                                      page, e.reason))
+                    if sys.version_info[0] == 2:
+                        # Python 2 does not clear the exception and it may seem
+                        # that the generator stopped due to an exception
+                        sys.exc_clear()
+                    continue
+
+                # Process the page
+                self.treat(page)
+
+                self._treat_counter += 1
+                if maxint and self._treat_counter == maxint:
+                    # Warn the user that the bot may not function correctly
+                    pywikibot.error(
+                        '\n%s: page count reached Python 2 sys.maxint (%d).\n'
+                        'Python 3 should be used to process very large batches'
+                        % (self.__class__.__name__, sys.maxint))
+        except QuitKeyboardInterrupt:
+            pywikibot.output('\nUser quit %s bot run...' %
+                             self.__class__.__name__)
+        except KeyboardInterrupt:
+            if config.verbose_output:
+                raise
+            else:
+                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                                 self.__class__.__name__)
+        finally:
+            self.exit()
+
+
+# TODO: Deprecate Bot class as self.site may be the site of the page or may be
+# a site previously defined
+class Bot(BaseBot):
+
+    """
+    Generic bot subclass for multiple sites.
+
+    If possible the MultipleSitesBot or SingleSiteBot classes should be used
+    instead which specifically handle multiple or single sites.
+    """
+
+    def __init__(self, **kwargs):
+        """Create a Bot instance and initalize cached sites."""
+        # TODO: add warning if site is specified and generator
+        # contains pages from a different site.
+        self._site = kwargs.pop('site', None)
+        self._sites = set([self._site] if self._site else [])
+
+        super(Bot, self).__init__(**kwargs)
+
     @property
     def site(self):
-        """Site that the bot is using."""
+        """Get the current site."""
         if not self._site:
             warning('Bot.site was not set before being retrieved.')
-            # TODO: peak at a page from the generator to determine the site
             self.site = pywikibot.Site()
             warning('Using the default site: %s' % self.site)
         return self._site
@@ -1412,64 +1491,132 @@ class Bot(object):
         self._site = site
 
     def run(self):
-        """Process all pages in generator."""
-        if not hasattr(self, 'generator'):
-            raise NotImplementedError('Variable %s.generator not set.'
-                                      % self.__class__.__name__)
-
+        """Check if it automatically updates the site before run."""
         # This check is to remove the possibility that the superclass changing
         # self.site causes bugs in subclasses.
         # If the subclass has set self.site before run(), it may be that the
         # bot processes pages on sites other than self.site, and therefore
         # this method cant alter self.site.  To use this functionality, don't
         # set self.site in __init__, and use page.site in treat().
-        auto_update_site = not self._site
-        if not auto_update_site:
+        self._auto_update_site = not self._site
+        if not self._auto_update_site:
             warning(
                 '%s.__init__ set the Bot.site property; this is only needed '
                 'when the Bot accesses many sites.' % self.__class__.__name__)
         else:
             log('Bot is managing the %s.site property in run()'
                 % self.__class__.__name__)
+        super(Bot, self).run()
 
-        maxint = 0
-        if sys.version_info[0] == 2:
-            maxint = sys.maxint
+    def init_page(self, page):
+        """Update site before calling treat."""
+        # When in auto update mode, set the site when it changes,
+        # so subclasses can hook onto changes to site.
+        if (self._auto_update_site and
+                (not self._site or page.site != self.site)):
+            self.site = page.site
 
-        try:
-            for page in self.generator:
-                # When in auto update mode, set the site when it changes,
-                # so subclasses can hook onto changes to site.
-                if (auto_update_site and
-                        (not self._site or page.site != self.site)):
-                    self.site = page.site
 
-                # Process the page
-                self.treat(page)
+class SingleSiteBot(BaseBot):
 
-                self._treat_counter += 1
-                if maxint and self._treat_counter == maxint:
-                    # Warn the user that the bot may not function correctly
-                    pywikibot.error(
-                        '\n%s: page count reached Python 2 sys.maxint (%d).\n'
-                        'Python 3 should be used to process very large batches'
-                        % (self.__class__.__name__, sys.maxint))
-        except QuitKeyboardInterrupt:
-            pywikibot.output('\nUser quit %s bot run...' %
-                             self.__class__.__name__)
-        except KeyboardInterrupt:
-            if config.verbose_output:
-                raise
+    """
+    A bot only working on one site and ignoring the others.
+
+    If no site is given from the start it'll use the first page's site. Any page
+    after the site has been defined and is not on the defined site will be
+    ignored.
+    """
+
+    def __init__(self, site=True, **kwargs):
+        """
+        Create a SingleSiteBot instance.
+
+        @param site: If True it'll be set to the configured site using
+            pywikibot.Site.
+        @type site: True or None or Site
+        """
+        if site is True:
+            site = pywikibot.Site()
+        self._site = site
+        super(SingleSiteBot, self).__init__(**kwargs)
+
+    @property
+    def site(self):
+        """Site that the bot is using."""
+        if not self._site:
+            raise ValueError('The site has not been defined yet.')
+        return self._site
+
+    @site.setter
+    def site(self, value):
+        """Set the current site but warns if different."""
+        if self._site:
+            # Warn in any case where the site is (probably) changed after
+            # setting it the first time. The appropriate variant is not to use
+            # self.site at all or define it once and never change it again
+            if self._site == value:
+                pywikibot.warning('Defined site without changing it.')
             else:
-                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                                 self.__class__.__name__)
-        finally:
-            self.exit()
+                pywikibot.warning('Changed the site from "{0}" to '
+                                  '"{1}"'.format(self._site, value))
+        self._site = value
+
+    def init_page(self, page):
+        """Set site if not defined and return if it's on the defined site."""
+        if not self._site:
+            self.site = page.site
+        elif page.site != self.site:
+            raise SkipPageError(page,
+                                'The bot is on site "{0}" but the page on '
+                                'site "{1}"'.format(self.site, page.site))
 
 
-class CurrentPageBot(Bot):
+class MultipleSitesBot(BaseBot):
 
-    """A bot which automatically sets 'current_page' on each treat()."""
+    """
+    A bot class working on multiple sites.
+
+    The bot should accommodate for that case and not store site specific
+    information on only one site.
+    """
+
+    def __init__(self, **kwargs):
+        """Constructor."""
+        self._site = None
+        super(MultipleSitesBot, self).__init__(**kwargs)
+
+    @property
+    @deprecated("the page's site property")
+    def site(self):
+        """
+        Return the site if it's set and ValueError otherwise.
+
+        The site is only defined while in treat and it is preferred to use
+        the page's site instead.
+        """
+        if self._site is None:
+            raise ValueError('Requesting the site not while in treat is not '
+                             'allowed.')
+        return self._site
+
+    def run(self):
+        """Reset the bot's site after run."""
+        super(MultipleSitesBot, self).run()
+        self._site = None
+
+    def init_page(self, page):
+        """Define the site for this page."""
+        self._site = page.site
+
+
+class CurrentPageBot(BaseBot):
+
+    """
+    A bot which automatically sets 'current_page' on each treat().
+
+    This class should be always used together with either the MultipleSitesBot
+    or SingleSiteBot class as there is no site managment in this class.
+    """
 
     ignore_save_related_errors = True
     ignore_server_errors = False

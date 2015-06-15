@@ -21,7 +21,7 @@ python unlink.py "Foo bar" -namespace:0 -namespace:6
     Removes links to the page [[Foo bar]] in articles and image descriptions.
 """
 #
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,10 +33,11 @@ __version__ = '$Id$'
 import re
 import pywikibot
 from pywikibot.editor import TextEditor
-from pywikibot import i18n, Bot
+from pywikibot import i18n
+from pywikibot.bot import SingleSiteBot
 
 
-class UnlinkBot(Bot):
+class UnlinkBot(SingleSiteBot):
 
     """Page unlinking bot."""
 
@@ -48,7 +49,7 @@ class UnlinkBot(Bot):
             # default to [] which means all namespaces will be processed
         })
 
-        super(UnlinkBot, self).__init__(**kwargs)
+        super(UnlinkBot, self).__init__(site=pageToUnlink.site, **kwargs)
         self.pageToUnlink = pageToUnlink
         linktrail = self.pageToUnlink.site.linktrail()
 

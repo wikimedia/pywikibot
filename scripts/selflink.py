@@ -11,7 +11,7 @@ These command line parameters can be used to specify which pages to work on:
                   ATTENTION: Use this with care!
 """
 #
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 
 import re
 import pywikibot
-from pywikibot import i18n, Bot
+from pywikibot import i18n
+from pywikibot.bot import SingleSiteBot
 from pywikibot.editor import TextEditor
 from pywikibot.pagegenerators import GeneratorFactory, PreloadingGenerator, \
     parameterHelp
@@ -31,14 +32,14 @@ docuReplacements = {
 }
 
 
-class SelflinkBot(Bot):
+class SelflinkBot(SingleSiteBot):
 
     """Self-link removal bot."""
 
     def __init__(self, generator, **kwargs):
         super(SelflinkBot, self).__init__(**kwargs)
         self.generator = generator
-        linktrail = pywikibot.Site().linktrail()
+        linktrail = self.site.linktrail()
         # The regular expression which finds links. Results consist of four
         # groups:
         # group title is the target page title, everything before | or ].

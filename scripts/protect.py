@@ -44,7 +44,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting.
 # Written by https://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -54,7 +54,8 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import SingleSiteBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -63,11 +64,11 @@ docuReplacements = {
 }
 
 
-class ProtectionRobot(Bot):
+class ProtectionRobot(SingleSiteBot):
 
     """This bot allows protection of pages en masse."""
 
-    def __init__(self, generator, protections, **kwargs):
+    def __init__(self, generator, protections, site=None, **kwargs):
         """
         Create a new ProtectionRobot.
 
@@ -75,12 +76,16 @@ class ProtectionRobot(Bot):
         @type generator: generator
         @param protections: protections as a dict with "type": "level"
         @type protections: dict
+        @param site: The site to which the protections apply. By default it's
+            using the site of the first page returned from the generator. If
+            True it's using the configured site.
+        @type site: None, True or Site
         @param kwargs: additional arguments directly feed to Bot.__init__()
         """
         self.availableOptions.update({
             'summary': None,
         })
-        super(ProtectionRobot, self).__init__(**kwargs)
+        super(ProtectionRobot, self).__init__(site=site, **kwargs)
         self.generator = generator
         self.protections = protections
 
@@ -243,7 +248,7 @@ def main(*args):
         if not options.get('summary'):
             options['summary'] = pywikibot.input(
                 u'Enter a reason for the protection change:')
-        bot = ProtectionRobot(generator, combined_protections, **options)
+        bot = ProtectionRobot(generator, combined_protections, site, **options)
         bot.run()
     else:
         # Show help text from the top of this file

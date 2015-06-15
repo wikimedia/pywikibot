@@ -34,11 +34,15 @@ class TestBotTreatExit(object):
         """
         def treat(page):
             self.assertEqual(page, next(self._page_iter))
-            self.assertIsNotNone(self.bot._site)
-            self.assertEqual(self.bot.site, self.bot._site)
-            if self._treat_site:
-                self.assertEqual(self.bot._site, self._treat_site)
-            self.assertEqual(page.site, self.bot.site)
+            if self._treat_site is None:
+                self.assertFalse(hasattr(self.bot, 'site'))
+                self.assertFalse(hasattr(self.bot, '_site'))
+            else:
+                self.assertIsNotNone(self.bot._site)
+                self.assertEqual(self.bot.site, self.bot._site)
+                if self._treat_site:
+                    self.assertEqual(self.bot._site, self._treat_site)
+                self.assertEqual(page.site, self.bot.site)
             if post_treat:
                 post_treat(page)
         self._page_iter = iter(pages)
@@ -105,6 +109,49 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         yield pywikibot.Page(self.de, 'Page 3')
         yield pywikibot.Page(self.en, 'Page 4')
 
+    def test_SingleSiteBot_automatic(self):
+        """Test SingleSiteBot class with no predefined site."""
+        self._treat_site = self.de
+        self.bot = pywikibot.bot.SingleSiteBot(site=None,
+                                               generator=self._generator())
+        self.bot.treat = self._treat([pywikibot.Page(self.de, 'Page 1'),
+                                      pywikibot.Page(self.de, 'Page 3')])
+        self.bot.exit = self._exit(2)
+        self.bot.run()
+        self.assertEqual(self.bot.site, self._treat_site)
+
+    def test_SingleSiteBot_specific(self):
+        """Test SingleSiteBot class with predefined site."""
+        self._treat_site = self.en
+        self.bot = pywikibot.bot.SingleSiteBot(site=self.en,
+                                               generator=self._generator())
+        self.bot.treat = self._treat([pywikibot.Page(self.en, 'Page 2'),
+                                      pywikibot.Page(self.en, 'Page 4')])
+        self.bot.exit = self._exit(2)
+        self.bot.run()
+        self.assertEqual(self.bot.site, self._treat_site)
+
+    def test_MultipleSitesBot(self):
+        """Test MultipleSitesBot class."""
+        # Assert no specific site
+        self._treat_site = False
+        self.bot = pywikibot.bot.MultipleSitesBot(generator=self._generator())
+        with self.assertRaises(AttributeError):
+            self.bot.site = self.de
+        with self.assertRaises(ValueError):
+            self.bot.site
+        if sys.version_info[0] == 2:
+            # The exc_info still contains the AttributeError :/
+            sys.exc_clear()
+        self.bot.treat = self._treat(self._generator())
+        self.bot.exit = self._exit(4)
+        self.bot.run()
+        with self.assertRaises(ValueError):
+            self.bot.site
+        if sys.version_info[0] == 2:
+            # The exc_info still contains the AttributeError :/
+            sys.exc_clear()
+
     def test_Bot(self):
         """Test normal Bot class."""
         # Assert no specific site
@@ -119,7 +166,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         def post_treat(page):
             self.assertIs(self.bot.current_page, page)
         # Assert no specific site
-        self._treat_site = False
+        self._treat_site = None
         self.bot = pywikibot.bot.CurrentPageBot(generator=self._generator())
         self.bot.treat_page = self._treat_page(self._generator(), post_treat)
         self.bot.exit = self._exit(4)
@@ -198,7 +245,7 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
             """Verify the page exists."""
             self.assertTrue(page.exists())
 
-        self._treat_site = False
+        self._treat_site = None
         self.bot = pywikibot.bot.ExistingPageBot(
             generator=self._missing_generator())
         self.bot.treat_page = self._treat_page(post_treat=post_treat)
@@ -217,7 +264,7 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
             """Verify the page is missing."""
             self.assertFalse(page.exists())
 
-        self._treat_site = False
+        self._treat_site = None
         self.bot = pywikibot.bot.CreatingPageBot(
             generator=self._missing_generator())
         self.bot.treat_page = self._treat_page(treat_generator(), post_treat)

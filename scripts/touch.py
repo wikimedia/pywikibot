@@ -25,11 +25,12 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import pagegenerators
+from pywikibot.bot import MultipleSitesBot
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}
 
 
-class TouchBot(pywikibot.Bot):
+class TouchBot(MultipleSitesBot):
 
     """Page touch bot."""
 
@@ -52,7 +53,7 @@ class TouchBot(pywikibot.Bot):
                             % page.title(asLink=True))
 
 
-class PurgeBot(pywikibot.Bot):
+class PurgeBot(MultipleSitesBot):
 
     """Purge each page on the generator."""
 

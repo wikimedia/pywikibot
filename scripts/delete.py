@@ -41,7 +41,8 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import exceptions
-from pywikibot import i18n, pagegenerators, CurrentPageBot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import MultipleSitesBot, CurrentPageBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -50,7 +51,7 @@ docuReplacements = {
 }
 
 
-class DeletionRobot(CurrentPageBot):
+class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     """This robot allows deletion of pages en masse."""
 
