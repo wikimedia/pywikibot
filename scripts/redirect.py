@@ -346,7 +346,10 @@ class RedirectGenerator:
             move_gen.set_maximum_items(self.api_number)
         pywikibot.output('.', newline=False)
         for logentry in move_gen:
-            moved_page = logentry.title()
+            try:
+                moved_page = logentry.title()
+            except KeyError:  # hidden page
+                continue
             pywikibot.output('.', newline=False)
             try:
                 if not moved_page.isRedirectPage():
