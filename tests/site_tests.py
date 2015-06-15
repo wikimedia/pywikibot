@@ -92,7 +92,8 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         # content also changes so force that the content changes
         self.assertNotIn('DUMMY', old)
         self.site.siteinfo._cache['general'][0]['DUMMY'] = 42
-        self.assertIn('DUMMY', self.site.siteinfo('general'))
+        old = self.site.siteinfo('general')
+        self.assertIn('DUMMY', old)
         self.assertNotEqual(self.site.siteinfo('general', force=True), old)
         self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
 
