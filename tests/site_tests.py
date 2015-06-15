@@ -1769,7 +1769,7 @@ class TestSiteLoadRevisions(TestCase):
         # Raises "loadrevisions: endtime > starttime with rvdir=False"
         self.assertRaises(ValueError, self.mysite.loadrevisions,
                           self.mainpage, rvdir=False,
-                          starttime="2002-01-01T00:00:00Z", endtime="2002-02-01T000:00:00Z")
+                          starttime="2002-01-01T00:00:00Z", endtime="2002-02-01T00:00:00Z")
 
     def testLoadRevisions_rev_id(self):
         """Test the site.loadrevisions() method, listing based on rev_id."""
