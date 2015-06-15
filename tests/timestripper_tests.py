@@ -231,6 +231,55 @@ class TestTimeStripperLanguage(TestCase):
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
 
+class TestTimeStripperDoNotArchiveUntil(TestCase):
+
+    """Test cases for Do Not Archive Until templates.
+
+    See https://commons.wikimedia.org/wiki/Template:DNAU and
+    https://en.wikipedia.org/wiki/Template:Do_not_archive_until.
+    """
+
+    family = 'wikisource'
+    code = 'en'
+
+    cached = True
+
+    username = '[[User:DoNotArchiveUntil]]'
+    date = '06:57 06 June 2015 (UTC)'
+    user_and_date = username + ' ' + date
+    tzone = tzoneFixedOffset(0, 'UTC')
+
+    def test_timestripper_match(self):
+        """Test that dates in comments  are correctly recognised."""
+        ts = TimeStripper(self.get_site())
+
+        txt_match = '<!-- [[User:Do___ArchiveUntil]] ' + self.date + ' -->'
+        res = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=self.tzone)
+        self.assertEqual(ts.timestripper(txt_match), res)
+
+        txt_match = '<!-- --> <!-- ' + self.user_and_date + ' <!-- -->'
+        res = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=self.tzone)
+        self.assertEqual(ts.timestripper(txt_match), res)
+
+        txt_match = '<!-- ' + self.user_and_date + ' -->'
+        res = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=self.tzone)
+        self.assertEqual(ts.timestripper(txt_match), res)
+
+    def test_timestripper_match_only(self):
+        """Test that latest date is used instead of other dates."""
+        ts = TimeStripper(self.get_site())
+
+        later_date = '10:57 06 June 2015 (UTC)'
+        txt_match = '<!-- --> ' + self.user_and_date + ' <!-- -->' + later_date
+        res = datetime.datetime(2015, 6, 6, 10, 57, tzinfo=self.tzone)
+        self.assertEqual(ts.timestripper(txt_match), res)
+
+        earlier_date = '02:57 06 June 2015 (UTC)'
+        txt_match = '<!-- ' + self.user_and_date + ' --> ' + earlier_date
+        res = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=self.tzone)
+        self.assertEqual(ts.timestripper(txt_match), res)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
