@@ -15,7 +15,6 @@ import os
 from collections import Iterable
 from datetime import datetime
 import re
-import time
 
 import pywikibot
 
@@ -79,12 +78,16 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
-        # This basically checks that the time is different
         old = self.site.siteinfo('general')
         self.assertIn('time', old)
         self.assertEqual(old, self.site.siteinfo['general'])
         self.assertEqual(self.site.siteinfo('general'), old)
-        time.sleep(1)
+        # Siteinfo always returns copies so it's not possible to directly check
+        # if they are the same dict or if they have been rerequested unless the
+        # content also changes so force that the content changes
+        self.assertNotIn('DUMMY', old)
+        self.site.siteinfo._cache['general'][0]['DUMMY'] = 42
+        self.assertIn('DUMMY', self.site.siteinfo('general'))
         self.assertNotEqual(self.site.siteinfo('general', force=True), old)
         self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
 
