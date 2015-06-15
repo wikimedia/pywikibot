@@ -620,6 +620,62 @@ def intersect_generators(genlist):
                     return
 
 
+def filter_unique(iterable, container=None, key=None, add=None):
+    """
+    Yield unique items from an iterable, omitting duplicates.
+
+    By default, to provide uniqueness, it puts the generated items into
+    the keys of a dict created as a local variable, each with a value of True.
+    It only yields items which are not already present in the local dict.
+
+    For large collections, this is not memory efficient, as a strong reference
+    to every item is kept in a local dict which can not be cleared.
+
+    Also, the local dict cant be re-used when chaining unique operations on
+    multiple generators.
+
+    To avoid these issues, it is advisable for the caller to provide their own
+    container and set the key parameter to be the function L{hash}, or use a
+    L{weakref} as the key.
+
+    The container can be any object that supports __contains__.
+    If the container is a set or dict, the method add or __setitem__ will be
+    used automatically.  Any other method may be provided explicitly using the
+    add parameter.
+
+    Note: This is not thread safe.
+
+    @param iterable: the source iterable
+    @type iterable: collections.Iterable
+    @param container: storage of seen items
+    @type container: type
+    @param key: function to convert the item to a key
+    @type key: callable
+    @param add: function to add an item to the container
+    @type add: callable
+    """
+    if container is None:
+        container = {}
+
+    if not add:
+        if hasattr(container, 'add'):
+            def container_add(x):
+                container.add(key(x) if key else x)
+
+            add = container_add
+        else:
+            def container_setitem(x):
+                container.__setitem__(key(x) if key else x,
+                                      True)
+
+            add = container_setitem
+
+    for item in iterable:
+        if (key(item) if key else item) not in container:
+            add(item)
+            yield item
+
+
 class CombinedError(KeyError, IndexError):
 
     """An error that gets caught by both KeyError and IndexError."""
