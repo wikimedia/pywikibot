@@ -706,8 +706,11 @@ copyright_economize_query = True
 # DISABLED FUNCTION. Setting this variable will not have any effect.
 persistent_http = False
 
-# Default socket timeout. Set to None to disable timeouts.
-socket_timeout = 120  # set a pretty long timeout just in case...
+# Default socket timeout in seconds.
+# DO NOT set to None to disable timeouts. Otherwise this may freeze your script.
+# You may assign either a tuple of two int or float values for connection and
+# read timeout, or a single value for both.
+socket_timeout = (30, 120)
 
 
 # ############# COSMETIC CHANGES SETTINGS ##############

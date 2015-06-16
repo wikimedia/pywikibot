@@ -244,10 +244,10 @@ def _http_process(session, http_request):
     uri = http_request.uri
     body = http_request.body
     headers = http_request.headers
-
+    timeout = config.socket_timeout
     try:
         request = session.request(method, uri, data=body, headers=headers,
-                                  verify=True)
+                                  verify=True, timeout=timeout)
     except Exception as e:
         http_request.data = e
     else:
