@@ -1325,9 +1325,8 @@ class checkImagesBot(object):
                 licenses_TEST = regex_are_licenses.findall(self.imageCheckText)
                 if not self.licenses_found and licenses_TEST:
                     raise pywikibot.Error(
-                        "APIs seems down. No templates found with them but "
-                        "actually there are templates used in the image's "
-                        "page!")
+                        "Invalid or broken templates found in the image's "
+                        "page %s!" % self.image)
             self.allLicenses = []
 
             if not self.list_licenses:
