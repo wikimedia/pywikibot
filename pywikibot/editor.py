@@ -63,6 +63,7 @@ class TextEditor(object):
         else:
             command = []
 
+        # See T102465 for problems relating to using config.editor unparsed.
         command = [config.editor] + command + [file_name]
         pywikibot.log(u'Running editor: %s' % TextEditor._concat(command))
         return command
