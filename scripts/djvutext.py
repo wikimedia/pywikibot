@@ -40,12 +40,13 @@ import os.path
 
 import pywikibot
 
-from pywikibot import i18n, Bot
+from pywikibot import i18n
+from pywikibot.bot import SingleSiteBot
 from pywikibot.tools.djvu import DjVuFile
 from pywikibot.proofreadpage import ProofreadPage
 
 
-class DjVuTextBot(Bot):
+class DjVuTextBot(SingleSiteBot):
 
     """
     A bot that uploads text-layer from djvu files to Page:namespace.
@@ -68,7 +69,7 @@ class DjVuTextBot(Bot):
             'force': False,
             'summary': None
         })
-        super(DjVuTextBot, self).__init__(**kwargs)
+        super(DjVuTextBot, self).__init__(site=index.site, **kwargs)
         self._djvu = djvu
         self._index = index
         self._prefix = self._index.title(withNamespace=False)

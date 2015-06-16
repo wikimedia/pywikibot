@@ -36,7 +36,7 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, cosmetic_changes
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
 
 
 warning = """
@@ -51,7 +51,7 @@ docuReplacements = {
 }
 
 
-class CosmeticChangesBot(ExistingPageBot, NoRedirectPageBot):
+class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     """Cosmetic changes bot."""
 

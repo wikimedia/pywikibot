@@ -45,7 +45,7 @@ import tempfile
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import ExistingPageBot, NoRedirectPageBot
+from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -54,7 +54,7 @@ docuReplacements = {
 }
 
 
-class PiperBot(ExistingPageBot, NoRedirectPageBot):
+class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     """Bot for munging text using external filtering programs."""
 

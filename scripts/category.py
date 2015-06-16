@@ -124,9 +124,9 @@ import bz2
 import sys
 
 import pywikibot
-from pywikibot import Bot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
+from pywikibot.bot import MultipleSitesBot
 from pywikibot.tools import (
     deprecated_args, deprecated, ModuleDeprecationWrapper
 )
@@ -282,7 +282,7 @@ class CategoryDatabase:
                                  % config.shortpath(filename))
 
 
-class CategoryAddBot(Bot):
+class CategoryAddBot(MultipleSitesBot):
 
     """A robot to mass-add a category to a list of pages."""
 

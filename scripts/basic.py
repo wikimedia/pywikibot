@@ -26,8 +26,9 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
 
+from pywikibot.bot import SingleSiteBot
 from pywikibot.tools import issue_deprecation_warning
 
 # This is required for the text that is shown when you run this script
@@ -37,7 +38,7 @@ docuReplacements = {
 }
 
 
-class BasicBot(Bot):
+class BasicBot(SingleSiteBot):
 
     """An incomplete sample bot."""
 
@@ -59,12 +60,11 @@ class BasicBot(Bot):
         if dry:
             issue_deprecation_warning('dry argument', 'pywikibot.config.simulate', 1)
             pywikibot.config.simulate = True
-        super(BasicBot, self).__init__(**kwargs)
+        super(BasicBot, self).__init__(site=True, **kwargs)
         self.generator = generator
 
         # Set the edit summary message
-        site = pywikibot.Site()
-        self.summary = i18n.twtranslate(site, 'basic-changing')
+        self.summary = i18n.twtranslate(self.site, 'basic-changing')
 
     def treat(self, page):
         """Load the given page, does some changes, and saves it."""

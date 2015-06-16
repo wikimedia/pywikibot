@@ -22,7 +22,7 @@ __version__ = '$Id$'
 import pywikibot
 
 from pywikibot import i18n, textlib, pagegenerators
-from pywikibot.bot import CurrentPageBot, InteractiveReplace
+from pywikibot.bot import MultipleSitesBot, CurrentPageBot, InteractiveReplace
 
 msg = {
     'ar': u'تغيير التحويلات في صفحة توضيح',
@@ -40,7 +40,7 @@ msg = {
 }
 
 
-class DisambiguationRedirectBot(CurrentPageBot):
+class DisambiguationRedirectBot(MultipleSitesBot, CurrentPageBot):
 
     """Change redirects from disambiguation pages."""
 

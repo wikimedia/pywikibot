@@ -36,14 +36,16 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
-from pywikibot.bot import FollowRedirectPageBot, ExistingPageBot
+from pywikibot.bot import (
+    MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot
+)
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
 }
 
 
-class CapitalizeBot(FollowRedirectPageBot, ExistingPageBot):
+class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
 
     """Capitalization Bot."""
 

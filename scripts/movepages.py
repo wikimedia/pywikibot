@@ -45,7 +45,8 @@ __version__ = '$Id$'
 
 import re
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import MultipleSitesBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -54,7 +55,7 @@ docuReplacements = {
 }
 
 
-class MovePagesBot(Bot):
+class MovePagesBot(MultipleSitesBot):
 
     """Page move bot."""
 
