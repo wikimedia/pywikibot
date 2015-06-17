@@ -43,9 +43,9 @@ from pywikibot import backports
 from pywikibot import config
 from pywikibot import daemonize
 from pywikibot import version
-from pywikibot.tools import deprecated, deprecated_args
+from pywikibot.tools import deprecated, deprecated_args, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     unicode = str
 
 # User interface initialization
@@ -136,7 +136,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
                 'Arguments for record is not correctly set'
             msg = record.args[0]
 
-            if sys.version_info[0] < 3:
+            if PY2:
                 record.pathname = msg.partition(':')[0]
                 record.lineno = msg.partition(':')[2].partition(':')[0]
                 record.module = msg.rpartition('/')[2].rpartition('.')[0]
@@ -181,7 +181,7 @@ class LoggingFormatter(logging.Formatter):
         """
         strExc = logging.Formatter.formatException(self, ei)
 
-        if sys.version_info[0] < 3 and isinstance(strExc, str):
+        if PY2 and isinstance(strExc, bytes):
             return strExc.decode(config.console_encoding) + '\n'
         else:
             return strExc + '\n'
@@ -1090,7 +1090,7 @@ Global arguments available for all bots:
     try:
         module = __import__('%s' % module_name)
         helpText = module.__doc__
-        if sys.version_info[0] < 3 and isinstance(helpText, str):
+        if PY2 and isinstance(helpText, bytes):
             helpText = helpText.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
@@ -1398,7 +1398,7 @@ class BaseBot(object):
                                       % self.__class__.__name__)
 
         maxint = 0
-        if sys.version_info[0] == 2:
+        if PY2:
             maxint = sys.maxint
 
         try:
@@ -1408,7 +1408,7 @@ class BaseBot(object):
                 except SkipPageError as e:
                     pywikibot.warning('Skipped "{0}" due to: {1}'.format(
                                       page, e.reason))
-                    if sys.version_info[0] == 2:
+                    if PY2:
                         # Python 2 does not clear the exception and it may seem
                         # that the generator stopped due to an exception
                         sys.exc_clear()

@@ -10,8 +10,9 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import re
-import sys
-from . import terminal_interface_base
+
+from pywikibot.tools import PY2
+from pywikibot.userinterfaces import terminal_interface_base
 
 try:
     import ctypes
@@ -76,7 +77,7 @@ class Win32CtypesUI(Win32BaseUI):
             if tagM:
                 # print the text up to the tag.
                 text_before_tag = text[:tagM.start()]
-                if sys.version_info[0] == 2:
+                if PY2:
                     text_before_tag = text_before_tag.encode(self.encoding, 'replace')
                 targetStream.write(text_before_tag)
                 newColor = tagM.group('name')
@@ -94,7 +95,7 @@ class Win32CtypesUI(Win32BaseUI):
                     ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[newColor])
                 text = text[tagM.end():]
         # print the rest of the text
-        if sys.version_info[0] == 2:
+        if PY2:
             text = text.encode(self.encoding, 'replace')
         targetStream.write(text)
         # just to be sure, reset the color

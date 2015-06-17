@@ -32,9 +32,9 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     basestring = (str, )
 
 cache = None
@@ -522,7 +522,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             if '__init__.py' in path:
                 path = path[0:path.index('__init__.py')]
 
-            if sys.version_info[0] == 2:
+            if PY2:
                 path = path.decode(sys.getfilesystemencoding())
 
             info['path'] = path

@@ -10,7 +10,6 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 from collections import Container, MutableMapping
-from pywikibot.comms import http
 from email.mime.nonmultipart import MIMENonMultipart
 import datetime
 import hashlib
@@ -30,14 +29,13 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.tools import MediaWikiVersion, deprecated, itergroup, ip
+from pywikibot.tools import MediaWikiVersion, deprecated, itergroup, ip, PY2
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, Error
 )
+from pywikibot.comms import http
 
-import sys
-
-if sys.version_info[0] > 2:
+if not PY2:
     # Subclassing necessary to fix a possible bug of the email package
     # in py3: see http://bugs.python.org/issue19003
     # The following solution might be removed if/once the bug is fixed,
@@ -1508,7 +1506,7 @@ class Request(MutableMapping):
                 value.encode('ascii')
                 # In Python 2, ascii API params should be represented as 'foo'
                 # rather than u'foo'
-                if sys.version_info[0] == 2:
+                if PY2:
                     value = str(value)
             except UnicodeError:
                 try:
@@ -1609,7 +1607,7 @@ class Request(MutableMapping):
             container.attach(submsg)
 
         # strip the headers to get the HTTP message body
-        if sys.version_info[0] > 2:
+        if not PY2:
             body = container.as_bytes()
         else:
             body = container.as_string()
