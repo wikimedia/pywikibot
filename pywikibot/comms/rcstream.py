@@ -202,7 +202,7 @@ def site_rc_listener(site, total=None):
     @param total: the maximum number of changes to return
     @type total: int
 
-    @returns pywikibot.comms.rcstream.rc_listener configured for the given site
+    @return: pywikibot.comms.rcstream.rc_listener configured for the given site
     """
     return rc_listener(
         wikihost=site.hostname(),

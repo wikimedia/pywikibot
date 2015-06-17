@@ -921,7 +921,7 @@ def signature(obj):
     Any exception calling inspect.signature is ignored and None is returned.
 
     @param obj: Function to inspect
-    @rtype obj: callable
+    @type obj: callable
     @rtype: inpect.Signature or None
     """
     try:
@@ -1014,7 +1014,7 @@ def add_full_name(obj):
         @param outer_args: args
         @type outer_args: list
         @param outer_kwargs: kwargs
-        @type: outer_kwargs: dict
+        @type outer_kwargs: dict
         """
         def inner_wrapper(*args, **kwargs):
             """Replacement function.
