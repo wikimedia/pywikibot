@@ -82,6 +82,7 @@ runnable_script_list = (['login'] +
 script_input = {
     'catall': 'q\n',  # q for quit
     'editarticle': 'Test page\n',
+    'imageuncat': 'q\n',
     'interwiki': 'Test page\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
@@ -132,7 +133,7 @@ no_args_expected_results = {
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
     'illustrate_wikidata': 'I need a generator with pages to work on',
-    'imageuncat': 'You have to specify the generator ',
+    'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
     'interwiki': 'does not exist. Skipping.',  # 'Test page' does not exist
     'login': 'Logged in on ',
     'match_images': 'Require two images to work on.',
