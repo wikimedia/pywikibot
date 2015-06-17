@@ -79,7 +79,7 @@ class Family(family.WikimediaFamily):
             'ltg', 'zu', 'om', 'za', 'chy', 'cu', 'rmy', 'tw', 'tn', 'chr',
             'mai', 'pih', 'got', 'xh', 'bi', 'sm', 'ss', 'rn', 'ki', 'pnt',
             'bm', 'iu', 'ee', 'lg', 'ts', 'fj', 'ak', 'ik', 'st', 'sg', 'ff',
-            'dz', 'ny', 'ch', 'ti', 've', 'ks', 'tum', 'cr',
+            'dz', 'ny', 'ch', 'ti', 've', 'ks', 'tum', 'cr', 'gom', 'lrc',
         ]
 
         # Sites we want to edit but not count as real languages
