@@ -19,7 +19,7 @@ from . import transliteration
 import pywikibot
 from pywikibot import config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, PY2
 
 transliterator = transliteration.transliterator(config.console_encoding)
 
@@ -124,7 +124,7 @@ class UI:
             line, count = colorTagR.subn('', line)
             if count > 0:
                 line += ' ***'
-            if sys.version_info[0] == 2:
+            if PY2:
                 line = line.encode(self.encoding, 'replace')
             targetStream.write(line)
 
@@ -194,7 +194,7 @@ class UI:
         self._print(text, targetStream)
 
     def _raw_input(self):
-        if sys.version_info[0] > 2:
+        if not PY2:
             return input()
         else:
             return raw_input()  # noqa
@@ -259,7 +259,7 @@ class UI:
                 text = self._raw_input()
         except KeyboardInterrupt:
             raise pywikibot.QuitKeyboardInterrupt()
-        if sys.version_info[0] == 2:
+        if PY2:
             text = text.decode(self.encoding)
         return text
 

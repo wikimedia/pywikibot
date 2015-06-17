@@ -22,7 +22,10 @@ import types
 from distutils.version import Version
 from warnings import warn
 
-if sys.version_info[0] > 2:
+PYTHON_VERSION = sys.version_info[:3]
+PY2 = (PYTHON_VERSION[0] == 2)
+
+if not PY2:
     import queue as Queue
     basestring = (str,)
     unicode = str
@@ -57,7 +60,7 @@ class NotImplementedClass(object):
             '%s: %s' % (self.__class__.__name__, self.__doc__))
 
 
-if sys.version_info < (2, 7):
+if PYTHON_VERSION < (2, 7):
     try:
         from future.backports.misc import Counter, OrderedDict
     except ImportError:
@@ -100,7 +103,7 @@ class UnicodeMixin(object):
 
     """Mixin class to add __str__ method in Python 2 or 3."""
 
-    if sys.version_info[0] > 2:
+    if not PY2:
         def __str__(self):
             """Return the unicode representation as the str representation."""
             return self.__unicode__()
@@ -162,7 +165,9 @@ class DotReadableDict(UnicodeMixin):
 
     def __unicode__(self):
         """Return string representation."""
-        if sys.version_info[0] > 2:
+        # TODO: This is more efficient if the PY2 test is done during
+        # class instantiation, and not inside the method.
+        if not PY2:
             return repr(self.__dict__)
         else:
             _content = u', '.join(
@@ -365,7 +370,7 @@ class MediaWikiVersion(Version):
             return -1
         return 0
 
-    if sys.version_info[0] == 2:
+    if PY2:
         __cmp__ = _cmp
 
 
@@ -825,7 +830,7 @@ def open_compressed(filename, use_extension=False):
     """
     def wrap(wrapped, sub_ver):
         """Wrap in a wrapper when this is below Python version 2.7."""
-        if sys.version_info < (2, 7, sub_ver):
+        if PYTHON_VERSION < (2, 7, sub_ver):
             return ContextManagerWrapper(wrapped)
         else:
             return wrapped
