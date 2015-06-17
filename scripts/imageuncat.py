@@ -5,10 +5,20 @@ Program to add uncat template to images without categories at commons.
 
 See imagerecat.py (still working on that one) to add these images to categories.
 
+This script is working on the given site, so if the commons should be handled,
+the site commons should be given and not a Wikipedia or similar.
+
+-yesterday        Go through all uploads from yesterday.
+
+-recentchanges    Go through the changes made between 120 minutes and 70
+                  minutes ago. (This overrides the '-recentchanges' default
+                  generator)
+
+&params;
 """
 #
 # (C) Multichill, 2008
-# (C) Pywikibot team, 2009-2014
+# (C) Pywikibot team, 2009-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,6 +31,10 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import pagegenerators
+
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp,
+}
 
 # Probably unneeded because these are hidden categories. Have to figure it out.
 ignoreCategories = [u'[[Category:CC-BY-SA-3.0]]',
@@ -1333,8 +1347,23 @@ def main(*args):
 
     local_args = pywikibot.handle_args(args)
 
-    # use the default imagerepository normally commons
-    site = pywikibot.Site().image_repository()
+    site = pywikibot.Site()
+
+    if site.code != 'commons' or site.family.name != 'commons':
+        pywikibot.warning('This script is primarily written for Wikimedia '
+                          'Commons, but has been invoked with site {0}. It '
+                          'might work for other sites but there is no '
+                          'guarantee that it does the right thing.'.format(site))
+        choice = pywikibot.input_choice(
+            'How do you want to continue?',
+            (('Continue using {0}'.format(site), 'c'),
+             ('Switch to Wikimedia Commons', 's'),
+             ('Quit', 'q')),
+            automatic_quit=False)
+        if choice == 's':
+            site = pywikibot.Site('commons', 'commons')
+        elif choice == 'q':
+            return False
 
     genFactory = pagegenerators.GeneratorFactory(site)
 
