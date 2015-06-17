@@ -185,7 +185,7 @@ class ParamInfo(Container):
         @param preloaded_modules: API modules to preload
         @type preloaded_modules: set of string
         @param modules_only_mode: use the 'modules' only syntax for API request
-        @type: modules_only_mode: bool or None to only use default, which True
+        @type modules_only_mode: bool or None to only use default, which True
             if the site is 1.25wmf4+
         """
         self.site = site

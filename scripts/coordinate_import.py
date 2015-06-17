@@ -60,7 +60,7 @@ class CoordImportRobot(WikidataBot):
         @type  claims: dict
         @return: the first property for which self.prop
             is used as qualifier, or None if any
-        @returntype: unicode or None
+        @return: unicode or None
 
         """
         for prop in claims:
