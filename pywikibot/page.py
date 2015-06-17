@@ -174,6 +174,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         If it cannot be reliably determined via the API,
         None is returned.
         """
+        # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
         if not hasattr(self, '_contentmodel'):
             self.site.loadpageinfo(self)
         return self._contentmodel
@@ -609,6 +610,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.latest_revision.timestamp
 
     @property
+    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)')
     def previous_revision_id(self):
         """Return the revision id for the previous revision of this Page.
 
@@ -616,23 +618,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @return: long
         """
-        history = self.getVersionHistory(total=2)
+        return self.latest_revision.parent_id or -1
 
-        if len(history) == 1:
-            return -1
-        else:
-            return min(x.revid for x in history)
-
-    @deprecated('previous_revision_id')
+    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)')
     def previousRevision(self):
         """
         Return the revision id for the previous revision.
 
-        DEPRECATED: Use previous_revision_id instead.
+        DEPRECATED: Use latest_revision.parent_id instead.
 
         @return: long
         """
-        return self.previous_revision_id
+        return self.latest_revision.parent_id or -1
 
     def exists(self):
         """Return True if page exists on the wiki, even if it's a redirect.
@@ -651,7 +648,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @rtype: L{Revision}
         """
-        return next(self.revisions(reverseOrder=True, total=1))
+        return next(self.revisions(reverse=True, total=1))
 
     def isRedirectPage(self):
         """Return True if this is a redirect, False if not or not existing."""
@@ -4419,7 +4416,8 @@ class Revision(DotReadableDict):
                                                  'rollbacktoken'])
 
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
-                 text=None, minor=False, rollbacktoken=None):
+                 text=None, minor=False, rollbacktoken=None, parentid=None,
+                 contentmodel=None):
         """
         Constructor.
 
@@ -4450,6 +4448,44 @@ class Revision(DotReadableDict):
         self.comment = comment
         self.minor = minor
         self.rollbacktoken = rollbacktoken
+        self._parent_id = parentid
+        self._content_model = contentmodel
+
+    @property
+    def parent_id(self):
+        """
+        Return id of parent/previous revision.
+
+        Returns 0 if there is no previous revision
+
+        @return: id of parent/previous revision
+        @rtype: long
+        @raises AssertionError: parent id not supplied to the constructor
+        """
+        if self._parent_id is None:
+            raise AssertionError(
+                'Revision %d was instantiated without a parent id'
+                % self.revid)
+
+        return self._parent_id
+
+    @property
+    def content_model(self):
+        """
+        Return content model of the revision.
+
+        @return: content model
+        @rtype: str
+        @raises AssertionError: content model not supplied to the constructor
+            which always occurs for MediaWiki versions lower than 1.21.
+        """
+        # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
+        if self._content_model is None:
+            raise AssertionError(
+                'Revision %d was instantiated without a content model'
+                % self.revid)
+
+        return self._content_model
 
     def hist_entry(self):
         """Return a namedtuple with a Page history record."""

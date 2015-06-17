@@ -17,6 +17,7 @@ import pywikibot.page
 
 from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
+    DeprecationTestCase,
 )
 from tests.utils import expected_failure_if
 
@@ -249,10 +250,10 @@ class TestPageObjectEnglish(TestCase):
                          u"[[:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
 
     def test_creation(self):
+        """Test Page.oldest_revision."""
         mainpage = self.get_mainpage()
-        creation = mainpage.getCreator()
-        self.assertEqual(creation[0], 'TwoOneTwo')
-        self.assertIsInstance(creation[1], pywikibot.Timestamp)
+        self.assertEqual(mainpage.oldest_revision.user, 'TwoOneTwo')
+        self.assertIsInstance(mainpage.oldest_revision.timestamp, pywikibot.Timestamp)
 
 
 class TestPageObject(DefaultSiteTestCase):
@@ -404,7 +405,6 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertIsInstance(mainpage.canBeEdited(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
         self.assertIsInstance(mainpage.editTime(), pywikibot.Timestamp)
-        self.assertIsInstance(mainpage.previous_revision_id, int)
         self.assertIsInstance(mainpage.permalink(), basestring)
 
     def test_talk_page(self):
@@ -505,6 +505,25 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertFalse(hasattr(page_copy, '_isredir'))
         page_copy.isDisambig()
         self.assertTrue(page_copy.isRedirectPage())
+
+
+class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
+
+    """Test deprecation of Page attributes."""
+
+    def test_creator(self):
+        """Test getCreator."""
+        mainpage = self.get_mainpage()
+        self.assertEqual(mainpage.getCreator(),
+                         (mainpage.oldest_revision.user,
+                          mainpage.oldest_revision.timestamp))
+        self.assertDeprecation()
+
+        self._reset_messages()
+        self.assertIsInstance(mainpage.previous_revision_id, int)
+        self.assertEqual(mainpage.previous_revision_id,
+                         mainpage.latest_revision.parent_id)
+        self.assertDeprecation()
 
 
 class TestPageRepr(DefaultSiteTestCase):

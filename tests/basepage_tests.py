@@ -89,7 +89,14 @@ class BasePageMethodsTestBase(BasePageTestBase):
     def _test_invoke(self):
         """Basic invocation of some base methods and properties."""
         self.assertTrue(self._page.exists())
-        self._page.previous_revision_id
+        self.assertIsNotNone(self._page.latest_revision)
+
+        self.assertIsInstance(self._page.latest_revision_id, int)
+        self.assertGreaterEqual(self._page.latest_revision_id, 1)
+
+        self.assertIsInstance(self._page.latest_revision.parent_id, int)
+        self.assertGreaterEqual(self._page.latest_revision.parent_id, 0)
+
         self._page.botMayEdit()
 
     def _test_return_datatypes(self):
