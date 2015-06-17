@@ -593,7 +593,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return self._lastNonBotUser
 
         self._lastNonBotUser = None
-        for entry in self.getVersionHistory():
+        for entry in self.revisions():
             if entry.user and (not self.site.isBot(entry.user)):
                 self._lastNonBotUser = entry.user
                 break
