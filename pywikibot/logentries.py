@@ -82,16 +82,26 @@ class LogEntry(object):
     def ns(self):
         return self.data['ns']
 
+    @deprecated('page()')
     def title(self):
+        """
+        DEPRECATED: Alias for page().
+
+        This is going to be replaced by just returning the title as a string
+        instead of a Page instance.
+        """
+        return self.page()
+
+    def page(self):
         """
         Page on which action was performed.
 
         Note: title may be missing in data dict e.g. by oversight action to
               hide the title. In that case a KeyError exception will raise
         """
-        if not hasattr(self, '_title'):
-            self._title = pywikibot.Page(self.site, self.data['title'])
-        return self._title
+        if not hasattr(self, '_page'):
+            self._page = pywikibot.Page(self.site, self.data['title'])
+        return self._page
 
     def type(self):
         return self.data['type']
@@ -136,7 +146,7 @@ class BlockEntry(LogEntry):
         if self.isAutoblockRemoval:
             self._blockid = int(self.data['title'][pos + 1:])
 
-    def title(self):
+    def page(self):
         """
         Return the blocked account or IP.
 
@@ -149,7 +159,7 @@ class BlockEntry(LogEntry):
         if self.isAutoblockRemoval:
             return self._blockid
         else:
-            return super(BlockEntry, self).title()
+            return super(BlockEntry, self).page()
 
     def flags(self):
         """

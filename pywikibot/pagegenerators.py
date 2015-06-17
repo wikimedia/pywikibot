@@ -890,7 +890,7 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None,
     for entry in site.logevents(total=total, logtype=logtype,
                                 user=user, namespace=namespace):
         try:
-            yield entry.title()
+            yield entry.page()
         except KeyError as e:
             pywikibot.warning(u'LogeventsPageGenerator: '
                               u'failed to load page for %r; skipping'
@@ -1668,8 +1668,8 @@ def NewimagesPageGenerator(step=None, total=None, site=None):
         site = pywikibot.Site()
     for entry in site.logevents(logtype="upload", step=step, total=total):
         # entry is an UploadEntry object
-        # entry.title() returns a Page object
-        yield entry.title()
+        # entry.page() returns a Page object
+        yield entry.page()
 
 
 def WikibaseItemGenerator(gen):

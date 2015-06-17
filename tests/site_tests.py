@@ -899,7 +899,8 @@ class SiteUserTestCase(DefaultSiteTestCase):
             for entry in mysite.logevents(logtype=typ, total=3):
                 self.assertEqual(entry.type(), typ)
         for entry in mysite.logevents(page=mainpage, total=3):
-            self.assertEqual(entry.title().title(), mainpage.title())
+            self.assertEqual(entry.page().title(), mainpage.title())
+            self.assertEqual(entry.page(), mainpage)
         for entry in mysite.logevents(user=mysite.user(), total=3):
             self.assertEqual(entry.user(), mysite.user())
         for entry in mysite.logevents(start=pywikibot.Timestamp.fromISOformat("2008-09-01T00:00:01Z"), total=5):

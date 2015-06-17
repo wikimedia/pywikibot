@@ -351,7 +351,7 @@ class RedirectGenerator:
         pywikibot.output('.', newline=False)
         for logentry in move_gen:
             try:
-                moved_page = logentry.title()
+                moved_page = logentry.page()
             except KeyError:  # hidden page
                 continue
             pywikibot.output('.', newline=False)

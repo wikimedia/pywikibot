@@ -1261,7 +1261,7 @@ def uploadedYesterday(site):
     yesterday = today + timedelta(days=-1)
 
     for logentry in site.logevents(logtype='upload', start=yesterday, end=today, reverse=True):
-        yield logentry.title()
+        yield logentry.page()
 
 
 def recentChanges(site=None, delay=0, block=70):

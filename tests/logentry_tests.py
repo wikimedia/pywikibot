@@ -79,7 +79,9 @@ class TestLogentriesBase(TestCase):
         self.assertIsInstance(logentry.pageid(), int)
         self.assertIsInstance(logentry.timestamp(), pywikibot.Timestamp)
         if 'title' in logentry.data:  # title may be missing
-            self.assertIsInstance(logentry.title(), pywikibot.Page)
+            self.assertIsInstance(logentry.page(), pywikibot.Page)
+        else:
+            self.assertRaises(KeyError, logentry.page)
         self.assertEqual(logentry.type(), logtype)
         self.assertIsInstance(logentry.user(), unicode)
         self.assertGreaterEqual(logentry.logid(), 0)
@@ -95,6 +97,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
         """Create the new class."""
         def test_method(logtype):
             def test_logevent(self, key):
+                """Test a single logtype entry."""
                 self._test_logevent(logtype)
 
             return test_logevent
@@ -191,6 +194,19 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.new_ns(), int)
         self.assertEqual(logentry.new_title(), logentry.target_page)
+
+    def test_LogEntry_title(self, key):
+        """Test title and page return the same instance."""
+        # Request multiple log entries in the hope that one might have no
+        # title entry
+        for logentry in self.site.logevents(total=5):
+            if 'title' in logentry.data:  # title may be missing
+                self.assertIsInstance(logentry.title(), pywikibot.Page)
+                self.assertIs(logentry.title(), logentry.page())
+            else:
+                self.assertRaises(KeyError, logentry.title)
+            self.assertDeprecation()
+            self._reset_messages()
 
 
 if __name__ == '__main__':
