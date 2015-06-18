@@ -61,6 +61,31 @@ class TestLogentriesBase(TestCase):
                             MediaWikiVersion('1.20'))
         return next(iter(self.site.logevents(logtype=logtype, total=1)))
 
+    def _test_logevent(self, logtype):
+        """Test a single logtype entry."""
+        logentry = self._get_logentry(logtype)
+        if logtype in LogEntryFactory._logtypes:
+            self.assertEqual(logentry._expectedType, logtype)
+        else:
+            self.assertIsNone(logentry._expectedType)
+        if self.site_key == 'old':
+            self.assertNotIn('params', logentry.data)
+        else:
+            self.assertNotIn(logentry.type(), logentry.data)
+        self.assertIsInstance(logentry.action(), unicode)
+        self.assertIsInstance(logentry.comment(), unicode)
+        self.assertIsInstance(logentry.logid(), int)
+        self.assertIsInstance(logentry.ns(), int)
+        self.assertIsInstance(logentry.pageid(), int)
+        self.assertIsInstance(logentry.timestamp(), pywikibot.Timestamp)
+        if 'title' in logentry.data:  # title may be missing
+            self.assertIsInstance(logentry.title(), pywikibot.Page)
+        self.assertEqual(logentry.type(), logtype)
+        self.assertIsInstance(logentry.user(), unicode)
+        self.assertGreaterEqual(logentry.logid(), 0)
+        self.assertGreaterEqual(logentry.ns(), -2)
+        self.assertGreaterEqual(logentry.pageid(), 0)
+
 
 class TestLogentriesMeta(MetaTestCaseClass):
 
@@ -69,31 +94,12 @@ class TestLogentriesMeta(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create the new class."""
         def test_method(logtype):
-
             def test_logevent(self, key):
-                """Test a single logtype entry."""
-                logentry = self._get_logentry(logtype)
-                self.assertEqual(logtype, logentry._expectedType)
-                if key == 'old':
-                    self.assertNotIn('params', logentry.data)
-                else:
-                    self.assertNotIn(logentry.type(), logentry.data)
-                self.assertIsInstance(logentry.action(), unicode)
-                self.assertIsInstance(logentry.comment(), unicode)
-                self.assertIsInstance(logentry.logid(), int)
-                self.assertIsInstance(logentry.ns(), int)
-                self.assertIsInstance(logentry.pageid(), int)
-                self.assertIsInstance(logentry.timestamp(), pywikibot.Timestamp)
-                if 'title' in logentry.data:  # title may be missing
-                    self.assertIsInstance(logentry.title(), pywikibot.Page)
-                self.assertEqual(logentry.type(), logtype)
-                self.assertIsInstance(logentry.user(), unicode)
-                self.assertGreaterEqual(logentry.logid(), 0)
-                self.assertGreaterEqual(logentry.ns(), -2)
-                self.assertGreaterEqual(logentry.pageid(), 0)
+                self._test_logevent(logtype)
+
             return test_logevent
 
-        # create test methods for package messages processed by unittest
+        # create test methods for the support logtype classes
         for logtype in LogEntryFactory._logtypes:
             test_name = str('test_%sEntry' % logtype.title())
             dct[test_name] = test_method(logtype)
@@ -107,6 +113,28 @@ class TestLogentries(TestLogentriesBase):
     """Test general LogEntry properties."""
 
     __metaclass__ = TestLogentriesMeta
+
+
+class TestSimpleLogentries(TestLogentriesBase):
+
+    """Test logentry classes without special classes."""
+
+    def test_simple_entries(self, key):
+        """Test those entries which don't have an extra LogEntry subclass."""
+        # Unfortunately it's not possible to use the metaclass to create a
+        # bunch of test methods for this too as the site instances haven't been
+        # initialized yet.
+        available_types = set(self.site._paraminfo.parameter(
+            'query+logevents', 'type')['type'])
+        for simple_type in available_types - set(LogEntryFactory._logtypes):
+            if not simple_type:
+                # paraminfo also reports an empty string as a type
+                continue
+            try:
+                self._test_logevent(simple_type)
+            except StopIteration:
+                print('Unable to test "{0}" on "{1}" because there are no log '
+                      'entries with that type.'.format(simple_type, key))
 
 
 class TestLogentryParams(TestLogentriesBase):
