@@ -78,6 +78,26 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         end_date.setTarget(pywikibot.WbTime(year=2012))
         item.claims['P115'][0].addQualifier(end_date)
 
+        # Testing all again but this time in properties
+        item = pywikibot.PropertyPage(testsite, 'P115')
+        item.get()
+        if 'P115' in item.claims:
+            to_remove = []
+            for claim in item.claims['P115']:
+                to_remove.append({'id': claim.toJSON()['id'], 'remove': ''})
+            item.editEntity({'claims': to_remove})
+
+        claim = pywikibot.page.Claim(testsite, 'P115', datatype='wikibase-item')
+        target = pywikibot.ItemPage(testsite, 'Q271')
+        claim.setTarget(target)
+        item.editEntity({'claims': [claim.toJSON()]})
+
+        item.get(force=True)
+
+        end_date = pywikibot.page.Claim(testsite, 'P88', isQualifier=True)
+        end_date.setTarget(pywikibot.WbTime(year=2012))
+        item.claims['P115'][0].addQualifier(end_date)
+
     def test_edit_entity_new_item(self):
         testsite = self.get_repo()
         ts = str(time.time())
