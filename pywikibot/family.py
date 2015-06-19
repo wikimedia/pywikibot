@@ -745,12 +745,6 @@ class Family(object):
         # order.
         self.interwiki_putfirst = {}
 
-        # Languages in interwiki_putfirst_doubled should have a number plus
-        # a list of languages. If there are at least the number of interwiki
-        # links, all languages in the list should be placed at the front as
-        # well as in the normal list.
-        self.interwiki_putfirst_doubled = {}  # THIS APPEARS TO BE UNUSED!
-
         # Some families, e. g. commons and meta, are not multilingual and
         # forward interlanguage links to another family (wikipedia).
         # These families can set this variable to the name of the target

@@ -1005,25 +1005,6 @@ class BaseSite(ComparableMixin):
         """Return list of language codes for ordering of interwiki links."""
         return self.family.interwiki_putfirst.get(self.code, None)
 
-    def interwiki_putfirst_doubled(self, list_of_links):
-        # TODO: is this even needed?  No family in the framework has this
-        # dictionary defined!
-        if self.lang in self.family.interwiki_putfirst_doubled:
-            if (len(list_of_links) >=
-                    self.family.interwiki_putfirst_doubled[self.lang][0]):
-                links2 = [lang.language() for lang in list_of_links]
-                result = []
-                for lang in self.family.interwiki_putfirst_doubled[self.lang][1]:
-                    try:
-                        result.append(list_of_links[links2.index(lang)])
-                    except ValueError:
-                        pass
-                return result
-            else:
-                return False
-        else:
-            return False
-
     def getSite(self, code):
         """Return Site object for language 'code' in this Family."""
         return pywikibot.Site(code=code, fam=self.family, user=self.user())
