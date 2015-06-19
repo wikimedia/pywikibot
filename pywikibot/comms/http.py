@@ -25,6 +25,7 @@ __docformat__ = 'epytext'
 import atexit
 import sys
 
+from distutils.version import StrictVersion
 from string import Formatter
 from warnings import warn
 
@@ -56,6 +57,13 @@ else:
     SSL_CERT_VERIFY_FAILED_MSG = ":14090086:"
 
 _logger = "comm.http"
+
+if (isinstance(pywikibot.config2.socket_timeout, tuple) and
+        StrictVersion(requests.__version__) < StrictVersion('2.4.0')):
+    pywikibot.warning('The configured timeout is a tuple but requests does not '
+                      'support a tuple as a timeout. It uses the lower of the '
+                      'two.')
+    pywikibot.config2.socket_timeout = min(pywikibot.config2.socket_timeout)
 
 session = requests.Session()
 
