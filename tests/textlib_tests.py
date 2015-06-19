@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,8 +10,14 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import codecs
+import functools
 import os
 import re
+
+try:
+    import mwparserfromhell
+except ImportError as e:
+    mwparserfromhell = e
 
 import pywikibot
 import pywikibot.textlib as textlib
@@ -253,11 +259,13 @@ class TestTemplateParams(TestCase):
 
     net = False
 
-    def _extract_templates_params(self, func):
+    def _common_results(self, func):
+        """Common cases."""
         self.assertEqual(func('{{a}}'), [('a', OrderedDict())])
         self.assertEqual(func('{{ a}}'), [('a', OrderedDict())])
         self.assertEqual(func('{{a }}'), [('a', OrderedDict())])
         self.assertEqual(func('{{ a }}'), [('a', OrderedDict())])
+
         self.assertEqual(func('{{a|b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{a|b|c=d}}'), [('a', OrderedDict((('1', 'b'), ('c', 'd'))))])
         self.assertEqual(func('{{a|b=c|f=g|d=e|1=}}'),
@@ -266,8 +274,11 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a|c=d|1=2}}'), [('a', OrderedDict((('c', 'd'), ('1', '2'))))])
         self.assertEqual(func('{{a|5=d|a=b}}'), [('a', OrderedDict((('5', 'd'), ('a', 'b'))))])
         self.assertEqual(func('{{a|=2}}'), [('a', OrderedDict((('', '2'), )))])
+
+        self.assertEqual(func('{{a|}}'), [('a', OrderedDict((('1', ''), )))])
         self.assertEqual(func('{{a|=|}}'), [('a', OrderedDict((('', ''), ('1', ''))))])
         self.assertEqual(func('{{a||}}'), [('a', OrderedDict((('1', ''), ('2', ''))))])
+
         self.assertEqual(func('{{a|b={{{1}}}}}'), [('a', OrderedDict((('b', '{{{1}}}'), )))])
         self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
                          [('a', OrderedDict((('b', '<noinclude>{{{1}}}</noinclude>'), )))])
@@ -279,50 +290,198 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{:a|b=c}}'), [(':a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{subst::a|b=c}}'), [('subst::a', OrderedDict((('b', 'c'), )))])
 
-    def test_extract_templates_params_mwpfh(self):
-        try:
-            import mwparserfromhell  # noqa
-        except ImportError:
-            raise unittest.SkipTest('mwparserfromhell not available')
+        self.assertEqual(func('{{a|b={{{1}}}|c={{{2}}}}}'),
+                         [('a', OrderedDict((('b', '{{{1}}}'), ('c', '{{{2}}}'))))])
+        self.assertEqual(func('{{a|b=c}}{{d|e=f}}'),
+                         [('a', OrderedDict((('b', 'c'), ))),
+                          ('d', OrderedDict((('e', 'f'), )))])
 
-        func = textlib.extract_templates_and_params_mwpfh
-        self._extract_templates_params(func)
+        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
+                         [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
 
-        self.assertEqual(func('{{a|}}'), [('a', OrderedDict((('1', ''), )))])
+        # initial '{' and '}' should be ignored as outer wikitext
+        self.assertEqual(func('{{{a|b}}X}'),
+                         [('a', OrderedDict((('1', 'b'), )))])
 
+    def _etp_regex_differs(self, func):
+        """Common cases not handled the same by ETP_REGEX."""
         self.assertEqual(func('{{a| b=c}}'), [('a', OrderedDict(((' b', 'c'), )))])
         self.assertEqual(func('{{a|b =c}}'), [('a', OrderedDict((('b ', 'c'), )))])
         self.assertEqual(func('{{a|b= c}}'), [('a', OrderedDict((('b', ' c'), )))])
         self.assertEqual(func('{{a|b=c }}'), [('a', OrderedDict((('b', 'c '), )))])
 
-        self.assertEqual(func('{{a| b={{c}}}}'), [('a', OrderedDict(((' b', '{{c}}'), ))), ('c', OrderedDict())])
-        self.assertEqual(func('{{a|b={{c}}}}'), [('a', OrderedDict((('b', '{{c}}'), ))), ('c', OrderedDict())])
-        self.assertEqual(func('{{a|b= {{c}}}}'), [('a', OrderedDict((('b', ' {{c}}'), ))), ('c', OrderedDict())])
-        self.assertEqual(func('{{a|b={{c}} }}'), [('a', OrderedDict((('b', '{{c}} '), ))), ('c', OrderedDict())])
+        # inner {} should be treated as part of the value
+        self.assertEqual(func('{{a|b={} }}'), [('a', OrderedDict((('b', '{} '), )))])
 
-        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'), [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
+    def _order_differs(self, func):
+        """Common cases where the order of templates differs."""
+        self.assertCountEqual(func('{{a|b={{c}}}}'),
+                              [('a', OrderedDict((('b', '{{c}}'), ))),
+                               ('c', OrderedDict())])
+
+        self.assertCountEqual(func('{{a|{{c|d}}}}'),
+                              [('c', OrderedDict((('1', 'd'), ))),
+                               ('a', OrderedDict([('1', '{{c|d}}')]))])
+
+        # inner '}' after {{b|c}} should be treated as wikitext
+        self.assertCountEqual(func('{{a|{{b|c}}}|d}}'),
+                              [('a', OrderedDict([('1', '{{b|c}}}'),
+                                                  ('2', u'd')])),
+                               ('b', OrderedDict([('1', 'c')]))])
+
+    def test_extract_templates_params_mwpfh(self):
+        """Test using mwparserfromhell."""
+        if isinstance(mwparserfromhell, ImportError):
+            raise unittest.SkipTest('mwparserfromhell not available')
+
+        func = textlib.extract_templates_and_params_mwpfh
+        self._common_results(func)
+        self._order_differs(func)
+        self._etp_regex_differs(func)
 
     def test_extract_templates_params_regex(self):
-        func = textlib.extract_templates_and_params_regex
-        self._extract_templates_params(func)
+        """Test using many complex regexes."""
+        func = functools.partial(textlib.extract_templates_and_params_regex,
+                                 remove_disabled_parts=False)
+        self._common_results(func)
+        self._order_differs(func)
 
-        self.assertEqual(func('{{a|}}'), [])  # FIXME: this is a bug
+        self.assertEqual(func('{{a|b={} }}'), [])  # FIXME: {} is normal text
 
         self.assertEqual(func('{{a| b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{a|b =c}}'), [('a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{a|b= c}}'), [('a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{a|b=c }}'), [('a', OrderedDict((('b', 'c'), )))])
 
-        self.assertEqual(func('{{a| b={{c}}}}'), [('c', OrderedDict()), ('a', OrderedDict((('b', '{{c}}'), )))])
-        self.assertEqual(func('{{a|b={{c}}}}'), [('c', OrderedDict()), ('a', OrderedDict((('b', '{{c}}'), )))])
-        self.assertEqual(func('{{a|b= {{c}}}}'), [('c', OrderedDict()), ('a', OrderedDict((('b', '{{c}}'), )))])
-        self.assertEqual(func('{{a|b={{c}} }}'), [('c', OrderedDict()), ('a', OrderedDict((('b', '{{c}}'), )))])
-
-        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'), [('a', OrderedDict((('b', ''), )))])
+        func = textlib.extract_templates_and_params_regex
+        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
+                         [('a', OrderedDict((('b', ''), )))])
 
     def test_extract_templates_params(self):
-        self._extract_templates_params(
+        """Test that the normal entry point works."""
+        self._common_results(
             textlib.extract_templates_and_params)
+
+    def test_template_simple_regex(self):
+        """Test using simple regex."""
+        func = textlib.extract_templates_and_params_regex_simple
+        self._common_results(func)
+        self._etp_regex_differs(func)
+
+        # The simple regex copies the whitespace of mwpfh, but does
+        # not have additional entries for nested templates.
+        self.assertEqual(func('{{a| b={{c}}}}'),
+                         [('a', OrderedDict(((' b', '{{c}}'), )))])
+        self.assertEqual(func('{{a|b={{c}}}}'),
+                         [('a', OrderedDict((('b', '{{c}}'), )))])
+        self.assertEqual(func('{{a|b= {{c}}}}'),
+                         [('a', OrderedDict((('b', ' {{c}}'), )))])
+        self.assertEqual(func('{{a|b={{c}} }}'),
+                         [('a', OrderedDict((('b', '{{c}} '), )))])
+
+        # These three are from _order_differs, and while the first works
+        self.assertEqual(func('{{a|{{c}} }}'),
+                         [('a', OrderedDict((('1', '{{c}} '), )))])
+
+        # an inner '|' causes extract_template_and_params_regex_simple to
+        # split arguments incorrectly in the next two cases.
+        self.assertEqual(func('{{a|{{c|d}} }}'),
+                         [('a', OrderedDict([('1', '{{c'),
+                                             ('2', 'd}} ')]))])
+
+        self.assertEqual(func('{{a|{{b|c}}}|d}}'),
+                         [(u'a', OrderedDict([('1', u'{{b'),
+                                              ('2', u'c}}}'),
+                                              ('3', u'd')]))])
+
+    def test_regexes(self):
+        """_ETP_REGEX, NESTED_TEMPLATE_REGEX and TEMP_REGEX tests."""
+        func = textlib._ETP_REGEX.search
+
+        self.assertIsNotNone(func('{{{1}}}'))
+        self.assertIsNotNone(func('{{a|b={{{1}}} }}'))
+        self.assertIsNotNone(func('{{a|b={{c}} }}'))
+        self.assertIsNotNone(func('{{a|b={{c}} }}'))
+        self.assertIsNotNone(func('{{a|b={{c|d=1}} }}'))
+
+        self.assertIsNotNone(func('{{a|{{c}} }}'))
+        self.assertIsNotNone(func('{{a|{{c|d}} }}'))
+
+        func = textlib._ETP_REGEX.match
+
+        self.assertIsNone(func('{{{1}}}'))
+
+        self.assertIsNotNone(func('{{#if:foo}}'))
+        self.assertIsNotNone(func('{{foo:}}'))
+
+        self.assertIsNotNone(func('{{CURRENTYEAR}}'))
+        self.assertIsNotNone(func('{{1}}'))
+
+        self.assertIsNone(func('{{a|b={{CURRENTYEAR}} }}'))
+        self.assertIsNone(func('{{a|b={{{1}}} }}'))
+        self.assertIsNone(func('{{a|b={{c}} }}'))
+        self.assertIsNone(func('{{a|b={{c|d=1}} }}'))
+        self.assertIsNone(func('{{a|b={} }}'))
+        self.assertIsNone(func('{{:a|b={{c|d=1}} }}'))
+
+        self.assertIsNone(func('{{a|{{c}} }}'))
+        self.assertIsNone(func('{{a|{{c|d}} }}'))
+
+        func = textlib.TEMP_REGEX.search
+
+        self.assertIsNotNone(func('{{{1}}}'))
+        self.assertIsNotNone(func('{{a|b={{c}} }}'))
+        self.assertIsNotNone(func('{{a|b={{c|d=1}} }}'))
+        self.assertIsNotNone(func('{{a|{{c}} }}'))
+        self.assertIsNotNone(func('{{a|{{c|d}} }}'))
+
+        func = textlib.TEMP_REGEX.match
+
+        self.assertIsNotNone(func('{{#if:foo}}'))
+        self.assertIsNotNone(func('{{foo:}}'))
+
+        self.assertIsNotNone(func('{{CURRENTYEAR}}'))
+        self.assertIsNotNone(func('{{1}}'))
+
+        self.assertIsNotNone(func('{{a|b={{CURRENTYEAR}} }}'))
+        self.assertIsNotNone(func('{{a|b={{{1}}} }}'))
+
+        self.assertIsNone(func('{{a|b={{c}} }}'))
+        self.assertIsNone(func('{{a|b={{c|d=1}} }}'))
+        self.assertIsNotNone(func('{{a|b={} }}'))
+        self.assertIsNone(func('{{:a|b={{c|d=1}} }}'))
+
+        self.assertIsNone(func('{{a|{{c}} }}'))
+        self.assertIsNone(func('{{a|{{c|d}} }}'))
+
+        func = textlib.NESTED_TEMPLATE_REGEX.search
+
+        # Numerically named templates are rejected
+        self.assertIsNone(func('{{1}}'))
+
+        self.assertIsNone(func('{{#if:foo}}'))
+        self.assertIsNone(func('{{{1}}}'))
+        self.assertIsNone(func('{{{1|}}}'))
+        self.assertIsNone(func('{{{15|a}}}'))
+        self.assertIsNone(func('{{{1|{{{2|a}}} }}}'))
+
+        self.assertIsNone(func('{{{1|{{2|a}} }}}'))
+
+        func = textlib.NESTED_TEMPLATE_REGEX.match
+
+        self.assertIsNotNone(func('{{CURRENTYEAR}}'))
+        self.assertIsNotNone(func('{{foo:bar}}'))
+        self.assertIsNone(func('{{1}}'))
+
+        self.assertIsNotNone(func('{{a|b={{CURRENTYEAR}} }}'))
+        self.assertIsNotNone(func('{{a|b={{{1}}} }}'))
+        self.assertIsNotNone(func('{{a|b={{c}} }}'))
+        self.assertIsNotNone(func('{{a|b={{c|d=1}} }}'))
+        self.assertIsNotNone(func('{{a|b={} }}'))
+        self.assertIsNotNone(func('{{:a|b={{c|d=1}} }}'))
+
+        self.assertIsNotNone(func('{{a|{{c}} }}'))
+        self.assertIsNotNone(func('{{a|{{c|d}} }}'))
 
 
 class TestReplaceLinks(TestCase):
@@ -748,10 +907,26 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                          '[[ey:y]]')  # "ex" is not a valid interwiki code
 
     def test_replace_template(self):
-        template_sample = r'{{templatename | url= | accessdate={{Fecha|1993}} |atitle=The [[real title]] }}'
+        template_sample = (r'a {{templatename '
+                           r'    | accessdate={{Fecha|1993}} '
+                           r'    |atitle=The [[real title]] }}')
         self.assertEqual(textlib.replaceExcept(template_sample, 'a', 'X',
                                                ['template'], site=self.site),
-                         template_sample)
+                         'X' + template_sample[1:])
+
+        template_sample = (r'a {{templatename '
+                           r'    | 1={{a}}2{{a}} '
+                           r'    | 2={{a}}1{{a}} }}')
+        self.assertEqual(textlib.replaceExcept(template_sample, 'a', 'X',
+                                               ['template'], site=self.site),
+                         'X' + template_sample[1:])
+
+        template_sample = (r'a {{templatename '
+                           r'    | 1={{{a}}}2{{{a}}} '
+                           r'    | 2={{{a}}}1{{{a}}} }}')
+        self.assertEqual(textlib.replaceExcept(template_sample, 'a', 'X',
+                                               ['template'], site=self.site),
+                         'X' + template_sample[1:])
 
     def test_replace_source_reference(self):
         """Test replacing in text which contains back references."""

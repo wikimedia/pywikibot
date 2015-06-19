@@ -11,7 +11,7 @@ __version__ = '$Id$'
 
 from pywikibot.tools import ip
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DeprecationTestCase
 from tests.utils import expected_failure_if
 
 
@@ -628,7 +628,7 @@ class TestIPBase(TestCase):
         self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
 
 
-class IPRegexTestCase(TestIPBase):
+class IPRegexTestCase(TestIPBase, DeprecationTestCase):
 
     """Test IP regex."""
 
@@ -640,6 +640,8 @@ class IPRegexTestCase(TestIPBase):
         self._run_tests()
         self._test_T76286_failures()
         self.assertEqual(self.fail, 0)
+        self.assertDeprecation(
+            'page.ip_regexp is deprecated, use tools.ip.is_IP instead.')
 
 
 class IPAddressModuleTestCase(TestIPBase):

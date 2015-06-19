@@ -16,7 +16,7 @@ import sys
 
 from warnings import warn
 
-from pywikibot.tools import LazyRegex
+from pywikibot.tools import DeprecatedRegex
 
 ipaddress_e = ipaddr_e = None
 
@@ -78,15 +78,15 @@ elif not ip_address:
     ip_address = ip_address_fake
 
 # deprecated IP detector
-ip_regexp = LazyRegex()
-ip_regexp.flags = re.IGNORECASE
-ip_regexp.raw = (
+ip_regexp = DeprecatedRegex(
     r'^(?:(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}'
     r'(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|'
     r'(((?=(?=(.*?(::)))\3(?!.+\4)))\4?|[\dA-F]{1,4}:)'
     r'([\dA-F]{1,4}(\4|:\b)|\2){5}'
     r'(([\dA-F]{1,4}(\4|:\b|$)|\2){2}|'
-    r'(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4}))\Z')
+    r'(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4}))\Z',
+    re.IGNORECASE,
+    'page.ip_regexp', 'tools.ip.is_IP')
 
 
 def is_IP(IP):
