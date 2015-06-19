@@ -928,32 +928,58 @@ for _filename in _fns:
             print("WARNING: Skipped '%(fn)s': owned by someone else."
                   % {'fn': _filename})
 
-# Test for obsoleted and/or unknown variables.
-for _key, _val in list(_uc.items()):
-    if _key.startswith('_'):
-        pass
-    elif _key in _imports:
-        pass
-    elif _key in _gl:
-        nt = type(_val)
-        ot = _tp[_key]
-        ov = _glv[_key]
 
-        if nt == ot or _val is None or ov is None:  # nopep8
-            pass
-        elif nt is int and (ot is float or ot is bool):
-            pass
-        elif ot is int and (nt is float or nt is bool):
-            pass
-        else:
-            print("WARNING: Type of '%(_key)s' changed" % locals())
-            print("         %(was)s: %(old)s" % {'was': "Was", 'old': ot})
-            print("         %(now)s: %(new)s" % {'now': "Now", 'new': nt})
-        del nt, ot, ov
+class _DifferentTypeError(UserWarning, TypeError):
+
+    """An error when the required type doesn't match the actual type."""
+
+    def __init__(self, name, actual_type, allowed_types):
+        super(_DifferentTypeError, self).__init__(
+            'Configuration variable "{0}" is defined as "{1.__name__}" but '
+            'expected "{2}".'.format(
+                name, actual_type,
+                '", "'.join(t.__name__ for t in allowed_types)))
+
+
+def _assert_default_type(name, value, default_value):
+    """Return the value if the old or new is None or both same type."""
+    if (value is None or default_value is None or
+            isinstance(value, type(default_value))):
+        return value
+    elif isinstance(value, int) and isinstance(default_value, float):
+        return float(value)
     else:
-        print("WARNING: "
-              "Configuration variable %(_key)r is defined but unknown.\n"
-              "Misspelled?" % locals())
+        raise _DifferentTypeError(name, type(value), type(default_value))
+
+
+def _assert_types(name, value, types):
+    """Return the value if it's one of the types."""
+    if isinstance(value, types):
+        return value
+    else:
+        raise _DifferentTypeError(name, type(value), types)
+
+
+def _check_user_config_types(user_config, default_values, skipped):
+    """Check the types compared to the default values."""
+    for name, value in user_config.items():
+        if name in default_values:
+            try:
+                if name == 'socket_timeout':
+                    value = _assert_types(name, value, (int, float, tuple))
+                else:
+                    value = _assert_default_type(name, value,
+                                                 default_values[name])
+            except _DifferentTypeError as e:
+                warn(e)
+            else:
+                user_config[name] = value
+        elif not name.startswith('_') and name not in skipped:
+            warn('Configuration variable {0} is defined but unknown. '
+                 'Misspelled?'.format(name), UserWarning)
+
+_check_user_config_types(_uc, _glv, _imports)
+
 
 # Copy the user config settings into globals
 _modified = [_key for _key in _gl
