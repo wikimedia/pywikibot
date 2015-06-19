@@ -30,6 +30,7 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import i18n, textlib
+from pywikibot.bot import QuitKeyboardInterrupt
 
 
 def choosecats(pagetext):
@@ -61,7 +62,7 @@ q: quit.""")
             chosen = None
             done = True
         elif choice == "q":
-            raise pywikibot.QuitKeyboardInterrupt
+            raise QuitKeyboardInterrupt
         else:
             chosen.append(choice)
     return chosen

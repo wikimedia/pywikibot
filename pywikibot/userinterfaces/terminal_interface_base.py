@@ -46,6 +46,25 @@ colors = [
 colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(colors))
 
 
+class ChoiceException(Exception):
+
+    """A choice for input_choice which result in this exception."""
+
+    def __init__(self, option, shortcut):
+        """Constructor using the given option and shortcut in input_choice."""
+        self.option = option
+        self.shortcut = shortcut
+
+
+class QuitKeyboardInterrupt(ChoiceException, KeyboardInterrupt):
+
+    """The user has cancelled processing at a prompt."""
+
+    def __init__(self):
+        """Constructor using the 'quit' ('q') in input_choice."""
+        super(QuitKeyboardInterrupt, self).__init__('quit', 'q')
+
+
 class UI:
 
     """Base for terminal user interfaces."""
@@ -258,7 +277,7 @@ class UI:
             else:
                 text = self._raw_input()
         except KeyboardInterrupt:
-            raise pywikibot.QuitKeyboardInterrupt()
+            raise QuitKeyboardInterrupt()
         if PY2:
             text = text.decode(self.encoding)
         return text
@@ -272,19 +291,20 @@ class UI:
         @type question: basestring
         @param options: All available options. Each entry contains the full
             length answer and a shortcut of only one character. The shortcut
-            must not appear in the answer.
-        @type options: iterable containing iterables of length 2
+            must not appear in the answer. Alternatively they may be a
+            ChoiceException (or subclass) instance which has a full option and
+            shortcut. It will raise that exception when selected.
+        @type options: iterable containing sequences of length 2 or
+            ChoiceException
         @param default: The default answer if no was entered. None to require
             an answer.
         @type default: basestring
         @param return_shortcut: Whether the shortcut or the index in the option
             should be returned.
         @type return_shortcut: bool
-        @param automatic_quit: Adds the option 'Quit' ('q') and throw a
-            L{QuitKeyboardInterrupt} if selected. If it's an integer it
-            doesn't add the option but throw the exception when the option was
-            selected.
-        @type automatic_quit: bool or int
+        @param automatic_quit: Adds the option 'Quit' ('q') if True and throws a
+            L{QuitKeyboardInterrupt} if selected.
+        @type automatic_quit: bool
         @param force: Automatically use the default
         @type force: bool
         @return: If return_shortcut the shortcut of options or the value of
@@ -295,23 +315,21 @@ class UI:
         options = list(options)
         if len(options) == 0:
             raise ValueError(u'No options are given.')
-        if automatic_quit is True:
-            options += [('Quit', 'q')]
-            quit_index = len(options) - 1
-        elif automatic_quit is not False:
-            quit_index = automatic_quit
-        else:
-            quit_index = None
+        if automatic_quit:
+            options += [QuitKeyboardInterrupt()]
         if default:
             default = default.lower()
         valid = {}
         default_index = -1
         formatted_options = []
         for i, option in enumerate(options):
-            if len(option) != 2:
-                raise ValueError(u'Option #{0} does not consist of an option '
-                                 u'and shortcut.'.format(i))
-            option, shortcut = option
+            if isinstance(option, ChoiceException):
+                option, shortcut = option.option, option.shortcut
+            else:
+                if len(option) != 2:
+                    raise ValueError('Option #{0} does not consist of an '
+                                     'option and shortcut.'.format(i))
+                option, shortcut = option
             if option.lower() in valid:
                 raise ValueError(
                     u'Multiple identical options ({0}).'.format(option))
@@ -342,8 +360,8 @@ class UI:
                 answer = default_index
             else:
                 answer = valid.get(answer.lower(), None)
-        if quit_index == answer:
-            raise pywikibot.QuitKeyboardInterrupt()
+        if isinstance(options[answer], ChoiceException):
+            raise options[answer]
         elif not return_shortcut:
             return answer
         elif answer < 0:

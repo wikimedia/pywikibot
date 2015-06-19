@@ -20,4 +20,10 @@ if sys.platform == 'win32':
 else:
     from .terminal_interface_unix import UnixUI as UI
 
-__all__ = ('UI',)
+from pywikibot.userinterfaces.terminal_interface_base import (
+    ChoiceException, QuitKeyboardInterrupt,
+)
+
+__all__ = (
+    'UI', 'ChoiceException', 'QuitKeyboardInterrupt',
+)

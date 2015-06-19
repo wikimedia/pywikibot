@@ -33,7 +33,7 @@ from pywikibot import config2 as config
 from pywikibot.bot import (
     output, warning, error, critical, debug, stdout, exception,
     input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui, log,
-    calledModuleName, Bot, CurrentPageBot, WikidataBot, QuitKeyboardInterrupt,
+    calledModuleName, Bot, CurrentPageBot, WikidataBot,
     # the following are flagged as deprecated on usage
     handleArgs,
 )
@@ -757,3 +757,7 @@ wrapper._add_deprecated_attr(
     'UserActionRefuse', pywikibot.exceptions._EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
                     'use UserRightsError and/or NotEmailableError')
+wrapper._add_deprecated_attr(
+    'QuitKeyboardInterrupt', pywikibot.bot.QuitKeyboardInterrupt,
+    warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
+                    'use pywikibot.bot.QuitKeyboardInterrupt instead')

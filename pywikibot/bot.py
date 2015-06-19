@@ -52,9 +52,12 @@ if not PY2:
 # search for user interface module in the 'userinterfaces' subdirectory
 uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                       % config.userinterface,
-                      fromlist=['UI'])
+                      fromlist=['UI', 'ChoiceException', 'QuitKeyboardInterrupt'])
 ui = uiModule.UI()
 pywikibot.argvu = ui.argvu()
+
+ChoiceException = uiModule.ChoiceException
+QuitKeyboardInterrupt = uiModule.QuitKeyboardInterrupt
 
 
 # It's not possible to use pywikibot.exceptions.PageRelatedError as that is
@@ -585,7 +588,8 @@ def input_choice(question, answers, default=None, return_shortcut=True,
     @type question: basestring
     @param answers: The valid answers each containing a full length answer and
         a shortcut. Each value must be unique.
-    @type answers: Iterable containing an iterable of length two
+    @type answers: iterable containing a sequence of length two or instances of
+        ChoiceException
     @param default: The result if no answer was entered. It must not be in the
         valid answers and can be disabled by setting it to None. If it should
         be linked with the valid answers it must be its shortcut.
@@ -594,7 +598,7 @@ def input_choice(question, answers, default=None, return_shortcut=True,
         returned.
     @type return_shortcut: bool
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
-            L{QuitKeyboardInterrupt} if selected.
+        L{QuitKeyboardInterrupt} if selected.
     @type automatic_quit: bool
     @param force: Automatically use the default
     @type force: bool
@@ -1132,11 +1136,6 @@ def open_webbrowser(page):
     from pywikibot import i18n
     webbrowser.open(page.full_url())
     i18n.input('pywikibot-enter-finished-browser')
-
-
-class QuitKeyboardInterrupt(KeyboardInterrupt):
-
-    """The user has cancelled processing at a prompt."""
 
 
 class BaseBot(object):
