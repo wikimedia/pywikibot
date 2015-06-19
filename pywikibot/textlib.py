@@ -1659,6 +1659,10 @@ class TimeStripper(object):
         ]
 
         self.linkP = compileLinkR()
+        self.comment_pattern = re.compile(r'<!--(.*?)-->')
+
+        self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
+                                       self.site.siteinfo['timezone'])
 
     def findmarker(self, text, base=u'@@', delta='@'):
         """Find a string which is not part of text."""
@@ -1711,6 +1715,17 @@ class TimeStripper(object):
         """
         # match date fields
         dateDict = dict()
+        # Analyze comments separately from rest of each line to avoid to skip
+        # dates in comments, as the date matched by timestripper is the
+        # rightmost one.
+        most_recent = []
+        for comment in self.comment_pattern.finditer(line):
+            # Recursion levels can be maximum two. If a comment is found, it will
+            # not for sure be found in the next level.
+            # Nested cmments are excluded by design.
+            timestamp = self.timestripper(comment.group(1))
+            most_recent.append(timestamp)
+
         # Remove parts that are not supposed to contain the timestamp, in order
         # to reduce false positives.
         line = removeDisabledParts(line)
@@ -1746,12 +1761,17 @@ class TimeStripper(object):
                                      % (v, k))
 
             # find timezone
-            dateDict['tzinfo'] = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
-                                                  self.site.siteinfo['timezone'])
+            dateDict['tzinfo'] = self.tzinfo
 
             timestamp = datetime.datetime(**dateDict)
-
         else:
+            timestamp = None
+
+        most_recent.append(timestamp)
+
+        try:
+            timestamp = max(ts for ts in most_recent if ts is not None)
+        except ValueError:
             timestamp = None
 
         return timestamp
