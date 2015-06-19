@@ -85,12 +85,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
         sitelang = page.site.code
         dictName, value = date.getAutoFormat(sitelang, page.title())
         if dictName:
-            if not (dictName == 'yearsBC' and
-                    sitelang in date.maxyearBC and
-                    value > date.maxyearBC[sitelang]) or \
-                    (dictName == 'yearsAD' and
-                     sitelang in date.maxyearAD and
-                     value > date.maxyearAD[sitelang]):
+            if True:
                 pywikibot.output(
                     u'TitleTranslate: %s was recognized as %s with value %d'
                     % (page.title(), dictName, value))
@@ -98,15 +93,7 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                     if entryLang not in site.languages():
                         continue
                     if entryLang != sitelang:
-                        if (dictName == 'yearsBC' and
-                                entryLang in date.maxyearBC and
-                                value > date.maxyearBC[entryLang]):
-                            pass
-                        elif (dictName == 'yearsAD' and
-                              entryLang in date.maxyearAD and
-                              value > date.maxyearAD[entryLang]):
-                            pass
-                        else:
+                        if True:
                             newname = entry(value)
                             x = pywikibot.Link(
                                 newname,
@@ -114,37 +101,3 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                                                fam=site.family))
                             result.add(x)
     return list(result)
-
-bcDateErrors = [u'[[ko:%d년]]']
-
-
-def appendFormatedDates(result, dictName, value):
-    for code, func in date.formats[dictName].items():
-        result.append(u'[[%s:%s]]' % (code, func(value)))
-
-
-def getPoisonedLinks(pl):
-    """Return a list of known corrupted links that should be removed if seen."""
-    result = []
-    pywikibot.output(u'getting poisoned links for %s' % pl.title())
-    dictName, value = date.getAutoFormat(pl.site.code, pl.title())
-    if dictName is not None:
-        pywikibot.output(u'date found in %s' % dictName)
-        # errors in year BC
-        if dictName in date.bcFormats:
-            for fmt in bcDateErrors:
-                result.append(fmt % value)
-        # i guess this is like friday the 13th for the years
-        if value == 398 and dictName == 'yearsBC':
-            appendFormatedDates(result, dictName, 399)
-        if dictName == 'yearsBC':
-            appendFormatedDates(result, 'decadesBC', value)
-            appendFormatedDates(result, 'yearsAD', value)
-        if dictName == 'yearsAD':
-            appendFormatedDates(result, 'decadesAD', value)
-            appendFormatedDates(result, 'yearsBC', value)
-        if dictName == 'centuriesBC':
-            appendFormatedDates(result, 'decadesBC', value * 100 + 1)
-        if dictName == 'centuriesAD':
-            appendFormatedDates(result, 'decadesAD', value * 100 + 1)
-    return result
