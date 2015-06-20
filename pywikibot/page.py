@@ -2733,7 +2733,7 @@ class User(Page):
 
         @return: dict
         """
-        if force:
+        if force and hasattr(self, '_userprops'):
             del self._userprops
         if not hasattr(self, '_userprops'):
             self._userprops = list(self.site.users([self.username, ]))[0]
