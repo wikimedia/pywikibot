@@ -930,9 +930,6 @@ def interwikiSort(sites, insite=None):
                     del sites[sites.index(site)]
                     firstsites = firstsites + [site]
         sites = firstsites + sites
-    if insite.interwiki_putfirst_doubled(sites):
-        # some (all?) implementations return False
-        sites = insite.interwiki_putfirst_doubled(sites) + sites
     return sites
 
 
