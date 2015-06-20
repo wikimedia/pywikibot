@@ -3618,7 +3618,7 @@ class ItemPage(WikibasePage):
         @type force: bool
         @param args: values of props
         """
-        super(ItemPage, self).get(force=force, *args, **kwargs)
+        data = super(ItemPage, self).get(force=force, *args, **kwargs)
 
         # claims
         self.claims = {}
@@ -3637,12 +3637,9 @@ class ItemPage(WikibasePage):
                 self.sitelinks[dbname] = self._content[
                     'sitelinks'][dbname]['title']
 
-        return {'aliases': self.aliases,
-                'labels': self.labels,
-                'descriptions': self.descriptions,
-                'sitelinks': self.sitelinks,
-                'claims': self.claims
-                }
+        data['claims'] = self.claims
+        data['sitelinks'] = self.sitelinks
+        return data
 
     def getRedirectTarget(self):
         """Return the redirect target for this page."""
