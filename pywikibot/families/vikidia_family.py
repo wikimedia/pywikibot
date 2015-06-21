@@ -7,22 +7,14 @@ __version__ = '$Id$'
 from pywikibot import family
 
 
-class Family(family.Family):
+class Family(family.SubdomainFamily):
 
     """Family class for Vikidia."""
 
     name = 'vikidia'
+    domain = 'vikidia.org'
 
-    langs = {
-        'ca': 'ca.vikidia.org',
-        'en': 'en.vikidia.org',
-        'es': 'es.vikidia.org',
-        'eu': 'eu.vikidia.org',
-        'fr': 'fr.vikidia.org',
-        'it': 'it.vikidia.org',
-        'ru': 'ru.vikidia.org',
-        'scn': 'scn.vikidia.org',
-    }
+    codes = ['ca', 'en', 'es', 'fr', 'it', 'ru']
 
     def protocol(self, code):
         """Return https as the protocol for this family."""

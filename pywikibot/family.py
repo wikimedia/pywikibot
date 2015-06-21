@@ -769,7 +769,8 @@ class Family(object):
 
         # Language codes of the largest wikis. They should be roughly sorted
         # by size.
-        self.languages_by_size = []
+        if not hasattr(self, 'languages_by_size'):
+            self.languages_by_size = []
 
         # Some languages belong to a group where the possibility is high that
         # equivalent articles have identical titles among the group.
@@ -1400,6 +1401,91 @@ class Family(object):
                                            for (old, new) in data.items()
                                            if new is not None)
 
+    @property
+    def domains(self):
+        """
+        Get list of unique domain names included in this family.
+
+        These domains may also exist in another family.
+
+        @rtype: iterable of str
+        """
+        return set(self.langs.values())
+
+    @property
+    def codes(self):
+        """
+        Get list of codes used by this family.
+
+        @rtype: iterable of str
+        """
+        return set(self.langs.keys())
+
+
+class SingleSiteFamily(Family):
+
+    """Single site family."""
+
+    def __init__(self):
+        """Constructor."""
+        if not hasattr(self, 'code'):
+            self.code = self.name
+
+        assert self.domain
+
+        super(SingleSiteFamily, self).__init__()
+
+        self.langs = {self.code: self.domain}
+
+    @property
+    def domains(self):
+        """Return the full domain name of the site."""
+        return (self.domain, )
+
+    def hostname(self, code):
+        return self.domain
+
+
+class SubdomainFamily(Family):
+
+    """Multi site wikis that are subdomains of the same top level domain."""
+
+    def __init__(self):
+        """Constructor."""
+        assert self.domain
+
+        codes = self.codes
+        if hasattr(self, 'test_codes'):
+            codes = codes + self.test_codes
+
+        self.langs = dict(
+            (code, '%s.%s' % (code, self.domain)) for code in codes)
+
+        super(SubdomainFamily, self).__init__()
+
+    @property
+    def codes(self):
+        """Property listing family codes."""
+        if hasattr(self, 'languages_by_size'):
+            return self.languages_by_size
+        raise NotImplementedError(
+            'Family %s needs property "languages_by_size" or "codes"'
+            % self.name)
+
+    @property
+    def domains(self):
+        """Return the domain name of the sites in this family."""
+        return [self.domain]
+
+
+class WikiaFamily(Family):
+
+    """Common features of Wikia families."""
+
+    def scriptpath(self, code):
+        """Return the script path for this family."""
+        return ''
+
 
 class WikimediaFamily(Family):
 
@@ -1426,7 +1512,7 @@ class WikimediaFamily(Family):
     ]
 
     other_content_families = [
-        'wikidata'
+        'wikidata',
         'mediawiki',
     ]
 
@@ -1488,6 +1574,17 @@ class WikimediaFamily(Family):
     }
 
     @property
+    def domain(self):
+        """Domain property."""
+        if self.name in self.multi_language_content_families + self.other_content_families:
+            return self.name + '.org'
+        elif self.name in self.wikimedia_org_families:
+            return 'wikimedia.org'
+
+        raise NotImplementedError(
+            'Family %s needs to define property \'domain\'' % self.name)
+
+    @property
     def interwiki_removals(self):
         return frozenset(self.removed_wikis + self.closed_wikis)
 
@@ -1508,18 +1605,26 @@ class WikimediaFamily(Family):
         return 'stream.wikimedia.org'
 
 
-class AutoFamily(Family):
+class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
+
+    """Single site family for sites hosted at *.wikimedia.org."""
+
+    @property
+    def domain(self):
+        """Return the parents domain with a subdomain prefix."""
+        return '{0}.wikimedia.org'.format(self.name)
+
+
+class AutoFamily(SingleSiteFamily):
 
     """Family that automatically loads the site configuration."""
 
     def __init__(self, name, url):
         """Constructor."""
-        super(AutoFamily, self).__init__()
         self.name = name
         self.url = urlparse.urlparse(url)
-        self.langs = {
-            name: self.url.netloc
-        }
+        self.domain = self.url.netloc
+        super(AutoFamily, self).__init__()
 
     def protocol(self, code):
         """Return the protocol of the URL."""

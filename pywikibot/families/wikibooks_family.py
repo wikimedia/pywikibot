@@ -8,9 +8,11 @@ __version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikibooks
-class Family(family.WikimediaFamily):
+class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wikibooks."""
+
+    name = 'wikibooks'
 
     closed_wikis = [
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
@@ -105,9 +107,6 @@ class Family(family.WikimediaFamily):
 
     def __init__(self):
         """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikibooks'
-
         self.languages_by_size = [
             'en', 'de', 'fr', 'hu', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'he',
             'vi', 'ca', 'id', 'sq', 'fi', 'ru', 'fa', 'cs', 'zh', 'sv', 'hr',
@@ -119,8 +118,7 @@ class Family(family.WikimediaFamily):
             'zh-min-nan', 'ku', 'uz',
         ]
 
-        self.langs = dict([(lang, '%s.wikibooks.org' % lang)
-                           for lang in self.languages_by_size])
+        super(Family, self).__init__()
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

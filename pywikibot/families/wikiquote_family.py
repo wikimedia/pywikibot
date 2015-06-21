@@ -8,9 +8,11 @@ __version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikiquote
-class Family(family.WikimediaFamily):
+class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wikiquote."""
+
+    name = 'wikiquote'
 
     closed_wikis = [
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
@@ -63,9 +65,6 @@ class Family(family.WikimediaFamily):
 
     def __init__(self):
         """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikiquote'
-
         self.languages_by_size = [
             'en', 'pl', 'it', 'ru', 'de', 'pt', 'cs', 'es', 'fr', 'sk', 'bs',
             'tr', 'fa', 'uk', 'lt', 'he', 'bg', 'eo', 'sl', 'ca', 'el', 'nn',
@@ -76,8 +75,7 @@ class Family(family.WikimediaFamily):
             'am', 'wo', 'ky',
         ]
 
-        self.langs = dict([(lang, '%s.wikiquote.org' % lang)
-                           for lang in self.languages_by_size])
+        super(Family, self).__init__()
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

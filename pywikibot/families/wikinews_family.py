@@ -8,9 +8,11 @@ __version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikinews
-class Family(family.WikimediaFamily):
+class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wikinews."""
+
+    name = 'wikinews'
 
     closed_wikis = [
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hungarian_Wikinews
@@ -25,17 +27,13 @@ class Family(family.WikimediaFamily):
 
     def __init__(self):
         """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikinews'
-
         self.languages_by_size = [
             'sr', 'en', 'fr', 'de', 'pl', 'es', 'pt', 'ru', 'it', 'zh', 'ta',
             'el', 'ca', 'cs', 'sv', 'ar', 'fa', 'ro', 'uk', 'tr', 'ja', 'sq',
             'no', 'ko', 'eo', 'fi', 'bs', 'he', 'bg',
         ]
 
-        self.langs = dict([(lang, '%s.wikinews.org' % lang)
-                           for lang in self.languages_by_size])
+        super(Family, self).__init__()
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

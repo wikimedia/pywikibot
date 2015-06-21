@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,8 +9,9 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
-from pywikibot.family import Family
+from pywikibot.family import Family, SingleSiteFamily
 from pywikibot.exceptions import UnknownFamily
+from pywikibot.tools import PY2
 
 import pywikibot.site
 
@@ -19,6 +20,9 @@ from tests.aspects import (
     TestCase,
     DeprecationTestCase,
 )
+
+if not PY2:
+    basestring = (str, )
 
 
 class TestFamily(TestCase):
@@ -32,8 +36,26 @@ class TestFamily(TestCase):
         for name in pywikibot.config.family_files:
             f = Family.load(name)
             self.assertIsInstance(f.langs, dict)
-            self.assertNotEqual(f.langs, {})
+            self.assertTrue(f.langs)
+            self.assertTrue(f.codes)
+            self.assertTrue(iter(f.codes))
+            self.assertIsInstance(next(iter(f.codes)), basestring)
+            self.assertTrue(f.domains)
+            self.assertTrue(iter(f.domains))
+            for domain in f.domains:
+                self.assertIsInstance(domain, basestring)
+                if domain != 'localhost':
+                    self.assertIn('.', domain)
             self.assertEqual(f.name, name)
+            self.assertIsInstance(f.languages_by_size, list)
+            self.assertGreaterEqual(set(f.langs), set(f.languages_by_size))
+            if len(f.langs) > 6 and f.name != 'wikimediachapter':
+                self.assertNotEqual(f.languages_by_size, [])
+            if isinstance(f, SingleSiteFamily):
+                self.assertIsNotNone(f.code)
+                self.assertIsNotNone(f.domain)
+                self.assertEqual(set(f.langs), set([f.code]))
+                self.assertEqual(set(f.codes), set([f.code]))
 
     def test_family_load_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""

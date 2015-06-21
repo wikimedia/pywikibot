@@ -8,12 +8,13 @@ from pywikibot import family
 
 
 # The project wiki of OpenStreetMap (OSM).
-class Family(family.Family):
+class Family(family.SingleSiteFamily):
 
     """Family class for OpenStreetMap wiki."""
 
     name = 'osm'
-    langs = {'en': 'wiki.openstreetmap.org'}
+    domain = 'wiki.openstreetmap.org'
+    code = 'en'
 
     def protocol(self, code):
         """Return https as the protocol for this family."""

@@ -8,9 +8,11 @@ __version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikisource
-class Family(family.WikimediaFamily):
+class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wikisource."""
+
+    name = 'wikisource'
 
     closed_wikis = [
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
@@ -21,9 +23,6 @@ class Family(family.WikimediaFamily):
 
     def __init__(self):
         """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikisource'
-
         self.languages_by_size = [
             'fr', 'en', 'de', 'ru', 'he', 'zh', 'pl', 'it', 'es', 'ar', 'sv',
             'cs', 'pt', 'fa', 'ca', 'hu', 'ml', 'ko', 'sl', 'ro', 'te', 'sr',
@@ -33,11 +32,12 @@ class Family(family.WikimediaFamily):
             'kn', 'gl', 'lt', 'cy', 'sk', 'zh-min-nan', 'fo', 'or',
         ]
 
-        self.langs = dict([(lang, '%s.wikisource.org' % lang)
-                           for lang in self.languages_by_size])
+        super(Family, self).__init__()
+
         # FIXME: '-' is invalid at the beginning of a hostname, and
         # '-' is not a valid subdomain.
-        self.langs['-'] = 'wikisource.org'
+        self.langs['-'] = self.domain
+        self.languages_by_size.append('-')
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

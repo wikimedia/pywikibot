@@ -9,9 +9,12 @@ from pywikibot.tools import deprecated
 
 
 # The Anarchopedia family
-class Family(family.Family):
+class Family(family.SubdomainFamily):
 
     """Family class for Anarchopedia wiki."""
+
+    name = 'anarchopedia'
+    domain = 'anarchopedia.org'
 
     interwiki_replacements = {
         # ISO 639-2 -> ISO 639-1 mappings
@@ -60,16 +63,13 @@ class Family(family.Family):
 
     def __init__(self):
         """Constructor."""
-        family.Family.__init__(self)
-        self.name = 'anarchopedia'
-
         self.languages_by_size = [
             'ar', 'en', 'de', 'nl', 'el', 'it', 'fa', 'fi', 'fr', 'he', 'es',
             'hy', 'id', 'meta', 'ja', 'ko', 'lv', 'lt', 'no', 'hr', 'pl', 'pt',
             'ro', 'ru', 'hrv', 'sq', 'sr', 'sv', 'tr', 'zh', 'eo', 'da',
         ]
-        for l in self.languages_by_size:
-            self.langs[l] = '%s.anarchopedia.org' % l
+
+        super(Family, self).__init__()
 
         self.nocapitalize = list(self.langs.keys())
 

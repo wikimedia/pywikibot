@@ -8,22 +8,20 @@ __version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikiversity
-class Family(family.WikimediaFamily):
+class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family class for Wikiversity."""
 
+    name = 'wikiversity'
+
     def __init__(self):
         """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikiversity'
-
         self.languages_by_size = [
             'de', 'en', 'fr', 'ru', 'cs', 'it', 'beta', 'pt', 'es', 'ar', 'sv',
             'fi', 'sl', 'el', 'ja', 'ko',
         ]
 
-        self.langs = dict([(lang, '%s.wikiversity.org' % lang)
-                           for lang in self.languages_by_size])
+        super(Family, self).__init__()
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

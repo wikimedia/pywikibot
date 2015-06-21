@@ -8,12 +8,12 @@ from pywikibot import family
 
 
 # The test wikipedia family
-class Family(family.WikimediaFamily):
+class Family(family.SingleSiteFamily, family.WikimediaFamily):
 
     """Family class for test.wikipedia.org."""
 
     name = 'test'
-    langs = {'test': 'test.wikipedia.org'}
+    domain = 'test.wikipedia.org'
 
     def from_url(self, url):
         """Return None to indicate no code of this family is accepted."""

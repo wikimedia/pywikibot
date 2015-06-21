@@ -8,15 +8,14 @@ from pywikibot import family
 
 
 # Outreach wiki custom family
-class Family(family.WikimediaFamily):
+class Family(family.WikimediaOrgFamily):
 
     """Family class for Wikimedia outreach wiki."""
+
+    name = 'outreach'
 
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        self.name = u'outreach'
-        self.langs = {
-            'outreach': 'outreach.wikimedia.org',
-        }
+
         self.interwiki_forward = 'wikipedia'

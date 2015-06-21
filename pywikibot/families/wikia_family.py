@@ -10,22 +10,12 @@ from pywikibot.tools import deprecated
 
 # The Wikia Search family
 # user-config.py: usernames['wikia']['wikia'] = 'User name'
-class Family(family.Family):
+class Family(family.SingleSiteFamily):
 
     """Family class for Wikia."""
 
-    def __init__(self):
-        """Constructor."""
-        family.Family.__init__(self)
-        self.name = u'wikia'
-
-        self.langs = {
-            'wikia': 'www.wikia.com',
-        }
-
-    def hostname(self, code):
-        """Return the hostname for every site in this family."""
-        return u'www.wikia.com'
+    name = u'wikia'
+    domain = 'www.wikia.com'
 
     @deprecated('APISite.version()')
     def version(self, code):

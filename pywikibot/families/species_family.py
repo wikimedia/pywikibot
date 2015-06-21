@@ -8,15 +8,14 @@ from pywikibot import family
 
 
 # The wikispecies family
-class Family(family.WikimediaFamily):
+class Family(family.WikimediaOrgFamily):
 
     """Family class for Wikimedia species wiki."""
+
+    name = 'species'
 
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        self.name = 'species'
-        self.langs = {
-            'species': 'species.wikimedia.org',
-        }
+
         self.interwiki_forward = 'wikipedia'
