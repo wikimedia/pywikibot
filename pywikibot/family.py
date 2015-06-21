@@ -132,8 +132,6 @@ class Family(object):
         self.fyinterwiki.sort(key=lambda x:
                               x.replace("y", "i") + x.count("y") * "!")
 
-        self.namespacesWithSubpage = [2] + list(range(1, 16, 2))
-
         # letters that can follow a wikilink and are regarded as part of
         # this link
         # This depends on the linktrail setting in LanguageXx.php and on
@@ -1452,8 +1450,6 @@ class WikimediaFamily(Family):
 
     def __init__(self):
         super(WikimediaFamily, self).__init__()
-
-        self.namespacesWithSubpage.extend([4, 12])
 
         # CentralAuth cross avaliable projects.
         self.cross_projects = [
