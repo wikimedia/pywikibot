@@ -12,10 +12,13 @@ class Family(family.Family):
 
     """Family class for WOW Wiki."""
 
+    name = 'wowwiki'
+
+    interwiki_removals = ['hr', 'ro', 'sr']
+
     def __init__(self):
         """Constructor."""
-        family.Family.__init__(self)
-        self.name = 'wowwiki'
+        super(Family, self).__init__()
 
         self.langs = {
             'cs': 'cs.wow.wikia.com',
@@ -28,7 +31,6 @@ class Family(family.Family):
             'fi': 'fi.wow.wikia.com',
             'fr': 'fr.wowwiki.com',
             'he': 'he.wow.wikia.com',
-            'hr': 'hr.wow.wikia.com',
             'hu': 'hu.wow.wikia.com',
             'is': 'is.wow.wikia.com',
             'it': 'it.wow.wikia.com',
@@ -41,10 +43,8 @@ class Family(family.Family):
             'pl': 'pl.wow.wikia.com',
             'pt': 'pt.wow.wikia.com',
             'pt-br': 'pt-br.wow.wikia.com',
-            'ro': 'ro.wow.wikia.com',
             'ru': 'ru.wow.wikia.com',
             'sk': 'sk.wow.wikia.com',
-            'sr': 'sr.wow.wikia.com',
             'sv': 'sv.warcraft.wikia.com',
             'tr': 'tr.wow.wikia.com',
             'zh-tw': 'zh-tw.wow.wikia.com',
