@@ -943,16 +943,6 @@ class Family(object):
             return list(pywikibot.Family(self.interwiki_forward).langs.keys())
         return list(self.langs.keys())
 
-    def _addlang(self, code, location, namespaces={}):
-        """
-        Add a new language to the langs and namespaces of the family.
-
-        This is supposed to be called in the constructor of the family.
-        """
-        self.langs[code] = location
-#        for num, val in namespaces.items():
-#            self.namespaces[num][code] = val
-
     def get_known_families(self, site):
         return self.known_families
 
