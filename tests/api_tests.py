@@ -10,14 +10,18 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import datetime
+import json
 import types
+
+from collections import Mapping
 
 import pywikibot.data.api as api
 import pywikibot.family
 import pywikibot.login
 import pywikibot.site
+import pywikibot.page
 
-from pywikibot.tools import MediaWikiVersion
+from pywikibot.tools import MediaWikiVersion, PY2
 
 from tests.aspects import (
     unittest,
@@ -25,7 +29,138 @@ from tests.aspects import (
     DefaultSiteTestCase,
     DefaultDrySiteTestCase,
 )
-from tests.utils import allowed_failure, FakeLoginManager
+from tests.utils import allowed_failure, expected_failure_if, FakeLoginManager
+
+if not PY2:
+    from urllib.parse import unquote_to_bytes
+    unicode = str
+else:
+    from urllib import unquote_plus as unquote_to_bytes
+
+
+class PatchedRequest(object):
+
+    """
+    A ContextWrapper allowing Request to handle specific returned data.
+
+    This patches the C{http} import in the L{pywikibot.data.api} module to a
+    class simulating C{request}. It has a C{data} attribute which is either a
+    static value which the requests will return or it's a callable returning the
+    data. If it's a callable it'll be called with the same parameters as the
+    original function in the L{pywikibot.comms.http} module, but with an extra
+    argument C{parameters} which contains the extracted parameters.
+
+    A unicode returned will be forwarded directly and a Mapping will be first
+    converted into a json string. If it is False it'll use the original request
+    and do an actual request. Any other types are not allowed.
+    """
+
+    class FakeHttp(object):
+
+        """A fake http module to have a consistent response from request."""
+
+        def __init__(self, wrapper):
+            self.__wrapper = wrapper
+
+        def request(self, *args, **kwargs):
+            result = self.__wrapper.data
+            if callable(result):
+                result = result(*args, **kwargs)
+            if result is False:
+                return self.__wrapper._old_http.request(*args, **kwargs)
+            elif isinstance(result, unicode):
+                return result
+            elif isinstance(result, Mapping):
+                return json.dumps(result)
+            else:
+                raise ValueError('The result is not a valid type '
+                                 '"{0}"'.format(type(result)))
+
+    def __init__(self, data=None):
+        """
+        Initialize the context wrapper.
+
+        @param data: The data for the request which may be changed later. It
+            must be either unicode or Mapping before submitting a request.
+        @type data: unicode or Mapping
+        """
+        super(PatchedRequest, self).__init__()
+        self.data = data
+
+    def __enter__(self):
+        """Patch the http module property."""
+        self._old_http = api.http
+        api.http = PatchedRequest.FakeHttp(self)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Reset the http module property."""
+        api.http = self._old_http
+
+
+class TestAPIMWException(DefaultSiteTestCase):
+
+    """Test raising an APIMWException."""
+
+    data = {'error': {'code': 'internal_api_error_fake',
+                      'info': 'Fake error message'}}
+
+    def _dummy_request(self, **kwargs):
+        self.assertIn('body', kwargs)
+        self.assertIn('uri', kwargs)
+        self.assertIn('site', kwargs)
+        if kwargs['body'] is None:
+            # use uri and remove script path
+            parameters = kwargs['uri']
+            prefix = kwargs['site'].scriptpath() + '/api.php?'
+            self.assertEqual(prefix, parameters[:len(prefix)])
+            parameters = parameters[len(prefix):]
+        else:
+            parameters = kwargs['body']
+        parameters = parameters.encode('ascii')  # it should be bytes anyway
+        # Extract parameter data from the body, it's ugly but allows us
+        # to verify that we actually test the right request
+        parameters = [p.split(b'=', 1) for p in parameters.split(b'&')]
+        parameters = dict(
+            (param.decode('ascii'), set(unquote_to_bytes(value).decode(kwargs['site'].encoding()).replace('+', ' ').split('|')))
+            for param, value in parameters)
+        if 'fake' not in parameters:
+            return False  # do an actual request
+        if self.assert_parameters:
+            for param, value in self.assert_parameters.items():
+                self.assertIn(param, parameters)
+                if value is not None:
+                    if isinstance(value, unicode):
+                        value = value.split('|')
+                    self.assertLessEqual(set(value), parameters[param])
+        return self.data
+
+    def test_API_error(self):
+        """Test a static request."""
+        req = api.Request(site=self.site, parameters={'action': 'query',
+                                                      'fake': True})
+        with PatchedRequest(self.data):
+            self.assertRaises(api.APIMWException, req.submit)
+
+    def test_API_error_encoding_ASCII(self):
+        """Test a Page instance as parameter using ASCII chars."""
+        page = pywikibot.page.Page(self.site, 'ASCII')
+        req = api.Request(site=self.site, parameters={'action': 'query',
+                                                      'fake': True,
+                                                      'titles': page})
+        self.assert_parameters = {'fake': ''}
+        with PatchedRequest(self._dummy_request):
+            self.assertRaises(api.APIMWException, req.submit)
+
+    @expected_failure_if(PY2)
+    def test_API_error_encoding_Unicode(self):
+        """Test a Page instance as parameter using non-ASCII chars."""
+        page = pywikibot.page.Page(self.site, 'Ümlä  üt')
+        req = api.Request(site=self.site, parameters={'action': 'query',
+                                                      'fake': True,
+                                                      'titles': page})
+        self.assert_parameters = {'fake': ''}
+        with PatchedRequest(self._dummy_request):
+            self.assertRaises(api.APIMWException, req.submit)
 
 
 class TestApiFunctions(DefaultSiteTestCase):
