@@ -3269,7 +3269,7 @@ class APISite(BaseSite):
                     # TODO: QueryGenerator should detect when the number of
                     # namespaces requested is higher than available, and split
                     # the request into several batches.
-                    excluded_namespaces.add([-1, -2])
+                    excluded_namespaces.update([-1, -2])
                     namespaces = set(self.namespaces) - excluded_namespaces
             else:
                 if 'file' in member_type:
