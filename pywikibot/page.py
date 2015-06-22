@@ -2352,8 +2352,8 @@ class Category(Page):
     @deprecate_arg("startFrom", "startsort")
     def articles(self, recurse=False, step=None, total=None,
                  content=False, namespaces=None, sortby=None,
-                 starttime=None, endtime=None, startsort=None,
-                 endsort=None):
+                 reverse=False, starttime=None, endtime=None,
+                 startsort=None, endsort=None):
         """
         Yield all articles in the current category.
 
@@ -2377,6 +2377,8 @@ class Category(Page):
             sort key) or "timestamp" (results ordered by time page was
             added to the category). This applies recursively.
         @type sortby: str
+        @param reverse: if True, generate results in reverse order
+            (default False)
         @param starttime: if provided, only generate pages added after this
             time; not valid unless sortby="timestamp"
         @type starttime: pywikibot.Timestamp
@@ -2395,6 +2397,7 @@ class Category(Page):
                                                 namespaces=namespaces,
                                                 step=step, total=total,
                                                 content=content, sortby=sortby,
+                                                reverse=reverse,
                                                 starttime=starttime,
                                                 endtime=endtime,
                                                 startsort=startsort,
@@ -2414,6 +2417,7 @@ class Category(Page):
                                                content=content,
                                                namespaces=namespaces,
                                                sortby=sortby,
+                                               reverse=reverse,
                                                starttime=starttime,
                                                endtime=endtime,
                                                startsort=startsort,
