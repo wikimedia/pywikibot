@@ -31,6 +31,11 @@ from warnings import warn
 
 import requests
 
+try:
+    import requests_oauthlib
+except ImportError as e:
+    requests_oauthlib = e
+
 if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
     from urllib.parse import quote
@@ -69,8 +74,6 @@ except (IOError, cookielib.LoadError):
     pywikibot.debug(u"Loading cookies failed.", _logger)
 else:
     pywikibot.debug(u"Loaded cookies from file.", _logger)
-
-session.cookies = cookie_jar
 
 
 # Prepare flush on quit
@@ -257,7 +260,7 @@ def get_authentication(uri):
                                      for i in range(len(netloc_parts))]
     for path in netlocs:
         if path in config.authenticate:
-            if len(config.authenticate[path]) == 2:
+            if len(config.authenticate[path]) in [2, 4]:
                 return config.authenticate[path]
             else:
                 warn('Invalid authentication tokens for %s '
@@ -273,10 +276,20 @@ def _http_process(session, http_request):
     if PY2 and headers:
         headers = dict((key, str(value)) for key, value in headers.items())
     auth = get_authentication(uri)
+    if auth is not None and len(auth) == 4:
+        if isinstance(requests_oauthlib, ImportError):
+            warn('%s' % requests_oauthlib, ImportWarning)
+            pywikibot.error('OAuth authentication not supported: %s'
+                            % requests_oauthlib)
+            auth = None
+        else:
+            auth = requests_oauthlib.OAuth1(*auth)
+    cookies = cookie_jar
     timeout = config.socket_timeout
     try:
         response = session.request(method, uri, data=body, headers=headers,
-                                   auth=auth, timeout=timeout, verify=True)
+                                   cookies=cookies, auth=auth, timeout=timeout,
+                                   verify=True)
     except Exception as e:
         http_request.data = e
     else:

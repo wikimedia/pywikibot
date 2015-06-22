@@ -36,6 +36,11 @@ ipaddr>=2.1.10 ; python_version < '3'
 
 unicodedata2>=7.0.0-2 ; python_version < '3'
 
+# OAuth support
+# mwoauth 0.2.4 is needed because it supports getting identity information
+# about the user
+mwoauth>=0.2.4
+
 # core interwiki_graph.py:
 git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29
 

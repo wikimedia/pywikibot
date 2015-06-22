@@ -31,7 +31,7 @@ import pywikibot
 from pywikibot import config, login
 from pywikibot.tools import MediaWikiVersion, deprecated, itergroup, ip, PY2
 from pywikibot.exceptions import (
-    Server504Error, Server414Error, FatalServerError, Error
+    Server504Error, Server414Error, FatalServerError, NoUsername, Error
 )
 from pywikibot.comms import http
 
@@ -1867,7 +1867,8 @@ class Request(MutableMapping):
         """
         self._add_defaults()
         if (not config.enable_GET_without_SSL and
-                self.site.protocol() != 'https'):
+                self.site.protocol() != 'https' or
+                self.site.is_oauth_token_available()):  # work around T108182
             use_get = False
         elif self.use_get is None:
             if self.action == 'query':
@@ -2093,6 +2094,9 @@ class Request(MutableMapping):
                             self.site.user(),
                             ', '.join('{0}: {1}'.format(*e)
                                       for e in user_tokens.items())))
+            if 'mwoauth-invalid-authorization' in code:
+                raise NoUsername('Failed OAuth authentication for %s: %s'
+                                 % (self.site, info))
             # raise error
             try:
                 # Due to bug T66958, Page's repr may return non ASCII bytes
