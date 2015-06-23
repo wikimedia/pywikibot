@@ -252,14 +252,15 @@ def _http_process(session, http_request):
     uri = http_request.uri
     body = http_request.body
     headers = http_request.headers
+    auth = config.authenticate.get(requests.utils.urlparse(uri).netloc, None)
     timeout = config.socket_timeout
     try:
-        request = session.request(method, uri, data=body, headers=headers,
-                                  verify=True, timeout=timeout)
+        response = session.request(method, uri, data=body, headers=headers,
+                                   auth=auth, timeout=timeout, verify=True)
     except Exception as e:
         http_request.data = e
     else:
-        http_request.data = request
+        http_request.data = response
 
 
 def error_handling_callback(request):
