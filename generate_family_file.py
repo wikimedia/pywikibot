@@ -17,59 +17,29 @@ __version__ = '$Id$'
 #
 
 # system imports
-import sys
-import re
 import codecs
-from collections import defaultdict
-from distutils.version import LooseVersion as V
-import json
+import os
+import sys
 
 # creating & retrieving urls
 if sys.version_info[0] > 2:
-    from urllib.parse import urlparse, urljoin
-    from urllib.error import HTTPError
-    import urllib.request as urllib2
-    from html.parser import HTMLParser
+    from urllib.parse import urlparse
     raw_input = input
 else:
-    from urlparse import urlparse, urljoin
-    import urllib2
-    from urllib2 import HTTPError
-    from HTMLParser import HTMLParser
+    from urlparse import urlparse
 
+# Disable user-config checks so the family can be created first,
+# and then used when generating the user-config
+_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')  # noqa
+os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'  # noqa
 
-def urlopen(url):
-    req = urllib2.Request(
-        url,
-        headers={'User-agent': 'Pywikibot Family File Generator 2.0'
-                               ' - https://www.mediawiki.org/wiki/Pywikibot'})
-    uo = urllib2.urlopen(req)
-    try:
-        if sys.version_info[0] > 2:
-            uo.charset = uo.headers.get_content_charset()
-        else:
-            uo.charset = uo.headers.getfirstmatchingheader('Content-Type')[0].strip().split('charset=')[1]
-    except IndexError:
-        uo.charset = 'latin-1'
-    return uo
+from pywikibot.site_detect import MWSite as Wiki
 
-
-class WikiHTMLPageParser(HTMLParser):
-
-    """Wiki HTML page parser."""
-
-    def __init__(self, *args, **kwargs):
-        HTMLParser.__init__(self, *args, **kwargs)
-        self.generator = None
-
-    def handle_starttag(self, tag, attrs):
-        attrs = defaultdict(lambda: None, attrs)
-        if tag == "meta":
-            if attrs["name"] == "generator":
-                self.generator = attrs["content"]
-        if tag == "link":
-            if attrs["rel"] == "EditURI":
-                self.edituri = attrs["href"]
+# Reset this flag in case another script is run by pwb after this script
+if not _orig_no_user_config:
+    del os.environ['PYWIKIBOT2_NO_USER_CONFIG']
+else:
+    os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = _orig_no_user_config
 
 
 class FamilyFileGenerator(object):
@@ -107,17 +77,9 @@ class FamilyFileGenerator(object):
     def getlangs(self, w):
         print("Determining other languages...", end="")
         try:
-            data = urlopen(
-                w.api +
-                "?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local&format=json")
-            iw = json.loads(data.read().decode(data.charset))
-            if 'error' in iw:
-                raise RuntimeError('%s - %s' % (iw['error']['code'],
-                                                iw['error']['info']))
-            self.langs = [wiki for wiki in iw['query']['interwikimap']
-                          if u'language' in wiki]
+            self.langs = w.langs
             print(u' '.join(sorted([wiki[u'prefix'] for wiki in self.langs])))
-        except HTTPError as e:
+        except Exception as e:
             self.langs = []
             print(e, "; continuing...")
 
@@ -223,92 +185,6 @@ class Family(family.Family):
                 f.write("            '%(lang)s': u'%(ver)s',\n"
                         % {'lang': w.lang, 'ver': w.version})
         f.write("        }[code]\n")
-
-
-class Wiki(object):
-
-    """Minimal wiki site class."""
-
-    REwgEnableApi = re.compile(r'wgEnableAPI ?= ?true')
-    REwgServer = re.compile(r'wgServer ?= ?"([^"]*)"')
-    REwgScriptPath = re.compile(r'wgScriptPath ?= ?"([^"]*)"')
-    REwgArticlePath = re.compile(r'wgArticlePath ?= ?"([^"]*)"')
-    REwgContentLanguage = re.compile(r'wgContentLanguage ?= ?"([^"]*)"')
-    REwgVersion = re.compile(r'wgVersion ?= ?"([^"]*)"')
-
-    def __init__(self, fromurl):
-        self.fromurl = fromurl
-        if fromurl.endswith("$1"):
-            fromurl = fromurl[:-2]
-        try:
-            uo = urlopen(fromurl)
-            data = uo.read().decode(uo.charset)
-        except HTTPError as e:
-            if e.code != 404:
-                raise
-            data = e.read().decode('latin-1')  # don't care about mojibake for errors
-            pass
-
-        wp = WikiHTMLPageParser()
-        wp.feed(data)
-        try:
-            self.version = wp.generator.replace("MediaWiki ", "")
-        except Exception:
-            self.version = "0.0"
-
-        if V(self.version) < V("1.17.0"):
-            self._parse_pre_117(data)
-        else:
-            self._parse_post_117(wp, fromurl)
-
-    def _parse_pre_117(self, data):
-        if not self.REwgEnableApi.search(data):
-            print("*** WARNING: Api does not seem to be enabled on %s"
-                  % self.fromurl)
-        try:
-            self.version = self.REwgVersion.search(data).groups()[0]
-        except AttributeError:
-            self.version = None
-
-        self.server = self.REwgServer.search(data).groups()[0]
-        self.scriptpath = self.REwgScriptPath.search(data).groups()[0]
-        self.articlepath = self.REwgArticlePath.search(data).groups()[0]
-        self.lang = self.REwgContentLanguage.search(data).groups()[0]
-
-        if self.version is None:
-            # try to get version using api
-            try:
-                d = json.load(urlopen(self.api + "?version&format=json"))
-                self.version = filter(
-                    lambda x: x.startswith("MediaWiki"),
-                    [l.strip()
-                     for l in d['error']['*'].split("\n")])[0].split()[1]
-            except Exception:
-                pass
-
-    def _parse_post_117(self, wp, fromurl):
-        apipath = wp.edituri.split("?")[0]
-        fullurl = urljoin(fromurl, apipath)
-        data = urlopen(fullurl + "?action=query&meta=siteinfo&format=json")
-        info = json.loads(data.read().decode(data.charset))['query']['general']
-        self.server = urljoin(fromurl, info['server'])
-        for item in ['scriptpath', 'articlepath', 'lang']:
-            setattr(self, item, info[item])
-
-    def __cmp__(self, other):
-        return (self.server + self.scriptpath ==
-                other.server + other.scriptpath)
-
-    def __hash__(self):
-        return hash(self.server + self.scriptpath)
-
-    @property
-    def api(self):
-        return self.server + self.scriptpath + "/api.php"
-
-    @property
-    def iwpath(self):
-        return self.server + self.articlepath
 
 
 if __name__ == "__main__":

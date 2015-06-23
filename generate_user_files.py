@@ -26,6 +26,7 @@ import pywikibot
 
 from pywikibot import config
 
+# Reset this flag in case another script is run by pwb after this script
 if not _orig_no_user_config:
     del os.environ['PYWIKIBOT2_NO_USER_CONFIG']
 else:
