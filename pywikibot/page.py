@@ -1464,7 +1464,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def moved_target(self):
         """Return a Page object for the target this Page was moved to.
 
-        If this page was not moved, it will raise a PageNotFound exception.
+        If this page was not moved, it will raise a NoMoveTarget exception.
         This method also works if the source was already deleted.
 
         @rtype: pywikibot.Page
