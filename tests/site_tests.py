@@ -1615,7 +1615,14 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def test_deprecated_token(self):
         self.assertEqual(self.mysite.getToken(), self.mysite.tokens['edit'])
-        self.assertEqual(self.mysite.getPatrolToken(), self.mysite.tokens['patrol'])
+        try:
+            self.assertEqual(self.mysite.getPatrolToken(), self.mysite.tokens['patrol'])
+        except pywikibot.Error as error_msg:
+            self.assertRegex(
+                unicode(error_msg),
+                "Action '[a-z]+' is not allowed for user .* on .* wiki.")
+            # test __contains__
+            self.assertNotIn('patrol', self.mysite.tokens)
 
 
 class TestSiteExtensions(WikimediaDefaultSiteTestCase):
