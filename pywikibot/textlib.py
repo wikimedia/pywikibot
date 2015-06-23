@@ -489,7 +489,7 @@ def replace_links(text, replace, site=None):
     def to_link(source):
         """Return the link from source when it's a Page otherwise itself."""
         if isinstance(source, pywikibot.Page):
-            return pywikibot.Page._link
+            return source._link
         elif isinstance(source, basestring):
             return pywikibot.Link(source, site)
         else:
