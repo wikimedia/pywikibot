@@ -49,7 +49,10 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
             def _patched_callback(link, text, groups, rng):
                 """Return the result from handle_answer."""
                 if callback._old == link:
-                    return callback.handle_answer(choice, link)
+                    callback._current_match = (link, text, groups, rng)
+                    answer = callback.handle_answer(choice)
+                    callback._current_match = None
+                    return answer
                 else:
                     return None
 

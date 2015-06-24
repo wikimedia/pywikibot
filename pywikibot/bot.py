@@ -701,6 +701,61 @@ def input_list_choice(question, answers, default=None,
                                 force=force)
 
 
+class Choice(StandardOption):
+
+    """A simple choice consisting of a option, shortcut and handler."""
+
+    def __init__(self, option, shortcut, replacer):
+        """Constructor."""
+        super(Choice, self).__init__(option, shortcut)
+        self._replacer = replacer
+
+    @property
+    def replacer(self):
+        """The replacer."""
+        return self._replacer
+
+    def handle(self):
+        """Handle this choice. Must be implemented."""
+        raise NotImplementedError()
+
+
+class StaticChoice(Choice):
+
+    """A static choice which just returns the given value."""
+
+    def __init__(self, option, shortcut, result):
+        """Create instance with replacer set to None."""
+        super(StaticChoice, self).__init__(option, shortcut, None)
+        self._result = result
+
+    def handle(self):
+        """Return the predefined value."""
+        return self._result
+
+
+class LinkChoice(Choice):
+
+    """A choice returning a mix of the link new and current link."""
+
+    def __init__(self, option, shortcut, replacer, section):
+        """Constructor."""
+        super(LinkChoice, self).__init__(option, shortcut, replacer)
+        self._section = section
+
+    def handle(self):
+        """Handle by either applying the new section or label."""
+        if self._section:
+            kwargs = {'section': self.replacer._new.section,
+                      'label': self.replacer.current_link.anchor}
+        else:
+            kwargs = {'section': self.replacer.current_link.section,
+                      'label': self.replacer._new.anchor}
+        return pywikibot.Link.create_separated(
+            self.replacer._new.canonical_title(), self.replacer._new.site,
+            **kwargs)
+
+
 class InteractiveReplace(object):
 
     """
@@ -719,12 +774,12 @@ class InteractiveReplace(object):
     it is greater 0 it shows that many characters before and after the link in
     question.
 
-    Subclasses may overwrite build_choices and handle_answer to add custom made
-    answers.
+    Additional choices can be defined using the 'additional_choices' and will be
+    amended to the choices defined by this class. This list is mutable and the
+    Choice instance returned and created by this class are too.
     """
 
-    def __init__(self, old_link, new_link, default=None, automatic_quit=True,
-                 yes_shortcut=True):
+    def __init__(self, old_link, new_link, default=None, automatic_quit=True):
         """
         Constructor.
 
@@ -740,9 +795,6 @@ class InteractiveReplace(object):
         @param automatic_quit: Add an option to quit and raise a
             QuitKeyboardException.
         @type automatic_quit: bool
-        @param yes_shortcut: Make the first replacement option accessible via
-            'y' shortcut (does not apply to unlink).
-        @type yes_shortcut: bool
         """
         if isinstance(old_link, pywikibot.Page):
             self._old = old_link._link
@@ -754,7 +806,7 @@ class InteractiveReplace(object):
             self._new = new_link
         self._default = default
         self._quit = automatic_quit
-        self._yes = yes_shortcut
+        self._current_match = None
         self.context = 30
         self.allow_skip_link = True
         self.allow_unlink = True
@@ -762,64 +814,44 @@ class InteractiveReplace(object):
         self.allow_replace_section = False
         self.allow_replace_label = False
         self.allow_replace_all = False
+        # Use list to preserve order
+        self._own_choices = [
+            ('skip_link', StaticChoice('Do not change', 'n', None)),
+            ('unlink', StaticChoice('Unlink', 'u', False)),
+            ('replace', StaticChoice('Change link target', 't',
+                                     self._new.canonical_title())),
+            ('replace_section', LinkChoice('Change link target and section',
+                                           's', self, True)),
+            ('replace_label', LinkChoice('Change link target and label',
+                                         'l', self, False)),
+            ('replace_all', StaticChoice('Change complete link', 'c',
+                                         self._new)),
+        ]
 
-    def build_choices(self):
-        """
-        Return the choices and what the shortcut 'y' actually means.
+        self.additional_choices = []
 
-        The shortcut alias for 'y' may be either what yes_shortcut is in the
-        constructor negated or the actual shortcut used. So if it didn't use 'y'
-        at all it's a boolean (True if there are replacements and it was
-        disabled, False if there are no replacements and it is enabled) and
-        otherwise it's one character.
-        """
-        choices = []
-        if self.allow_skip_link:
-            choices += [('Do not change', 'n')]
-        if self.allow_unlink:
-            choices += [('Unlink', 'u')]
-        yes_used = not self._yes
-        if self.allow_replace:
-            choices += [('Change link target', 't' if yes_used else 'y')]
-            yes_used = 't'
-        if self.allow_replace_section:
-            choices += [('Change link target and section', 's' if yes_used else 'y')]
-            yes_used = 's'
-        if self.allow_replace_label:
-            choices += [('Change link target and label', 'l' if yes_used else 'y')]
-            yes_used = 'l'
-        if self.allow_replace_all:
-            choices += [('Change complete link', 'c' if yes_used else 'y')]
-            yes_used = 'c'
-        # 'y' was disabled in the constructor so return False as it was actually
-        # not used
-        if yes_used is True:
-            yes_used = False
-        return choices, yes_used
-
-    def handle_answer(self, choice, link):
+    def handle_answer(self, choice):
         """Return the result for replace_links."""
-        if choice == 'n':
-            return None
-        elif choice == 'u':
-            return False
-        elif choice == 't':
-            return self._new.canonical_title()
-        elif choice == 's':
-            return pywikibot.Link.create_separated(
-                self._new.canonical_title(), self._new.site,
-                section=self._new.section, label=link.anchor)
-        elif choice == 'l':
-            return pywikibot.Link.create_separated(
-                self._new.canonical_title(), self._new.site,
-                section=link.section, label=self._new.anchor)
+        for c in self.choices:
+            if c.shortcut == choice:
+                return c.handle()
         else:
-            assert choice == 'c', 'Invalid choice {0}'.format(choice)
-            return self._new
+            raise ValueError('Invalid choice "{0}"'.format(choice))
+
+    @property
+    def choices(self):
+        """Return the tuple of choices."""
+        choices = []
+        for name, choice in self._own_choices:
+            if getattr(self, 'allow_' + name):
+                choices += [choice]
+        choices += self.additional_choices
+        return tuple(choices)
 
     def __call__(self, link, text, groups, rng):
         """Ask user how the selected link should be replaced."""
         if self._old == link:
+            self._current_match = (link, text, groups, rng)
             if self.context > 0:
                 # at the beginning of the link, start red color.
                 # at the end of the link, reset the color to default
@@ -831,22 +863,45 @@ class InteractiveReplace(object):
             else:
                 question = ('Should the link \03{{lightred}}{1}\03{{default}} '
                             'target to \03{{lightpurple}}{0}\03{{default}}?')
-            choices, yes_alias = self.build_choices()
-            if yes_alias and self._default == yes_alias:
-                default = 'y'
-            else:
-                default = self._default
 
             choice = pywikibot.input_choice(
                 question.format(self._new.canonical_title(),
                                 self._old.canonical_title()),
-                choices, default=default, automatic_quit=self._quit)
-            if yes_alias and choice == 'y':
-                choice = yes_alias
+                self.choices, default=self._default, automatic_quit=self._quit)
 
-            return self.handle_answer(choice, link)
+            answer = self.handle_answer(choice, link)
+            self._current_match = None
+            return answer
         else:
             return None
+
+    @property
+    def current_link(self):
+        """Get the current link when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current link')
+        return self._current_match[0]
+
+    @property
+    def current_text(self):
+        """Get the current text when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current text')
+        return self._current_match[1]
+
+    @property
+    def current_groups(self):
+        """Get the current groups when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current groups')
+        return self._current_match[2]
+
+    @property
+    def current_range(self):
+        """Get the current range when it's handling one currently."""
+        if self._current_match is None:
+            raise ValueError('No current range')
+        return self._current_match[3]
 
 
 # Command line parsing and help

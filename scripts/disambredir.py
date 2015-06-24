@@ -46,7 +46,7 @@ class DisambiguationRedirectBot(MultipleSitesBot, CurrentPageBot):
 
     def _create_callback(self, old, new):
         replace_callback = InteractiveReplace(
-            old, new, default='n', automatic_quit=False, yes_shortcut=True)
+            old, new, default='n', automatic_quit=False)
         replace_callback.allow_replace_label = True
         return replace_callback
 
