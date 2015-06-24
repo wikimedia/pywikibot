@@ -24,7 +24,6 @@ __version__ = '$Id$'
 # [3] https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 import os
-import re
 import sys
 import types
 
@@ -145,6 +144,14 @@ if not requests:
 
 del requests
 
+if len(sys.argv) > 1 and sys.argv[1][0] != '-':
+    filename = sys.argv[1]
+else:
+    filename = None
+
+# Skip the filename if one was given
+args = sys.argv[(2 if filename else 1):]
+
 # Search for user-config.py before creating one.
 try:
     # If successful, user-config.py already exists in one of the candidate
@@ -158,20 +165,20 @@ try:
 except RuntimeError as err:
     # user-config.py to be created
     print("NOTE: 'user-config.py' was not found!")
-    print("Please follow the prompts to create it:")
-    run_python_file('generate_user_files.py',
-                    ['generate_user_files.py'] + sys.argv[1:],
-                    [])
-    sys.exit(1)
+    if not filename.startswith('generate_'):
+        print("Please follow the prompts to create it:")
+        run_python_file('generate_user_files.py',
+                        ['generate_user_files.py'],
+                        [])
+        sys.exit(1)
 
 
 def main():
     """Command line entry point."""
-    if len(sys.argv) > 1 and not re.match('-{1,2}help', sys.argv[1]):
+    global filename
+    if filename:
         file_package = None
         tryimport_pwb()
-        filename = sys.argv[1]
-        argv = sys.argv[1:]
         argvu = pwb.argvu[1:]
         if not filename.endswith('.py'):
             filename += '.py'
@@ -210,7 +217,7 @@ def main():
                 warn('Parent module %s not found: %s'
                      % (file_package, e), ImportWarning)
 
-        run_python_file(filename, argv, argvu, file_package)
+        run_python_file(filename, [filename] + args, argvu, file_package)
         return True
     else:
         return False
