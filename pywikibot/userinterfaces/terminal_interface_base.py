@@ -20,6 +20,9 @@ import pywikibot
 from pywikibot import config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.tools import deprecated, PY2
+from pywikibot.bot_choice import (
+    Option, OutputOption, StandardOption, ChoiceException, QuitKeyboardInterrupt,
+)
 
 transliterator = transliteration.transliterator(config.console_encoding)
 
@@ -44,25 +47,6 @@ colors = [
 ]
 
 colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(colors))
-
-
-class ChoiceException(Exception):
-
-    """A choice for input_choice which result in this exception."""
-
-    def __init__(self, option, shortcut):
-        """Constructor using the given option and shortcut in input_choice."""
-        self.option = option
-        self.shortcut = shortcut
-
-
-class QuitKeyboardInterrupt(ChoiceException, KeyboardInterrupt):
-
-    """The user has cancelled processing at a prompt."""
-
-    def __init__(self):
-        """Constructor using the 'quit' ('q') in input_choice."""
-        super(QuitKeyboardInterrupt, self).__init__('quit', 'q')
 
 
 class UI:
@@ -287,15 +271,18 @@ class UI:
         """
         Ask the user and returns a value from the options.
 
+        Depending on the options setting return_shortcut to False may not be
+        sensible when the option supports multiple values as it'll return an
+        ambiguous index.
+
         @param question: The question, without trailing whitespace.
         @type question: basestring
         @param options: All available options. Each entry contains the full
             length answer and a shortcut of only one character. The shortcut
             must not appear in the answer. Alternatively they may be a
-            ChoiceException (or subclass) instance which has a full option and
-            shortcut. It will raise that exception when selected.
-        @type options: iterable containing sequences of length 2 or
-            ChoiceException
+            Option (or subclass) instance. ChoiceException instances which have
+            a full option and shortcut and will be raised if selected.
+        @type options: iterable containing sequences of length 2 or Option
         @param default: The default answer if no was entered. None to require
             an answer.
         @type default: basestring
@@ -312,6 +299,8 @@ class UI:
             options. If default is not a shortcut, it'll return -1.
         @rtype: int (if not return_shortcut), lowercased basestring (otherwise)
         """
+        if force and default is None:
+            raise ValueError('With no default option it cannot be forced')
         options = list(options)
         if len(options) == 0:
             raise ValueError(u'No options are given.')
@@ -319,55 +308,39 @@ class UI:
             options += [QuitKeyboardInterrupt()]
         if default:
             default = default.lower()
-        valid = {}
-        default_index = -1
-        formatted_options = []
         for i, option in enumerate(options):
-            if isinstance(option, ChoiceException):
-                option, shortcut = option.option, option.shortcut
-            else:
+            if not isinstance(option, Option):
                 if len(option) != 2:
-                    raise ValueError('Option #{0} does not consist of an '
-                                     'option and shortcut.'.format(i))
-                option, shortcut = option
-            if option.lower() in valid:
-                raise ValueError(
-                    u'Multiple identical options ({0}).'.format(option))
-            shortcut = shortcut.lower()
-            if shortcut in valid:
-                raise ValueError(
-                    u'Multiple identical shortcuts ({0}).'.format(shortcut))
-            valid[option.lower()] = i
-            valid[shortcut] = i
-            index = option.lower().find(shortcut)
-            if shortcut == default:
-                default_index = i
-                shortcut = shortcut.upper()
-            if index >= 0:
-                option = u'{0}[{1}]{2}'.format(option[:index], shortcut,
-                                               option[index + len(shortcut):])
-            else:
-                option = u'{0} [{1}]'.format(option, shortcut)
-            formatted_options += [option]
-        question = u'{0} ({1})'.format(question, ', '.join(formatted_options))
-        answer = None
-        while answer is None:
+                    raise ValueError(u'Option #{0} does not consist of an '
+                                     u'option and shortcut.'.format(i))
+                options[i] = StandardOption(*option)
+            # TODO: Test for uniquity
+
+        handled = False
+        while not handled:
+            for option in options:
+                if isinstance(option, OutputOption) and option.before_question:
+                    option.output()
+            output = Option.formatted(question, options, default)
             if force:
-                self.output(question + '\n')
+                self.output(output + '\n')
+                answer = default
             else:
-                answer = self.input(question)
-            if default and not answer:  # nothing entered
-                answer = default_index
-            else:
-                answer = valid.get(answer.lower(), None)
-        if isinstance(options[answer], ChoiceException):
-            raise options[answer]
+                answer = self.input(output) or default
+            # something entered or default is defined
+            if answer:
+                for index, option in enumerate(options):
+                    if option.handled(answer):
+                        answer = option.result(answer)
+                        handled = option.stop
+                        break
+
+        if isinstance(answer, ChoiceException):
+            raise answer
         elif not return_shortcut:
-            return answer
-        elif answer < 0:
-            return default
+            return index
         else:
-            return options[answer][1].lower()
+            return answer
 
     @deprecated('input_choice')
     def inputChoice(self, question, options, hotkeys, default=None):

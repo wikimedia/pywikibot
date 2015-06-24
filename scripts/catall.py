@@ -37,6 +37,7 @@ def choosecats(pagetext):
     chosen = []
     done = False
     length = 1000
+    # TODO: → input_choice
     print("""Give the new categories, one per line.
 Empty line: if the first, don't change. Otherwise: Ready.
 -: I made a mistake, let me start over.

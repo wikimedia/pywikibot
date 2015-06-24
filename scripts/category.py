@@ -126,7 +126,9 @@ import sys
 import pywikibot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
-from pywikibot.bot import MultipleSitesBot
+from pywikibot.bot import (
+    MultipleSitesBot, IntegerOption, StandardOption, ContextOption,
+)
 from pywikibot.tools import (
     deprecated_args, deprecated, ModuleDeprecationWrapper
 )
@@ -866,6 +868,27 @@ class CategoryTidyRobot(pywikibot.Bot):
         NOTE: current_cat is only used for internal recursion. You should
         always use current_cat = original_cat.
         """
+        class CatContextOption(ContextOption):
+
+            """An option to show more and more context."""
+
+            def __init__(self):
+                """Constructor."""
+                super(CatContextOption, self).__init__(
+                    'print first part of the page (longer and longer)', '?',
+                    full_text, contextLength, 500)
+
+            def output_range(self, start, end):
+                pywikibot.output('\n' + full_text[:end] + '\n')
+
+                # if categories possibly weren't visible, show them additionally
+                # (maybe this should always be shown?)
+                if len(self.text) > end:
+                    pywikibot.output('')
+                    pywikibot.output('Original categories: ')
+                    for cat in article.categories():
+                        pywikibot.output(u'* %s' % cat.title())
+
         pywikibot.output(u'')
         # Show the title of the page where the link was found.
         # Highlight the title in purple.
@@ -890,7 +913,8 @@ class CategoryTidyRobot(pywikibot.Bot):
         if contextLength > 1000 or contextLength < 0:
             contextLength = 500
 
-        pywikibot.output('\n' + full_text[:contextLength] + '\n')
+        context_option = CatContextOption()
+        context_option.output()
 
         # we need list to index the choice
         subcatlist = list(self.catDB.getSubcats(current_cat))
@@ -907,69 +931,43 @@ class CategoryTidyRobot(pywikibot.Bot):
         for i, subcat in enumerate(subcatlist):
             # layout: we don't expect a cat to have more than 100 subcats
             pywikibot.output(u'%2d - Move down to %s' % (i, subcat.title()))
-        pywikibot.output(' j - Jump to another category\n'
-                         ' s - Skip this article\n'
-                         ' r - Remove this category tag\n'
-                         ' ? - Print first part of the page (longer and longer)\n'
-                         u'Enter - Save category as %s' % current_cat.title())
+        options = (IntegerOption(0, len(supercatlist), 'u'),
+                   IntegerOption(0, len(subcatlist)),
+                   StandardOption('jump to another category', 'j'),
+                   StandardOption('skip this article', 's'),
+                   StandardOption('remove this category tag', 'r'),
+                   context_option,
+                   StandardOption('save category as "{0}"'.format(current_cat.title()), 'c'))
+        choice = pywikibot.input_choice('Choice:', options, default='c')
 
-        flag = False
-        while not flag:
-            pywikibot.output('')
-            choice = pywikibot.input(u'Choice:')
-            if choice in ['s', 'S']:
-                flag = True
-            elif choice == '':
-                pywikibot.output(u'Saving category as %s' % current_cat.title())
-                if current_cat == original_cat:
-                    pywikibot.output('No changes necessary.')
-                else:
-                    article.change_category(original_cat, current_cat,
-                                            comment=self.editSummary)
-                flag = True
-            elif choice in ['j', 'J']:
-                newCatTitle = pywikibot.input(u'Please enter the category the '
-                                              u'article should be moved to:',
-                                              default=None)  # require an answer
-                newCat = pywikibot.Category(pywikibot.Link('Category:' +
-                                                           newCatTitle))
-                # recurse into chosen category
-                self.move_to_category(article, original_cat, newCat)
-                flag = True
-            elif choice in ['r', 'R']:
-                # remove the category tag
-                article.change_category(original_cat, None,
-                                        comment=self.editSummary)
-                flag = True
-            elif choice == '?':
-                contextLength += 500
-                pywikibot.output('\n' + full_text[:contextLength] + '\n')
-
-                # if categories possibly weren't visible, show them additionally
-                # (maybe this should always be shown?)
-                if len(full_text) > contextLength:
-                    pywikibot.output('')
-                    pywikibot.output('Original categories: ')
-                    for cat in article.categories():
-                        pywikibot.output(u'* %s' % cat.title())
-            elif choice[0] == 'u':
-                try:
-                    choice = int(choice[1:])
-                except ValueError:
-                    # user pressed an unknown command. Prompt him again.
-                    continue
-                self.move_to_category(article, original_cat,
-                                      supercatlist[choice])
-                flag = True
+        if choice == 'c':
+            pywikibot.output(u'Saving category as %s' % current_cat.title())
+            if current_cat == original_cat:
+                pywikibot.output('No changes necessary.')
             else:
-                try:
-                    choice = int(choice)
-                except ValueError:
-                    # user pressed an unknown command. Prompt him again.
-                    continue
+                article.change_category(original_cat, current_cat,
+                                        comment=self.editSummary)
+        elif choice == 'j':
+            newCatTitle = pywikibot.input(u'Please enter the category the '
+                                          u'article should be moved to:',
+                                          default=None)  # require an answer
+            newCat = pywikibot.Category(pywikibot.Link('Category:' +
+                                                       newCatTitle))
+            # recurse into chosen category
+            self.move_to_category(article, original_cat, newCat)
+        elif choice == 'r':
+            # remove the category tag
+            article.change_category(original_cat, None,
+                                    comment=self.editSummary)
+        elif choice != 's':
+            if choice[0] == 'u':
+                # recurse into supercategory
+                self.move_to_category(article, original_cat,
+                                      supercatlist[choice[1]])
+            elif choice[0] == '':
                 # recurse into subcategory
-                self.move_to_category(article, original_cat, subcatlist[choice])
-                flag = True
+                self.move_to_category(article, original_cat,
+                                      subcatlist[choice[1]])
 
     def run(self):
         """Start bot."""

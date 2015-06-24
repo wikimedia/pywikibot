@@ -86,9 +86,12 @@ import re
 
 import pywikibot
 from pywikibot import editor as editarticle
-from pywikibot.tools import concat_options, first_lower, first_upper as firstcap
+from pywikibot.tools import first_lower, first_upper as firstcap
 from pywikibot import pagegenerators, config, i18n
-from pywikibot.bot import Bot, QuitKeyboardInterrupt
+from pywikibot.bot import (
+    Bot, QuitKeyboardInterrupt,
+    StandardOption, HighlightContextOption, ListOption,
+)
 
 # Disambiguation Needed template
 dn_template = {
@@ -443,6 +446,89 @@ class PrimaryIgnoreManager(object):
                 pass
 
 
+class ListAlternativesOption(StandardOption):
+
+    """List the alternatives."""
+
+    def __init__(self, option, shortcut, bot):
+        """Constructor."""
+        super(ListAlternativesOption, self).__init__(option, shortcut, False)
+        self._bot = bot
+
+    def result(self, value):
+        """List the alternatives."""
+        self._bot.listAlternatives()
+
+
+class AddAlternativeOption(ListAlternativesOption):
+
+    """Add a new alternative."""
+
+    def result(self, value):
+        """Add the alternative and then list them."""
+        newAlternative = pywikibot.input(u'New alternative:')
+        self._bot.alternatives.append(newAlternative)
+        super(AddAlternativeOption, self).result(value)
+
+
+class EditOption(StandardOption):
+
+    """Edit the text."""
+
+    def __init__(self, option, shortcut, text, start, title):
+        """Constructor."""
+        super(EditOption, self).__init__(option, shortcut)
+        self._text = text
+        self._start = start
+        self._title = title
+
+    @property
+    def stop(self):
+        """Return whether if user didn't press cancel and changed it."""
+        return self.new_text and self.new_text != self._text
+
+    def result(self, value):
+        """Open a text editor and let the user change it."""
+        editor = editarticle.TextEditor()
+        self.new_text = editor.edit(self._text, jumpIndex=self._start(),
+                                    highlight=self._title)
+        return super(EditOption, self).result(value)
+
+
+class ShowPageOption(StandardOption):
+
+    """Show the page's contents in an editor."""
+
+    def __init__(self, option, shortcut, start, page):
+        """Constructor."""
+        super(ShowPageOption, self).__init__(option, shortcut, False)
+        self._start = start
+        if page.isRedirectPage():
+            page = page.getRedirectTarget()
+        self._page = page
+
+    def result(self, value):
+        """Open a text editor and show the text."""
+        editor = editarticle.TextEditor()
+        editor.edit(self._page.text,
+                    jumpIndex=self._start,
+                    highlight=self._page.title())
+
+
+class AliasOption(StandardOption):
+
+    """An option allowing multiple aliases which also select it."""
+
+    def __init__(self, option, shortcuts, stop=True):
+        """Constructor."""
+        super(AliasOption, self).__init__(option, shortcuts[0], stop)
+        self._aliases = frozenset(s.lower() for s in shortcuts[1:])
+
+    def test(self, value):
+        """Test aliases and combine it with the original test."""
+        return value.lower() in self._aliases or super(AliasOption, self).test(value)
+
+
 class DisambiguationRobot(Bot):
 
     """Disambiguation bot."""
@@ -651,87 +737,51 @@ class DisambiguationRobot(Bot):
                                                           len(self.dn_template_str) + 8]):
                     continue
 
-                # This loop will run while the user doesn't choose an option
-                # that will actually change the page
-                while True:
-                    self.current_page = refPage
+                edit = EditOption('edit page', 'e', text, m.start(), disambPage.title()),
+                context_option = HighlightContextOption(
+                    'more context', 'm', text, 60, start=m.start(), end=m.end())
+                context_option.before_question = True
 
-                    if not self.always:
-                        # at the beginning of the link, start red color.
-                        # at the end of the link, reset the color to default
-                        pywikibot.output(
-                            text[max(0, m.start() - context):m.start()] +
-                            '\03{lightred}' + text[m.start():m.end()] +
-                            '\03{default}' + text[m.end():m.end() + context])
-                        options = ['#', 'r#', '[s]kip link', '[e]dit page',
-                                   '[n]ext page', '[u]nlink', '[q]uit']
-                        if self.dn_template_str:
-                            options.append(u'[t]ag template %s' % self.dn_template_str)
-                        options.append('[m]ore context')
-                        if not edited:
-                            options.append('show [d]isambiguation page')
-                        options += ['[l]ist', '[a]dd new']
-                        if edited:
-                            options += ['save in this form [x]']
-                        options = concat_options('Option', 72, options)
-                        choice = pywikibot.input(options)
-                    else:
-                        choice = self.always
-                    if choice in ['a', 'A']:
-                        newAlternative = pywikibot.input(u'New alternative:')
-                        self.alternatives.append(newAlternative)
-                        self.listAlternatives()
-                    elif choice in ['e', 'E']:
-                        editor = editarticle.TextEditor()
-                        newText = editor.edit(text, jumpIndex=m.start(),
-                                              highlight=disambPage.title())
-                        # if user didn't press Cancel
-                        if newText and newText != text:
-                            text = newText
-                            break
-                    elif choice in ['d', 'D']:
-                        editor = editarticle.TextEditor()
-                        if disambPage.isRedirectPage():
-                            disambredir = disambPage.getRedirectTarget()
-                            editor.edit(
-                                disambredir.get(),
-                                jumpIndex=m.start(),
-                                highlight=disambredir.title())
-                        else:
-                            editor.edit(
-                                disambPage.get(),
-                                jumpIndex=m.start(),
-                                highlight=disambPage.title())
-                    elif choice in ['l', 'L']:
-                        self.listAlternatives()
-                    elif choice in ['m', 'M']:
-                        # show more text around the link we're working on
-                        context *= 2
-                    else:
-                        break
+                options = [ListOption(self.alternatives, ''),
+                           ListOption(self.alternatives, 'r'),
+                           StandardOption('skip link', 's'),
+                           edit,
+                           StandardOption('next page', 'n'),
+                           StandardOption('unlink', 'u')]
+                if self.dn_template_str:
+                    # '?', '/' for old choice
+                    options += [AliasOption('tag template %s' % self.dn_template_str,
+                                            ['t', '?', '/'])]
+                options += [context_option]
+                if not edited:
+                    options += [ShowPageOption('show disambiguation page', 'd',
+                                               m.start(), disambPage)]
+                options += [ListAlternativesOption('list', 'l'),
+                            AddAlternativeOption('add new', 'a')]
+                if edited:
+                    options += [StandardOption('save in this form', 'x')]
 
-                if choice in ['e', 'E']:
-                    # user has edited the page and then pressed 'OK'
+                # TODO: Output context on each question
+                answer = pywikibot.input_choice('Option', options,
+                                                default=self.always)
+                if answer == 'x':
+                    assert edited, 'invalid option before editing'
+                    break
+                elif answer == 's':
+                    n -= 1  # TODO what's this for?
+                    continue
+                elif answer == 'e':
+                    text = edit.new_text
                     edited = True
                     curpos = 0
                     continue
-                elif choice in ['n', 'N']:
+                elif answer == 'n':
                     # skip this page
                     if self.primary:
                         # If run with the -primary argument, skip this
                         # occurrence next time.
                         self.primaryIgnoreManager.ignore(refPage)
                     return True
-                elif choice in ['q', 'Q']:
-                    # quit the program
-                    self.quit()
-                elif choice in ['s', 'S']:
-                    # Next link on this page
-                    n -= 1
-                    continue
-                elif choice in ['x', 'X'] and edited:
-                    # Save the page as is
-                    break
 
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
@@ -748,8 +798,8 @@ class DisambiguationRobot(Bot):
                 trailing_chars = m.group('linktrail')
                 if trailing_chars:
                     link_text += trailing_chars
-                # '?', '/' for old choice
-                if choice in ['t', 'T', '?', '/'] and self.dn_template_str:
+                if answer == 't':
+                    assert self.dn_template_str
                     # small chunk of text to search
                     search_text = text[m.end():m.end() + context]
                     # figure out where the link (and sentance) ends, put note
@@ -765,40 +815,24 @@ class DisambiguationRobot(Bot):
                             text[m.end() + position_split:])
                     dn = True
                     continue
-                elif choice in ['u', 'U']:
+                elif answer == 'u':
                     # unlink - we remove the section if there's any
                     text = text[:m.start()] + link_text + text[m.end():]
                     unlink_counter += 1
                     continue
                 else:
-                    if len(choice) > 0 and choice[0] == 'r':
+                    # Check that no option from above was missed
+                    assert isinstance(answer, tuple), 'only tuple answer left.'
+                    assert answer[0] in ['r', ''], 'only valid tuple answers.'
+                    if answer[0] == 'r':
                         # we want to throw away the original link text
                         replaceit = link_text == page_title
-                        choice = choice[1:]
                     elif include == "redirect":
                         replaceit = True
                     else:
                         replaceit = False
 
-                    try:
-                        choice = int(choice)
-                    except ValueError:
-                        pywikibot.output(u"Unknown option")
-                        # step back to ask the user again what to do with the
-                        # current link
-                        curpos -= 1
-                        continue
-                    if choice >= len(self.alternatives) or choice < 0:
-                        pywikibot.output(
-                            u"Choice out of range. Please select a number "
-                            u"between 0 and %i." % (len(self.alternatives) - 1))
-                        # show list of possible choices
-                        self.listAlternatives()
-                        # step back to ask the user again what to do with the
-                        # current link
-                        curpos -= 1
-                        continue
-                    new_page_title = self.alternatives[choice]
+                    new_page_title = answer[1]
                     repPl = pywikibot.Page(pywikibot.Link(new_page_title,
                                                           disambPage.site))
                     if (new_page_title[0].isupper() or
