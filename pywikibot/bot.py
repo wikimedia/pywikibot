@@ -43,6 +43,11 @@ from pywikibot import backports
 from pywikibot import config
 from pywikibot import daemonize
 from pywikibot import version
+from pywikibot.bot_choice import (  # noqa: unused imports
+    Option, StandardOption, NestedOption, IntegerOption, ContextOption,
+    ListOption,
+    ChoiceException, QuitKeyboardInterrupt,
+)
 from pywikibot.tools import deprecated, deprecated_args, PY2
 
 if not PY2:
@@ -52,12 +57,9 @@ if not PY2:
 # search for user interface module in the 'userinterfaces' subdirectory
 uiModule = __import__("pywikibot.userinterfaces.%s_interface"
                       % config.userinterface,
-                      fromlist=['UI', 'ChoiceException', 'QuitKeyboardInterrupt'])
+                      fromlist=['UI'])
 ui = uiModule.UI()
 pywikibot.argvu = ui.argvu()
-
-ChoiceException = uiModule.ChoiceException
-QuitKeyboardInterrupt = uiModule.QuitKeyboardInterrupt
 
 
 # It's not possible to use pywikibot.exceptions.PageRelatedError as that is

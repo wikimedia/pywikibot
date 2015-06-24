@@ -359,6 +359,7 @@ import socket
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
+from pywikibot.bot import IntegerOption, StandardOption
 from pywikibot.tools import first_upper
 
 if sys.version_info[0] > 2:
@@ -1567,24 +1568,18 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     pywikibot.output(u"  (%d) Found link to %s in:"
                                      % (i, page2))
                     self.whereReport(page2, indent=8)
-                while True:
-                    # TODO: allow answer to repeat previous or go back after a mistake
-                    answer = pywikibot.input(u"Which variant should be used? (<number>, [n]one, [g]ive up) ").lower()
-                    if answer:
-                        if answer == 'g':
-                            return None
-                        elif answer == 'n':
-                            # None acceptable
-                            break
-                        elif answer.isdigit():
-                            answer = int(answer)
-                            try:
-                                result[site] = pages[answer - 1]
-                            except IndexError:
-                                # user input is out of range
-                                pass
-                            else:
-                                break
+
+                # TODO: allow answer to repeat previous or go back after a mistake
+                answer = pywikibot.input_choice(
+                    'Which variant should be used?',
+                    (IntegerOption(maximum=len(pages) + 1),
+                     StandardOption('none', 'n'),
+                     StandardOption('give up', 'g')))
+                if answer == 'g':
+                    return None
+                elif answer != 'n':
+                    result[site] = pages[answer[1] - 1]
+
         # Loop over the ones that have one solution, so are in principle
         # not a problem.
         acceptall = False
