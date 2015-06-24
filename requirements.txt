@@ -21,6 +21,15 @@
 # mandatory; see README.conversion.txt
 requests
 
+# Dependency of pyOpenSSL. Use specific version to avoid expected
+# DeprecationWarning
+cryptography<=0.8.2 ; python_version < '2.7'
+
+# requests security extra
+pyOpenSSL ; python_full_version < '2.7.9'
+ndg-httpsclient ; python_full_version < '2.7.9'
+pyasn1 ; python_full_version < '2.7.9'
+
 future ; python_version < '2.7'
 # core interwiki_graph.py:
 git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29

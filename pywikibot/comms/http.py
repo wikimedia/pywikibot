@@ -43,7 +43,7 @@ from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
 )
 from pywikibot.comms import threadedhttp
-from pywikibot.tools import deprecate_arg
+from pywikibot.tools import deprecate_arg, PY2
 import pywikibot.version
 
 # The error message for failed SSL certificate verification
@@ -246,6 +246,8 @@ def _http_process(session, http_request):
     uri = http_request.uri
     body = http_request.body
     headers = http_request.headers
+    if PY2 and headers:
+        headers = dict((key, str(value)) for key, value in headers.items())
     auth = config.authenticate.get(requests.utils.urlparse(uri).netloc, None)
     timeout = config.socket_timeout
     try:

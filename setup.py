@@ -27,6 +27,7 @@ extra_deps = {
     'Tkinter': ['Pillow'],
     # 0.6.1 supports socket.io 1.0, but WMF is using 0.9 (T91393 and T85716)
     'rcstream': ['socketIO-client<0.6.1'],
+    'security': ['requests[security]'],
 }
 
 if sys.version_info[0] == 2:
@@ -72,6 +73,10 @@ if sys.version_info[0] == 2:
     if sys.version_info < (2, 6, 5):
         raise RuntimeError("ERROR: Pywikibot only runs under Python 2.6.5 or higher")
     elif sys.version_info[1] == 6:
+        # requests security extra includes pyOpenSSL. cryptography is the
+        # dependency of pyOpenSSL. 0.8.2 is the newest and compatible version
+        # for Python 2.6, which won't raise unexpected DeprecationWarning.
+        extra_deps['security'].append('cryptography<=0.8.2')
         # work around distutils hardcoded unittest dependency
         import unittest  # noqa
         if 'test' in sys.argv and sys.version_info < (2, 7):
@@ -89,6 +94,15 @@ if sys.version_info[0] == 2:
     # https://pypi.python.org/pypi/ipaddr
     # Other backports are likely broken.
     dependencies.append('ipaddr')
+
+    if sys.version_info < (2, 7, 9):
+        # Python versions before 2.7.9 will cause urllib3 to trigger
+        # InsecurePlatformWarning warnings for all HTTPS requests. By
+        # installing with security extras, requests will automatically set
+        # them up and the warnings will stop. See
+        # <https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning>
+        # for more details.
+        dependencies += extra_deps['security']
 
     script_deps['data_ingestion.py'] = extra_deps['csv']
 
@@ -128,6 +142,11 @@ if 'PYSETUP_TEST_EXTRAS' in os.environ:
 
     if 'oursql' in test_deps and os.name == 'nt':
         test_deps.remove('oursql')  # depends on Cython
+
+    if 'requests[security]' in test_deps:
+        # Bug T105767 on Python 2.7 release 9+
+        if sys.version_info[:2] == (2, 7) and sys.version_info[2] >= 9:
+            test_deps.remove('requests[security]')
 
 # These extra dependencies are needed other unittest fails to load tests.
 if sys.version_info[0] == 2:
