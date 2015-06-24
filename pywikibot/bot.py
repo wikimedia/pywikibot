@@ -77,6 +77,15 @@ class SkipPageError(Exception):
         self.page = page
 
 
+class UnhandledAnswer(Exception):
+
+    """The given answer didn't suffice."""
+
+    def __init__(self, stop=False):
+        """Constructor."""
+        self.stop = stop
+
+
 # Logging module configuration
 class RotatingFileHandler(logging.handlers.RotatingFileHandler):
 
@@ -719,6 +728,10 @@ class Choice(StandardOption):
         """Handle this choice. Must be implemented."""
         raise NotImplementedError()
 
+    def handle_link(self):
+        """The current link will be handled by this choice."""
+        return False
+
 
 class StaticChoice(Choice):
 
@@ -756,6 +769,30 @@ class LinkChoice(Choice):
             **kwargs)
 
 
+class AlwaysChoice(Choice):
+
+    """Add an option to always apply the default."""
+
+    def __init__(self, replacer, option='always', shortcut='a'):
+        """Constructor."""
+        super(AlwaysChoice, self).__init__(option, shortcut, replacer)
+        self.always = False
+
+    def handle(self):
+        """Handle the custom shortcut."""
+        self.always = True
+        return self.answer
+
+    def handle_link(self):
+        """Directly return answer whether it's applying it always."""
+        return self.always
+
+    @property
+    def answer(self):
+        """Get the actual default answer instructing the replacement."""
+        return self.replacer.handle_answer(self.replacer._default)
+
+
 class InteractiveReplace(object):
 
     """
@@ -770,9 +807,11 @@ class InteractiveReplace(object):
     * allow_replace_all = False (replace target, section and label)
     (The boolean values are the default values)
 
-    It has also a 'context' attribute which must be a non-negative integer. If
+    It has also a C{context} attribute which must be a non-negative integer. If
     it is greater 0 it shows that many characters before and after the link in
-    question.
+    question. The C{context_delta} attribute can be defined too and adds an
+    option to increase C{context} by the given amount each time the option is
+    selected.
 
     Additional choices can be defined using the 'additional_choices' and will be
     amended to the choices defined by this class. This list is mutable and the
@@ -788,8 +827,9 @@ class InteractiveReplace(object):
         @type old_link: Link or Page
         @param new_link: The new link with which it should be replaced.
             Depending on the replacement mode it'll use this link's label and
-            section.
-        @type new_link: Link or Page
+            section. If False it'll unlink all and the attributes beginning with
+            allow_replace are ignored.
+        @type new_link: Link or Page or False
         @param default: The default answer as the shortcut
         @type default: None or str
         @param automatic_quit: Add an option to quit and raise a
@@ -808,6 +848,7 @@ class InteractiveReplace(object):
         self._quit = automatic_quit
         self._current_match = None
         self.context = 30
+        self.context_delta = 0
         self.allow_skip_link = True
         self.allow_unlink = True
         self.allow_replace = True
@@ -818,15 +859,18 @@ class InteractiveReplace(object):
         self._own_choices = [
             ('skip_link', StaticChoice('Do not change', 'n', None)),
             ('unlink', StaticChoice('Unlink', 'u', False)),
-            ('replace', StaticChoice('Change link target', 't',
-                                     self._new.canonical_title())),
-            ('replace_section', LinkChoice('Change link target and section',
-                                           's', self, True)),
-            ('replace_label', LinkChoice('Change link target and label',
-                                         'l', self, False)),
-            ('replace_all', StaticChoice('Change complete link', 'c',
-                                         self._new)),
         ]
+        if self._new:
+            self._own_choices += [
+                ('replace', StaticChoice('Change link target', 't',
+                                         self._new.canonical_title())),
+                ('replace_section', LinkChoice('Change link target and section',
+                                               's', self, True)),
+                ('replace_label', LinkChoice('Change link target and label',
+                                             'l', self, False)),
+                ('replace_all', StaticChoice('Change complete link', 'c',
+                                             self._new)),
+            ]
 
         self.additional_choices = []
 
@@ -838,42 +882,67 @@ class InteractiveReplace(object):
         else:
             raise ValueError('Invalid choice "{0}"'.format(choice))
 
+    def __call__(self, link, text, groups, rng):
+        """Ask user how the selected link should be replaced."""
+        if self._old == link:
+            self._current_match = (link, text, groups, rng)
+            while True:
+                try:
+                    answer = self.handle_link()
+                except UnhandledAnswer as e:
+                    if e.stop:
+                        raise
+                else:
+                    break
+            self._current_match = None  # don't reset in case of an exception
+            return answer
+        else:
+            return None
+
     @property
     def choices(self):
         """Return the tuple of choices."""
         choices = []
         for name, choice in self._own_choices:
             if getattr(self, 'allow_' + name):
-                choices += [choice]
+                choices += [self._own_choices[name]]
+        if self.context_delta > 0:
+            choices += [HighlightContextOption(
+                'more context', 'm', self.current_text, self.context,
+                self.context_delta, *self.current_range)]
         choices += self.additional_choices
         return tuple(choices)
 
-    def __call__(self, link, text, groups, rng):
-        """Ask user how the selected link should be replaced."""
-        if self._old == link:
-            self._current_match = (link, text, groups, rng)
-            if self.context > 0:
-                # at the beginning of the link, start red color.
-                # at the end of the link, reset the color to default
-                pywikibot.output(text[max(0, rng[0] - self.context): rng[0]] +
-                                 '\03{lightred}' + text[rng[0]: rng[1]] +
-                                 '\03{default}' + text[rng[1]: rng[1] + self.context])
-                question = ('Should the link target to '
-                            '\03{{lightpurple}}{0}\03{{default}}?')
-            else:
-                question = ('Should the link \03{{lightred}}{1}\03{{default}} '
-                            'target to \03{{lightpurple}}{0}\03{{default}}?')
+    def handle_link(self):
+        """Handle the currently given replacement."""
+        choices = self.choices
+        for choice in choices:
+            if isinstance(choice, Choice) and choice.handle_link():
+                return choice.answer
 
-            choice = pywikibot.input_choice(
-                question.format(self._new.canonical_title(),
-                                self._old.canonical_title()),
-                self.choices, default=self._default, automatic_quit=self._quit)
-
-            answer = self.handle_answer(choice, link)
-            self._current_match = None
-            return answer
+        if self.context > 0:
+            rng = self.current_range
+            text = self.current_text
+            # at the beginning of the link, start red color.
+            # at the end of the link, reset the color to default
+            pywikibot.output(text[max(0, rng[0] - self.context): rng[0]] +
+                             '\03{lightred}' + text[rng[0]: rng[1]] +
+                             '\03{default}' + text[rng[1]: rng[1] + self.context])
+            question = 'Should the link '
         else:
-            return None
+            question = 'Should the link \03{{lightred}}{0}\03{{default}} '
+
+        if self._new is False:
+            question += 'be unlinked?'
+        else:
+            question += 'target to \03{{lightpurple}}{0}\03{{default}}?'.format(
+                self._new.canonical_title())
+
+        choice = pywikibot.input_choice(
+            question.format(self._old.canonical_title()),
+            choices, default=self._default, automatic_quit=self._quit)
+
+        return self.handle_answer(choice)
 
     @property
     def current_link(self):

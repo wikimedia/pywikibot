@@ -30,14 +30,51 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
-import re
 import pywikibot
-from pywikibot.editor import TextEditor
 from pywikibot import i18n
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import (
+    SingleSiteBot, ExistingPageBot, NoRedirectPageBot, InteractiveReplace,
+    ChoiceException, UnhandledAnswer, AlwaysChoice,
+)
+from pywikibot.editor import TextEditor
+from pywikibot.textlib import replace_links
 
 
-class UnlinkBot(SingleSiteBot):
+class EditReplacement(ChoiceException, UnhandledAnswer):
+
+    """The text should be edited and replacement should be restarted."""
+
+    def __init__(self):
+        """Constructor."""
+        super(EditReplacement, self).__init__('edit', 'e')
+        self.stop = True
+
+
+class InteractiveUnlink(InteractiveReplace):
+
+    """An implementation which just allows unlinking."""
+
+    def __init__(self, bot):
+        """Create default settings."""
+        super(InteractiveUnlink, self).__init__(
+            old_link=bot.pageToUnlink, new_link=False, default='u')
+        self._always = AlwaysChoice(self, 'unlink all pages', 'a')
+        self._always.always = bot.getOption('always')
+        self.additional_choices = [AlwaysChoice(self, 'unlink all on page', 'p'),
+                                   self._always, EditReplacement()]
+        self._bot = bot
+        self.allow_replace = False
+        self.context = 100
+        self.context_change = 100
+
+    def handle_answer(self, choice):
+        """Handle choice and store in bot's options."""
+        answer = super(InteractiveUnlink, self).handle_answer(choice)
+        self._bot.options['always'] = self._always.always
+        return answer
+
+
+class UnlinkBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     """Page unlinking bot."""
 
@@ -51,119 +88,37 @@ class UnlinkBot(SingleSiteBot):
 
         super(UnlinkBot, self).__init__(site=pageToUnlink.site, **kwargs)
         self.pageToUnlink = pageToUnlink
-        linktrail = self.pageToUnlink.site.linktrail()
 
         self.generator = pageToUnlink.getReferences(
             namespaces=self.getOption('namespaces'), content=True)
-        # The regular expression which finds links. Results consist of four
-        # groups:
-        #
-        # group title is the target page title, that is, everything
-        # before | or ].
-        #
-        # group section is the page section.
-        # It'll include the # to make life easier for us.
-        #
-        # group label is the alternative link title, that's everything
-        # between | and ].
-        #
-        # group linktrail is the link trail, that's letters after ]] which are
-        # part of the word.
-        # note that the definition of 'letter' varies from language to language.
-        self.linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?(\|(?P<label>[^\]]*))?\]\](?P<linktrail>%s)'
-                                % linktrail)
         self.comment = i18n.twtranslate(self.pageToUnlink.site, 'unlink-unlinking',
                                         self.pageToUnlink.title())
 
-    def handleNextLink(self, text, match, context=100):
-        """
-        Return a tuple (text, jumpToBeginning).
+    def _create_callback(self):
+        """Create a new callback instance for replace_links."""
+        return InteractiveUnlink(self)
 
-        text is the unicode string after the current link has been processed.
-        jumpToBeginning is a boolean which specifies if the cursor position
-        should be reset to 0. This is required after the user has edited the
-        article.
-        """
-        # ignore interwiki links and links to sections of the same page as well
-        # as section links
-        if not match.group('title') \
-           or self.pageToUnlink.site.isInterwikiLink(match.group('title')) \
-           or match.group('section'):
-            return text, False
-        linkedPage = pywikibot.Page(self.pageToUnlink.site,
-                                    match.group('title'))
-        # Check whether the link found is to the current page itself.
-        if linkedPage != self.pageToUnlink:
-            # not a self-link
-            return text, False
-        else:
-            # at the beginning of the link, start red color.
-            # at the end of the link, reset the color to default
-            if self.getOption('always'):
-                choice = 'a'
-            else:
-                pywikibot.output(
-                    text[max(0, match.start() - context):match.start()] +
-                    '\03{lightred}' + text[match.start():match.end()] +
-                    '\03{default}' + text[match.end():match.end() + context])
-                choice = pywikibot.input_choice(
-                    u'\nWhat shall be done with this link?\n',
-                    [('unlink', 'u'), ('skip', 's'), ('edit', 'e'),
-                     ('more context', 'm'), ('unlink all', 'a')], 'u')
-                pywikibot.output(u'')
-
-                if choice == 's':
-                    # skip this link
-                    return text, False
-                elif choice == 'e':
-                    editor = TextEditor()
-                    newText = editor.edit(text, jumpIndex=match.start())
-                    # if user didn't press Cancel
-                    if newText:
-                        return newText, True
-                    else:
-                        return text, True
-                elif choice == 'm':
-                    # show more context by recursive self-call
-                    return self.handleNextLink(text, match,
-                                               context=context + 100)
-                elif choice == 'a':
-                    self.options['always'] = True
-            new = match.group('label') or match.group('title')
-            new += match.group('linktrail')
-            return text[:match.start()] + new + text[match.end():], False
-
-    def treat(self, page):
+    def treat_page(self):
         """Remove links pointing to the configured page from the given page."""
-        self.current_page = page
-        try:
-            oldText = page.get()
-            text = oldText
-            curpos = 0
-            while curpos < len(text):
-                match = self.linkR.search(text, pos=curpos)
-                if not match:
-                    break
-                # Make sure that next time around we will not find this same
-                # hit.
-                curpos = match.start() + 1
-                text, jumpToBeginning = self.handleNextLink(text, match)
-                if jumpToBeginning:
-                    curpos = 0
-            if oldText == text:
-                pywikibot.output(u'No changes necessary.')
+        text = self.current_page.text
+        while True:
+            unlink_callback = self._create_callback()
+            try:
+                text = replace_links(text, unlink_callback,
+                                     self.pageToUnlink.site)
+            except EditReplacement:
+                new_text = TextEditor().edit(
+                    unlink_callback.current_text,
+                    jumpIndex=unlink_callback.current_range[0])
+                # if user didn't press Cancel
+                if new_text:
+                    text = new_text
+                else:
+                    text = unlink_callback.current_text
             else:
-                pywikibot.showDiff(oldText, text)
-                page.text = text
-                page.save(self.comment)
-        except pywikibot.NoPage:
-            pywikibot.output(u"Page %s does not exist?!"
-                             % page.title(asLink=True))
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"Page %s is a redirect; skipping."
-                             % page.title(asLink=True))
-        except pywikibot.LockedPage:
-            pywikibot.output(u"Page %s is locked?!" % page.title(asLink=True))
+                break
+
+        self.put_current(text, summary=self.comment)
 
 
 def main(*args):
