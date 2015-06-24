@@ -418,15 +418,6 @@ class RedirectRobot(Bot):
         for redir_name in self.generator.retrieve_broken_redirects():
             self.delete_1_broken_redirect(redir_name)
 
-    def moved_page(self, source):
-        gen = iter(self.site.logevents(logtype='move', page=source, total=1))
-        try:
-            lastmove = next(gen)
-        except StopIteration:
-            return None
-        else:
-            return lastmove.new_title()
-
     def delete_1_broken_redirect(self, redir_name):
         if isinstance(redir_name, basestring):
             redir_page = pywikibot.Page(self.site, redir_name)
@@ -454,7 +445,11 @@ class RedirectRobot(Bot):
                 pywikibot.exception()
                 pass
             except pywikibot.NoPage:
-                movedTarget = self.moved_page(targetPage)
+                movedTarget = None
+                try:
+                    movedTarget = targetPage.moved_target()
+                except pywikibot.NoMoveTarget:
+                    pass
                 if movedTarget:
                     if not movedTarget.exists():
                         # FIXME: Test to another move
