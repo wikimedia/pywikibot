@@ -70,7 +70,12 @@ class TestArchiveBot(TestCase):
             self.assertIsInstance(thread.code, basestring)
             self.assertEqual(thread.code, talk.timestripper.site.code)
             self.assertIsInstance(thread.content, basestring)
-            self.assertIsInstance(thread.timestamp, datetime)
+            try:
+                self.assertIsInstance(thread.timestamp, datetime)
+            except AssertionError:
+                if thread.code not in self.expected_failures:
+                    pywikibot.output('code %s: %s' % (thread.code, thread.content))
+                raise
 
     expected_failures = ['ar', 'pdc', 'th']
     # expected failures - should be fixed
