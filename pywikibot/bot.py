@@ -45,7 +45,7 @@ from pywikibot import daemonize
 from pywikibot import version
 from pywikibot.bot_choice import (  # noqa: unused imports
     Option, StandardOption, NestedOption, IntegerOption, ContextOption,
-    ListOption,
+    ListOption, HighlightContextOption,
     ChoiceException, QuitKeyboardInterrupt,
 )
 from pywikibot.tools import deprecated, deprecated_args, PY2
