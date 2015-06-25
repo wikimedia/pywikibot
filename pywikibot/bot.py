@@ -905,7 +905,7 @@ class InteractiveReplace(object):
         choices = []
         for name, choice in self._own_choices:
             if getattr(self, 'allow_' + name):
-                choices += [self._own_choices[name]]
+                choices += [choice]
         if self.context_delta > 0:
             choices += [HighlightContextOption(
                 'more context', 'm', self.current_text, self.context,
