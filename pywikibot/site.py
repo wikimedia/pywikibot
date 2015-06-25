@@ -3503,15 +3503,13 @@ class APISite(BaseSite):
                                  'subcats': 0}
         return category._catinfo
 
-    @deprecated_args(throttle=None, limit="total", includeredirects="filterredir")
+    @deprecated_args(throttle=None, limit='total',
+                     includeredirects='filterredir')
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, reverse=False,
-                 includeredirects=None, step=None, total=None, content=False):
+                 step=None, total=None, content=False):
         """Iterate pages in a single namespace.
-
-        Note: parameters includeRedirects and throttle are deprecated and
-        included only for backwards compatibility.
 
         @param start: Start at this title (page need not exist).
         @param prefix: Only yield pages starting with this string.
@@ -3533,16 +3531,16 @@ class APISite(BaseSite):
             level; can only be used if protect_type is specified
         @param reverse: if True, iterate in reverse Unicode lexigraphic
             order (default: iterate in forward order)
-        @param includeredirects: DEPRECATED, use filterredir instead
         @param content: if True, load the current content of each iterated page
             (default False)
         @raises KeyError: the namespace identifier was not resolved
         @raises TypeError: the namespace identifier has an inappropriate
             type such as bool, or an iterable with more than one namespace
         """
-        if includeredirects is not None:
-            if includeredirects:
-                if includeredirects == "only":
+        # backward compatibility test
+        if filterredir not in (True, False, None):
+            if filterredir:
+                if filterredir == 'only':
                     filterredir = True
                 else:
                     filterredir = None
@@ -3582,7 +3580,7 @@ class APISite(BaseSite):
 
         """
         return self.allpages(prefix=prefix, namespace=namespace,
-                             includeredirects=includeredirects)
+                             filterredir=includeredirects)
 
     def alllinks(self, start="!", prefix="", namespace=0, unique=False,
                  fromids=False, step=None, total=None):
