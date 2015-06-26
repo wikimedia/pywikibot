@@ -102,6 +102,18 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertIn('statistics', self.site.siteinfo('statistics', dump=True))
         self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
 
+    def test_allpages_filterredir_True(self):
+        """Test that filterredir set to 'only' is deprecated to True."""
+        for page in self.site.allpages(filterredir='only', total=1):
+            self.assertTrue(page.isRedirectPage())
+        self.assertDeprecation()
+
+    def test_allpages_filterredir_False(self):
+        """Test that if filterredir's bool is False it's deprecated to False."""
+        for page in self.site.allpages(filterredir='', total=1):
+            self.assertFalse(page.isRedirectPage())
+        self.assertDeprecation()
+
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase):
 
