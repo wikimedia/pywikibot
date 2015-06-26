@@ -41,26 +41,12 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
-class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
+class TestSiteUserDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
 
-    """Test cases for Site deprecated methods on a live wiki."""
+    """Test cases for Site deprecated methods requiring a live wiki and user."""
 
     cached = True
     user = True
-
-    def test_live_version(self):
-        """Test live_version."""
-        mysite = self.get_site()
-        ver = mysite.live_version()
-        self.assertIsInstance(ver, tuple)
-        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
-        self.assertIsInstance(ver[2], basestring)
-        self.assertDeprecation()
-
-    def test_getcurrenttime(self):
-        """Test live_version."""
-        self.assertEqual(self.site.getcurrenttime(), self.site.server_time())
-        self.assertDeprecation()
 
     def test_token(self):
         """Test ability to get page tokens."""
@@ -80,6 +66,27 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
             self.assertEqual(token, mysite.token(mainpage, ttype))
             self.assertDeprecation("pywikibot.site.APISite.token is deprecated"
                                    ", use the 'tokens' property instead.")
+
+
+class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
+
+    """Test cases for Site deprecated methods on a live wiki."""
+
+    cached = True
+
+    def test_live_version(self):
+        """Test live_version."""
+        mysite = self.get_site()
+        ver = mysite.live_version()
+        self.assertIsInstance(ver, tuple)
+        self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
+        self.assertIsInstance(ver[2], basestring)
+        self.assertDeprecation()
+
+    def test_getcurrenttime(self):
+        """Test live_version."""
+        self.assertEqual(self.site.getcurrenttime(), self.site.server_time())
+        self.assertDeprecation()
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
