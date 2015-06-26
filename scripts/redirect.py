@@ -81,7 +81,6 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
-import re
 import sys
 import datetime
 import pywikibot
@@ -391,27 +390,6 @@ class RedirectRobot(Bot):
         self.action = action
         self.generator = generator
         self.exiting = False
-        self._valid_template = None
-
-    def has_valid_template(self, twtitle):
-        """
-        Check whether a template from translatewiki.net exists on the wiki.
-
-        We assume we are always working on self.site
-
-        @param twtitle - a string which is the i18n key
-
-        """
-        if self._valid_template is None:
-            self._valid_template = False
-            if i18n.twhas_key(self.site, twtitle):
-                template_msg = i18n.twtranslate(self.site, twtitle)
-                template = re.findall(u'.*?{{(.*?)[|}]', template_msg)
-                if template:
-                    title = template[0]
-                    page = pywikibot.Page(self.site, title, ns=10)
-                    self._valid_template = page.exists()
-        return self._valid_template
 
     def delete_broken_redirects(self):
         # get reason for deletion text
@@ -497,8 +475,8 @@ class RedirectRobot(Bot):
                         assert targetPage.site == self.site, (
                             u'target page is on different site %s'
                             % targetPage.site)
-                        if self.has_valid_template(
-                                'redirect-broken-redirect-template'):
+                        if i18n.twhas_key(self.site,
+                                          'redirect-broken-redirect-template'):
                             pywikibot.output(u"No sysop in user-config.py, "
                                              u"put page to speedy deletion.")
                             content = redir_page.get(get_redirect=True)
