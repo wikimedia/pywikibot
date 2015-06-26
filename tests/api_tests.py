@@ -29,7 +29,7 @@ from tests.aspects import (
     DefaultSiteTestCase,
     DefaultDrySiteTestCase,
 )
-from tests.utils import allowed_failure, expected_failure_if, FakeLoginManager
+from tests.utils import allowed_failure, FakeLoginManager
 
 if not PY2:
     from urllib.parse import unquote_to_bytes
@@ -151,7 +151,6 @@ class TestAPIMWException(DefaultSiteTestCase):
         with PatchedRequest(self._dummy_request):
             self.assertRaises(api.APIMWException, req.submit)
 
-    @expected_failure_if(PY2)
     def test_API_error_encoding_Unicode(self):
         """Test a Page instance as parameter using non-ASCII chars."""
         page = pywikibot.page.Page(self.site, 'Ümlä  üt')

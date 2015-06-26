@@ -1809,11 +1809,17 @@ class Request(MutableMapping):
                 pywikibot.error("Detected MediaWiki API exception %s%s"
                                 % (class_name,
                                    "; retrying" if retry else "; raising"))
+                # Due to bug T66958, Page's repr may return non ASCII bytes
+                # Get as bytes in PY2 and decode with the console encoding as
+                # the rest should be ASCII anyway.
+                param_repr = str(self._params)
+                if PY2:
+                    param_repr = param_repr.decode(config.console_encoding)
                 pywikibot.log(u"MediaWiki exception %s details:\n"
                               u"          query=\n%s\n"
                               u"          response=\n%s"
                               % (class_name,
-                                 pprint.pformat(self._params),
+                                 pprint.pformat(param_repr),
                                  result))
 
                 if retry:
@@ -1869,8 +1875,14 @@ class Request(MutableMapping):
                                       for e in user_tokens.items())))
             # raise error
             try:
+                # Due to bug T66958, Page's repr may return non ASCII bytes
+                # Get as bytes in PY2 and decode with the console encoding as
+                # the rest should be ASCII anyway.
+                param_repr = str(self._params)
+                if PY2:
+                    param_repr = param_repr.decode(config.console_encoding)
                 pywikibot.log(u"API Error: query=\n%s"
-                              % pprint.pformat(self._params))
+                              % pprint.pformat(param_repr))
                 pywikibot.log(u"           response=\n%s"
                               % result)
 
