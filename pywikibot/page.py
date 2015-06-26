@@ -768,7 +768,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return True if this is an image description page, False otherwise."""
         return self.namespace() == 6
 
-    def isDisambig(self, get_Index=True):
+    @remove_last_args(('get_Index', ))
+    def isDisambig(self):
         """Return True if this is a disambiguation page, False otherwise.
 
         Relies on the presence of specific templates, identified in
@@ -779,9 +780,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if the value in the Family file is None no entry was made, looks for
         the list on [[MediaWiki:Disambiguationspage]]. If this page does not
         exist, take the MediaWiki message.
-
-        If get_Index is True then also load the templates for index articles
-        which are given on en-wiki
 
         'Template:Disambig' is always assumed to be default, and will be
         appended regardless of its existence.
@@ -805,18 +803,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if distl is None:
                 disambigpages = Page(self.site,
                                      "MediaWiki:Disambiguationspage")
-                indexes = set()
                 if disambigpages.exists():
                     disambigs = set(link.title(withNamespace=False)
                                     for link in disambigpages.linkedPages()
                                     if link.namespace() == 10)
-                    # cache index article templates separately
-                    if self.site.sitename() == 'wikipedia:en':
-                        regex = re.compile('\(\((.+?)\)\)')
-                        content = disambigpages.get()
-                        for index in regex.findall(content):
-                            indexes.add(first_upper(index))
-                        self.site._indextemplates = indexes
                 else:
                     message = self.site.mediawiki_message(
                         'disambiguationspage').split(':', 1)[1]
@@ -834,9 +824,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         disambigs = set()
         # always use cached disambig templates
         disambigs.update(self.site._disambigtemplates)
-        # if get_Index is True, also use cached index templates
-        if get_Index and hasattr(self.site, '_indextemplates'):
-            disambigs.update(self.site._indextemplates)
         # see if any template on this page is in the set of disambigs
         disambigInPage = disambigs.intersection(templates)
         return self.namespace() != 10 and len(disambigInPage) > 0
