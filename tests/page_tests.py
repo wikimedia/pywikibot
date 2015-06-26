@@ -15,6 +15,8 @@ from pywikibot import config
 from pywikibot import InvalidTitle
 import pywikibot.page
 
+from pywikibot.tools import PY2
+
 from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
     DeprecationTestCase,
@@ -562,6 +564,14 @@ class TestPageRepr(DefaultSiteTestCase):
         self.assertEqual(repr(page), "Page(b'\\xc5\\x8c')")
         self.assertEqual(u'%r' % page, "Page(b'\\xc5\\x8c')")
         self.assertEqual(u'{0!r}'.format(page), "Page(b'\\xc5\\x8c')")
+
+    @unittest.skipIf(not PY2, 'Python 2 specific test')
+    @unittest.expectedFailure
+    def test_ASCII_comatible(self):
+        """Test that repr returns ASCII compatible bytes in Python 2."""
+        page = pywikibot.Page(self.site, 'ä')
+        # Bug T95809, the repr in Python 2 should be decodable as ASCII
+        repr(page).decode('ascii')
 
 
 class TestPageBotMayEdit(TestCase):
