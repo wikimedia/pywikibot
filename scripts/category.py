@@ -654,7 +654,7 @@ class CategoryMoveRobot(object):
                          self.oldcat.title(), self.newcat.title()))
         comma = self.site.mediawiki_message('comma-separator')
         authors = comma.join(self.oldcat.contributingUsers())
-        template_vars = (self.oldcat.title(), authors)
+        template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
         comment = i18n.twtranslate(self.site, 'category-renamed', template_vars)
         self.newcat.text = self.oldcat.text
         self._strip_cfd_templates(comment)
