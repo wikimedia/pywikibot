@@ -135,7 +135,8 @@ def main(*args):
     options['filters'] = filters
     s = ', '.join(options['filters'])
     options['comment'] = i18n.twtranslate(pywikibot.Site().lang,
-                                          'piper-edit-summary') % s
+                                          'piper-edit-summary',
+                                          {'filters': s})
 
     if not gen:
         gen = genFactory.getCombinedGenerator()
