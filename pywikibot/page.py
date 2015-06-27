@@ -772,17 +772,17 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def isDisambig(self):
         """Return True if this is a disambiguation page, False otherwise.
 
-        Relies on the presence of specific templates, identified in
-        the Family file or on a wiki page, to identify disambiguation
-        pages.
+        By default, it uses the the Disambiguator extension's result. The
+        identification relies on the presense of the __DISAMBIG__ magic word
+        which may also be transcluded.
 
-        By default, loads a list of template names from the Family file;
-        if the value in the Family file is None no entry was made, looks for
+        If the Disambiguator extension isn't activated for the given site,
+        the identification relies on the presence of specific templates.
+        First load a list of template names from the Family file;
+        if the value in the Family file is None or no entry was made, look for
         the list on [[MediaWiki:Disambiguationspage]]. If this page does not
-        exist, take the MediaWiki message.
-
-        'Template:Disambig' is always assumed to be default, and will be
-        appended regardless of its existence.
+        exist, take the MediaWiki message. 'Template:Disambig' is always
+        assumed to be default, and will be appended regardless of its existence.
 
         @rtype: bool
         """
