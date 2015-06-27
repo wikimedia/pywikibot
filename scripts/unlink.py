@@ -92,7 +92,7 @@ class UnlinkBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         self.generator = pageToUnlink.getReferences(
             namespaces=self.getOption('namespaces'), content=True)
         self.comment = i18n.twtranslate(self.pageToUnlink.site, 'unlink-unlinking',
-                                        self.pageToUnlink.title())
+                                        {'title': self.pageToUnlink.title()})
 
     def _create_callback(self):
         """Create a new callback instance for replace_links."""
