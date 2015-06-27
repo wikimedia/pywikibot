@@ -17,9 +17,11 @@ class Family(family.Family):
         'ca': 'ca.vikidia.org',
         'en': 'en.vikidia.org',
         'es': 'es.vikidia.org',
+        'eu': 'eu.vikidia.org',
         'fr': 'fr.vikidia.org',
         'it': 'it.vikidia.org',
         'ru': 'ru.vikidia.org',
+        'scn': 'scn.vikidia.org',
     }
 
     def protocol(self, code):
