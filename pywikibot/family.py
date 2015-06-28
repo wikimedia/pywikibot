@@ -1076,6 +1076,8 @@ class Family(object):
     def apipath(self, code):
         return '%s/api.php' % self.scriptpath(code)
 
+    # TODO: @deprecated('APISite.article_path')
+    # As soon as from_url does not need nicepath anymore
     def nicepath(self, code):
         return '/wiki/'
 
@@ -1114,6 +1116,7 @@ class Family(object):
     def get_address(self, code, title):
         return '%s?title=%s&redirect=no' % (self.path(code), title)
 
+    @deprecated('APISite.nice_get_address(title)')
     def nice_get_address(self, code, title):
         return '%s%s' % (self.nicepath(code), title)
 

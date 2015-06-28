@@ -2118,7 +2118,7 @@ class YahooSearchPageGenerator:
         # restrict query to local site
         localQuery = '%s site:%s' % (self.query, self.site.hostname())
         base = 'http://%s%s' % (self.site.hostname(),
-                                self.site.nice_get_address(''))
+                                self.site.article_path)
         for url in self.queryYahoo(localQuery):
             if url[:len(base)] == base:
                 title = url[len(base):]
@@ -2184,7 +2184,7 @@ class GoogleSearchPageGenerator:
         # restrict query to local site
         localQuery = '%s site:%s' % (self.query, self.site.hostname())
         base = 'http://%s%s' % (self.site.hostname(),
-                                self.site.nice_get_address(''))
+                                self.site.article_path)
         for url in self.queryGoogle(localQuery):
             if url[:len(base)] == base:
                 title = url[len(base):]
