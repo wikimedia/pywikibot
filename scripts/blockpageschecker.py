@@ -192,13 +192,8 @@ def showQuest(page):
         u'Do you want to open the page?',
         [('with browser', 'b'), ('with gui', 'g'), ('no', 'n')], 'n',
         automatic_quit=False)
-    site = page.site
-    url = '%s://%s%s?redirect=no' % (site.protocol(),
-                                     site.hostname(),
-                                     site.nice_get_address(
-                                         page.title(asUrl=True)))
     if quest == 'b':
-        webbrowser.open(url)
+        webbrowser.open('%s?redirect=no' % page.full_url())
     elif quest == 'g':
         from pywikibot import editor as editarticle
         editor = editarticle.TextEditor()

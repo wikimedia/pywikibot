@@ -155,7 +155,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
     # Understand if the bot has to skip the page or not
     # In this way you can use both -except and -excepturl
     if regexSkipUrl is not None:
-        url = site.nice_get_address(page.title(asUrl=True))
+        url = page.full_url()
         result = re.findall(regexSkipUrl, site.getUrl(url))
         if result != []:
             pywikibot.output(

@@ -300,8 +300,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def full_url(self):
         """Return the full URL."""
-        return self.site.base_url(self.site.nice_get_address(self.title(
-            asUrl=True)))
+        return self.site.base_url(self.site.article_path +
+                                  self.title(asUrl=True))
 
     def autoFormat(self):
         """Return L{date.getAutoFormat} dictName and value, if any.

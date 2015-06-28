@@ -1209,6 +1209,16 @@ class Siteinfo(Container):
         else:
             return pywikibot.tools.EMPTY_DEFAULT
 
+    def _post_process(self, prop, data):
+        """Do some default handling of data. Directly modifies data."""
+        # Be careful with version tests inside this here as it might need to
+        # query this method to actually get the version number
+        if prop == 'general':
+            if 'articlepath' not in data:  # Introduced in 1.16.0
+                # Old version of MediaWiki, extract from base
+                path = urlparse(data['base'])[2].rsplit('/', 1)[0] + '/$1'
+                data['articlepath'] = path
+
     def _get_siteinfo(self, prop, expiry):
         """
         Retrieve a siteinfo property.
@@ -1286,6 +1296,7 @@ class Siteinfo(Container):
                 cache_time = datetime.datetime.utcnow()
                 for prop in props:
                     if prop in data['query']:
+                        self._post_process(prop, data['query'][prop])
                         result[prop] = (data['query'][prop], cache_time)
             return result
 
@@ -1895,6 +1906,14 @@ class APISite(BaseSite):
                 uidata['query']['userinfo']['name'])
         return set(ns for ns in self.namespaces.values() if ns.id >= 0 and
                    self._useroptions['searchNs{0}'.format(ns.id)] in ['1', True])
+
+    @property
+    def article_path(self):
+        """Get the nice article path without $1."""
+        # Assert and remove the trailing $1 and assert that it'll end in /
+        assert self.siteinfo['general']['articlepath'].endswith('/$1'), \
+            'articlepath must end with /$1'
+        return self.siteinfo['general']['articlepath'][:-2]
 
     def assert_valid_iter_params(self, msg_prefix, start, end, reverse):
         """Validate iterating API parameters."""
