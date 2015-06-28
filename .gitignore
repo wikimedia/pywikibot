@@ -17,3 +17,4 @@ pywikibot.egg-info/
 pywikibot/families/
 build
 dist
+docs/_build/
