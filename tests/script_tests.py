@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -121,6 +121,7 @@ auto_run_script_list = [
     'clean_sandbox',
     'disambredir',
     'featured',
+    'followlive',
     'imagerecat',
     'login',
     'lonelypages',
