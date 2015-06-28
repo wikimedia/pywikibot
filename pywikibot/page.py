@@ -4439,7 +4439,7 @@ class Revision(DotReadableDict):
 
     def __init__(self, revid, timestamp, user, anon=False, comment=u"",
                  text=None, minor=False, rollbacktoken=None, parentid=None,
-                 contentmodel=None):
+                 contentmodel=None, sha1=None):
         """
         Constructor.
 
@@ -4472,6 +4472,7 @@ class Revision(DotReadableDict):
         self.rollbacktoken = rollbacktoken
         self._parent_id = parentid
         self._content_model = contentmodel
+        self._sha1 = sha1
 
     @property
     def parent_id(self):
@@ -4508,6 +4509,16 @@ class Revision(DotReadableDict):
                 % self.revid)
 
         return self._content_model
+
+    @property
+    def sha1(self):
+        if self._sha1 is None:
+            if self.text is None:
+                # No text? No sha1 then.
+                return None
+            self._sha1 = hashlib.sha1(self.text.encode('utf8')).hexdigest()
+
+        return self._sha1
 
     def hist_entry(self):
         """Return a namedtuple with a Page history record."""

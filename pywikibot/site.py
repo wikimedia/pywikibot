@@ -3390,7 +3390,7 @@ class APISite(BaseSite):
             rvargs = {'type_arg': 'info|revisions'}
 
         if getText:
-            rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
+            rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content|sha1"
             if section is not None:
                 rvargs[u"rvsection"] = unicode(section)
         if rollback:

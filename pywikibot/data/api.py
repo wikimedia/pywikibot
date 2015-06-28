@@ -2787,6 +2787,7 @@ def update_page(page, pagedict, props=[]):
                 rollbacktoken=rev.get('rollbacktoken', None),
                 parentid=rev.get('parentid'),
                 contentmodel=rev.get('contentmodel', None),
+                sha1=rev.get('sha1', None)
             )
             page._revisions[revision.revid] = revision
 
