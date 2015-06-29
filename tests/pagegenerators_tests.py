@@ -298,7 +298,7 @@ class TestYearPageGenerator(DefaultSiteTestCase):
     def test_basic(self):
         site = self.get_site()
         # Some languages are missing (T85681)
-        if (site.language() not in date.formats['YearBC']) or (site.language() not in date.formats['YearAD']):
+        if (site.lang not in date.formats['YearBC']) or (site.lang not in date.formats['YearAD']):
             raise unittest.SkipTest('Date formats for this language are missing from date.py')
         start = -20
         end = 2026

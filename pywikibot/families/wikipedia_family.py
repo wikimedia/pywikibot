@@ -523,7 +523,7 @@ class Family(family.WikimediaFamily):
         """Override the family interwiki prefixes for each site."""
         # In Swedish Wikipedia 's:' is part of page title not a family
         # prefix for 'wikisource'.
-        if site.language() == 'sv':
+        if site.code == 'sv':
             d = self.known_families.copy()
             d.pop('s')
             d['src'] = 'wikisource'

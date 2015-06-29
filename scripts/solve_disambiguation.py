@@ -568,7 +568,7 @@ class DisambiguationRobot(Bot):
         self.minimum = minimum
 
         self.mysite = pywikibot.Site()
-        self.mylang = self.mysite.language()
+        self.mylang = self.mysite.lang
         self.comment = None
 
         self.dn_template_str = i18n.translate(self.mysite, dn_template)

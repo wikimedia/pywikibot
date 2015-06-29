@@ -811,10 +811,10 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                                              separator=separatorstripped)
     s = interwikiFormat(new, insite=site)
     if s:
-        if site.language() in site.family.interwiki_attop or \
+        if site.code in site.family.interwiki_attop or \
            u'<!-- interwiki at top -->' in oldtext:
             # do not add separator if interwiki links are on one line
-            newtext = s + (u'' if site.language()
+            newtext = s + (u'' if site.code
                            in site.family.interwiki_on_one_line
                            else separator) + s2.replace(marker, '').strip()
         else:
@@ -831,7 +831,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                 newtext = (s2[:firstafter].replace(marker, '') +
                            s +
                            s2[firstafter:])
-            elif site.language() in site.family.categories_last:
+            elif site.code in site.family.categories_last:
                 cats = getCategoryLinks(s2, site=site)
                 s2 = removeCategoryLinksAndSeparator(
                     s2.replace(marker, cseparatorstripped).strip(), site) + \
@@ -903,7 +903,7 @@ def interwikiFormat(links, insite=None):
         except AttributeError:
             s.append(pywikibot.Site(site, insite.family).linkto(
                 links[site], othersite=insite))
-    if insite.lang in insite.family.interwiki_on_one_line:
+    if insite.code in insite.family.interwiki_on_one_line:
         sep = u' '
     else:
         sep = config.line_separator
@@ -1097,7 +1097,7 @@ See https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Positi
                                              separator=separatorstripped)
     s = categoryFormat(new, insite=site)
     if s:
-        if site.language() in site.family.category_attop:
+        if site.code in site.family.category_attop:
             newtext = s + separator + s2
         else:
             # calculate what was after the categories links on the page
@@ -1114,7 +1114,7 @@ See https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Positi
                 newtext = (s2[:firstafter].replace(marker, '') +
                            s +
                            s2[firstafter:])
-            elif site.language() in site.family.categories_last:
+            elif site.code in site.family.categories_last:
                 newtext = s2.replace(marker, '').strip() + separator + s
             else:
                 interwiki = getLanguageLinks(s2, insite=site)

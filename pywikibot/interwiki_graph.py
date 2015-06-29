@@ -134,7 +134,7 @@ class GraphDrawer:
 
     def getLabel(self, page):
         """Get label for page."""
-        return '"%s:%s"' % (page.site.language(), page.title())
+        return '"%s:%s"' % (page.site.code, page.title())
 
     def addNode(self, page):
         """Add a node for page."""
@@ -242,7 +242,7 @@ def getFilename(page, extension=None):
     @rtype: str
     """
     filename = '%s-%s-%s' % (page.site.family.name,
-                             page.site.language(),
+                             page.site.code,
                              page.titleForFilename())
     if extension:
         filename += '.%s' % extension

@@ -3401,7 +3401,7 @@ class WikibasePage(BasePage):
         """
         for key in data:
             if isinstance(key, pywikibot.site.BaseSite):
-                data[key.language()] = data[key]
+                data[key.lang] = data[key]
                 del data[key]
         return data
 

@@ -109,6 +109,11 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertIn('statistics', self.site.siteinfo('statistics', dump=True))
         self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
 
+    def test_language_method(self):
+        """Test if the language method returns the same as the lang property."""
+        self.assertEqual(self.site.language(), self.site.lang)
+        self.assertOneDeprecation()
+
     def test_allpages_filterredir_True(self):
         """Test that filterredir set to 'only' is deprecated to True."""
         for page in self.site.allpages(filterredir='only', total=1):
