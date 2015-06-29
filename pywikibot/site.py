@@ -5722,6 +5722,29 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
 
+    def watched_pages(self, sysop=False, force=False, step=None, total=None):
+        """
+        Return watchlist.
+
+        @param sysop: Returns watchlist of sysop user if true
+        @type sysop: bool
+        @param force_reload: Reload watchlist
+        @type force_reload: bool
+        @return: list of pages in watchlist
+        @rtype: list of pywikibot.Page objects
+        """
+        self.login(sysop=sysop)
+        if not total:
+            total = pywikibot.config.special_page_limit
+        if force:
+            gen = api.PageGenerator(site=self, generator='watchlistraw',
+                                    step=step, gwrlimit=total)
+        else:
+            gen = api.PageGenerator(
+                site=self, generator='watchlistraw', step=step,
+                expiry=pywikibot.config.API_config_expiry, gwrlimit=total)
+        return gen
+
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
                               class_name='APISite')
