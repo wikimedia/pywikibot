@@ -121,36 +121,6 @@ from pywikibot.exceptions import ArgumentDeprecationWarning
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
-def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
-                            max_revision_depth=None):
-    """
-    Generator which will yield Pages modified by username.
-
-    It only looks at the last editors given by max_revision_depth.
-    If timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
-    ignored.
-    If skip is set, pages edited by the given user are ignored otherwise only
-    pages edited by this user are given back.
-    """
-    if timestamp:
-        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
-    else:
-        ts = pywikibot.Timestamp.min
-    for page in generator:
-        found = False
-        for ed in page.revisions(total=max_revision_depth):
-            if ed.timestamp >= ts:
-                if username == ed.user:
-                    found = True
-                    break
-            else:
-                break
-        if found != bool(skip):  # xor operation
-            yield page
-        else:
-            pywikibot.output(u'Skipping %s' % page.title(asLink=True))
-
-
 class XmlDumpTemplatePageGenerator(object):
 
     """
@@ -385,8 +355,8 @@ def main(*args):
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
-        gen = UserEditFilterGenerator(gen, user, timestamp, skip,
-                                      max_revision_depth=100)
+        gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp, skip,
+                                                     max_revision_depth=100)
 
     if not genFactory.gens:
         # make sure that proper namespace filtering etc. is handled
