@@ -48,7 +48,7 @@ from pywikibot.bot_choice import (  # noqa: unused imports
     ListOption, HighlightContextOption,
     ChoiceException, QuitKeyboardInterrupt,
 )
-from pywikibot.tools import deprecated, deprecated_args, PY2
+from pywikibot.tools import deprecated, deprecated_args, PY2, PYTHON_VERSION
 
 if not PY2:
     unicode = str
@@ -1498,6 +1498,23 @@ class BaseBot(object):
         pywikibot.output("\n%i pages read"
                          "\n%i pages written"
                          % (self._treat_counter, self._save_counter))
+        if hasattr(self, '_start_ts'):
+            delta = (pywikibot.Timestamp.now() - self._start_ts)
+            if PYTHON_VERSION >= (2, 7):
+                seconds = int(delta.total_seconds())
+            else:
+                seconds = delta.seconds + delta.days * 86400
+            if delta.days:
+                pywikibot.output("Execution time: %d days, %d seconds"
+                                 % (delta.days, delta.seconds))
+            else:
+                pywikibot.output("Execution time: %d seconds" % delta.seconds)
+            if self._treat_counter:
+                pywikibot.output("Read operation time: %d seconds"
+                                 % (seconds / self._treat_counter))
+            if self._save_counter:
+                pywikibot.output("Write operation time: %d seconds"
+                                 % (seconds / self._save_counter))
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
@@ -1518,6 +1535,7 @@ class BaseBot(object):
 
     def run(self):
         """Process all pages in generator."""
+        self._start_ts = pywikibot.Timestamp.now()
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable %s.generator not set.'
                                       % self.__class__.__name__)
