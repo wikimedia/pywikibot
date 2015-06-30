@@ -356,7 +356,8 @@ def main(*args):
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
         gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp, skip,
-                                                     max_revision_depth=100)
+                                                     max_revision_depth=100,
+                                                     show_filtered=True)
 
     if not genFactory.gens:
         # make sure that proper namespace filtering etc. is handled

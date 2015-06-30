@@ -1467,10 +1467,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     @deprecated_args(getText='content', reverseOrder='reverse')
     def revisions(self, reverse=False, step=None, total=None, content=False,
-                  rollback=False):
+                  rollback=False, starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
         self.site.loadrevisions(self, getText=content, rvdir=reverse,
+                                starttime=starttime, endtime=endtime,
                                 step=step, total=total, rollback=rollback)
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
@@ -1523,18 +1524,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
                                           step=step, total=total)
                 ]
 
-    def contributors(self, step=None, total=None):
+    def contributors(self, step=None, total=None,
+                     starttime=None, endtime=None):
         """
         Compile contributors of this page with edit counts.
 
         @param step: limit each API call to this number of revisions
         @param total: iterate no more than this number of revisions in total
+        @param starttime: retrieve revisions starting at this Timestamp
+        @param endtime: retrieve revisions ending at this Timestamp
 
         @return: number of edits for each username
         @rtype: L{collections.Counter}
         """
         return Counter(rev.user for rev in
-                       self.revisions(step=step, total=total))
+                       self.revisions(step=step, total=total,
+                                      starttime=starttime, endtime=endtime))
 
     @deprecated('contributors()')
     def contributingUsers(self, step=None, total=None):

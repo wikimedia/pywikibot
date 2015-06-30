@@ -1482,7 +1482,7 @@ def EdittimeFilterPageGenerator(generator,
 
 
 def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
-                            max_revision_depth=None):
+                            max_revision_depth=None, show_filtered=False):
     """
     Generator which will yield Pages modified by username.
 
@@ -1496,28 +1496,26 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
     @param username: user name which edited the page
     @type username: str
     @param timestamp: ignore edits which are older than this timestamp
-    @type timestamp: str (MediaWiki format JJJJMMDDhhmmss) or None
+    @type timestamp: datetime or str (MediaWiki format JJJJMMDDhhmmss) or None
     @param skip: Ignore pages edited by the given user
     @type skip: bool
     @param max_revision_depth: It only looks at the last editors given by
         max_revision_depth
     @type max_revision_depth: int or None
+    @param show_filtered: Output a message for each page not yielded
+    @type show_filtered: bool
     """
     if timestamp:
-        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
-    else:
-        ts = pywikibot.Timestamp.min
+        if isinstance(timestamp, basestring):
+            ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+        else:
+            ts = timestamp
     for page in generator:
-        found = False
-        for ed in page.revisions(total=max_revision_depth):
-            if ed.timestamp >= ts:
-                if username == ed.user:
-                    found = True
-                    break
-            else:
-                break
-        if found != bool(skip):  # xor operation
+        contribs = page.contributors(total=max_revision_depth, endtime=ts)
+        if bool(contribs[username]) is not bool(skip):  # xor operation
             yield page
+        elif show_filtered:
+            pywikibot.output(u'Skipping %s' % page.title(asLink=True))
 
 
 def CombinedPageGenerator(generators):
