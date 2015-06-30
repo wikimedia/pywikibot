@@ -1481,6 +1481,45 @@ def EdittimeFilterPageGenerator(generator,
         yield page
 
 
+def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
+                            max_revision_depth=None):
+    """
+    Generator which will yield Pages modified by username.
+
+    It only looks at the last editors given by max_revision_depth.
+    If timestamp is set in MediaWiki format JJJJMMDDhhmmss, older edits are
+    ignored.
+    If skip is set, pages edited by the given user are ignored otherwise only
+    pages edited by this user are given back.
+
+    @param generator: A generator object
+    @param username: user name which edited the page
+    @type username: str
+    @param timestamp: ignore edits which are older than this timestamp
+    @type timestamp: str (MediaWiki format JJJJMMDDhhmmss) or None
+    @param skip: Ignore pages edited by the given user
+    @type skip: bool
+    @param max_revision_depth: It only looks at the last editors given by
+        max_revision_depth
+    @type max_revision_depth: int or None
+    """
+    if timestamp:
+        ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
+    else:
+        ts = pywikibot.Timestamp.min
+    for page in generator:
+        found = False
+        for ed in page.revisions(total=max_revision_depth):
+            if ed.timestamp >= ts:
+                if username == ed.user:
+                    found = True
+                    break
+            else:
+                break
+        if found != bool(skip):  # xor operation
+            yield page
+
+
 def CombinedPageGenerator(generators):
     """Yield from each iterable until exhausted, then proceed with the next."""
     return itertools.chain(*generators)
