@@ -654,7 +654,7 @@ class TestLinks(WikidataTestCase):
         self.wdp.get()
 
     def test_iterlinks_page_object(self):
-        page = [pg for pg in self.wdp.iterlinks() if pg.site.language() == 'af'][0]
+        page = [pg for pg in self.wdp.iterlinks() if pg.site.code == 'af'][0]
         self.assertEqual(page, pywikibot.Page(self.get_site('afwiki'), u'New York Stad'))
 
     def test_iterlinks_filtering(self):

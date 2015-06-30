@@ -1273,6 +1273,13 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         if self._do_test_warning_filename:
             self.assertDeprecationFile(self.expect_warning_filename)
 
+    def assertOneDeprecation(self, msg=None, reset=True):
+        """Assert that exactly one deprecation happened and reset if wished."""
+        self.assertEqual(len(self.deprecation_messages), 1)
+        self.assertDeprecation(msg)
+        if reset:
+            self._reset_messages()
+
     def assertNoDeprecation(self, msg=None):
         if msg:
             self.assertNotIn(msg, self.deprecation_messages)

@@ -638,7 +638,7 @@ class NoReferencesBot(Bot):
 
     def createReferenceSection(self, oldText, index, ident='=='):
         """Create a reference section and insert it into the given text."""
-        if self.site.language() in noTitleRequired:
+        if self.site.code in noTitleRequired:
             newSection = u'\n%s\n' % (self.referencesText)
         else:
             newSection = u'\n%s %s %s\n%s\n' % (ident,

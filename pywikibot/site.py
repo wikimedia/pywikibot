@@ -2333,11 +2333,15 @@ class APISite(BaseSite):
         """Return this site's internal id."""
         return self.siteinfo['wikiid']
 
+    @deprecated('APISite.lang')
     def language(self):
         """Return the code for the language of this Site."""
-        return self.siteinfo['lang']
+        return self.lang
 
-    lang = property(fget=language, doc=language.__doc__)
+    @property
+    def lang(self):
+        """Return the code for the language of this Site."""
+        return self.siteinfo['lang']
 
     def version(self):
         """
@@ -6249,8 +6253,8 @@ class DataSite(APISite):
             }
         }
         labels = {
-            page.site.language(): {
-                'language': page.site.language(),
+            page.site.lang: {
+                'language': page.site.lang,
                 'value': page.title(),
             }
         }
@@ -6259,8 +6263,8 @@ class DataSite(APISite):
                 'site': link.site.dbName(),
                 'title': link.title,
             }
-            labels[link.site.language()] = {
-                'language': link.site.language(),
+            labels[link.site.lang] = {
+                'language': link.site.lang,
                 'value': link.title,
             }
         data = {

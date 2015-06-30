@@ -1050,9 +1050,9 @@ class Subject(interwiki_graph.Subject):
             # Allow for a mapping between different namespaces
             crossFrom = self.originPage.site.family.crossnamespace.get(
                 self.originPage.namespace(), {})
-            crossTo = crossFrom.get(self.originPage.site.language(),
+            crossTo = crossFrom.get(self.originPage.site.lang,
                                     crossFrom.get('_default', {}))
-            nsmatch = crossTo.get(linkedPage.site.language(),
+            nsmatch = crossTo.get(linkedPage.site.lang,
                                   crossTo.get('_default', []))
             if linkedPage.namespace() in nsmatch:
                 return False
@@ -1090,7 +1090,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                             newHint = pywikibot.input(
                                 u'Give the alternative for language %s, not '
                                 u'using a language code:'
-                                % linkedPage.site.language())
+                                % linkedPage.site.lang)
                             if newHint:
                                 alternativePage = pywikibot.Page(
                                     linkedPage.site, newHint)
@@ -1190,7 +1190,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             elif choice == 'a':
                 newHint = pywikibot.input(
                     u'Give the alternative for language %s, not using a '
-                    u'language code:' % page.site.language())
+                    u'language code:' % page.site.lang)
                 alternativePage = pywikibot.Page(page.site, newHint)
                 return (True, alternativePage)
             elif choice == 'g':
@@ -1200,7 +1200,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         return (False, None)
 
     def isIgnored(self, page):
-        if page.site.language() in globalvar.neverlink:
+        if page.site.lang in globalvar.neverlink:
             pywikibot.output(u"Skipping link %s to an ignored language" % page)
             return True
         if page in globalvar.ignore:
@@ -1286,8 +1286,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         pywikibot.output(
                             u'WARNING: %s:%s relates to %s:%s, which is an '
                             u'auto entry %s(%s)'
-                            % (self.originPage.site.language(), self.originPage,
-                               page.site.language(), page, dictName, year))
+                            % (self.originPage.site.lang, self.originPage,
+                               page.site.lang, page, dictName, year))
 
                     # Abort processing if the bot is running in autonomous mode.
                     if globalvar.autonomous:
@@ -1419,7 +1419,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     # Ignore the interwiki links.
                     iw = ()
                 if globalvar.lacklanguage:
-                    if globalvar.lacklanguage in [link.site.language()
+                    if globalvar.lacklanguage in [link.site.lang
                                                   for link in iw]:
                         iw = ()
                         self.workonme = False
@@ -2440,7 +2440,7 @@ def readWarnfile(filename, bot):
         # expects a list of strings, so we convert it back.
         # TODO: This is a quite ugly hack, in the future we should maybe make
         # titletranslate expect a list of pagelinks.
-        hintStrings = ['%s:%s' % (hintedPage.site.language(),
+        hintStrings = ['%s:%s' % (hintedPage.site.lang,
                                   hintedPage.title()) for hintedPage in pagelist]
         bot.add(page, hints=hintStrings)
 

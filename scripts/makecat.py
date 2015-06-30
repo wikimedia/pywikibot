@@ -45,14 +45,8 @@ __version__ = '$Id$'
 import sys
 import codecs
 import pywikibot
-from pywikibot import date, pagegenerators, i18n, textlib
+from pywikibot import pagegenerators, i18n, textlib
 from pywikibot.tools import DequeGenerator
-
-
-def isdate(s):
-    """Return true if s is a date or year."""
-    dict, val = date.getAutoFormat(pywikibot.Site().language(), s)
-    return dict is not None
 
 
 def needcheck(pl):
@@ -62,7 +56,7 @@ def needcheck(pl):
     if pl in checked:
         return False
     if skipdates:
-        if isdate(pl.title()):
+        if pl.autoFormat()[0] is not None:
             return False
     return True
 

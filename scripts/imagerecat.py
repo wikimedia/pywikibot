@@ -128,7 +128,7 @@ def getCommonshelperCats(imagepage):
     global search_wikis
     global hint_wiki
     site = imagepage.site
-    lang = site.language()
+    lang = site.code
     family = site.family.name
     if lang == u'commons' and family == u'commons':
         parameters = urlencode(

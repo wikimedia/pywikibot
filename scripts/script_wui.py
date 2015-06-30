@@ -315,7 +315,7 @@ def main(*args):
 
     site = pywikibot.Site()
     site.login()
-    chan = '#' + site.language() + '.' + site.family.name
+    chan = '#' + site.code + '.' + site.family.name
     bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
     try:
         bot.start()
