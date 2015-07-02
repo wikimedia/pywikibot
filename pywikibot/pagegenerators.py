@@ -47,7 +47,6 @@ from pywikibot import date, config, i18n
 from pywikibot.comms import http
 from pywikibot.data import wikidataquery as wdquery
 from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.site import Namespace
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -355,7 +354,7 @@ class GeneratorFactory(object):
         """
         if isinstance(self._namespaces, list):
             self._namespaces = frozenset(
-                Namespace.resolve(self._namespaces, self.site.namespaces))
+                self.site.namespaces.resolve(self._namespaces))
         return self._namespaces
 
     def getCombinedGenerator(self, gen=None):
@@ -1208,10 +1207,10 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     # As site was only required if the namespaces contain strings, dont
     # attempt to use the config selected site unless the initial attempt
     # at resolving the namespaces fails.
+    if not site:
+        site = pywikibot.Site()
     try:
-        namespaces = Namespace.resolve(namespaces,
-                                       site.namespaces if site else
-                                       pywikibot.Site().namespaces)
+        namespaces = site.namespaces.resolve(namespaces)
     except KeyError as e:
         pywikibot.log('Failed resolving namespaces:')
         pywikibot.exception(e)

@@ -11,12 +11,39 @@ __version__ = '$Id$'
 
 from collections import Iterable
 from pywikibot.site import Namespace
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, AutoDeprecationTestCase
 
 import sys
 if sys.version_info[0] > 2:
     basestring = (str, )
     unicode = str
+
+# Default namespaces which should work in any MW wiki
+_base_builtin_ns = {
+    'Media': -2,
+    'Special': -1,
+    '': 0,
+    'Talk': 1,
+    'User': 2,
+    'User talk': 3,
+    'Project': 4,
+    'Project talk': 5,
+    'MediaWiki': 8,
+    'MediaWiki talk': 9,
+    'Template': 10,
+    'Template talk': 11,
+    'Help': 12,
+    'Help talk': 13,
+    'Category': 14,
+    'Category talk': 15,
+}
+image_builtin_ns = dict(_base_builtin_ns)
+image_builtin_ns['Image'] = 6
+image_builtin_ns['Image talk'] = 7
+file_builtin_ns = dict(_base_builtin_ns)
+file_builtin_ns['File'] = 6
+file_builtin_ns['File talk'] = 7
+builtin_ns = dict(list(image_builtin_ns.items()) + list(file_builtin_ns.items()))
 
 
 class TestNamespaceObject(TestCase):
@@ -24,35 +51,6 @@ class TestNamespaceObject(TestCase):
     """Test cases for Namespace class."""
 
     net = False
-
-    # These should work in any MW wiki
-    builtin_ids = {
-        'Media': -2,
-        'Special': -1,
-        '': 0,
-        'Talk': 1,
-        'User': 2,
-        'User talk': 3,
-        'Project': 4,
-        'Project talk': 5,
-        'File': 6,
-        'File talk': 7,
-        'MediaWiki': 8,
-        'MediaWiki talk': 9,
-        'Template': 10,
-        'Template talk': 11,
-        'Help': 12,
-        'Help talk': 13,
-        'Category': 14,
-        'Category talk': 15,
-    }
-
-    old_builtin_ids = {
-        'Image': 6,
-        'Image talk': 7,
-    }
-
-    all_builtin_ids = dict(list(builtin_ids.items()) + list(old_builtin_ids.items()))
 
     def testNamespaceTypes(self):
         """Test cases for methods manipulating namespace names."""
@@ -68,20 +66,6 @@ class TestNamespaceObject(TestCase):
         self.assertTrue(all(isinstance(name, basestring)
                             for val in ns.values()
                             for name in val))
-
-        self.assertTrue(all(isinstance(Namespace.lookup_name(b, ns), Namespace)
-                            for b in self.builtin_ids))
-
-        self.assertTrue(all(Namespace.lookup_name(b, ns).id == self.all_builtin_ids[b]
-                            for b in self.all_builtin_ids))
-
-        ns = Namespace.builtin_namespaces(use_image_name=True)
-
-        self.assertTrue(all(isinstance(Namespace.lookup_name(b, ns), Namespace)
-                            for b in self.builtin_ids))
-
-        self.assertTrue(all(Namespace.lookup_name(b, ns).id == self.all_builtin_ids[b]
-                            for b in self.all_builtin_ids))
 
         # Use a namespace object as a dict key
         self.assertEqual(ns[ns[6]], ns[6])
@@ -218,6 +202,13 @@ class TestNamespaceObject(TestCase):
         b = eval(repr(a))
         self.assertEqual(a, b)
 
+
+class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
+
+    """Test static/classmethods in Namespace replaced by NamespacesDict."""
+
+    net = False
+
     def test_resolve(self):
         """Test Namespace.resolve."""
         namespaces = Namespace.builtin_namespaces(use_image_name=False)
@@ -275,6 +266,20 @@ class TestNamespaceObject(TestCase):
         self.assertRaisesRegex(KeyError,
                                r'Namespace identifier\(s\) not recognised: -10,-11',
                                Namespace.resolve, [-10, 0, -11])
+
+    def test_lookup_name(self):
+        """Test Namespace.lookup_name."""
+        file_nses = Namespace.builtin_namespaces(use_image_name=False)
+        image_nses = Namespace.builtin_namespaces(use_image_name=True)
+
+        for name, ns_id in builtin_ns.items():
+            file_ns = Namespace.lookup_name(name, file_nses)
+            self.assertIsInstance(file_ns, Namespace)
+            image_ns = Namespace.lookup_name(name, image_nses)
+            self.assertIsInstance(image_ns, Namespace)
+            with self.disable_assert_capture():
+                self.assertEqual(file_ns.id, ns_id)
+                self.assertEqual(image_ns.id, ns_id)
 
 
 class TestNamespaceCollections(TestCase):

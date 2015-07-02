@@ -26,13 +26,13 @@ import json
 import copy
 import mimetypes
 
-from collections import Iterable, Container, namedtuple
+from collections import Iterable, Container, namedtuple, Mapping
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
 from pywikibot.tools import (
-    itergroup, UnicodeMixin, ComparableMixin, SelfCallDict, SelfCallString,
+    itergroup, UnicodeMixin, ComparableMixin, SelfCallMixin, SelfCallString,
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
     redirect_func, issue_deprecation_warning,
     manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
@@ -414,6 +414,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         return False
 
     @classmethod
+    @deprecated('NamespacesDict.lookup_name')
     def lookup_name(cls, name, namespaces=None):
         """Find the Namespace for a name.
 
@@ -427,18 +428,10 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         if not namespaces:
             namespaces = cls.builtin_namespaces()
 
-        name = cls.normalize_name(name)
-        if name is False:
-            return None
-        name = name.lower()
-
-        for namespace in namespaces.values():
-            if namespace._contains_lowercase_name(name):
-                return namespace
-
-        return None
+        return NamespacesDict._lookup_name(name, namespaces)
 
     @staticmethod
+    @deprecated('NamespacesDict.resolve')
     def resolve(identifiers, namespaces=None):
         """
         Resolve namespace identifiers to obtain Namespace objects.
@@ -461,6 +454,83 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         if not namespaces:
             namespaces = Namespace.builtin_namespaces()
 
+        return NamespacesDict._resolve(identifiers, namespaces)
+
+
+class NamespacesDict(Mapping, SelfCallMixin):
+
+    """
+    An immutable dictionary containing the Namespace instances.
+
+    It adds a deprecation message when called as the 'namespaces' property of
+    APISite was callable.
+    """
+
+    _own_desc = 'the namespaces property'
+
+    def __init__(self, namespaces):
+        """Create new dict using the given namespaces."""
+        super(NamespacesDict, self).__init__()
+        self._namespaces = namespaces
+
+    def __iter__(self):
+        """Iterate over all namespaces."""
+        return iter(self._namespaces)
+
+    def __getitem__(self, number):
+        """Get the namespace with the given number."""
+        return self._namespaces[number]
+
+    def __len__(self):
+        """Get the number of namespaces."""
+        return len(self._namespaces)
+
+    def lookup_name(self, name):
+        """
+        Find the Namespace for a name also checking aliases.
+
+        @param name: Name of the namespace.
+        @type name: basestring
+        @return: Namespace or None
+        """
+        return self._lookup_name(name, self._namespaces)
+
+    # Temporary until Namespace.lookup_name can be removed
+    @staticmethod
+    def _lookup_name(name, namespaces):
+        name = Namespace.normalize_name(name)
+        if name is False:
+            return None
+        name = name.lower()
+
+        for namespace in namespaces.values():
+            if namespace._contains_lowercase_name(name):
+                return namespace
+
+        return None
+
+    def resolve(self, identifiers):
+        """
+        Resolve namespace identifiers to obtain Namespace objects.
+
+        Identifiers may be any value for which int() produces a valid
+        namespace id, except bool, or any string which Namespace.lookup_name
+        successfully finds.  A numerical string is resolved as an integer.
+
+        @param identifiers: namespace identifiers
+        @type identifiers: iterable of basestring or Namespace key,
+            or a single instance of those types
+        @return: list of Namespace objects in the same order as the
+            identifiers
+        @raises KeyError: a namespace identifier was not resolved
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool
+        """
+        return self._resolve(identifiers, self._namespaces)
+
+    # Temporary until Namespace.resolve can be removed
+    @staticmethod
+    def _resolve(identifiers, namespaces):
         if isinstance(identifiers, (basestring, Namespace)):
             identifiers = [identifiers]
         else:
@@ -473,7 +543,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         # lookup namespace names, and assume anything else is a key.
         # int(None) raises TypeError; however, bool needs special handling.
         result = [NotImplemented if isinstance(ns, bool) else
-                  Namespace.lookup_name(ns, namespaces)
+                  NamespacesDict._lookup_name(ns, namespaces)
                   if isinstance(ns, basestring) and
                       not ns.lstrip('-').isdigit() else
                   namespaces[int(ns)] if int(ns) in namespaces
@@ -492,14 +562,6 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                                         if ns is None]))
 
         return result
-
-
-# This class can be removed after self-callability has been removed
-class _NamespacesDict(SelfCallDict):
-
-    """A wrapper to add a deprecation message when called."""
-
-    _own_desc = 'the namespaces property'
 
 
 class BaseSite(ComparableMixin):
@@ -787,6 +849,7 @@ class BaseSite(ComparableMixin):
         self.interwiki(prefix)
         return self._iw_sites[prefix][1]
 
+    @deprecated('APISite.namespaces.lookup_name')
     def ns_index(self, namespace):
         """
         Return the Namespace for a given namespace name.
@@ -796,11 +859,12 @@ class BaseSite(ComparableMixin):
         @return: The matching Namespace object on this Site
         @rtype: Namespace, or None if invalid
         """
-        return Namespace.lookup_name(namespace, self.namespaces)
+        return self.namespaces.lookup_name(namespace)
 
-    # for backwards-compatibility
-    getNamespaceIndex = redirect_func(ns_index, old_name='getNamespaceIndex',
-                                      class_name='BaseSite')
+    @deprecated('APISite.namespaces.lookup_name')
+    def getNamespaceIndex(self, namespace):
+        """DEPRECATED: Return the Namespace for a given namespace name."""
+        return self.namespaces.lookup_name(namespace)
 
     def _build_namespaces(self):
         """Create default namespaces."""
@@ -811,7 +875,7 @@ class BaseSite(ComparableMixin):
     def namespaces(self):
         """Return dict of valid namespaces on this wiki."""
         if not hasattr(self, '_namespaces'):
-            self._namespaces = _NamespacesDict(self._build_namespaces())
+            self._namespaces = NamespacesDict(self._build_namespaces())
         return self._namespaces
 
     def ns_normalize(self, value):
@@ -821,7 +885,7 @@ class BaseSite(ComparableMixin):
         @type value: unicode
 
         """
-        index = self.ns_index(value)
+        index = self.namespaces.lookup_name(value)
         return self.namespace(index)
 
     # for backwards-compatibility
@@ -938,7 +1002,7 @@ class BaseSite(ComparableMixin):
             """Separate the namespace from the name."""
             ns, delim, name = title.partition(':')
             if delim:
-                ns = Namespace.lookup_name(ns, self.namespaces)
+                ns = self.namespaces.lookup_name(ns)
             if not delim or not ns:
                 return default_ns, title
             else:

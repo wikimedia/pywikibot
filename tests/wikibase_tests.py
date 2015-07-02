@@ -17,9 +17,8 @@ import os
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.tools import SelfCallDict
 from pywikibot.page import WikibasePage, ItemPage
-from pywikibot.site import Namespace
+from pywikibot.site import Namespace, NamespacesDict
 
 from tests.aspects import (
     unittest, TestCase,
@@ -842,7 +841,7 @@ class TestAlternateNamespaces(WikidataTestCase):
     def setUpClass(cls):
         super(TestAlternateNamespaces, cls).setUpClass()
 
-        cls.get_repo()._namespaces = SelfCallDict({
+        cls.get_repo()._namespaces = NamespacesDict({
             90: Namespace(id=90,
                           case='first-letter',
                           canonical_name='Item',

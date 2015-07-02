@@ -37,6 +37,8 @@ import sys
 import time
 import warnings
 
+from contextlib import contextmanager
+
 import pywikibot
 
 from pywikibot import config, log, ServerError, Site
@@ -937,6 +939,58 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
         return page
 
 
+class CapturingTestCase(TestCase):
+
+    """
+    Capture assertion calls to do additional calls around them.
+
+    All assertions done which start with "assert" are patched in such a way that
+    after the assertion it calls C{process_assertion} with the assertion and the
+    arguments.
+
+    To avoid that it patches the assertion it's possible to put the call in an
+    C{disable_assert_capture} with-statement.
+
+    """
+
+    # Is True while an assertion is running, so that assertions won't be patched
+    # when they are executed while an assertion is running and only the outer
+    # most assertion gets actually patched.
+    _patched = False
+
+    @contextmanager
+    def disable_assert_capture(self):
+        """A context manager which preventing that asssertions are patched."""
+        nested = self._patched  # Don't reset if it was set before
+        self._patched = True
+        yield
+        if not nested:
+            self._patched = False
+
+    def process_assert(self, assertion, *args, **kwargs):
+        """Handle the assertion."""
+        assertion(*args, **kwargs)
+
+    def patch_assert(self, assertion):
+        """Execute process_assert when the assertion is called."""
+        def inner_assert(*args, **kwargs):
+            assert self._patched is False
+            self._patched = True
+            try:
+                self.process_assert(assertion, *args, **kwargs)
+            finally:
+                self._patched = False
+        return inner_assert
+
+    def __getattribute__(self, attr):
+        """Patch assertions if enabled."""
+        result = super(CapturingTestCase, self).__getattribute__(attr)
+        if attr.startswith('assert') and not self._patched:
+            return self.patch_assert(result)
+        else:
+            return result
+
+
 class SiteAttributeTestCase(TestCase):
 
     """Add the sites as attributes to the instances."""
@@ -1306,3 +1360,29 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self.context_manager.__exit__()
 
         super(DeprecationTestCase, self).tearDown()
+
+
+class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
+
+    """
+    A test case capturing asserts and asserting a deprecation afterwards.
+
+    For example C{assertEqual} will do first C{assertEqual} and then
+    C{assertOneDeprecation}.
+
+    With C{check_file} it's possible to enable or disable the check whether the
+    filename matches the caller's filename. By default it does not match the
+    filename if the name starts with 'assertRaises' (as it'll call it inside the
+    assert in that case).
+    """
+
+    def process_assert(self, assertion, *args, **kwargs):
+        """Handle assertion and call C{assertOneDeprecation} after it."""
+        super(AutoDeprecationTestCase, self).process_assert(
+            assertion, *args, **kwargs)
+        self._do_test_warning_filename = self.check_file(assertion.__name__)
+        self.assertOneDeprecation()
+
+    def check_file(self, name):
+        """Disable filename check on asserted exceptions."""
+        return not name.startswith('assertRaises')
