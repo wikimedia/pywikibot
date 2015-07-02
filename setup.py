@@ -21,7 +21,7 @@ extra_deps = {
     # Core library dependencies
     'isbn': ['python-stdnum'],
     'Graphviz':  ['pydot>=1.0.28'],
-    'Google': ['google'],
+    'Google': ['google>=1.7'],
     'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': ['Pillow'],
