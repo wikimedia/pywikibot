@@ -4678,7 +4678,7 @@ class Link(ComparableMixin):
                 t = t.lstrip(u":").lstrip(u" ")
                 continue
             prefix = t[:t.index(u":")].lower()  # part of text before :
-            ns = self._source.ns_index(prefix)
+            ns = self._source.namespaces.lookup_name(prefix)
             if ns:
                 # The prefix is a namespace in the source wiki
                 return (fam.name, code)
@@ -4719,7 +4719,7 @@ class Link(ComparableMixin):
                 continue
 
             prefix = t[:t.index(u":")].lower()
-            ns = self._site.ns_index(prefix)
+            ns = self._site.namespaces.lookup_name(prefix)
             if ns:
                 # Ordinary namespace
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
@@ -4765,7 +4765,7 @@ class Link(ComparableMixin):
                                                  self._namespace + 1]
                 if '' in other_ns:  # other namespace uses empty str as ns
                     next_ns = t[:t.index(':')]
-                    if self._site.ns_index(next_ns):
+                    if self._site.namespaces.lookup_name(next_ns):
                         raise pywikibot.InvalidTitle(
                             u"The (non-)talk page of '{0}' is a valid title "
                             "in another namespace.".format(self._text))
@@ -4890,7 +4890,7 @@ class Link(ComparableMixin):
         else:
             # look for corresponding ns in onsite by name comparison
             for alias in ns:
-                namespace = Namespace.lookup_name(alias, onsite.namespaces)
+                namespace = onsite.namespaces.lookup_name(alias)
                 if namespace:
                     namespace = namespace.custom_name
                     break
@@ -5018,7 +5018,7 @@ class Link(ComparableMixin):
 
         if ':' in title:
             ns, t = title.split(':', 1)
-            ns = link._site.ns_index(ns.lower())
+            ns = link._site.namespaces.lookup_name(ns)
             if ns:
                 link._namespace = ns
                 title = t

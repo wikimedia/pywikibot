@@ -12,7 +12,7 @@ __version__ = '$Id$'
 
 import sys
 import os
-from collections import Iterable
+from collections import Iterable, Mapping
 from datetime import datetime
 import re
 
@@ -120,6 +120,11 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         for page in self.site.allpages(filterredir='', total=1):
             self.assertFalse(page.isRedirectPage())
         self.assertDeprecation()
+
+    def test_ns_index(self):
+        """Test ns_index."""
+        self.assertEqual(self.site.ns_index('MediaWiki'), 8)
+        self.assertOneDeprecation()
 
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase):
@@ -257,28 +262,8 @@ class TestSiteObject(DefaultSiteTestCase):
     def testNamespaceMethods(self):
         """Test cases for methods manipulating namespace names."""
         mysite = self.get_site()
-        builtins = {
-            '': 0,  # these should work in any MW wiki
-            'Talk': 1,
-            'User': 2,
-            'User talk': 3,
-            'Project': 4,
-            'Project talk': 5,
-            'Image': 6,
-            'Image talk': 7,
-            'MediaWiki': 8,
-            'MediaWiki talk': 9,
-            'Template': 10,
-            'Template talk': 11,
-            'Help': 12,
-            'Help talk': 13,
-            'Category': 14,
-            'Category talk': 15,
-        }
-        self.assertTrue(all(mysite.ns_index(b) == builtins[b]
-                            for b in builtins))
         ns = mysite.namespaces
-        self.assertIsInstance(ns, dict)
+        self.assertIsInstance(ns, Mapping)
         self.assertTrue(all(x in ns for x in range(0, 16)))
         # built-in namespaces always present
         self.assertIsInstance(mysite.ns_normalize("project"), basestring)
@@ -1006,7 +991,7 @@ class SiteUserTestCase(DefaultSiteTestCase):
             title = change['title']
             self.assertIn(":", title)
             prefix = title[:title.index(":")]
-            self.assertIn(mysite.ns_index(prefix), [6, 7])
+            self.assertIn(self.site.namespaces.lookup_name(prefix).id, [6, 7])
             self.assertIn(change["ns"], [6, 7])
         if MediaWikiVersion(mysite.version()) <= MediaWikiVersion("1.14"):
             pagelist = [mainpage]
@@ -1248,7 +1233,7 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
             title = rev['title']
             self.assertIn(":", title)
             prefix = title[:title.index(":")]
-            self.assertIn(mysite.ns_index(prefix), [6, 7])
+            self.assertIn(self.site.namespaces.lookup_name(prefix).id, [6, 7])
             self.assertIn(rev["ns"], [6, 7])
         for rev in mysite.watchlist_revs(showMinor=True, total=5):
             self.assertIsInstance(rev, dict)
@@ -2525,7 +2510,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         site = self.get_site('wikia')
         self.assertEqual(site.hostname(), 'www.wikia.com')
         self.assertEqual(site.code, 'wikia')
-        self.assertIsInstance(site.namespaces, dict)
+        self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
         self.assertEqual(site.family.hostname('en'), 'www.wikia.com')
         self.assertEqual(site.family.hostname('wikia'), 'www.wikia.com')
@@ -2558,7 +2543,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         site = self.get_site('lyricwiki')
         self.assertEqual(site.hostname(), 'lyrics.wikia.com')
         self.assertEqual(site.code, 'en')
-        self.assertIsInstance(site.namespaces, dict)
+        self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
         self.assertEqual(site.family.hostname('en'), 'lyrics.wikia.com')
 
@@ -2576,7 +2561,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         site = self.get_site('commons')
         self.assertEqual(site.hostname(), 'commons.wikimedia.org')
         self.assertEqual(site.code, 'commons')
-        self.assertIsInstance(site.namespaces, dict)
+        self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
 
         self.assertRaises(KeyError, site.family.hostname, 'en')
@@ -2608,7 +2593,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         site = self.get_site('wikidata')
         self.assertEqual(site.hostname(), 'www.wikidata.org')
         self.assertEqual(site.code, 'wikidata')
-        self.assertIsInstance(site.namespaces, dict)
+        self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
 
         self.assertRaises(KeyError, site.family.hostname, 'en')

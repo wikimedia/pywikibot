@@ -98,7 +98,7 @@ class TemplateCountRobot:
         mysite = pywikibot.Site()
         # The names of the templates are the keys, and lists of pages
         # transcluding templates are the values.
-        mytpl = mysite.ns_index(mysite.template_namespace())
+        mytpl = mysite.namespaces.lookup_name(mysite.template_namespace())
         for template in templates:
             transcludingArray = []
             gen = pywikibot.Page(mysite, template, ns=mytpl).getReferences(
