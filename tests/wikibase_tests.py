@@ -787,27 +787,44 @@ class TestNamespaces(WikidataTestCase):
     def test_wikibase_namespace_selection(self):
         """Test various ways to correctly specify the namespace."""
         wikidata = self.get_repo()
-        page = pywikibot.page.ItemPage(wikidata, 'Q6')
-        self.assertEqual(page.namespace(), 0)
-        page = pywikibot.page.ItemPage(wikidata, title='Q6')
-        self.assertEqual(page.namespace(), 0)
 
-        page = pywikibot.page.WikibasePage(wikidata, title='Q6', ns=0)
+        page = pywikibot.page.ItemPage(wikidata, 'Q60')
         self.assertEqual(page.namespace(), 0)
-        page = pywikibot.page.WikibasePage(wikidata, title='Q6',
+        page.get()
+
+        page = pywikibot.page.ItemPage(wikidata, title='Q60')
+        self.assertEqual(page.namespace(), 0)
+        page.get()
+
+        page = pywikibot.page.WikibasePage(wikidata, title='Q60', ns=0)
+        self.assertEqual(page.namespace(), 0)
+        page.get()
+
+        page = pywikibot.page.WikibasePage(wikidata, title='Q60',
                                            entity_type='item')
         self.assertEqual(page.namespace(), 0)
+        page.get()
 
-        page = pywikibot.page.PropertyPage(wikidata, 'Property:P60')
+        page = pywikibot.page.PropertyPage(wikidata, 'Property:P6')
         self.assertEqual(page.namespace(), 120)
-        page = pywikibot.page.PropertyPage(wikidata, 'P60')
-        self.assertEqual(page.namespace(), 120)
+        page.get()
 
-        page = pywikibot.page.WikibasePage(wikidata, title='P60', ns=120)
+        page = pywikibot.page.PropertyPage(wikidata, 'P6')
         self.assertEqual(page.namespace(), 120)
-        page = pywikibot.page.WikibasePage(wikidata, title='P60',
+        page.get()
+
+        page = pywikibot.page.WikibasePage(wikidata, title='Property:P6')
+        self.assertEqual(page.namespace(), 120)
+        page.get()
+
+        page = pywikibot.page.WikibasePage(wikidata, title='P6', ns=120)
+        self.assertEqual(page.namespace(), 120)
+        page.get()
+
+        page = pywikibot.page.WikibasePage(wikidata, title='P6',
                                            entity_type='property')
         self.assertEqual(page.namespace(), 120)
+        page.get()
 
     def test_wrong_namespaces(self):
         """Test incorrect namespaces for Wikibase entities."""
