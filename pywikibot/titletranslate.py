@@ -3,7 +3,7 @@
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Yuri Astrakhan, 2005
-# (C) Pywikibot team, 2003-2014
+# (C) Pywikibot team, 2003-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,11 +15,14 @@ import re
 
 import pywikibot
 import pywikibot.date as date
+
 from pywikibot import config
+from pywikibot.tools import deprecated_args
 
 
-def translate(page, hints=None, auto=True, removebrackets=False, site=None,
-              family=None):
+@deprecated_args(family=None)
+def translate(page=None, hints=None, auto=True, removebrackets=False,
+              site=None):
     """
     Return a list of links to pages on other sites based on hints.
 
@@ -32,10 +35,12 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
 
     """
     result = set()
+
+    assert page or site
+
     if site is None and page:
         site = page.site
-    if family is None and site:
-        family = site.family
+
     if hints:
         for h in hints:
             if ':' not in h:
@@ -65,13 +70,15 @@ def translate(page, hints=None, auto=True, removebrackets=False, site=None,
                     codes = site.family.language_groups[codes]
                 else:
                     codes = codes.split(',')
+
             for newcode in codes:
 
                 if newcode in site.languages():
                     if newcode != site.code:
+                        ns = page.namespace() if page else 0
                         x = pywikibot.Link(newname,
                                            site.getSite(code=newcode),
-                                           defaultNamespace=page.namespace())
+                                           defaultNamespace=ns)
                         result.add(x)
                 else:
                     if config.verbose_output:

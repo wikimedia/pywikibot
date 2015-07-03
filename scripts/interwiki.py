@@ -925,24 +925,21 @@ class Subject(interwiki_graph.Subject):
         """Add the given translation hints to the todo list."""
         if globalvar.same and self.originPage:
             if hints:
-                links = titletranslate.translate(
-                    self.originPage,
-                    hints=hints + ['all:'],
-                    auto=globalvar.auto,
-                    removebrackets=globalvar.hintnobracket)
+                hints += ['all:']
             else:
-                links = titletranslate.translate(
-                    self.originPage,
-                    hints=['all:'],
-                    auto=globalvar.auto,
-                    removebrackets=globalvar.hintnobracket)
+                hints = ['all:']
+
+            site = self.originPage.site
         else:
-            links = titletranslate.translate(
-                self.originPage,
-                hints=hints,
-                auto=globalvar.auto,
-                removebrackets=globalvar.hintnobracket,
-                site=pywikibot.Site())
+            site = pywikibot.Site()
+
+        links = titletranslate.translate(
+            self.originPage,
+            hints=hints,
+            auto=globalvar.auto,
+            removebrackets=globalvar.hintnobracket,
+            site=site)
+
         for link in links:
             page = pywikibot.Page(link)
             if globalvar.contentsondisk:
