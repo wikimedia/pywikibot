@@ -35,7 +35,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,7 +64,7 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
 }
 
-# Maps each group number to the list of its publisher number ranges. Taken from:
+# Maps each group number to the list of its publisher number ranges. Source:
 # https://web.archive.org/web/20090823122028/http://www.isbn-international.org/converter/ranges.htm
 ranges = {
     '0': [  # English speaking area
@@ -267,7 +267,8 @@ ranges = {
         ('85000', '94999'),
         ('970000', '999999'),
     ],
-    '92': [  # International Publishers (Unesco, EU), European Community Organizations
+    # International Publishers (Unesco, EU), European Community Organizations
+    '92': [
         ('0', '5'),
         ('60', '79'),
         ('800', '899'),
@@ -1492,7 +1493,7 @@ class IsbnBot(Bot):
 
         self.generator = generator
         self.isbnR = re.compile(r'(?<=ISBN )(?P<code>[\d\-]+[Xx]?)')
-        self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
+        self.comment = i18n.twtranslate(self.site, 'isbn-formatting')
 
     def treat(self, page):
         """Treat a page."""
@@ -1558,7 +1559,7 @@ class IsbnWikibaseBot(WikidataBot):
             self.isbn_10_prop_id = self.get_property_by_name('ISBN-10')
         if self.isbn_13_prop_id is None:
             self.isbn_13_prop_id = self.get_property_by_name('ISBN-13')
-        self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
+        self.comment = i18n.twtranslate(self.site, 'isbn-formatting')
 
     def treat_page_and_item(self, page, item):
         """Treat a page."""
@@ -1596,7 +1597,8 @@ class IsbnWikibaseBot(WikidataBot):
                 if old_isbn == new_isbn:
                     continue
                 # remove 'ISBN ' prefix
-                assert new_isbn.startswith('ISBN '), 'ISBN should start with "ISBN"'
+                assert new_isbn.startswith('ISBN '), \
+                    'ISBN should start with "ISBN"'
                 new_isbn = new_isbn[5:]
                 claim.setTarget(new_isbn)
                 change_messages.append('Changing %s (%s --> %s)' %
