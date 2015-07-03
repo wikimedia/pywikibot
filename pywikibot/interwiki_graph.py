@@ -91,6 +91,11 @@ class Subject(object):
         """Page on the origin wiki."""
         return self._origin
 
+    @origin.setter
+    def origin(self, value):
+        """Page on the origin wiki."""
+        self._origin = value
+
     @property
     def originPage(self):
         """Deprecated property for the origin page.
@@ -99,6 +104,14 @@ class Subject(object):
         """
         # TODO: deprecate this property
         return self.origin
+
+    @originPage.setter
+    def originPage(self, value):
+        """Deprecated property for the origin page.
+
+        DEPRECATED.  Use origin.
+        """
+        self.origin = value
 
     @property
     def foundIn(self):
