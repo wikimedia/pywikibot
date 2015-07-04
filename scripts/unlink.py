@@ -31,10 +31,9 @@ __version__ = '$Id$'
 #
 
 import pywikibot
-from pywikibot import i18n
 from pywikibot.bot import (
-    SingleSiteBot, ExistingPageBot, NoRedirectPageBot, InteractiveReplace,
-    ChoiceException, UnhandledAnswer, AlwaysChoice,
+    SingleSiteBot, ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot,
+    InteractiveReplace, ChoiceException, UnhandledAnswer, AlwaysChoice,
 )
 from pywikibot.editor import TextEditor
 from pywikibot.textlib import replace_links
@@ -74,38 +73,30 @@ class InteractiveUnlink(InteractiveReplace):
         return answer
 
 
-class UnlinkBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
+class BaseUnlinkBot(ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot):
 
-    """Page unlinking bot."""
+    """A bot unlinking a given link from the current page."""
 
-    def __init__(self, pageToUnlink, **kwargs):
-        """Initialize a UnlinkBot instance with the given page to unlink."""
+    def __init__(self, **kwargs):
+        """Redirect all parameters and add namespace as an available option."""
         self.availableOptions.update({
             'namespaces': [],
             # Which namespaces should be processed?
             # default to [] which means all namespaces will be processed
         })
-
-        super(UnlinkBot, self).__init__(site=pageToUnlink.site, **kwargs)
-        self.pageToUnlink = pageToUnlink
-
-        self.generator = pageToUnlink.getReferences(
-            namespaces=self.getOption('namespaces'), content=True)
-        self.comment = i18n.twtranslate(self.pageToUnlink.site, 'unlink-unlinking',
-                                        {'title': self.pageToUnlink.title()})
+        super(BaseUnlinkBot, self).__init__(**kwargs)
 
     def _create_callback(self):
         """Create a new callback instance for replace_links."""
         return InteractiveUnlink(self)
 
-    def treat_page(self):
-        """Remove links pointing to the configured page from the given page."""
+    def unlink(self, target_page):
+        """Unlink all links linking to the target page."""
         text = self.current_page.text
         while True:
             unlink_callback = self._create_callback()
             try:
-                text = replace_links(text, unlink_callback,
-                                     self.pageToUnlink.site)
+                text = replace_links(text, unlink_callback, target_page.site)
             except EditReplacement:
                 new_text = TextEditor().edit(
                     unlink_callback.current_text,
@@ -118,7 +109,30 @@ class UnlinkBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             else:
                 break
 
-        self.put_current(text, summary=self.comment)
+        self.put_current(text)
+
+
+class UnlinkBot(SingleSiteBot, BaseUnlinkBot):
+
+    """A bot unlinking the given link from the current page."""
+
+    summary_key = 'unlink-unlinking'
+
+    @property
+    def summary_parameters(self):
+        """Return the title parameter."""
+        return {'title': self.pageToUnlink.title()}
+
+    def __init__(self, pageToUnlink, **kwargs):
+        """Initialize a UnlinkBot instance with the given page to unlink."""
+        super(UnlinkBot, self).__init__(**kwargs)
+        self.pageToUnlink = pageToUnlink
+        self.generator = pageToUnlink.getReferences(
+            namespaces=self.getOption('namespaces'), content=True)
+
+    def treat_page(self):
+        """Remove links pointing to the configured page from the given page."""
+        self.unlink(self.pageToUnlink)
 
 
 def main(*args):

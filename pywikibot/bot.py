@@ -1803,6 +1803,37 @@ class CurrentPageBot(BaseBot):
                      **kwargs)
 
 
+class AutomaticTWSummaryBot(CurrentPageBot):
+
+    """
+    A class which automatically defines C{summary} for C{put_current}.
+
+    The class must defined a C{summary_key} string which contains the i18n key
+    for L{pywikibot.i18n.twtranslate}. It can also override the
+    C{summary_parameters} property to specify any parameters for the translated
+    message.
+    """
+
+    summary_key = None  # must be defined in subclasses
+
+    @property
+    def summary_parameters(self):
+        """A dictionary of all parameters for i18n."""
+        return {}
+
+    def put_current(self, *args, **kwargs):
+        """Defining a summary if not already defined and then call original."""
+        if 'summary' not in kwargs:
+            from pywikibot import i18n
+            if self.summary_key is None:
+                raise ValueError('The summary_key must be set.')
+            summary = i18n.twtranslate(self.current_page.site, self.summary_key,
+                                       self.summary_parameters)
+            pywikibot.log('Use automatic summary message "{0}"'.format(summary))
+            kwargs['summary'] = summary
+        super(AutomaticTWSummaryBot, self).put_current(*args, **kwargs)
+
+
 class ExistingPageBot(CurrentPageBot):
 
     """A CurrentPageBot class which only treats existing pages."""
