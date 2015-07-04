@@ -112,12 +112,17 @@ from pywikibot.textlib import to_local_digits
 ZERO = datetime.timedelta(0)
 
 
-class MalformedConfigError(pywikibot.Error):
+class ArchiveBotSiteConfigError(pywikibot.Error):
+
+    """There is an error originated by archivebot's on-site configuration."""
+
+
+class MalformedConfigError(ArchiveBotSiteConfigError):
 
     """There is an error in the configuration template."""
 
 
-class MissingConfigError(pywikibot.Error):
+class MissingConfigError(ArchiveBotSiteConfigError):
 
     """
     The config is missing in the header.
@@ -131,7 +136,7 @@ class AlgorithmError(MalformedConfigError):
     """Invalid specification of archiving algorithm."""
 
 
-class ArchiveSecurityError(pywikibot.Error):
+class ArchiveSecurityError(ArchiveBotSiteConfigError):
 
     """
     Page title is not a valid archive of page being archived.
@@ -473,7 +478,7 @@ class PageArchiver(object):
         else:
             raise MissingConfigError(u'Missing or malformed template')
         if not self.get_attr('algo', ''):
-            raise MissingConfigError(u'Missing algo')
+            raise MissingConfigError('Missing argument "algo" in template')
 
     def feed_archive(self, archive, thread, max_archive_size, params=None):
         """Feed the thread to one of the archives.
@@ -554,8 +559,9 @@ class PageArchiver(object):
             rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
                             % (template_title_regex(self.tpl).pattern), re.DOTALL)
             if not rx.search(self.page.header):
-                pywikibot.error("Couldn't find the template in the header")
-                return
+                raise MalformedConfigError(
+                    "Couldn't find the template in the header"
+                )
 
             pywikibot.output(u'Archiving %d thread(s).' % self.archived_threads)
             # Save the archives first (so that bugs don't cause a loss of data)
@@ -595,6 +601,7 @@ def main(*args):
     salt = None
     force = False
     calc = None
+    sleep = 10
     args = []
 
     def if_arg_value(arg, name):
@@ -624,6 +631,8 @@ def main(*args):
             pagename = v
         for v in if_arg_value(arg, '-namespace'):
             namespace = v
+        for v in if_arg_value(arg, '-sleep'):
+            sleep = int(v)
         if not arg.startswith('-'):
             args.append(arg)
 
@@ -678,11 +687,15 @@ def main(*args):
             try:
                 archiver = PageArchiver(pg, a, salt, force)
                 archiver.run()
-                time.sleep(10)
+            except ArchiveBotSiteConfigError as e:
+                # no stack trace for errors originated by pages on-site
+                pywikibot.error('Missing or malformed template in page %s: %s'
+                                % (pg, e))
             except Exception:
                 pywikibot.error(u'Error occurred while processing page %s' % pg)
                 pywikibot.exception(tb=True)
-
+            finally:
+                time.sleep(sleep)
 
 if __name__ == '__main__':
     main()
