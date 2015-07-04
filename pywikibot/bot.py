@@ -628,7 +628,7 @@ def input_choice(question, answers, default=None, return_shortcut=True,
 
 def input_yn(question, default=None, automatic_quit=True, force=False):
     """
-    Ask the user a yes/no question and returns the answer as a bool.
+    Ask the user a yes/no question and return the answer as a bool.
 
     @param question: The question asked without trailing spaces.
     @type question: basestring
