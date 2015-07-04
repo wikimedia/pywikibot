@@ -707,6 +707,29 @@ class TestReplaceLinks(TestCase):
             textlib.replace_links('[[Talk:test]]s', ('Talk:Test', 'Project:Tests'), self.wp_site),
             '[[Project:Tests|Talk:tests]]')
 
+    def test_unicode_callback(self):
+        """Test returning unicode in the callback."""
+        def callback(link, text, groups, rng):
+            self.assertEqual(link.site, self.wp_site)
+            if link.title == 'World':
+                # This must be a unicode instance not bytes
+                return 'homewörlder'
+        self.assertEqual(
+            textlib.replace_links(self.text, callback, self.wp_site),
+            'Hello homewörlder, [[how|are]] [[you#section|you]]? Are [[you]] a '
+            '[[bug:1337]]?')
+
+    def test_bytes_callback(self):
+        """Test returning bytes in the callback."""
+        def callback(link, text, groups, rng):
+            self.assertEqual(link.site, self.wp_site)
+            if link.title == 'World':
+                # This must be a bytes instance not unicode
+                return b'homeworlder'
+        self.assertRaisesRegex(
+            ValueError, r'unicode \(str.*bytes \(str',
+            textlib.replace_links, self.text, callback, self.wp_site)
+
 
 class TestLocalDigits(TestCase):
 

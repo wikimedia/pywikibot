@@ -459,8 +459,14 @@ def replace_links(text, replace, site=None):
     depending on the result for that link. If the result is just None it skips
     that link. When it's False it unlinks it and just inserts the label. When it
     is a Link instance it'll use the target, section and label from that Link
-    instance. If it's a string or Page instance it'll use just the target from
-    the replacement and the section and label from the original link.
+    instance. If it's a Page instance it'll use just the target from the
+    replacement and the section and label from the original link.
+
+    If it's a string and the replacement was a sequence it converts it into a
+    Page instance. If the replacement is done via a callable it'll use it like
+    unlinking and directly replace the link with the text itself. It only
+    supports unicode when used by the callable and bytes (str in Python 2) are
+    not allowed.
 
     If either the section or label should be used the replacement can be a
     function which returns a Link instance and copies the value which should
@@ -476,10 +482,10 @@ def replace_links(text, replace, site=None):
         the first pipe which might contain additional data which is used in File
         namespace for example.
         Alternatively it can be a sequence containing two items where the first
-        must be a Link or Page and the second has the same meaning as the result
-        by the callable. It'll convert that into a callable where the first item
-        (the Link or Page) has to be equal to the found link and in that case it
-        will apply the second value from the sequence.
+        must be a Link or Page and the second has almost the same meaning as the
+        result by the callable. It'll convert that into a callable where the
+        first item (the Link or Page) has to be equal to the found link and in
+        that case it will apply the second value from the sequence.
     @type  replace: sequence of pywikibot.Page/pywikibot.Link/str or
         callable
     @param site: a Site object to use if replace is not a sequence or the link
@@ -503,9 +509,7 @@ def replace_links(text, replace, site=None):
 
     def check_replacement_class(replacement):
         """Normalize the replacement into a list."""
-        # separate checks as basestring is a type in Python 2
-        if (not isinstance(replacement, (pywikibot.Page, pywikibot.Link)) and
-                not isinstance(replacement, basestring)):
+        if not isinstance(replacement, (pywikibot.Page, pywikibot.Link)):
             raise ValueError('The replacement must be None, False, '
                              'a sequence, a Link or a basestring but '
                              'is "{0}"'.format(type(replacement)))
@@ -520,9 +524,10 @@ def replace_links(text, replace, site=None):
                 'The original value must be either basestring, Link or Page '
                 'but is "{0}"'.format(type(replace_items[0])))
         if replace_items[1] is not False and replace_items[1] is not None:
+            if isinstance(replace_items[1], basestring):
+                replace_items[1] = pywikibot.Page(site, replace_items[1])
             check_replacement_class(replace_items[0])
-            if (not isinstance(replace_items[1], basestring) and
-                    replace_items[0].site != replace_items[1].site):
+            if replace_items[0].site != replace_items[1].site:
                 raise ValueError('Both pages in the "replace" argument '
                                  'must belong to the same site.')
         site = replace_items[0].site
@@ -602,10 +607,18 @@ def replace_links(text, replace, site=None):
 
         if replacement is False:
             # unlink - we remove the section if there's any
-            text = text[:rng[0]] + link_text + text[rng[1]:]
+            assert isinstance(link_text, unicode), 'link text must be unicode.'
+            replacement = link_text
+        if isinstance(replacement, unicode):
+            # Nothing good can come out of the fact that bytes is returned so
+            # force unicode
+            text = text[:rng[0]] + replacement + text[rng[1]:]
             # Make sure that next time around we will not find this same hit.
-            curpos = rng[0] + len(link_text)
+            curpos = rng[0] + len(replacement)
             continue
+        elif isinstance(replacement, bytes):
+            raise ValueError('The result must be unicode (str in Python 3) and '
+                             'not bytes (str in Python 2).')
 
         # Verify that it's either Link, Page or basestring
         check_replacement_class(replacement)
@@ -613,10 +626,7 @@ def replace_links(text, replace, site=None):
         if isinstance(replacement, pywikibot.Link):
             is_link = True
         else:
-            if isinstance(replacement, pywikibot.Page):
-                replacement = replacement._link
-            else:
-                replacement = pywikibot.Link(replacement, site)
+            replacement = replacement._link
             is_link = False
 
         new_page_title = replacement.canonical_title()
