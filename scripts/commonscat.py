@@ -365,7 +365,7 @@ class CommonscatBot(Bot):
         if self.getOption('summary'):
             comment = self.getOption('summary')
         else:
-            comment = i18n.twtranslate(page.site.code,
+            comment = i18n.twtranslate(page.site,
                                        'commonscat-msg_change',
                                        {'oldcat': oldcat, 'newcat': newcat})
 

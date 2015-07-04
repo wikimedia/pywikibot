@@ -603,17 +603,17 @@ class RedirectRobot(Bot):
                             targetPage.title(withSection=False))
                         content = content_page.get(get_redirect=True)
                     if i18n.twhas_key(
-                        targetPage.site.lang,
+                        targetPage.site,
                         'redirect-broken-redirect-template') and \
-                        i18n.twhas_key(targetPage.site.lang,
+                        i18n.twhas_key(targetPage.site,
                                        'redirect-remove-loop'):
                         pywikibot.output(u"Tagging redirect for deletion")
                         # Delete the two redirects
                         content = i18n.twtranslate(
-                            targetPage.site.lang,
+                            targetPage.site,
                             'redirect-broken-redirect-template'
                         ) + "\n" + content
-                        summ = i18n.twtranslate(targetPage.site.lang,
+                        summ = i18n.twtranslate(targetPage.site,
                                                 'redirect-remove-loop')
                         targetPage.put(content, summ)
                         redir.put(content, summ)

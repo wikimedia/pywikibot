@@ -96,9 +96,9 @@ class CategoryRedirectBot(pywikibot.Bot):
         self.dbl_redir_comment = 'category_redirect-fix-double'
         self.maint_comment = 'category_redirect-comment'
         self.edit_request_text = i18n.twtranslate(
-            self.site.code, 'category_redirect-edit-request') + u'\n~~~~'
+            self.site, 'category_redirect-edit-request') + u'\n~~~~'
         self.edit_request_item = i18n.twtranslate(
-            self.site.code, 'category_redirect-edit-request-item')
+            self.site, 'category_redirect-edit-request-item')
 
     def get_cat_title(self):
         """Specify the category title."""
@@ -215,7 +215,7 @@ class CategoryRedirectBot(pywikibot.Bot):
         softredirect template.
         """
         pywikibot.output("Checking hard-redirect category pages.")
-        comment = i18n.twtranslate(self.site.code, self.redir_comment)
+        comment = i18n.twtranslate(self.site, self.redir_comment)
 
         # generator yields all hard redirect pages in namespace 14
         for page in pagegenerators.PreloadingGenerator(
@@ -303,7 +303,7 @@ class CategoryRedirectBot(pywikibot.Bot):
 
         self.check_hard_redirect()
 
-        comment = i18n.twtranslate(self.site.code, self.move_comment)
+        comment = i18n.twtranslate(self.site, self.move_comment)
         counts = {}
         nonemptypages = []
         redircat = pywikibot.Category(pywikibot.Link(self.cat_title, self.site))
@@ -405,7 +405,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                     newtext = newtext + oldtext.strip()
                     try:
                         cat.text = newtext
-                        cat.save(i18n.twtranslate(self.site.code,
+                        cat.save(i18n.twtranslate(self.site,
                                                   self.dbl_redir_comment))
                     except pywikibot.Error as e:
                         self.log_text.append("** Failed: %s" % e)
@@ -436,7 +436,7 @@ class CategoryRedirectBot(pywikibot.Bot):
         self.log_text.sort()
         self.problems.sort()
         newredirs.sort()
-        comment = i18n.twtranslate(self.site.code, self.maint_comment)
+        comment = i18n.twtranslate(self.site, self.maint_comment)
         self.log_page.text = (u"\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n"
                               % time.gmtime()[:6] +
                               u'\n'.join(self.log_text) +
