@@ -807,12 +807,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     disambigs = set(link.title(withNamespace=False)
                                     for link in disambigpages.linkedPages()
                                     if link.namespace() == 10)
-                else:
+                elif self.site.has_mediawiki_message('disambiguationspage'):
                     message = self.site.mediawiki_message(
                         'disambiguationspage').split(':', 1)[1]
                     # add the default template(s) for default mw message
                     # only
                     disambigs = set([first_upper(message)]) | default
+                else:
+                    disambigs = default
                 self.site._disambigtemplates = disambigs
             else:
                 # Normalize template capitalization
