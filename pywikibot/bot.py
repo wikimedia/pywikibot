@@ -935,8 +935,9 @@ class InteractiveReplace(object):
         if self._new is False:
             question += 'be unlinked?'
         else:
-            question += 'target to \03{{lightpurple}}{0}\03{{default}}?'.format(
-                self._new.canonical_title())
+            question += ('target to '
+                         '\03{{{{lightpurple}}}}{0}\03{{{{default}}}}?').format(
+                             self._new.canonical_title())
 
         choice = pywikibot.input_choice(
             question.format(self._old.canonical_title()),
