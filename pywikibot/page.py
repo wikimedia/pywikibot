@@ -5076,9 +5076,9 @@ class Link(ComparableMixin):
         elif section is not None:
             link._section = None
         if label:
-            link._label = label
+            link._anchor = label
         elif label is not None:
-            link._label = ''
+            link._anchor = ''
         return link
 
 
