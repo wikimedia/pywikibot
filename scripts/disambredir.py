@@ -11,7 +11,7 @@ If no starting name is provided, the bot starts at '!'.
 """
 #
 # (C) André Engels, 2006-2009
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,28 +21,16 @@ __version__ = '$Id$'
 #
 import pywikibot
 
-from pywikibot import i18n, textlib, pagegenerators
-from pywikibot.bot import MultipleSitesBot, CurrentPageBot, InteractiveReplace
-
-msg = {
-    'ar': u'تغيير التحويلات في صفحة توضيح',
-    'be-x-old': u'Замена перанакіраваньняў на старонку неадназначнасьцяў',
-    'en': u'Changing redirects on a disambiguation page',
-    'he': u'משנה קישורים להפניות בדף פירושונים',
-    'fa': u'اصلاح تغییرمسیرها در یک صفحه ابهام‌زدایی',
-    'ja': u'ロボットによる: 曖昧さ回避ページのリダイレクト修正',
-    'nl': u'Verandering van redirects op een doorverwijspagina',
-    'pl': u'Zmiana przekierowań na stronie ujednoznaczającej',
-    'pt': u'Arrumando redirects na página de desambiguação',
-    'ru': u'Изменение перенаправлений на странице неоднозначности',
-    'uk': u'Зміна перенаправлень на сторінці багатозначності',
-    'zh': u'機器人: 修改消歧義頁中的重定向連結',
-}
+from pywikibot import textlib, pagegenerators
+from pywikibot.bot import (MultipleSitesBot, InteractiveReplace,
+                           AutomaticTWSummaryBot)
 
 
-class DisambiguationRedirectBot(MultipleSitesBot, CurrentPageBot):
+class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):
 
     """Change redirects from disambiguation pages."""
+
+    summary_key = 'disambredir-msg'
 
     def _create_callback(self, old, new):
         replace_callback = InteractiveReplace(
@@ -67,8 +55,7 @@ class DisambiguationRedirectBot(MultipleSitesBot, CurrentPageBot):
                 self.current_page.site)
 
         if text != self.current_page.get():
-            summary = i18n.translate(self.current_page.site, msg, fallback=True)
-            self.put_current(text, summary=summary)
+            self.put_current(text)
 
 
 def main(*args):
