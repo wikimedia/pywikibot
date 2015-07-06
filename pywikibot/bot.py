@@ -751,19 +751,34 @@ class LinkChoice(Choice):
 
     """A choice returning a mix of the link new and current link."""
 
-    def __init__(self, option, shortcut, replacer, section):
+    def __init__(self, option, shortcut, replacer, replace_section,
+                 replace_label):
         """Constructor."""
         super(LinkChoice, self).__init__(option, shortcut, replacer)
-        self._section = section
+        self._section = replace_section
+        self._label = replace_label
 
     def handle(self):
         """Handle by either applying the new section or label."""
+        kwargs = {}
         if self._section:
-            kwargs = {'section': self.replacer._new.section,
-                      'label': self.replacer.current_link.anchor}
+            kwargs['section'] = self.replacer._new.section
         else:
-            kwargs = {'section': self.replacer.current_link.section,
-                      'label': self.replacer._new.anchor}
+            kwargs['section'] = self.replacer.current_link.section
+        if self._label:
+            if self.replacer._new.anchor is None:
+                kwargs['label'] = self.replacer._new.canonical_title()
+                if self.replacer._new.section:
+                    kwargs['label'] += '#' + self.replacer._new.section
+            else:
+                kwargs['label'] = self.replacer._new.anchor
+        else:
+            if self.replacer.current_link.anchor is None:
+                kwargs['label'] = self.replacer.current_groups['title']
+                if self.replacer.current_groups['section']:
+                    kwargs['label'] += '#' + self.replacer.current_groups['section']
+            else:
+                kwargs['label'] = self.replacer.current_link.anchor
         return pywikibot.Link.create_separated(
             self.replacer._new.canonical_title(), self.replacer._new.site,
             **kwargs)
@@ -862,14 +877,14 @@ class InteractiveReplace(object):
         ]
         if self._new:
             self._own_choices += [
-                ('replace', StaticChoice('Change link target', 't',
-                                         self._new.canonical_title())),
+                ('replace', LinkChoice('Change link target', 't', self,
+                                       False, False)),
                 ('replace_section', LinkChoice('Change link target and section',
-                                               's', self, True)),
+                                               's', self, True, False)),
                 ('replace_label', LinkChoice('Change link target and label',
-                                             'l', self, False)),
-                ('replace_all', StaticChoice('Change complete link', 'c',
-                                             self._new)),
+                                             'l', self, False, True)),
+                ('replace_all', LinkChoice('Change complete link', 'c', self,
+                                           True, True)),
             ]
 
         self.additional_choices = []

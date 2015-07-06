@@ -70,6 +70,7 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
         cls.page = pywikibot.Page(cls.site, 'User:BobBot/Test disambig')
         cls.page.linkedPages = fixed_generator(
             [pywikibot.Page(cls.site, 'User:BobBot/Redir'),
+             pywikibot.Page(cls.site, 'User:BobBot/Redir2'),
              pywikibot.Page(cls.site, 'Main Page')])
 
     def bot_save(self, page, *args, **kwargs):
@@ -83,6 +84,8 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
         super(TestDisambigurationRedirectBot, self).setUp()
         self.page.text = ('[[User:BobBot/Redir#Foo|Bar]]\n'
                           '[[User:BobBot/Redir|Baz]]\n'
+                          '[[User:BobBot/Redir2]]\n'
+                          '[[user:BobBot/Redir2]]\n'
                           '[[Main Page|Label]]\n')
         self.bot = disambredir.DisambiguationRedirectBot(generator=[self.page])
 
@@ -95,6 +98,8 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
         self.assertEqual(self.page.text,
                          '[[User:BobBot/Redir#Foo|Bar]]\n'
                          '[[User:BobBot/Redir|Baz]]\n'
+                         '[[User:BobBot/Redir2]]\n'
+                         '[[user:BobBot/Redir2]]\n'
                          '[[Main Page|Label]]\n')
 
     def test_unlink(self):
@@ -102,7 +107,8 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
         self._patch_create_callback('u')
         self.bot.run()
         self.assertEqual(self.page.text,
-                         'Bar\nBaz\n[[Main Page|Label]]\n')
+                         'Bar\nBaz\nUser:BobBot/Redir2\nuser:BobBot/Redir2\n'
+                         '[[Main Page|Label]]\n')
 
     def test_replace_target(self):
         """Test replacing just target page."""
@@ -111,15 +117,41 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
         self.assertEqual(self.page.text,
                          '[[Main Page#Foo|Bar]]\n'
                          '[[Main Page|Baz]]\n'
+                         '[[Main Page|User:BobBot/Redir2]]\n'
+                         '[[Main Page|user:BobBot/Redir2]]\n'
                          '[[Main Page|Label]]\n')
 
-    def test_replace_all(self):
+    def test_replace_label(self):
         """Test replacing target and label."""
         self._patch_create_callback('l')
         self.bot.run()
         self.assertEqual(self.page.text,
                          '[[Main Page#Foo|Main Page]]\n'
                          '[[Main Page]]\n'
+                         '[[Main Page|Main Page#What we do on this wiki]]\n'
+                         '[[Main Page|Main Page#What we do on this wiki]]\n'
+                         '[[Main Page|Label]]\n')
+
+    def test_replace_section(self):
+        """Test replacing target including section."""
+        self._patch_create_callback('s')
+        self.bot.run()
+        self.assertEqual(self.page.text,
+                         '[[Main Page|Bar]]\n'
+                         '[[Main Page|Baz]]\n'
+                         '[[Main Page#What we do on this wiki|User:BobBot/Redir2]]\n'
+                         '[[Main Page#What we do on this wiki|user:BobBot/Redir2]]\n'
+                         '[[Main Page|Label]]\n')
+
+    def test_replace_all(self):
+        """Test replacing target including section and label."""
+        self._patch_create_callback('c')
+        self.bot.run()
+        self.assertEqual(self.page.text,
+                         '[[Main Page]]\n'
+                         '[[Main Page]]\n'
+                         '[[Main Page#What we do on this wiki]]\n'
+                         '[[Main Page#What we do on this wiki]]\n'
                          '[[Main Page|Label]]\n')
 
 
