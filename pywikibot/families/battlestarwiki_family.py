@@ -15,7 +15,9 @@ class Family(family.Family):
 
     name = 'battlestarwiki'
 
-    languages_by_size = ['en', 'de', 'fr', 'zh', 'es', 'ms', 'tr', 'simple']
+    languages_by_size = ['en', 'de']
+
+    interwiki_removals = ['fr', 'zh', 'es', 'ms', 'tr', 'simple']
 
     langs = dict([(lang, '%s.battlestarwiki.org' % lang)
                   for lang in languages_by_size])
