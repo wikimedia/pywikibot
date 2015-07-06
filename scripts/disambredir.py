@@ -48,6 +48,8 @@ class DisambiguationRedirectBot(MultipleSitesBot, CurrentPageBot):
         replace_callback = InteractiveReplace(
             old, new, default='n', automatic_quit=False)
         replace_callback.allow_replace_label = True
+        replace_callback.allow_replace_section = True
+        replace_callback.allow_replace_all = True
         return replace_callback
 
     def treat_page(self):

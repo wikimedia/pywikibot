@@ -22,6 +22,36 @@ from tests.aspects import (
 )
 
 
+class TestCreateSeparated(DefaultDrySiteTestCase):
+
+    """Test C{Link.create_separated}."""
+
+    def _test_link(self, link, page, section, label):
+        """Test the separate contents of the link."""
+        self.assertIs(link.site, self.site)
+        self.assertEqual(link.title, page)
+        if section is None:
+            self.assertIsNone(link.section)
+        else:
+            self.assertEqual(link.section, section)
+        if label is None:
+            self.assertIsNone(link.anchor)
+        else:
+            self.assertEqual(link.anchor, label)
+
+    def test(self):
+        """Test combinations of parameters."""
+        self._test_link(Link.create_separated('Foo', self.site),
+                        'Foo', None, None)
+        self._test_link(Link.create_separated('Foo', self.site, section='Bar'),
+                        'Foo', 'Bar', None)
+        self._test_link(Link.create_separated('Foo', self.site, label='Baz'),
+                        'Foo', None, 'Baz')
+        self._test_link(Link.create_separated('Foo', self.site, section='Bar',
+                                              label='Baz'),
+                        'Foo', 'Bar', 'Baz')
+
+
 # ---- Tests checking if the parser does (not) accept (in)valid titles
 
 

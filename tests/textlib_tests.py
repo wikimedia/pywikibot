@@ -547,7 +547,7 @@ class TestReplaceLinks(TestCase):
         self._count = 0  # buffer number of found instances
         self.assertEqual(
             textlib.replace_links(self.text, callback, self.wp_site),
-            'Hello [[World]], [[how|are]] [[1#section|1]]? Are [[2]] a '
+            'Hello [[World]], [[how|are]] [[1#section]]? Are [[2]] a '
             '[[bug:1337]]?')
         del self._count
 
@@ -641,7 +641,7 @@ class TestReplaceLinks(TestCase):
             textlib.replace_links(source_text,
                                   ('Foo', pywikibot.Link('Bar#snafu', self.wp_site)),
                                   self.wp_site),
-            '[[Bar#snafu|Bar]]')
+            '[[Bar#snafu]]')
         self.assertEqual(
             textlib.replace_links(source_text, ('Foo', 'Bar|foo'), self.wp_site),
             '[[Bar#bar|baz]]')

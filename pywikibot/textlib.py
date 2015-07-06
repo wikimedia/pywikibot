@@ -514,6 +514,12 @@ def replace_links(text, replace, site=None):
                              'a sequence, a Link or a basestring but '
                              'is "{0}"'.format(type(replacement)))
 
+    def title_section(l):
+        title = l.title
+        if l.section:
+            title += '#' + l.section
+        return title
+
     if isinstance(replace, collections.Sequence):
         if len(replace) != 2:
             raise ValueError('When used as a sequence, the "replace" '
@@ -634,20 +640,16 @@ def replace_links(text, replace, site=None):
         if is_link:
             # Use link's label
             link_text = replacement.anchor
-            if link_text is None:
-                link_text = new_page_title
-                must_piped = False
-            else:
-                must_piped = True
+            must_piped = link_text is not None
             section = replacement.section
         else:
             must_piped = True
             section = groups['section']
 
         if section:
-            section = '#' + section
-        else:
-            section = ''
+            new_page_title += '#' + section
+        if link_text is None:
+            link_text = new_page_title
 
         # Parse the link text and check if it points to the same page
         parsed_link_text = pywikibot.Link(link_text, replacement.site)
@@ -656,15 +658,17 @@ def replace_links(text, replace, site=None):
         except InvalidTitle:
             pass
         else:
+            parsed_link_title = title_section(parsed_link_text)
+            replacement_title = title_section(replacement)
             # compare title, but only with parts if linktrail works
-            if not linktrail.sub('', parsed_link_text.title[len(replacement.title):]):
+            if not linktrail.sub('', parsed_link_title[len(replacement_title):]):
                 # TODO: This must also compare everything that was used as a
                 #       prefix (in case insensitive)
-                must_piped = (not parsed_link_text.title.startswith(replacement.title) or
+                must_piped = (not parsed_link_title.startswith(replacement_title) or
                               parsed_link_text.namespace != replacement.namespace)
 
-        if section or must_piped:
-            newlink = '[[{0}{1}|{2}]]'.format(new_page_title, section, link_text)
+        if must_piped:
+            newlink = '[[{0}|{1}]]'.format(new_page_title, link_text)
         else:
             newlink = '[[{0}]]{1}'.format(link_text[:len(new_page_title)],
                                           link_text[len(new_page_title):])
