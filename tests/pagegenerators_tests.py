@@ -2,13 +2,14 @@
 # -*- coding: utf-8  -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
+import calendar
 import datetime
 import os
 import sys
@@ -318,24 +319,56 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
     """Test the day page generator."""
 
-    def test_basic(self):
-        site = self.get_site()
-        fd = date.FormatDate(site)
-        startMonth = 1
-        endMonth = 12
+    @classmethod
+    def setUpClass(cls):
+        super(TestDayPageGenerator, cls).setUpClass()
+        cls.site = cls.get_site()
+        cls.fd = date.FormatDate(cls.site)
 
-        gen = pagegenerators.DayPageGenerator(startMonth, endMonth, site)
+    def _run_test(self, startMonth=1, endMonth=12, year=2000):
+        params = {
+            'startMonth': startMonth,
+            'endMonth': endMonth,
+            'site': self.site,
+        }
+        if year != 2000:
+            params['year'] = year
+        # use positional parameter
+        gen1 = pagegenerators.DayPageGenerator(startMonth, endMonth, self.site,
+                                               year)
+        # use keyworded parameter and default for year
+        gen2 = pagegenerators.DayPageGenerator(**params)
 
-        for page in pagegenerators.DayPageGenerator(startMonth, endMonth, site):
+        for page in gen1:
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(page.isAutoTitle)
 
         expected = []
         for month in range(startMonth, endMonth + 1):
-            for day in range(1, date.getNumberOfDaysInMonth(month) + 1):
-                expected.append(fd(month, day))
+            for day in range(1, calendar.monthrange(year, month)[1] + 1):
+                expected.append(self.fd(month, day))
 
-        self.assertPageTitlesEqual(gen, expected)
+        self.assertPageTitlesEqual(gen2, expected)
+
+    def test_basic(self):
+        """General test for day page generator."""
+        self._run_test()
+
+    def test_year_2001(self):
+        """Test for day page generator of year 2001."""
+        self._run_test(2, year=2001)
+
+    def test_year_2100(self):
+        """Test for day page generator of year 2100."""
+        self._run_test(endMonth=2, year=2100)
+
+    def test_start_0(self):
+        """Test for day page generator with startMonth 0."""
+        self.assertRaises(calendar.IllegalMonthError, self._run_test, 0)
+
+    def test_end_13(self):
+        """Test for day page generator with endMonth 13."""
+        self.assertRaises(calendar.IllegalMonthError, self._run_test, 12, 13)
 
 
 class TestPreloadingGenerator(DefaultSiteTestCase):

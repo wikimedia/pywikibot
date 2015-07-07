@@ -20,7 +20,7 @@ import datetime
 import re
 import sys
 
-from pywikibot.tools import first_lower, first_upper
+from pywikibot.tools import first_lower, first_upper, deprecated
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -2313,9 +2313,15 @@ for monthId in range(12):
         formatLimits[dayMnthFmts[monthId]] = _formatLimit_DayOfMonth30
 
 
+@deprecated("calendar.monthrange")
 def getNumberOfDaysInMonth(month):
-    """Return the number of days in a given month, 1 being January, etc."""
-    return formatLimits[dayMnthFmts[month - 1]][2] - 1
+    """
+    Return the maximum number of days in a given month, 1 being January, etc.
+
+    For February alway 29 will be given, even it is not a leap year.
+    """
+    # use year 2000 which is a leap year
+    return calendar.monthrange(2000, month)[1]
 
 
 def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
