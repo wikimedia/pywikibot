@@ -22,7 +22,7 @@ Command line options:
                wikipedia, user, etc. namespaces.
 """
 # (C) Daniel Herding, 2007
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,7 @@ mispelling.py does not support site {site}.
 
 Help Pywikibot team to provide support for your wiki by submitting
 a bug to:
-    https://bugzilla.wikimedia.org/enter_bug.cgi?product=Pywikibot
+https://phabricator.wikimedia.org/maniphest/task/create/?projects=pywikibot-core
 with category containing misspelling pages or a template for
 these misspellings.\n"""
 
