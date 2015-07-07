@@ -737,7 +737,7 @@ class DisambiguationRobot(Bot):
                                                           len(self.dn_template_str) + 8]):
                     continue
 
-                edit = EditOption('edit page', 'e', text, m.start(), disambPage.title()),
+                edit = EditOption('edit page', 'e', text, m.start(), disambPage.title())
                 context_option = HighlightContextOption(
                     'more context', 'm', text, 60, start=m.start(), end=m.end())
                 context_option.before_question = True
@@ -756,8 +756,8 @@ class DisambiguationRobot(Bot):
                 if not edited:
                     options += [ShowPageOption('show disambiguation page', 'd',
                                                m.start(), disambPage)]
-                options += [ListAlternativesOption('list', 'l'),
-                            AddAlternativeOption('add new', 'a')]
+                options += [ListAlternativesOption('list', 'l', self),
+                            AddAlternativeOption('add new', 'a', self)]
                 if edited:
                     options += [StandardOption('save in this form', 'x')]
 
