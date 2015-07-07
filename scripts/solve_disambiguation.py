@@ -82,6 +82,7 @@ __version__ = '$Id$'
 
 import codecs
 import itertools
+import os
 import re
 
 import pywikibot
@@ -408,11 +409,16 @@ class PrimaryIgnoreManager(object):
     def __init__(self, disambPage, enabled=False):
         self.disambPage = disambPage
         self.enabled = enabled
-
         self.ignorelist = []
-        filename = config.datafilepath(
-            'disambiguations',
-            self.disambPage.title(as_filename=True) + '.txt')
+
+        folder = config.datafilepath('disambiguations')
+        if os.path.exists(folder):
+            self._read_ignorelist(folder)
+
+    def _read_ignorelist(self, folder):
+        """Read pages to be ignored from file."""
+        filename = os.path.join(
+            folder, self.disambPage.title(as_filename=True) + '.txt')
         try:
             # The file is stored in the disambiguation/ subdir.
             # Create if necessary.
