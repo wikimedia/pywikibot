@@ -83,7 +83,7 @@ script_input = {
     'catall': 'q\n',  # q for quit
     'editarticle': 'Test page\n',
     'imageuncat': 'q\n',
-    'interwiki': 'Test page\n',
+    'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
     'replace': 'foo\nbar\n\n\n',  # match, replacement,
@@ -134,7 +134,8 @@ no_args_expected_results = {
     'harvest_template': 'ERROR: Please specify',
     'illustrate_wikidata': 'I need a generator with pages to work on',
     'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
-    'interwiki': 'does not exist. Skipping.',  # 'Test page' does not exist
+    # script_input['interwiki'] above lists a title that should not exist
+    'interwiki': 'does not exist. Skipping.',
     'login': 'Logged in on ',
     'match_images': 'Require two images to work on.',
     'pagefromfile': 'Please enter the file name',
