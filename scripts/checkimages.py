@@ -913,8 +913,8 @@ class checkImagesBot(object):
         regexOnCommons = (r"\[\[:File:%s\]\] is also on '''Commons''': "
                           r"\[\[commons:File:.*?\]\](?: \(same name\))?$"
                           % re.escape(self.imageName))
-        commons_image_with_this_hash = next(site.allimages(sha1=hash_found,
-                                                           total=1), None)
+        commons_image_with_this_hash = next(iter(site.allimages(sha1=hash_found,
+                                                                total=1)), None)
         if commons_image_with_this_hash:
             servTMP = pywikibot.translate(self.site, serviceTemplates)
             templatesInTheImage = self.image.templates()
