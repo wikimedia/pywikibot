@@ -9,13 +9,37 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
-from pywikibot.flow import Topic, Post
+from pywikibot.flow import Board, Topic, Post
 from pywikibot.tools import PY2
 
 from tests.aspects import TestCase
 
 if not PY2:
     unicode = str
+
+
+class TestFlowCreateTopic(TestCase):
+
+    """Test the creation of Flow topics."""
+
+    family = 'test'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def test_create_topic(self):
+        """Test creation of topic."""
+        site = self.get_site()
+        content = 'If you can read this, the Flow code in Pywikibot works!'
+        board = Board(site, 'Talk:Pywikibot test')
+        topic = board.new_topic('Pywikibot test', content, 'wikitext')
+        first_post = topic.replies()[0]
+        wikitext = first_post.get(format='wikitext')
+        self.assertIn('wikitext', first_post._content)
+        self.assertNotIn('html', first_post._content)
+        self.assertIsInstance(wikitext, unicode)
+        self.assertEqual(wikitext, content)
 
 
 class TestFlowReply(TestCase):

@@ -138,6 +138,20 @@ class Board(FlowPage):
             cont_args = self._parse_url(data['links']['pagination'])
             data = self.site.load_topiclist(self, **cont_args)
 
+    def new_topic(self, title, content, format='wikitext'):
+        """Create and return a Topic object for a new topic on this Board.
+
+        @param title: The title of the new topic (must be in plaintext)
+        @type title: unicode
+        @param content: The content of the topic's initial post
+        @type content: unicode
+        @param format: The content format of the value supplied for content
+        @type format: unicode (either 'wikitext' or 'html')
+        @return: The new topic
+        @rtype: Topic
+        """
+        return Topic.create_topic(self, title, content, format)
+
 
 class Topic(FlowPage):
 
@@ -148,6 +162,24 @@ class Topic(FlowPage):
         if not hasattr(self, '_data') or force:
             self._data = self.site.load_topic(self, format)
         return self._data
+
+    @classmethod
+    def create_topic(cls, board, title, content, format='wikitext'):
+        """Create and return a Topic object for a new topic on a Board.
+
+        @param board: The topic's parent board
+        @type board: Board
+        @param title: The title of the new topic (must be in plaintext)
+        @type title: unicode
+        @param content: The content of the topic's initial post
+        @type content: unicode
+        @param format: The content format of the value supplied for content
+        @type format: unicode (either 'wikitext' or 'html')
+        @return: The new topic
+        @rtype: Topic
+        """
+        data = board.site.create_new_topic(board, title, content, format)
+        return cls(board.site, data['topic-page'])
 
     @classmethod
     def from_topiclist_data(cls, board, root_uuid, topiclist_data):

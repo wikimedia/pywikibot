@@ -5873,6 +5873,30 @@ class APISite(BaseSite):
 
     @must_be('user')
     @need_extension('Flow')
+    def create_new_topic(self, page, title, content, format):
+        """Create a new topic on a Flow board.
+
+        @param page: A Flow board
+        @type page: Board
+        @param title: The title of the new topic (must be in plaintext)
+        @type title: unicode
+        @param content: The content of the topic's initial post
+        @type content: unicode
+        @param format: The content format of the value supplied for content
+        @type format: unicode (either 'wikitext' or 'html')
+        @return: The metadata of the new topic
+        @rtype: dict
+        """
+        token = self.tokens['csrf']
+        params = {'action': 'flow', 'page': page, 'token': token,
+                  'submodule': 'new-topic', 'ntformat': format,
+                  'nttopic': title, 'ntcontent': content}
+        req = self._request(parameters=params, use_get=False)
+        data = req.submit()
+        return data['flow']['new-topic']['committed']['topiclist']
+
+    @must_be('user')
+    @need_extension('Flow')
     def reply_to_post(self, page, reply_to_uuid, content, format):
         """Reply to a post on a Flow topic.
 
