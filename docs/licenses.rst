@@ -4,9 +4,6 @@ Licenses
 The framework itself is available under the :ref:`MIT license <licenses-MIT>`; the
 documentation is available under the :ref:`CC-BY-SA 3.0 <licenses-CCBYSA>` license.
 
-Httplib2, which is provided as 'external' library, is also available
-under the :ref:`MIT license <licenses-MIT>`.
-
 .. _licenses-MIT:
 
 MIT License
