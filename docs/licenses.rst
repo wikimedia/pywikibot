@@ -1,8 +1,9 @@
 Licenses
 ========
 
-The framework itself is available under the :ref:`MIT license <licenses-MIT>`; the
-documentation is available under the :ref:`CC-BY-SA 3.0 <licenses-CCBYSA>` license.
+The framework itself and this documentation are available under the
+:ref:`MIT license <licenses-MIT>`; manual pages on mediawiki.org are
+available under the `CC-BY-SA 3.0 <licenses-CCBYSA>` license.
 
 .. _licenses-MIT:
 
@@ -34,8 +35,4 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 
-.. _licenses-CCBYSA:
-
-CC-BY-SA 3.0
-------------
-This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/ or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+.. _licenses-CCBYSA: http://creativecommons.org/licenses/by-sa/3.0/
