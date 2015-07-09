@@ -3,7 +3,7 @@ Licenses
 
 The framework itself and this documentation are available under the
 :ref:`MIT license <licenses-MIT>`; manual pages on mediawiki.org are
-available under the `CC-BY-SA 3.0 <licenses-CCBYSA>` license.
+available under the `CC-BY-SA 3.0`_ license.
 
 .. _licenses-MIT:
 
@@ -35,4 +35,4 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 
 
-.. _licenses-CCBYSA: http://creativecommons.org/licenses/by-sa/3.0/
+.. _CC-BY-SA 3.0: http://creativecommons.org/licenses/by-sa/3.0/
