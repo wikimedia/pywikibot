@@ -507,6 +507,15 @@ class ParamInfo(Container):
                 if (help_text.find('\n\nThis module only accepts POST '
                                    'requests.\n', start) < end):
                     self._paraminfo[path]['mustbeposted'] = ''
+                # All actions which must be POSTed are write actions except for
+                # login. Because Request checks if the user is logged in when
+                # doing a write action the check would always fail on login.
+                # Purge is the only action which isn't POSTed but actually does
+                # require writerights. This was checked with the data from
+                # 1.25wmf22 on en.wikipedia.org.
+                if ('mustbeposted' in self._paraminfo[path] and
+                        path != 'login') or path == 'purge':
+                    self._paraminfo[path]['writerights'] = ''
 
         self._emulate_pageset()
 
