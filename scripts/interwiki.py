@@ -2544,10 +2544,10 @@ def main(*args):
             ns = namespaces[0]
             if ns != 'all':
                 if isinstance(ns, unicode) or isinstance(ns, str):
-                    index = site.getNamespaceIndex(ns)
+                    index = site.namespaces.lookup(ns)
                     if index is None:
                         raise ValueError(u'Unknown namespace: %s' % ns)
-                    ns = index
+                    ns = index.id
             namespaces = []
         else:
             ns = 'all'
