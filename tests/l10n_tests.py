@@ -98,7 +98,8 @@ class TestSites(TestCase):
             keys = i18n.twget_keys(package)
             for key in keys:
                 self.assertIn(key, languages,
-                              "%s not found in site codes" % key)
+                              "'%s' - json key '%s' is not a site language"
+                              % (package, key))
 
 
 if __name__ == '__main__':
