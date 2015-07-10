@@ -92,7 +92,8 @@ if sys.version_info[0] == 2:
     # However the Debian package python-ipaddr is also supported:
     # https://pypi.python.org/pypi/ipaddr
     # Other backports are likely broken.
-    dependencies.append('ipaddr')
+    # ipaddr 2.1.10+ is distributed with Debian and Fedora.  See T105443.
+    dependencies.append('ipaddr>=2.1.10')
 
     if sys.version_info < (2, 7, 9):
         # Python versions before 2.7.9 will cause urllib3 to trigger

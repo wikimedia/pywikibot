@@ -20,6 +20,7 @@ addons:
       - djvulibre-bin
       - graphviz
       - liblua5.1-0-dev
+      - python-ipaddr
 
 before_install:
   # When PYSETUP_TEST_EXTRAS is not enabled, do not allow the
@@ -92,7 +93,7 @@ env:
 
 matrix:
   include:
-    - python: '2.7'
+    - python: '2.7_with_system_site_packages'  # equivalent to virtualenv: system_site_packages: true
       env: LANGUAGE=he FAMILY=wikivoyage SITE_ONLY=1
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1

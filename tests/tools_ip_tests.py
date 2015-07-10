@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
+from distutils.version import StrictVersion
+
 from pywikibot.tools import ip
 
 from tests.aspects import unittest, TestCase, DeprecationTestCase
@@ -69,8 +71,6 @@ class TestIPBase(TestCase):
         self.ipv6test(True, "FF02:0000:0000:0000:0000:0000:0000:0001")
         self.ipv6test(True, "0000:0000:0000:0000:0000:0000:0000:0001")
         self.ipv6test(True, "0000:0000:0000:0000:0000:0000:0000:0000")
-        self.ipv6test(False, "02001:0000:1234:0000:0000:C1C0:ABCD:0876")  # extra 0 not allowed!
-        self.ipv6test(False, "2001:0000:1234:0000:00001:C1C0:ABCD:0876")  # extra 0 not allowed!
         self.ipv6test(False, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876")  # leading space
         self.ipv6test(False, "2001:0000:1234:0000:0000:C1C0:ABCD:0876 ")  # trailing space
         # leading and trailing space
@@ -631,6 +631,11 @@ class TestIPBase(TestCase):
         self.ipv6test(False, "1111:2222:3333:4444:5555:6666:00.00.00.00")
         self.ipv6test(False, "1111:2222:3333:4444:5555:6666:000.000.000.000")
 
+    def _test_T105443_failures(self):
+        """Test known bugs with ipaddr v2.1.10."""
+        self.ipv6test(False, "02001:0000:1234:0000:0000:C1C0:ABCD:0876")  # extra 0 not allowed!
+        self.ipv6test(False, "2001:0000:1234:0000:00001:C1C0:ABCD:0876")  # extra 0 not allowed!
+
 
 class IPRegexTestCase(TestIPBase, DeprecationTestCase):
 
@@ -643,6 +648,7 @@ class IPRegexTestCase(TestIPBase, DeprecationTestCase):
         """Test IP regex."""
         self._run_tests()
         self._test_T76286_failures()
+        self._test_T105443_failures()
         self.assertEqual(self.fail, 0)
         self.assertDeprecation(
             'page.ip_regexp is deprecated, use tools.ip.is_IP instead.')
@@ -674,6 +680,13 @@ class IPAddressModuleTestCase(TestIPBase):
     def test_T76286_failures(self):
         """Test known bugs in the ipaddress module."""
         self._test_T76286_failures()
+        self.assertEqual(self.fail, 0)
+
+    @expected_failure_if(ip.ip_address.__module__ == 'ipaddr' and
+                         ip._ipaddr_version == StrictVersion('2.1.10'))
+    def test_T105443_failures(self):
+        """Test known bugs in the ipaddr module."""
+        self._test_T105443_failures()
         self.assertEqual(self.fail, 0)
 
 if __name__ == "__main__":

@@ -14,24 +14,30 @@ __version__ = '$Id$'
 import re
 import sys
 
+from distutils.version import StrictVersion
 from warnings import warn
 
 from pywikibot.tools import DeprecatedRegex
 
-ipaddress_e = ipaddr_e = None
+_ipaddress_e = _ipaddr_e = _ipaddr_version = None
 
 try:
     from ipaddress import ip_address
-except ImportError as ipaddress_e:
+except ImportError as e:
+    _ipaddress_e = e
     ip_address = None
-    pass
 
 if not ip_address or sys.version_info[0] < 3:
     try:
-        from ipaddr import IPAddress as ip_address
-        ip_address.__T76286__ = False
-    except ImportError as ipaddr_e:
-        pass
+        from ipaddr import __version__ as _ipaddr_version
+    except ImportError as e:
+        _ipaddr_e = e
+    else:
+        _ipaddr_version = StrictVersion(_ipaddr_version)
+        if _ipaddr_version >= StrictVersion('2.1.10'):
+            from ipaddr import IPAddress as ip_address
+        else:
+            _ipaddr_e = ImportError('ipaddr %s is broken.' % _ipaddr_version)
 
 if ip_address and ip_address.__module__ == 'ipaddress':
     if sys.version_info[0] < 3:
@@ -66,8 +72,8 @@ if ip_address and ip_address.__module__ == 'ipaddress':
 elif not ip_address:
     warn('Importing ipaddr.IPAddress failed: %s\n'
          'Importing ipaddress.ip_address failed: %s\n'
-         'Please install ipaddr.'
-         % (ipaddr_e, ipaddress_e), ImportWarning)
+         'Please install ipaddr 2.1.10+ or ipaddress.'
+         % (_ipaddr_e, _ipaddress_e), ImportWarning)
 
     def ip_address_fake(IP):
         """Fake ip_address method."""
