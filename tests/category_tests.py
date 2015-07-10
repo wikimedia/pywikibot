@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the Category class."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #

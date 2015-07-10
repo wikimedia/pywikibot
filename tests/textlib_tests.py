@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2011-2015
 #
 # Distributed under the terms of the MIT license.
 #
