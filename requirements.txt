@@ -1,4 +1,4 @@
-# This is a PIP requirements file
+# This is a PIP 6+ requirements file for using Pywikibot and scripts
 #
 # All dependencies can be installed using:
 # $ sudo pip install -r requirements.txt
@@ -21,18 +21,31 @@
 # mandatory; see README.conversion.txt
 requests
 
+future ; python_version < '2.7'
 # core interwiki_graph.py:
-pydot
+git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29
+
+# wikistats.py and scripts
+unicodecsv ; python_version < '3'
+
+# cosmetic_changes and scripts/isbn
+python-stdnum
+
+# GUI
+Pillow
 
 # core pagegenerators
-pYsearch
+--allow-external pYsearch
+--allow-unverified pYsearch
+pYsearch ; python_version < '3'
 google >= 1.7
+socketIO-client<0.6.1
 
 # scripts/script_wui.py:
 crontab
 
-# scipts/replicate_wiki.py
-argparse
+# scipts/replicate_wiki.py and scripts/editarticle.py
+argparse ; python_version < '2.7'
 
 # scripts/flickrripper.py
 # On Python 2, flickrapi 1.4.x or 2.x may be used.  Only 2.x works on Python 3.
@@ -41,21 +54,23 @@ argparse
 #   pkg_resources.VersionConflict: (requests 1.2.3 (/usr/lib/python2.7/site-packages), Requirement.parse('requests>=2.2.1'))
 # If you see that on Python 2, change this to flickrapi==1.4.5
 # On Python 3, force pip to install requests 2.2.1, or remove flickrapi below.
-Pillow
 flickrapi
 
 # incomplete core component botirc
-irc
+irc ; python_version > '2.6'
 
 # textlib.py
-mwparserfromhell>=0.3.3
+mwparserfromhell>=0.3.3 ; python_version <= '3.4'
 
 # The mysql generator in pagegenerators depends on either oursql or MySQLdb
-# pywikibot prefers oursql
-oursql
+# pywikibot prefers oursql.  Both are Python 2 only; T89976.
+oursql ; python_version < '3'
 
 # scripts/script_wui.py depends on Lua, which is not available using pip
 # but can be obtained from: https://github.com/bastibe/lunatic-python
 
 # core HTML comparison parser in diff module
 beautifulsoup4
+
+# scripts/states_redirect.py
+pycountry

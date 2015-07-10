@@ -1,0 +1,13 @@
+# This is a PIP 6+ requirements file for development dependencies
+#
+unittest2==0.8.0 ; python_version < '2.7'
+
+six
+
+nose
+
+# pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
+# excluded from this file as they are quite expensive to install, and they
+# are not useful on the Appveyor Win32 builds since the relevant UI tests
+# also require accessing the menu of the console window, which doesnt exist
+# in the Appveyor environment.

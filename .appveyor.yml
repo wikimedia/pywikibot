@@ -81,7 +81,7 @@ install:
 
   # This is needed for Python versions not installed on Appveyor build machines
   - ps: if (-not(Test-Path($env:PYTHON))) { iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1') }
-  - pip install unittest2==0.8
+  - pip install -r dev-requirements.txt
   - pip install requests
 
 build: off
