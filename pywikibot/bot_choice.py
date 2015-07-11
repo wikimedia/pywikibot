@@ -166,16 +166,18 @@ class IntegerOption(Option):
     def __init__(self, minimum=1, maximum=None, prefix=''):
         """Constructor."""
         super(IntegerOption, self).__init__()
-        if minimum is not None and maximum is not None and minimum >= maximum:
+        if not ((minimum is None or isinstance(minimum, int)) and
+                (maximum is None or isinstance(maximum, int))):
+            raise ValueError(
+                'The minimum and maximum parameters must be int or None.')
+        if minimum is not None and maximum is not None and minimum > maximum:
             raise ValueError('The minimum must be lower than the maximum.')
-        self.minimum = minimum
-        self.maximum = maximum
+        self._min = minimum
+        self._max = maximum
         self.prefix = prefix
 
     def test(self, value):
         """Return whether the value is an int and in the specified range."""
-        if not value.lower().startswith(self.prefix.lower()):
-            return False
         try:
             value = self.parse(value)
         except ValueError:
@@ -184,15 +186,43 @@ class IntegerOption(Option):
             return ((self.minimum is None or value >= self.minimum) and
                     (self.maximum is None or value <= self.maximum))
 
+    @property
+    def minimum(self):
+        """return the minimum value."""
+        return self._min
+
+    @property
+    def maximum(self):
+        """return the maximum value."""
+        return self._max
+
     def format(self, default):
         """Return a formatted string showing the range."""
-        if self.minimum is not None or self.maximum is not None:
-            _min = '' if self.minimum is None else str(self.minimum)
-            _max = '' if self.maximum is None else str(self.maximum)
-            rng = _min + '-' + _max
+        if default is not None and self.test(default):
+            value = self.parse(default)
+            default = '[{0}]'.format(value)
         else:
-            rng = 'any'
-        return self.prefix + '<number> [' + rng + ']'
+            value = None
+            default = ''
+        if self.minimum is not None or self.maximum is not None:
+            if default and value == self.minimum:
+                minimum = default
+                default = ''
+            else:
+                minimum = '' if self.minimum is None else str(self.minimum)
+            if default and value == self.maximum:
+                maximum = default
+                default = ''
+            else:
+                maximum = '' if self.maximum is None else str(self.maximum)
+            default = '-{0}-'.format(default) if default else '-'
+            if self.minimum == self.maximum:
+                rng = minimum
+            else:
+                rng = minimum + default + maximum
+        else:
+            rng = 'any' + default
+        return '{0}<number> [{1}]'.format(self.prefix, rng)
 
     def parse(self, value):
         """Return integer from value with prefix removed."""
@@ -235,32 +265,34 @@ class ContextOption(OutputOption, StandardOption):
         pywikibot.output(self.text[start_context:end_context])
 
 
-class ListOption(Option):
+class ListOption(IntegerOption):
 
     """An option to select something from a list."""
 
-    def __init__(self, sequence, prefix):
+    def __init__(self, sequence, prefix=''):
         """Constructor."""
-        super(ListOption, self).__init__()
         self._list = sequence
-        self._prefix = prefix
+        try:
+            super(ListOption, self).__init__(1, self.maximum, prefix)
+        except ValueError:
+            raise ValueError('The sequence is empty.')
+        del self._max
 
     def format(self, default):
         """Return a string showing the range."""
-        return '<number> [0-{0}]'.format(len(self._list) - 1)
-
-    def test(self, value):
-        """Test if the value is an int and in range."""
-        try:
-            value = int(value)
-        except ValueError:
-            return False
+        if not self._list:
+            raise ValueError('The sequence is empty.')
         else:
-            return 0 <= value < len(self._list)
+            return super(ListOption, self).format(default)
+
+    @property
+    def maximum(self):
+        """return the maximum value."""
+        return len(self._list)
 
     def result(self, value):
         """Return a tuple with the prefix and selected value."""
-        return (self._prefix, self._list[int(value)])
+        return (self.prefix, self._list[self.parse(value) - 1])
 
 
 class HighlightContextOption(ContextOption):
