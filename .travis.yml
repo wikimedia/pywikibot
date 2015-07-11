@@ -17,6 +17,7 @@ os:
 addons:
   apt:
     packages:
+      - djvulibre-bin
       - graphviz
       - liblua5.1-0-dev
 
