@@ -23,6 +23,7 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 #
 
+import calendar
 import codecs
 import datetime
 import itertools
@@ -2305,12 +2306,14 @@ def YearPageGenerator(start=1, end=2050, site=None):
             yield pywikibot.Page(pywikibot.Link(current_year, site))
 
 
-def DayPageGenerator(startMonth=1, endMonth=12, site=None):
+def DayPageGenerator(startMonth=1, endMonth=12, site=None, year=2000):
     """
     Day page generator.
 
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
+    @param year: considering leap year.
+    @type year: int
     """
     if site is None:
         site = pywikibot.Site()
@@ -2318,7 +2321,7 @@ def DayPageGenerator(startMonth=1, endMonth=12, site=None):
     firstPage = pywikibot.Page(site, fd(startMonth, 1))
     pywikibot.output(u"Starting with %s" % firstPage.title(asLink=True))
     for month in range(startMonth, endMonth + 1):
-        for day in range(1, date.getNumberOfDaysInMonth(month) + 1):
+        for day in range(1, calendar.monthrange(year, month)[1] + 1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
 
