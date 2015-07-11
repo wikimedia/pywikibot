@@ -71,7 +71,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2014
+# (C) Pywikibot team, 2003-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -643,6 +643,7 @@ class DisambiguationRobot(Bot):
         """
         # TODO: break this function up into subroutines!
 
+        self.current_page = refPage
         include = False
         unlink_counter = 0
         new_targets = []
