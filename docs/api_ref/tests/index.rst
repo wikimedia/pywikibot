@@ -11,7 +11,8 @@ Library tests
     thread<./thread_tests>
     date<./date_tests>
     mediawikiversion<./mediawikiversion_tests>
-    ipregex<./ipregex_tests>
+    tools_chars<./tools_chars_tests>
+    tools_ip<./tools_ip_tests>
     xmlreader<./xmlreader_tests>
     textlib<./textlib_tests>
     http<./http_tests>
