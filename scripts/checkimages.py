@@ -1001,7 +1001,7 @@ class checkImagesBot(object):
                             self.timestamp = dup_page.latest_file_info.timestamp
                         except pywikibot.PageRelatedError:
                             continue
-                    data = time.strptime(self.timestamp, u"%Y-%m-%dT%H:%M:%SZ")
+                    data = self.timestamp.timetuple()
                     data_seconds = time.mktime(data)
                     time_image_list.append([data_seconds, dup_page.title()])
                     time_list.append(data_seconds)
