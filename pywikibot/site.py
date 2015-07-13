@@ -4771,7 +4771,7 @@ class APISite(BaseSite):
         @type reason: basestring
 
         """
-        token = self.tokens['undelete']
+        token = self.tokens['delete']
         self.lock_page(page)
 
         req = self._simple_request(action='undelete',
