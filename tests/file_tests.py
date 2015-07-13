@@ -126,33 +126,33 @@ class TestShareFiles(TestCase):
 
 class TestFilePage(TestCase):
 
-        """Test FilePage.latest_revision_info.
+    """Test FilePage.latest_revision_info.
 
-        These tests cover exceptions for all properties and methods
-        in FilePage that rely on site.loadimageinfo.
+    These tests cover exceptions for all properties and methods
+    in FilePage that rely on site.loadimageinfo.
 
-        """
+    """
 
-        family = 'wikipedia'
-        code = 'test'
+    family = 'wikipedia'
+    code = 'test'
 
-        cached = True
+    cached = True
 
-        def test_file_info_with_no_page(self):
-            """FilePage:latest_file_info raises NoPage for non existing pages."""
-            site = self.get_site()
-            image = pywikibot.FilePage(site, u'File:NoPage')
-            self.assertFalse(image.exists())
-            with self.assertRaises(pywikibot.NoPage):
-                image = image.latest_file_info
+    def test_file_info_with_no_page(self):
+        """FilePage:latest_file_info raises NoPage for non existing pages."""
+        site = self.get_site()
+        image = pywikibot.FilePage(site, u'File:NoPage')
+        self.assertFalse(image.exists())
+        with self.assertRaises(pywikibot.NoPage):
+            image = image.latest_file_info
 
-        def test_file_info_with_no_file(self):
-            """FilePage:latest_file_info raises PagerelatedError if no file is present."""
-            site = self.get_site()
-            image = pywikibot.FilePage(site, u'File:Test with no image')
-            self.assertTrue(image.exists())
-            with self.assertRaises(pywikibot.PageRelatedError):
-                image = image.latest_file_info
+    def test_file_info_with_no_file(self):
+        """FilePage:latest_file_info raises PagerelatedError if no file is present."""
+        site = self.get_site()
+        image = pywikibot.FilePage(site, u'File:Test with no image')
+        self.assertTrue(image.exists())
+        with self.assertRaises(pywikibot.PageRelatedError):
+            image = image.latest_file_info
 
 
 class TestDeprecatedFilePage(DeprecationTestCase):
