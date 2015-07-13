@@ -11,7 +11,12 @@ __version__ = '$Id$'
 
 import pywikibot
 
-from tests.aspects import unittest, TestCase
+from pywikibot.tools import PY2
+
+from tests.aspects import unittest, TestCase, DeprecationTestCase
+
+if not PY2:
+    unicode = str
 
 
 class TestShareFiles(TestCase):
@@ -148,6 +153,34 @@ class TestFilePage(TestCase):
             self.assertTrue(image.exists())
             with self.assertRaises(pywikibot.PageRelatedError):
                 image = image.latest_file_info
+
+
+class TestDeprecatedFilePage(DeprecationTestCase):
+
+    """Test deprecated parts of FilePage."""
+
+    family = 'commons'
+    code = 'commons'
+
+    cached = True
+
+    def test_getFirstUploader(self):
+        """Test getFirstUploader."""
+        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
+        first = page.getFirstUploader()
+        self.assertOneDeprecation()
+        self.assertEqual(first, ['Herbizid', '2011-03-18T10:04:48Z'])
+        self.assertIsInstance(first[0], unicode)
+        self.assertIsInstance(first[1], unicode)
+
+    def test_getLatestUploader(self):
+        """Test getLatestUploader."""
+        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
+        latest = page.getLatestUploader()
+        self.assertOneDeprecation()
+        self.assertEqual(len(latest), 2)
+        self.assertIsInstance(latest[0], unicode)
+        self.assertIsInstance(latest[1], unicode)
 
 
 if __name__ == '__main__':
