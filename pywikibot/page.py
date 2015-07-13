@@ -1578,7 +1578,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @rtype: tuple(username, Timestamp)
         """
         result = self.oldest_revision
-        return result.user, result.timestamp.isoformat()
+        return result.user, unicode(result.timestamp.isoformat())
 
     @deprecated('contributors() or revisions()')
     @deprecated_args(limit="total")
@@ -1590,7 +1590,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param total: iterate no more than this number of revisions in total
         @rtype: list of dict, each dict containing the username and Timestamp
         """
-        return [{'user': rev.user, 'timestamp': rev.timestamp.isoformat()}
+        return [{'user': rev.user, 'timestamp': unicode(rev.timestamp.isoformat())}
                 for rev in self.revisions(total=total)]
 
     @deprecate_arg("throttle", None)
@@ -2230,7 +2230,7 @@ class FilePage(Page):
 
         """
         return [self.oldest_file_info.user,
-                self.oldest_file_info.timestamp.isoformat()]
+                unicode(self.oldest_file_info.timestamp.isoformat())]
 
     @deprecated("FilePage.latest_file_info.user")
     def getLatestUploader(self):
@@ -2240,7 +2240,7 @@ class FilePage(Page):
 
         """
         return [self.latest_file_info.user,
-                self.latest_file_info.timestamp.isoformat()]
+                unicode(self.latest_file_info.timestamp.isoformat())]
 
     @deprecated('FilePage.get_file_history()')
     def getFileVersionHistory(self):
