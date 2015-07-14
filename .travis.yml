@@ -53,7 +53,7 @@ script:
       echo "usernames['wikipedia']['test'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "usernames['wikidata']['test'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
       echo "usernames['commons']['commons'] = '$PYWIKIBOT2_USERNAME'" >> ~/.pywikibot/user-config.py ;
-      echo "('$PYWIKIBOT2_USERNAME', '$USER_PASSWORD')" > ~/.pywikibot/passwordfile ;
+      printf "('%q', '%q')\n" "$PYWIKIBOT2_USERNAME" "$USER_PASSWORD" > ~/.pywikibot/passwordfile ;
       echo "import os" >> ~/.pywikibot/user-config.py ;
       echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py ;
     fi
