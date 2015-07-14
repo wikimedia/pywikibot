@@ -109,7 +109,9 @@ a username and password to travis:
 4. The next build should run tests that require a logged in user
 
 While passwords in travis-ci environment variables are not leaked in normal
-operations, you are responsible for your own passwords.
+operations, you are responsible for your own passwords. If the password contains
+single quotes it is necessary to surround them in double quotes (see also
+`travis-ci #4350 <https://github.com/travis-ci/travis-ci/issues/4350>`_).
 
 It is strongly recommended that an untrusted bot account is created for
 travis tests, using a password that is not shared with trusted accounts.
