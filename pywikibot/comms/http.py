@@ -46,15 +46,9 @@ from pywikibot.comms import threadedhttp
 from pywikibot.tools import deprecate_arg
 import pywikibot.version
 
-if sys.version_info[:3] >= (2, 7, 9):
-    # Python 2.7.9 includes a backport of the ssl module from Python 3
-    # https://www.python.org/dev/peps/pep-0466/
-    SSL_CERT_VERIFY_FAILED_MSG = "SSL: CERTIFICATE_VERIFY_FAILED"
-else:
-    # The OpenSSL error code for
-    #   certificate verify failed
-    # cf. `openssl errstr 14090086`
-    SSL_CERT_VERIFY_FAILED_MSG = ":14090086:"
+# The error message for failed SSL certificate verification
+# 'certificate verify failed' is a commonly detectable string
+SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
 _logger = "comm.http"
 
