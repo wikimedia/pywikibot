@@ -916,9 +916,6 @@ class checkImagesBot(object):
             return  # Image deleted, no hash found. Skip the image.
 
         site = pywikibot.Site('commons', 'commons')
-        regexOnCommons = (r"\[\[:File:%s\]\] is also on '''Commons''': "
-                          r"\[\[commons:File:.*?\]\](?: \(same name\))?$"
-                          % re.escape(self.imageName))
         commons_image_with_this_hash = next(iter(site.allimages(sha1=hash_found,
                                                                 total=1)), None)
         if commons_image_with_this_hash:
@@ -952,21 +949,16 @@ class checkImagesBot(object):
             # It's not only on commons but the image needs a check
             # the second usually is a url or something like that.
             # Compare the two in equal way, both url.
+            repme = (u"\n*[[:File:%s]] is also on '''Commons''': "
+                     u"[[commons:File:%s]]"
+                     % (self.imageName,
+                        commons_image_with_this_hash.title(
+                            withNamespace=False)))
             if (self.image.title(asUrl=True) ==
                     commons_image_with_this_hash.title(asUrl=True)):
-                repme = (u"\n*[[:File:%s]] is also on '''Commons''': "
-                         u"[[commons:File:%s]] (same name)"
-                         % (self.imageName,
-                            commons_image_with_this_hash.title(
-                                withNamespace=False)))
-            else:
-                repme = (u"\n*[[:File:%s]] is also on '''Commons''': "
-                         u"[[commons:File:%s]]"
-                         % (self.imageName,
-                            commons_image_with_this_hash.title(
-                                withNamespace=False)))
+                repme += " (same name)"
             self.report_image(self.imageName, self.rep_page, self.com, repme,
-                              addings=False, regex=regexOnCommons)
+                              addings=False)
         return True
 
     def checkImageDuplicated(self, duplicates_rollback):
@@ -979,8 +971,6 @@ class checkImagesBot(object):
                                               duplicates_comment_talk)
         dupComment_image = i18n.translate(self.site,
                                                duplicates_comment_image)
-        duplicateRegex = (r'\[\[:File:%s\]\] has the following duplicates'
-                          % re.escape(self.image.title(asUrl=True)))
         imagePage = pywikibot.FilePage(self.site, self.imageName)
         hash_found = imagePage.latest_file_info.sha1
         duplicates = list(self.site.allimages(sha1=hash_found))
@@ -1111,8 +1101,7 @@ class checkImagesBot(object):
                     repme += u"\n**[[:File:%s]]" % dup_page.title(asUrl=True)
 
                 result = self.report_image(self.imageName, self.rep_page,
-                                           self.com, repme, addings=False,
-                                           regex=duplicateRegex)
+                                           self.com, repme, addings=False)
                 if not result:
                     return True  # If Errors, exit (but continue the check)
 
@@ -1123,7 +1112,7 @@ class checkImagesBot(object):
         return True  # Ok - No problem. Let's continue the checking phase
 
     def report_image(self, image_to_report, rep_page=None, com=None,
-                     rep_text=None, addings=True, regex=None):
+                     rep_text=None, addings=True):
         """Report the files to the report page when needed."""
         if not rep_page:
             rep_page = self.rep_page
@@ -1135,9 +1124,6 @@ class checkImagesBot(object):
             rep_text = self.rep_text
 
         another_page = pywikibot.Page(self.site, rep_page)
-
-        if not regex:
-            regex = image_to_report
         try:
             text_get = another_page.get()
         except pywikibot.NoPage:
@@ -1159,12 +1145,13 @@ class checkImagesBot(object):
                 # or not)
                 return True
 
-        # The talk page includes "_" between the two names, in this way I
-        # replace them to " "
-        n = re.compile(regex, re.UNICODE | re.DOTALL)
-        y = n.findall(text_get)
-
-        if y:
+        # Skip if the message is already there.
+        # Don't care for differences inside brackets.
+        end = rep_text.find('(', max(0, rep_text.find(']]')))
+        if end < 0:
+            end = None
+        short_text = rep_text[:end].strip()
+        if short_text in text_get:
             pywikibot.output(u"%s is already in the report page."
                              % image_to_report)
             reported = False
@@ -1396,16 +1383,12 @@ class checkImagesBot(object):
                                         % self.imageName + \
                     "a ''fake license'', license detected: <nowiki>%s</nowiki>" \
                                         % self.license_found
-                regexFakeLicense = r"\* ?\[\[:File:%s\]\] seems to have " \
-                                   % (re.escape(self.imageName)) + \
-                    "a ''fake license'', license detected: <nowiki>%s</nowiki>$" \
-                                   % (re.escape(self.license_found))
                 printWithTimeZone(
                     u"%s seems to have a fake license: %s, reporting..."
                     % (self.imageName, self.license_found))
                 self.report_image(self.imageName,
                                   rep_text=rep_text_license_fake,
-                                  addings=False, regex=regexFakeLicense)
+                                  addings=False)
             elif self.license_found:
                 pywikibot.output(u"[[%s]] seems ok, license found: {{%s}}..."
                                  % (self.imageName, self.license_found))
