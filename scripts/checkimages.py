@@ -905,8 +905,9 @@ class checkImagesBot(object):
         """Checking if the file is on commons."""
         pywikibot.output(u'Checking if [[%s]] is on commons...'
                          % self.imageName)
-        hash_found = self.image.latest_file_info.sha1
-        if not hash_found:
+        try:
+            hash_found = self.image.latest_file_info.sha1
+        except pywikibot.NoPage:
             return  # Image deleted, no hash found. Skip the image.
 
         site = pywikibot.Site('commons', 'commons')
