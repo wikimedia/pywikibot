@@ -271,7 +271,7 @@ class CharsetTestCase(TestCase):
 
     @staticmethod
     def _create_request(charset=None, data=UTF8_BYTES):
-        req = threadedhttp.HttpRequest(None, charset=charset)
+        req = threadedhttp.HttpRequest('', charset=charset)
         resp = requests.Response()
         resp.headers = {'content-type': 'charset=utf-8'}
         resp._content = data[:]
@@ -280,7 +280,7 @@ class CharsetTestCase(TestCase):
 
     def test_no_charset(self):
         """Test decoding without explicit charset."""
-        req = threadedhttp.HttpRequest(None)
+        req = threadedhttp.HttpRequest('')
         resp = requests.Response()
         resp.headers = {'content-type': ''}
         resp._content = CharsetTestCase.LATIN1_BYTES[:]
