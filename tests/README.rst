@@ -2,13 +2,13 @@
 Pywikibot tests
 ===============
 
-The Pywikibot tests are based on the unittest framework
-<https://docs.python.org/2/library/unittest.html>,
-and are compatible with nose.<https://nose.readthedocs.org/>
+The Pywikibot tests are based on the `unittest framework
+<https://docs.python.org/2/library/unittest.html>`_,
+and are compatible with `nose <https://nose.readthedocs.org/>`_.
 
 The tests package provides a function load_tests that supports the
-'load tests protocol'.
-<https://docs.python.org/2/library/unittest.html#load-tests-protocol>.
+`load tests protocol
+<https://docs.python.org/2/library/unittest.html#load-tests-protocol>`_.
 The default ordering begins with tests of underlying components, then tests
 site and page semantics, and finishes with tests of the scripts and finally
 any tests which have not been inserted into the ordered list of tests.
@@ -220,9 +220,9 @@ the class attribute 'sites' may include a hostname.
 Other class attributes
 ----------------------
 
-- 'net = False' : test class does not use a site
-- 'dry = True' : test class can use a fake site object
-- 'user = True' : test class needs to login to site
-- 'sysop = True' : test class needs to login to site as a sysop
-- 'write = True' : test class needs to write to a site
+- ``net = False`` : test class does not use a site
+- ``dry = True`` : test class can use a fake site object
+- ``user = True`` : test class needs to login to site
+- ``sysop = True`` : test class needs to login to site as a sysop
+- ``write = True`` : test class needs to write to a site
 
