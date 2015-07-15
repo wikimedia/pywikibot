@@ -222,7 +222,7 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(len(pi),
                              len(pi.preloaded_modules))
 
-        self.assertIn('info', pi._query_modules)
+        self.assertIn('info', pi.query_modules)
         self.assertIn('login', pi._action_modules)
 
     def test_init_pageset(self):
@@ -354,6 +354,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('foobar', pi._paraminfo)
 
         self.assertRaises(KeyError, pi.__getitem__, 'foobar')
+        self.assertRaises(KeyError, pi.__getitem__, 'foobar+foobar')
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
@@ -363,6 +364,23 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertEqual(len(pi),
                          len(pi.preloaded_modules))
+
+    def test_submodules(self):
+        """Test another module apart from query having submodules."""
+        pi = api.ParamInfo(self.site)
+        self.assertFalse(pi._modules)
+        pi.fetch(['query'])
+        self.assertIn('query', pi._modules)
+        self.assertIsInstance(pi._modules['query'], frozenset)
+        self.assertIn('revisions', pi._modules['query'])
+        self.assertEqual(pi.submodules('query'), pi.query_modules)
+        for mod in pi.submodules('query', True):
+            self.assertEqual(mod[:6], 'query+')
+            self.assertEqual(mod[6:], pi[mod]['name'])
+            self.assertEqual(mod, pi[mod]['path'])
+
+        self.assertRaises(KeyError, pi.__getitem__, 'query+foobar')
+        self.assertRaises(KeyError, pi.submodules, 'edit')
 
     def test_query_modules_with_limits(self):
         site = self.get_site()
@@ -377,6 +395,17 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('revisions', pi.modules)
         self.assertIn('help', pi.modules)
         self.assertIn('allpages', pi.modules)
+        for mod in pi.modules:
+            self.assertNotIn('+', mod)
+
+    def test_module_paths(self):
+        """Test module paths use the complete paths."""
+        pi = api.ParamInfo(self.site)
+        self.assertIn('help', pi.module_paths)
+        self.assertNotIn('revisions', pi.module_paths)
+        self.assertIn('query+revisions', pi.module_paths)
+        self.assertNotIn('allpages', pi.module_paths)
+        self.assertIn('query+allpages', pi.module_paths)
 
     def test_prefixes(self):
         """Test v1.8 module prefixes exist."""
@@ -385,6 +414,24 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('revisions', pi.prefixes)
         self.assertIn('login', pi.prefixes)
         self.assertIn('allpages', pi.prefixes)
+
+    def test_prefix_map(self):
+        """Test module prefixes use the path."""
+        pi = api.ParamInfo(self.site)
+        self.assertIn('query+revisions', pi.prefix_map)
+        self.assertIn('login', pi.prefix_map)
+        self.assertIn('query+allpages', pi.prefix_map)
+        for mod in pi.prefix_map:
+            self.assertEqual(mod, pi[mod]['path'])
+
+    def test_attributes(self):
+        """Test attributes method."""
+        pi = api.ParamInfo(self.site)
+        attributes = pi.attributes('mustbeposted')
+        self.assertIn('edit', attributes)
+        for mod, value in attributes.items():
+            self.assertEqual(mod, pi[mod]['path'])
+            self.assertEqual(value, '')
 
     def test_old_mode(self):
         site = self.get_site()
@@ -418,6 +465,25 @@ class TestParamInfo(DefaultSiteTestCase):
                          1 + len(pi.preloaded_modules))
 
         self.assertIn('revisions', pi.prefixes)
+
+
+class TestOtherSubmodule(TestCase):
+
+    """Test handling multiple different modules having submodules."""
+
+    family = 'mediawiki'
+    code = 'mediawiki'
+
+    def test_other_submodule(self):
+        """Test another module apart from query having submodules."""
+        pi = api.ParamInfo(self.site)
+        self.assertFalse(pi._modules)
+        pi.fetch(['query'])
+        self.assertNotIn('flow', pi._modules)
+        pi.fetch(['flow'])
+        self.assertIn('flow', pi._modules)
+        for modules in pi._modules.values():
+            self.assertIsInstance(modules, frozenset)
 
 
 class TestOptionSet(TestCase):

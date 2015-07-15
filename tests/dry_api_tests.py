@@ -332,8 +332,8 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
         # Pretend that paraminfo has been loaded
         for mod in site._paraminfo.init_modules:
             site._paraminfo._paraminfo[mod] = {}
-        site._paraminfo._query_modules = ['info']
-        site._paraminfo._action_modules = ['edit']
+        site._paraminfo._action_modules = frozenset(['edit'])
+        site._paraminfo._modules = {'query': frozenset(['info'])}
         # TODO: remove access of this private member of ParamInfo
         site._paraminfo._ParamInfo__inited = True
 
