@@ -145,6 +145,8 @@ class ParamInfo(Container):
     Partially supports MW 1.11, using data extracted from API 'help'.
     MW 1.10 not supported as module prefixes are not extracted from API 'help'.
 
+    It does not support the format modules.
+
     TODO: Rewrite help parser to support earlier releases.
 
     TODO: establish a data structure in the class which prefills
@@ -185,10 +187,11 @@ class ParamInfo(Container):
 
         # Cached data.
         self._prefixes = {}
+        self._prefix_map = {}
         self._with_limits = None
 
-        self._action_modules = None
-        self._query_modules = []  # filled in _init()
+        self._action_modules = frozenset()  # top level modules
+        self._modules = {}  # filled in _init() (and enlarged in fetch)
         self._limit = None
 
         self.preloaded_modules = self.init_modules
@@ -199,6 +202,24 @@ class ParamInfo(Container):
         self.modules_only_mode = modules_only_mode
         if self.modules_only_mode:
             self.paraminfo_keys = frozenset(['modules'])
+
+    def _add_submodules(self, name, modules):
+        """Add the modules to the internal cache or check if equal."""
+        # The current implementation here doesn't support submodules inside of
+        # submodules, because that would require to fetch all modules when only
+        # the names of them were requested
+        assert '+' not in name
+        modules = frozenset(modules)
+        if name == 'main':
+            # The main module behaves differently as it has no prefix
+            if self._action_modules:
+                assert modules == self._action_modules
+            else:
+                self._action_modules = modules
+        elif name in self._modules:
+            assert modules == self._modules[name]
+        else:
+            self._modules[name] = modules
 
     def _init(self):
         _mw_ver = MediaWikiVersion(self.site.version())
@@ -228,7 +249,7 @@ class ParamInfo(Container):
         assert(main_modules_param)
         assert('type' in main_modules_param)
         assert(isinstance(main_modules_param['type'], list))
-        self._action_modules = frozenset(main_modules_param['type'])
+        assert self._action_modules == set(main_modules_param['type'])
 
         # While deprecated with warning in 1.25, paraminfo param 'querymodules'
         # provides a list of all query modules. This will likely be removed
@@ -242,36 +263,14 @@ class ParamInfo(Container):
         if query_modules_param and 'type' in query_modules_param:
             # 1.19+ 'type' is the list of modules; on 1.18, it is 'string'
             if isinstance(query_modules_param['type'], list):
-                self._query_modules = frozenset(query_modules_param['type'])
+                self._add_submodules('query', query_modules_param['type'])
 
-        if not self._query_modules:
-            if 'query' not in self._paraminfo:
-                self.fetch(set(['query']), _init=True)
+        if 'query' not in self._modules:
+            assert 'query' not in self._paraminfo
+            self.fetch(set(['query']), _init=True)
+        assert 'query' in self._modules
 
-            meta_param = self.parameter('query', 'meta')
-            prop_param = self.parameter('query', 'prop')
-            list_param = self.parameter('query', 'list')
-            generator_param = self.parameter('query', 'generator')
-
-            assert(meta_param)
-            assert(prop_param)
-            assert(list_param)
-            assert(generator_param)
-            assert('type' in meta_param)
-            assert('type' in prop_param)
-            assert('type' in list_param)
-            assert('type' in generator_param)
-            assert(isinstance(meta_param['type'], list))
-            assert(isinstance(prop_param['type'], list))
-            assert(isinstance(list_param['type'], list))
-            assert(isinstance(generator_param['type'], list))
-
-            self._query_modules = frozenset(
-                meta_param['type'] + prop_param['type'] + list_param['type'] +
-                generator_param['type']
-            )
-
-        _reused_module_names = self._action_modules & self._query_modules
+        _reused_module_names = self._action_modules & self._modules['query']
 
         # The only name clash in core between actions and query submodules is
         # action=tokens and actions=query&meta=tokens, and this will warn if
@@ -323,6 +322,12 @@ class ParamInfo(Container):
 
         action_modules = help_text[start:end].split(', ')
 
+        start = help_text.find('The format of the output')
+        start = help_text.find('One value: ', start) + len('One value: ')
+        end = help_text.find('\n', start)
+
+        format_modules = help_text[start:end].split(', ')
+
         self._paraminfo['main'] = {
             'name': 'main',
             'path': 'main',
@@ -334,6 +339,12 @@ class ParamInfo(Container):
                 {
                     "name": "action",
                     'type': action_modules,
+                    'submodules': '',
+                },
+                {
+                    'name': 'format',
+                    'type': format_modules,
+                    'submodules': '',
                 },
             ],
         }
@@ -399,14 +410,17 @@ class ParamInfo(Container):
                 {
                     'name': 'prop',
                     'type': prop_modules,
+                    'submodules': '',
                 },
                 {
                     'name': 'list',
                     'type': list_modules,
+                    'submodules': '',
                 },
                 {
                     'name': 'meta',
                     'type': meta_modules,
+                    'submodules': '',
                 },
                 {
                     'name': 'generator',
@@ -414,6 +428,8 @@ class ParamInfo(Container):
                 },
             ],
         }
+        # Converted entries added, now treat them like they have been fetched
+        self._generate_submodules(['main', 'query'])
 
         # TODO: rewrite 'help' parser to determine prefix from the parameter
         # names, as API 1.10 help does not include prefix on the first line.
@@ -510,6 +526,15 @@ class ParamInfo(Container):
         @type modules: set
         @rtype: NoneType
         """
+        def module_generator():
+            """A generator yielding batches of modules."""
+            i = itergroup(sorted(modules), self._limit)
+            for batch in i:
+                for failed_module in failed_modules:
+                    yield [failed_module]
+                del failed_modules[:]
+                yield batch
+
         # The first request should be 'paraminfo', so that
         # query modules can be prefixed with 'query+'
         # If _init is True, dont call _init().
@@ -523,7 +548,7 @@ class ParamInfo(Container):
         if not modules:
             return
 
-        assert(self._query_modules or _init)
+        assert 'query' in self._modules or _init
 
         if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
             # When the help is parsed, all paraminfo should already be loaded
@@ -532,6 +557,11 @@ class ParamInfo(Container):
                           % modules, _logger=_logger)
             return
 
+        # If something went wrong in a batch it can add each module to the
+        # batch and the generator will on the next iteration yield each module
+        # separately
+        failed_modules = []
+
         # This can be further optimised, by grouping them in more stable
         # subsets, which are unlikely to change. i.e. first request core
         # modules which have been a stable part of the API for a long time.
@@ -539,7 +569,7 @@ class ParamInfo(Container):
         # Also, when self.modules_only_mode is disabled, both modules and
         # querymodules may each be filled with self._limit items, doubling the
         # number of modules that may be processed in a single batch.
-        for module_batch in itergroup(sorted(modules), self._limit):
+        for module_batch in module_generator():
             if self.modules_only_mode and 'pageset' in module_batch:
                 pywikibot.debug('paraminfo fetch: removed pageset', _logger)
                 module_batch.remove('pageset')
@@ -575,11 +605,99 @@ class ParamInfo(Container):
             result = request.submit()
 
             normalized_result = self.normalize_paraminfo(result)
+            for path in list(normalized_result):
+                if normalized_result[path] is False:
+                    del normalized_result[path]
+
+            # Sometimes the name/path of the module is not actually the name
+            # which was requested, so we need to manually determine which
+            # (wrongly named) module uses which actual name. See also T105478
+            missing_modules = [m for m in module_batch
+                               if m not in normalized_result]
+            if len(missing_modules) == 1 and len(normalized_result) == 1:
+                # Okay it's possible to recover
+                normalized_result = next(iter(normalized_result.values()))
+                pywikibot.warning('The module "{0[name]}" ("{0[path]}") '
+                                  'was returned as path even though "{1}" '
+                                  'was requested'.format(normalized_result,
+                                                         missing_modules[0]))
+                normalized_result['path'] = missing_modules[0]
+                normalized_result['name'] = missing_modules[0].rsplit('+')[0]
+                normalized_result = {missing_modules[0]: normalized_result}
+            elif len(module_batch) > 1 and missing_modules:
+                # Rerequest the missing ones separately
+                pywikibot.log('Inconsitency in batch "{0}"; rerequest '
+                              'separately'.format(missing_modules))
+                failed_modules.extend(missing_modules)
+
+            # Remove all modules which weren't requested, we can't be sure that
+            # they are valid
+            for path in list(normalized_result):
+                if path not in module_batch:
+                    del normalized_result[path]
 
             self._paraminfo.update(normalized_result)
+            self._generate_submodules(mod['path']
+                                      for mod in normalized_result.values())
 
         if 'pageset' in modules and 'pageset' not in self._paraminfo:
             self._emulate_pageset()
+
+    def _generate_submodules(self, modules):
+        """Check and generate submodules for the given modules."""
+        for module in modules:
+            parameters = self._paraminfo[module].get('parameters', [])
+            submodules = set()
+            # Advanced submodule into added to MW API in df80f1ea
+            if self.site.version() >= MediaWikiVersion('1.26wmf9'):
+                # This is supplying submodules even if they aren't submodules of
+                # the given module so skip those
+                for param in parameters:
+                    if ((module == 'main' and param['name'] == 'format') or
+                            'submodules' not in param):
+                        continue
+                    for submodule in param['submodules'].values():
+                        if '+' in submodule:
+                            parent, child = submodule.rsplit('+', 1)
+                        else:
+                            parent = 'main'
+                            child = submodule
+                        if parent == module:
+                            submodules.add(child)
+            else:
+                # Boolean submodule info added to MW API in afa153ae
+                if self.site.version() >= MediaWikiVersion('1.24wmf18'):
+                    params = set(param['name'] for param in parameters
+                                 if 'submodules' in param)
+                else:
+                    if module == 'main':
+                        params = set(['action'])
+                    elif module == 'query':
+                        params = set(['prop', 'list', 'meta'])
+                    else:
+                        params = set()
+                    for param in parameters:
+                        if param['name'] in params:
+                            param['submodules'] = ''
+
+                for param in params:
+                    param = self.parameter(module, param)
+                    # Do not add format modules
+                    if module != 'main' or param['name'] != 'format':
+                        submodules |= set(param['type'])
+
+            if submodules:
+                self._add_submodules(module, submodules)
+            if module == 'query':
+                # Previously also modules from generator were used as query
+                # modules, but verify that those are just a subset of the
+                # prop/list/meta modules. There is no sanity check as this
+                # needs to be revisited if query has no generator parameter
+                for param in parameters:
+                    if param['name'] == 'generator':
+                        break
+                assert param['name'] == 'generator' and \
+                       submodules >= set(param['type'])
 
     def _normalize_modules(self, modules):
         """Add query+ to any query module name not also in action modules."""
@@ -590,7 +708,7 @@ class ParamInfo(Container):
         assert(self._action_modules)
 
         return set('query+' + mod if '+' not in mod and
-                   mod in self._query_modules and
+                   mod in self.query_modules and
                    mod not in self._action_modules
                    else mod
                    for mod in modules)
@@ -610,7 +728,11 @@ class ParamInfo(Container):
 
     @classmethod
     def normalize_paraminfo(cls, data):
-        """Convert both old and new API JSON into a new-ish data structure."""
+        """
+        Convert both old and new API JSON into a new-ish data structure.
+
+        For duplicate paths, the value will be False.
+        """
         result_data = {}
         for paraminfo_key, modules_data in data['paraminfo'].items():
             if not modules_data:
@@ -652,7 +774,15 @@ class ParamInfo(Container):
 
                 path = mod_data['path']
 
-                result_data[path] = mod_data
+                if path in result_data:
+                    # Only warn first time
+                    if result_data[path] is not False:
+                        pywikibot.warning('Path "{0}" is ambiguous.'.format(path))
+                    else:
+                        pywikibot.log('Found another path "{0}"'.format(path))
+                    result_data[path] = False
+                else:
+                    result_data[path] = mod_data
 
         return result_data
 
@@ -730,19 +860,37 @@ class ParamInfo(Container):
         return param_data
 
     @property
+    @deprecated('submodules() or module_paths')
     def modules(self):
         """
         Set of all module names without path prefixes.
 
-        Only includes one 'tokens', even if it appears as both a
-        action and a query submodule.
+        Modules with the same names will be only added once (e.g. 'tokens' from
+        the action modules and query modules).
 
         @return: module names
         @rtype: set of str
         """
+        return self._module_set(False)
+
+    @property
+    def module_paths(self):
+        """Set of all modules using their paths."""
+        return self._module_set(True)
+
+    # As soon as modules() is removed, module_paths and _module_set can be
+    # combined, so don't add any code between these two methods.
+    def _module_set(self, path):
         if not self.__inited:
             self._init()
-        return self._action_modules | self._query_modules
+        # Load the submodules of all action modules available
+        self.fetch(self.action_modules)
+        modules = set(self.action_modules)
+        for parent_module in self._modules:
+            submodules = self.submodules(parent_module, path)
+            assert not submodules & modules or not path
+            modules |= submodules
+        return modules
 
     @property
     def action_modules(self):
@@ -754,9 +902,27 @@ class ParamInfo(Container):
     @property
     def query_modules(self):
         """Set of all query module names without query+ path prefix."""
+        return self.submodules('query')
+
+    def submodules(self, name, path=False):
+        """
+        Set of all submodules.
+
+        @param name: The name of the parent module.
+        @type name: str
+        @param path: Whether the path and not the name is returned.
+        @type path: bool
+        @return: The names or paths of the submodules.
+        @rtype: set
+        """
         if not self.__inited:
             self._init()
-        return self._query_modules
+        if name not in self._modules:
+            self.fetch([name])
+        submodules = self._modules[name]
+        if path:
+            submodules = self._prefix_submodules(submodules, name)
+        return submodules
 
     @staticmethod
     def _prefix_submodules(modules, prefix):
@@ -764,6 +930,7 @@ class ParamInfo(Container):
         return set('{0}+{1}'.format(prefix, mod) for mod in modules)
 
     @property
+    @deprecated('prefix_map')
     def prefixes(self):
         """
         Mapping of module to its prefix for all modules with a prefix.
@@ -774,19 +941,55 @@ class ParamInfo(Container):
             self._prefixes = self.module_attribute_map('prefix')
         return self._prefixes
 
+    @property
+    def prefix_map(self):
+        """
+        Mapping of module to its prefix for all modules with a prefix.
+
+        This loads paraminfo for all modules.
+        """
+        if not self._prefix_map:
+            self._prefix_map = dict((module, prefix) for module, prefix in
+                                    self.attributes('prefix').items()
+                                    if prefix)
+        return self._prefix_map.copy()
+
+    def attributes(self, attribute, modules=None):
+        """
+        Mapping of modules with an attribute to the attribute value.
+
+        It will include all modules which have that attribute set, also if that
+        attribute is empty or set to False.
+
+        @param attribute: attribute name
+        @type attribute: basestring
+        @param modules: modules to include. If None (default), it'll load all
+            modules including all submodules using the paths.
+        @type modules: set or None
+        @rtype: dict using modules as keys
+        """
+        if modules is None:
+            modules = self.module_paths
+        self.fetch(modules)
+
+        return dict((mod, self[mod][attribute])
+                    for mod in modules
+                    if attribute in self[mod])
+
+    @deprecated('attributes')
     def module_attribute_map(self, attribute, modules=None):
         """
         Mapping of modules with an attribute to the attribute value.
 
         @param attribute: attribute name
         @type attribute: basestring
-        @param modules: modules to include (default: all modules)
+        @param modules: modules to include. If None (default) it'll load all
+            action and query modules using the module names. It only uses the
+            path for query modules which have the same name as an action module.
         @type modules: set
         @rtype: dict using modules as keys
         """
         if modules is None:
-            # TODO: The keys for modules with a clash are path prefixed
-            # which is different from all other keys.
             modules = self.modules | self._prefix_submodules(
                 self.query_modules & self.action_modules, 'query')
 
@@ -800,7 +1003,7 @@ class ParamInfo(Container):
     def query_modules_with_limits(self):
         """Set of all query modules which have limits."""
         if not self._with_limits:
-            self.fetch(self._prefix_submodules(self.query_modules, 'query'))
+            self.fetch(self.submodules('query', True))
             self._with_limits = frozenset(
                 [mod for mod in self.query_modules
                  if self.parameter('query+' + mod, 'limit')])
