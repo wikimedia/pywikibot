@@ -16,7 +16,9 @@ else:
     from urlparse import urlparse
 
 import pywikibot.weblib as weblib
+
 from tests.aspects import unittest, TestCase
+from tests.utils import PatchedHttp
 
 
 class TestInternetArchive(TestCase):
@@ -29,15 +31,24 @@ class TestInternetArchive(TestCase):
         },
     }
 
+    def _test_response(self, response, *args, **kwargs):
+        # for later tests this is must be present, and it'll tell us the
+        # original content if that does not match
+        self.assertIn('closest', response.content)
+
     def testInternetArchiveNewest(self):
-        archivedversion = weblib.getInternetArchiveURL('https://google.com')
+        with PatchedHttp(weblib, False) as p:
+            p.after_fetch = self._test_response
+            archivedversion = weblib.getInternetArchiveURL('https://google.com')
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
         self.assertTrue(parsed.path.strip('/').endswith('www.google.com'), parsed.path)
 
     def testInternetArchiveOlder(self):
-        archivedversion = weblib.getInternetArchiveURL('https://google.com', '200606')
+        with PatchedHttp(weblib, False) as p:
+            p.after_fetch = self._test_response
+            archivedversion = weblib.getInternetArchiveURL('https://google.com', '200606')
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
