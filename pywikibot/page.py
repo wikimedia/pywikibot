@@ -3305,9 +3305,20 @@ class WikibasePage(BasePage):
                 self.descriptions[lang] = self._content[
                     'descriptions'][lang]['value']
 
+        # claims
+        self.claims = {}
+        if 'claims' in self._content:
+            for pid in self._content['claims']:
+                self.claims[pid] = []
+                for claim in self._content['claims'][pid]:
+                    c = Claim.fromJSON(self.repo, claim)
+                    c.on_item = self
+                    self.claims[pid].append(c)
+
         return {'aliases': self.aliases,
                 'labels': self.labels,
                 'descriptions': self.descriptions,
+                'claims': self.claims,
                 }
 
     def _diff_to(self, type_key, key_name, value_name, diffto, data):
@@ -3360,6 +3371,35 @@ class WikibasePage(BasePage):
 
         if aliases:
             data['aliases'] = aliases
+
+        claims = {}
+        for prop in self.claims:
+            if len(self.claims[prop]) > 0:
+                claims[prop] = [claim.toJSON() for claim in self.claims[prop]]
+
+        if diffto and 'claims' in diffto:
+            temp = defaultdict(list)
+            claim_ids = set()
+
+            diffto_claims = diffto['claims']
+
+            for prop in claims:
+                for claim in claims[prop]:
+                    if (prop not in diffto_claims or
+                            claim not in diffto_claims[prop]):
+                        temp[prop].append(claim)
+
+                    claim_ids.add(claim['id'])
+
+            for prop, prop_claims in diffto_claims.items():
+                for claim in prop_claims:
+                    if 'id' in claim and claim['id'] not in claim_ids:
+                        temp[prop].append({'id': claim['id'], 'remove': ''})
+
+            claims = temp
+
+        if claims:
+            data['claims'] = claims
         return data
 
     def getID(self, numeric=False, force=False):
@@ -3654,16 +3694,6 @@ class ItemPage(WikibasePage):
         """
         data = super(ItemPage, self).get(force=force, *args, **kwargs)
 
-        # claims
-        self.claims = {}
-        if 'claims' in self._content:
-            for pid in self._content['claims']:
-                self.claims[pid] = list()
-                for claim in self._content['claims'][pid]:
-                    c = Claim.fromJSON(self.repo, claim)
-                    c.on_item = self
-                    self.claims[pid].append(c)
-
         # sitelinks
         self.sitelinks = {}
         if 'sitelinks' in self._content:
@@ -3701,34 +3731,6 @@ class ItemPage(WikibasePage):
 
         self._diff_to('sitelinks', 'site', 'title', diffto, data)
 
-        claims = {}
-        for prop in self.claims:
-            if len(self.claims[prop]) > 0:
-                claims[prop] = [claim.toJSON() for claim in self.claims[prop]]
-
-        if diffto and 'claims' in diffto:
-            temp = defaultdict(list)
-            claim_ids = set()
-
-            diffto_claims = diffto['claims']
-
-            for prop in claims:
-                for claim in claims[prop]:
-                    if (prop not in diffto_claims or
-                            claim not in diffto_claims[prop]):
-                        temp[prop].append(claim)
-
-                    claim_ids.add(claim['id'])
-
-            for prop, prop_claims in diffto_claims.items():
-                for claim in prop_claims:
-                    if 'id' in claim and claim['id'] not in claim_ids:
-                        temp[prop].append({'id': claim['id'], 'remove': ''})
-
-            claims = temp
-
-        if claims:
-            data['claims'] = claims
         return data
 
     def iterlinks(self, family=None):
@@ -3836,7 +3838,8 @@ class ItemPage(WikibasePage):
         """
         Remove the claims from the item.
 
-        @type claims: list
+        @param claims: list of claims to be removed
+        @type claims: list or pywikibot.Claim
 
         """
         # this check allows single claims to be removed by pushing them into a
