@@ -883,7 +883,7 @@ class ParamInfo(Container):
     @deprecated('submodules() or module_paths')
     def modules(self):
         """
-        Set of all module names without path prefixes.
+        Set of all main and query modules without path prefixes.
 
         Modules with the same names will be only added once (e.g. 'tokens' from
         the action modules and query modules).
@@ -891,7 +891,7 @@ class ParamInfo(Container):
         @return: module names
         @rtype: set of str
         """
-        return self._module_set(False)
+        return self.action_modules | self.query_modules
 
     @property
     def module_paths(self):

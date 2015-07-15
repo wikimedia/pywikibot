@@ -482,8 +482,16 @@ class TestOtherSubmodule(TestCase):
         self.assertNotIn('flow', pi._modules)
         pi.fetch(['flow'])
         self.assertIn('flow', pi._modules)
+        other_modules = set()
         for modules in pi._modules.values():
             self.assertIsInstance(modules, frozenset)
+            other_modules |= modules
+
+        other_modules -= pi.action_modules
+        other_modules -= pi.query_modules
+        self.assertLessEqual(other_modules & pi.submodules('flow'),
+                             pi.submodules('flow'))
+        self.assertFalse(other_modules & pi.modules)
 
 
 class TestOptionSet(TestCase):
