@@ -81,9 +81,9 @@ class Board(FlowPage):
 
     """A Flow discussion board."""
 
-    def _load(self):
+    def _load(self, force=False):
         """Load and cache the Board's data, derived from its topic list."""
-        if not hasattr(self, '_data'):
+        if not hasattr(self, '_data') or force:
             self._data = self.site.load_board(self)
         return self._data
 
@@ -143,10 +143,10 @@ class Topic(FlowPage):
 
     """A Flow discussion topic."""
 
-    def _load(self):
+    def _load(self, format='wikitext', force=False):
         """Load and cache the Topic's data."""
-        if not hasattr(self, '_data'):
-            self._data = self.site.load_topic(self)
+        if not hasattr(self, '_data') or force:
+            self._data = self.site.load_topic(self, format)
         return self._data
 
     @classmethod
@@ -192,6 +192,18 @@ class Topic(FlowPage):
         @rtype: list of Posts
         """
         return self.root.replies(format=format, force=force)
+
+    def reply(self, content, format='wikitext'):
+        """A convenience method to reply to this topic's root post.
+
+        @param content: The content of the new post
+        @type content: unicode
+        @param format: The format of the given content
+        @type format: str ('wikitext' or 'html')
+        @return: The new reply to this topic's root post
+        @rtype: Post
+        """
+        return self.root.reply(content, format)
 
 
 # Flow non-page-like objects
@@ -258,9 +270,7 @@ class Post(object):
         if self.uuid not in data['posts']:
             raise ValueError('Post not found in supplied data.')
 
-        self._data = data
         current_revision_id = data['posts'][self.uuid][0]
-
         if current_revision_id not in data['revisions']:
             raise ValueError('Current revision of post'
                              'not found in supplied data.')
@@ -272,12 +282,15 @@ class Post(object):
             assert isinstance(content['content'], unicode)
             self._content[content['format']] = content['content']
 
-    def _load(self, format='wikitext'):
+    def _load(self, format='wikitext', load_from_topic=False):
         """Load and cache the Post's data using the given content format."""
-        data = self.site.load_post_current_revision(self.page, self.uuid,
-                                                    format)
+        if load_from_topic:
+            data = self.page._load(format=format, force=True)
+        else:
+            data = self.site.load_post_current_revision(self.page, self.uuid,
+                                                        format)
         self._set_data(data)
-        return self._data
+        return self._current_revision
 
     @property
     def uuid(self):
@@ -342,10 +355,34 @@ class Post(object):
         if hasattr(self, '_replies') and not force:
             return self._replies
 
+        # load_from_topic workaround due to T106733
+        # (replies not returned by view-post)
         if not hasattr(self, '_current_revision') or force:
-            self._load(format)
+            self._load(format, load_from_topic=True)
 
         reply_uuids = self._current_revision['replies']
         self._replies = [Post(self.page, uuid) for uuid in reply_uuids]
 
         return self._replies
+
+    def reply(self, content, format='wikitext'):
+        """Reply to this post.
+
+        @param content: The content of the new post
+        @type content: unicode
+        @param format: The format of the given content
+        @type format: str ('wikitext' or 'html')
+        @return: The new reply post
+        @rtype: Post
+        """
+        self._load()
+        reply_url = self._current_revision['actions']['reply']['url']
+        parsed_url = urlparse(reply_url)
+        params = parse_qs(parsed_url.query)
+        reply_to = params['topic_postId']
+        if self.uuid == reply_to:
+            del self._current_revision
+            del self._replies
+        data = self.site.reply_to_post(self.page, reply_to, content, format)
+        post = Post(self.page, data['post-id'])
+        return post
