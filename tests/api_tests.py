@@ -10,10 +10,7 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import datetime
-import json
 import types
-
-from collections import Mapping
 
 import pywikibot.data.api as api
 import pywikibot.family
@@ -29,72 +26,13 @@ from tests.aspects import (
     DefaultSiteTestCase,
     DefaultDrySiteTestCase,
 )
-from tests.utils import allowed_failure, FakeLoginManager
+from tests.utils import allowed_failure, FakeLoginManager, PatchedHttp
 
 if not PY2:
     from urllib.parse import unquote_to_bytes
     unicode = str
 else:
     from urllib import unquote_plus as unquote_to_bytes
-
-
-class PatchedRequest(object):
-
-    """
-    A ContextWrapper allowing Request to handle specific returned data.
-
-    This patches the C{http} import in the L{pywikibot.data.api} module to a
-    class simulating C{request}. It has a C{data} attribute which is either a
-    static value which the requests will return or it's a callable returning the
-    data. If it's a callable it'll be called with the same parameters as the
-    original function in the L{pywikibot.comms.http} module, but with an extra
-    argument C{parameters} which contains the extracted parameters.
-
-    A unicode returned will be forwarded directly and a Mapping will be first
-    converted into a json string. If it is False it'll use the original request
-    and do an actual request. Any other types are not allowed.
-    """
-
-    class FakeHttp(object):
-
-        """A fake http module to have a consistent response from request."""
-
-        def __init__(self, wrapper):
-            self.__wrapper = wrapper
-
-        def request(self, *args, **kwargs):
-            result = self.__wrapper.data
-            if callable(result):
-                result = result(*args, **kwargs)
-            if result is False:
-                return self.__wrapper._old_http.request(*args, **kwargs)
-            elif isinstance(result, unicode):
-                return result
-            elif isinstance(result, Mapping):
-                return json.dumps(result)
-            else:
-                raise ValueError('The result is not a valid type '
-                                 '"{0}"'.format(type(result)))
-
-    def __init__(self, data=None):
-        """
-        Initialize the context wrapper.
-
-        @param data: The data for the request which may be changed later. It
-            must be either unicode or Mapping before submitting a request.
-        @type data: unicode or Mapping
-        """
-        super(PatchedRequest, self).__init__()
-        self.data = data
-
-    def __enter__(self):
-        """Patch the http module property."""
-        self._old_http = api.http
-        api.http = PatchedRequest.FakeHttp(self)
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Reset the http module property."""
-        api.http = self._old_http
 
 
 class TestAPIMWException(DefaultSiteTestCase):
@@ -138,7 +76,7 @@ class TestAPIMWException(DefaultSiteTestCase):
         """Test a static request."""
         req = api.Request(site=self.site, parameters={'action': 'query',
                                                       'fake': True})
-        with PatchedRequest(self.data):
+        with PatchedHttp(api, self.data):
             self.assertRaises(api.APIMWException, req.submit)
 
     def test_API_error_encoding_ASCII(self):
@@ -148,7 +86,7 @@ class TestAPIMWException(DefaultSiteTestCase):
                                                       'fake': True,
                                                       'titles': page})
         self.assert_parameters = {'fake': ''}
-        with PatchedRequest(self._dummy_request):
+        with PatchedHttp(api, self._dummy_request):
             self.assertRaises(api.APIMWException, req.submit)
 
     def test_API_error_encoding_Unicode(self):
@@ -158,7 +96,7 @@ class TestAPIMWException(DefaultSiteTestCase):
                                                       'fake': True,
                                                       'titles': page})
         self.assert_parameters = {'fake': ''}
-        with PatchedRequest(self._dummy_request):
+        with PatchedHttp(api, self._dummy_request):
             self.assertRaises(api.APIMWException, req.submit)
 
 
