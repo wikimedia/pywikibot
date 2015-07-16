@@ -641,7 +641,7 @@ class InteractiveReplace(object):
     It shows various options which can be switched on and off:
     * allow_skip_link = True (skip the current link)
     * allow_unlink = True (unlink)
-    * allow_replace = True (just replace target, keep section and label)
+    * allow_replace = False (just replace target, keep section and label)
     * allow_replace_section = False (replace target and section, keep label)
     * allow_replace_label = False (replace target and label, keep section)
     * allow_replace_all = False (replace target, section and label)
@@ -691,7 +691,7 @@ class InteractiveReplace(object):
         self.context_delta = 0
         self.allow_skip_link = True
         self.allow_unlink = True
-        self.allow_replace = True
+        self.allow_replace = False
         self.allow_replace_section = False
         self.allow_replace_label = False
         self.allow_replace_all = False
