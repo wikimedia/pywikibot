@@ -613,9 +613,8 @@ db_connect_file = user_home_path('.my.cnf')
 
 # ############# SEARCH ENGINE SETTINGS ##############
 
-# Some scripts allow using the Yahoo! Search Web Services. To use this feature,
-# you must install the pYsearch module from http://pysearch.sourceforge.net
-# and get a Yahoo AppID from https://developer.yahoo.com/
+# Yahoo! Search Web Services are not operational.
+# See https://phabricator.wikimedia.org/T106085
 yahoo_appid = ''
 
 # To use Windows Live Search web service you must get an AppID from

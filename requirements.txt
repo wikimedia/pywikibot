@@ -44,9 +44,6 @@ python-stdnum
 Pillow
 
 # core pagegenerators
---allow-external pYsearch
---allow-unverified pYsearch
-pYsearch ; python_version < '3'
 google >= 1.7
 socketIO-client<0.6.1
 

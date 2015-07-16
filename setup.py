@@ -35,7 +35,6 @@ if sys.version_info[0] == 2:
     extra_deps.update({
         'csv': ['unicodecsv'],
         'MySQL': ['oursql'],
-        'Yahoo': ['pYsearch'],
     })
 
 script_deps = {
