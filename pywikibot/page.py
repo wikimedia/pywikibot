@@ -3143,6 +3143,7 @@ class WikibasePage(BasePage):
 
         # .site forces a parse of the Link title to determine site
         self.repo = self.site
+        self.id = self._link.title
 
     def _defined_by(self, singular=False):
         """
@@ -3598,7 +3599,7 @@ class ItemPage(WikibasePage):
         # Special case for empty item.
         if title is None or title == '-1':
             super(ItemPage, self).__init__(site, u'-1', ns=ns)
-            self.id = u'-1'
+            assert self.id == '-1'
             return
 
         super(ItemPage, self).__init__(site, title, ns=ns)
@@ -3613,7 +3614,7 @@ class ItemPage(WikibasePage):
                 u"'%s' is not a valid item page title"
                 % self._link.title)
 
-        self.id = self._link.title
+        assert self.id == self._link.title
 
     def title(self, **kwargs):
         """
@@ -3984,11 +3985,10 @@ class PropertyPage(WikibasePage, Property):
         """
         WikibasePage.__init__(self, source, title,
                               ns=source.property_namespace)
-        Property.__init__(self, source, title)
-        self.id = self.title(withNamespace=False).upper()
-        if not self.id.startswith(u'P'):
+        if not title or not self.id.startswith('P'):
             raise pywikibot.InvalidTitle(
                 u"'%s' is not an property page title" % title)
+        Property.__init__(self, source, self.id)
 
     def get(self, force=False, *args):
         """
