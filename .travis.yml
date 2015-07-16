@@ -21,6 +21,8 @@ addons:
       - graphviz
       - liblua5.1-0-dev
 
+cache: pip
+
 before_install:
   # When PYSETUP_TEST_EXTRAS is not enabled, do not allow the
   # default 'install' step to install all dependencies listed in
