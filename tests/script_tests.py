@@ -257,21 +257,18 @@ class TestScriptMeta(MetaTestCaseClass):
                 if result['exit_code'] == -9:
                     print(' killed', end='  ')
 
-                if '-help' in args or error or \
-                        script_name not in auto_run_script_list:
+                if error:
+                    self.assertIn(error, result['stderr'])
 
-                    if error:
-                        self.assertIn(error, result['stderr'])
+                    exit_codes = [0, 1, 2, -9]
+                elif not is_autorun:
+                    if stderr_other == ['']:
+                        stderr_other = None
+                    self.assertIsNone(stderr_other)
+                    self.assertIn('Global arguments available for all',
+                                  result['stdout'])
 
-                        exit_codes = [0, 1, 2, -9]
-                    else:
-                        if stderr_other == ['']:
-                            stderr_other = None
-                        self.assertIsNone(stderr_other)
-                        self.assertIn('Global arguments available for all',
-                                      result['stdout'])
-
-                        exit_codes = [0]
+                    exit_codes = [0]
                 else:
                     # auto-run
                     exit_codes = [0, -9]
