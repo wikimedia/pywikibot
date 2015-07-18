@@ -223,7 +223,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         self.assertIsInstance(logentry.new_ns(), int)
         self.assertEqual(logentry.new_title(), logentry.target_page)
 
-        self._do_test_warning_filename = False
         self.assertDeprecation('pywikibot.logentries.MoveEntry.new_ns is '
                                'deprecated, use target_ns.id instead.')
         self.assertDeprecation('pywikibot.logentries.MoveEntry.new_title is '
@@ -255,7 +254,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         # main page was moved back again, we test it.
         self.assertEqual(mainpage, target.getMovedTarget())
 
-        self._do_test_warning_filename = False
         self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
                                'deprecated, use moved_target() instead.')
 
@@ -265,7 +263,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         with self.assertRaises(pywikibot.NoPage):
             self.get_mainpage(site).getMovedTarget()
 
-        self._do_test_warning_filename = False
         self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
                                'deprecated, use moved_target() instead.')
 
@@ -275,7 +272,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         with self.assertRaises(pywikibot.NoPage):
             page.getMovedTarget()
 
-        self._do_test_warning_filename = False
         self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
                                'deprecated, use moved_target() instead.')
 
