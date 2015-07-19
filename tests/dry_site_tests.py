@@ -217,12 +217,9 @@ class TestNeedVersion(DeprecationTestCase):
 
     def test_need_version_fail_with_deprecated(self):
         """Test order of combined version check and deprecation warning."""
-        # As assertRaisesRegex calls the method, unittest is the module
-        # invoking the method instead of this test module.
-        self._do_test_warning_filename = False
-
         # FIXME: The deprecation message should be:
         #   __name__ + '.TestNeedVersion.deprecated_unavailable_method
+
         # The outermost decorator is the version check, so no deprecation message.
         self.assertRaisesRegex(
             NotImplementedError,
