@@ -112,7 +112,7 @@ If the username does not exist on one of the Travis build sites, user tests
 will not be run on that build site.
 
 While passwords in travis-ci environment variables are not leaked in normal
-operations, you are responsible for your own passwords. If the password contains
+operations, you are responsible for your own passwords. If the variables contain
 single quotes it is necessary to surround them in double quotes (see also
 `travis-ci #4350 <https://github.com/travis-ci/travis-ci/issues/4350>`_).
 
