@@ -733,9 +733,12 @@ class CosmeticChangesToolkit:
         # dash in external link, where the correct end of the URL can
         # be detected from the file extension. It is very unlikely that
         # this will cause mistakes.
+        extensions = [r'\.{0}'.format(ext)
+                      for ext in ['pdf', 'html?', 'php', 'aspx?', 'jsp']]
         text = textlib.replaceExcept(
             text,
-            r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\| *(?P<label>[^\|\]]+?)\]',
+            r'\[(?P<url>https?://[^\|\] ]+?(' + '|'.join(extensions) + r')) *'
+            r'\| *(?P<label>[^\|\]]+?)\]',
             r'[\g<url> \g<label>]', exceptions)
         return text
 
