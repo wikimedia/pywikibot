@@ -4877,7 +4877,8 @@ class APISite(BaseSite):
         "nosuchrcid": "There is no change with rcid %(rcid)s",
         "nosuchrevid": "There is no change with revid %(revid)s",
         "patroldisabled": "Patrolling is disabled on %(site)s wiki",
-        "noautopatrol": "User %(user)s has no permission to patrol its own changes, 'autopatrol' is needed",
+        "noautopatrol": 'User %(user)s has no permission to patrol its own '
+                        'changes, "autopatrol" is needed',
         "notpatrollable": "The revision %(revid)s can't be patrolled as it's too old."
     }
 
