@@ -426,7 +426,6 @@ tkvertsize = 1000
 # The command for the editor you want to use. If set to None, a simple Tkinter
 # editor will be used.
 editor = os.environ.get('EDITOR', None)
-# On Windows systems, this script tries to determine the default text editor.
 
 # Warning: DO NOT use an editor which doesn't support Unicode to edit pages!
 # You will BREAK non-ASCII symbols!
