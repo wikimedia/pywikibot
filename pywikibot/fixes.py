@@ -116,9 +116,11 @@ fixes = {
             (r'([a-zäöüß](\]\])?,)((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1 \3'),
             # Leerzeichen und Komma vertauscht
             (r'([a-zäöüß](\]\])?) ,((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1, \3'),
-            # Plenks (d. h. Leerzeichen auch vor dem Komma/Punkt/Ausrufezeichen/Fragezeichen)
-            # Achtung bei Französisch: https://de.wikipedia.org/wiki/Plenk#Sonderfall_Franz.C3.B6sisch
-            # Leerzeichen vor Doppelpunkt/Semikolon kann korrekt sein, nach irgendeiner Norm für Zitationen.
+            # Plenks (Leerzeichen vor Komma/Punkt/Ausrufezeichen/Fragezeichen)
+            # Achtung bei Französisch:
+            # https://de.wikipedia.org/wiki/Plenk#Franz.C3.B6sische_Sprache
+            # Leerzeichen vor Doppelpunkt/Semikolon kann korrekt sein,
+            # z.B. nach Quellenangaben
             (r'([a-zäöüß](\]\])?) ([,.!?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1\3 \4'),
             #   (u'([a-z]\.)([A-Z])', r'\1 \2'),
         ],
