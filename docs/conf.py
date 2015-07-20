@@ -252,20 +252,25 @@ def pywikibot_env():
 def pywikibot_script_docstring_fixups(
         app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
-    result = ['This script supports use of :py:mod:`pywikibot.pagegenerators` arguments.'
-              if l in ('&params;', '&pagegenerators_help;')
-              else '                  The available fixes are listed in :py:mod:`pywikibot.fixes`.'
-              if l == '&fixes-help;'
-              else l + ':'
-              if l.endswith(':') and not l.strip().startswith(':') and 'Traceback (most recent call last)' not in l
-              else ' ' + l if l.startswith('-')
-              else l.replace('                ', '                 ')
-              if l.startswith('                ')
-              else '  ' + l.strip()
-              if l.strip().startswith('python')
-              else l
-              for l in lines]
-    lines[:] = result[:]
+    for index, line in enumerate(lines):
+        if line in ('&params;', '&pagegenerators_help;'):
+            lines[index] = ('This script supports use of '
+                            ':py:mod:`pywikibot.pagegenerators` arguments.')
+        elif line == '&fixes-help;':
+            lines[index] = ('                  The available fixes are listed '
+                            'in :py:mod:`pywikibot.fixes`.')
+        elif (line.endswith(':') and not line.strip().startswith(':') and
+                'Traceback (most recent call last)' not in line):
+            lines[index] = line + ':'
+        elif line.startswith('-'):
+            # Indent options
+            lines[index] = ' ' + line
+        elif line.startswith('                '):
+            # Indent description of options (as options are indented)
+            lines[index] = line.replace('                ', '                 ')
+        elif line.strip().startswith('python'):
+            # Indent commands
+            lines[index] = '  ' + line.strip()
 
 
 def setup(app):
