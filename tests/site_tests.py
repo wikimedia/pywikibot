@@ -298,14 +298,13 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertIsInstance(mysite.logged_in(True), bool)
         self.assertIsInstance(mysite.userinfo, dict)
 
-        for msg in ("1movedto2", "about", "aboutpage", "aboutsite",
-                    "accesskey-n-portal"):
+        for msg in ('about', 'aboutpage', 'aboutsite', 'accesskey-n-portal'):
             self.assertTrue(mysite.has_mediawiki_message(msg))
             self.assertIsInstance(mysite.mediawiki_message(msg), basestring)
         self.assertFalse(mysite.has_mediawiki_message("nosuchmessage"))
         self.assertRaises(KeyError, mysite.mediawiki_message, "nosuchmessage")
 
-        msg = ("1movedto2", "about", "aboutpage")
+        msg = ('about', 'aboutpage')
         self.assertIsInstance(mysite.mediawiki_messages(msg), dict)
         self.assertTrue(mysite.mediawiki_messages(msg))
 
