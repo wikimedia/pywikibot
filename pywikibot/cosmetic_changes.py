@@ -886,8 +886,15 @@ class CosmeticChangesToolkit:
             text = textlib.replaceExcept(text, str(i), new[i], exceptions)
         return text
 
-    # Retrieved from "https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup"
     def commonsfiledesc(self, text):
+        """
+        Clean up file descriptions on the Wikimedia Commons.
+
+        It is working according to [1] and works only on pages in the file
+        namespace on the Wikimedia Commons.
+
+        [1]: https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
+        """
         if self.site.sitename() != u'commons:commons' or self.namespace == 6:
             return
         # section headers to {{int:}} versions
