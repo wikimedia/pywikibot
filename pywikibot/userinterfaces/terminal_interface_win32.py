@@ -88,11 +88,13 @@ class Win32CtypesUI(Win32BaseUI):
                             lastColor = colorStack[-1]
                         else:
                             lastColor = 'default'
-                        ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[lastColor])
+                        ctypes.windll.kernel32.SetConsoleTextAttribute(
+                            std_out_handle, windowsColors[lastColor])
                 else:
                     colorStack.append(newColor)
                     # set the new color
-                    ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors[newColor])
+                    ctypes.windll.kernel32.SetConsoleTextAttribute(
+                        std_out_handle, windowsColors[newColor])
                 text = text[tagM.end():]
         # print the rest of the text
         if PY2:

@@ -57,7 +57,8 @@ class DryCachedRequestTests(SiteAttributeTestCase):
         self.diffsite = CachedRequest(expiry=1, site=self.altsite, action='query', meta='userinfo')
 
     def test_expiry_formats(self):
-        self.assertEqual(self.req.expiry, CachedRequest(datetime.timedelta(days=1), **self.parms).expiry)
+        self.assertEqual(self.req.expiry,
+                         CachedRequest(datetime.timedelta(days=1), **self.parms).expiry)
 
     def test_expired(self):
         self.assertFalse(self.req._expired(datetime.datetime.now()))

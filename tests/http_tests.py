@@ -241,7 +241,8 @@ class DefaultUserAgentTestCase(TestCase):
 
     def setUp(self):
         self.orig_format = config.user_agent_format
-        config.user_agent_format = '{script_product} ({script_comments}) {pwb} ({revision}) {http_backend} {python}'
+        config.user_agent_format = ('{script_product} ({script_comments}) {pwb} '
+                                    '({revision}) {http_backend} {python}')
 
     def tearDown(self):
         config.user_agent_format = self.orig_format

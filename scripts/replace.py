@@ -644,7 +644,8 @@ class ReplaceRobot(Bot):
                 if choice == 'a':
                     self.options['always'] = True
                 if choice == 'y':
-                    page.put_async(new_text, self.generate_summary(applied), callback=self.count_changes)
+                    page.put_async(new_text, self.generate_summary(applied),
+                                   callback=self.count_changes)
                 # choice must be 'N'
                 break
             if self.getOption('always') and new_text != original_text:

@@ -366,7 +366,8 @@ referencesSections = {
 # on your wiki, you don't have to enter anything here.
 referencesTemplates = {
     'wikipedia': {
-        'ar': [u'Reflist', u'مراجع', u'ثبت المراجع', u'ثبت_المراجع', u'بداية المراجع', u'نهاية المراجع'],
+        'ar': ['Reflist', 'مراجع', 'ثبت المراجع', 'ثبت_المراجع',
+               'بداية المراجع', 'نهاية المراجع'],
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг',
                u'Заўвагі'],
         'be-x-old': [u'Зноскі'],

@@ -1746,7 +1746,8 @@ class Request(MutableMapping):
 
     def __repr__(self):
         """Return internal representation."""
-        return "%s.%s<%s->%r>" % (self.__class__.__module__, self.__class__.__name__, self.site, str(self))
+        return '%s.%s<%s->%r>' % (self.__class__.__module__, self.__class__.__name__,
+                                  self.site, str(self))
 
     def _simulate(self, action):
         """Simulate action."""

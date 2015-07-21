@@ -32,7 +32,7 @@ transferbot.py -v -family:toolserver -tofamily:wikitech -page:"Template:Query se
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -151,9 +151,10 @@ def main(*args):
 
         pywikibot.log("Getting page text.")
         text = page.get(get_redirect=True)
-        text += "<noinclude>\n\n<small>This page was moved from %s. It's edit history can be viewed at %s</small></noinclude>" % (
-                page.title(asLink=True, insite=targetpage.site),
-                edithistpage.title(asLink=True, insite=targetpage.site))
+        text += ("<noinclude>\n\n<small>This page was moved from %s. It's "
+                 "edit history can be viewed at %s</small></noinclude>"
+                 % (page.title(asLink=True, insite=targetpage.site),
+                    edithistpage.title(asLink=True, insite=targetpage.site)))
 
         pywikibot.log("Getting edit history.")
         historytable = page.getVersionHistoryTable()

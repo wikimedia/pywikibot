@@ -168,15 +168,19 @@ class TestTimeStripperLanguage(TestCase):
         'ptwiki': {
             'family': 'wikipedia',
             'code': 'pt',
-            'match': u'19h48min de 3 de fevereiro de 2010‎ (UTC) 19h48min de 7 de fevereiro de 2010‎ (UTC)',
+            'match': '19h48min de 3 de fevereiro de 2010‎ (UTC) 19h48min '
+                     'de 7 de fevereiro de 2010‎ (UTC)',
         },
         'viwiki': {
             'family': 'wikipedia',
             'code': 'vi',
-            'match': u'19:48, ngày 15 tháng 9 năm 2008 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
-            'match2': u'16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, ngày 12 tháng 9 năm 2008 (UTC)',
-            'match3':  u'21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, ngày 14 tháng 8 năm 2014 (UTC)',
-            'nomatch1': u'21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, ngày 14 March 8 năm 2014 (UTC)',
+            'match': '19:48, ngày 15 tháng 9 năm 2008 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
+            'match2': '16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, '
+                      'ngày 12 tháng 9 năm 2008 (UTC)',
+            'match3':  '21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, '
+                       'ngày 14 tháng 8 năm 2014 (UTC)',
+            'nomatch1': '21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, '
+                        'ngày 14 March 8 năm 2014 (UTC)',
         },
     }
 

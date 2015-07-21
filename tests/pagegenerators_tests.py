@@ -278,8 +278,9 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
         self.assertEqual(len(titles), len(self.expected_titles))
-        expected_titles = [expected_title[self.title_columns[site.namespaces[page.namespace()].case]]
-                           for expected_title, page in zip(self.expected_titles, titles)]
+        expected_titles = [
+            expected_title[self.title_columns[site.namespaces[page.namespace()].case]]
+            for expected_title, page in zip(self.expected_titles, titles)]
         self.assertPageTitlesEqual(titles, expected_titles)
 
     def test_lines(self):
@@ -287,8 +288,9 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
         self.assertEqual(len(titles), len(self.expected_titles))
-        expected_titles = [expected_title[self.title_columns[site.namespaces[page.namespace()].case]]
-                           for expected_title, page in zip(self.expected_titles, titles)]
+        expected_titles = [
+            expected_title[self.title_columns[site.namespaces[page.namespace()].case]]
+            for expected_title, page in zip(self.expected_titles, titles)]
         self.assertPageTitlesEqual(titles, expected_titles)
 
 
@@ -531,7 +533,11 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
                                 False)
 
     def test_nonexisting_qualifiers(self):
-        """Test ItemClaimFilterPageGenerator on sample page using qualifiers the page doesn't have."""
+        """
+        Test ItemClaimFilterPageGenerator on sample page.
+
+        The item does not have the searched qualifiers.
+        """
         qualifiers = {
             'P370': pywikibot.WbTime(1950, 1, 1, precision=9,
                                      site=self.get_site()),

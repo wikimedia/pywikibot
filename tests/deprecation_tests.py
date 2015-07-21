@@ -393,7 +393,9 @@ class DeprecatorTestCase(DeprecationTestCase):
 
             rv = func(bah='b')
             self.assertEqual(rv, 'b')
-            self.assertDeprecation('bah argument of ' + __name__ + '.' + func.__name__ + ' is deprecated; use foo instead.')
+            self.assertDeprecation(
+                'bah argument of ' + __name__ + '.' + func.__name__ + ' is '
+                'deprecated; use foo instead.')
 
             self._reset_messages()
 
@@ -427,13 +429,15 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         rv = deprecated_func_arg3(3, loud='3')
         self.assertEqual(rv, 3)
-        self.assertDeprecation('loud argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
+        self.assertDeprecation('loud argument of ' + __name__ +
+                               '.deprecated_func_arg3 is deprecated.')
 
         self._reset_messages()
 
         rv = deprecated_func_arg3(4, old='4')
         self.assertEqual(rv, 4)
-        self.assertDeprecation('old argument of ' + __name__ + '.deprecated_func_arg3 is deprecated.')
+        self.assertDeprecation('old argument of ' + __name__ +
+                               '.deprecated_func_arg3 is deprecated.')
 
         self._reset_messages()
 

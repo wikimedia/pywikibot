@@ -154,7 +154,8 @@ no_args_expected_results = {
 }
 
 if sys.version_info[0] > 2:
-    no_args_expected_results['replicate_wiki'] = 'error: the following arguments are required: destination'
+    no_args_expected_results['replicate_wiki'] = (
+        'error: the following arguments are required: destination')
 else:
     no_args_expected_results['replicate_wiki'] = 'error: too few arguments'
 

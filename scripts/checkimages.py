@@ -185,7 +185,8 @@ empty = {
     'fr': u'{{Bienvenue nouveau\n~~~~\n',
     'ga': u'{{subst:Fáilte}} - ~~~~\n',
     'hu': u'{{subst:Üdvözlet|~~~~}}\n',
-    'it': u'<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n~~~~\n<!-- fine template di benvenuto -->',
+    'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n~~~~\n'
+          '<!-- fine template di benvenuto -->',
     'ja': u'{{subst:Welcome/intro}}\n{{subst:welcome|--~~~~}}\n',
     'ko': u'{{환영}}--~~~~\n',
     'ta': u'{{welcome}}\n~~~~\n',
@@ -254,7 +255,8 @@ delete_immediately_notification = {
     'hu': u'A [[:Kép:%s]] fájlnak rossz a kiterjesztése, kérlek ellenőrízd. ~~~~',
     'it': u'{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Ext|%s|__botnick__}} --~~~~',
     'ko': u'[[:그림:%s]]의 파일 형식이 잘못되었습니다. 확인 바랍니다.--~~~~',
-    'ta': u'[[:படிமம்:%s]] இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு செய்து ஒரு முறை சரி பார்க்கவும் ~~~~',
+    'ta': '[[:படிமம்:%s]] இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு செய்து ஒ'
+          'ரு முறை சரி பார்க்கவும் ~~~~',
     'ur': u'ملف [[:File:%s]] کی توسیع شاید درست نہیں ہے، براہ کرم جانچ لیں۔ ~~~~',
     'zh': u'您好，你上傳的[[:File:%s]]無法被識別，請檢查您的檔案，謝謝。--~~~~',
 }
@@ -308,7 +310,8 @@ nothing_notification = {
     'hu': u"{{subst:adjforrást|Kép:%s}} \n Ezt az üzenetet ~~~ automatikusan "
           u"helyezte el a vitalapodon, kérdéseddel fordulj a gazdájához, vagy "
           u"a [[WP:KF|Kocsmafalhoz]]. --~~~~",
-    'it': u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza|%s|__botnick__}} --~~~~",
+    'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza|'
+          '%s|__botnick__}} --~~~~',
     'ja': u"\n{{subst:Image copyright|File:%s}}--~~~~",
     'ko': u'\n{{subst:User:Kwjbot IV/untagged|%s}} --~~~~',
     'ta': u'\n{{subst:Di-no license-notice|படிமம்:%s}} ~~~~',
@@ -466,7 +469,8 @@ HiddenTemplateNotification = {
                 u"[[File:Human-help-browser.svg|18px|link=Commons:Help desk|?]]"
                 u" '''[[Commons:Help desk|→]] [[Commons:Help desk]]''' in any "
                 u"language you like to use.'' --__botnick__ ~~~~~"),
-    'it': u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Template_insufficiente|%s|__botnick__}} --~~~~",
+    'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/'
+          'Template_insufficiente|%s|__botnick__}} --~~~~',
     'ko': u"\n{{subst:User:Kwj2772/whitetemplates|%s}} --~~~~",
 }
 
@@ -489,7 +493,8 @@ duplicate_user_talk_head = {
 # Message to put in the talk
 duplicates_user_talk_text = {
     'commons': u'{{subst:User:Filnik/duplicates|File:%s|File:%s}}',  # FIXME: it doesn't exist
-    'it': u"{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Duplicati|%s|%s|__botnick__}} --~~~~",
+    'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Duplicati|'
+          '%s|%s|__botnick__}} --~~~~',
 }
 
 # Comment used by the bot while it reports the problem in the uploader's talk
@@ -549,7 +554,8 @@ emailSubject = {
 #         where to send the warning-msg
 uploadBots = {
     'commons': [['File Upload Bot (Magnus Manske)',
-                 r'\|[Ss]ource=Transferred from .*?; transferred to Commons by \[\[User:(.*?)\]\]']],
+                 r'\|[Ss]ource=Transferred from .*?; '
+                 r'transferred to Commons by \[\[User:(.*?)\]\]']],
 }
 
 # Service images that don't have to be deleted and/or reported has a template

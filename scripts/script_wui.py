@@ -50,7 +50,8 @@ Syntax example:
 #
 #  # patches to keep code running
 #  builtin_raw_input = __builtin__.raw_input
-#  __builtin__.raw_input = lambda: 'n'     # overwrite 'raw_input' to run bot non-blocking and simulation mode
+#  # overwrite 'raw_input' to run bot non-blocking and simulation mode
+#  __builtin__.raw_input = lambda: 'n'
 #
 #  # backup sys.argv; depreciated: if possible manipulate pywikibot.config instead
 #  sys_argv = copy.deepcopy( sys.argv )
@@ -98,7 +99,7 @@ bot_config = {
     'BotName': pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
 
     # protected !!! ('CSS' or other semi-protected page is essential here)
-    'ConfCSSshell': u'User:DrTrigon/DrTrigonBot/script_wui-shell.css',    # u'User:DrTrigonBot/Simon sagt' ?
+    'ConfCSSshell': 'User:DrTrigon/DrTrigonBot/script_wui-shell.css',
     'ConfCSScrontab': u'User:DrTrigon/DrTrigonBot/script_wui-crontab.css',
 
     # (may be protected but not that important... 'CSS' is not needed here !!!)
@@ -194,7 +195,9 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             # (date supported only, thus [min] and [hour] dropped)
             entry = crontab.CronTab(timestmp)
             # find the delay from current minute (does not return 0.0 - but next)
-            delay = entry.next(datetime.datetime.now().replace(second=0, microsecond=0) - datetime.timedelta(microseconds=1))
+            now = datetime.datetime.now().replace(second=0, microsecond=0)
+            delay = entry.next(
+                now - datetime.timedelta(microseconds=1))
 
             if (delay <= bot_config['CRONMaxDelay']):
                 pywikibot.output(u"CRONTAB: %s / %s / %s" % (page, rev, timestmp))

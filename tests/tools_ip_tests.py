@@ -73,8 +73,10 @@ class TestIPBase(TestCase):
         self.ipv6test(False, "2001:0000:1234:0000:00001:C1C0:ABCD:0876")  # extra 0 not allowed!
         self.ipv6test(False, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876")  # leading space
         self.ipv6test(False, "2001:0000:1234:0000:0000:C1C0:ABCD:0876 ")  # trailing space
-        self.ipv6test(False, " 2001:0000:1234:0000:0000:C1C0:ABCD:0876 ")  # leading and trailing space
-        self.ipv6test(False, "2001:0000:1234:0000:0000:C1C0:ABCD:0876  0")  # junk after valid address
+        # leading and trailing space
+        self.ipv6test(False, ' 2001:0000:1234:0000:0000:C1C0:ABCD:0876 ')
+        # junk after valid address
+        self.ipv6test(False, '2001:0000:1234:0000:0000:C1C0:ABCD:0876  0')
         self.ipv6test(False, "2001:0000:1234: 0000:0000:C1C0:ABCD:0876")  # internal space
 
         self.ipv6test(False, "3ffe:0b00:0000:0001:0000:0000:000a")  # seven segments
@@ -188,7 +190,8 @@ class TestIPBase(TestCase):
         self.ipv6test(False, "2001:1:1:1:1:1:255Z255X255Y255")  # garbage instead of "." in IPv4
         self.ipv6test(False, "::ffff:192x168.1.26")  # ditto
         self.ipv6test(True, "::ffff:192.168.1.1")
-        self.ipv6test(True, "0:0:0:0:0:0:13.1.68.3")  # IPv4-compatible IPv6 address, full, deprecated
+        # IPv4-compatible IPv6 address, full, deprecated
+        self.ipv6test(True, '0:0:0:0:0:0:13.1.68.3')
         self.ipv6test(True, "0:0:0:0:0:FFFF:129.144.52.38")  # IPv4-mapped IPv6 address, full
         self.ipv6test(True, "::13.1.68.3")  # IPv4-compatible IPv6 address, compressed, deprecated
         self.ipv6test(True, "::FFFF:129.144.52.38")  # IPv4-mapped IPv6 address, compressed
@@ -617,7 +620,8 @@ class TestIPBase(TestCase):
         # Additional cases:
         # http://crisp.tweakblogs.net/blog/2031/ipv6-validation-%28and-caveats%29.html
         self.ipv6test(True, "0:a:b:c:d:e:f::")
-        self.ipv6test(True, "::0:a:b:c:d:e:f")  # syntactically correct, but bad form (::0:... could be combined)
+        # syntactically correct, but bad form (::0:... could be combined)
+        self.ipv6test(True, '::0:a:b:c:d:e:f')
         self.ipv6test(True, "a:b:c:d:e:f:0::")
         self.ipv6test(False, "':10.0.0.1")
 

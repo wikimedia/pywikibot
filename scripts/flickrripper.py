@@ -207,10 +207,11 @@ def getFilename(photoInfo=None, site=None, project=u'Flickr'):
                       % (title, project, username)).exists():
         i = 1
         while True:
-            if pywikibot.Page(site, u'File:%s - %s - %s (%d).jpg' % (title, project, username, i)).exists():
+            name = '%s - %s - %s (%d).jpg' % (title, project, username, i)
+            if pywikibot.Page(site, 'File:' + name).exists():
                 i += 1
             else:
-                return u'%s - %s - %s (%d).jpg' % (title, project, username, i)
+                return name
     else:
         return u'%s - %s - %s.jpg' % (title, project, username)
 
@@ -259,15 +260,17 @@ def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
         description = description.replace(u'{{cc-by-2.0}}\n', u'')
         description = description.replace(u'{{flickrreview}}\n', u'')
         description = description.replace(
-            u'{{copyvio|Flickr, licensed as "All Rights Reserved" which is not a free license --~~~~}}\n',
-            u'')
+            '{{copyvio|Flickr, licensed as "All Rights Reserved" which is not '
+            'a free license --~~~~}}\n',
+            '')
         description = description.replace(u'=={{int:license}}==',
                                           u'=={{int:license}}==\n' + override)
     elif flickrreview:
         if reviewer:
-            description = description.replace(u'{{flickrreview}}',
-                                              u'{{flickrreview|' + reviewer +
-                                              '|{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-{{subst:CURRENTDAY2}}}}')
+            description = description.replace(
+                '{{flickrreview}}',
+                '{{flickrreview|' + reviewer +
+                '|{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-{{subst:CURRENTDAY2}}}}')
     if addCategory:
         description = description.replace(u'{{subst:unc}}\n', u'')
         description = description + u'\n[[Category:' + addCategory + ']]\n'
@@ -309,7 +312,8 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                     pywikibot.warning('Switching to autonomous mode.')
                     autonomous = True
             elif not autonomous:
-                pywikibot.warning('Switching to autonomous mode because GUI interface cannot be used')
+                pywikibot.warning('Switching to autonomous mode because GUI '
+                                  'interface cannot be used')
                 pywikibot.warning(_tk_error)
                 autonomous = True
             if autonomous:
@@ -318,7 +322,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                 skip = False
         # pywikibot.output(newPhotoDescription)
         # if (pywikibot.Page(title=u'File:'+ filename, site=pywikibot.Site()).exists()):
-        # I should probably check if the hash is the same and if not upload it under a different name
+        # TODO: Check if the hash is the same and if not upload it under a different name
         # pywikibot.output(u'File:' + filename + u' already exists!')
         # else:
             # Do the actual upload
@@ -431,7 +435,8 @@ def main(*args):
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'], config.flickr['api_secret'])
         (token, frob) = flickr.get_token_part_one(perms='read')
         if not token:
-            # The user still hasn't authorised this app yet, get_token_part_one() will have spawn a browser window
+            # The user still hasn't authorised this app yet, get_token_part_one()
+            # will have spawn a browser window
             pywikibot.input("Press ENTER after you authorized this program")
         flickr.get_token_part_two((token, frob))
     else:

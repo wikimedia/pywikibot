@@ -129,7 +129,8 @@ def main(*args):
     mysite = pywikibot.Site()
     if mysite.sitename() == 'wikipedia:nl':
         pywikibot.output(
-            u'\03{lightred}There is consensus on the Dutch Wikipedia that bots should not be used to fix redirects.\03{default}')
+            '\03{lightred}There is consensus on the Dutch Wikipedia that '
+            'bots should not be used to fix redirects.\03{default}')
         sys.exit()
 
     if featured:

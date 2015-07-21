@@ -138,7 +138,6 @@ class BlockEntry(LogEntry):
     def __init__(self, apidata, site):
         """Constructor."""
         super(BlockEntry, self).__init__(apidata, site)
-        # see en.wikipedia.org/w/api.php?action=query&list=logevents&letype=block&lelimit=1&lestart=2009-03-04T00:35:07Z
         # When an autoblock is removed, the "title" field is not a page title
         # ( https://bugzilla.wikimedia.org/show_bug.cgi?id=17781 )
         pos = self.data['title'].find('#')

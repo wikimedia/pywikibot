@@ -1247,7 +1247,8 @@ ignoreTemplates = [u'1000Bit',
                    u'Zxx',
                    ]
 
-puttext = u'\n{{Uncategorized|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}}}'
+puttext = ('\n{{Uncategorized|year={{subst:CURRENTYEAR}}|'
+           'month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}}}')
 putcomment = u'Please add categories to this image'
 
 

@@ -578,7 +578,8 @@ def html_comparator(compare_string):
 
     comparands = {'deleted-context': [], 'added-context': []}
     soup = BeautifulSoup(compare_string)
-    for change_type, css_class in (('deleted-context', 'diff-deletedline'), ('added-context', 'diff-addedline')):
+    for change_type, css_class in (('deleted-context', 'diff-deletedline'),
+                                   ('added-context', 'diff-addedline')):
         crutons = soup.find_all('td', class_=css_class)
         for cruton in crutons:
             cruton_string = ''.join(cruton.strings)

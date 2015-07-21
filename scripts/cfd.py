@@ -43,11 +43,14 @@ movemode = re.compile(r"^===*\s*Move/Merge then delete\s*===*\s*$", re.IGNORECAS
 emptymode = re.compile(r"^===*\s*Empty then delete\s*===*\s*$", re.IGNORECASE)
 deletemode = re.compile(r"^===*\s*Ready for deletion\s*===*\s*$", re.IGNORECASE)
 maintenance = re.compile(r"^===*\s*Old by month categories with entries\s*===*\s*$", re.IGNORECASE)
-dateheader = re.compile(r"(\[\[Wikipedia:Categories[_ ]for[_ ](?:discussion|deletion)/Log/([^\]]*?)\]\])",
-                        re.IGNORECASE)
-movecat = re.compile(r"\[\[:Category:([^\]]*?)\]\][^\]]*?\[\[:Category:([^\]]*?)\]\]", re.IGNORECASE)
+dateheader = re.compile(
+    r'(\[\[Wikipedia:Categories[_ ]for[_ ](?:discussion|deletion)/Log/([^\]]*?)\]\])',
+    re.IGNORECASE)
+movecat = re.compile(r'\[\[:Category:([^\]]*?)\]\][^\]]*?\[\[:Category:([^\]]*?)\]\]',
+                     re.IGNORECASE)
 deletecat = re.compile(r"\[\[:Category:([^\]]*?)\]\]", re.IGNORECASE)
-findday = re.compile(r"\[\[(Wikipedia:Categories for (?:discussion|deletion)/Log/\d{4} \w+ \d+)#", re.IGNORECASE)
+findday = re.compile(r'\[\[(Wikipedia:Categories for (?:discussion|deletion)/Log/\d{4} \w+ \d+)#',
+                     re.IGNORECASE)
 
 
 class ReCheck:
@@ -144,7 +147,8 @@ def main(*args):
             # easier to call delete.py on it.
             thisDay = findDay(src, day)
             if (mode == "Empty" or mode == "Delete") and thisDay != "None":
-                summary = "Robot - Removing category " + src + " per [[WP:CFD|CFD]] at " + thisDay + "."
+                summary = 'Robot - Removing category {0} per [[WP:CFD|CFD]] at {1}.'.format(
+                    src, thisDay)
             else:
                 continue
             robot = category.CategoryMoveRobot(oldcat=src, batch=True, comment=summary,
@@ -191,7 +195,8 @@ def findDay(pageTitle, oldDay):
                     elif paramName == 'year':
                         year = paramVal
                 if day and month and year:
-                    return "[[Wikipedia:Categories for discussion/Log/%s %s %s]]" % (year, month, day)
+                    return ('[[Wikipedia:Categories for discussion/Log/%s %s %s]]'
+                            % (year, month, day))
         return oldDay
 
 if __name__ == "__main__":

@@ -56,7 +56,8 @@ class BlockreviewBot:
     }
 
     msg_user = {
-        'de': u'Bot: Administrator [[Benutzer:%(admin)s|%(admin)s]] für Sperrprüfung benachrichtigt',
+        'de': 'Bot: Administrator [[Benutzer:%(admin)s|%(admin)s]] für '
+              'Sperrprüfung benachrichtigt',
     }
 
     msg_done = {

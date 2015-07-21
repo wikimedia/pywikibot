@@ -78,7 +78,8 @@ if sys.platform == "win32":
         GetFileType = WINFUNCTYPE(DWORD, DWORD)(("GetFileType", windll.kernel32))
         FILE_TYPE_CHAR = 0x0002
         FILE_TYPE_REMOTE = 0x8000
-        GetConsoleMode = WINFUNCTYPE(BOOL, HANDLE, POINTER(DWORD))(("GetConsoleMode", windll.kernel32))
+        GetConsoleMode = (WINFUNCTYPE(BOOL, HANDLE, POINTER(DWORD))
+                          (("GetConsoleMode", windll.kernel32)))
         INVALID_HANDLE_VALUE = DWORD(-1).value
 
         def not_a_console(handle):
@@ -251,7 +252,8 @@ if sys.platform == "win32":
 
     # This works around <http://bugs.python.org/issue2128>.
     GetCommandLineW = WINFUNCTYPE(LPWSTR)(("GetCommandLineW", windll.kernel32))
-    CommandLineToArgvW = WINFUNCTYPE(POINTER(LPWSTR), LPCWSTR, POINTER(c_int))(("CommandLineToArgvW", windll.shell32))
+    CommandLineToArgvW = (WINFUNCTYPE(POINTER(LPWSTR), LPCWSTR, POINTER(c_int))
+                          (("CommandLineToArgvW", windll.shell32)))
 
     argc = c_int(0)
     argv_unicode = CommandLineToArgvW(GetCommandLineW(), byref(argc))

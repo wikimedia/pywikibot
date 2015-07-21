@@ -154,8 +154,10 @@ fixes = {
                 r'DOS/4GW',   # Software
                 r'ntfs-3g',   # Dateisystem-Treiber
                 r'/\w(,\w)*/',      # Laut-Aufzählung in der Linguistik
-                r'[xyz](,[xyz])+',  # Variablen in der Mathematik (unklar, ob Leerzeichen hier Pflicht sind)
-                r'(?m)^;(.*?)$',    # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
+                # Variablen in der Mathematik (unklar, ob Leerzeichen hier Pflicht sind)
+                r'[xyz](,[xyz])+',
+                # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
+                r'(?m)^;(.*?)$',
                 r'\d+h( |&nbsp;)\d+m',
                 # Schreibweise für Zeiten, vor allem in Film-Infoboxen.
                 # Nicht korrekt, aber dafür schön kurz.
@@ -193,7 +195,8 @@ fixes = {
             # external link and description separated by a dash.
             # ATTENTION: while this is a mistake in most cases, there are some
             # valid URLs that contain dashes!
-            (r'\[(?P<url>https?://[^\|\]\s]+?) *\| *(?P<label>[^\|\]]+?)\]', r'[\g<url> \g<label>]'),
+            (r'\[(?P<url>https?://[^\|\]\s]+?) *\| *(?P<label>[^\|\]]+?)\]',
+             r'[\g<url> \g<label>]'),
             # wiki link closed by single bracket.
             # ATTENTION: There are some false positives, for example
             # Brainfuck code examples or MS-DOS parameter instructions.
@@ -245,7 +248,8 @@ fixes = {
             # external link and description separated by a dash, with
             # whitespace in front of the dash, so that it is clear that
             # the dash is not a legitimate part of the URL.
-            (r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]', r'[\g<url> \g<label>]'),
+            (r'\[(?P<url>https?://[^\|\] \r\n]+?) +\| *(?P<label>[^\|\]]+?)\]',
+             r'[\g<url> \g<label>]'),
             # dash in external link, where the correct end of the URL can
             # be detected from the file extension. It is very unlikely that
             # this will cause mistakes.
@@ -272,9 +276,11 @@ fixes = {
         'replacements': [
             (r'\batlantische(r|n|) Ozean', r'Atlantische\1 Ozean'),
             (r'\bdeutsche(r|n|) Bundestag\b', r'Deutsche\1 Bundestag'),
-            (r'\bdeutschen Bundestags\b', r'Deutschen Bundestags'),  # Aufpassen, z. B. 'deutsche Bundestagswahl'
+            # Aufpassen, z. B. 'deutsche Bundestagswahl'
+            (r'\bdeutschen Bundestags\b', r'Deutschen Bundestags'),
             (r'\bdeutsche(r|n|) Reich\b', r'Deutsche\1 Reich'),
-            (r'\bdeutschen Reichs\b', r'Deutschen Reichs'),  # Aufpassen, z. B. 'deutsche Reichsgrenzen'
+            # Aufpassen, z. B. 'deutsche Reichsgrenzen'
+            (r'\bdeutschen Reichs\b', r'Deutschen Reichs'),
             (r'\bdritte(n|) Welt(?!krieg)', r'Dritte\1 Welt'),
             (r'\bdreißigjährige(r|n|) Krieg', r'Dreißigjährige\1 Krieg'),
             (r'\beuropäische(n|) Gemeinschaft', r'Europäische\1 Gemeinschaft'),
@@ -352,7 +358,7 @@ fixes = {
             #   (u'&dagger;\[\[(\d)', u'† [[\\1'),
             (r'\[\[(\d+\. (?:Januar|Februar|März|April|Mai|Juni|Juli|August|'
              r'September|Oktober|November|Dezember)) (\d{1,4})\]\]', r'[[\1]] [[\2]]'),
-            # Keine führende Null beim Datum (ersteinmal nur bei denen, bei denen auch ein Leerzeichen fehlt)
+            # Keine führende Null beim Datum (erst einmal nur bei fehlenden Leerzeichen)
             (r'0(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|'
              r'September|Oktober|November|Dezember)', r'\1. \2'),
             # Kein Leerzeichen zwischen Tag und Monat

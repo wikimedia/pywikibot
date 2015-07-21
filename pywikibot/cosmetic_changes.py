@@ -912,7 +912,8 @@ class CosmeticChangesToolkit:
         # frequent field values to {{int:}} versions
         text = textlib.replaceExcept(
             text,
-            r'([\r\n]\|[Ss]ource *\= *)(?:[Oo]wn work by uploader|[Oo]wn work|[Ee]igene [Aa]rbeit) *([\r\n])',
+            r'([\r\n]\|[Ss]ource *\= *)'
+            r'(?:[Oo]wn work by uploader|[Oo]wn work|[Ee]igene [Aa]rbeit) *([\r\n])',
             r'\1{{own}}\2', exceptions, True)
         text = textlib.replaceExcept(
             text,
@@ -937,7 +938,8 @@ class CosmeticChangesToolkit:
             r'\1== {{int:filedesc}} ==', exceptions, True)
         text = textlib.replaceExcept(
             text,
-            r'([\r\n]|^)\=\= *{{int:license-header}} *\=\=(?:[\r\n ]*)\=\= *{{int:license-header}} *\=\=',
+            r'([\r\n]|^)\=\= *{{int:license-header}} *\=\=(?:[\r\n ]*)'
+            r'\=\= *{{int:license-header}} *\=\=',
             r'\1== {{int:license-header}} ==', exceptions, True)
         return text
 

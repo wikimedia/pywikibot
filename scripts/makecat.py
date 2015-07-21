@@ -213,8 +213,8 @@ try:
                                     u'%s:%s'
                                     % (mysite.category_namespace(),
                                        workingcatname))
-    filename = pywikibot.config.datafilepath('category',
-                                             workingcatname.encode('ascii', 'xmlcharrefreplace') + '_exclude.txt')
+    filename = pywikibot.config.datafilepath(
+        'category', workingcatname.encode('ascii', 'xmlcharrefreplace') + '_exclude.txt')
     try:
         f = codecs.open(filename, 'r', encoding=mysite.encoding())
         for line in f.readlines():

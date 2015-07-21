@@ -141,12 +141,14 @@ class TestLiveApiFunctions(WikidataTestCase):
         self.assertEqual(str(q), 'between[569,,+00000002010-01-01T01:00:00Z]')
 
         q = query.Between(569, begin, end)
-        self.assertEqual(str(q), 'between[569,+00000001999-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
+        self.assertEqual(str(q),
+                         'between[569,+00000001999-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
 
         # try negative year
         begin = pywikibot.WbTime(site=self.repo, year=-44)
         q = query.Between(569, begin, end)
-        self.assertEqual(str(q), 'between[569,-00000000044-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
+        self.assertEqual(str(q),
+                         'between[569,-00000000044-01-01T00:00:00Z,+00000002010-01-01T01:00:00Z]')
 
     def testQueriesDirectFromClaim(self):
         """Test construction of the right Query from a page.Claim."""
@@ -192,13 +194,15 @@ class TestLiveApiFunctions(WikidataTestCase):
         qs1 = q1.AND(q2)
         qs2 = q1.OR(qs1).AND(query.HasClaim(98))
 
-        self.assertEqual(str(qs2), '(claim[99:100] OR (claim[99:100] AND claim[99:101])) AND claim[98]')
+        self.assertEqual(str(qs2),
+                         '(claim[99:100] OR (claim[99:100] AND claim[99:101])) AND claim[98]')
 
         # if the joiners are the same, no need to group
         qs1 = q1.AND(q2)
         qs2 = q1.AND(qs1).AND(query.HasClaim(98))
 
-        self.assertEqual(str(qs2), 'claim[99:100] AND claim[99:100] AND claim[99:101] AND claim[98]')
+        self.assertEqual(str(qs2),
+                         'claim[99:100] AND claim[99:100] AND claim[99:101] AND claim[98]')
 
         qs1 = query.HasClaim(100).AND(query.HasClaim(101))
         qs2 = qs1.OR(query.HasClaim(102))

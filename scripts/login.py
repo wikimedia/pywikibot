@@ -79,8 +79,9 @@ def main(*args):
     for arg in pywikibot.handle_args(args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
-                password = pywikibot.input(u'Password for all accounts (no characters will be shown):',
-                                           password=True)
+                password = pywikibot.input(
+                    'Password for all accounts (no characters will be shown):',
+                    password=True)
             else:
                 password = arg[6:]
         elif arg == "-sysop":

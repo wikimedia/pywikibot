@@ -461,7 +461,8 @@ class ReferencesRobot(Bot):
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
         self.NON_HTML = re.compile(
-            br'(?is)<script[^>]*>.*?</script>|<style[^>]*>.*?</style>|<!--.*?-->|<!\[CDATA\[.*?\]\]>')
+            br'(?is)<script[^>]*>.*?</script>|<style[^>]*>.*?</style>|'
+            br'<!--.*?-->|<!\[CDATA\[.*?\]\]>')
 
         # Authorized mime types for HTML pages
         self.MIME = re.compile(
