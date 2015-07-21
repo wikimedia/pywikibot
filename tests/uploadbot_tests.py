@@ -54,11 +54,12 @@ class TestUploadbot(TestCase):
 
     def test_png_url(self):
         """Test uploading a png from url using upload.py."""
-        bot = upload.UploadRobot(url=['https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'],
-                                 description="pywikibot upload.py script test",
-                                 useFilename=None, keepFilename=True,
-                                 verifyDescription=True, aborts=set(),
-                                 ignoreWarning=True, targetSite=self.get_site())
+        bot = upload.UploadRobot(
+            url=['https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'],
+            description="pywikibot upload.py script test",
+            useFilename=None, keepFilename=True,
+            verifyDescription=True, aborts=set(),
+            ignoreWarning=True, targetSite=self.get_site())
         bot.run()
 
 

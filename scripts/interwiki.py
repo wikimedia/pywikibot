@@ -1436,15 +1436,21 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                     f.write(u"* %s {Found more than one link for %s}"
                             % (self.originPage, page.site))
                     if config.interwiki_graph and config.interwiki_graph_url:
-                        filename = interwiki_graph.getFilename(self.originPage, extension=config.interwiki_graph_formats[0])
-                        f.write(u" [%s%s graph]" % (config.interwiki_graph_url, filename))
+                        filename = interwiki_graph.getFilename(
+                            self.originPage,
+                            extension=config.interwiki_graph_formats[0])
+                        f.write(
+                            ' [%s%s graph]'
+                            % (config.interwiki_graph_url, filename))
                     f.write("\n")
                     f.close()
                 # FIXME: What errors are we catching here?
                 # except: should be avoided!!
                 except:
                     # raise
-                    pywikibot.output(u'File autonomous_problems.dat open or corrupted! Try again with -restore.')
+                    pywikibot.output(
+                        'File autonomous_problems.dat open or corrupted! '
+                        'Try again with -restore.')
                     sys.exit()
                 iw = ()
             elif page.isEmpty() and not page.isCategory():
@@ -1473,9 +1479,9 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                                 if prevPage != linkedPage and prevPage.site == lpsite:
                                     # Still, this could be "no problem" as either may be a
                                     # redirect to the other. No way to find out quickly!
-                                    pywikibot.output(u"NOTE: %s: %s gives duplicate interwiki on same site %s"
-                                                     % (self.originPage, page,
-                                                        linkedPage))
+                                    pywikibot.output(
+                                        'NOTE: %s: %s gives duplicate interwiki on same site %s'
+                                        % (self.originPage, page, linkedPage))
                                     break
                             else:
                                 if config.interwiki_shownew:
@@ -1673,7 +1679,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                    (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
                         lclSiteDone = True   # even if we fail the update
-                    if site.family.name in config.usernames and site.code in config.usernames[site.family.name]:
+                    if (site.family.name in config.usernames and
+                            site.code in config.usernames[site.family.name]):
                         try:
                             if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
@@ -1852,7 +1859,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         new.pop(ignorepage.site)
                     else:
                         pywikibot.output(
-                            u"NOTE: Not removing interwiki from %(from)s to %(to)s (exists both commented and non-commented)"
+                            'NOTE: Not removing interwiki from %(from)s to '
+                            '%(to)s (exists both commented and non-commented)'
                             % {'to': ignorepage,
                                'from': page})
             except KeyError:
@@ -2174,7 +2182,8 @@ class InterwikiBot(object):
                     if globalvar.skipauto:
                         dictName, year = page.autoFormat()
                         if dictName is not None:
-                            pywikibot.output(u'Skipping: %s is an auto entry %s(%s)' % (page, dictName, year))
+                            pywikibot.output('Skipping: %s is an auto entry %s(%s)'
+                                             % (page, dictName, year))
                             continue
                     if globalvar.parenthesesonly:
                         # Only yield pages that have ( ) in titles

@@ -97,7 +97,9 @@ class BaseRevertBot(object):
             rev = history[1]
         else:
             return False
-        comment = i18n.twtranslate(pywikibot.Site(), 'revertbot-revert', {'revid': rev[0], 'author': rev[2], 'timestamp': rev[1]})
+        comment = i18n.twtranslate(
+            pywikibot.Site(), 'revertbot-revert',
+            {'revid': rev[0], 'author': rev[2], 'timestamp': rev[1]})
         if self.comment:
             comment += ': ' + self.comment
         page = pywikibot.Page(self.site, item['title'])

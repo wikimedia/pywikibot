@@ -2270,9 +2270,11 @@ formatLimits = {
     'MonthName':     (lambda v: 1 <= v and v < 13,      1, 13),
     'Number':        (lambda v: 0 <= v and v < 1000000, 0, 1001),
     'YearAD':        (lambda v: 0 <= v and v < 2501,    0, 2501),
-    'YearBC':        (lambda v: 0 <= v and v < 4001,    0, 501),   # zh: has years as old as 前1700年
+    # zh: has years as old as 前1700年
+    'YearBC':        (lambda v: 0 <= v and v < 4001,    0, 501),
     'DecadeAD':      (lambda v: 0 <= v and v < 2501,    0, 2501),
-    'DecadeBC':      (lambda v: 0 <= v and v < 4001,    0, 501),   # zh: has decades as old as 前1700年代
+    # zh: has decades as old as 前1700年代
+    'DecadeBC':      (lambda v: 0 <= v and v < 4001,    0, 501),
 
     # Some centuries use Roman numerals or a given list
     # do not exceed them in testing

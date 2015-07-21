@@ -77,14 +77,16 @@ class TestMonthDelta(TestCase):
         self.assertEqual(datetime(2012, 3, 10), date.apply_month_delta(datetime(2012, 1, 10), 2))
         self.assertEqual(datetime(2012, 3, 31), date.apply_month_delta(datetime(2012, 1, 31), 2))
         self.assertEqual(datetime(2012, 2, 29), date.apply_month_delta(datetime(2012, 1, 31)))
-        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 1, 31), add_overlap=True))
+        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 1, 31),
+                         add_overlap=True))
 
     def test_apply_negative_delta(self):
         """Test adding months to a date."""
         self.assertEqual(datetime(2012, 1, 10), date.apply_month_delta(datetime(2012, 3, 10), -2))
         self.assertEqual(datetime(2012, 1, 31), date.apply_month_delta(datetime(2012, 3, 31), -2))
         self.assertEqual(datetime(2012, 2, 29), date.apply_month_delta(datetime(2012, 3, 31), -1))
-        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 3, 31), -1, add_overlap=True))
+        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 3, 31), -1,
+                         add_overlap=True))
 
     def test_get_delta(self):
         """Test that the delta is calculated correctly."""

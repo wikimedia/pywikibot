@@ -65,7 +65,8 @@ class IllustrateRobot(WikidataBot):
 
         claims = item.get().get('claims')
         if self.wdproperty in claims:
-            pywikibot.output(u'Item %s already contains image (%s)' % (item.title(), self.wdproperty))
+            pywikibot.output('Item %s already contains image (%s)'
+                             % (item.title(), self.wdproperty))
             return
 
         newclaim = pywikibot.Claim(self.repo, self.wdproperty)

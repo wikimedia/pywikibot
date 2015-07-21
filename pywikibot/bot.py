@@ -1971,8 +1971,8 @@ class WikidataBot(Bot):
         self.source_values = json.loads(page.get())
         for family_code, family in self.source_values.items():
             for source_lang in family:
-                self.source_values[family_code][source_lang] = pywikibot.ItemPage(self.repo,
-                                                                                  family[source_lang])
+                self.source_values[family_code][source_lang] = pywikibot.ItemPage(
+                    self.repo, family[source_lang])
 
     def get_property_by_name(self, property_name):
         """
@@ -2044,7 +2044,8 @@ class WikidataBot(Bot):
 
         @return: Claim
         """
-        if site.family.name in self.source_values and site.code in self.source_values[site.family.name]:
+        if (site.family.name in self.source_values and
+                site.code in self.source_values[site.family.name]):
             source = pywikibot.Claim(self.repo, 'P143')
             source.setTarget(self.source_values.get(site.family.name).get(site.code))
             return source

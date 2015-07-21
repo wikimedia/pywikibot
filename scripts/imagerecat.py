@@ -248,7 +248,8 @@ def getOpenStreetMap(latitude, longitude):
         elif addresspart.tag in invalidParts:
             pywikibot.output(u'Dropping %s, %s' % (addresspart.tag, addresspart.text))
         else:
-            pywikibot.warning(u'%s, %s is not in addressparts lists' % (addresspart.tag, addresspart.text))
+            pywikibot.warning('%s, %s is not in addressparts lists'
+                              % (addresspart.tag, addresspart.text))
     return result
 
 
@@ -409,7 +410,8 @@ def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
     if onlyFilter:
         comment = u'Filtering categories'
     else:
-        comment = u'Image is categorized by a bot using data from [[Commons:Tools#CommonSense|CommonSense]]'
+        comment = ('Image is categorized by a bot using data from '
+                   '[[Commons:Tools#CommonSense|CommonSense]]')
     pywikibot.showDiff(imagepage.text, newtext)
     imagepage.text = newtext
     imagepage.save(comment)
@@ -429,7 +431,8 @@ def removeTemplates(oldtext=u''):
 
 def getCheckCategoriesTemplate(usage, galleries, ncats):
     """Build the check categories template with all parameters."""
-    result = u'{{Check categories|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}\n'
+    result = ('{{Check categories|year={{subst:CURRENTYEAR}}|month={{subst:'
+              'CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}\n')
     usageCounter = 1
     for (lang, project, article) in usage:
         result += u'|lang%d=%s' % (usageCounter, lang)

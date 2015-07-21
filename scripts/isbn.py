@@ -67,8 +67,8 @@ docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
 }
 
-# Maps each group number to the list of its publisher number ranges.
-# Taken from https://web.archive.org/web/20090823122028/http://www.isbn-international.org/converter/ranges.htm
+# Maps each group number to the list of its publisher number ranges. Taken from:
+# https://web.archive.org/web/20090823122028/http://www.isbn-international.org/converter/ranges.htm
 ranges = {
     '0': [  # English speaking area
         ('00', '19'),

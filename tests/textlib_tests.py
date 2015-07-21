@@ -62,14 +62,19 @@ class TestSectionFunctions(TestCase):
 
     def testSpacesInSection(self):
         self.assertContains("enwiki_help_editing", u"Minor_edits")
-        self.assertNotContains("enwiki_help_editing", u"#Minor edits", "Incorrect, '#Minor edits' does not work")
-        self.assertNotContains("enwiki_help_editing", u"Minor Edits", "section hashes are case-sensitive")
-        self.assertNotContains("enwiki_help_editing", u"Minor_Edits", "section hashes are case-sensitive")
+        self.assertNotContains('enwiki_help_editing', '#Minor edits',
+                               "Incorrect, '#Minor edits' does not work")
+        self.assertNotContains('enwiki_help_editing', 'Minor Edits',
+                               'section hashes are case-sensitive')
+        self.assertNotContains('enwiki_help_editing', 'Minor_Edits',
+                               'section hashes are case-sensitive')
 
     @unittest.expectedFailure
     def testNonAlphabeticalCharactersInSection(self):
-        self.assertContains("enwiki_help_editing", u"Talk_.28discussion.29_pages", "As used in the TOC")
-        self.assertContains("enwiki_help_editing", u"Talk_(discussion)_pages", "Understood by mediawiki")
+        self.assertContains('enwiki_help_editing', 'Talk_.28discussion.29_pages',
+                            'As used in the TOC')
+        self.assertContains('enwiki_help_editing', 'Talk_(discussion)_pages',
+                            'Understood by mediawiki')
 
     def test_spaces_outside_section(self):
         self.assertContains("enwiki_help_editing", u"Naming and_moving")
@@ -79,12 +84,17 @@ class TestSectionFunctions(TestCase):
     def test_link_in_section(self):
         # section is ==[[Wiki markup]]==
         self.assertContains("enwiki_help_editing", u"[[Wiki markup]]", "Link as section header")
-        self.assertContains("enwiki_help_editing", u"[[:Wiki markup]]", "section header link with preleading colon")
-        self.assertNotContains("enwiki_help_editing", u"Wiki markup", "section header must be a link")
+        self.assertContains('enwiki_help_editing', '[[:Wiki markup]]',
+                            'section header link with preleading colon')
+        self.assertNotContains('enwiki_help_editing', 'Wiki markup',
+                               'section header must be a link')
         # section is ===[[:Help]]ful tips===
-        self.assertContains("enwiki_help_editing", u"[[Help]]ful tips", "Containing link")
-        self.assertContains("enwiki_help_editing", u"[[:Help]]ful tips", "Containing link with preleading colon")
-        self.assertNotContains("enwiki_help_editing", u"Helpful tips", "section header must contain a link")
+        self.assertContains('enwiki_help_editing', '[[Help]]ful tips',
+                            'Containing link')
+        self.assertContains('enwiki_help_editing', '[[:Help]]ful tips',
+                            'Containing link with preleading colon')
+        self.assertNotContains('enwiki_help_editing', 'Helpful tips',
+                               'section header must contain a link')
 
 
 class TestFormatInterwiki(TestCase):
@@ -283,7 +293,8 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a|b=<noinclude>{{{1}}}</noinclude>}}'),
                          [('a', OrderedDict((('b', '<noinclude>{{{1}}}</noinclude>'), )))])
         self.assertEqual(func('{{subst:a|b=c}}'), [('subst:a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{safesubst:a|b=c}}'), [('safesubst:a', OrderedDict((('b', 'c'), )))])
+        self.assertEqual(func('{{safesubst:a|b=c}}'),
+                         [('safesubst:a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{msgnw:a|b=c}}'), [('msgnw:a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{Template:a|b=c}}'), [('Template:a', OrderedDict((('b', 'c'), )))])
         self.assertEqual(func('{{template:a|b=c}}'), [('template:a', OrderedDict((('b', 'c'), )))])

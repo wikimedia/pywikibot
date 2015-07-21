@@ -71,8 +71,8 @@ class HarvestRobot(WikidataBot):
         if temp.isRedirectPage():
             temp = temp.getRedirectTarget()
         titles = [page.title(withNamespace=False)
-                  for page
-                  in temp.getReferences(redirectsOnly=True, namespaces=[10], follow_redirects=False)]
+                  for page in temp.getReferences(redirectsOnly=True, namespaces=[10],
+                                                 follow_redirects=False)]
         titles.append(temp.title(withNamespace=False))
         return titles
 
@@ -161,7 +161,8 @@ class HarvestRobot(WikidataBot):
                                 claim.setTarget(value.strip())
                             elif claim.type == 'commonsMedia':
                                 commonssite = pywikibot.Site("commons", "commons")
-                                imagelink = pywikibot.Link(value, source=commonssite, defaultNamespace=6)
+                                imagelink = pywikibot.Link(value, source=commonssite,
+                                                           defaultNamespace=6)
                                 image = pywikibot.FilePage(imagelink)
                                 if image.isRedirectPage():
                                     image = pywikibot.FilePage(image.getRedirectTarget())
@@ -173,7 +174,8 @@ class HarvestRobot(WikidataBot):
                                 pywikibot.output("%s is not a supported datatype." % claim.type)
                                 continue
 
-                            pywikibot.output('Adding %s --> %s' % (claim.getID(), claim.getTarget()))
+                            pywikibot.output('Adding %s --> %s'
+                                             % (claim.getID(), claim.getTarget()))
                             item.addClaim(claim)
                             # A generator might yield pages from multiple sites
                             source = self.getSource(page.site)

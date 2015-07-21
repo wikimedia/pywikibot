@@ -572,7 +572,8 @@ class WindowsTerminalTestCase(UITestCase):
         # select all and copy to clipboard
         self._app.window_().SetFocus()
         self.waitForWindow()
-        self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}', with_spaces=True)
+        self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}',
+                                     with_spaces=True)
 
         while True:
             data = self.getclip()

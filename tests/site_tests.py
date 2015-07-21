@@ -237,13 +237,20 @@ class TestSiteObject(DefaultSiteTestCase):
 
     def testConstructors(self):
         """Test cases for site constructors."""
-        self.assertEqual(pywikibot.site.APISite.fromDBName('enwiki'), pywikibot.Site('en', 'wikipedia'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('eswikisource'), pywikibot.Site('es', 'wikisource'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('dewikinews'), pywikibot.Site('de', 'wikinews'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('ukwikivoyage'), pywikibot.Site('uk', 'wikivoyage'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('metawiki'), pywikibot.Site('meta', 'meta'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('commonswiki'), pywikibot.Site('commons', 'commons'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('wikidatawiki'), pywikibot.Site('wikidata', 'wikidata'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('enwiki'),
+                         pywikibot.Site('en', 'wikipedia'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('eswikisource'),
+                         pywikibot.Site('es', 'wikisource'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('dewikinews'),
+                         pywikibot.Site('de', 'wikinews'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('ukwikivoyage'),
+                         pywikibot.Site('uk', 'wikivoyage'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('metawiki'),
+                         pywikibot.Site('meta', 'meta'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('commonswiki'),
+                         pywikibot.Site('commons', 'commons'))
+        self.assertEqual(pywikibot.site.APISite.fromDBName('wikidatawiki'),
+                         pywikibot.Site('wikidata', 'wikidata'))
 
     def testLanguageMethods(self):
         """Test cases for languages() and related methods."""
@@ -332,7 +339,8 @@ class TestSiteObject(DefaultSiteTestCase):
 
         self.assertEqual(mysite.months_names[4], (u'May', u'May'))
         self.assertEqual(mysite.list_to_text(('Pride', 'Prejudice')), 'Pride and Prejudice')
-        self.assertEqual(mysite.list_to_text(('This', 'that', 'the other')), 'This, that and the other')
+        self.assertEqual(mysite.list_to_text(('This', 'that', 'the other')),
+                         'This, that and the other')
 
     def testPageMethods(self):
         """Test ApiSite methods for getting page-specific info."""
@@ -701,34 +709,41 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for t in range(1, len(timestamps)):
             self.assertGreaterEqual(timestamps[t], timestamps[t - 1])
 
-        for block in mysite.blocks(starttime=pywikibot.Timestamp.fromISOformat("2008-07-01T00:00:01Z"), total=5):
+        for block in mysite.blocks(
+                starttime=pywikibot.Timestamp.fromISOformat('2008-07-01T00:00:01Z'),
+                total=5):
             self.assertIsInstance(block, dict)
             for prop in props:
                 self.assertIn(prop, block)
-        for block in mysite.blocks(endtime=pywikibot.Timestamp.fromISOformat("2008-07-31T23:59:59Z"), total=5):
+        for block in mysite.blocks(
+                endtime=pywikibot.Timestamp.fromISOformat('2008-07-31T23:59:59Z'),
+                total=5):
             self.assertIsInstance(block, dict)
             for prop in props:
                 self.assertIn(prop, block)
-        for block in mysite.blocks(starttime=pywikibot.Timestamp.fromISOformat("2008-08-02T00:00:01Z"),
-                                   endtime=pywikibot.Timestamp.fromISOformat("2008-08-02T23:59:59Z"),
-                                   reverse=True, total=5):
+        for block in mysite.blocks(
+                starttime=pywikibot.Timestamp.fromISOformat('2008-08-02T00:00:01Z'),
+                endtime=pywikibot.Timestamp.fromISOformat("2008-08-02T23:59:59Z"),
+                reverse=True, total=5):
             self.assertIsInstance(block, dict)
             for prop in props:
                 self.assertIn(prop, block)
-        for block in mysite.blocks(starttime=pywikibot.Timestamp.fromISOformat("2008-08-03T23:59:59Z"),
-                                   endtime=pywikibot.Timestamp.fromISOformat("2008-08-03T00:00:01Z"),
-                                   total=5):
+        for block in mysite.blocks(
+                starttime=pywikibot.Timestamp.fromISOformat('2008-08-03T23:59:59Z'),
+                endtime=pywikibot.Timestamp.fromISOformat("2008-08-03T00:00:01Z"),
+                total=5):
             self.assertIsInstance(block, dict)
             for prop in props:
                 self.assertIn(prop, block)
         # starttime earlier than endtime
-        self.assertRaises(pywikibot.Error, mysite.blocks,
+        self.assertRaises(pywikibot.Error, mysite.blocks, total=5,
                           starttime=pywikibot.Timestamp.fromISOformat("2008-08-03T00:00:01Z"),
-                          endtime=pywikibot.Timestamp.fromISOformat("2008-08-03T23:59:59Z"), total=5)
+                          endtime=pywikibot.Timestamp.fromISOformat('2008-08-03T23:59:59Z'))
         # reverse: endtime earlier than starttime
         self.assertRaises(pywikibot.Error, mysite.blocks,
                           starttime=pywikibot.Timestamp.fromISOformat("2008-08-03T23:59:59Z"),
-                          endtime=pywikibot.Timestamp.fromISOformat("2008-08-03T00:00:01Z"), reverse=True, total=5)
+                          endtime=pywikibot.Timestamp.fromISOformat('2008-08-03T00:00:01Z'),
+                          reverse=True, total=5)
         for block in mysite.blocks(users='80.100.22.71', total=5):
             self.assertIsInstance(block, dict)
             self.assertEqual(block['user'], '80.100.22.71')
@@ -909,21 +924,25 @@ class SiteUserTestCase(DefaultSiteTestCase):
             self.assertEqual(entry.page(), mainpage)
         for entry in mysite.logevents(user=mysite.user(), total=3):
             self.assertEqual(entry.user(), mysite.user())
-        for entry in mysite.logevents(start=pywikibot.Timestamp.fromISOformat("2008-09-01T00:00:01Z"), total=5):
+        for entry in mysite.logevents(
+                start=pywikibot.Timestamp.fromISOformat('2008-09-01T00:00:01Z'), total=5):
             self.assertIsInstance(entry, pywikibot.logentries.LogEntry)
             self.assertLessEqual(str(entry.timestamp()), "2008-09-01T00:00:01Z")
-        for entry in mysite.logevents(end=pywikibot.Timestamp.fromISOformat("2008-09-02T23:59:59Z"), total=5):
+        for entry in mysite.logevents(
+                end=pywikibot.Timestamp.fromISOformat('2008-09-02T23:59:59Z'), total=5):
             self.assertIsInstance(entry, pywikibot.logentries.LogEntry)
             self.assertGreaterEqual(str(entry.timestamp()), "2008-09-02T23:59:59Z")
-        for entry in mysite.logevents(start=pywikibot.Timestamp.fromISOformat("2008-02-02T00:00:01Z"),
-                                      end=pywikibot.Timestamp.fromISOformat("2008-02-02T23:59:59Z"),
-                                      reverse=True, total=5):
+        for entry in mysite.logevents(
+                start=pywikibot.Timestamp.fromISOformat('2008-02-02T00:00:01Z'),
+                end=pywikibot.Timestamp.fromISOformat("2008-02-02T23:59:59Z"),
+                reverse=True, total=5):
             self.assertIsInstance(entry, pywikibot.logentries.LogEntry)
             self.assertTrue(
                 "2008-02-02T00:00:01Z" <= str(entry.timestamp()) <= "2008-02-02T23:59:59Z")
-        for entry in mysite.logevents(start=pywikibot.Timestamp.fromISOformat("2008-02-03T23:59:59Z"),
-                                      end=pywikibot.Timestamp.fromISOformat("2008-02-03T00:00:01Z"),
-                                      total=5):
+        for entry in mysite.logevents(
+                start=pywikibot.Timestamp.fromISOformat('2008-02-03T23:59:59Z'),
+                end=pywikibot.Timestamp.fromISOformat("2008-02-03T00:00:01Z"),
+                total=5):
             self.assertIsInstance(entry, pywikibot.logentries.LogEntry)
             self.assertTrue(
                 "2008-02-03T00:00:01Z" <= str(entry.timestamp()) <= "2008-02-03T23:59:59Z")
@@ -934,7 +953,8 @@ class SiteUserTestCase(DefaultSiteTestCase):
         # reverse: endtime earlier than starttime
         self.assertRaises(pywikibot.Error, mysite.logevents,
                           start=pywikibot.Timestamp.fromISOformat("2008-02-03T23:59:59Z"),
-                          end=pywikibot.Timestamp.fromISOformat("2008-02-03T00:00:01Z"), reverse=True, total=5)
+                          end=pywikibot.Timestamp.fromISOformat('2008-02-03T00:00:01Z'),
+                          reverse=True, total=5)
 
     def testRecentchanges(self):
         """Test the site.recentchanges() method."""
@@ -950,31 +970,37 @@ class SiteUserTestCase(DefaultSiteTestCase):
         self.assertLessEqual(len(rc), 10)
         self.assertTrue(all(isinstance(change, dict)
                             for change in rc))
-        for change in mysite.recentchanges(start=pywikibot.Timestamp.fromISOformat("2008-10-01T01:02:03Z"),
-                                           total=5):
+        for change in mysite.recentchanges(
+                start=pywikibot.Timestamp.fromISOformat('2008-10-01T01:02:03Z'),
+                total=5):
             self.assertIsInstance(change, dict)
             self.assertLessEqual(change['timestamp'], "2008-10-01T01:02:03Z")
-        for change in mysite.recentchanges(end=pywikibot.Timestamp.fromISOformat("2008-04-01T02:03:04Z"),
-                                           total=5):
+        for change in mysite.recentchanges(
+                end=pywikibot.Timestamp.fromISOformat('2008-04-01T02:03:04Z'),
+                total=5):
             self.assertIsInstance(change, dict)
             self.assertGreaterEqual(change['timestamp'], "2008-10-01T02:03:04Z")
-        for change in mysite.recentchanges(start=pywikibot.Timestamp.fromISOformat("2008-10-01T03:05:07Z"),
-                                           total=5, reverse=True):
+        for change in mysite.recentchanges(
+                start=pywikibot.Timestamp.fromISOformat('2008-10-01T03:05:07Z'),
+                total=5, reverse=True):
             self.assertIsInstance(change, dict)
             self.assertGreaterEqual(change['timestamp'], "2008-10-01T03:05:07Z")
-        for change in mysite.recentchanges(end=pywikibot.Timestamp.fromISOformat("2008-10-01T04:06:08Z"),
-                                           total=5, reverse=True):
+        for change in mysite.recentchanges(
+                end=pywikibot.Timestamp.fromISOformat('2008-10-01T04:06:08Z'),
+                total=5, reverse=True):
             self.assertIsInstance(change, dict)
             self.assertLessEqual(change['timestamp'], "2008-10-01T04:06:08Z")
-        for change in mysite.recentchanges(start=pywikibot.Timestamp.fromISOformat("2008-10-03T11:59:59Z"),
-                                           end=pywikibot.Timestamp.fromISOformat("2008-10-03T00:00:01Z"),
-                                           total=5):
+        for change in mysite.recentchanges(
+                start=pywikibot.Timestamp.fromISOformat('2008-10-03T11:59:59Z'),
+                end=pywikibot.Timestamp.fromISOformat("2008-10-03T00:00:01Z"),
+                total=5):
             self.assertIsInstance(change, dict)
             self.assertTrue(
                 "2008-10-03T00:00:01Z" <= change['timestamp'] <= "2008-10-03T11:59:59Z")
-        for change in mysite.recentchanges(start=pywikibot.Timestamp.fromISOformat("2008-10-05T06:00:01Z"),
-                                           end=pywikibot.Timestamp.fromISOformat("2008-10-05T23:59:59Z"),
-                                           reverse=True, total=5):
+        for change in mysite.recentchanges(
+                start=pywikibot.Timestamp.fromISOformat('2008-10-05T06:00:01Z'),
+                end=pywikibot.Timestamp.fromISOformat("2008-10-05T23:59:59Z"),
+                reverse=True, total=5):
             self.assertIsInstance(change, dict)
             self.assertTrue(
                 "2008-10-05T06:00:01Z" <= change['timestamp'] <= "2008-10-05T23:59:59Z")
@@ -985,7 +1011,8 @@ class SiteUserTestCase(DefaultSiteTestCase):
         # reverse: end earlier than start
         self.assertRaises(pywikibot.Error, mysite.recentchanges,
                           start=pywikibot.Timestamp.fromISOformat("2008-02-03T23:59:59Z"),
-                          end=pywikibot.Timestamp.fromISOformat("2008-02-03T00:00:01Z"), reverse=True, total=5)
+                          end=pywikibot.Timestamp.fromISOformat('2008-02-03T00:00:01Z'),
+                          reverse=True, total=5)
         for change in mysite.recentchanges(namespaces=[6, 7], total=5):
             self.assertIsInstance(change, dict)
             self.assertIn('title', change)
@@ -1100,43 +1127,49 @@ class TestUserContribs(DefaultSiteTestCase):
     def test_user_prefix_range(self):
         """Test the site.usercontribs() method."""
         mysite = self.get_site()
-        for contrib in mysite.usercontribs(userprefix="Jane",
-                                           start=pywikibot.Timestamp.fromISOformat("2008-10-06T01:02:03Z"),
-                                           total=5):
+        for contrib in mysite.usercontribs(
+                userprefix='Jane',
+                start=pywikibot.Timestamp.fromISOformat("2008-10-06T01:02:03Z"),
+                total=5):
             self.assertLessEqual(contrib['timestamp'], "2008-10-06T01:02:03Z")
 
-        for contrib in mysite.usercontribs(userprefix="Jane",
-                                           end=pywikibot.Timestamp.fromISOformat("2008-10-07T02:03:04Z"),
-                                           total=5):
+        for contrib in mysite.usercontribs(
+                userprefix='Jane',
+                end=pywikibot.Timestamp.fromISOformat("2008-10-07T02:03:04Z"),
+                total=5):
             self.assertGreaterEqual(contrib['timestamp'], "2008-10-07T02:03:04Z")
 
     def test_user_prefix_reverse(self):
         """Test the site.usercontribs() method with range reversed."""
         mysite = self.get_site()
-        for contrib in mysite.usercontribs(userprefix="Brion",
-                                           start=pywikibot.Timestamp.fromISOformat("2008-10-08T03:05:07Z"),
-                                           total=5, reverse=True):
+        for contrib in mysite.usercontribs(
+                userprefix='Brion',
+                start=pywikibot.Timestamp.fromISOformat("2008-10-08T03:05:07Z"),
+                total=5, reverse=True):
             self.assertGreaterEqual(contrib['timestamp'], "2008-10-08T03:05:07Z")
 
-        for contrib in mysite.usercontribs(userprefix="Brion",
-                                           end=pywikibot.Timestamp.fromISOformat("2008-10-09T04:06:08Z"),
-                                           total=5, reverse=True):
+        for contrib in mysite.usercontribs(
+                userprefix='Brion',
+                end=pywikibot.Timestamp.fromISOformat("2008-10-09T04:06:08Z"),
+                total=5, reverse=True):
             self.assertLessEqual(contrib['timestamp'], "2008-10-09T04:06:08Z")
 
-        for contrib in mysite.usercontribs(userprefix="Tim",
-                                           start=pywikibot.Timestamp.fromISOformat("2008-10-10T11:59:59Z"),
-                                           end=pywikibot.Timestamp.fromISOformat("2008-10-10T00:00:01Z"),
-                                           total=5):
+        for contrib in mysite.usercontribs(
+                userprefix='Tim',
+                start=pywikibot.Timestamp.fromISOformat("2008-10-10T11:59:59Z"),
+                end=pywikibot.Timestamp.fromISOformat("2008-10-10T00:00:01Z"),
+                total=5):
             self.assertTrue(
                 "2008-10-10T00:00:01Z" <= contrib['timestamp'] <= "2008-10-10T11:59:59Z")
 
     def test_invalid_range(self):
         """Test the site.usercontribs() method with invalid parameters."""
         mysite = self.get_site()
-        for contrib in mysite.usercontribs(userprefix="Tim",
-                                           start=pywikibot.Timestamp.fromISOformat("2008-10-11T06:00:01Z"),
-                                           end=pywikibot.Timestamp.fromISOformat("2008-10-11T23:59:59Z"),
-                                           reverse=True, total=5):
+        for contrib in mysite.usercontribs(
+                userprefix='Tim',
+                start=pywikibot.Timestamp.fromISOformat("2008-10-11T06:00:01Z"),
+                end=pywikibot.Timestamp.fromISOformat("2008-10-11T23:59:59Z"),
+                reverse=True, total=5):
             self.assertTrue(
                 "2008-10-11T06:00:01Z" <= contrib['timestamp'] <= "2008-10-11T23:59:59Z")
         # start earlier than end
@@ -1696,7 +1729,9 @@ class TestSiteInfo(WikimediaDefaultSiteTestCase):
         self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
         self.assertEqual(mysite.siteinfo['timeoffset'] % 15, 0)
         self.assertRegex(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
-        self.assertIsInstance(datetime.strptime(mysite.siteinfo['time'], "%Y-%m-%dT%H:%M:%SZ"), datetime)
+        self.assertIsInstance(
+            datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
+            datetime)
         self.assertGreater(mysite.siteinfo['maxuploadsize'], 0)
         self.assertIn(mysite.siteinfo['case'], ["first-letter", "case-sensitive"])
         self.assertEqual(mysite.case(), mysite.siteinfo['case'])

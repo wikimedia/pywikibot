@@ -215,7 +215,7 @@ locale.setlocale(locale.LC_ALL, '')
 
 # The page where the bot will save the log (e.g. Wikipedia:Welcome log).
 #
-# ATTENTION: Not listed projects are disabled to log welcomed users, and no necessary to set details.
+# ATTENTION: Projects not listed won't write a log to the wiki.
 logbook = {
     'ar': u'Project:سجل الترحيب',
     'fr': u'Wikipedia:Prise de décision/Accueil automatique des nouveaux par un robot/log',
@@ -287,7 +287,9 @@ netext = {
 }
 # The page where the bot will report users with a possibly bad username.
 report_page = {
-    'commons': {'_default': u'Project:Administrators\' noticeboard/User problems/Usernames to be checked', },
+    'commons': {
+        '_default': 'Project:Administrators\' noticeboard/User problems/Usernames to be checked',
+    },
     'wikipedia': {
         'am': u'User:Beria/Report',
         'ar': 'Project:إخطار الإداريين/أسماء مستخدمين للفحص',

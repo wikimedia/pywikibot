@@ -33,14 +33,15 @@ class TestPhoto(TestCase):
 
     def setUp(self):
         super(TestPhoto, self).setUp()
-        self.obj = data_ingestion.Photo(URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png',
-                                        metadata={'description.en': '"Sounds" icon',
-                                                  'source': 'http://commons.wikimedia.org/wiki/File:Sound-icon.svg',
-                                                  'author': 'KDE artists | Silstor',
-                                                  'license': 'LGPL',
-                                                  'set': 'Crystal SVG icon set',
-                                                  'name': 'Sound icon'},
-                                        site=self.get_site('commons'))
+        self.obj = data_ingestion.Photo(
+            URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png',
+            metadata={'description.en': '"Sounds" icon',
+                      'source': 'http://commons.wikimedia.org/wiki/File:Sound-icon.svg',
+                      'author': 'KDE artists | Silstor',
+                      'license': 'LGPL',
+                      'set': 'Crystal SVG icon set',
+                      'name': 'Sound icon'},
+            site=self.get_site('commons'))
 
     def test_downloadPhoto(self):
         """Test download from http://upload.wikimedia.org/."""
@@ -53,7 +54,8 @@ class TestPhoto(TestCase):
         self.assertIn('MP sounds.png', [dup.replace("_", " ") for dup in duplicates])
 
     def test_getTitle(self):
-        self.assertEqual(self.obj.getTitle("%(name)s - %(set)s.%(_ext)s"), "Sound icon - Crystal SVG icon set.png")
+        self.assertEqual(self.obj.getTitle('%(name)s - %(set)s.%(_ext)s'),
+                         'Sound icon - Crystal SVG icon set.png')
 
     def test_getDescription(self):
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
@@ -82,10 +84,12 @@ class TestCSVReader(TestCase):
             self.obj = next(self.iterator)
 
     def test_PhotoURL(self):
-        self.assertEqual(self.obj.URL, 'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')
+        self.assertEqual(self.obj.URL,
+                         'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')
 
     def test_getTitle(self):
-        self.assertEqual(self.obj.getTitle("%(name)s - %(set)s.%(_ext)s"), "Sound icon - Crystal SVG icon set.png")
+        self.assertEqual(self.obj.getTitle('%(name)s - %(set)s.%(_ext)s'),
+                         'Sound icon - Crystal SVG icon set.png')
 
     def test_getDescription(self):
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
