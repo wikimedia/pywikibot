@@ -83,7 +83,8 @@ class HarvestRobot(WikidataBot):
         linked_page = pywikibot.Page(link)
 
         if not linked_page.exists():
-            pywikibot.output(u'%s doesn\'t exist so it can\'t be linked. Skipping' % (linked_page))
+            pywikibot.output('%s does not exist so it cannot be linked. '
+                             'Skipping.' % (linked_page))
             return
 
         if linked_page.isRedirectPage():
@@ -95,11 +96,12 @@ class HarvestRobot(WikidataBot):
             linked_item = None
 
         if not linked_item or not linked_item.exists():
-            pywikibot.output(u'%s doesn\'t have a wikidata item to link with. Skipping' % (linked_page))
+            pywikibot.output('%s does not have a wikidata item to link with. '
+                             'Skipping.' % (linked_page))
             return
 
         if linked_item.title() == item.title():
-            pywikibot.output(u'%s links to itself. Skipping' % (linked_page))
+            pywikibot.output('%s links to itself. Skipping.' % (linked_page))
             return
 
         return linked_item
@@ -109,7 +111,8 @@ class HarvestRobot(WikidataBot):
         self.current_page = page
         item.get()
         if set(self.fields.values()) <= set(item.claims.keys()):
-            pywikibot.output(u'%s item %s has claims for all properties. Skipping' % (page, item.title()))
+            pywikibot.output('%s item %s has claims for all properties. '
+                             'Skipping.' % (page, item.title()))
             return
 
         pagetext = page.get()
@@ -136,7 +139,7 @@ class HarvestRobot(WikidataBot):
                         claim = pywikibot.Claim(self.repo, self.fields[field])
                         if claim.getID() in item.get().get('claims'):
                             pywikibot.output(
-                                u'A claim for %s already exists. Skipping'
+                                'A claim for %s already exists. Skipping.'
                                 % claim.getID())
                             # TODO: Implement smarter approach to merging
                             # harvested values with existing claims esp.
@@ -147,7 +150,8 @@ class HarvestRobot(WikidataBot):
                                 match = re.search(pywikibot.link_regex, value)
                                 if not match:
                                     pywikibot.output(
-                                        u'%s field %s value %s isnt a wikilink. Skipping'
+                                        '%s field %s value %s is not a '
+                                        'wikilink. Skipping.'
                                         % (claim.getID(), field, value))
                                     continue
 
