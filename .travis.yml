@@ -91,6 +91,8 @@ matrix:
   include:
     - python: '2.7'
       env: LANGUAGE=he FAMILY=wikivoyage SITE_ONLY=1
+    - python: '2.7'
+      env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1
     - python: '3.3'
       env: LANGUAGE=en FAMILY=oraintest SITE_ONLY=1
     - python: '3.4'
