@@ -4138,6 +4138,11 @@ class Claim(Property):
                                    'hash': data['hash']})
 
     def toJSON(self):
+        """
+        Create dict suitable for the MediaWiki API.
+
+        @rtype: dict
+        """
         data = {
             'mainsnak': {
                 'snaktype': self.snaktype,
@@ -4524,6 +4529,17 @@ class Revision(DotReadableDict):
 
     @property
     def sha1(self):
+        """
+        Return and cache SHA1 checksum of the text.
+
+        @return: if the SHA1 checksum is cached it'll be returned which is the
+            case when it was requested from the API. Otherwise it'll use the
+            revision's text to calculate the checksum (encoding it using UTF8
+            first). That calculated checksum will be cached too and returned on
+            future calls. If the text is None (not queried) it will just return
+            None and does not cache anything.
+        @rtype: str or None
+        """
         if self._sha1 is None:
             if self.text is None:
                 # No text? No sha1 then.

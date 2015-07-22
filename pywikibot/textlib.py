@@ -429,9 +429,23 @@ def findmarker(text, startwith=u'@@', append=None):
 
 
 def expandmarker(text, marker='', separator=''):
-    # set to remove any number of separator occurrences plus arbitrary
-    # whitespace before, after, and between them,
-    # by allowing to include them into marker.
+    """
+    Return a marker expanded whitespace and the separator.
+
+    It searches for the first occurrence of the marker and gets the combination
+    of the separator and whitespace directly before it.
+
+    @param text: the text which will be searched.
+    @type text: str
+    @param marker: the marker to be searched.
+    @type marker: str
+    @param separator: the separator string allowed before the marker. If empty
+        it won't include whitespace too.
+    @type separator: str
+    @return: the marker with the separator and whitespace from the text in front
+        of it. It'll be just the marker if the separator is empty.
+    @rtype: str
+    """
     if separator:
         firstinmarker = text.find(marker)
         firstinseparator = firstinmarker
