@@ -203,7 +203,7 @@ def _get_regexes(keys, site):
                 # extensions
                 if exc not in _regex_cache:
                     _regex_cache[exc] = re.compile(r'(?is)<%s>.*?</%s>'
-                                                    % (exc, exc))
+                                                   % (exc, exc))
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
@@ -446,6 +446,9 @@ def expandmarker(text, marker='', separator=''):
         of it. It'll be just the marker if the separator is empty.
     @rtype: str
     """
+    # set to remove any number of separator occurrences plus arbitrary
+    # whitespace before, after, and between them,
+    # by allowing to include them into marker.
     if separator:
         firstinmarker = text.find(marker)
         firstinseparator = firstinmarker

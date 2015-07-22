@@ -103,7 +103,7 @@ class RcListenerThread(threading.Thread):
 
             def on_connect(self):
                 debug('Connected to %r; subscribing to %s'
-                          % (thread, thread.wikihost),
+                      % (thread, thread.wikihost),
                       _logger)
                 self.emit('subscribe', thread.wikihost)
                 debug('Subscribed to %s' % thread.wikihost, _logger)

@@ -457,7 +457,8 @@ class PatchManager(object):
                         first = self.b[super_hunk[0].b_rng[0]]
                     hunk_list += [(status, index,
                                    Hunk.get_header_text(
-                                   *self._get_context_range(super_hunk), affix=''),
+                                       *self._get_context_range(super_hunk),
+                                       affix=''),
                                    mode, first)]
                     rng_width = max(len(hunk_list[-1][2]), rng_width)
                 line_template = ('{0}{1} {2: >' +

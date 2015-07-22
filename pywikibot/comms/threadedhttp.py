@@ -138,9 +138,10 @@ class HttpRequest(UnicodeMixin):
             if (self.header_encoding and codecs.lookup(self.header_encoding) !=
                     (codecs.lookup(charset) if charset else None)):
                 if charset:
-                    pywikibot.warning(u'Encoding "{0}" requested but "{1}" '
-                                       'received in the header.'.format(
-                        charset, self.header_encoding))
+                    pywikibot.warning(
+                        'Encoding "{0}" requested but "{1}" '
+                        'received in the header.'.format(
+                            charset, self.header_encoding))
                 try:
                     # TODO: Buffer decoded content, weakref does remove it too
                     #       early (directly after this method)

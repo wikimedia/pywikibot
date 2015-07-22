@@ -2621,7 +2621,7 @@ class Category(Page):
                 # The complete list can be removed, it'll either yield all of
                 # them, or only a portion but will skip the rest anyway
                 cached += cache.pop(timestamp)[:None if total is None else
-                                                total - len(cached)]
+                                               total - len(cached)]
                 if total and len(cached) >= total:
                     break  # already got enough
             assert total is None or len(cached) <= total, \
@@ -3188,10 +3188,10 @@ class WikibasePage(BasePage):
             # if none of the above applies, this item is in an invalid state
             # which needs to be raise as an exception, but also logged in case
             # an exception handler is catching the generic Error.
-            pywikibot.error('%s is in invalid state' %
-                                            self.__class__.__name__)
-            raise pywikibot.Error('%s is in invalid state' %
-                                            self.__class__.__name__)
+            pywikibot.error('%s is in invalid state'
+                            % self.__class__.__name__)
+            raise pywikibot.Error('%s is in invalid state'
+                                  % self.__class__.__name__)
 
         return params
 
@@ -4008,7 +4008,7 @@ class PropertyPage(WikibasePage, Property):
         @return: Claim
         """
         return Claim(self.site, self.getID(), datatype=self.type,
-                      *args, **kwargs)
+                     *args, **kwargs)
 
 
 class Claim(Property):
@@ -4199,7 +4199,7 @@ class Claim(Property):
         value_class = self.types[self.type]
         if not isinstance(value, value_class):
             raise ValueError("%s is not type %s."
-                                 % (value, value_class))
+                             % (value, value_class))
         self.target = value
 
     def changeTarget(self, value=None, snaktype='value', **kwargs):
@@ -4773,7 +4773,7 @@ class Link(ComparableMixin):
                 raise SiteDefinitionError(
                     u'{0} is not a local page on {1}, and the interwiki prefix '
                     '{2} is not supported by PyWikiBot!:\n{3}'.format(
-                    self._text, self._site, prefix, e))
+                        self._text, self._site, prefix, e))
             else:
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
                 if first_other_site:
@@ -4781,7 +4781,7 @@ class Link(ComparableMixin):
                         raise pywikibot.InvalidTitle(
                             u'{0} links to a non local site {1} via an '
                             'interwiki link to {2}.'.format(
-                            self._text, newsite, first_other_site))
+                                self._text, newsite, first_other_site))
                 elif newsite != self._source:
                     first_other_site = newsite
                 self._site = newsite

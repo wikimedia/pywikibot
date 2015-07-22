@@ -132,19 +132,20 @@ class PageFromFileRobot(Bot):
                 pywikibot.output(u"Page %s is redirect, skipping!" % title)
                 return
             pagecontents = page.get(get_redirect=True)
-            if self.getOption('nocontent') != u'':
-                if pagecontents.find(self.getOption('nocontent')) != -1 or \
-                pagecontents.find(self.getOption('nocontent').lower()) != -1:
-                    pywikibot.output(u'Page has %s so it is skipped' % self.getOption('nocontent'))
-                    return
+            nocontent = self.getOption('nocontent')
+            if nocontent and (
+                    nocontent in pagecontents or
+                    nocontent.lower() in pagecontents):
+                pywikibot.output('Page has %s so it is skipped' % nocontent)
+                return
             if self.getOption('append') == 'top':
                 pywikibot.output(u"Page %s already exists, appending on top!"
-                                     % title)
+                                 % title)
                 contents = contents + pagecontents
                 comment = comment_top
             elif self.getOption('append') == 'bottom':
                 pywikibot.output(u"Page %s already exists, appending on bottom!"
-                                     % title)
+                                 % title)
                 contents = pagecontents + contents
                 comment = comment_bottom
             elif self.getOption('force'):

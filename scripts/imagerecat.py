@@ -380,7 +380,7 @@ def filterParents(categories):
         cat = cat.replace('_', ' ')
         toFilter = toFilter + "[[Category:" + cat + "]]\n"
     parameters = urlencode({'source': toFilter.encode('utf-8'),
-                                   'bot': '1'})
+                            'bot': '1'})
     filterCategoriesRe = re.compile(r'\[\[Category:([^\]]*)\]\]')
     try:
         filterCategoriesPage = fetch(

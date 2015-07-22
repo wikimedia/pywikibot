@@ -611,7 +611,7 @@ class ParamInfo(Container):
             else:
                 params['modules'] = [mod for mod in module_batch
                                      if not mod.startswith('query+') and
-                                        mod not in self.root_modules]
+                                     mod not in self.root_modules]
                 params['querymodules'] = [mod[6:] for mod in module_batch
                                           if mod.startswith('query+')]
 
@@ -717,7 +717,7 @@ class ParamInfo(Container):
                     if param['name'] == 'generator':
                         break
                 assert param['name'] == 'generator' and \
-                       submodules >= set(param['type'])
+                    submodules >= set(param['type'])
 
     def _normalize_modules(self, modules):
         """Add query+ to any query module name not also in action modules."""

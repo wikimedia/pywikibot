@@ -389,7 +389,7 @@ class UploadRobot:
         except pywikibot.data.api.APIError as error:
             if error.code == u'uploaddisabled':
                 pywikibot.error("Upload error: Local file uploads are disabled on %s."
-                                  % site)
+                                % site)
             else:
                 pywikibot.error("Upload error: ", exc_info=True)
         except Exception:

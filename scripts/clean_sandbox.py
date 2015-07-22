@@ -169,7 +169,7 @@ class SandboxBot(Bot):
         if not self.generator:
             if self.site.code not in sandboxTitle:
                 pywikibot.error(u'No generator is given for this site'
-                                 u'(%s), exiting.' % self.site)
+                                u'(%s), exiting.' % self.site)
                 raise RuntimeError
             local_sandbox_title = sandboxTitle[self.site.code]
             if not isinstance(local_sandbox_title, list):
@@ -206,8 +206,7 @@ class SandboxBot(Bot):
                     if text.strip() == translatedContent.strip():
                         pywikibot.output(
                             u'The sandbox is still clean, no change necessary.')
-                    elif subst and \
-                         sandboxPage.userName() == self.site.user():
+                    elif subst and sandboxPage.userName() == self.site.user():
                         pywikibot.output(
                             u'The sandbox might be clean, no change necessary.')
                     elif pos != 0 and not subst:

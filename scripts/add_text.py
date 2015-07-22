@@ -160,15 +160,17 @@ def add_text(page, addText, summary=None, regexSkip=None,
         result = re.findall(regexSkipUrl, site.getUrl(url))
         if result != []:
             pywikibot.output(
-u'''Exception! regex (or word) used with -exceptUrl is in the page. Skip!
-Match was: %s''' % result)
+                'Exception! regex (or word) used with -exceptUrl '
+                'is in the page. Skip!\n'
+                'Match was: %s' % result)
             return (False, False, always)
     if regexSkip is not None:
         result = re.findall(regexSkip, text)
         if result != []:
             pywikibot.output(
-u'''Exception! regex (or word) used with -except is in the page. Skip!
-Match was: %s''' % result)
+                'Exception! regex (or word) used with -except '
+                'is in the page. Skip!\n'
+                'Match was: %s' % result)
             return (False, False, always)
     # If not up, text put below
     if not up:
