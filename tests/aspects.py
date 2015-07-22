@@ -763,6 +763,8 @@ class MetaTestCaseClass(type):
         bases = tuple([CheckHostnameMixin] + list(bases))
 
         if 'write' in dct and dct['write']:
+            if 'user' not in dct:
+                dct['user'] = True
             bases = tuple([SiteWriteMixin] + list(bases))
 
         if ('user' in dct and dct['user']) or ('sysop' in dct and dct['sysop']):
