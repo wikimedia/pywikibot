@@ -55,7 +55,7 @@ _ETP_REGEX = re.compile(
 # It exists for backwards compatibility to the old 'TEMP_REGEX'
 # which was the _ETP_REGEX.
 TEMP_REGEX = DeprecatedRegex(r"""
-{{\s*(?:msg:)?\s*
+{{\s*(?:msg:\s*)?
   (?P<name>[^{\|]+?)\s*
   (?:\|(?P<params>[^{]*
         (?:(?:{}|{{[A-Z]+(?:\:[^}])?}}|{{{[^}]+}}}) [^{]*)*
@@ -72,18 +72,26 @@ TEMP_REGEX = DeprecatedRegex(r"""
 # Prefix msg: is not included in the 'name' group, but all others are
 # included for backwards compatibility with TEMP_REGEX.
 # Only parser functions using # are excluded.
+# When more than two levels of templates are found, this regex will
+# capture from the beginning of the first {{ to the end of the last }},
+# with wikitext between templates as part of the parameters of the first
+# template in the wikitext.
+# This ensures it fallsback to a safe mode for replaceExcept, as it
+# ensures that any replacement will not occur within template text.
 NESTED_TEMPLATE_REGEX = re.compile(r"""
-{{\s*(?:msg:)?\s*
-  (?P<name>[^{\|#0-9][^{\|#0-9]*?)\s*
-  (?:\|(?P<params>[^{]*
-          (({{{[^}]+}}}
-           |{{[^}|]+\|?[^}]*}}
-           |{}
-           ) [^{]*
-          )*
-       )?
+{{\s*(?:msg:\s*)?
+  (?P<name>[^{\|#0-9][^{\|#]*?)\s*
+  (?:\|(?P<params> [^{]*?
+          (({{{[^{}]+?}}}
+            |{{[^{}]+?}}
+            |{[^{}]*?}
+          ) [^{]*?
+        )*?
+    )?
   )?
 }}
+|
+(?P<unhandled_depth>{{\s*[^{\|#0-9][^{\|#]*?\s* [^{]* {{ .* }})
 """, re.VERBOSE)
 
 
