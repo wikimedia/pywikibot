@@ -68,6 +68,7 @@ script:
   - python -c "import setuptools; print(setuptools.__version__)"
 
   - if [[ "$USE_NOSE" == "1" ]]; then
+      nosetests --version ;
       if [[ "$SITE_ONLY" == "1" ]]; then
         echo "Running site tests only code ${LANGUAGE} on family ${FAMILY}" ;
         python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" ;
