@@ -380,6 +380,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
     """Site interface to prevent sites being loaded."""
 
     def __init__(self, code, fam=None, user=None, sysop=None):
+        """Constructor."""
         raise pywikibot.SiteDefinitionError(
             'Loading site %s:%s during dry test not permitted'
             % (fam, code))
@@ -1021,6 +1022,12 @@ class DefaultSiteTestCase(TestCase):
 
     @classmethod
     def override_default_site(cls, site):
+        """
+        Override the default site.
+
+        @param site: site tests should use
+        @type site: BaseSite
+        """
         print('%s using %s instead of %s:%s.'
               % (cls.__name__, site, cls.family, cls.code))
         cls.site = site
@@ -1278,6 +1285,7 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up test class."""
         if os.environ.get('PYWIKIBOT2_TEST_NO_RC', '0') == '1':
             raise unittest.SkipTest('RecentChanges tests disabled.')
 
@@ -1293,6 +1301,7 @@ class DebugOnlyTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up test class."""
         if not __debug__:
             raise unittest.SkipTest(
                 '%s is disabled when __debug__ is disabled.' % cls.__name__)
@@ -1306,6 +1315,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     _generic_match = re.compile(r'.* is deprecated(, use .* instead)?\.')
 
     def __init__(self, *args, **kwargs):
+        """Constructor."""
         super(DeprecationTestCase, self).__init__(*args, **kwargs)
         self.warning_log = []
 
@@ -1318,15 +1328,18 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self.context_manager = warnings.catch_warnings(record=True)
 
     def _reset_messages(self):
+        """Reset captured deprecation warnings."""
         self._do_test_warning_filename = True
         del self.warning_log[:]
 
     @property
     def deprecation_messages(self):
+        """Return captured deprecation warnings."""
         messages = [str(item.message) for item in self.warning_log]
         return messages
 
     def assertDeprecation(self, msg=None):
+        """Assert that a deprecation warning happened."""
         if msg is None:
             self.assertGreater(sum(1 for msg in self.deprecation_messages
                                    if self._generic_match.match(msg)), 0)
@@ -1343,20 +1356,24 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
             self._reset_messages()
 
     def assertNoDeprecation(self, msg=None):
+        """Assert that no deprecation warning happened."""
         if msg:
             self.assertNotIn(msg, self.deprecation_messages)
         else:
             self.assertEqual([], self.deprecation_messages)
 
     def assertDeprecationClass(self, cls):
+        """Assert that all deprecation warning are of one class."""
         self.assertTrue(all(isinstance(item.message, cls)
                             for item in self.warning_log))
 
     def assertDeprecationFile(self, filename):
+        """Assert that all deprecation warning are of one filename."""
         for item in self.warning_log:
             self.assertEqual(item.filename, filename)
 
     def setUp(self):
+        """Set up unit test."""
         super(DeprecationTestCase, self).setUp()
 
         self.warning_log = self.context_manager.__enter__()
@@ -1365,6 +1382,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self._reset_messages()
 
     def tearDown(self):
+        """Tear down unit test."""
         self.context_manager.__exit__()
 
         super(DeprecationTestCase, self).tearDown()

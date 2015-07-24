@@ -37,6 +37,7 @@ class TestInternetArchive(TestCase):
         self.assertIn('closest', response.content)
 
     def testInternetArchiveNewest(self):
+        """Test Internet Archive for newest https://google.com."""
         with PatchedHttp(weblib, False) as p:
             p.after_fetch = self._test_response
             archivedversion = weblib.getInternetArchiveURL('https://google.com')
@@ -46,6 +47,7 @@ class TestInternetArchive(TestCase):
         self.assertTrue(parsed.path.strip('/').endswith('www.google.com'), parsed.path)
 
     def testInternetArchiveOlder(self):
+        """Test Internet Archive for https://google.com as of June 2006."""
         with PatchedHttp(weblib, False) as p:
             p.after_fetch = self._test_response
             archivedversion = weblib.getInternetArchiveURL('https://google.com', '200606')
@@ -68,6 +70,7 @@ class TestWebCite(TestCase):
 
     @unittest.expectedFailure
     def testWebCiteOlder(self):
+        """Test WebCite for https://google.com as of January 2013."""
         archivedversion = weblib.getWebCitationURL('https://google.com', '20130101')
         self.assertEqual(archivedversion, 'http://www.webcitation.org/6DHSeh2L0')
 

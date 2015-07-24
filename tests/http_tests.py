@@ -192,6 +192,7 @@ class UserAgentTestCase(TestCase):
     net = False
 
     def test_user_agent(self):
+        """Test http.user_agent function."""
         self.assertEqual('', http.user_agent(format_string='  '))
         self.assertEqual('', http.user_agent(format_string=' '))
         self.assertEqual('a', http.user_agent(format_string=' a '))
@@ -209,6 +210,7 @@ class UserAgentTestCase(TestCase):
                       http.user_agent(format_string='SVN/1.7.5 {pwb}'))
 
     def test_user_agent_username(self):
+        """Test http.user_agent_username function."""
         self.assertEqual('%25', http.user_agent_username('%'))
         self.assertEqual('%2525', http.user_agent_username('%25'))
         self.assertEqual(';', http.user_agent_username(';'))
@@ -220,6 +222,7 @@ class UserAgentTestCase(TestCase):
         self.assertEqual('%E2%81%82', http.user_agent_username(u'⁂'))
 
     def test_version(self):
+        """Test http.user_agent {version}."""
         old_cache = pywikibot.version.cache
         try:
             pywikibot.version.cache = None
@@ -240,11 +243,13 @@ class DefaultUserAgentTestCase(TestCase):
     net = False
 
     def setUp(self):
+        """Set up unit test."""
         self.orig_format = config.user_agent_format
         config.user_agent_format = ('{script_product} ({script_comments}) {pwb} '
                                     '({revision}) {http_backend} {python}')
 
     def tearDown(self):
+        """Tear down unit test."""
         config.user_agent_format = self.orig_format
 
     def test_default_user_agent(self):
@@ -272,6 +277,7 @@ class CharsetTestCase(TestCase):
 
     @staticmethod
     def _create_request(charset=None, data=UTF8_BYTES):
+        """Helper method."""
         req = threadedhttp.HttpRequest('', charset=charset)
         resp = requests.Response()
         resp.headers = {'content-type': 'charset=utf-8'}
@@ -345,6 +351,7 @@ class BinaryTestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up test class."""
         super(BinaryTestCase, cls).setUpClass()
 
         with open(os.path.join(_images_dir, 'MP_sounds.png'), 'rb') as f:

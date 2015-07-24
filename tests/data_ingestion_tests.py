@@ -32,6 +32,7 @@ class TestPhoto(TestCase):
     }
 
     def setUp(self):
+        """Set up unit test."""
         super(TestPhoto, self).setUp()
         self.obj = data_ingestion.Photo(
             URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png',
@@ -54,10 +55,12 @@ class TestPhoto(TestCase):
         self.assertIn('MP sounds.png', [dup.replace("_", " ") for dup in duplicates])
 
     def test_getTitle(self):
+        """Test getTitle()."""
         self.assertEqual(self.obj.getTitle('%(name)s - %(set)s.%(_ext)s'),
                          'Sound icon - Crystal SVG icon set.png')
 
     def test_getDescription(self):
+        """Test getDescription()."""
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
 """{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
@@ -77,6 +80,7 @@ class TestCSVReader(TestCase):
     code = 'commons'
 
     def setUp(self):
+        """Set up unit test."""
         super(TestCSVReader, self).setUp()
         with open(os.path.join(_data_dir, 'csv_ingestion.csv')) as fileobj:
             self.iterator = data_ingestion.CSVReader(fileobj, 'url',
@@ -84,14 +88,17 @@ class TestCSVReader(TestCase):
             self.obj = next(self.iterator)
 
     def test_PhotoURL(self):
+        """Test PhotoURL()."""
         self.assertEqual(self.obj.URL,
                          'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')
 
     def test_getTitle(self):
+        """Test getTitle()."""
         self.assertEqual(self.obj.getTitle('%(name)s - %(set)s.%(_ext)s'),
                          'Sound icon - Crystal SVG icon set.png')
 
     def test_getDescription(self):
+        """Test getDescription()."""
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
 """{{CrystalTemplate
 |author=KDE artists {{!}} Silstor

@@ -31,6 +31,7 @@ class WikiStatsTestCase(TestCase):
     }
 
     def test_sort(self):
+        """Test sorted results."""
         ws = WikiStats()
         data = ws.sorted('wikipedia', 'total')
         top = data[0]
@@ -42,6 +43,7 @@ class WikiStatsTestCase(TestCase):
         self.assertEqual(ws.languages_by_size('wikisource')[0], 'fr')
 
     def test_csv(self):
+        """Test CSV."""
         if not csv:
             raise unittest.SkipTest('unicodecsv not installed.')
         ws = WikiStats()
@@ -53,6 +55,7 @@ class WikiStatsTestCase(TestCase):
         data = ws.get_dict
 
     def test_xml(self):
+        """Test XML."""
         ws = WikiStats()
         data = ws.get_dict('wikisource', 'xml')
         self.assertIsInstance(data, dict)
