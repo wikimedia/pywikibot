@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,37 +67,32 @@ textlib_methods = (
     'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
 )
 
-# pep257 doesn't understand when the first entry is on the next line
-__all__ = ('config', 'ui', 'UnicodeMixin', 'translate',
-           'Page', 'FilePage', 'Category', 'Link', 'User',
-           'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
-           'html2unicode', 'url2unicode', 'unicode2html',
-           'stdout', 'output', 'warning', 'error', 'critical', 'debug',
-           'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
-           'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
-           'calledModuleName', 'Bot', 'CurrentPageBot', 'WikidataBot',
-           'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'NoMoveTarget',
-           'SectionError',
-           'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
-           'UnknownExtension',
-           'NoUsername', 'UserBlocked', 'UserActionRefuse',
-           'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
-           'PageSaveRelatedError', 'PageNotSaved', 'OtherPageSaveError',
-           'LockedPage', 'CascadeLockedPage', 'LockedNoPage', 'NoCreateError',
-           'EditConflict', 'PageDeletedConflict', 'PageCreatedConflict',
-           'UploadWarning',
-           'ServerError', 'FatalServerError', 'Server504Error',
-           'CaptchaError', 'SpamfilterError', 'CircularRedirect',
-           'InterwikiRedirectPage',
-           'WikiBaseError', 'CoordinateGlobeUnknownException',
-           'QuitKeyboardInterrupt',
-           )
-# flake8 is unable to detect concatenation in the same operation
-# like:
-# ) + textlib_methods
-# pep257 also doesn't support __all__ multiple times in a document
-# so instead use this trick
-globals()['__all__'] = globals()['__all__'] + textlib_methods
+__all__ = (
+    'config', 'ui', 'UnicodeMixin', 'translate',
+    'Page', 'FilePage', 'Category', 'Link', 'User',
+    'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
+    'html2unicode', 'url2unicode', 'unicode2html',
+    'stdout', 'output', 'warning', 'error', 'critical', 'debug',
+    'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
+    'handle_args', 'handleArgs', 'showHelp', 'ui', 'log',
+    'calledModuleName', 'Bot', 'CurrentPageBot', 'WikidataBot',
+    'Error', 'InvalidTitle', 'BadTitle', 'NoPage', 'NoMoveTarget',
+    'SectionError',
+    'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
+    'UnknownExtension',
+    'NoUsername', 'UserBlocked', 'UserActionRefuse',
+    'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
+    'PageSaveRelatedError', 'PageNotSaved', 'OtherPageSaveError',
+    'LockedPage', 'CascadeLockedPage', 'LockedNoPage', 'NoCreateError',
+    'EditConflict', 'PageDeletedConflict', 'PageCreatedConflict',
+    'UploadWarning',
+    'ServerError', 'FatalServerError', 'Server504Error',
+    'CaptchaError', 'SpamfilterError', 'CircularRedirect',
+    'InterwikiRedirectPage',
+    'WikiBaseError', 'CoordinateGlobeUnknownException',
+    'QuitKeyboardInterrupt',
+)
+__all__ += textlib_methods
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)

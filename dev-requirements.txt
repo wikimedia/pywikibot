@@ -6,6 +6,11 @@ six
 
 nose
 
+pep8
+pep257>=0.6
+pyflakes>=0.9
+flake8
+
 # pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
 # excluded from this file as they are quite expensive to install, and they
 # are not useful on the Appveyor Win32 builds since the relevant UI tests
