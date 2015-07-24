@@ -80,6 +80,7 @@ class Family(family.WikimediaFamily):
             'mai', 'pih', 'got', 'xh', 'bi', 'sm', 'ss', 'rn', 'ki', 'pnt',
             'bm', 'iu', 'ee', 'lg', 'ts', 'fj', 'ak', 'ik', 'st', 'sg', 'ff',
             'dz', 'ny', 'ch', 'ti', 've', 'ks', 'tum', 'cr', 'gom', 'lrc',
+            'azb',
         ]
 
         # Sites we want to edit but not count as real languages
