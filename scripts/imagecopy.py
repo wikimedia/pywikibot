@@ -254,7 +254,8 @@ class imageTransfer(threading.Thread):
 
     def run(self):
         tosend = {'language': self.imagePage.site.language().encode('utf-8'),
-                  'image': self.imagePage.title(withNamespace=False).encode('utf-8'),
+                  'image': self.imagePage.title(
+                      withNamespace=False).encode('utf-8'),
                   'newname': self.newname.encode('utf-8'),
                   'project': self.imagePage.site.family.name.encode('utf-8'),
                   'username': '',
@@ -276,20 +277,23 @@ class imageTransfer(threading.Thread):
         CH = self.fixAuthor(CH)
         pywikibot.output(CH)
 
-        # I want every picture to be tagged with the bottemplate so i can check my contributions later.
-        CH = u'\n\n{{BotMoveToCommons|' + self.imagePage.site.language() + \
-             '.' + self.imagePage.site.family.name + \
-             '|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}}}' + \
-             CH
+        # I want every picture to be tagged with the bottemplate so i can check
+        # my contributions later.
+        CH = ('\n\n{{BotMoveToCommons|' + self.imagePage.site.language() +
+              '.' + self.imagePage.site.family.name +
+              '|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}'
+              '|day={{subst:CURRENTDAY}}}}' + CH)
 
         if self.category:
-            CH = CH.replace(u'{{subst:Unc}} <!-- Remove this line once you have added categories -->', u'')
+            CH = CH.replace('{{subst:Unc}} <!-- Remove this line once you have '
+                            'added categories -->', '')
             CH += u'[[Category:' + self.category + u']]'
 
         bot = upload.UploadRobot(url=self.imagePage.fileUrl(), description=CH,
                                  useFilename=self.newname, keepFilename=True,
                                  verifyDescription=False, ignoreWarning=True,
-                                 targetSite=pywikibot.Site('commons', 'commons'))
+                                 targetSite=pywikibot.Site('commons',
+                                                           'commons'))
         bot.run()
 
         # Should check if the image actually was uploaded
@@ -301,20 +305,23 @@ class imageTransfer(threading.Thread):
 
             # Remove the move to commons templates
             if self.imagePage.site.language() in moveToCommonsTemplate:
-                for moveTemplate in moveToCommonsTemplate[self.imagePage.site.language()]:
+                for moveTemplate in moveToCommonsTemplate[
+                        self.imagePage.site.language()]:
                     imtxt = re.sub(u'(?i)\{\{' + moveTemplate + u'[^\}]*\}\}',
                                    u'', imtxt)
 
             # add {{NowCommons}}
             if self.imagePage.site.language() in nowCommonsTemplate:
-                addTemplate = nowCommonsTemplate[self.imagePage.site.language()] % self.newname
+                addTemplate = nowCommonsTemplate[
+                    self.imagePage.site.language()] % self.newname
             else:
                 addTemplate = nowCommonsTemplate['_default'] % self.newname
 
-            commentText = i18n.twtranslate(self.imagePage.site,
-                                           'commons-file-now-available',
-                                           {'localfile': self.imagePage.title(withNamespace=False),
-                                            'commonsfile': self.newname})
+            commentText = i18n.twtranslate(
+                self.imagePage.site,
+                'commons-file-now-available',
+                {'localfile': self.imagePage.title(withNamespace=False),
+                 'commonsfile': self.newname})
 
             pywikibot.showDiff(self.imagePage.get(), imtxt + addTemplate)
             self.imagePage.put(imtxt + addTemplate, comment=commentText)
@@ -322,27 +329,31 @@ class imageTransfer(threading.Thread):
             self.gen = pagegenerators.FileLinksGenerator(self.imagePage)
             self.preloadingGen = pagegenerators.PreloadingGenerator(self.gen)
 
-            # If the image is uploaded under a different name, replace all instances
+            # If the image is uploaded under a different name, replace all
+            # instances
             if self.imagePage.title(withNamespace=False) != self.newname:
-                moveSummary = i18n.twtranslate(self.imagePage.site,
-                                               'commons-file-moved',
-                                               {'localfile': self.imagePage.title(withNamespace=False),
-                                                'commonsfile': self.newname})
+                moveSummary = i18n.twtranslate(
+                    self.imagePage.site,
+                    'commons-file-moved',
+                    {'localfile': self.imagePage.title(withNamespace=False),
+                     'commonsfile': self.newname})
 
-                imagebot = image.ImageRobot(generator=self.preloadingGen,
-                                            oldImage=self.imagePage.title(withNamespace=False),
-                                            newImage=self.newname,
-                                            summary=moveSummary, always=True,
-                                            loose=True)
+                imagebot = image.ImageRobot(
+                    generator=self.preloadingGen,
+                    oldImage=self.imagePage.title(withNamespace=False),
+                    newImage=self.newname,
+                    summary=moveSummary, always=True, loose=True)
                 imagebot.run()
         return
 
     def fixAuthor(self, pageText):
         """Fix the author field in the information template."""
         informationRegex = re.compile(
-            u'\|Author\=Original uploader was (?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])')
+            '\|Author\=Original uploader was '
+            '(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])')
         selfRegex = re.compile(
-            u'\{\{self\|author\=(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])\|')
+            '\{\{self\|author\='
+            '(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])\|')
 
         # Find the |Author=Original uploader was ....
         informationMatch = informationRegex.search(pageText)
@@ -400,7 +411,8 @@ class TkdialogIC(Tkdialog):
         imageinfo = Tkinter.Label(self.root, text='Uploaded by %s.' % uploader)
         textarea = Tkinter.Text(self.root)
         textarea.insert(Tkinter.END, content.encode('utf-8'))
-        textarea.config(state=Tkinter.DISABLED, height=8, width=40, padx=0, pady=0,
+        textarea.config(state=Tkinter.DISABLED,
+                        height=8, width=40, padx=0, pady=0,
                         wrap=Tkinter.WORD, yscrollcommand=scrollbar.set)
         scrollbar.config(command=textarea.yview)
         self.entry = Tkinter.Entry(self.root)
@@ -413,7 +425,8 @@ class TkdialogIC(Tkdialog):
                                          command=self.add2_auto_skip)
         browser_button = Tkinter.Button(self.root, text='View in browser',
                                         command=self.open_in_browser)
-        skip_button = Tkinter.Button(self.root, text="Skip", command=self.skip_file)
+        skip_button = Tkinter.Button(self.root, text='Skip',
+                                     command=self.skip_file)
         ok_button = Tkinter.Button(self.root, text="OK", command=self.ok_file)
 
         # Start grid
@@ -437,7 +450,12 @@ class TkdialogIC(Tkdialog):
         self.root.destroy()
 
     def getnewname(self):
-        """Activate the dialog and return the new name and if the image is skipped."""
+        """
+        Activate dialog.
+
+        @return: new name and if the image is skipped
+        @rtype: tuple
+        """
         self.root.mainloop()
         return (self.changename, self.skip)
 
@@ -546,13 +564,17 @@ def main(*args):
                         if not CommonsPage.exists():
                             break
                         else:
-                            pywikibot.output('Image already exists, pick another name or skip this image')
-                        # We dont overwrite images, pick another name, go to the start of the loop
+                            pywikibot.output(
+                                'Image already exists, pick another name or '
+                                'skip this image')
+                        # We dont overwrite images, pick another name, go to
+                        # the start of the loop
 
             if not skip:
                 imageTransfer(imagepage, newname, category).start()
 
-    pywikibot.output(u'Still ' + str(threading.activeCount()) + u' active threads, lets wait')
+    pywikibot.output('Still ' + str(threading.activeCount()) +
+                     ' active threads, lets wait')
     for openthread in threading.enumerate():
         if openthread != threading.currentThread():
             openthread.join()

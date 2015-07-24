@@ -125,11 +125,13 @@ def main(*args):
             dest = m.result.group(2)
             thisDay = findDay(src, day)
             if mode == "Move" and thisDay != "None":
-                summary = "Robot - Moving category " + src + " to [[:Category:" + dest + "]] per [[WP:CFD|CFD]] at " + \
-                          thisDay + "."
+                summary = (
+                    'Robot - Moving category ' + src + ' to [[:Category:' +
+                    dest + ']] per [[WP:CFD|CFD]] at ' + thisDay + '.')
             elif mode == "Speedy":
-                summary = "Robot - Speedily moving category " + src + " to [[:Category:" + dest + \
-                          "]] per [[WP:CFDS|CFDS]]."
+                summary = (
+                    'Robot - Speedily moving category ' + src +
+                    ' to [[:Category:' + dest + ']] per [[WP:CFDS|CFDS]].')
             else:
                 continue
             # If the category is redirect, we do NOT want to move articles to
@@ -148,19 +150,22 @@ def main(*args):
                                         deletion_comment=True)
         elif m.check(deletecat, line):
             src = m.result.group(1)
-            # I currently don't see any reason to handle these two cases separately, though
-            # if are guaranteed that the category in the "Delete" case is empty, it might be
-            # easier to call delete.py on it.
+            # I currently don't see any reason to handle these two cases
+            # separately, though if are guaranteed that the category in the
+            # "Delete" case is empty, it might be easier to call delete.py on
+            # it.
             thisDay = findDay(src, day)
             if (mode == "Empty" or mode == "Delete") and thisDay != "None":
-                summary = 'Robot - Removing category {0} per [[WP:CFD|CFD]] at {1}.'.format(
-                    src, thisDay)
+                summary = (
+                    'Robot - Removing category {0} per [[WP:CFD|CFD]] '
+                    'at {1}.'.format(src, thisDay))
             else:
                 continue
             robot = CategoryMoveBot(oldcat=src, batch=True, comment=summary,
                                     deletion_comment=True, inplace=True)
         else:
-            # This line does not fit any of our regular expressions, so ignore it.
+            # This line does not fit any of our regular expressions,
+            # so ignore it.
             pass
         if summary != "" and robot is not None:
             pywikibot.output(summary, toStdout=True)

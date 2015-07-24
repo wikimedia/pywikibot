@@ -176,7 +176,9 @@ def getDescription(photoInfo=None, panoramioreview=False, reviewer=u'',
         if photoInfo.get(u'license') == u'by-sa':
             desc += u'{{Cc-by-sa-3.0}}\n'
         if panoramioreview:
-            desc += u'{{Panoramioreview|%s|{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-{{subst:CURRENTDAY2}}}}\n' % (reviewer,)
+            desc += ('{{Panoramioreview|%s|{{subst:CURRENTYEAR}}-'
+                     '{{subst:CURRENTMONTH}}-{{subst:CURRENTDAY2}}}}\n'
+                     % reviewer)
         else:
             desc += u'{{Panoramioreview}}\n'
 
@@ -254,7 +256,8 @@ def getPhotos(photoset=u'', start_id='', end_id='', interval=100):
     """Loop over a set of Panoramio photos."""
     i = 0
     has_more = True
-    url = u'http://www.panoramio.com/map/get_panoramas.php?set=%s&from=%s&to=%s&size=original'
+    url = ('http://www.panoramio.com/map/get_panoramas.php?'
+           'set=%s&from=%s&to=%s&size=original')
     while has_more:
         gotInfo = False
         maxtries = 10

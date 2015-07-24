@@ -384,7 +384,8 @@ class CosmeticChangesToolkit(object):
 
             # TODO: Taking main cats to top
             #   for name in categories:
-            #       if re.search(u"(.+?)\|(.{,1}?)",name.title()) or name.title()==name.title().split(":")[0]+title:
+            #       if (re.search(u"(.+?)\|(.{,1}?)",name.title()) or
+            #               name.title() == name.title().split(":")[0] + title):
             #            categories.remove(name)
             #            categories.insert(0, name)
             text = textlib.replaceCategoryLinks(text, categories,
@@ -606,7 +607,8 @@ class CosmeticChangesToolkit(object):
     # group <linktrail> is the link trail after ]] which are part of the word.
     # note that the definition of 'letter' varies from language to language.
         linkR = re.compile(
-            r'(?P<newline>[\n]*)\[\[(?P<titleWithSection>[^\]\|]+)(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>' +
+            r'(?P<newline>[\n]*)\[\[(?P<titleWithSection>[^\]\|]+)'
+            r'(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>' +
             self.site.linktrail() + ')')
 
         text = textlib.replaceExcept(text, linkR, handleOneLink,

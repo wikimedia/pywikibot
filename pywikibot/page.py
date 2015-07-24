@@ -2390,8 +2390,8 @@ class FilePage(Page):
             comment = info['comment']
             lines.append(u'| %s || %s || %s || %s || <nowiki>%s</nowiki>'
                          % (datetime, username, resolution, size, comment))
-        return u'{| border="1"\n! date/time || username || resolution || size || edit summary\n|----\n' + \
-               u'\n|----\n'.join(lines) + '\n|}'
+        return ('{| border="1"\n! date/time || username || resolution || size '
+                '|| edit summary\n|----\n\n|----\n'.join(lines) + '\n|}')
 
     def usingPages(self, step=None, total=None, content=False):
         """

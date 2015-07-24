@@ -211,14 +211,16 @@ class TestNamespaceObject(TestCase):
 
         a.defaultcontentmodel = 'bar'
         s = repr(a)
-        r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], defaultcontentmodel=%r)" \
-            % (unicode('Foo'), unicode('Foo'), unicode('bar'))
+        r = ('Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], '
+             'defaultcontentmodel=%r)' %
+             (unicode('Foo'), unicode('Foo'), unicode('bar')))
         self.assertEqual(s, r)
 
         a.case = 'upper'
         s = repr(a)
-        r = "Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], case=%r, defaultcontentmodel=%r)" \
-            % (unicode('Foo'), unicode('Foo'), unicode('upper'), unicode('bar'))
+        r = ('Namespace(id=0, custom_name=%r, canonical_name=%r, aliases=[], '
+             'case=%r, defaultcontentmodel=%r)' %
+             (unicode('Foo'), unicode('Foo'), unicode('upper'), unicode('bar')))
         self.assertEqual(s, r)
 
         b = eval(repr(a))
