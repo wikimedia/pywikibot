@@ -111,7 +111,7 @@ class StandardOption(Option):
             shortcut = self.shortcut.upper()
         if index >= 0:
             return '{0}[{1}]{2}'.format(self.option[:index], shortcut,
-                                         self.option[index + len(self.shortcut):])
+                                        self.option[index + len(self.shortcut):])
         else:
             return '{0} [{1}]'.format(self.option, shortcut)
 

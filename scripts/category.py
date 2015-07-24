@@ -633,7 +633,7 @@ class CategoryMoveRobot(object):
         if not old_page.exists():
             # only warn if not a talk page
             log = (pywikibot.log if old_page.namespace() % 2 else
-                    pywikibot.warning)
+                   pywikibot.warning)
             log(u"Moving {0} '{1}' requested, but the page doesn't "
                 u"exist.".format(name, old_page.title()))
             move_possible = False
