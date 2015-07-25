@@ -23,7 +23,8 @@ to show warnings about deprecated methods:
             pwb.py maintenance/compat2core <scriptname> -warnonly
 """
 #
-# (C) xqt, 2014
+# (C) xqt, 2014-2015
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -76,8 +77,9 @@ replacements = (
     # other deprecated methods
     (r'(?<!site)\.encoding\s*\(\s*\)', '.site.encoding()'),
     (r'\.newimages\s*\(', '.newfiles('),
-    # new core methods
+    # new core methods and properties
     (r'\.get\s*\(\s*get_redirect\s*=\s*True\s*\)', '.text'),
+    (r'(?:pywikibot|wikipedia)\.verbose', 'config.verbose_output'),
     # stopme() is done by the framework itself
     (r'(\s*)try\:\s*\r?\n\s+main\(\)\s*\r?\n\s*finally\:\s*\r?\n'
      r'\s+pywikibot\.stopme\(\)',
@@ -110,6 +112,8 @@ warnings = (
     ('query.GetData(',
      'query.GetData() should be replaced by pywikibot.data.api.Request or\n'
      'by a direct site request'),
+    ('.verbose',
+     'verbose_output need "from pywikibot import config" first')
 )
 
 
