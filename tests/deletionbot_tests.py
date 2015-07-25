@@ -61,6 +61,7 @@ class TestDeletionBotUser(ScriptMainTestCase):
     write = True
 
     def test_delete_mark(self):
+        """Test marking User:Unicodesnowman/DeleteMark for deletion."""
         site = self.get_site()
         if site.username(sysop=True):
             raise unittest.SkipTest('can\'t test mark with sysop account')
@@ -90,6 +91,7 @@ class TestDeletionBot(ScriptMainTestCase):
     undelete_args = []
 
     def setUp(self):
+        """Set up unit test."""
         self._original_delete = pywikibot.Page.delete
         self._original_undelete = pywikibot.Page.undelete
         pywikibot.Page.delete = delete_dummy
@@ -97,11 +99,13 @@ class TestDeletionBot(ScriptMainTestCase):
         super(TestDeletionBot, self).setUp()
 
     def tearDown(self):
+        """Tear down unit test."""
         pywikibot.Page.delete = self._original_delete
         pywikibot.Page.undelete = self._original_undelete
         super(TestDeletionBot, self).tearDown()
 
     def test_dry(self):
+        """Test dry run of bot."""
         delete.main('-page:Main Page', '-always', '-summary:foo')
         self.assertEqual(self.delete_args, ['[[Main Page]]', 'foo', False, True])
         delete.main('-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')
@@ -109,10 +113,12 @@ class TestDeletionBot(ScriptMainTestCase):
 
 
 def delete_dummy(self, reason, prompt, mark):
+    """Dummy delete method."""
     TestDeletionBot.delete_args = [self.title(asLink=True), reason, prompt, mark]
 
 
 def undelete_dummy(self, reason):
+    """Dummy undelete method."""
     TestDeletionBot.undelete_args = [self.title(asLink=True), reason]
 
 

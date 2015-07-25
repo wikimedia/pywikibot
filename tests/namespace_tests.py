@@ -53,7 +53,7 @@ class TestNamespaceObject(TestCase):
     net = False
 
     def testNamespaceTypes(self):
-        """Test cases for methods manipulating namespace names."""
+        """Test cases for methods manipulating Namespace names."""
         ns = Namespace.builtin_namespaces(use_image_name=False)
 
         self.assertIsInstance(ns, dict)
@@ -71,6 +71,7 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(ns[ns[6]], ns[6])
 
     def testNamespaceConstructor(self):
+        """Test Namespace constructor."""
         kwargs = {u'case': u'first-letter'}
         y = Namespace(id=6, custom_name=u'dummy', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'], **kwargs)
@@ -104,6 +105,7 @@ class TestNamespaceObject(TestCase):
         self.assertIn(u'Immagine', y)
 
     def testNamespaceToString(self):
+        """Test Namespace __str__ and __unicode__."""
         ns = Namespace.builtin_namespaces(use_image_name=False)
 
         self.assertEqual(str(ns[0]), ':')
@@ -125,6 +127,7 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(y.custom_prefix(), u':ملف:')
 
     def testNamespaceCompare(self):
+        """Test Namespace comparisons."""
         a = Namespace(id=0, canonical_name=u'')
 
         self.assertEqual(a, 0)
@@ -209,8 +212,8 @@ class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
 
     net = False
 
-    def test_resolve(self):
-        """Test Namespace.resolve."""
+    def test_resolve_equal(self):
+        """Test Namespace.resolve success."""
         namespaces = Namespace.builtin_namespaces(use_image_name=False)
         main_ns = namespaces[0]
         file_ns = namespaces[6]
@@ -245,6 +248,8 @@ class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
         self.assertEqual(Namespace.resolve(':Image'), [file_ns])
         self.assertEqual(Namespace.resolve(':Image:'), [file_ns])
 
+    def test_resolve_exceptions(self):
+        """Test Namespace.resolve failure."""
         self.assertRaises(TypeError, Namespace.resolve, [True])
         self.assertRaises(TypeError, Namespace.resolve, [False])
         self.assertRaises(TypeError, Namespace.resolve, [None])

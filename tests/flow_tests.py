@@ -30,6 +30,7 @@ class TestBoardBasePageMethods(BasePageMethodsTestBase):
     code = 'mediawiki'
 
     def setUp(self):
+        """Set up unit test."""
         self._page = pywikibot.flow.Board(
             self.site, 'Talk:Sandbox')
         super(TestBoardBasePageMethods, self).setUp()
@@ -54,6 +55,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
     code = 'mediawiki'
 
     def setUp(self):
+        """Set up unit test."""
         self._page = pywikibot.flow.Board(
             self.site, 'Talk:Sandbox')
         super(TestLoadRevisionsCaching, self).setUp()

@@ -33,11 +33,13 @@ class TestTkdialog(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up test class."""
         if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') != '1':
             raise unittest.SkipTest('Tkdialog tests are disabled on Travis-CI')
         super(TestTkdialog, cls).setUpClass()
 
     def testTkdialog(self):
+        """Test Tk dialog."""
         try:
             box = Tkdialog('foo', 'tests/data/MP_sounds.png', 'MP_sounds.png')
             box.show_dialog()
@@ -53,11 +55,13 @@ class TestTkinter(DefaultSiteTestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up test class."""
         if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') != '1':
             raise unittest.SkipTest('Tkinter tests are disabled on Travis-CI')
         super(TestTkinter, cls).setUpClass()
 
     def testTkinter(self):
+        """Test Tkinter window."""
         root = Tkinter.Tk()
         root.resizable(width=Tkinter.FALSE, height=Tkinter.FALSE)
         root.title("pywikibot GUI")
