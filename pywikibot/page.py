@@ -1965,6 +1965,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.title(asUrl=True)
 
+    @deprecated('Page.protection()')
+    def getRestrictions(self):
+        """DEPRECATED. Use self.protection() instead."""
+        restrictions = self.protection()
+        return dict((k, list(restrictions[k])) for k in restrictions)
+
 # ###### DISABLED METHODS (warnings provided) ######
     # these methods are easily replaced by editing the page's text using
     # textlib methods and then using put() on the result.
