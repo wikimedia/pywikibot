@@ -123,8 +123,10 @@ def main(*args):
     try:
         bot.run()
     except pywikibot.Error as e:
-        pywikibot.showHelp()
-        pywikibot.warning(e)
+        pywikibot.bot.suggest_help(exception=e)
+        return False
+    else:
+        return True
 
 
 if __name__ == "__main__":

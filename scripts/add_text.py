@@ -340,8 +340,8 @@ def main(*args):
             addText = f.read()
     generator = genFactory.getCombinedGenerator()
     if not generator:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
     if not addText:
         pywikibot.error("The text to add wasn't given.")
         return

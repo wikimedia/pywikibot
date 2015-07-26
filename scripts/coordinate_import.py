@@ -127,8 +127,10 @@ def main(*args):
     if generator:
         coordbot = CoordImportRobot(generator)
         coordbot.run()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 if __name__ == "__main__":
     main()

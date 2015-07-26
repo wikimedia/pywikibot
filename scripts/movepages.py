@@ -270,8 +270,11 @@ def main(*args):
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         bot = MovePagesBot(preloadingGen, **options)
         bot.run()
-    elif not fromToPairs:
-        pywikibot.showHelp()
+        return True
+    else:
+        # in theory pairs could be missing too
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 if __name__ == '__main__':
     main()

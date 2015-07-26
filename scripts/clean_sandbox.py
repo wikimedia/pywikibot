@@ -287,8 +287,13 @@ def main(*args):
 
     generator = gen_factory.getCombinedGenerator()
 
-    bot = SandboxBot(generator=generator, **opts)
-    bot.run()
+    if generator:
+        bot = SandboxBot(generator=generator, **opts)
+        bot.run()
+        return True
+
+    pywikibot.bot.suggest_help(missing_generator=True)
+    return False
 
 if __name__ == "__main__":
     main()

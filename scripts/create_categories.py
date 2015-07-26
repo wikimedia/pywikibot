@@ -107,14 +107,22 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
+    missing = set()
+    if not parent:
+        missing.add('-parent')
+    if not basename:
+        missing.add('-basename')
+
     generator = genFactory.getCombinedGenerator()
-    if generator and parent and basename:
+    if generator and missing:
         bot = CreateCategoriesBot(generator, parent, basename, **options)
         bot.run()
-        pywikibot.output(u'All done')
+        pywikibot.output('All done')
+        return True
     else:
-        pywikibot.output(u'No pages to work on')
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_parameters=missing,
+                                   missing_generator=not generator)
+        return False
 
 if __name__ == "__main__":
     main()

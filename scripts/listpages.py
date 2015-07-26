@@ -232,8 +232,10 @@ def main(*args):
                 with open(filename, mode='wb') as f:
                     f.write(page.text.encode(encoding))
         pywikibot.output(u"%i page(s) found" % i)
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 
 if __name__ == "__main__":

@@ -303,17 +303,14 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    show = False
-
-    # Parse command line arguments
-    if pywikibot.handle_args(args):
-        show = True
-
-    if not show:
+    unknown_args = pywikibot.handle_args(args)
+    if unknown_args:
+        pywikibot.bot.suggest_help(unknown_parameters=unknown_args)
+        return False
+    else:
         bot = BlockreviewBot()
         bot.run()
-    else:
-        pywikibot.showHelp()
+        return True
 
 if __name__ == "__main__":
     main()

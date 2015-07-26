@@ -205,8 +205,10 @@ def main(*args):
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         bot = ImageRobot(preloadingGen, old_image, new_image, **options)
         bot.run()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_parameters=['old image'])
+        return False
 
 if __name__ == "__main__":
     main()

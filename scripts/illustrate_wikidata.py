@@ -116,11 +116,12 @@ def main(*args):
 
     generator = generator_factory.getCombinedGenerator()
     if not generator:
-        pywikibot.output('I need a generator with pages to work on')
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
     bot = IllustrateRobot(generator, wdproperty)
     bot.run()
+    return True
 
 if __name__ == "__main__":
     main()

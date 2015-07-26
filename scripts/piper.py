@@ -146,8 +146,10 @@ def main(*args):
         gen = pagegenerators.PreloadingGenerator(gen)
         bot = PiperBot(gen, **options)
         bot.run()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 
 if __name__ == '__main__':

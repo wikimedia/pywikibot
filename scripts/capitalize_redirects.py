@@ -120,8 +120,10 @@ def main(*args):
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         bot = CapitalizeBot(preloadingGen, **options)
         bot.run()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 if __name__ == "__main__":
     main()

@@ -950,9 +950,8 @@ LIMIT 200""" % (whereClause, exceptClause)
     gen = genFactory.getCombinedGenerator(gen)
 
     if not gen:
-        # syntax error, show help text from the top of this file
-        pywikibot.showHelp('replace')
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
     bot = ReplaceRobot(preloadingGen, replacements, exceptions, acceptall,

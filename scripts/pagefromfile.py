@@ -317,7 +317,8 @@ def main(*args):
     # show help text from the top of this file if reader failed
     # or User quit.
     if failed_filename:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_parameters=['-file'])
+        return False
     else:
         reader = PageFromFileReader(filename, pageStartMarker, pageEndMarker,
                                     titleStartMarker, titleEndMarker, include,

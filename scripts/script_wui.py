@@ -306,9 +306,10 @@ def main(*args):
     """
     global __simulate, __sys_argv
 
-    for arg in pywikibot.handle_args(args):
-        pywikibot.showHelp('script_wui')
-        return
+    unknown_args = pywikibot.handle_args(args)
+    if unknown_args:
+        pywikibot.bot.suggest_help(unknown_parameters=unknown_args)
+        return False
 
     __simulate = pywikibot.config.simulate
     __sys_argv = sys.argv

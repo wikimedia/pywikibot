@@ -640,11 +640,8 @@ def main(*args):
 
     if calc:
         if not salt:
-            pywikibot.showHelp()
-            pywikibot.output(
-                'NOTE: you must specify a salt to calculate a key using '
-                '-salt:SALT option.')
-            return
+            pywikibot.bot.suggest_help(missing_parameters=['-salt'])
+            return False
         page = pywikibot.Page(site, calc)
         if page.exists():
             calc = page.title()
@@ -660,9 +657,8 @@ def main(*args):
         salt = ''
 
     if not args:
-        pywikibot.showHelp()
-        pywikibot.output(u'NOTE: you must specify a template to run the bot.')
-        return
+        pywikibot.bot.suggest_help(additional_text='No template was specified.')
+        return False
 
     for a in args:
         pagelist = []

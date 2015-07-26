@@ -323,8 +323,8 @@ def main(*args):
                 templateNames.append(templateName.title(withNamespace=False))
 
     if not templateNames:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_parameters=['templates'])
+        return False
 
     if options.get('subst', False) ^ options.get('remove', False):
         for templateName in templateNames:

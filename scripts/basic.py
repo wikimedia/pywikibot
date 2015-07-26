@@ -131,8 +131,10 @@ def main(*args):
         gen = pagegenerators.PreloadingGenerator(gen)
         bot = BasicBot(gen)
         bot.run()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 if __name__ == "__main__":
     main()

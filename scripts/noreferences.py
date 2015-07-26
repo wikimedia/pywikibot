@@ -735,8 +735,10 @@ def main(*args):
     if gen:
         bot = NoReferencesBot(gen, **options)
         bot.run()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 if __name__ == "__main__":
     main()

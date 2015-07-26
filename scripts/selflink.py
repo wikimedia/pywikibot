@@ -98,12 +98,13 @@ def main(*args):
 
     gen = genFactory.getCombinedGenerator()
     if not gen:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
     preloadingGen = PreloadingGenerator(gen)
     bot = SelflinkBot(preloadingGen, **botArgs)
     bot.run()
+    return True
 
 if __name__ == "__main__":
     main()

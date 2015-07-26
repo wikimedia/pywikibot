@@ -141,8 +141,10 @@ def main(*args):
     if gen:
         for page in pagegenerators.PreloadingGenerator(gen):
             workon(page)
+        return True
     else:
-        pywikibot.showHelp('fixing_redirects')
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 if __name__ == "__main__":
     main()

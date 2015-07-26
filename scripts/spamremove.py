@@ -62,9 +62,8 @@ def main(*args):
             spamSite = arg
 
     if not spamSite:
-        pywikibot.showHelp()
-        pywikibot.output(u"No spam site specified.")
-        return
+        pywikibot.bot.suggest_help(missing_parameters=['spam site'])
+        return False
 
     mysite = pywikibot.Site()
     pages = mysite.exturlusage(spamSite, namespaces=namespaces, content=True)

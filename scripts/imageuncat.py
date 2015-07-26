@@ -1377,8 +1377,8 @@ def main(*args):
 
     generator = genFactory.getCombinedGenerator(gen=generator)
     if not generator:
-        pywikibot.output(
-            u'You have to specify the generator you want to use for the program!')
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
     else:
         pregenerator = pagegenerators.PreloadingGenerator(generator)
         site.login()
@@ -1388,6 +1388,7 @@ def main(*args):
                     and (not page.isRedirectPage()):
                 if isUncat(page):
                     addUncat(page)
+        return True
 
 if __name__ == "__main__":
     main()

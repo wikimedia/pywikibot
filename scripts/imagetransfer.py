@@ -338,8 +338,8 @@ def main(*args):
         page = pywikibot.Page(pywikibot.Site(), pageTitle)
         gen = iter([page])
     else:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_parameters=['page'])
+        return False
 
     if not targetLang and not targetFamily:
         targetSite = pywikibot.Site('commons', 'commons')

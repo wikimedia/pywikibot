@@ -204,7 +204,7 @@ try:
             workingcatname = arg
 
     if not workingcatname:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_parameters=['working category'])
         sys.exit(0)
 
     mysite = pywikibot.Site()

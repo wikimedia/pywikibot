@@ -203,12 +203,12 @@ def main(*args):
 
     generator = gen.getCombinedGenerator()
     if not generator:
-        # show help text from the top of this file
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
     bot = ClaimRobot(generator, claims, exists_arg)
     bot.run()
+    return True
 
 if __name__ == "__main__":
     main()
