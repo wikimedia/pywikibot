@@ -156,9 +156,10 @@ def main(*args):
                                       % ['', 'un'][options.get('undelete', False)])
         bot = DeletionRobot(generator, summary, **options)
         bot.run()
+        return True
     else:
-        # Show help text from the top of this file
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
 
 if __name__ == "__main__":

@@ -132,14 +132,16 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    if 'action' in options:
-        gen = genFactory.getCombinedGenerator()
-        if gen:
-            gen = pagegenerators.PreloadingGenerator(gen)
-            bot = CommonsLinkBot(gen, **options)
-            bot.run()
-            return
-    pywikibot.showHelp()
+    gen = genFactory.getCombinedGenerator()
+    if 'action' in options and gen:
+        gen = pagegenerators.PreloadingGenerator(gen)
+        bot = CommonsLinkBot(gen, **options)
+        bot.run()
+        return True
+
+    pywikibot.bot.suggest_help(missing_action='action' not in options,
+                               missing_generator=not gen)
+    return False
 
 
 if __name__ == "__main__":

@@ -102,6 +102,7 @@ auto_run_script_list = [
     'checkimages',
     'clean_sandbox',
     'disambredir',
+    'featured',
     'imagerecat',
     'login',
     'lonelypages',
@@ -123,25 +124,20 @@ auto_run_script_list = [
 # Some of these are not pretty, but at least they are informative
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
-    'archivebot': 'NOTE: you must specify a template to run the bot',
-    'create_categories': 'No pages to work on',
     # TODO: until done here, remember to set editor = None in user_config.py
     'editarticle': 'Nothing changed',  # This masks related bug 68645 but that
                                        # bug is more broadly about config
                                        # rather than editarticle.
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
-    'illustrate_wikidata': 'I need a generator with pages to work on',
     'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
     'login': 'Logged in on ',
-    'match_images': 'Require two images to work on.',
     'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
     'shell': ('>>> ', 'Welcome to the'),
-    'spamremove': 'No spam site specified',
     'transferbot': 'Target site not different from source site',  # Bug 68662
     'unusedfiles': ('Working on', None),
     'watchlist': 'Retrieving watchlist',
@@ -274,9 +270,13 @@ class TestScriptMeta(MetaTestCaseClass):
                 elif not is_autorun:
                     if stderr_other == ['']:
                         stderr_other = None
-                    self.assertIsNone(stderr_other)
-                    self.assertIn('Global arguments available for all',
-                                  result['stdout'])
+                    if stderr_other is not None:
+                        self.assertIn('Use -help for further information.',
+                                      stderr_other)
+                        self.assertNotIn('-help', args)
+                    else:
+                        self.assertIn('Global arguments available for all',
+                                      result['stdout'])
 
                     exit_codes = [0]
                 else:

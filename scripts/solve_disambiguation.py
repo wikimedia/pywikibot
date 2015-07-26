@@ -1153,8 +1153,8 @@ def main(*args):
         generator = iter([page])
 
     if not generator:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
     site.login()
 

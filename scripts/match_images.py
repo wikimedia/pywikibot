@@ -164,12 +164,10 @@ def main(*args):
             images.append(arg)
 
     if len(images) != 2:
-        pywikibot.showHelp('match_images')
-        pywikibot.error('Require two images to work on.')
-        return
-
-    else:
-        pass
+        pywikibot.bot.suggest_help(
+            additional_text='Unable to execute script because it '
+                            'requires two images to work on.')
+        return False
 
     imagePageA = pywikibot.page.FilePage(pywikibot.Site(),
                                          images[0])

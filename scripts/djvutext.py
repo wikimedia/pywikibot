@@ -158,7 +158,7 @@ def main(*args):
 
     # index is mandatory.
     if not index:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_parameters=['-index'])
         return False
 
     # If djvu_path is not a fle, build djvu_path from dir+index.

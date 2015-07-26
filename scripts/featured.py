@@ -627,11 +627,8 @@ def main(*args):
         else:
             options[arg[1:].lower()] = True
 
-    if options:
-        bot = FeaturedBot(**options)
-        bot.run()
-    else:
-        pywikibot.showHelp()
+    bot = FeaturedBot(**options)
+    bot.run()
 
 
 if __name__ == "__main__":

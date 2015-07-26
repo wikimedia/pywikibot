@@ -1249,6 +1249,44 @@ Global arguments available for all bots:
     pywikibot.stdout(globalHelp)
 
 
+def suggest_help(missing_parameters=[], missing_generator=False,
+                 unknown_parameters=[], exception=None,
+                 missing_action=False, additional_text=''):
+    """
+    Output error message to use -help with additional text before it.
+
+    @param missing_parameters: A list of parameters which are missing.
+    @type missing_parameters: list of str
+    @param missing_generator: Whether a generator is missing.
+    @type missing_generator: bool
+    @param unknown_parameters: A list of parameters which are unknown.
+    @type unknown_parameters: list of str
+    @param exception: An exception thrown.
+    @type exception: Exception
+    @param missing_action: Add an entry that no action was defined.
+    @type missing_action: bool
+    @param additional_text: Additional text added to the end.
+    @type additional_text: str
+    """
+    if exception:
+        additional_text = ('An error occured: "{0}"'.format(exception) +
+                           additional_text)
+    if missing_generator:
+        additional_text = ('Unable to execute script because no generator was '
+                           'defined.\n' + additional_text)
+    if missing_parameters:
+        additional_text = 'Missing parameter(s) "{0}"\n'.format(
+            '", "'.join(missing_parameters)) + additional_text
+    if missing_action:
+        additional_text = 'No action defined.\n' + additional_text
+    if unknown_parameters:
+        additional_text = 'Unknown parameter(s) "{0}"\n'.format(
+            '", "'.join(unknown_parameters)) + additional_text
+    if not additional_text.endswith('\n'):
+        additional_text += '\n'
+    error(additional_text + 'Use -help for further information.')
+
+
 def writeToCommandLogFile():
     """
     Save name of the called module along with all parameters to logs/commands.log.

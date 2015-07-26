@@ -133,8 +133,8 @@ def main(*args):
             argsList.append(arg)
 
     if not operation:
-        pywikibot.showHelp('templatecount')
-        return
+        pywikibot.bot.suggest_help(missing_parameters=['operation'])
+        return False
 
     robot = TemplateCountRobot()
     if not argsList:

@@ -1271,8 +1271,10 @@ def main(*args):
         finally:
             if catDB:
                 catDB.dump()
+        return True
     else:
-        pywikibot.showHelp()
+        pywikibot.bot.suggest_help(missing_action=True)
+        return False
 
 
 if __name__ == "__main__":

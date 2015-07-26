@@ -271,8 +271,10 @@ def main(*args):
     config_generator = genFactory.getCombinedGenerator()
 
     if not config_generator or not csv_dir:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(
+            missing_parameters=[] if csv_dir else ['-csvdir'],
+            missing_generator=not config_generator)
+        return False
 
     for config_page in config_generator:
         try:

@@ -76,6 +76,7 @@ def main(*args):
     sysop = False
     logall = False
     logout = False
+    unknown_args = []
     for arg in pywikibot.handle_args(args):
         if arg.startswith("-pass"):
             if len(arg) == 5:
@@ -95,8 +96,12 @@ def main(*args):
         elif arg == "-logout":
             logout = True
         else:
-            pywikibot.showHelp('login')
-            return
+            unknown_args += [arg]
+
+    if unknown_args:
+        pywikibot.bot.suggest_help(unknown_parameters=unknown_args)
+        return False
+
     if logall:
         if sysop:
             namedict = config.sysopnames

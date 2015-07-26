@@ -775,7 +775,13 @@ def main(*args):
         xmlFilename and moved_pages or
         fullscan and xmlFilename
     ):
-        pywikibot.showHelp()
+        problems = []
+        if xmlFilename and moved_pages:
+            problems += ['Either use a XML file or the moved pages from the API']
+        if xmlFilename and fullscan:
+            problems += ['Either use a XML file or do a full scan using the API']
+        pywikibot.bot.suggest_help(additional_text='\n'.join(problems),
+                                   missing_action=not action)
     else:
         pywikibot.Site().login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,

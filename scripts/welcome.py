@@ -994,9 +994,8 @@ def main(*args):
         bot = WelcomeBot()
     except KeyError as error:
         # site not managed by welcome.py
-        pywikibot.showHelp()
-        pywikibot.warning(error)
-        return
+        pywikibot.bot.suggest_help(exception=error)
+        return False
 
     try:
         bot.run()

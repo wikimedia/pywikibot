@@ -144,11 +144,12 @@ def main(*args):
 
     generator = gen.getCombinedGenerator()
     if not generator:
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
 
     bot = NewItemRobot(generator, **options)
     bot.run()
+    return True
 
 if __name__ == "__main__":
     main()

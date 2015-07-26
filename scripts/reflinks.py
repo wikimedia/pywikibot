@@ -839,13 +839,14 @@ def main(*args):
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
-        # syntax error, show help text from the top of this file
-        pywikibot.showHelp()
-        return
+        pywikibot.bot.suggest_help(missing_generator=True)
+        return False
+
     generator = pagegenerators.PreloadingGenerator(generator, step=50)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
     bot = ReferencesRobot(generator, **options)
     bot.run()
+    return True
 
 if __name__ == "__main__":
     main()
