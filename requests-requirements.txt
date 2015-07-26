@@ -1,0 +1,11 @@
+requests
+
+# Dependency of pyOpenSSL. Use specific version to avoid expected
+# DeprecationWarning
+cryptography<=0.8.2 ; python_version < '2.7'
+
+# requests security extra
+# Bug T105767 on Python 2.7 release 9+
+pyOpenSSL ; python_full_version < '2.7.9' or python_version >= '3'
+ndg-httpsclient ; python_full_version < '2.7.9' or python_version >= '3'
+pyasn1 ; python_full_version < '2.7.9' or python_version >= '3'
