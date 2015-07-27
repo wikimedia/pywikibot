@@ -87,7 +87,7 @@ content = {
     'pt': u'<!--não apague esta linha-->{{página de testes}}<!--não apagar-->\r\n',
     'ru': u'{{/Пишите ниже}}\n<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
     'simple': u'{{subst:/Text}}',
-    'sco': u'Feel free tae test here',
+    'sco': u'{{subst:Saundbox}}',
     'sr': u'{{песак}}\n<!-- Молимо, испробавајте испод ове линије. Хвала. -->',
     'sv': u'{{subst:Sandlådan}}',
     'th': u'{{กระบะทราย}}\n<!-- กรุณาอย่าแก้ไขบรรทัดนี้ ขอบคุณครับ/ค่ะ -- '
@@ -124,7 +124,7 @@ sandboxTitle = {
     'pt': u'Project:Página de testes',
     'ru': u'Project:Песочница',
     'simple': u'Project:Sandbox',
-    'sco': u'Project:Saundpit',
+    'sco': u'Project:Saundbox',
     'sr': u'Project:Песак',
     'sv': u'Project:Sandlådan',
     'th': u'Project:ทดลองเขียน',
