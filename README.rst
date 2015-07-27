@@ -8,6 +8,9 @@ version 1.14 or higher.
 Also included are various general function scripts that can be adapted for
 different tasks.
 
+For further information about the library excluding scripts see
+the full `code documentation <https://doc.wikimedia.org/pywikibot/>`_.
+
 Quick start
 -----------
 
@@ -17,6 +20,11 @@ Quick start
     cd core
     git submodule update --init
     python pwb.py script_name
+
+Or to install using PyPI (excluding scripts)
+::
+
+    pip install pywikibot --pre
 
 Our `installation
 guide <https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Installation>`_
@@ -34,8 +42,6 @@ If you wish to write your own script it's very easy to get started:
     page = pywikibot.Page(site, 'Wikipedia:Sandbox')
     page.text = page.text.replace('foo', 'bar')
     page.save('Replacing "foo" with "bar"')  # Saves the page
-
-For more documentation on pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
 Required external programms
 ---------------------------
