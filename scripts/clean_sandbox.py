@@ -63,6 +63,7 @@ content = {
           u'and editing skills below this line. As this page is for editing '
           u'experiments, this page will automatically be cleaned every 12 '
           u'hours. -->',
+    'eo': '{{Bonvolu ne forigi tiun ĉi linion (Provejo)}}',
     'fa': u'{{subst:Wikipedia:ربات/sandbox}}',
     'fi': u'{{subst:Hiekka}}',
     'he': u'{{ארגז חול}}\n<!-- נא לערוך מתחת לשורה זו בלבד, תודה. -->',
@@ -107,6 +108,7 @@ sandboxTitle = {
     'da': u'Project:Sandkassen',
     'de': u'Project:Spielwiese',
     'en': u'Project:Sandbox',
+    'eo': 'Project:Provejo',
     'fa': [u'Project:صفحه تمرین', u'Project:آشنایی با ویرایش'],
     'fi': u'Project:Hiekkalaatikko',
     'fr': u'Project:Bac à sable',
