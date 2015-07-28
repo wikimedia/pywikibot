@@ -3,10 +3,7 @@
 """
 Allows access to the bot account's watchlist.
 
-The function refresh() downloads the current watchlist and saves it to disk.
-It is run automatically when a bot first tries to save a page retrieved. The
-watchlist can be updated manually by running this script. The list will also
-be reloaded automatically once a month.
+The watchlist can be updated manually by running this script.
 
 Syntax: python watchlist [-all | -new]
 
@@ -18,7 +15,7 @@ Command line options:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2014
+# (C) Pywikibot team, 2005-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,20 +30,12 @@ from pywikibot import config
 from pywikibot.data.api import CachedRequest
 from scripts.maintenance.cache import CacheEntry
 
-cache = {}
-
 
 def get(site=None):
     """Load the watchlist, fetching it if necessary."""
     if site is None:
         site = pywikibot.Site()
-    if site in cache:
-        # Use cached copy if it exists.
-        watchlist = cache[site]
-    else:
-        # create cached copy
-        watchlist = refresh(site)
-        cache[site] = watchlist
+    watchlist = [p.title() for p in site.watched_pages()]
     return watchlist
 
 
@@ -58,30 +47,8 @@ def isWatched(pageName, site=None):
 
 def refresh(site, sysop=False):
     """Fetch the watchlist."""
-    if not site.logged_in(sysop=sysop):
-        site.login(sysop=sysop)
-
-    params = {
-        'action': 'query',
-        'list': 'watchlistraw',
-        'wrlimit': config.special_page_limit,
-    }
-
     pywikibot.output(u'Retrieving watchlist for %s via API.' % str(site))
-    # pywikibot.put_throttle() # It actually is a get, but a heavy one.
-    watchlist = []
-    while True:
-        req = CachedRequest(config.API_config_expiry, site=site, **params)
-        data = req.submit()
-        if 'error' in data:
-            raise RuntimeError('ERROR: %s' % data)
-        watchlist.extend([w['title'] for w in data['watchlistraw']])
-
-        if 'query-continue' in data:
-            params.update(data['query-continue']['watchlistraw'])
-        else:
-            break
-    return watchlist
+    return list(site.watched_pages(sysop=sysop, force=True))
 
 
 def refresh_all(sysop=False):
@@ -95,7 +62,7 @@ def refresh_all(sysop=False):
         entry.parse_key()
         entry._rebuild()
         if entry.site not in seen:
-            if entry._data['watchlistraw']:
+            if entry._data.get('watchlistraw'):
                 refresh(entry.site, sysop)
                 seen.append(entry.site)
 
@@ -106,10 +73,12 @@ def refresh_new(sysop=False):
         'Downloading all watchlists for your accounts in user-config.py')
     for family in config.usernames:
         for lang in config.usernames[family]:
-            refresh(pywikibot.Site(lang, family), sysop=sysop)
+            site = pywikibot.Site(lang, family)
+            refresh(site, sysop=sysop)
     for family in config.sysopnames:
         for lang in config.sysopnames[family]:
-            refresh(pywikibot.Site(lang, family), sysop=sysop)
+            site = pywikibot.Site(lang, family)
+            refresh(site, sysop=sysop)
 
 
 def main(*args):
@@ -137,12 +106,10 @@ def main(*args):
         refresh_new(sysop=sysop)
     else:
         site = pywikibot.Site()
-        refresh(site, sysop=sysop)
-
-        watchlist = get(site)
+        watchlist = refresh(site, sysop=sysop)
         pywikibot.output(u'%i pages in the watchlist.' % len(watchlist))
-        for pageName in watchlist:
-            pywikibot.output(pageName, toStdout=True)
+        for page in watchlist:
+            pywikibot.output(page.title(), toStdout=True)
 
 if __name__ == "__main__":
     main()
