@@ -573,7 +573,7 @@ class DisambiguationRobot(Bot):
         self.main_only = main_only
         self.minimum = minimum
 
-        self.mysite = pywikibot.Site()
+        self.site = self.mysite = pywikibot.Site()
         self.mylang = self.mysite.lang
         self.comment = None
 
