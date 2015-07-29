@@ -178,9 +178,11 @@ class ImageTransferBot:
         try:
             description = sourceImagePage.get()
             # try to translate license templates
-            if (sourceSite.sitename(), self.targetSite.sitename()) in licenseTemplates:
-                for old, new in licenseTemplates[(sourceSite.sitename(),
-                                                  self.targetSite.sitename())].items():
+            if (sourceSite.sitename,
+                    self.targetSite.sitename) in licenseTemplates:
+                for old, new in licenseTemplates[
+                        (sourceSite.sitename,
+                         self.targetSite.sitename)].items():
                     new = '{{%s}}' % new
                     old = re.compile('{{%s}}' % old)
                     description = textlib.replaceExcept(description, old, new,

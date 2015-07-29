@@ -1722,7 +1722,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
             for (site, page) in new.items():
                 # edit restriction for some templates on zh-wiki where
                 # interlanguage keys are included by /doc subpage
-                smallWikiAllowed = not (page.site.sitename() == 'wikipedia:zh' and
+                smallWikiAllowed = not (page.site.sitename == 'wikipedia:zh' and
                                         page.namespace() == 10 and
                                         u'Country data' in page.title(withNamespace=False))
                 # edit restriction on is-wiki
@@ -1733,8 +1733,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 # or the last edit was 1 month ago
                 if (smallWikiAllowed and
                     globalvar.autonomous and
-                    (page.site.sitename() == 'wikipedia:is' or
-                     page.site.sitename() == 'wikipedia:zh' and
+                    (page.site.sitename == 'wikipedia:is' or
+                     page.site.sitename == 'wikipedia:zh' and
                      page.namespace() == 10
                      )):
                     old = {}
@@ -1772,7 +1772,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                             else:
                                 pywikibot.output(
                                     u'NOTE: number of edits are restricted at %s'
-                                    % page.site.sitename()
+                                    % page.site.sitename
                                 )
 
                 # if we have an account for this site

@@ -671,8 +671,7 @@ class NoReferencesBot(Bot):
                 pywikibot.output(u"Page %s is a disambig; skipping."
                                  % page.title(asLink=True))
                 continue
-            if self.site.sitename() == 'wikipedia:en' and \
-               page.isIpEdit():
+            if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
                 pywikibot.output(
                     u"Page %s is edited by IP. Possible vandalized"
                     % page.title(asLink=True))

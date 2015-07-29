@@ -130,7 +130,7 @@ class BlockreviewBot:
                 # Notify the blocking admin
                 if templates[1] == [] or templates[1][0] == u'1':
                     if self.info['action'] == 'block' or user.isBlocked():
-                        if self.site.sitename() == 'wikipedia:de':
+                        if self.site.sitename == 'wikipedia:de':
                             admin = pywikibot.User(self.site, self.info['user'])
                             adminPage = admin.getUserTalkPage()
                             adminText = adminPage.get()
@@ -144,7 +144,7 @@ class BlockreviewBot:
                             self.save(adminText, adminPage, comment, False)
                         # test for pt-wiki
                         # just print all sysops talk pages
-                        elif self.site.sitename() == 'wikipedia:pt':
+                        elif self.site.sitename == 'wikipedia:pt':
                             from pywikibot import pagegenerators as pg
                             gen = pg.PreloadingGenerator(self.SysopGenerator())
                             for sysop in gen:
