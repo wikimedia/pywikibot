@@ -628,8 +628,9 @@ class CosmeticChangesToolkit:
         """Cleanup multiple or trailing spaces."""
         multipleSpacesR = re.compile('  +')
         spaceAtLineEndR = re.compile(' $')
-        exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table',
-                      'template']
+        exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table']
+        if self.site.sitename != 'wikipedia:cs':
+            exceptions.append('template')
         text = textlib.replaceExcept(text, multipleSpacesR, ' ', exceptions)
         text = textlib.replaceExcept(text, spaceAtLineEndR, '', exceptions)
         return text
