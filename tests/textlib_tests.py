@@ -314,6 +314,10 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{{a|b}}X}'),
                          [('a', OrderedDict((('1', 'b'), )))])
 
+        # sf.net bug 1575: unclosed template
+        self.assertEqual(func('{{a'), [])
+        self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
+
     def _etp_regex_differs(self, func):
         """Common cases not handled the same by ETP_REGEX."""
         self.assertEqual(func('{{a| b=c}}'), [('a', OrderedDict(((' b', 'c'), )))])
@@ -350,6 +354,18 @@ class TestTemplateParams(TestCase):
         self._order_differs(func)
         self._etp_regex_differs(func)
 
+        self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
+                              [('c', OrderedDict((('1', '{{d}}'), ))),
+                               ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
+                               ('d', OrderedDict())
+                               ])
+
+        self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
+                              [('c', OrderedDict((('1', '{{d|}}'), ))),
+                               ('a', OrderedDict([('1', '{{c|{{d|}}}}')])),
+                               ('d', OrderedDict([('1', '')]))
+                               ])
+
     def test_extract_templates_params_regex(self):
         """Test using many complex regexes."""
         func = functools.partial(textlib.extract_templates_and_params_regex,
@@ -367,6 +383,20 @@ class TestTemplateParams(TestCase):
         func = textlib.extract_templates_and_params_regex
         self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
                          [('a', OrderedDict((('b', ''), )))])
+
+        # Identical to mwpfh
+        self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
+                              [('c', OrderedDict((('1', '{{d}}'), ))),
+                               ('a', OrderedDict([('1', '{{c|{{d}}}}')])),
+                               ('d', OrderedDict())
+                               ])
+
+        # However fails to correctly handle three levels of balanced brackets
+        # with empty parameters
+        self.assertCountEqual(func('{{a|{{c|{{d|}}}}}}'),
+                              [('c', OrderedDict((('1', '{{d|}}}'), ))),
+                               ('d', OrderedDict([('1', '}')]))
+                               ])
 
     def test_extract_templates_params(self):
         """Test that the normal entry point works."""
@@ -404,6 +434,13 @@ class TestTemplateParams(TestCase):
                          [(u'a', OrderedDict([('1', u'{{b'),
                                               ('2', u'c}}}'),
                                               ('3', u'd')]))])
+
+        # Safe fallback to handle arbitary template levels
+        # by merging top level templates together.
+        # i.e. 'b' is not recognised as a template, and 'foo' is also
+        # consumed as part of 'a'.
+        self.assertEqual(func('{{a|{{c|{{d|{{e|}}}} }} }} foo {{b}}'),
+                         [(None, OrderedDict())])
 
     def test_regexes(self):
         """_ETP_REGEX, NESTED_TEMPLATE_REGEX and TEMP_REGEX tests."""
@@ -493,6 +530,17 @@ class TestTemplateParams(TestCase):
 
         self.assertIsNotNone(func('{{a|{{c}} }}'))
         self.assertIsNotNone(func('{{a|{{c|d}} }}'))
+
+        # All templates are captured when template depth is greater than 2
+        m = func('{{a|{{c|{{d|}} }} | foo  = bar }} foo {{bar}} baz')
+        self.assertIsNotNone(m)
+        self.assertIsNotNone(m.group(0))
+        self.assertIsNone(m.group('name'))
+        self.assertIsNone(m.group(1))
+        self.assertIsNone(m.group('params'))
+        self.assertIsNone(m.group(2))
+        self.assertIsNotNone(m.group('unhandled_depth'))
+        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
 
 
 class TestReplaceLinks(TestCase):
@@ -958,6 +1006,12 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         template_sample = (r'a {{templatename '
                            r'    | 1={{{a}}}2{{{a}}} '
                            r'    | 2={{{a}}}1{{{a}}} }}')
+        self.assertEqual(textlib.replaceExcept(template_sample, 'a', 'X',
+                                               ['template'], site=self.site),
+                         'X' + template_sample[1:])
+
+        # sf.net bug 1575: unclosed template
+        template_sample = template_sample[:-2]
         self.assertEqual(textlib.replaceExcept(template_sample, 'a', 'X',
                                                ['template'], site=self.site),
                          'X' + template_sample[1:])
