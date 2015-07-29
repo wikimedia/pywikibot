@@ -7,7 +7,7 @@ such as API result caching and excessive test durations.  An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
