@@ -1118,7 +1118,7 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     marker = findmarker(oldtext)
     if site is None:
         site = pywikibot.Site()
-    if site.sitename() == 'wikipedia:de' and "{{Personendaten" in oldtext:
+    if site.sitename == 'wikipedia:de' and '{{Personendaten' in oldtext:
         raise pywikibot.Error(
             'The Pywikibot is no longer allowed to touch categories on the '
             'German\nWikipedia on pages that contain the Personendaten '
