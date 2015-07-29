@@ -7,7 +7,7 @@ such as API result caching and excessive test durations.  An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,7 +53,10 @@ from pywikibot.data.api import Request as _original_Request
 import tests
 
 from tests import unittest, patch_request, unpatch_request
-from tests.utils import execute_pwb, DrySite, DryRequest, add_metaclass
+from tests.utils import (
+    add_metaclass, execute_pwb, DrySite, DryRequest,
+    WarningSourceSkipContextManager,
+)
 
 
 class TestCaseBase(unittest.TestCase):
@@ -1314,6 +1317,17 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     _generic_match = re.compile(r'.* is deprecated(, use .* instead)?\.')
 
+    skip_list = [
+        unittest.case._AssertRaisesContext,
+        TestCase.assertRaises,
+        TestCase.assertRaisesRegex,
+        TestCase.assertRaisesRegexp,
+    ]
+
+    # Python 3 component in the call stack of _AssertRaisesContext
+    if hasattr(unittest.case, '_AssertRaisesBaseContext'):
+        skip_list.append(unittest.case._AssertRaisesBaseContext)
+
     def __init__(self, *args, **kwargs):
         """Constructor."""
         super(DeprecationTestCase, self).__init__(*args, **kwargs)
@@ -1324,8 +1338,9 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
             self.expect_warning_filename = self.expect_warning_filename[:-1]
 
         self._do_test_warning_filename = True
+        self._ignore_unknown_warning_packages = False
 
-        self.context_manager = warnings.catch_warnings(record=True)
+        self.context_manager = WarningSourceSkipContextManager(self.skip_list)
 
     def _reset_messages(self):
         """Reset captured deprecation warnings."""
@@ -1370,7 +1385,14 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     def assertDeprecationFile(self, filename):
         """Assert that all deprecation warning are of one filename."""
         for item in self.warning_log:
-            self.assertEqual(item.filename, filename)
+            if (self._ignore_unknown_warning_packages and
+                    'pywikibot' not in item.filename):
+                continue
+
+            if item.filename != filename:
+                self.fail(
+                    'expected warning filename %s; warning item: %s'
+                    % (filename, item))
 
     def setUp(self):
         """Set up unit test."""
@@ -1395,20 +1417,16 @@ class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
 
     For example C{assertEqual} will do first C{assertEqual} and then
     C{assertOneDeprecation}.
-
-    With C{check_file} it's possible to enable or disable the check whether the
-    filename matches the caller's filename. By default it does not match the
-    filename if the name starts with 'assertRaises' (as it'll call it inside the
-    assert in that case).
     """
 
     def process_assert(self, assertion, *args, **kwargs):
         """Handle assertion and call C{assertOneDeprecation} after it."""
         super(AutoDeprecationTestCase, self).process_assert(
             assertion, *args, **kwargs)
-        self._do_test_warning_filename = self.check_file(assertion.__name__)
         self.assertOneDeprecation()
 
-    def check_file(self, name):
-        """Disable filename check on asserted exceptions."""
-        return not name.startswith('assertRaises')
+    skip_list = DeprecationTestCase.skip_list + [
+        CapturingTestCase.process_assert,
+        CapturingTestCase.patch_assert,
+        process_assert,
+    ]

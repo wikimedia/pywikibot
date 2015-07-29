@@ -1,13 +1,14 @@
 # -*- coding: utf-8  -*-
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2015
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 #
+import inspect
 import json
 import os
 import re
@@ -15,6 +16,7 @@ import subprocess
 import sys
 import time
 import traceback
+import warnings
 
 from collections import Mapping
 from warnings import warn
@@ -114,6 +116,91 @@ def fixed_generator(iterable):
             yield item
 
     return gen
+
+
+class WarningSourceSkipContextManager(warnings.catch_warnings):
+
+    """
+    Warning context manager that adjusts source of warning.
+
+    The source of the warning will be moved further down the
+    stack to skip a list of objects that have been monkey
+    patched into the call stack.
+    """
+
+    def __init__(self, skip_list):
+        """
+        Constructor.
+
+        @param skip_list: List of objects to be skipped
+        @type skip_list: list of object or (obj, str, int, int)
+        """
+        super(WarningSourceSkipContextManager, self).__init__(record=True)
+        self.skip_list = skip_list
+
+    @property
+    def skip_list(self):
+        """
+        Return list of filename and line ranges to skip.
+
+        @rtype: list of (obj, str, int, int)
+        """
+        return self._skip_list
+
+    @skip_list.setter
+    def skip_list(self, value):
+        """
+        Set list of objects to be skipped.
+
+        @param value: List of objects to be skipped
+        @type value: list of object or (obj, str, int, int)
+        """
+        self._skip_list = []
+        for item in value:
+            if isinstance(item, tuple):
+                self._skip_list.append(item)
+            else:
+                filename = inspect.getsourcefile(item)
+                code, first_line = inspect.getsourcelines(item)
+                last_line = first_line + len(code)
+                self._skip_list.append(
+                    (item, filename, first_line, last_line))
+
+    def __enter__(self):
+        """Enter the context manager."""
+        def detailed_show_warning(*args, **kwargs):
+            """warnings.showwarning replacement handler."""
+            entry = warnings.WarningMessage(*args, **kwargs)
+
+            skip_lines = 0
+            entry_line_found = False
+
+            for (_, filename, fileno, _, line, _) in inspect.stack():
+                if any(start <= fileno <= end
+                       for (_, skip_filename, start, end) in self.skip_list
+                       if skip_filename == filename):
+                    if entry_line_found:
+                        continue
+                    else:
+                        skip_lines += 1
+
+                if (filename, fileno) == (entry.filename, entry.lineno):
+                    if not skip_lines:
+                        break
+                    entry_line_found = True
+
+                if entry_line_found:
+                    if not skip_lines:
+                        (entry.filename, entry.lineno) = (filename, fileno)
+                        break
+                    else:
+                        skip_lines -= 1
+
+            log.append(entry)
+
+        log = super(WarningSourceSkipContextManager, self).__enter__()
+        self._module.showwarning = detailed_show_warning
+        return log
 
 
 class DryParamInfo(dict):
