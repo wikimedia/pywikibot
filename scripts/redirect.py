@@ -387,6 +387,8 @@ class RedirectRobot(Bot):
         })
         super(RedirectRobot, self).__init__(**kwargs)
         self.site = pywikibot.Site()
+        self.repo = self.site.data_repository()
+        self.is_repo = self.repo if self.repo == self.site else None
         self.action = action
         self.generator = generator
         self.exiting = False
@@ -630,6 +632,12 @@ class RedirectRobot(Bot):
                 oldText = redir.get(get_redirect=True)
             except pywikibot.BadTitle:
                 pywikibot.output(u"Bad Title Error")
+                break
+            if self.is_repo and redir.namespace() == self.repo.item_namespace:
+                redir = pywikibot.ItemPage(self.repo, redir.title())
+                targetPage = pywikibot.ItemPage(self.repo, targetPage.title())
+                pywikibot.output('Fixing double item redirect')
+                redir.set_redirect_target(targetPage)
                 break
             redir.set_redirect_target(targetPage, keep_section=True, save=False)
             summary = i18n.twtranslate(self.site, 'redirect-fix-double',
