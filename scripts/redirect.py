@@ -457,11 +457,11 @@ class RedirectRobot(Bot):
                                 pywikibot.output(u"Page [[%s]] not saved; "
                                                  u"sysop privileges required."
                                                  % redir_page.title())
-                                pass
                             except pywikibot.LockedPage:
                                 pywikibot.output(u'%s is locked.'
                                                  % redir_page.title())
-                                pass
+                            except pywikibot.OtherPageSaveError:
+                                pywikibot.exception()
                 elif self.getOption('delete') and self.user_confirm(
                         u'Redirect target %s does not exist.\n'
                         u'Do you want to delete %s?'
