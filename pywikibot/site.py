@@ -5692,6 +5692,18 @@ class APISite(BaseSite):
                                 step=step, total=total)
         return lrgen
 
+    def unconnected_pages(self, step=None, total=None):
+        """Yield Page objects from Special:UnconnectedPages.
+
+        @param step: request batch size
+        @param total: number of pages to return
+        """
+        upgen = self._generator(api.PageGenerator,
+                                type_arg='querypage',
+                                gqppage='UnconnectedPages',
+                                step=step, total=total)
+        return upgen
+
     @deprecated_args(lvl='level')
     def protectedpages(self, namespace=0, type='edit', level=False, total=None):
         """
