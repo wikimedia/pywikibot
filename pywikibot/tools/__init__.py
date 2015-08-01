@@ -1098,7 +1098,7 @@ def add_full_name(obj):
 def issue_deprecation_warning(name, instead, depth):
     """Issue a deprecation warning."""
     if instead:
-        warn(u'{0} is deprecated, use {1} instead.'.format(name, instead),
+        warn('{0} is deprecated; use {1} instead.'.format(name, instead),
              DeprecationWarning, depth + 1)
     else:
         warn(u'{0} is deprecated.'.format(name), _NotImplementedWarning,
@@ -1433,7 +1433,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
         if not warning_message:
             if replacement_name:
-                warning_message = u"{0}.{1} is deprecated, use {2} instead."
+                warning_message = '{0}.{1} is deprecated; use {2} instead.'
             else:
                 warning_message = u"{0}.{1} is deprecated."
 

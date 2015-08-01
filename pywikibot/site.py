@@ -3634,7 +3634,7 @@ class APISite(BaseSite):
                     filterredir = None
             else:
                 filterredir = False
-            warn('The value "{0!r}" for "filterredir" is deprecated, use '
+            warn('The value "{0!r}" for "filterredir" is deprecated; use '
                  '{1} instead.'.format(old, filterredir), DeprecationWarning, 3)
 
         apgen = self._generator(api.PageGenerator, type_arg="allpages",

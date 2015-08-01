@@ -1315,7 +1315,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     """Test cases for deprecation function in the tools module."""
 
-    _generic_match = re.compile(r'.* is deprecated(, use .* instead)?\.')
+    _generic_match = re.compile(r'.* is deprecated(; use .* instead)?\.')
 
     skip_list = [
         unittest.case._AssertRaisesContext,
@@ -1371,7 +1371,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         else:
             msg = '{0} is deprecated'.format(deprecated)
             if instead:
-                msg += ', use {0} instead'.format(instead)
+                msg += '; use {0} instead'.format(instead)
             msg += '.'
         return msg
 
