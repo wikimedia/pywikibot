@@ -496,15 +496,19 @@ class RedirectRobot(Bot):
                 else:
                     pywikibot.output(u'Cannot fix or delete the broken redirect')
             except pywikibot.IsRedirectPage:
-                pywikibot.output(u"Redirect target %s is also a redirect! "
-                                 u"Won't delete anything."
-                                 % targetPage.title(asLink=True))
+                pywikibot.output(
+                    "Redirect target {{0}} is also a redirect! {{1}}".format(
+                        targetPage.title(asLink=True),
+                        "Won't delete anything."
+                        if self.getOption('delete') else "Skipping."))
             else:
                 # we successfully get the target page, meaning that
                 # it exists and is not a redirect: no reason to touch it.
                 pywikibot.output(
-                    u'Redirect target %s does exist! Won\'t delete anything.'
-                    % targetPage.title(asLink=True))
+                    "Redirect target {{0}} does exist! {{1}}".format(
+                        targetPage.title(asLink=True),
+                        "Won't delete anything."
+                        if self.getOption('delete') else "Skipping."))
 
     def fix_double_redirects(self):
         for redir_name in self.generator.retrieve_double_redirects():
