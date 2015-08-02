@@ -78,12 +78,12 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertIsInstance(ver, tuple)
         self.assertTrue(all(isinstance(ver[i], int) for i in (0, 1)))
         self.assertIsInstance(ver[2], basestring)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
 
     def test_getcurrenttime(self):
         """Test live_version."""
         self.assertEqual(self.site.getcurrenttime(), self.site.server_time())
-        self.assertDeprecation()
+        self.assertOneDeprecation()
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
@@ -115,13 +115,13 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         """Test that filterredir set to 'only' is deprecated to True."""
         for page in self.site.allpages(filterredir='only', total=1):
             self.assertTrue(page.isRedirectPage())
-        self.assertDeprecation()
+        self.assertOneDeprecation()
 
     def test_allpages_filterredir_False(self):
         """Test that if filterredir's bool is False it's deprecated to False."""
         for page in self.site.allpages(filterredir='', total=1):
             self.assertFalse(page.isRedirectPage())
-        self.assertDeprecation()
+        self.assertOneDeprecation()
 
     def test_ns_index(self):
         """Test ns_index."""

@@ -47,11 +47,9 @@ class TestDeprecatedExceptions(DeprecationTestCase):
     def test_PageNotFound(self):
         """Test PageNotFound is deprecated from the package."""
         cls = pywikibot.PageNotFound
-        self.assertDeprecation(
+        self.assertOneDeprecation(
             'pywikibot.PageNotFound is deprecated, and no longer '
             'used by pywikibot; use http.fetch() instead.')
-
-        self._reset_messages()
 
         e = cls('foo')
         self.assertIsInstance(e, pywikibot.Error)
@@ -62,11 +60,9 @@ class TestDeprecatedExceptions(DeprecationTestCase):
 
         cls = pywikibot.exceptions.PageNotFound
 
-        self.assertDeprecation(
+        self.assertOneDeprecation(
             'pywikibot.exceptions.PageNotFound is deprecated, and no longer '
             'used by pywikibot; use http.fetch() instead.')
-
-        self._reset_messages()
 
         e = cls('foo')
         self.assertIsInstance(e, pywikibot.Error)

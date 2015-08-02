@@ -652,6 +652,7 @@ class IPRegexTestCase(TestIPBase, DeprecationTestCase):
         self.assertEqual(self.fail, 0)
         self.assertDeprecation(
             'page.ip_regexp is deprecated, use tools.ip.is_IP instead.')
+        self.assertEqual(self.total, len(self.deprecation_messages))
 
 
 class IPAddressModuleTestCase(TestIPBase):

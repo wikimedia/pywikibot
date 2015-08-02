@@ -236,9 +236,10 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
             if 'title' in logentry.data:  # title may be missing
                 self.assertIsInstance(logentry.title(), pywikibot.Page)
                 self.assertIs(logentry.title(), logentry.page())
+                self.assertOneDeprecation(count=2)
             else:
                 self.assertRaises(KeyError, logentry.title)
-            self.assertDeprecation()
+                self.assertOneDeprecation()
             self._reset_messages()
 
     def test_getMovedTarget(self, key):
