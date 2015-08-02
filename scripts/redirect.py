@@ -409,6 +409,8 @@ class RedirectRobot(Bot):
             targetPage = redir_page.getRedirectTarget()
         except pywikibot.IsNotRedirectPage:
             pywikibot.output(u'%s is not a redirect.' % redir_page.title())
+        except pywikibot.CircularRedirect:
+            pywikibot.output(u'%s is a circular redirect.' % redir_page.title())
         except pywikibot.NoPage:
             pywikibot.output(u'%s doesn\'t exist.' % redir_page.title())
         else:
