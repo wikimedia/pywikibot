@@ -403,6 +403,7 @@ class RedirectRobot(Bot):
             redir_page = redir_name
         # Show the title of the page we're working on.
         # Highlight the title in purple.
+        done = not self.getOption('delete')
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % redir_page.title())
         try:
@@ -433,8 +434,9 @@ class RedirectRobot(Bot):
                         # FIXME: Test to another move
                         pywikibot.output(u'Target page %s does not exist'
                                          % (movedTarget))
-                    elif redir_name == movedTarget.title():
-                        pywikibot.output(u'Target page forms a redirect loop')
+                    elif redir_page == movedTarget:
+                        pywikibot.output(
+                            'Redirect to target page forms a redirect loop')
                     else:
                         pywikibot.output(u'%s has been moved to %s'
                                          % (redir_page, movedTarget))
@@ -462,7 +464,9 @@ class RedirectRobot(Bot):
                                                  % redir_page.title())
                             except pywikibot.OtherPageSaveError:
                                 pywikibot.exception()
-                elif self.getOption('delete') and self.user_confirm(
+                            else:
+                                done = True
+                if not done and self.user_confirm(
                         u'Redirect target %s does not exist.\n'
                         u'Do you want to delete %s?'
                         % (targetPage.title(asLink=True),
@@ -493,7 +497,7 @@ class RedirectRobot(Bot):
                         else:
                             pywikibot.output(
                                 u'No speedy deletion template available')
-                else:
+                elif not (self.getOption('delete') or movedTarget):
                     pywikibot.output(u'Cannot fix or delete the broken redirect')
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Redirect target %s is also a redirect! "
