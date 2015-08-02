@@ -1,11 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+r"""
 Coordinate importing script.
 
 Usage:
 
-python coordinate_import.py -lang:en -family:wikipedia -cat:Category:Coordinates_not_on_Wikidata
+    python pwb.py coordinate_import -lang:en -family:wikipedia \
+        -cat:Category:Coordinates_not_on_Wikidata
 
 This will work on all pages in the category "coordinates not on Wikidata" and
 will import the coordinates on these pages to Wikidata.
@@ -16,13 +17,14 @@ is used so that extension has to be setup properly. You can look at the
 
 You can use any typical pagegenerator to provide with a list of pages:
 
-python coordinate_import.py -lang:it -family:wikipedia -transcludes:Infobox_stazione_ferroviaria -namespace:0
+    python pwb.py coordinate_import -lang:it -family:wikipedia \
+        -namespace:0 -transcludes:Infobox_stazione_ferroviaria
 
 &params;
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2015
 #
 # Distributed under the terms of MIT License.
 #

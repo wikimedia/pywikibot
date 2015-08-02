@@ -8,7 +8,7 @@ Delete function requires adminship.
 
 Syntax:
 
-    python redirect.py action [-arguments ...]
+    python pwb.py redirect action [-arguments ...]
 
 where action can be one of these:
 

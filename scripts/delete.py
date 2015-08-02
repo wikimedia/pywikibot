@@ -18,13 +18,15 @@ Furthermore, the following command line parameters are supported:
 -undelete:        Actually undelete pages instead of deleting.
                   Obviously makes sense only with -page and -file.
 
-Usage: python delete.py [-category categoryName]
+Usage:
+
+    python pwb.py delete [-category categoryName]
 
 Examples:
 
 Delete everything in the category "To delete" without prompting.
 
-    python delete.py -cat:"To delete" -always
+    python pwb.py delete -cat:"To delete" -always
 """
 #
 # (C) Pywikibot team, 2014

@@ -4,9 +4,10 @@
 Program to match two images based on histograms.
 
 Usage:
-match_images.py ImageA ImageB
+
+    python pwb.py match_images ImageA ImageB
+
 It is essential to provide two images to work on.
-example. - match_images.py ImageA.jpg ImageB.jpg
 
 &params;
 

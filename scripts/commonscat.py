@@ -23,7 +23,8 @@ supported:
                   template.
 
 For example to go through all categories:
-commonscat.py -start:Category:!
+
+    python pwb.py commonscat -start:Category:!
 """
 # Commonscat bot:
 #

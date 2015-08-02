@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+r"""
 Very simple script to replace a template with another one.
 
 It also converts the old MediaWiki boilerplate format to the new format.
@@ -60,7 +60,7 @@ Examples:
 If you have a template called [[Template:Cities in Washington]] and want to
 change it to [[Template:Cities in Washington state]], start
 
-    python template.py "Cities in Washington" "Cities in Washington state"
+    python pwb.py template "Cities in Washington" "Cities in Washington state"
 
 Move the page [[Template:Cities in Washington]] manually afterwards.
 
@@ -68,7 +68,7 @@ Move the page [[Template:Cities in Washington]] manually afterwards.
 If you have a template called [[Template:test]] and want to substitute it only
 on pages in the User: and User talk: namespaces, do:
 
-    python template.py test -subst -namespace:2 -namespace:3
+    python pwb.py template test -subst -namespace:2 -namespace:3
 
 Note that -namespace: is a global Pywikibot parameter
 
@@ -77,24 +77,26 @@ This next example substitutes the template lived with a supplied edit summary.
 It only performs substitutions in main article namespace and doesn't prompt to
 start replacing. Note that -putthrottle: is a global Pywikibot parameter.
 
-    python template.py -putthrottle:30 -namespace:0 lived -subst -always
+    python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \
         -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."
 
 
 This next example removes the templates {{cfr}}, {{cfru}}, and {{cfr-speedy}}
 from five category pages as given:
 
-    python template.py cfr cfru cfr-speedy -remove -always
-        -page:"Category:Mountain monuments and memorials" -page:"Category:Indian family names"
-        -page:"Category:Tennis tournaments in Belgium" -page:"Category:Tennis tournaments in Germany"
-        -page:"Category:Episcopal cathedrals in the United States"
+    python pwb.py template cfr cfru cfr-speedy -remove -always \
+        -page:"Category:Mountain monuments and memorials" \
+        -page:"Category:Indian family names" \
+        -page:"Category:Tennis tournaments in Belgium" \
+        -page:"Category:Tennis tournaments in Germany" \
+        -page:"Category:Episcopal cathedrals in the United States" \
         -summary:"Removing Cfd templates from category pages that survived."
 
 
 This next example substitutes templates test1, test2, and space test on all
 pages:
 
-    python template.py test1 test2 "space test" -subst -always
+    python pwb.py template test1 test2 "space test" -subst -always
 
 """
 #

@@ -6,7 +6,9 @@ This script processes the Categories for discussion working page.
 It parses out the actions that need to be taken as a result of CFD discussions
 (as posted to the working page by an administrator) and performs them.
 
-Syntax: python cfd.py
+Syntax:
+
+    python pwb.py cfd
 
 """
 #

@@ -4,7 +4,8 @@
 This bot replicates pages in a wiki to a second wiki within one family.
 
 Example:
-python replicate_wiki.py [-r] -ns 10 -f wikipedia -o nl li fy
+
+    python pwb.py replicate_wiki [-r] -ns 10 -f wikipedia -o nl li fy
 
 to copy all templates from an nlwiki to liwiki and fywiki. It will show which
 pages have to be changed if -r is not present, and will only actually write

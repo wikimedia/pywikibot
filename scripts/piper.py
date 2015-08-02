@@ -1,17 +1,18 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+r"""
 This bot uses external filtering programs for munging text.
 
 For example:
 
-    python pwb.py piper.py -filter:'tr A-Z a-z' -page:Wikipedia:Sandbox
+    python pwb.py piper -filter:"tr A-Z a-z" -page:Wikipedia:Sandbox
 
 Would lower case the article with tr(1).
 
 Muliple -filter commands can be specified:
 
-    python pwb.py piper.py -filter:cat -filter:'tr A-Z a-z' -filter:'tr a-z A-Z' -page:Wikipedia:Sandbox
+    python pwb.py piper -filter:cat -filter:"tr A-Z a-z" -filter:"tr a-z A-Z" \
+        -page:Wikipedia:Sandbox
 
 
 Would pipe the article text through cat(1) (NOOP) and then lower case

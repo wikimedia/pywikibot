@@ -8,7 +8,9 @@ It is run automatically when a bot first tries to save a page retrieved. The
 watchlist can be updated manually by running this script. The list will also
 be reloaded automatically once a month.
 
-Syntax: python watchlist [-all | -new]
+Syntax:
+
+    python pwb.py watchlist [-all | -new]
 
 Command line options:
     -all  -  Reloads watchlists for all wikis where a watchlist is already

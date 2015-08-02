@@ -5,7 +5,7 @@ Script to copy images to Wikimedia Commons, or to another wiki.
 
 Syntax:
 
-    python imagetransfer.py pagename [-interwiki] [-tolang:xx] [-tofamily:yy]
+    python pwb.py imagetransfer pagename [-interwiki] [-tolang:x] [-tofamily:y]
 
 Arguments:
 
@@ -13,12 +13,12 @@ Arguments:
 
   -keepname    Keep the filename and do not verify description while replacing
 
-  -tolang:xx   Copy the image to the wiki in language xx
+  -tolang:x    Copy the image to the wiki in language x
 
-  -tofamily:yy Copy the image to a wiki in the family yy
+  -tofamily:y  Copy the image to a wiki in the family y
 
-  -file:zz     Upload many files from textfile: [[Image:xx]]
-                                                [[Image:yy]]
+  -file:z      Upload many files from textfile: [[Image:x]]
+                                                [[Image:y]]
 
 If pagename is an image description page, offers to copy the image to the
 target site. If it is a normal page, it will offer to copy any of the images

@@ -35,10 +35,12 @@ Usage: python protect.py <OPTIONS>
 Examples:
 
 Protect everything in the category 'To protect' prompting.
-    python protect.py -cat:'To protect'
+
+    python pwb.py protect -cat:"To protect"
 
 Unprotect all pages listed in text file 'unprotect.txt' without prompting.
-    python protect.py -file:unprotect.txt -unprotect -always
+
+    python pwb.py protect -file:unprotect.txt -unprotect -always
 """
 #
 # Written by https://it.wikisource.org/wiki/Utente:Qualc1

@@ -63,7 +63,7 @@ Command line options:
 
 To complete a move of a page, one can use:
 
-    python solve_disambiguation.py -just -pos:New_Name Old_Name
+    python pwb.py solve_disambiguation -just -pos:New_Name Old_Name
 
 """
 #

@@ -3,7 +3,9 @@
 """
 A generic bot to do data ingestion (batch uploading).
 
-usage: data_ingestion.py -csvdir:local_dir/ -page:config_page
+usage:
+
+    python pwb.py data_ingestion -csvdir:local_dir/ -page:config_page
 """
 #
 # (C) Pywikibot team, 2013

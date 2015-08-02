@@ -39,11 +39,11 @@ Furthermore, the following command line parameters are supported:
 
 --- Example of how to use the script ---
 
-python blockpageschecker.py -always
+    python pwb.py blockpageschecker -always
 
-python blockpageschecker.py -cat:Geography -always
+    python pwb.py blockpageschecker -cat:Geography -always
 
-python blockpageschecker.py -show -protectedpages:4
+    python pwb.py blockpageschecker -show -protectedpages:4
 
 """
 #

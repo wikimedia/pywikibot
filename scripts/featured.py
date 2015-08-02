@@ -46,7 +46,7 @@ This script understands various command-line arguments:
 -count            Only counts how many featured/good articles exist
                   on all wikis (given with the "-fromlang" argument) or
                   on several language(s) (when using the "-fromall" argument).
-                  Example: featured.py -fromlang:en,he -count
+                  Example: python pwb.py featured -fromlang:en,he -count
                   counts how many featured articles exist in the en and he
                   wikipedias.
 

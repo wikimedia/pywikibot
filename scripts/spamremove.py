@@ -5,7 +5,7 @@ Script to remove links that are being or have been spammed.
 
 Usage:
 
-spamremove.py www.spammedsite.com
+    python pwb.py spamremove www.spammedsite.com
 
 It will use Special:Linksearch to find the pages on the wiki that link to
 that site, then for each page make a proposed change consisting of removing

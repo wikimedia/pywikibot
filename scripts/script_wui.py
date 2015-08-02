@@ -18,7 +18,8 @@ The following parameters are supported:
 All other parameters will be ignored.
 
 Syntax example:
-    python script_wui.py -dir:.
+
+    python pwb.py script_wui -dir:.
         Default operating mode.
 """
 #  @package script_wui

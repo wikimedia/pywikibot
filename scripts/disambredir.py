@@ -4,7 +4,8 @@
 User assisted updating redirect links on disambiguation pages.
 
 Usage:
-    python disambredir.py [start]
+
+    python pwb.py disambredir [start]
 
 If no starting name is provided, the bot starts at '!'.
 

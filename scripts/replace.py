@@ -74,7 +74,7 @@ Furthermore, the following command line parameters are supported:
 
 -replacementfile  Lines from the given file name(s) will be read as replacement
                   arguments. i.e. a file containing lines "a" and "b", used as
-                  python replace.py -page:X -replacementfile:file c d
+                  python pwb.py replace -page:X -replacementfile:file c d
                   will replace 'a' with 'b' and 'c' with 'd'.
 
 -always           Don't prompt you for each replacement
@@ -100,24 +100,26 @@ If you want to change templates from the old syntax, e.g. {{msg:Stub}}, to the
 new syntax, e.g. {{Stub}}, download an XML dump file (pages-articles) from
 https://download.wikimedia.org, then use this command:
 
-    python replace.py -xml -regex "{{msg:(.*?)}}" "{{\1}}"
+    python pwb.py replace -xml -regex "{{msg:(.*?)}}" "{{\1}}"
 
 If you have a dump called foobar.xml and want to fix typos in articles, e.g.
 Errror -> Error, use this:
 
-    python replace.py -xml:foobar.xml "Errror" "Error" -namespace:0
+    python pwb.py replace -xml:foobar.xml "Errror" "Error" -namespace:0
 
 If you want to do more than one replacement at a time, use this:
-    python replace.py -xml:foobar.xml "Errror" "Error" "Faail" "Fail" -namespace:0
+
+    python pwb.py replace -xml:foobar.xml "Errror" "Error" "Faail" "Fail" \
+        -namespace:0
 
 If you have a page called 'John Doe' and want to fix the format of ISBNs, use:
 
-    python replace.py -page:John_Doe -fix:isbn
+    python pwb.py replace -page:John_Doe -fix:isbn
 
 This command will change 'referer' to 'referrer', but not in pages which
 talk about HTTP, where the typo has become part of the standard:
 
-    python replace.py referer referrer -file:typos.txt -excepttext:HTTP
+    python pwb.py replace referer referrer -file:typos.txt -excepttext:HTTP
 
 Please type "replace.py -help | more" if you can't read the top of the help.
 """

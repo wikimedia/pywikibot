@@ -23,11 +23,11 @@ Examples:
 
 Counts how many times {{ref}} and {{note}} are transcluded in articles:
 
-    templatecount.py -count -namespace:0 ref note
+    python pwb.py templatecount -count -namespace:0 ref note
 
 Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
-    templatecount.py -list -namespace:14 cfd cfdu
+    python pwb.py templatecount -list -namespace:14 cfd cfdu
 
 """
 #
