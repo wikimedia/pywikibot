@@ -240,7 +240,6 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
             else:
                 self.assertRaises(KeyError, logentry.title)
                 self.assertOneDeprecation()
-            self._reset_messages()
 
     def test_getMovedTarget(self, key):
         """Test getMovedTarget method."""
