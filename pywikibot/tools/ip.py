@@ -5,8 +5,6 @@
 #
 # Distributed under the terms of the MIT license.
 #
-# Note that this module _must_ not import future.unicode_literals
-# otherwise it will not be able to detect the defective ipaddress module.
 from __future__ import unicode_literals
 
 __version__ = '$Id$'
