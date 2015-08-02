@@ -34,11 +34,8 @@ class TestDeprecatedExceptions(DeprecationTestCase):
         # But it sholdnt be accessed from the exceptions module.
         cls = pywikibot.exceptions.UploadWarning
 
-        self.assertDeprecation(
-            'pywikibot.exceptions.UploadWarning is deprecated, '
-            'use pywikibot.data.api.UploadWarning instead.')
-
-        self._reset_messages()
+        self.assertOneDeprecationParts('pywikibot.exceptions.UploadWarning',
+                                       'pywikibot.data.api.UploadWarning')
 
         e = cls('foo', 'bar')
         self.assertIsInstance(e, pywikibot.Error)
@@ -53,10 +50,8 @@ class TestDeprecatedExceptions(DeprecationTestCase):
 
         e = cls('foo')
         self.assertIsInstance(e, pywikibot.Error)
-        self.assertDeprecation(
-            'pywikibot.exceptions.DeprecatedPageNotFoundError is deprecated.')
-
-        self._reset_messages()
+        self.assertOneDeprecationParts(
+            'pywikibot.exceptions.DeprecatedPageNotFoundError')
 
         cls = pywikibot.exceptions.PageNotFound
 
@@ -66,8 +61,8 @@ class TestDeprecatedExceptions(DeprecationTestCase):
 
         e = cls('foo')
         self.assertIsInstance(e, pywikibot.Error)
-        self.assertDeprecation(
-            'pywikibot.exceptions.DeprecatedPageNotFoundError is deprecated.')
+        self.assertOneDeprecationParts(
+            'pywikibot.exceptions.DeprecatedPageNotFoundError')
 
 
 if __name__ == '__main__':

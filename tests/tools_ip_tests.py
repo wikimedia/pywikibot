@@ -650,8 +650,7 @@ class IPRegexTestCase(TestIPBase, DeprecationTestCase):
         self._test_T76286_failures()
         self._test_T105443_failures()
         self.assertEqual(self.fail, 0)
-        self.assertDeprecation(
-            'page.ip_regexp is deprecated, use tools.ip.is_IP instead.')
+        self.assertDeprecationParts('page.ip_regexp', 'tools.ip.is_IP')
         self.assertEqual(self.total, len(self.deprecation_messages))
 
 

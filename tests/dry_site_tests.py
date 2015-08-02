@@ -232,20 +232,18 @@ class TestNeedVersion(DeprecationTestCase):
             NotImplementedError,
             'deprecated_unavailable_method2',
             self.deprecated_unavailable_method2)
-        self.assertDeprecation(
-            __name__ + '.TestNeedVersion.deprecated_unavailable_method2 is deprecated.')
+        self.assertOneDeprecationParts(
+            __name__ + '.TestNeedVersion.deprecated_unavailable_method2')
 
     def test_need_version_success_with_deprecated(self):
         """Test order of combined version check and deprecation warning."""
         self.deprecated_available_method()
-        self.assertDeprecation(
-            __name__ + '.TestNeedVersion.deprecated_available_method is deprecated.')
-
-        self._reset_messages()
+        self.assertOneDeprecationParts(
+            __name__ + '.TestNeedVersion.deprecated_available_method')
 
         self.deprecated_available_method2()
-        self.assertDeprecation(
-            __name__ + '.TestNeedVersion.deprecated_available_method2 is deprecated.')
+        self.assertOneDeprecationParts(
+            __name__ + '.TestNeedVersion.deprecated_available_method2')
 
 
 if __name__ == '__main__':

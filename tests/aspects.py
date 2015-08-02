@@ -1324,6 +1324,11 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         TestCase.assertRaisesRegexp,
     ]
 
+    # Require no instead string
+    NO_INSTEAD = object()
+    # Require an instead string
+    INSTEAD = object()
+
     # Python 3 component in the call stack of _AssertRaisesContext
     if hasattr(unittest.case, '_AssertRaisesBaseContext'):
         skip_list.append(unittest.case._AssertRaisesBaseContext)
@@ -1353,15 +1358,74 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         messages = [str(item.message) for item in self.warning_log]
         return messages
 
+    @classmethod
+    def _build_message(cls, deprecated, instead):
+        if deprecated is None:
+            if instead is None:
+                msg = None
+            elif instead is True:
+                msg = cls.INSTEAD
+            else:
+                assert instead is False
+                msg = cls.NO_INSTEAD
+        else:
+            msg = '{0} is deprecated'.format(deprecated)
+            if instead:
+                msg += ', use {0} instead'.format(instead)
+            msg += '.'
+        return msg
+
+    def assertDeprecationParts(self, deprecated=None, instead=None):
+        """
+        Assert that a deprecation warning happened.
+
+        To simplify deprecation tests it just requires the to separated parts
+        and forwards the result to L{assertDeprecation}.
+
+        @param deprecated: The deprecated string. If None it uses a generic
+            match depending on instead.
+        @type deprecated: str or None
+        @param instead: The instead string unless deprecated is None. If it's
+            None it allows any generic deprecation string, on True only those
+            where instead string is present and on False only those where it's
+            missing. If the deprecation string is not None, no instead string
+            is expected when instead evaluates to False.
+        @type instead: str or None or True or False
+        """
+        self.assertDeprecation(self._build_message(deprecated, instead))
+
     def assertDeprecation(self, msg=None):
-        """Assert that a deprecation warning happened."""
-        if msg is None:
-            self.assertGreater(sum(1 for msg in self.deprecation_messages
-                                   if self._generic_match.match(msg)), 0)
+        """
+        Assert that a deprecation warning happened.
+
+        @param msg: Either the specific message or None to allow any generic
+            message. When set to C{INSTEAD} it only counts those supplying an
+            alternative and when C{NO_INSTEAD} only those not supplying one.
+        @type msg: string or None or INSTEAD or NO_INSTEAD
+        """
+        if msg is None or msg is self.INSTEAD or msg is self.NO_INSTEAD:
+            deprecation_messages = self.deprecation_messages
+            for deprecation_message in deprecation_messages:
+                match = self._generic_match.match(deprecation_message)
+                if (match and bool(match.group(1)) == (msg is self.INSTEAD) or
+                        msg is None):
+                    break
+            else:
+                self.fail('No generic deprecation message match found in '
+                          '{0}'.format(deprecation_messages))
         else:
             self.assertIn(msg, self.deprecation_messages)
         if self._do_test_warning_filename:
             self.assertDeprecationFile(self.expect_warning_filename)
+
+    def assertOneDeprecationParts(self, deprecated=None, instead=None, count=1):
+        """
+        Assert that exactly one deprecation message happened and reset.
+
+        It uses the same arguments as L{assertDeprecationParts}.
+        """
+        self.assertOneDeprecation(self._build_message(deprecated, instead),
+                                  count)
 
     def assertOneDeprecation(self, msg=None, count=1):
         """Assert that exactly one deprecation message happened and reset."""

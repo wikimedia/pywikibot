@@ -221,12 +221,12 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         """Test deprecated MoveEntry methods."""
         logentry = self._get_logentry('move')
         self.assertIsInstance(logentry.new_ns(), int)
-        self.assertEqual(logentry.new_title(), logentry.target_page)
+        self.assertOneDeprecationParts('pywikibot.logentries.MoveEntry.new_ns',
+                                       'target_ns.id')
 
-        self.assertDeprecation('pywikibot.logentries.MoveEntry.new_ns is '
-                               'deprecated, use target_ns.id instead.')
-        self.assertDeprecation('pywikibot.logentries.MoveEntry.new_title is '
-                               'deprecated, use target_page instead.')
+        self.assertEqual(logentry.new_title(), logentry.target_page)
+        self.assertOneDeprecationParts(
+            'pywikibot.logentries.MoveEntry.new_title', 'target_page')
 
     def test_LogEntry_title(self, key):
         """Test title and page return the same instance."""
@@ -255,8 +255,8 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         # main page was moved back again, we test it.
         self.assertEqual(mainpage, target.getMovedTarget())
 
-        self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
-                               'deprecated, use moved_target() instead.')
+        self.assertOneDeprecationParts(
+            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()', 2)
 
     def test_moved_target_fail_old(self):
         """Test getMovedTarget method failing on older wiki."""
@@ -264,8 +264,8 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         with self.assertRaises(pywikibot.NoPage):
             self.get_mainpage(site).getMovedTarget()
 
-        self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
-                               'deprecated, use moved_target() instead.')
+        self.assertOneDeprecationParts('pywikibot.page.BasePage.getMovedTarget',
+                                       'moved_target()')
 
     def test_moved_target_fail_de(self):
         """Test getMovedTarget method failing on de-wiki."""
@@ -273,8 +273,8 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         with self.assertRaises(pywikibot.NoPage):
             page.getMovedTarget()
 
-        self.assertDeprecation('pywikibot.page.BasePage.getMovedTarget is '
-                               'deprecated, use moved_target() instead.')
+        self.assertOneDeprecationParts('pywikibot.page.BasePage.getMovedTarget',
+                                       'moved_target()')
 
 
 if __name__ == '__main__':

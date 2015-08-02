@@ -61,8 +61,8 @@ class TestSiteUserDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
         else:
             self.assertEqual(token, mysite.token(mainpage, ttype))
-            self.assertDeprecation("pywikibot.site.APISite.token is deprecated"
-                                   ", use the 'tokens' property instead.")
+            self.assertOneDeprecationParts('pywikibot.site.APISite.token',
+                                           "the 'tokens' property")
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
@@ -99,12 +99,12 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         old = self.site.siteinfo('general')
         self.assertIn('DUMMY', old)
         self.assertNotEqual(self.site.siteinfo('general', force=True), old)
-        self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
+        self.assertOneDeprecationParts('Calling siteinfo', 'itself', 4)
 
     def test_siteinfo_dump(self):
         """Test calling the Siteinfo with dump=True."""
         self.assertIn('statistics', self.site.siteinfo('statistics', dump=True))
-        self.assertDeprecation('Calling siteinfo is deprecated, use itself instead.')
+        self.assertOneDeprecationParts('Calling siteinfo', 'itself')
 
     def test_language_method(self):
         """Test if the language method returns the same as the lang property."""
@@ -137,8 +137,8 @@ class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase
         """Test that namespaces is callable and returns itself."""
         site = self.get_site()
         self.assertIs(site.namespaces(), site.namespaces)
-        self.assertDeprecation('Calling the namespaces property is deprecated, '
-                               'use it directly instead.')
+        self.assertOneDeprecationParts('Calling the namespaces property',
+                                       'it directly')
 
 
 class TestBaseSiteProperties(TestCase):

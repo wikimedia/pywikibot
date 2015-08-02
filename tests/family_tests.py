@@ -196,8 +196,8 @@ class TestOldFamilyMethod(DeprecationTestCase):
         self.assertEqual(f.name, 'species')
         f = pywikibot.site.Family('osm')
         self.assertEqual(f.name, 'osm')
-        self.assertDeprecation(
-            'pywikibot.site.Family is deprecated, use pywikibot.family.Family.load instead.')
+        self.assertOneDeprecationParts('pywikibot.site.Family',
+                                       'pywikibot.family.Family.load', 2)
 
         # @deprecated warning occurs within redirect_func's call
         # invoking the method instead of this test module.
@@ -205,9 +205,9 @@ class TestOldFamilyMethod(DeprecationTestCase):
 
         f = pywikibot.site.Family('i18n', fatal=False)
         self.assertEqual(f.name, 'i18n')
-        self.assertDeprecation(
-            'pywikibot.site.Family is deprecated, use pywikibot.family.Family.load instead.')
-        self.assertDeprecation('fatal argument of pywikibot.family.Family.load is deprecated.')
+        self.assertDeprecationParts('pywikibot.site.Family',
+                                    'pywikibot.family.Family.load')
+        self.assertDeprecationParts('fatal argument of pywikibot.family.Family.load')
 
     def test_old_site_family_function_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""
@@ -217,9 +217,9 @@ class TestOldFamilyMethod(DeprecationTestCase):
         self.assertRaises(UnknownFamily, pywikibot.site.Family, 'unknown',
                           fatal=False)
         self.assertRaises(UnknownFamily, pywikibot.site.Family, 'unknown')
-        self.assertDeprecation(
-            'pywikibot.site.Family is deprecated, use pywikibot.family.Family.load instead.')
-        self.assertDeprecation('fatal argument of pywikibot.family.Family.load is deprecated.')
+        self.assertDeprecationParts('pywikibot.site.Family',
+                                    'pywikibot.family.Family.load')
+        self.assertDeprecationParts('fatal argument of pywikibot.family.Family.load')
 
 
 if __name__ == '__main__':
