@@ -105,7 +105,7 @@ if sys.version_info[0] == 2:
             sys.modules['unittest'] = unittest2
 
         script_deps['replicate_wiki.py'] = ['argparse']
-        dependencies.append('future')  # provides collections backports
+        dependencies.append('future>=0.15.0')  # provides collections backports
         dependency_links.append(
             'git+https://github.com/jayvdb/unicodedata2@issue_2#egg=unicodedata2-7.0.0')
 
