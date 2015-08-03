@@ -28,7 +28,8 @@ Furthermore, the following command line parameters are supported:
 
 
 --- Examples ---
-python lonelypages.py -enable:User:Bot/CheckBot -always
+
+    python pwb.py lonelypages -enable:User:Bot/CheckBot -always
 """
 #
 # (C) Pietrodn, it.wiki 2006-2007

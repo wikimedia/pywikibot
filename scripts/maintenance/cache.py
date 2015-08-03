@@ -3,7 +3,9 @@
 r"""
 This script runs commands on each entry in the API caches.
 
-Syntax: cache.py [-password] [-delete] [-c '...'] [dir ...]
+Syntax:
+
+    python pwb.py cache [-password] [-delete] [-c "..."] [dir ...]
 
 If no directory are specified, it will detect the API caches.
 

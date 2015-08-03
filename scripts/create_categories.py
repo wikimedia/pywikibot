@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+r"""
 Program to batch create categories.
 
 The program expects a generator of page titles to be used as
@@ -17,12 +17,13 @@ The following command line parameters are supported:
 -basename       The base to be used for the new category names.
 
 Example:
-create_categories.py
-    -lang:commons
-    -family:commons
-    -links:User:Multichill/Wallonia
-    -parent:"Cultural heritage monuments in Wallonia"
-    -basename:"Cultural heritage monuments in"
+
+    python pwb.py create_categories \
+        -lang:commons \
+        -family:commons \
+        -links:User:Multichill/Wallonia \
+        -parent:"Cultural heritage monuments in Wallonia" \
+        -basename:"Cultural heritage monuments in"
 
 The page 'User:Multichill/Wallonia' on commons contains
 page links like [[Category:Hensies]], causing this script

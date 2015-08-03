@@ -3,7 +3,9 @@
 """
 Scripts to manage categories.
 
-Syntax: python category.py action [-option]
+Syntax:
+
+    python pwb.py category action [-option]
 
 where action can be one of these:
  * add          - mass-add a category to a list of pages
@@ -89,13 +91,13 @@ case.
 
 For example, to create a new category from a list of persons, type:
 
-  python category.py add -person
+  python pwb.py category add -person
 
 and follow the on-screen instructions.
 
 Or to do it all from the command-line, use the following syntax:
 
-  python category.py move -from:US -to:'United States'
+  python pwb.py category move -from:US -to:"United States"
 
 This will move all pages in the category US to the category United States.
 

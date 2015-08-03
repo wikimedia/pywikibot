@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""
+r"""
 Script to delete files that are also present on Wikimedia Commons.
 
 Do not run this script on Wikimedia Commons itself. It works based on
@@ -39,7 +39,9 @@ This script understands various command-line arguments:
                     the user to check if the images are equal or not.
 
 -- Example --
-python nowcommons.py -replaceonly -hash -replace -replaceloose -replacealways
+
+    python pwb.py nowcommons -replaceonly -replaceloose -replacealways \
+        -replace -hash
 
 -- Known issues --
 Please fix these if you are capable and motivated:

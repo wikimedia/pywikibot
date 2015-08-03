@@ -7,7 +7,7 @@ A script that adds claims to Wikidata items based on categories.
 
 Usage:
 
-python claimit.py [pagegenerators] P1 Q2 P123 Q456
+    python pwb.py claimit [pagegenerators] P1 Q2 P123 Q456
 
 You can use any typical pagegenerator to provide with a list of pages.
 Then list the property-->target pairs to add.
@@ -16,7 +16,7 @@ Then list the property-->target pairs to add.
 
 For geographic coordinates:
 
-python claimit.py [pagegenerators] P625 [lat-dec],[long-dec],[prec]
+    python pwb.py claimit [pagegenerators] P625 [lat-dec],[long-dec],[prec]
 
 [lat-dec] and [long-dec] represent the latitude and longitude respectively,
 and [prec] represents the precision. All values are in decimal degrees,
@@ -24,14 +24,14 @@ not DMS. If [prec] is omitted, the default precision is 0.0001 degrees.
 
 Example:
 
-python claimit.py [pagegenerators] P625 -23.3991,-52.0910,0.0001
+    python pwb.py claimit [pagegenerators] P625 -23.3991,-52.0910,0.0001
 
 ------------------------------------------------------------------------------
 
 By default, claimit.py does not add a claim if one with the same property
 already exists on the page. To override this behavior, use the 'exists' option:
 
-python claimit.py [pagegenerators] P246 "string example" -exists:p
+    python pwb.py claimit [pagegenerators] P246 "string example" -exists:p
 
 Suppose the claim you want to add has the same property as an existing claim
 and the "-exists:p" argument is used. Now, claimit.py will not add the claim
@@ -42,7 +42,7 @@ to the 'exists' argument.
 For instance, to add the claim to each page even if one with the same
 property, target, and qualifiers already exists:
 
-python claimit.py [pagegenerators] P246 "string example" -exists:ptq
+    python pwb.py claimit [pagegenerators] P246 "string example" -exists:ptq
 
 Note that the ordering of the letters in the 'exists' argument does not matter,
 but 'p' must be included.

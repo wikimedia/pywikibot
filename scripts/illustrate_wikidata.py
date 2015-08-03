@@ -8,7 +8,7 @@ For this to be available the PageImages extension
 
 Usage:
 
-python illustrate_wikidata.py <some generator>
+    python pwb.py illustrate_wikidata <some generator>
 
 &params;
 """

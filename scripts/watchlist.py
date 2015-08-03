@@ -5,7 +5,9 @@ Allows access to the bot account's watchlist.
 
 The watchlist can be updated manually by running this script.
 
-Syntax: python watchlist [-all | -new]
+Syntax:
+
+    python pwb.py watchlist [-all | -new]
 
 Command line options:
     -all  -  Reloads watchlists for all wikis where a watchlist is already

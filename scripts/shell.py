@@ -4,6 +4,7 @@
 Spawns an interactive Python shell.
 
 Usage:
+
     python pwb.py shell [args]
 
 If no arguments are given, the pywikibot library will not be loaded.

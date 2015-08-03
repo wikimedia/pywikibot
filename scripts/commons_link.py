@@ -10,7 +10,9 @@ an article in Commons will not be in English but with
 redirect, this also functions.
 
 Run:
-Syntax: python commons_link.py [action] [pagegenerator]
+Syntax:
+
+    python pwb.py commons_link [action] [pagegenerator]
 
 where action can be one of these:
  * pages      : Run over articles, include {{commons}}

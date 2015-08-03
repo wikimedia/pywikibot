@@ -1,12 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+r"""
 Template harvesting script.
 
 Usage:
 
-* harvest_template.py -transcludes:"..." template_parameter PID [template_parameter PID]
-* harvest_template.py [generators] -template:"..." template_parameter PID [template_parameter PID]
+* python pwb.py harvest_template -transcludes:"..." \
+    template_parameter PID [template_parameter PID]
+* python pwb.py harvest_template [generators] -template:"..." \
+    template_parameter PID [template_parameter PID]
 
 This will work on all pages that transclude the template in the article
 namespace
@@ -17,7 +19,8 @@ These command line parameters can be used to specify which pages to work on:
 
 Examples:
 
-* harvest_template.py -lang:nl -cat:Sisoridae -template:"Taxobox straalvinnige" -namespace:0 orde P70 familie P71 geslacht P74
+    python pwb.py harvest_template -lang:nl -cat:Sisoridae -namespace:0 \
+        -template:"Taxobox straalvinnige" orde P70 familie P71 geslacht P74
 
 """
 #

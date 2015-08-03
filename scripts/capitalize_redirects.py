@@ -16,7 +16,9 @@ Command-line arguments:
                   where all words of the title start with an uppercase
                   character and the remaining characters are lowercase.
 
-Example: "python capitalize_redirects.py -start:B -always"
+Example:
+
+    python pwb.py capitalize_redirects -start:B -always
 """
 #
 # (C) Yrithinnd, 2006

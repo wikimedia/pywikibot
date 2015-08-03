@@ -3,7 +3,9 @@
 """
 This script can be used to change one image to another or remove an image.
 
-Syntax: python image.py image_name [new_image_name]
+Syntax:
+
+    python pwb.py image image_name [new_image_name]
 
 If only one command-line parameter is provided then that image will be removed;
 if two are provided, then the first image will be replaced by the second one on
@@ -27,11 +29,11 @@ Examples:
 The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first remove it
 from everything that displays it:
 
-    python image.py FlagrantCopyvio.jpg
+    python pwb.py image FlagrantCopyvio.jpg
 
 The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
-    python image.py Flag.jpg Flag.svg
+    python pwb.py image Flag.jpg Flag.svg
 
 """
 #

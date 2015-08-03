@@ -72,21 +72,21 @@ report_dead_links_on_talk - If set to true, causes the script to report dead
                             times during a timespan of at least one week.
 
 Syntax examples:
-    python weblinkchecker.py -start:!
+    python pwb.py weblinkchecker -start:!
         Loads all wiki pages in alphabetical order using the Special:Allpages
         feature.
 
-    python weblinkchecker.py -start:Example_page
+    python pwb.py weblinkchecker -start:Example_page
         Loads all wiki pages using the Special:Allpages feature, starting at
         "Example page"
 
-    python weblinkchecker.py -weblink:www.example.org
+    python pwb.py weblinkchecker -weblink:www.example.org
         Loads all wiki pages that link to www.example.org
 
-    python weblinkchecker.py Example page
+    python pwb.py weblinkchecker Example page
         Only checks links found in the wiki page "Example page"
 
-    python weblinkchecker.py -repeat
+    python pwb.py weblinkchecker -repeat
         Loads all wiki pages where dead links were found during a prior run
 """
 #

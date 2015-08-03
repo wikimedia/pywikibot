@@ -17,7 +17,9 @@ are taken into account.
                   moves all images, pages and categories in redirect categories
                   to the target category.
 
-Usage: category_redirect.py [options]
+Usage:
+
+    python pwb.py category_redirect [options]
 
 """
 #

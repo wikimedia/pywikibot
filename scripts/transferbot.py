@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""
+r"""
 This script transfers pages from a source wiki to a target wiki.
 
 It also copies edit history to a subpage.
@@ -22,12 +22,16 @@ Pages to work on can be specified using any of:
 
 Example commands:
 
-# Transfer all pages in category "Query service" from the Toolserver wiki to
-# wikitech, adding Nova_Resource:Tools/Tools/ as prefix
-transferbot.py -v -family:toolserver -tofamily:wikitech -cat:"Query service" -prefix:Nova_Resource:Tools/Tools/
+Transfer all pages in category "Query service" from the English Wikipedia to the
+Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
 
-# Copy the template "Query service" from the Toolserver wiki to wikitech
-transferbot.py -v -family:toolserver -tofamily:wikitech -page:"Template:Query service"
+    python pwb.py transferbot -family:wikipedia -lang:en -cat:"Query service" \
+        -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
+
+Copy the template "Query service" from the Toolserver wiki to wikitech:
+
+    python pwb.py transferbot -family:wikipedia -lang:en \
+        -tofamily:wiktionary -tolang:ar -page:"Template:Query service"
 
 """
 #

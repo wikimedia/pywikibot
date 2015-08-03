@@ -10,7 +10,8 @@ For each page in the target wiki:
   list of categories to replace the current list of categories of the page.
 
 Usage:
-    catall.py [start]
+
+    python pwb.py catall [start]
 
 If no starting name is provided, the bot starts at 'A'.
 

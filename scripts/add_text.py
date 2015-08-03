@@ -42,17 +42,17 @@ Furthermore, the following command line parameters are supported:
 # category:catname
 # Warning! Put it in one line, otherwise it won't work correctly.
 
-python add_text.py -cat:catname -summary:"Bot: Adding a template"
--text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
+    python pwb.py add_text -cat:catname -summary:"Bot: Adding a template" \
+        -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
 
 2.
 # Command used on it.wikipedia to put the template in the page without any
 # category.
 # Warning! Put it in one line, otherwise it won't work correctly.
 
-python add_text.py -excepturl:"class='catlinks'>" -uncat
--text:"{{Categorizzare}}" -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare"
--summary:"Bot: Aggiungo template Categorizzare"
+    python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare" \
+        -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
+        -summary:"Bot: Aggiungo template Categorizzare"
 
 --- Credits and Help ---
 This script has been written by Botwiki's staff, if you want to help us
