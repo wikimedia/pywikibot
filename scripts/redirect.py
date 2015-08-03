@@ -411,6 +411,8 @@ class RedirectRobot(Bot):
             pywikibot.output(u'%s is not a redirect.' % redir_page.title())
         except pywikibot.NoPage:
             pywikibot.output(u'%s doesn\'t exist.' % redir_page.title())
+        except pywikibot.InvalidTitle:
+            pywikibot.exception()
         else:
             try:
                 targetPage.get()
