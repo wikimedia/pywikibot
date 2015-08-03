@@ -56,7 +56,7 @@ and arguments can be:
 -until:title   The possible last page title in each namespace. Page needs not
                exist.
 
--step:n        The number of entries retrieved at oncevia API
+-step:n        The number of entries retrieved at once via API
 
 -total:n       The maximum count of redirects to work upon. If omitted, there
                is no limit.
