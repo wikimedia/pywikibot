@@ -92,17 +92,20 @@ dependency_links = [
     'git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29',
 ]
 
+if PYTHON_VERSION < (2, 7, 3):
+    # work around distutils hardcoded unittest dependency
+    # work around T106512
+    import unittest  # noqa
+    if 'test' in sys.argv:
+        import unittest2
+        sys.modules['unittest'] = unittest2
+
 if sys.version_info[0] == 2:
     if PY26:
         # requests security extra includes pyOpenSSL. cryptography is the
         # dependency of pyOpenSSL. 0.8.2 is the newest and compatible version
         # for Python 2.6, which won't raise unexpected DeprecationWarning.
         extra_deps['security'].append('cryptography<=0.8.2')
-        # work around distutils hardcoded unittest dependency
-        import unittest  # noqa
-        if 'test' in sys.argv:
-            import unittest2
-            sys.modules['unittest'] = unittest2
 
         script_deps['replicate_wiki.py'] = ['argparse']
         dependencies.append('future')  # provides collections backports
