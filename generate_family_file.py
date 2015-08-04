@@ -186,6 +186,14 @@ class Family(family.Family):
                         % {'lang': w.lang, 'ver': w.version})
         f.write("        }[code]\n")
 
+        f.write("\n")
+        f.write("    def protocol(self, code):\n")
+        f.write("        return {\n")
+        for w in self.wikis.values():
+            f.write("            '%(lang)s': u'%(protocol)s',\n"
+                    % {'lang': w.lang, 'protocol': urlparse(w.server).scheme})
+        f.write("        }[code]\n")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
