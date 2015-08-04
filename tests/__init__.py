@@ -27,8 +27,9 @@ except ImportError as e:
     print("ImportError: %s" % e)
     sys.exit(1)
 
-if sys.version_info < (2, 7):
+if sys.version_info < (2, 7, 3):
     # Unittest2 is a backport of python 2.7s unittest module to python 2.6
+    # Also use unittest2 for python 2.7.2 (T106512)
     import unittest2 as unittest
 else:
     import unittest
