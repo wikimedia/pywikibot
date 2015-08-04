@@ -6,16 +6,14 @@ Correct all redirect links in featured pages or only one page of each wiki.
 Can be using with:
 &params;
 
--featured         Run over featured pages
+-featured         Run over featured pages (for some wikimedia wikis only)
 
 Run fixing_redirects.py -help to see all the command-line
 options -file, -ref, -links, ...
 
 """
 #
-# This script based on disambredir.py and solve_disambiguation.py
-#
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,10 +21,10 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 #
-import sys
 import pywikibot
 from pywikibot import pagegenerators
-from pywikibot import i18n
+from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
+                           AutomaticTWSummaryBot, suggest_help)
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -34,74 +32,49 @@ docuReplacements = {
     '&params;':     pagegenerators.parameterHelp,
 }
 
-featured_articles = {
-    'ar': u'ويكيبيديا:مقالات مختارة',
-    'cs': u'Wikipedie:Nejlepší články',
-    'de': u'Wikipedia:Exzellente_Artikel',
-    'en': u'Wikipedia:Featured_articles',
-    'es': u'Wikipedia:Artículos_destacados',
-    'fa': u'ویکی‌پدیا:نوشتارهای برگزیده',
-    'fr': u'Wikipédia:Articles_de_qualité',
-    'he': u'פורטל:ערכים_מומלצים',
-    'is': u'Wikipedia:Úrvalsgreinar',
-    'it': u'Wikipedia:Articoli_in_vetrina',
-    'ja': u'Wikipedia:秀逸な記事',
-    'nl': u'Wikipedia:Etalage',
-    'nn': u'Wikipedia:Gode artiklar',
-    'no': u'Wikipedia:Anbefalte artikler',
-    'pl': u'Wikipedia:Artykuły_na_medal',
-    'pt': u'Wikipedia:Os_melhores_artigos',
-    'sv': u'Wikipedia:Utvalda_artiklar',
-    'vi': u'Wikipedia:Bài_viết_chọn_lọc',
-    'zh': u'Wikipedia:特色条目',
-}
+# Featured articles categories
+featured_articles = 'Q4387444'
 
 
-pageCache = []
+class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
+                        AutomaticTWSummaryBot):
 
+    """Run over pages and resolve redirect links."""
 
-def workon(page):
-    """Change all redirects from the given page to actual links."""
-    mysite = pywikibot.Site()
-    try:
-        text = page.get()
-    except pywikibot.IsRedirectPage:
-        pywikibot.output(u'%s is a redirect page. Skipping' % page)
-        return
-    except pywikibot.NoPage:
-        pywikibot.output(u'%s does not exist. Skipping' % page)
-        return
-    pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                     % page.title())
-    links = page.linkedPages()
-    if links is not None:
-        links = pagegenerators.PreloadingGenerator(links)
-#        pywikibot.getall(mysite, links)
-    else:
-        pywikibot.output('Nothing left to do.')
-        return
+    ignore_save_related_errors = True
+    ignore_server_errors = True
+    summary_key = 'fixing_redirects-fixing'
 
-    for page2 in links:
-        try:
-            target = page2.getRedirectTarget()
-        except pywikibot.NoPage:
-            try:
-                target = page2.getMovedTarget()
-            except (pywikibot.NoPage, pywikibot.BadTitle):
+    def treat_page(self):
+        """Change all redirects from the current page to actual links."""
+        links = self.current_page.linkedPages()
+        newtext = self.current_page.text
+        i = None
+        for i, page in enumerate(links):
+            if not page.exists():
+                try:
+                    target = page.moved_target()
+                except (pywikibot.NoMoveTarget,
+                        pywikibot.CircularRedirect,
+                        pywikibot.InvalidTitle):
+                    continue
+            elif page.isRedirectPage():
+                try:
+                    target = page.getRedirectTarget()
+                except (pywikibot.CircularRedirect,
+                        pywikibot.InvalidTitle):
+                    continue
+            else:
                 continue
-        except (pywikibot.Error, pywikibot.SectionError):
-            continue
-        # no fix to user namespaces
-        if target.namespace() in [0, 1] and not page2.namespace() in [0, 1]:
-            continue
-        text = pywikibot.textlib.replace_links(text, [page2, target])
-    if text != page.get():
-        comment = i18n.twtranslate(mysite, 'fixing_redirects-fixing')
-        pywikibot.showDiff(page.get(), text)
-        try:
-            page.put(text, comment)
-        except (pywikibot.Error):
-            pywikibot.error('unable to put %s' % page)
+            # no fix to user namespaces
+            if target.namespace() in [2, 3] and page.namespace() not in [2, 3]:
+                continue
+            newtext = pywikibot.textlib.replace_links(newtext, [page, target])
+
+        if i is None:
+            pywikibot.output('Nothing left to do.')
+        else:
+            self.put_current(newtext)
 
 
 def main(*args):
@@ -123,28 +96,41 @@ def main(*args):
     for arg in local_args:
         if arg == '-featured':
             featured = True
-        else:
-            genFactory.handleArg(arg)
+        elif genFactory.handleArg(arg):
+            pass
 
     mysite = pywikibot.Site()
     if mysite.sitename == 'wikipedia:nl':
         pywikibot.output(
             '\03{lightred}There is consensus on the Dutch Wikipedia that '
             'bots should not be used to fix redirects.\03{default}')
-        sys.exit()
+        return
 
     if featured:
-        featuredList = i18n.translate(mysite, featured_articles)
-        ref = pywikibot.Page(pywikibot.Site(), featuredList)
-        gen = ref.getReferences(namespaces=[0])
-    if not gen:
+        repo = mysite.data_repository()
+        if repo:
+            dp = pywikibot.ItemPage(repo, featured_articles)
+            try:
+                ref = pywikibot.Category(mysite, dp.getSitelink(mysite))
+            except pywikibot.NoPage:
+                pass
+            else:
+                gen = ref.articles(namespaces=0, content=True)
+        if not gen:
+            suggest_help(
+                unknown_parameters=['-featured'],
+                additional_text='Option is not available for this site.')
+            return False
+    else:
         gen = genFactory.getCombinedGenerator()
+        if gen:
+            gen = mysite.preloadpages(gen)
     if gen:
-        for page in pagegenerators.PreloadingGenerator(gen):
-            workon(page)
+        bot = FixingRedirectBot(generator=gen)
+        bot.run()
         return True
     else:
-        pywikibot.bot.suggest_help(missing_generator=True)
+        suggest_help(missing_generator=True)
         return False
 
 if __name__ == "__main__":
