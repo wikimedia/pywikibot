@@ -46,7 +46,7 @@ script:
 
   - mkdir ~/.pywikibot
 
-  - python pwb.py generate_family_file 'http://test.orain.org/' oraintest
+  - python pwb.py generate_family_file 'https://test.orain.org/' oraintest
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
 
