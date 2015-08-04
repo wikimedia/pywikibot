@@ -142,6 +142,7 @@ import collections
 import re
 import time
 import sys
+import warnings
 
 import pywikibot
 
@@ -191,6 +192,31 @@ class ReplacementBase(object):
     @property
     def edit_summary(self):
         return self._edit_summary
+
+    @property
+    def description(self):
+        """Description of the changes that this replacement applies.
+
+        This description is used as the default summary of the replacement. If
+        you do not specify an edit summary on the command line or in some other
+        way, whenever you apply this replacement to a page and submit the
+        changes to the MediaWiki server, the edit summary includes the
+        descriptions of each replacement that you applied to the page.
+        """
+        return '-{0} +{1}'.format(self.old, self.new)
+
+    @property
+    def container(self):
+        """Container object which contains this replacement.
+
+        A container object is an object that groups one or more replacements
+        together and provides some properties that are common to all of them.
+        For example, containers may define a common name for a group of
+        replacements, or a common edit summary.
+
+        Container objects must have a "name" attribute.
+        """
+        return None
 
     def _compile(self, use_regex, flags):
         # This does not update use_regex and flags depending on this instance
@@ -263,13 +289,15 @@ class ReplacementList(list):
     are compiled only once.
     """
 
-    def __init__(self, use_regex, exceptions, case_insensitive, edit_summary):
+    def __init__(self, use_regex, exceptions, case_insensitive, edit_summary,
+                 name):
         super(ReplacementList, self).__init__()
         self.use_regex = use_regex
         self._exceptions = exceptions
         self.exceptions = None
         self.case_insensitive = case_insensitive
         self.edit_summary = edit_summary
+        self.name = name
 
     def _compile_exceptions(self, use_regex, flags):
         if not self.exceptions and self._exceptions is not None:
@@ -305,6 +333,19 @@ class ReplacementListEntry(ReplacementBase):
             return self.fix_set.edit_summary
         else:
             return self._edit_summary
+
+    @property
+    def container(self):
+        """Container object which contains this replacement.
+
+        A container object is an object that groups one or more replacements
+        together and provides some properties that are common to all of them.
+        For example, containers may define a common name for a group of
+        replacements, or a common edit summary.
+
+        Container objects must have a "name" attribute.
+        """
+        return self.fix_set
 
     def _compile(self, use_regex, flags):
         super(ReplacementListEntry, self)._compile(use_regex, flags)
@@ -483,18 +524,20 @@ class ReplaceRobot(Bot):
         self.summary = summary
         self.changed_pages = 0
 
-    def isTitleExcepted(self, title):
+    def isTitleExcepted(self, title, exceptions=None):
         """
         Return True iff one of the exceptions applies for the given title.
 
         @rtype: bool
         """
-        if "title" in self.exceptions:
-            for exc in self.exceptions['title']:
+        if exceptions is None:
+            exceptions = self.exceptions
+        if 'title' in exceptions:
+            for exc in exceptions['title']:
                 if exc.search(title):
                     return True
-        if "require-title" in self.exceptions:
-            for req in self.exceptions['require-title']:
+        if 'require-title' in exceptions:
+            for req in exceptions['require-title']:
                 if not req.search(title):
                     return True
         return False
@@ -511,7 +554,7 @@ class ReplaceRobot(Bot):
                     return True
         return False
 
-    def apply_replacements(self, original_text, applied):
+    def apply_replacements(self, original_text, applied, page=None):
         """
         Apply all replacements to the given text.
 
@@ -519,11 +562,35 @@ class ReplaceRobot(Bot):
         """
         def get_exceptions(exceptions):
             return exceptions.get('inside-tags', []) + exceptions.get('inside', [])
+
+        if page is None:
+            pywikibot.warn(
+                'You must pass the target page as the "page" parameter to '
+                'apply_replacements().', DeprecationWarning, stacklevel=2)
         new_text = original_text
         exceptions = get_exceptions(self.exceptions)
+        skipped_containers = set()
         for replacement in self.replacements:
             if self.sleep is not None:
                 time.sleep(self.sleep)
+            if (replacement.container and
+                    replacement.container.name in skipped_containers):
+                continue
+            elif page is not None and self.isTitleExcepted(
+                    page.title(), replacement.exceptions):
+                if replacement.container:
+                    pywikibot.output(
+                        'Skipping fix "{0}" on {1} because the title is on the '
+                        'exceptions list.'.format(
+                            replacement.container.name,
+                            page.title(asLink=True)))
+                    skipped_containers.add(replacement.container.name)
+                else:
+                    pywikibot.output(
+                        'Skipping unnamed replacement ({0}) on {1} because the '
+                        'title is on the exceptions list.'.format(
+                            replacement.description, page.title(asLink=True)))
+                continue
             old_text = new_text
             new_text = textlib.replaceExcept(
                 new_text, replacement.old_regex, replacement.new,
@@ -534,8 +601,15 @@ class ReplaceRobot(Bot):
 
         return new_text
 
-    def doReplacements(self, original_text):
-        return self.apply_replacements(original_text, set())
+    def doReplacements(self, original_text, page=None):
+        if page is None:
+            pywikibot.warn(
+                'You must pass the target page as the "page" parameter to '
+                'doReplacements().', DeprecationWarning, stacklevel=2)
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', DeprecationWarning)
+            new_text = self.apply_replacements(original_text, set(), page=page)
+        return new_text
 
     def count_changes(self, page, err):  # pylint: disable=unused-argument
         """Count succesfully changed pages."""
@@ -601,7 +675,8 @@ class ReplaceRobot(Bot):
                 last_text = None
                 while new_text != last_text:
                     last_text = new_text
-                    new_text = self.apply_replacements(last_text, applied)
+                    new_text = self.apply_replacements(last_text, applied,
+                                                       page)
                     if not self.recursive:
                         break
                 if new_text == original_text:
@@ -890,7 +965,8 @@ def main(*args):
         replacement_set = ReplacementList(fix.get('regex'),
                                           fix.get('exceptions'),
                                           fix.get('nocase'),
-                                          set_summary)
+                                          set_summary,
+                                          name=fix_name)
         # Whether some replacements have a summary, if so only show which
         # have none, otherwise just mention the complete fix
         missing_fix_summaries = []
