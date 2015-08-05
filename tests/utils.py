@@ -33,6 +33,7 @@ from pywikibot.comms import threadedhttp
 from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest
 from pywikibot.data.api import Request as _original_Request
+from pywikibot.tools import PYTHON_VERSION
 
 from tests import _pwb_py
 from tests import unittest  # noqa
@@ -525,6 +526,12 @@ def execute(command, data_in=None, timeout=0, error=None):
     # str() on Python 2.
     env = os.environ.copy()
 
+    # Python issue 6906
+    if PYTHON_VERSION < (2, 6, 6):
+        for var in ('TK_LIBRARY', 'TCL_LIBRARY', 'TIX_LIBRARY'):
+            if var in env:
+                env[var] = env[var].encode('mbcs')
+
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'
     env[str('PYWIKIBOT_TEST_QUIET')] = str('1')
 
@@ -551,21 +558,22 @@ def execute(command, data_in=None, timeout=0, error=None):
 
     try:
         p = subprocess.Popen(command, env=env, **options)
-    except TypeError:
+    except TypeError as e:
         # Generate a more informative error
         if sys.platform == 'win32' and sys.version_info[0] < 3:
             unicode_env = [(k, v) for k, v in os.environ.items()
                            if not isinstance(k, str) or
                            not isinstance(v, str)]
             if unicode_env:
-                raise TypeError('os.environ must contain only str: %r'
-                                % unicode_env)
+                raise TypeError(
+                    '%s: unicode in os.environ: %r' % (e, unicode_env))
+
             child_unicode_env = [(k, v) for k, v in env.items()
                                  if not isinstance(k, str) or
                                  not isinstance(v, str)]
             if child_unicode_env:
-                raise TypeError('os.environ must contain only str: %r'
-                                % child_unicode_env)
+                raise TypeError(
+                    '%s: unicode in child env: %r' % (e, child_unicode_env))
         raise
 
     if data_in is not None:
