@@ -108,7 +108,7 @@ if sys.version_info[0] == 2:
         extra_deps['security'].append('cryptography<=0.8.2')
 
         script_deps['replicate_wiki.py'] = ['argparse']
-        dependencies.append('future')  # provides collections backports
+        dependencies.append('future>=0.15.0')  # provides collections backports
         dependency_links.append(
             'git+https://github.com/jayvdb/unicodedata2@issue_2#egg=unicodedata2-7.0.0')
 

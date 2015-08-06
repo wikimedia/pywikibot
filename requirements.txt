@@ -30,7 +30,7 @@ pyOpenSSL ; python_full_version < '2.7.9'
 ndg-httpsclient ; python_full_version < '2.7.9'
 pyasn1 ; python_full_version < '2.7.9'
 
-future ; python_version < '2.7'
+future>=0.15.0 ; python_version < '2.7'
 
 ipaddr>=2.1.10 ; python_version < '3'
 

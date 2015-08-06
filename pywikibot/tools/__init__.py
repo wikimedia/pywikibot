@@ -62,12 +62,12 @@ class NotImplementedClass(object):
 
 if PYTHON_VERSION < (2, 7):
     try:
-        from future.backports.misc import Counter, OrderedDict
+        import future.backports.misc
     except ImportError:
         warn("""
 pywikibot support of Python 2.6 relies on package future for many features.
 Please upgrade to Python 2.7+ or Python 3.3+, or run:
-    "pip install future"
+    "pip install future>=0.15.0"
 """, RuntimeWarning)
         try:
             from ordereddict import OrderedDict
@@ -86,10 +86,28 @@ Please upgrade to Python 2.7+ or Python 3.3+, or run:
                 """Counter not found."""
 
                 pass
+    else:
+        Counter = future.backports.misc.Counter
+        OrderedDict = future.backports.misc.OrderedDict
+
+        try:
+            count = future.backports.misc.count
+        except AttributeError:
+            warn('Please update the "future" package to at least version '
+                 '0.15.0 to use its count.', RuntimeWarning, 2)
+
+            def count(start=0, step=1):
+                """Backported C{count} to support keyword arguments and step."""
+                while True:
+                    yield start
+                    start += step
+
+        del future
 
 else:
     from collections import Counter  # noqa ; unused
     from collections import OrderedDict
+    from itertools import count  # noqa ; unused
 
 
 def empty_iterator():
@@ -563,13 +581,13 @@ class ThreadList(list):
 
     def active_count(self):
         """Return the number of alive threads, and delete all non-alive ones."""
-        count = 0
+        cnt = 0
         for item in self[:]:
             if item.isAlive():
-                count += 1
+                cnt += 1
             else:
                 self.remove(item)
-        return count
+        return cnt
 
     def append(self, thd):
         """Add a thread to the pool and start it."""
