@@ -51,7 +51,7 @@ extra_deps = {
     # 0.6.1 supports socket.io 1.0, but WMF is using 0.9 (T91393 and T85716)
     'rcstream': ['socketIO-client<0.6.1'],
     'security': ['requests[security]'],
-    'unicode7': ['unicodedata2'],
+    'unicode7': ['unicodedata2'] if PY2 else [],
 }
 
 if PY2:
