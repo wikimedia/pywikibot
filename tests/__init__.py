@@ -141,10 +141,7 @@ script_test_modules = [
 
 disabled_test_modules = [
     'tests',  # tests of the tests package
-    # weblib is deprecated, the tests fail for weblib,
-    # but the tests are run in weblinkchecker_tests.
     'l10n',
-    'weblib',
 ]
 if not i18n.messages_available():
     disabled_test_modules.append('l10n')
@@ -155,6 +152,9 @@ disabled_tests = {
     ],
     'site_detect': [
         'test_IWM',  # very slow and tests include unnecessary sites
+    ],
+    'weblib': [
+        'testWebCiteOlder',  # fails. T110640
     ],
 }
 
