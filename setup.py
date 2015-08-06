@@ -51,7 +51,6 @@ extra_deps = {
     # 0.6.1 supports socket.io 1.0, but WMF is using 0.9 (T91393 and T85716)
     'rcstream': ['socketIO-client<0.6.1'],
     'security': ['requests[security]'],
-    'unicode7': ['unicodedata2'] if PY2 else [],
 }
 
 if PY2:
@@ -59,6 +58,7 @@ if PY2:
     extra_deps.update({
         'csv': ['unicodecsv'],
         'MySQL': ['oursql'],
+        'unicode7': ['unicodedata2>=7.0.0-2'],
     })
 
 script_deps = {
@@ -109,8 +109,6 @@ if sys.version_info[0] == 2:
 
         script_deps['replicate_wiki.py'] = ['argparse']
         dependencies.append('future>=0.15.0')  # provides collections backports
-        dependency_links.append(
-            'git+https://github.com/jayvdb/unicodedata2@issue_2#egg=unicodedata2-7.0.0')
 
         dependencies += extra_deps['unicode7']  # T102461 workaround
 
