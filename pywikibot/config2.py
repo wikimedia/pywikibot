@@ -151,13 +151,17 @@ solve_captcha = True
 # the following form:
 #
 # authenticate['en.wikipedia.org'] = ('John','XXXXX')
+# authenticate['*.wikipedia.org'] = ('John','XXXXX')
 #
 # where John is your login name, and XXXXX your password.
 # Note:
 # 1. This is only for sites that use authentication in the form that gives
 #    you a popup for name and password when you try to access any data, NOT
 #    for, for example, wiki usernames
-# 2. You must use the hostname of the site, not its family/language pair
+# 2. You must use the hostname of the site, not its family/language pair.
+#    Pywikibot supports wildcard (*) in the prefix of hostname and select the
+#    best match authentication. So you can specify authentication not only for
+#    one site
 authenticate = {}
 
 #
