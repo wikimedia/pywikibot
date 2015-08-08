@@ -207,7 +207,6 @@ class ParamInfo(Container):
         self.preloaded_modules = self.init_modules
         if preloaded_modules:
             self.preloaded_modules |= set(preloaded_modules)
-        self.__inited = False
 
         self.modules_only_mode = modules_only_mode
         if self.modules_only_mode:
@@ -232,6 +231,9 @@ class ParamInfo(Container):
             self._modules[name] = modules
 
     def _init(self):
+        assert ('query' in self._modules) is ('main' in self._paraminfo)
+        if 'query' in self._modules:
+            return
         _mw_ver = MediaWikiVersion(self.site.version())
 
         if _mw_ver < MediaWikiVersion('1.15'):
@@ -250,7 +252,7 @@ class ParamInfo(Container):
         if _mw_ver > MediaWikiVersion('1.26') or _mw_ver < MediaWikiVersion('1.19'):
             self.preloaded_modules |= set(['query'])
 
-        self.fetch(self.preloaded_modules, _init=True)
+        self._fetch(self.preloaded_modules)
 
         # paraminfo 'mainmodule' was added 1.15
         assert('main' in self._paraminfo)
@@ -277,7 +279,7 @@ class ParamInfo(Container):
 
         if 'query' not in self._modules:
             assert 'query' not in self._paraminfo
-            self.fetch(set(['query']), _init=True)
+            self._fetch(set(['query']))
         assert 'query' in self._modules
 
         _reused_module_names = self._action_modules & self._modules['query']
@@ -288,8 +290,6 @@ class ParamInfo(Container):
         if _reused_module_names > set(['tokens']):
             warn('Unexpected overlap between action and query submodules: %s'
                  % (_reused_module_names - set(['tokens'])), UserWarning)
-
-        self.__inited = True
 
     def _emulate_pageset(self):
         """Emulate the pageset module, which existed in MW 1.15-1.24."""
@@ -535,7 +535,7 @@ class ParamInfo(Container):
 
         self._emulate_pageset()
 
-    def fetch(self, modules, _init=False):
+    def fetch(self, modules):
         """
         Fetch paraminfo for multiple modules.
 
@@ -543,6 +543,29 @@ class ParamInfo(Container):
         Use __getitem__ to cause an exception if a module does not exist.
 
         @param modules: API modules to load
+        @type modules: iterable or str
+        @rtype: NoneType
+        """
+        if 'main' not in self._paraminfo:
+            # The first request should be 'paraminfo', so that
+            # query modules can be prefixed with 'query+'
+            self._init()
+
+        if 'query' in self._modules:
+            # It does fetch() while initializing, and this method can't be
+            # called before it's initialized.
+            modules = self._normalize_modules(modules)
+        elif self._action_modules:
+            # At least we do know the valid action modules and require a subset
+            assert not modules - self._action_modules - self.root_modules
+
+        self._fetch(modules)
+
+    def _fetch(self, modules):
+        """
+        Fetch paraminfo for multiple modules without initializing beforehand.
+
+        @param modules: API modules to load and which haven't been loaded yet.
         @type modules: set
         @rtype: NoneType
         """
@@ -555,20 +578,11 @@ class ParamInfo(Container):
                 del failed_modules[:]
                 yield batch
 
-        # The first request should be 'paraminfo', so that
-        # query modules can be prefixed with 'query+'
-        # If _init is True, dont call _init().
-        if 'paraminfo' not in self._paraminfo and not _init:
-            self._init()
-
-        if self.__inited:
-            modules = self._normalize_modules(modules)
-
         modules = modules - set(self._paraminfo.keys())
         if not modules:
             return
 
-        assert 'query' in self._modules or _init
+        assert 'query' in self._modules or 'paraminfo' not in self._paraminfo
 
         if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
             # When the help is parsed, all paraminfo should already be loaded
@@ -593,13 +607,12 @@ class ParamInfo(Container):
             if self.modules_only_mode and 'pageset' in module_batch:
                 pywikibot.debug('paraminfo fetch: removed pageset', _logger)
                 module_batch.remove('pageset')
-                if 'query' not in self._paraminfo:
-                    pywikibot.debug('paraminfo batch: added query', _logger)
-                    module_batch.append('query')
                 # If this occurred during initialisation,
                 # also record it in the preloaded_modules.
                 # (at least so tests know an extra load was intentional)
-                if not self.__inited:
+                if 'query' not in self._paraminfo:
+                    pywikibot.debug('paraminfo batch: added query', _logger)
+                    module_batch.append('query')
                     self.preloaded_modules |= set(['query'])
 
             params = {
@@ -742,8 +755,7 @@ class ParamInfo(Container):
         @return: The modules converted into a module paths
         @rtype: set
         """
-        if not self.__inited:
-            self._init()
+        self._init()
         return self._normalize_modules(modules)
 
     @classmethod
@@ -901,8 +913,6 @@ class ParamInfo(Container):
     # As soon as modules() is removed, module_paths and _module_set can be
     # combined, so don't add any code between these two methods.
     def _module_set(self, path):
-        if not self.__inited:
-            self._init()
         # Load the submodules of all action modules available
         self.fetch(self.action_modules)
         modules = set(self.action_modules)
@@ -915,8 +925,7 @@ class ParamInfo(Container):
     @property
     def action_modules(self):
         """Set of all action modules."""
-        if not self.__inited:
-            self._init()
+        self._init()
         return self._action_modules
 
     @property
@@ -935,8 +944,6 @@ class ParamInfo(Container):
         @return: The names or paths of the submodules.
         @rtype: set
         """
-        if not self.__inited:
-            self._init()
         if name not in self._modules:
             self.fetch([name])
         submodules = self._modules[name]
