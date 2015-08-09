@@ -905,6 +905,31 @@ class LiveRCPageGeneratorTestCase(RecentChangesTestCase):
                     "user", "bot"]:
             self.assertIn(key, rcinfo.keys())
 
+
+class TestUnconnectedPageGenerator(DefaultSiteTestCase):
+
+    """Test UnconnectedPageGenerator."""
+
+    def test_unconnected_with_repo(self):
+        """Test that the ItemPage returned raises NoPage."""
+        if not self.site.data_repository():
+            raise unittest.SkipTest('Site is not using a Wikibase repository')
+        cnt = 0
+        for page in pagegenerators.UnconnectedPageGenerator(self.site, total=5):
+            self.assertRaises(pywikibot.NoPage, pywikibot.ItemPage.fromPage,
+                              page)
+            cnt += 1
+        self.assertLessEqual(cnt, 5)
+
+    def test_unconnected_without_repo(self):
+        """Test that it raises a ValueError on sites without repository."""
+        if self.site.data_repository():
+            raise unittest.SkipTest('Site is using a Wikibase repository')
+        with self.assertRaises(ValueError):
+            for page in pagegenerators.UnconnectedPageGenerator(self.site,
+                                                                total=5):
+                assert False  # this shouldn't be reached
+
 if __name__ == "__main__":
     try:
         unittest.main()
