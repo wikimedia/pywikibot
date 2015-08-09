@@ -92,10 +92,6 @@ class Family(family.WikimediaFamily):
             'zh': [102],
         }
 
-        for key, values in self.authornamespaces.items():
-            for item in values:
-                self.crossnamespace[item].update({key: self.authornamespaces})
-
         # Subpages for documentation.
         # TODO: List is incomplete, to be completed for missing languages.
         # TODO: Remove comments for appropriate pages
