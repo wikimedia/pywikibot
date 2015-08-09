@@ -783,8 +783,8 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
     def test_logevents_default(self):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertTrue(gf.handleArg('-newuserslog'))
-        self.assertDeprecation('The usage of "-newuserslog" is deprecated.'
-                               ' Use -logevents "newusers,,500" instead')
+        self.assertOneDeprecationParts('The usage of "-newuserslog"',
+                                       '-logevents:"newusers,,500"')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)

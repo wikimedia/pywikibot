@@ -39,6 +39,7 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     redirect_func,
+    issue_deprecation_warning,
     DequeGenerator,
     intersect_generators,
     filter_unique,
@@ -793,10 +794,11 @@ class GeneratorFactory(object):
                         user = None
                 else:
                     user = None
-                warn(u'The usage of "{0}" is deprecated. Use -logevents '
-                     u'"{1}" instead'.format(
-                         arg, ','.join((mode, user or '', str(total)))),
-                     ArgumentDeprecationWarning, 2)
+                issue_deprecation_warning(
+                    'The usage of "{0}"'.format(arg),
+                    '-logevents:"{0}"'.format(
+                        ','.join((mode, user or '', str(total)))),
+                    2, ArgumentDeprecationWarning)
                 gen = self._parse_log_events(mode, user, total)
 
         if gen:
