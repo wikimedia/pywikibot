@@ -157,6 +157,10 @@ parameterHelp = u"""\
                   given as -recentchanges:x, will work on the x most recently
                   changed pages.
 
+-unconnectedpages Work on the most recent unconnected pages to the Wikibase
+                  repository. Given as -unconnectedpages:x, will work on the
+                  x most recent unconnected pages.
+
 -ref              Work on all pages that link to a certain page.
                   Argument can also be given as "-ref:referredpagetitle".
 
@@ -691,6 +695,12 @@ class GeneratorFactory(object):
             gen = NewpagesPageGenerator(namespaces=namespaces,
                                         total=total,
                                         site=self.site)
+        elif arg.startswith('-unconnectedpages'):
+            namespaces = self.namespaces or 0
+            total = 60
+            if len(arg) >= 18:
+                total = int(arg[18:])
+            gen = UnconnectedPageGenerator(total=total, site=self.site)
         elif arg.startswith('-imagesused'):
             imagelinkstitle = arg[len('-imagesused:'):]
             if not imagelinkstitle:
@@ -933,7 +943,7 @@ def NewpagesPageGenerator(site=None, namespaces=[0], step=None, total=None):
 
     @param step: Maximum number of pages to retrieve per API query
     @type step: int
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maxmium number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -1016,6 +1026,25 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
     if _filter_unique:
         gen = _filter_unique(gen)
     return gen
+
+
+def UnconnectedPageGenerator(site=None, step=None, total=None):
+    """
+    Iterate Page objects for all unconnected pages to a Wikibase repository.
+
+    @param step: Maximum number of pages to retrieve per API query
+    @type step: int
+    @param total: Maximum number of pages to retrieve in total
+    @type total: int
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.APISite}
+    """
+    if site is None:
+        site = pywikibot.Site()
+    if not site.data_repository():
+        raise ValueError('The given site does not have Wikibase repository.')
+    for page in site.unconnected_pages(step=step, total=total):
+        yield page
 
 
 @deprecated_args(referredImagePage='referredFilePage')
