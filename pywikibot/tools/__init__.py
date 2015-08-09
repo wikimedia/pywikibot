@@ -1113,14 +1113,17 @@ def add_full_name(obj):
     return outer_wrapper
 
 
-def issue_deprecation_warning(name, instead, depth):
+def issue_deprecation_warning(name, instead, depth, warning_class=None):
     """Issue a deprecation warning."""
     if instead:
-        warn('{0} is deprecated; use {1} instead.'.format(name, instead),
-             DeprecationWarning, depth + 1)
+        if warning_class is None:
+            warning_class = DeprecationWarning
+        warn(u'{0} is deprecated; use {1} instead.'.format(name, instead),
+             warning_class, depth + 1)
     else:
-        warn(u'{0} is deprecated.'.format(name), _NotImplementedWarning,
-             depth + 1)
+        if warning_class is None:
+            warning_class = _NotImplementedWarning
+        warn('{0} is deprecated.'.format(name), warning_class, depth + 1)
 
 
 @add_full_name
