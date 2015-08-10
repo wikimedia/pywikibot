@@ -1270,6 +1270,9 @@ class Siteinfo(Container):
                 'levels': ['', 'autoconfirmed', 'sysop'],
                 'types': ['create', 'edit', 'move', 'upload']
             }
+        elif key == 'fileextensions':
+            # the default file extensions in MediaWiki
+            return [{'ext': ext} for ext in ['png', 'gif', 'jpg', 'jpeg']]
         else:
             return pywikibot.tools.EMPTY_DEFAULT
 

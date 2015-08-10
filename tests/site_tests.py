@@ -33,7 +33,7 @@ from tests.aspects import (
     DefaultWikidataClientTestCase,
     AlteredDefaultSiteTestCase,
 )
-from tests.utils import allowed_failure, allowed_failure_if
+from tests.utils import allowed_failure, allowed_failure_if, entered_loop
 from tests.basepage_tests import BasePageLoadRevisionsCachingTestBase
 
 if sys.version_info[0] > 2:
@@ -1765,7 +1765,7 @@ class TestSiteAPILimits(TestCase):
         self.assertEqual(len(mypage._revisions), 12)
 
 
-class TestSiteInfo(WikimediaDefaultSiteTestCase):
+class TestSiteInfo(DefaultSiteTestCase):
 
     """Test cases for Site metadata and capabilities."""
 
@@ -1788,20 +1788,31 @@ class TestSiteInfo(WikimediaDefaultSiteTestCase):
         self.assertEqual(mysite.case(), mysite.siteinfo['case'])
         self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
 
-        def entered_loop(iterable):
-            for iterable_item in iterable:
-                return True
-            return False
-
+    def test_properties_with_defaults(self):
+        """Test the siteinfo properties with defaults."""
+        # This does not test that the defaults work correct,
+        # unless the default site is a version needing these defaults
+        # 'fileextensions' introduced in v1.14:
+        self.assertIsInstance(self.site.siteinfo.get('fileextensions'), list)
+        self.assertIn('fileextensions', self.site.siteinfo)
+        self.assertIn({'ext': 'png'}, self.site.siteinfo['fileextensions'])
+        # 'restrictions' introduced in v1.23:
+        mysite = self.site
         self.assertIsInstance(mysite.siteinfo.get('restrictions'), dict)
         self.assertIn('restrictions', mysite.siteinfo)
-        # the following line only works in 1.23+
-        self.assertTrue(mysite.siteinfo.is_recognised('restrictions'))
-        del mysite.siteinfo._cache['restrictions']
-        self.assertIsInstance(mysite.siteinfo.get('restrictions', cache=False), dict)
-        self.assertNotIn('restrictions', mysite.siteinfo)
+        self.assertIn('cascadinglevels', self.site.siteinfo['restrictions'])
 
+    def test_no_cache(self):
+        """Test siteinfo caching can be disabled."""
+        if 'fileextensions' in self.site.siteinfo._cache:
+            del self.site.siteinfo._cache['fileextensions']
+        self.site.siteinfo.get('fileextensions', cache=False)
+        self.assertNotIn('fileextensions', self.site.siteinfo)
+
+    def test_not_exists(self):
+        """Test accessing a property not in siteinfo."""
         not_exists = 'this-property-does-not-exist'
+        mysite = self.site
         self.assertRaises(KeyError, mysite.siteinfo.__getitem__, not_exists)
         self.assertNotIn(not_exists, mysite.siteinfo)
         self.assertEqual(len(mysite.siteinfo.get(not_exists)), 0)

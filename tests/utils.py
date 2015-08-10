@@ -119,6 +119,13 @@ def fixed_generator(iterable):
     return gen
 
 
+def entered_loop(iterable):
+    """Return True if iterable contains items."""
+    for iterable_item in iterable:
+        return True
+    return False
+
+
 class WarningSourceSkipContextManager(warnings.catch_warnings):
 
     """
