@@ -637,13 +637,20 @@ fixes = {
     },
 }
 
+
+def _load_file(filename):
+    """Load the fixes from the given filename."""
+    if os.path.exists(filename):
+        # load binary, to let compile decode it according to the file header
+        with open(filename, 'rb') as f:
+            exec(compile(f.read(), filename, 'exec'))
+        return True
+    else:
+        return False
+
 #
 # Load the user fixes file.
-filename = config.datafilepath('user-fixes.py')
-if os.path.exists(filename):
-    # load binary, to let compile decode it according to the file header
-    with open(filename, 'rb') as f:
-        exec(compile(f.read(), filename, 'exec'))
+if _load_file(config.datafilepath('user-fixes.py')):
     user_fixes_loaded = True
 else:
     user_fixes_loaded = False

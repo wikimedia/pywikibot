@@ -902,12 +902,14 @@ def main(*args):
                 pywikibot.warning('The new string "{0}" contains formatting '
                                   'characters like U+200E'.format(
                     chars.replace_invisible(replacement[1])))
-            replacements.append(ReplacementListEntry(
+            replacement_set.append(ReplacementListEntry(
                 old=replacement[0],
                 new=replacement[1],
                 fix_set=replacement_set,
                 edit_summary=summary,
             ))
+        if replacement_set:
+            replacements.extend(replacement_set)
 
     # Set the regular expression flags
     flags = re.UNICODE
