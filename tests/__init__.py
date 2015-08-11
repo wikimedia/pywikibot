@@ -94,6 +94,9 @@ script_test_modules = [
 
 disabled_test_modules = [
     'tests',  # tests of the tests package
+    # weblib is deprecated, the tests fail for weblib,
+    # but the tests are run in weblinkchecker_tests.
+    'weblib',
 ]
 if not i18n.messages_available():
     disabled_test_modules.append('l10n')

@@ -10,14 +10,17 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import sys
+
 if sys.version_info[0] > 2:
     from urllib.parse import urlencode
 else:
     from urllib import urlencode
 
 from pywikibot.comms import http
+from pywikibot.tools import deprecated
 
 
+@deprecated('memento_client package')
 def getInternetArchiveURL(url, timestamp=None):
     """Return archived URL by Internet Archive.
 
@@ -46,6 +49,7 @@ def getInternetArchiveURL(url, timestamp=None):
         return None
 
 
+@deprecated('memento_client package')
 def getWebCitationURL(url, timestamp=None):
     """Return archived URL by Web Citation.
 

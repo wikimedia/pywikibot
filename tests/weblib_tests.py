@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Weblib test module."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,11 +17,11 @@ else:
 
 import pywikibot.weblib as weblib
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, DeprecationTestCase
 from tests.utils import PatchedHttp
 
 
-class TestInternetArchive(TestCase):
+class TestInternetArchive(DeprecationTestCase):
 
     """Test weblib methods to access Internet Archive."""
 
@@ -36,11 +36,16 @@ class TestInternetArchive(TestCase):
         # original content if that does not match
         self.assertIn('closest', response.content)
 
-    def testInternetArchiveNewest(self):
-        """Test Internet Archive for newest https://google.com."""
+    def _get_archive_url(self, url, date_string=None):
         with PatchedHttp(weblib, False) as p:
             p.after_fetch = self._test_response
-            archivedversion = weblib.getInternetArchiveURL('https://google.com')
+            archivedversion = weblib.getInternetArchiveURL(url, date_string)
+            self.assertOneDeprecation()
+            return archivedversion
+
+    def testInternetArchiveNewest(self):
+        """Test Internet Archive for newest https://google.com."""
+        archivedversion = self._get_archive_url('https://google.com')
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
@@ -48,9 +53,7 @@ class TestInternetArchive(TestCase):
 
     def testInternetArchiveOlder(self):
         """Test Internet Archive for https://google.com as of June 2006."""
-        with PatchedHttp(weblib, False) as p:
-            p.after_fetch = self._test_response
-            archivedversion = weblib.getInternetArchiveURL('https://google.com', '200606')
+        archivedversion = self._get_archive_url('https://google.com', '20060601')
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
@@ -58,7 +61,7 @@ class TestInternetArchive(TestCase):
         self.assertIn('200606', parsed.path)
 
 
-class TestWebCite(TestCase):
+class TestWebCite(DeprecationTestCase):
 
     """Test weblib methods to access WebCite."""
 
@@ -68,10 +71,14 @@ class TestWebCite(TestCase):
         }
     }
 
-    @unittest.expectedFailure
+    def _get_archive_url(self, url, date_string=None):
+        archivedversion = weblib.getWebCitationURL(url, date_string)
+        self.assertOneDeprecation()
+        return archivedversion
+
     def testWebCiteOlder(self):
         """Test WebCite for https://google.com as of January 2013."""
-        archivedversion = weblib.getWebCitationURL('https://google.com', '20130101')
+        archivedversion = self._get_archive_url('https://google.com', '20130101')
         self.assertEqual(archivedversion, 'http://www.webcitation.org/6DHSeh2L0')
 
 
