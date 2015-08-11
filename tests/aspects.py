@@ -685,12 +685,21 @@ class MetaTestCaseClass(type):
         # Inherit superclass attributes
         for base in bases:
             for key in ('pwb', 'net', 'site', 'user', 'sysop', 'write',
-                        'sites', 'family', 'code', 'dry',
-                        'cached', 'cacheinfo', 'wikibase'):
+                        'sites', 'family', 'code', 'dry', 'hostname',
+                        'hostnames', 'cached', 'cacheinfo', 'wikibase'):
                 if hasattr(base, key) and key not in dct:
                     # print('%s has %s; copying to %s'
                     #       % (base.__name__, key, name))
                     dct[key] = getattr(base, key)
+
+        # Will be inserted into dct[sites] later
+        if 'hostname' in dct:
+            hostnames = [dct['hostname']]
+            del dct['hostname']
+        elif 'hostnames' in dct:
+            hostnames = dct['hostnames']
+        else:
+            hostnames = []
 
         if 'net' in dct and dct['net'] is False:
             dct['site'] = False
@@ -712,6 +721,13 @@ class MetaTestCaseClass(type):
                         'family': dct['family'],
                     }
                 }
+
+        if hostnames:
+            if 'sites' not in dct:
+                dct['sites'] = {}
+            for hostname in hostnames:
+                assert hostname not in dct['sites']
+                dct['sites'][hostname] = {'hostname': hostname}
 
         if 'dry' in dct and dct['dry'] is True:
             dct['net'] = False

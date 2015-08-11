@@ -344,8 +344,6 @@ class BinaryTestCase(TestCase):
 
     """Get binary file using requests and pywikibot."""
 
-    net = True
-
     hostname = 'upload.wikimedia.org'
     url = 'https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'
 

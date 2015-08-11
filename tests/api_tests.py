@@ -835,7 +835,6 @@ class TestLazyLoginBase(TestCase):
     it impossible to test two scenarios with the same APISite object.
     """
 
-    net = True
     hostname = 'steward.wikimedia.org'
 
     @classmethod
