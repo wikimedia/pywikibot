@@ -108,7 +108,6 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://glossary.reuters.com/index.php?title=$1')
         self.assertSite('http://www.livepedia.gr/index.php?title=$1')
         self.assertSite('http://guildwars.wikia.com/wiki/$1')
-        self.assertSite('http://www.gutenberg.org/wiki/$1')
         self.assertSite('http://www.hrwiki.org/index.php/$1')
         self.assertSite('http://wiki.rennkuckuck.de/index.php/$1')
         self.assertSite('http://www.proofwiki.org/wiki/$1')
@@ -122,7 +121,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://www.EcoReality.org/wiki/$1')
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
         self.assertSite('http://wikitree.org/index.php?title=$1')
-        self.assertEqual(self.pass_no, 16)
+        self.assertEqual(self.pass_no, 15)
         self.assertEqual(len(self.failures), 0)
         self.assertEqual(len(self.errors), 0)
 
