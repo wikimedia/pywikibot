@@ -1773,7 +1773,6 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     def testSiteinfo(self):
         """Test the siteinfo property."""
-        mysite = self.get_site()
         # general enteries
         mysite = self.get_site()
         self.assertIsInstance(mysite.siteinfo['timeoffset'], (int, float))
