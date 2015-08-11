@@ -48,6 +48,10 @@ script:
 
   - python pwb.py generate_family_file 'https://test.orain.org/' oraintest
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz
+  - if [[ $FAMILY == 'wpbeta' ]]; then
+      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'y' ;
+    fi
+
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
 
   - if [[ -n "$USER_PASSWORD" && -n "$PYWIKIBOT2_USERNAME" ]]; then
@@ -96,6 +100,10 @@ matrix:
   include:
     - python: '2.7_with_system_site_packages'  # equivalent to virtualenv: system_site_packages: true
       env: LANGUAGE=he FAMILY=wikivoyage SITE_ONLY=1
+    - python: '2.7'
+      env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1
+    - python: '3.4'
+      env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1
     - python: '3.3'

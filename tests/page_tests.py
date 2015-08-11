@@ -459,6 +459,8 @@ class TestPageObject(DefaultSiteTestCase):
                 break
 
     def testLinks(self):
+        if self.site.family.name == 'wpbeta':
+            raise unittest.SkipTest('Test fails on betawiki; T69931')
         mainpage = self.get_mainpage()
         for p in mainpage.linkedPages():
             self.assertIsInstance(p, pywikibot.Page)
