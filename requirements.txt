@@ -86,3 +86,6 @@ beautifulsoup4
 
 # scripts/states_redirect.py
 pycountry
+
+# scripts/weblinkchecker.py
+git+https://github.com/mementoweb/py-memento-client#egg=memento_client-0.5.0

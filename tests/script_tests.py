@@ -33,6 +33,7 @@ script_deps = {
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwlib'],
+    'weblinkchecker.py': ['memento_client'],
 }
 
 if sys.version_info < (2, 7):

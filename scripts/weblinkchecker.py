@@ -91,7 +91,7 @@ Syntax examples:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2014
+# (C) Pywikibot team, 2005-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -101,11 +101,19 @@ __version__ = '$Id$'
 
 import re
 import codecs
+import datetime
 import pickle
 import socket
 import threading
 import time
 import sys
+
+from warnings import warn
+
+try:
+    import memento_client
+except ImportError as e:
+    memento_client = e
 
 import pywikibot
 from pywikibot import i18n, config, pagegenerators, textlib, xmlreader, weblib
@@ -155,6 +163,34 @@ ignorelist = [
     # bot rejected on the site:
     re.compile(r'.*[\./@]quickfacts\.census\.gov(/.*)?'),
 ]
+
+
+def _get_closest_memento_url(url, when=None, timegate_uri=None):
+    """Get most recent memento for url."""
+    if isinstance(memento_client, ImportError):
+        raise memento_client
+
+    if not when:
+        when = datetime.datetime.now()
+
+    mc = memento_client.MementoClient()
+    if timegate_uri:
+        mc.timegate_uri = timegate_uri
+
+    memento_info = mc.get_memento_info(url, when)
+    return memento_info.get('mementos').get('closest').get('uri')[0]
+
+
+def get_archive_url(url):
+    """Get archive URL."""
+    try:
+        return _get_closest_memento_url(
+            url,
+            timegate_uri='http://web.archive.org/web/')
+    except Exception:
+        return _get_closest_memento_url(
+            url,
+            timegate_uri='http://timetravel.mementoweb.org/webcite/timegate/')
 
 
 def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
@@ -633,7 +669,15 @@ class History:
             # We'll list it in a file so that it can be removed manually.
             if timeSinceFirstFound > 60 * 60 * 24 * day:
                 # search for archived page
-                archiveURL = weblib.getInternetArchiveURL(url)
+                try:
+                    archiveURL = get_archive_url(url)
+                except Exception as e:
+                    pywikibot.warning(
+                        'get_closest_memento_url({0}) failed: {1}'.format(
+                            url, e))
+                    archiveURL = None
+                if archiveURL is None:
+                    archiveURL = weblib.getInternetArchiveURL(url)
                 if archiveURL is None:
                     archiveURL = weblib.getWebCitationURL(url)
                 self.log(url, error, page, archiveURL)
@@ -862,6 +906,9 @@ def main(*args):
     xmlFilename = None
     HTTPignore = []
     day = 7
+
+    if isinstance(memento_client, ImportError):
+        warn('memento_client not imported: %s' % memento_client, ImportWarning)
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
