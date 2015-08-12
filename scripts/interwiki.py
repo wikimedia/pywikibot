@@ -2588,7 +2588,6 @@ def main(*args):
             hintlessPageGen = pagegenerators.CombinedPageGenerator(
                 [hintlessPageGen, gen2])
 
-    site.login()
     bot = InterwikiBot()
 
     if not hintlessPageGen:
