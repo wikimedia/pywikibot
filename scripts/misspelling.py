@@ -33,7 +33,11 @@ __version__ = '$Id$'
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
+from pywikibot.tools import PY2
 from solve_disambiguation import DisambiguationRobot
+
+if not PY2:
+    basestring = (str, )
 
 HELP_MSG = """\n
 mispelling.py does not support site {site}.
@@ -50,14 +54,15 @@ class MisspellingRobot(DisambiguationRobot):
     """Spelling bot."""
 
     misspellingTemplate = {
-        'de': u'Falschschreibung',
+        'de': ('Falschschreibung', 'Obsolete Schreibung'),
     }
 
     # Optional: if there is a category, one can use the -start
     # parameter.
     misspellingCategory = {
         'da': u'Omdirigeringer af fejlstavninger',  # only contains date redirects at the moment
-        'de': u'Kategorie:Wikipedia:Falschschreibung',
+        'de': ('Kategorie:Wikipedia:Falschschreibung',
+               'Kategorie:Wikipedia:Obsolete Schreibung'),
         'en': u'Redirects from misspellings',
         'hu': u'Átirányítások hibás névről',
         'nl': u'Categorie:Wikipedia:Redirect voor spelfout',
@@ -77,18 +82,23 @@ class MisspellingRobot(DisambiguationRobot):
         """
         mylang = self.site.code
         if mylang in self.misspellingCategory:
-            misspellingCategoryTitle = self.misspellingCategory[mylang]
-            misspellingCategory = pywikibot.Category(self.site,
-                                                     misspellingCategoryTitle)
-            generator = pagegenerators.CategorizedPageGenerator(
-                misspellingCategory, recurse=True, start=firstPageTitle)
+            categories = self.misspellingCategory[mylang]
+            if isinstance(categories, basestring):
+                categories = (categories, )
+            generators = (
+                pagegenerators.CategorizedPageGenerator(
+                    pywikibot.Category(self.site, misspellingCategoryTitle),
+                    recurse=True, start=firstPageTitle)
+                for misspellingCategoryTitle in categories)
         elif mylang in self.misspellingTemplate:
-            misspellingTemplateName = ('Template:%s'
-                                       % self.misspellingTemplate[mylang])
-            misspellingTemplate = pywikibot.Page(self.site,
-                                                 misspellingTemplateName)
-            generator = pagegenerators.ReferringPageGenerator(
-                misspellingTemplate, onlyTemplateInclusion=True)
+            templates = self.misspellingTemplate[mylang]
+            if isinstance(templates, basestring):
+                templates = (templates, )
+            generators = (
+                pagegenerators.ReferringPageGenerator(
+                    pywikibot.Page(self.site, misspellingTemplateName, ns=10),
+                    onlyTemplateInclusion=True)
+                for misspellingTemplateName in templates)
             if firstPageTitle:
                 pywikibot.output(
                     u'-start parameter unsupported on this wiki because there '
@@ -98,7 +108,7 @@ class MisspellingRobot(DisambiguationRobot):
 
             empty_gen = (i for i in [])
             return empty_gen
-
+        generator = pagegenerators.CombinedPageGenerator(generators)
         preloadingGen = pagegenerators.PreloadingGenerator(generator)
         return preloadingGen
 
