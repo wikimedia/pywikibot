@@ -46,7 +46,7 @@ script:
 
   - mkdir ~/.pywikibot
 
-  - python pwb.py generate_family_file 'https://test.orain.org/' oraintest
+  - if [[ "$FAMILY" == 'oraintest' ]]; then python pwb.py generate_family_file 'https://test.orain.org/' oraintest ; fi
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz
   - if [[ $FAMILY == 'wpbeta' ]]; then
       python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'y' ;
