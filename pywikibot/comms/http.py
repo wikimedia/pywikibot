@@ -241,6 +241,29 @@ def request(site=None, uri=None, method='GET', body=None, headers=None,
     return r.content
 
 
+def get_authentication(uri):
+    """
+    Retrieve authentication token.
+
+    @param uri: the URI to access
+    @type uri: str
+    @return: authentication token
+    @rtype: None or tuple of two str
+    """
+    parsed_uri = requests.utils.urlparse(uri)
+    netloc_parts = parsed_uri.netloc.split('.')
+    netlocs = [parsed_uri.netloc] + ['.'.join(['*'] + netloc_parts[i + 1:])
+                                     for i in range(len(netloc_parts))]
+    for path in netlocs:
+        if path in config.authenticate:
+            if len(config.authenticate[path]) == 2:
+                return config.authenticate[path]
+            else:
+                warn('Invalid authentication tokens for %s '
+                     'set in `config.authenticate`' % path)
+    return None
+
+
 def _http_process(session, http_request):
     method = http_request.method
     uri = http_request.uri
@@ -248,7 +271,7 @@ def _http_process(session, http_request):
     headers = http_request.headers
     if PY2 and headers:
         headers = dict((key, str(value)) for key, value in headers.items())
-    auth = config.authenticate.get(requests.utils.urlparse(uri).netloc, None)
+    auth = get_authentication(uri)
     timeout = config.socket_timeout
     try:
         response = session.request(method, uri, data=body, headers=headers,
