@@ -1813,10 +1813,8 @@ class APISite(BaseSite):
             return
         # check whether a login cookie already exists for this user
         self._loginstatus = LoginStatus.IN_PROGRESS
-        if hasattr(self, "_userinfo"):
-            del self._userinfo
         try:
-            self.getuserinfo()
+            self.getuserinfo(force=True)
             if self.userinfo['name'] == self._username[sysop] and \
                self.logged_in(sysop):
                 return
@@ -1826,9 +1824,7 @@ class APISite(BaseSite):
                                     user=self._username[sysop])
         if loginMan.login(retry=True):
             self._username[sysop] = loginMan.username
-            if hasattr(self, "_userinfo"):
-                del self._userinfo
-            self.getuserinfo()
+            self.getuserinfo(force=True)
             self._loginstatus = (LoginStatus.AS_SYSOP
                                  if sysop else LoginStatus.AS_USER)
         else:
@@ -1846,11 +1842,9 @@ class APISite(BaseSite):
         uirequest = self._simple_request(action='logout')
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
-        if hasattr(self, "_userinfo"):
-            del self._userinfo
-        self.getuserinfo()
+        self.getuserinfo(force=True)
 
-    def getuserinfo(self):
+    def getuserinfo(self, force=False):
         """Retrieve userinfo from site and store in _userinfo attribute.
 
         self._userinfo will be a dict with the following keys and values:
@@ -1863,8 +1857,10 @@ class APISite(BaseSite):
           - message: present if user has a new message on talk page
           - blockinfo: present if user is blocked (dict)
 
+        @param force: force to retrieve userinfo ignoring cache
+        @type force: bool
         """
-        if (not hasattr(self, '_userinfo') or
+        if (not hasattr(self, '_userinfo') or force or
                 'rights' not in self._userinfo or
                 self._userinfo['name'] != self._username['sysop' in self._userinfo['groups']]):
             uirequest = self._simple_request(
