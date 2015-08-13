@@ -397,11 +397,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
                                             filterRedirects=False))
         self.assertEqual(filtered & redirs, set([]))
         self.assertEqual(indirect & redirs, set([]))
-        self.assertTrue(filtered.issubset(indirect))
-        self.assertTrue(filtered.issubset(backlinks))
-        self.assertTrue(redirs.issubset(backlinks))
-        self.assertTrue(backlinks.issubset(
-                        set(mysite.pagebacklinks(mainpage, namespaces=[0, 2]))))
+        self.assertLessEqual(filtered, indirect)
+        self.assertLessEqual(filtered, backlinks)
+        self.assertLessEqual(redirs, backlinks)
+        self.assertLessEqual(
+            backlinks,
+            set(self.site.pagebacklinks(mainpage, namespaces=[0, 2])))
 
         # pagereferences includes both backlinks and embeddedin
         embedded = set(mysite.page_embeddedin(mainpage, namespaces=[0]))
