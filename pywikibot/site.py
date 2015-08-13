@@ -5836,16 +5836,19 @@ class APISite(BaseSite):
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    def load_topic(self, page):
+    def load_topic(self, page, format):
         """Retrieve the data for a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
+        @param format: The content format to request the data in.
+        @type format: str (either 'wikitext', 'html', or 'fixed-html')
         @return: A dict representing the topic's data.
         @rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
-                                   submodule='view-topic')
+                                   submodule='view-topic',
+                                   vtformat=format)
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
 
@@ -5867,6 +5870,30 @@ class APISite(BaseSite):
                                    vpformat=format)
         data = req.submit()
         return data['flow']['view-post']['result']['topic']
+
+    @must_be('user')
+    @need_extension('Flow')
+    def reply_to_post(self, page, reply_to_uuid, content, format):
+        """Reply to a post on a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param reply_to_uuid: The UUID of the Post to create a reply to
+        @type reply_to_uuid: unicode
+        @param content: The content of the reply
+        @type content: unicode
+        @param format: The content format used for the supplied content
+        @type format: unicode (either 'wikitext' or 'html')
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        token = self.tokens['csrf']
+        params = {'action': 'flow', 'page': page, 'token': token,
+                  'submodule': 'reply', 'repreplyTo': reply_to_uuid,
+                  'repcontent': content, 'repformat': format}
+        req = self._request(parameters=params, use_get=False)
+        data = req.submit()
+        return data['flow']['reply']['committed']['topic']
 
     def watched_pages(self, sysop=False, force=False, step=None, total=None):
         """
