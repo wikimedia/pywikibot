@@ -146,16 +146,16 @@ class TestLink(DefaultDrySiteTestCase):
         # Subpage
         p = Page(self.get_site(), 'Foo')
         l = Link('/bar', p)
-        self.assertEquals(l.title, 'Foo/bar')
-        self.assertEquals(l.site, self.get_site())
+        self.assertEqual(l.title, 'Foo/bar')
+        self.assertEqual(l.site, self.get_site())
         # Subpage of Page with section
         p = Page(self.get_site(), 'Foo#Baz')
         l = Link('/bar', p)
-        self.assertEquals(l.title, 'Foo/bar')
-        self.assertEquals(l.site, self.get_site())
+        self.assertEqual(l.title, 'Foo/bar')
+        self.assertEqual(l.site, self.get_site())
         # Non-subpage link text beginning with slash
         l = Link('/bar', self.get_site())
-        self.assertEquals(l.title, '/bar')
+        self.assertEqual(l.title, '/bar')
 
 
 class Issue10254TestCase(DefaultDrySiteTestCase):
