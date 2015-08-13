@@ -30,27 +30,45 @@ class TestWikiSiteDetection(TestCase):
         """Set up test."""
         self.failures = {}
         self.errors = {}
-        self.pass_no = 0
-        self.total = 0
+        self.passes = {}
+        self.all = []
         super(TestWikiSiteDetection, self).setUp()
 
     def tearDown(self):
         """Tear Down test."""
+        def norm(url):
+            res = None
+            typ = -1
+            for pos, result in enumerate([self.passes, self.errors,
+                                          self.failures]):
+                if url in result:
+                    assert res is None
+                    res = result[url]
+                    typ = pos
+            if res is None:
+                typ += 1
+                res = 'Missing'
+            assert 0 <= pos < len(PREFIXES)
+            return typ, url, res
+
         super(TestWikiSiteDetection, self).tearDown()
         print('Out of %d sites, %d tests passed, %d tests failed '
               'and %d tests raised an error'
-              % (self.total, self.pass_no, len(self.failures), len(self.errors)
+              % (len(self.all), len(self.passes), len(self.failures), len(self.errors)
                  )
               )
-        if self.failures or self.errors:
-            print('Failures:\n' + '\n'.join('%s : %s'
-                  % (key, value) for (key, value) in self.failures.items()))
-            print('Errors:\n' + '\n'.join('%s : %s'
-                  % (key, value) for (key, value) in self.errors.items()))
+
+        PREFIXES = ['PASS', 'ERR ', 'FAIL', 'MISS']
+
+        sorted_all = sorted((norm(url) for url in self.all),
+                            key=lambda item: item[0])
+        print('Results:\n' + '\n'.join(
+            '{0} {1} : {2}'.format(PREFIXES[i[0]], i[1], i[2])
+            for i in sorted_all))
 
     def _wiki_detection(self, url, result):
         """Perform one load test."""
-        self.total += 1
+        self.all += [url]
         try:
             site = MWSite(url)
         except Exception as e:
@@ -62,7 +80,7 @@ class TestWikiSiteDetection(TestCase):
                 self.assertIsNone(site)
             else:
                 self.assertIsInstance(site, result)
-            self.pass_no += 1
+            self.passes[url] = result
         except AssertionError as error:
             self.failures[url] = error
 
@@ -79,8 +97,8 @@ class TestWikiSiteDetection(TestCase):
         data = self.get_site().siteinfo['interwikimap']
         for item in data:
             if 'local' not in item:
-                self.total += 1
                 url = item['url']
+                self.all += [url]
                 try:
                     site = MWSite(url)
                 except Exception as error:
@@ -97,7 +115,7 @@ class TestWikiSiteDetection(TestCase):
                         try:
                             self.assertIsInstance(version, basestring)
                             self.assertRegex(version, r'^\d\.\d+.*')
-                            self.pass_no += 1
+                            self.passes[url] = site
                         except AssertionError as error:
                             print('failed to parse version of ' + url)
                             self.failures[url] = error
@@ -109,7 +127,6 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://www.livepedia.gr/index.php?title=$1')
         self.assertSite('http://guildwars.wikia.com/wiki/$1')
         self.assertSite('http://www.hrwiki.org/index.php/$1')
-        self.assertSite('http://wiki.rennkuckuck.de/index.php/$1')
         self.assertSite('http://www.proofwiki.org/wiki/$1')
         self.assertSite(
             'http://www.ck-wissen.de/ckwiki/index.php?title=$1')
@@ -119,7 +136,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://www.EcoReality.org/wiki/$1')
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
         self.assertSite('http://wikitree.org/index.php?title=$1')
-        self.assertEqual(self.pass_no, 13)
+        self.assertEqual(len(self.passes), 13)
         self.assertEqual(len(self.failures), 0)
         self.assertEqual(len(self.errors), 0)
 
