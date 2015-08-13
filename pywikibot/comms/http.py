@@ -43,7 +43,7 @@ from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
 )
 from pywikibot.comms import threadedhttp
-from pywikibot.tools import deprecate_arg, PY2
+from pywikibot.tools import deprecate_arg, issue_deprecation_warning, PY2
 import pywikibot.version
 
 # The error message for failed SSL certificate verification
@@ -219,8 +219,9 @@ def request(site=None, uri=None, method='GET', body=None, headers=None,
     """
     assert(site or uri)
     if not site:
-        warn('Invoking http.request without argument site is deprecated. '
-             'Use http.fetch.', DeprecationWarning, 2)
+        # +1 because of @deprecate_arg
+        issue_deprecation_warning(
+            'Invoking http.request without argument site', 'http.fetch()', 3)
         r = fetch(uri, method, body, headers, **kwargs)
         return r.content
 

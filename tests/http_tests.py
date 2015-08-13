@@ -20,7 +20,7 @@ from pywikibot import config2 as config
 from pywikibot.comms import http, threadedhttp
 
 from tests import _images_dir
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, DeprecationTestCase
 from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
@@ -34,9 +34,6 @@ class HttpTestCase(TestCase):
     sites = {
         'www-wp': {
             'hostname': 'www.wikipedia.org',
-        },
-        'www-wq': {
-            'hostname': 'www.wikiquote.org',
         },
     }
 
@@ -58,17 +55,35 @@ class HttpTestCase(TestCase):
         self.assertIsInstance(r.content, unicode)
         self.assertIsInstance(r.raw, bytes)
 
+
+class HttpRequestURI(DeprecationTestCase):
+
+    """Tests using http.request without a site."""
+
+    sites = {
+        'www-wp': {
+            'hostname': 'www.wikipedia.org',
+        },
+        'www-wq': {
+            'hostname': 'www.wikiquote.org',
+        },
+    }
+
     def test_http(self):
         """Test http.request using http://www.wikipedia.org/."""
         r = http.request(site=None, uri='http://www.wikipedia.org/')
         self.assertIsInstance(r, unicode)
         self.assertIn('<html lang="mul"', r)
+        self.assertOneDeprecationParts(
+            'Invoking http.request without argument site', 'http.fetch()')
 
     def test_https(self):
         """Test http.request using https://www.wikiquote.org/."""
         r = http.request(site=None, uri='https://www.wikiquote.org/')
         self.assertIsInstance(r, unicode)
         self.assertIn('<html lang="mul"', r)
+        self.assertOneDeprecationParts(
+            'Invoking http.request without argument site', 'http.fetch()')
 
 
 class HttpsCertificateTestCase(TestCase):
