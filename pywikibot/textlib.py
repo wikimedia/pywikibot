@@ -962,8 +962,9 @@ def interwikiSort(sites, insite=None):
     if putfirst:
         # In this case I might have to change the order
         firstsites = []
+        validlanglinks = insite.validLanguageLinks()
         for code in putfirst:
-            if code in insite.validLanguageLinks():
+            if code in validlanglinks:
                 site = insite.getSite(code=code)
                 if site in sites:
                     del sites[sites.index(site)]
