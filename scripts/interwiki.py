@@ -359,7 +359,7 @@ import socket
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
-from pywikibot.bot import IntegerOption, StandardOption
+from pywikibot.bot import ListOption, StandardOption
 from pywikibot.tools import first_upper
 
 if sys.version_info[0] > 2:
@@ -1575,13 +1575,13 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 # TODO: allow answer to repeat previous or go back after a mistake
                 answer = pywikibot.input_choice(
                     'Which variant should be used?',
-                    (IntegerOption(maximum=len(pages) + 1),
+                    (ListOption(pages),
                      StandardOption('none', 'n'),
                      StandardOption('give up', 'g')))
                 if answer == 'g':
                     return None
                 elif answer != 'n':
-                    result[site] = pages[answer[1] - 1]
+                    result[site] = answer[1]
 
         # Loop over the ones that have one solution, so are in principle
         # not a problem.
