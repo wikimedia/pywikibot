@@ -814,6 +814,17 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertNotIn(page.protection()['edit'][0], invalid_levels)
         self.assertLessEqual(len(pages), 10)
 
+    def test_unconnected(self):
+        """Test that the ItemPage returned raises NoPage."""
+        if not self.site.data_repository():
+            raise unittest.SkipTest('Site is not using a Wikibase repository')
+        cnt = 0
+        for page in self.site.unconnected_pages(total=5):
+            self.assertRaises(pywikibot.NoPage, pywikibot.ItemPage.fromPage,
+                              page)
+            cnt += 1
+        self.assertLessEqual(cnt, 5)
+
 
 class TestImageUsage(DefaultSiteTestCase):
 
