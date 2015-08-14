@@ -14,14 +14,25 @@ __version__ = '$Id$'
 import codecs
 import os
 import stat
+import webbrowser
 
 from warnings import warn
+
+try:
+    import mwoauth
+except ImportError as e:
+    mwoauth = e
 
 import pywikibot
 
 from pywikibot import config
 from pywikibot.tools import deprecated_args, normalize_username
 from pywikibot.exceptions import NoUsername
+
+
+class OAuthImpossible(ImportError):
+
+    """OAuth authentication is not possible on your system."""
 
 
 class _PasswordFileWarning(UserWarning):
@@ -296,3 +307,119 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
     def showCaptchaWindow(self, url):
         """Open a window to show the captcha for the given URL."""
         pass
+
+
+class OauthLoginManager(LoginManager):
+
+    """Site login manager using OAuth."""
+
+    # NOTE: Currently OauthLoginManager use mwoauth directly to complete OAuth
+    # authentication process
+
+    def __init__(self, password=None, sysop=False, site=None, user=None):
+        """
+        Constructor.
+
+        All parameters default to defaults in user-config.
+
+        @param site: Site object to log into
+        @type site: BaseSite
+        @param user: consumer key
+        @type user: basestring
+        @param password: consumer secret
+        @type password: basestring
+        @param sysop: login as sysop account.
+            The sysop username is loaded from config.sysopnames.
+        @type sysop: bool
+
+        @raises NoUsername: No username is configured for the requested site.
+        @raise OAuthImpossible: mwoauth isn't installed
+        """
+        if isinstance(mwoauth, ImportError):
+            raise OAuthImpossible('mwoauth is not installed: %s.' % mwoauth)
+        assert password is not None and user is not None
+        assert sysop is False
+        super(OauthLoginManager, self).__init__(None, False, site, None)
+        if self.password:
+            pywikibot.warn('Password exists in password file for %s:%s.'
+                           'Password is unnecessary and should be removed '
+                           'when OAuth enabled.' % (self.site, self.username))
+        self._consumer_token = (user, password)
+        self._access_token = None
+
+    def login(self, retry=False, force=False):
+        """
+        Attempt to log into the server.
+
+        @param retry: infinitely retry if exception occurs during authentication.
+        @type retry: bool
+        @param force: force to re-authenticate
+        @type force: bool
+        """
+        if self.access_token is None or force:
+            pywikibot.output('Logging in to %(site)s via OAuth consumer %(key)s'
+                             % {'key': self.consumer_token[0],
+                                'site': self.site})
+            consumer_token = mwoauth.ConsumerToken(self.consumer_token[0],
+                                                   self.consumer_token[1])
+            handshaker = mwoauth.Handshaker(
+                self.site.base_url(self.site.path()), consumer_token)
+            try:
+                redirect, request_token = handshaker.initiate()
+                pywikibot.stdout('Authenticate via web browser..')
+                webbrowser.open(redirect)
+                pywikibot.stdout('If your web browser does not open '
+                                 'automatically, please point it to: %s'
+                                 % redirect)
+                request_qs = pywikibot.input('Response query string: ')
+                access_token = handshaker.complete(request_token,
+                                                   request_qs)
+                self._access_token = (access_token.key, access_token.secret)
+            except Exception as e:
+                pywikibot.error(e)
+                if retry:
+                    self.login(retry=True, force=force)
+        else:
+            pywikibot.output('Logged in to %(site)s via consumer %(key)s'
+                             % {'key': self.consumer_token[0],
+                                'site': self.site})
+
+    @property
+    def consumer_token(self):
+        """
+        OAuth consumer key token and secret token.
+
+        @rtype: tuple of two str
+        """
+        return self._consumer_token
+
+    @property
+    def access_token(self):
+        """
+        OAuth access key token and secret token.
+
+        @rtype: tuple of two str
+        """
+        return self._access_token
+
+    @property
+    def identity(self):
+        """
+        Get identifying information about a user via an authorized token.
+
+        @rtype: None or dict
+        """
+        if self.access_token is None:
+            pywikibot.error('Access token not set')
+            return None
+        consumer_token = mwoauth.ConsumerToken(self.consumer_token[0],
+                                               self.consumer_token[1])
+        access_token = mwoauth.AccessToken(self.access_token[0],
+                                           self.access_token[1])
+        try:
+            identity = mwoauth.identify(self.site.base_url(self.site.path()),
+                                        consumer_token, access_token)
+            return identity
+        except Exception as e:
+            pywikibot.error(e)
+            return None

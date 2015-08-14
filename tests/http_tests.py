@@ -97,9 +97,9 @@ class TestGetAuthenticationConfig(TestCase):
         self._authenticate = config.authenticate
         config.authenticate = {
             'zh.wikipedia.beta.wmflabs.org': ('1', '2'),
-            '*.wikipedia.beta.wmflabs.org': ('3', '4'),
+            '*.wikipedia.beta.wmflabs.org': ('3', '4', '3', '4'),
             '*.beta.wmflabs.org': ('5', '6'),
-            '*.wmflabs.org': ('7', '8'),
+            '*.wmflabs.org': ('7', '8', '8'),
         }
 
     def tearDown(self):
@@ -110,9 +110,9 @@ class TestGetAuthenticationConfig(TestCase):
         """Test url-based authentication info."""
         pairs = {
             'https://zh.wikipedia.beta.wmflabs.org': ('1', '2'),
-            'https://en.wikipedia.beta.wmflabs.org': ('3', '4'),
+            'https://en.wikipedia.beta.wmflabs.org': ('3', '4', '3', '4'),
             'https://wiki.beta.wmflabs.org': ('5', '6'),
-            'https://beta.wmflabs.org': ('7', '8'),
+            'https://beta.wmflabs.org': None,
             'https://wmflabs.org': None,
             'https://www.wikiquote.org/': None,
         }

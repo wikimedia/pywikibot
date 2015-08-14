@@ -42,7 +42,9 @@ before_script:
   - pip install -r dev-requirements.txt
 
 script:
-  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then pip install requests ; fi
+  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then
+      pip install requests mwoauth ;
+    fi
 
   - mkdir ~/.pywikibot
 
@@ -64,6 +66,15 @@ script:
       echo "password_file = os.path.expanduser('~/.pywikibot/passwordfile')" >> ~/.pywikibot/user-config.py ;
     fi
 
+  - if [[ -n "$OAUTH_DOMAIN" ]]; then
+      if [[ -n "$OAUTH_PYWIKIBOT2_USERNAME" ]]; then
+        printf "usernames['${FAMILY}']['${LANGUAGE}'] = '%q'\n" "$OAUTH_PYWIKIBOT2_USERNAME" >> ~/.pywikibot/user-config.py ;
+      fi ;
+      oauth_token_var="OAUTH_TOKENS_${FAMILY^^}_${LANGUAGE^^}" ;
+      if [[ -n "${!oauth_token_var}" ]]; then
+        printf "authenticate['${OAUTH_DOMAIN}'] = ('%s')\n" "${!oauth_token_var//:/', '}" >> ~/.pywikibot/user-config.py ;
+      fi ;
+    fi
   - echo "authenticate['wiki.musicbrainz.org'] = ('NOTSPAM', 'NOTSPAM')" >> ~/.pywikibot/user-config.py ;
 
   - echo "max_retries = 2" >> ~/.pywikibot/user-config.py
@@ -103,13 +114,15 @@ matrix:
     - python: '2.7'
       env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1
     - python: '3.4'
-      env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1
+      env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1
     - python: '3.3'
-      env: LANGUAGE=en FAMILY=oraintest SITE_ONLY=1
+      env: LANGUAGE=en FAMILY=oraintest SITE_ONLY=1 OAUTH_DOMAIN="test.orain.org"
     - python: '3.3'
       env: LANGUAGE=en FAMILY=musicbrainz SITE_ONLY=1
+    - python: '3.4'
+      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
     - python: '3.4'
       env: LANGUAGE=test FAMILY=wikidata SITE_ONLY=1
     - python: '3.4'

@@ -162,6 +162,18 @@ solve_captcha = True
 #    Pywikibot supports wildcard (*) in the prefix of hostname and select the
 #    best match authentication. So you can specify authentication not only for
 #    one site
+#
+# Pywikibot also support OAuth 1.0a via mwoauth
+# https://pypi.python.org/pypi/mwoauth
+#
+# You can add OAuth tokens to your user-config.py of the following form:
+#
+# authenticate['en.wikipedia.org'] = ('consumer_key','consumer_secret',
+#                                     'access_key', 'access_secret')
+# authenticate['*.wikipedia.org'] = ('consumer_key','consumer_secret',
+#                                    'access_key', 'access_secret')
+#
+# Note: the target wiki site must install OAuth extension
 authenticate = {}
 
 #

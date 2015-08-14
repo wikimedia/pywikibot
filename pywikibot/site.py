@@ -38,6 +38,7 @@ from pywikibot.tools import (
     manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
     merge_unique_dicts,
 )
+from pywikibot.comms.http import get_authentication
 from pywikibot.tools.ip import is_IP
 from pywikibot.throttle import Throttle
 from pywikibot.data import api
@@ -1789,6 +1790,15 @@ class APISite(BaseSite):
         """
         return self.logged_in(sysop) and self.user()
 
+    def is_oauth_token_available(self):
+        """
+        Check whether OAuth token is set for this site.
+
+        @rtype: bool
+        """
+        auth_token = get_authentication(self.base_url(''))
+        return auth_token is not None and len(auth_token) == 4
+
     def login(self, sysop=False):
         """Log the user in if not already logged in."""
         # TODO: this should include an assert that loginstatus
@@ -1812,6 +1822,7 @@ class APISite(BaseSite):
                                  if sysop else LoginStatus.AS_USER)
             return
         # check whether a login cookie already exists for this user
+        # or check user identity when OAuth enabled
         self._loginstatus = LoginStatus.IN_PROGRESS
         try:
             self.getuserinfo(force=True)
@@ -1820,6 +1831,17 @@ class APISite(BaseSite):
                 return
         except api.APIError:  # May occur if you are not logged in (no API read permissions).
             pass
+        if self.is_oauth_token_available():
+            if sysop:
+                raise NoUsername('No sysop is permitted with OAuth')
+            elif self.userinfo['name'] != self._username[sysop]:
+                raise NoUsername('Logged in on %(site)s via OAuth as %(wrong)s, '
+                                 'but expect as %(right)s'
+                                 % {'site': self,
+                                    'wrong': self.userinfo['name'],
+                                    'right': self._username[sysop]})
+            else:
+                raise NoUsername('Logging in on %s via OAuth failed' % self)
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
         if loginMan.login(retry=True):
@@ -1838,7 +1860,11 @@ class APISite(BaseSite):
         """Logout of the site and load details for the logged out user.
 
         Also logs out of the global account if linked to the user.
+
+        @raise APIError: Logout is not available when OAuth enabled.
         """
+        if self.is_oauth_token_available():
+            pywikibot.warning('Using OAuth suppresses logout function')
         uirequest = self._simple_request(action='logout')
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN

@@ -35,6 +35,11 @@ Parameters:
 
    -sysop       Log in with your sysop account.
 
+   -oauth       Generate OAuth authentication information.
+                NOTE: Need to copy OAuth tokens to your user-config.py
+                manually. -logout, -pass, -force, -pass:XXXX and -sysop are not
+                compatible with -oauth.
+
 If not given as parameter, the script will ask for your username and
 password (password entry will be hidden), log in to your home wiki using
 this combination, and store the resulting cookies (containing your password
@@ -60,7 +65,45 @@ __version__ = '$Id$'
 import pywikibot
 from os.path import join
 from pywikibot import config
+from pywikibot.login import OauthLoginManager
 from pywikibot.exceptions import SiteDefinitionError
+
+
+def _get_consumer_token(site):
+    key_msg = 'OAuth consumer key on {0}:{1}'.format(site.code, site.family)
+    key = pywikibot.input(key_msg)
+    secret_msg = 'OAuth consumer secret for consumer {0}'.format(key)
+    secret = pywikibot.input(secret_msg, password=True)
+    return key, secret
+
+
+def _oauth_login(site):
+    consumer_key, consumer_secret = _get_consumer_token(site)
+    login_manager = OauthLoginManager(consumer_secret, False, site,
+                                      consumer_key)
+    login_manager.login()
+    identity = login_manager.identity
+    if identity is None:
+        pywikibot.error('Invalid OAuth info for %(site)s.' %
+                        {'site': site})
+    elif site.username() != identity['username']:
+        pywikibot.error('Logged in on %(site)s via OAuth as %(wrong)s, '
+                        'but expect as %(right)s'
+                        % {'site': site,
+                           'wrong': identity['username'],
+                           'right': site.username()})
+    else:
+        oauth_token = login_manager.consumer_token + login_manager.access_token
+        pywikibot.output('Logged in on %(site)s as %(username)s'
+                         'via OAuth consumer %(consumer)s'
+                         % {'site': site,
+                            'username': site.username(sysop=False),
+                            'consumer': consumer_key})
+        pywikibot.output('NOTE: To use OAuth, you need to copy the '
+                         'following line to your user-config.py:')
+        pywikibot.output('authenticate[\'%(hostname)s\'] = %(oauth_token)s' %
+                         {'hostname': site.hostname(),
+                          'oauth_token': oauth_token})
 
 
 def main(*args):
@@ -76,6 +119,7 @@ def main(*args):
     sysop = False
     logall = False
     logout = False
+    oauth = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
         if arg.startswith("-pass"):
@@ -95,6 +139,8 @@ def main(*args):
                              join(config.base_dir, 'pywikibot.lwp'))
         elif arg == "-logout":
             logout = True
+        elif arg == '-oauth':
+            oauth = True
         else:
             unknown_args += [arg]
 
@@ -103,7 +149,7 @@ def main(*args):
         return False
 
     if logall:
-        if sysop:
+        if sysop and not oauth:
             namedict = config.sysopnames
         else:
             namedict = config.usernames
@@ -114,6 +160,9 @@ def main(*args):
         for lang in namedict[familyName]:
             try:
                 site = pywikibot.Site(code=lang, fam=familyName)
+                if oauth:
+                    _oauth_login(site)
+                    continue
                 if logout:
                     site.logout()
                 else:
