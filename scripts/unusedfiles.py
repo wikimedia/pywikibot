@@ -34,12 +34,10 @@ comment = {
 }
 
 template_to_the_image = {
-    'en': u'{{subst:No-use2}}',
     'it': u'{{immagine orfana}}',
     'fa': u'{{تصاویر بدون استفاده}}',
 }
 template_to_the_user = {
-    'en': u'\n\n{{img-sem-uso|%(title)s}}',
     'fa': u'\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
     'it': u'\n\n{{Utente:Filbot/Immagine orfana}}',
 }
