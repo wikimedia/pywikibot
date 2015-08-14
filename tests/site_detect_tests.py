@@ -136,7 +136,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://www.EcoReality.org/wiki/$1')
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
         self.assertSite('http://wikitree.org/index.php?title=$1')
-        self.assertEqual(len(self.passes), 13)
+        self.assertEqual(len(self.passes), 12)
         self.assertEqual(len(self.failures), 0)
         self.assertEqual(len(self.errors), 0)
 
