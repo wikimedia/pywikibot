@@ -1007,12 +1007,13 @@ for _key in _modified:
              "Please inform the maintainers if you depend on it." % _key,
              _ConfigurationDeprecationWarning)
 
-# Fix up default console_encoding
+# If we cannot auto-detect the console encoding (e.g. when piping data)
+# assume utf-8. On Linux, this will typically be correct; on windows,
+# this can be an issue when piping through more. However, the behavior
+# when redirecting to a file utf-8 is more reasonable.
+
 if console_encoding is None:
-    if sys.platform == 'win32':
-        console_encoding = 'cp850'
-    else:
-        console_encoding = 'iso-8859-1'
+    console_encoding = 'utf-8'
 
 # Fix up transliteration_target
 if transliteration_target == 'not set':
