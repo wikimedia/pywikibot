@@ -33,6 +33,7 @@ class TestReplacementsMain(TestCase):
 
     family = 'test'
     code = 'test'
+    cached = False
 
     def setUp(self):
         """Replace the original bot class with a fake one."""
@@ -54,18 +55,31 @@ class TestReplacementsMain(TestCase):
                 """Nothing to do here."""
                 pass
 
+        def patched_login(sysop=False):
+            """Do nothing."""
+            pass
+
+        def patched_site(*args, **kwargs):
+            """Patching a Site instance replacing it's login."""
+            site = self._original_site(*args, **kwargs)
+            site.login = patched_login
+            return site
+
         super(TestReplacementsMain, self).setUp()
         self._original_bot = replace.ReplaceRobot
         self._original_input = replace.pywikibot.input
+        self._original_site = replace.pywikibot.Site
         self.bots = []
         self.inputs = []
         replace.ReplaceRobot = FakeReplaceBot
         replace.pywikibot.input = self._fake_input
+        replace.pywikibot.Site = patched_site
 
     def tearDown(self):
         """Bring back the old bot class."""
         replace.ReplaceRobot = self._original_bot
         replace.pywikibot.input = self._original_input
+        replace.pywikibot.Site = self._original_site
         super(TestReplacementsMain, self).tearDown()
 
     def _fake_input(self, message):
