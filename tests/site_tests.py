@@ -1793,15 +1793,17 @@ class TestSiteInfo(DefaultSiteTestCase):
         """Test the siteinfo properties with defaults."""
         # This does not test that the defaults work correct,
         # unless the default site is a version needing these defaults
-        # 'fileextensions' introduced in v1.14:
+        # 'fileextensions' introduced in v1.15:
         self.assertIsInstance(self.site.siteinfo.get('fileextensions'), list)
         self.assertIn('fileextensions', self.site.siteinfo)
-        self.assertIn({'ext': 'png'}, self.site.siteinfo['fileextensions'])
+        fileextensions = self.site.siteinfo.get('fileextensions')
+        self.assertIn({'ext': 'png'}, fileextensions)
         # 'restrictions' introduced in v1.23:
         mysite = self.site
         self.assertIsInstance(mysite.siteinfo.get('restrictions'), dict)
         self.assertIn('restrictions', mysite.siteinfo)
-        self.assertIn('cascadinglevels', self.site.siteinfo['restrictions'])
+        restrictions = self.site.siteinfo.get('restrictions')
+        self.assertIn('cascadinglevels', restrictions)
 
     def test_no_cache(self):
         """Test siteinfo caching can be disabled."""
