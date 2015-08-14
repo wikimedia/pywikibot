@@ -53,7 +53,10 @@ Furthermore, the following command line parameters are supported:
 
 -summary:XYZ      Set the summary message text for the edit to XYZ, bypassing
                   the predefined message texts with original and replacements
-                  inserted.
+                  inserted. Can't be used with -automaticsummary.
+
+-automaticsummary Uses an automatic summary for all replacements which don't
+                  have a summary defined. Can't be used with -summary.
 
 -sleep:123        If you use -fix you can check multiple regex at the same time
                   in every page. This can lead to a great waste of CPU because
@@ -790,6 +793,8 @@ def main(*args):
             add_cat = arg[8:]
         elif arg.startswith('-summary:'):
             edit_summary = arg[9:]
+        elif arg.startswith('-automaticsummary'):
+            edit_summary = True
         elif arg.startswith('-allowoverlap'):
             allowoverlap = True
         elif arg.startswith('-manualinput'):
@@ -846,6 +851,7 @@ def main(*args):
                 'Please enter another text that should be replaced,'
                 '\nor press Enter to start:')
 
+    # The summary stored here won't be actually used but is only an example
     single_summary = None
     for i in range(0, len(commandline_replacements), 2):
         replacement = Replacement(commandline_replacements[i],
@@ -858,22 +864,11 @@ def main(*args):
             )
         replacements.append(replacement)
 
-    if not edit_summary:
-        if single_summary:
-            pywikibot.output(u'The summary message for the command line '
-                             'replacements will be something like: %s'
-                             % single_summary)
-        if fixes_set:
-            pywikibot.output('If a summary is defined for the fix, this '
-                             'default summary won\'t be applied.')
-        edit_summary = pywikibot.input(
-            'Press Enter to use this automatic message, or enter a '
-            'description of the\nchanges your bot will make:')
-
     # Perform one of the predefined actions.
-    for fix in fixes_set:
+    missing_fixes_summaries = []  # which a fixes/replacements miss a summary
+    for fix_name in fixes_set:
         try:
-            fix = fixes.fixes[fix]
+            fix = fixes.fixes[fix_name]
         except KeyError:
             pywikibot.output(u'Available predefined fixes are: %s'
                              % ', '.join(fixes.fixes.keys()))
@@ -881,6 +876,10 @@ def main(*args):
                 pywikibot.output('The user fixes file could not be found: '
                                  '{0}'.format(fixes.filename))
             return
+        if not fix['replacements']:
+            pywikibot.warning('No replacements defined for fix '
+                              '"{0}"'.format(fix_name))
+            continue
         if "msg" in fix:
             if isinstance(fix['msg'], basestring):
                 set_summary = i18n.twtranslate(site, str(fix['msg']))
@@ -892,8 +891,14 @@ def main(*args):
                                           fix.get('exceptions'),
                                           fix.get('nocase'),
                                           set_summary)
-        for replacement in fix['replacements']:
+        # Whether some replacements have a summary, if so only show which
+        # have none, otherwise just mention the complete fix
+        missing_fix_summaries = []
+        for index, replacement in enumerate(fix['replacements'], start=1):
             summary = None if len(replacement) < 3 else replacement[2]
+            if not set_summary and not summary:
+                missing_fix_summaries.append(
+                    '"{0}" (replacement #{1})'.format(fix_name, index))
             if chars.contains_invisible(replacement[0]):
                 pywikibot.warning('The old string "{0}" contains formatting '
                                   'characters like U+200E'.format(
@@ -908,8 +913,33 @@ def main(*args):
                 fix_set=replacement_set,
                 edit_summary=summary,
             ))
+
         if replacement_set:
             replacements.extend(replacement_set)
+
+        if len(fix['replacements']) == len(missing_fix_summaries):
+            missing_fixes_summaries.append(
+                '"{0}" (all replacements)'.format(fix_name))
+        else:
+            missing_fixes_summaries += missing_fix_summaries
+
+    if ((not edit_summary or edit_summary is True) and
+            (missing_fixes_summaries or single_summary)):
+        if single_summary:
+            pywikibot.output(u'The summary message for the command line '
+                             'replacements will be something like: %s'
+                             % single_summary)
+        if missing_fixes_summaries:
+            pywikibot.output('The summary will not be used when the fix has '
+                             'one defined but the following fix(es) do(es) not '
+                             'have a summary defined: '
+                             '{0}'.format(', '.join(missing_fixes_summaries)))
+        if edit_summary is not True:
+            edit_summary = pywikibot.input(
+                'Press Enter to use this automatic message, or enter a '
+                'description of the\nchanges your bot will make:')
+        else:
+            edit_summary = ''
 
     # Set the regular expression flags
     flags = re.UNICODE
