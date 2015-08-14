@@ -584,7 +584,7 @@ class Global(object):
         elif arg.startswith('-neverlink:'):
             self.neverlink += arg[11:].split(",")
         elif arg.startswith('-ignore:'):
-            self.ignore += [pywikibot.Page(None, p) for p in arg[8:].split(",")]
+            self.ignore += [pywikibot.Page(pywikibot.Site(), p) for p in arg[8:].split(",")]
         elif arg.startswith('-ignorefile:'):
             ignorefile = arg[12:]
             ignorePageGen = pagegenerators.TextfilePageGenerator(ignorefile)
