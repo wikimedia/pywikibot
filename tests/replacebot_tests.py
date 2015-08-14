@@ -97,11 +97,17 @@ class TestReplacementsMain(TestCase):
         self.assertEqual(replacement.old, str(offset * 2 + 1))
         self.assertEqual(replacement.new, str(offset * 2 + 2))
 
-    def _test_fix_replacement(self, replacement, length=1, offset=0):
+    def _test_fix_replacement(self, replacement, length=1, offset=0, msg=False):
         """Test a replacement from a fix."""
         assert length > offset
         self._test_replacement(replacement, replace.ReplacementListEntry,
                                offset)
+        if msg:
+            self.assertEqual(replacement.edit_summary,
+                             'M{0}'.format(offset + 1))
+        else:
+            self.assertIs(replacement.edit_summary,
+                          replacement.fix_set.edit_summary)
         self.assertIsInstance(replacement.fix_set, replace.ReplacementList)
         self.assertIsInstance(replacement.fix_set, list)
         self.assertIn(replacement, replacement.fix_set)
@@ -128,15 +134,22 @@ class TestReplacementsMain(TestCase):
         self.assertEqual(len(bot.replacements), 1)
         self._test_replacement(bot.replacements[0])
 
+    def test_cmd_automatic(self):
+        """Test command line replacements with automatic summary."""
+        bot = self._get_bot(None, '1', '2', '-automaticsummary')
+        self.assertEqual(len(bot.replacements), 1)
+        self._test_replacement(bot.replacements[0])
+        self.assertEqual(self.inputs, [])
+
     def test_only_fix_global_message(self):
         """Test fixes replacements only."""
-        bot = self._get_bot(True, '-fix:has-msg')
+        bot = self._get_bot(None, '-fix:has-msg')
         self.assertEqual(len(bot.replacements), 1)
         self._test_fix_replacement(bot.replacements[0])
 
     def test_only_fix_global_message_tw(self):
         """Test fixes replacements only."""
-        bot = self._get_bot(True, '-fix:has-msg-tw')
+        bot = self._get_bot(None, '-fix:has-msg-tw')
         self.assertEqual(len(bot.replacements), 1)
         self._test_fix_replacement(bot.replacements[0])
 
@@ -146,9 +159,22 @@ class TestReplacementsMain(TestCase):
         self.assertEqual(len(bot.replacements), 1)
         self._test_fix_replacement(bot.replacements[0])
 
+    def test_only_fix_all_replacement_summary(self):
+        """Test fixes replacements only."""
+        bot = self._get_bot(None, '-fix:all-repl-msg')
+        self.assertEqual(len(bot.replacements), 1)
+        self._test_fix_replacement(bot.replacements[0], msg=True)
+
+    def test_only_fix_partial_replacement_summary(self):
+        """Test fixes replacements only."""
+        bot = self._get_bot(True, '-fix:partial-repl-msg')
+        for offset, replacement in enumerate(bot.replacements):
+            self._test_fix_replacement(replacement, 2, offset, offset == 0)
+        self.assertEqual(len(bot.replacements), 2)
+
     def test_only_fix_multiple(self):
         """Test fixes replacements only."""
-        bot = self._get_bot(True, '-fix:has-msg-multiple')
+        bot = self._get_bot(None, '-fix:has-msg-multiple')
         for offset, replacement in enumerate(bot.replacements):
             self._test_fix_replacement(replacement, 3, offset)
         self.assertEqual(len(bot.replacements), 3)

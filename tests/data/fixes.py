@@ -32,6 +32,21 @@ fixes['no-msg'] = {
     ]
 }
 
+fixes['all-repl-msg'] = {
+    'regex': False,
+    'replacements': [
+        ('1', '2', 'M1'),
+    ]
+}
+
+fixes['partial-repl-msg'] = {
+    'regex': False,
+    'replacements': [
+        ('1', '2', 'M1'),
+        ('3', '4'),
+    ]
+}
+
 fixes['has-msg-multiple'] = {
     'regex': False,
     'msg': {
