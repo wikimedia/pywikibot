@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,7 @@ import datetime
 
 import pywikibot
 
-from pywikibot.logentries import LogEntryFactory
+from pywikibot.logentries import LogEntryFactory, UserTargetLogEntry
 from pywikibot.tools import (
     MediaWikiVersion,
     UnicodeType as unicode,
@@ -86,6 +86,10 @@ class TestLogentriesBase(TestCase):
         if 'title' in logentry.data:  # title may be missing
             if logtype == 'block' and logentry.isAutoblockRemoval:
                 self.assertIsInstance(logentry.page(), int)
+            elif isinstance(logentry, UserTargetLogEntry):
+                self.assertIsInstance(logentry.page(), pywikibot.User)
+            elif logtype == 'upload':
+                self.assertIsInstance(logentry.page(), pywikibot.FilePage)
             else:
                 self.assertIsInstance(logentry.page(), pywikibot.Page)
         else:

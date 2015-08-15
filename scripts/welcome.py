@@ -157,7 +157,7 @@ badwords at all but can be used for some bad-nickname.
 # (C) Filnik, 2007-2011
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
-# (C) xqt, 2009-2017
+# (C) xqt, 2009-2018
 # (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
@@ -676,7 +676,7 @@ class WelcomeBot(object):
                                       start=start):
             if ue.action() == 'create' or (
                     ue.action() == 'autocreate' and globalvar.welcomeAuto):
-                yield pywikibot.User(ue.page())
+                yield ue.page()
 
     def defineSign(self, force=False):
         """Setup signature."""
