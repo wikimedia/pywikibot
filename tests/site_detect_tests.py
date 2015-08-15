@@ -62,8 +62,9 @@ class TestWikiSiteDetection(TestCase):
 
         sorted_all = sorted((norm(url) for url in self.all),
                             key=lambda item: item[0])
+        width = max(len(item[1]) for item in sorted_all)
         print('Results:\n' + '\n'.join(
-            '{0} {1} : {2}'.format(PREFIXES[i[0]], i[1], i[2])
+            '{0} {1:{3}} : {2}'.format(PREFIXES[i[0]], i[1], i[2], width)
             for i in sorted_all))
 
     def _wiki_detection(self, url, result):
