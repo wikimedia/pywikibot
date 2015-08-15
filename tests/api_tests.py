@@ -163,6 +163,26 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('info', pi.query_modules)
         self.assertIn('login', pi._action_modules)
 
+    def test_init_query_first(self):
+        """Test init where it first adds query and then main."""
+        def patched_generate_submodules(modules):
+            # Change the query such that query is handled before main
+            modules = set(modules)
+            if 'main' in modules:
+                assert 'query' in modules
+                modules.discard('main')
+                modules = list(modules) + ['main']
+            else:
+                assert 'query' not in modules
+            original_generate_submodules(modules)
+        pi = api.ParamInfo(self.site, set(['query', 'main']))
+        self.assertEqual(len(pi), 0)
+        original_generate_submodules = pi._generate_submodules
+        pi._generate_submodules = patched_generate_submodules
+        pi._init()
+        self.assertIn('main', pi._paraminfo)
+        self.assertIn('query', pi._paraminfo)
+
     def test_init_pageset(self):
         site = self.get_site()
         self.assertNotIn('query', api.ParamInfo.init_modules)
