@@ -10,10 +10,11 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 
+import json
 import sys
 import os
 from collections import Iterable, Mapping
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 
 import pywikibot
@@ -819,9 +820,24 @@ class TestSiteGenerators(DefaultSiteTestCase):
         if not self.site.data_repository():
             raise unittest.SkipTest('Site is not using a Wikibase repository')
         cnt = 0
+        start_time = datetime.now() - timedelta(minutes=5)
+        # Pages which have been connected recently may still be reported as
+        # unconnected. So try on an version that is a few minutes older if the
+        # tested site appears as a sitelink.
         for page in self.site.unconnected_pages(total=5):
-            self.assertRaises(pywikibot.NoPage, pywikibot.ItemPage.fromPage,
-                              page)
+            try:
+                item = pywikibot.ItemPage.fromPage(page)
+            except pywikibot.NoPage:
+                pass
+            else:
+                revisions = list(item.revisions(total=1, starttime=start_time,
+                                                content=True))
+                if revisions:
+                    sitelinks = json.loads(revisions[0].text)['sitelinks']
+                    self.assertNotIn(
+                        self.site.dbName(), sitelinks,
+                        'Page "{0}" is connected to a Wikibase '
+                        'repository'.format(page.title()))
             cnt += 1
         self.assertLessEqual(cnt, 5)
 
