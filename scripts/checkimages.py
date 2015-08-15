@@ -198,7 +198,7 @@ empty = {
 msg_comm2 = {
     'ar': u'بوت: طلب معلومات المصدر.',
     'commons': u'Bot: Requesting source information.',
-    'de': u'Bot:Notify User',
+    'de': u'Bot: Benachrichtigung über Lizenzprobleme',
     'en': u'Robot: Requesting source information.',
     'fa': u'ربات: درخواست منبع تصویر',
     'ga': u'Róbó: Ag iarraidh eolais foinse.',
