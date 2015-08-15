@@ -11,7 +11,7 @@ __version__ = '$Id$'
 
 import logging
 
-from pywikibot.exceptions import NoPage, UnknownExtension
+from pywikibot.exceptions import NoPage, UnknownExtension, LockedPage
 from pywikibot.page import BasePage
 from pywikibot.tools import PY2
 
@@ -213,6 +213,11 @@ class Topic(FlowPage):
             self._root = Post.fromJSON(self, self.uuid, self._data)
         return self._root
 
+    @property
+    def is_locked(self):
+        """Whether this topic is locked."""
+        return self.root._current_revision['isLocked']
+
     def replies(self, format='wikitext', force=False):
         """A list of replies to this topic's root post.
 
@@ -236,6 +241,24 @@ class Topic(FlowPage):
         @rtype: Post
         """
         return self.root.reply(content, format)
+
+    def lock(self, reason='Closed'):
+        """Lock this topic.
+
+        @param reason: The reason for locking this topic
+        @type reason: unicode
+        """
+        self.site.lock_topic(self, True, reason)
+        self.root._load(load_from_topic=True)
+
+    def unlock(self, reason='Reopened'):
+        """Unlock this topic.
+
+        @param reason: The reason for unlocking this topic
+        @type reason: unicode
+        """
+        self.site.lock_topic(self, False, reason)
+        self.root._load(load_from_topic=True)
 
 
 # Flow non-page-like objects
@@ -408,6 +431,9 @@ class Post(object):
         @rtype: Post
         """
         self._load()
+        if self.page.is_locked:
+            raise LockedPage(self.page, 'Topic %s is locked.')
+
         reply_url = self._current_revision['actions']['reply']['url']
         parsed_url = urlparse(reply_url)
         params = parse_qs(parsed_url.query)

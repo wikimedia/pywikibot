@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
+from pywikibot.exceptions import LockedPage
 from pywikibot.flow import Board, Topic, Post
 from pywikibot.tools import PY2
 
@@ -30,9 +31,8 @@ class TestFlowCreateTopic(TestCase):
 
     def test_create_topic(self):
         """Test creation of topic."""
-        site = self.get_site()
         content = 'If you can read this, the Flow code in Pywikibot works!'
-        board = Board(site, 'Talk:Pywikibot test')
+        board = Board(self.site, 'Talk:Pywikibot test')
         topic = board.new_topic('Pywikibot test', content, 'wikitext')
         first_post = topic.replies()[0]
         wikitext = first_post.get(format='wikitext')
@@ -149,3 +149,51 @@ class TestFlowReply(TestCase):
         self.assertListEqual(old_nested_replies, [])
         more_root_replies = topic_root.replies(force=True)
         self.assertEqual(len(more_root_replies), len(new_root_replies) + 1)
+
+
+class TestFlowLockTopic(TestCase):
+
+    """Locking and unlocking topics."""
+
+    family = 'test'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def test_lock_unlock_topic(self):
+        """Lock and unlock a test topic."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sn12rdih4iducjsd')
+        if topic.is_locked:
+            topic.unlock()
+        self.assertFalse(topic.is_locked)
+        # Lock topic
+        topic.lock('Pywikibot test')
+        self.assertTrue(topic.is_locked)
+        # Unlock topic
+        topic.unlock('Pywikibot test')
+        self.assertFalse(topic.is_locked)
+
+
+class TestFlowEditFailure(TestCase):
+
+    """Flow-related edit failure tests."""
+
+    family = 'test'
+    code = 'test'
+
+    user = True
+    write = -1
+
+    def test_reply_to_locked_topic(self):
+        """Test replying to locked topic (should raise exception)."""
+        # Setup
+        content = 'I am a reply to a locked topic. This is not good!'
+        topic = Topic(self.site, 'Topic:Smxnipjfs8umm1wt')
+        # Reply (should raise a LockedPage exception)
+        self.assertRaises(LockedPage, topic.reply, content, 'wikitext')
+        topic_root = topic.root
+        self.assertRaises(LockedPage, topic_root.reply, content, 'wikitext')
+        topic_reply = topic.root.replies(force=True)[0]
+        self.assertRaises(LockedPage, topic_reply.reply, content, 'wikitext')
