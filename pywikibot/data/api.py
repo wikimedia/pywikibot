@@ -551,13 +551,15 @@ class ParamInfo(Container):
             # query modules can be prefixed with 'query+'
             self._init()
 
-        if 'query' in self._modules:
-            # It does fetch() while initializing, and this method can't be
-            # called before it's initialized.
-            modules = self._normalize_modules(modules)
-        elif self._action_modules:
-            # At least we do know the valid action modules and require a subset
-            assert not modules - self._action_modules - self.root_modules
+        if self._action_modules:
+            # The query module may be added before the action modules have been
+            if 'query' in self._modules:
+                # It does fetch() while initializing, and this method can't be
+                # called before it's initialized.
+                modules = self._normalize_modules(modules)
+            else:
+                # At least we do know the valid action modules and require a subset
+                assert not modules - self._action_modules - self.root_modules
 
         self._fetch(modules)
 
