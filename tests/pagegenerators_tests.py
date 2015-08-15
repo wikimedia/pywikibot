@@ -915,6 +915,8 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         """Test that the ItemPage returned raises NoPage."""
         if not self.site.data_repository():
             raise unittest.SkipTest('Site is not using a Wikibase repository')
+        if self.site.hostname() == 'test.wikipedia.org':
+            raise unittest.SkipTest('test.wikipedia is misconfigured; T85358')
         cnt = 0
         start_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
         # Pages which have been connected recently may still be reported as
