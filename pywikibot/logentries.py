@@ -248,6 +248,20 @@ class UploadEntry(LogEntry):
 
     _expectedType = 'upload'
 
+    def page(self):
+        """
+        FilePage on which action was performed.
+
+        Note: title may be missing in data dict e.g. by oversight action to
+              hide the title. In that case a KeyError exception will raise
+
+        @rtype: FilePage
+        @raise: KeyError: title was missing from log entry
+        """
+        if not hasattr(self, '_page'):
+            self._page = pywikibot.FilePage(self.site, self.data['title'])
+        return self._page
+
 
 class MoveEntry(LogEntry):
 

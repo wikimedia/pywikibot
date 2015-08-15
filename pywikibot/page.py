@@ -3048,7 +3048,7 @@ class User(Page):
             raise StopIteration
         for item in self.site.logevents(
                 logtype='upload', user=self.username, total=total):
-            yield (FilePage(self.site, item.title().title()),
+            yield (item.page(),
                    unicode(item.timestamp()),
                    item.comment(),
                    item.pageid() > 0

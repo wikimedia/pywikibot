@@ -5452,8 +5452,7 @@ class APISite(BaseSite):
         for event in self.logevents(logtype="upload", user=user,
                                     start=start, end=end, reverse=reverse,
                                     step=step, total=total):
-            # event.title() actually returns a Page
-            filepage = pywikibot.FilePage(event.title())
+            filepage = event.page()
             date = event.timestamp()
             user = event.user()
             comment = event.comment() or u''
