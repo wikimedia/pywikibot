@@ -54,8 +54,8 @@ class TestWikiSiteDetection(TestCase):
         super(TestWikiSiteDetection, self).tearDown()
         print('Out of %d sites, %d tests passed, %d tests failed '
               'and %d tests raised an error'
-              % (len(self.all), len(self.passes), len(self.failures), len(self.errors)
-                 )
+              % (len(self.all), len(self.passes), len(self.failures),
+                 len(self.errors))
               )
 
         PREFIXES = ['PASS', 'ERR ', 'FAIL', 'MISS']

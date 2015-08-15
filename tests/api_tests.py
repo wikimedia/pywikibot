@@ -58,9 +58,13 @@ class TestAPIMWException(DefaultSiteTestCase):
         # Extract parameter data from the body, it's ugly but allows us
         # to verify that we actually test the right request
         parameters = [p.split(b'=', 1) for p in parameters.split(b'&')]
-        parameters = dict(
-            (param.decode('ascii'), set(unquote_to_bytes(value).decode(kwargs['site'].encoding()).replace('+', ' ').split('|')))
-            for param, value in parameters)
+        keys = [p[0].decode('ascii') for p in parameters]
+        values = [unquote_to_bytes(p[1]) for p in parameters]
+        values = [v.decode(kwargs['site'].encoding()) for v in values]
+        values = [v.replace('+', ' ') for v in values]
+        values = [set(v.split('|')) for v in values]
+        parameters = dict(zip(keys, values))
+
         if 'fake' not in parameters:
             return False  # do an actual request
         if self.assert_parameters:
