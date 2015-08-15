@@ -151,6 +151,7 @@ commonscatTemplates = {
     'uk': (u'Commonscat', [u'Commons cat', u'Category', u'Commonscat-inline']),
     'vi': (u'Commonscat',
            [u'Commons2', u'Commons cat', u'Commons category', u'Commons+cat']),
+    'yi': (u'קאמאנסקאט', [u'Commonscat']),
     'zh': (u'Commonscat', [u'Commons cat', u'Commons category']),
     'zh-classical': (u'共享類', [u'Commonscat']),
     'zh-yue': (u'同享類',
