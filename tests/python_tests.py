@@ -59,6 +59,7 @@ class PythonTestCase(TestCase):
 
     @unittest.skipIf(not unicodedata2, 'unicodedata2 not found')
     def test_issue_10254_unicodedata2(self):
+        """Test Python issue #10254 is avoided with unicodedata2 package."""
         text = 'Li̍t-sṳ́'
         self.assertEqual(text, unicodedata2.normalize('NFC', text))
 

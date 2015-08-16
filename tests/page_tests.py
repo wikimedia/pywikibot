@@ -167,6 +167,7 @@ class TestPageObjectEnglish(TestCase):
     cached = True
 
     def testGeneral(self):
+        """Test general features of a page."""
         site = self.get_site()
         mainpage = self.get_mainpage()
         maintalk = mainpage.toggleTalkPage()
@@ -383,6 +384,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertEqual(p3.isCategory(), False)
 
     def testIsImage(self):
+        """Test C{Page.isImage} check."""
         site = self.get_site()
         p1 = pywikibot.Page(site, u"First page")
         p2 = pywikibot.Page(site, u"File:Second page")
@@ -437,6 +439,7 @@ class TestPageObject(DefaultSiteTestCase):
         self.assertFalse(pg.isDisambig())
 
     def testReferences(self):
+        """Test references to a page."""
         mainpage = self.get_mainpage()
         count = 0
         # Ignore redirects for time considerations
@@ -459,6 +462,7 @@ class TestPageObject(DefaultSiteTestCase):
                 break
 
     def testLinks(self):
+        """Test the different types of links from a page."""
         if self.site.family.name == 'wpbeta':
             raise unittest.SkipTest('Test fails on betawiki; T69931')
         mainpage = self.get_mainpage()
@@ -485,6 +489,7 @@ class TestPageObject(DefaultSiteTestCase):
             self.assertIsInstance(p, unicode)
 
     def testPickleAbility(self):
+        """Test the ability to pickle the page."""
         mainpage = self.get_mainpage()
         import pickle
         mainpage_str = pickle.dumps(mainpage, protocol=config.pickle_protocol)
@@ -722,7 +727,13 @@ class TestPageHistory(DefaultSiteTestCase):
 
 class TestPageRedirects(TestCase):
 
-    """Test redirects."""
+    """
+    Test redirects.
+
+    This is using the pages 'User:Legoktm/R1', 'User:Legoktm/R2' and
+    'User:Legoktm/R3' on the English Wikipedia. 'R1' is redirecting to 'R2',
+    'R2' is a normal page and 'R3' does not exist.
+    """
 
     family = 'wikipedia'
     code = 'en'
@@ -730,6 +741,7 @@ class TestPageRedirects(TestCase):
     cached = True
 
     def testIsRedirect(self):
+        """Test C{Page.isRedirectPage()} and C{Page.getRedirectTarget}."""
         site = self.get_site()
         p1 = pywikibot.Page(site, u'User:Legoktm/R1')
         p2 = pywikibot.Page(site, u'User:Legoktm/R2')
@@ -737,6 +749,7 @@ class TestPageRedirects(TestCase):
         self.assertEqual(p1.getRedirectTarget(), p2)
 
     def testPageGet(self):
+        """Test C{Page.get()} on different types of pages."""
         site = self.get_site()
         p1 = pywikibot.Page(site, u'User:Legoktm/R2')
         p2 = pywikibot.Page(site, u'User:Legoktm/R1')
@@ -755,6 +768,7 @@ class TestPageUserAction(DefaultSiteTestCase):
     user = True
 
     def test_purge(self):
+        """Test purging the mainpage."""
         mainpage = self.get_mainpage()
         self.assertIsInstance(mainpage.purge(), bool)
 

@@ -27,6 +27,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
     write = True
 
     def test_label_set(self):
+        """Test setting an English label."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
         self.assertIsInstance(item, pywikibot.ItemPage)
@@ -36,6 +37,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertEqual(item.labels['en'], 'Test123')
 
     def test_label_remove(self):
+        """Test adding a Farsi and English label and removing the Farsi one."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
         # These two should be additive
@@ -54,12 +56,14 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertNotIn('fa', item.labels.keys())
 
     def test_alias_set(self):
+        """Test setting an English alias."""
         testsite = self.get_repo()
         ts = str(time.time())
         item = pywikibot.ItemPage(testsite, 'Q68')
         item.editAliases({'en': [ts]})
 
     def test_add_claim_with_qualifier(self):
+        """Test adding a claim with a qualifier to an item and a property."""
         testsite = self.get_repo()
         item = pywikibot.ItemPage(testsite, 'Q68')
         item.get()
@@ -99,6 +103,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.claims['P115'][0].addQualifier(end_date)
 
     def test_edit_entity_new_item(self):
+        """Test creating a new item using C{ItemPage.editEntity}."""
         testsite = self.get_repo()
         ts = str(time.time())
         data = {
@@ -119,6 +124,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item.editEntity(data)
 
     def test_edit_entity_new_linked_item(self):
+        """Test linking a page using a new item."""
         ts = str(time.time())
 
         # Create a new page, which is unlinked

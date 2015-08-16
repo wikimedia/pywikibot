@@ -145,6 +145,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     code = 'en'
 
     def setUp(self):
+        """Set up the script by patching the bot class."""
         super(TestReferencesBotConstructor, self).setUp()
         self._original_constructor = ReferencesRobot.__init__
         self._original_run = ReferencesRobot.run
@@ -152,17 +153,20 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         ReferencesRobot.run = lambda self: None
 
     def tearDown(self):
+        """Tear down the test by undoing the bot class patch."""
         ReferencesRobot.__init__ = self._original_constructor
         ReferencesRobot.run = self._original_run
         super(TestReferencesBotConstructor, self).tearDown()
 
     def test_xml_simple(self):
+        """Test the generator without any narrowing."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'))
         gen = self.constructor_args[0]
         self.assertPageTitlesCountEqual(gen, [u'Fake page', u'Talk:Fake page'],
                                         site=self.get_site())
 
     def test_xml_one_namespace(self):
+        """Test the generator using one namespace id."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
              '-namespace:1')
         gen = self.constructor_args[0]
@@ -171,6 +175,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
                                   site=self.get_site())
 
     def test_xml_multiple_namespace_ids(self):
+        """Test the generator using multiple separate namespaces parameters."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
              '-namespace:0', '-namespace:1', '-xmlstart:Fake page')
         gen = self.constructor_args[0]
@@ -179,6 +184,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     @unittest.expectedFailure
     def test_xml_multiple_namespace_ids_2(self):
+        """Test the generator using multiple namespaces in one parameter."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
              '-namespace:0,1', '-xmlstart:Fake page')
         gen = self.constructor_args[0]
@@ -187,6 +193,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     @unittest.expectedFailure
     def test_xml_start_prefix(self):
+        """Test the generator using a start partial page."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
              '-namespace:1', '-xmlstart:Fake')
         gen = self.constructor_args[0]
@@ -196,6 +203,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     @unittest.expectedFailure
     def test_xml_start_underscore(self):
+        """Test the generator using a start page with an underscore."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
              '-namespace:1', '-xmlstart:Fake_page')
         gen = self.constructor_args[0]
@@ -204,6 +212,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
                                   site=self.get_site())
 
     def test_xml_namespace_name(self):
+        """Test the generator using a namespace name."""
         main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
              '-namespace:Talk', '-xmlstart:Fake page')
         gen = self.constructor_args[0]
@@ -213,6 +222,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
 
 def dummy_constructor(self, *args, **kwargs):
+    """A constructor faking the actual constructor."""
     TestReferencesBotConstructor.constructor_args = args
     TestReferencesBotConstructor.constructor_kwargs = kwargs
 

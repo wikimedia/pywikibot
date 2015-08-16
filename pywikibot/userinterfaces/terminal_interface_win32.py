@@ -49,6 +49,7 @@ class Win32BaseUI(terminal_interface_base.UI):
     """User interface for Win32 terminals without ctypes."""
 
     def __init__(self):
+        """Constructor."""
         terminal_interface_base.UI.__init__(self)
         self.encoding = 'ascii'
 
@@ -58,6 +59,7 @@ class Win32CtypesUI(Win32BaseUI):
     """User interface for Win32 terminals using ctypes."""
 
     def __init__(self):
+        """Constructor."""
         Win32BaseUI.__init__(self)
         from .win32_unicode import stdin, stdout, stderr, argv
         self.stdin = stdin
@@ -67,6 +69,7 @@ class Win32CtypesUI(Win32BaseUI):
         self.encoding = 'utf-8'
 
     def printColorized(self, text, targetStream):
+        """Print the text colorized to the target stream."""
         std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
         # Color tags might be cascaded, e.g. because of transliteration.
         # Therefore we need this stack.

@@ -112,6 +112,7 @@ class QuerySet():
         return s
 
     def __repr__(self):
+        """Return a string representation."""
         return u"QuerySet(%s)" % self
 
 
@@ -201,6 +202,7 @@ class Query():
         return True
 
     def validateOrRaise(self, msg=None):
+        """Validate the contents and raise TypeError if the validation fails."""
         if not self.validate():
             raise TypeError(msg)
 
@@ -221,6 +223,7 @@ class Query():
             return int(item)
 
     def convertWDTypes(self, items):
+        """Convert the items into integer IDs using L{Query.convertWDType}."""
         return [self.convertWDType(x) for x in listify(items)]
 
     def __str__(self):
@@ -234,6 +237,7 @@ class Query():
         raise NotImplementedError
 
     def __repr__(self):
+        """Return a string representation."""
         return u"Query(%s)" % self
 
 
@@ -262,6 +266,7 @@ class HasClaim(Query):
         self.validateOrRaise()
 
     def formatItems(self):
+        """Format the items when they are a list."""
         res = ''
         if self.items:
             res += ":" + ",".join([self.formatItem(x) for x in self.items])
@@ -269,9 +274,11 @@ class HasClaim(Query):
         return res
 
     def validate(self):
+        """Validate that the items are ints or Querys."""
         return self.isOrContainsOnlyTypes(self.items, [int, Query])
 
     def __str__(self):
+        """Return the query string for the API."""
         if isinstance(self.items, list):
             return "%s[%s%s]" % (self.queryType, self.prop, self.formatItems())
         elif isinstance(self.items, Query):
@@ -296,6 +303,7 @@ class StringClaim(HasClaim):
         return '"%s"' % x
 
     def validate(self):
+        """Validate that the items are strings."""
         return self.isOrContainsOnlyTypes(self.items, basestring)
 
 
@@ -330,11 +338,13 @@ class Tree(Query):
         self.validateOrRaise()
 
     def validate(self):
+        """Validate that the item, forward and reverse are all ints."""
         return (self.isOrContainsOnlyTypes(self.item, int) and
                         self.isOrContainsOnlyTypes(self.forward, int) and
                         self.isOrContainsOnlyTypes(self.reverse, int))
 
     def __str__(self):
+        """Return the query string for the API."""
         return "%s[%s][%s][%s]" % (self.queryType, self.formatList(self.item),
                                     self.formatList(self.forward),
                                     self.formatList(self.reverse))
@@ -354,9 +364,11 @@ class Around(Query):
         self.rad = rad
 
     def validate(self):
+        """Validate that the prop is an int."""
         return isinstance(self.prop, int)
 
     def __str__(self):
+        """Return the query string for the API."""
         return "%s[%s,%s,%s,%s]" % (self.queryType, self.prop,
                                     self.lt, self.lg, self.rad)
 
@@ -383,9 +395,11 @@ class Between(Query):
         self.end = end
 
     def validate(self):
+        """Validate that a range is given and the prop is an int."""
         return (self.begin or self.end) and isinstance(self.prop, int)
 
     def __str__(self):
+        """Return the query string for the API."""
         begin = self.begin.toTimestr() if self.begin else ''
 
         # if you don't have an end, you don't put in the comma
@@ -410,9 +424,11 @@ class Link(Query):
         self.validateOrRaise()
 
     def validate(self):
+        """Validate that the link is a string."""
         return self.isOrContainsOnlyTypes(self.link, basestring)
 
     def __str__(self):
+        """Return the query string for the API."""
         return "%s[%s]" % (self.queryType, self.formatList(self.link))
 
 
@@ -470,6 +486,7 @@ class WikidataQuery():
                                             "wikidataquery_cache")
 
     def getUrl(self, queryStr):
+        """Get the URL given the query string."""
         return "%s/api?%s" % (self.host, queryStr)
 
     def getQueryString(self, q, labels=[], props=[]):

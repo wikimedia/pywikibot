@@ -10,6 +10,13 @@ class transliterator(object):
     """Class to transliterating text."""
 
     def __init__(self, encoding):
+        """
+        Initialize the transliteration mapping.
+
+        @param encoding: the encoding available. Any transliterated character
+            which can't be mapped, will be removed from the mapping.
+        @type encoding: str
+        """
         self.trans = {}
         for char in u"ÀÁÂẦẤẪẨẬÃĀĂẰẮẴẶẲȦǠẠḀȂĄǍẢ":
             self.trans[char] = u"A"
@@ -2818,6 +2825,20 @@ class transliterator(object):
             self.trans[char] = value
 
     def transliterate(self, char, default="?", prev="-", next="-"):
+        """
+        Transliterate the character.
+
+        @param char: The character to transliterate.
+        @type char: str
+        @param default: The character used when there is no transliteration.
+        @type default: str
+        @param prev: The previous character
+        @type prev: str
+        @param next: The next character
+        @type next: str
+        @return: The transliterated character which may be an empty string
+        @rtype: str
+        """
         if char in self.trans:
             return self.trans[char]
         # Arabic

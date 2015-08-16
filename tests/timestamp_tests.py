@@ -24,6 +24,7 @@ class TestTimestamp(TestCase):
     net = False
 
     def test_clone(self):
+        """Test cloning a Timestamp instance."""
         t1 = T.utcnow()
         t2 = t1.clone()
         self.assertEqual(t1, t2)
@@ -40,6 +41,7 @@ class TestTimestamp(TestCase):
         self.assertIsInstance(T.fromtimestampformat(t1), T)
 
     def test_iso_format(self):
+        """Test conversion from and to ISO format."""
         t1 = T.utcnow()
         ts1 = t1.toISOformat()
         t2 = T.fromISOformat(ts1)
@@ -51,6 +53,7 @@ class TestTimestamp(TestCase):
         self.assertEqual(ts1, ts2)
 
     def test_mediawiki_format(self):
+        """Test conversion from and to timestamp format."""
         t1 = T.utcnow()
         ts1 = t1.totimestampformat()
         t2 = T.fromtimestampformat(ts1)
@@ -62,6 +65,7 @@ class TestTimestamp(TestCase):
         self.assertEqual(ts1, ts2)
 
     def test_add_timedelta(self):
+        """Test addin a timedelta to a Timestamp."""
         t1 = T.utcnow()
         t2 = t1 + datetime.timedelta(days=1)
         if t1.month != t2.month:
@@ -84,6 +88,7 @@ class TestTimestamp(TestCase):
         self.assertIs(t3, NotImplemented)
 
     def test_sub_timedelta(self):
+        """Test substracting a timedelta from a Timestamp."""
         t1 = T.utcnow()
         t2 = t1 - datetime.timedelta(days=1)
         if t1.month != t2.month:
@@ -93,6 +98,7 @@ class TestTimestamp(TestCase):
         self.assertIsInstance(t2, T)
 
     def test_sub_timedate(self):
+        """Test subtracting two timestamps."""
         t1 = T.utcnow()
         t2 = t1 - datetime.timedelta(days=1)
         td = t1 - t2

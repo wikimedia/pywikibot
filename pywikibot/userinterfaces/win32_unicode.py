@@ -83,12 +83,14 @@ if sys.platform == "win32":
         INVALID_HANDLE_VALUE = DWORD(-1).value
 
         def not_a_console(handle):
+            """Return whether the handle is not to a console."""
             if handle == INVALID_HANDLE_VALUE or handle is None:
                 return True
             return ((GetFileType(handle) & ~FILE_TYPE_REMOTE) != FILE_TYPE_CHAR or
                     GetConsoleMode(handle, byref(DWORD())) == 0)
 
         def old_fileno(std_name):
+            """Return the fileno or None if that doesn't work."""
             # some environments like IDLE don't support the fileno operation
             # handle those like std streams which don't have fileno at all
             std = getattr(sys, 'std{0}'.format(std_name))
@@ -133,6 +135,7 @@ if sys.platform == "win32":
                 """Unicode terminal input class."""
 
                 def __init__(self, hConsole, name, bufsize=1024):
+                    """Initialize the input stream."""
                     self._hConsole = hConsole
                     self.bufsize = bufsize
                     self.buffer = create_unicode_buffer(bufsize)
@@ -140,6 +143,7 @@ if sys.platform == "win32":
                     self.encoding = 'utf-8'
 
                 def readline(self):
+                    """Read one line from the input."""
                     maxnum = DWORD(self.bufsize - 1)
                     numrecv = DWORD(0)
                     result = ReadConsoleW(self._hConsole, self.buffer, maxnum, byref(numrecv), None)
@@ -163,6 +167,7 @@ if sys.platform == "win32":
                 """Unicode terminal output class."""
 
                 def __init__(self, hConsole, stream, fileno, name):
+                    """Initialize the output stream."""
                     self._hConsole = hConsole
                     self._stream = stream
                     self._fileno = fileno
@@ -174,16 +179,20 @@ if sys.platform == "win32":
                     self.flush()
 
                 def isatty(self):
+                    """Return whether it's a tty."""
                     return False
 
                 def close(self):
+                    """Set the stream to be closed."""
                     # don't really close the handle, that would only cause problems
                     self.closed = True
 
                 def fileno(self):
+                    """Return the fileno."""
                     return self._fileno
 
                 def flush(self):
+                    """Flush the stream."""
                     if self._hConsole is None:
                         try:
                             self._stream.flush()
@@ -193,6 +202,7 @@ if sys.platform == "win32":
                             raise
 
                 def write(self, text):
+                    """Write the text to the output."""
                     try:
                         if self._hConsole is None:
                             if isinstance(text, unicode):
@@ -222,6 +232,7 @@ if sys.platform == "win32":
                         raise
 
                 def writelines(self, lines):
+                    """Write a list of lines by using write."""
                     try:
                         for line in lines:
                             self.write(line)

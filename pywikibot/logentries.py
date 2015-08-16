@@ -31,6 +31,7 @@ class LogDict(dict):
     """
 
     def __missing__(self, key):
+        """Debug when the key is missing."""
         pywikibot.debug(u"API log entry received:\n" + repr(self),
                         _logger)
         raise KeyError("Log entry (%s) has no '%s' key" % (self._type, key))
@@ -55,6 +56,7 @@ class LogEntry(object):
         self.data._type = self.type()
 
     def __hash__(self):
+        """Return the id as the hash."""
         return self.logid()
 
     @property
@@ -74,12 +76,15 @@ class LogEntry(object):
                             "for type %s." % (self.action(), self.type))
 
     def logid(self):
+        """Return the id of the log entry."""
         return self.data['logid']
 
     def pageid(self):
+        """Return the log id of the page handled by this log entry."""
         return self.data['pageid']
 
     def ns(self):
+        """Return the namespace id of the page handled by this log entry."""
         return self.data['ns']
 
     @deprecated('page()')
@@ -104,12 +109,15 @@ class LogEntry(object):
         return self._page
 
     def type(self):
+        """The type of thie logentry."""
         return self.data['type']
 
     def action(self):
+        """The action of this log entry."""
         return self.data['action']
 
     def user(self):
+        """Return the user name doing this action."""
         # TODO use specific User class ?
         return self.data['user']
 
@@ -121,6 +129,7 @@ class LogEntry(object):
         return self._timestamp
 
     def comment(self):
+        """Return the logentry's comment."""
         return self.data['comment']
 
 

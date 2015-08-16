@@ -70,6 +70,7 @@ class FlowPage(BasePage):
         return self._uuid
 
     def get(self, force=False, get_redirect=False, sysop=False):
+        """Get the page's content."""
         if get_redirect or force or sysop:
             raise NotImplementedError
 
