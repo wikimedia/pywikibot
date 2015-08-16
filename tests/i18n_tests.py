@@ -38,6 +38,7 @@ class TestTranslate(TestCase):
         super(TestTranslate, self).setUp()
 
     def testLocalized(self):
+        """Test fully localized translations."""
         self.assertEqual(i18n.translate('en', self.msg_localized,
                                         fallback=True),
                          u'test-localized EN')
@@ -49,6 +50,7 @@ class TestTranslate(TestCase):
                          u'test-localized FY')
 
     def testSemiLocalized(self):
+        """Test translate by fallback to an alternative language."""
         self.assertEqual(i18n.translate('en', self.msg_semi_localized,
                                         fallback=True),
                          u'test-semi-localized EN')
@@ -60,6 +62,7 @@ class TestTranslate(TestCase):
                          u'test-semi-localized NL')
 
     def testNonLocalized(self):
+        """Test translate with missing localisation."""
         self.assertEqual(i18n.translate('en', self.msg_non_localized,
                                         fallback=True),
                          u'test-non-localized EN')
@@ -74,6 +77,7 @@ class TestTranslate(TestCase):
                          u'test-non-localized EN')
 
     def testNoEnglish(self):
+        """Test translate with missing English text."""
         self.assertEqual(i18n.translate('en', self.msg_no_english,
                                         fallback=True),
                          u'test-no-english JA')
@@ -90,11 +94,13 @@ class UserInterfaceLangTestCase(TestCase):
     """Base class for tests using config.userinterface_lang."""
 
     def setUp(self):
+        """Change the userinterface language to the site's code."""
         super(UserInterfaceLangTestCase, self).setUp()
         self.orig_userinterface_lang = pywikibot.config.userinterface_lang
         pywikibot.config.userinterface_lang = self.get_site().code
 
     def tearDown(self):
+        """Reset the userinterface language."""
         pywikibot.config.userinterface_lang = self.orig_userinterface_lang
         super(UserInterfaceLangTestCase, self).tearDown()
 
@@ -106,11 +112,13 @@ class TWNSetMessagePackageBase(TestCase):
     message_package = None
 
     def setUp(self):
+        """Load the test translations."""
         self.orig_messages_package_name = i18n._messages_package_name
         i18n.set_messages_package(self.message_package)
         super(TWNSetMessagePackageBase, self).setUp()
 
     def tearDown(self):
+        """Load the original translations back."""
         super(TWNSetMessagePackageBase, self).tearDown()
         i18n.set_messages_package(self.orig_messages_package_name)
 
@@ -121,6 +129,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
 
     @classmethod
     def setUpClass(cls):
+        """Verify that the test translations are not empty."""
         if not isinstance(cls.message_package, basestring):
             raise TypeError('%s.message_package must be a package name'
                             % cls.__name__)
@@ -145,6 +154,7 @@ class TestTWTranslate(TWNTestCaseBase):
     message_package = 'tests.i18n'
 
     def testLocalized(self):
+        """Test fully localized entry."""
         self.assertEqual(i18n.twtranslate('en', 'test-localized'),
                          u'test-localized EN')
         self.assertEqual(i18n.twtranslate('nl', 'test-localized'),
@@ -153,6 +163,7 @@ class TestTWTranslate(TWNTestCaseBase):
                          u'test-localized FY')
 
     def testSemiLocalized(self):
+        """Test translating with fallback to alternative language."""
         self.assertEqual(i18n.twtranslate('en', 'test-semi-localized'),
                          u'test-semi-localized EN')
         self.assertEqual(i18n.twtranslate('nl', 'test-semi-localized'),
@@ -161,6 +172,7 @@ class TestTWTranslate(TWNTestCaseBase):
                          u'test-semi-localized NL')
 
     def testNonLocalized(self):
+        """Test translating non localized entries."""
         self.assertEqual(i18n.twtranslate('en', 'test-non-localized'),
                          u'test-non-localized EN')
         self.assertEqual(i18n.twtranslate('fy', 'test-non-localized'),
@@ -171,6 +183,7 @@ class TestTWTranslate(TWNTestCaseBase):
                          u'test-non-localized EN')
 
     def testNoEnglish(self):
+        """Test translating into English with missing entry."""
         self.assertRaises(i18n.TranslationError, i18n.twtranslate,
                           'en', 'test-no-english')
 
@@ -234,6 +247,7 @@ class TestTWNTranslate(TWNTestCaseBase):
             u'Robot: Changer seulement une page.')
 
     def testMultiple(self):
+        """Test using multiple plural entries."""
         self.assertEqual(
             i18n.twntranslate('de', 'test-multiple-plurals', 1)
             % {'action': u'Ändere', 'line': u'eine'},
@@ -293,6 +307,7 @@ class TestTWNTranslate(TWNTestCaseBase):
                               {'action': u'Ändere', 'line': "elf", 'page': 2})
 
     def testAllParametersExist(self):
+        """Test that all parameters are required when using a dict."""
         with self.assertRaisesRegex(KeyError, repr(u'line')):
             # all parameters must be inside twntranslate
             i18n.twntranslate('de', 'test-multiple-plurals',
@@ -348,6 +363,7 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Verify that a translation does not yet exist."""
         if cls.code in i18n.twget_keys('pywikibot-enter-category-name'):
             raise unittest.SkipTest(
                 '%s has a translation for %s'
@@ -376,6 +392,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         self.output_text = text
 
     def setUp(self):
+        """Patch the output and input methods."""
         super(MissingPackageTestCase, self).setUp()
         self.output_text = ''
         self.orig_raw_input = bot.ui._raw_input
@@ -384,6 +401,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         bot.ui.output = self._capture_output
 
     def tearDown(self):
+        """Restore the output and input methods."""
         bot.ui._raw_input = self.orig_raw_input
         bot.ui.output = self.orig_output
         super(MissingPackageTestCase, self).tearDown()

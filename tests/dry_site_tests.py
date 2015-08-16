@@ -31,6 +31,7 @@ class TestDrySite(DefaultDrySiteTestCase):
     dry = True
 
     def test_logged_in(self):
+        """Test logged_in() method."""
         x = self.get_site()
 
         x._userinfo = {'name': None, 'groups': []}
@@ -49,6 +50,7 @@ class TestDrySite(DefaultDrySiteTestCase):
         self.assertFalse(x.logged_in(False))
 
     def test_user_agent(self):
+        """Test different variants of user agents."""
         x = self.get_site()
 
         x._userinfo = {'name': 'foo'}
@@ -108,6 +110,7 @@ class TestMustBe(DebugOnlyTestCase):
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
+        """Creating fake variables to appear as a site."""
         self.code = 'test'
         self.family = lambda: None
         self.family.name = 'test'
@@ -117,25 +120,30 @@ class TestMustBe(DebugOnlyTestCase):
         self.version = lambda: '1.13'  # pre 1.14
 
     def login(self, sysop):
-        # mock call
+        """Fake the log in and just store who logged in."""
         self._logged_in_as = 'sysop' if sysop else 'user'
 
     def testMockInTest(self):
+        """Test that setUp and login work."""
         self.assertEqual(self._logged_in_as, None)
         self.login(True)
         self.assertEqual(self._logged_in_as, 'sysop')
 
+    # Test that setUp is actually called between each test
     testMockInTestReset = testMockInTest
 
     @must_be('sysop')
     def call_this_sysop_req_function(self, *args, **kwargs):
+        """Require a sysop to function."""
         return args, kwargs
 
     @must_be('user')
     def call_this_user_req_function(self, *args, **kwargs):
+        """Require a user to function."""
         return args, kwargs
 
     def testMustBeSysop(self):
+        """Test a function which requires a sysop."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
         retval = self.call_this_sysop_req_function(*args, **kwargs)
@@ -144,6 +152,7 @@ class TestMustBe(DebugOnlyTestCase):
         self.assertEqual(self._logged_in_as, 'sysop')
 
     def testMustBeUser(self):
+        """Test a function which requires a user."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
         retval = self.call_this_user_req_function(*args, **kwargs)
@@ -152,6 +161,7 @@ class TestMustBe(DebugOnlyTestCase):
         self.assertEqual(self._logged_in_as, 'user')
 
     def testOverrideUserType(self):
+        """Test overriding the required group."""
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
         retval = self.call_this_user_req_function(*args, as_group='sysop', **kwargs)
@@ -160,6 +170,7 @@ class TestMustBe(DebugOnlyTestCase):
         self.assertEqual(self._logged_in_as, 'sysop')
 
     def testObsoleteSite(self):
+        """Test when the site is obsolete and shouldn't be edited."""
         self.obsolete = True
         args = (1, 2, 'a', 'b')
         kwargs = {'i': 'j', 'k': 'l'}
@@ -180,37 +191,45 @@ class TestNeedVersion(DeprecationTestCase):
 
     @need_version("1.14")
     def too_new(self):
+        """Method which is to new."""
         return True
 
     @need_version("1.13")
     def old_enough(self):
+        """Method which is as new as the server."""
         return True
 
     @need_version("1.12")
     def older(self):
+        """Method which is old enough."""
         return True
 
     @need_version("1.14")
     @deprecated
     def deprecated_unavailable_method(self):
+        """Method which is to new and then deprecated."""
         return True
 
     @deprecated
     @need_version("1.14")
     def deprecated_unavailable_method2(self):
+        """Method which is deprecated first and then to new."""
         return True
 
     @need_version("1.12")
     @deprecated
     def deprecated_available_method(self):
+        """Method which is old enough and then deprecated."""
         return True
 
     @deprecated
     @need_version("1.12")
     def deprecated_available_method2(self):
+        """Method which is deprecated first and then old enough."""
         return True
 
     def test_need_version(self):
+        """Test need_version when the version is to new, exact or old enough."""
         self.assertRaises(NotImplementedError, self.too_new)
         self.assertTrue(self.old_enough())
         self.assertTrue(self.older())
