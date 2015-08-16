@@ -91,31 +91,34 @@ class BaseRevertBot(object):
         return 'top' in item
 
     def revert(self, item):
-        history = pywikibot.Page(self.site, item['title']).fullVersionHistory(
-            total=2, rollback=self.rollback)
+        page = pywikibot.Page(self.site, item['title'])
+        history = list(page.revisions(total=2))
         if len(history) > 1:
             rev = history[1]
         else:
             return False
         comment = i18n.twtranslate(
-            pywikibot.Site(), 'revertbot-revert',
-            {'revid': rev[0], 'author': rev[2], 'timestamp': rev[1]})
+            self.site, 'revertbot-revert',
+            {'revid': rev.revid,
+             'author': rev.user,
+             'timestamp': rev.timestamp})
         if self.comment:
             comment += ': ' + self.comment
-        page = pywikibot.Page(self.site, item['title'])
         pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
                          % page.title(asLink=True, forceInterwiki=True,
                                       textlink=True))
         if not self.rollback:
             old = page.text
-            page.text = rev[3]
+            page.text = rev.text
             pywikibot.showDiff(old, page.text)
             page.save(comment)
             return comment
         try:
             pywikibot.data.api.Request(
-                self.site, parameters={'action': 'rollback', 'title': page,
-                                       'user': self.user, 'token': rev[4],
+                self.site, parameters={'action': 'rollback',
+                                       'title': page,
+                                       'user': self.user,
+                                       'token': rev.rollbacktoken,
                                        'markbot': True}).submit()
         except pywikibot.data.api.APIError as e:
             if e.code == 'badtoken':
