@@ -115,7 +115,8 @@ class TestApiFunctions(DefaultSiteTestCase):
 
     def testObjectCreation(self):
         """Test api.Request() constructor with implicit site creation."""
-        req = api.Request(action="test", foo="", bar="test")
+        req = api.Request(parameters={'action': 'test', 'foo': '',
+                                      'bar': 'test'})
         self.assertTrue(req)
         self.assertEqual(req.site, self.get_site())
 
@@ -127,7 +128,8 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
     def testObjectCreation(self):
         """Test api.Request() constructor."""
         mysite = self.get_site()
-        req = api.Request(site=mysite, action="test", foo="", bar="test")
+        req = api.Request(site=mysite, parameters={'action': 'test', 'foo': '',
+                                                   'bar': 'test'})
         self.assertTrue(req)
         self.assertEqual(req.site, mysite)
         self.assertIn("foo", req._params)
@@ -836,13 +838,13 @@ class TestCachedRequest(DefaultSiteTestCase):
                   'titles': mainpage.title(),
                   }
         req1 = api.CachedRequest(datetime.timedelta(minutes=10),
-                                 site=mysite, **params)
+                                 site=mysite, parameters=params)
         data1 = req1.submit()
         req2 = api.CachedRequest(datetime.timedelta(minutes=10),
-                                 site=mysite, **params)
+                                 site=mysite, parameters=params)
         data2 = req2.submit()
         req3 = api.CachedRequest(datetime.timedelta(minutes=10),
-                                 site=mysite, **params)
+                                 site=mysite, parameters=params)
         data3 = req3.submit()
         self.assertEqual(data1, data2)
         self.assertEqual(data2, data3)
@@ -861,7 +863,7 @@ class TestCachedRequest(DefaultSiteTestCase):
                   'titles': 'TestCachedRequest_test_internals ' + str(now),
                   }
         req = api.CachedRequest(datetime.timedelta(minutes=10),
-                                site=mysite, **params)
+                                site=mysite, parameters=params)
         rv = req._load_cache()
         self.assertFalse(rv)
         self.assertIsNone(req._data)
@@ -927,7 +929,7 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
     def test_access_denied_notexist_username(self):
         """Test the query with a username which does not exist."""
         self.site._username = ['Not registered username', None]
-        req = api.Request(site=self.site, action='query')
+        req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
@@ -948,7 +950,7 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
         if 'steward' in pywikibot.config.usernames:
             del pywikibot.config.usernames['steward']
 
-        req = api.Request(site=self.site, action='query')
+        req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)

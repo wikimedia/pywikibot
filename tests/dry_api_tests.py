@@ -180,13 +180,13 @@ class MockCachedRequestKeyTests(TestCase):
     def test_cachefile_path_different_users(self):
         """Test and compare the file paths when different usernames are used."""
         req = CachedRequest(expiry=1, site=self.mocksite,
-                            action='query', meta='siteinfo')
+                            parameters={'action': 'query', 'meta': 'siteinfo'})
         anonpath = req._cachefile_path()
 
         self.mocksite._userinfo = {'name': u'MyUser'}
         self.mocksite._loginstatus = 0
         req = CachedRequest(expiry=1, site=self.mocksite,
-                            action='query', meta='siteinfo')
+                            parameters={'action': 'query', 'meta': 'siteinfo'})
         userpath = req._cachefile_path()
 
         self.assertNotEqual(anonpath, userpath)
@@ -194,7 +194,7 @@ class MockCachedRequestKeyTests(TestCase):
         self.mocksite._userinfo = {'name': u'MySysop'}
         self.mocksite._loginstatus = 1
         req = CachedRequest(expiry=1, site=self.mocksite,
-                            action='query', meta='siteinfo')
+                            parameters={'action': 'query', 'meta': 'siteinfo'})
         sysoppath = req._cachefile_path()
 
         self.assertNotEqual(anonpath, sysoppath)
@@ -206,13 +206,13 @@ class MockCachedRequestKeyTests(TestCase):
         self.mocksite._loginstatus = 0
 
         req = CachedRequest(expiry=1, site=self.mocksite,
-                            action='query', meta='siteinfo')
+                            parameters={'action': 'query', 'meta': 'siteinfo'})
         en_user_path = req._cachefile_path()
 
         self.mocksite._namespaces = {2: [u'مستخدم']}
 
         req = CachedRequest(expiry=1, site=self.mocksite,
-                            action='query', meta='siteinfo')
+                            parameters={'action': 'query', 'meta': 'siteinfo'})
 
         expect = (u'MockSite()User(User:محمد الفلسطيني)' +
                   "[('action', 'query'), ('meta', 'siteinfo')]")
@@ -237,14 +237,16 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
 
         del site._userinfo
         self.assertRaisesRegex(pywikibot.Error, ' without userinfo',
-                               Request, site=site, action='edit')
+                               Request, site=site,
+                               parameters={'action': 'edit'})
 
         # Explicitly using str as the test expects it to be str (without the
         # u-prefix) in Python 2 and this module is using unicode_literals
         site._userinfo = {'name': str('1.2.3.4'), 'groups': []}
 
         self.assertRaisesRegex(pywikibot.Error, " as IP '1.2.3.4'",
-                               Request, site=site, action='edit')
+                               Request, site=site,
+                               parameters={'action': 'edit'})
 
     def test_unexpected_user(self):
         """Test Request object when username is not correct."""
@@ -252,7 +254,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         site._userinfo = {'name': 'other_username', 'groups': []}
         site._username[0] = 'myusername'
 
-        Request(site=site, action='edit')
+        Request(site=site, parameters={'action': 'edit'})
 
     def test_normal(self):
         """Test Request object when username is correct."""
@@ -260,7 +262,7 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         site._userinfo = {'name': 'myusername', 'groups': []}
         site._username[0] = 'myusername'
 
-        Request(site=site, action='edit')
+        Request(site=site, parameters={'action': 'edit'})
 
 
 class DryMimeTests(TestCase):
@@ -301,9 +303,9 @@ class MimeTests(DefaultDrySiteTestCase):
         site = self.get_site()
         site._username[0] = 'myusername'
         site._userinfo = {'name': 'myusername', 'groups': []}
-        req = Request(site=site, action="upload",
-                      file='MP_sounds.png', mime=True,
-                      filename=join_images_path('MP_sounds.png'))
+        parameters = {'action': 'upload', 'file': 'MP_sounds.png',
+                      'filename': join_images_path('MP_sounds.png')}
+        req = Request(site=site, mime=True, parameters=parameters)
         self.assertEqual(req.mime, True)
 
 
@@ -467,8 +469,10 @@ class QueryGenTests(DefaultDrySiteTestCase):
 
     def test_query_constructor(self):
         """Test QueryGenerator constructor."""
-        qGen1 = QueryGenerator(site=self.get_site(), action="query", meta="siteinfo")
-        qGen2 = QueryGenerator(site=self.get_site(), meta="siteinfo")
+        qGen1 = QueryGenerator(site=self.site,
+                               parameters={'action': 'query', 'meta': 'siteinfo'})
+        qGen2 = QueryGenerator(site=self.site,
+                               parameters={'meta': 'siteinfo'})
         self.assertCountEqual(qGen1.request._params.items(), qGen2.request._params.items())
 
 
