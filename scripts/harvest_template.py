@@ -85,7 +85,8 @@ class HarvestRobot(WikidataBot):
             pywikibot.error(u'Template %s does not exist.' % temp.title())
             exit()
 
-        pywikibot.output('Finding redirects...')  # Put some output here since it can take a while
+        # Put some output here since it can take a while
+        pywikibot.output('Finding redirects...')
         if temp.isRedirectPage():
             temp = temp.getRedirectTarget()
         titles = [page.title(withNamespace=False)
@@ -143,7 +144,9 @@ class HarvestRobot(WikidataBot):
                 template = pywikibot.Page(page.site, template,
                                           ns=10).title(withNamespace=False)
             except pywikibot.exceptions.InvalidTitle:
-                pywikibot.error(u"Failed parsing template; '%s' should be the template name." % template)
+                pywikibot.error(
+                    "Failed parsing template; '%s' should be the template name."
+                    % template)
                 continue
             # We found the template we were looking for
             if template in self.templateTitles:
@@ -191,11 +194,15 @@ class HarvestRobot(WikidataBot):
                                 if image.isRedirectPage():
                                     image = pywikibot.FilePage(image.getRedirectTarget())
                                 if not image.exists():
-                                    pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (image.title(),))
+                                    pywikibot.output(
+                                        '[[%s]] doesn\'t exist so I can\'t link to it'
+                                        % (image.title(),))
                                     continue
                                 claim.setTarget(image)
                             else:
-                                pywikibot.output("%s is not a supported datatype." % claim.type)
+                                pywikibot.output(
+                                    '%s is not a supported datatype.'
+                                    % claim.type)
                                 continue
 
                             pywikibot.output('Adding %s --> %s'

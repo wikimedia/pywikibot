@@ -163,7 +163,7 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
 
     @raises ImportError
 
-    [1] https://github.com/wikimedia/mediawiki/blob/master/includes/rcfeed/MachineReadableRCFeedFormatter.php
+    [1]: See mediawiki/includes/rcfeed/MachineReadableRCFeedFormatter.php
 
     """
     try:
