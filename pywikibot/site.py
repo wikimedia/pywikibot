@@ -6532,7 +6532,6 @@ class DataSite(APISite):
 
         gen = api.APIGenerator('wbsearchentities', data_name='search',
                                search=search, language=language, **kwargs)
-        gen.set_query_increment(50)
         if limit is not None:
             gen.set_maximum_items(limit)
         return gen
