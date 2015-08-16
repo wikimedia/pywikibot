@@ -93,6 +93,7 @@ class BlockreviewBot:
         self.parts = None
 
     def run(self):
+        """Run the bot."""
         # TODO: change the generator for template to the included category
         try:
             genPage = pywikibot.Page(self.site,
@@ -228,6 +229,7 @@ class BlockreviewBot:
             self.save(talkText, userPage, talkComment)
 
     def getInfo(self, user):
+        """Collect user info for i18n parameter dict."""
         if not self.info:
             self.info = next(self.site.logpages(
                 1, mode='block', title=user.getUserPage().title(), dump=True))
@@ -242,6 +244,7 @@ class BlockreviewBot:
             }
 
     def SysopGenerator(self):
+        """Retrieve sysop talkpages."""
         for user in self.site.allusers(group='sysop'):
             # exclude sysop bots
             if 'bot' not in user['groups']:
@@ -263,6 +266,7 @@ class BlockreviewBot:
             return text
 
     def save(self, text, page, comment, minorEdit=True, botflag=True):
+        """Save the text."""
         if text != page.text:
             # Show the title of the page we're working on.
             # Highlight the title in purple.
