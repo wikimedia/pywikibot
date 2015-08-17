@@ -5941,6 +5941,29 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['reply']['committed']['topic']
 
+    @must_be('user')
+    @need_extension('Flow')
+    def lock_topic(self, page, lock, reason):
+        """Lock or unlock a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param lock: Whether to lock or unlock the topic
+        @type lock: bool (True corresponds to locking the topic.)
+        @param reason: The reason to lock or unlock the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        status = 'lock' if lock else 'unlock'
+        token = self.tokens['csrf']
+        params = {'action': 'flow', 'page': page, 'token': token,
+                  'submodule': 'lock-topic', 'cotreason': reason,
+                  'cotmoderationState': status}
+        req = self._request(parameters=params, use_get=False)
+        data = req.submit()
+        return data['flow']['lock-topic']['committed']['topic']
+
     def watched_pages(self, sysop=False, force=False, step=None, total=None):
         """
         Return watchlist.
