@@ -110,7 +110,8 @@ class TestReplacementsMain(TestCase):
         """Test a replacement from the command line."""
         self.assertIsInstance(replacement, clazz)
         self.assertEqual(replacement.old, str(offset * 2 + 1))
-        self.assertEqual(replacement.new, str(offset * 2 + 2))
+        if not callable(replacement.new):
+            self.assertEqual(replacement.new, str(offset * 2 + 2))
 
     def _test_fix_replacement(self, replacement, length=1, offset=0, msg=False):
         """Test a replacement from a fix."""
@@ -229,6 +230,13 @@ class TestReplacementsMain(TestCase):
         self._apply(bot, 'Hello 1', missing=True, title='Neither')
         self._apply(bot, 'Hello 2', title='Allowed')
         self._apply(bot, 'Hello 1', missing=True, title='Allowed Declined')
+
+    def test_fix_callable(self):
+        """Test fix replacements using a callable."""
+        bot = self._get_bot(True, '-fix:no-msg-callable')
+        self.assertEqual(len(bot.replacements), 1)
+        self._test_fix_replacement(bot.replacements[0])
+        self.assertTrue(callable(bot.replacements[0].new))
 
 
 if __name__ == '__main__':

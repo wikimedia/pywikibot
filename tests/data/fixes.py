@@ -70,3 +70,10 @@ fixes['no-msg-title-exceptions'] = {
         ('1', '2'),
     ]
 }
+
+fixes['no-msg-callable'] = {
+    'regex': False,
+    'replacements': [
+        ('1', lambda match: str(match.start())),
+    ]
+}
