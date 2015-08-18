@@ -979,7 +979,8 @@ def main(*args):
                 pywikibot.warning('The old string "{0}" contains formatting '
                                   'characters like U+200E'.format(
                     chars.replace_invisible(replacement[0])))
-            if chars.contains_invisible(replacement[1]):
+            if (not callable(replacement[1]) and
+                    chars.contains_invisible(replacement[1])):
                 pywikibot.warning('The new string "{0}" contains formatting '
                                   'characters like U+200E'.format(
                     chars.replace_invisible(replacement[1])))
