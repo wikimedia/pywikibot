@@ -964,7 +964,7 @@ def _assert_default_type(name, value, default_value):
     elif isinstance(value, int) and isinstance(default_value, float):
         return float(value)
     else:
-        raise _DifferentTypeError(name, type(value), type(default_value))
+        raise _DifferentTypeError(name, type(value), [type(default_value)])
 
 
 def _assert_types(name, value, types):
