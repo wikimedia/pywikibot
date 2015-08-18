@@ -879,11 +879,13 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
     # pywikibot is not connected to a tty. T100964
 
     def setUp(self):
+        super(TestLazyLoginNotExistUsername, self).setUp()
         self.orig_login_manager = pywikibot.data.api.LoginManager
         pywikibot.data.api.LoginManager = FakeLoginManager
 
     def tearDown(self):
         pywikibot.data.api.LoginManager = self.orig_login_manager
+        super(TestLazyLoginNotExistUsername, self).tearDown()
 
     def test_access_denied_notexist_username(self):
         """Test the query with a username which does not exist."""
