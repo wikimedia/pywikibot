@@ -11,6 +11,8 @@ __version__ = '$Id$'
 #
 import os
 
+import pywikibot
+
 from pywikibot import fixes
 
 from scripts import replace
@@ -37,23 +39,22 @@ class TestReplacementsMain(TestCase):
 
     def setUp(self):
         """Replace the original bot class with a fake one."""
-        class FakeReplaceBot(object):
+        class FakeReplaceBot(replace.ReplaceRobot):
 
             """A fake bot class for the minimal support."""
 
             changed_pages = -42  # show that weird number to show this was used
 
-            def __init__(inner_self, generator, replacements, exceptions={},
-                         always=False, allowoverlap=False, recursive=False,
-                         addedCat=None, sleep=None, summary='', site=None,
-                         **kwargs):
-                inner_self.replacements = replacements
-                inner_self.site = site
+            def __init__(inner_self, *args, **kwargs):
+                # Unpatch already here, as otherwise super calls will use
+                # this class' super which is the class itself
+                replace.ReplaceRobot = self._original_bot
+                super(FakeReplaceBot, inner_self).__init__(*args, **kwargs)
                 self.bots.append(inner_self)
 
             def run(inner_self):
                 """Nothing to do here."""
-                pass
+                inner_self.changed_pages = -47  # show that run was called
 
         def patched_login(sysop=False):
             """Do nothing."""
@@ -122,6 +123,7 @@ class TestReplacementsMain(TestCase):
         else:
             self.assertIs(replacement.edit_summary,
                           replacement.fix_set.edit_summary)
+        self.assertIs(replacement.fix_set, replacement.container)
         self.assertIsInstance(replacement.fix_set, replace.ReplacementList)
         self.assertIsInstance(replacement.fix_set, list)
         self.assertIn(replacement, replacement.fix_set)
@@ -140,7 +142,24 @@ class TestReplacementsMain(TestCase):
         else:
             self.assertNotIn(self.SUMMARY_CONFIRMATION, self.inputs)
         self.assertEqual(bot.site, self.site)
+        self.assertEqual(bot.changed_pages, -47)
         return bot
+
+    def _apply(self, bot, expected, missing=None, title='Test page'):
+        """Test applying a test change."""
+        applied = set()
+        if missing is True:
+            required_applied = set()
+        else:
+            required_applied = set(bot.replacements)
+            if missing:
+                required_applied -= set(missing)
+        # shouldn't be edited anyway
+        page = pywikibot.Page(self.site, title)
+        self.assertEqual(expected,
+                         bot.apply_replacements('Hello 1', applied, page))
+        self.assertEqual(applied, required_applied)
+        self.assertEqual(expected, bot.doReplacements('Hello 1', page))
 
     def test_only_cmd(self):
         """Test command line replacements only."""
@@ -199,6 +218,17 @@ class TestReplacementsMain(TestCase):
         self.assertEqual(len(bot.replacements), 2)
         self._test_replacement(bot.replacements[0])
         self._test_fix_replacement(bot.replacements[1])
+
+    def test_except_title(self):
+        """Test excepting and requiring a title specific to fix."""
+        bot = self._get_bot(True, '-fix:no-msg-title-exceptions')
+        self.assertEqual(len(bot.replacements), 1)
+        self._test_fix_replacement(bot.replacements[0])
+        self.assertIn('title', bot.replacements[0].exceptions)
+        self.assertIn('require-title', bot.replacements[0].exceptions)
+        self._apply(bot, 'Hello 1', missing=True, title='Neither')
+        self._apply(bot, 'Hello 2', title='Allowed')
+        self._apply(bot, 'Hello 1', missing=True, title='Allowed Declined')
 
 
 if __name__ == '__main__':

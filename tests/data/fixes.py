@@ -59,3 +59,14 @@ fixes['has-msg-multiple'] = {
         ('5', '6'),
     ]
 }
+
+fixes['no-msg-title-exceptions'] = {
+    'regex': False,
+    'exceptions': {
+        'title': ['Declined'],
+        'require-title': ['Allowed'],
+    },
+    'replacements': [
+        ('1', '2'),
+    ]
+}
