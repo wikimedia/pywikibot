@@ -1736,6 +1736,11 @@ class Request(MutableMapping):
                     pywikibot.error(
                         u"_encoded_items: '%s' could not be encoded as '%s':"
                         u" %r" % (key, self.site.encoding(), value))
+            if PY2:
+                key = key.encode('ascii')
+            else:
+                assert key.encode('ascii')
+            assert isinstance(key, str)
             params[key] = value
         return params
 
