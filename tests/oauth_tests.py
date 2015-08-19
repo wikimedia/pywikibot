@@ -28,6 +28,8 @@ class OAuthSiteTestCase(TestCase):
 
     """Run tests related to OAuth authentication."""
 
+    oauth = True
+
     @classmethod
     def setUpClass(cls):
         """Check if mwoauth is installed."""

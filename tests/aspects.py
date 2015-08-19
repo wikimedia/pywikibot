@@ -593,6 +593,9 @@ class RequireUserMixin(TestCaseBase):
         for site in cls.sites.values():
             cls.require_site_user(site['family'], site['code'], sysop)
 
+            if hasattr(cls, 'oauth') and cls.oauth:
+                continue
+
             try:
                 site['site'].login(sysop)
             except NoUsername:
@@ -620,6 +623,9 @@ class RequireUserMixin(TestCaseBase):
         # logged in.
         for site in self.sites.values():
             site = site['site']
+
+            if hasattr(self, 'oauth') and self.oauth:
+                continue
 
             if not site.logged_in(sysop):
                 site.login(sysop)
@@ -783,7 +789,7 @@ class MetaTestCaseClass(type):
         bases = tuple([CheckHostnameMixin] + list(bases))
 
         if 'write' in dct and dct['write']:
-            if 'user' not in dct and 'oauth' not in dct:
+            if 'user' not in dct:
                 dct['user'] = True
             bases = tuple([SiteWriteMixin] + list(bases))
 
