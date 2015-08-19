@@ -287,9 +287,14 @@ def _http_process(session, http_request):
     cookies = cookie_jar
     timeout = config.socket_timeout
     try:
+        ignore_validation = http_request.kwargs.pop(
+            'disable_ssl_certificate_validation', False)
+        # Note that the connections are pooled which mean that a future
+        # HTTPS request can succeed even if the certificate is invalid and
+        # verify=True, when a request with verify=False happened before
         response = session.request(method, uri, data=body, headers=headers,
                                    cookies=cookies, auth=auth, timeout=timeout,
-                                   verify=True)
+                                   verify=not ignore_validation)
     except Exception as e:
         http_request.data = e
     else:
