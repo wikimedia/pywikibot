@@ -19,11 +19,12 @@ except ImportError as e:
 from pywikibot.login import OauthLoginManager
 from tests.aspects import (
     unittest,
+    TestCase,
     DefaultSiteTestCase,
 )
 
 
-class OAuthSiteTestCase(DefaultSiteTestCase):
+class OAuthSiteTestCase(TestCase):
 
     """Run tests related to OAuth authentication."""
 
@@ -55,7 +56,14 @@ class OAuthSiteTestCase(DefaultSiteTestCase):
         self.access_token = tokens[2:]
 
 
-class TestOauthLoginManger(OAuthSiteTestCase):
+class DefaultOAuthSiteTestCase(DefaultSiteTestCase, OAuthSiteTestCase):
+
+    """Default OAuth site test."""
+
+    pass
+
+
+class TestOauthLoginManger(DefaultOAuthSiteTestCase):
 
     """Test OAuth login manager."""
 

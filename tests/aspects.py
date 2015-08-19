@@ -685,7 +685,7 @@ class MetaTestCaseClass(type):
         # Inherit superclass attributes
         for base in bases:
             for key in ('pwb', 'net', 'site', 'user', 'sysop', 'write',
-                        'sites', 'family', 'code', 'dry', 'hostname',
+                        'sites', 'family', 'code', 'dry', 'hostname', 'oauth',
                         'hostnames', 'cached', 'cacheinfo', 'wikibase'):
                 if hasattr(base, key) and key not in dct:
                     # print('%s has %s; copying to %s'
@@ -783,7 +783,7 @@ class MetaTestCaseClass(type):
         bases = tuple([CheckHostnameMixin] + list(bases))
 
         if 'write' in dct and dct['write']:
-            if 'user' not in dct:
+            if 'user' not in dct and 'oauth' not in dct:
                 dct['user'] = True
             bases = tuple([SiteWriteMixin] + list(bases))
 
