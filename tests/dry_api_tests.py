@@ -48,21 +48,49 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     def setUp(self):
         super(DryCachedRequestTests, self).setUp()
-        self.parms = {'site': self.basesite,
-                      'action': 'query',
+        self.parms = {'action': 'query',
                       'meta': 'userinfo'}
-        self.req = CachedRequest(expiry=1, **self.parms)
-        self.expreq = CachedRequest(expiry=0, **self.parms)
-        self.diffreq = CachedRequest(expiry=1, site=self.basesite, action='query', meta='siteinfo')
-        self.diffsite = CachedRequest(expiry=1, site=self.altsite, action='query', meta='userinfo')
+        self.req = CachedRequest(expiry=1, site=self.basesite,
+                                 parameters=self.parms)
+        self.expreq = CachedRequest(expiry=0, site=self.basesite,
+                                    parameters=self.parms)
+        self.diffreq = CachedRequest(
+            expiry=1, site=self.basesite,
+            parameters={'action': 'query', 'meta': 'siteinfo'})
+        self.diffsite = CachedRequest(
+            expiry=1, site=self.altsite,
+            parameters={'action': 'query', 'meta': 'userinfo'})
+        # When using ** the paramters are still unicode
+        self.deprecated_explicit = CachedRequest(
+            expiry=1, site=self.basesite, action='query', meta='userinfo')
+        self.deprecated_asterisks = CachedRequest(
+            expiry=1, site=self.basesite, **self.parms)
 
     def test_expiry_formats(self):
         self.assertEqual(self.req.expiry,
-                         CachedRequest(datetime.timedelta(days=1), **self.parms).expiry)
+                         CachedRequest(datetime.timedelta(days=1), site=self.basesite,
+                                       parameters=self.parms).expiry)
 
     def test_expired(self):
         self.assertFalse(self.req._expired(datetime.datetime.now()))
         self.assertTrue(self.req._expired(datetime.datetime.now() - datetime.timedelta(days=2)))
+
+    def test_parameter_types(self):
+        """Test _uniquedescriptionstr is identical using different ways."""
+        # This test is done as create_file_name and cachefile_path only use
+        # the hashed name which is not very helpful
+        self.assertEqual(self.req._uniquedescriptionstr(),
+                         self.req._uniquedescriptionstr())
+        self.assertEqual(self.req._uniquedescriptionstr(),
+                         self.expreq._uniquedescriptionstr())
+        self.assertEqual(self.req._uniquedescriptionstr(),
+                         self.deprecated_explicit._uniquedescriptionstr())
+        self.assertEqual(self.req._uniquedescriptionstr(),
+                         self.deprecated_asterisks._uniquedescriptionstr())
+        self.assertNotEqual(self.req._uniquedescriptionstr(),
+                            self.diffreq._uniquedescriptionstr())
+        self.assertNotEqual(self.req._uniquedescriptionstr(),
+                            self.diffsite._uniquedescriptionstr())
 
     def test_get_cache_dir(self):
         retval = self.req._get_cache_dir()
@@ -71,11 +99,19 @@ class DryCachedRequestTests(SiteAttributeTestCase):
     def test_create_file_name(self):
         self.assertEqual(self.req._create_file_name(), self.req._create_file_name())
         self.assertEqual(self.req._create_file_name(), self.expreq._create_file_name())
+        self.assertEqual(self.req._create_file_name(),
+                         self.deprecated_explicit._create_file_name())
+        self.assertEqual(self.req._create_file_name(),
+                         self.deprecated_asterisks._create_file_name())
         self.assertNotEqual(self.req._create_file_name(), self.diffreq._create_file_name())
 
     def test_cachefile_path(self):
         self.assertEqual(self.req._cachefile_path(), self.req._cachefile_path())
         self.assertEqual(self.req._cachefile_path(), self.expreq._cachefile_path())
+        self.assertEqual(self.req._cachefile_path(),
+                         self.deprecated_explicit._cachefile_path())
+        self.assertEqual(self.req._cachefile_path(),
+                         self.deprecated_asterisks._cachefile_path())
         self.assertNotEqual(self.req._cachefile_path(), self.diffreq._cachefile_path())
         self.assertNotEqual(self.req._cachefile_path(), self.diffsite._cachefile_path())
 
