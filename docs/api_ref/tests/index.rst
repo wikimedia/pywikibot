@@ -37,6 +37,7 @@ Library tests
     wikibase<./wikibase_tests>
     wikibase_edit<./wikibase_edit_tests>
     upload<./upload_tests>
+    oauth<./oauth_tests>
 
 ============
 Script tests
