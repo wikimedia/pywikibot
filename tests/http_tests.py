@@ -10,7 +10,9 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 import os
+import re
 import sys
+import warnings
 
 import requests
 
@@ -21,7 +23,6 @@ from pywikibot.comms import http, threadedhttp
 
 from tests import _images_dir
 from tests.aspects import unittest, TestCase, DeprecationTestCase
-from tests.utils import expected_failure_if
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -124,63 +125,32 @@ class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""
 
-    sites = {
-        'omegawiki': {
-            'hostname': 'www.omegawiki.org',
-        },
-        'vikidia': {
-            'hostname': 'en.vikidia.org',
-        },
-    }
+    hostname = 'testssl-expire.disig.sk'
 
     def test_https_cert_error(self):
-        """Test http.request fails on invalid omegawiki SSL certificate."""
+        """Test if http.fetch respects disable_ssl_certificate_validation."""
         self.assertRaises(pywikibot.FatalServerError,
-                          http.request,
-                          site=None,
-                          uri='https://www.omegawiki.org/')
+                          http.fetch,
+                          uri='https://testssl-expire.disig.sk/index.en.html')
 
-    @expected_failure_if(sys.version_info[0] > 2)  # bug 72236
-    def test_https_ignore_cert_error(self):
-        """Test http.request ignoring invalid vikidia SSL certificate."""
-        # As the connection is cached, the above test will cause
-        # subsequent requests to go to the existing, broken, connection.
-        # So, this uses a different host, which hopefully hasnt been
-        # connected previously by other tests.
-        r = http.request(site=None,
-                         uri='https://en.vikidia.org/wiki/Main_Page',
-                         disable_ssl_certificate_validation=True)
+        with warnings.catch_warnings(record=True) as warning_log:
+            response = http.fetch(
+                uri='https://testssl-expire.disig.sk/index.en.html',
+                disable_ssl_certificate_validation=True)
+        r = response.content
         self.assertIsInstance(r, unicode)
-        self.assertIn('<title>Vikidia</title>', r)
+        self.assertTrue(re.search(r'<title>.*</title>', r))
 
-    def test_https_cert_invalid(self):
-        """Verify vikidia SSL certificate is invalid."""
-        try:
-            from pyasn1_modules import pem, rfc2459
-            from pyasn1.codec.der import decoder
-        except ImportError:
-            raise unittest.SkipTest('pyasn1 and pyasn1_modules not available.')
+        # Verify that it now fails again
+        http.session.close()  # but first clear the connection
+        self.assertRaises(pywikibot.FatalServerError,
+                          http.fetch,
+                          uri='https://testssl-expire.disig.sk/index.en.html')
 
-        import ssl
-        import io
-
-        cert = ssl.get_server_certificate(addr=('en.vikidia.org', 443))
-        s = io.StringIO(unicode(cert))
-        substrate = pem.readPemFromFile(s)
-        cert = decoder.decode(substrate, asn1Spec=rfc2459.Certificate())[0]
-        tbs_cert = cert.getComponentByName('tbsCertificate')
-        issuer = tbs_cert.getComponentByName('issuer')
-        organisation = None
-        for rdn in issuer.getComponent():
-            for attr in rdn:
-                attr_type = attr.getComponentByName('type')
-                if attr_type == rfc2459.id_at_organizationName:
-                    value, _ = decoder.decode(attr.getComponentByName('value'),
-                                              asn1Spec=rfc2459.X520name())
-                    organisation = str(value.getComponent())
-                    break
-
-        self.assertEqual(organisation, 'TuxFamily.org non-profit organization')
+        # Verify that the warning occurred
+        self.assertEqual(len(warning_log), 1)
+        self.assertEqual(warning_log[0].category.__name__,
+                         'InsecureRequestWarning')
 
 
 class TestHttpStatus(TestCase):
