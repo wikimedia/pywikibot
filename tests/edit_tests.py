@@ -82,7 +82,6 @@ class OAuthEditTest(OAuthSiteTestCase):
     code = 'test'
 
     write = True
-    oauth = True
 
     def setUp(self):
         """Set up test by checking site and initialization."""
