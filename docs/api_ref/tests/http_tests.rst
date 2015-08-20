@@ -10,7 +10,7 @@ Available tests
         :members:
     .. autoclass:: tests.http_tests.HttpTestCase
         :members:
-    .. autoclass:: tests.http_tests.ThreadedHttpTestCase
+    .. autoclass:: tests.http_tests.TestGetAuthenticationConfig
         :members:
     .. autoclass:: tests.http_tests.UserAgentTestCase
         :members:
