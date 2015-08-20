@@ -65,6 +65,7 @@ if PY2:
 script_deps = {
     'flickrripper.py': ['Pillow'],
     'states_redirect.py': ['pycountry'],
+    'weblinkchecker.py': ['memento_client>=0.5.1'],
 }
 # flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
 # The problem doesnt exist in flickrapi 2.x.
@@ -91,7 +92,6 @@ dependency_links = [
     'hg+https://bitbucket.org/TJG/pywin32#egg=pywin32',
     'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
     'git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29',
-    'git+https://github.com/mementoweb/py-memento-client#egg=memento_client-0.5.0',
 ]
 
 if PYTHON_VERSION < (2, 7, 3):

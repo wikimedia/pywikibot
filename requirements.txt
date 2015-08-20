@@ -93,4 +93,4 @@ beautifulsoup4
 pycountry
 
 # scripts/weblinkchecker.py
-git+https://github.com/mementoweb/py-memento-client#egg=memento_client-0.5.0
+memento_client>=0.5.1
