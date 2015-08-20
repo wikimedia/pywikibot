@@ -1476,7 +1476,7 @@ class AutoFamily(Family):
 
     """Family that automatically loads the site configuration."""
 
-    def __init__(self, name, url, site=None):
+    def __init__(self, name, url):
         """Constructor."""
         super(AutoFamily, self).__init__()
         self.name = name
