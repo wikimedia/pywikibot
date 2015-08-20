@@ -57,7 +57,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.tools import (
-    PYTHON_VERSION,
+    PYTHON_VERSION, PY2,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     first_upper, remove_last_args, _NotImplementedWarning,
@@ -280,7 +280,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def __repr__(self):
         """Return a more complete string representation."""
-        title = self.title().encode(config.console_encoding)
+        if not PY2:
+            title = repr(self.title())
+        else:
+            try:
+                title = self.title().encode(config.console_encoding)
+            except UnicodeEncodeError:
+                # okay console encoding didn't work, at least try something
+                title = self.title().encode('unicode_escape')
         return str('{0}({1})').format(self.__class__.__name__, title)
 
     def _cmpkey(self):

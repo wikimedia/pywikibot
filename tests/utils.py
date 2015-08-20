@@ -325,6 +325,7 @@ class DrySite(pywikibot.site.APISite):
         self._siteinfo._cache['case'] = (
             'case-sensitive' if self.family.name == 'wiktionary' else
             'first-letter', True)
+        self._siteinfo._cache['mainpage'] = 'Main Page'
         extensions = []
         if self.family.name == 'wikisource':
             extensions.append({'name': 'ProofreadPage'})
