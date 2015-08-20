@@ -786,7 +786,10 @@ class MetaTestCaseClass(type):
         if 'cached' in dct and dct['cached']:
             bases = tuple([ForceCacheMixin] + list(bases))
 
-        bases = tuple([CheckHostnameMixin] + list(bases))
+        if 'net' in dct and dct['net']:
+            bases = tuple([CheckHostnameMixin] + list(bases))
+        else:
+            assert not hostnames, 'net must be True with hostnames defined'
 
         if 'write' in dct and dct['write']:
             if 'user' not in dct:
