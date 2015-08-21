@@ -125,6 +125,14 @@ pywikibot.fixes module
     :undoc-members:
     :show-inheritance:
 
+pywikibot.flow module
+----------------------
+
+.. automodule:: pywikibot.flow
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pywikibot.i18n module
 ---------------------
 

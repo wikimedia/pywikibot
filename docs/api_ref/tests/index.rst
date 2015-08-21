@@ -38,6 +38,8 @@ Library tests
     wikibase_edit<./wikibase_edit_tests>
     upload<./upload_tests>
     oauth<./oauth_tests>
+    flow<./flow_tests>
+    flow_edit<./flow_edit_tests>
 
 ============
 Script tests
