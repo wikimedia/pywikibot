@@ -17,7 +17,7 @@ import sys
 from collections import defaultdict
 from distutils.version import LooseVersion as V
 
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, PYTHON_VERSION
 
 if not PY2:
     from html.parser import HTMLParser
@@ -150,8 +150,11 @@ class WikiHTMLPageParser(HTMLParser):
 
     """Wiki HTML page parser."""
 
-    def __init__(self, *args, **kwargs):
-        HTMLParser.__init__(self, *args, **kwargs)
+    def __init__(self):
+        if PYTHON_VERSION < (3, 4):
+            HTMLParser.__init__(self)
+        else:
+            super().__init__(convert_charrefs=True)
         self.generator = None
 
     def handle_starttag(self, tag, attrs):
