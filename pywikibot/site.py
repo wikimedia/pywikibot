@@ -2986,7 +2986,8 @@ class APISite(BaseSite):
             # TODO: try to catch exceptions?
             if 'patrol' in valid_tokens:
                 if MediaWikiVersion('1.14') <= _version < MediaWikiVersion('1.17'):
-                    user_tokens['patrol'] = user_tokens['edit']
+                    if 'edit' in user_tokens:
+                        user_tokens['patrol'] = user_tokens['edit']
                 else:
                     req = self._simple_request(action='query',
                                                list='recentchanges',
