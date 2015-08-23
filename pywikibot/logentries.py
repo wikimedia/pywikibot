@@ -69,11 +69,7 @@ class LogEntry(object):
         if 'params' in self.data:
             return self.data['params']
         else:  # try old mw style preceding mw 1.19
-            try:
-                return self.data[self._expectedType]
-            except KeyError:
-                raise Error("action='%s': this log entry has no params details "
-                            "for type %s." % (self.action(), self.type))
+            return self.data[self._expectedType]
 
     def logid(self):
         """Return the id of the log entry."""
@@ -177,6 +173,8 @@ class BlockEntry(LogEntry):
 
         @rtype: list of flag strings
         """
+        if self.action() == 'unblock':
+            return []
         if not hasattr(self, '_flags'):
             self._flags = self._params['flags']
             # pre mw 1.19 returned a delimited string.
