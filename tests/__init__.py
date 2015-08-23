@@ -130,6 +130,10 @@ extra_test_modules = sorted(_unknown_test_modules())
 
 test_modules = library_test_modules + extra_test_modules + script_test_modules
 
+if 'PYWIKIBOT_TEST_MODULES' in os.environ:
+    _enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
+    disabled_test_modules = set(test_modules) - set(_enabled_test_modules)
+
 
 def collector(loader=unittest.loader.defaultTestLoader):
     """Load the default modules.
@@ -152,9 +156,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
               % disabled_tests)
 
     modules = [module
-               for module in (library_test_modules +
-                              extra_test_modules +
-                              script_test_modules)
+               for module in test_modules
                if module not in disabled_test_modules]
 
     test_list = []

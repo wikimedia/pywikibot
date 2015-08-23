@@ -30,6 +30,11 @@ setup.py
 
     python setup.py test
 
+::
+
+    python setup.py nosetests --tests tests
+
+
 Module unittest
 ~~~~~~~~~~~~~~~
 
@@ -54,21 +59,29 @@ unittest
 
 ::
 
-    python -m unittest -v tests.site_tests
+    python -m unittest -v tests.api_tests tests.site_tests
 
 nose
 ~~~~
 
 ::
 
-    nosetests -v tests.site_tests
+    nosetests -v tests.api_tests tests.site_tests
 
 pwb
 ~~~
 
 ::
 
+    python pwb.py tests/api_tests.py -v
     python pwb.py tests/site_tests.py -v
+
+env
+~~~
+
+::
+
+    PYWIKIBOT_TEST_MODULES=api,site python setup.py test
 
 
 Travis CI
