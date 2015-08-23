@@ -559,6 +559,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def testAllLinks(self):
         """Test the site.alllinks() method."""
+        if self.site.family.name == 'wsbeta':
+            raise unittest.SkipTest('Test fails on betawiki; T69931')
+
         mysite = self.get_site()
         fwd = list(mysite.alllinks(total=10))
         self.assertLessEqual(len(fwd), 10)
