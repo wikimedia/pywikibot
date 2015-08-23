@@ -23,6 +23,13 @@ Arguments:
                   'Mi': Mebibytes (1024x1024 B)
                 The suffixes are case insensitive.
 
+It is possible to combine -abortonwarn and -ignorewarn so that if the specific
+warning is given it won't apply the general one but more specific one. So if it
+should ignore specific warnings and abort on the rest it's possible by defining
+no warning for -abortonwarn and the specific warnings for -ignorewarn. The order
+does not matter. If both are unspecific or a warning is specified by both, it'll
+prefer aborting.
+
 If any other arguments are given, the first is either URL, filename or directory
 to upload, and the rest is a proposed description to go with the upload. If none
 of these are given, the user is asked for the directory, file or URL to upload.
@@ -197,6 +204,44 @@ class UploadRobot:
         t.close()
         return tempname
 
+    def _handle_warning(self, warning):
+        """
+        Return whether the warning cause an abort or be ignored.
+
+        @param warning: The warning name
+        @type warning: str
+        @return: False if this warning should cause an abort, True if it should
+            be ignored or None if this warning has no default handler.
+        @rtype: bool or None
+        """
+        if self.aborts is not True:
+            if warning in self.aborts:
+                return False
+        if self.ignoreWarning is True or (self.ignoreWarning is not False and
+                                          warning in self.ignoreWarning):
+            return True
+        return None if self.aborts is not True else False
+
+    def _handle_warnings(self, warnings):
+        messages = '\n'.join('{0.code}: {0.info}'.format(warning)
+                             for warning in sorted(warnings,
+                                                   key=lambda w: w.code))
+        if len(warnings) > 1:
+            messages = '\n' + messages
+        pywikibot.output('We got the following warning(s): ' + messages)
+        answer = True
+        for warning in warnings:
+            this_answer = self._handle_warning(warning.code)
+            if this_answer is False:
+                answer = False
+                break
+            elif this_answer is None:
+                answer = None
+        if answer is None:
+            answer = pywikibot.input_yn(u"Do you want to ignore?",
+                                        default=False, automatic_quit=False)
+        return answer
+
     def process_filename(self, file_url=None):
         """Return base filename portion of file_url."""
         if not file_url:
@@ -351,54 +396,44 @@ class UploadRobot:
 
         pywikibot.output(u'Uploading file to %s via API...' % site)
 
+        success = False
         try:
-            apiIgnoreWarnings = False
             if self.ignoreWarning is True:
                 apiIgnoreWarnings = True
+            else:
+                apiIgnoreWarnings = self._handle_warnings
             if self.uploadByUrl:
-                site.upload(imagepage, source_url=file_url,
-                            ignore_warnings=apiIgnoreWarnings,
-                            _file_key=_file_key, _offset=_offset)
+                success = site.upload(imagepage, source_url=file_url,
+                                      ignore_warnings=apiIgnoreWarnings,
+                                      _file_key=_file_key, _offset=_offset)
             else:
                 if "://" in file_url:
                     temp = self.read_file_content(file_url)
                 else:
                     temp = file_url
-                site.upload(imagepage, source_filename=temp,
-                            ignore_warnings=apiIgnoreWarnings,
-                            chunk_size=self.chunk_size,
-                            _file_key=_file_key, _offset=_offset)
+                success = site.upload(imagepage, source_filename=temp,
+                                      ignore_warnings=apiIgnoreWarnings,
+                                      chunk_size=self.chunk_size,
+                                      _file_key=_file_key, _offset=_offset)
 
-        except pywikibot.data.api.UploadWarning as warn:
-            pywikibot.output(
-                u'We got a warning message: {0} - {1}'.format(warn.code, warn.message))
-            if self.abort_on_warn(warn.code):
-                answer = False
-            elif self.ignore_on_warn(warn.code):
-                answer = True
-            else:
-                answer = pywikibot.input_yn(u"Do you want to ignore?",
-                                            default=False, automatic_quit=False)
-            if answer:
-                self.ignoreWarning = True
-                self.keepFilename = True
-                return self.upload_file(file_url, debug, warn.file_key, warn.offset)
-            else:
-                pywikibot.output(u"Upload aborted.")
-                return
         except pywikibot.data.api.APIError as error:
             if error.code == u'uploaddisabled':
                 pywikibot.error("Upload error: Local file uploads are disabled on %s."
                                 % site)
             else:
                 pywikibot.error("Upload error: ", exc_info=True)
+            return None
         except Exception:
             pywikibot.error("Upload error: ", exc_info=True)
-
+            return None
         else:
-            # No warning, upload complete.
-            pywikibot.output(u"Upload of %s successful." % filename)
-            return filename  # data['filename']
+            if success:
+                # No warning, upload complete.
+                pywikibot.output(u"Upload of %s successful." % filename)
+                return filename  # data['filename']
+            else:
+                pywikibot.output(u"Upload aborted.")
+                return None
 
     def run(self):
         """Run bot."""

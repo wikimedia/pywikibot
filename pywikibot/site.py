@@ -5180,7 +5180,7 @@ class APISite(BaseSite):
     @deprecate_arg('imagepage', 'filepage')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
-               chunk_size=0, _file_key=None, _offset=0):
+               chunk_size=0, _file_key=None, _offset=0, report_success=None):
         """Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
@@ -5195,8 +5195,16 @@ class APISite(BaseSite):
         @param text: Initial page text; if this is not set, then
             filepage.text will be used, or comment.
         @param watch: If true, add filepage to the bot user's watchlist
-        @param ignore_warnings: if true, ignore API warnings and force
-            upload (for example, to overwrite an existing file); default False
+        @param ignore_warnings: It may be a static boolean, a callable returning
+            a boolean or an iterable. The callable gets a list of UploadWarning
+            instances and the iterable should contain the warning codes for
+            which an equivalent callable would return True if all UploadWarning
+            codes are in thet list. If the result is False it'll not continuing
+            uploading the file and otherwise disable any warning and
+            reattempting to upload the file. NOTE: If report_success is True or
+            None it'll raise an UploadWarning exception if the static boolean is
+            False.
+        @type ignore_warnings: bool or callable or iterable of str
         @param chunk_size: The chunk size in bytesfor chunked uploading (see
             U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
             will only upload in chunks, if the version number is 1.20 or higher
@@ -5209,7 +5217,23 @@ class APISite(BaseSite):
             continue a previously canceled chunked upload. If False it treats
             that as a finished upload. By default starts at 0.
         @type _offset: int or bool
+        @param report_success: If the upload was successful it'll print a
+            success message and if ignore_warnings is set to False it'll
+            raise an UploadWarning if a warning occurred. If it's None (default)
+            it'll be True if ignore_warnings is a bool and False otherwise. If
+            it's True or None ignore_warnings must be a bool.
+        @return: It returns True if the upload was successful and False
+            otherwise.
+        @rtype: bool
         """
+        def create_warnings_list(response):
+            return [
+                api.UploadWarning(
+                    warning,
+                    upload_warnings.get(warning, '%(msg)s') % {'msg': data},
+                    _file_key, response.get('offset', 0))
+                for warning, data in response['warnings'].items()]
+
         upload_warnings = {
             # map API warning codes to user error messages
             # %(msg)s will be replaced by message string from API responsse
@@ -5240,6 +5264,22 @@ class APISite(BaseSite):
         if not comment:
             raise ValueError("APISite.upload: cannot upload file without "
                              "a summary/description.")
+        if report_success is None:
+            report_success = isinstance(ignore_warnings, bool)
+        if report_success is True:
+            if not isinstance(ignore_warnings, bool):
+                raise ValueError('report_success may only be set to True when '
+                                 'ignore_warnings is a boolean')
+            issue_deprecation_warning('"ignore_warnings" as a boolean and '
+                                      '"report_success" is True or None',
+                                      '"report_success=False" or define '
+                                      '"ignore_warnings" as callable/iterable',
+                                      2)
+        if isinstance(ignore_warnings, Iterable):
+            ignored_warnings = ignore_warnings
+            ignore_warnings = lambda warnings: all(w.code in ignored_warnings
+                                                   for w in warnings)
+        ignore_all_warnings = not callable(ignore_warnings) and ignore_warnings
         if text is None:
             text = filepage.text
         if not text:
@@ -5289,7 +5329,7 @@ class APISite(BaseSite):
                                 'filesize': filesize,
                                 'offset': offset,
                                 'filename': file_page_title,
-                                'ignorewarnings': ignore_warnings})
+                                'ignorewarnings': ignore_all_warnings})
                         req.mime_params['chunk'] = (chunk,
                                                     ("application", "octet-stream"),
                                                     {'filename': mime_filename})
@@ -5303,7 +5343,16 @@ class APISite(BaseSite):
                             if error.code == u'uploaddisabled':
                                 self._uploaddisabled = True
                             raise error
-                        if 'warnings' in data and not ignore_warnings:
+                        if 'warnings' in data and not ignore_all_warnings:
+                            if callable(ignore_warnings):
+                                if ignore_warnings(create_warnings_list(data)):
+                                    # Future warnings of this run can be ignored
+                                    ignore_warnings = True
+                                    ignore_all_warnings = True
+                                    offset = result.get('offset', 0)
+                                    continue
+                                else:
+                                    return False
                             result = data
                             if 'offset' not in result:
                                 result['offset'] = 0
@@ -5345,7 +5394,7 @@ class APISite(BaseSite):
                 url=source_url, comment=comment, text=text, token=token)
         if not result:
             final_request['watch'] = watch
-            final_request['ignorewarnings'] = ignore_warnings
+            final_request['ignorewarnings'] = ignore_all_warnings
             try:
                 result = final_request.submit()
                 self._uploaddisabled = False
@@ -5357,10 +5406,7 @@ class APISite(BaseSite):
             result = result["upload"]
             pywikibot.debug(result, _logger)
 
-        if "warnings" in result and not ignore_warnings:
-            # TODO: Handle multiple warnings at the same time
-            warning = list(result["warnings"].keys())[0]
-            message = result["warnings"][warning]
+        if 'warnings' in result and not ignore_all_warnings:
             if 'filekey' in result:
                 _file_key = result['filekey']
             elif 'sessionkey' in result:
@@ -5370,6 +5416,24 @@ class APISite(BaseSite):
             else:
                 _file_key = None
                 pywikibot.warning('No filekey defined.')
+            if not report_success:
+                if ignore_warnings(create_warnings_list(result)):
+                    return self.upload(
+                        filepage, source_filename, source_url, comment, text,
+                        watch, True, chunk_size, _file_key,
+                        result.get('offset', False), report_success=False)
+                else:
+                    return False
+            warn('When ignore_warnings=False in APISite.upload will change '
+                 'from raising an UploadWarning into behaving like being a '
+                 'callable returning False.', DeprecationWarning, 2)
+            if len(result['warnings']) > 1:
+                warn('The upload returned {0} warnings: '
+                     '{1}'.format(len(result['warnings']),
+                                  ', '.join(result['warnings'])),
+                     UserWarning, 2)
+            warning = list(result["warnings"].keys())[0]
+            message = result["warnings"][warning]
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]
                                           % {'msg': message},
                                           file_key=_file_key,
@@ -5378,12 +5442,13 @@ class APISite(BaseSite):
         elif "result" not in result:
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
-            pywikibot.output(u"Upload successful.")
+            if report_success:
+                pywikibot.output(u"Upload successful.")
             # If we receive a nochange, that would mean we're in simulation
             # mode, don't attempt to access imageinfo
             if "nochange" not in result:
                 filepage._load_file_revisions([result["imageinfo"]])
-            return
+        return result['result'] == 'Success'
 
     @deprecated_args(number='total',
                      repeat=None,
