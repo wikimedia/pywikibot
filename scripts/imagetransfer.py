@@ -62,7 +62,7 @@ copy_message = {
 }
 
 nowCommonsTemplate = {
-    'ar': u'{{subst:الآن_كومنز|Image:%s}}',
+    'ar': u'{{الآن كومنز|%s}}',
     'de': u'{{NowCommons|%s}}',
     'fr': u'{{Désormais sur Commons|%s}}',
     'en': u'{{subst:ncd|Image:%s}}',
