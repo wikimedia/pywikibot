@@ -6325,7 +6325,7 @@ class APISite(BaseSite):
         data = req.submit()
         return data['flow']['reply']['committed']['topic']
 
-    @must_be('user')
+    @must_be('user', 'flow-lock')
     @need_extension('Flow')
     def lock_topic(self, page, lock, reason):
         """Lock or unlock a Flow topic.
@@ -6347,6 +6347,164 @@ class APISite(BaseSite):
         req = self._request(parameters=params, use_get=False)
         data = req.submit()
         return data['flow']['lock-topic']['committed']['topic']
+
+    @must_be('user')
+    @need_extension('Flow')
+    def moderate_topic(self, page, state, reason):
+        """Moderate a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param state: The new moderation state
+        @type state: str
+        @param reason: The reason to moderate the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        token = self.tokens['csrf']
+        params = {'action': 'flow', 'page': page, 'token': token,
+                  'submodule': 'moderate-topic', 'mtreason': reason,
+                  'mtmoderationState': state}
+        req = self._request(parameters=params, use_get=False)
+        data = req.submit()
+        return data['flow']['moderate-topic']['committed']['topic']
+
+    @must_be('user', 'flow-delete')
+    @need_extension('Flow')
+    def delete_topic(self, page, reason):
+        """Delete a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param reason: The reason to delete the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_topic(page, 'delete', reason)
+
+    @must_be('user', 'flow-hide')
+    @need_extension('Flow')
+    def hide_topic(self, page, reason):
+        """Hide a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param reason: The reason to hide the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_topic(page, 'hide', reason)
+
+    @must_be('user', 'flow-suppress')
+    @need_extension('Flow')
+    def suppress_topic(self, page, reason):
+        """Suppress a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param reason: The reason to suppress the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_topic(page, 'suppress', reason)
+
+    @must_be('user')
+    @need_extension('Flow')
+    def restore_topic(self, page, reason):
+        """Restore a Flow topic.
+
+        @param page: A Flow topic
+        @type page: Topic
+        @param reason: The reason to restore the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_topic(page, 'restore', reason)
+
+    @must_be('user')
+    @need_extension('Flow')
+    def moderate_post(self, post, state, reason):
+        """Moderate a Flow post.
+
+        @param post: A Flow post
+        @type post: Post
+        @param state: The new moderation state
+        @type state: str
+        @param reason: The reason to moderate the topic
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        page = post.page
+        uuid = post.uuid
+        token = self.tokens['csrf']
+        params = {'action': 'flow', 'page': page, 'token': token,
+                  'submodule': 'moderate-post', 'mpreason': reason,
+                  'mpmoderationState': state, 'mppostId': uuid}
+        req = self._request(parameters=params, use_get=False)
+        data = req.submit()
+        return data['flow']['moderate-post']['committed']['topic']
+
+    @must_be('user', 'flow-delete')
+    @need_extension('Flow')
+    def delete_post(self, post, reason):
+        """Delete a Flow post.
+
+        @param post: A Flow post
+        @type post: Post
+        @param reason: The reason to delete the post
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_post(post, 'delete', reason)
+
+    @must_be('user', 'flow-hide')
+    @need_extension('Flow')
+    def hide_post(self, post, reason):
+        """Hide a Flow post.
+
+        @param post: A Flow post
+        @type post: Post
+        @param reason: The reason to hide the post
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_post(post, 'hide', reason)
+
+    @must_be('user', 'flow-suppress')
+    @need_extension('Flow')
+    def suppress_post(self, post, reason):
+        """Suppress a Flow post.
+
+        @param post: A Flow post
+        @type post: Post
+        @param reason: The reason to suppress the post
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_post(post, 'suppress', reason)
+
+    @must_be('user')
+    @need_extension('Flow')
+    def restore_post(self, post, reason):
+        """Restore a Flow post.
+
+        @param post: A Flow post
+        @type post: Post
+        @param reason: The reason to restore the post
+        @type reason: unicode
+        @return: Metadata returned by the API
+        @rtype: dict
+        """
+        return self.moderate_post(post, 'restore', reason)
 
     def watched_pages(self, sysop=False, force=False, step=None, total=None):
         """
