@@ -40,7 +40,9 @@ class TestAPIMWException(DefaultSiteTestCase):
     """Test raising an APIMWException."""
 
     data = {'error': {'code': 'internal_api_error_fake',
-                      'info': 'Fake error message'}}
+                      'info': 'Fake error message'},
+            'servedby': 'unittest',
+            }
 
     def _dummy_request(self, **kwargs):
         self.assertIn('body', kwargs)

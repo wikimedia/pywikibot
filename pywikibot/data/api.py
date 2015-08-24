@@ -105,6 +105,14 @@ class APIError(Error):
 
     def __str__(self):
         """Return a string representation."""
+        if self.other:
+            return '{0}: {1} [{2}]'.format(
+                self.code,
+                self.info,
+                '; '.join(
+                    '{0}:{1}'.format(key, val)
+                    for key, val in self.other.items()))
+
         return "%(code)s: %(info)s" % self.__dict__
 
 
@@ -2005,8 +2013,17 @@ class Request(MutableMapping):
                     # retry the previous query
                     continue
             self._handle_warnings(result)
+
             if "error" not in result:
                 return result
+
+            error = result['error'].copy()
+            for key in result:
+                if key == 'error':
+                    continue
+                assert key not in error
+                assert isinstance(result[key], basestring)
+                error[key] = result[key]
 
             if "*" in result["error"]:
                 # help text returned
@@ -2029,13 +2046,17 @@ class Request(MutableMapping):
 
             if code.startswith(u'internal_api_error_'):
                 class_name = code[len(u'internal_api_error_'):]
+
+                del error['code']  # is added via class_name
+                e = APIMWException(class_name, **error)
+
                 retry = class_name in ['DBConnectionError',  # bug 62974
                                        'DBQueryError',  # bug 58158
                                        'ReadOnlyError'  # bug 59227
                                        ]
 
                 pywikibot.error("Detected MediaWiki API exception %s%s"
-                                % (class_name,
+                                % (e,
                                    "; retrying" if retry else "; raising"))
                 # Due to bug T66958, Page's repr may return non ASCII bytes
                 # Get as bytes in PY2 and decode with the console encoding as
@@ -2054,8 +2075,7 @@ class Request(MutableMapping):
                     self.wait()
                     continue
 
-                del result['error']['code']  # is added via class_name
-                raise APIMWException(class_name, **result['error'])
+                raise e
 
             # bugs 46535, 62126, 64494, 66619
             # maybe removed when it 46535 is solved
