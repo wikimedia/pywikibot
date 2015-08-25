@@ -343,25 +343,27 @@ def main(*args):
     """
     global base_dir
 
-    default_args = (config.family, config.mylang, None)
+    # set the config family and mylang values to an invalid state so that
+    # the script can detect that the command line arguments -family & -lang
+    # were used and and handle_args has updated these config values,
+    # and 'force' mode can be activated below.
+    (config.family, config.mylang) = ('wikipedia', None)
 
     local_args = pywikibot.handle_args(args)
     if local_args:
         pywikibot.output('Unknown arguments: %s' % ' '.join(local_args))
         return False
 
-    username = config.usernames[config.family].get(config.mylang)
-    args = (config.family, config.mylang, username)
-
-    if args != default_args:
+    if config.mylang is not None:
         force = True
         pywikibot.output(u'Automatically generating user-config.py')
     else:
         force = False
+        # Force default site of en.wikipedia
+        (config.family, config.mylang) = ('wikipedia', 'en')
 
-    # Force default
-    if config.family == 'wikipedia' and config.mylang == 'language':
-        args = ('wikipedia', 'en', username)
+    username = config.usernames[config.family].get(config.mylang)
+    args = (config.family, config.mylang, username)
 
     while not force or config.verbose_output:
         pywikibot.output(u'\nYour default user directory is "%s"' % base_dir)

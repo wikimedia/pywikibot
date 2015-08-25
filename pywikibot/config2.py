@@ -1056,9 +1056,10 @@ if sys.platform == 'win32' and editor:
 
 
 # Fix up default site
-if family == 'wikipedia' and mylang == 'language' and _no_user_config != '2':
-    print("WARNING: family and mylang are not set.\n"
-          "Defaulting to family='test' and mylang='test'.")
+if family == 'wikipedia' and mylang == 'language':
+    if _no_user_config != '2':
+        print("WARNING: family and mylang are not set.\n"
+              "Defaulting to family='test' and mylang='test'.")
     family = mylang = 'test'
 
 # SECURITY WARNINGS
