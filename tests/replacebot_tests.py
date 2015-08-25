@@ -18,14 +18,15 @@ from pywikibot import fixes
 from scripts import replace
 
 from tests import _data_dir
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest
+from tests.bot_tests import TWNBotTestCase
 
 # Load only the custom fixes
 fixes.fixes.clear()
 fixes._load_file(os.path.join(_data_dir, 'fixes.py'))
 
 
-class TestReplacementsMain(TestCase):
+class TestReplacementsMain(TWNBotTestCase):
 
     """Test various calls of main()."""
 

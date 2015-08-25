@@ -364,12 +364,12 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     @classmethod
     def setUpClass(cls):
         """Verify that a translation does not yet exist."""
+        super(InputTestCase, cls).setUpClass()
+
         if cls.code in i18n.twget_keys('pywikibot-enter-category-name'):
             raise unittest.SkipTest(
                 '%s has a translation for %s'
                 % (cls.code, 'pywikibot-enter-category-name'))
-
-        super(InputTestCase, cls).setUpClass()
 
     def test_pagegen_i18n_input(self):
         """Test i18n.input via ."""

@@ -14,9 +14,24 @@ import sys
 import pywikibot
 import pywikibot.bot
 
+from pywikibot import i18n
+
 from tests.aspects import (
     unittest, DefaultSiteTestCase, SiteAttributeTestCase, TestCase,
 )
+
+
+class TWNBotTestCase(TestCase):
+
+    """Verify that i18n is available."""
+
+    @classmethod
+    def setUpClass(cls):
+        """Verify that the translations are available."""
+        if not i18n.messages_available():
+            raise unittest.SkipTest("i18n messages package '%s' not available."
+                                    % i18n._messages_package_name)
+        super(TWNBotTestCase, cls).setUpClass()
 
 
 class FakeSaveBotTestCase(TestCase):

@@ -19,11 +19,11 @@ import pywikibot
 from scripts import disambredir
 
 from tests.aspects import unittest
-from tests.bot_tests import FakeSaveBotTestCase
+from tests.bot_tests import FakeSaveBotTestCase, TWNBotTestCase
 from tests.utils import fixed_generator
 
 
-class TestDisambigurationRedirectBot(FakeSaveBotTestCase):
+class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
 
     """
     Test cases for DisambigurationRedirectBot.

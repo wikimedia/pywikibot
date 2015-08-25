@@ -19,10 +19,12 @@ from scripts.isbn import (
     getIsbn, hyphenateIsbnNumbers, convertIsbn10toIsbn13,
     main
 )
+
 from tests.aspects import (
     unittest, TestCase, DefaultDrySiteTestCase,
     WikibaseTestCase, ScriptMainTestCase,
 )
+from tests.bot_tests import TWNBotTestCase
 
 
 class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
@@ -168,7 +170,7 @@ def userPut_dummy(self, page, oldtext, newtext, **kwargs):
     TestIsbnBot.newtext = newtext
 
 
-class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase):
+class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase, TWNBotTestCase):
 
     """Test isbnbot on Wikibase site with non-write patching."""
 
