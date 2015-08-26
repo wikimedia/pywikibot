@@ -27,6 +27,7 @@ from pywikibot.data import api
 
 from tests.aspects import (
     unittest, TestCase, DeprecationTestCase,
+    TestCaseBase,
     DefaultSiteTestCase,
     DefaultDrySiteTestCase,
     WikimediaDefaultSiteTestCase,
@@ -42,28 +43,32 @@ if sys.version_info[0] > 2:
     unicode = str
 
 
-class TestSiteUserDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
+class TokenTestBase(TestCaseBase):
 
-    """Test cases for Site deprecated methods requiring a live wiki and user."""
+    """Verify token exists before running tests."""
 
-    cached = True
-    user = True
-
-    def test_token(self):
-        """Test ability to get page tokens."""
+    def setUp(self):
+        """Skip test if user does not have token and clear site wallet."""
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        ttype = "edit"
+        ttype = self.token_type
         try:
             token = mysite.tokens[ttype]
         except pywikibot.Error as error_msg:
             self.assertRegex(
                 unicode(error_msg),
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
-        else:
-            self.assertEqual(token, mysite.token(mainpage, ttype))
-            self.assertOneDeprecationParts('pywikibot.site.APISite.token',
-                                           "the 'tokens' property")
+            self.assertNotIn(self.token_type, self.site.tokens)
+            raise unittest.SkipTest(error_msg)
+
+        self.token = token
+        self._orig_wallet = self.site.tokens
+        self.site.tokens = pywikibot.site.TokenWallet(self.site)
+        super(TokenTestBase, self).setUp()
+
+    def tearDown(self):
+        """Restore site tokens."""
+        self.site.tokens = self._orig_wallet
+        super(TokenTestBase, self).tearDown()
 
 
 class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase):
@@ -1559,23 +1564,47 @@ class TestSiteSysopWrite(TestCase):
         self.assertTrue(len(revs) > 2)
 
 
-class SiteUserTestCase2(DefaultSiteTestCase):
+class TestUsernameInUsers(DefaultSiteTestCase):
 
-    """More tests that rely on a user account."""
+    """Test that the user account can be found in users list."""
 
     user = True
+    cached = True
 
-    def testUsers(self):
-        """Test the site.users() method."""
+    def test_username_in_users(self):
+        """Test the site.users() method with bot username."""
         mysite = self.get_site()
         us = list(mysite.users(mysite.user()))
         self.assertEqual(len(us), 1)
         self.assertIsInstance(us[0], dict)
+
+
+class TestUserList(DefaultSiteTestCase):
+
+    """Test usernames Jimbo Wales, Brion VIBBER and Tim Starling."""
+
+    cached = True
+
+    def testUsers(self):
+        """Test the site.users() method with preset usernames."""
+        mysite = self.site
+        cnt = 0
         for user in mysite.users(
                 ["Jimbo Wales", "Brion VIBBER", "Tim Starling"]):
             self.assertIsInstance(user, dict)
             self.assertTrue(user["name"]
                             in ["Jimbo Wales", "Brion VIBBER", "Tim Starling"])
+            cnt += 1
+        if not cnt:
+            raise unittest.SkipTest('Test usernames not found')
+
+
+class PatrolTestCase(TokenTestBase, DefaultSiteTestCase):
+
+    """Test patrol method."""
+
+    user = True
+    token_type = 'patrol'
 
     def testPatrol(self):
         """Test the site.patrol() method."""
@@ -1741,10 +1770,48 @@ class TestSiteTokens(DefaultSiteTestCase):
     def testInvalidToken(self):
         self.assertRaises(pywikibot.Error, lambda t: self.mysite.tokens[t], "invalidtype")
 
-    def test_deprecated_token(self):
+
+class TestDeprecatedEditTokenFunctions(TokenTestBase,
+                                       DefaultSiteTestCase,
+                                       DeprecationTestCase):
+
+    """Test cases for Site edit token deprecated methods."""
+
+    cached = True
+    user = True
+    token_type = 'edit'
+
+    def test_token(self):
+        """Test ability to get page tokens using site.tokens."""
+        token = self.token
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
+        ttype = "edit"
+        self.assertEqual(token, mysite.token(mainpage, ttype))
+        self.assertOneDeprecationParts('pywikibot.site.APISite.token',
+                                       "the 'tokens' property")
+
+    def test_getToken(self):
+        """Test ability to get page tokens using site.getToken."""
+        self.mysite = self.site
         self.assertEqual(self.mysite.getToken(), self.mysite.tokens['edit'])
+        self.assertOneDeprecationParts('pywikibot.site.APISite.getToken',
+                                       "the 'tokens' property")
+
+
+class TestDeprecatedPatrolToken(DefaultSiteTestCase, DeprecationTestCase):
+
+    """Test cases for Site patrol token deprecated methods."""
+
+    cached = True
+    user = True
+
+    def test_getPatrolToken(self):
+        """Test site.getPatrolToken."""
+        self.mysite = self.site
         try:
             self.assertEqual(self.mysite.getPatrolToken(), self.mysite.tokens['patrol'])
+            self.assertOneDeprecation()
         except pywikibot.Error as error_msg:
             self.assertRegex(
                 unicode(error_msg),
