@@ -1610,7 +1610,11 @@ class PatrolTestCase(TokenTestBase, DefaultSiteTestCase):
         """Test the site.patrol() method."""
         mysite = self.get_site()
 
-        rc = list(mysite.recentchanges(total=1))[0]
+        rc = list(mysite.recentchanges(total=1))
+        if not rc:
+            raise unittest.SkipTest('no recent changes to patrol')
+
+        rc = rc[0]
 
         # site.patrol() needs params
         self.assertRaises(pywikibot.Error, lambda x: list(x), mysite.patrol())
