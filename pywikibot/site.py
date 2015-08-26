@@ -4979,6 +4979,7 @@ class APISite(BaseSite):
         "notpatrollable": "The revision %(revid)s can't be patrolled as it's too old."
     }
 
+    @must_be(group='user')
     @deprecated_args(token=None)
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.

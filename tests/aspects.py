@@ -539,10 +539,15 @@ class SiteWriteMixin(TestCaseBase):
         Otherwise the test class is skipped unless environment variable
         PYWIKIBOT2_TEST_WRITE is set to 1.
         """
+        if issubclass(cls, ForceCacheMixin):
+            raise Exception(
+                '%s can not be a subclass of both '
+                'SiteWriteMixin and ForceCacheMixin'
+                % cls.__name__)
+
         super(SiteWriteMixin, cls).setUpClass()
 
         site = cls.get_site()
-        assert 'test' in (site.family.name, site.code)
 
         if cls.write == -1:
             env_var = 'PYWIKIBOT2_TEST_WRITE_FAIL'
@@ -555,11 +560,13 @@ class SiteWriteMixin(TestCaseBase):
                 'Set %s=1 to enable.'
                 % (cls.__name__, env_var))
 
-        if issubclass(cls, ForceCacheMixin):
+        if (not hasattr(site.family, 'test_codes') or
+                site.code not in site.family.test_codes):
             raise Exception(
-                '%s can not be a subclass of both '
-                'SiteEditTestCase and ForceCacheMixin'
-                % cls.__name__)
+                '%s should only be run on test sites. '
+                'To run this test, add \'%s\' to the %s family '
+                'attribute \'test_codes\'.'
+                % (cls.__name__, site.code, site.family.name))
 
 
 class RequireUserMixin(TestCaseBase):
