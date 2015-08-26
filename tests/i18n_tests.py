@@ -133,7 +133,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
         if not isinstance(cls.message_package, basestring):
             raise TypeError('%s.message_package must be a package name'
                             % cls.__name__)
-        # Th call to set_messages_package below exists only to confirm
+        # The call to set_messages_package below exists only to confirm
         # that the package exists and messages are available, so
         # that tests can be skipped if the i18n data doesnt exist.
         cls.orig_messages_package_name = i18n._messages_package_name
