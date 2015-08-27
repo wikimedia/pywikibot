@@ -2022,7 +2022,8 @@ class Request(MutableMapping):
                 if key == 'error':
                     continue
                 assert key not in error
-                assert isinstance(result[key], basestring)
+                assert isinstance(result[key], basestring), \
+                    'Unexpected %s: %r' % (key, result[key])
                 error[key] = result[key]
 
             if "*" in result["error"]:
