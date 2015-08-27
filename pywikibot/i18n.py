@@ -81,8 +81,12 @@ def messages_available():
     if _messages_available is not None:
         return _messages_available
     try:
-        __import__(_messages_package_name)
+        mod = __import__(_messages_package_name, fromlist=[str('__path__')])
     except ImportError:
+        _messages_available = False
+        return False
+
+    if not os.listdir(next(iter(mod.__path__))):
         _messages_available = False
         return False
 
@@ -612,11 +616,13 @@ def twget_keys(twtitle):
     Return all language codes for a special message.
 
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
+
+    @raises OSError: the package i18n can not be loaded
     """
     # obtain the directory containing all the json files for this package
     package = twtitle.split("-")[0]
     mod = __import__(_messages_package_name, fromlist=[str('__file__')])
-    pathname = os.path.join(os.path.dirname(mod.__file__), package)
+    pathname = os.path.join(next(iter(mod.__path__)), package)
 
     # build a list of languages in that directory
     langs = [filename.partition('.')[0]
