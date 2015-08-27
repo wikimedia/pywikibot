@@ -10,6 +10,13 @@ import itertools
 import os
 import sys
 
+try:
+    # Work around a traceback on Python < 2.7.4 and < 3.3.1
+    # http://bugs.python.org/issue15881#msg170215
+    import multiprocessing  # noqa: unused
+except ImportError:
+    pass
+
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 PY26 = (PYTHON_VERSION < (2, 7))
