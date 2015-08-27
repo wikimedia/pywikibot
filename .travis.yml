@@ -53,6 +53,9 @@ script:
   - if [[ $FAMILY == 'wpbeta' ]]; then
       python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'y' ;
     fi
+  - if [[ $FAMILY == 'wsbeta' ]]; then
+      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
+    fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
 
@@ -112,9 +115,11 @@ matrix:
     - python: '2.7_with_system_site_packages'  # equivalent to virtualenv: system_site_packages: true
       env: LANGUAGE=he FAMILY=wikivoyage SITE_ONLY=1
     - python: '2.7'
-      env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1
-    - python: '3.4'
+      env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
+    - python: '3.3'
       env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
+    - python: '3.4'
+      env: LANGUAGE=en FAMILY=wsbeta SITE_ONLY=1
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1
     - python: '3.3'
