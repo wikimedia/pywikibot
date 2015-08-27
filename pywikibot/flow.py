@@ -104,8 +104,8 @@ class Board(FlowPage):
         return new_params
 
     def topics(self, format='wikitext', limit=100, sort_by='newest',
-                offset=None, offset_uuid='', reverse=False,
-                include_offset=False, toc_only=False):
+               offset=None, offset_uuid='', reverse=False,
+               include_offset=False, toc_only=False):
         """Load this board's topics.
 
         @param format: The content format to request the data in.

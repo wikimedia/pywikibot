@@ -166,6 +166,7 @@ docuReplacements = {
 
 
 def precompile_exceptions(exceptions, use_regex, flags):
+    """Compile the exceptions with the given flags."""
     if not exceptions:
         return
     for exceptionCategory in [
@@ -183,6 +184,7 @@ class ReplacementBase(object):
     """The replacement instructions."""
 
     def __init__(self, old, new, edit_summary=None, default_summary=True):
+        """Create a basic replacement instance."""
         self.old = old
         self.old_regex = None
         self.new = new
@@ -191,6 +193,7 @@ class ReplacementBase(object):
 
     @property
     def edit_summary(self):
+        """Return the edit summary for this fix."""
         return self._edit_summary
 
     @property
@@ -219,6 +222,7 @@ class ReplacementBase(object):
         return None
 
     def _compile(self, use_regex, flags):
+        """Compile the search text without modifying the flags."""
         # This does not update use_regex and flags depending on this instance
         if not use_regex:
             self.old_regex = re.escape(self.old)
@@ -227,6 +231,7 @@ class ReplacementBase(object):
         self.old_regex = re.compile(self.old_regex, flags)
 
     def compile(self, use_regex, flags):
+        """Compile the search text."""
         # Set the regular expression flags
         flags |= re.UNICODE
 
@@ -247,6 +252,7 @@ class Replacement(ReplacementBase):
     def __init__(self, old, new, use_regex=None, exceptions=None,
                  case_insensitive=None, edit_summary=None,
                  default_summary=True):
+        """Create a single replacement entry unrelated to a fix."""
         super(Replacement, self).__init__(old, new, edit_summary,
                                           default_summary)
         self._use_regex = use_regex
@@ -264,13 +270,16 @@ class Replacement(ReplacementBase):
 
     @property
     def case_insensitive(self):
+        """Return whether the search text is case insensitive."""
         return self._case_insensitive
 
     @property
     def use_regex(self):
+        """Return whether the search text is using regex."""
         return self._use_regex
 
     def _compile(self, use_regex, flags):
+        """Compile the search regex and exceptions."""
         super(Replacement, self)._compile(use_regex, flags)
         precompile_exceptions(self.exceptions, use_regex, flags)
 
@@ -291,6 +300,7 @@ class ReplacementList(list):
 
     def __init__(self, use_regex, exceptions, case_insensitive, edit_summary,
                  name):
+        """Create a fix list which can contain multiple replacements."""
         super(ReplacementList, self).__init__()
         self.use_regex = use_regex
         self._exceptions = exceptions
@@ -300,6 +310,7 @@ class ReplacementList(list):
         self.name = name
 
     def _compile_exceptions(self, use_regex, flags):
+        """Compile the exceptions if not already done."""
         if not self.exceptions and self._exceptions is not None:
             self.exceptions = dict(self._exceptions)
             precompile_exceptions(self.exceptions, use_regex, flags)
@@ -311,24 +322,29 @@ class ReplacementListEntry(ReplacementBase):
 
     def __init__(self, old, new, fix_set, edit_summary=None,
                  default_summary=True):
+        """Create a replacement entry inside a fix set."""
         super(ReplacementListEntry, self).__init__(old, new, edit_summary,
                                                    default_summary)
         self.fix_set = fix_set
 
     @property
     def case_insensitive(self):
+        """Return whether the fix set is case insensitive."""
         return self.fix_set.case_insensitive
 
     @property
     def use_regex(self):
+        """Return whether the fix set is using regex."""
         return self.fix_set.use_regex
 
     @property
     def exceptions(self):
+        """Return the exceptions of the fix set."""
         return self.fix_set.exceptions
 
     @property
     def edit_summary(self):
+        """Return this entry's edit summary or the fix's summary."""
         if self._edit_summary is None:
             return self.fix_set.edit_summary
         else:
@@ -348,6 +364,7 @@ class ReplacementListEntry(ReplacementBase):
         return self.fix_set
 
     def _compile(self, use_regex, flags):
+        """Compile the search regex and the fix's exceptions."""
         super(ReplacementListEntry, self)._compile(use_regex, flags)
         self.fix_set._compile_exceptions(use_regex, flags)
 
@@ -504,7 +521,7 @@ class ReplaceRobot(Bot):
                 if len(replacement) != 2:
                     raise ValueError('Replacement number {0} does not have '
                                      'exactly two elements: {1}'.format(
-                                     i, replacement))
+                                         i, replacement))
                 # Replacement assumes it gets strings but it's already compiled
                 replacements[i] = Replacement.from_compiled(replacement[0],
                                                             replacement[1])
@@ -602,6 +619,7 @@ class ReplaceRobot(Bot):
         return new_text
 
     def doReplacements(self, original_text, page=None):
+        """Apply replacements to the given text and page."""
         if page is None:
             pywikibot.warn(
                 'You must pass the target page as the "page" parameter to '
@@ -978,12 +996,12 @@ def main(*args):
             if chars.contains_invisible(replacement[0]):
                 pywikibot.warning('The old string "{0}" contains formatting '
                                   'characters like U+200E'.format(
-                    chars.replace_invisible(replacement[0])))
+                                      chars.replace_invisible(replacement[0])))
             if (not callable(replacement[1]) and
                     chars.contains_invisible(replacement[1])):
                 pywikibot.warning('The new string "{0}" contains formatting '
                                   'characters like U+200E'.format(
-                    chars.replace_invisible(replacement[1])))
+                                      chars.replace_invisible(replacement[1])))
             replacement_set.append(ReplacementListEntry(
                 old=replacement[0],
                 new=replacement[1],
