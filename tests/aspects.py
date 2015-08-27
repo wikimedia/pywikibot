@@ -615,7 +615,15 @@ class RequireUserMixin(TestCaseBase):
         Login to the site if it is not logged in.
         """
         super(RequireUserMixin, self).setUp()
+        self._reset_login()
 
+    def tearDown(self):
+        """Log back into the site."""
+        super(RequireUserMixin, self).tearDown()
+        self._reset_login()
+
+    def _reset_login(self):
+        """Login to all sites."""
         sysop = hasattr(self, 'sysop') and self.sysop
 
         # There may be many sites, and setUp doesnt know
@@ -629,6 +637,7 @@ class RequireUserMixin(TestCaseBase):
 
             if not site.logged_in(sysop):
                 site.login(sysop)
+            assert(site.user())
 
     def get_userpage(self, site=None):
         """Create a User object for the user's userpage."""
