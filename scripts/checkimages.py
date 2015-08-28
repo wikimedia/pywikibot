@@ -867,7 +867,6 @@ class checkImagesBot(object):
 
             for element in self.load(pageHiddenText):
                 self.hiddentemplates.add(pywikibot.Page(self.site, element))
-        return self.hiddentemplates
 
     def returnOlderTime(self, listGiven, timeListGiven):
         """Get some time and return the oldest of them."""
@@ -1321,7 +1320,7 @@ class checkImagesBot(object):
         regex_are_licenses = re.compile(
             r'(?<!\{)\{\{(?:[Tt]emplate:|)([^{]+?)\}\}', re.DOTALL)
         while True:
-            self.hiddentemplates = self.loadHiddenTemplates()
+            self.loadHiddenTemplates()
             self.licenses_found = self.image.templates()
             templatesInTheImageRaw = regex_find_licenses.findall(
                 self.imageCheckText)
