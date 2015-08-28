@@ -137,27 +137,27 @@ class ComparableMixin(object):
     """Mixin class to allow comparing to other objects which are comparable."""
 
     def __lt__(self, other):
-        """Compare if other is less than self."""
-        return other >= self._cmpkey()
-
-    def __le__(self, other):
-        """Compare if other is less equals self."""
+        """Compare if self is less than other."""
         return other > self._cmpkey()
 
+    def __le__(self, other):
+        """Compare if self is less equals other."""
+        return other >= self._cmpkey()
+
     def __eq__(self, other):
-        """Compare if other is equal to self."""
+        """Compare if self is equal to other."""
         return other == self._cmpkey()
 
     def __ge__(self, other):
-        """Compare if other is greater equals self."""
-        return other < self._cmpkey()
-
-    def __gt__(self, other):
-        """Compare if other is greater than self."""
+        """Compare if self is greater equals other."""
         return other <= self._cmpkey()
 
+    def __gt__(self, other):
+        """Compare if self is greater than other."""
+        return other < self._cmpkey()
+
     def __ne__(self, other):
-        """Compare if other is not equal to self."""
+        """Compare if self is not equal to other."""
         return other != self._cmpkey()
 
 
