@@ -2019,7 +2019,7 @@ class Request(MutableMapping):
 
             error = result['error'].copy()
             for key in result:
-                if key == 'error':
+                if key in ('error', 'warnings'):
                     continue
                 assert key not in error
                 assert isinstance(result[key], basestring), \
