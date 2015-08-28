@@ -132,13 +132,17 @@ class TestNamespaceObject(TestCase):
 
         self.assertEqual(a, 0)
         self.assertEqual(a, '')
+        self.assertFalse(a < 0)
+        self.assertFalse(a > 0)
         self.assertNotEqual(a, None)
+
+        self.assertGreater(a, -1)
 
         x = Namespace(id=6, custom_name=u'dummy', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'])
         y = Namespace(id=6, custom_name=u'ملف', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'])
-        z = Namespace(id=7, custom_name=u'dummy', canonical_name=u'File',
+        z = Namespace(id=7, custom_name=u'dummy 7', canonical_name=u'File',
                       aliases=[u'Image', u'Immagine'])
 
         self.assertEqual(x, x)
@@ -157,11 +161,19 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(x, u'image')
         self.assertEqual(x, u'Image')
 
+        self.assertFalse(x < 6)
+        self.assertFalse(x > 6)
+
         self.assertEqual(y, u'ملف')
 
         self.assertLess(a, x)
+        self.assertLess(x, z)
+        self.assertLessEqual(a, x)
         self.assertGreater(x, a)
+        self.assertGreater(x, 0)
         self.assertGreater(z, x)
+        self.assertGreaterEqual(x, a)
+        self.assertGreaterEqual(y, x)
 
         self.assertIn(6, [x, y, z])
         self.assertNotIn(8, [x, y, z])
