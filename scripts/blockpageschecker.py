@@ -300,7 +300,7 @@ def main(*args):
             continue
         # FIXME: This check does not work :
         # PreloadingGenerator cannot set correctly page.editRestriction
-        # (see bug 55322)
+        # (see bug T57322)
         # if not page.canBeEdited():
         #    pywikibot.output("%s is sysop-protected : this account can't edit "
         #                     "it! Skipping..." % pagename)

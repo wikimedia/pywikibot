@@ -178,7 +178,7 @@ args = sys.argv[(2 if filename else 1):]
 try:
     # If successful, user-config.py already exists in one of the candidate
     # directories. See config2.py for details on search order.
-    # Use env var to communicate to config2.py pwb.py location (bug 72918).
+    # Use env var to communicate to config2.py pwb.py location (bug T74918).
     _pwb_dir = os.path.split(__file__)[0]
     if sys.platform == 'win32' and sys.version_info[0] < 3:
         _pwb_dir = str(_pwb_dir)

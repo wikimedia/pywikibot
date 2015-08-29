@@ -58,7 +58,7 @@ class UnusedFilesBot(Bot):
         generator = pagegenerators.PreloadingGenerator(generator)
         for image in generator:
             if not image.exists():
-                pywikibot.output(u"File '%s' does not exist (see bug 69133)."
+                pywikibot.output("File '%s' does not exist (see bug T71133)."
                                  % image.title())
                 continue
             # Use fileUrl() and fileIsShared() to confirm it is local media

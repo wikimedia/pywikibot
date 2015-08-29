@@ -682,7 +682,7 @@ class ReferencesRobot(Bot):
                 if 'utf-8' not in enc:
                     enc.append('utf-8')
                 try:
-                    u = linkedpagetext.decode(enc[0])   # Bug 67410
+                    u = linkedpagetext.decode(enc[0])   # Bug T69410
                 except (UnicodeDecodeError, LookupError) as e:
                     pywikibot.output(u'%s : Decoding error - %s' % (ref.link, e))
                     continue

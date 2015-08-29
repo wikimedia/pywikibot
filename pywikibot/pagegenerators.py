@@ -771,7 +771,7 @@ class GeneratorFactory(object):
                 u'How many images do you want to load?')
             gen = NewimagesPageGenerator(total=int(limit), site=self.site)
         elif arg.startswith('-newpages'):
-            # partial workaround for bug 67249
+            # partial workaround for bug T69249
             # to use -namespace/ns with -newpages, -ns must be given
             # before -newpages
             # otherwise default namespace is 0
