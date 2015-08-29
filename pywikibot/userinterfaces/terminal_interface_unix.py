@@ -37,18 +37,17 @@ class UnixUI(terminal_interface_base.UI):
 
     """User interface for unix terminals."""
 
-    def printColorized(self, text, targetStream):
-        """Print the text colorized using the Unix colors."""
-        totalcount = 0
-        for key, value in unixColors.items():
-            ckey = '\03{%s}' % key
-            totalcount += text.count(ckey)
-            text = text.replace(ckey, value)
+    def support_color(self, target_stream):
+        """Return that the target stream supports colors."""
+        return True
 
-        if totalcount > 0:
-            # just to be sure, reset the color
-            text += unixColors['default']
+    def encounter_color(self, color, target_stream):
+        """Write the unix color directly to the stream."""
+        self._write(unixColors[color], target_stream)
 
+    def _write(self, text, target_stream):
+        """Optionally encode and write the text to the target stream."""
+        targetStream = target_stream
         if sys.version_info[0] == 2:
             # .encoding does not mean we can write unicode
             # to the stream pre-2.7.

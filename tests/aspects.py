@@ -741,7 +741,8 @@ class MetaTestCaseClass(type):
         if (('sites' not in dct and 'site' not in dct) or
                 ('site' in dct and not dct['site'])):
             # Prevent use of pywikibot.Site
-            bases = tuple([DisableSiteMixin] + list(bases))
+            if all(not issubclass(base, DisableSiteMixin) for base in bases):
+                bases = tuple([DisableSiteMixin] + list(bases))
 
             # 'pwb' tests will _usually_ require a site.  To ensure the
             # test class dependencies are declarative, this requires the

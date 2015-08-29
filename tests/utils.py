@@ -19,6 +19,7 @@ import traceback
 import warnings
 
 from collections import Mapping
+from types import ModuleType
 from warnings import warn
 
 if sys.version_info[0] > 2:
@@ -124,6 +125,23 @@ def entered_loop(iterable):
     for iterable_item in iterable:
         return True
     return False
+
+
+class FakeModule(ModuleType):
+
+    """An empty fake module."""
+
+    @classmethod
+    def create_dotted(cls, name):
+        """Create a chain of modules based on the name separated by periods."""
+        modules = name.split('.')
+        mod = None
+        for mod_name in modules[::-1]:
+            module = cls(str(mod_name))
+            if mod:
+                setattr(module, mod.__name__, mod)
+            mod = module
+        return mod
 
 
 class WarningSourceSkipContextManager(warnings.catch_warnings):
