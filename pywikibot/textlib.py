@@ -993,7 +993,7 @@ def getCategoryLinks(text, site=None, include=[]):
     # Ignore category links within nowiki tags, pre tags, includeonly tags,
     # and HTML comments
     text = removeDisabledParts(text, include=include)
-    catNamespace = '|'.join(site.category_namespaces())
+    catNamespace = '|'.join(site.namespaces.CATEGORY)
     R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<rest>.+?)\]\]'
                    % catNamespace, re.I)
     for match in R.finditer(text):
@@ -1025,7 +1025,7 @@ def removeCategoryLinks(text, site=None, marker=''):
     # ASCII letters and hyphens.
     if site is None:
         site = pywikibot.Site()
-    catNamespace = '|'.join(site.category_namespaces())
+    catNamespace = '|'.join(site.namespaces.CATEGORY)
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
                          ['nowiki', 'comment', 'math', 'pre', 'source', 'includeonly'],
@@ -1070,7 +1070,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None):
     if site is None:
         site = pywikibot.Site()
 
-    catNamespace = '|'.join(site.category_namespaces())
+    catNamespace = '|'.join(site.namespaces.CATEGORY)
     title = oldcat.title(withNamespace=False)
     if not title:
         return

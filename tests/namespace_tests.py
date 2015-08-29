@@ -10,7 +10,7 @@ from __future__ import unicode_literals
 __version__ = '$Id$'
 
 from collections import Iterable
-from pywikibot.site import Namespace
+from pywikibot.site import Namespace, NamespacesDict
 from tests.aspects import unittest, TestCase, AutoDeprecationTestCase
 
 import sys
@@ -44,6 +44,11 @@ file_builtin_ns = dict(_base_builtin_ns)
 file_builtin_ns['File'] = 6
 file_builtin_ns['File talk'] = 7
 builtin_ns = dict(list(image_builtin_ns.items()) + list(file_builtin_ns.items()))
+
+
+def builtin_NamespacesDict():
+    """Return a NamespacesDict of the builtin namespaces."""
+    return NamespacesDict(Namespace.builtin_namespaces())
 
 
 class TestNamespaceObject(TestCase):
@@ -329,6 +334,67 @@ class TestNamespaceCollections(TestCase):
 
         self.assertEqual(len(namespaces),
                          len(positive_namespaces) + len(excluded_namespaces))
+
+
+class TestNamespacesDictGetItem(TestCase):
+
+    """Test NamespacesDict.__getitem__."""
+
+    net = False
+
+    def test_ids(self):
+        """Test lookup by canonical namespace id."""
+        namespaces = builtin_NamespacesDict()
+        for namespace in namespaces.values():
+            self.assertEqual(namespace, namespaces[namespace.id])
+
+    def test_namespace(self):
+        """Test lookup by Namespace object."""
+        namespaces = builtin_NamespacesDict()
+        for namespace in namespaces.values():
+            self.assertEqual(namespace, namespaces[namespace])
+
+    def test_invalid_id(self):
+        """Test lookup by invalid id."""
+        namespaces = builtin_NamespacesDict()
+        lower = min(namespaces.keys()) - 1
+        higher = max(namespaces.keys()) + 1
+        self.assertRaises(KeyError, namespaces.__getitem__, lower)
+        self.assertRaises(KeyError, namespaces.__getitem__, higher)
+
+    def test_canonical_name(self):
+        """Test lookup by canonical namespace name."""
+        namespaces = builtin_NamespacesDict()
+        for namespace in namespaces.values():
+            self.assertEqual(namespace, namespaces[namespace.canonical_name])
+            self.assertEqual(namespace,
+                             namespaces[namespace.canonical_name.upper()])
+
+    def test_canonical_attr(self):
+        """Test attribute lookup by canonical namespace name."""
+        namespaces = builtin_NamespacesDict()
+        self.assertEqual(namespaces[0], namespaces.MAIN)
+        self.assertEqual(namespaces[1], namespaces.TALK)
+
+        for namespace in namespaces.values():
+            if namespace.id == 0:
+                continue
+            attr = namespace.canonical_name.upper()
+            self.assertEqual(namespace, getattr(namespaces, attr))
+
+    def test_all(self):
+        """Test lookup by any namespace name."""
+        namespaces = builtin_NamespacesDict()
+        for namespace in namespaces.values():
+            for name in namespace:
+                self.assertEqual(namespace, namespaces[name.upper()])
+
+    def test_invalid_name(self):
+        """Test lookup by invalid name."""
+        namespaces = builtin_NamespacesDict()
+        self.assertRaises(KeyError, namespaces.__getitem__, 'FOO')
+        # '|' is not permitted in namespace names
+        self.assertRaises(KeyError, namespaces.__getitem__, '|')
 
 
 if __name__ == '__main__':

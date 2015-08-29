@@ -2528,7 +2528,7 @@ class Category(Page):
         # move to category.py? (Although it doesn't seem to be used there,
         # either)
         if not isinstance(cat, Category):
-            cat = self.site.category_namespace() + ':' + cat
+            cat = self.site.namespaces.CATEGORY + ':' + cat
             targetCat = Category(self.site, cat)
         else:
             targetCat = cat
@@ -2569,7 +2569,7 @@ class Category(Page):
         """
         # I don't see why we need this as part of the framework either
         # move to scripts/category.py?
-        catname = self.site.category_namespace() + ':' + catname
+        catname = self.site.namespaces.CATEGORY + ':' + catname
         targetCat = Category(self.site, catname)
         if targetCat.exists():
             pywikibot.warning(u'Target page %s already exists!'
