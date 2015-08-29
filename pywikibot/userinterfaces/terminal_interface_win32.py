@@ -11,7 +11,6 @@ __version__ = '$Id$'
 
 import re
 
-from pywikibot.tools import PY2
 from pywikibot.userinterfaces import terminal_interface_base
 
 try:
@@ -68,43 +67,14 @@ class Win32CtypesUI(Win32BaseUI):
         self.argv = argv
         self.encoding = 'utf-8'
 
-    def printColorized(self, text, targetStream):
-        """Print the text colorized to the target stream."""
-        std_out_handle = ctypes.windll.kernel32.GetStdHandle(-11)
-        # Color tags might be cascaded, e.g. because of transliteration.
-        # Therefore we need this stack.
-        colorStack = []
-        tagM = True
-        while tagM:
-            tagM = colorTagR.search(text)
-            if tagM:
-                # print the text up to the tag.
-                text_before_tag = text[:tagM.start()]
-                if PY2:
-                    text_before_tag = text_before_tag.encode(self.encoding, 'replace')
-                targetStream.write(text_before_tag)
-                newColor = tagM.group('name')
-                if newColor == 'default':
-                    if len(colorStack) > 0:
-                        colorStack.pop()
-                        if len(colorStack) > 0:
-                            lastColor = colorStack[-1]
-                        else:
-                            lastColor = 'default'
-                        ctypes.windll.kernel32.SetConsoleTextAttribute(
-                            std_out_handle, windowsColors[lastColor])
-                else:
-                    colorStack.append(newColor)
-                    # set the new color
-                    ctypes.windll.kernel32.SetConsoleTextAttribute(
-                        std_out_handle, windowsColors[newColor])
-                text = text[tagM.end():]
-        # print the rest of the text
-        if PY2:
-            text = text.encode(self.encoding, 'replace')
-        targetStream.write(text)
-        # just to be sure, reset the color
-        ctypes.windll.kernel32.SetConsoleTextAttribute(std_out_handle, windowsColors['default'])
+    def support_color(self, target_stream):
+        """Return whether the target stream supports actually color."""
+        return getattr(target_stream, '_hConsole', None) is not None
+
+    def encounter_color(self, color, target_stream):
+        """Set the new color."""
+        ctypes.windll.kernel32.SetConsoleTextAttribute(
+            target_stream._hConsole, windowsColors[color])
 
     def _raw_input(self):
         data = self.stdin.readline()

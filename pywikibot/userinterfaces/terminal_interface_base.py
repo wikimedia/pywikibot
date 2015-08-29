@@ -46,10 +46,10 @@ colors = [
     'white',
 ]
 
-colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(colors))
+colorTagR = re.compile('\03{(?P<name>%s|previous)}' % '|'.join(colors))
 
 
-class UI:
+class UI(object):
 
     """Base for terminal user interfaces."""
 
@@ -114,30 +114,55 @@ class UI:
         warnings_logger = logging.getLogger("py.warnings")
         warnings_logger.addHandler(warning_handler)
 
-    def printNonColorized(self, text, targetStream):
-        """
-        Write the text non colorized to the target stream.
+    def encounter_color(self, color, target_stream):
+        """Handle the next color encountered."""
+        raise NotImplementedError('The {0} class does not support '
+                                  'colors.'.format(self.__class__.__name__))
 
-        To each line which contains a color tag a ' ***' is added at the end.
-        """
-        lines = text.split('\n')
-        for i, line in enumerate(lines):
-            if i > 0:
-                line = "\n" + line
-            line, count = colorTagR.subn('', line)
-            if count > 0:
-                line += ' ***'
-            if PY2:
-                line = line.encode(self.encoding, 'replace')
-            targetStream.write(line)
+    def _write(self, text, target_stream):
+        """Optionally encode and write the text to the target stream."""
+        if PY2:
+            text = text.encode(self.encoding, 'replace')
+        target_stream.write(text)
 
-    printColorized = printNonColorized
+    def support_color(self, target_stream):
+        """Return whether the target stream does support colors."""
+        return False
 
-    def _print(self, text, targetStream):
-        if config.colorized_output:
-            self.printColorized(text, targetStream)
-        else:
-            self.printNonColorized(text, targetStream)
+    def _print(self, text, target_stream):
+        """Write the text to the target stream handling the colors."""
+        colorized = config.colorized_output and self.support_color(target_stream)
+        colored_line = False
+        # Color tags might be cascaded, e.g. because of transliteration.
+        # Therefore we need this stack.
+        color_stack = ['default']
+        text_parts = colorTagR.split(text) + ['default']
+        for index, (text, next_color) in enumerate(zip(text_parts[::2],
+                                                       text_parts[1::2])):
+            current_color = color_stack[-1]
+            if next_color == 'previous':
+                if len(color_stack) > 1:  # keep the last element in the stack
+                    color_stack.pop()
+                next_color = color_stack[-1]
+            else:
+                color_stack.append(next_color)
+
+            if current_color != next_color:
+                colored_line = True
+            if colored_line and not colorized:
+                if '\n' in text:  # Normal end of line
+                    text = text.replace('\n', ' ***\n', 1)
+                    colored_line = False
+                elif index == len(text_parts) // 2 - 1:  # Or end of text
+                    text += ' ***'
+                    colored_line = False
+
+            # print the text up to the tag.
+            self._write(text, target_stream)
+
+            if current_color != next_color and colorized:
+                # set the new color, but only if they change
+                self.encounter_color(color_stack[-1], target_stream)
 
     def output(self, text, toStdout=False, targetStream=None):
         """
@@ -176,7 +201,7 @@ class UI:
                     # transliteration was successful. The replacement
                     # could consist of multiple letters.
                     # mark the transliterated letters in yellow.
-                    transliteratedText += '\03{lightyellow}%s\03{default}' \
+                    transliteratedText += '\03{lightyellow}%s\03{previous}' \
                                           % transliterated
                     # memorize if we replaced a single letter by multiple
                     # letters.
