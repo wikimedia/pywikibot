@@ -290,10 +290,14 @@ class UploadRobot(BaseBot):
         # FIXME: these 2 belong somewhere else, presumably in family
         # forbidden characters are handled by pywikibot/page.py
         forbidden = ':*?/\\'  # to be extended
-        allowed_formats = (u'gif', u'jpg', u'jpeg', u'mid', u'midi',
-                           u'ogg', u'png', u'svg', u'xcf', u'djvu',
-                           u'ogv', u'oga', u'tif', u'tiff', u'webm',
-                           u'flac', u'wav')
+        try:
+            allowed_formats = self.targetSite.siteinfo.get(
+                'fileextensions', get_default=False)
+        except KeyError:
+            allowed_formats = []
+        else:
+            allowed_formats = [item['ext'] for item in allowed_formats]
+
         # ask until it's valid
         first_check = True
         while True:
@@ -314,7 +318,7 @@ class UploadRobot(BaseBot):
                 pywikibot.output(
                     'Invalid character(s): %s. Please try again' % c)
                 continue
-            if ext not in allowed_formats:
+            if allowed_formats and ext not in allowed_formats:
                 if always:
                     pywikibot.output('File format is not one of '
                                      '[{0}]'.format(' '.join(allowed_formats)))
