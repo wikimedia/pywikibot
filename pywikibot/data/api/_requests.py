@@ -420,6 +420,9 @@ class Request(MutableMapping, WaitingMixin):
         """Add default parameters to the API request.
 
         This method will only add them once.
+
+        .. version-changed:: 11.8
+           Disable maxlag for meta queries and paraminfo action.
         """
         if hasattr(self, '__defaulted'):
             return
@@ -429,8 +432,13 @@ class Request(MutableMapping, WaitingMixin):
             raise ValueError('The mime and params shall not share the '
                              'same keys.')
 
+        maxlag = config.maxlag
+
         if self.action == 'query':
             meta = self._params.get('meta', [])
+            if meta:
+                maxlag = None
+
             # Special logic for private wikis (T153903).
             # If the wiki requires login privileges to read articles, pywikibot
             # will be blocked from accessing the userinfo.
@@ -449,17 +457,20 @@ class Request(MutableMapping, WaitingMixin):
                 prop = set(self['prop'] + ['proofread'])
                 self['prop'] = sorted(prop)
 
+        elif self.action == 'paraminfo':
+            maxlag = None
         elif self.action == 'help':
+            maxlag = None
             self['wrap'] = ''
 
-        if config.maxlag:
-            self._params.setdefault('maxlag', [str(config.maxlag)])
+        if maxlag:
+            self._params.setdefault('maxlag', [str(maxlag)])
         self._params.setdefault('format', ['json'])
         if self['format'] != ['json']:
             raise TypeError(
                 f'Query format {self["format"]!r} cannot be parsed.')
 
-        self.__defaulted = True  # skipcq: PTC-W0037
+        self.__defaulted = True
 
     def _encoded_items(self) -> dict[str, str | bytes]:
         """Build a dict of params with minimal encoding needed for the site.
