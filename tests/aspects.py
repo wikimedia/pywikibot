@@ -492,13 +492,13 @@ class CheckHostnameMixin(TestCaseBase):
                 if '://' not in hostname:
                     hostname = 'http://' + hostname
                 r = http.fetch(uri=hostname,
+                               method='HEAD',
                                default_error_handling=False)
                 if r.exception:
                     e = r.exception
                 else:
                     if r.status not in [200, 301, 302, 303, 307, 308]:
                         raise ServerError('HTTP status: %d' % r.status)
-                    r.content  # default decode may raise exception
             except Exception as e2:
                 pywikibot.error('%s: accessing %s caused exception:'
                                 % (cls.__name__, hostname))
@@ -888,7 +888,7 @@ class TestCase(TestTimerMixin, TestLoggingMixin, TestCaseBase):
                                     interface=interface)
             if 'hostname' not in data and 'site' in data:
                 try:
-                    data['hostname'] = data['site'].hostname()
+                    data['hostname'] = data['site'].base_url(data['site'].path())
                 except KeyError:
                     # The family has defined this as obsolete
                     # without a mapping to a hostname.
