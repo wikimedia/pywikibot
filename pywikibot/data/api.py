@@ -709,10 +709,7 @@ class ParamInfo(Container):
                             submodules.add(child)
             else:
                 # Boolean submodule info added to MW API in afa153ae
-                if self.site.version() >= MediaWikiVersion('1.24wmf18'):
-                    params = set(param['name'] for param in parameters
-                                 if 'submodules' in param)
-                else:
+                if self.site.version() < MediaWikiVersion('1.24wmf18'):
                     if module == 'main':
                         params = set(['action'])
                     elif module == 'query':
@@ -723,10 +720,10 @@ class ParamInfo(Container):
                         if param['name'] in params:
                             param['submodules'] = ''
 
-                for param in params:
-                    param = self.parameter(module, param)
+                for param in parameters:
                     # Do not add format modules
-                    if module != 'main' or param['name'] != 'format':
+                    if 'submodules' in param and (module != 'main' or
+                                                  param['name'] != 'format'):
                         submodules |= set(param['type'])
 
             if submodules:
