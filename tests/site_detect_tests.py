@@ -9,6 +9,8 @@ from __future__ import unicode_literals
 
 __version__ = '$Id$'
 
+from requests.exceptions import Timeout
+
 from pywikibot.site_detect import MWSite
 from pywikibot.tools import PY2
 
@@ -28,6 +30,7 @@ class TestWikiSiteDetection(TestCase):
 
     def setUp(self):
         """Set up test."""
+        self.skips = {}
         self.failures = {}
         self.errors = {}
         self.passes = {}
@@ -40,25 +43,25 @@ class TestWikiSiteDetection(TestCase):
             res = None
             typ = -1
             for pos, result in enumerate([self.passes, self.errors,
-                                          self.failures]):
+                                          self.failures, self.skips]):
                 if url in result:
                     assert res is None
                     res = result[url]
                     typ = pos
             if res is None:
-                typ += 1
+                typ = len(PREFIXES) - 1
                 res = 'Missing'
             assert 0 <= pos < len(PREFIXES)
             return typ, url, res
 
         super(TestWikiSiteDetection, self).tearDown()
-        print('Out of %d sites, %d tests passed, %d tests failed '
-              'and %d tests raised an error'
+        print('Out of %d sites, %d tests passed, %d tests failed, '
+              '%d tests skiped and %d tests raised an error'
               % (len(self.all), len(self.passes), len(self.failures),
-                 len(self.errors))
+                 len(self.skips), len(self.errors))
               )
 
-        PREFIXES = ['PASS', 'ERR ', 'FAIL', 'MISS']
+        PREFIXES = ['PASS', 'ERR ', 'FAIL', 'SKIP', 'MISS']
 
         sorted_all = sorted((norm(url) for url in self.all),
                             key=lambda item: item[0])
@@ -72,8 +75,12 @@ class TestWikiSiteDetection(TestCase):
         self.all += [url]
         try:
             site = MWSite(url)
+        except Timeout as e:
+            self.skips[url] = e
+            return
         except Exception as e:
-            print('failed on ' + url)
+            print('failure {0} on {1}: {2}'.format(
+                url, type(e), e))
             self.errors[url] = e
             return
         try:
@@ -92,6 +99,18 @@ class TestWikiSiteDetection(TestCase):
     def assertNoSite(self, url):
         """Assert a url is not a MediaWiki site."""
         self._wiki_detection(url, None)
+
+    def assertAllPass(self):
+        """Assert that all urls were detected as a MediaWiki site."""
+        self.assertEqual(len(self.passes), len(self.all) - len(self.skips))
+        self.assertEqual(len(self.failures), 0)
+        self.assertEqual(len(self.errors), 0)
+
+    def assertAllError(self):
+        """Assert that all urls were not detected as a MediaWiki site."""
+        self.assertEqual(len(self.passes), 0)
+        self.assertEqual(len(self.failures), 0)
+        self.assertEqual(len(self.errors), len(self.all) - len(self.skips))
 
     def test_IWM(self):
         """Test the load_site method for MW sites on the IWM list."""
@@ -125,6 +144,7 @@ class TestWikiSiteDetection(TestCase):
         """Test detection of MediaWiki sites."""
         self.assertSite('http://botwiki.sno.cc/wiki/$1')
         self.assertSite('http://glossary.reuters.com/index.php?title=$1')
+        self.assertSite('http://www.livepedia.gr/index.php?title=$1')
         self.assertSite('http://guildwars.wikia.com/wiki/$1')
         self.assertSite('http://www.hrwiki.org/index.php/$1')
         self.assertSite('http://www.proofwiki.org/wiki/$1')
@@ -136,9 +156,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://www.EcoReality.org/wiki/$1')
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
         self.assertSite('http://wikitree.org/index.php?title=$1')
-        self.assertEqual(len(self.passes), 11)
-        self.assertEqual(len(self.failures), 0)
-        self.assertEqual(len(self.errors), 0)
+        self.assertAllPass()
 
     def test_detect_failure(self):
         """Test detection failure for MediaWiki sites with an API."""
@@ -149,7 +167,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertNoSite('http://wiki.linuxquestions.org/wiki/$1')
         # offline
         self.assertNoSite('http://seattlewiki.org/wiki/$1')
-        self.assertEqual(len(self.errors), 4)
+        self.assertAllError()
 
     def test_pre_api_sites(self):
         """Test detection of MediaWiki sites prior to the API."""
@@ -159,7 +177,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertNoSite('http://www.werelate.org/wiki/$1')
         self.assertNoSite('http://www.otterstedt.de/wiki/index.php/$1')
         self.assertNoSite('http://kb.mozillazine.org/$1')
-        self.assertEqual(len(self.errors), 6)
+        self.assertAllError()
 
     def test_detect_nosite(self):
         """Test detection of non-wiki sites."""
@@ -176,7 +194,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertNoSite('http://arxiv.org/abs/$1')
         self.assertNoSite('http://musicbrainz.org/doc/$1')
         self.assertNoSite('http://wiki.animutationportal.com/index.php/$1')
-        self.assertEqual(len(self.errors), 11)
+        self.assertAllError()
 
 
 if __name__ == '__main__':
