@@ -324,9 +324,6 @@ class TestTemplateParams(TestCase):
                          [('a', OrderedDict((('b', 'c'), ))),
                           ('d', OrderedDict((('e', 'f'), )))])
 
-        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
-                         [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
-
         # initial '{' and '}' should be ignored as outer wikitext
         self.assertEqual(func('{{{a|b}}X}'),
                          [('a', OrderedDict((('1', 'b'), )))])
@@ -335,13 +332,52 @@ class TestTemplateParams(TestCase):
         self.assertEqual(func('{{a'), [])
         self.assertEqual(func('{{a}}{{foo|'), [('a', OrderedDict())])
 
-    def _etp_regex_differs(self, func):
-        """Common cases not handled the same by ETP_REGEX."""
+    def _unstripped(self, func):
+        """Common cases of unstripped results."""
+        self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
+                         [('a', OrderedDict((('b', '<!--{{{1}}}-->'), )))])
+
+        self.assertEqual(func('{{a|  }}'), [('a', OrderedDict((('1', '  '), )))])
+        self.assertEqual(func('{{a| | }}'), [('a', OrderedDict((('1', ' '), ('2', ' '))))])
+        self.assertEqual(func('{{a| =|}}'), [('a', OrderedDict(((' ', ''), ('1', ''))))])
+
         self.assertEqual(func('{{a| b=c}}'), [('a', OrderedDict(((' b', 'c'), )))])
         self.assertEqual(func('{{a|b =c}}'), [('a', OrderedDict((('b ', 'c'), )))])
         self.assertEqual(func('{{a|b= c}}'), [('a', OrderedDict((('b', ' c'), )))])
         self.assertEqual(func('{{a|b=c }}'), [('a', OrderedDict((('b', 'c '), )))])
 
+        self.assertEqual(func('{{a| foo |2= bar }}'),
+                         [('a', OrderedDict((('1', ' foo '), ('2', ' bar '))))])
+
+        # The correct entry 'bar' is removed
+        self.assertEqual(func('{{a| foo |2= bar | baz }}'),
+                         [('a', OrderedDict((('1', ' foo '), ('2', ' baz '))))])
+        # However whitespace prevents the correct item from being removed
+        self.assertEqual(func('{{a| foo | 2 = bar | baz }}'),
+                         [('a', OrderedDict((('1', ' foo '), (' 2 ', ' bar '), ('2', ' baz '))))])
+
+    def _stripped(self, func):
+        """Common cases of stripped results."""
+        self.assertEqual(func('{{a|  }}'), [('a', OrderedDict((('1', '  '), )))])
+        self.assertEqual(func('{{a| | }}'), [('a', OrderedDict((('1', ' '), ('2', ' '))))])
+        self.assertEqual(func('{{a| =|}}'), [('a', OrderedDict((('', ''), ('1', ''))))])
+
+        self.assertEqual(func('{{a| b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
+        self.assertEqual(func('{{a|b =c}}'), [('a', OrderedDict((('b', 'c'), )))])
+        self.assertEqual(func('{{a|b= c}}'), [('a', OrderedDict((('b', 'c'), )))])
+        self.assertEqual(func('{{a|b=c }}'), [('a', OrderedDict((('b', 'c'), )))])
+
+        self.assertEqual(func('{{a| foo |2= bar }}'),
+                         [('a', OrderedDict((('1', ' foo '), ('2', 'bar'))))])
+
+        # 'bar' is always removed
+        self.assertEqual(func('{{a| foo |2= bar | baz }}'),
+                         [('a', OrderedDict((('1', ' foo '), ('2', ' baz '))))])
+        self.assertEqual(func('{{a| foo | 2 = bar | baz }}'),
+                         [('a', OrderedDict((('1', ' foo '), ('2', ' baz '))))])
+
+    def _etp_regex_differs(self, func):
+        """Common cases not handled the same by ETP_REGEX."""
         # inner {} should be treated as part of the value
         self.assertEqual(func('{{a|b={} }}'), [('a', OrderedDict((('b', '{} '), )))])
 
@@ -367,6 +403,7 @@ class TestTemplateParams(TestCase):
         func = textlib.extract_templates_and_params_mwpfh
         self._common_results(func)
         self._order_differs(func)
+        self._unstripped(func)
         self._etp_regex_differs(func)
 
         self.assertCountEqual(func('{{a|{{c|{{d}}}}}}'),
@@ -381,21 +418,34 @@ class TestTemplateParams(TestCase):
                                ('d', OrderedDict([('1', '')]))
                                ])
 
+    @require_modules('mwparserfromhell')
+    def test_extract_templates_params_mwpfh_stripped(self):
+        """Test using mwparserfromhell with stripping."""
+        func = functools.partial(textlib.extract_templates_and_params_mwpfh,
+                                 strip=True)
+
+        self._common_results(func)
+        self._order_differs(func)
+        self._stripped(func)
+
     def test_extract_templates_params_regex(self):
         """Test using many complex regexes."""
         func = functools.partial(textlib.extract_templates_and_params_regex,
-                                 remove_disabled_parts=False)
+                                 remove_disabled_parts=False, strip=False)
         self._common_results(func)
         self._order_differs(func)
+        self._unstripped(func)
 
         self.assertEqual(func('{{a|b={} }}'), [])  # FIXME: {} is normal text
 
-        self.assertEqual(func('{{a| b=c}}'), [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b =c}}'), [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b= c}}'), [('a', OrderedDict((('b', 'c'), )))])
-        self.assertEqual(func('{{a|b=c }}'), [('a', OrderedDict((('b', 'c'), )))])
-
+    def test_extract_templates_params_regex_stripped(self):
+        """Test using many complex regexes with stripping."""
         func = textlib.extract_templates_and_params_regex
+
+        self._common_results(func)
+        self._order_differs(func)
+        self._stripped(func)
+
         self.assertEqual(func('{{a|b=<!--{{{1}}}-->}}'),
                          [('a', OrderedDict((('b', ''), )))])
 
@@ -415,9 +465,16 @@ class TestTemplateParams(TestCase):
 
     def test_extract_templates_params(self):
         """Test that the normal entry point works."""
-        self._common_results(
-            functools.partial(textlib.extract_templates_and_params,
-                              remove_disabled_parts=False))
+        func = functools.partial(textlib.extract_templates_and_params,
+                                 remove_disabled_parts=False, strip=False)
+
+        self._common_results(func)
+        self._unstripped(func)
+
+        func = functools.partial(textlib.extract_templates_and_params,
+                                 remove_disabled_parts=False, strip=True)
+        self._common_results(func)
+        self._stripped(func)
 
     def test_template_simple_regex(self):
         """Test using simple regex."""
@@ -569,12 +626,14 @@ class TestGenericTemplateParams(PatchingTestCase):
     def extract_mwpfh(self, text, *args, **kwargs):
         """Patched call to extract_templates_and_params_mwpfh."""
         self._text = text
+        self._args = args
         self._mwpfh = True
 
     @PatchingTestCase.patched(textlib, 'extract_templates_and_params_regex')
     def extract_regex(self, text, *args, **kwargs):
         """Patched call to extract_templates_and_params_regex."""
         self._text = text
+        self._args = args
         self._mwpfh = False
 
     def test_removing_disabled_parts_regex(self):
@@ -602,6 +661,33 @@ class TestGenericTemplateParams(PatchingTestCase):
         self.assertTrue(self._mwpfh)
         textlib.extract_templates_and_params('{{a<!-- -->}}')
         self.assertEqual(self._text, '{{a<!-- -->}}')
+        self.assertTrue(self._mwpfh)
+
+    def test_strip_regex(self):
+        """Test stripping values when using the regex variant."""
+        self.patch(config, 'use_mwparserfromhell', False)
+        textlib.extract_templates_and_params('{{a| foo }}', False, True)
+        self.assertEqual(self._args, (False, True))
+        self.assertFalse(self._mwpfh)
+        textlib.extract_templates_and_params('{{a| foo }}', False, False)
+        self.assertEqual(self._args, (False, False))
+        self.assertFalse(self._mwpfh)
+        textlib.extract_templates_and_params('{{a| foo }}', False)
+        self.assertEqual(self._args, (False, True))
+        self.assertFalse(self._mwpfh)
+
+    @require_modules('mwparserfromhell')
+    def test_strip_mwpfh(self):
+        """Test stripping values when using the mwpfh variant."""
+        self.patch(config, 'use_mwparserfromhell', True)
+        textlib.extract_templates_and_params('{{a| foo }}', None, True)
+        self.assertEqual(self._args, (True, ))
+        self.assertTrue(self._mwpfh)
+        textlib.extract_templates_and_params('{{a| foo }}', None, False)
+        self.assertEqual(self._args, (False, ))
+        self.assertTrue(self._mwpfh)
+        textlib.extract_templates_and_params('{{a| foo }}')
+        self.assertEqual(self._args, (False, ))
         self.assertTrue(self._mwpfh)
 
 
