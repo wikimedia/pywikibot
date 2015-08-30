@@ -80,7 +80,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
     def test_capitalization(self):
         """Test that the case method is mirroring the siteinfo."""
         self.assertEqual(self.site.case(), self.site.siteinfo['case'])
-        self.assertOneDeprecationParts('pywikibot.site.BaseSite.case',
+        self.assertOneDeprecationParts('pywikibot.site.APISite.case',
                                        'siteinfo or Namespace instance')
         self.assertIs(self.site.nocapitalize,
                       self.site.siteinfo['case'] == 'case-sensitive')
