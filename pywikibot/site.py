@@ -3359,8 +3359,7 @@ class APISite(BaseSite):
             # to use namespaces available on earlier versions.
 
             # Covert namespaces to a known type
-            namespaces = set(Namespace.resolve(namespaces or [],
-                                               self.namespaces))
+            namespaces = set(self.namespaces.resolve(namespaces or []))
 
             if 'page' in member_type:
                 excluded_namespaces = set()
@@ -5813,7 +5812,7 @@ class APISite(BaseSite):
         @return: The pages which are protected.
         @rtype: generator of Page
         """
-        namespaces = Namespace.resolve(namespace, self.namespaces)
+        namespaces = self.namespaces.resolve(namespace)
         # always assert that, so we are be sure that type could be 'create'
         assert 'create' in self.protection_types(), \
             "'create' should be a valid protection type."
