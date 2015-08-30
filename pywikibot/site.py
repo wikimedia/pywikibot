@@ -2411,7 +2411,7 @@ class APISite(BaseSite):
         """Site information dict."""
         return self._siteinfo
 
-    @deprecated('use siteinfo or Namespace instance')
+    @deprecated('siteinfo or Namespace instance')
     def case(self):
         """Return this site's capitalization rule."""
         # This is the global setting via $wgCapitalLinks, it is used whenever

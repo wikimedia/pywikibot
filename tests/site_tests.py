@@ -77,6 +77,17 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
 
     cached = True
 
+    def test_capitalization(self):
+        """Test that the case method is mirroring the siteinfo."""
+        self.assertEqual(self.site.case(), self.site.siteinfo['case'])
+        self.assertOneDeprecationParts('pywikibot.site.BaseSite.case',
+                                       'siteinfo or Namespace instance')
+        self.assertIs(self.site.nocapitalize,
+                      self.site.siteinfo['case'] == 'case-sensitive')
+        self.assertOneDeprecationParts(
+            'pywikibot.site.BaseSite.nocapitalize',
+            "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
+
     def test_live_version(self):
         """Test live_version."""
         mysite = self.get_site()
@@ -224,7 +235,10 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertIsInstance(dabcat, pywikibot.Category)
 
         foo = unicode(pywikibot.Link("foo", source=mysite))
-        self.assertEqual(foo, u"[[foo]]" if mysite.nocapitalize else u"[[Foo]]")
+        if self.site.namespaces[0].case == 'case-sensitive':
+            self.assertEqual(foo, '[[foo]]')
+        else:
+            self.assertEqual(foo, '[[Foo]]')
 
         self.assertFalse(mysite.isInterwikiLink("foo"))
         self.assertIsInstance(mysite.redirectRegex().pattern, basestring)
@@ -1895,7 +1909,6 @@ class TestSiteInfo(DefaultSiteTestCase):
             datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
             datetime)
         self.assertIn(mysite.siteinfo['case'], ["first-letter", "case-sensitive"])
-        self.assertEqual(mysite.case(), mysite.siteinfo['case'])
         self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
 
     def test_properties_with_defaults(self):
