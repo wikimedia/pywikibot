@@ -1038,6 +1038,44 @@ class CapturingTestCase(TestCase):
             return result
 
 
+class PatchingTestCase(TestCase):
+
+    """Easily patch and unpatch instances."""
+
+    @staticmethod
+    def patched(obj, attr_name):
+        """Apply patching information."""
+        def add_patch(decorated):
+            decorated._patching = (obj, attr_name)
+            return decorated
+        return add_patch
+
+    def patch(self, obj, attr_name, replacement):
+        """
+        Patch the obj's attribute with the replacement.
+
+        It will be reset after each C{tearDown}.
+        """
+        self._patched_instances += [(obj, attr_name, getattr(obj, attr_name))]
+        setattr(obj, attr_name, replacement)
+
+    def setUp(self):
+        """Set up the test by initializing the patched list."""
+        super(TestCaseBase, self).setUp()
+        self._patched_instances = []
+        for attribute in dir(self):
+            attribute = getattr(self, attribute)
+            if callable(attribute) and hasattr(attribute, '_patching'):
+                self.patch(attribute._patching[0], attribute._patching[1],
+                           attribute)
+
+    def tearDown(self):
+        """Tear down the test by unpatching the patched."""
+        for patched in self._patched_instances:
+            setattr(*patched)
+        super(TestCaseBase, self).tearDown()
+
+
 class SiteAttributeTestCase(TestCase):
 
     """Add the sites as attributes to the instances."""
