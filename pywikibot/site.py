@@ -6618,8 +6618,17 @@ class DataSite(APISite):
             raise ValueError(u'Data site used does not support provided '
                              u'language.')
 
+        if 'site' in kwargs:
+            if kwargs['site'].sitename != self.sitename:
+                raise ValueError('The site given in the kwargs is different.')
+            else:
+                warn('search_entities should not get a site via kwargs.',
+                     UserWarning, 2)
+                del kwargs['site']
+
+        parameters = dict(search=search, language=language, **kwargs)
         gen = api.APIGenerator('wbsearchentities', data_name='search',
-                               search=search, language=language, **kwargs)
+                               site=self, parameters=parameters)
         if limit is not None:
             gen.set_maximum_items(limit)
         return gen

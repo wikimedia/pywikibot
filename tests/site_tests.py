@@ -2564,19 +2564,18 @@ class TestDataSiteSearchEntities(WikidataTestCase):
     def test_general(self):
         """Test basic search_entities functionality."""
         datasite = self.get_repo()
-        pages = datasite.search_entities('abc', 'en', limit=50,
-                                         site=self.get_site())
+        pages = datasite.search_entities('abc', 'en', limit=50)
         self.assertGreater(len(list(pages)), 0)
         self.assertLessEqual(len(list(pages)), 50)
         pages = datasite.search_entities('alphabet', 'en', type='property',
-                                         limit=50, site=self.get_site())
+                                         limit=50)
         self.assertGreater(len(list(pages)), 0)
         self.assertLessEqual(len(list(pages)), 50)
 
     def test_continue(self):
         """Test that continue parameter in search_entities works."""
         datasite = self.get_repo()
-        kwargs = {'limit': 50, 'site': self.get_site()}
+        kwargs = {'limit': 50}
         pages = datasite.search_entities('Rembrandt', 'en', **kwargs)
         kwargs['continue'] = 1
         pages_continue = datasite.search_entities('Rembrandt', 'en', **kwargs)

@@ -2293,7 +2293,25 @@ class CachedRequest(Request):
         return self._data
 
 
-class APIGenerator(object):
+class _RequestWrapper(object):
+
+    """A wrapper class to handle the usage of the C{parameters} parameter."""
+
+    def _clean_kwargs(self, kwargs, **mw_api_args):
+        """Clean kwargs, define site and request class."""
+        if 'site' not in kwargs:
+            warn('{0} invoked without a site'.format(self.__class__.__name__),
+                 RuntimeWarning, 3)
+            kwargs['site'] = pywikibot.Site()
+        assert(not hasattr(self, 'site') or self.site == kwargs['site'])
+        self.site = kwargs['site']
+        self.request_class = kwargs['site']._request_class(kwargs)
+        kwargs = self.request_class.clean_kwargs(kwargs)
+        kwargs['parameters'].update(mw_api_args)
+        return kwargs
+
+
+class APIGenerator(_RequestWrapper):
 
     """Iterator that handle API responses containing lists.
 
@@ -2320,12 +2338,7 @@ class APIGenerator(object):
         @param data_name: Name of the data in API response.
         @type data_name: str
         """
-        kwargs['action'] = action
-        try:
-            self.site = kwargs['site']
-        except KeyError:
-            self.site = pywikibot.Site()
-            kwargs['site'] = self.site
+        kwargs = self._clean_kwargs(kwargs, action=action)
 
         self.continue_name = continue_name
         self.limit_name = limit_name
@@ -2333,8 +2346,8 @@ class APIGenerator(object):
 
         self.query_increment = 50
         self.limit = None
-        self.starting_offset = kwargs.pop(self.continue_name, 0)
-        self.request = Request(**kwargs)
+        self.starting_offset = kwargs['parameters'].pop(self.continue_name, 0)
+        self.request = self.request_class(**kwargs)
         self.request[self.limit_name] = self.query_increment
 
     def set_query_increment(self, value):
@@ -2404,7 +2417,7 @@ class APIGenerator(object):
                 break
 
 
-class QueryGenerator(object):
+class QueryGenerator(_RequestWrapper):
 
     """Base class for iterators that handle responses to API action=query.
 
@@ -2516,18 +2529,6 @@ class QueryGenerator(object):
         #     "templates":{"tlcontinue":"310820|828|Namespace_detect"}}
         # self.continuekey is a list
         self.continuekey = self.modules
-
-    def _clean_kwargs(self, kwargs, **mw_api_args):
-        """Clean kwargs, define site and request class."""
-        if 'site' not in kwargs:
-            warn('QueryGenerator() invoked without a site', RuntimeWarning, 3)
-            kwargs['site'] = pywikibot.Site()
-        assert(not hasattr(self, 'site') or self.site == kwargs['site'])
-        self.site = kwargs['site']
-        self.request_class = kwargs['site']._request_class(kwargs)
-        kwargs = self.request_class.clean_kwargs(kwargs)
-        kwargs['parameters'].update(mw_api_args)
-        return kwargs
 
     def set_query_increment(self, value):
         """Set the maximum number of items to be retrieved per API query.
