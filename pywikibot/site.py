@@ -5274,7 +5274,7 @@ class APISite(BaseSite):
                                       '"report_success" is True or None',
                                       '"report_success=False" or define '
                                       '"ignore_warnings" as callable/iterable',
-                                      2)
+                                      3)
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
             ignore_warnings = lambda warnings: all(w.code in ignored_warnings
@@ -5426,12 +5426,12 @@ class APISite(BaseSite):
                     return False
             warn('When ignore_warnings=False in APISite.upload will change '
                  'from raising an UploadWarning into behaving like being a '
-                 'callable returning False.', DeprecationWarning, 2)
+                 'callable returning False.', DeprecationWarning, 3)
             if len(result['warnings']) > 1:
                 warn('The upload returned {0} warnings: '
                      '{1}'.format(len(result['warnings']),
                                   ', '.join(result['warnings'])),
-                     UserWarning, 2)
+                     UserWarning, 3)
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]
