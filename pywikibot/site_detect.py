@@ -12,39 +12,19 @@ __version__ = '$Id$'
 
 import json
 import re
-import sys
 
 from collections import defaultdict
 from distutils.version import LooseVersion as V
 
+from pywikibot.comms.http import fetch
 from pywikibot.tools import PY2, PYTHON_VERSION
 
 if not PY2:
     from html.parser import HTMLParser
     from urllib.parse import urljoin
-    from urllib.error import HTTPError
-    import urllib.request as urllib2
 else:
     from HTMLParser import HTMLParser
     from urlparse import urljoin
-    from urllib2 import HTTPError
-    import urllib2
-
-
-def urlopen(url):
-    req = urllib2.Request(
-        url,
-        headers={'User-agent': 'Pywikibot Family File Generator 2.0'
-                               ' - https://www.mediawiki.org/wiki/Pywikibot'})
-    uo = urllib2.urlopen(req)
-    try:
-        if sys.version_info[0] > 2:
-            uo.charset = uo.headers.get_content_charset()
-        else:
-            uo.charset = uo.headers.getfirstmatchingheader('Content-Type')[0].strip().split('charset=')[1]
-    except IndexError:
-        uo.charset = 'latin-1'
-    return uo
 
 
 class MWSite(object):
@@ -62,14 +42,7 @@ class MWSite(object):
         self.fromurl = fromurl
         if fromurl.endswith("$1"):
             fromurl = fromurl[:-2]
-        try:
-            uo = urlopen(fromurl)
-            data = uo.read().decode(uo.charset)
-        except HTTPError as e:
-            if e.code != 404:
-                raise
-            data = e.read().decode('latin-1')  # don't care about mojibake for errors
-            pass
+        data = fetch(fromurl).content
 
         wp = WikiHTMLPageParser()
         wp.feed(data)
@@ -85,10 +58,10 @@ class MWSite(object):
 
     @property
     def langs(self):
-        data = urlopen(
+        response = fetch(
             self.api +
             "?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local&format=json")
-        iw = json.loads(data.read().decode(data.charset))
+        iw = json.loads(response.content)
         if 'error' in iw:
             raise RuntimeError('%s - %s' % (iw['error']['code'],
                                             iw['error']['info']))
@@ -113,7 +86,7 @@ class MWSite(object):
         if self.version is None:
             # try to get version using api
             try:
-                d = json.load(urlopen(self.api + "?version&format=json"))
+                d = json.load(fetch(self.api + '?version&format=json').content)
                 self.version = filter(
                     lambda x: x.startswith("MediaWiki"),
                     [l.strip()
@@ -124,8 +97,8 @@ class MWSite(object):
     def _parse_post_117(self, wp, fromurl):
         apipath = wp.edituri.split("?")[0]
         fullurl = urljoin(fromurl, apipath)
-        data = urlopen(fullurl + "?action=query&meta=siteinfo&format=json")
-        info = json.loads(data.read().decode(data.charset))['query']['general']
+        response = fetch(fullurl + '?action=query&meta=siteinfo&format=json')
+        info = json.loads(response.content)['query']['general']
         self.server = urljoin(fromurl, info['server'])
         for item in ['scriptpath', 'articlepath', 'lang']:
             setattr(self, item, info[item])
