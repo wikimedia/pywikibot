@@ -42,6 +42,8 @@ def print_debug(msg, *args, **kwargs):
 # pywikibot updates it to use logging in bot.init_handlers()
 debug = print_debug
 
+_logger = 'tools'
+
 
 class _NotImplementedWarning(RuntimeWarning):
 
@@ -387,7 +389,8 @@ class MediaWikiVersion(Version):
     Any other suffixes are considered invalid.
     """
 
-    MEDIAWIKI_VERSION = re.compile(r'^(\d+(?:\.\d+)+)(wmf(\d+)|alpha|beta(\d+)|-?rc\.?(\d+))?$')
+    MEDIAWIKI_VERSION = re.compile(
+        r'^(\d+(?:\.\d+)+)(wmf(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
 
     def parse(self, vstring):
         """Parse version string."""
@@ -407,6 +410,14 @@ class MediaWikiVersion(Version):
         elif version_match.group(2) == 'alpha':
             self._dev_version = (1, )
         else:
+            assert 'wmf' not in version_match.group(2)
+            assert 'alpha' not in version_match.group(2)
+            assert 'beta' not in version_match.group(2)
+            assert 'rc' not in version_match.group(2)
+            if version_match.group(2):
+                debug('Additional unused version part '
+                      '"{0}"'.format(version_match.group(2)),
+                      _logger)
             self._dev_version = (4, )
         self.suffix = version_match.group(2) or ''
         self.version = tuple(components)
