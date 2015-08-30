@@ -69,14 +69,15 @@ class TestMediaWikiVersion(TestCase):
         self._version_check('1.23rc1', (1, 23), (3, 1), 'rc1')
         self._version_check('1.23-rc1', (1, 23), (3, 1), '-rc1')
         self._version_check('1.23-rc.1', (1, 23), (3, 1), '-rc.1')
+        self._version_check('1.23text', (1, 23), (4, ), 'text')
 
     def test_invalid_versions(self):
         """Verify that insufficient version fail creating."""
         self.assertRaises(ValueError, V, 'invalid')
         self.assertRaises(ValueError, V, '1number')
         self.assertRaises(ValueError, V, '1.missing')
-        self.assertRaises(ValueError, V, '1.23wmf-1')
-        self.assertRaises(ValueError, V, '1.23text')
+
+        self.assertRaises(AssertionError, V, '1.23wmf-1')
 
 
 if __name__ == '__main__':
