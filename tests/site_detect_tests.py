@@ -125,7 +125,6 @@ class TestWikiSiteDetection(TestCase):
         """Test detection of MediaWiki sites."""
         self.assertSite('http://botwiki.sno.cc/wiki/$1')
         self.assertSite('http://glossary.reuters.com/index.php?title=$1')
-        self.assertSite('http://www.livepedia.gr/index.php?title=$1')
         self.assertSite('http://guildwars.wikia.com/wiki/$1')
         self.assertSite('http://www.hrwiki.org/index.php/$1')
         self.assertSite('http://www.proofwiki.org/wiki/$1')
@@ -137,7 +136,7 @@ class TestWikiSiteDetection(TestCase):
         self.assertSite('http://www.EcoReality.org/wiki/$1')
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
         self.assertSite('http://wikitree.org/index.php?title=$1')
-        self.assertEqual(len(self.passes), 12)
+        self.assertEqual(len(self.passes), 11)
         self.assertEqual(len(self.failures), 0)
         self.assertEqual(len(self.errors), 0)
 
