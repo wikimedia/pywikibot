@@ -59,6 +59,8 @@ class i18nBot(object):
         for msg in args:
             if hasattr(self.script, msg):
                 self.messages[msg] = msg
+            else:
+                print('message {0} not found'.format(msg))
         for new, old in kwargs.items():
             self.messages[old] = new.replace('_', '-')
         self.dict = {}
