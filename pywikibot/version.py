@@ -18,6 +18,9 @@ import time
 import datetime
 import subprocess
 import codecs
+import xml.dom.minidom
+
+from io import BytesIO
 
 from warnings import warn
 
@@ -185,8 +188,6 @@ def github_svn_rev2hash(tag, rev):
     @return: the git hash
     @rtype: str
     """
-    from io import StringIO
-    import xml.dom.minidom
     from pywikibot.comms import http
 
     uri = 'https://github.com/wikimedia/%s/!svn/vcc/default' % tag
@@ -195,9 +196,8 @@ def github_svn_rev2hash(tag, rev):
                               "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
                          headers={'label': str(rev),
                                   'user-agent': 'SVN/1.7.5 {pwb}'})
-    data = request.content
 
-    dom = xml.dom.minidom.parse(StringIO(data))
+    dom = xml.dom.minidom.parse(BytesIO(request.raw))
     hsh = dom.getElementsByTagName("C:git-commit")[0].firstChild.nodeValue
     date = dom.getElementsByTagName("S:date")[0].firstChild.nodeValue
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
