@@ -152,6 +152,25 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     properties will have the same value.
     """
 
+    MEDIA = -2
+    SPECIAL = -1
+    MAIN = 0
+    TALK = 1
+    USER = 2
+    USER_TALK = 3
+    PROJECT = 4
+    PROJECT_TALK = 5
+    FILE = 6
+    FILE_TALK = 7
+    MEDIAWIKI = 8
+    MEDIAWIKI_TALK = 9
+    TEMPLATE = 10
+    TEMPLATE_TALK = 11
+    HELP = 12
+    HELP_TALK = 13
+    CATEGORY = 14
+    CATEGORY_TALK = 15
+
     # These are the MediaWiki built-in names for MW 1.14+.
     # Namespace prefixes are always case-insensitive, but the
     # canonical forms are capitalized.
@@ -478,9 +497,41 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Iterate over all namespaces."""
         return iter(self._namespaces)
 
-    def __getitem__(self, number):
-        """Get the namespace with the given number."""
-        return self._namespaces[number]
+    def __getitem__(self, key):
+        """
+        Get the namespace with the given key.
+
+        @param key: namespace key
+        @type key: Namespace, int or str
+        @rtype: Namespace
+        """
+        if isinstance(key, (Namespace, int)):
+            return self._namespaces[key]
+        else:
+            namespace = self.lookup_name(key)
+            if namespace:
+                return namespace
+
+        return super(NamespacesDict, self).__getitem__(key)
+
+    def __getattr__(self, attr):
+        """
+        Get the namespace with the given key.
+
+        @param key: namespace key
+        @type key: Namespace, int or str
+        @rtype: Namespace
+        """
+        # lookup_name access _namespaces
+        if attr.isupper():
+            if attr == 'MAIN':
+                return self[0]
+
+            namespace = self.lookup_name(attr)
+            if namespace:
+                return namespace
+
+        return self.__getattribute__(attr)
 
     def __len__(self):
         """Get the number of namespaces."""
@@ -1035,26 +1086,32 @@ class BaseSite(ComparableMixin):
 
     # namespace shortcuts for backwards-compatibility
 
+    @deprecated('namespaces.SPECIAL')
     def special_namespace(self):
         """Return local name for the Special: namespace."""
         return self.namespace(-1)
 
+    @deprecated('namespaces.FILE')
     def image_namespace(self):
         """Return local name for the File namespace."""
         return self.namespace(6)
 
+    @deprecated('namespaces.MEDIAWIKI')
     def mediawiki_namespace(self):
         """Return local name for the MediaWiki namespace."""
         return self.namespace(8)
 
+    @deprecated('namespaces.TEMPLATE')
     def template_namespace(self):
         """Return local name for the Template namespace."""
         return self.namespace(10)
 
+    @deprecated('namespaces.CATEGORY')
     def category_namespace(self):
         """Return local name for the Category namespace."""
         return self.namespace(14)
 
+    @deprecated('list(namespaces.CATEGORY)')
     def category_namespaces(self):
         """Return names for the Category namespace."""
         return self.namespace(14, all=True)

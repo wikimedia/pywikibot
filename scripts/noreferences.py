@@ -608,7 +608,7 @@ class NoReferencesBot(Bot):
         # keep removing interwiki links, templates etc. from the bottom.
         # At the end, look at the length of the temp text. That's the position
         # where we'll insert the references section.
-        catNamespaces = '|'.join(self.site.category_namespaces())
+        catNamespaces = '|'.join(self.site.namespaces.CATEGORY)
         categoryPattern = r'\[\[\s*(%s)\s*:[^\n]*\]\]\s*' % catNamespaces
         interwikiPattern = r'\[\[([a-zA-Z\-]+)\s?:([^\[\]\n]*)\]\]\s*'
         # won't work with nested templates
@@ -730,7 +730,7 @@ def main(*args):
             pass
         else:
             cat = pywikibot.Category(site, "%s:%s" % (
-                site.category_namespace(), cat))
+                site.namespaces.CATEGORY, cat))
             gen = cat.articles(namespaces=genFactory.namespaces or [0])
     if gen:
         bot = NoReferencesBot(gen, **options)
