@@ -1,4 +1,5 @@
 # See tests/README.rst for instructions for using travis with developer builds.
+
 language: python
 
 sudo: false
@@ -9,10 +10,9 @@ python:
   - '3.4'
   - '2.6'
 
-# OSX builds are not yet available
+# OSX builds do not yet support Python
 os:
   - linux
-  - osx
 
 addons:
   apt:
