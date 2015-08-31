@@ -1654,9 +1654,20 @@ class APISite(BaseSite):
         self.tokens = TokenWallet(self)
 
     @classmethod
-    def fromDBName(cls, dbname):
+    def fromDBName(cls, dbname, site=None):
+        """
+        Create a site from a database name using the sitematrix.
+
+        @param dbname: database name
+        @type dbname: str
+        @param site: Site to load sitematrix from. (Default meta.wikimedia.org)
+        @type site: APISite
+        @return: site object for the database name
+        @rtype: APISite
+        """
         # TODO this only works for some WMF sites
-        site = pywikibot.Site('meta', 'meta')
+        if not site:
+            site = pywikibot.Site('meta', 'meta')
         req = site._request(expiry=datetime.timedelta(days=10),
                             parameters={'action': 'sitematrix'})
         data = req.submit()

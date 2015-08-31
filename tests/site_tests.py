@@ -257,19 +257,23 @@ class TestSiteObject(DefaultSiteTestCase):
 
     def testConstructors(self):
         """Test cases for site constructors."""
-        self.assertEqual(pywikibot.site.APISite.fromDBName('enwiki'),
+        if isinstance(self.site.family, pywikibot.family.WikimediaFamily):
+            site = self.site
+        else:
+            site = None
+        self.assertEqual(pywikibot.site.APISite.fromDBName('enwiki', site),
                          pywikibot.Site('en', 'wikipedia'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('eswikisource'),
+        self.assertEqual(pywikibot.site.APISite.fromDBName('eswikisource', site),
                          pywikibot.Site('es', 'wikisource'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('dewikinews'),
+        self.assertEqual(pywikibot.site.APISite.fromDBName('dewikinews', site),
                          pywikibot.Site('de', 'wikinews'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('ukwikivoyage'),
+        self.assertEqual(pywikibot.site.APISite.fromDBName('ukwikivoyage', site),
                          pywikibot.Site('uk', 'wikivoyage'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('metawiki'),
+        self.assertEqual(pywikibot.site.APISite.fromDBName('metawiki', site),
                          pywikibot.Site('meta', 'meta'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('commonswiki'),
+        self.assertEqual(pywikibot.site.APISite.fromDBName('commonswiki', site),
                          pywikibot.Site('commons', 'commons'))
-        self.assertEqual(pywikibot.site.APISite.fromDBName('wikidatawiki'),
+        self.assertEqual(pywikibot.site.APISite.fromDBName('wikidatawiki', site),
                          pywikibot.Site('wikidata', 'wikidata'))
 
     def testLanguageMethods(self):
