@@ -2550,7 +2550,7 @@ def main(*args):
             ns = namespaces[0]
             if ns != 'all':
                 if isinstance(ns, unicode) or isinstance(ns, str):
-                    index = site.namespaces.lookup(ns)
+                    index = site.namespaces.lookup_name(ns)
                     if index is None:
                         raise ValueError(u'Unknown namespace: %s' % ns)
                     ns = index.id
