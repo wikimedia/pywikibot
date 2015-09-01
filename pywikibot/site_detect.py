@@ -85,11 +85,11 @@ class MWSite(object):
         if self.version is None:
             # try to get version using api
             try:
-                d = json.load(fetch(self.api + '?version&format=json').content)
-                self.version = filter(
+                d = json.loads(fetch(self.api + '?version&format=json').content)
+                self.version = list(filter(
                     lambda x: x.startswith("MediaWiki"),
                     [l.strip()
-                     for l in d['error']['*'].split("\n")])[0].split()[1]
+                     for l in d['error']['*'].split("\n")]))[0].split()[1]
             except Exception:
                 pass
 
