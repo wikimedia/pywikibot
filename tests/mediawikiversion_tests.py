@@ -79,6 +79,12 @@ class TestMediaWikiVersion(TestCase):
 
         self.assertRaises(AssertionError, V, '1.23wmf-1')
 
+    def test_generator(self):
+        """Test from_generator classmethod."""
+        self.assertEqual(V.from_generator('MediaWiki 1.2.3'),
+                         self._make('1.2.3'))
+        self.assertRaises(ValueError, V.from_generator, 'Invalid 1.2.3')
+
 
 if __name__ == '__main__':
     try:

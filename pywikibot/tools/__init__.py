@@ -392,6 +392,14 @@ class MediaWikiVersion(Version):
     MEDIAWIKI_VERSION = re.compile(
         r'^(\d+(?:\.\d+)+)(wmf(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
 
+    @classmethod
+    def from_generator(cls, generator):
+        """Create instance using the generator string."""
+        if not generator.startswith('MediaWiki '):
+            raise ValueError('Generator string ({0!r}) must start with '
+                             '"MediaWiki "'.format(generator))
+        return cls(generator[len('MediaWiki '):])
+
     def parse(self, vstring):
         """Parse version string."""
         version_match = MediaWikiVersion.MEDIAWIKI_VERSION.match(vstring)
