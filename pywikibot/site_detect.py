@@ -113,7 +113,7 @@ class MWSite(object):
                 % self.fromurl)
         try:
             self.version = MediaWikiVersion(
-                self.REwgVersion.search(data).groups(0))
+                self.REwgVersion.search(data).group(1))
         except AttributeError:
             pass
 
