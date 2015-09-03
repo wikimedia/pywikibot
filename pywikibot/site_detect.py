@@ -102,9 +102,8 @@ class MWSite(object):
         if 'error' in iw:
             raise RuntimeError('%s - %s' % (iw['error']['code'],
                                             iw['error']['info']))
-        self.langs = [wiki for wiki in iw['query']['interwikimap']
-                      if u'language' in wiki]
-        return self.langs
+        return [wiki for wiki in iw['query']['interwikimap']
+                if u'language' in wiki]
 
     def _parse_pre_117(self, data):
         """Parse HTML."""
