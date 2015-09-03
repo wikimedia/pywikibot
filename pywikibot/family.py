@@ -691,7 +691,8 @@ class Family(object):
         }
 
         # A list of projects that share cross-project sessions.
-        self.cross_projects = []
+        if not hasattr(self, 'cross_projects'):
+            self.cross_projects = []
 
         # A list with the name for cross-project cookies.
         # default for wikimedia centralAuth extensions.
@@ -1404,6 +1405,51 @@ class WikimediaFamily(Family):
 
     """Class for all wikimedia families."""
 
+    multi_language_content_families = [
+        'wikipedia', 'test',
+        'wiktionary', 'wikisource',
+        'wikibooks', 'wikinews', 'wikiquote',
+        'wikiversity', 'wikivoyage',
+    ]
+
+    wikimedia_org_content_families = [
+        'commons', 'incubator', 'species',
+    ]
+
+    wikimedia_org_meta_families = [
+        'meta', 'outreach', 'strategy',
+        'wikimediachapter',
+    ]
+
+    wikimedia_org_other_families = [
+        'wikitech',
+    ]
+
+    other_content_families = [
+        'wikidata'
+        'mediawiki',
+    ]
+
+    content_families = set(
+        multi_language_content_families +
+        wikimedia_org_content_families +
+        other_content_families
+    )
+
+    wikimedia_org_families = set(
+        wikimedia_org_content_families +
+        wikimedia_org_meta_families +
+        wikimedia_org_other_families
+    )
+
+    # CentralAuth cross avaliable projects.
+    cross_projects = set(
+        multi_language_content_families +
+        wikimedia_org_content_families +
+        wikimedia_org_meta_families +
+        other_content_families
+    )
+
     # Code mappings which are only an alias, and there is no 'old' wiki.
     # For all except 'nl_nds', subdomains do exist as a redirect, but that
     # should not be relied upon.
@@ -1440,16 +1486,6 @@ class WikimediaFamily(Family):
         # Romanian was to be the replacement.
         'mo': 'ro',
     }
-
-    def __init__(self):
-        super(WikimediaFamily, self).__init__()
-
-        # CentralAuth cross avaliable projects.
-        self.cross_projects = [
-            'commons', 'incubator', 'mediawiki', 'meta', 'species', 'test',
-            'wikibooks', 'wikidata', 'wikinews', 'wikipedia', 'wikiquote',
-            'wikisource', 'wikiversity', 'wiktionary',
-        ]
 
     @property
     def interwiki_removals(self):

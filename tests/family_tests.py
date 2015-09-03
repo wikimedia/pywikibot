@@ -33,9 +33,6 @@ class TestFamily(TestCase):
             f = Family.load(name)
             self.assertIsInstance(f.langs, dict)
             self.assertNotEqual(f.langs, {})
-            # There is one inconsistency
-            if f.name == 'wikimediachapter' and name == 'wikimedia':
-                continue
             self.assertEqual(f.name, name)
 
     def test_family_load_invalid(self):
