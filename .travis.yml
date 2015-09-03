@@ -52,10 +52,10 @@ script:
   - if [[ "$FAMILY" == 'oraintest' ]]; then python pwb.py generate_family_file 'https://test.orain.org/' oraintest ; fi
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz
   - if [[ $FAMILY == 'wpbeta' ]]; then
-      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'y' ;
+      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'n' ;
     fi
   - if [[ $FAMILY == 'wsbeta' ]]; then
-      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
+      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'n' ;
     fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
