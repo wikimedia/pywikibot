@@ -8,17 +8,16 @@ from pywikibot import family
 
 
 # The Wikimedia Strategy family
-class Family(family.WikimediaFamily):
+class Family(family.WikimediaOrgFamily):
 
     """Family class for Wikimedia Strategy Wiki."""
+
+    name = 'strategy'
 
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        self.name = 'strategy'
-        self.langs = {
-            'strategy': 'strategy.wikimedia.org',
-        }
+
         self.interwiki_forward = 'wikipedia'
 
     def dbName(self, code):

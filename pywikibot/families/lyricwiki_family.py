@@ -11,15 +11,10 @@ from pywikibot import family
 
 # user_config.py:
 # usernames['lyricwiki']['en'] = 'user'
-class Family(family.Family):
+class Family(family.SingleSiteFamily, family.WikiaFamily):
 
     """Family class for LyricWiki."""
 
     name = 'lyricwiki'
-    langs = {
-        'en': 'lyrics.wikia.com',
-    }
-
-    def scriptpath(self, code):
-        """Return the script path for this family."""
-        return ''
+    code = 'en'
+    domain = 'lyrics.wikia.com'

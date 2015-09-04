@@ -2774,8 +2774,8 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         self.assertFalse(site.obsolete)
         self.assertEqual(site.family.hostname('en'), 'lyrics.wikia.com')
 
-        self.assertRaises(KeyError, site.family.hostname, 'lyrics')
-        self.assertRaises(KeyError, site.family.hostname, 'lyricwiki')
+        self.assertEqual(site.family.hostname('lyrics'), 'lyrics.wikia.com')
+        self.assertEqual(site.family.hostname('lyricwiki'), 'lyrics.wikia.com')
 
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
                           'lyricwiki', 'lyricwiki')
@@ -2791,7 +2791,7 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
 
-        self.assertRaises(KeyError, site.family.hostname, 'en')
+        self.assertEqual(site.family.hostname('en'), 'commons.wikimedia.org')
 
         pywikibot.config.family = 'commons'
         pywikibot.config.mylang = 'de'

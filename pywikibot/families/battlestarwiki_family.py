@@ -8,16 +8,13 @@ from pywikibot import family
 
 
 # The Battlestar Wiki family, a set of Battlestar wikis.
-# http://battlestarwiki.org/
-class Family(family.Family):
+class Family(family.SubdomainFamily):
 
     """Family class for Battlestar Wiki."""
 
     name = 'battlestarwiki'
+    domain = 'battlestarwiki.org'
 
-    languages_by_size = ['en', 'de']
+    codes = ['en', 'de']
 
     interwiki_removals = ['fr', 'zh', 'es', 'ms', 'tr', 'simple']
-
-    langs = dict([(lang, '%s.battlestarwiki.org' % lang)
-                  for lang in languages_by_size])

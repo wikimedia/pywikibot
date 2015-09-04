@@ -8,9 +8,11 @@ __version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
-class Family(family.WikimediaFamily):
+class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     """Family module for Wikipedia."""
+
+    name = 'wikipedia'
 
     closed_wikis = [
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
@@ -48,9 +50,6 @@ class Family(family.WikimediaFamily):
 
     def __init__(self):
         """Constructor."""
-        super(Family, self).__init__()
-        self.name = 'wikipedia'
-
         self.languages_by_size = [
             'en', 'sv', 'nl', 'de', 'fr', 'war', 'ru', 'ceb', 'it', 'es', 'vi',
             'pl', 'ja', 'pt', 'zh', 'uk', 'ca', 'fa', 'no', 'sh', 'fi', 'ar',
@@ -86,8 +85,7 @@ class Family(family.WikimediaFamily):
         # Sites we want to edit but not count as real languages
         self.test_codes = ['test', 'test2']
 
-        self.langs = dict((lang, '%s.wikipedia.org' % lang) for lang in
-                          self.languages_by_size + self.test_codes)
+        super(Family, self).__init__()
 
         self.category_redirect_templates = {
             '_default': (),

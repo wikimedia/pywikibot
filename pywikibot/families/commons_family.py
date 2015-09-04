@@ -8,17 +8,15 @@ from pywikibot import family
 
 
 # The Wikimedia Commons family
-class Family(family.WikimediaFamily):
+class Family(family.WikimediaOrgFamily):
 
     """Family class for Wikimedia Commons."""
+
+    name = 'commons'
 
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        self.name = 'commons'
-        self.langs = {
-            'commons': 'commons.wikimedia.org',
-        }
 
         self.interwiki_forward = 'wikipedia'
 

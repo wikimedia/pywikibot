@@ -13,10 +13,12 @@ class Family(family.WikimediaFamily):
 
     """Family class for Wikidata."""
 
+    name = 'wikidata'
+    test_codes = ('test', )
+
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        self.name = 'wikidata'
         self.langs = {
             'wikidata': 'www.wikidata.org',
             'test': 'test.wikidata.org',
