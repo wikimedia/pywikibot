@@ -559,31 +559,33 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     _logger = "wiki"
 
     if url:
-        if url in _url_cache:
-            cached = _url_cache[url]
-            if cached:
-                code = cached[0]
-                fam = cached[1]
-            else:
-                raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
-        else:
+        if url not in _url_cache:
+            matched_sites = []
             # Iterate through all families and look, which does apply to
             # the given URL
             for fam in config.family_files:
-                try:
-                    family = pywikibot.family.Family.load(fam)
-                    code = family.from_url(url)
-                    if code:
-                        _url_cache[url] = (code, fam)
-                        break
-                except Exception as e:
-                    pywikibot.warning('Error in Family(%s).from_url: %s'
-                                      % (fam, e))
+                family = pywikibot.family.Family.load(fam)
+                code = family.from_url(url)
+                if code is not None:
+                    matched_sites += [(code, fam)]
+
+            if matched_sites:
+                if len(matched_sites) > 1:
+                    pywikibot.warning(
+                        'Found multiple matches for URL "{0}": {1} (use first)'
+                        .format(url, ', '.join(str(s) for s in matched_sites)))
+                _url_cache[url] = matched_sites[0]
             else:
-                _url_cache[url] = None
                 # TODO: As soon as AutoFamily is ready, try and use an
                 #       AutoFamily
-                raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
+                _url_cache[url] = None
+
+        cached = _url_cache[url]
+        if cached:
+            code = cached[0]
+            fam = cached[1]
+        else:
+            raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
     else:
         # Fallback to config defaults
         code = code or config.mylang

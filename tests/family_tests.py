@@ -19,7 +19,9 @@ from tests.aspects import (
     unittest,
     TestCase,
     DeprecationTestCase,
+    PatchingTestCase,
 )
+from tests.utils import DrySite
 
 if not PY2:
     basestring = (str, )
@@ -143,23 +145,34 @@ class TestFamily(TestCase):
                           {'a': 'b', 'c': None})
 
 
-class TestFamilyUrlRegex(TestCase):
+class TestFamilyUrlRegex(PatchingTestCase):
 
     """Test family URL regex."""
 
     net = False
 
-    def test_get_regex_wikipedia_precise(self):
-        """Test the family regex is optimal."""
-        f = Family.load('wikipedia')
-        regex = f._get_regex_all()
+    @PatchingTestCase.patched(pywikibot, 'Site')
+    def Site(self, code, fam, *args, **kwargs):
+        """Own DrySite creator."""
+        self.assertEqual(args, tuple())
+        self.assertEqual(kwargs, {})
+        self.assertEqual(code, self.current_code)
+        self.assertEqual(fam, self.current_family)
+        site = DrySite(code, fam, None, None)
+        site._siteinfo._cache['general'] = ({'articlepath': self.article_path},
+                                            True)
+        return site
 
-        self.assertTrue(regex.startswith('(?:\/\/|https\:\/\/)('))
-        self.assertIn('vo\.wikipedia\.org', regex)
-        self.assertTrue(regex.endswith(')(?:\/w\/index\.php\/?|\/wiki\/)'))
+    def setUp(self):
+        """Setup default article path."""
+        super(TestFamilyUrlRegex, self).setUp()
+        self.article_path = '/wiki/$1'
 
     def test_from_url_wikipedia_extra(self):
         """Test various URLs against wikipedia regex."""
+        self.current_code = 'vo'
+        self.current_family = 'wikipedia'
+
         f = Family.load('wikipedia')
 
         prefix = 'https://vo.wikipedia.org'
@@ -171,13 +184,18 @@ class TestFamilyUrlRegex(TestCase):
 
         self.assertEqual(f.from_url(prefix + '/wiki/$1'), 'vo')
         self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1'), 'vo')
-        self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1/foo'), 'vo')
         self.assertEqual(f.from_url(prefix + '/w/index.php/$1'), 'vo')
         self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1'), 'vo')
-        self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1/foo'), 'vo')
+
+        # Text after $1 is not allowed
+        self.assertRaises(ValueError, f.from_url,
+                          '//vo.wikipedia.org/wiki/$1/foo')
+
+        # the IWM may contain the wrong protocol, but it's only used to
+        # determine a site so using HTTP or HTTPS is not an issue
+        self.assertEqual(f.from_url('http://vo.wikipedia.org/wiki/$1'), 'vo')
 
         # wrong protocol
-        self.assertIsNone(f.from_url('http://vo.wikipedia.org/wiki/$1'))
         self.assertIsNone(f.from_url('ftp://vo.wikipedia.org/wiki/$1'))
         # wrong code
         self.assertIsNone(f.from_url('https://foobar.wikipedia.org/wiki/$1'))
@@ -191,16 +209,19 @@ class TestFamilyUrlRegex(TestCase):
     def test_each_family(self):
         """Test each family builds a working regex."""
         for family in pywikibot.config.family_files:
+            self.current_family = family
             family = Family.load(family)
-            # Test family does not respond to from_url due to overlap
-            # with Wikipedia family.
-            if family.name == 'test':
-                continue
-            for code in family.langs:
-                url = ('%s://%s%s$1' % (family.protocol(code),
-                                        family.hostname(code),
-                                        family.path(code)))
-                self.assertEqual(family.from_url(url), code)
+            for code in family.codes:
+                self.current_code = code
+                url = ('%s://%s%s/$1' % (family.protocol(code),
+                                         family.hostname(code),
+                                         family.path(code)))
+                # Families can switch off if they want to be detected using URL
+                # this applies for test:test (there is test:wikipedia)
+                if family._ignore_from_url or code in family._ignore_from_url:
+                    self.assertIsNone(family.from_url(url))
+                else:
+                    self.assertEqual(family.from_url(url), code)
 
 
 class TestOldFamilyMethod(DeprecationTestCase):

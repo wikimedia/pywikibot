@@ -1060,13 +1060,19 @@ class Family(object):
         # Override this ONLY if the wiki family requires a path prefix
         return ''
 
-    def base_url(self, code, uri):
+    def _hostname(self, code):
+        """Return the protocol and hostname."""
         protocol = self.protocol(code)
         if protocol == 'https':
             host = self.ssl_hostname(code)
-            uri = self.ssl_pathprefix(code) + uri
         else:
             host = self.hostname(code)
+        return protocol, host
+
+    def base_url(self, code, uri):
+        protocol, host = self._hostname(code)
+        if protocol == 'https':
+            uri = self.ssl_pathprefix(code) + uri
         return urlparse.urljoin('{0}://{1}'.format(protocol, host), uri)
 
     def path(self, code):
@@ -1078,38 +1084,9 @@ class Family(object):
     def apipath(self, code):
         return '%s/api.php' % self.scriptpath(code)
 
-    # TODO: @deprecated('APISite.article_path')
-    # As soon as from_url does not need nicepath anymore
+    @deprecated('APISite.article_path')
     def nicepath(self, code):
         return '/wiki/'
-
-    def _get_path_regex(self, code):
-        """
-        Return a regex matching a site URL path.
-
-        @return: regex string
-        @rtype: unicode
-        """
-        # The trailing slash after path(code) is optional.
-        return ('(?:%s?|%s)' %
-                (re.escape(self.path(code) + '/'),
-                 re.escape(self.nicepath(code))))
-
-    def _get_url_regex(self, code):
-        """
-        Return a regex matching a site URL.
-
-        Regex match group 1 is the domain.
-
-        Does not make use of ssl_hostname or ssl_pathprefix.
-
-        @return: regex string
-        @rtype: unicode
-        """
-        return (r'(?:\/\/|%s\:\/\/)(%s)%s' %
-                (self.protocol(code),
-                 re.escape(self.hostname(code)),
-                 self._get_path_regex(code)))
 
     def rcstream_host(self, code):
         raise NotImplementedError("This family does not support RCStream")
@@ -1122,119 +1099,82 @@ class Family(object):
     def nice_get_address(self, code, title):
         return '%s%s' % (self.nicepath(code), title)
 
-    def _get_regex_all(self):
-        """
-        Return a regex matching any site.
-
-        It is using Family methods with code set to 'None' initially.
-        That will raise KeyError if the Family methods use the code to
-        lookup the correct value in a dictionary such as C{langs}.
-        On KeyError, it retries it with each key from C{langs}.
-
-        @return: regex string
-        @rtype: unicode
-        """
-        if hasattr(self, '_regex_all'):
-            return self._regex_all
-
-        try:
-            self._regex_all = self._get_url_regex(None)
-            return self._regex_all
-        except KeyError:
-            # Probably automatically generated family
-            pass
-
-        # If there is only one code, use it.
-        if len(self.langs) == 1:
-            code = next(iter(self.langs.keys()))
-            self._regex_all = self._get_url_regex(code)
-            return self._regex_all
-
-        try:
-            protocol = self.protocol(None) + '\:\/\/'
-        except KeyError:
-            protocol = None
-
-        try:
-            hostname = re.escape(self.hostname(None))
-        except KeyError:
-            hostname = None
-
-        try:
-            path = self._get_path_regex(None)
-        except KeyError:
-            path = None
-
-        # If two or more of the three above varies, the regex cant be optimised
-        none_count = [protocol, hostname, path].count(None)
-
-        if none_count > 1:
-            self._regex_all = ('(?:%s)'
-                               % '|'.join(self._get_url_regex(code)
-                                          for code in self.langs.keys()))
-            return self._regex_all
-
-        if not protocol:
-            protocols = set(self.protocol(code) + '\:\/\/'
-                            for code in self.langs.keys())
-            protocol = '|'.join(protocols)
-
-        # Allow protocol neutral '//'
-        protocol = '(?:\/\/|%s)' % protocol
-
-        if not hostname:
-            hostnames = set(re.escape(self.hostname(code))
-                            for code in self.langs.keys())
-            hostname = '|'.join(hostnames)
-
-        # capture hostname
-        hostname = '(' + hostname + ')'
-
-        if not path:
-            regexes = set(self._get_path_regex(code)
-                          for code in self.langs.keys())
-            path = '(?:%s)' % '|'.join(regexes)
-
-        self._regex_all = protocol + hostname + path
-        return self._regex_all
+    # List of codes which aren't returned by from_url; True returns None always
+    _ignore_from_url = []
 
     def from_url(self, url):
         """
         Return whether this family matches the given url.
 
-        It must match URLs generated via C{self.langs} and
-        L{Family.nice_get_address} or L{Family.path}. If the protocol doesn't
-        match but is present in the interwikimap it'll log this.
+        It is first checking if a domain of this family is in the the domain of
+        the URL. If that is the case it's checking all codes and verifies that
+        a path generated via L{APISite.article_path} and L{Family.path} matches
+        the path of the URL together with the hostname for that code.
 
-        It ignores $1 in the url, and anything that follows it.
+        It is using L{Family.domains} to first check if a domain applies and
+        then iterates over L{Family.codes} to actually determine which code
+        applies.
 
+        @param url: the URL which may contain a C{$1}. If it's missing it is
+            assumed to be at the end and if it's present nothing is allowed
+            after it.
+        @type url: str
         @return: The language code of the url. None if that url is not from
             this family.
         @rtype: str or None
-        @raises RuntimeError: Mismatch between Family langs dictionary and
-            URL regex.
+        @raises RuntimeError: When there are multiple languages in this family
+            which would work with the given URL.
+        @raises ValueError: When text is present after $1.
         """
-        if '$1' in url:
-            url = url[:url.find('$1')]
-
-        url_match = re.match(self._get_regex_all(), url)
-        if not url_match:
+        if self._ignore_from_url is True:
             return None
+        else:
+            ignored = self._ignore_from_url
 
-        for code, domain in self.langs.items():
-            if domain is None:
-                warn('Family(%s): langs missing domain names' % self.name,
-                     FamilyMaintenanceWarning)
-            elif domain == url_match.group(1):
-                return code
+        parsed = urlparse.urlparse(url)
+        if not re.match('^(https?)?$', parsed.scheme):
+            return None
+        path = parsed.path
+        if parsed.query:
+            path += '?' + parsed.query
 
-        # if domain was None, this will return the only possible code.
-        if len(self.langs) == 1:
-            return next(iter(self.langs))
+        # Discard $1 and everything after it
+        path, _, suffix = path.partition('$1')
+        if suffix:
+            raise ValueError('Text after the $1 placeholder is not supported '
+                             '(T111513).')
 
-        raise RuntimeError(
-            'Family(%s): matched regex has not matched a domain in langs'
-            % self.name)
+        matched_sites = []
+        for domain in self.domains:
+            if domain in parsed.netloc:
+                break
+        else:
+            domain = False
+        if domain is not False:
+            for code in self.codes:
+                if code in ignored:
+                    continue
+                if self._hostname(code)[1] == parsed.netloc:
+                    # Use the code and family instead of the url
+                    # This is only creating a Site instance if domain matches
+                    site = pywikibot.Site(code, self.name)
+                    pywikibot.log('Found candidate {0}'.format(site))
+                    site_paths = [site.path()] * 3
+                    site_paths[1] += '/'
+                    site_paths[2] += '?title='
+                    site_paths += [site.article_path]
+
+                    if path in site_paths:
+                        matched_sites += [site]
+
+        if len(matched_sites) == 1:
+            return matched_sites[0].code
+        elif not matched_sites:
+            return None
+        else:
+            raise RuntimeError(
+                'Found multiple matches for URL "{0}": {1}'
+                .format(url, ', '.join(str(s) for s in matched_sites)))
 
     def maximum_GET_length(self, code):
         return config.maximum_GET_length

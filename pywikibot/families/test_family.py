@@ -14,7 +14,3 @@ class Family(family.SingleSiteFamily, family.WikimediaFamily):
 
     name = 'test'
     domain = 'test.wikipedia.org'
-
-    def from_url(self, url):
-        """Return None to indicate no code of this family is accepted."""
-        return None  # Don't accept this, but 'test' of 'wikipedia'

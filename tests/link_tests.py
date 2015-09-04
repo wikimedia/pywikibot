@@ -477,7 +477,7 @@ class TestFullyQualifiedNoLangFamilyExplicitLinkParser(LinkTestCase):
             'code': 'en'
         },
         'test.wp': {
-            'family': 'wikipedia',
+            'family': 'test',
             'code': 'test'
         },
     }
@@ -840,7 +840,7 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
         config.family = 'wikipedia'
         link = Link('wikidata:testwiki:Q6')
         link.parse()
-        self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
+        self.assertEqual(link.site, pywikibot.Site('test', 'test'))
         self.assertEqual(link.title, 'Q6')
         self.assertEqual(link.namespace, 0)
 
@@ -850,7 +850,7 @@ class TestFullyQualifiedNoLangFamilyImplicitLinkParser(LinkTestCase):
         config.family = 'wikipedia'
         link = Link('wikidata:testwiki:Talk:Q6')
         link.parse()
-        self.assertEqual(link.site, pywikibot.Site('test', 'wikipedia'))
+        self.assertEqual(link.site, pywikibot.Site('test', 'test'))
         self.assertEqual(link.title, 'Q6')
         self.assertEqual(link.namespace, 1)
 
