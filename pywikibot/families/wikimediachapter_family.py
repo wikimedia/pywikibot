@@ -11,6 +11,8 @@ class Family(family.WikimediaFamily):
 
     """Family for Wikimedia chapters hosted on wikimedia.org."""
 
+    code_aliases = {}
+
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
