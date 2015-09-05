@@ -220,7 +220,6 @@ class UploadRobot(BaseBot):
         handle, tempname = tempfile.mkstemp()
         with os.fdopen(handle, "wb") as t:
             t.write(_contents)
-        t.close()
         return tempname
 
     def _handle_warning(self, warning):
