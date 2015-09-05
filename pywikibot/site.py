@@ -616,6 +616,67 @@ class NamespacesDict(Mapping, SelfCallMixin):
         return result
 
 
+class _IWEntry(object):
+
+    """An entry of the _InterwikiMap with a lazy loading site."""
+
+    def __init__(self, local, url):
+        self._site = None
+        self.local = local
+        self.url = url
+
+    @property
+    def site(self):
+        if self._site is None:
+            try:
+                self._site = pywikibot.Site(url=self.url)
+            except Exception as e:
+                self._site = e
+        return self._site
+
+
+class _InterwikiMap(object):
+
+    """A representation of the interwiki map of a site."""
+
+    def __init__(self, site):
+        """Create an empty uninitalized interwiki map for the given site."""
+        super(_InterwikiMap, self).__init__()
+        self._site = site
+        self._map = None
+
+    def reset(self):
+        """Remove all mappings to force building a new mapping."""
+        self._map = None
+
+    @property
+    def _iw_sites(self):
+        """Fill the interwikimap cache with the basic entries."""
+        # _iw_sites is a local cache to return a APISite instance depending
+        # on the interwiki prefix of that site
+        if self._map is None:
+            self._map = dict((iw['prefix'], _IWEntry('local' in iw, iw['url']))
+                             for iw in self._site.siteinfo['interwikimap'])
+        return self._map
+
+    def __getitem__(self, prefix):
+        """Return the site, locality and url for the requested prefix."""
+        if prefix not in self._iw_sites:
+            raise KeyError(u"'{0}' is not an interwiki prefix.".format(prefix))
+        if isinstance(self._iw_sites[prefix].site, BaseSite):
+            return self._iw_sites[prefix]
+        elif isinstance(self._iw_sites[prefix].site, Exception):
+            raise self._iw_sites[prefix].site
+        else:
+            raise TypeError('_iw_sites[%s] is wrong type: %s'
+                            % (prefix, type(self._iw_sites[prefix].site)))
+
+    def get_by_url(self, url):
+        """Return a set of prefixes applying to the URL."""
+        return set(prefix for prefix, iw_entry in self._iw_sites
+                   if iw_entry.url == url)
+
+
 class BaseSite(ComparableMixin):
 
     """Site methods that are independent of the communication interface."""
@@ -828,18 +889,12 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if first_upper(lang) not in nsnames]
 
-    def _cache_interwikimap(self, force=False):
-        """Cache the interwikimap with usable site instances."""
-        # _iw_sites is a local cache to return a APISite instance depending
-        # on the interwiki prefix of that site
-        if force or not hasattr(self, '_iw_sites'):
-            self._iw_sites = {}
-            for iw in self.siteinfo['interwikimap']:
-                try:
-                    site = pywikibot.Site(url=iw['url'])
-                except Exception as e:
-                    site = e
-                self._iw_sites[iw['prefix']] = (site, 'local' in iw)
+    def _interwiki_urls(self):
+        site_paths = [self.path()] * 3
+        site_paths[1] += '/'
+        site_paths[2] += '?title='
+        site_paths += [self.article_path]
+        return site_paths
 
     def interwiki(self, prefix):
         """
@@ -849,25 +904,15 @@ class BaseSite(ComparableMixin):
             doesn't match any of the existing families.
         @raise KeyError: if the prefix is not an interwiki prefix.
         """
-        self._cache_interwikimap()
-        if prefix in self._iw_sites:
-            site = self._iw_sites[prefix]
-            if isinstance(site[0], BaseSite):
-                return site[0]
-            elif isinstance(site[0], Exception):
-                raise site[0]
-            else:
-                raise TypeError('_iw_sites[%s] is wrong type: %s'
-                                % (prefix, type(site[0])))
-        else:
-            raise KeyError(u"'{0}' is not an interwiki prefix.".format(prefix))
+        return self._interwikimap[prefix].site
 
     def interwiki_prefix(self, site):
         """
         Return the interwiki prefixes going to that site.
 
         The interwiki prefixes are ordered first by length (shortest first)
-        and then alphabetically.
+        and then alphabetically. L{interwiki(prefix)} is not guaranteed to equal
+        C{site} (i.e. the parameter passed to this function).
 
         @param site: The targeted site, which might be it's own.
         @type site: L{BaseSite}
@@ -876,10 +921,9 @@ class BaseSite(ComparableMixin):
         @raise KeyError: if there is no interwiki prefix for that site.
         """
         assert site is not None, 'Site must not be None'
-        self._cache_interwikimap()
-        prefixes = set([prefix
-                        for prefix, cache_entry in self._iw_sites.items()
-                        if cache_entry[0] == site])
+        prefixes = set()
+        for url in site._interwiki_urls():
+            prefixes.update(self._interwikimap.get_by_url(url))
         if not prefixes:
             raise KeyError(
                 u"There is no interwiki prefix to '{0}'".format(site))
@@ -897,9 +941,7 @@ class BaseSite(ComparableMixin):
             doesn't match any of the existing families.
         @raise KeyError: if the prefix is not an interwiki prefix.
         """
-        # Request if necessary
-        self.interwiki(prefix)
-        return self._iw_sites[prefix][1]
+        return self._interwikimap[prefix].local
 
     @deprecated('APISite.namespaces.lookup_name')
     def ns_index(self, namespace):
@@ -1697,17 +1739,20 @@ class APISite(BaseSite):
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
         self._siteinfo = Siteinfo(self)
         self._paraminfo = api.ParamInfo(self)
+        self._interwikimap = _InterwikiMap(self)
         self.tokens = TokenWallet(self)
 
     def __getstate__(self):
         """Remove TokenWallet before pickling, for security reasons."""
         new = super(APISite, self).__getstate__()
         del new['tokens']
+        del new['_interwikimap']
         return new
 
     def __setstate__(self, attrs):
         """Restore things removed in __getstate__."""
         super(APISite, self).__setstate__(attrs)
+        self._interwikimap = _InterwikiMap(self)
         self.tokens = TokenWallet(self)
 
     @classmethod

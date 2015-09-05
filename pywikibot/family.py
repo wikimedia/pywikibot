@@ -1159,12 +1159,8 @@ class Family(object):
                     # This is only creating a Site instance if domain matches
                     site = pywikibot.Site(code, self.name)
                     pywikibot.log('Found candidate {0}'.format(site))
-                    site_paths = [site.path()] * 3
-                    site_paths[1] += '/'
-                    site_paths[2] += '?title='
-                    site_paths += [site.article_path]
 
-                    if path in site_paths:
+                    if path in site._interwiki_urls():
                         matched_sites += [site]
 
         if len(matched_sites) == 1:

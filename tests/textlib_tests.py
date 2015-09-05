@@ -23,6 +23,7 @@ import pywikibot
 import pywikibot.textlib as textlib
 
 from pywikibot import config, UnknownSite
+from pywikibot.site import _IWEntry
 from pywikibot.tools import OrderedDict
 
 from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
@@ -571,23 +572,22 @@ class TestReplaceLinks(TestCase):
     text = ('Hello [[World]], [[how|are]] [[you#section|you]]? Are [[you]] a '
             '[[bug:1337]]?')
 
-    @staticmethod
-    def _dummy_cache(force=False):
-        pass
-
     @classmethod
     def setUpClass(cls):
         """Create a fake interwiki cache."""
         super(TestReplaceLinks, cls).setUpClass()
-        # make APISite.interwiki work, as long as it doesn't call
-        # _cache_interwikimap with force=True
+        # make APISite.interwiki work and prevent it from doing requests
         for site in cls.sites.values():
-            site['site']._cache_interwikimap = cls._dummy_cache
-            site['site']._iw_sites = dict((iw['family'], (iw['site'], True))
-                                          for iw in cls.sites.values())
-            site['site']._iw_sites['bug'] = (UnknownSite('Not a wiki'),
-                                             False)
-            site['site']._iw_sites['en'] = (site['site'], True)
+            mapping = {}
+            for iw in cls.sites.values():
+                mapping[iw['family']] = _IWEntry(True, 'invalid')
+                mapping[iw['family']]._site = iw['site']
+            mapping['bug'] = _IWEntry(False, 'invalid')
+            mapping['bug']._site = UnknownSite('Not a wiki')
+            mapping['en'] = _IWEntry(True, 'invalid')
+            mapping['en']._site = site['site']
+            site['site']._interwikimap._map = mapping
+            site['site']._interwikimap._site = None  # prevent it from loading
         cls.wp_site = cls.get_site('wp')
 
     def test_replacements_function(self):
