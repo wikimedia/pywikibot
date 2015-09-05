@@ -65,12 +65,13 @@ textlib_methods = (
     'getCategoryLinks', 'categoryFormat', 'replaceCategoryLinks',
     'removeCategoryLinks', 'removeCategoryLinksAndSeparator',
     'replaceCategoryInPlace', 'compileLinkR', 'extract_templates_and_params',
+    'TimeStripper',
 )
 
 __all__ = (
     'config', 'ui', 'UnicodeMixin', 'translate',
     'Page', 'FilePage', 'Category', 'Link', 'User',
-    'ItemPage', 'PropertyPage', 'Claim', 'TimeStripper',
+    'ItemPage', 'PropertyPage', 'Claim',
     'html2unicode', 'url2unicode', 'unicode2html',
     'stdout', 'output', 'warning', 'error', 'critical', 'debug',
     'exception', 'input_choice', 'input', 'input_yn', 'inputChoice',
