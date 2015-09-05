@@ -243,13 +243,19 @@ class DryParamInfo(dict):
         self.prefixes = set()
 
     def fetch(self, modules, _init=False):
-        """Prevented method."""
-        raise Exception(u'DryParamInfo.fetch(%r, %r) prevented'
-                        % (modules, _init))
+        """Load dry data."""
+        return [self[mod] for mod in modules]
 
     def parameter(self, module, param_name):
         """Load dry data."""
         return self[module][param_name]
+
+    def __getitem__(self, name):
+        """Return dry data or a dummy parameter block."""
+        try:
+            return super(DryParamInfo, self).__getitem__(name)
+        except KeyError:
+            return {'name': name, 'limit': None}
 
 
 class DummySiteinfo():
