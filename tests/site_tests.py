@@ -160,15 +160,13 @@ class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase
     def test_messages_star(self):
         """Test that fetching all messages is deprecated."""
         # Load all messages and check that '*' is not a valid key.
-        mysite = self.site
-        self.assertIsInstance(mysite.mediawiki_messages('*'), dict)
+        self.assertEqual(self.site.mediawiki_messages('*'),
+                         {'*': 'dummy entry'})
         self.assertOneDeprecationParts('mediawiki_messages("*")',
                                        'specific messages')
-
-        self.assertEqual(len(mysite.mediawiki_messages(['*'])), 1)
-        self.assertOneDeprecation()
-        self.assertEqual(mysite.mediawiki_messages('*'), {'*': 'dummy entry'})
-        self.assertOneDeprecation()
+        self.assertEqual(self.site.mediawiki_messages(['hello']),
+                         {'hello': 'world'})
+        self.assertNoDeprecation()
 
 
 class TestBaseSiteProperties(TestCase):

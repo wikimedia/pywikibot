@@ -348,7 +348,7 @@ class DrySite(pywikibot.site.APISite):
         if self.family.name == 'wikisource':
             extensions.append({'name': 'ProofreadPage'})
         self._siteinfo._cache['extensions'] = (extensions, True)
-        self._msgcache = {'*': 'dummy entry'}
+        self._msgcache = {'*': 'dummy entry', 'hello': 'world'}
 
     def _build_namespaces(self):
         return Namespace.builtin_namespaces(case=self.siteinfo['case'])
