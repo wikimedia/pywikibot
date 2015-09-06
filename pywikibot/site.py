@@ -900,7 +900,8 @@ class BaseSite(ComparableMixin):
 
     def __repr__(self):
         """Return internal representation."""
-        return 'Site("%s", "%s")' % (self.code, self.family.name)
+        return '{0}("{1}", "{2}")'.format(
+            self.__class__.__name__, self.code, self.family)
 
     def __hash__(self):
         """Return hashable key."""
@@ -1729,6 +1730,15 @@ class TokenWallet(object):
     def __repr__(self):
         """Return a representation of the internal tokens dictionary."""
         return self._tokens.__repr__()
+
+
+class RemovedSite(BaseSite):
+
+    """Site removed from a family."""
+
+    def __init__(self, code, fam, user=None, sysop=None):
+        """Constructor."""
+        super(RemovedSite, self).__init__(code, fam, user, sysop)
 
 
 class NonMWAPISite(BaseSite):
@@ -6450,10 +6460,6 @@ class DataSite(APISite):
                     f.__doc__ = method.__doc__
                 return f
         return super(APISite, self).__getattr__(attr)
-
-    def __repr__(self):
-        """Return internal representation."""
-        return 'DataSite("%s", "%s")' % (self.code, self.family.name)
 
     @deprecated("pywikibot.PropertyPage")
     def _get_propertyitem(self, props, source, **params):

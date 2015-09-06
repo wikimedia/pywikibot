@@ -364,12 +364,6 @@ class DrySite(pywikibot.site.APISite):
     def _build_namespaces(self):
         return Namespace.builtin_namespaces(case=self.siteinfo['case'])
 
-    def __repr__(self):
-        """Override default so warnings and errors indicate test is dry."""
-        return "%s(%r, %r)" % (self.__class__.__name__,
-                               self.code,
-                               self.family.name)
-
     @property
     def userinfo(self):
         """Return dry data."""
