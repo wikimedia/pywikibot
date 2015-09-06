@@ -50,7 +50,7 @@ from pywikibot.exceptions import (
     CaptchaError, SpamfilterError, CircularRedirect, InterwikiRedirectPage,
     WikiBaseError, CoordinateGlobeUnknownException,
 )
-from pywikibot.tools import UnicodeMixin, redirect_func
+from pywikibot.tools import PY2, UnicodeMixin, redirect_func
 from pywikibot.i18n import translate
 from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
@@ -94,6 +94,10 @@ __all__ = (
     'QuitKeyboardInterrupt',
 )
 __all__ += textlib_methods
+
+if PY2:
+    # T111615: Python 2 requires __all__ is bytes
+    globals()['__all__'] = tuple(bytes(item) for item in __all__)
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
