@@ -157,6 +157,19 @@ class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase
         self.assertOneDeprecationParts('Calling the namespaces property',
                                        'it directly')
 
+    def test_messages_star(self):
+        """Test that fetching all messages is deprecated."""
+        # Load all messages and check that '*' is not a valid key.
+        mysite = self.site
+        self.assertIsInstance(mysite.mediawiki_messages('*'), dict)
+        self.assertOneDeprecationParts('mediawiki_messages("*")',
+                                       'specific messages')
+
+        self.assertEqual(len(mysite.mediawiki_messages(['*'])), 1)
+        self.assertOneDeprecation()
+        self.assertEqual(mysite.mediawiki_messages('*'), {'*': 'dummy entry'})
+        self.assertOneDeprecation()
+
 
 class TestBaseSiteProperties(TestCase):
 
@@ -315,13 +328,16 @@ class TestSiteObject(DefaultSiteTestCase):
                             for key in ns
                             for item in mysite.namespace(key, True)))
 
-    def testApiMethods(self):
-        """Test generic ApiSite methods."""
+    def test_user_attributes_return_types(self):
+        """Test returned types of user attributes."""
         mysite = self.get_site()
         self.assertIsInstance(mysite.logged_in(), bool)
         self.assertIsInstance(mysite.logged_in(True), bool)
         self.assertIsInstance(mysite.userinfo, dict)
 
+    def test_messages(self):
+        """Test MediaWiki: messages."""
+        mysite = self.get_site()
         for msg in ('about', 'aboutpage', 'aboutsite', 'accesskey-n-portal'):
             self.assertTrue(mysite.has_mediawiki_message(msg))
             self.assertIsInstance(mysite.mediawiki_message(msg), basestring)
@@ -329,28 +345,31 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertRaises(KeyError, mysite.mediawiki_message, "nosuchmessage")
 
         msg = ('about', 'aboutpage')
+        about_msgs = self.site.mediawiki_messages(msg)
         self.assertIsInstance(mysite.mediawiki_messages(msg), dict)
         self.assertTrue(mysite.mediawiki_messages(msg))
+        self.assertEqual(len(about_msgs), 2)
+        self.assertIn(msg[0], about_msgs)
+
+        # mediawiki_messages must be given a list; using a string will split it
+        self.assertRaises(KeyError, self.site.mediawiki_messages, 'about')
 
         msg = ("nosuchmessage1", "about", "aboutpage", "nosuchmessage")
         self.assertFalse(mysite.has_all_mediawiki_messages(msg))
         self.assertRaises(KeyError, mysite.mediawiki_messages, msg)
-
-        # Load all messages and check that '*' is not a valid key.
-        self.assertIsInstance(mysite.mediawiki_messages('*'), dict)
-        self.assertGreater(len(mysite.mediawiki_messages(['*'])), 10)
-        self.assertNotIn('*', mysite.mediawiki_messages(['*']))
 
         self.assertIsInstance(mysite.server_time(), pywikibot.Timestamp)
         ts = mysite.getcurrenttimestamp()
         self.assertIsInstance(ts, basestring)
         self.assertRegex(ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
 
-        self.assertIsInstance(mysite.siteinfo, pywikibot.site.Siteinfo)
         self.assertIsInstance(mysite.months_names, list)
-        ver = mysite.version()
-        self.assertIsInstance(ver, basestring)
-        self.assertIsNotNone(re.search('^\d+\.\d+.*?\d*$', ver))
+        self.assertEqual(len(mysite.months_names), 12)
+        self.assertTrue(all(isinstance(month, tuple)
+                            for month in mysite.months_names))
+        self.assertTrue(all(len(month) == 2
+                            for month in mysite.months_names))
+
         self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
 
     def testEnglishSpecificMethods(self):

@@ -2194,7 +2194,8 @@ class APISite(BaseSite):
     def mediawiki_messages(self, keys):
         """Fetch the text of a set of MediaWiki messages.
 
-        If keys is '*' or ['*'], all messages will be fetched.
+        If keys is '*' or ['*'], all messages will be fetched. (deprecated)
+
         The returned dict uses each key to store the associated message.
 
         @param keys: MediaWiki messages to fetch
@@ -2202,6 +2203,10 @@ class APISite(BaseSite):
 
         @return: dict
         """
+        if keys == '*' or keys == ['*']:
+            issue_deprecation_warning('mediawiki_messages("*")',
+                                      'specific messages', 2)
+
         if not all(_key in self._msgcache for _key in keys):
             parameters = {'meta': 'allmessages',
                           'ammessages': keys,
