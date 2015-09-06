@@ -2036,6 +2036,21 @@ class Request(MutableMapping):
                 self.site._relogin()
                 continue
 
+            # If the user assertion failed, we're probably logged out as well.
+            if code == 'assertuserfailed':
+                pywikibot.error("User assertion failed. Forcing re-login.")
+                self.site._relogin()
+                continue
+
+            # Lastly, the purge module require a POST if used as anonymous user,
+            # but we normally send a GET request. If the API tells us the request
+            # has to be POSTed, we're probably logged out.
+            if code == 'mustbeposted' and self.action == 'purge':
+                pywikibot.error("Received unexpected 'mustbeposted' error. "
+                                "Forcing re-login.")
+                self.site._relogin()
+                continue
+
             if code == "maxlag":
                 lag = lagpattern.search(info)
                 if lag:
