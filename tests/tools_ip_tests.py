@@ -1,6 +1,6 @@
 #!/usr/bin/python
-"""Test IP module/regex."""
 # -*- coding: utf-8  -*-
+"""Test IP module/regex."""
 #
 # (C) Pywikibot team, 2012-2015
 #

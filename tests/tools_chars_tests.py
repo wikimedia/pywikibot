@@ -1,6 +1,6 @@
 #!/usr/bin/python
-"""Test tools.chars package."""
 # -*- coding: utf-8  -*-
+"""Test tools.chars package."""
 #
 # (C) Pywikibot team, 2015
 #

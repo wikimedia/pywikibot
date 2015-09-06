@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 """CGI user interface."""
 from __future__ import unicode_literals
 

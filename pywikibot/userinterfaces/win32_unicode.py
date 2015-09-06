@@ -1,3 +1,4 @@
+# -*- coding: utf-8  -*-
 """Stdout, stderr and argv support for unicode."""
 ##############################################
 # Support for unicode in windows cmd.exe
