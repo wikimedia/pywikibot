@@ -2043,6 +2043,8 @@ class Request(MutableMapping):
                 return {'help': {'mime': 'text/plain',
                                  'help': result['error']['help']}}
 
+            pywikibot.warning('API error %s: %s' % (code, info))
+
             if code.startswith(u'internal_api_error_'):
                 class_name = code[len(u'internal_api_error_'):]
 
