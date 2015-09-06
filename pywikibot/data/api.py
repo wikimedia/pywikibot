@@ -1996,6 +1996,13 @@ class Request(MutableMapping):
                 # case, force a re-login.
                 username = result['query']['userinfo']['name']
                 if self.site.user() is not None and self.site.user() != username:
+                    pywikibot.error(
+                        "Logged in as '{actual}' instead of '{expected}'. "
+                        "Forcing re-login.".format(
+                            actual=username,
+                            expected=self.site.user()
+                        )
+                    )
                     self.site._relogin()
                     continue
 
@@ -2019,14 +2026,14 @@ class Request(MutableMapping):
             code = result['error'].setdefault('code', 'Unknown')
             info = result['error'].setdefault('info', None)
 
+            # Older wikis returned an error instead of a warning when
+            # the request asked for too many values. If we get this
+            # error, assume we are not logged in (we can't check this
+            # because the userinfo data is not present) and force
+            # a re-login
             if code.endswith('limit'):
-                # Older wikis returned an error instead of a warning when
-                # the request asked for too many values. If we get this
-                # error, assume we are not logged in (we can't check this
-                # because the userinfo data is not present) and force
-                # a re-login
                 pywikibot.error("Received API limit error. Forcing re-login")
-                self.site.relogin()
+                self.site._relogin()
                 continue
 
             if code == "maxlag":

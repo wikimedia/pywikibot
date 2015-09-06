@@ -1979,7 +1979,7 @@ class APISite(BaseSite):
         del self._userinfo
         old_status = self._loginstatus
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
-        self.site.login(old_status)
+        self.login(old_status)
 
     def logout(self):
         """Logout of the site and load details for the logged out user.
