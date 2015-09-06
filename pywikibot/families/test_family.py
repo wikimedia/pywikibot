@@ -14,3 +14,4 @@ class Family(family.SingleSiteFamily, family.WikimediaFamily):
 
     name = 'test'
     domain = 'test.wikipedia.org'
+    test_codes = ('test', )

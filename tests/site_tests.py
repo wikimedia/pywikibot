@@ -1620,12 +1620,16 @@ class TestUserList(DefaultSiteTestCase):
             raise unittest.SkipTest('Test usernames not found')
 
 
-class PatrolTestCase(TokenTestBase, DefaultSiteTestCase):
+class PatrolTestCase(TokenTestBase, TestCase):
 
     """Test patrol method."""
 
+    family = 'test'
+    code = 'test'
+
     user = True
     token_type = 'patrol'
+    write = True
 
     def testPatrol(self):
         """Test the site.patrol() method."""
