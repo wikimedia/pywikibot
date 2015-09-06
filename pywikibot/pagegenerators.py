@@ -1008,7 +1008,7 @@ class GeneratorFactory(object):
                 if value:
                     try:
                         total = int(value)
-                    except Exception:
+                    except ValueError:
                         params = value.split(';')
                         if len(params) == 2:
                             value, total = params

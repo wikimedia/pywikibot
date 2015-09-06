@@ -355,7 +355,7 @@ def main(*args):
     bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
     try:
         bot.start()
-    except Exception:
+    except BaseException:
         bot.t.cancel()
         raise
 
