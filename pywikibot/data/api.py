@@ -1989,26 +1989,16 @@ class Request(MutableMapping):
                                "Unable to process query response of type %s."
                                % type(result),
                                data=result)
-            if self.action == 'query':
-                if 'userinfo' in result.get('query', ()):
-                    if hasattr(self.site, '_userinfo'):
-                        self.site._userinfo.update(result['query']['userinfo'])
-                    else:
-                        self.site._userinfo = result['query']['userinfo']
-                status = self.site._loginstatus  # save previous login status
-                if (('error' in result and
-                     result['error']['code'].endswith('limit')) or
-                    (status >= 0 and
-                        self.site._userinfo['name'] != self.site._username[status])):
-                    # user is no longer logged in (session expired?)
-                    # reset userinfo, then make user log in again
-                    del self.site._userinfo
-                    self.site._loginstatus = -1
-                    if status < 0:
-                        status = 0  # default to non-sysop login
-                    self.site.login(status)
-                    # retry the previous query
+
+            if self.action == 'query' and 'userinfo' in result.get('query', ()):
+                # if we get passed userinfo in the query result, we can confirm
+                # that we are logged in as the correct user. If this is not the
+                # case, force a re-login.
+                username = result['query']['userinfo']['name']
+                if self.site.user() is not None and self.site.user() != username:
+                    self.site._relogin()
                     continue
+
             self._handle_warnings(result)
 
             if "error" not in result:
@@ -2028,6 +2018,17 @@ class Request(MutableMapping):
                 result['error']['help'] = result['error'].pop("*")
             code = result['error'].setdefault('code', 'Unknown')
             info = result['error'].setdefault('info', None)
+
+            if code.endswith('limit'):
+                # Older wikis returned an error instead of a warning when
+                # the request asked for too many values. If we get this
+                # error, assume we are not logged in (we can't check this
+                # because the userinfo data is not present) and force
+                # a re-login
+                pywikibot.error("Received API limit error. Forcing re-login")
+                self.site.relogin()
+                continue
+
             if code == "maxlag":
                 lag = lagpattern.search(info)
                 if lag:

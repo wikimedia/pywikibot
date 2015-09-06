@@ -1969,6 +1969,18 @@ class APISite(BaseSite):
     forceLogin = redirect_func(login, old_name='forceLogin',
                                class_name='APISite')
 
+    def _relogin(self):
+        """Force a login sequence without logging out, using the current user.
+
+        This is an internal function which is used to re-login when
+        the internal login state does not match the state we receive
+        from the site.
+        """
+        del self._userinfo
+        old_status = self._loginstatus
+        self._loginstatus = LoginStatus.NOT_LOGGED_IN
+        self.site.login(old_status)
+
     def logout(self):
         """Logout of the site and load details for the logged out user.
 
@@ -1999,9 +2011,7 @@ class APISite(BaseSite):
         @param force: force to retrieve userinfo ignoring cache
         @type force: bool
         """
-        if (not hasattr(self, '_userinfo') or force or
-                'rights' not in self._userinfo or
-                self._userinfo['name'] != self._username['sysop' in self._userinfo['groups']]):
+        if force or not hasattr(self, '_userinfo'):
             uirequest = self._simple_request(
                 action="query",
                 meta="userinfo",
