@@ -26,13 +26,9 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        self.langs.update({
-            'en': 'www.wowwiki.com',
-            'da': 'da.wowwiki.com',
-            'fr': 'fr.wowwiki.com',
-            'no': 'no.wowwiki.com',
-            'sv': 'sv.warcraft.wikia.com',
-        })
+        # Override 'sv'.  http://sv.wow.wikia.com is an empty wiki.
+        # The interwikimap in this family map 'sv' to this empty wiki.
+        self.langs['sv'] = 'sv.warcraft.wikia.com'
 
         self.disambiguationTemplates['en'] = ['disambig', 'disambig/quest',
                                               'disambig/quest2',
