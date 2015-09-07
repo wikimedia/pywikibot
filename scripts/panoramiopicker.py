@@ -274,7 +274,6 @@ def getPhotos(photoset=u'', start_id='', end_id='', interval=100):
             except socket.timeout:
                 pywikibot.output(u'Got a timeout, let\'s try again')
 
-        print(contents)
         metadata = json.loads(contents)
         photos = metadata.get(u'photos')
         for photo in photos:
@@ -317,7 +316,6 @@ def main(*args):
     if config.panoramio['reviewer']:
         reviewer = config.panoramio['reviewer']
     elif 'commons' in config.sysopnames['commons']:
-        print(config.sysopnames['commons'])
         reviewer = config.sysopnames['commons']['commons']
     elif 'commons' in config.usernames['commons']:
         reviewer = config.usernames['commons']['commons']

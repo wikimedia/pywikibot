@@ -11,7 +11,7 @@ This module is responsible for
     - URL-encoding all data
     - Basic HTTP error handling
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 #
 # (C) Pywikibot team, 2007-2015
@@ -88,7 +88,7 @@ def _flush():
     message = 'Closing network session.'
     if hasattr(sys, 'last_type'):
         # we quit because of an exception
-        print(sys.last_type)
+        print(sys.last_type)  # noqa: print
         critical(message)
     else:
         log(message)

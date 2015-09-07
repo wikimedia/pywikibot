@@ -378,7 +378,6 @@ class EditBoxWindow(Tkinter.Frame):
         if highlight:
             self.find_all(highlight)
         if jumpIndex:
-            print(jumpIndex)
             # lines are indexed starting at 1
             line = text[:jumpIndex].count('\n') + 1
             column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)

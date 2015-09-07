@@ -152,7 +152,7 @@ class BlockreviewBot(object):
                         elif self.site.sitename == 'wikipedia:pt':
                             gen = pg.PreloadingGenerator(self.SysopGenerator())
                             for sysop in gen:
-                                print(sysop.title())
+                                pywikibot.output(sysop.title())
 
                         talkText = talkText.replace(u'{{%s}}' % unblock_tpl,
                                                     u'{{%s|2}}' % unblock_tpl)

@@ -1,11 +1,11 @@
 # -*- coding: utf-8  -*-
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 __version__ = '$Id$'
 
@@ -184,6 +184,11 @@ test_modules = library_test_modules + extra_test_modules + script_test_modules
 if 'PYWIKIBOT_TEST_MODULES' in os.environ:
     _enabled_test_modules = os.environ['PYWIKIBOT_TEST_MODULES'].split(',')
     disabled_test_modules = set(test_modules) - set(_enabled_test_modules)
+
+
+def unittest_print(*args, **kwargs):
+    """Print information in test log."""
+    print(*args, **kwargs)
 
 
 def collector(loader=unittest.loader.defaultTestLoader):

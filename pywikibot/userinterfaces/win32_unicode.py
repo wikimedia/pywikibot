@@ -173,7 +173,8 @@ def old_fileno(std_name):
 # So be paranoid about catching errors and reporting them to original_stderr,
 # so that we can at least see them.
 def _complain(message):
-    print(isinstance(message, str) and message or repr(message), file=original_stderr)
+    print(isinstance(message, str) and message or repr(message),
+          file=original_stderr)  # noqa: print
 
 
 def register_cp65001():

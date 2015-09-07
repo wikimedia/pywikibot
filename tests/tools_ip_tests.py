@@ -13,6 +13,7 @@ from distutils.version import StrictVersion
 
 from pywikibot.tools import ip
 
+from tests import unittest_print
 from tests.aspects import unittest, TestCase, DeprecationTestCase
 from tests.utils import expected_failure_if
 
@@ -34,10 +35,11 @@ class TestIPBase(TestCase):
         """Tear down test."""
         super(TestIPBase, self).tearDown()
         if not self.fail:
-            print('%d tests done' % self.total)
+            unittest_print('{0} tests done'.format(self.total))
         else:
-            print('%d of %d tests failed:\n%s'
-                  % (self.fail, self.total, '\n'.join(self.errors)))
+            unittest_print(
+                '{0} of {1} tests failed:\n{2}'.format(
+                    self.fail, self.total, '\n'.join(self.errors)))
 
     def ipv6test(self, result, IP):
         """Perform one IP test."""
@@ -671,7 +673,7 @@ class IPAddressModuleTestCase(TestIPBase):
 
     def test_ipaddress_module(self):
         """Test ipaddress module."""
-        print('testing %s' % ip.ip_address.__module__)
+        unittest_print('testing {0}'.format(ip.ip_address.__module__))
         self._run_tests()
         self.assertEqual(self.fail, 0)
 
