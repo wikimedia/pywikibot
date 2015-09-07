@@ -10,7 +10,7 @@ not be run by other users without prior contact.
 """
 #
 # (C) xqt, 2010-2016
-# (C) Pywikibot team, 2016
+# (C) Pywikibot team, 2014-2016
 #
 # Distributed under the terms of the MIT license.
 #
