@@ -12,7 +12,7 @@ therefore distributed under the PSF license.
 # Distributed under the terms of the PSF license.
 #
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 __license__ = """
 PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
@@ -62,6 +62,7 @@ products or services of Licensee, or any third party.
 agrees to be bound by the terms and conditions of this License
 Agreement.
 """
+
 import logging
 import warnings
 

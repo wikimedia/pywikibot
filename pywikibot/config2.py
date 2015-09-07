@@ -56,6 +56,9 @@ if sys.platform == 'win32':
     else:
         import _winreg as winreg
 
+from pywikibot import __url__
+from pywikibot.logging import error, output, warning
+
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
 # names and some magic variables (like __name__)
@@ -317,7 +320,7 @@ def get_base_dir(test_directory=None):
         exc_text = "No user-config.py found in directory '%s'.\n" % base_dir
         if _no_user_config:
             if _no_user_config != '2':
-                print(exc_text)
+                output(exc_text)
         else:
             exc_text += "  Please check that user-config.py is stored in the correct location.\n"
             exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
@@ -333,7 +336,7 @@ base_dir = _base_dir
 
 for arg in sys.argv[1:]:
     if arg.startswith(str('-verbose')) or arg == str('-v'):
-        print("The base directory is %s" % base_dir)
+        output('The base directory is {0}'.format(base_dir))
         break
 family_files = {}
 
@@ -871,8 +874,8 @@ def _win32_extension_command(extension):
             return cmd[:-1].strip()
     except WindowsError as e:
         # Catch any key lookup errors
-        print('WARNING: Unable to find editor for files *.' + extension)
-        print(e)
+        output('Unable to detect program for file extension "{0}": {1}'.format(
+            extension, e))
 
 
 def _detect_win32_editor():
@@ -922,7 +925,7 @@ for _key, _val in _glv.items():
 _thislevel = 0
 if _no_user_config:
     if _no_user_config != '2':
-        print("WARNING: Skipping loading of user-config.py.")
+        warning('Skipping loading of user-config.py.')
     _fns = []
 else:
     _fns = [os.path.join(_base_dir, "user-config.py")]
@@ -937,11 +940,11 @@ for _filename in _fns:
                 with open(_filename, 'rb') as f:
                     exec(compile(f.read(), _filename, 'exec'), _uc)
             else:
-                print("WARNING: Skipped '%(fn)s': writeable by others."
-                      % {'fn': _filename})
+                warning("Skipped '%(fn)s': writeable by others."
+                        % {'fn': _filename})
         else:
-            print("WARNING: Skipped '%(fn)s': owned by someone else."
-                  % {'fn': _filename})
+            warning("Skipped '%(fn)s': owned by someone else."
+                    % {'fn': _filename})
 
 
 class _DifferentTypeError(UserWarning, TypeError):
@@ -1031,10 +1034,9 @@ if console_encoding is None:
 if transliteration_target == 'not set':
     if sys.platform == 'win32':
         transliteration_target = console_encoding
-        print("WARNING: Running on Windows and transliteration_target is not "
-              "set.")
-        print("Please see "
-              "https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Windows")
+        warning(
+            'Running on Windows and transliteration_target is not set.\n'
+            'Please see {0}/Windows'.format(__url__))
     else:
         transliteration_target = None
 elif transliteration_target in ('None', 'none'):
@@ -1049,23 +1051,24 @@ if sys.platform == 'win32' and editor:
     # https://docs.python.org/2/reference/lexical_analysis.html#string-literals
     # encode('unicode-escape') also changes Unicode characters
     if set(editor) & set('\a\b\f\n\r\t\v'):
-        print('WARNING: The editor path contains probably invalid escaped '
-              'characters. Make sure to use a raw-string (r"..." or r\'...\'), '
-              'forward slashs as a path delimiter or to escape the normal '
-              'path delimiter.')
+        warning(
+            'The editor path contains probably invalid escaped '
+            'characters. Make sure to use a raw-string (r"..." or r\'...\'), '
+            'forward slashs as a path delimiter or to escape the normal '
+            'path delimiter.')
 
 
 # Fix up default site
 if family == 'wikipedia' and mylang == 'language':
     if _no_user_config != '2':
-        print("WARNING: family and mylang are not set.\n"
-              "Defaulting to family='test' and mylang='test'.")
+        warning('family and mylang are not set.\n'
+                "Defaulting to family='test' and mylang='test'.")
     family = mylang = 'test'
 
 # SECURITY WARNINGS
 if (not ignore_file_security_warnings and
         private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
-    print("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
+    error("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
           " to allow access from the group/others which"
           " could give them access to the sensitive files."
           " To avoid giving others access to sensitive files, pywikibot"
@@ -1083,7 +1086,7 @@ if __name__ == "__main__":
         if _arg == "modified":
             _all = 0
         else:
-            print("Unknown arg %(_arg)s ignored" % locals())
+            warning('Unknown arg %(_arg)s ignored' % locals())
     _k = list(globals().keys())
     _k.sort()
     for _name in _k:
@@ -1102,7 +1105,7 @@ if __name__ == "__main__":
                             _value = repr('xxxxxxxx')
                     else:
                         _value = repr(_value)
-                    print("%s=%s" % (_name, _value))
+                    output('{0}={1}'.format(_name, _value))
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):

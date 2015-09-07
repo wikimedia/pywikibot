@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 
 __release__ = '2.0b3'
 __version__ = '$Id$'
+__url__ = 'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot'
 
 import datetime
 import math
