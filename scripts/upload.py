@@ -27,6 +27,8 @@ Arguments:
                 is defined for all. It will also require a valid file name and
                 description. It'll only overwrite files if -ignorewarn includes
                 the 'exists' warning.
+  -recursive    When the filename is a directory it also uploads the files from
+                the subdirectories.
 
 It is possible to combine -abortonwarn and -ignorewarn so that if the specific
 warning is given it won't apply the general one but more specific one. So if it
@@ -512,6 +514,7 @@ def main(*args):
     chunk_size = 0
     chunk_size_regex = r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$'
     chunk_size_regex = re.compile(chunk_size_regex, re.I)
+    recursive = False
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
@@ -521,6 +524,8 @@ def main(*args):
                 keepFilename = True
                 always = True
                 verifyDescription = False
+            elif arg == '-recursive':
+                recursive = True
             elif arg.startswith('-keep'):
                 keepFilename = True
             elif arg.startswith('-filename:'):
@@ -597,6 +602,9 @@ def main(*args):
     if os.path.isdir(url):
         file_list = []
         for directory_info in os.walk(url):
+            if not recursive:
+                # Do not visit any subdirectories
+                directory_info[1][:] = []
             for dir_file in directory_info[2]:
                 file_list.append(os.path.join(directory_info[0], dir_file))
         url = file_list
