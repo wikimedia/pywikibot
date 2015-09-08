@@ -99,8 +99,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'es': (u'Categoría redirigida',),
             'eu': (u'Kategoria redirect',),
             'fa': (u'رده بهتر',
-                   u'انتقال رده',
-                   u'فیلم‌های امریکایی',),
+                   u'انتقال رده',),
             'fr': (u'Redirection de catégorie',),
             'gv': (u'Aastiurey ronney',),
             'hi': (u'श्रेणीअनुप्रेषित',
@@ -392,7 +391,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # TODO: Remove comments for appropriate pages
         self.doc_subpages = {
             '_default': ((u'/doc', ),
-                         ['ar', 'bn', 'cs', 'da', 'en', 'es', 'fa',
+                         ['ar', 'bn', 'cs', 'da', 'en', 'es',
                           'hu', 'id', 'ilo', 'ja', 'ms',
                           'ms', 'pt', 'ro', 'ru', 'simple', 'vi', 'zh']
                          ),
@@ -400,6 +399,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'de': (u'Doku', u'/Meta'),
             'dsb': (u'/Dokumentacija', ),
             'eu': (u'txantiloi dokumentazioa', u'/dok'),
+            'fa': (u'/doc', u'/توضیحات'),
             # fi: no idea how to handle this type of subpage at :Metasivu:
             'fi': ((), ),
             'fr': (u'/documentation', ),
