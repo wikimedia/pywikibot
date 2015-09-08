@@ -984,7 +984,17 @@ class SiteUserTestCase(DefaultSiteTestCase):
     def testLogEvents(self):
         """Test the site.logevents() method."""
         mysite = self.get_site()
-        mainpage = self.get_mainpage()
+        for entry in mysite.logevents(user=mysite.user(), total=3):
+            self.assertEqual(entry.user(), mysite.user())
+
+
+class TestLogEvents(DefaultSiteTestCase):
+
+    """Test logevents methods."""
+
+    def test_logevents(self):
+        """Test logevents method."""
+        mysite = self.get_site()
         le = list(mysite.logevents(total=10))
         self.assertLessEqual(len(le), 10)
         self.assertTrue(all(isinstance(entry, pywikibot.logentries.LogEntry)
@@ -993,11 +1003,18 @@ class SiteUserTestCase(DefaultSiteTestCase):
                     "move", "import", "patrol", "merge"):
             for entry in mysite.logevents(logtype=typ, total=3):
                 self.assertEqual(entry.type(), typ)
+
+    def test_logevents_mainpage(self):
+        """Test logevents method on the main page."""
+        mysite = self.get_site()
+        mainpage = self.get_mainpage()
         for entry in mysite.logevents(page=mainpage, total=3):
             self.assertEqual(entry.page().title(), mainpage.title())
             self.assertEqual(entry.page(), mainpage)
-        for entry in mysite.logevents(user=mysite.user(), total=3):
-            self.assertEqual(entry.user(), mysite.user())
+
+    def test_logevents_timestamp(self):
+        """Test logevents method."""
+        mysite = self.get_site()
         for entry in mysite.logevents(
                 start=pywikibot.Timestamp.fromISOformat('2008-09-01T00:00:01Z'), total=5):
             self.assertIsInstance(entry, pywikibot.logentries.LogEntry)
@@ -1029,6 +1046,32 @@ class SiteUserTestCase(DefaultSiteTestCase):
                           start=pywikibot.Timestamp.fromISOformat("2008-02-03T23:59:59Z"),
                           end=pywikibot.Timestamp.fromISOformat('2008-02-03T00:00:01Z'),
                           reverse=True, total=5)
+
+
+class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
+
+    """Test logpages methods."""
+
+    def test_logpages(self):
+        """Test the deprecated site.logpages() method."""
+        le = list(self.site.logpages(number=10))
+        self.assertOneDeprecation()
+        self.assertLessEqual(len(le), 10)
+        for entry in le:
+            self.assertIsInstance(entry, tuple)
+            self.assertIsInstance(entry[0], pywikibot.Page)
+            self.assertIsInstance(entry[1], basestring)
+            self.assertIsInstance(entry[2], int)
+            self.assertIsInstance(entry[3], basestring)
+
+    def test_logpages_dump(self):
+        """Test the deprecated site.logpages() method using dump mode."""
+        le = list(self.site.logpages(number=10, dump=True))
+        self.assertOneDeprecation()
+        self.assertLessEqual(len(le), 10)
+        for entry in le:
+            self.assertIsInstance(entry, dict)
+            self.assertIn('title', entry)
 
 
 class TestRecentChanges(DefaultSiteTestCase):
