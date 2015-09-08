@@ -49,6 +49,7 @@ class TokenTestBase(TestCaseBase):
 
     def setUp(self):
         """Skip test if user does not have token and clear site wallet."""
+        super(TokenTestBase, self).setUp()
         mysite = self.get_site()
         ttype = self.token_type
         try:
@@ -63,7 +64,6 @@ class TokenTestBase(TestCaseBase):
         self.token = token
         self._orig_wallet = self.site.tokens
         self.site.tokens = pywikibot.site.TokenWallet(self.site)
-        super(TokenTestBase, self).setUp()
 
     def tearDown(self):
         """Restore site tokens."""
