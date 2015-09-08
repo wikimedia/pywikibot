@@ -6,7 +6,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 import codecs
@@ -161,7 +161,7 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
     return fam.name, mylang, username
 
 EXTENDED_CONFIG = u"""# -*- coding: utf-8  -*-
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 # This is an automatically generated file. You can find more configuration
 # parameters in 'config.py' file.
@@ -208,7 +208,7 @@ mylang = '{main_lang}'
 {config_text}"""
 
 SMALL_CONFIG = (u"# -*- coding: utf-8  -*-\n"
-                u"from __future__ import unicode_literals\n"
+                u"from __future__ import absolute_import, unicode_literals\n"
                 u"family = '{main_family}'\n"
                 u"mylang = '{main_lang}'\n"
                 u"{usernames}\n")

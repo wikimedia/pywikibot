@@ -9,7 +9,7 @@ This file is part of the Pywikibot framework, and is licensed under the MIT lice
 This module requires socketIO_client to be installed:
     pip install socketIO_client
 """
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import sys
 import threading

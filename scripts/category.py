@@ -114,7 +114,7 @@ This will move all pages in the category US to the category United States.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 #

@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """Classes and functions for working with the Echo extension."""
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import pywikibot
 

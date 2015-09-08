@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """Family module for Wikibooks."""
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 

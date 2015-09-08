@@ -84,7 +84,7 @@ right parameter.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 #

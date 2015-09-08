@@ -31,7 +31,7 @@ Example:
 #
 # Automatically converted from compat branch by compat2core.py script
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 #

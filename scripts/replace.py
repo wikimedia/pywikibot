@@ -132,7 +132,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 #

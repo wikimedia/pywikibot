@@ -45,7 +45,7 @@ print("%s" % entry._uniquedescriptionstr())
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import print_function, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 __version__ = '$Id$'
 #
 

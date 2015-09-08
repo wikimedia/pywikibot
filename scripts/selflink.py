@@ -15,7 +15,7 @@ These command line parameters can be used to specify which pages to work on:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import pywikibot
 

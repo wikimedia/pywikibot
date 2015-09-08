@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """Text editor class for your favourite editor."""
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 #
 # (C) Gerrit Holl, 2004

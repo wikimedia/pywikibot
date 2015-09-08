@@ -1,6 +1,6 @@
 # -*- coding: utf-8  -*-
 """Collection of fixes for tests."""
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 # flake8 cannot detect that fixes is defined via pywikibot.fixes
 if 'fixes' not in globals():
