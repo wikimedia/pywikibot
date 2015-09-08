@@ -81,11 +81,3 @@ class Family(family.SubdomainFamily):
     def scriptpath(self, code):
         """Return the script path for this family."""
         return ''
-
-    def path(self, code):
-        """Return the path to index.php for this family."""
-        return '/index.php'
-
-    def apipath(self, code):
-        """Return the path to api.php for this family."""
-        return '/api.php'
