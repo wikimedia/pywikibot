@@ -236,8 +236,8 @@ def _altlang(code):
         return ['kbd', 'ady', 'ru']
     if code == 'tt':
         return ['tt-cyrl', 'ru']
-    if code in ['be', 'be-x-old', 'be-tarask']:
-        return ['be', 'be-x-old', 'be-tarask', 'ru']
+    if code in ['be', 'be-tarask']:
+        return ['be', 'be-tarask', 'ru']
     if code == 'kaa':
         return ['uz', 'ru']
     # Serbocroatian
