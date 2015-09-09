@@ -3703,15 +3703,21 @@ class ItemPage(WikibasePage):
             raise pywikibot.NoPage(i)
         return i
 
-    def get(self, force=False, *args, **kwargs):
+    def get(self, force=False, get_redirect=False, *args, **kwargs):
         """
         Fetch all item data, and cache it.
 
         @param force: override caching
         @type force: bool
+        @param get_redirect: return the item content, do not follow the
+                             redirect, do not raise an exception.
+        @type get_redirect: bool
         @param args: values of props
         """
         data = super(ItemPage, self).get(force=force, *args, **kwargs)
+
+        if self.isRedirectPage() and not get_redirect:
+            raise pywikibot.IsRedirectPage(self)
 
         # sitelinks
         self.sitelinks = {}
@@ -3898,6 +3904,13 @@ class ItemPage(WikibasePage):
             raise NotImplementedError
         self.repo.set_redirect_target(
             from_item=self, to_item=target_page)
+
+    def isRedirectPage(self):
+        """Return True if item is a redirect, False if not or not existing."""
+        if hasattr(self, '_content') and not hasattr(self, '_isredir'):
+            self._isredir = self.id != self._content.get('id', self.id)
+            return self._isredir
+        return super(ItemPage, self).isRedirectPage()
 
 
 class Property():

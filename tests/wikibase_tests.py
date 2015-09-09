@@ -522,10 +522,12 @@ class TestRedirects(WikidataTestCase):
     def test_redirect_item(self):
         wikidata = self.get_repo()
         item = pywikibot.ItemPage(wikidata, 'Q10008448')
+        item.get(get_redirect=True)
         target = pywikibot.ItemPage(wikidata, 'Q8422626')
         self.assertTrue(item.isRedirectPage())
         self.assertEqual(item.getRedirectTarget(), target)
         self.assertIsInstance(item.getRedirectTarget(), pywikibot.ItemPage)
+        self.assertRaises(pywikibot.IsRedirectPage, item.get)
 
 
 class TestPropertyPage(WikidataTestCase):
