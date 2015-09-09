@@ -407,7 +407,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         """Return a dict of the builtin namespaces."""
         return dict((i, cls(i, use_image_name=use_image_name,
                             case=cls.default_case(i, case)))
-                     for i in range(-2, 16))
+                    for i in range(-2, 16))
 
     @staticmethod
     def normalize_name(name):
@@ -597,7 +597,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         result = [NotImplemented if isinstance(ns, bool) else
                   NamespacesDict._lookup_name(ns, namespaces)
                   if isinstance(ns, basestring) and
-                      not ns.lstrip('-').isdigit() else
+                  not ns.lstrip('-').isdigit() else
                   namespaces[int(ns)] if int(ns) in namespaces
                   else None
                   for ns in identifiers]
@@ -754,6 +754,11 @@ class BaseSite(ComparableMixin):
     @property
     @deprecated("APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
     def nocapitalize(self):
+        """
+        Return whether this site's default title case is case-sensitive.
+
+        DEPRECATED.
+        """
         return self.siteinfo['case'] == 'case-sensitive'
 
     @property
@@ -874,9 +879,11 @@ class BaseSite(ComparableMixin):
         return SelfCallString(self.__str__())
 
     def __repr__(self):
+        """Return internal representation."""
         return 'Site("%s", "%s")' % (self.code, self.family.name)
 
     def __hash__(self):
+        """Return hashable key."""
         return hash(repr(self))
 
     def languages(self):
@@ -1445,7 +1452,7 @@ class Siteinfo(Container):
                 else:
                     pywikibot.log(u"Unable to get siteinfo, because at least "
                                   u"one property is unknown: '{0}'".format(
-                                  u"', '".join(props)))
+                                      "', '".join(props)))
                     results = {}
                     for prop in props:
                         results.update(self._get_siteinfo(prop, expiry))
@@ -2412,16 +2419,21 @@ class APISite(BaseSite):
         if not hasattr(self, "_magicwords"):
             magicwords = self.siteinfo.get("magicwords", cache=False)
             self._magicwords = dict((item["name"], item["aliases"])
-                                        for item in magicwords)
+                                    for item in magicwords)
 
         if word in self._magicwords:
             return self._magicwords[word]
         else:
             return [word]
 
-    @deprecated
+    @deprecated('expand_text')
     def resolvemagicwords(self, wikitext):
-        return NotImplementedError
+        """
+        Replace the {{ns:xx}} marks in a wikitext with the namespace names.
+
+        DEPRECATED.
+        """
+        return self.expand_text(wikitext)
 
     @remove_last_args(('default', ))
     def redirect(self):
@@ -2730,7 +2742,7 @@ class APISite(BaseSite):
                                   page.title(withSection=False)):
                 pywikibot.warning(
                     u"{0}: Query on {1} returned data on '{2}'".format(
-                    method_name, page, pageitem['title']))
+                        method_name, page, pageitem['title']))
                 continue
             api.update_page(page, pageitem, query.props)
 
@@ -3156,8 +3168,8 @@ class APISite(BaseSite):
 
             if 'tokens' in data and data['tokens']:
                 user_tokens = dict((key[:-5], val)
-                                    for key, val in data['tokens'].items()
-                                    if val != '+\\')
+                                   for key, val in data['tokens'].items()
+                                   if val != '+\\')
 
         return user_tokens
 
@@ -3178,7 +3190,7 @@ class APISite(BaseSite):
         if self.username(sysop) != self.user():
             raise ValueError('The token for {0} was requested but only the '
                              'token for {1} can be retrieved.'.format(
-                             self.username(sysop), self.user()))
+                                 self.username(sysop), self.user()))
         if not getalways:
             raise ValueError('In pywikibot/core getToken does not support the '
                              'getalways parameter.')
@@ -3194,7 +3206,7 @@ class APISite(BaseSite):
         if self.username(sysop) != self.user():
             raise ValueError('The token for {0} was requested but only the '
                              'token for {1} can be retrieved.'.format(
-                             self.username(sysop), self.user()))
+                                 self.username(sysop), self.user()))
         return self.tokens['patrol']
 
     def getParsedString(self, string, keeptags=None):
@@ -3735,6 +3747,7 @@ class APISite(BaseSite):
         self._update_page(category, ciquery, 'categoryinfo')
 
     def categoryinfo(self, category):
+        """Retrieve data on contents of category."""
         if not hasattr(category, "_catinfo"):
             self.getcategoryinfo(category)
         if not hasattr(category, "_catinfo"):
@@ -4744,24 +4757,28 @@ class APISite(BaseSite):
     _mv_errors = {
         "noapiwrite": "API editing not enabled on %(site)s wiki",
         "writeapidenied":
-"User %(user)s is not authorized to edit on %(site)s wiki",
+            "User %(user)s is not authorized to edit on %(site)s wiki",
         "nosuppress":
-"User %(user)s is not authorized to move pages without creating redirects",
+            'User %(user)s is not authorized to move pages without '
+            'creating redirects',
         "cantmove-anon":
-"""Bot is not logged in, and anon users are not authorized to move pages on
-%(site)s wiki""",
+            'Bot is not logged in, and anon users are not authorized to '
+            'move pages on %(site)s wiki',
         "cantmove":
-"User %(user)s is not authorized to move pages on %(site)s wiki",
+            "User %(user)s is not authorized to move pages on %(site)s wiki",
         "immobilenamespace":
-"Pages in %(oldnamespace)s namespace cannot be moved on %(site)s wiki",
+            'Pages in %(oldnamespace)s namespace cannot be moved on %(site)s '
+            'wiki',
         "articleexists": OnErrorExc(exception=ArticleExistsConflict, on_new_page=True),
         # "protectedpage" can happen in both directions.
         "protectedpage": OnErrorExc(exception=LockedPage, on_new_page=None),
         "protectedtitle": OnErrorExc(exception=LockedNoPage, on_new_page=True),
         "nonfilenamespace":
-"Cannot move a file to %(newnamespace)s namespace on %(site)s wiki",
+            'Cannot move a file to %(newnamespace)s namespace on %(site)s '
+            'wiki',
         "filetypemismatch":
-"[[%(newtitle)s]] file extension does not match content of [[%(oldtitle)s]]",
+            '[[%(newtitle)s]] file extension does not match content of '
+            '[[%(oldtitle)s]]',
     }
 
     @must_be(group='user')
@@ -5612,8 +5629,7 @@ class APISite(BaseSite):
             raise pywikibot.UploadWarning(warning, upload_warnings[warning]
                                           % {'msg': message},
                                           file_key=_file_key,
-                                          offset=result['offset']
-                                                 if 'offset' in result else False)
+                                          offset=result.get('offset', False))
         elif "result" not in result:
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
@@ -6059,8 +6075,8 @@ class APISite(BaseSite):
 
     @need_extension('Flow')
     def load_topiclist(self, page, format='wikitext', limit=100,
-                         sortby='newest', toconly=False, offset=None,
-                         offset_id=None, reverse=False, include_offset=False):
+                       sortby='newest', toconly=False, offset=None,
+                       offset_id=None, reverse=False, include_offset=False):
         """Retrieve the topiclist of a Flow board.
 
         @param page: A Flow board
@@ -6318,6 +6334,7 @@ class DataSite(APISite):
         return super(APISite, self).__getattr__(attr)
 
     def __repr__(self):
+        """Return internal representation."""
         return 'DataSite("%s", "%s")' % (self.code, self.family.name)
 
     @deprecated("pywikibot.PropertyPage")
@@ -6325,7 +6342,7 @@ class DataSite(APISite):
         """Generic method to get the data for multiple Wikibase items."""
         wbdata = self.get_item(source, props=props, **params)
         assert props in wbdata, \
-               "API wbgetentities response lacks %s key" % props
+            "API wbgetentities response lacks %s key" % props
         return wbdata[props]
 
     @deprecated("pywikibot.WikibasePage")
@@ -6338,12 +6355,12 @@ class DataSite(APISite):
             wbrequest = self._simple_request(**params)
             wbdata = wbrequest.submit()
             assert 'success' in wbdata, \
-                   "API wbgetentities response lacks 'success' key"
+                "API wbgetentities response lacks 'success' key"
             assert wbdata['success'] == 1, "API 'success' key is not 1"
             assert 'entities' in wbdata, \
-                   "API wbgetentities response lacks 'entities' key"
+                "API wbgetentities response lacks 'entities' key"
             assert ids in wbdata['entities'], \
-                   "API wbgetentities response lacks %s key" % ids
+                "API wbgetentities response lacks %s key" % ids
             return wbdata['entities'][ids]
         else:
             # not implemented yet
@@ -6438,6 +6455,18 @@ class DataSite(APISite):
 
     @must_be(group='user')
     def editEntity(self, identification, data, bot=True, **kwargs):
+        """
+        Edit entity.
+
+        @param identification: API parameters to use for entity identification
+        @type identification: dict
+        @param data: data updates
+        @type data: dict
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
+        @return: New entity data
+        @rtype: dict
+        """
         if "id" in identification and identification["id"] == "-1":
             del identification["id"]
         params = dict(**identification)
@@ -6459,7 +6488,16 @@ class DataSite(APISite):
 
     @must_be(group='user')
     def addClaim(self, item, claim, bot=True, **kwargs):
+        """
+        Add a claim.
 
+        @param item: Entity to modify
+        @type item: WikibasePage
+        @param claim: Claim to be added
+        @type claim: Claim
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
+        """
         params = dict(action='wbcreateclaim',
                       entity=item.getID(),
                       baserevid=item.latest_revision_id,
@@ -6492,6 +6530,8 @@ class DataSite(APISite):
         @type claim: Claim
         @param snaktype: An optional snaktype. Default: 'value'
         @type snaktype: str ('value', 'novalue' or 'somevalue')
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -6553,6 +6593,8 @@ class DataSite(APISite):
         @type source: Claim
         @param new: Whether to create a new one if the "source" already exists
         @type new: bool
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a source.")
@@ -6605,6 +6647,8 @@ class DataSite(APISite):
         @type claim: Claim
         @param qualifier: A Claim object to be used as a qualifier
         @type qualifier: Claim
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a qualifier.")
@@ -6636,6 +6680,14 @@ class DataSite(APISite):
 
     @must_be(group='user')
     def removeClaims(self, claims, bot=True, **kwargs):
+        """
+        Remove claims.
+
+        @param claims: Claims to be added
+        @type claims: list of Claim
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
+        """
         params = dict(action='wbremoveclaims')
         if bot:
             params['bot'] = 1
@@ -6657,6 +6709,8 @@ class DataSite(APISite):
         @type claim: Claim
         @param sources: A list of Claim objects that are sources
         @type sources: Claim
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         """
         params = dict(action='wbremovereferences')
         if bot:
@@ -6679,7 +6733,8 @@ class DataSite(APISite):
         @type page1: pywikibot.Page
         @param page2: Second page to link
         @type page2: pywikibot.Page
-        @param bot: whether to mark edit as bot
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         @return: dict API output
         """
         params = {
@@ -6744,7 +6799,8 @@ class DataSite(APISite):
 
         @param page: page to fetch links from
         @type page: pywikibot.Page
-        @param bot: whether to mark the edit as bot
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         @return: pywikibot.ItemPage of newly created item
         """
         sitelinks = {
@@ -6807,47 +6863,3 @@ class DataSite(APISite):
         if limit is not None:
             gen.set_maximum_items(limit)
         return gen
-
-    # deprecated BaseSite methods
-    def fam(self):
-        raise NotImplementedError
-
-    def urlEncode(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def getUrl(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def linkto(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def loggedInAs(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def postData(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def postForm(self, *args, **kwargs):
-        raise NotImplementedError
-
-    # deprecated APISite methods
-    def isBlocked(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def checkBlocks(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def isAllowed(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def prefixindex(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def categories(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def linksearch(self, *args, **kwargs):
-        raise NotImplementedError
-
-    def newimages(self, *args, **kwargs):
-        raise NotImplementedError
