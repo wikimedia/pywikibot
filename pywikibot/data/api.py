@@ -3173,6 +3173,8 @@ def update_page(page, pagedict: dict, props=None):
 
     if 'pageprops' in pagedict:
         page._pageprops = pagedict['pageprops']
+    elif 'pageprops' in props:
+        page._pageprops = {}
 
     if 'preload' in pagedict:
         page._preloadedtext = pagedict['preload']
