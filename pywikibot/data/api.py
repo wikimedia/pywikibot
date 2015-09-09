@@ -1927,6 +1927,12 @@ class Request(MutableMapping):
                     else:
                         body = paramstring
 
+                pywikibot.debug('API request to {0} (uses get: {1}):\n'
+                                'Headers: {2!r}\nURI: {3!r}\n'
+                                'Body: {4!r}'.format(self.site, use_get,
+                                                     headers, uri, body),
+                                _logger)
+
                 rawdata = http.request(
                     site=self.site, uri=uri, method='GET' if use_get else 'POST',
                     body=body, headers=headers)
