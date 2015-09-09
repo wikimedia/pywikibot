@@ -6736,6 +6736,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def linkTitles(self, page1, page2, bot=True):
         """
         Link two pages together.
@@ -6762,6 +6763,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def mergeItems(self, fromItem, toItem, **kwargs):
         """
         Merge two items together.
@@ -6785,6 +6787,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def set_redirect_target(self, from_item, to_item):
         """
         Make a redirect to another item.
@@ -6804,6 +6807,7 @@ class DataSite(APISite):
         data = req.submit()
         return data
 
+    @must_be(group='user')
     def createNewItemFromPage(self, page, bot=True, **kwargs):
         """
         Create a new Wikibase item for a provided page.
