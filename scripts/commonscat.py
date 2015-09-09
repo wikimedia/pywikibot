@@ -161,7 +161,7 @@ commonscatTemplates = {
 ignoreTemplates = {
     'af': [u'commons'],
     'ar': [u'تحويلة تصنيف', u'كومنز', u'كومونز', u'Commons'],
-    'be-x-old': [u'Commons', u'Commons category'],
+    'be-tarask': [u'Commons', u'Commons category'],
     'cs': [u'Commons', u'Sestřičky', u'Sisterlinks'],
     'da': [u'Commons', u'Commons left', u'Commons2', u'Commonsbilleder',
            u'Commonskat', u'Commonscat2', u'GalleriCommons', u'Søsterlinks'],

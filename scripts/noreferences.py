@@ -370,7 +370,7 @@ referencesTemplates = {
                'بداية المراجع', 'نهاية المراجع'],
         'be': [u'Зноскі', u'Примечания', u'Reflist', u'Спіс заўваг',
                u'Заўвагі'],
-        'be-x-old': [u'Зноскі'],
+        'be-tarask': [u'Зноскі'],
         'ca': [u'Referències', u'Reflist', u'Listaref', u'Referència',
                u'Referencies', u'Referències2',
                u'Amaga', u'Amaga ref', u'Amaga Ref', u'Amaga Ref2', u'Apèndix'],

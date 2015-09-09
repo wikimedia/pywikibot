@@ -57,7 +57,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'eu', 'sk', 'da', 'bg', 'he', 'lt', 'hy', 'hr', 'sl', 'et', 'uz',
             'gl', 'nn', 'vo', 'la', 'simple', 'el', 'hi', 'az', 'th', 'ka',
             'ce', 'oc', 'be', 'mk', 'mg', 'new', 'ur', 'tt', 'ta', 'pms', 'cy',
-            'tl', 'lv', 'bs', 'te', 'be-x-old', 'br', 'ht', 'sq', 'jv', 'lb',
+            'tl', 'lv', 'bs', 'te', 'be-tarask', 'br', 'ht', 'sq', 'jv', 'lb',
             'mr', 'is', 'ml', 'zh-yue', 'bn', 'af', 'ba', 'ga', 'pnb', 'cv',
             'fy', 'lmo', 'tg', 'sco', 'my', 'yo', 'an', 'ky', 'sw', 'io', 'ne',
             'gu', 'scn', 'bpy', 'nds', 'ku', 'ast', 'qu', 'als', 'su', 'pa',
@@ -174,7 +174,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'ast': u'Dixebra',
             'ar':  u'صفحات توضيح',
             'be':  u'Disambig',
-            'be-x-old':  u'Вікіпэдыя:Неадназначнасьці',
+            'be-tarask':  u'Вікіпэдыя:Неадназначнасьці',
             'bg':  u'Пояснителни страници',
             'ca':  u'Pàgines de desambiguació',
             'cbk-zam': u'Desambiguo',
@@ -260,7 +260,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.cross_allowed = [
             'ab', 'ace', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar', 'arc',
             'arz', 'as', 'ast', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg', 'bcl',
-            'be', 'be-x-old', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
+            'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
             'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy',
             'ckb', 'co', 'cr', 'crh', 'csb', 'cu', 'cv', 'cy', 'da', 'diq',
             'dsb', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et', 'eu', 'ext', 'fa',
@@ -300,7 +300,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'arz', 'as', 'ast', 'gn', 'av', 'ay', 'az',
             'bjn', 'id', 'ms', 'bg', 'bm', 'zh-min-nan', 'nan', 'map-bms', 'jv',
-            'su', 'ba', 'be', 'be-x-old', 'bh', 'bcl', 'bi', 'bn', 'bo', 'bar',
+            'su', 'ba', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bn', 'bo', 'bar',
             'bs', 'bpy', 'br', 'bug', 'bxr', 'ca', 'ceb', 'ch', 'cbk-zam', 'sn',
             'tum', 'ny', 'cho', 'chr', 'co', 'cy', 'cv', 'cs', 'da', 'dk',
             'pdc', 'de', 'nv', 'dsb', 'na', 'dv', 'dz', 'mh', 'et', 'el', 'eml',
@@ -329,7 +329,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         ]
 
         self.interwiki_putfirst = {
-            'be-x-old': self.alphabetic,
+            'be-tarask': self.alphabetic,
             'en': self.alphabetic,
             'et': self.alphabetic_revised,
             'fi': self.alphabetic_revised,

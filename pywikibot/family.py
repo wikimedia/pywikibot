@@ -61,7 +61,7 @@ class Family(object):
         self.alphabetic = [
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm',
-            'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms', 'ba', 'be', 'be-x-old',
+            'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms', 'ba', 'be', 'be-tarask',
             'bh', 'bcl', 'bi', 'bg', 'bar', 'bo', 'bs', 'br', 'bxr', 'ca', 'cv',
             'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',
             'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'dz', 'mh', 'et', 'el',
@@ -97,7 +97,7 @@ class Family(object):
             'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
             'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bjn',
             'id', 'ms', 'bm', 'bn', 'zh-min-nan', 'nan', 'map-bms', 'jv', 'su',
-            'ba', 'min', 'be', 'be-x-old', 'bh', 'bcl', 'bi', 'bar', 'bo', 'bs',
+            'ba', 'min', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bar', 'bo', 'bs',
             'br', 'bug', 'bg', 'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch', 'cbk-zam',
             'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv',
             'nv', 'dsb', 'na', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es',
@@ -148,7 +148,7 @@ class Family(object):
             'ay': u'[a-záéíóúñ]*',
             'bar': u'[äöüßa-z]*',
             'be': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
-            'be-x-old': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
+            'be-tarask': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
             'bg': u'[a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]*',
             'bm': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'bs': u'[a-zćčžšđž]*',
@@ -356,7 +356,6 @@ class Family(object):
             'dmoz':             'dmoz',
             'dmozs':            'dmozs',
             'docbook':          'docbook',
-#            'doi':              'doi',
             'doom_wiki':        'doom_wiki',
             'download':         'download',
             'drae':             'drae',
@@ -789,7 +788,7 @@ class Family(object):
             ],
             # languages that use the cyrillic alphabet
             'cyril': [
-                'ab', 'av', 'ba', 'be', 'be-x-old', 'bg', 'bxr', 'ce', 'cu',
+                'ab', 'av', 'ba', 'be', 'be-tarask', 'bg', 'bxr', 'ce', 'cu',
                 'cv', 'kbd', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo',
                 'myv', 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk',
                 'udm', 'uk', 'xal',
@@ -1494,6 +1493,9 @@ class WikimediaFamily(Family):
 
         # miss-spelling
         'nl_nds': 'nl-nds',
+
+        # Renamed; see T11823
+        'be-x-old': 'be-tarask',
     }
 
     # Not open for edits; stewards can still edit.
