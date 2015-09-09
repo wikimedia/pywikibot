@@ -88,6 +88,7 @@ Please upgrade to Python 2.7+ or Python 3.3+, or run:
                 """Counter not found."""
 
                 pass
+        count = None
     else:
         Counter = future.backports.misc.Counter
         OrderedDict = future.backports.misc.OrderedDict
@@ -97,14 +98,16 @@ Please upgrade to Python 2.7+ or Python 3.3+, or run:
         except AttributeError:
             warn('Please update the "future" package to at least version '
                  '0.15.0 to use its count.', RuntimeWarning, 2)
-
-            def count(start=0, step=1):
-                """Backported C{count} to support keyword arguments and step."""
-                while True:
-                    yield start
-                    start += step
-
+            count = None
         del future
+
+    if count is None:
+        def count(start=0, step=1):
+            """Backported C{count} to support keyword arguments and step."""
+            while True:
+                yield start
+                start += step
+
 
 else:
     from collections import Counter  # noqa ; unused
