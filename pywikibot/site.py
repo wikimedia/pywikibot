@@ -6341,6 +6341,12 @@ class DataSite(APISite):
     def _get_propertyitem(self, props, source, **params):
         """Generic method to get the data for multiple Wikibase items."""
         wbdata = self.get_item(source, props=props, **params)
+        if props == 'info':
+            return wbdata
+
+        if props == 'sitelinks/urls':
+            props = 'sitelinks'
+
         assert props in wbdata, \
             "API wbgetentities response lacks %s key" % props
         return wbdata[props]
@@ -6359,8 +6365,13 @@ class DataSite(APISite):
             assert wbdata['success'] == 1, "API 'success' key is not 1"
             assert 'entities' in wbdata, \
                 "API wbgetentities response lacks 'entities' key"
+
+            if ids.upper() in wbdata['entities']:
+                ids = ids.upper()
+
             assert ids in wbdata['entities'], \
                 "API wbgetentities response lacks %s key" % ids
+
             return wbdata['entities'][ids]
         else:
             # not implemented yet
