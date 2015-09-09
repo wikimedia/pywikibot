@@ -1885,13 +1885,16 @@ class APISite(BaseSite):
         # This checks expiry in kwargs and not kwargs['parameters'] so it won't
         # create a CachedRequest when there is an expiry in an API parameter
         # and kwargs here are actually in parameters mode.
-        if 'expiry' in kwargs:
+        if 'expiry' in kwargs and kwargs['expiry'] is not None:
             return api.CachedRequest
         else:
             return api.Request
 
     def _request(self, **kwargs):
         """Create a request by forwarding all parameters directly."""
+        if 'expiry' in kwargs and kwargs['expiry'] is None:
+            del kwargs['expiry']
+
         return self._request_class(kwargs)(site=self, **kwargs)
 
     def _simple_request(self, **kwargs):
@@ -6362,13 +6365,10 @@ class APISite(BaseSite):
         self.login(sysop=sysop)
         if not total:
             total = pywikibot.config.special_page_limit
-        if force:
-            gen = api.PageGenerator(site=self, generator='watchlistraw',
-                                    step=step, gwrlimit=total)
-        else:
-            gen = api.PageGenerator(
-                site=self, generator='watchlistraw', step=step,
-                expiry=pywikibot.config.API_config_expiry, gwrlimit=total)
+        expiry = None if force else pywikibot.config.API_config_expiry
+        gen = api.PageGenerator(site=self, generator='watchlistraw',
+                                expiry=expiry,
+                                step=step, gwrlimit=total)
         return gen
 
     # aliases for backwards compatibility
