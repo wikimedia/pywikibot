@@ -184,8 +184,6 @@ class TestWikibaseTypes(WikidataTestCase):
         # test WbQuantity error handling
         self.assertRaises(ValueError, pywikibot.WbQuantity, amount=None,
                           error=1)
-        self.assertRaises(NotImplementedError, pywikibot.WbQuantity, amount=789,
-                          unit='invalid_unit')
 
 
 class TestItemPageExtensibility(TestCase):

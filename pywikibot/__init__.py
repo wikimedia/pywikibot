@@ -476,9 +476,6 @@ class WbQuantity(object):
         """
         if amount is None:
             raise ValueError('no amount given')
-        if unit is not None and unit != '1':
-            raise NotImplementedError(
-                'Currently only unit-less quantities are supported')
         if unit is None:
             unit = '1'
         self.amount = amount
