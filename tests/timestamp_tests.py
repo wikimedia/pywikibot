@@ -43,9 +43,9 @@ class TestTimestamp(TestCase):
     def test_iso_format(self):
         """Test conversion from and to ISO format."""
         t1 = T.utcnow()
-        ts1 = t1.toISOformat()
+        ts1 = t1.isoformat()
         t2 = T.fromISOformat(ts1)
-        ts2 = t2.toISOformat()
+        ts2 = t2.isoformat()
         # MediaWiki ISO format doesn't include microseconds
         self.assertNotEqual(t1, t2)
         t1 = t1.replace(microsecond=0)
