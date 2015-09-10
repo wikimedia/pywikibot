@@ -650,7 +650,8 @@ def _load_file(filename):
 
 #
 # Load the user fixes file.
-if _load_file(config.datafilepath('user-fixes.py')):
+filename = config.datafilepath('user-fixes.py')
+if _load_file(filename):
     user_fixes_loaded = True
 else:
     user_fixes_loaded = False
