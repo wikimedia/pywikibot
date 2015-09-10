@@ -6313,6 +6313,27 @@ class DataSite(APISite):
                 '%r does not support entity type "property"'
                 % self)
 
+    def _get_baserevid(self, claim, baserevid):
+        """Check that claim.on_item is set and matches baserevid if used."""
+        if not claim.on_item:
+            issue_deprecation_warning('claim without on_item set', 3)
+            if not baserevid:
+                warn('Neither claim.on_item nor baserevid provided',
+                     UserWarning, 3)
+            return baserevid
+
+        if not baserevid:
+            return claim.on_item.latest_revision_id
+
+        issue_deprecation_warning(
+            'Site method with baserevid', 'claim with on_item set', 3)
+        if baserevid != claim.on_item.latest_revision_id:
+            warn('Using baserevid {0} instead of claim baserevid {1}'
+                 ''.format(baserevid, claim.on_item.latest_revision_id),
+                 UserWarning, 3)
+
+        return baserevid
+
     def __getattr__(self, attr):
         """Provide data access methods.
 
@@ -6491,16 +6512,21 @@ class DataSite(APISite):
         if 'baserevid' in kwargs and kwargs['baserevid']:
             params['baserevid'] = kwargs['baserevid']
         params['token'] = self.tokens['edit']
+
         for arg in kwargs:
             if arg in ['clear', 'data', 'exclude', 'summary']:
                 params[arg] = kwargs[arg]
+            elif arg != 'baserevid':
+                warn('Unknown wbeditentity parameter {0} ignored'.format(arg),
+                     UserWarning, 2)
+
         params['data'] = json.dumps(data)
         req = self._simple_request(**params)
         data = req.submit()
         return data
 
     @must_be(group='user')
-    def addClaim(self, item, claim, bot=True, **kwargs):
+    def addClaim(self, item, claim, bot=True, summary=None):
         """
         Add a claim.
 
@@ -6510,19 +6536,21 @@ class DataSite(APISite):
         @type claim: Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
         """
         params = dict(action='wbcreateclaim',
                       entity=item.getID(),
                       baserevid=item.latest_revision_id,
                       snaktype=claim.getSnakType(),
                       property=claim.getID(),
+                      summary=summary,
+                      bot=bot,
                       )
-        if bot:
-            params['bot'] = 1
+
         if claim.getSnakType() == 'value':
             params['value'] = json.dumps(claim._formatValue())
-        if 'summary' in kwargs:
-            params['summary'] = kwargs['summary']
+
         params['token'] = self.tokens['edit']
         req = self._simple_request(**params)
         data = req.submit()
@@ -6535,7 +6563,8 @@ class DataSite(APISite):
         item.latest_revision_id = data['pageinfo']['lastrevid']
 
     @must_be(group='user')
-    def changeClaimTarget(self, claim, snaktype='value', bot=True, **kwargs):
+    def changeClaimTarget(self, claim, snaktype='value',
+                          bot=True, summary=None):
         """
         Set the claim target to the value of the provided claim target.
 
@@ -6545,6 +6574,8 @@ class DataSite(APISite):
         @type snaktype: str ('value', 'novalue' or 'somevalue')
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -6554,11 +6585,10 @@ class DataSite(APISite):
         params = dict(action='wbsetclaimvalue',
                       claim=claim.snak,
                       snaktype=snaktype,
+                      summary=summary,
+                      bot=bot,
                       )
-        if bot:
-            params['bot'] = 1
-        if 'summary' in kwargs:
-            params['summary'] = kwargs['summary']
+
         params['token'] = self.tokens['edit']
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatValue())
@@ -6569,12 +6599,16 @@ class DataSite(APISite):
         return data
 
     @must_be(group='user')
-    def save_claim(self, claim, **kwargs):
+    def save_claim(self, claim, summary=None, bot=True):
         """
         Save the whole claim to the wikibase site.
 
         @param claim: The claim to save
         @type claim: Claim
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
         """
         if claim.isReference or claim.isQualifier:
             raise NotImplementedError
@@ -6585,18 +6619,17 @@ class DataSite(APISite):
                   'claim': json.dumps(claim.toJSON()),
                   'token': self.tokens['edit'],
                   'baserevid': claim.on_item.latest_revision_id,
+                  'summary': summary,
+                  'bot': bot,
                   }
-        if 'bot' not in kwargs or kwargs['bot']:
-            params['bot'] = True
-        if 'summary' in kwargs:
-            params['summary'] = kwargs['summary']
 
         req = self._simple_request(**params)
         data = req.submit()
         return data
 
     @must_be(group='user')
-    def editSource(self, claim, source, new=False, bot=True, **kwargs):
+    def editSource(self, claim, source, new=False,
+                   bot=True, summary=None, baserevid=None):
         """
         Create/Edit a source.
 
@@ -6608,16 +6641,21 @@ class DataSite(APISite):
         @type new: bool
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
+        @param baserevid: Base revision id override, used to detect conflicts.
+            When omitted, revision of claim.on_item is used. DEPRECATED.
+        @type baserevid: long
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a source.")
         params = dict(action='wbsetreference',
                       statement=claim.snak,
+                      baserevid=self._get_baserevid(claim, baserevid),
+                      summary=summary,
+                      bot=bot,
                       )
-        if claim.on_item:  # I think this wouldn't be false, but lets be safe
-            params['baserevid'] = claim.on_item.latest_revision_id
-        if bot:
-            params['bot'] = 1
+
         params['token'] = self.tokens['edit']
         # build up the snak
         if isinstance(source, list):
@@ -6643,16 +6681,14 @@ class DataSite(APISite):
             if not new and hasattr(sourceclaim, 'hash'):
                 params['reference'] = sourceclaim.hash
         params['snaks'] = json.dumps(snak)
-        for arg in kwargs:
-            if arg in ['baserevid', 'summary']:
-                params[arg] = kwargs[arg]
 
         req = self._simple_request(**params)
         data = req.submit()
         return data
 
     @must_be(group='user')
-    def editQualifier(self, claim, qualifier, new=False, bot=True, **kwargs):
+    def editQualifier(self, claim, qualifier, new=False, bot=True,
+                      summary=None, baserevid=None):
         """
         Create/Edit a qualifier.
 
@@ -6662,16 +6698,21 @@ class DataSite(APISite):
         @type qualifier: Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
+        @param baserevid: Base revision id override, used to detect conflicts.
+            When omitted, revision of claim.on_item is used. DEPRECATED.
+        @type baserevid: long
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a qualifier.")
         params = dict(action='wbsetqualifier',
                       claim=claim.snak,
+                      baserevid=self._get_baserevid(claim, baserevid),
+                      summary=summary,
+                      bot=bot,
                       )
-        if claim.on_item:  # I think this wouldn't be false, but lets be safe
-            params['baserevid'] = claim.on_item.latest_revision_id
-        if bot:
-            params['bot'] = 1
+
         if (not new and
                 hasattr(qualifier, 'hash') and
                 qualifier.hash is not None):
@@ -6683,16 +6724,12 @@ class DataSite(APISite):
         params['snaktype'] = qualifier.getSnakType()
         params['property'] = qualifier.getID()
 
-        for arg in kwargs:
-            if arg in ['baserevid', 'summary']:
-                params[arg] = kwargs[arg]
-
         req = self._simple_request(**params)
         data = req.submit()
         return data
 
     @must_be(group='user')
-    def removeClaims(self, claims, bot=True, **kwargs):
+    def removeClaims(self, claims, bot=True, summary=None, baserevid=None):
         """
         Remove claims.
 
@@ -6700,21 +6737,35 @@ class DataSite(APISite):
         @type claims: list of Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
+        @param baserevid: Base revision id override, used to detect conflicts.
+            When omitted, revision of claim.on_item is used. DEPRECATED.
+        @type baserevid: long
         """
-        params = dict(action='wbremoveclaims')
-        if bot:
-            params['bot'] = 1
+        # Check on_item vs baserevid for all additional claims
+        for claim in claims:
+            baserevid = self._get_baserevid(claim, baserevid)
+
+        items = set(claim.on_item for claim in claims if claim.on_item)
+        assert len(items) == 1
+
+        params = dict(action='wbremoveclaims',
+                      baserevid=baserevid,
+                      summary=summary,
+                      bot=bot,
+                      )
+
         params['claim'] = '|'.join(claim.snak for claim in claims)
         params['token'] = self.tokens['edit']
-        for kwarg in kwargs:
-            if kwarg in ['baserevid', 'summary']:
-                params[kwarg] = kwargs[kwarg]
+
         req = self._simple_request(**params)
         data = req.submit()
         return data
 
     @must_be(group='user')
-    def removeSources(self, claim, sources, bot=True, **kwargs):
+    def removeSources(self, claim, sources,
+                      bot=True, summary=None, baserevid=None):
         """
         Remove sources.
 
@@ -6724,16 +6775,22 @@ class DataSite(APISite):
         @type sources: Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
+        @param baserevid: Base revision id override, used to detect conflicts.
+            When omitted, revision of claim.on_item is used. DEPRECATED.
+        @type baserevid: long
         """
-        params = dict(action='wbremovereferences')
-        if bot:
-            params['bot'] = 1
+        params = dict(action='wbremovereferences',
+                      baserevid=self._get_baserevid(claim, baserevid),
+                      summary=summary,
+                      bot=bot,
+                      )
+
         params['statement'] = claim.snak
         params['references'] = '|'.join(source.hash for source in sources)
         params['token'] = self.tokens['edit']
-        for kwarg in kwargs:
-            if kwarg in ['baserevid', 'summary']:
-                params[kwarg] = kwargs[kwarg]
+
         req = self._simple_request(**params)
         data = req.submit()
         return data
@@ -6766,7 +6823,9 @@ class DataSite(APISite):
         return data
 
     @must_be(group='user')
-    def mergeItems(self, fromItem, toItem, **kwargs):
+    @deprecated_args(ignoreconflicts='ignore_conflicts')
+    def mergeItems(self, fromItem, toItem, ignore_conflicts=False,
+                   summary=None):
         """
         Merge two items together.
 
@@ -6774,17 +6833,21 @@ class DataSite(APISite):
         @type fromItem: pywikibot.ItemPage
         @param toItem: Item to merge into
         @type toItem: pywikibot.ItemPage
+        @param ignore_conflicts: Whether to ignore conflicts
+        @type ignore_conflicts: bool
+        @param summary: Edit summary
+        @type summary: str
         @return: dict API output
         """
         params = {
             'action': 'wbmergeitems',
             'fromid': fromItem.getID(),
             'toid': toItem.getID(),
-            'token': self.tokens['edit']
+            'ignoreconflicts': ignore_conflicts,
+            'token': self.tokens['edit'],
+            'summary': summary,
         }
-        for kwarg in kwargs:
-            if kwarg in ['ignoreconflicts', 'summary']:
-                params[kwarg] = kwargs[kwarg]
+
         req = self._simple_request(**params)
         data = req.submit()
         return data
