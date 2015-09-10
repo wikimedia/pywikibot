@@ -65,33 +65,15 @@ from warnings import warn
 
 try:
     import stdnum.isbn as stdnum_isbn
-    scripts_isbn = None
 except ImportError:
     stdnum_isbn = None
-    # Old dependency
-    try:
-        import scripts.isbn as scripts_isbn
-    except ImportError:
-        scripts_isbn = None
 
 import pywikibot
 
-from pywikibot import config, textlib, pagegenerators
-from pywikibot.page import url2unicode
+from pywikibot import config, textlib
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
-
-warning = """
-ATTENTION: You can run this script as a stand-alone for testing purposes.
-However, the changes that are made are only minor, and other users
-might get angry if you fill the version histories and watchlists with such
-irrelevant changes. Some wikis prohibit stand-alone running."""
-
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-    '&warning;': warning,
-}
 
 # This is from interwiki.py;
 # move it to family file and implement global instances
@@ -159,6 +141,20 @@ CANCEL_MATCH = 3
 
 def _format_isbn_match(match, strict=True):
     """Helper function to validate and format a single matched ISBN."""
+    scripts_isbn = None
+
+    if not stdnum_isbn:
+        # For backwards compatibility, if stdnum.isbn is not available
+        # attempt loading scripts.isbn as an alternative implementation.
+        try:
+            import scripts.isbn as scripts_isbn
+        except ImportError:
+            raise NotImplementedError(
+                'ISBN functionality not available.  Install stdnum package.')
+
+        warn('package stdnum.isbn not found; using scripts.isbn',
+             ImportWarning)
+
     isbn = match.group('code')
     if stdnum_isbn:
         try:
@@ -194,19 +190,11 @@ def _reformat_ISBNs(text, strict=True):
 
     @raises Exception: Invalid ISBN encountered when strict enabled
     """
-    if not stdnum_isbn:
-        if not scripts_isbn:
-            raise NotImplementedError(
-                'ISBN functionality not available.  Install stdnum package.')
-
-        warn('package stdnum.isbn not found; using scripts.isbn',
-             ImportWarning)
-
     return textlib.reformat_ISBNs(
         text, lambda match: _format_isbn_match(match, strict=strict))
 
 
-class CosmeticChangesToolkit:
+class CosmeticChangesToolkit(object):
 
     """Cosmetic changes toolkit."""
 
@@ -519,6 +507,7 @@ class CosmeticChangesToolkit:
                                              titleLength)
 
                     # Convert URL-encoded characters to unicode
+                    from pywikibot.page import url2unicode
                     titleWithSection = url2unicode(titleWithSection,
                                                    encodings=self.site)
 

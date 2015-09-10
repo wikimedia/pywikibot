@@ -47,7 +47,6 @@ from pywikibot.tools import (
 
 from pywikibot import date, config, i18n
 from pywikibot.comms import http
-from pywikibot.data import wikidataquery as wdquery
 from pywikibot.exceptions import ArgumentDeprecationWarning
 
 if sys.version_info[0] > 2:
@@ -2367,6 +2366,8 @@ def WikidataQueryPageGenerator(query, site=None):
     @type site: L{pywikibot.site.BaseSite}
 
     """
+    from pywikibot.data import wikidataquery as wdquery
+
     if site is None:
         site = pywikibot.Site()
     repo = site.data_repository()
