@@ -507,7 +507,7 @@ class RedirectRobot(Bot):
                     pywikibot.output(u'Cannot fix or delete the broken redirect')
             except pywikibot.IsRedirectPage:
                 pywikibot.output(
-                    "Redirect target {{0}} is also a redirect! {{1}}".format(
+                    "Redirect target {0} is also a redirect! {1}".format(
                         targetPage.title(asLink=True),
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))
@@ -515,7 +515,7 @@ class RedirectRobot(Bot):
                 # we successfully get the target page, meaning that
                 # it exists and is not a redirect: no reason to touch it.
                 pywikibot.output(
-                    "Redirect target {{0}} does exist! {{1}}".format(
+                    "Redirect target {0} does exist! {1}".format(
                         targetPage.title(asLink=True),
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))

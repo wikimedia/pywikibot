@@ -1332,7 +1332,7 @@ def remove_last_args(arg_names):
             depth = get_wrapper_depth(wrapper) + 1
             args, varargs, kwargs, _ = inspect.getargspec(wrapper.__wrapped__)
             if varargs is not None and kwargs is not None:
-                raise ValueError(u'{1} may not have * or ** args.'.format(
+                raise ValueError('{0} may not have * or ** args.'.format(
                     name))
             deprecated = set(__kw) & set(arg_names)
             if len(__args) > len(args):
