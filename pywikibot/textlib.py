@@ -793,12 +793,12 @@ def removeLanguageLinks(text, site=None, marker=''):
     """
     if site is None:
         site = pywikibot.Site()
-    if not site.validLanguageLinks():
-        return text
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
     languages = '|'.join(site.validLanguageLinks() +
                          list(site.family.obsolete.keys()))
+    if not languages:
+        return text
     interwikiR = re.compile(r'\[\[(%s)\s?:[^\[\]\n]*\]\][\s]*'
                             % languages, re.IGNORECASE)
     text = replaceExcept(text, interwikiR, '',
