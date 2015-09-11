@@ -1453,14 +1453,6 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                         'Try again with -restore.')
                     sys.exit()
                 iw = ()
-            elif not page.isCategory() and page.isEmpty():
-                globalvar.remove.append(unicode(page))
-                if not globalvar.quiet:
-                    pywikibot.output(u"NOTE: %s is empty; ignoring it and its interwiki links"
-                                     % page)
-                # Ignore the interwiki links
-                self.done.remove(page)
-                iw = ()
 
             for link in iw:
                 linkedPage = pywikibot.Page(link)
@@ -1836,7 +1828,7 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
         except pywikibot.NoPage:
             pywikibot.output(u"Not editing %s: page does not exist" % page)
             raise SaveError(u'Page doesn\'t exist')
-        if page.isEmpty() and not page.isCategory():
+        if not page.isCategory() and page.isEmpty():
             pywikibot.output(u"Not editing %s: page is empty" % page)
             raise SaveError(u'Page is empty.')
 
