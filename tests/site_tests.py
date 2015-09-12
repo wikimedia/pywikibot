@@ -302,6 +302,7 @@ class TestSiteObject(DefaultSiteTestCase):
 
         for item in mysite.validLanguageLinks():
             self.assertIn(item, langs)
+            self.assertIsNone(self.site.namespaces.lookup_name(item))
 
     def testNamespaceMethods(self):
         """Test cases for methods manipulating namespace names."""

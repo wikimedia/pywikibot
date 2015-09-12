@@ -580,6 +580,7 @@ class TestDryPageGenerator(TestCase):
         # Add custom_name for this site namespace, to match the live site.
         if 'Wikipedia' not in self.site.namespaces:
             self.site.namespaces[4].custom_name = 'Wikipedia'
+            self.site.namespaces._namespace_names['wikipedia'] = self.site.namespaces[4]
 
     def test_results(self):
         """Test that PageGenerator yields pages with expected attributes."""

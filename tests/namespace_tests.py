@@ -336,6 +336,30 @@ class TestNamespaceCollections(TestCase):
                          len(positive_namespaces) + len(excluded_namespaces))
 
 
+class TestNamespacesDictLookupName(TestCase):
+
+    """Test NamespacesDict.lookup_name and lookup_normalized_name."""
+
+    net = False
+
+    def test_lookup_name(self):
+        """Test lookup_name."""
+        namespaces = builtin_NamespacesDict()
+        self.assertIs(namespaces.lookup_name('project'), namespaces[4])
+        self.assertIs(namespaces.lookup_name('PROJECT'), namespaces[4])
+        self.assertIs(namespaces.lookup_name('Project'), namespaces[4])
+        self.assertIs(namespaces.lookup_name('Project:'), namespaces[4])
+
+    def test_lookup_normalized_name(self):
+        """Test lookup_normalized_name."""
+        namespaces = builtin_NamespacesDict()
+        self.assertIs(namespaces.lookup_normalized_name('project'),
+                      namespaces[4])
+        self.assertIsNone(namespaces.lookup_normalized_name('PROJECT'))
+        self.assertIsNone(namespaces.lookup_normalized_name('Project'))
+        self.assertIsNone(namespaces.lookup_normalized_name('Project:'))
+
+
 class TestNamespacesDictGetItem(TestCase):
 
     """Test NamespacesDict.__getitem__."""

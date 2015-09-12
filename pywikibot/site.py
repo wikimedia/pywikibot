@@ -492,6 +492,10 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """Create new dict using the given namespaces."""
         super(NamespacesDict, self).__init__()
         self._namespaces = namespaces
+        self._namespace_names = {}
+        for namespace in self._namespaces.values():
+            for name in namespace:
+                self._namespace_names[name.lower()] = namespace
 
     def __iter__(self):
         """Iterate over all namespaces."""
@@ -545,7 +549,22 @@ class NamespacesDict(Mapping, SelfCallMixin):
         @type name: basestring
         @return: Namespace or None
         """
-        return self._lookup_name(name, self._namespaces)
+        name = Namespace.normalize_name(name)
+        if name is False:
+            return None
+        return self.lookup_normalized_name(name.lower())
+
+    def lookup_normalized_name(self, name):
+        """
+        Find the Namespace for a name also checking aliases.
+
+        The name has to be normalized and must be lower case.
+
+        @param name: Name of the namespace.
+        @type name: basestring
+        @return: Namespace or None
+        """
+        return self._namespace_names.get(name)
 
     # Temporary until Namespace.lookup_name can be removed
     @staticmethod
@@ -892,9 +911,8 @@ class BaseSite(ComparableMixin):
 
     def validLanguageLinks(self):
         """Return list of language codes that can be used in interwiki links."""
-        nsnames = [name for name in self.namespaces.values()]
         return [lang for lang in self.languages()
-                if first_upper(lang) not in nsnames]
+                if self.namespaces.lookup_normalized_name(lang) is None]
 
     def _interwiki_urls(self):
         site_paths = [self.path()] * 3
