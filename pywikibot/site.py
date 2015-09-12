@@ -16,6 +16,7 @@ __version__ = '$Id$'
 #
 
 import datetime
+import hashlib
 import itertools
 import os
 import re
@@ -5389,10 +5390,20 @@ class APISite(BaseSite):
                     raise
                 return self._uploaddisabled
 
+    def stash_info(self, file_key, props=False):
+        """Get the stash info for a given file key."""
+        if not props:
+            props = False
+        req = self._simple_request(
+            action='query', prop='stashimageinfo', siifilekey=file_key,
+            siiprop=props)
+        return req.submit()['query']['stashimageinfo'][0]
+
     @deprecate_arg('imagepage', 'filepage')
     def upload(self, filepage, source_filename=None, source_url=None,
                comment=None, text=None, watch=False, ignore_warnings=False,
-               chunk_size=0, _file_key=None, _offset=0, report_success=None):
+               chunk_size=0, _file_key=None, _offset=0, _verify_stash=None,
+               report_success=None):
         """Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
@@ -5427,8 +5438,15 @@ class APISite(BaseSite):
         @type _file_key: str or None
         @param _offset: When file_key is not None this can be an integer to
             continue a previously canceled chunked upload. If False it treats
-            that as a finished upload. By default starts at 0.
+            that as a finished upload. If True it requests the stash info from
+            the server to determine the offset. By default starts at 0.
         @type _offset: int or bool
+        @param _verify_stash: Requests the SHA1 and file size uploaded and
+            compares it to the local file. Also verifies that _offset is
+            matching the file size if the _offset is an int. If _offset is False
+            if verifies that the file size match with the local file. If None
+            it'll verifies the stash when a file key and offset is given.
+        @type _verify_stash: bool or None
         @param report_success: If the upload was successful it'll print a
             success message and if ignore_warnings is set to False it'll
             raise an UploadWarning if a warning occurred. If it's None (default)
@@ -5443,7 +5461,7 @@ class APISite(BaseSite):
                 api.UploadWarning(
                     warning,
                     upload_warnings.get(warning, '%(msg)s') % {'msg': data},
-                    _file_key, response.get('offset', 0))
+                    _file_key, response['offset'])
                 for warning, data in response['warnings'].items()]
 
         upload_warnings = {
@@ -5499,7 +5517,76 @@ class APISite(BaseSite):
         token = self.tokens['edit']
         result = None
         file_page_title = filepage.title(withNamespace=False)
-        if _file_key and _offset is False:
+        file_size = None
+        offset = _offset
+        # make sure file actually exists
+        if source_filename:
+            if os.path.isfile(source_filename):
+                file_size = os.path.getsize(source_filename)
+            elif offset is not False:
+                raise ValueError("File '%s' does not exist."
+                                 % source_filename)
+
+        if source_filename and _file_key:
+            assert offset is False or file_size is not None
+            if _verify_stash is None:
+                _verify_stash = True
+            if (offset is not False and offset is not True and
+                    offset > file_size):
+                raise ValueError(
+                    'For the file key "{0}" the offset was set to {1} '
+                    'while the file is only {2} bytes large.'.format(
+                        _file_key, offset, file_size))
+
+        if _verify_stash or offset is True:
+            if not _file_key:
+                raise ValueError('Without a file key it cannot request the '
+                                 'stash information')
+            if not source_filename:
+                raise ValueError('Can request stash information only when '
+                                 'using a file name.')
+            props = ['size']
+            if _verify_stash:
+                props += ['sha1']
+            stash_info = self.stash_info(_file_key, props)
+            if offset is True:
+                offset = stash_info['size']
+            elif offset is False:
+                if file_size != stash_info['size']:
+                    raise ValueError(
+                        'For the file key "{0}" the server reported a size {1} '
+                        'while the file size is {2}'.format(
+                            _file_key, stash_info['size'], file_size))
+            elif offset is not False and offset != stash_info['size']:
+                raise ValueError(
+                    'For the file key "{0}" the server reported a size {1} '
+                    'while the offset was {2}'.format(
+                        _file_key, stash_info['size'], offset))
+
+            if _verify_stash:
+                # The SHA1 was also requested so calculate and compare it
+                assert 'sha1' in stash_info, \
+                    'sha1 not in stash info: {0}'.format(stash_info)
+                sha1 = hashlib.sha1()
+                bytes_to_read = offset
+                with open(source_filename, 'rb') as f:
+                    while bytes_to_read > 0:
+                        read_bytes = f.read(min(bytes_to_read, 1 << 20))
+                        assert read_bytes  # make sure we actually read bytes
+                        bytes_to_read -= len(read_bytes)
+                        sha1.update(read_bytes)
+                sha1 = sha1.hexdigest()
+                if sha1 != stash_info['sha1']:
+                    raise ValueError(
+                        'The SHA1 of {0} bytes of the stashed "{1}" is {2} '
+                        'while the local file is {3}'.format(
+                            offset, _file_key, stash_info['sha1'], sha1))
+
+        assert offset is not True
+        if _file_key and file_size is None:
+            assert offset is False
+
+        if _file_key and offset is False or offset == file_size:
             pywikibot.log('Reused already upload file using '
                           'filekey "{0}"'.format(_file_key))
             # TODO: Use sessionkey instead of filekey if necessary
@@ -5511,10 +5598,6 @@ class APISite(BaseSite):
             # TODO: Dummy value to allow also Unicode names, see bug 73661
             mime_filename = 'FAKE-NAME'
             # upload local file
-            # make sure file actually exists
-            if not os.path.isfile(source_filename):
-                raise ValueError("File '%s' does not exist."
-                                 % source_filename)
             throttle = True
             filesize = os.path.getsize(source_filename)
             chunked_upload = (chunk_size > 0 and chunk_size < filesize and
@@ -5525,7 +5608,6 @@ class APISite(BaseSite):
                         'action': 'upload', 'token': token, 'text': text,
                         'filename': file_page_title, 'comment': comment})
                 if chunked_upload:
-                    offset = _offset
                     if offset > 0:
                         pywikibot.log('Continuing upload from byte '
                                       '{0}'.format(offset))
@@ -5555,13 +5637,16 @@ class APISite(BaseSite):
                             if error.code == u'uploaddisabled':
                                 self._uploaddisabled = True
                             raise error
+                        _file_key = data['filekey']
                         if 'warnings' in data and not ignore_all_warnings:
                             if callable(ignore_warnings):
+                                if 'offset' not in data:
+                                    data['offset'] = True
                                 if ignore_warnings(create_warnings_list(data)):
                                     # Future warnings of this run can be ignored
                                     ignore_warnings = True
                                     ignore_all_warnings = True
-                                    offset = result.get('offset', 0)
+                                    offset = data['offset']
                                     continue
                                 else:
                                     return False
@@ -5569,7 +5654,6 @@ class APISite(BaseSite):
                             if 'offset' not in result:
                                 result['offset'] = 0
                             break
-                        _file_key = data['filekey']
                         throttle = False
                         if 'offset' in data:
                             new_offset = int(data['offset'])
@@ -5588,13 +5672,16 @@ class APISite(BaseSite):
                             final_request['filekey'] = _file_key
                             break
                 else:  # not chunked upload
-                    file_contents = f.read()
-                    filetype = (mimetypes.guess_type(source_filename)[0] or
-                                'application/octet-stream')
-                    final_request.mime_params = {
-                        'file': (file_contents, filetype.split('/'),
-                                 {'filename': mime_filename})
-                    }
+                    if _file_key:
+                        final_request['filekey'] = _file_key
+                    else:
+                        file_contents = f.read()
+                        filetype = (mimetypes.guess_type(source_filename)[0] or
+                                    'application/octet-stream')
+                        final_request.mime_params = {
+                            'file': (file_contents, filetype.split('/'),
+                                     {'filename': mime_filename})
+                        }
         else:
             # upload by URL
             if "upload_by_url" not in self.userinfo["rights"]:
@@ -5629,11 +5716,13 @@ class APISite(BaseSite):
                 _file_key = None
                 pywikibot.warning('No filekey defined.')
             if not report_success:
+                if 'offset' not in result:
+                    result['offset'] = True
                 if ignore_warnings(create_warnings_list(result)):
                     return self.upload(
                         filepage, source_filename, source_url, comment, text,
                         watch, True, chunk_size, _file_key,
-                        result.get('offset', False), report_success=False)
+                        result['offset'], report_success=False)
                 else:
                     return False
             warn('When ignore_warnings=False in APISite.upload will change '
