@@ -9,14 +9,18 @@
 from __future__ import print_function, unicode_literals
 __version__ = '$Id$'
 
-import os
-import sys
-import re
 import codecs
+import os
+import re
+import sys
+
 import pywikibot
+
 from pywikibot import i18n
 from pywikibot.data import api
 from pywikibot.tools import first_lower, first_upper
+
+from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
 if sys.version_info[0] > 2:
     xrange = range
@@ -417,9 +421,8 @@ class CaseChecker(object):
                             elif not dst.exists():
                                 src = self.Page(title)
                                 if page['ns'] == 14:
-                                    import category
                                     dst = self.Page(newTitle)
-                                    bot = category.CategoryMoveRobot(
+                                    bot = CategoryMoveBot(
                                         src.title(withNamespace=False),
                                         dst.title(withNamespace=False),
                                         self.autonomous,
