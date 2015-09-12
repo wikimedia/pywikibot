@@ -35,12 +35,11 @@ import pkgutil
 
 from collections import defaultdict
 
-from pywikibot import Error
-from .plural import plural_rules
-
 import pywikibot
 
-from . import config2 as config
+from pywikibot import Error
+from pywikibot import config
+from pywikibot.plural import plural_rules
 
 if sys.version_info[0] > 2:
     basestring = (str, )

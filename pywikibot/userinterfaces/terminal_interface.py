@@ -16,8 +16,8 @@ __version__ = '$Id$'
 import sys
 
 if sys.platform == 'win32':
-    from .terminal_interface_win32 import Win32UI as UI
+    from pywikibot.userinterfaces.terminal_interface_win32 import Win32UI as UI
 else:
-    from .terminal_interface_unix import UnixUI as UI
+    from pywikibot.userinterfaces.terminal_interface_unix import UnixUI as UI
 
 __all__ = ('UI',)

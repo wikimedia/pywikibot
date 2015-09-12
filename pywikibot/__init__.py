@@ -626,7 +626,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 getSite = pywikibot.tools.redirect_func(Site, old_name='getSite')
 
 
-from .page import (
+from pywikibot.page import (
     Page,
     FilePage,
     Category,
@@ -636,7 +636,7 @@ from .page import (
     PropertyPage,
     Claim,
 )
-from .page import html2unicode, url2unicode, unicode2html
+from pywikibot.page import html2unicode, url2unicode, unicode2html
 
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
