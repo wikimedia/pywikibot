@@ -40,6 +40,8 @@ Specific arguments:
 -autosummary    Use MediaWikis autosummary when creating a new page,
                 overrides -summary in this case
 -minor          set minor edit flag on page edits
+-showdiff       show difference between pag and page to upload; it forces
+                -always=False; default to False.
 
 If the page to be uploaded already exists:
 
@@ -102,10 +104,13 @@ class PageFromFileRobot(Bot):
             'minor': False,
             'autosummary': False,
             'nocontent': '',
-            'redirect': True
+            'redirect': True,
+            'showdiff': False,
         })
 
         super(PageFromFileRobot, self).__init__(**kwargs)
+        self.availableOptions.update(
+            {'always': False if self.getOption('showdiff') else True})
         self.reader = reader
 
     def run(self):
@@ -174,7 +179,7 @@ class PageFromFileRobot(Bot):
         self.userPut(page, page.text, contents,
                      summary=comment,
                      minor=self.getOption('minor'),
-                     show_diff=False,
+                     show_diff=self.getOption('showdiff'),
                      ignore_save_related_errors=True)
 
 
@@ -319,6 +324,8 @@ def main(*args):
             options['summary'] = arg[9:]
         elif arg == '-autosummary':
             options['autosummary'] = True
+        elif arg == '-showdiff':
+            options['showdiff'] = True
         else:
             pywikibot.output(u"Disregarding unknown argument %s." % arg)
 
