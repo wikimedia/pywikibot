@@ -4059,6 +4059,8 @@ class Claim(Property):
         'quantity': lambda value, site: pywikibot.WbQuantity.fromWikibase(value),
     }
 
+    SNAK_TYPES = ('value', 'somevalue', 'novalue')
+
     def __init__(self, site, pid, snak=None, hash=None, isReference=False,
                  isQualifier=False, **kwargs):
         """
@@ -4273,7 +4275,7 @@ class Claim(Property):
         @param value: Type of snak
         @type value: str ('value', 'somevalue', or 'novalue')
         """
-        if value in ['value', 'somevalue', 'novalue']:
+        if value in self.SNAK_TYPES:
             self.snaktype = value
         else:
             raise ValueError(
