@@ -62,11 +62,14 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import pywikibot
 from os.path import join
+
+import pywikibot
+
 from pywikibot import config
-from pywikibot.login import OauthLoginManager
+
 from pywikibot.exceptions import SiteDefinitionError
+from pywikibot.login import OauthLoginManager
 
 
 def _get_consumer_token(site):

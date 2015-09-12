@@ -10,12 +10,12 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
-import logging
-import re
 import collections
 import imp
+import logging
+import re
 import string
+import sys
 import warnings
 
 if sys.version_info[0] > 2:
@@ -27,12 +27,13 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import config2 as config
+from pywikibot import config
+
+from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     deprecated, deprecated_args, issue_deprecation_warning,
     FrozenDict,
 )
-from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 
 logger = logging.getLogger("pywiki.wiki.family")
 

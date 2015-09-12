@@ -34,6 +34,7 @@ __version__ = '$Id$'
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
+
 from pywikibot.tools import PY2
 
 from scripts.solve_disambiguation import DisambiguationRobot

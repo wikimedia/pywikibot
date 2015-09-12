@@ -36,6 +36,7 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import pagegenerators
+
 from pywikibot.comms.http import fetch
 from pywikibot.tools import deprecated, deprecated_args
 

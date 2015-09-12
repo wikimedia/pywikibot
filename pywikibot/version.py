@@ -12,16 +12,16 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import codecs
+import datetime
 import os
+import subprocess
 import sys
 import time
-import datetime
-import subprocess
-import codecs
 import xml.dom.minidom
 
+from distutils.sysconfig import get_python_lib
 from io import BytesIO
-
 from warnings import warn
 
 try:
@@ -477,8 +477,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     if not modules:
         modules = sys.modules.keys()
 
-    import distutils.sysconfig
-    std_lib_dir = distutils.sysconfig.get_python_lib(standard_lib=True)
+    std_lib_dir = get_python_lib(standard_lib=True)
 
     root_packages = set([key.split('.')[0]
                          for key in modules])

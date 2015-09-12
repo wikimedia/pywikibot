@@ -92,8 +92,8 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import re
 import os
+import re
 
 import pywikibot
 from pywikibot import config2 as config, i18n

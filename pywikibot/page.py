@@ -47,9 +47,9 @@ else:
 import pywikibot
 
 from pywikibot import config
+from pywikibot import textlib
+
 from pywikibot.comms import http
-from pywikibot.family import Family
-from pywikibot.site import Namespace
 from pywikibot.exceptions import (
     AutoblockUser,
     _EmailUserError,
@@ -57,6 +57,8 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     UserRightsError,
 )
+from pywikibot.family import Family
+from pywikibot.site import Namespace
 from pywikibot.tools import (
     PYTHON_VERSION, PY2,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
@@ -67,7 +69,6 @@ from pywikibot.tools import (
 )
 from pywikibot.tools.ip import ip_regexp  # noqa & deprecated
 from pywikibot.tools.ip import is_IP
-from pywikibot import textlib
 
 
 logger = logging.getLogger("pywiki.wiki.page")

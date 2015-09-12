@@ -12,6 +12,7 @@ __version__ = '$Id$'
 import os
 
 from pywikibot.login import OauthLoginManager
+
 from tests.aspects import (
     unittest,
     require_modules,

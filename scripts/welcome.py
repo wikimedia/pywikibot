@@ -183,15 +183,18 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import time
-import re
-import locale
 import codecs
-from random import choice
+import locale
+import re
 import sys
+import time
+
+from random import choice
+
 import pywikibot
-from pywikibot import i18n
+
 from pywikibot import config
+from pywikibot import i18n
 
 if sys.version_info[0] > 2:
     unicode = str

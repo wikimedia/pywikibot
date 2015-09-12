@@ -14,6 +14,7 @@ import logging
 import math
 import re
 import sys
+import threading
 
 import pywikibot
 
@@ -473,7 +474,6 @@ class TerminalHandler(logging.Handler):
     """
 
     # create a class-level lock that can be shared by all instances
-    import threading
     sharedlock = threading.RLock()
 
     def __init__(self, UI, strm=None):

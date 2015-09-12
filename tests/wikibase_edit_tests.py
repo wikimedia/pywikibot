@@ -11,6 +11,7 @@ __version__ = '$Id$'
 #
 
 import time
+
 import pywikibot
 
 from tests.aspects import unittest, WikibaseTestCase

@@ -18,14 +18,16 @@ __version__ = '$Id$'
 #
 
 import sys
+
 if sys.version_info[0] > 2:
     import tkinter as Tkinter
     from tkinter.scrolledtext import ScrolledText
     from tkinter import simpledialog as tkSimpleDialog
 else:
     import Tkinter
-    from ScrolledText import ScrolledText
     import tkSimpleDialog
+
+    from ScrolledText import ScrolledText
 
 from idlelib import SearchDialog, ReplaceDialog, configDialog
 from idlelib.configHandler import idleConf

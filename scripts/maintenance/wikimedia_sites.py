@@ -12,12 +12,14 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import re
 import codecs
-from xml.etree import cElementTree
+import re
 import sys
 
+from xml.etree import cElementTree
+
 import pywikibot
+
 from pywikibot.family import Family
 
 if sys.version_info[0] > 2:

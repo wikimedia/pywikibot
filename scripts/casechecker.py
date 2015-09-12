@@ -17,6 +17,7 @@ import sys
 import pywikibot
 
 from pywikibot import i18n
+
 from pywikibot.data import api
 from pywikibot.tools import first_lower, first_upper
 

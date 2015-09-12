@@ -69,9 +69,11 @@ from scripts import imagerecat, image, upload
 
 if not PY2:
     import tkinter as Tkinter
+
     from queue import Queue
 else:
     import Tkinter
+
     from Queue import Queue
 
 try:

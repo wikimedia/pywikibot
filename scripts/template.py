@@ -119,6 +119,7 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, Bot
+
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
 

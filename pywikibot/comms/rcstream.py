@@ -19,6 +19,11 @@ if sys.version_info[0] > 2:
 else:
     from Queue import Queue, Empty
 
+try:
+    import socketIO_client
+except ImportError as e:
+    socketIO_client = e
+
 from pywikibot.bot import debug, warning
 
 _logger = 'pywikibot.rcstream'
@@ -77,7 +82,6 @@ class RcListenerThread(threading.Thread):
         self.total = total
         self.count = 0
 
-        import socketIO_client
         debug('Opening connection to %r' % self, _logger)
         self.client = socketIO_client.SocketIO(rchost, rcport)
 
@@ -166,13 +170,7 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
     [1]: See mediawiki/includes/rcfeed/MachineReadableRCFeedFormatter.php
 
     """
-    try:
-        # this is just to test whether socketIO_client is installed or not,
-        # as the ImportError would otherwise pop up in the worker thread
-        # where it's not easily caught. We don't use it, so we silence
-        # flake8 with noqa.
-        import socketIO_client  # noqa
-    except ImportError:
+    if isinstance(socketIO_client, Exception):
         raise ImportError('socketIO_client is required for the rc stream; '
                           'install it with pip install socketIO_client')
 

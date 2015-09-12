@@ -9,34 +9,37 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-from collections import Container, MutableMapping
-from email.mime.nonmultipart import MIMENonMultipart
 import datetime
 import hashlib
 import inspect
 import json
 import os
+import pprint
+import re
+import time
+import traceback
+
+from collections import Container, MutableMapping
+from email.mime.nonmultipart import MIMENonMultipart
+from warnings import warn
+
 try:
     import cPickle as pickle
 except ImportError:
     import pickle
-import pprint
-import re
-import traceback
-import time
-
-from warnings import warn
 
 import pywikibot
+
 from pywikibot import config, login
+
+from pywikibot.comms import http
+from pywikibot.exceptions import (
+    Server504Error, Server414Error, FatalServerError, NoUsername, Error
+)
 from pywikibot.tools import (
     MediaWikiVersion, deprecated, itergroup, ip, PY2, getargspec,
 )
 from pywikibot.tools.formatter import color_format
-from pywikibot.exceptions import (
-    Server504Error, Server414Error, FatalServerError, NoUsername, Error
-)
-from pywikibot.comms import http
 
 if not PY2:
     # Subclassing necessary to fix a possible bug of the email package

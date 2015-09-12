@@ -67,15 +67,17 @@ from __future__ import absolute_import, print_function, unicode_literals
 __version__ = '$Id$'
 #
 
-import os
 import datetime
-import pickle
 import hashlib
+import os
+import pickle
+
 import pywikibot
+
 from pywikibot.data import api
 
-from pywikibot.site import APISite, DataSite, LoginStatus  # noqa
 from pywikibot.page import User  # noqa
+from pywikibot.site import APISite, DataSite, LoginStatus  # noqa
 
 
 class ParseError(Exception):

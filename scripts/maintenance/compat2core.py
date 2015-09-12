@@ -35,9 +35,10 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import codecs
 import os
 import re
-import codecs
+
 import pywikibot
 
 # be careful with replacement order!

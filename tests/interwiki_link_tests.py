@@ -10,8 +10,10 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 from pywikibot import config2 as config
-from pywikibot.page import Link
+
 from pywikibot.exceptions import InvalidTitle
+from pywikibot.page import Link
+
 from tests.aspects import (
     unittest,
     AlteredDefaultSiteTestCase as LinkTestCase,

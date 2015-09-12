@@ -9,7 +9,9 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import json
 import sys
+import xml.etree.ElementTree as ET
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlencode
@@ -32,7 +34,6 @@ def getInternetArchiveURL(url, timestamp=None):
         moment is returned. Format: YYYYMMDDhhmmss or part thereof.
 
     """
-    import json
     uri = u'https://archive.org/wayback/available?'
 
     query = {'url': url}
@@ -61,7 +62,6 @@ def getWebCitationURL(url, timestamp=None):
         moment is returned. Format: YYYYMMDDhhmmss or part thereof.
 
     """
-    import xml.etree.ElementTree as ET
     uri = u'http://www.webcitation.org/query?'
 
     query = {'returnxml': 'true',

@@ -13,11 +13,14 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
-import os
 import codecs
+import os
+import sys
+
 import pywikibot
+
 from pywikibot.version import getversion
+
 try:
     import requests
 except ImportError:

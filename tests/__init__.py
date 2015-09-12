@@ -37,8 +37,9 @@ import pywikibot.data.api
 
 from pywikibot import config
 from pywikibot import i18n
-from pywikibot.data.api import Request as _original_Request
+
 from pywikibot.data.api import CachedRequest
+from pywikibot.data.api import Request as _original_Request
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 

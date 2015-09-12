@@ -56,16 +56,18 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import os
-import time
-import tempfile
-import re
 import math
+import os
+import re
 import sys
+import tempfile
+import time
 
 import pywikibot
 import pywikibot.data.api
+
 from pywikibot import config
+
 from pywikibot.bot import suggest_help, BaseBot
 from pywikibot.tools import (
     deprecated
@@ -75,10 +77,11 @@ from pywikibot.tools.formatter import color_format
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
     from urllib.request import URLopener
+
     basestring = (str,)
 else:
-    from urlparse import urlparse
     from urllib import URLopener
+    from urlparse import urlparse
 
 
 class UploadRobot(BaseBot):

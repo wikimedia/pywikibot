@@ -347,19 +347,21 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
-import re
-import os
-import time
-import datetime
 import codecs
+import datetime
+import os
 import pickle
+import re
+import shelve
 import socket
+import sys
+import time
 
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
 from pywikibot import titletranslate
+
 from pywikibot.bot import ListOption, StandardOption
 from pywikibot.tools import first_upper
 from pywikibot.tools.formatter import color_format
@@ -680,7 +682,6 @@ class StoredPage(pywikibot.Page):
             setattr(self, attr, getattr(page, attr))
 
         if not StoredPage.SPpath:
-            import shelve
             index = 1
             while True:
                 path = config.datafilepath('cache', 'pagestore' + str(index))

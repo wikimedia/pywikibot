@@ -30,10 +30,11 @@ if not PY2:
 import pywikibot
 
 from pywikibot import config
+
 from pywikibot.comms import threadedhttp
-from pywikibot.site import Namespace
 from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
+from pywikibot.site import Namespace
 from pywikibot.tools import (
     PYTHON_VERSION,
     UnicodeType as unicode,

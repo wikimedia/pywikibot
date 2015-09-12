@@ -41,9 +41,10 @@ import os.path
 import pywikibot
 
 from pywikibot import i18n
+
 from pywikibot.bot import SingleSiteBot
-from pywikibot.tools.djvu import DjVuFile
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools.djvu import DjVuFile
 
 
 class DjVuTextBot(SingleSiteBot):

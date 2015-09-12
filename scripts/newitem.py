@@ -29,9 +29,11 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import pywikibot
-from pywikibot import pagegenerators, WikidataBot
 from datetime import timedelta
+
+import pywikibot
+
+from pywikibot import pagegenerators, WikidataBot
 
 
 class NewItemRobot(WikidataBot):

@@ -18,9 +18,11 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import threading
 import re
+import threading
+
 from xml.etree.cElementTree import iterparse
+
 import xml.sax
 
 from pywikibot.tools import open_archive

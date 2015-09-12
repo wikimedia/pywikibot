@@ -12,6 +12,7 @@ __version__ = '$Id$'
 
 import copy
 import json
+
 from decimal import Decimal
 
 import pywikibot

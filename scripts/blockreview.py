@@ -25,7 +25,10 @@ __version__ = '$Id$'
 #
 
 import pywikibot
+
 from pywikibot import i18n
+from pywikibot import pagegenerators as pg
+
 from pywikibot.tools.formatter import color_format
 
 
@@ -147,7 +150,6 @@ class BlockreviewBot(object):
                         # test for pt-wiki
                         # just print all sysops talk pages
                         elif self.site.sitename == 'wikipedia:pt':
-                            from pywikibot import pagegenerators as pg
                             gen = pg.PreloadingGenerator(self.SysopGenerator())
                             for sysop in gen:
                                 print(sysop.title())

@@ -94,8 +94,8 @@ import time
 
 import pywikibot
 
-from pywikibot import pagegenerators as pg
 from pywikibot import i18n
+from pywikibot import pagegenerators as pg
 
 from pywikibot.exceptions import NotEmailableError
 from pywikibot.family import Family

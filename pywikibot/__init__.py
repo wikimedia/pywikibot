@@ -11,11 +11,13 @@ __release__ = '2.0b3'
 __version__ = '$Id$'
 __url__ = 'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot'
 
+import atexit
 import datetime
 import math
 import re
 import sys
 import threading
+
 from decimal import Decimal
 
 if sys.version_info[0] > 2:
@@ -33,6 +35,7 @@ from pywikibot.logging import (
 )
 
 from pywikibot import config2 as config
+
 from pywikibot.bot import (
     input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
@@ -729,7 +732,6 @@ def stopme():
     except IndexError:
         pass
 
-import atexit
 atexit.register(stopme)
 
 

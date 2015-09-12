@@ -11,6 +11,7 @@ __version__ = '$Id$'
 #
 
 from pywikibot.site import BaseSite
+
 import scripts.maintenance.cache as cache
 
 from tests import join_cache_path

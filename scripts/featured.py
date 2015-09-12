@@ -69,10 +69,12 @@ __version__ = '$Id$'
 import pickle
 import re
 import sys
+
 import pywikibot
+
 from pywikibot import i18n, textlib, config
+
 from pywikibot.pagegenerators import PreloadingGenerator
-from pywikibot.config2 import LS  # line separator
 from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
@@ -578,8 +580,8 @@ class FeaturedBot(pywikibot.Bot):
                         # Moving {{Link FA|xx}} to top of interwikis
                         iw = textlib.getLanguageLinks(text, tosite)
                         text = textlib.removeLanguageLinks(text, tosite)
-                        text += u"%s{{%s|%s}}%s" % (LS, add_tl[0],
-                                                    fromsite.code, LS)
+                        text += u"%s{{%s|%s}}%s" % (config.LS, add_tl[0],
+                                                    fromsite.code, config.LS)
                         text = textlib.replaceLanguageLinks(text,
                                                             iw, tosite)
                     changed = True

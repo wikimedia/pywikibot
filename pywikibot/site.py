@@ -15,36 +15,28 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import copy
 import datetime
+import functools
 import hashlib
 import itertools
-import functools
+import json
+import mimetypes
 import os
 import re
 import sys
 import threading
 import time
-import json
-import copy
-import mimetypes
 
 from collections import Iterable, Container, namedtuple, Mapping
 from warnings import warn
 
 import pywikibot
 import pywikibot.family
-from pywikibot.tools import (
-    itergroup, UnicodeMixin, ComparableMixin, SelfCallMixin, SelfCallString,
-    deprecated, deprecate_arg, deprecated_args, remove_last_args,
-    redirect_func, issue_deprecation_warning,
-    manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
-    merge_unique_dicts,
-    PY2,
-)
+
 from pywikibot.comms.http import get_authentication
-from pywikibot.tools.ip import is_IP
-from pywikibot.throttle import Throttle
 from pywikibot.data import api
+from pywikibot.echo import Notification
 from pywikibot.exceptions import (
     Error,
     PageRelatedError,
@@ -69,18 +61,27 @@ from pywikibot.exceptions import (
     UserBlocked,
     EntityTypeUnknownException,
 )
-
-from pywikibot.echo import Notification
+from pywikibot.throttle import Throttle
+from pywikibot.tools import (
+    itergroup, UnicodeMixin, ComparableMixin, SelfCallMixin, SelfCallString,
+    deprecated, deprecate_arg, deprecated_args, remove_last_args,
+    redirect_func, issue_deprecation_warning,
+    manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
+    merge_unique_dicts,
+    PY2,
+)
+from pywikibot.tools.ip import is_IP
 
 if sys.version_info[0] > 2:
+    from itertools import zip_longest
     from urllib.parse import urlencode, urlparse
+
     basestring = (str,)
     unicode = str
-    from itertools import zip_longest
 else:
+    from itertools import izip_longest as zip_longest
     from urllib import urlencode
     from urlparse import urlparse
-    from itertools import izip_longest as zip_longest
 
 
 _logger = "wiki.site"

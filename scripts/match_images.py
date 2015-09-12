@@ -33,11 +33,12 @@ Expect the code to change a lot!
 from __future__ import absolute_import, division, unicode_literals
 __version__ = '$Id$'
 
-
 import io
+
 from PIL import Image
 
 import pywikibot
+
 from pywikibot.comms import http
 
 

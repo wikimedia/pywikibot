@@ -6,23 +6,26 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
 
+import hashlib
 import json
+import os
+import pickle
 import sys
+import tempfile
+import time
+
 if sys.version_info[0] > 2:
     from urllib.parse import quote
     basestring = (str, )
 else:
     from urllib2 import quote
-import pickle
-import os
-import hashlib
-import time
-import tempfile
 
 import pywikibot
+
 from pywikibot.comms import http
-from pywikibot.page import ItemPage, PropertyPage, Claim
+
 from pywikibot import config
+from pywikibot.page import ItemPage, PropertyPage, Claim
 
 
 def listify(x):

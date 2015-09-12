@@ -55,6 +55,7 @@ import mwparserfromhell
 import pywikibot
 
 from pywikibot import pagegenerators
+
 from pywikibot.bot import SingleSiteBot
 
 _logger = 'patrol'

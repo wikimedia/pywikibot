@@ -34,7 +34,9 @@ __version__ = '$Id$'
 #
 
 import pywikibot
+
 from pywikibot import i18n
+
 from pywikibot.editor import TextEditor
 from pywikibot.tools.formatter import color_format
 

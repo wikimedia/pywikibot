@@ -11,6 +11,7 @@ __version__ = '$Id$'
 
 import json
 import os
+import pickle
 import re
 import sys
 
@@ -20,6 +21,7 @@ from datetime import datetime, timedelta
 import pywikibot
 
 from pywikibot import config
+
 from pywikibot.comms import http
 from pywikibot.data import api
 
@@ -221,7 +223,6 @@ class TestSiteObject(DefaultSiteTestCase):
     cached = True
 
     def testPickleAbility(self):
-        import pickle
         mysite = self.get_site()
         mysite_str = pickle.dumps(mysite, protocol=config.pickle_protocol)
         mysite_pickled = pickle.loads(mysite_str)

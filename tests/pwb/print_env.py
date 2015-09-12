@@ -5,6 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import sys
+
 from pywikibot.tools import first_upper
 
 _pwb_dir = os.path.abspath(os.path.join(

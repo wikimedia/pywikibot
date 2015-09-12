@@ -36,7 +36,9 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 import re
+
 import pywikibot
+
 from pywikibot import textlib, pagegenerators, i18n, Bot
 
 docuReplacements = {

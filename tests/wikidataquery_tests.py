@@ -10,15 +10,16 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-
-import pywikibot.data.wikidataquery as query
-from tests.aspects import unittest, WikidataTestCase, TestCase
-
-import pywikibot
-from pywikibot.page import ItemPage, PropertyPage, Claim
-
 import os
 import time
+
+import pywikibot
+
+import pywikibot.data.wikidataquery as query
+
+from pywikibot.page import ItemPage, PropertyPage, Claim
+
+from tests.aspects import unittest, WikidataTestCase, TestCase
 
 
 class TestDryApiFunctions(TestCase):

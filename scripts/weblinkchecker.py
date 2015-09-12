@@ -99,14 +99,14 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import re
 import codecs
 import datetime
 import pickle
+import re
 import socket
+import sys
 import threading
 import time
-import sys
 
 from functools import partial
 from warnings import warn
@@ -119,6 +119,7 @@ except ImportError as e:
 import pywikibot
 
 from pywikibot import i18n, config, pagegenerators, textlib, weblib
+
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
@@ -127,15 +128,16 @@ from pywikibot.tools.formatter import color_format
 
 # TODO: Convert to httlib2
 if sys.version_info[0] > 2:
+    import http.client as httplib
     import urllib.parse as urlparse
     import urllib.request as urllib
-    import http.client as httplib
+
     basestring = (str, )
     unicode = str
 else:
-    import urlparse
-    import urllib
     import httplib
+    import urllib
+    import urlparse
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp

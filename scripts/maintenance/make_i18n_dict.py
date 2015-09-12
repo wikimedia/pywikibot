@@ -36,9 +36,9 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import os
-import json
 import codecs
+import json
+import os
 
 from pywikibot import config
 

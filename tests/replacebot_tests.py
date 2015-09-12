@@ -16,6 +16,7 @@ from pywikibot import fixes
 from scripts import replace
 
 from tests import join_data_path
+
 from tests.aspects import unittest
 from tests.bot_tests import TWNBotTestCase
 

@@ -27,9 +27,12 @@ __version__ = '$Id$'
 #
 
 import re
+
 import pywikibot
+
 from pywikibot import i18n
 from pywikibot import pagegenerators
+
 from pywikibot.tools.formatter import color_format
 
 docuReplacements = {

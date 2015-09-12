@@ -42,10 +42,13 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
 import codecs
+import sys
+
 import pywikibot
+
 from pywikibot import pagegenerators, i18n, textlib
+
 from pywikibot.tools import DequeGenerator
 
 

@@ -31,11 +31,14 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 #
-import sys
 import re
+import sys
 import time
+
 from datetime import timedelta
+
 import pywikibot
+
 from pywikibot import i18n, pagegenerators, config
 
 if sys.version_info[0] > 2:

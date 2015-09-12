@@ -12,9 +12,10 @@ from __future__ import absolute_import, unicode_literals
 
 import subprocess
 
+from pywikibot.tools.djvu import DjVuFile
+
 from tests import join_data_path, create_path_func
 from tests.aspects import unittest, TestCase
-from pywikibot.tools.djvu import DjVuFile
 
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
 

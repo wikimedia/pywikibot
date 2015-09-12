@@ -119,12 +119,14 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import codecs
 import os
-import re
 import pickle
+import re
 import sys
 
 import pywikibot
+
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
 from pywikibot.bot import (
@@ -1069,7 +1071,6 @@ class CategoryTreeRobot(object):
         pywikibot.output(u'')
         if self.filename:
             pywikibot.output(u'Saving results in %s' % self.filename)
-            import codecs
             f = codecs.open(self.filename, 'a', 'utf-8')
             f.write(tree)
             f.close()

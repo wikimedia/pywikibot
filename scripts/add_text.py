@@ -73,11 +73,12 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import re
 import codecs
+import re
 import time
 
 import pywikibot
+
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.tools.formatter import color_format
 

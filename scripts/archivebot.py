@@ -97,14 +97,16 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 import datetime
-import time
+import locale
 import os
 import re
-import locale
+import time
+
 from hashlib import md5
 from math import ceil
 
 import pywikibot
+
 from pywikibot import i18n
 from pywikibot.textlib import TimeStripper
 from pywikibot.textlib import to_local_digits

@@ -26,11 +26,11 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import re
-import locale
 import json
+import locale
 import os
 import pkgutil
+import re
 
 from collections import defaultdict, Mapping
 from warnings import warn
@@ -38,8 +38,8 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import __url__
-from pywikibot import Error
 from pywikibot import config
+from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
 from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
 

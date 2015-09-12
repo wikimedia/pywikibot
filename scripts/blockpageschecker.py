@@ -59,14 +59,15 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import time
 import re
+import time
 import webbrowser
 
 import pywikibot
+
+from pywikibot import config
 from pywikibot import i18n
 from pywikibot import pagegenerators
-from pywikibot import config
 from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script

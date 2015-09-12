@@ -32,13 +32,15 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import argparse
 import os
 import sys
-import argparse
 import tempfile
 
 import pywikibot
+
 from pywikibot import i18n
+
 from pywikibot.editor import TextEditor
 
 

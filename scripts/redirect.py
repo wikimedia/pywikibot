@@ -81,9 +81,11 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
 import datetime
+import sys
+
 import pywikibot
+
 from pywikibot import i18n, xmlreader, Bot
 from pywikibot.tools.formatter import color_format
 

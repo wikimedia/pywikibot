@@ -37,12 +37,13 @@ __version__ = '$Id$'
 #
 
 import re
-import time
 import socket
-import xml.etree.ElementTree
 import sys
+import time
+import xml.etree.ElementTree
 
 import pywikibot
+
 from pywikibot import pagegenerators, textlib
 from pywikibot.comms.http import fetch
 

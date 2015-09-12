@@ -17,6 +17,7 @@ __version__ = '$Id$'
 import os
 
 from scripts import upload
+
 from tests import join_images_path
 from tests.aspects import unittest, TestCase
 

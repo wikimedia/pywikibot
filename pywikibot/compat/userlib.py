@@ -16,7 +16,7 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 
-from pywikibot import User
+from pywikibot.page import User
 from pywikibot.tools import ModuleDeprecationWrapper
 
 __all__ = ('User',)

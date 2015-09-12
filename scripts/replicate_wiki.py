@@ -49,6 +49,8 @@ __version__ = '$Id$'
 
 import sys
 
+from argparse import ArgumentParser
+
 import pywikibot
 
 from pywikibot import config, Page
@@ -232,8 +234,6 @@ class SyncSites(object):
 
 
 def main(*args):
-    from argparse import ArgumentParser
-
     my_args = pywikibot.handle_args(args)
 
     parser = ArgumentParser(add_help=False)

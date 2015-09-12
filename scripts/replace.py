@@ -140,13 +140,14 @@ __version__ = '$Id$'
 import codecs
 import collections
 import re
-import time
 import sys
+import time
 import warnings
 
 import pywikibot
 
 from pywikibot import i18n, textlib, pagegenerators, Bot
+
 from pywikibot import editor as editarticle
 
 # Imports predefined replacements tasks from fixes.py

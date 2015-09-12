@@ -11,8 +11,9 @@ __version__ = '$Id$'
 
 import pywikibot
 
-from scripts import interwikidata
 from pywikibot import Link
+
+from scripts import interwikidata
 
 from tests.aspects import unittest, SiteAttributeTestCase
 

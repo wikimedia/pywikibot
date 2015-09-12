@@ -9,6 +9,8 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import pickle
+
 import pywikibot
 import pywikibot.page
 
@@ -491,7 +493,6 @@ class TestPageObject(DefaultSiteTestCase):
     def testPickleAbility(self):
         """Test the ability to pickle the page."""
         mainpage = self.get_mainpage()
-        import pickle
         mainpage_str = pickle.dumps(mainpage, protocol=config.pickle_protocol)
         mainpage_unpickled = pickle.loads(mainpage_str)
         self.assertEqual(mainpage, mainpage_unpickled)

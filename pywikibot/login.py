@@ -26,8 +26,8 @@ except ImportError as e:
 import pywikibot
 
 from pywikibot import config
-from pywikibot.tools import deprecated_args, normalize_username
 from pywikibot.exceptions import NoUsername
+from pywikibot.tools import deprecated_args, normalize_username
 
 
 class OAuthImpossible(ImportError):

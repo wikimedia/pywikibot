@@ -64,21 +64,24 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-
 import datetime
-import threading
-import sys
-import os
-import traceback
 import gc
-import resource
+import logging
+import os
 import re
+import resource
+import sys
+import threading
+import traceback
+
+from io import StringIO
 
 # https://labix.org/lunatic-python is bit-rotting, and there are maintained
 # versions on github:
 # https://github.com/bastibe/lunatic-python.git
 # https://github.com/AlereDevices/lunatic-python.git
 import lua
+
 # The crontab package is https://github.com/josiahcarlson/parse-crontab
 # version 0.20 installs a package called 'tests' which conflicts with our
 # test suite.  The patch to fix this has been merged, but is not released.
@@ -88,6 +91,7 @@ import crontab
 import pywikibot
 # pywikibot.botirc depends on https://pypi.python.org/pypi/irc
 import pywikibot.botirc
+
 from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
@@ -218,9 +222,6 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unused-argument
     """Main thread."""
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
-    # https://docs.python.org/release/2.6/library/logging.html
-    from io import StringIO
-    import logging
 
     # safety; default mode is safe (no writing)
     pywikibot.config.simulate = True

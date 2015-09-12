@@ -46,15 +46,15 @@ from __future__ import absolute_import, division, unicode_literals
 __version__ = '$Id$'
 #
 
+import codecs
+import gzip
+import io
+import os
 import re
 import socket
-import codecs
 import subprocess
-import tempfile
-import os
-import gzip
 import sys
-import io
+import tempfile
 
 from functools import partial
 

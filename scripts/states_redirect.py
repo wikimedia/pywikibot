@@ -26,7 +26,9 @@ __version__ = '$Id$'
 
 import re
 import sys
+
 import pywikibot
+
 from pywikibot import i18n
 
 try:

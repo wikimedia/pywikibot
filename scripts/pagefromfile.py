@@ -66,12 +66,14 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import codecs
 import os
 import re
-import codecs
+
 from warnings import warn
 
 import pywikibot
+
 from pywikibot import config, Bot, i18n
 from pywikibot.exceptions import ArgumentDeprecationWarning
 

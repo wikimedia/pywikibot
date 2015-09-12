@@ -39,9 +39,11 @@ from __future__ import absolute_import, division, unicode_literals
 __version__ = '$Id$'
 #
 
-import time
 import datetime
+import time
+
 import pywikibot
+
 from pywikibot import i18n, Bot, pagegenerators
 
 content = {
