@@ -2147,7 +2147,7 @@ def LiveRCPageGenerator(site=None, total=None):
 # following classes just ported from version 1 without revision; not tested
 
 
-class YahooSearchPageGenerator:
+class YahooSearchPageGenerator(object):
 
     """
     Page generator using Yahoo! search results.
@@ -2206,7 +2206,7 @@ class YahooSearchPageGenerator:
                 yield page
 
 
-class GoogleSearchPageGenerator:
+class GoogleSearchPageGenerator(object):
 
     """
     Page generator using Google search results.

@@ -441,7 +441,7 @@ noTitleRequired = [u'pl', u'be', u'szl']
 maintenance_category = 'cite_error_refs_without_references_category'
 
 
-class XmlDumpNoReferencesPageGenerator:
+class XmlDumpNoReferencesPageGenerator(object):
 
     """
     Generator which will yield Pages that might lack a references tag.

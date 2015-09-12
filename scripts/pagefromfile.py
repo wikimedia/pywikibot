@@ -183,7 +183,7 @@ class PageFromFileRobot(Bot):
                      ignore_save_related_errors=True)
 
 
-class PageFromFileReader:
+class PageFromFileReader(object):
 
     """
     Responsible for reading the file.

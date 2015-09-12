@@ -96,7 +96,7 @@ def space_to_underscore(link):
     return link.canonical_title().replace(' ', '_')
 
 
-class RedirectGenerator:
+class RedirectGenerator(object):
 
     """Redirect generator."""
 

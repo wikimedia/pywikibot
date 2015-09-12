@@ -156,7 +156,7 @@ licenseTemplates = {
 }
 
 
-class ImageTransferBot:
+class ImageTransferBot(object):
 
     """Image transfer bot."""
 

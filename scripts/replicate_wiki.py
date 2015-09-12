@@ -68,7 +68,7 @@ def multiple_replace(text, word_dict):
     return text
 
 
-class SyncSites:
+class SyncSites(object):
 
     """Work is done in here."""
 

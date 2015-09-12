@@ -257,7 +257,7 @@ class DryParamInfo(dict):
         return self[module][param_name]
 
 
-class DummySiteinfo():
+class DummySiteinfo(object):
 
     """Dummy class to use instead of L{pywikibot.site.Siteinfo}."""
 

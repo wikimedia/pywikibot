@@ -358,7 +358,7 @@ def correctcap(link, text):
         return linkupper
 
 
-class ReferringPageGeneratorWithIgnore:
+class ReferringPageGeneratorWithIgnore(object):
 
     """Referring Page generator, with an ignore manager."""
 
