@@ -603,7 +603,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
             tmp = __import__('pywikibot.site', fromlist=[interface])
             interface = getattr(tmp, interface)
         except ImportError:
-            raise ValueError("Invalid interface name '%(interface)s'" % locals())
+            raise ValueError('Invalid interface name: {0}'.format(interface))
 
     if not issubclass(interface, BaseSite):
         warning('Site called with interface=%s' % interface.__name__)

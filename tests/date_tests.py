@@ -37,15 +37,15 @@ class TestDateMeta(MetaTestCaseClass):
                     for value in range(start, stop, step):
                         self.assertTrue(
                             predicate(value),
-                            "date.formats['%(formatname)s']['%(code)s']:\n"
-                            "invalid value %(value)d" % locals())
+                            "date.formats['%s']['%s']:\ninvalid value %d"
+                            % (formatname, code, value))
 
                         newValue = convFunc(convFunc(value))
                         self.assertEqual(
                             newValue, value,
-                            "date.formats['%(formatname)s']['%(code)s']:\n"
-                            "value %(newValue)d does not match %(value)s"
-                            % locals())
+                            "date.formats['%s']['%s']:\n"
+                            "value %d does not match %s"
+                            % (formatname, code, newValue, value))
             return testMapEntry
 
         for formatname in date.formats:

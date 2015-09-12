@@ -116,7 +116,7 @@ class APIError(Error):
                     '{0}:{1}'.format(key, val)
                     for key, val in self.other.items()))
 
-        return "%(code)s: %(info)s" % self.__dict__
+        return '{0}: {1}'.format(self.code, self.info)
 
 
 class UploadWarning(APIError):

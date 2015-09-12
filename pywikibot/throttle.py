@@ -136,8 +136,9 @@ class Throttle(object):
             else:
                 f.close()
             self.process_multiplicity = count
-            pywikibot.log(u"Found %(count)s %(mysite)s processes "
-                          u"running, including this one." % locals())
+            pywikibot.log(
+                'Found {0} {1} processes running, including this one.'.format(
+                    count, mysite))
         finally:
             self.lock.release()
 

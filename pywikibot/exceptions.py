@@ -159,7 +159,8 @@ class PageRelatedError(Error):
         self.site = page.site
 
         if '%(' in self.message and ')s' in self.message:
-            super(PageRelatedError, self).__init__(self.message % self.__dict__)
+            super(PageRelatedError, self).__init__(
+                self.message % self.__dict__)  # noqa: H501
         else:
             super(PageRelatedError, self).__init__(self.message % page)
 

@@ -133,7 +133,8 @@ def main(*args):
     Pages to transfer: %(gen_args)s
 
     Prefix for transferred pages: %(prefix)s
-    """ % locals())
+    """ % {'fromsite': fromsite, 'tosite': tosite,
+           'gen_args': gen_args, 'prefix': prefix})
 
     for page in gen:
         summary = "Moved page from %s" % page.title(asLink=True)

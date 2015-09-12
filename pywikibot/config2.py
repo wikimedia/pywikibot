@@ -1097,7 +1097,7 @@ if __name__ == "__main__":
         if _arg == "modified":
             _all = 0
         else:
-            warning('Unknown arg %(_arg)s ignored' % locals())
+            warning('Unknown arg {0} ignored'.format(_arg))
     _k = list(globals().keys())
     _k.sort()
     for _name in _k:

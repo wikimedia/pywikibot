@@ -1110,7 +1110,7 @@ class BaseSite(ComparableMixin):
         # arbitrary stuff, then a wikilink. The wikilink may contain
         # a label, although this is not useful.
         return re.compile(r'\s*#%(pattern)s\s*:?\s*\[\[(.+?)(?:\|.*?)?\]\]'
-                          % locals(),
+                          % {'pattern': pattern},
                           re.IGNORECASE | re.UNICODE | re.DOTALL)
 
     def sametitle(self, title1, title2):
@@ -4714,7 +4714,7 @@ class APISite(BaseSite):
         elif watch:
             pywikibot.warning(
                 u"editpage: Invalid watch value '%(watch)s' ignored."
-                % locals())
+                % {'watch': watch})
         req = self._simple_request(**params)
         while True:
             try:
