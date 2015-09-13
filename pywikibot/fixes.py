@@ -643,7 +643,7 @@ def _load_file(filename):
     if os.path.exists(filename):
         # load binary, to let compile decode it according to the file header
         with open(filename, 'rb') as f:
-            exec(compile(f.read(), filename, 'exec'))
+            exec(compile(f.read(), filename, 'exec'), globals())
         return True
     else:
         return False
