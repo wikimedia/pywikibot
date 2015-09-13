@@ -2579,6 +2579,7 @@ def main(*args):
                 nextPage, namespace, includeredirects=False)
             hintlessPageGen = pagegenerators.CombinedPageGenerator(
                 [hintlessPageGen, gen2])
+        restoredFiles.append(dumpFileName)
 
     site.login()
     bot = InterwikiBot()
