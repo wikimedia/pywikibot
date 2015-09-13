@@ -6,18 +6,21 @@ This module supports several different bot classes which could be used in
 conjunction. Each bot should subclass at least one of these four classes:
 
 * L{BaseBot}: Basic bot class in case where the site is handled differently,
-    like working on two sites in parallel.
+  like working on two sites in parallel.
+
 * L{SingleSiteBot}: Bot class which should only be run on a single site. They
-    usually store site specific content and thus can't be easily run when the
-    generator returns a page on another site. It has a property C{site} which
-    can also be changed. If the generator returns a page of a different site
-    it'll skip that page.
+  usually store site specific content and thus can't be easily run when the
+  generator returns a page on another site. It has a property C{site} which
+  can also be changed. If the generator returns a page of a different site
+  it'll skip that page.
+
 * L{MultipleSitesBot}: Bot class which supports to be run on multiple sites
-    without the need to manually initialize it every time. It is not possible to
-    set the C{site} property and it's deprecated to request it. Instead site of
-    the current page should be used. And out of C{run} that sit isn't defined.
+  without the need to manually initialize it every time. It is not possible to
+  set the C{site} property and it's deprecated to request it. Instead site of
+  the current page should be used. And out of C{run} that sit isn't defined.
+
 * L{Bot}: The previous base class which should be avoided. This class is mainly
-    used for bots which work with wikibase or together with an image repository.
+  used for bots which work with wikibase or together with an image repository.
 
 Additionally there is the L{CurrentPageBot} class which automatically sets the
 current page to the page treated. It is recommended to use this class and to
@@ -32,7 +35,7 @@ filter the pages which are ultimately handled by C{treat_page}:
 * L{RedirectPageBot}: Only handle pages which are redirect pages.
 * L{NoRedirectPageBot}: Only handle pages which are not redirect pages.
 * L{FollowRedirectPageBot}: If the generator returns a redirect page it'll
-    follow the redirect and instead work on the redirected class.
+  follow the redirect and instead work on the redirected class.
 
 It is possible to combine filters by subclassing multiple of them. They are
 new-style classes so when a class is first subclassing L{ExistingPageBot} and
