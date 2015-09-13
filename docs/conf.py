@@ -248,6 +248,11 @@ def pywikibot_env():
 def pywikibot_script_docstring_fixups(
         app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
+    if what != "module":
+        return
+
+    if os.path.sep + "scripts" + os.path.sep not in obj.__file__:
+        return
     for index, line in enumerate(lines):
         if line in ('&params;', '&pagegenerators_help;'):
             lines[index] = ('This script supports use of '
