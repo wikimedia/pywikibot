@@ -529,13 +529,13 @@ def twntranslate(code, twtitle, parameters=None):
 
     As an examples, if we had several json dictionaries in test folder like:
 
-    en.json:
+    en.json::
 
       {
           "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
       }
 
-    fr.json:
+    fr.json::
 
       {
           "test-plural": "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",

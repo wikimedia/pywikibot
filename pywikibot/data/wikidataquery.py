@@ -232,7 +232,7 @@ class Query():
 
         Sub-classes must override this method.
 
-        @raise NotImplementedError: Always raised by this abstract method
+        @raises NotImplementedError: Always raised by this abstract method
         """
         raise NotImplementedError
 

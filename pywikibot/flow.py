@@ -46,8 +46,8 @@ class FlowPage(BasePage):
         @param title: normalized title of the page
         @type title: unicode
 
-        @raise TypeError: incorrect use of parameters
-        @raise ValueError: use of non-Flow-enabled Site
+        @raises TypeError: incorrect use of parameters
+        @raises ValueError: use of non-Flow-enabled Site
         """
         super(FlowPage, self).__init__(source, title)
 
@@ -194,8 +194,8 @@ class Topic(FlowPage):
         @type topiclist_data: dict
         @return: A Topic object derived from the supplied data
         @rtype: Topic
-        @raise TypeError: any passed parameters have wrong types
-        @raise ValueError: the passed topiclist_data is missing required data
+        @raises TypeError: any passed parameters have wrong types
+        @raises ValueError: the passed topiclist_data is missing required data
         """
         if not isinstance(board, Board):
             raise TypeError('board must be a pywikibot.flow.Board object.')
@@ -276,7 +276,7 @@ class Post(object):
         @param uuid: UUID of a Flow post
         @type uuid: unicode
 
-        @raise TypeError: incorrect types of parameters
+        @raises TypeError: incorrect types of parameters
         """
         if not isinstance(page, Topic):
             raise TypeError('Page must be a Topic object')
@@ -303,8 +303,8 @@ class Post(object):
         @type data: dict
 
         @return: A Post object
-        @raise TypeError: data is not a dict
-        @raise ValueError: data is missing required entries
+        @raises TypeError: data is not a dict
+        @raises ValueError: data is missing required entries
         """
         post = cls(page, post_uuid)
         post._set_data(data)
@@ -316,8 +316,8 @@ class Post(object):
 
         @param data: The data to store internally
         @type data: dict
-        @raise TypeError: data is not a dict
-        @raise ValueError: missing data entries or post/revision not found
+        @raises TypeError: data is not a dict
+        @raises ValueError: missing data entries or post/revision not found
         """
         if not isinstance(data, dict):
             raise TypeError('Illegal post data (must be a dictionary).')
@@ -386,7 +386,7 @@ class Post(object):
         @type format: unicode
         @return: The contents of the post in the given content format
         @rtype: unicode
-        @raise NotImplementedError: use of 'sysop'
+        @raises NotImplementedError: use of 'sysop'
         """
         if sysop:
             raise NotImplementedError
@@ -402,7 +402,7 @@ class Post(object):
         @type format: str ('wikitext', 'html', or 'fixed-html')
         @param force: Whether to reload from the API instead of using the cache
         @type force: bool
-        @return This post's replies
+        @return: This post's replies
         @rtype: list of Posts
         """
         if format not in ('wikitext', 'html', 'fixed-html'):
