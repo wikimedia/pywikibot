@@ -27,7 +27,7 @@ _logger = 'pywikibot.rcstream'
 class RcListenerThread(threading.Thread):
 
     """
-    Low-level RC Listener Thread, which reads the RC stream and pushes them to it's internal queue.
+    Low-level RC Listener Thread, pushing RC stream events into a queue.
 
     @param wikihost: the hostname of the wiki we want to get changes for. This
                      is passed to rcstream using a 'subscribe' command. Pass
@@ -45,6 +45,7 @@ class RcListenerThread(threading.Thread):
     to a single site and pushes those entries into a queue.
 
     Usage:
+
     >>> t = RcListenerThread('en.wikipedia.org', 'stream.wikimedia.org')
     >>> t.start()
     >>> change = t.queue.get()

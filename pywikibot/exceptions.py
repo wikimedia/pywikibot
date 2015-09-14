@@ -3,6 +3,7 @@
 Exception and warning classes used throughout the framework.
 
 Error: Base class, all exceptions should the subclass of this class.
+
   - NoUsername: Username is not in user-config.py, or it is invalid.
   - UserBlocked: Username or IP has been blocked
   - AutoblockUser: requested action on a virtual autoblock user not valid
@@ -16,10 +17,12 @@ Error: Base class, all exceptions should the subclass of this class.
   - UnknownExtension: Extension is not defined for this site
 
 SiteDefinitionError: Site loading problem
+
   - UnknownSite: Site does not exist in Family
   - UnknownFamily: Family is not registered
 
 PageRelatedError: any exception which is caused by an operation on a Page.
+
   - NoPage: Page does not exist
   - IsRedirectPage: Page is a redirect page
   - IsNotRedirectPage: Page is not a redirect page
@@ -31,6 +34,7 @@ PageRelatedError: any exception which is caused by an operation on a Page.
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 (alias: PageNotSaved).
+
   - SpamfilterError: MediaWiki spam filter detected a blacklisted URL
   - OtherPageSaveError: misc. other save related exception.
   - LockedPage: Page is locked
@@ -43,23 +47,27 @@ PageSaveRelatedError: page exceptions within the save operation on a Page
   - NoCreateError: parameter nocreate not allow page creation
 
 ServerError: a problem with the server.
+
   - FatalServerError: A fatal/non-recoverable server error
 
 WikiBaseError: any issue specific to Wikibase.
+
   - CoordinateGlobeUnknownException: globe is not implemented yet.
   - EntityTypeUnknownException: entity type is not available on the site.
 
 DeprecationWarning: old functionality replaced by new functionality
 
 PendingDeprecationWarning: problematic code which has not yet been
-    fully deprecated, possibly because a replacement is not available
+fully deprecated, possibly because a replacement is not available
 
 RuntimeWarning: problems developers should have fixed, and users need to
-    be aware of its status.
+be aware of its status.
+
   - tools._NotImplementedWarning: do not use
   - NotImplementedWarning: functionality not implemented
 
 UserWarning: warnings targetted at users
+
   - config2._ConfigurationDeprecationWarning: user configuration file problems
   - login._PasswordFileWarning: password file problems
   - ArgumentDeprecationWarning: command line argument problems

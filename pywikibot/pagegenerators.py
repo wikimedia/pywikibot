@@ -100,27 +100,36 @@ parameterHelp = u"""\
 
 -logevents        Work on articles that were on a specified Special:Log.
                   The value may be a comma separated list of three values:
+
                       logevent,username,total
+
                   To use the default value, use an empty string.
                   You have options for every type of logs given by the
                   log event parameter which could be one of the following:
+
                       block, protect, rights, delete, upload, move, import,
                       patrol, merge, suppress, review, stable, gblblock,
                       renameuser, globalauth, gblrights, abusefilter, newusers
+
                   It uses the default number of pages 10.
+
                   Examples:
+
                   -logevents:move gives pages from move log (usually redirects)
                   -logevents:delete,,20 gives 20 pages from deletion log
                   -logevents:protect,Usr gives pages from protect by user Usr
                   -logevents:patrol,Usr,20 gives 20 patroled pages by user Usr
+
                   In some cases it must be written as -logevents:"patrol,Usr,20"
 
 -namespaces       Filter the page generator to only yield pages in the
 -namespace        specified namespaces. Separate multiple namespace
 -ns               numbers or names with commas.
                   Examples:
+
                   -ns:0,2,4
                   -ns:Help,MediaWiki
+
                   If used with -newpages, -namepace/ns must be provided
                   before -newpages.
                   If used with -recentchanges, efficiency is improved if
