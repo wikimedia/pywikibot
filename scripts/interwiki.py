@@ -1125,8 +1125,8 @@ class Subject(interwiki_graph.Subject):
                                  % (page, self.originPage))
                 return True
             elif (page.title() != self.originPage.title() and
-                  self.originPage.site.nocapitalize and
-                  page.site.nocapitalize):
+                  self.originPage.namespace().case == 'case-sensitive' and
+                  page.namespace().case == 'case-sensitive'):
                 pywikibot.output(
                     u"NOTE: Ignoring %s for %s in wiktionary mode because both "
                     u"languages are uncapitalized."
