@@ -386,6 +386,7 @@ class MediaWikiVersion(Version):
     Two versions are equal if their normal version and dev version are equal. A
     version is greater if the normal version or dev version is greater. For
     example:
+
         1.24 < 1.24.1 < 1.25wmf1 < 1.25alpha < 1.25beta1 < 1.25beta2
         < 1.25-rc-1 < 1.25-rc.2 < 1.25
 
@@ -854,9 +855,12 @@ class ContextManagerWrapper(object):
     used as a context manager in with-statements. In such statements the value
     set via 'as' is directly the wrapped object. For example:
 
-     wrapped = ContextManagerWrapper(an_object)
-     with wrapped as another_object:
-         assert(another_object is an_object)
+    >>> class Wrapper(object):
+    ...     def close(self): pass
+    >>> an_object = Wrapper()
+    >>> wrapped = ContextManagerWrapper(an_object)
+    >>> with wrapped as another_object:
+    ...      assert another_object is an_object
 
     It does not subclass the object though, so isinstance checks will fail
     outside a with-statement.
