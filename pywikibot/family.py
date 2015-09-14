@@ -1545,7 +1545,7 @@ class WikimediaFamily(Family):
 
 class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
 
-    """Single site family for sites hosted at *.wikimedia.org."""
+    """Single site family for sites hosted at C{*.wikimedia.org}."""
 
     @property
     def domain(self):

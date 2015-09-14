@@ -1304,7 +1304,7 @@ def remove_last_args(arg_names):
     original function requests one and arg_names contain one name will result
     in an error, because the function got called with 2 parameters.
 
-    The decorated function may not use *args or **kwargs.
+    The decorated function may not use C{*args} or C{**kwargs}.
 
     @param arg_names: The names of all arguments.
     @type arg_names: iterable; for the most explanatory message it should
