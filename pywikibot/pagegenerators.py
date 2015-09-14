@@ -2202,8 +2202,9 @@ class GoogleSearchPageGenerator:
     """
     Page generator using Google search results.
 
-    To use this generator, you need to install the package 'google'.
-    https://pypi.python.org/pypi/google
+    To use this generator, you need to install the package 'google':
+
+        L{https://pypi.python.org/pypi/google}
 
     This package has been available since 2010, hosted on github
     since 2012, and provided by pypi since 2013.
@@ -2230,6 +2231,7 @@ class GoogleSearchPageGenerator:
 
         The terms of service as at June 2014 give two conditions that
         may apply to use of search:
+
             1. Dont access [Google Services] using a method other than
                the interface and the instructions that [they] provide.
             2. Don't remove, obscure, or alter any legal notices
