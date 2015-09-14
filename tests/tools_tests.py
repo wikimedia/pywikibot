@@ -14,11 +14,12 @@ import decimal
 import os.path
 import subprocess
 import sys
+import tempfile
 
 from pywikibot import tools
 
 from tests import _data_dir
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, DeprecationTestCase, TestCase
 from tests.utils import expected_failure_if
 
 _xml_data_dir = os.path.join(_data_dir, 'xml')
@@ -70,15 +71,15 @@ class ContextManagerWrapperTestCase(TestCase):
         self.assertTrue(wrapper.closed)
 
 
-class OpenCompressedTestCase(TestCase):
+class OpenArchiveTestCase(TestCase):
 
     """
     Unit test class for tools.
 
-    The tests for open_compressed requires that article-pyrus.xml* contain all
+    The tests for open_archive requires that article-pyrus.xml* contain all
     the same content after extraction. The content itself is not important.
     The file article-pyrus.xml_invalid.7z is not a valid 7z file and
-    open_compressed will fail extracting it using 7za.
+    open_archive will fail extracting it using 7za.
     """
 
     net = False
@@ -86,38 +87,118 @@ class OpenCompressedTestCase(TestCase):
     @classmethod
     def setUpClass(cls):
         """Define base_file and original_content."""
-        super(OpenCompressedTestCase, cls).setUpClass()
+        super(OpenArchiveTestCase, cls).setUpClass()
         cls.base_file = os.path.join(_xml_data_dir, 'article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
             cls.original_content = f.read()
 
-    @staticmethod
-    def _get_content(*args):
-        """Use open_compressed and return content using a with-statement."""
-        with tools.open_compressed(*args) as f:
+    def _get_content(self, *args, **kwargs):
+        """Use open_archive and return content using a with-statement."""
+        with tools.open_archive(*args, **kwargs) as f:
             return f.read()
 
-    def test_open_compressed_normal(self):
-        """Test open_compressed with no compression in the standard library."""
+    def test_open_archive_normal(self):
+        """Test open_archive with no compression in the standard library."""
         self.assertEqual(self._get_content(self.base_file), self.original_content)
 
-    def test_open_compressed_bz2(self):
-        """Test open_compressed with bz2 compressor in the standard library."""
+    def test_open_archive_bz2(self):
+        """Test open_archive with bz2 compressor in the standard library."""
         self.assertEqual(self._get_content(self.base_file + '.bz2'), self.original_content)
-        self.assertEqual(self._get_content(self.base_file + '.bz2', True), self.original_content)
+        self.assertEqual(self._get_content(self.base_file + '.bz2', use_extension=False),
+                         self.original_content)
 
-    def test_open_compressed_gz(self):
-        """Test open_compressed with gz compressor in the standard library."""
+    def test_open_archive_gz(self):
+        """Test open_archive with gz compressor in the standard library."""
         self.assertEqual(self._get_content(self.base_file + '.gz'), self.original_content)
 
-    def test_open_compressed_7z(self):
-        """Test open_compressed with 7za if installed."""
+    def test_open_archive_7z(self):
+        """Test open_archive with 7za if installed."""
         try:
             subprocess.Popen(['7za'], stdout=subprocess.PIPE).stdout.close()
         except OSError:
             raise unittest.SkipTest('7za not installed')
         self.assertEqual(self._get_content(self.base_file + '.7z'), self.original_content)
-        self.assertRaises(OSError, self._get_content, self.base_file + '_invalid.7z', True)
+        self.assertRaises(OSError, self._get_content, self.base_file + '_invalid.7z',
+                          use_extension=True)
+
+
+class OpenCompressedTestCase(OpenArchiveTestCase, DeprecationTestCase):
+
+    """Test opening files with the deprecated open_compressed."""
+
+    net = False
+
+    def _get_content(self, *args, **kwargs):
+        """Use open_compressed and return content using a with-statement."""
+        # open_archive default is True, so if it's False it's not the default
+        # so use the non-default of open_compressed (which is True)
+        if kwargs.get('use_extension') is False:
+            kwargs['use_extension'] = True
+
+        with tools.open_compressed(*args, **kwargs) as f:
+            content = f.read()
+        self.assertOneDeprecation(self.INSTEAD)
+        return content
+
+
+class OpenArchiveWriteTestCase(TestCase):
+
+    """Test writing with open_archive."""
+
+    net = False
+
+    @classmethod
+    def setUpClass(cls):
+        """Define base_file and original_content."""
+        super(OpenArchiveWriteTestCase, cls).setUpClass()
+        cls.base_file = os.path.join(_xml_data_dir, 'article-pyrus.xml')
+        with open(cls.base_file, 'rb') as f:
+            cls.original_content = f.read()
+
+    def _write_content(self, suffix):
+        try:
+            fn = tempfile.mkstemp(suffix)[1]
+            with tools.open_archive(fn, 'wb') as f:
+                f.write(self.original_content)
+            with tools.open_archive(fn, 'rb') as f:
+                self.assertEqual(f.read(), self.original_content)
+            with open(fn, 'rb') as f:
+                return f.read()
+        finally:
+            os.remove(fn)
+
+    def test_invalid_modes(self):
+        """Test various invalid mode configurations."""
+        self.assertRaises(ValueError, tools.open_archive,
+                          '/dev/null', 'ra')  # two modes besides
+        self.assertRaises(ValueError, tools.open_archive,
+                          '/dev/null', 'rt')  # text mode
+        self.assertRaises(ValueError, tools.open_archive,
+                          '/dev/null', 'br')  # binary at front
+        self.assertRaises(ValueError, tools.open_archive,
+                          '/dev/null', 'wb', False)  # writing without extension
+
+    def test_binary_mode(self):
+        """Test that it uses binary mode."""
+        with tools.open_archive(self.base_file, 'r') as f:
+            self.assertEqual(f.mode, 'rb')
+            self.assertIsInstance(f.read(), bytes)
+
+    def test_write_archive_bz2(self):
+        """Test writing a bz2 archive."""
+        content = self._write_content('.bz2')
+        with open(self.base_file + '.bz2', 'rb') as f:
+            self.assertEqual(content, f.read())
+
+    def test_write_archive_gz(self):
+        """Test writing a gz archive."""
+        content = self._write_content('.gz')
+        self.assertEqual(content[:3], b'\x1F\x8B\x08')
+
+    def test_write_archive_7z(self):
+        """Test writing an archive as a 7z archive."""
+        self.assertRaises(NotImplementedError, tools.open_archive,
+                          '/dev/null.7z', mode='wb')
 
 
 class MergeUniqueDicts(TestCase):

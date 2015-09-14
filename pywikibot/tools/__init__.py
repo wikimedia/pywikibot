@@ -888,23 +888,32 @@ class ContextManagerWrapper(object):
         setattr(self._wrapped, name, value)
 
 
-def open_compressed(filename, use_extension=False):
+def open_archive(filename, mode='rb', use_extension=True):
     """
     Open a file and uncompress it if needed.
 
     This function supports bzip2, gzip and 7zip as compression containers. It
     uses the packages available in the standard library for bzip2 and gzip so
     they are always available. 7zip is only available when a 7za program is
-    available.
+    available and only supports reading from it.
 
     The compression is either selected via the magic number or file ending.
 
     @param filename: The filename.
     @type filename: str
     @param use_extension: Use the file extension instead of the magic number
-        to determine the type of compression (default False).
+        to determine the type of compression (default True). Must be True when
+        writing or appending.
     @type use_extension: bool
-    @raises ValueError: When 7za is not available.
+    @param mode: The mode in which the file should be opened. It may either be
+        'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
+        mode. It defaults to 'rb'.
+    @type mode: string
+    @raises ValueError: When 7za is not available or the opening mode is unknown
+        or it tries to write a 7z archive.
+    @raises FileNotFoundError: When the filename doesn't exist and it tries
+        to read from it or it tries to determine the compression algorithm (or
+        IOError on Python 2).
     @raises OSError: When it's not a 7z archive but the file extension is 7z.
         It is also raised by bz2 when its content is invalid. gzip does not
         immediately raise that error but only on reading it.
@@ -920,11 +929,18 @@ def open_compressed(filename, use_extension=False):
         else:
             return wrapped
 
+    if mode in ('r', 'a', 'w'):
+        mode += 'b'
+    elif mode not in ('rb', 'ab', 'wb'):
+        raise ValueError('Invalid mode: "{0}"'.format(mode))
+
     if use_extension:
         # if '.' not in filename, it'll be 1 character long but otherwise
         # contain the period
         extension = filename[filename.rfind('.'):][1:]
     else:
+        if mode != 'rb':
+            raise ValueError('Magic number detection only when reading')
         with open(filename, 'rb') as f:
             magic_number = f.read(8)
         if magic_number.startswith(b'BZh'):
@@ -937,10 +953,13 @@ def open_compressed(filename, use_extension=False):
             extension = ''
 
     if extension == 'bz2':
-        return wrap(bz2.BZ2File(filename), 1)
+        return wrap(bz2.BZ2File(filename, mode), 1)
     elif extension == 'gz':
-        return wrap(gzip.open(filename), 0)
+        return wrap(gzip.open(filename, mode), 0)
     elif extension == '7z':
+        if mode != 'rb':
+            raise NotImplementedError('It is not possible to write a 7z file.')
+
         try:
             process = subprocess.Popen(['7za', 'e', '-bd', '-so', filename],
                                        stdout=subprocess.PIPE,
@@ -1500,3 +1519,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
             if self._deprecated[attr][1]:
                 return self._deprecated[attr][1]
         return getattr(self._module, attr)
+
+
+@deprecated('open_archive()')
+def open_compressed(filename, use_extension=False):
+    """DEPRECATED: Open a file and uncompress it if needed."""
+    return open_archive(filename, use_extension=use_extension)

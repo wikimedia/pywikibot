@@ -122,7 +122,6 @@ __version__ = '$Id$'
 import os
 import re
 import pickle
-import bz2
 import sys
 
 import pywikibot
@@ -132,7 +131,7 @@ from pywikibot.bot import (
     MultipleSitesBot, IntegerOption, StandardOption, ContextOption,
 )
 from pywikibot.tools import (
-    deprecated_args, deprecated, ModuleDeprecationWrapper
+    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive
 )
 
 if sys.version_info[0] > 2:
@@ -183,11 +182,10 @@ class CategoryDatabase:
     def _load(self):
         if not self.is_loaded:
             try:
-                f = bz2.BZ2File(self.filename, 'r')
                 pywikibot.output(u'Reading dump from %s'
                                  % config.shortpath(self.filename))
-                databases = pickle.load(f)
-                f.close()
+                with open_archive(self.filename, 'rb') as f:
+                    databases = pickle.load(f)
                 # keys are categories, values are 2-tuples with lists as
                 # entries.
                 self.catContentDB = databases['catContentDB']
@@ -265,17 +263,16 @@ class CategoryDatabase:
         if self.is_loaded and (self.catContentDB or self.superclassDB):
             pywikibot.output(u'Dumping to %s, please wait...'
                              % config.shortpath(filename))
-            f = bz2.BZ2File(filename, 'w')
             databases = {
                 'catContentDB': self.catContentDB,
                 'superclassDB': self.superclassDB
             }
             # store dump to disk in binary format
-            try:
-                pickle.dump(databases, f, protocol=config.pickle_protocol)
-            except pickle.PicklingError:
-                pass
-            f.close()
+            with open_archive(filename, 'wb') as f:
+                try:
+                    pickle.dump(databases, f, protocol=config.pickle_protocol)
+                except pickle.PicklingError:
+                    pass
         else:
             try:
                 os.remove(filename)

@@ -23,7 +23,7 @@ import re
 from xml.etree.cElementTree import iterparse
 import xml.sax
 
-from pywikibot.tools import open_compressed
+from pywikibot.tools import open_archive
 
 
 def parseRestrictions(restrictions):
@@ -118,7 +118,7 @@ class XmlDump(object):
 
     def parse(self):
         """Generator using cElementTree iterparse function."""
-        with open_compressed(self.filename) as source:
+        with open_archive(self.filename) as source:
             # iterparse's event must be a str but they are unicode with
             # unicode_literals in Python 2
             context = iterparse(source, events=(str('start'), str('end'),
