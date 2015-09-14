@@ -6,6 +6,8 @@ wikibase_tests
 ---------------
 Available tests
 ---------------
+    .. autoclass:: tests.wikibase_tests.TestLoadRevisionsCaching
+        :members:
     .. autoclass:: tests.wikibase_tests.TestAlternateNamespaces
         :members:
     .. autoclass:: tests.wikibase_tests.TestClaimSetValue
@@ -22,7 +24,9 @@ Available tests
         :members:
     .. autoclass:: tests.wikibase_tests.TestNamespaces
         :members:
-    .. autoclass:: tests.wikibase_tests.TestPageMethods
+    .. autoclass:: tests.wikibase_tests.TestItemBasePageMethods
+        :members:
+    .. autoclass:: tests.wikibase_tests.TestPageMethodsWithItemTitle
         :members:
     .. autoclass:: tests.wikibase_tests.TestPreloadingItemGenerator
         :members:
