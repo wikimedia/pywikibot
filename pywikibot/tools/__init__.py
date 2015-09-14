@@ -955,7 +955,7 @@ def open_compressed(filename, use_extension=False):
             else:
                 return process.stdout
     else:
-        # assume it's an uncompressed XML file
+        # assume it's an uncompressed file
         return open(filename, 'rb')
 
 
