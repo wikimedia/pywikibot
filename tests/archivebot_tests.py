@@ -78,7 +78,7 @@ class TestArchiveBot(TestCase):
                 raise
 
     expected_failures = ['ar', 'pdc', 'th']
-    # expected failures - should be fixed
+    # FIXME:
     # 'ar': Uses Arabic acronym for TZ
     # 'pdc': changed month name setting in wiki over time (?)
     #   in old posts in talk page, February is "Feb.", site message gives
