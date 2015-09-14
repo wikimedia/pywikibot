@@ -53,6 +53,7 @@ extra_deps = {
     'rcstream': ['socketIO-client<0.6.1'],
     'security': ['requests[security]'],
     'mwoauth': ['mwoauth>=0.2.4'],
+    'html': ['BeautifulSoup4'],
 }
 
 if PY2:

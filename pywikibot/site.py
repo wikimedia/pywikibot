@@ -3714,6 +3714,16 @@ class APISite(BaseSite):
                 raise NoPage(page)
             api.update_page(page, pagedata, rvgen.props)
 
+    # TODO: expand support to other parameters of action=parse?
+    def get_parsed_page(self, page):
+        """Retrieve parsed text of the page using action=parse."""
+        req = self._simple_request(action='parse', page=page)
+        data = req.submit()
+        assert 'parse' in data, "API parse response lacks 'parse' key"
+        assert 'text' in data['parse'], "API parse response lacks 'text' key"
+        parsed_text = data['parse']['text']['*']
+        return parsed_text
+
     def pagelanglinks(self, page, step=None, total=None,
                       include_obsolete=False):
         """Iterate all interlanguage links on page, yielding Link objects.
