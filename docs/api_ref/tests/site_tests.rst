@@ -12,7 +12,15 @@ Available tests
         :members:
     .. autoclass:: tests.site_tests.SiteUserTestCase
         :members:
-    .. autoclass:: tests.site_tests.SiteUserTestCase2
+    .. autoclass:: tests.site_tests.TestUsernameInUsers
+        :members:
+    .. autoclass:: tests.site_tests.TestUserList
+        :members:
+    .. autoclass:: tests.site_tests.PatrolTestCase
+        :members:
+    .. autoclass:: tests.site_tests.TestDeprecatedEditTokenFunctions
+        :members:
+    .. autoclass:: tests.site_tests.TestDeprecatedPatrolToken
         :members:
     .. autoclass:: tests.site_tests.TestCommonsSite
         :members:
