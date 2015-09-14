@@ -323,7 +323,7 @@ class TestIndexPageMappings(IndexPageTestCase):
     @classmethod
     def setUpClass(cls):
         """Prepare get_page dataset for tests."""
-        super(IndexPageTestCase, cls).setUpClass()
+        super(TestIndexPageMappings, cls).setUpClass()
         for key, site_def in cls.sites.items():
             site = cls.get_site(name=key)
             base_title = site_def['page']
