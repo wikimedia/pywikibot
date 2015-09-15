@@ -153,10 +153,10 @@ pywikibot.families.wikidata_family module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.families.wikimedia_family module
-------------------------------------------
+pywikibot.families.wikimediachapter_family module
+-------------------------------------------------
 
-.. automodule:: pywikibot.families.wikimedia_family
+.. automodule:: pywikibot.families.wikimediachapter_family
     :members:
     :undoc-members:
     :show-inheritance:

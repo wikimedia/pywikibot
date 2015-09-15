@@ -3,8 +3,18 @@
 This module contains backports to support older Python versions.
 
 They contain the backported code originally developed for Python. It is
-therefore distributed under the PSF license, as follows:
+therefore distributed under the PSF license.
+"""
+#
+# (C) Python Software Foundation, 2001-2014
+# (C) with modifications from Pywikibot team, 2015
+#
+# Distributed under the terms of the PSF license.
+#
 
+from __future__ import unicode_literals
+
+__license__ = """
 PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
 --------------------------------------------
 1. This LICENSE AGREEMENT is between the Python Software Foundation
@@ -52,14 +62,6 @@ products or services of Licensee, or any third party.
 agrees to be bound by the terms and conditions of this License
 Agreement.
 """
-#
-# (C) Python Software Foundation, 2001-2014
-# (C) with modifications from Pywikibot team, 2015
-#
-# Distributed under the terms of the PSF license.
-#
-from __future__ import unicode_literals
-
 import logging
 import warnings
 

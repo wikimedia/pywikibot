@@ -2091,16 +2091,16 @@ class WikidataBot(Bot):
         @param data: data to be saved, or None if the diff should be created
           automatically
         @kwarg summary: revision comment, passed to ItemPage.editEntity
-        @kwtype summary: str
+        @type summary: str
         @kwarg show_diff: show changes between oldtext and newtext (default:
           True)
-        @kwtype show_diff: bool
+        @type show_diff: bool
         @kwarg ignore_server_errors: if True, server errors will be reported
           and ignored (default: False)
-        @kwtype ignore_server_errors: bool
+        @type ignore_server_errors: bool
         @kwarg ignore_save_related_errors: if True, errors related to
-        page save will be reported and ignored (default: False)
-        @kwtype ignore_save_related_errors: bool
+          page save will be reported and ignored (default: False)
+        @type ignore_save_related_errors: bool
         """
         self.current_page = item
 

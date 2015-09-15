@@ -926,9 +926,9 @@ class BaseSite(ComparableMixin):
         """
         Return the site for a corresponding interwiki prefix.
 
-        @raise SiteDefinitionError: if the url given in the interwiki table
+        @raises SiteDefinitionError: if the url given in the interwiki table
             doesn't match any of the existing families.
-        @raise KeyError: if the prefix is not an interwiki prefix.
+        @raises KeyError: if the prefix is not an interwiki prefix.
         """
         return self._interwikimap[prefix].site
 
@@ -944,7 +944,7 @@ class BaseSite(ComparableMixin):
         @type site: L{BaseSite}
         @return: The interwiki prefixes
         @rtype: list (guaranteed to be not empty)
-        @raise KeyError: if there is no interwiki prefix for that site.
+        @raises KeyError: if there is no interwiki prefix for that site.
         """
         assert site is not None, 'Site must not be None'
         prefixes = set()
@@ -963,9 +963,9 @@ class BaseSite(ComparableMixin):
         link. So if that link also contains an interwiki link it does follow
         it as long as it's a local link.
 
-        @raise SiteDefinitionError: if the url given in the interwiki table
+        @raises SiteDefinitionError: if the url given in the interwiki table
             doesn't match any of the existing families.
-        @raise KeyError: if the prefix is not an interwiki prefix.
+        @raises KeyError: if the prefix is not an interwiki prefix.
         """
         return self._interwikimap[prefix].local
 
@@ -1569,7 +1569,7 @@ class Siteinfo(Container):
         @type expiry: int/float (days), L{datetime.timedelta}, False (never)
         @return: The gathered property
         @rtype: various
-        @raise KeyError: If the key is not a valid siteinfo property and the
+        @raises KeyError: If the key is not a valid siteinfo property and the
             get_default option is set to False.
         @see: L{_get_siteinfo}
         """
@@ -2012,7 +2012,7 @@ class APISite(BaseSite):
 
         Also logs out of the global account if linked to the user.
 
-        @raise APIError: Logout is not available when OAuth enabled.
+        @raises APIError: Logout is not available when OAuth enabled.
         """
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
@@ -2899,10 +2899,10 @@ class APISite(BaseSite):
         @return: redirect target of page
         @rtype: BasePage
 
-        @raise IsNotRedirectPage: page is not a redirect
-        @raise RuntimeError: no redirects found
-        @raise CircularRedirect: page is a circular redirect
-        @raise InterwikiRedirectPage: the redirect target is
+        @raises IsNotRedirectPage: page is not a redirect
+        @raises RuntimeError: no redirects found
+        @raises CircularRedirect: page is a circular redirect
+        @raises InterwikiRedirectPage: the redirect target is
             on another site
         """
         if not self.page_isredirect(page):

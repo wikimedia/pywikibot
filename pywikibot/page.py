@@ -3,6 +3,7 @@
 Objects representing various types of MediaWiki, including Wikibase, pages.
 
 This module also includes objects:
+
 * Property: a type of semantic data.
 * Claim: an instance of a semantic assertion.
 * Revision: a single change to a wiki page.
@@ -2024,8 +2025,8 @@ class Page(BasePage):
         """Iterate templates used on this Page.
 
         @return: a generator that yields a tuple for each use of a template
-        in the page, with the template Page as the first entry and a list of
-        parameters as the second entry.
+            in the page, with the template Page as the first entry and a list of
+            parameters as the second entry.
         """
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
@@ -2270,7 +2271,7 @@ class FilePage(Page):
     def getFileVersionHistory(self):
         """Return the file's version history.
 
-        @return: A list of dictionaries with the following keys::
+        @return: A list of dictionaries with the following keys:
 
             [comment, sha1, url, timestamp, metadata,
              height, width, mime, user, descriptionurl, size]
@@ -3092,10 +3093,10 @@ class WikibasePage(BasePage):
         @kwarg entity_type: Wikibase entity type
         @type entity_type: str ('item' or 'property')
 
-        @raise TypeError: incorrect use of parameters
-        @raise ValueError: incorrect namespace
-        @raise pywikibot.Error: title parsing problems
-        @raise NotImplementedError: the entity type is not supported
+        @raises TypeError: incorrect use of parameters
+        @raises ValueError: incorrect namespace
+        @raises pywikibot.Error: title parsing problems
+        @raises NotImplementedError: the entity type is not supported
         """
         if not isinstance(site, pywikibot.site.DataSite):
             raise TypeError("site must be a pywikibot.site.DataSite object")
@@ -3894,6 +3895,7 @@ class ItemPage(WikibasePage):
         Make the item redirect to another item.
 
         You need to define an extra argument to make this work, like save=True
+
         @param target_page: target of the redirect, this argument is required.
         @type target_page: pywikibot.Item or string
         @param force: if true, it sets the redirect target even the page

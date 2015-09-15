@@ -46,6 +46,16 @@ For bot developers:
    getting_help
    api_ref/index
 
+For framework developers:
+=========================
+
+.. toctree::
+   :maxdepth: 2
+
+   api_ref/tests/index
+   scripts.maintenance
+
+
 Miscellaneous
 =============
 .. toctree::
