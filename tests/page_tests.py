@@ -788,6 +788,22 @@ class TestPageRedirects(TestCase):
         self.assertRaises(pywikibot.exceptions.IsRedirectPage, p2.get)
         self.assertRaises(pywikibot.exceptions.NoPage, p3.get)
 
+    def test_set_redirect_target(self):
+        """Test set_redirect_target method."""
+        # R1 redirects to R2 and R3 doesn't exist.
+        site = self.get_site()
+        p1 = pywikibot.Page(site, u'User:Legoktm/R2')
+        p2 = pywikibot.Page(site, u'User:Legoktm/R1')
+        p3 = pywikibot.Page(site, u'User:Legoktm/R3')
+
+        text = p2.get(get_redirect=True)
+        self.assertRaises(pywikibot.exceptions.IsNotRedirectPage,
+                          p1.set_redirect_target, p2)
+        self.assertRaises(pywikibot.exceptions.NoPage, p3.set_redirect_target,
+                          p2)
+        p2.set_redirect_target(p1, save=False)
+        self.assertEqual(text, p2.get(get_redirect=True))
+
 
 class TestPageUserAction(DefaultSiteTestCase):
 

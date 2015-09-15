@@ -154,6 +154,22 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertEqual(item._defined_by(), dict())
         item.editEntity(data)
 
+    def test_set_redirect_target(self):
+        """Test set_redirect_target method."""
+        testsite = self.get_repo()
+        item = pywikibot.ItemPage(testsite, 'Q1107')
+        target_id = 'Q68'
+        if not item.isRedirectPage():
+            item.editEntity(data={}, clear=True)
+        elif item.getRedirectTarget().getID() == 'Q68':
+            target_id = 'Q67'
+        target_item = pywikibot.ItemPage(testsite, target_id)
+        item.set_redirect_target(target_id, force=True)
+        self.assertTrue(item.isRedirectPage())
+        new_item = pywikibot.ItemPage(testsite, item.getID())
+        self.assertTrue(new_item.isRedirectPage())
+        self.assertEqual(new_item.getRedirectTarget(), target_item)
+
 
 if __name__ == '__main__':
     try:
