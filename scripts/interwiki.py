@@ -358,7 +358,8 @@ import socket
 
 import pywikibot
 
-from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph, titletranslate
+from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
+from pywikibot import titletranslate
 from pywikibot.bot import ListOption, StandardOption
 from pywikibot.tools import first_upper
 
@@ -584,7 +585,8 @@ class Global(object):
         elif arg.startswith('-neverlink:'):
             self.neverlink += arg[11:].split(",")
         elif arg.startswith('-ignore:'):
-            self.ignore += [pywikibot.Page(pywikibot.Site(), p) for p in arg[8:].split(",")]
+            self.ignore += [pywikibot.Page(pywikibot.Site(), p)
+                            for p in arg[8:].split(',')]
         elif arg.startswith('-ignorefile:'):
             ignorefile = arg[12:]
             ignorePageGen = pagegenerators.TextfilePageGenerator(ignorefile)
@@ -1055,7 +1057,8 @@ class Subject(interwiki_graph.Subject):
                 return False
             if globalvar.autonomous:
                 pywikibot.output(
-u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i."
+                    'NOTE: Ignoring link from page %s in namespace %i to page '
+                    '%s in namespace %i.'
                     % (linkingPage, linkingPage.namespace(), linkedPage,
                        linkedPage.namespace()))
                 # Fill up foundIn, so that we will not write this notice
@@ -1065,14 +1068,16 @@ u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i."
                 preferredPage = self.getFoundInCorrectNamespace(linkedPage.site)
                 if preferredPage:
                     pywikibot.output(
-u"NOTE: Ignoring link from page %s in namespace %i to page %s in namespace %i "
-u"because page %s in the correct namespace has already been found."
+                        'NOTE: Ignoring link from page %s in namespace %i to '
+                        'page %s in namespace %i because page %s in the '
+                        'correct namespace has already been found.'
                         % (linkingPage, linkingPage.namespace(), linkedPage,
                            linkedPage.namespace(), preferredPage))
                     return True
                 else:
                     choice = pywikibot.input_choice(
-u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
+                        'WARNING: %s is in namespace %i, but %s is in '
+                        'namespace %i. Follow it anyway?'
                         % (self.originPage, self.originPage.namespace(),
                            linkedPage, linkedPage.namespace()),
                         [('Yes', 'y'), ('No', 'n'),
@@ -1458,8 +1463,9 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 linkedPage = pywikibot.Page(link)
                 if globalvar.hintsareright:
                     if linkedPage.site in self.hintedsites:
-                        pywikibot.output(u"NOTE: %s: %s extra interwiki on hinted site ignored %s"
-                                         % (self.originPage, page, linkedPage))
+                        pywikibot.output(
+                            'NOTE: %s: %s extra interwiki on hinted site ignored %s'
+                            % (self.originPage, page, linkedPage))
                         break
                 if not self.skipPage(page, linkedPage, counter):
                     if globalvar.followinterwiki or page == self.originPage:
@@ -1912,7 +1918,8 @@ u'WARNING: %s is in namespace %i, but %s is in namespace %i. Follow it anyway?'
                 ):
                     new[rmsite] = rmPage
                     pywikibot.output(
-                        u"WARNING: %s is either deleted or has a mismatching disambiguation state."
+                        'WARNING: %s is either deleted or has a mismatching '
+                        'disambiguation state.'
                         % rmPage)
             # Re-Check what needs to get done
             mods, mcomment, adding, removing, modifying = compareLanguages(old,
@@ -2196,7 +2203,9 @@ class InterwikiBot(object):
                         except KeyError:
                             pass
                         if loc is not None and loc in page.title():
-                            pywikibot.output(u'Skipping: %s is a templates subpage' % page.title())
+                            pywikibot.output(
+                                'Skipping: %s is a templates subpage'
+                                % page.title())
                             continue
                     break
 
@@ -2265,7 +2274,8 @@ class InterwikiBot(object):
                     except pywikibot.ServerError:
                         # Could not extract allpages special page?
                         pywikibot.output(
-                            u'ERROR: could not retrieve more pages. Will try again in %d seconds'
+                            'ERROR: could not retrieve more pages. '
+                            'Will try again in %d seconds'
                             % timeout)
                         time.sleep(timeout)
                         timeout *= 2
