@@ -24,11 +24,7 @@ class WikiStatsTestCase(TestCase):
 
     """Test WikiStats dump."""
 
-    sites = {
-        'wikistats': {
-            'hostname': 'wikistats.wmflabs.org',
-        },
-    }
+    hostname = 'https://wikistats.wmflabs.org/api.php'
 
     def test_sort(self):
         """Test sorted results."""
