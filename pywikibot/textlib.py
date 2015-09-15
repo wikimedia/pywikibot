@@ -38,7 +38,11 @@ import pywikibot
 from pywikibot import config2 as config
 from pywikibot.exceptions import InvalidTitle
 from pywikibot.family import Family
-from pywikibot.tools import OrderedDict, DeprecatedRegex
+from pywikibot.tools import (
+    DeprecatedRegex,
+    OrderedDict,
+    issue_deprecation_warning
+)
 
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache = {}
@@ -843,6 +847,9 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     cseparator = site.family.category_text_separator
     separatorstripped = separator.strip()
     cseparatorstripped = cseparator.strip()
+    do_not_strip = oldtext.strip() != oldtext
+    if do_not_strip:
+        issue_deprecation_warning('Using unstripped text', 'stripped text', 2)
     if addOnly:
         s2 = oldtext
     else:
@@ -910,7 +917,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                     newtext = s2.replace(marker, '').strip() + separator + s
     else:
         newtext = s2.replace(marker, '')
-    return newtext
+    return newtext if do_not_strip else newtext.strip()
 
 
 def interwikiFormat(links, insite=None):
