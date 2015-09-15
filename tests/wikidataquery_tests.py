@@ -231,11 +231,7 @@ class TestApiSlowFunctions(TestCase):
 
     """Test slow WikiDataQuery API functions."""
 
-    sites = {
-        'wdq': {
-            'hostname': 'wdq.wmflabs.org',
-        },
-    }
+    hostname = 'https://wdq.wmflabs.org/api'
 
     def testQueryApiGetter(self):
         """Test that we can actually retreive data and that caching works."""
