@@ -1452,7 +1452,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
             module = sys.modules[module]
         super(ModuleDeprecationWrapper, self).__setattr__('_deprecated', {})
         super(ModuleDeprecationWrapper, self).__setattr__('_module', module)
-        super(ModuleDeprecationWrapper, self).__setattr__('__doc__', module.__doc__)
+        self.__dict__.update(module.__dict__)
 
         if __debug__:
             sys.modules[module.__name__] = self
