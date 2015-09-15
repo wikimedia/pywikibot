@@ -14,11 +14,6 @@ import functools
 import os
 import re
 
-try:
-    import mwparserfromhell
-except ImportError as e:
-    mwparserfromhell = e
-
 import pywikibot
 import pywikibot.textlib as textlib
 
@@ -26,7 +21,9 @@ from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
 from pywikibot.tools import OrderedDict
 
-from tests.aspects import unittest, TestCase, DefaultDrySiteTestCase
+from tests.aspects import (
+    unittest, require_modules, TestCase, DefaultDrySiteTestCase,
+)
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
@@ -353,11 +350,9 @@ class TestTemplateParams(TestCase):
                                                   ('2', u'd')])),
                                ('b', OrderedDict([('1', 'c')]))])
 
+    @require_modules('mwparserfromhell')
     def test_extract_templates_params_mwpfh(self):
         """Test using mwparserfromhell."""
-        if isinstance(mwparserfromhell, ImportError):
-            raise unittest.SkipTest('mwparserfromhell not available')
-
         func = textlib.extract_templates_and_params_mwpfh
         self._common_results(func)
         self._order_differs(func)

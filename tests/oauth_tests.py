@@ -11,31 +11,21 @@ __version__ = '$Id$'
 
 import os
 
-try:
-    import mwoauth
-except ImportError as e:
-    mwoauth = e
-
 from pywikibot.login import OauthLoginManager
 from tests.aspects import (
     unittest,
+    require_modules,
     TestCase,
     DefaultSiteTestCase,
 )
 
 
+@require_modules('mwoauth')
 class OAuthSiteTestCase(TestCase):
 
     """Run tests related to OAuth authentication."""
 
     oauth = True
-
-    @classmethod
-    def setUpClass(cls):
-        """Check if mwoauth is installed."""
-        super(OAuthSiteTestCase, cls).setUpClass()
-        if isinstance(mwoauth, ImportError):
-            raise unittest.SkipTest('mwoauth not installed')
 
     def _get_oauth_tokens(self):
         """Get valid OAuth tokens from environment variables."""

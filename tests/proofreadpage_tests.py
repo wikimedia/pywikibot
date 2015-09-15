@@ -11,16 +11,11 @@ __version__ = '$Id$'
 
 import json
 
-try:
-    from bs4 import BeautifulSoup
-except ImportError as e:
-    BeautifulSoup = e
-
 import pywikibot
 
 from pywikibot.data import api
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, require_modules, TestCase
 
 from tests.basepage_tests import (
     BasePageMethodsTestBase,
@@ -207,16 +202,12 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
 
 
+@require_modules('bs4')
 class IndexPageTestCase(TestCase):
 
     """Run tests related to IndexPage ProofreadPage extension."""
 
-    @classmethod
-    def setUpClass(cls):
-        """Check if beautifulsoup4 is installed."""
-        super(IndexPageTestCase, cls).setUpClass()
-        if isinstance(BeautifulSoup, ImportError):
-            raise unittest.SkipTest('beautifulsoup4 not installed')
+    pass
 
 
 class TestIndexPageInvalidSite(IndexPageTestCase):

@@ -19,20 +19,14 @@ else:
 
 from scripts import weblinkchecker
 
-from tests.aspects import unittest, TestCase, TestCaseBase
+from tests.aspects import unittest, require_modules, TestCase, TestCaseBase
 from tests import weblib_tests
 
 
+@require_modules('memento_client')
 class MementoTestBase(TestCaseBase):
 
     """Test memento client."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Set up test class."""
-        if isinstance(weblinkchecker.memento_client, ImportError):
-            raise unittest.SkipTest('memento_client not imported')
-        super(MementoTestBase, cls).setUpClass()
 
     def _get_archive_url(self, url, date_string=None):
         if date_string is None:

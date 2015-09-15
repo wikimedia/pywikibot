@@ -331,6 +331,25 @@ class TestTimerMixin(TestCaseBase):
         super(TestTimerMixin, self).tearDown()
 
 
+def require_modules(*required_modules):
+    """Require that the given list of modules can be imported."""
+    def test_requirement(obj):
+        """Test the requirement and return an optionally decorated object."""
+        missing = []
+        for required_module in required_modules:
+            try:
+                __import__(required_module, globals(), locals(), [], 0)
+            except ImportError:
+                missing += [required_module]
+        if missing:
+            return unittest.skip('{0} not installed'.format(
+                ', '.join(missing)))(obj)
+        else:
+            return obj
+
+    return test_requirement
+
+
 class DisableSiteMixin(TestCaseBase):
 
     """Test cases not connected to a Site object.
