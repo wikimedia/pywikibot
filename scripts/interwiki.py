@@ -537,6 +537,9 @@ class Global(object):
             self.same = True
         elif arg == '-wiktionary':
             self.same = 'wiktionary'
+            # Don't use auto-translation in -wiktionary mode
+            # where page titles must be the same
+            self.auto = False
         elif arg == '-repository':
             self.repository = True
         elif arg == '-untranslated':
