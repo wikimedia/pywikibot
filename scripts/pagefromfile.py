@@ -40,7 +40,7 @@ Specific arguments:
 -autosummary    Use MediaWikis autosummary when creating a new page,
                 overrides -summary in this case
 -minor          set minor edit flag on page edits
--showdiff       show difference between pag and page to upload; it forces
+-showdiff       show difference between page and page to upload; it forces
                 -always=False; default to False.
 
 If the page to be uploaded already exists:
