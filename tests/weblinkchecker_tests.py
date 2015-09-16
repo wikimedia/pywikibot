@@ -19,12 +19,12 @@ else:
 
 from scripts import weblinkchecker
 
-from tests.aspects import unittest, require_modules, TestCase, TestCaseBase
+from tests.aspects import unittest, require_modules, TestCase
 from tests import weblib_tests
 
 
 @require_modules('memento_client')
-class MementoTestBase(TestCaseBase):
+class MementoTestCase(TestCase):
 
     """Test memento client."""
 
@@ -39,7 +39,7 @@ class MementoTestBase(TestCaseBase):
             self.timegate_uri)
 
 
-class WeblibTestMementoInternetArchive(MementoTestBase, weblib_tests.TestInternetArchive):
+class WeblibTestMementoInternetArchive(MementoTestCase, weblib_tests.TestInternetArchive):
 
     """Test InternetArchive Memento using old weblib tests."""
 
@@ -47,7 +47,7 @@ class WeblibTestMementoInternetArchive(MementoTestBase, weblib_tests.TestInterne
     hostname = timegate_uri
 
 
-class WeblibTestMementoWebCite(MementoTestBase, weblib_tests.TestWebCite):
+class WeblibTestMementoWebCite(MementoTestCase, weblib_tests.TestWebCite):
 
     """Test WebCite Memento using old weblib tests."""
 
@@ -55,7 +55,7 @@ class WeblibTestMementoWebCite(MementoTestBase, weblib_tests.TestWebCite):
     hostname = timegate_uri
 
 
-class TestMementoWebCite(MementoTestBase):
+class TestMementoWebCite(MementoTestCase):
 
     """New WebCite Memento tests."""
 
@@ -70,7 +70,7 @@ class TestMementoWebCite(MementoTestBase):
         self.assertEqual(parsed.netloc, 'www.webcitation.org')
 
 
-class TestMementoDefault(MementoTestBase, TestCase):
+class TestMementoDefault(MementoTestCase):
 
     """Test InternetArchive is default Memento timegate."""
 

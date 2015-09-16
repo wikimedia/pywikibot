@@ -657,7 +657,14 @@ class MetaTestCaseClass(type):
                  for attr_name in dct
                  if attr_name.startswith('test')]
 
-        dct['abstract_class'] = len(tests) == 0
+        base_tests = []
+        if not tests:
+            for base in bases:
+                base_tests += [attr_name
+                               for attr_name, attr in base.__dict__.items()
+                               if attr_name.startswith('test') and callable(attr)]
+
+        dct['abstract_class'] = not tests and not base_tests
 
         # Bail out if it is the abstract class.
         if dct['abstract_class']:
@@ -716,8 +723,7 @@ class MetaTestCaseClass(type):
         if (('sites' not in dct and 'site' not in dct) or
                 ('site' in dct and not dct['site'])):
             # Prevent use of pywikibot.Site
-            if all(not issubclass(base, DisableSiteMixin) for base in bases):
-                bases = tuple([DisableSiteMixin] + list(bases))
+            bases = cls.add_base(bases, DisableSiteMixin)
 
             # 'pwb' tests will _usually_ require a site.  To ensure the
             # test class dependencies are declarative, this requires the
@@ -751,29 +757,29 @@ class MetaTestCaseClass(type):
         # The following section is only processed if the test uses sites.
 
         if 'dry' in dct and dct['dry']:
-            bases = tuple([DisconnectedSiteMixin] + list(bases))
+            bases = cls.add_base(bases, DisconnectedSiteMixin)
             del dct['net']
         else:
             dct['net'] = True
 
         if 'cacheinfo' in dct and dct['cacheinfo']:
-            bases = tuple([CacheInfoMixin] + list(bases))
+            bases = cls.add_base(bases, CacheInfoMixin)
 
         if 'cached' in dct and dct['cached']:
-            bases = tuple([ForceCacheMixin] + list(bases))
+            bases = cls.add_base(bases, ForceCacheMixin)
 
         if 'net' in dct and dct['net']:
-            bases = tuple([CheckHostnameMixin] + list(bases))
+            bases = cls.add_base(bases, CheckHostnameMixin)
         else:
             assert not hostnames, 'net must be True with hostnames defined'
 
         if 'write' in dct and dct['write']:
             if 'user' not in dct:
                 dct['user'] = True
-            bases = tuple([SiteWriteMixin] + list(bases))
+            bases = cls.add_base(bases, SiteWriteMixin)
 
         if ('user' in dct and dct['user']) or ('sysop' in dct and dct['sysop']):
-            bases = tuple([RequireUserMixin] + list(bases))
+            bases = cls.add_base(bases, RequireUserMixin)
 
         for test in tests:
             test_func = dct[test]
@@ -806,6 +812,13 @@ class MetaTestCaseClass(type):
             del dct[test]
 
         return super(MetaTestCaseClass, cls).__new__(cls, name, bases, dct)
+
+    @staticmethod
+    def add_base(bases, subclass):
+        """Return a tuple of bases with the subclasses added if not already."""
+        if not any(issubclass(base, subclass) for base in bases):
+            bases = (subclass, ) + bases
+        return bases
 
 
 @add_metaclass
