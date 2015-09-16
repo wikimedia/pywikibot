@@ -2591,7 +2591,6 @@ def main(*args):
                 [hintlessPageGen, gen2])
         restoredFiles.append(dumpFileName)
 
-    site.login()
     bot = InterwikiBot()
 
     if not hintlessPageGen:
