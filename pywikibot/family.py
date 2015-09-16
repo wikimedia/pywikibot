@@ -952,7 +952,7 @@ class Family(object):
 
         Returns a string, not a compiled regular expression object.
 
-        This reads from the family file, and ''not'' from
+        This reads from the family file, and **not** from
         [[MediaWiki:Linktrail]], because the MW software currently uses a
         built-in linktrail from its message files and ignores the wiki
         value.

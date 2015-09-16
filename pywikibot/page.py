@@ -4386,6 +4386,7 @@ class Claim(Property):
         Check whether the Claim's target is equal to specified value.
 
         The function checks for:
+
         - ItemPage ID equality
         - WbTime year equality
         - Coordinate equality, regarding precision

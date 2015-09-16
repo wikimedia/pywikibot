@@ -280,9 +280,10 @@ def init_handlers(strm=None):
     user interfaces (GUIs) without modifying the core bot code.
 
     The following output levels are defined:
+
      - DEBUG: only for file logging; debugging messages.
      - STDOUT: output that must be sent to sys.stdout (for bots that may
-         have their output redirected to a file or other destination).
+       have their output redirected to a file or other destination).
      - VERBOSE: optional progress information for display to user.
      - INFO: normal (non-optional) progress information for display to user.
      - INPUT: prompts requiring user response.
@@ -290,7 +291,7 @@ def init_handlers(strm=None):
      - ERROR: user error messages.
      - CRITICAL: fatal error messages.
 
-    Accordingly, do ''not'' use print statements in bot code; instead,
+    Accordingly, do **not** use print statements in bot code; instead,
     use pywikibot.output function.
 
     @param strm: Output stream. If None, re-uses the last stream if one
@@ -1498,9 +1499,11 @@ class BaseBot(object):
         and puts the page if needed.
 
         Option used:
+
         * 'always'
 
         Keyword args used:
+
         * 'async' - passed to page.save
         * 'summary' - passed to page.save
         * 'show_diff' - show changes between oldtext and newtext (enabled)
