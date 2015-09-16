@@ -1507,6 +1507,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
 
     def __setattr__(self, attr, value):
         """Set the value of the wrapped module."""
+        self.__dict__[attr] = value
         setattr(self._module, attr, value)
 
     def __getattr__(self, attr):
