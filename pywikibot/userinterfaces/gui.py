@@ -33,6 +33,8 @@ from idlelib.MultiCall import MultiCallCreator
 
 import pywikibot
 
+from pywikibot import __url__
+
 
 class TextEditor(ScrolledText):
 
@@ -517,8 +519,7 @@ class Tkdialog:
         except ImportError:
             pywikibot.warning('This script requires ImageTk from the'
                               'Python Imaging Library (PIL).\n'
-                              'See: https://www.mediawiki.org/wiki/'
-                              'Manual:Pywikibot/flickrripper.py')
+                              'See: {0}/flickrripper.py'.format(__url__))
             raise
 
         image = Image.open(photo)

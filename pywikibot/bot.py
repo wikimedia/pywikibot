@@ -49,7 +49,7 @@ used.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
@@ -75,12 +75,6 @@ from warnings import warn
 
 _logger = "bot"
 
-# logging levels
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
-STDOUT = 16
-VERBOSE = 18
-INPUT = 25
-
 import pywikibot
 
 from pywikibot import backports
@@ -92,7 +86,18 @@ from pywikibot.bot_choice import (  # noqa: unused imports
     ListOption, HighlightContextOption,
     ChoiceException, QuitKeyboardInterrupt,
 )
+from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING  # noqa: unused
+from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
+from pywikibot.logging import (
+    add_init_routine,
+    debug, error, exception, log, output, stdout, warning,
+)
+from pywikibot.logging import critical  # noqa: unused
 from pywikibot.tools import deprecated, deprecated_args, PY2, PYTHON_VERSION
+from pywikibot.tools._logging import (
+    LoggingFormatter as _LoggingFormatter,
+    RotatingFileHandler,
+)
 
 if not PY2:
     unicode = str
@@ -130,119 +135,13 @@ class UnhandledAnswer(Exception):
         self.stop = stop
 
 
-# Logging module configuration
-class RotatingFileHandler(logging.handlers.RotatingFileHandler):
+class LoggingFormatter(_LoggingFormatter):
 
-    """Modified RotatingFileHandler supporting unlimited amount of backups."""
+    """Logging formatter that uses config.console_encoding."""
 
-    def doRollover(self):
-        """
-        Modified naming system for logging files.
-
-        Overwrites the default Rollover renaming by inserting the count number
-        between file name root and extension. If backupCount is >= 1, the system
-        will successively create new files with the same pathname as the base
-        file, but with inserting ".1", ".2" etc. in front of the filename
-        suffix. For example, with a backupCount of 5 and a base file name of
-        "app.log", you would get "app.log", "app.1.log", "app.2.log", ...
-        through to "app.5.log". The file being written to is always "app.log" -
-        when it gets filled up, it is closed and renamed to "app.1.log", and if
-        files "app.1.log", "app.2.log" etc. already exist, then they are
-        renamed to "app.2.log", "app.3.log" etc. respectively.
-        If backupCount is == -1 do not rotate but create new numbered filenames.
-        The newest file has the highest number except some older numbered files
-        where deleted and the bot was restarted. In this case the ordering
-        starts from the lowest available (unused) number.
-
-        """
-        if self.stream:
-            self.stream.close()
-            self.stream = None
-        root, ext = os.path.splitext(self.baseFilename)
-        if self.backupCount > 0:
-            for i in range(self.backupCount - 1, 0, -1):
-                sfn = "%s.%d%s" % (root, i, ext)
-                dfn = "%s.%d%s" % (root, i + 1, ext)
-                if os.path.exists(sfn):
-                    if os.path.exists(dfn):
-                        os.remove(dfn)
-                    os.rename(sfn, dfn)
-            dfn = "%s.1%s" % (root, ext)
-            if os.path.exists(dfn):
-                os.remove(dfn)
-            os.rename(self.baseFilename, dfn)
-        elif self.backupCount == -1:
-            if not hasattr(self, '_lastNo'):
-                self._lastNo = 1
-            while True:
-                fn = "%s.%d%s" % (root, self._lastNo, ext)
-                self._lastNo += 1
-                if not os.path.exists(fn):
-                    break
-            os.rename(self.baseFilename, fn)
-        self.mode = 'w'
-        self.stream = self._open()
-
-    def format(self, record):
-        """Strip trailing newlines before outputting text to file."""
-        # Warnings captured from the warnings system are not processed by
-        # logoutput(), so the 'context' variables are missing.
-        # The same context details are provided by Python 3.X, but need to
-        # be extracted from the warning message for Python <= 2.7.
-        if record.name == 'py.warnings' and 'caller_file' not in record.__dict__:
-            assert len(record.args) == 1, \
-                'Arguments for record is not correctly set'
-            msg = record.args[0]
-
-            if PY2:
-                record.pathname = msg.partition(':')[0]
-                record.lineno = msg.partition(':')[2].partition(':')[0]
-                record.module = msg.rpartition('/')[2].rpartition('.')[0]
-            else:
-                assert msg.startswith(record.pathname + ':'), \
-                    'Record argument should start with path'
-
-            record.__dict__['caller_file'] = record.pathname
-            record.__dict__['caller_name'] = record.module
-            record.__dict__['caller_line'] = record.lineno
-
-            # Remove the path and the line number, and strip the extra space
-            msg = msg.partition(':')[2].partition(':')[2].lstrip()
-            record.args = (msg,)
-
-        text = logging.handlers.RotatingFileHandler.format(self, record)
-        return text.rstrip("\r\n")
-
-
-class LoggingFormatter(logging.Formatter):
-
-    """Format LogRecords for output to file.
-
-    This formatter *ignores* the 'newline' key of the LogRecord, because
-    every record written to a file must end with a newline, regardless of
-    whether the output to the user's console does.
-
-    """
-
-    def formatException(self, ei):
-        r"""
-        Convert exception trace to unicode if necessary.
-
-        Make sure that the exception trace is converted to unicode.
-
-        L{exceptions.Error} traces are encoded in our console encoding, which
-        is needed for plainly printing them.  However, when logging them
-        using logging.exception, the Python logging module will try to use
-        these traces, and it will fail if they are console encoded strings.
-
-        Formatter.formatException also strips the trailing \n, which we need.
-        """
-        strExc = logging.Formatter.formatException(self, ei)
-
-        if PY2 and isinstance(strExc, bytes):
-            return strExc.decode(config.console_encoding) + '\n'
-        else:
-            return strExc + '\n'
+    def __init__(self, fmt=None, datefmt=None):
+        """Constructor setting underlying encoding to console_encoding."""
+        _LoggingFormatter.__init__(self, fmt, datefmt, config.console_encoding)
 
 
 # Initialize the handlers and formatters for the logging system.
@@ -456,162 +355,7 @@ def writelogheader():
     log(u'=== ' * 14)
 
 
-# User output/logging functions
-
-# Six output functions are defined. Each requires a unicode or string
-# argument.  All of these functions generate a message to the log file if
-# logging is enabled ("-log" or "-debug" command line arguments).
-
-# The functions output(), stdout(), warning(), and error() all display a
-# message to the user through the logger object; the only difference is the
-# priority level,  which can be used by the application layer to alter the
-# display. The stdout() function should be used only for data that is
-# the "result" of a script, as opposed to information messages to the
-# user.
-
-# The function log() by default does not display a message to the user, but
-# this can be altered by using the "-verbose" command line option.
-
-# The function debug() only logs its messages, they are never displayed on
-# the user console. debug() takes a required second argument, which is a
-# string indicating the debugging layer.
-
-def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
-              **kwargs):
-    """Format output and send to the logging module.
-
-    Helper function used by all the user-output convenience functions.
-
-    """
-    if _logger:
-        logger = logging.getLogger("pywiki." + _logger)
-    else:
-        logger = logging.getLogger("pywiki")
-
-    # make sure logging system has been initialized
-    if not _handlers_initialized:
-        init_handlers()
-
-    # frame 0 is logoutput() in this module,
-    # frame 1 is the convenience function (output(), etc.)
-    # frame 2 is whatever called the convenience function
-    frame = sys._getframe(2)
-
-    module = os.path.basename(frame.f_code.co_filename)
-    context = {'caller_name': frame.f_code.co_name,
-               'caller_file': module,
-               'caller_line': frame.f_lineno,
-               'newline': ("\n" if newline else "")}
-
-    if decoder:
-        text = text.decode(decoder)
-    elif not isinstance(text, unicode):
-        if not isinstance(text, str):
-            # looks like text is a non-text object.
-            # Maybe it has a __unicode__ builtin ?
-            # (allows to print Page, Site...)
-            text = unicode(text)
-        else:
-            try:
-                text = text.decode('utf-8')
-            except UnicodeDecodeError:
-                text = text.decode('iso8859-1')
-
-    logger.log(_level, text, extra=context, **kwargs)
-
-
-def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
-    r"""Output a message to the user via the userinterface.
-
-    Works like print, but uses the encoding used by the user's console
-    (console_encoding in the configuration file) instead of ASCII.
-
-    If decoder is None, text should be a unicode string. Otherwise it
-    should be encoded in the given encoding.
-
-    If newline is True, a line feed will be added after printing the text.
-
-    If toStdout is True, the text will be sent to standard output,
-    so that it can be piped to another process. All other text will
-    be sent to stderr. See: https://en.wikipedia.org/wiki/Pipeline_%28Unix%29
-
-    text can contain special sequences to create colored output. These
-    consist of the escape character \03 and the color name in curly braces,
-    e. g. \03{lightpurple}. \03{default} resets the color.
-
-    Other keyword arguments are passed unchanged to the logger; so far, the
-    only argument that is useful is "exc_info=True", which causes the
-    log message to include an exception traceback.
-
-    """
-    if toStdout:  # maintained for backwards-compatibity only
-        logoutput(text, decoder, newline, STDOUT, **kwargs)
-    else:
-        logoutput(text, decoder, newline, INFO, **kwargs)
-
-
-def stdout(text, decoder=None, newline=True, **kwargs):
-    """Output script results to the user via the userinterface."""
-    logoutput(text, decoder, newline, STDOUT, **kwargs)
-
-
-def warning(text, decoder=None, newline=True, **kwargs):
-    """Output a warning message to the user via the userinterface."""
-    logoutput(text, decoder, newline, WARNING, **kwargs)
-
-
-def error(text, decoder=None, newline=True, **kwargs):
-    """Output an error message to the user via the userinterface."""
-    logoutput(text, decoder, newline, ERROR, **kwargs)
-
-
-def log(text, decoder=None, newline=True, **kwargs):
-    """Output a record to the log file."""
-    logoutput(text, decoder, newline, VERBOSE, **kwargs)
-
-
-def critical(text, decoder=None, newline=True, **kwargs):
-    """Output a critical record to the log file."""
-    logoutput(text, decoder, newline, CRITICAL, **kwargs)
-
-
-def debug(text, layer, decoder=None, newline=True, **kwargs):
-    """Output a debug record to the log file.
-
-    @param layer: The name of the logger that text will be sent to.
-    """
-    logoutput(text, decoder, newline, DEBUG, layer, **kwargs)
-
-
-def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
-    """Output an error traceback to the user via the userinterface.
-
-    Use directly after an 'except' statement::
-
-        ...
-        except:
-            pywikibot.exception()
-        ...
-
-    or alternatively::
-
-        ...
-        except Exception as e:
-            pywikibot.exception(e)
-        ...
-
-    @param tb: Set to True in order to output traceback also.
-    """
-    if isinstance(msg, BaseException):
-        exc_info = 1
-    else:
-        exc_info = sys.exc_info()
-        msg = u'%s: %s' % (repr(exc_info[1]).split('(')[0],
-                           unicode(exc_info[1]).strip())
-    if tb:
-        kwargs['exc_info'] = exc_info
-    logoutput(msg, decoder, newline, ERROR, **kwargs)
-
+add_init_routine(init_handlers)
 
 # User input functions
 

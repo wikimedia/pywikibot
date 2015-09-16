@@ -32,15 +32,7 @@ if not PY2:
 else:
     import Queue
 
-
-def print_debug(msg, *args, **kwargs):
-    """Simple debug routine."""
-    print(msg)
-
-
-# This variable uses the builtin print function.
-# pywikibot updates it to use logging in bot.init_handlers()
-debug = print_debug
+from pywikibot.logging import debug
 
 _logger = 'tools'
 
