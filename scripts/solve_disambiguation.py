@@ -91,8 +91,9 @@ from pywikibot.tools import first_lower, first_upper as firstcap
 from pywikibot import pagegenerators, config, i18n
 from pywikibot.bot import (
     Bot, QuitKeyboardInterrupt,
-    StandardOption, HighlightContextOption, ListOption,
+    StandardOption, HighlightContextOption, ListOption, OutputProxyOption,
 )
+from pywikibot.tools.formatter import SequenceOutputter
 
 # Disambiguation Needed template
 dn_template = {
@@ -452,28 +453,14 @@ class PrimaryIgnoreManager(object):
                 pass
 
 
-class ListAlternativesOption(StandardOption):
-
-    """List the alternatives."""
-
-    def __init__(self, option, shortcut, bot):
-        """Constructor."""
-        super(ListAlternativesOption, self).__init__(option, shortcut, False)
-        self._bot = bot
-
-    def result(self, value):
-        """List the alternatives."""
-        self._bot.listAlternatives()
-
-
-class AddAlternativeOption(ListAlternativesOption):
+class AddAlternativeOption(OutputProxyOption):
 
     """Add a new alternative."""
 
     def result(self, value):
         """Add the alternative and then list them."""
         newAlternative = pywikibot.input(u'New alternative:')
-        self._bot.alternatives.append(newAlternative)
+        self._outputter.sequence.append(newAlternative)
         super(AddAlternativeOption, self).result(value)
 
 
@@ -763,8 +750,11 @@ class DisambiguationRobot(Bot):
                 if not edited:
                     options += [ShowPageOption('show disambiguation page', 'd',
                                                m.start(), disambPage)]
-                options += [ListAlternativesOption('list', 'l', self),
-                            AddAlternativeOption('add new', 'a', self)]
+                options += [
+                    OutputProxyOption('list', 'l',
+                                      SequenceOutputter(self.alternatives)),
+                    AddAlternativeOption('add new', 'a',
+                                         SequenceOutputter(self.alternatives))]
                 if edited:
                     options += [StandardOption('save in this form', 'x')]
 
@@ -1054,7 +1044,7 @@ u"Page does not exist, using the first link in page %s."
                 self.alternatives.sort(key=lambda x: x.lower())
             else:
                 self.alternatives.sort()
-            self.listAlternatives()
+            SequenceOutputter(self.alternatives).output()
 
             gen = ReferringPageGeneratorWithIgnore(disambPage, self.primary,
                                                    minimum=self.minimum)

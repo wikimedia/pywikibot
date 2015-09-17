@@ -86,7 +86,7 @@ from pywikibot import daemonize
 from pywikibot import version
 from pywikibot.bot_choice import (  # noqa: unused imports
     Option, StandardOption, NestedOption, IntegerOption, ContextOption,
-    ListOption, HighlightContextOption,
+    ListOption, OutputProxyOption, HighlightContextOption,
     ChoiceException, QuitKeyboardInterrupt,
 )
 from pywikibot.logging import CRITICAL, ERROR, INFO, WARNING  # noqa: unused
@@ -359,6 +359,7 @@ def writelogheader():
 
 
 add_init_routine(init_handlers)
+
 
 # User input functions
 
