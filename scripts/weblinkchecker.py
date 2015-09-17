@@ -178,7 +178,19 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
         mc.timegate_uri = timegate_uri
 
     memento_info = mc.get_memento_info(url, when)
-    return memento_info.get('mementos').get('closest').get('uri')[0]
+    mementos = memento_info.get('mementos')
+    if not mementos:
+        raise Exception(
+            'mementos not found for {0} via {1}'.format(url, timegate_uri))
+    if 'closest' not in mementos:
+        raise Exception(
+            'closest memento not found for {0} via {1}'.format(
+                url, timegate_uri))
+    if 'uri' not in mementos['closest']:
+        raise Exception(
+            'closest memento uri not found for {0} via {1}'.format(
+                url, timegate_uri))
+    return mementos['closest']['uri'][0]
 
 
 def get_archive_url(url):
