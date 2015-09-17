@@ -9,9 +9,13 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import inspect
 import math
 
+from string import Formatter
+
 from pywikibot.logging import output
+from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
 class SequenceOutputter(object):
@@ -56,3 +60,63 @@ class SequenceOutputter(object):
     def output(self):
         """Output the text of the current sequence."""
         output(self.format_list())
+
+
+class _ColorFormatter(Formatter):
+
+    """Special string formatter which skips colors."""
+
+    colors = set(colors)
+
+    def __init__(self):
+        """Create new instance and store the stack depth."""
+        super(_ColorFormatter, self).__init__()
+        self._depth = len(inspect.stack())
+
+    def parse(self, format_string):
+        """Yield results similar to parse but skip colors."""
+        previous_literal = ''
+        for literal, field, spec, conv in super(_ColorFormatter, self).parse(
+                format_string):
+            if field in self.colors:
+                if spec:
+                    raise ValueError(
+                        'Color field "{0}" in "{1}" uses format spec '
+                        'information "{2}"'.format(field, format_string, spec))
+                elif conv:
+                    raise ValueError(
+                        'Color field "{0}" in "{1}" uses conversion '
+                        'information "{2}"'.format(field, format_string, conv))
+                else:
+                    if not literal or literal[-1] != '\03':
+                        literal += '\03'
+                    if '\03' in literal[:-1]:
+                        raise ValueError(r'Literal text in {0} contains '
+                                         r'\03'.format(format_string))
+                    previous_literal += literal + '{' + field + '}'
+            else:
+                if '\03' in literal:
+                    raise ValueError(r'Literal text in {0} contains '
+                                     r'\03'.format(format_string))
+                yield previous_literal + literal, field, spec, conv
+                previous_literal = ''
+        if previous_literal:
+            yield previous_literal, None, None, None
+
+    def vformat(self, format_string, args, kwargs):
+        """Return the normal format result but verify no colors are keywords."""
+        if self.colors.intersection(kwargs):  # kwargs use colors
+            raise ValueError('Keyword argument(s) use valid color(s): ' +
+                             '", "'.join(self.colors.intersection(kwargs)))
+        return super(_ColorFormatter, self).vformat(format_string, args,
+                                                    kwargs)
+
+
+def color_format(text, *args, **kwargs):
+    r"""
+    Do C{str.format} without having to worry about colors.
+
+    It is automatically adding \03 in front of color fields so it's
+    unnecessary to add them manually. Any other \03 in the text is disallowed.
+    """
+    return _ColorFormatter().format(text, *args, **kwargs)

@@ -31,6 +31,50 @@ class TestListOutputter(TestCase):
         self.assertEqual(outputter.format_list(), '\nfoo\nbar\n')
 
 
+class TestColorFormat(TestCase):
+
+    """Test color_format function in bot module."""
+
+    net = False
+
+    def test_no_colors(self):
+        """Test without colors in template string."""
+        self.assertEqual(formatter.color_format('42'), '42')
+        self.assertEqual(formatter.color_format('{0}', 42), '42')
+        self.assertEqual(formatter.color_format('{ans}', ans=42), '42')
+
+    def test_colors(self):
+        """Test with colors in template string."""
+        self.assertEqual(formatter.color_format('{0}{black}', 42),
+                         '42\03{black}')
+        self.assertEqual(formatter.color_format('{ans}{black}', ans=42),
+                         '42\03{black}')
+        self.assertRaisesRegex(
+            ValueError, r'.*conversion.*', formatter.color_format,
+            '{0}{black!r}', 42)
+        self.assertRaisesRegex(
+            ValueError, r'.*format spec.*', formatter.color_format,
+            '{0}{black:03}', 42)
+
+    def test_marker(self):
+        r"""Test that the \03 marker is only allowed in front of colors."""
+        self.assertEqual(formatter.color_format('{0}\03{black}', 42),
+                         '42\03{black}')
+        # literal before a normal field
+        self.assertRaisesRegex(
+            ValueError, r'.*\\03', formatter.color_format,
+            '\03{0}{black}', 42)
+        # literal before a color field
+        self.assertRaisesRegex(
+            ValueError, r'.*\\03', formatter.color_format,
+            '{0}\03before{black}', 42)
+
+    def test_color_kwargs(self):
+        """Test with a color as keyword argument."""
+        self.assertRaises(ValueError,
+                          formatter.color_format, '{aqua}{black}', aqua=42)
+
+
 if __name__ == '__main__':
     try:
         unittest.main()

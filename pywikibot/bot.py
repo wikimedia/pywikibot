@@ -101,6 +101,7 @@ from pywikibot.tools._logging import (
     LoggingFormatter as _LoggingFormatter,
     RotatingFileHandler,
 )
+from pywikibot.tools.formatter import color_format
 
 if not PY2:
     unicode = str
@@ -742,17 +743,16 @@ class InteractiveReplace(object):
                              '\03{default}' + text[rng[1]: rng[1] + self.context])
             question = 'Should the link '
         else:
-            question = 'Should the link \03{{lightred}}{0}\03{{default}} '
+            question = 'Should the link {lightred}{0}{default} '
 
         if self._new is False:
             question += 'be unlinked?'
         else:
-            question += ('target to '
-                         '\03{{{{lightpurple}}}}{0}\03{{{{default}}}}?').format(
-                             self._new.canonical_title())
+            question += color_format('target to {lightpurple}{0}{default}?',
+                                     self._new.canonical_title())
 
         choice = pywikibot.input_choice(
-            question.format(self._old.canonical_title()),
+            color_format(question, self._old.canonical_title()),
             choices, default=self._default, automatic_quit=self._quit)
 
         return self.handle_answer(choice)
