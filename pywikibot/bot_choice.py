@@ -125,6 +125,20 @@ class StandardOption(Option):
                 self.option.lower() == value.lower())
 
 
+class OutputProxyOption(OutputOption, StandardOption):
+
+    """An option which calls output of the given output class."""
+
+    def __init__(self, option, shortcut, output):
+        """Create a new option for the given sequence."""
+        super(OutputProxyOption, self).__init__(option, shortcut)
+        self._outputter = output
+
+    def output(self):
+        """Output the contents."""
+        self._outputter.output()
+
+
 class NestedOption(OutputOption, StandardOption):
 
     """
