@@ -124,7 +124,9 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
 
     text can contain special sequences to create colored output. These
     consist of the escape character \03 and the color name in curly braces,
-    e. g. \03{lightpurple}. \03{default} resets the color.
+    e. g. \03{lightpurple}. \03{default} resets the color. By using the
+    color_format method from pywikibot.tools.formatter, the escape character
+    may be omitted.
 
     Other keyword arguments are passed unchanged to the logger; so far, the
     only argument that is useful is "exc_info=True", which causes the

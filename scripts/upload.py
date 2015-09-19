@@ -70,6 +70,7 @@ from pywikibot.bot import suggest_help, BaseBot
 from pywikibot.tools import (
     deprecated
 )
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
@@ -374,9 +375,9 @@ class UploadRobot(BaseBot):
 
         while not self.description or self.verifyDescription:
             if not self.description:
-                pywikibot.output(
-                    u'\03{lightred}It is not possible to upload a file '
-                    'without a summary/description.\03{default}')
+                pywikibot.output(color_format(
+                    '{lightred}It is not possible to upload a file '
+                    'without a summary/description.{default}'))
 
             assert not always
             # if no description, default is 'yes'

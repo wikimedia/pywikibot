@@ -362,6 +362,7 @@ from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
 from pywikibot import titletranslate
 from pywikibot.bot import ListOption, StandardOption
 from pywikibot.tools import first_upper
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -1931,8 +1932,8 @@ class Subject(interwiki_graph.Subject):
             return False
 
         # Show a message in purple.
-        pywikibot.output(
-            u"\03{lightpurple}Updating links on page %s.\03{default}" % page)
+        pywikibot.output(color_format(
+            '{lightpurple}Updating links on page {0}.{default}', page))
         pywikibot.output(u"Changes to be made: %s" % mods)
         oldtext = page.get()
         template = (page.namespace() == 10)

@@ -79,6 +79,7 @@ import time
 
 import pywikibot
 from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.tools.formatter import color_format
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -216,8 +217,8 @@ def add_text(page, addText, summary=None, regexSkip=None,
     else:
         newtext = addText + config.line_separator + text
     if putText and text != newtext:
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title())
+        pywikibot.output(color_format(
+            '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
         pywikibot.showDiff(text, newtext)
     # Let's put the changes.
     while True:

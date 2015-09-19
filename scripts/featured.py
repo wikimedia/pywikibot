@@ -57,7 +57,7 @@ This script understands various command-line arguments:
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2005-2014
+# (C) Pywikibot team, 2005-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -73,6 +73,7 @@ import pywikibot
 from pywikibot import i18n, textlib, config
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.config2 import LS  # line separator
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     unichr = chr
@@ -384,9 +385,9 @@ class FeaturedBot(pywikibot.Bot):
             elif p.namespace() == 1 and site.code != 'el':
                 articles.append(pywikibot.Page(p.site,
                                 p.title(withNamespace=False)))
-        pywikibot.output(
-            '\03{lightred}** %s has %i %s articles\03{default}'
-            % (site, len(articles), task))
+        pywikibot.output(color_format(
+            '{lightred}** {0} has {1} {2} articles{default}',
+            site, len(articles), task))
         while articles:
             p = articles.pop(0)
             if p.title() < self.getOption('afterpage'):

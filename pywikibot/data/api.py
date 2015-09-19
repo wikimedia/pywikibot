@@ -30,6 +30,7 @@ from warnings import warn
 import pywikibot
 from pywikibot import config, login
 from pywikibot.tools import MediaWikiVersion, deprecated, itergroup, ip, PY2
+from pywikibot.tools.formatter import color_format
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername, Error
 )
@@ -1775,9 +1776,9 @@ class Request(MutableMapping):
     def _simulate(self, action):
         """Simulate action."""
         if action and config.simulate and (self.write or action in config.actions_to_block):
-            pywikibot.output(
-                u'\03{lightyellow}SIMULATION: %s action blocked.\03{default}'
-                % action)
+            pywikibot.output(color_format(
+                '{lightyellow}SIMULATION: {0} action blocked.{default}',
+                action))
             return {action: {'result': 'Success', 'nochange': ''}}
 
     def _is_wikibase_error_retryable(self, error):

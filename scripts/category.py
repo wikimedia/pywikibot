@@ -133,6 +133,7 @@ from pywikibot.bot import (
 from pywikibot.tools import (
     deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive
 )
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -891,10 +892,10 @@ class CategoryTidyRobot(pywikibot.Bot):
         pywikibot.output(u'')
         # Show the title of the page where the link was found.
         # Highlight the title in purple.
-        pywikibot.output(
-            u'Treating page \03{lightpurple}%s\03{default}, '
-            u'currently in \03{lightpurple}%s\03{default}'
-            % (article.title(), current_cat.title()))
+        pywikibot.output(color_format(
+            'Treating page {lightpurple}{0}{default}, '
+            'currently in {lightpurple}{1}{default}',
+            article.title(), current_cat.title()))
 
         # Determine a reasonable amount of context to print
         try:

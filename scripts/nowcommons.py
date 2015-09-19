@@ -52,7 +52,7 @@ Please fix these if you are capable and motivated:
 # (C) Wikipedian, 2006-2007
 # (C) Siebrand Mazeland, 2007-2008
 # (C) xqt, 2010-2014
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -69,6 +69,7 @@ import pywikibot
 
 from pywikibot import i18n, Bot
 from pywikibot import pagegenerators as pg
+from pywikibot.tools.formatter import color_format
 
 from scripts.image import ImageRobot as ImageBot
 
@@ -252,8 +253,9 @@ class NowCommonsDeleteBot(Bot):
                     continue
                 url_local = x.group('urllocal')
                 url_commons = x.group('urlcommons')
-                pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                                 % image_local)
+                pywikibot.output(color_format(
+                    '\n\n>>> {lightpurple}{0}{default} <<<',
+                    image_local))
                 pywikibot.output(u'Local: %s\nCommons: %s\n'
                                  % (url_local, url_commons))
                 webbrowser.open(url_local, 0, 1)
@@ -353,16 +355,16 @@ class NowCommonsDeleteBot(Bot):
                  commonsImagePage.title(withNamespace=False):
                     usingPages = list(localImagePage.usingPages())
                     if usingPages and usingPages != [localImagePage]:
-                        pywikibot.output(
-                            u'\"\03{lightred}%s\03{default}\" is still used in %i pages.'
-                            % (localImagePage.title(withNamespace=False),
-                               len(usingPages)))
+                        pywikibot.output(color_format(
+                            '"{lightred}{0}{default}" is still used in {1} pages.',
+                            localImagePage.title(withNamespace=False),
+                            len(usingPages)))
                         if self.getOption('replace') is True:
-                                pywikibot.output(
-                                    u'Replacing \"\03{lightred}%s\03{default}\" by \
-                                    \"\03{lightgreen}%s\03{default}\".'
-                                    % (localImagePage.title(withNamespace=False),
-                                       commonsImagePage.title(withNamespace=False)))
+                                pywikibot.output(color_format(
+                                    'Replacing "{lightred}{0}{default}" by '
+                                    '"{lightgreen}{1}{default}\".',
+                                    localImagePage.title(withNamespace=False),
+                                    commonsImagePage.title(withNamespace=False)))
                                 bot = ImageBot(
                                     pg.FileLinksGenerator(localImagePage),
                                     localImagePage.title(withNamespace=False),
@@ -399,9 +401,10 @@ class NowCommonsDeleteBot(Bot):
                             pywikibot.output(u'Please change them manually.')
                         continue
                     else:
-                        pywikibot.output(
-                            u'No page is using \"\03{lightgreen}%s\03{default}\" anymore.'
-                            % localImagePage.title(withNamespace=False))
+                        pywikibot.output(color_format(
+                            'No page is using "{lightgreen}{0}{default}" '
+                            'anymore.',
+                            localImagePage.title(withNamespace=False)))
                 commonsText = commonsImagePage.get()
                 if self.getOption('replaceonly') is False:
                     if sha1 == commonsImagePage.latest_file_info.sha1:
@@ -415,13 +418,13 @@ class NowCommonsDeleteBot(Bot):
                                 old versions are not worth keeping.""")
                             continue
                         if self.getOption('always') is False:
-                            pywikibot.output(
-                                u'\n\n>>>> Description on \03{lightpurple}%s\03{default} <<<<\n'
-                                % page.title())
+                            format_str = color_format(
+                                '\n\n>>>> Description on {lightpurple}%s'
+                                '{default} <<<<\n')
+                            pywikibot.output(format_str % page.title())
                             pywikibot.output(localImagePage.get())
-                            pywikibot.output(
-                                u'\n\n>>>> Description on \03{lightpurple}%s\03{default} <<<<\n'
-                                % commonsImagePage.title())
+                            pywikibot.output(format_str %
+                                             commonsImagePage.title())
                             pywikibot.output(commonsText)
                             if pywikibot.input_yn(
                                     u'Does the description on Commons contain '

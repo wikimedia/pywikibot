@@ -89,6 +89,7 @@ import crontab
 import pywikibot
 # pywikibot.botirc depends on https://pypi.python.org/pypi/irc
 import pywikibot.botirc
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     import _thread as thread
@@ -126,7 +127,8 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
     """WikiUserInterface bot."""
 
     def __init__(self, *arg):
-        pywikibot.output(u'\03{lightgreen}* Initialization of bot\03{default}')
+        pywikibot.output(color_format(
+            '{lightgreen}* Initialization of bot{default}'))
 
         pywikibot.botirc.IRCBot.__init__(self, *arg)
 

@@ -153,6 +153,7 @@ from pywikibot import editor as editarticle
 from pywikibot import fixes
 
 from pywikibot.tools import chars, deprecated_args
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -712,8 +713,8 @@ class ReplaceRobot(Bot):
                                                                 site=page.site)
                 # Show the title of the page we're working on.
                 # Highlight the title in purple.
-                pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                                 % page.title())
+                pywikibot.output(color_format(
+                    '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
                 pywikibot.showDiff(original_text, new_text)
                 if self.getOption('always'):
                     break

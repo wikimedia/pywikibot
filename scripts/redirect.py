@@ -85,6 +85,7 @@ import sys
 import datetime
 import pywikibot
 from pywikibot import i18n, xmlreader, Bot
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -406,8 +407,8 @@ class RedirectRobot(Bot):
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         done = not self.getOption('delete')
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % redir_page.title())
+        pywikibot.output(color_format(
+            '\n\n>>> {lightpurple}{0}{default} <<<', redir_page.title()))
         try:
             targetPage = redir_page.getRedirectTarget()
         except pywikibot.IsNotRedirectPage:
@@ -531,8 +532,8 @@ class RedirectRobot(Bot):
             redir = redir_name
         # Show the title of the page we're working on.
         # Highlight the title in purple.
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % redir.title())
+        pywikibot.output(color_format(
+            '\n\n>>> {lightpurple}{0}{default} <<<', redir.title()))
         newRedir = redir
         redirList = []  # bookkeeping to detect loops
         while True:
