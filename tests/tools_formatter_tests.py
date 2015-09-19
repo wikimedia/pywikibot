@@ -97,6 +97,13 @@ class TestColorFormat(TestCase):
         self.assertRaises(TypeError, formatter.color_format, b'{0}', 'a')
         self.assertRaises(TypeError, formatter.color_format, b'{black}{0}', 'a')
 
+    def test_variant_colors(self):
+        """Test variant colors with {color} parameter."""
+        self.assert_format('{0}{color}', '42\03{black}', 42, color='black')
+        self.assert_format('{ans}{color}', '42\03{black}', ans=42,
+                           color='black')
+        self.assert_format('{color}', '42', color=42)
+
 
 if __name__ == '__main__':
     try:
