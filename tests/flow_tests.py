@@ -11,19 +11,15 @@ __version__ = '$Id$'
 
 from pywikibot.exceptions import NoPage
 from pywikibot.flow import Board, Topic, Post
-from pywikibot.tools import PY2
+from pywikibot.tools import UnicodeType as unicode
 
 from tests.aspects import (
     TestCase,
 )
-
 from tests.basepage_tests import (
     BasePageMethodsTestBase,
     BasePageLoadRevisionsCachingTestBase,
 )
-
-if not PY2:
-    unicode = str
 
 
 class TestBoardBasePageMethods(BasePageMethodsTestBase):

@@ -10,15 +10,16 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 from datetime import datetime
-import sys
+
 import pywikibot
 import pywikibot.page
-from pywikibot.textlib import TimeStripper
-from scripts import archivebot
-from tests.aspects import unittest, TestCase
 
-if sys.version_info[0] > 2:
-    basestring = (str,)
+from pywikibot.textlib import TimeStripper
+from pywikibot.tools import StringTypes as basestring
+
+from scripts import archivebot
+
+from tests.aspects import unittest, TestCase
 
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,

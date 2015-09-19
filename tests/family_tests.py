@@ -9,11 +9,11 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-from pywikibot.family import Family, SingleSiteFamily
-from pywikibot.exceptions import UnknownFamily
-from pywikibot.tools import PY2
-
 import pywikibot.site
+
+from pywikibot.exceptions import UnknownFamily
+from pywikibot.family import Family, SingleSiteFamily
+from pywikibot.tools import StringTypes as basestring
 
 from tests.aspects import (
     unittest,
@@ -22,9 +22,6 @@ from tests.aspects import (
     PatchingTestCase,
 )
 from tests.utils import DrySite
-
-if not PY2:
-    basestring = (str, )
 
 
 class TestFamily(TestCase):

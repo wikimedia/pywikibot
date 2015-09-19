@@ -11,12 +11,15 @@ __version__ = '$Id$'
 import os
 import sys
 
+from pywikibot.tools import (
+    PY2,
+    PYTHON_VERSION,
+    StringTypes,
+)
+
 from tests import _root_dir
 from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import allowed_failure, execute_pwb, add_metaclass
-
-if sys.version_info[0] > 2:
-    basestring = (str, )
 
 scripts_path = os.path.join(_root_dir, 'scripts')
 
@@ -36,11 +39,11 @@ script_deps = {
     'weblinkchecker.py': ['memento_client'],
 }
 
-if sys.version_info < (2, 7):
+if PYTHON_VERSION < (2, 7):
     script_deps['replicate_wiki'] = ['argparse']
     script_deps['editarticle'] = ['argparse']
 
-if sys.version_info < (3, 0):
+if PY2:
     script_deps['data_ingestion'] = ['unicodecsv']
 
 
@@ -150,7 +153,7 @@ no_args_expected_results = {
     'upload': 'ERROR: Upload error',
 }
 
-if sys.version_info[0] > 2:
+if not PY2:
     no_args_expected_results['replicate_wiki'] = (
         'error: the following arguments are required: destination')
 else:
@@ -238,7 +241,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
                 if self._results and script_name in self._results:
                     error = self._results[script_name]
-                    if isinstance(error, basestring):
+                    if isinstance(error, StringTypes):
                         stdout = None
                     else:
                         stdout, error = error

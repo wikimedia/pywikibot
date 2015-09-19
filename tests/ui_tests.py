@@ -60,16 +60,16 @@ import pywikibot
 from pywikibot.bot import (
     ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
 )
-from pywikibot.tools import PY2
+from pywikibot.tools import (
+    PY2,
+    UnicodeType as unicode,
+)
 from pywikibot.userinterfaces import (
     terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
 )
 
 from tests.aspects import TestCase
 from tests.utils import unittest, FakeModule
-
-if sys.version_info[0] > 2:
-    unicode = str
 
 
 class Stream(object):
@@ -86,7 +86,7 @@ class Stream(object):
             the patched stream.
         @type patched_streams: dict
         """
-        self._stream = io.StringIO() if sys.version_info[0] > 2 else io.BytesIO()
+        self._stream = io.StringIO() if not PY2 else io.BytesIO()
         self._name = 'std{0}'.format(name)
         self._original = getattr(sys, self._name)
         patched_streams[self._original] = self._stream
@@ -172,7 +172,7 @@ newstdout = strout._stream
 newstderr = strerr._stream
 newstdin = strin._stream
 
-if sys.version_info[0] == 2:
+if PY2:
     # In Python 2 the sys.std* streams use bytes instead of unicode
     # But this module is using unicode_literals so '…' will generate unicode
     # So it'll convert those back into bytes
@@ -229,7 +229,7 @@ class UITestCase(unittest.TestCase):
         unpatch()
 
     def _encode(self, string, encoding='utf-8'):
-        if sys.version_info[0] > 2:
+        if not PY2:
             return string
         else:
             return string.encode(encoding)

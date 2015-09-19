@@ -27,10 +27,14 @@ PY2 = (PYTHON_VERSION[0] == 2)
 
 if not PY2:
     import queue as Queue
-    basestring = (str,)
-    unicode = str
+
+    StringTypes = basestring = (str,)
+    UnicodeType = unicode = str
 else:
     import Queue
+
+    StringTypes = types.StringTypes
+    UnicodeType = types.UnicodeType
 
 from pywikibot.logging import debug
 

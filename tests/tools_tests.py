@@ -13,7 +13,6 @@ import collections
 import decimal
 import os.path
 import subprocess
-import sys
 import tempfile
 
 from pywikibot import tools
@@ -430,7 +429,7 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.strs, container=deduped, key=hash)
         self._test_dedup_str(deduped, deduper, hash)
 
-    @expected_failure_if(sys.version_info[0] >= 3)
+    @expected_failure_if(not tools.PY2)
     def test_str_id(self):
         """Test str using id as key fails on Python 3."""
         # str in Python 3 behave like objects.
