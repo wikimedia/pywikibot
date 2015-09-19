@@ -44,20 +44,26 @@ __version__ = '$Id$'
 
 import collections
 import os
+import platform
+import re
 import stat
 import sys
-import re
+import types
 
 from warnings import warn
 
-if sys.platform == 'win32':
-    if sys.version_info[0] > 2:
+from pywikibot import __url__
+from pywikibot.logging import error, output, warning
+
+OSWIN32 = (sys.platform == 'win32')
+PY2 = (sys.version_info[0] > 2)
+
+if OSWIN32:
+    if not PY2:
         import winreg
     else:
         import _winreg as winreg
 
-from pywikibot import __url__
-from pywikibot.logging import error, output, warning
 
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
@@ -287,8 +293,7 @@ def get_base_dir(test_directory=None):
         else:
             base_dir_cand = []
             home = os.path.expanduser("~")
-            if sys.platform == 'win32':
-                import platform
+            if OSWIN32:
                 win_version = int(platform.version()[0])
                 if win_version == 5:
                     sub_dir = ["Application Data"]
@@ -374,7 +379,7 @@ ignore_bot_templates = False
 # This default code should work fine, so you don't have to think about it.
 # TODO: consider getting rid of this config variable.
 try:
-    if sys.version_info[0] > 2 or not sys.stdout.encoding:
+    if not PY2 or not sys.stdout.encoding:
         console_encoding = sys.stdout.encoding
     else:
         console_encoding = sys.stdout.encoding.decode('ascii')
@@ -935,8 +940,8 @@ for _filename in _fns:
         _filestatus = os.stat(_filename)
         _filemode = _filestatus[0]
         _fileuid = _filestatus[4]
-        if sys.platform == 'win32' or _fileuid in [os.getuid(), 0]:
-            if sys.platform == 'win32' or _filemode & 0o02 == 0:
+        if OSWIN32 or _fileuid in [os.getuid(), 0]:
+            if OSWIN32 or _filemode & 0o02 == 0:
                 with open(_filename, 'rb') as f:
                     exec(compile(f.read(), _filename, 'exec'), _uc)
             else:
@@ -1032,7 +1037,7 @@ if console_encoding is None:
 
 # Fix up transliteration_target
 if transliteration_target == 'not set':
-    if sys.platform == 'win32':
+    if OSWIN32:
         transliteration_target = console_encoding
         warning(
             'Running on Windows and transliteration_target is not set.\n'
@@ -1043,10 +1048,10 @@ elif transliteration_target in ('None', 'none'):
     transliteration_target = None
 
 
-if sys.platform == 'win32' and editor is None:
+if OSWIN32 and editor is None:
     editor = _detect_win32_editor()
 
-if sys.platform == 'win32' and editor:
+if OSWIN32 and editor:
     # single character string literals from
     # https://docs.python.org/2/reference/lexical_analysis.html#string-literals
     # encode('unicode-escape') also changes Unicode characters
@@ -1080,7 +1085,6 @@ if (not ignore_file_security_warnings and
 # When called as main program, list all configuration variables
 #
 if __name__ == "__main__":
-    import types
     _all = 1
     for _arg in sys.argv[1:]:
         if _arg == "modified":
