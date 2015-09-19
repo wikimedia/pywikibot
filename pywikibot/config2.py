@@ -54,9 +54,9 @@ from warnings import warn
 
 from pywikibot import __url__
 from pywikibot.logging import error, output, warning
+from pywikibot.tools import PY2
 
 OSWIN32 = (sys.platform == 'win32')
-PY2 = (sys.version_info[0] > 2)
 
 if OSWIN32:
     if not PY2:
