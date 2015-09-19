@@ -95,7 +95,8 @@ class TextEditor(object):
         @rtype: unicode or None
         """
         if config.editor:
-            tempFilename = '%s.%s' % (tempfile.mkstemp()[1],
+            handle, tempFilename = tempfile.mkstemp()
+            tempFilename = '%s.%s' % (tempFilename,
                                       config.editor_filename_extension)
             try:
                 with codecs.open(tempFilename, 'w',
@@ -113,6 +114,7 @@ class TextEditor(object):
                         newcontent = temp_file.read()
                     return newcontent
             finally:
+                os.close(handle)
                 os.unlink(tempFilename)
 
         if isinstance(gui, ImportError):
