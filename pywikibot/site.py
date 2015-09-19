@@ -3657,10 +3657,7 @@ class APISite(BaseSite):
                 raise ValueError(
                     "loadrevisions: endid > startid with rvdir=False")
 
-        if self.has_extension('ProofreadPage'):
-            rvargs = {'type_arg': 'info|revisions|proofread'}
-        else:
-            rvargs = {'type_arg': 'info|revisions'}
+        rvargs = {'type_arg': 'info|revisions'}
 
         if getText:
             rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content|sha1"
