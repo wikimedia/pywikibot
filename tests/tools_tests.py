@@ -157,7 +157,7 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def _write_content(self, suffix):
         try:
-            fn = tempfile.mkstemp(suffix)[1]
+            fh, fn = tempfile.mkstemp(suffix)
             with tools.open_archive(fn, 'wb') as f:
                 f.write(self.original_content)
             with tools.open_archive(fn, 'rb') as f:
@@ -165,6 +165,7 @@ class OpenArchiveWriteTestCase(TestCase):
             with open(fn, 'rb') as f:
                 return f.read()
         finally:
+            os.close(fh)
             os.remove(fn)
 
     def test_invalid_modes(self):
