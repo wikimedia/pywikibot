@@ -31,7 +31,7 @@ import sys
 
 from ctypes import byref, c_int, create_unicode_buffer
 from ctypes import c_void_p as LPVOID
-from io import UnsupportedOperation
+from io import IOBase, UnsupportedOperation
 
 OSWIN32 = (sys.platform == "win32")
 
@@ -61,7 +61,7 @@ except NameError:
     ReadConsoleW = WriteConsoleW = None
 
 
-class UnicodeInput:
+class UnicodeInput(IOBase):
 
     """Unicode terminal input class."""
 
@@ -87,7 +87,7 @@ class UnicodeInput:
             return data
 
 
-class UnicodeOutput:
+class UnicodeOutput(IOBase):
 
     """Unicode terminal output class."""
 
