@@ -11,12 +11,9 @@ __version__ = '$Id$'
 
 import pywikibot
 
-from pywikibot.tools import PY2
+from pywikibot.tools import UnicodeType as unicode
 
 from tests.aspects import unittest, TestCase, DeprecationTestCase
-
-if not PY2:
-    unicode = str
 
 
 class TestShareFiles(TestCase):

@@ -10,13 +10,15 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 from collections import Iterable
-from pywikibot.site import Namespace, NamespacesDict
-from tests.aspects import unittest, TestCase, AutoDeprecationTestCase
 
-import sys
-if sys.version_info[0] > 2:
-    basestring = (str, )
-    unicode = str
+from pywikibot.site import Namespace, NamespacesDict
+from pywikibot.tools import (
+    PY2,
+    StringTypes as basestring,
+    UnicodeType as unicode,
+)
+
+from tests.aspects import unittest, TestCase, AutoDeprecationTestCase
 
 # Default namespaces which should work in any MW wiki
 _base_builtin_ns = {
@@ -126,7 +128,7 @@ class TestNamespaceObject(TestCase):
                       aliases=[u'Image', u'Immagine'], **kwargs)
 
         self.assertEqual(str(y), ':File:')
-        if sys.version_info[0] <= 2:
+        if PY2:
             self.assertEqual(unicode(y), u':ملف:')
         self.assertEqual(y.canonical_prefix(), ':File:')
         self.assertEqual(y.custom_prefix(), u':ملف:')

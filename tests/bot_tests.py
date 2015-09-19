@@ -15,6 +15,7 @@ import pywikibot
 import pywikibot.bot
 
 from pywikibot import i18n
+from pywikibot.tools import PY2
 
 from tests.aspects import (
     unittest, DefaultSiteTestCase, SiteAttributeTestCase, TestCase,
@@ -229,7 +230,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
             self.bot.site = self.de
         with self.assertRaises(ValueError):
             self.bot.site
-        if sys.version_info[0] == 2:
+        if PY2:
             # The exc_info still contains the AttributeError :/
             sys.exc_clear()
         self.bot.treat = self._treat(self._generator())
@@ -237,7 +238,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.run()
         with self.assertRaises(ValueError):
             self.bot.site
-        if sys.version_info[0] == 2:
+        if PY2:
             # The exc_info still contains the AttributeError :/
             sys.exc_clear()
 
@@ -290,7 +291,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
                                      post_treat)
 
         # TODO: sys.exc_info is empty in Python 3
-        if sys.version_info[0] > 2:
+        if not PY2:
             exc = None
         else:
             exc = KeyboardInterrupt

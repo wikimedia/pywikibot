@@ -9,23 +9,26 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-
 import json
-import sys
 import os
+import re
+import sys
+
 from collections import Iterable, Mapping
 from datetime import datetime, timedelta
-import re
 
 import pywikibot
 
 from pywikibot import config
-from pywikibot import async_request, page_put_queue
 from pywikibot.comms import http
 from pywikibot.data import api
+
+from pywikibot import async_request, page_put_queue
 from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
+    StringTypes as basestring,
+    UnicodeType as unicode,
 )
 
 from tests.aspects import (
@@ -38,12 +41,8 @@ from tests.aspects import (
     DefaultWikidataClientTestCase,
     AlteredDefaultSiteTestCase,
 )
-from tests.utils import allowed_failure, allowed_failure_if, entered_loop
 from tests.basepage_tests import BasePageLoadRevisionsCachingTestBase
-
-if sys.version_info[0] > 2:
-    basestring = (str, )
-    unicode = str
+from tests.utils import allowed_failure, allowed_failure_if, entered_loop
 
 
 class TokenTestBase(TestCaseBase):
@@ -2015,7 +2014,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertNotIn(not_exists, mysite.siteinfo)
         self.assertEqual(len(mysite.siteinfo.get(not_exists)), 0)
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists)))
-        if sys.version_info[0] == 2:
+        if PY2:
             self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iteritems()))
             self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).itervalues()))
             self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).iterkeys()))

@@ -9,22 +9,22 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import sys
 import pywikibot
-from pywikibot import config
-from pywikibot import InvalidTitle
 import pywikibot.page
 
-from pywikibot.tools import PY2
+from pywikibot import config
+from pywikibot import InvalidTitle
+
+from pywikibot.tools import (
+    PY2,
+    StringTypes as basestring,
+    UnicodeType as unicode,
+)
 
 from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
     DefaultDrySiteTestCase, DeprecationTestCase,
 )
-
-if sys.version_info[0] > 2:
-    basestring = (str, )
-    unicode = str
 
 
 class TestLinkObject(SiteAttributeTestCase):
@@ -568,14 +568,14 @@ class TestPageRepr(TestPageBaseUnicode):
         page = pywikibot.Page(self.get_site(), u'Ō')
         self.assertEqual(repr(page), b'Page(\xc5\x8c)')
 
-    @unittest.skipIf(sys.version_info[0] > 2, 'Python 2 specific test')
+    @unittest.skipIf(not PY2, 'Python 2 specific test')
     def test_unicode_percent_r_failure(self):
         """Test u'{x!r}'.format(Page(u'<non-ascii>')) raises exception on Python 2."""
         # This raises an exception on Python 2, but passes on Python 3
         page = pywikibot.Page(self.get_site(), u'Ō')
         self.assertRaisesRegex(UnicodeDecodeError, '', unicode.format, u'{0!r}', page)
 
-    @unittest.skipIf(sys.version_info[0] < 3, 'Python 3+ specific test')
+    @unittest.skipIf(PY2, 'Python 3+ specific test')
     def test_unicode_value_py3(self):
         """Test to capture actual Python 3 result pre unicode_literals."""
         self.assertEqual(repr(self.page), "Page('Ō')")

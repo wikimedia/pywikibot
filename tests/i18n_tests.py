@@ -9,16 +9,12 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import sys
-
 import pywikibot
 
 from pywikibot import i18n, bot, plural
+from pywikibot.tools import StringTypes
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase, PwbTestCase
-
-if sys.version_info[0] == 3:
-    basestring = (str, )
 
 
 class TestTranslate(TestCase):
@@ -130,7 +126,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
     @classmethod
     def setUpClass(cls):
         """Verify that the test translations are not empty."""
-        if not isinstance(cls.message_package, basestring):
+        if not isinstance(cls.message_package, StringTypes):
             raise TypeError('%s.message_package must be a package name'
                             % cls.__name__)
         # The call to set_messages_package below exists only to confirm

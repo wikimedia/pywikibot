@@ -11,7 +11,6 @@ __version__ = '$Id$'
 
 import os
 import re
-import sys
 import warnings
 
 import requests
@@ -20,12 +19,13 @@ import pywikibot
 
 from pywikibot import config2 as config
 from pywikibot.comms import http, threadedhttp
+from pywikibot.tools import (
+    PYTHON_VERSION,
+    UnicodeType as unicode,
+)
 
 from tests import _images_dir
 from tests.aspects import unittest, TestCase, DeprecationTestCase
-
-if sys.version_info[0] > 2:
-    unicode = str
 
 
 class HttpTestCase(TestCase):
@@ -281,7 +281,7 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertNotIn('(;', http.user_agent())
         self.assertNotIn(';)', http.user_agent())
         self.assertIn('requests/', http.user_agent())
-        self.assertIn('Python/' + str(sys.version_info[0]), http.user_agent())
+        self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
 
 
 class CharsetTestCase(TestCase):

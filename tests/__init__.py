@@ -10,7 +10,6 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 import os
-import sys
 import warnings
 
 __all__ = ('requests', '_cache_dir', 'TestRequest',
@@ -20,23 +19,23 @@ __all__ = ('requests', '_cache_dir', 'TestRequest',
 # - requests is mandatory
 # - future is needed as a fallback for python 2.6,
 #   however if unavailable this will fail on use; see pywikibot/tools.py
+# - unittest2; see below
 # - mwparserfromhell is optional, so is only imported in textlib_tests
-try:
-    import requests  # noqa
-except ImportError as e:
-    print("ImportError: %s" % e)
-    sys.exit(1)
+import requests  # noqa
 
-if sys.version_info < (2, 7, 3):
-    # Unittest2 is a backport of python 2.7s unittest module to python 2.6
+from pywikibot.tools import PYTHON_VERSION
+
+if PYTHON_VERSION < (2, 7, 3):
+    # unittest2 is a backport of python 2.7s unittest module to python 2.6
     # Also use unittest2 for python 2.7.2 (T106512)
     import unittest2 as unittest
 else:
     import unittest
 
+import pywikibot.data.api
+
 from pywikibot import config
 from pywikibot import i18n
-import pywikibot.data.api
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.data.api import CachedRequest
 

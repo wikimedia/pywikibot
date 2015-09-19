@@ -13,12 +13,9 @@ from requests.exceptions import Timeout
 
 from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
-from pywikibot.tools import MediaWikiVersion, PY2
+from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, TestCase
-
-if not PY2:
-    basestring = (str,)
 
 
 class TestWikiSiteDetection(TestCase):

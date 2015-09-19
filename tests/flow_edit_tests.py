@@ -11,12 +11,9 @@ __version__ = '$Id$'
 
 from pywikibot.exceptions import LockedPage
 from pywikibot.flow import Board, Topic, Post
-from pywikibot.tools import PY2
+from pywikibot.tools import UnicodeType as unicode
 
 from tests.aspects import TestCase
-
-if not PY2:
-    unicode = str
 
 
 class TestFlowCreateTopic(TestCase):

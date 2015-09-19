@@ -44,11 +44,12 @@ import pywikibot
 import pywikibot.config2 as config
 
 from pywikibot import Site
-from pywikibot.exceptions import ServerError, NoUsername
-from pywikibot.site import BaseSite
-from pywikibot.family import WikimediaFamily
 from pywikibot.comms import http
 from pywikibot.data.api import Request as _original_Request
+from pywikibot.exceptions import ServerError, NoUsername
+from pywikibot.family import WikimediaFamily
+from pywikibot.site import BaseSite
+from pywikibot.tools import PY2
 
 import tests
 
@@ -57,6 +58,8 @@ from tests.utils import (
     add_metaclass, execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager,
 )
+
+OSWIN32 = (sys.platform == 'win32')
 
 
 class TestCaseBase(unittest.TestCase):
@@ -1309,7 +1312,7 @@ class PwbTestCase(TestCase):
         if 'PYWIKIBOT2_DIR' in os.environ:
             self.orig_pywikibot_dir = os.environ['PYWIKIBOT2_DIR']
         base_dir = pywikibot.config.base_dir
-        if sys.platform == 'win32' and sys.version_info[0] < 3:
+        if OSWIN32 and PY2:
             base_dir = str(base_dir)
         os.environ[str('PYWIKIBOT2_DIR')] = base_dir
 
