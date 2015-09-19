@@ -4259,6 +4259,7 @@ class Claim(Property):
                                            **kwargs)
         # TODO: Re-create the entire item from JSON, not just id
         self.snak = data['claim']['id']
+        self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
 
     def getTarget(self):
         """
@@ -4338,10 +4339,10 @@ class Claim(Property):
         @type claims: list of pywikibot.Claim
         """
         data = self.repo.editSource(self, claims, new=True, **kwargs)
+        self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         source = defaultdict(list)
         for claim in claims:
             claim.hash = data['reference']['hash']
-            self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
             source[claim.getID()].append(claim)
         self.sources.append(source)
 
@@ -4361,7 +4362,8 @@ class Claim(Property):
         @param sources: the sources to remove
         @type sources: list of pywikibot.Claim
         """
-        self.repo.removeSources(self, sources, **kwargs)
+        data = self.repo.removeSources(self, sources, **kwargs)
+        self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         for source in sources:
             source_dict = defaultdict(list)
             source_dict[source.getID()].append(source)
