@@ -5764,7 +5764,6 @@ class APISite(BaseSite):
     @deprecated_args(number='total',
                      repeat=None,
                      namespace="namespaces",
-                     returndict=None,
                      rcshow=None,
                      rc_show=None,
                      get_redirect=None)
