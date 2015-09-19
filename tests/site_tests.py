@@ -22,8 +22,11 @@ import pywikibot
 from pywikibot import config
 from pywikibot import async_request, page_put_queue
 from pywikibot.comms import http
-from pywikibot.tools import MediaWikiVersion
 from pywikibot.data import api
+from pywikibot.tools import (
+    MediaWikiVersion,
+    PY2,
+)
 
 from tests.aspects import (
     unittest, TestCase, DeprecationTestCase,
@@ -1062,7 +1065,8 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
             self.assertIsInstance(entry, tuple)
             self.assertIsInstance(entry[0], pywikibot.Page)
             self.assertIsInstance(entry[1], basestring)
-            self.assertIsInstance(entry[2], int)
+            self.assertIsInstance(
+                entry[2], long if PY2 and entry[2] > sys.maxint else int)  # noqa
             self.assertIsInstance(entry[3], basestring)
 
     def test_logpages_dump(self):
