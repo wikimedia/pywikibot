@@ -116,7 +116,9 @@ except ImportError as e:
     memento_client = e
 
 import pywikibot
+
 from pywikibot import i18n, config, pagegenerators, textlib, xmlreader, weblib
+from pywikibot.bot import ExistingPageBot, SingleSiteBot
 
 # TODO: Convert to httlib2
 if sys.version_info[0] > 2:
@@ -244,7 +246,7 @@ def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
             yield m.group('urlb')
 
 
-class XmlDumpPageGenerator:
+class XmlDumpPageGenerator(object):
 
     """Xml generator that yiels pages containing a web link."""
 
@@ -597,7 +599,7 @@ class LinkCheckThread(threading.Thread):
             self.history.setLinkDead(self.url, message, self.page, self.day)
 
 
-class History:
+class History(object):
 
     """
     Store previously found dead links.
@@ -621,9 +623,12 @@ class History:
 
     """
 
-    def __init__(self, reportThread):
+    def __init__(self, reportThread, site=None):
         self.reportThread = reportThread
-        self.site = pywikibot.Site()
+        if not site:
+            self.site = pywikibot.Site()
+        else:
+            self.site = site
         self.semaphore = threading.Semaphore()
         self.datfilename = pywikibot.config.datafilepath(
             'deadlinks', 'deadlinks-%s-%s.dat' % (self.site.family.name, self.site.code))
@@ -820,7 +825,7 @@ class DeadLinkReportThread(threading.Thread):
                 self.semaphore.release()
 
 
-class WeblinkCheckerRobot:
+class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
 
     """
     Bot which will search for dead weblinks.
@@ -828,8 +833,11 @@ class WeblinkCheckerRobot:
     It uses several LinkCheckThreads at once to process pages from generator.
     """
 
-    def __init__(self, generator, HTTPignore=None, day=7):
-        self.generator = generator
+    def __init__(self, generator, HTTPignore=None, day=7, site=True):
+        """Constructor."""
+        super(WeblinkCheckerRobot, self).__init__(
+            generator=generator, site=site)
+
         if config.report_dead_links_on_talk:
             pywikibot.log("Starting talk page thread")
             reportThread = DeadLinkReportThread()
@@ -838,23 +846,17 @@ class WeblinkCheckerRobot:
             reportThread.start()
         else:
             reportThread = None
-        self.history = History(reportThread)
+        self.history = History(reportThread, site=self.site)
         if HTTPignore is None:
             self.HTTPignore = []
         else:
             self.HTTPignore = HTTPignore
         self.day = day
 
-    def run(self):
-        for page in self.generator:
-            self.checkLinksIn(page)
-
-    def checkLinksIn(self, page):
-        try:
-            text = page.get()
-        except pywikibot.NoPage:
-            pywikibot.output(u'%s does not exist.' % page.title())
-            return
+    def treat_page(self):
+        """Process one page."""
+        page = self.current_page
+        text = page.get()
         for url in weblinksIn(text):
             ignoreUrl = False
             for ignoreR in ignorelist:
