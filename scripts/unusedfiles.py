@@ -24,15 +24,6 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import i18n, pagegenerators, Bot
 
-comment = {
-    'ar': u'صور للاستبعاد',
-    'en': u'images for elimination',
-    'fa': u'تصویر استفاده نشده',
-    'he': u'תמונות להסרה',
-    'it': u'Bot: segnalo immagine orfana da eliminare',
-    'pt': u'Bot: marcação de imagens para eliminação',
-}
-
 template_to_the_image = {
     'it': u'{{immagine orfana}}',
     'fa': u'{{تصاویر بدون استفاده}}',
@@ -59,11 +50,10 @@ class UnusedFilesBot(Bot):
                                         template_to_the_image)
         template_user = i18n.translate(self.site,
                                        template_to_the_user)
-        summary = i18n.translate(self.site, comment, fallback=True)
-        if not all([template_image, template_user, comment]):
+        self.summary = i18n.twtranslate(self.site, 'unusedfiles-comment')
+        if not all([template_image, template_user]):
             raise pywikibot.Error(u'This script is not localized for %s site.'
                                   % self.site)
-        self.summary = summary
         generator = pagegenerators.UnusedFilesGenerator(site=self.site)
         generator = pagegenerators.PreloadingGenerator(generator)
         for image in generator:
