@@ -27,8 +27,8 @@ class TestXMLPageGenerator(TestCase):
     def test_non_bare_ref_urls(self):
         """Test pages without bare references are not processed."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('article-pear-0.10.xml'),
-            xmlStart=u'Pear',
+            filename=join_xml_data_path('article-pear-0.10.xml'),
+            start='Pear',
             namespaces=[0, 1],
             site=self.get_site())
         pages = list(gen)
@@ -37,8 +37,8 @@ class TestXMLPageGenerator(TestCase):
     def test_simple_bare_refs(self):
         """Test simple bare references in multiple namespaces."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=u'Fake page',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start='Fake page',
             namespaces=[0, 1],
             site=self.get_site())
         pages = list(gen)
@@ -48,8 +48,8 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_empty_list(self):
         """Test namespaces=[] processes all namespaces."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=u'Fake page',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start=u'Fake page',
             namespaces=[],
             site=self.get_site())
         pages = list(gen)
@@ -60,8 +60,8 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_None(self):
         """Test namespaces=None processes all namespaces."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=u'Fake page',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start='Fake page',
             namespaces=None,
             site=self.get_site())
         pages = list(gen)
@@ -72,8 +72,8 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_string_ids(self):
         """Test namespaces with ids as string."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=u'Fake page',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start='Fake page',
             namespaces=["0", "1"],
             site=self.get_site())
         pages = list(gen)
@@ -83,8 +83,8 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_names(self):
         """Test namespaces with namespace names."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=u'Fake page',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start='Fake page',
             namespaces=["Talk"],
             site=self.get_site())
         pages = list(gen)
@@ -95,8 +95,8 @@ class TestXMLPageGenerator(TestCase):
     def test_start_with_underscore(self):
         """Test with underscore in start page title."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=u'Fake_page',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start='Fake_page',
             namespaces=[0, 1],
             site=self.get_site())
         pages = list(gen)
@@ -106,8 +106,8 @@ class TestXMLPageGenerator(TestCase):
     def test_without_start(self):
         """Test without a start page title."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart=None,
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start=None,
             namespaces=[0, 1],
             site=self.get_site())
         pages = list(gen)
@@ -118,8 +118,8 @@ class TestXMLPageGenerator(TestCase):
     def test_start_prefix(self):
         """Test with a prefix as a start page title."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
-            xmlStart='Fake',
+            filename=join_xml_data_path('dummy-reflinks.xml'),
+            start='Fake',
             namespaces=[0, 1],
             site=self.get_site())
         pages = list(gen)

@@ -56,14 +56,18 @@ import gzip
 import sys
 import io
 
+from functools import partial
+
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, textlib, xmlreader, Bot
+from pywikibot import i18n, pagegenerators, textlib, Bot
+from pywikibot.pagegenerators import (
+    XMLDumpPageGenerator as _XMLDumpPageGenerator,
+)
 from pywikibot.tools.formatter import color_format
 
 from scripts import noreferences
 
-# TODO: Convert to httlib2
 if sys.version_info[0] > 2:
     from urllib.parse import quote
     from urllib.request import urlopen
@@ -185,41 +189,8 @@ linksInRef = re.compile(
 # ( maintained by User:Dispenser )
 listof404pages = '404-links.txt'
 
-
-class XmlDumpPageGenerator(object):
-
-    """Xml generator that yields pages containing bare references."""
-
-    def __init__(self, xmlFilename, xmlStart, namespaces, site=None):
-        self.xmlStart = xmlStart
-        self.namespaces = namespaces
-        self.skipping = bool(xmlStart)
-        self.site = site or pywikibot.Site()
-
-        dump = xmlreader.XmlDump(xmlFilename)
-        self.parser = dump.parse()
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        while True:
-            try:
-                entry = next(self.parser)
-            except StopIteration:
-                raise
-            if self.skipping:
-                if entry.title != self.xmlStart:
-                    continue
-                self.skipping = False
-            page = pywikibot.Page(self.site, entry.title)
-            if not self.namespaces == []:
-                if page.namespace() not in self.namespaces:
-                    continue
-            if linksInRef.search(entry.text):
-                return page
-
-    __next__ = next
+XmlDumpPageGenerator = partial(
+    _XMLDumpPageGenerator, text_predicate=linksInRef.search)
 
 
 class RefLink(object):

@@ -854,24 +854,27 @@ class SelfCallString(SelfCallMixin, str):
     """Unicode string with SelfCallMixin."""
 
 
-class DequeGenerator(collections.deque):
+class IteratorNextMixin(collections.Iterator):
+
+    """Backwards compatibility for Iterators."""
+
+    if PY2:
+
+        def next(self):
+            """Python 2 next."""
+            return self.__next__()
+
+
+class DequeGenerator(IteratorNextMixin, collections.deque):
 
     """A generator that allows items to be added during generating."""
 
-    def __iter__(self):
-        """Return the object which will be iterated."""
-        return self
-
-    def next(self):
+    def __next__(self):
         """Python 3 iterator method."""
         if len(self):
             return self.popleft()
         else:
             raise StopIteration
-
-    def __next__(self):
-        """Python 3 iterator method."""
-        return self.next()
 
 
 class ContextManagerWrapper(object):
