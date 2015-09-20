@@ -155,25 +155,6 @@ txt_find = {
     'zh': [u'{{no source', u'{{unknown', u'{{No license'],
 }
 
-# Summary for when the will add the no source
-msg_comm = {
-    'ar': u'بوت: التعليم على ملف مرفوع حديثا غير موسوم',
-    'commons': u'Bot: Marking newly uploaded untagged file',
-    'de': u'Bot: Markiere mit {{[[Wikipedia:Dateiüberprüfung/Anleitung|DÜP]]}},'
-          u' da keine Lizenzvorlage gefunden — bitte nicht entfernen,'
-          u' Informationen bald auf der Benutzerdiskussion des Uploaders.',
-    'en': u'Bot: Marking newly uploaded untagged file',
-    'fa': u'ربات: حق تکثیر تصویر تازه بارگذاری شده نامعلوم است.',
-    'ga': u'Róbó: Ag márcáil comhad nua-uaslódáilte gan ceadúnas',
-    'hu': u'Robot: Frissen feltöltött licencsablon nélküli fájl megjelölése',
-    'it': u"Bot: Aggiungo unverified",
-    'ja': u'ロボットによる:著作権情報なしの画像をタグ',
-    'ko': u'로봇:라이선스 없음',
-    'ta': u'தானியங்கி:காப்புரிமை வழங்கப்படா படிமத்தை சுட்டுதல்',
-    'ur': u'روبالہ:نشان زدگی جدید زبراثقال شدہ املاف',
-    'zh': u'機器人:標示新上傳且未包含必要資訊的檔案',
-}
-
 # When the Bot find that the usertalk is empty is not pretty to put only the
 # no source without the welcome, isn't it?
 empty = {
@@ -192,23 +173,6 @@ empty = {
     'ta': u'{{welcome}}\n~~~~\n',
     'ur': u'{{خوش آمدید}}\n~~~~\n',
     'zh': u'{{subst:welcome|sign=~~~~}}',
-}
-
-# Summary that the bot use when it notify the problem with the image's license
-msg_comm2 = {
-    'ar': u'بوت: طلب معلومات المصدر.',
-    'commons': u'Bot: Requesting source information.',
-    'de': u'Bot: Benachrichtigung über Lizenzprobleme',
-    'en': u'Robot: Requesting source information.',
-    'fa': u'ربات: درخواست منبع تصویر',
-    'ga': u'Róbó: Ag iarraidh eolais foinse.',
-    'it': u"Bot: Notifico l'unverified",
-    'hu': u'Robot: Forrásinformáció kérése',
-    'ja': u'ロボットによる:著作権情報明記のお願い',
-    'ko': u'로봇:라이선스 정보 요청',
-    'ta': u'தானியங்கி:மூலம் வழங்கப்படா படிமத்தை சுட்டுதல்',
-    'ur': u'روبالہ:درخواست ماخذ تصویر',
-    'zh': u'機器人：告知用戶',
 }
 
 # if the file has an unknown extension it will be tagged with this template.
@@ -618,7 +582,9 @@ class checkImagesBot(object):
                                     for tmp in hiddentemplatesRaw])
         self.pageHidden = i18n.translate(self.site, PageWithHiddenTemplates)
         self.pageAllowed = i18n.translate(self.site, PageWithAllowedTemplates)
-        self.comment = i18n.translate(self.site, msg_comm, fallback=True)
+        self.comment = i18n.twtranslate(self.site,
+                                        'checkimages-source-tag-comment',
+                                        fallback=False)
         # Adding the bot's nickname at the notification text if needed.
         self.bots = i18n.translate(self.site, bot_list)
         if self.bots:
@@ -774,7 +740,8 @@ class checkImagesBot(object):
 
     def put_mex_in_talk(self):
         """Function to put the warning in talk page of the uploader."""
-        commento2 = i18n.translate(self.site, msg_comm2, fallback=True)
+        commento2 = i18n.twtranslate(self.site,
+                                     'checkimages-source-notice-comment')
         emailPageName = i18n.translate(self.site, emailPageWithText)
         emailSubj = i18n.translate(self.site, emailSubject)
         if self.notification2:
