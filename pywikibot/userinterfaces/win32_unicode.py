@@ -96,21 +96,11 @@ class UnicodeOutput(IOBase):
         self._hConsole = hConsole
         self._stream = stream
         self._fileno = fileno
-        self.closed = False
         self.softspace = False
         self.mode = 'w'
         self.encoding = 'utf-8'
         self.name = name
         self.flush()
-
-    def isatty(self):
-        """Return whether it's a tty."""
-        return False
-
-    def close(self):
-        """Set the stream to be closed."""
-        # don't really close the handle, that would only cause problems
-        self.closed = True
 
     def fileno(self):
         """Return the fileno."""
