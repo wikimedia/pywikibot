@@ -28,7 +28,7 @@ import pywikibot
 from pywikibot import i18n
 
 
-class BlockreviewBot:
+class BlockreviewBot(object):
 
     """Block review bot."""
 

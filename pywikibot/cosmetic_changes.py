@@ -206,7 +206,7 @@ def _reformat_ISBNs(text, strict=True):
         text, lambda match: _format_isbn_match(match, strict=strict))
 
 
-class CosmeticChangesToolkit:
+class CosmeticChangesToolkit(object):
 
     """Cosmetic changes toolkit."""
 

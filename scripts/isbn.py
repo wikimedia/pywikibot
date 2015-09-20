@@ -1180,7 +1180,7 @@ class InvalidIsbnException(pywikibot.Error):
     """Invalid ISBN."""
 
 
-class ISBN:
+class ISBN(object):
 
     """Abstract superclass."""
 

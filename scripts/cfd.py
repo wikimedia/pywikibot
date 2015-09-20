@@ -58,7 +58,7 @@ findday = re.compile(r'\[\[(Wikipedia:Categories for (?:discussion|deletion)/Log
                      re.IGNORECASE)
 
 
-class ReCheck:
+class ReCheck(object):
 
     """Helper class."""
 

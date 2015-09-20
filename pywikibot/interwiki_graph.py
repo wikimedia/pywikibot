@@ -129,7 +129,7 @@ class Subject(object):
         self.found_in = value
 
 
-class GraphDrawer:
+class GraphDrawer(object):
 
     """Graphviz (dot) code creator."""
 

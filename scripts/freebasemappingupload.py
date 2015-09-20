@@ -31,7 +31,7 @@ import sys
 import pywikibot
 
 
-class FreebaseMapperRobot:
+class FreebaseMapperRobot(object):
 
     """Freebase Mapping bot."""
 

@@ -159,7 +159,7 @@ cfd_templates = {
 }
 
 
-class CategoryDatabase:
+class CategoryDatabase(object):
 
     """Temporary database saving pages and subcategories for each category.
 
@@ -766,7 +766,7 @@ class CategoryRemoveRobot(CategoryMoveRobot):
             pagesonly=pagesonly)
 
 
-class CategoryListifyRobot:
+class CategoryListifyRobot(object):
 
     """Create a list containing all of the members in a category."""
 
@@ -982,7 +982,7 @@ class CategoryTidyRobot(pywikibot.Bot):
         self.move_to_category(page, self.cat, self.cat)
 
 
-class CategoryTreeRobot:
+class CategoryTreeRobot(object):
 
     """Robot to create tree overviews of the category structure.
 

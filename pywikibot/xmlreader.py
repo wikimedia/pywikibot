@@ -49,7 +49,7 @@ def parseRestrictions(restrictions):
     return editRestriction, moveRestriction
 
 
-class XmlEntry:
+class XmlEntry(object):
 
     """Represent a page."""
 

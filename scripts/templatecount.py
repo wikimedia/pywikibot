@@ -46,7 +46,7 @@ import pywikibot
 templates = ['ref', 'note', 'ref label', 'note label', 'reflist']
 
 
-class TemplateCountRobot:
+class TemplateCountRobot(object):
 
     """Template count bot."""
 

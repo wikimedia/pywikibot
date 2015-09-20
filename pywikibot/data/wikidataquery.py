@@ -34,7 +34,7 @@ def listify(x):
     return x if isinstance(x, list) else [x]
 
 
-class QuerySet():
+class QuerySet(object):
 
     """
     A QuerySet represents a set of queries or other query sets.
@@ -116,7 +116,7 @@ class QuerySet():
         return u"QuerySet(%s)" % self
 
 
-class Query():
+class Query(object):
 
     """
     A query is a single query for the WikidataQuery API.
@@ -458,7 +458,7 @@ def fromClaim(claim):
                         % claim.type)
 
 
-class WikidataQuery():
+class WikidataQuery(object):
 
     """
     An interface to the WikidataQuery API.

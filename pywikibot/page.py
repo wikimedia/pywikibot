@@ -3921,7 +3921,7 @@ class ItemPage(WikibasePage):
         return super(ItemPage, self).isRedirectPage()
 
 
-class Property():
+class Property(object):
 
     """
     A Wikibase property.
