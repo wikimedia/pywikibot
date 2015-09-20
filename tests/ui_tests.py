@@ -544,7 +544,7 @@ class WindowsTerminalTestCase(UITestCase):
                                     % e)
 
         try:
-            window.TypeKeys('% {UP}{ENTER}^L{HOME}L{ENTER}', with_spaces=True)
+            window.TypeKeys('% {UP}{ENTER}%L{HOME}L{ENTER}', with_spaces=True)
         except Exception as e:
             cls.tearDownProcess()
             raise unittest.SkipTest('Windows package pywinauto could not use window TypeKeys: %r'
@@ -666,8 +666,16 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
             u"pywikibot.output(u'\\n'.join(pywikibot.handleArgs()))\" "
             u"Alpha Bετα Гамма دلتا\n")
         lines = []
-        while len(lines) < 4 or lines[0] != 'Alpha':
+
+        for i in range(3):
             lines = self.getstdouterr().split('\n')
+            if len(lines) >= 4 and 'Alpha' not in lines:
+                # if len(lines) < 4, we assume not all lines had been output
+                # yet, and retry. We check at least one of the lines contains
+                # "Alpha" to prevent using older clipboard content. We limit
+                # the number of retries to 3 so that the test will finish even
+                # if neither of these requirements are met.
+                break
             time.sleep(1)
 
         # empty line is the new command line
