@@ -40,6 +40,7 @@ dependencies = ['requests']
 
 # the irc module has no Python 2.6 support since 10.0
 irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
+csv_dep = 'unicodecsv<=0.13' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
 
 extra_deps = {
     # Core library dependencies
@@ -59,7 +60,7 @@ extra_deps = {
 if PY2:
     # Additional core library dependencies which are only available on Python 2
     extra_deps.update({
-        'csv': ['unicodecsv'],
+        'csv': [csv_dep],
         'MySQL': ['oursql'],
         'unicode7': ['unicodedata2>=7.0.0-2'],
     })
