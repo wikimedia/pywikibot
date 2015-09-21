@@ -3016,7 +3016,7 @@ class LoginManager(login.LoginManager):
 
     def storecookiedata(self, data):
         """Ignore data; cookies are set by threadedhttp module."""
-        pywikibot.cookie_jar.save()
+        http.cookie_jar.save()
 
 
 def update_page(page, pagedict, props=[]):

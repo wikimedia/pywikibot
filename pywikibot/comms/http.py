@@ -91,11 +91,6 @@ def _flush():
     pywikibot.log('Network session closed.')
 atexit.register(_flush)
 
-
-# export cookie_jar to global namespace
-pywikibot.cookie_jar = cookie_jar
-
-
 USER_AGENT_PRODUCTS = {
     'python': 'Python/' + '.'.join([str(i) for i in sys.version_info]),
     'http_backend': 'requests/' + requests.__version__,

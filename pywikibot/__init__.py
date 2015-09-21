@@ -751,6 +751,8 @@ _putthread.setDaemon(True)
 wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
 wrapper._add_deprecated_attr(
+    'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar')
+wrapper._add_deprecated_attr(
     'PageNotFound', pywikibot.exceptions.DeprecatedPageNotFoundError,
     warning_message=('{0}.{1} is deprecated, and no longer '
                      'used by pywikibot; use http.fetch() instead.'))
