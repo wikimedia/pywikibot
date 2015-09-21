@@ -10,14 +10,10 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
-
 from pywikibot.data.wikistats import WikiStats, csv
+from pywikibot.tools import UnicodeType
 
 from tests.aspects import unittest, TestCase
-
-if sys.version_info[0] == 3:
-    basestring = (str, )
 
 
 class WikiStatsTestCase(TestCase):
@@ -34,7 +30,7 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('prefix', top)
         self.assertIn('total', top)
         self.assertEqual(top['prefix'], 'en')
-        self.assertIsInstance(top['total'], basestring)
+        self.assertIsInstance(top['total'], UnicodeType)
         self.assertEqual(ws.languages_by_size('wikipedia')[0], 'en')
         self.assertEqual(ws.languages_by_size('wikisource')[0], 'fr')
 
