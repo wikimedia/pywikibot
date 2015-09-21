@@ -74,7 +74,7 @@ UserWarning: warnings targetted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -82,12 +82,14 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import sys
-
-from pywikibot.tools import UnicodeMixin, _NotImplementedWarning
-
-if sys.version_info[0] > 2:
-    unicode = str
+from pywikibot.tools import (
+    # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
+    deprecated as __deprecated,
+    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
+    UnicodeMixin,
+    UnicodeType,
+    _NotImplementedWarning,
+)
 
 
 class NotImplementedWarning(_NotImplementedWarning):
@@ -179,7 +181,7 @@ class PageSaveRelatedError(PageRelatedError):  # noqa
     @property
     def args(self):
         """Expose args."""
-        return unicode(self)
+        return UnicodeType(self)
 
 
 class OtherPageSaveError(PageSaveRelatedError):
@@ -200,7 +202,7 @@ class OtherPageSaveError(PageSaveRelatedError):
     @property
     def args(self):
         """Expose args."""
-        return unicode(self.reason)
+        return UnicodeType(self.reason)
 
 
 class NoUsername(Error):
@@ -520,11 +522,7 @@ class EntityTypeUnknownException(WikiBaseError):
     pass
 
 
-import pywikibot.data.api
-import pywikibot.tools
-
-
-@pywikibot.tools.deprecated
+@__deprecated
 class DeprecatedPageNotFoundError(Error):
 
     """Page not found (deprecated)."""
@@ -532,7 +530,7 @@ class DeprecatedPageNotFoundError(Error):
     pass
 
 
-@pywikibot.tools.deprecated
+@__deprecated
 class _EmailUserError(UserRightsError, NotEmailableError):
 
     """Email related error."""
@@ -540,8 +538,12 @@ class _EmailUserError(UserRightsError, NotEmailableError):
     pass
 
 
-wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('UploadWarning', pywikibot.data.api.UploadWarning)
+wrapper = _ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'UploadWarning',
+    replacement_name='pywikibot.data.api.UploadWarning',
+    warning_message='pywikibot.exceptions.UploadWarning is deprecated; '
+                    'use APISite.upload with a warning handler instead.')
 wrapper._add_deprecated_attr('PageNotFound', DeprecatedPageNotFoundError,
                              warning_message='{0}.{1} is deprecated, and no '
                                              'longer used by pywikibot; use '

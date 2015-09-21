@@ -38,6 +38,7 @@ from pywikibot.bot import (
     # the following are flagged as deprecated on usage
     handleArgs,
 )
+from pywikibot.data.api import UploadWarning as _UploadWarning
 from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, NoMoveTarget, SectionError,
     SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
@@ -53,8 +54,8 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import PY2, UnicodeMixin, redirect_func
 from pywikibot.i18n import translate
-from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
+
 import pywikibot.textlib as textlib
 import pywikibot.tools
 
@@ -757,8 +758,12 @@ wrapper._add_deprecated_attr(
 wrapper._add_deprecated_attr(
     'UserActionRefuse', pywikibot.exceptions._EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
-                    'use UserRightsError and/or NotEmailableError')
+                    'use UserRightsError and/or NotEmailableError instead.')
 wrapper._add_deprecated_attr(
     'QuitKeyboardInterrupt', pywikibot.bot.QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
-                    'use pywikibot.bot.QuitKeyboardInterrupt instead')
+                    'use pywikibot.bot.QuitKeyboardInterrupt instead.')
+wrapper._add_deprecated_attr(
+    'UploadWarning', _UploadWarning,
+    warning_message='pywikibot.UploadWarning is deprecated; '
+                    'use APISite.upload with a warning handler instead.')
