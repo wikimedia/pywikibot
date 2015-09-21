@@ -25,6 +25,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                            AutomaticTWSummaryBot, suggest_help)
+from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -101,9 +102,9 @@ def main(*args):
 
     mysite = pywikibot.Site()
     if mysite.sitename == 'wikipedia:nl':
-        pywikibot.output(
-            '\03{lightred}There is consensus on the Dutch Wikipedia that '
-            'bots should not be used to fix redirects.\03{default}')
+        pywikibot.output(color_format(
+            '{lightred}There is consensus on the Dutch Wikipedia that '
+            'bots should not be used to fix redirects.{default}'))
         return
 
     if featured:

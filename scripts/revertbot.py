@@ -14,7 +14,7 @@ The following command line parameters are supported:
 """
 #
 # (C) Bryan Tong Minh, 2008
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
 # for Google Code-In 2013
@@ -30,6 +30,7 @@ import re
 import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators
+from pywikibot.tools.formatter import color_format
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -104,9 +105,9 @@ class BaseRevertBot(object):
              'timestamp': rev.timestamp})
         if self.comment:
             comment += ': ' + self.comment
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % page.title(asLink=True, forceInterwiki=True,
-                                      textlink=True))
+        pywikibot.output(color_format(
+            '\n\n>>> {lightpurple}{0}{default} <<<',
+            page.title(asLink=True, forceInterwiki=True, textlink=True)))
         if not self.rollback:
             old = page.text
             page.text = rev.text

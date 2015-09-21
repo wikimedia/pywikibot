@@ -23,7 +23,7 @@ Command line options:
 
 """
 #
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,6 +36,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import i18n
 from pywikibot.editor import TextEditor
+from pywikibot.tools.formatter import color_format
 
 
 def main(*args):
@@ -76,8 +77,8 @@ def main(*args):
             continue
         # Show the title of the page we're working on.
         # Highlight the title in purple.
-        pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                         % p.title())
+        pywikibot.output(color_format(
+            '\n\n>>> {lightpurple}{0}{default} <<<', p.title()))
         lines = text.split('\n')
         newpage = []
         lastok = ""
@@ -85,7 +86,7 @@ def main(*args):
             if spamSite in line:
                 if lastok:
                     pywikibot.output(lastok)
-                pywikibot.output('\03{lightred}%s\03{default}' % line)
+                pywikibot.output(color_format('{lightred}{0}{default}', line))
                 lastok = None
             else:
                 newpage.append(line)

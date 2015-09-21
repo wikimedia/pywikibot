@@ -50,7 +50,7 @@ Furthermore, the following command line parameters are supported:
 # (C) Monobi a.k.a. Wikihermit, 2007
 # (C) Filnik, 2007-2011
 # (C) Nicolas Dumazet (NicDumZ), 2008-2009
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,10 +62,12 @@ __version__ = '$Id$'
 import time
 import re
 import webbrowser
+
 import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators
 from pywikibot import config
+from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -441,8 +443,8 @@ def main(*args):
 
         if oldtext != text:
             # Ok, asking if the change has to be performed and do it if yes.
-            pywikibot.output(u"\n\n>>> \03{lightpurple}%s\03{default} <<<"
-                             % page.title())
+            pywikibot.output(color_format(
+                '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
             pywikibot.showDiff(oldtext, text)
             if not always:
                 choice = pywikibot.input_choice(u'Do you want to accept these '

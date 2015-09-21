@@ -739,8 +739,9 @@ class InteractiveReplace(object):
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
             pywikibot.output(text[max(0, rng[0] - self.context): rng[0]] +
-                             '\03{lightred}' + text[rng[0]: rng[1]] +
-                             '\03{default}' + text[rng[1]: rng[1] + self.context])
+                             color_format('{lightred}{0}{default}',
+                                          text[rng[0]: rng[1]]) +
+                             text[rng[1]: rng[1] + self.context])
             question = 'Should the link '
         else:
             question = 'Should the link {lightred}{0}{default} '
@@ -1210,8 +1211,8 @@ class BaseBot(object):
             msg = u'Working on %r' % page.title()
             if config.colorized_output:
                 log(msg)
-                stdout(u'\n\n>>> \03{lightpurple}%s\03{default} <<<'
-                       % page.title())
+                stdout(color_format('\n\n>>> {lightpurple}{0}{default} <<<',
+                                    page.title()))
             else:
                 stdout(msg)
 

@@ -52,6 +52,7 @@ from pywikibot.exceptions import (
     WikiBaseError, CoordinateGlobeUnknownException,
 )
 from pywikibot.tools import PY2, UnicodeMixin, redirect_func
+from pywikibot.tools.formatter import color_format
 from pywikibot.i18n import translate
 from pywikibot.data.api import UploadWarning
 from pywikibot.diff import PatchManager
@@ -690,11 +691,9 @@ def stopme():
 
         if page_put_queue.qsize() > 1:
             num, sec = remaining()
-            format_values = dict(num=num, sec=sec)
-            output(u'\03{lightblue}'
-                   u'Waiting for %(num)i pages to be put. '
-                   u'Estimated time remaining: %(sec)s'
-                   u'\03{default}' % format_values)
+            output(color_format(
+                '{lightblue}Waiting for {num} pages to be put. '
+                'Estimated time remaining: {sec}{default}', num=num, sec=sec))
 
         while(_putthread.isAlive()):
             try:

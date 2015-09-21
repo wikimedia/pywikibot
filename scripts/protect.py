@@ -58,6 +58,7 @@ __version__ = '$Id$'
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
+from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -185,8 +186,9 @@ def main(*args):
             else:
                 options['summary'] = arg[len('-summary:'):]
         elif arg.startswith('-images'):
-            pywikibot.output('\n\03{lightred}-image option is deprecated. '
-                             'Please use -imagelinks instead.\03{default}\n')
+            pywikibot.output(color_format(
+                '\n{lightred}-image option is deprecated. '
+                'Please use -imagelinks instead.{default}\n'))
             local_args.append('-imagelinks' + arg[7:])
         elif arg.startswith('-unprotect'):
             default_level = 'all'

@@ -119,6 +119,7 @@ import pywikibot
 
 from pywikibot import i18n, config, pagegenerators, textlib, xmlreader, weblib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.tools.formatter import color_format
 
 # TODO: Convert to httlib2
 if sys.version_info[0] > 2:
@@ -769,16 +770,16 @@ class DeadLinkReportThread(threading.Thread):
                 (url, errorReport, containingPage, archiveURL) = self.queue[0]
                 self.queue = self.queue[1:]
                 talkPage = containingPage.toggleTalkPage()
-                pywikibot.output(
-                    u'\03{lightaqua}** Reporting dead link on %s...\03{default}'
-                    % talkPage.title(asLink=True))
+                pywikibot.output(color_format(
+                    '{lightaqua}** Reporting dead link on {0}...{default}',
+                    talkPage.title(asLink=True)))
                 try:
                     content = talkPage.get() + "\n\n"
                     if url in content:
-                        pywikibot.output(
-                            u'\03{lightaqua}** Dead link seems to have already '
-                            u'been reported on %s\03{default}'
-                            % talkPage.title(asLink=True))
+                        pywikibot.output(color_format(
+                            '{lightaqua}** Dead link seems to have already '
+                            'been reported on {0}{default}',
+                            talkPage.title(asLink=True)))
                         self.semaphore.release()
                         continue
                 except (pywikibot.NoPage, pywikibot.IsRedirectPage):
@@ -817,10 +818,10 @@ class DeadLinkReportThread(threading.Thread):
                 try:
                     talkPage.put(content, comment)
                 except pywikibot.SpamfilterError as error:
-                    pywikibot.output(
-                        u'\03{lightaqua}** SpamfilterError while trying to '
-                        u'change %s: %s\03{default}'
-                        % (talkPage.title(asLink=True), error.url))
+                    pywikibot.output(color_format(
+                        '{lightaqua}** SpamfilterError while trying to '
+                        'change {0}: {1}{default}',
+                        talkPage.title(asLink=True), error.url))
 
                 self.semaphore.release()
 
