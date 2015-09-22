@@ -4493,7 +4493,7 @@ class APISite(BaseSite):
                                 step=step, total=total)
         if get_text:
             drgen.request['drprop'] = (drgen.request['drprop'] +
-                                       "|content|token")
+                                       ['content', 'token'])
         if start is not None:
             drgen.request["drstart"] = start
         if end is not None:
