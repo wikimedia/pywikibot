@@ -4055,7 +4055,7 @@ class Claim(Property):
     """
     A Claim on a Wikibase entity.
 
-    Claims are standard claims as well as references.
+    Claims are standard claims as well as references and qualifiers.
     """
 
     TARGET_CONVERTER = {
@@ -4114,10 +4114,7 @@ class Claim(Property):
         if 'id' in data:
             claim.snak = data['id']
         elif 'hash' in data:
-            claim.isReference = True
             claim.hash = data['hash']
-        else:
-            claim.isQualifier = True
         claim.snaktype = data['mainsnak']['snaktype']
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
@@ -4159,6 +4156,7 @@ class Claim(Property):
             for claimsnak in data['snaks'][prop]:
                 claim = cls.fromJSON(site, {'mainsnak': claimsnak,
                                             'hash': data['hash']})
+                claim.isReference = True
                 if claim.getID() not in source:
                     source[claim.getID()] = []
                 source[claim.getID()].append(claim)
@@ -4175,8 +4173,10 @@ class Claim(Property):
 
         @return: Claim
         """
-        return cls.fromJSON(site, {'mainsnak': data,
-                                   'hash': data['hash']})
+        claim = cls.fromJSON(site, {'mainsnak': data,
+                                    'hash': data['hash']})
+        claim.isQualifier = True
+        return claim
 
     def toJSON(self):
         """
