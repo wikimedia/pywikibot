@@ -15,6 +15,7 @@ import math
 from string import Formatter
 
 from pywikibot.logging import output
+from pywikibot.tools import UnicodeType
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -103,11 +104,41 @@ class _ColorFormatter(Formatter):
         if previous_literal:
             yield previous_literal, None, None, None
 
+    def _vformat(self, *args, **kwargs):
+        """
+        Override original `_vformat` to prevent that it changes into `bytes`.
+
+        The original `_vformat` is returning `bytes` under certain
+        curcumstances. It happens when the `format_string` is empty, when there
+        is no literal text around it or when the field value is not a `unicode`
+        already.
+
+        @rtype: unicode
+        """
+        result = super(_ColorFormatter, self)._vformat(*args, **kwargs)
+        if not isinstance(result, UnicodeType):
+            assert result == b''
+            result = ''  # This is changing it into a unicode
+        return result
+
     def vformat(self, format_string, args, kwargs):
-        """Return the normal format result but verify no colors are keywords."""
+        """
+        Return the normal format result but verify no colors are keywords.
+
+        @param format_string: The format template string
+        @type format_string: unicode
+        @param args: The positional field values
+        @type args: sequence
+        @param kwargs: The named field values
+        @type kwargs: dict
+        @return: The formatted string
+        @rtype: unicode
+        """
         if self.colors.intersection(kwargs):  # kwargs use colors
             raise ValueError('Keyword argument(s) use valid color(s): ' +
                              '", "'.join(self.colors.intersection(kwargs)))
+        if not isinstance(format_string, UnicodeType):
+            raise TypeError('expected str, got {0}'.format(type(format_string)))
         return super(_ColorFormatter, self).vformat(format_string, args,
                                                     kwargs)
 
@@ -118,5 +149,10 @@ def color_format(text, *args, **kwargs):
 
     It is automatically adding \03 in front of color fields so it's
     unnecessary to add them manually. Any other \03 in the text is disallowed.
+
+    @param text: The format template string
+    @type text: unicode
+    @return: The formatted string
+    @rtype: unicode
     """
     return _ColorFormatter().format(text, *args, **kwargs)
