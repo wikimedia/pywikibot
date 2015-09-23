@@ -170,8 +170,7 @@ class SandboxBot(Bot):
             raise RuntimeError
         if not self.generator:
             if self.site.code not in sandboxTitle:
-                pywikibot.error(u'No generator is given for this site'
-                                u'(%s), exiting.' % self.site)
+                pywikibot.bot.suggest_help(missing_generator=True)
                 raise RuntimeError
             local_sandbox_title = sandboxTitle[self.site.code]
             if not isinstance(local_sandbox_title, list):
@@ -288,13 +287,9 @@ def main(*args):
 
     generator = gen_factory.getCombinedGenerator()
 
-    if generator:
-        bot = SandboxBot(generator=generator, **opts)
-        bot.run()
-        return True
+    bot = SandboxBot(generator=generator, **opts)
+    bot.run()
 
-    pywikibot.bot.suggest_help(missing_generator=True)
-    return False
 
 if __name__ == "__main__":
     main()
