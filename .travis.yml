@@ -90,13 +90,16 @@ script:
       nosetests --version ;
       if [[ "$SITE_ONLY" == "1" ]]; then
         echo "Running site tests only code ${LANGUAGE} on family ${FAMILY}" ;
-        python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" ;
+        python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" --with-coverage --cover-package=. ;
       else
-        python setup.py nosetests --tests tests --verbosity=2 ;
+        python setup.py nosetests --tests tests --verbosity=2 --with-coverage --cover-package=. ;
       fi ;
     else
-      python setup.py test ;
+      coverage run setup.py test ;
     fi
+
+after_success:
+    codecov
 
 env:
   global:
