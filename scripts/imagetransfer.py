@@ -27,7 +27,7 @@ used on a page reachable via interwiki links.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,26 +43,6 @@ import pywikibot
 from pywikibot import config, i18n, textlib
 
 from scripts import upload
-
-copy_message = {
-    'ar': u"هذه الصورة تم نقلها من %s. الوصف الأصلي كان:\r\n\r\n%s",
-    'en': u"This image was copied from %s. The original description was:\r\n\r\n%s",
-    'fa': u"تصویر از %s کپی شده‌است.توضیحات اصلی ان این بود::\r\n\r\n%s",
-    'de': u"Dieses Bild wurde von %s kopiert. Die dortige Beschreibung lautete:\r\n\r\n%s",
-    'fr': u"Cette image est copiée de %s. La description originale était:\r\n\r\n%s",
-    'he': u"תמונה זו הועתקה מהאתר %s. תיאור הקובץ המקורי היה:\r\n\r\n%s",
-    'hu': u"Kép másolása innen: %s. Az eredeti leírás:\r\n\r\n%s",
-    'ia': u"Iste imagine esseva copiate de %s. Le description original esseva:\r\n\r\n%s",
-    'it': u"Questa immagine è stata copiata da %s. La descrizione originale era:\r\n\r\n%s",
-    'kk': u"Бұл сурет %s дегеннен көшірілді. Түпнұсқа сипатттамасы былай болды:\r\n\r\n%s",
-    'lt': u"Šis paveikslėlis buvo įkeltas iš %s. Originalus aprašymas buvo:\r\n\r\n%s",
-    'nl': u"Afbeelding gekopieerd vanaf %s. De beschrijving daar was:\r\n\r\n%s",
-    'pl': u"Ten obraz został skopiowany z %s. Oryginalny opis to:\r\n\r\n%s",
-    'pt': u"Esta imagem foi copiada de %s. A descrição original foi:\r\n\r\n%s",
-    'ru': u"Изображение было скопировано с %s. Оригинальное описание содержало:\r\n\r\n%s",
-    'sr': u"Ова слика је копирана са %s. Оригинални опис је:\r\n\r\n%s",
-    'zh': u"本圖像從 %s 複製，原始說明資料：\r\n\r\n%s",
-}
 
 nowCommonsTemplate = {
     'ar': u'{{الآن كومنز|%s}}',
@@ -84,27 +64,6 @@ nowCommonsTemplate = {
     'pt': u'{{NowCommons|%s}}',
     'sr': u'{{NowCommons|%s}}',
     'zh': u'{{NowCommons|Image:%s}}',
-}
-
-nowCommonsMessage = {
-    'ar': u'الملف الآن متوفر في ويكيميديا كومنز.',
-    'de': u'Datei ist jetzt auf Wikimedia Commons verfügbar.',
-    'en': u'File is now available on Wikimedia Commons.',
-    'eo': u'Dosiero nun estas havebla en la Wikimedia-Komunejo.',
-    'fa': u'پرونده اکنون در انبار است',
-    'he': u'הקובץ זמין כעת בוויקישיתוף.',
-    'hu': u'A fájl most már elérhető a Wikimedia Commonson',
-    'ia': u'Le file es ora disponibile in Wikimedia Commons.',
-    'ja': u'ファイルはウィキメディア・コモンズにあります',
-    'it': u'L\'immagine è adesso disponibile su Wikimedia Commons.',
-    'kk': u'Файлды енді Wikimedia Ортаққорынан қатынауға болады.',
-    'lt': u'Failas įkeltas į Wikimedia Commons projektą.',
-    'nl': u'Dit bestand staat nu op [[w:nl:Wikimedia Commons|Wikimedia Commons]].',
-    'pl': u'Plik jest teraz dostępny na Wikimedia Commons.',
-    'pt': u'Arquivo está agora na Wikimedia Commons.',
-    'ru': u'[[ВП:КБУ#Ф8|Ф.8]]: доступно на [[Викисклад]]е',
-    'sr': u'Слика је сада доступна и на Викимедија Остави.',
-    'zh': u'檔案已存在於維基共享資源。',
 }
 
 # Translations for license templates.
@@ -192,8 +151,10 @@ class ImageTransferBot(object):
                                                         ['comment', 'math',
                                                          'nowiki', 'pre'])
 
-            description = i18n.translate(self.targetSite, copy_message,
-                                         fallback=True) % (sourceSite, description)
+            description = i18n.twtranslate(self.targetSite,
+                                           'imagetransfer-file_page_message',
+                                           dict(site=sourceSite,
+                                                description=description))
             description += '\n\n'
             description += sourceImagePage.getFileVersionHistoryTable()
             # add interwiki link
@@ -217,7 +178,8 @@ class ImageTransferBot(object):
             if targetFilename and self.targetSite.family.name == 'commons' and \
                self.targetSite.code == 'commons':
                 # upload to Commons was successful
-                reason = i18n.translate(sourceSite, nowCommonsMessage, fallback=True)
+                reason = i18n.twtranslate(sourceSite,
+                                          'imagetransfer-nowcommons_notice')
                 # try to delete the original image if we have a sysop account
                 if sourceSite.family.name in config.sysopnames and \
                    sourceSite.lang in config.sysopnames[sourceSite.family.name]:
@@ -232,7 +194,7 @@ class ImageTransferBot(object):
                     sourceImagePage.put(sourceImagePage.get() + '\n\n' +
                                         nowCommonsTemplate[sourceSite.lang]
                                         % targetFilename,
-                                        summary=nowCommonsMessage[sourceSite.lang])
+                                        summary=reason)
 
     def showImageList(self, imagelist):
         for i in range(len(imagelist)):
