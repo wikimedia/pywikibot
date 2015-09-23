@@ -110,10 +110,6 @@ class DjVuTextBot(SingleSiteBot):
 
         # Overwrite body of the page with content from djvu
         page.body = self._djvu.get_page(page.page_number)
-
-        # Add username in header if page does not exists.
-        if not page.exists():
-            page.user = page.site.user()
         new_text = page.text
 
         summary = self.getOption('summary')
@@ -135,7 +131,7 @@ def main(*args):
     """
     index = None
     djvu_path = '.'  # default djvu file directory
-    pages = '1'
+    pages = '1-'
     options = {}
 
     # Parse command line arguments.

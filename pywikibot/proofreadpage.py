@@ -261,7 +261,8 @@ class ProofreadPage(pywikibot.Page):
         exception Error:   the page is not formatted according to ProofreadPage
                            extension.
         """
-        if not self.text:  # Property force page text loading.
+        # Property force page text loading.
+        if not (hasattr(self, '_text') or self.text):
             self._create_empty_page()
             return
 
