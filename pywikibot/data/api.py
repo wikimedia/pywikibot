@@ -1673,11 +1673,6 @@ class Request(MutableMapping):
             uiprop = self._params.get("uiprop", [])
             uiprop = set(uiprop + ["blockinfo", "hasmsg"])
             self._params["uiprop"] = list(sorted(uiprop))
-            if "properties" in self._params:
-                if "info" in self._params["properties"]:
-                    inprop = self._params.get("inprop", [])
-                    info = set(inprop + ["protection", "talkid", "subjectid"])
-                    self._params["info"] = list(info)
             if 'prop' in self._params:
                 if self.site.has_extension('ProofreadPage'):
                     prop = set(self._params['prop'] + ['proofread'])
