@@ -2914,7 +2914,6 @@ class APISite(BaseSite):
         query = self._simple_request(
             action='query',
             prop='info',
-            inprop=['protection', 'talkid', 'subjectid'],
             titles=title,
             redirects=True)
         result = query.submit()
