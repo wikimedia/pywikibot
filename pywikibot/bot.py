@@ -272,8 +272,6 @@ def init_handlers(strm=None):
 
     _handlers_initialized = True
 
-    pywikibot.tools.debug = debug
-
     writelogheader()
 
 
@@ -954,7 +952,7 @@ def handle_args(args=None, do_help=True):
         showHelp()
         sys.exit(0)
 
-    pywikibot.debug(u"handle_args() completed.", _logger)
+    debug('handle_args() completed.', _logger)
     return nonGlobalArgs
 
 
