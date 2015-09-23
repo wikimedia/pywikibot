@@ -4827,7 +4827,7 @@ class Link(ComparableMixin):
             except SiteDefinitionError as e:
                 raise SiteDefinitionError(
                     u'{0} is not a local page on {1}, and the interwiki prefix '
-                    '{2} is not supported by PyWikiBot!:\n{3}'.format(
+                    '{2} is not supported by Pywikibot!:\n{3}'.format(
                         self._text, self._site, prefix, e))
             else:
                 t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
