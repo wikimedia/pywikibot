@@ -1477,6 +1477,7 @@ class checkImagesBot(object):
                 return True
 
     def findAdditionalProblems(self):
+        """Extract additional settings from configuration page."""
         # In every tuple there's a setting configuration
         for tupla in self.settingsData:
             name = tupla[1]
@@ -1523,6 +1524,7 @@ class checkImagesBot(object):
                         continue
 
     def checkStep(self):
+        """Check a single file page."""
         # nothing = Defining an empty image description
         nothing = ['', ' ', '  ', '   ', '\n', '\n ', '\n  ', '\n\n', '\n \n',
                    ' \n', ' \n ', ' \n \n']
