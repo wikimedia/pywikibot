@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for exceptions."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,20 +22,34 @@ class TestDeprecatedExceptions(DeprecationTestCase):
 
     def test_UploadWarning(self):
         """Test exceptions.UploadWarning is deprecated only."""
-        # Accessing from the main package should work fine.
+        # Accessing from the main package should be deprecated.
         cls = pywikibot.UploadWarning
-        self.assertNoDeprecation()
+
+        self.assertOneDeprecationParts('pywikibot.UploadWarning',
+                                       'APISite.upload with a warning handler')
+
         e = cls('foo', 'bar')
         self.assertIsInstance(e, pywikibot.Error)
         self.assertNoDeprecation()
 
         self._reset_messages()
 
-        # But it sholdnt be accessed from the exceptions module.
+        # And it should not be accessed from the exceptions module either.
+        # The first access loads the symbol
         cls = pywikibot.exceptions.UploadWarning
 
         self.assertOneDeprecationParts('pywikibot.exceptions.UploadWarning',
-                                       'pywikibot.data.api.UploadWarning')
+                                       'APISite.upload with a warning handler')
+
+        e = cls('foo', 'bar')
+        self.assertIsInstance(e, pywikibot.Error)
+        self.assertNoDeprecation()
+
+        # Check this again because the second time it should be cached
+        cls = pywikibot.exceptions.UploadWarning
+
+        self.assertOneDeprecationParts('pywikibot.exceptions.UploadWarning',
+                                       'APISite.upload with a warning handler')
 
         e = cls('foo', 'bar')
         self.assertIsInstance(e, pywikibot.Error)
