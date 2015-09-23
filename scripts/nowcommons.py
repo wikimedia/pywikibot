@@ -374,9 +374,9 @@ class NowCommonsDeleteBot(Bot):
                                 bot.run()
                                 # If the image is used with the urlname the
                                 # previous function won't work
-                                if len(list(pywikibot.FilePage(self.site,
-                                                                page.title()).usingPages())) > 0 and \
-                                                                self.getOption('replaceloose'):
+                                is_used = bool(list(pywikibot.FilePage(
+                                    self.site, page.title()).usingPages(total=1)))
+                                if is_used and self.getOption('replaceloose'):
                                     bot = ImageBot(
                                         pg.FileLinksGenerator(
                                             localImagePage),
