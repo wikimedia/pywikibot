@@ -471,6 +471,19 @@ class TestOtherSubmodule(TestCase):
         self.assertFalse(other_modules & pi.modules)
 
 
+class TestParaminfoModules(DefaultSiteTestCase):
+
+    """Test loading all paraminfo modules."""
+
+    def test_action_modules(self):
+        """Test loading all action modules."""
+        self.site._paraminfo.fetch(self.site._paraminfo.action_modules)
+
+    def test_query_modules(self):
+        """Test loading all query modules."""
+        self.site._paraminfo.fetch(self.site._paraminfo.query_modules)
+
+
 class TestOptionSet(TestCase):
 
     """OptionSet class test class."""
