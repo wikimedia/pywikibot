@@ -567,7 +567,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
                 family = pywikibot.family.Family.load(fam)
                 code = family.from_url(url)
                 if code is not None:
-                    matched_sites += [(code, fam)]
+                    matched_sites += [(code, family)]
 
             if matched_sites:
                 if len(matched_sites) > 1:
@@ -590,7 +590,11 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         # Fallback to config defaults
         code = code or config.mylang
         fam = fam or config.family
-    interface = interface or config.site_interface
+
+        if not isinstance(fam, pywikibot.family.Family):
+            fam = pywikibot.family.Family.load(fam)
+
+    interface = interface or fam.interface(code)
 
     # config.usernames is initialised with a dict for each family name
     family_name = str(fam)

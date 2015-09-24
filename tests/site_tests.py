@@ -224,6 +224,11 @@ class TestSiteObject(DefaultSiteTestCase):
         mysite_pickled = pickle.loads(mysite_str)
         self.assertEqual(mysite, mysite_pickled)
 
+    def test_repr(self):
+        """Test __repr__."""
+        expect = 'Site("{0}", "{1}")'.format(self.code, self.family)
+        self.assertStringMethod(str.endswith, repr(self.site), expect)
+
     def testBaseMethods(self):
         """Test cases for BaseSite methods."""
         mysite = self.get_site()
@@ -235,9 +240,6 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertEqual(mysite.sitename(),
                          "%s:%s" % (self.family,
                                     self.code))
-        self.assertEqual(repr(mysite),
-                         'Site("%s", "%s")'
-                         % (self.code, self.family))
         self.assertIsInstance(mysite.linktrail(), basestring)
         self.assertIsInstance(mysite.redirect(), basestring)
         try:
@@ -2757,6 +2759,7 @@ class TestObsoleteSite(TestCase):
     def test_removed_site(self):
         """Test Wikimedia offline site."""
         site = pywikibot.Site('ru-sib', 'wikipedia')
+        self.assertIsInstance(site, pywikibot.site.RemovedSite)
         self.assertEqual(site.code, 'ru-sib')
         self.assertIsInstance(site.obsolete, bool)
         self.assertTrue(site.obsolete)

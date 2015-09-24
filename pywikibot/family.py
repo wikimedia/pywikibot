@@ -1098,6 +1098,20 @@ class Family(object):
     def nice_get_address(self, code, title):
         return '%s%s' % (self.nicepath(code), title)
 
+    def interface(self, code):
+        """
+        Return interface to use for code.
+
+        @rtype: str or subclass of BaseSite
+        """
+        if code in self.interwiki_removals:
+            if code in self.codes:
+                pywikibot.warn('Interwiki removal %s is in %s codes'
+                               % (code, self))
+            return 'RemovedSite'
+
+        return config.site_interface
+
     # List of codes which aren't returned by from_url; True returns None always
     _ignore_from_url = []
 
