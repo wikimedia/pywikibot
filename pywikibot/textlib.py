@@ -941,14 +941,15 @@ def interwikiFormat(links, insite=None):
     ar = interwikiSort(list(links.keys()), insite)
     s = []
     for site in ar:
-        try:
+        if isinstance(links[site], pywikibot.Link):
+            links[site] = pywikibot.Page(links[site])
+        if isinstance(links[site], pywikibot.Page):
             title = links[site].title(asLink=True, forceInterwiki=True,
                                       insite=insite)
             link = title.replace('[[:', '[[')
             s.append(link)
-        except AttributeError:
-            s.append(pywikibot.Site(site, insite.family).linkto(
-                links[site], othersite=insite))
+        else:
+            raise ValueError('links dict must contain Page or Link objects')
     if insite.code in insite.family.interwiki_on_one_line:
         sep = u' '
     else:

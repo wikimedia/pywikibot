@@ -104,11 +104,21 @@ class TestFormatInterwiki(TestCase):
 
     cached = True
 
-    def test_interwiki_format(self):
+    def test_interwiki_format_Page(self):
         """Test formatting interwiki links using Page instances."""
         interwikis = {
             'de': pywikibot.Page(pywikibot.Link('de:German', self.site)),
             'fr': pywikibot.Page(pywikibot.Link('fr:French', self.site))
+        }
+        self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
+                         % {'LS': config.LS},
+                         textlib.interwikiFormat(interwikis, self.site))
+
+    def test_interwiki_format_Link(self):
+        """Test formatting interwiki links using Page instances."""
+        interwikis = {
+            'de': pywikibot.Link('de:German', self.site),
+            'fr': pywikibot.Link('fr:French', self.site),
         }
         self.assertEqual('[[de:German]]%(LS)s[[fr:French]]%(LS)s'
                          % {'LS': config.LS},
