@@ -117,6 +117,7 @@ auto_run_script_list = [
     'patrol',
     'script_wui',
     'shell',
+    'standardize_interwiki',
     'states_redirect',
     'unusedfiles',
     'upload',
