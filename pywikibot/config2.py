@@ -655,6 +655,13 @@ flickr = {
     'reviewer': u'',  # If so, under what reviewer name?
 }
 
+# Using the Panoramio api
+panoramio = {
+    'review': False,  # Do we use automatically make our uploads reviewed?
+    'reviewer': u'',  # If so, under what reviewer name?
+}
+
+
 # ############# COPYRIGHT SETTINGS ##############
 
 # Enable/disable search engine in copyright.py script
