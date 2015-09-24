@@ -61,6 +61,7 @@ from pywikibot.tools import (
     PYTHON_VERSION, PY2,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
+    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     first_upper, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
 )
@@ -2306,8 +2307,7 @@ class FilePage(Page):
             self, step=step, total=total, content=content)
 
 
-import pywikibot.tools
-wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
+wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
 
 

@@ -26,19 +26,24 @@ else:
 
 from warnings import warn
 
-# Use pywikibot. prefix for all in-package imports; this is to prevent
-# confusion with similarly-named modules in version 1 framework, for users
-# who want to continue using both
+# logging must be imported first so that other modules can
+# use these logging methods during the initialisation sequence.
+from pywikibot.logging import (
+    critical, debug, error, exception, log, output, stdout, warning
+)
 
 from pywikibot import config2 as config
 from pywikibot.bot import (
-    output, warning, error, critical, debug, stdout, exception,
-    input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui, log,
+    input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
     # the following are flagged as deprecated on usage
     handleArgs,
 )
+from pywikibot.bot_choice import (
+    QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
+)
 from pywikibot.data.api import UploadWarning as _UploadWarning
+from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
     Error, InvalidTitle, BadTitle, NoPage, NoMoveTarget, SectionError,
     SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
@@ -51,14 +56,25 @@ from pywikibot.exceptions import (
     ServerError, FatalServerError, Server504Error,
     CaptchaError, SpamfilterError, CircularRedirect, InterwikiRedirectPage,
     WikiBaseError, CoordinateGlobeUnknownException,
+    DeprecatedPageNotFoundError as _DeprecatedPageNotFoundError,
+    _EmailUserError,
 )
-from pywikibot.tools import PY2, UnicodeMixin, redirect_func
-from pywikibot.tools.formatter import color_format
+from pywikibot.family import Family
 from pywikibot.i18n import translate
-from pywikibot.diff import PatchManager
+from pywikibot.site import BaseSite
+from pywikibot.tools import (
+    # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
+    deprecated as __deprecated,
+    deprecate_arg as __deprecate_arg,
+    normalize_username,
+    redirect_func,
+    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
+    PY2,
+    UnicodeMixin,
+)
+from pywikibot.tools.formatter import color_format
 
 import pywikibot.textlib as textlib
-import pywikibot.tools
 
 textlib_methods = (
     'unescape', 'replaceExcept', 'removeDisabledParts', 'removeHTMLParts',
@@ -108,8 +124,8 @@ for _name in textlib_methods:
     globals()[_name] = wrapped_func
 
 
-deprecated = redirect_func(pywikibot.tools.deprecated)
-deprecate_arg = redirect_func(pywikibot.tools.deprecate_arg)
+deprecated = redirect_func(__deprecated)
+deprecate_arg = redirect_func(__deprecate_arg)
 
 
 class Timestamp(datetime.datetime):
@@ -564,14 +580,14 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
             # Iterate through all families and look, which does apply to
             # the given URL
             for fam in config.family_files:
-                family = pywikibot.family.Family.load(fam)
+                family = Family.load(fam)
                 code = family.from_url(url)
                 if code is not None:
                     matched_sites += [(code, family)]
 
             if matched_sites:
                 if len(matched_sites) > 1:
-                    pywikibot.warning(
+                    warning(
                         'Found multiple matches for URL "{0}": {1} (use first)'
                         .format(url, ', '.join(str(s) for s in matched_sites)))
                 _url_cache[url] = matched_sites[0]
@@ -591,8 +607,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         code = code or config.mylang
         fam = fam or config.family
 
-        if not isinstance(fam, pywikibot.family.Family):
-            fam = pywikibot.family.Family.load(fam)
+        if not isinstance(fam, Family):
+            fam = Family.load(fam)
 
     interface = interface or fam.interface(code)
 
@@ -612,10 +628,10 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         except ImportError:
             raise ValueError("Invalid interface name '%(interface)s'" % locals())
 
-    if not issubclass(interface, pywikibot.site.BaseSite):
+    if not issubclass(interface, BaseSite):
         warning('Site called with interface=%s' % interface.__name__)
 
-    user = pywikibot.tools.normalize_username(user)
+    user = normalize_username(user)
     key = '%s:%s:%s:%s' % (interface.__name__, fam, code, user)
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user, sysop=sysop)
@@ -630,9 +646,10 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
 
 # alias for backwards-compability
-getSite = pywikibot.tools.redirect_func(Site, old_name='getSite')
+getSite = redirect_func(Site, old_name='getSite')
 
 
+# These imports depend on Wb* classes above.
 from pywikibot.page import (
     Page,
     FilePage,
@@ -649,7 +666,7 @@ from pywikibot.page import html2unicode, url2unicode, unicode2html
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
-@pywikibot.tools.deprecated("comment parameter for page saving method")
+@__deprecated('comment parameter for page saving method')
 def setAction(s):
     """Set a summary to use for changed page submissions."""
     config.default_edit_summary = s
@@ -752,20 +769,20 @@ _putthread = threading.Thread(target=async_manager)
 _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
-wrapper = pywikibot.tools.ModuleDeprecationWrapper(__name__)
+wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
 wrapper._add_deprecated_attr(
     'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar')
 wrapper._add_deprecated_attr(
-    'PageNotFound', pywikibot.exceptions.DeprecatedPageNotFoundError,
+    'PageNotFound', _DeprecatedPageNotFoundError,
     warning_message=('{0}.{1} is deprecated, and no longer '
                      'used by pywikibot; use http.fetch() instead.'))
 wrapper._add_deprecated_attr(
-    'UserActionRefuse', pywikibot.exceptions._EmailUserError,
+    'UserActionRefuse', _EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
                     'use UserRightsError and/or NotEmailableError instead.')
 wrapper._add_deprecated_attr(
-    'QuitKeyboardInterrupt', pywikibot.bot.QuitKeyboardInterrupt,
+    'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
                     'use pywikibot.bot.QuitKeyboardInterrupt instead.')
 wrapper._add_deprecated_attr(
