@@ -230,11 +230,6 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                     else:
                         skip_lines -= 1
 
-            # Avoid failures because getargspec hasn't been removed yet: T106209
-            if PYTHON_VERSION >= (3, 5, 0):
-                if str(entry.message) == ('inspect.getargspec() is deprecated, '
-                                          'use inspect.signature() instead'):
-                    return
             # Avoid failures because cryptography is mentioning Python 2.6
             # is outdated
             if PYTHON_VERSION < (2, 7):
