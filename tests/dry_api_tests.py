@@ -10,7 +10,6 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import os
 import datetime
 
 import pywikibot
@@ -22,7 +21,7 @@ from pywikibot.data.api import (
 )
 from pywikibot.family import Family
 
-from tests import _images_dir
+from tests import join_images_path
 from tests.utils import DummySiteinfo
 from tests.aspects import (
     unittest, TestCase, DefaultDrySiteTestCase, SiteAttributeTestCase,
@@ -272,7 +271,7 @@ class DryMimeTests(TestCase):
 
     def test_mime_file_payload(self):
         """Test Request._generate_MIME_part loads binary as binary."""
-        local_filename = os.path.join(_images_dir, 'MP_sounds.png')
+        local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
         submsg = Request._generate_MIME_part(
@@ -282,7 +281,7 @@ class DryMimeTests(TestCase):
 
     def test_mime_file_container(self):
         """Test Request._build_mime_request encodes binary."""
-        local_filename = os.path.join(_images_dir, 'MP_sounds.png')
+        local_filename = join_images_path('MP_sounds.png')
         with open(local_filename, 'rb') as f:
             file_content = f.read()
         body = Request._build_mime_request({}, {
@@ -304,7 +303,7 @@ class MimeTests(DefaultDrySiteTestCase):
         site._userinfo = {'name': 'myusername', 'groups': []}
         req = Request(site=site, action="upload",
                       file='MP_sounds.png', mime=True,
-                      filename=os.path.join(_images_dir, 'MP_sounds.png'))
+                      filename=join_images_path('MP_sounds.png'))
         self.assertEqual(req.mime, True)
 
 

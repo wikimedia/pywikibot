@@ -17,7 +17,7 @@ __version__ = '$Id$'
 import os
 
 from scripts import upload
-from tests import _images_dir
+from tests import join_images_path
 from tests.aspects import unittest, TestCase
 
 
@@ -33,7 +33,7 @@ class TestUploadbot(TestCase):
     def test_png_list(self):
         """Test uploading a list of pngs using upload.py."""
         image_list = []
-        for directory_info in os.walk(_images_dir):
+        for directory_info in os.walk(join_images_path()):
             for dir_file in directory_info[2]:
                 image_list.append(os.path.join(directory_info[0], dir_file))
         bot = upload.UploadRobot(url=image_list,
@@ -45,7 +45,7 @@ class TestUploadbot(TestCase):
 
     def test_png(self):
         """Test uploading a png using upload.py."""
-        bot = upload.UploadRobot(url=[os.path.join(_images_dir, "MP_sounds.png")],
+        bot = upload.UploadRobot(url=[join_images_path("MP_sounds.png")],
                                  description="pywikibot upload.py script test",
                                  useFilename=None, keepFilename=True,
                                  verifyDescription=True, aborts=set(),

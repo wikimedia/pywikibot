@@ -15,14 +15,13 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import os
 import sys
 
-from tests import _tests_dir
+from tests import join_tests_path, create_path_func
 from tests.utils import execute, execute_pwb
 from tests.aspects import unittest, PwbTestCase
 
-_pwb_tests_dir = os.path.join(_tests_dir, 'pwb')
+join_pwb_tests_path = create_path_func(join_tests_path, 'pwb')
 
 
 class TestPwb(PwbTestCase):
@@ -42,7 +41,7 @@ class TestPwb(PwbTestCase):
 
     def _do_check(self, name):
         package_name = 'tests.pwb.' + name
-        script_path = os.path.join(_pwb_tests_dir, name + '.py')
+        script_path = join_pwb_tests_path(name + '.py')
 
         direct = execute([sys.executable, '-m', package_name])
         vpwb = execute_pwb([script_path])

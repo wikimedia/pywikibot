@@ -10,14 +10,13 @@
 
 from __future__ import absolute_import, unicode_literals
 
-import os
 import subprocess
 
-from tests import _data_dir
+from tests import join_data_path, create_path_func
 from tests.aspects import unittest, TestCase
 from pywikibot.tools.djvu import DjVuFile
 
-_djvu_dir = 'djvu'
+join_djvu_data_path = create_path_func(join_data_path, 'djvu')
 
 
 class TestDjVuFile(TestCase):
@@ -26,9 +25,9 @@ class TestDjVuFile(TestCase):
 
     net = False
 
-    file_djvu_not_existing = os.path.join(_data_dir, _djvu_dir, 'not_existing.djvu')
-    file_djvu = os.path.join(_data_dir, _djvu_dir, 'myfile.djvu')
-    file_djvu_wo_text = os.path.join(_data_dir, _djvu_dir, 'myfile_wo_text.djvu')
+    file_djvu_not_existing = join_djvu_data_path('not_existing.djvu')
+    file_djvu = join_djvu_data_path('myfile.djvu')
+    file_djvu_wo_text = join_djvu_data_path('myfile_wo_text.djvu')
     test_txt = 'A file with non-ASCII characters, \nlike é or ç'
 
     @classmethod

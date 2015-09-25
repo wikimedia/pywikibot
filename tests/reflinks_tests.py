@@ -9,14 +9,10 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import os
-
 from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
-from tests import _data_dir
+from tests import join_xml_data_path
 from tests.aspects import unittest, TestCase, ScriptMainTestCase
-
-_xml_data_dir = os.path.join(_data_dir, 'xml')
 
 
 class TestXMLPageGenerator(TestCase):
@@ -31,7 +27,7 @@ class TestXMLPageGenerator(TestCase):
     def test_non_bare_ref_urls(self):
         """Test pages without bare references are not processed."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'article-pear-0.10.xml'),
+            xmlFilename=join_xml_data_path('article-pear-0.10.xml'),
             xmlStart=u'Pear',
             namespaces=[0, 1],
             site=self.get_site())
@@ -41,7 +37,7 @@ class TestXMLPageGenerator(TestCase):
     def test_simple_bare_refs(self):
         """Test simple bare references in multiple namespaces."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=u'Fake page',
             namespaces=[0, 1],
             site=self.get_site())
@@ -52,7 +48,7 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_empty_list(self):
         """Test namespaces=[] processes all namespaces."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=u'Fake page',
             namespaces=[],
             site=self.get_site())
@@ -64,7 +60,7 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_None(self):
         """Test namespaces=None processes all namespaces."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=u'Fake page',
             namespaces=None,
             site=self.get_site())
@@ -76,7 +72,7 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_string_ids(self):
         """Test namespaces with ids as string."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=u'Fake page',
             namespaces=["0", "1"],
             site=self.get_site())
@@ -87,7 +83,7 @@ class TestXMLPageGenerator(TestCase):
     def test_namespace_names(self):
         """Test namespaces with namespace names."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=u'Fake page',
             namespaces=["Talk"],
             site=self.get_site())
@@ -99,7 +95,7 @@ class TestXMLPageGenerator(TestCase):
     def test_start_with_underscore(self):
         """Test with underscore in start page title."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=u'Fake_page',
             namespaces=[0, 1],
             site=self.get_site())
@@ -110,7 +106,7 @@ class TestXMLPageGenerator(TestCase):
     def test_without_start(self):
         """Test without a start page title."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart=None,
             namespaces=[0, 1],
             site=self.get_site())
@@ -122,7 +118,7 @@ class TestXMLPageGenerator(TestCase):
     def test_start_prefix(self):
         """Test with a prefix as a start page title."""
         gen = XmlDumpPageGenerator(
-            xmlFilename=os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+            xmlFilename=join_xml_data_path('dummy-reflinks.xml'),
             xmlStart='Fake',
             namespaces=[0, 1],
             site=self.get_site())
@@ -160,14 +156,14 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     def test_xml_simple(self):
         """Test the generator without any narrowing."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'))
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'))
         gen = self.constructor_args[0]
         self.assertPageTitlesCountEqual(gen, [u'Fake page', u'Talk:Fake page'],
                                         site=self.get_site())
 
     def test_xml_one_namespace(self):
         """Test the generator using one namespace id."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1')
         gen = self.constructor_args[0]
         pages = list(gen)
@@ -176,7 +172,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     def test_xml_multiple_namespace_ids(self):
         """Test the generator using multiple separate namespaces parameters."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:0', '-namespace:1', '-xmlstart:Fake page')
         gen = self.constructor_args[0]
         self.assertPageTitlesCountEqual(gen, [u'Fake page', u'Talk:Fake page'],
@@ -185,7 +181,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     @unittest.expectedFailure
     def test_xml_multiple_namespace_ids_2(self):
         """Test the generator using multiple namespaces in one parameter."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:0,1', '-xmlstart:Fake page')
         gen = self.constructor_args[0]
         self.assertPageTitlesCountEqual(gen, [u'Fake page', u'Talk:Fake page'],
@@ -194,7 +190,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     @unittest.expectedFailure
     def test_xml_start_prefix(self):
         """Test the generator using a start partial page."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1', '-xmlstart:Fake')
         gen = self.constructor_args[0]
         pages = list(gen)
@@ -204,7 +200,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     @unittest.expectedFailure
     def test_xml_start_underscore(self):
         """Test the generator using a start page with an underscore."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:1', '-xmlstart:Fake_page')
         gen = self.constructor_args[0]
         pages = list(gen)
@@ -213,7 +209,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
 
     def test_xml_namespace_name(self):
         """Test the generator using a namespace name."""
-        main('-xml:' + os.path.join(_xml_data_dir, 'dummy-reflinks.xml'),
+        main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
              '-namespace:Talk', '-xmlstart:Fake page')
         gen = self.constructor_args[0]
         pages = list(gen)

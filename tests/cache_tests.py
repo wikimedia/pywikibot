@@ -13,7 +13,7 @@ __version__ = '$Id$'
 from pywikibot.site import BaseSite
 import scripts.maintenance.cache as cache
 
-from tests import _cache_dir
+from tests import join_cache_path
 from tests.aspects import unittest, TestCase
 
 
@@ -37,7 +37,7 @@ class RequestCacheTests(TestCase):
 
     def test_cache(self):
         """Test the apicache by doing _check_cache_entry over each entry."""
-        cache.process_entries(_cache_dir, self._check_cache_entry)
+        cache.process_entries(join_cache_path(), self._check_cache_entry)
 
 
 if __name__ == '__main__':

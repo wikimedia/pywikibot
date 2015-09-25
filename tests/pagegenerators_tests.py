@@ -12,7 +12,6 @@ __version__ = '$Id$'
 import calendar
 import datetime
 import json
-import os
 import sys
 
 from distutils.version import LooseVersion
@@ -25,7 +24,7 @@ from pywikibot.pagegenerators import (
     PreloadingGenerator,
 )
 
-from tests import _data_dir
+from tests import join_data_path
 from tests.aspects import (
     unittest,
     TestCase,
@@ -275,7 +274,7 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
     )
 
     def test_brackets(self):
-        filename = os.path.join(_data_dir, 'pagelist-brackets.txt')
+        filename = join_data_path('pagelist-brackets.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
         self.assertEqual(len(titles), len(self.expected_titles))
@@ -285,7 +284,7 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         self.assertPageTitlesEqual(titles, expected_titles)
 
     def test_lines(self):
-        filename = os.path.join(_data_dir, 'pagelist-lines.txt')
+        filename = join_data_path('pagelist-lines.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
         self.assertEqual(len(titles), len(self.expected_titles))

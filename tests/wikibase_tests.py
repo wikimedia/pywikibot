@@ -12,7 +12,6 @@ __version__ = '$Id$'
 
 import copy
 import json
-import os
 
 import pywikibot
 
@@ -20,6 +19,7 @@ from pywikibot import pagegenerators
 from pywikibot.page import WikibasePage, ItemPage
 from pywikibot.site import Namespace, NamespacesDict
 
+from tests import join_pages_path
 from tests.aspects import (
     unittest, TestCase,
     WikidataTestCase,
@@ -650,7 +650,7 @@ class TestLinks(WikidataTestCase):
         super(TestLinks, self).setUp()
         self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
         self.wdp.id = 'Q60'
-        with open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60_only_sitelinks.wd')) as f:
+        with open(join_pages_path('Q60_only_sitelinks.wd')) as f:
             self.wdp._content = json.load(f)
         self.wdp.get()
 
@@ -968,7 +968,7 @@ class TestJSON(WikidataTestCase):
         wikidata = self.get_repo()
         self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
         self.wdp.id = 'Q60'
-        with open(os.path.join(os.path.split(__file__)[0], 'pages', 'Q60.wd')) as f:
+        with open(join_pages_path('Q60.wd')) as f:
             self.wdp._content = json.load(f)
         self.wdp.get()
         del self.wdp._content['id']
