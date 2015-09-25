@@ -9,7 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import os
 import re
 import warnings
 
@@ -24,7 +23,7 @@ from pywikibot.tools import (
     UnicodeType as unicode,
 )
 
-from tests import _images_dir
+from tests import join_images_path
 from tests.aspects import unittest, TestCase, DeprecationTestCase
 
 
@@ -371,7 +370,7 @@ class BinaryTestCase(TestCase):
         """Set up test class."""
         super(BinaryTestCase, cls).setUpClass()
 
-        with open(os.path.join(_images_dir, 'MP_sounds.png'), 'rb') as f:
+        with open(join_images_path('MP_sounds.png'), 'rb') as f:
             cls.png = f.read()
 
     def test_requests(self):

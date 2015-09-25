@@ -8,8 +8,6 @@
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
-#
-import os
 
 import pywikibot
 
@@ -17,13 +15,13 @@ from pywikibot import fixes
 
 from scripts import replace
 
-from tests import _data_dir
+from tests import join_data_path
 from tests.aspects import unittest
 from tests.bot_tests import TWNBotTestCase
 
 # Load only the custom fixes
 fixes.fixes.clear()
-fixes._load_file(os.path.join(_data_dir, 'fixes.py'))
+fixes._load_file(join_data_path('fixes.py'))
 
 
 class TestReplacementsMain(TWNBotTestCase):

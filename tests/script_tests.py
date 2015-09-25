@@ -17,11 +17,11 @@ from pywikibot.tools import (
     StringTypes,
 )
 
-from tests import _root_dir
+from tests import join_root_path
 from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
 from tests.utils import allowed_failure, execute_pwb, add_metaclass
 
-scripts_path = os.path.join(_root_dir, 'scripts')
+scripts_path = join_root_path('scripts')
 
 # These dependencies are not always the package name which is in setup.py.
 # e.g. 'PIL.ImageTk' is a object provided by several different pypi packages,

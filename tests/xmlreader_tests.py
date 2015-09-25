@@ -9,14 +9,10 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import os.path
-
 from pywikibot import xmlreader
 
-from tests import _data_dir
+from tests import join_xml_data_path
 from tests.aspects import unittest, TestCase
-
-_xml_data_dir = os.path.join(_data_dir, 'xml')
 
 
 class XmlReaderTestCase(TestCase):
@@ -28,7 +24,7 @@ class XmlReaderTestCase(TestCase):
     def _get_entries(self, filename, **kwargs):
         """Get all entries via XmlDump."""
         entries = [r for r in
-                   xmlreader.XmlDump(os.path.join(_xml_data_dir, filename),
+                   xmlreader.XmlDump(join_xml_data_path(filename),
                                      **kwargs).parse()]
         return entries
 
@@ -62,8 +58,7 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
         """Test XmlDump correctly parsing whether a page is a redirect."""
         pages = self._get_entries('article-pyrus.xml', allrevisions=True)
         pages = [r for r in
-                 xmlreader.XmlDump(os.path.join(_xml_data_dir,
-                                                "article-pyrus.xml")).parse()]
+                 xmlreader.XmlDump(join_xml_data_path('article-pyrus.xml')).parse()]
         self.assertTrue(pages[0].isredirect)
 
     def _compare(self, previous, variant, all_revisions):

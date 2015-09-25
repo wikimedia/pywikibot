@@ -8,12 +8,10 @@
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
-#
-import os
 
 from pywikibot import fixes
 
-from tests import unittest, _data_dir
+from tests import unittest, join_data_path
 from tests.aspects import TestCase
 
 
@@ -37,14 +35,14 @@ class TestFixes(TestCase):
         """Test loading a fix file overwriting the fixes."""
         fixes.fixes = {}
         old_fixes = fixes.fixes
-        fixes._load_file(os.path.join(_data_dir, 'set-fixes.py'))
+        fixes._load_file(join_data_path('set-fixes.py'))
         self.assertIsNot(fixes.fixes, old_fixes)
 
     def test_update_value(self):
         """Test loading a fix file changing the fixes."""
         fixes.fixes = {}
         old_fixes = fixes.fixes
-        fixes._load_file(os.path.join(_data_dir, 'fixes.py'))
+        fixes._load_file(join_data_path('fixes.py'))
         self.assertIs(fixes.fixes, old_fixes)
 
 

@@ -17,11 +17,9 @@ import tempfile
 
 from pywikibot import tools
 
-from tests import _data_dir
+from tests import join_xml_data_path
 from tests.aspects import unittest, DeprecationTestCase, TestCase
 from tests.utils import expected_failure_if
-
-_xml_data_dir = os.path.join(_data_dir, 'xml')
 
 
 class ContextManagerWrapperTestCase(TestCase):
@@ -87,7 +85,7 @@ class OpenArchiveTestCase(TestCase):
     def setUpClass(cls):
         """Define base_file and original_content."""
         super(OpenArchiveTestCase, cls).setUpClass()
-        cls.base_file = os.path.join(_xml_data_dir, 'article-pyrus.xml')
+        cls.base_file = join_xml_data_path('article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
             cls.original_content = f.read()
 
@@ -150,7 +148,7 @@ class OpenArchiveWriteTestCase(TestCase):
     def setUpClass(cls):
         """Define base_file and original_content."""
         super(OpenArchiveWriteTestCase, cls).setUpClass()
-        cls.base_file = os.path.join(_xml_data_dir, 'article-pyrus.xml')
+        cls.base_file = join_xml_data_path('article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
             cls.original_content = f.read()
 
