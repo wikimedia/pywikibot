@@ -44,6 +44,9 @@ from tests import unittest  # noqa
 
 OSWIN32 = (sys.platform == 'win32')
 
+PYTHON_26_CRYPTO_WARN = ('Python 2.6 is no longer supported by the Python core '
+                         'team, please upgrade your Python.')
+
 
 class DrySiteNote(RuntimeWarning):
 
@@ -231,6 +234,12 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
             if PYTHON_VERSION >= (3, 5, 0):
                 if str(entry.message) == ('inspect.getargspec() is deprecated, '
                                           'use inspect.signature() instead'):
+                    return
+            # Avoid failures because cryptography is mentioning Python 2.6
+            # is outdated
+            if PYTHON_VERSION < (2, 7):
+                if (isinstance(entry, DeprecationWarning) and
+                        str(entry.message) == PYTHON_26_CRYPTO_WARN):
                     return
 
             log.append(entry)
@@ -557,9 +566,16 @@ def execute(command, data_in=None, timeout=0, error=None):
     """
     Execute a command and capture outputs.
 
+    On Python 2.6 it adds an option to ignore the deprecation warning from
+    the cryptography package after the first entry of the command parameter.
+
     @param command: executable to run and arguments to use
     @type command: list of unicode
     """
+    if PYTHON_VERSION < (2, 7):
+        command.insert(
+            1, '-W ignore:{0}:DeprecationWarning'.format(PYTHON_26_CRYPTO_WARN))
+
     # Any environment variables added on Windows must be of type
     # str() on Python 2.
     env = os.environ.copy()
