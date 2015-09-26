@@ -382,7 +382,15 @@ class DrySite(pywikibot.site.APISite):
         self._msgcache = {'*': 'dummy entry', 'hello': 'world'}
 
     def _build_namespaces(self):
-        return Namespace.builtin_namespaces(case=self.siteinfo['case'])
+        ns_dict = Namespace.builtin_namespaces(case=self.siteinfo['case'])
+        if hasattr(self.family, 'authornamespaces'):
+            assert len(self.family.authornamespaces[self.code]) <= 1
+            if self.family.authornamespaces[self.code]:
+                author_ns = self.family.authornamespaces[self.code][0]
+                assert author_ns not in ns_dict
+                ns_dict[author_ns] = Namespace(
+                    author_ns, 'Author', case=self.siteinfo['case'])
+        return ns_dict
 
     @property
     def userinfo(self):
