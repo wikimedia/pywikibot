@@ -73,7 +73,7 @@ flickrapi ; python_version >= '2.7'
 # incomplete core component botirc
 irc ; python_version > '2.6'
 
-# textlib.py
+# textlib.py and patrol.py
 mwparserfromhell>=0.3.3 ; python_version <= '3.4'
 
 # The mysql generator in pagegenerators depends on either oursql or MySQLdb

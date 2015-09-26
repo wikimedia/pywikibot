@@ -69,6 +69,7 @@ script_deps = {
     'flickrripper.py': ['Pillow'],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client>=0.5.1'],
+    'patrol.py': ['mwparserfromhell>=0.3.3'],
 }
 # flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
 # The problem doesnt exist in flickrapi 2.x.
@@ -133,9 +134,6 @@ if sys.version_info[0] == 2:
 
     script_deps['data_ingestion.py'] = extra_deps['csv']
 
-    # mwlib is not available for py3
-    script_deps['patrol'] = ['mwlib']
-
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
 # which depends on pywin32.
@@ -157,11 +155,6 @@ extra_deps.update(script_deps)
 # so all scripts can be compiled for script_tests, etc.
 if 'PYSETUP_TEST_EXTRAS' in os.environ:
     test_deps += list(itertools.chain(*(extra_deps.values())))
-    # mwlib requires 'pyparsing>=1.4.11,<1.6', which conflicts with
-    # pydot's requirement for pyparsing>=2.0.1.
-    if 'mwlib' in test_deps:
-        test_deps.remove('mwlib')
-
     if 'oursql' in test_deps and os.name == 'nt':
         test_deps.remove('oursql')  # depends on Cython
 

@@ -44,7 +44,7 @@ script_deps = {
     'match_images': ['PIL.ImageTk'],
     'panoramiopicker': ['BeautifulSoup'],
     'states_redirect': ['pycountry'],
-    'patrol': ['mwlib'],
+    'patrol': ['mwparserfromhell'],
 }
 
 if PYTHON_VERSION < (2, 7):

@@ -12,7 +12,7 @@ __version__ = '$Id$'
 try:
     from scripts import patrol
 except ImportError:
-    patrol = None  # if mwlib is not installed
+    patrol = None  # if mwparserfromhell is not installed
 
 from tests.aspects import require_modules, unittest, DefaultDrySiteTestCase
 
@@ -21,17 +21,17 @@ This is some text above the entries:
 
 == Header ==
 * [[User:Test 1]]: [[Page 1]], [[Page 2]]
-* [[User:Test 2]]: [[Page 2]], [[Page 4]], [[Page 6]]
+* [[User:Test_2]]: [[Page 2]], [[Page 4]], [[Page 6]]
 
 == Others ==
 * [[User:Prefixed]]: [[Special:PrefixIndex/Page 1]], [[Special:PREFIXINDEX/Page 2]]
 
 == More test 1 ==
-* [[User:Test 1]]: [[Page 3]]
+* [[User:Test_1]]: [[Page 3]]
 """
 
 
-@require_modules('mwlib')
+@require_modules('mwparserfromhell')
 class TestPatrolBot(DefaultDrySiteTestCase):
 
     """Test the PatrolBot class."""
@@ -51,7 +51,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
                                             for i in range(1, 4)])
         self.assertIn('Prefixed', tuples)
         self.assertEqual(tuples['Prefixed'], ['Page 1', 'Page 2'])
-        self.assertRaises(Exception, self.bot.parse_page_tuples, '[[link]]')
+        self.assertEqual(self.bot.parse_page_tuples('[[link]]'), {})
 
     def test_in_list(self):
         """Test the method which returns whether a page is in the list."""

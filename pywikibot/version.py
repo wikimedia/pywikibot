@@ -533,14 +533,6 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             info['ver'] = package.__version__
         elif name.startswith('unicodedata'):
             info['ver'] = package.unidata_version
-        elif name == 'mwlib':  # mwlib 0.14.3 does not include a __init__.py
-            module = __import__(name + '._version',
-                                fromlist=['_version'], level=0)
-            if '__version__' in module.__dict__:
-                info['ver'] = module.__version__
-                path = module.__file__
-                path = path[0:path.index('_version.')]
-                info['path'] = path
 
         # If builtins or standard_lib is None,
         # only include package if a version was found.
