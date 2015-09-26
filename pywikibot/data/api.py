@@ -29,7 +29,9 @@ from warnings import warn
 
 import pywikibot
 from pywikibot import config, login
-from pywikibot.tools import MediaWikiVersion, deprecated, itergroup, ip, PY2
+from pywikibot.tools import (
+    MediaWikiVersion, deprecated, itergroup, ip, PY2, getargspec,
+)
 from pywikibot.tools.formatter import color_format
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername, Error
@@ -1515,7 +1517,7 @@ class Request(MutableMapping):
         for super_cls in inspect.getmro(cls):
             if not super_cls.__name__.endswith('Request'):
                 break
-            args |= set(inspect.getargspec(super_cls.__init__)[0])
+            args |= set(getargspec(super_cls.__init__)[0])
         else:
             raise ValueError('Request was not a super class of '
                              '{0!r}'.format(cls))
