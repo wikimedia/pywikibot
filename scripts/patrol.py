@@ -25,11 +25,14 @@ Commandline parameters that are supported:
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
-import pywikibot
-from pywikibot import pagegenerators, Bot
 import mwlib.uparser  # used to parse the whitelist
 import mwlib.parser  # used to parse the whitelist
 import time
+
+import pywikibot
+
+from pywikibot import pagegenerators
+from pywikibot.bot import SingleSiteBot
 
 _logger = 'patrol'
 
@@ -40,7 +43,7 @@ docuReplacements = {
 }
 
 
-class PatrolBot(Bot):
+class PatrolBot(SingleSiteBot):
 
     """Bot marks the edits as patrolled based on info obtained by whitelist."""
 
@@ -49,7 +52,7 @@ class PatrolBot(Bot):
         'en': u'patrol_whitelist',
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, site=True, **kwargs):
         """
         Constructor.
 
@@ -67,10 +70,9 @@ class PatrolBot(Bot):
             'versionchecktime': 300,
             'autopatroluserns': False
         })
-        super(PatrolBot, self).__init__(**kwargs)
+        super(PatrolBot, self).__init__(site, **kwargs)
         self.recent_gen = True
         self.user = None
-        self.site = pywikibot.Site()
         if self.getOption('whitelist'):
             self.whitelist_pagename = self.getOption('whitelist')
         else:
