@@ -45,7 +45,6 @@ script_deps = {
     'panoramiopicker': ['BeautifulSoup'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwlib'],
-    'weblinkchecker.py': ['memento_client'],
 }
 
 if PYTHON_VERSION < (2, 7):
