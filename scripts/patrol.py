@@ -48,6 +48,8 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 import time
 
+from collections import defaultdict
+
 import mwparserfromhell
 
 import pywikibot
@@ -165,17 +167,6 @@ class PatrolBot(SingleSiteBot):
                 raise
             pywikibot.error(u'%s' % e)
 
-    @staticmethod
-    def add_to_tuples(tuples, user, page):
-        """Update tuples 'user' key by adding page."""
-        if pywikibot.config.verbose_output:
-            pywikibot.output(u"Adding %s:%s" % (user, page.title()))
-
-        if user in tuples:
-            tuples[user].append(page)
-        else:
-            tuples[user] = [page]
-
     def in_list(self, pagelist, title):
         """Check if title present in pagelist."""
         if pywikibot.config.verbose_output:
@@ -209,7 +200,7 @@ class PatrolBot(SingleSiteBot):
 
     def parse_page_tuples(self, wikitext, user=None):
         """Parse page details apart from 'user:' for use."""
-        tuples = {}
+        whitelist = defaultdict(list)
 
         current_user = False
         parsed = mwparserfromhell.parse(wikitext)
@@ -263,19 +254,20 @@ class PatrolBot(SingleSiteBot):
                         if self.is_wikisource_author_page(page):
                             if pywikibot.config.verbose_output:
                                 pywikibot.output(u'Whitelist author: %s' % page)
-                            author = LinkedPagesRule(page)
-                            self.add_to_tuples(tuples, current_user, author)
+                            page = LinkedPagesRule(page)
                         else:
                             if pywikibot.config.verbose_output:
                                 pywikibot.output(u'Whitelist page: %s' % page)
-                            self.add_to_tuples(tuples, current_user, page)
+                        if pywikibot.config.verbose_output:
+                            pywikibot.output('Adding {0}:{1}'.format(current_user, page))
+                        whitelist[current_user].append(page)
                     elif pywikibot.config.verbose_output:
                         pywikibot.output(u'Discarding whitelist page for '
                                          u'another user: %s' % page)
                 else:
                     raise Exception(u'No user set for page %s' % page)
 
-        return tuples
+        return dict(whitelist)
 
     def is_wikisource_author_page(self, title):
         """Initialise author_ns if site family is 'wikisource' else pass."""
