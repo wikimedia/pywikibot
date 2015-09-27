@@ -23,6 +23,7 @@ from pywikibot.tools import OrderedDict
 
 from tests.aspects import (
     unittest, require_modules, TestCase, DefaultDrySiteTestCase,
+    PatchingTestCase,
 )
 
 files = {}
@@ -415,7 +416,8 @@ class TestTemplateParams(TestCase):
     def test_extract_templates_params(self):
         """Test that the normal entry point works."""
         self._common_results(
-            textlib.extract_templates_and_params)
+            functools.partial(textlib.extract_templates_and_params,
+                              remove_disabled_parts=False))
 
     def test_template_simple_regex(self):
         """Test using simple regex."""
@@ -555,6 +557,52 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(m.group(2))
         self.assertIsNotNone(m.group('unhandled_depth'))
         self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+
+
+class TestGenericTemplateParams(PatchingTestCase):
+
+    """Test whether the generic function forwards the call correctly."""
+
+    net = False
+
+    @PatchingTestCase.patched(textlib, 'extract_templates_and_params_mwpfh')
+    def extract_mwpfh(self, text, *args, **kwargs):
+        """Patched call to extract_templates_and_params_mwpfh."""
+        self._text = text
+        self._mwpfh = True
+
+    @PatchingTestCase.patched(textlib, 'extract_templates_and_params_regex')
+    def extract_regex(self, text, *args, **kwargs):
+        """Patched call to extract_templates_and_params_regex."""
+        self._text = text
+        self._mwpfh = False
+
+    def test_removing_disabled_parts_regex(self):
+        """Test removing disabled parts when using the regex variant."""
+        self.patch(config, 'use_mwparserfromhell', False)
+        textlib.extract_templates_and_params('{{a<!-- -->}}', True)
+        self.assertEqual(self._text, '{{a}}')
+        self.assertFalse(self._mwpfh)
+        textlib.extract_templates_and_params('{{a<!-- -->}}', False)
+        self.assertEqual(self._text, '{{a<!-- -->}}')
+        self.assertFalse(self._mwpfh)
+        textlib.extract_templates_and_params('{{a<!-- -->}}')
+        self.assertEqual(self._text, '{{a}}')
+        self.assertFalse(self._mwpfh)
+
+    @require_modules('mwparserfromhell')
+    def test_removing_disabled_parts_mwpfh(self):
+        """Test removing disabled parts when using the mwpfh variant."""
+        self.patch(config, 'use_mwparserfromhell', True)
+        textlib.extract_templates_and_params('{{a<!-- -->}}', True)
+        self.assertEqual(self._text, '{{a}}')
+        self.assertTrue(self._mwpfh)
+        textlib.extract_templates_and_params('{{a<!-- -->}}', False)
+        self.assertEqual(self._text, '{{a<!-- -->}}')
+        self.assertTrue(self._mwpfh)
+        textlib.extract_templates_and_params('{{a<!-- -->}}')
+        self.assertEqual(self._text, '{{a<!-- -->}}')
+        self.assertTrue(self._mwpfh)
 
 
 class TestReplaceLinks(TestCase):

@@ -1291,9 +1291,8 @@ def extract_templates_and_params(text, remove_disabled_parts=None):
     use_mwparserfromhell = (config.use_mwparserfromhell and
                             not isinstance(mwparserfromhell, Exception))
 
-    if use_mwparserfromhell:
-        if remove_disabled_parts is None:
-            remove_disabled_parts = False
+    if remove_disabled_parts is None:
+        remove_disabled_parts = not use_mwparserfromhell
 
     if remove_disabled_parts:
         text = removeDisabledParts(text)
