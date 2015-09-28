@@ -28,7 +28,7 @@ class TestInternetArchive(DeprecationTestCase):
 
     sites = {
         'archive.org': {
-            'hostname': 'web.archive.org',
+            'hostname': 'https://archive.org/wayback/available?url=invalid',
         },
     }
 
