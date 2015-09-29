@@ -422,7 +422,7 @@ class MediaWikiVersion(Version):
     """
 
     MEDIAWIKI_VERSION = re.compile(
-        r'^(\d+(?:\.\d+)+)(wmf(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
+        r'^(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
 
     @classmethod
     def from_generator(cls, generator):
@@ -450,10 +450,10 @@ class MediaWikiVersion(Version):
         elif version_match.group(2) == 'alpha':
             self._dev_version = (1, )
         else:
-            assert 'wmf' not in version_match.group(2)
-            assert 'alpha' not in version_match.group(2)
-            assert 'beta' not in version_match.group(2)
-            assert 'rc' not in version_match.group(2)
+            for handled in ('wmf', 'alpha', 'beta', 'rc'):
+                # if any of those pops up here our parser has failed
+                assert handled not in version_match.group(2), \
+                    'Found "{0}" in "{1}"'.format(handled, version_match.group(2))
             if version_match.group(2):
                 debug('Additional unused version part '
                       '"{0}"'.format(version_match.group(2)),
