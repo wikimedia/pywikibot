@@ -1685,7 +1685,7 @@ def DequePreloadingGenerator(generator, step=50):
     while True:
         page_count = min(len(generator), step)
         if not page_count:
-            raise StopIteration
+            return
 
         for page in PreloadingGenerator(generator, page_count):
             yield page
