@@ -45,9 +45,14 @@ __version__ = '$Id$'
 
 import re
 
+from functools import partial
+
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, textlib, Bot
+from pywikibot.pagegenerators import (
+    XMLDumpPageGenerator,
+)
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -440,37 +445,18 @@ noTitleRequired = [u'pl', u'be', u'szl']
 
 maintenance_category = 'cite_error_refs_without_references_category'
 
+_ref_regex = re.compile('</ref>', re.IGNORECASE)
+_references_regex = re.compile('<references.*?/>', re.IGNORECASE)
 
-class XmlDumpNoReferencesPageGenerator(object):
 
-    """
-    Generator which will yield Pages that might lack a references tag.
+def _match_xml_page_text(text):
+    """Match page text."""
+    text = textlib.removeDisabledParts(text)
+    return _ref_regex.search(text) and not _references_regex.search(text)
 
-    These pages will be retrieved from a local XML dump file
-    (pages-articles or pages-meta-current).
-    """
 
-    def __init__(self, xmlFilename):
-        """
-        Constructor.
-
-        Arguments:
-            * xmlFilename  - The dump's path, either absolute or relative
-        """
-        self.xmlFilename = xmlFilename
-        self.refR = re.compile('</ref>', re.IGNORECASE)
-        # The references tab can contain additional spaces and a group
-        # attribute.
-        self.referencesR = re.compile('<references.*?/>', re.IGNORECASE)
-
-    def __iter__(self):
-        """XML iterator."""
-        from pywikibot import xmlreader
-        dump = xmlreader.XmlDump(self.xmlFilename)
-        for entry in dump.parse():
-            text = textlib.removeDisabledParts(entry.text)
-            if self.refR.search(text) and not self.referencesR.search(text):
-                yield pywikibot.Page(pywikibot.Site(), entry.title)
+XmlDumpNoReferencesPageGenerator = partial(
+    XMLDumpPageGenerator, text_predicate=_match_xml_page_text)
 
 
 class NoReferencesBot(Bot):
@@ -488,8 +474,8 @@ class NoReferencesBot(Bot):
         self.site = pywikibot.Site()
         self.comment = i18n.twtranslate(self.site, 'noreferences-add-tag')
 
-        self.refR = re.compile('</ref>', re.IGNORECASE)
-        self.referencesR = re.compile('<references.*?/>', re.IGNORECASE)
+        self.refR = _ref_regex
+        self.referencesR = _references_regex
         self.referencesTagR = re.compile('<references>.*?</references>',
                                          re.IGNORECASE | re.DOTALL)
         try:

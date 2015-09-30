@@ -108,6 +108,7 @@ import threading
 import time
 import sys
 
+from functools import partial
 from warnings import warn
 
 try:
@@ -117,8 +118,11 @@ except ImportError as e:
 
 import pywikibot
 
-from pywikibot import i18n, config, pagegenerators, textlib, xmlreader, weblib
+from pywikibot import i18n, config, pagegenerators, textlib, weblib
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
+from pywikibot.pagegenerators import (
+    XMLDumpPageGenerator as _XMLDumpPageGenerator,
+)
 from pywikibot.tools.formatter import color_format
 
 # TODO: Convert to httlib2
@@ -247,48 +251,8 @@ def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
             yield m.group('urlb')
 
 
-class XmlDumpPageGenerator(object):
-
-    """Xml generator that yiels pages containing a web link."""
-
-    def __init__(self, xmlFilename, xmlStart, namespaces):
-        self.xmlStart = xmlStart
-        self.namespaces = namespaces
-        self.skipping = bool(xmlStart)
-        self.site = pywikibot.Site()
-
-        dump = xmlreader.XmlDump(xmlFilename)
-        self.parser = dump.parse()
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        try:
-            for entry in self.parser:
-                if self.skipping:
-                    if entry.title != self.xmlStart:
-                        continue
-                    self.skipping = False
-                page = pywikibot.Page(self.site, entry.title)
-                if self.namespaces:
-                    if page.namespace() not in self.namespaces:
-                        continue
-                found = False
-                for url in weblinksIn(entry.text):
-                    found = True
-                if found:
-                    return page
-        except KeyboardInterrupt:
-            try:
-                if not self.skipping:
-                    pywikibot.output(
-                        u'To resume, use "-xmlstart:%s" on the command line.'
-                        % entry.title)
-            except NameError:
-                pass
-
-    __next__ = next
+XmlDumpPageGenerator = partial(
+    _XMLDumpPageGenerator, text_predicate=weblinksIn)
 
 
 class NotAnURLError(BaseException):
