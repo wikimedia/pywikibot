@@ -1301,24 +1301,24 @@ class Request(MutableMapping):
     >>> # add a new parameter
     >>> r['siprop'] = "namespaces"
     >>> # note that "uiprop" param gets added automatically
-    >>> r.action  # doctest: +IGNORE_UNICODE
-    u'query'
-    >>> sorted(r._params.keys())  # doctest: +IGNORE_UNICODE
-    [u'action', u'meta', u'siprop']
-    >>> r._params['action']  # doctest: +IGNORE_UNICODE
-    [u'query']
-    >>> r._params['meta']  # doctest: +IGNORE_UNICODE
-    [u'userinfo', u'siteinfo']
-    >>> r._params['siprop']  # doctest: +IGNORE_UNICODE
-    [u'namespaces']
-    >>> data = r.submit()  # doctest: +IGNORE_UNICODE
+    >>> str(r.action)
+    'query'
+    >>> sorted(str(key) for key in r._params.keys())
+    ['action', 'meta', 'siprop']
+    >>> [str(key) for key in r._params['action']]
+    ['query']
+    >>> [str(key) for key in r._params['meta']]
+    ['userinfo', 'siteinfo']
+    >>> [str(key) for key in r._params['siprop']]
+    ['namespaces']
+    >>> data = r.submit()
     >>> isinstance(data, dict)
     True
     >>> set(['query', 'batchcomplete', 'warnings']).issuperset(data.keys())
     True
     >>> 'query' in data
     True
-    >>> sorted(data[u'query'].keys())  # doctest: +IGNORE_UNICODE
+    >>> sorted(str(key) for key in data[u'query'].keys())
     ['namespaces', 'userinfo']
 
     """
