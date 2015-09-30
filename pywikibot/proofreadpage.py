@@ -478,7 +478,7 @@ class IndexPage(pywikibot.Page):
         There is a 1-to-many correspondence (a label can be the same for
         several pages).
 
-        @return: list containing page numbers corresponding to page label.
+        @return: set containing page numbers corresponding to page label.
         """
         return self._get_from_label(self._page_numbers_from_label, label)
 
@@ -488,6 +488,6 @@ class IndexPage(pywikibot.Page):
         There is a 1-to-many correspondence (a label can be the same for
         several pages).
 
-        @return: list containing pages corresponding to page label.
+        @return: set containing pages corresponding to page label.
         """
         return self._get_from_label(self._pages_from_label, label)
