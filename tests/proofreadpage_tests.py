@@ -345,7 +345,7 @@ class TestIndexPageMappings(IndexPageTestCase):
         # Error if page does not exists.
         self.assertRaises(KeyError, index_page.get_label_from_page, None)
 
-    def test_get_page_number(self, key):
+    def test_get_page_and_number(self, key):
         """Test IndexPage page get_page_number functions."""
         data = self.sites[key]
         index_page = IndexPage(self.site, self.sites[key]['index'])
@@ -380,7 +380,7 @@ class TestIndexPageMappings(IndexPageTestCase):
             n = index_page._numbers_from_page[p]
             self.assertEqual(index_page._page_from_numbers[n], p)
         for n in num_set:
-            n = index_page._page_from_numbers[p]
+            p = index_page._page_from_numbers[n]
             self.assertEqual(index_page._numbers_from_page[p], n)
 
     def test_page_number_mapping(self, key):
