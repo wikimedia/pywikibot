@@ -47,7 +47,7 @@ dependencies = ['requests']
 
 # the irc module has no Python 2.6 support since 10.0
 irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
-csv_dep = 'unicodecsv<=0.13' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
+csv_dep = 'unicodecsv!=0.14.0' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
 
 extra_deps = {
     # Core library dependencies
