@@ -366,16 +366,28 @@ class IndexPage(pywikibot.Page):
         self._all_page_links = set(
             self.site.pagelinks(self, namespaces=self.site.proofread_page_ns))
 
-        # Cache results.
+        self._cached = False
+
+    def check_if_cached(fn):
+        """Decorator to check if data are cached and cache them if needed."""
+        def wrapper(self, *args, **kwargs):
+            if self._cached is False:
+                self._get_page_mappings()
+            return fn(self, *args, **kwargs)
+        return wrapper
+
+    def _get_page_mappings(self):
+        """Associate label and number for each page linked to the index."""
+        # Clean cache, if any.
         self._page_from_numbers = {}
         self._numbers_from_page = {}
         self._page_numbers_from_label = {}
         self._pages_from_label = {}
         self._labels_from_page_number = {}
         self._labels_from_page = {}
+        if hasattr(self, '_parsed_text'):
+            del self._parsed_text
 
-    def _get_page_mappings(self):
-        """Associate label and number for each page linked to the index."""
         self._parsed_text = self._get_parsed_page()
         self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
         attrs = {'class': re.compile('prp-pagequality')}
@@ -423,17 +435,20 @@ class IndexPage(pywikibot.Page):
         # Sanity check: all links to Page: ns must have been considered.
         assert set(self._labels_from_page) == set(self._all_page_links)
 
+        # Info cached.
+        self._cached = True
+
     @property
+    @check_if_cached
     def num_pages(self):
         """Return total number of pages in Index.
 
         @return: total number of pages in Index
         @rtype: int
         """
-        if not self._page_from_numbers:
-            self._get_page_mappings()
         return len(self._page_from_numbers)
 
+    @check_if_cached
     def get_label_from_page(self, page):
         """Return 'page label' for page.
 
@@ -443,14 +458,12 @@ class IndexPage(pywikibot.Page):
         @return: page label
         @rtype: unicode string
         """
-        if not self._labels_from_page:
-            self._get_page_mappings()
-
         try:
             return self._labels_from_page[page]
         except KeyError:
             raise KeyError('Invalid Page: %s.' % page)
 
+    @check_if_cached
     def get_label_from_page_number(self, page_number):
         """Return page label from page number.
 
@@ -460,9 +473,6 @@ class IndexPage(pywikibot.Page):
         @return: page label
         @rtype: unicode string
         """
-        if not self._labels_from_page_number:
-            self._get_page_mappings()
-
         try:
             return self._labels_from_page_number[page_number]
         except KeyError:
@@ -472,9 +482,6 @@ class IndexPage(pywikibot.Page):
     def _get_from_label(self, mapping_dict, label):
         """Helper function to get info from label."""
         # Convert label to string if an integer is passed.
-        if not mapping_dict:
-            self._get_page_mappings()
-
         if isinstance(label, int):
             label = str(label)
 
@@ -483,6 +490,7 @@ class IndexPage(pywikibot.Page):
         except KeyError:
             raise KeyError('No page has label: "%s".' % label)
 
+    @check_if_cached
     def get_page_number_from_label(self, label='1'):
         """Return page number from page label.
 
@@ -493,6 +501,7 @@ class IndexPage(pywikibot.Page):
         """
         return self._get_from_label(self._page_numbers_from_label, label)
 
+    @check_if_cached
     def get_page_from_label(self, label='1'):
         """Return page number from page label.
 
@@ -503,6 +512,7 @@ class IndexPage(pywikibot.Page):
         """
         return self._get_from_label(self._pages_from_label, label)
 
+    @check_if_cached
     def get_page_from_number(self, page_number):
         """Return a page object from page number.
 
@@ -510,9 +520,6 @@ class IndexPage(pywikibot.Page):
         @return: page
         @rtype: page object
         """
-        if not self._page_from_numbers:
-            self._get_page_mappings()
-
         try:
             return self._page_from_numbers[page_number]
         except KeyError:
