@@ -38,7 +38,7 @@ class TestProofreadPageInvalidSite(TestCase):
                           ProofreadPage, self.site, 'title')
 
 
-class TestBasePageMethods(BasePageMethodsTestBase):
+class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
 
     """Test behavior of ProofreadPage methods inherited from BasePage."""
 
@@ -49,7 +49,7 @@ class TestBasePageMethods(BasePageMethodsTestBase):
         """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super(TestBasePageMethods, self).setUp()
+        super(TestBasePageMethodsProofreadPage, self).setUp()
 
     def test_basepage_methods(self):
         """Test ProofreadPage methods inherited from superclass BasePage."""
@@ -57,7 +57,7 @@ class TestBasePageMethods(BasePageMethodsTestBase):
         self._test_return_datatypes()
 
 
-class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
+class TestLoadRevisionsCachingProofreadPage(BasePageLoadRevisionsCachingTestBase):
 
     """Test site.loadrevisions() caching."""
 
@@ -68,7 +68,7 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
         """Set up test case."""
         self._page = ProofreadPage(
             self.site, 'Page:Popular Science Monthly Volume 1.djvu/12')
-        super(TestLoadRevisionsCaching, self).setUp()
+        super(TestLoadRevisionsCachingProofreadPage, self).setUp()
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
@@ -268,6 +268,43 @@ class TestIndexPageValidSite(IndexPageTestCase):
         page = IndexPage(source)
         self.assertEqual(page.title(withNamespace=False), source.title)
         self.assertEqual(page.namespace(), source.namespace)
+
+
+class TestBasePageMethodsIndexPage(BasePageMethodsTestBase):
+
+    """Test behavior of ProofreadPage methods inherited from BasePage."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    def setUp(self):
+        """Set up test case."""
+        self._page = IndexPage(
+            self.site, 'Index:Popular Science Monthly Volume 1.djvu')
+        super(TestBasePageMethodsIndexPage, self).setUp()
+
+    def test_basepage_methods(self):
+        """Test IndexPage methods inherited from superclass BasePage."""
+        self._test_invoke()
+        self._test_return_datatypes()
+
+
+class TestLoadRevisionsCachingIndexPage(BasePageLoadRevisionsCachingTestBase):
+
+    """Test site.loadrevisions() caching."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    def setUp(self):
+        """Set up test case."""
+        self._page = IndexPage(
+            self.site, 'Index:Popular Science Monthly Volume 1.djvu')
+        super(TestLoadRevisionsCachingIndexPage, self).setUp()
+
+    def test_page_text(self):
+        """Test site.loadrevisions() with Page.text."""
+        self._test_page_text()
 
 
 class TestIndexPageMappings(IndexPageTestCase):
