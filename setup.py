@@ -190,9 +190,9 @@ setup(
     maintainer='The Pywikibot team',
     maintainer_email='pywikibot@lists.wikimedia.org',
     license='MIT License',
-    packages=['pywikibot'] + [package
-                              for package in find_packages()
-                              if package.startswith('pywikibot.')],
+    packages=[str(name)] + [package
+                            for package in find_packages()
+                            if package.startswith('pywikibot.')],
     install_requires=dependencies,
     dependency_links=dependency_links,
     extras_require=extra_deps,
