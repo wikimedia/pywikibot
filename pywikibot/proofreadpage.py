@@ -374,7 +374,7 @@ class IndexPage(pywikibot.Page):
         self._labels_from_page_number = {}
         self._labels_from_page = {}
 
-    def _get_page_labels(self):
+    def _get_page_mappings(self):
         """Associate label and number for each page linked to the index."""
         self._parsed_text = self._get_parsed_page()
         self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
@@ -423,6 +423,17 @@ class IndexPage(pywikibot.Page):
         # Sanity check: all links to Page: ns must have been considered.
         assert set(self._labels_from_page) == set(self._all_page_links)
 
+    @property
+    def num_pages(self):
+        """Return total number of pages in Index.
+
+        @return: total number of pages in Index
+        @rtype: int
+        """
+        if not self._page_from_numbers:
+            self._get_page_mappings()
+        return len(self._page_from_numbers)
+
     def get_label_from_page(self, page):
         """Return 'page label' for page.
 
@@ -433,7 +444,7 @@ class IndexPage(pywikibot.Page):
         @rtype: unicode string
         """
         if not self._labels_from_page:
-            self._get_page_labels()
+            self._get_page_mappings()
 
         try:
             return self._labels_from_page[page]
@@ -450,7 +461,7 @@ class IndexPage(pywikibot.Page):
         @rtype: unicode string
         """
         if not self._labels_from_page_number:
-            self._get_page_labels()
+            self._get_page_mappings()
 
         try:
             return self._labels_from_page_number[page_number]
@@ -462,7 +473,7 @@ class IndexPage(pywikibot.Page):
         """Helper function to get info from label."""
         # Convert label to string if an integer is passed.
         if not mapping_dict:
-            self._get_page_labels()
+            self._get_page_mappings()
 
         if isinstance(label, int):
             label = str(label)
@@ -491,3 +502,18 @@ class IndexPage(pywikibot.Page):
         @return: set containing pages corresponding to page label.
         """
         return self._get_from_label(self._pages_from_label, label)
+
+    def get_page_from_number(self, page_number):
+        """Return a page object from page number.
+
+        @param page_number: int
+        @return: page
+        @rtype: page object
+        """
+        if not self._page_from_numbers:
+            self._get_page_mappings()
+
+        try:
+            return self._page_from_numbers[page_number]
+        except KeyError:
+            raise KeyError('Invalid page number: %s.' % page_number)
