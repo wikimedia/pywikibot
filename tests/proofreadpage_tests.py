@@ -270,7 +270,7 @@ class TestIndexPageValidSite(IndexPageTestCase):
         self.assertEqual(page.namespace(), source.namespace)
 
 
-class TestBasePageMethodsIndexPage(BasePageMethodsTestBase):
+class TestBasePageMethodsIndexPage(IndexPageTestCase, BasePageMethodsTestBase):
 
     """Test behavior of ProofreadPage methods inherited from BasePage."""
 
@@ -289,7 +289,8 @@ class TestBasePageMethodsIndexPage(BasePageMethodsTestBase):
         self._test_return_datatypes()
 
 
-class TestLoadRevisionsCachingIndexPage(BasePageLoadRevisionsCachingTestBase):
+class TestLoadRevisionsCachingIndexPage(IndexPageTestCase,
+                                        BasePageLoadRevisionsCachingTestBase):
 
     """Test site.loadrevisions() caching."""
 
