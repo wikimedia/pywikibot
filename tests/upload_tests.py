@@ -15,8 +15,6 @@ __version__ = '$Id$'
 
 import pywikibot
 
-from pywikibot.data.api import APIError
-
 from tests import join_images_path
 from tests.aspects import unittest, TestCase
 
@@ -103,9 +101,8 @@ class TestUpload(TestCase):
         self._finish_upload(chunk_size, self.sounds_png)
 
         # Check if it's still cached
-        with self.assertRaises(APIError) as cm:
+        with self.assertAPIError('siiinvalidsessiondata') as cm:
             self.site.stash_info(self._file_key)
-        self.assertEqual(cm.exception.code, 'siiinvalidsessiondata')
         self.assertTrue(cm.exception.info.startswith('File not found'),
                         'info ({0}) did not start with '
                         '"File not found"'.format(cm.exception.info))
