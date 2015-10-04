@@ -32,7 +32,7 @@ import pywikibot
 from pywikibot import config
 from pywikibot.comms import threadedhttp
 from pywikibot.site import Namespace
-from pywikibot.data.api import CachedRequest
+from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.tools import (
     PYTHON_VERSION,
@@ -242,6 +242,48 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         log = super(WarningSourceSkipContextManager, self).__enter__()
         self._module.showwarning = detailed_show_warning
         return log
+
+
+class AssertAPIErrorContextManager(object):
+
+    """
+    Context manager to assert certain APIError exceptions.
+
+    This is build similar to the L{unittest.TestCase.assertError} implementation
+    which creates an context manager. It then calls L{handle} which either
+    returns this manager if no executing object given or calls the callable
+    object.
+    """
+
+    def __init__(self, code, info, msg, test_case):
+        """Create instance expecting the code and info."""
+        self.code = code
+        self.info = info
+        self.msg = msg
+        self.test_case = test_case
+
+    def __enter__(self):
+        """Enter this context manager and the unittest's context manager."""
+        self.cm = self.test_case.assertRaises(APIError, msg=self.msg)
+        self.cm.__enter__()
+        return self.cm
+
+    def __exit__(self, exc_type, exc_value, tb):
+        """Exit the context manager and assert code and optionally info."""
+        result = self.cm.__exit__(exc_type, exc_value, tb)
+        assert result is isinstance(exc_value, APIError)
+        if result:
+            self.test_case.assertEqual(exc_value.code, self.code)
+            if self.info:
+                self.test_case.assertEqual(exc_value.info, self.info)
+        return result
+
+    def handle(self, callable_obj, args, kwargs):
+        """Handle the callable object by returning itself or using itself."""
+        if callable_obj is None:
+            return self
+        with self:
+            callable_obj(*args, **kwargs)
 
 
 class DryParamInfo(dict):
