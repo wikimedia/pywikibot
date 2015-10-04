@@ -786,9 +786,12 @@ def filter_unique(iterable, container=None, key=None, add=None):
             add = container_setitem
 
     for item in iterable:
-        if (key(item) if key else item) not in container:
-            add(item)
-            yield item
+        try:
+            if (key(item) if key else item) not in container:
+                add(item)
+                yield item
+        except StopIteration:
+            return
 
 
 class CombinedError(KeyError, IndexError):
