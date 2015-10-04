@@ -382,11 +382,11 @@ class TestIndexPageMappings(IndexPageTestCase):
 
         # Get label from number.
         self.assertEqual(index_page.get_label_from_page_number(num), label)
+        # Error if number does not exists.
         self.assertRaises(KeyError, index_page.get_label_from_page_number, -1)
 
         # Get label from page.
         self.assertEqual(index_page.get_label_from_page(proofread_page), label)
-
         # Error if page does not exists.
         self.assertRaises(KeyError, index_page.get_label_from_page, None)
 
@@ -432,25 +432,6 @@ class TestIndexPageMappings(IndexPageTestCase):
         for n in num_set:
             p = index_page.get_page_from_number(n)
             self.assertEqual(index_page._numbers_from_page[p], n)
-
-    def test_page_number_mapping(self, key):
-        """Test consistency of page <-> mapping."""
-        data = self.sites[key]
-        num, title_num, label = data['get_label']
-
-        index_page = IndexPage(self.site, self.sites[key]['index'])
-        page_title = self.sites[key]['page'].format(title_num)
-        proofread_page = ProofreadPage(self.site, page_title)
-
-        # Get label from number.
-        self.assertEqual(index_page.get_label_from_page_number(num), label)
-        # Error if number does not exists.
-        self.assertRaises(KeyError, index_page.get_label_from_page_number, -1)
-
-        # Get label from page.
-        self.assertEqual(index_page.get_label_from_page(proofread_page), label)
-        # Error if page does not exists.
-        self.assertRaises(KeyError, index_page.get_label_from_page, None)
 
 
 if __name__ == '__main__':
