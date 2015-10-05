@@ -504,9 +504,11 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
             break
     else:
         raise TranslationError(
-            'No English translation has been defined for TranslateWiki key'
+            'No %s translation has been defined for TranslateWiki key'
             ' %r\nIt can happen due to lack of i18n submodule or files. '
-            'Read https://mediawiki.org/wiki/PWB/i18n' % twtitle)
+            'Read https://mediawiki.org/wiki/PWB/i18n'
+            % ('English' if 'en' in langs else "'%s'" % lang,
+               twtitle))
     # send the language code back via the given list
     if code_needed:
         code.append(alt)
