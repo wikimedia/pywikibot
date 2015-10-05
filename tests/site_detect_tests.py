@@ -170,7 +170,6 @@ class SiteDetectionTestCase(TestWikiSiteDetection):
     def test_detect_site(self):
         """Test detection of MediaWiki sites."""
         self.assertSite('http://botwiki.sno.cc/wiki/$1')
-        self.assertSite('http://guildwars.wikia.com/wiki/$1')
         self.assertSite('http://www.hrwiki.org/index.php/$1')  # v 1.15
         self.assertSite('http://www.proofwiki.org/wiki/$1')
         self.assertSite(
