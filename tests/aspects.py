@@ -850,6 +850,7 @@ class MetaTestCaseClass(type):
                 test_name = test + '_' + key.replace('-', '_')
 
                 dct[test_name] = wrap_method(key, sitedata, dct[test])
+                dct[test_name].__name__ = str(test_name)
 
                 if key in dct.get('expected_failures', []):
                     dct[test_name] = unittest.expectedFailure(dct[test_name])
