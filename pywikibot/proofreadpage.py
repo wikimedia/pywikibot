@@ -385,6 +385,16 @@ class IndexPage(pywikibot.Page):
         #    href="/wiki/Page:xxx.djvu/n"
         #    title="Page:xxx.djvu/n">m
         # </a>
+        # Try to purge or raise ValueError.
+        if not self._soup.find_all('a', attrs=attrs):
+            self.purge()
+            del self._parsed_text
+            self._parsed_text = self._get_parsed_page()
+            self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
+            if not self._soup.find_all('a', attrs=attrs):
+                raise ValueError(
+                    'Missing class="qualityN prp-pagequality-N" in: %s.'
+                    % self)
 
         page_cnt = 0
         for a_tag in self._soup.find_all('a', attrs=attrs):
