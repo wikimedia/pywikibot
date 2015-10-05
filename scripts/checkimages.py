@@ -582,7 +582,7 @@ class checkImagesBot(object):
                                     for tmp in hiddentemplatesRaw])
         self.pageHidden = i18n.translate(self.site, PageWithHiddenTemplates)
         self.pageAllowed = i18n.translate(self.site, PageWithAllowedTemplates)
-        self.comment = i18n.twtranslate(self.site,
+        self.comment = i18n.twtranslate(self.site.lang,
                                         'checkimages-source-tag-comment',
                                         fallback=False)
         # Adding the bot's nickname at the notification text if needed.
@@ -740,7 +740,7 @@ class checkImagesBot(object):
 
     def put_mex_in_talk(self):
         """Function to put the warning in talk page of the uploader."""
-        commento2 = i18n.twtranslate(self.site,
+        commento2 = i18n.twtranslate(self.site.lang,
                                      'checkimages-source-notice-comment')
         emailPageName = i18n.translate(self.site, emailPageWithText)
         emailSubj = i18n.translate(self.site, emailSubject)
