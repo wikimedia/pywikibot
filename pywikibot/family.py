@@ -1571,8 +1571,16 @@ class AutoFamily(SingleSiteFamily):
 
     """Family that automatically loads the site configuration."""
 
+    @deprecated_args(site=None)
     def __init__(self, name, url):
-        """Constructor."""
+        """
+        Constructor.
+
+        @param name: Name for the family
+        @type name: str
+        @param url: API endpoint URL of the wiki
+        @type url: str
+        """
         self.name = name
         self.url = urlparse.urlparse(url)
         self.domain = self.url.netloc
