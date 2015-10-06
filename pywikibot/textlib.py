@@ -187,9 +187,6 @@ def _create_default_regexes():
 
 def _get_regexes(keys, site):
     """Fetch compiled regexes."""
-    if site is None:
-        site = pywikibot.Site()
-
     if not _regex_cache:
         _create_default_regexes()
 
@@ -203,6 +200,11 @@ def _get_regexes(keys, site):
             # which may not yet have a site specific re compiled.
             if exc in _regex_cache:
                 if type(_regex_cache[exc]) is tuple:
+                    if not site:
+                        issue_deprecation_warning(
+                            'site=None', 'a valid site', 3)
+                        site = pywikibot.Site()
+
                     if (exc, site) not in _regex_cache:
                         re_text, re_var = _regex_cache[exc]
                         _regex_cache[(exc, site)] = re.compile(

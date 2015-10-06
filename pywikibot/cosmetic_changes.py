@@ -799,7 +799,8 @@ class CosmeticChangesToolkit(object):
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
                                      r'\1&nbsp;°\2', exceptions, site=self.site)
         text = textlib.replaceExcept(text, u'º([CF])', u'°' + r'\1',
-                                     exceptions)
+                                     exceptions,
+                                     site=self.site)
         return text
 
     def fixArabicLetters(self, text):
@@ -843,12 +844,17 @@ class CosmeticChangesToolkit(object):
         text = textlib.replaceExcept(text, u',', u'،', exceptions)
         if self.site.code == 'ckb':
             text = textlib.replaceExcept(text,
-                                         u'\u0647([.\u060c_<\\]\\s])',
-                                         u'\u06d5\\1', exceptions)
-            text = textlib.replaceExcept(text, u'ه‌', u'ە', exceptions)
-            text = textlib.replaceExcept(text, u'ه', u'ھ', exceptions)
-        text = textlib.replaceExcept(text, u'ك', u'ک', exceptions)
-        text = textlib.replaceExcept(text, u'[ىي]', u'ی', exceptions)
+                                         '\u0647([.\u060c_<\\]\\s])',
+                                         '\u06d5\\1', exceptions,
+                                         site=self.site)
+            text = textlib.replaceExcept(text, 'ه\u200c', 'ە', exceptions,
+                                         site=self.site)
+            text = textlib.replaceExcept(text, 'ه', 'ھ', exceptions,
+                                         site=self.site)
+        text = textlib.replaceExcept(text, 'ك', 'ک', exceptions,
+                                     site=self.site)
+        text = textlib.replaceExcept(text, '[ىي]', 'ی', exceptions,
+                                     site=self.site)
 
         return text
 
