@@ -367,6 +367,25 @@ class TestIndexPageMappings(IndexPageTestCase):
                                for i in page_numbers)
                 site_def['get_page'].append([label, page_set])
 
+    def test_check_if_cached(self, key):
+        """Test if cache is checked and loaded properly."""
+        data = self.sites[key]
+        index_page = IndexPage(self.site, self.sites[key]['index'])
+
+        num, title_num, label = data['get_label']
+        self.assertIs(index_page._cached, False)
+        fetched_label = index_page.get_label_from_page_number(num)
+
+        self.assertIs(index_page._cached, True)
+        self.assertEqual(label, fetched_label)
+
+        # Check if cache is refreshed.
+        index_page._labels_from_page_number[num] = 'wrong cached value'
+        self.assertEqual(index_page.get_label_from_page_number(num),
+                         'wrong cached value')
+        index_page._cached = False
+        self.assertEqual(index_page.get_label_from_page_number(num), label)
+
     def test_num_pages(self, key):
         """Test num_pages property."""
         index_page = IndexPage(self.site, self.sites[key]['index'])
