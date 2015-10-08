@@ -108,7 +108,7 @@ class TestProofreadPageValidSite(TestCase):
 
     def test_valid_site_source(self):
         """Test ProofreadPage from valid Site as source."""
-        page = ProofreadPage(self.site, 'title')
+        page = ProofreadPage(self.site, 'Page:dummy test page')
         self.assertEqual(page.namespace(), self.site.proofread_page_ns)
 
     def test_invalid_existing_page_source(self):
@@ -166,7 +166,7 @@ class TestProofreadPageValidSite(TestCase):
 
     def test_preload_from_not_existing_page(self):
         """Test ProofreadPage page decomposing/composing text."""
-        page = ProofreadPage(self.site, 'dummy test page')
+        page = ProofreadPage(self.site, 'Page:dummy test page')
         self.assertEqual(page.text,
                          '<noinclude><pagequality level="1" user="%s" />'
                          '<div class="pagetext">\n\n\n</noinclude>'
@@ -175,7 +175,7 @@ class TestProofreadPageValidSite(TestCase):
 
     def test_preload_from_empty_text(self):
         """Test ProofreadPage page decomposing/composing text."""
-        page = ProofreadPage(self.site, 'dummy test page')
+        page = ProofreadPage(self.site, 'Page:dummy test page')
         page.text = ''
         self.assertEqual(page.text,
                          '<noinclude><pagequality level="1" user="%s" />'
@@ -300,7 +300,7 @@ class TestIndexPageValidSite(IndexPageTestCase):
 
     def test_valid_site_as_source(self):
         """Test IndexPage from valid Site as source."""
-        page = IndexPage(self.site, 'title')
+        page = IndexPage(self.site, 'Index:dummy test page')
         self.assertEqual(page.namespace(), self.site.proofread_index_ns)
 
     def test_invalid_existing_page_as_source(self):
@@ -377,9 +377,9 @@ class TestIndexPageMappings(IndexPageTestCase):
         'enws': {
             'family': 'wikisource',
             'code': 'en',
-            'index': 'Popular Science Monthly Volume 1.djvu',
+            'index': 'Index:Popular Science Monthly Volume 1.djvu',
             'num_pages': 804,
-            'page': 'Popular Science Monthly Volume 1.djvu/{0}',
+            'page': 'Page:Popular Science Monthly Volume 1.djvu/{0}',
             'get_label': [11, 11, '1'],
             'get_number': [[1, set([11])],
                            ['Cvr', set([1, 9, 10, 804])],
@@ -389,9 +389,9 @@ class TestIndexPageMappings(IndexPageTestCase):
         'dews': {  # dews does not use page convention name/number.
             'family': 'wikisource',
             'code': 'de',
-            'index': 'Musen-Almanach für das Jahr 1799',
+            'index': 'Index:Musen-Almanach für das Jahr 1799',
             'num_pages': 272,
-            'page': 'Schiller_Musenalmanach_1799_{0:3d}.jpg',
+            'page': 'Seite:Schiller_Musenalmanach_1799_{0:3d}.jpg',
             'get_label': [120, 120, '120'],  # page no, title no, label
             'get_number': [[120, set([120])],
                            ],
@@ -400,9 +400,9 @@ class TestIndexPageMappings(IndexPageTestCase):
         'frws': {
             'family': 'wikisource',
             'code': 'fr',
-            'index': 'Segard - Hymnes profanes, 1894.djvu',
+            'index': 'Index:Segard - Hymnes profanes, 1894.djvu',
             'num_pages': 107,
-            'page': 'Segard - Hymnes profanes, 1894.djvu/{0}',
+            'page': 'Page:Segard - Hymnes profanes, 1894.djvu/{0}',
             'get_label': [11, 11, '8'],
             'get_number': [[8, set([11])],
                            ['-', set(range(1, 4)) | set(range(101, 108))],
@@ -530,6 +530,52 @@ class TestIndexPageMappings(IndexPageTestCase):
 
         gen = index_page.page_gen(num, num, filter_ql=[0])
         self.assertEqual(list(gen), [])
+
+
+class TestIndexPageMappingsRedlinks(IndexPageTestCase):
+
+    """Test IndexPage mappings with redlinks."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    cached = True
+
+    with_redlink = {
+        'title': {'blue': 'Page:Pywikibot test page 1/1',
+                  'red': 'Page:Pywikibot test page 2/2',
+                  },
+        'index': 'Index:Pywikibot test page 1'
+    }
+
+    def test_index_redlink(self):
+        """Test index property with redlink."""
+        page = ProofreadPage(self.site, self.with_redlink['title']['red'])
+        index_page = IndexPage(self.site, self.with_redlink['index'])
+        self.assertEqual(page.index, index_page)
+
+    def test_get_page_and_number_redlink(self):
+        """Test IndexPage page get_page_number functions with redlinks."""
+        index_page = IndexPage(self.site, self.with_redlink['index'])
+
+        for title in self.with_redlink['title'].values():
+            p = ProofreadPage(self.site, title)
+            n = index_page.get_number(p)
+            self.assertEqual(index_page.get_page(n), p)
+
+    def test_page_gen_redlink(self):
+        """Test Index page generator with redlinks."""
+        index_page = IndexPage(self.site, self.with_redlink['index'])
+        proofread_pages = [ProofreadPage(self.site, page_title) for
+                           page_title in self.with_redlink['title'].values()]
+
+        # Check start/end limits.
+        self.assertRaises(ValueError, index_page.page_gen, -1, 2)
+        self.assertRaises(ValueError, index_page.page_gen, 1, -1)
+        self.assertRaises(ValueError, index_page.page_gen, 2, 1)
+
+        gen = index_page.page_gen(1, None, filter_ql=range(5))
+        self.assertEqual(list(gen), proofread_pages)
 
 
 if __name__ == '__main__':

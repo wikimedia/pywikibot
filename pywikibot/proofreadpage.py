@@ -91,11 +91,10 @@ class ProofreadPage(pywikibot.Page):
             site = source.site
         else:
             site = source
-        ns = site.proofread_page_ns
-        super(ProofreadPage, self).__init__(source, title, ns=ns)
+        super(ProofreadPage, self).__init__(source, title)
         if self.namespace() != site.proofread_page_ns:
             raise ValueError('Page %s must belong to %s namespace'
-                             % (self.title(), ns))
+                             % (self.title(), site.proofread_page_ns))
         # Ensure that constants are in line with Extension values.
         if list(self.site.proofread_levels.keys()) != self.PROOFREAD_LEVELS:
             raise ValueError('QLs do not match site values: %s != %s'
@@ -401,8 +400,6 @@ class IndexPage(pywikibot.Page):
 
     """Index Page page used in Mediawiki ProofreadPage extension."""
 
-    # TODO: handle not existing pages when quering labels/nubers?
-    # Currently APIError is thrown.
     def __init__(self, source, title=''):
         """Instantiate a IndexPage object.
 
@@ -433,14 +430,13 @@ class IndexPage(pywikibot.Page):
             site = source.site
         else:
             site = source
-        ns = site.proofread_index_ns
-        super(IndexPage, self).__init__(source, title, ns=site.proofread_index_ns)
+        super(IndexPage, self).__init__(source, title)
         if self.namespace() != site.proofread_index_ns:
             raise ValueError('Page %s must belong to %s namespace'
-                             % (self.title(), ns))
+                             % (self.title(), site.proofread_index_ns))
 
         self._all_page_links = set(
-            self.site.pagelinks(self, namespaces=self.site.proofread_page_ns))
+            self.site.pagelinks(self, namespaces=site.proofread_page_ns))
 
         self._cached = False
 
@@ -451,6 +447,15 @@ class IndexPage(pywikibot.Page):
                 self._get_page_mappings()
             return fn(self, *args, **kwargs)
         return wrapper
+
+    def _parse_redlink(self, href):
+        """Parse page title when link in Index is a redlink."""
+        p_href = re.compile('/w/index\.php\?title=(.+?)&action=edit&redlink=1')
+        title = p_href.search(href)
+        if title:
+            return title.group(1)
+        else:
+            return None
 
     def _get_page_mappings(self):
         """Associate label and number for each page linked to the index."""
@@ -466,13 +471,20 @@ class IndexPage(pywikibot.Page):
 
         self._parsed_text = self._get_parsed_page()
         self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
-        attrs = {'class': re.compile('prp-pagequality')}
+        attrs = {'class': re.compile('prp-pagequality|new')}
 
-        # Search for attribute "prp-pagequality" in tags like:
-        # <a class="quality1 prp-pagequality-1"
-        #    href="/wiki/Page:xxx.djvu/n"
+        # Search for attribute "prp-pagequality" in tags:
+        # Existing pages:
+        # <a href="/wiki/Page:xxx.djvu/n"
         #    title="Page:xxx.djvu/n">m
+        #    class="quality1 prp-pagequality-1"
+        # </a> or
+        # Non-existing pages:
+        # <a href="/w/index.php?title=xxx&amp;action=edit&amp;redlink=1"
+        #    class="new"
+        #    title="Page:xxx.djvu/n (page does not exist)">m
         # </a>
+
         # Try to purge or raise ValueError.
         if not self._soup.find_all('a', attrs=attrs):
             self.purge()
@@ -481,17 +493,30 @@ class IndexPage(pywikibot.Page):
             self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
-                    'Missing class="qualityN prp-pagequality-N" in: %s.'
+                    'Missing class="qualityN prp-pagequality-N" or'
+                    'class="new" in: %s.'
                     % self)
 
         page_cnt = 0
         for a_tag in self._soup.find_all('a', attrs=attrs):
-            page_cnt += 1
             label = a_tag.text.lstrip('0')  # Label is not converted to int.
-            title = a_tag.get('title')
+            class_ = a_tag.get('class')
+            href = a_tag.get('href')
 
-            page = ProofreadPage(self.site, title)
-            page.index = self  # set index property for page
+            if 'new' in class_:
+                title = self._parse_redlink(href)  # non-existing page
+                if title is None:  # title not conforming to required format
+                    continue
+            else:
+                title = a_tag.get('title')   # existing page
+            try:
+                page = ProofreadPage(self.site, title)
+                page.index = self  # set index property for page
+                page_cnt += 1
+            except ValueError:
+                # title is not in site.proofread_page_ns; do not consider it
+                continue
+
             if page not in self._all_page_links:
                 raise pywikibot.Error('Page %s not recognised.' % page)
 
