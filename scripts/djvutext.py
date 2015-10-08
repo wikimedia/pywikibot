@@ -83,7 +83,7 @@ class DjVuTextBot(SingleSiteBot):
 
         # Get edit summary message if it's empty.
         if not self.getOption('summary'):
-            self.options['summary'] = i18n.twntranslate(
+            self.options['summary'] = i18n.twtranslate(
                 self._index.site, 'djvutext-creating')
 
     def page_number_gen(self):

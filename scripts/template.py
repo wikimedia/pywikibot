@@ -202,13 +202,13 @@ class TemplateRobot(ReplaceBot):
             site = self.site
 
             if self.getOption('remove'):
-                self.options['summary'] = i18n.twntranslate(
+                self.options['summary'] = i18n.twtranslate(
                     site, 'template-removing', params)
             elif self.getOption('subst'):
-                self.options['summary'] = i18n.twntranslate(
+                self.options['summary'] = i18n.twtranslate(
                     site, 'template-substituting', params)
             else:
-                self.options['summary'] = i18n.twntranslate(
+                self.options['summary'] = i18n.twtranslate(
                     site, 'template-changing', params)
 
         # regular expression to find the original template.

@@ -1039,9 +1039,20 @@ class CapturingTestCase(TestCase):
         if not nested:
             self._patched = False
 
+    @contextmanager
+    def _delay_assertion(self, context, assertion, args, kwargs):
+        with self.disable_assert_capture():
+            with context as ctx:
+                yield ctx
+            self.after_assert(assertion, *args, **kwargs)
+
     def process_assert(self, assertion, *args, **kwargs):
-        """Handle the assertion."""
-        assertion(*args, **kwargs)
+        """Handle the assertion call."""
+        return assertion(*args, **kwargs)
+
+    def after_assert(self, assertion, *args, **kwargs):
+        """Handle after the assertion."""
+        pass
 
     def patch_assert(self, assertion):
         """Execute process_assert when the assertion is called."""
@@ -1049,7 +1060,12 @@ class CapturingTestCase(TestCase):
             assert self._patched is False
             self._patched = True
             try:
-                self.process_assert(assertion, *args, **kwargs)
+                context = self.process_assert(assertion, *args, **kwargs)
+                if hasattr(context, '__enter__'):
+                    return self._delay_assertion(context, assertion, args, kwargs)
+                else:
+                    self.after_assert(assertion, *args, **kwargs)
+                    return context
             finally:
                 self._patched = False
         return inner_assert
@@ -1584,14 +1600,13 @@ class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
     C{assertOneDeprecation}.
     """
 
-    def process_assert(self, assertion, *args, **kwargs):
+    def after_assert(self, assertion, *args, **kwargs):
         """Handle assertion and call C{assertOneDeprecation} after it."""
-        super(AutoDeprecationTestCase, self).process_assert(
+        super(AutoDeprecationTestCase, self).after_assert(
             assertion, *args, **kwargs)
         self.assertOneDeprecation()
 
     skip_list = DeprecationTestCase.skip_list + [
         CapturingTestCase.process_assert,
         CapturingTestCase.patch_assert,
-        process_assert,
     ]
