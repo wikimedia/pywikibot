@@ -33,7 +33,7 @@ import json
 import os
 import pkgutil
 
-from collections import defaultdict
+from collections import defaultdict, Mapping
 
 import pywikibot
 
@@ -41,6 +41,7 @@ from pywikibot import __url__
 from pywikibot import Error
 from pywikibot import config
 from pywikibot.plural import plural_rules
+from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -448,6 +449,9 @@ def translate(code, xdict, parameters=None, fallback=False):
     if parameters is None:
         return trans
 
+    if not isinstance(parameters, Mapping):
+        issue_deprecation_warning('parameters not being a mapping', None, 2)
+
     # else we check for PLURAL variants
     trans = _extract_plural(code, trans, parameters)
     if parameters:
@@ -470,7 +474,8 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
 
     @param code: The language code
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
-    @param parameters: For passing parameters.
+    @param parameters: For passing parameters. It should be a mapping but for
+        backwards compatibility can also be a list, tuple or a single value.
     @param fallback: Try an alternate language code
     @type fallback: boolean
     """
@@ -512,6 +517,10 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     # send the language code back via the given list
     if code_needed:
         code.append(alt)
+
+    if parameters is not None and not isinstance(parameters, Mapping):
+        issue_deprecation_warning('parameters not being a Mapping', None, 2)
+
     if parameters:
         return trans % parameters
     else:
