@@ -843,8 +843,12 @@ class uploader(threading.Thread):
 
         cid = u''
         if self.checktemplate:
-            cid += u'\n{{BotMoveToCommons|%(lang)s.%(family)s|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}}}\n' \
-                   % {u'lang': lang, u'family': family}
+            cid += ('\n{{BotMoveToCommons|%(lang)s.%(family)s'
+                    '|year={{subst:CURRENTYEAR}}'
+                    '|month={{subst:CURRENTMONTHNAME}}'
+                    '|day={{subst:CURRENTDAY}}}}\n'
+                    % {'lang': lang, 'family': family}
+                    )
         cid += u'== {{int:filedesc}} ==\n'
         cid += u'{{Information\n'
         cid += u'|description=%(description)s\n' % fields
