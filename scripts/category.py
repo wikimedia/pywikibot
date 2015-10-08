@@ -791,10 +791,10 @@ class CategoryListifyRobot(object):
         if self.subCats:
             setOfArticles = setOfArticles.union(set(self.cat.subcategories()))
         if not self.editSummary:
-            self.editSummary = i18n.twntranslate(self.site,
-                                                 'category-listifying',
-                                                 {'fromcat': self.cat.title(),
-                                                  'num': len(setOfArticles)})
+            self.editSummary = i18n.twtranslate(self.site,
+                                                'category-listifying',
+                                                {'fromcat': self.cat.title(),
+                                                 'num': len(setOfArticles)})
 
         listString = ""
         for article in setOfArticles:

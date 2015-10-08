@@ -26,7 +26,6 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
-import sys
 import re
 import locale
 import json
@@ -41,10 +40,7 @@ from pywikibot import __url__
 from pywikibot import Error
 from pywikibot import config
 from pywikibot.plural import plural_rules
-from pywikibot.tools import issue_deprecation_warning
-
-if sys.version_info[0] > 2:
-    basestring = (str, )
+from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -346,22 +342,16 @@ def _extract_plural(code, message, parameters):
 
     """
     plural_items = re.findall(PLURAL_PATTERN, message)
+    assert isinstance(parameters, Mapping), \
+        'parameters is not Mapping but {0}'.format(type(parameters))
     if plural_items:  # we found PLURAL patterns, process it
-        if len(plural_items) > 1 and isinstance(parameters, (tuple, list)) and \
-           len(plural_items) != len(parameters):
-            raise ValueError("Length of parameter does not match PLURAL "
-                             "occurrences.")
-        i = 0
         for selector, variants in plural_items:
-            if isinstance(parameters, dict):
-                num = int(parameters[selector])
-            elif isinstance(parameters, basestring):
-                num = int(parameters)
-            elif isinstance(parameters, (tuple, list)):
-                num = int(parameters[i])
-                i += 1
-            else:
-                num = parameters
+            num = parameters[selector]
+            if not isinstance(num, int):
+                issue_deprecation_warning(
+                    'type {0} for value {1} ({2})'.format(type(num), selector, num),
+                    'an int', 1)
+                num = int(num)
             # TODO: check against plural_rules[code]['nplurals']
             try:
                 index = plural_rules[code]['plural'](num)
@@ -373,6 +363,40 @@ def _extract_plural(code, message, parameters):
             repl = variants.split('|')[index]
             message = re.sub(PLURAL_PATTERN, repl, message, count=1)
     return message
+
+
+class _PluralMappingAlias(Mapping):
+
+    """
+    Aliasing class to allow non mappings in _extract_plural.
+
+    That function only uses __getitem__ so this is only implemented here.
+    """
+
+    def __init__(self, source):
+        if isinstance(source, StringTypes):
+            source = int(source)
+        self.source = source
+        self.index = -1
+        super(_PluralMappingAlias, self).__init__()
+
+    def __getitem__(self, key):
+        self.index += 1
+        if isinstance(self.source, dict):
+            return int(self.source[key])
+        elif isinstance(self.source, (tuple, list)):
+            if self.index < len(self.source):
+                return int(self.source[self.index])
+            raise ValueError('Length of parameter does not match PLURAL '
+                             'occurrences.')
+        else:
+            return self.source
+
+    def __iter__(self):
+        raise NotImplementedError
+
+    def __len__(self):
+        raise NotImplementedError
 
 
 DEFAULT_FALLBACK = ('_default', )
@@ -392,14 +416,14 @@ def translate(code, xdict, parameters=None, fallback=False):
     not be always the same. When fallback is iterable it'll return None if no
     code applies (instead of returning one).
 
-    For PLURAL support have a look at the twntranslate method
+    For PLURAL support have a look at the twtranslate method.
 
     @param code: The language code
     @type code: string or Site object
     @param xdict: dictionary with language codes as keys or extended dictionary
                   with family names as keys containing language dictionaries or
                   a single (unicode) string. May contain PLURAL tags as
-                  described in twntranslate
+                  described in twtranslate
     @type xdict: dict, string, unicode
     @param parameters: For passing (plural) parameters
     @type parameters: dict, string, unicode, int
@@ -451,9 +475,12 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     if not isinstance(parameters, Mapping):
         issue_deprecation_warning('parameters not being a mapping', None, 2)
+        plural_parameters = _PluralMappingAlias(parameters)
+    else:
+        plural_parameters = parameters
 
     # else we check for PLURAL variants
-    trans = _extract_plural(code, trans, parameters)
+    trans = _extract_plural(code, trans, plural_parameters)
     if parameters:
         try:
             return trans % parameters
@@ -463,21 +490,64 @@ def translate(code, xdict, parameters=None, fallback=False):
     return trans
 
 
-def twtranslate(code, twtitle, parameters=None, fallback=True):
+def twtranslate(code, twtitle, parameters=None, fallback=True,
+                only_plural=False):
     """
-    Translate a message.
-
-    The translations are retrieved from json files in messages_package_name.
+    Translate a message using JSON files in messages_package_name.
 
     fallback parameter must be True for i18n and False for L10N or testing
     purposes.
+
+    Support for plural is implemented like in MediaWiki extension. If the
+    TranslateWiki message contains a plural tag inside which looks like::
+
+        {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
+
+    it takes that variant calculated by the plural_rules depending on the number
+    value. Multiple plurals are allowed.
+
+    As an examples, if we had several json dictionaries in test folder like:
+
+    en.json::
+
+      {
+          "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
+      }
+
+    fr.json::
+
+      {
+          "test-plural": "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
+      }
+
+    and so on.
+
+    >>> from pywikibot import i18n
+    >>> i18n.set_messages_package('tests.i18n')
+    >>> # use a dictionary
+    >>> str(i18n.twtranslate('en', 'test-plural', {'num':2}))
+    'Bot: Changing 2 pages.'
+    >>> # use additional format strings
+    >>> str(i18n.twtranslate('fr', 'test-plural', {'num': 1, 'descr': 'seulement'}))
+    'Robot: Changer seulement une page.'
+    >>> # use format strings also outside
+    >>> str(i18n.twtranslate('fr', 'test-plural', {'num': 10}, only_plural=True)
+    ...     % {'descr': 'seulement'})
+    'Robot: Changer seulement quelques pages.'
 
     @param code: The language code
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: For passing parameters. It should be a mapping but for
         backwards compatibility can also be a list, tuple or a single value.
+        They are also used for plural entries in which case they must be a
+        Mapping and will cause a TypeError otherwise.
     @param fallback: Try an alternate language code
     @type fallback: boolean
+    @param only_plural: Define whether the parameters should be only applied to
+        plural instances. If this is False it will apply the parameters also
+        to the resulting string. If this is True the placeholders must be
+        manually applied afterwards.
+    @type only_plural: bool
     """
     if not messages_available():
         raise TranslationError(
@@ -518,87 +588,40 @@ def twtranslate(code, twtitle, parameters=None, fallback=True):
     if code_needed:
         code.append(alt)
 
+    if '{{PLURAL:' in trans:
+        # _extract_plural supports in theory non-mappings, but they are
+        # deprecated
+        if not isinstance(parameters, Mapping):
+            raise TypeError('parameters must be a mapping.')
+        trans = _extract_plural(alt, trans, parameters)
+
+    # this is only the case when called in twntranslate, and that didn't apply
+    # parameters when it wasn't a dict
+    if isinstance(parameters, _PluralMappingAlias):
+        # This is called due to the old twntranslate function which ignored
+        # KeyError. Instead only_plural should be used.
+        if isinstance(parameters.source, dict):
+            try:
+                trans %= parameters.source
+            except KeyError:
+                pass
+        parameters = None
+
     if parameters is not None and not isinstance(parameters, Mapping):
         issue_deprecation_warning('parameters not being a Mapping', None, 2)
 
-    if parameters:
+    if not only_plural and parameters:
         return trans % parameters
     else:
         return trans
 
 
-# Maybe this function should be merged with twtranslate
+@deprecated('twtranslate')
 def twntranslate(code, twtitle, parameters=None):
-    r"""Translate a message with plural support.
-
-    Support is implemented like in MediaWiki extension. If the TranslateWiki
-    message contains a plural tag inside which looks like::
-
-        {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
-
-    it takes that variant calculated by the plural_rules depending on the number
-    value. Multiple plurals are allowed.
-
-    As an examples, if we had several json dictionaries in test folder like:
-
-    en.json::
-
-      {
-          "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
-      }
-
-    fr.json::
-
-      {
-          "test-plural": "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
-      }
-
-    and so on.
-
-    >>> from pywikibot import i18n
-    >>> i18n.set_messages_package('tests.i18n')
-    >>> # use a number
-    >>> str(i18n.twntranslate('en', 'test-plural', 0) % {'num': 'no'})
-    'Bot: Changing no pages.'
-    >>> # use a string
-    >>> str(i18n.twntranslate('en', 'test-plural', '1') % {'num': 'one'})
-    'Bot: Changing one page.'
-    >>> # use a dictionary
-    >>> str(i18n.twntranslate('en', 'test-plural', {'num':2}))
-    'Bot: Changing 2 pages.'
-    >>> # use additional format strings
-    >>> str(i18n.twntranslate('fr', 'test-plural', {'num': 1, 'descr': 'seulement'}))
-    'Robot: Changer seulement une page.'
-    >>> # use format strings also outside
-    >>> str(i18n.twntranslate('fr', 'test-plural', 10) % {'descr': 'seulement'})
-    'Robot: Changer seulement quelques pages.'
-
-    The translations are retrieved from i18n.<package>, based on the callers
-    import table.
-
-    @param code: The language code
-    @param twtitle: The TranslateWiki string title, in <package>-<key> format
-    @param parameters: For passing (plural) parameters.
-
-    """
-    # If a site is given instead of a code, use its language
-    if hasattr(code, 'code'):
-        code = code.code
-    # we send the code via list and get the alternate code back
-    code = [code]
-    trans = twtranslate(code, twtitle)
-    # get the alternate language code modified by twtranslate
-    lang = code.pop()
-    # check for PLURAL variants
-    trans = _extract_plural(lang, trans, parameters)
-    # we always have a dict for replacement of translatewiki messages
-    if parameters and isinstance(parameters, dict):
-        try:
-            return trans % parameters
-        except KeyError:
-            # parameter is for PLURAL variants only, don't change the string
-            pass
-    return trans
+    """DEPRECATED: Get translated string for the key."""
+    if parameters is not None:
+        parameters = _PluralMappingAlias(parameters)
+    return twtranslate(code, twtitle, parameters)
 
 
 def twhas_key(code, twtitle):

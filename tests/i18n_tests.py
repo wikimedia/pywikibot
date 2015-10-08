@@ -14,7 +14,10 @@ import pywikibot
 from pywikibot import i18n, bot, plural
 from pywikibot.tools import StringTypes
 
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase, PwbTestCase
+from tests.aspects import (
+    unittest, TestCase, DefaultSiteTestCase, PwbTestCase,
+    AutoDeprecationTestCase,
+)
 
 
 class TestTranslate(TestCase):
@@ -184,7 +187,7 @@ class TestTWTranslate(TWNTestCaseBase):
                           'en', 'test-no-english')
 
 
-class TestTWNTranslate(TWNTestCaseBase):
+class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
 
     """Test {{PLURAL:}} support."""
 
