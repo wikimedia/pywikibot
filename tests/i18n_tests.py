@@ -304,10 +304,10 @@ class TestTWNTranslate(TWNTestCaseBase):
 
     def testAllParametersExist(self):
         """Test that all parameters are required when using a dict."""
-        with self.assertRaisesRegex(KeyError, repr(u'line')):
-            # all parameters must be inside twntranslate
-            i18n.twntranslate('de', 'test-multiple-plurals',
-                              {'line': 1, 'page': 1}) % {'action': u'Ändere'}
+        # all parameters must be inside twntranslate
+        self.assertEqual(i18n.twntranslate('de', 'test-multiple-plurals',
+                                           {'line': 1, 'page': 1}),
+                         'Bot: %(action)s %(line)s Zeile von einer Seite.')
 
     def test_fallback_lang(self):
         """
