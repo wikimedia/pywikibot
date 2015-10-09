@@ -592,6 +592,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilter_default(self):
         gf = pagegenerators.GeneratorFactory()
         # Matches titles with the same two or more continous characters
+        self.assertTrue(gf.handleArg('-start'))
         self.assertTrue(gf.handleArg('-titleregex:(.)\\1+'))
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
@@ -603,39 +604,39 @@ class TestFactoryGenerator(DefaultSiteTestCase):
             self.assertRegex(page.title().lower(), '(.)\\1+')
 
     def test_regexfilter_ns_after(self):
-        """Bug: T85389: -ns after -titleregex is ignored with a warning."""
         gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start'))
         self.assertTrue(gf.handleArg('-titleregex:.*'))
         gf.handleArg('-ns:1')
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
-        self.assertGreater(len(pages), 0)
         self.assertLessEqual(len(pages), 10)
-        self.assertPagesInNamespaces(pages, 0)
+        self.assertPagesInNamespaces(pages, 1)
 
-    def test_regexfilter_ns_first(self):
+    def test_regexfilter_ns_before(self):
         gf = pagegenerators.GeneratorFactory()
-        # Workaround for Bug: T85389
-        # Give -ns before -titleregex (as for -newpages)
+        self.assertTrue(gf.handleArg('-start'))
         gf.handleArg('-ns:1')
         self.assertTrue(gf.handleArg('-titleregex:.*'))
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = list(gen)
-        self.assertGreater(len(pages), 0)
         self.assertLessEqual(len(pages), 10)
         self.assertPagesInNamespaces(pages, 1)
 
-    def test_regexfilter_two_ns_first(self):
+    def test_allpages_with_two_ns(self):
+        """Test that allpages fails with two ns as parameter."""
         gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start'))
         gf.handleArg('-ns:3,1')
-        self.assertRaisesRegex(
+        # allpages only accepts a single namespace, and will raise a
+        # TypeError if self.namespaces contains more than one namespace.
+        self.assertRaises(
             TypeError,
             'allpages module does not support multiple namespaces',
-            gf.handleArg,
-            '-titleregex:.*')
+            gf.getCombinedGenerator)
 
     def test_prefixing_default(self):
         gf = pagegenerators.GeneratorFactory()
