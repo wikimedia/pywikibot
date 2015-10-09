@@ -706,17 +706,13 @@ class CosmeticChangesToolkit(object):
 #                                     r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
 #                                     % (self.site.code, self.site.family.name),
 #                                     r'[[\g<link>|\g<title>]]', exceptions)
-        # external link in double brackets
+        # external link in/starting with double brackets
         text = textlib.replaceExcept(
             text,
-            r'\[\[(?P<url>https?://[^\]]+?)\]\]',
-            r'[\g<url>]', exceptions)
-        # external link starting with double bracket
-        text = textlib.replaceExcept(text,
-                                     r'\[\[(?P<url>https?://.+?)\]',
-                                     r'[\g<url>]', exceptions)
-        # external link and description separated by a dash, with
-        # whitespace in front of the dash, so that it is clear that
+            r'\[\[(?P<url>https?://[^\]]+?)\]\]?',
+            r'[\g<url>]', exceptions, site=self.site)
+        # external link and description separated by a pipe, with
+        # whitespace in front of the pipe, so that it is clear that
         # the dash is not a legitimate part of the URL.
         text = textlib.replaceExcept(
             text,
@@ -739,14 +735,10 @@ class CosmeticChangesToolkit(object):
         # Keep in mind that MediaWiki automatically converts <br> to <br />
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
-        text = textlib.replaceExcept(text, r'(?i)<b>(.*?)</b>', r"'''\1'''",
-                                     exceptions)
-        text = textlib.replaceExcept(text, r'(?i)<strong>(.*?)</strong>',
-                                     r"'''\1'''", exceptions)
-        text = textlib.replaceExcept(text, r'(?i)<i>(.*?)</i>', r"''\1''",
-                                     exceptions)
-        text = textlib.replaceExcept(text, r'(?i)<em>(.*?)</em>', r"''\1''",
-                                     exceptions)
+        text = textlib.replaceExcept(text, r'(?i)<(b|strong)>(.*?)</\1>',
+                                     r"'''\2'''", exceptions, site=self.site)
+        text = textlib.replaceExcept(text, r'(?i)<(i|em)>(.*?)</\1>',
+                                     r"''\2''", exceptions, site=self.site)
         # horizontal line without attributes in a single line
         text = textlib.replaceExcept(text, r'(?i)([\r\n])<hr[ /]*>([\r\n])',
                                      r'\1----\2', exceptions)
@@ -797,19 +789,15 @@ class CosmeticChangesToolkit(object):
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace', 'gallery', 'hyperlink', 'interwiki', 'link']
         # change <number> ccm -> <number> cm³
-        text = textlib.replaceExcept(text, r'(\d)\s*&nbsp;ccm',
-                                     r'\1&nbsp;' + u'cm³', exceptions)
-        text = textlib.replaceExcept(text,
-                                     r'(\d)\s*ccm', r'\1&nbsp;' + u'cm³',
-                                     exceptions)
+        text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?ccm',
+                                     r'\1&nbsp;cm³', exceptions,
+                                     site=self.site)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
         pattern = re.compile(u'«.*?»', re.UNICODE)
         exceptions.append(pattern)
-        text = textlib.replaceExcept(text, r'(\d)\s*&nbsp;' + u'[º°]([CF])',
-                                     r'\1&nbsp;' + u'°' + r'\2', exceptions)
-        text = textlib.replaceExcept(text, r'(\d)\s*' + u'[º°]([CF])',
-                                     r'\1&nbsp;' + u'°' + r'\2', exceptions)
+        text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
+                                     r'\1&nbsp;°\2', exceptions, site=self.site)
         text = textlib.replaceExcept(text, u'º([CF])', u'°' + r'\1',
                                      exceptions)
         return text
