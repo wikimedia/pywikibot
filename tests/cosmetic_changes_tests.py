@@ -52,6 +52,10 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         """Test removeUselessSpaces method."""
         self.assertEqual('Foo bar',
                          self.cct.removeUselessSpaces('Foo  bar '))
+        self.assertEqual('Foo bar',
+                         self.cct.removeUselessSpaces('Foo  bar   '))
+        self.assertEqual('Foo bar\nsna fu',
+                         self.cct.removeUselessSpaces('Foo  bar \nsna  fu  '))
         # inside comments
         self.assertEqual('<!--Foo  bar -->',
                          self.cct.removeUselessSpaces('<!--Foo  bar -->'))

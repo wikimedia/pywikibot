@@ -617,13 +617,11 @@ class CosmeticChangesToolkit(object):
 
     def removeUselessSpaces(self, text):
         """Cleanup multiple or trailing spaces."""
-        multipleSpacesR = re.compile('  +')
-        spaceAtLineEndR = re.compile(' $')
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
-        text = textlib.replaceExcept(text, multipleSpacesR, ' ', exceptions)
-        text = textlib.replaceExcept(text, spaceAtLineEndR, '', exceptions)
+        text = textlib.replaceExcept(text, r'(?m) +( |$)', r'\1', exceptions,
+                                     site=self.site)
         return text
 
     def removeNonBreakingSpaceBeforePercent(self, text):
