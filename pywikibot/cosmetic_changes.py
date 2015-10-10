@@ -731,6 +731,10 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixHtml(self, text):
+        def replace_header(match):
+            depth = int(match.group(1))
+            return r'{0} {1} {0}'.format('=' * depth, match.group(2))
+
         # Everything case-insensitive (?i)
         # Keep in mind that MediaWiki automatically converts <br> to <br />
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
@@ -748,14 +752,11 @@ class CosmeticChangesToolkit(object):
                                      r'<hr \1 />',
                                      exceptions)
         # a header where only spaces are in the same line
-        for level in range(1, 7):
-            equals = '\\1%s \\2 %s\\3' % ("=" * level, "=" * level)
-            text = textlib.replaceExcept(
-                text,
-                r'(?i)([\r\n]) *<h%d> *([^<]+?) *</h%d> *([\r\n])'
-                % (level, level),
-                r'%s' % equals,
-                exceptions)
+        text = textlib.replaceExcept(
+            text,
+            r'(?i)(?<=[\r\n]) *<h([1-7])> *([^<]+?) *</h\1> *(?=[\r\n])',
+            replace_header,
+            exceptions)
         # TODO: maybe we can make the bot replace <p> tags with \r\n's.
         return text
 
