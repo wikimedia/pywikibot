@@ -134,8 +134,9 @@ parameterHelp = u"""\
                   before -newpages.
                   If used with -recentchanges, efficiency is improved if
                   -namepace/ns is provided before -recentchanges.
-                  If used with -titleregex, -namepace/ns must be provided
-                  before -titleregex and shall contain only one value.
+
+                  If used with -start, -namepace/ns shall contain only one
+                  value.
 
 -interwiki        Work on the given page and all equivalent pages in other
                   languages. This can, for example, be used to fight
@@ -181,13 +182,21 @@ parameterHelp = u"""\
                   "-start:Template:!" will make the bot work on all pages
                   in the template namespace.
 
+                  default value is start:!
+
 -prefixindex      Work on pages commencing with a common prefix.
 
 -step:n           When used with any other argument that specifies a set
                   of pages, only retrieve n pages at a time from the wiki
                   server.
 
--titleregex       Work on titles that match the given regular expression.
+-titleregex       A regular expression that needs to match the article title
+                  otherwise the page won't be returned.
+                  Multiple -titleregex:regexpr can be provided and the page will
+                  be returned if title is matched by any of the regexpr
+                  provided.
+                  Case insensitive regular expressions will be used and
+                  dot matches any character.
 
 -transcludes      Work on all pages that use a certain template.
                   Argument can also be given as "-transcludes:Title".
@@ -327,6 +336,7 @@ class GeneratorFactory(object):
         self.step = None
         self.limit = None
         self.articlefilter_list = []
+        self.titlefilter_list = []
         self.claimfilter_list = []
         self.intersect = False
         self._site = site
@@ -396,6 +406,9 @@ class GeneratorFactory(object):
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
+            if self.titlefilter_list or self.articlefilter_list:
+                pywikibot.warning(
+                    'grep/titleregex filters specified but no generators.')
             return None
         elif len(self.gens) == 1:
             gensList = self.gens[0]
@@ -419,11 +432,15 @@ class GeneratorFactory(object):
                                                             claim[0], claim[1],
                                                             claim[2], claim[3])
 
+        if self.titlefilter_list:
+            dupfiltergen = RegexFilterPageGenerator(
+                dupfiltergen, self.titlefilter_list)
+
         if self.articlefilter_list:
-            return RegexBodyFilterPageGenerator(
+            dupfiltergen = RegexBodyFilterPageGenerator(
                 PreloadingGenerator(dupfiltergen), self.articlefilter_list)
-        else:
-            return dupfiltergen
+
+        return dupfiltergen
 
     def getCategoryGen(self, arg, recurse=False, content=False,
                        gen_func=None):
@@ -672,8 +689,7 @@ class GeneratorFactory(object):
         elif arg.startswith('-start'):
             firstPageTitle = arg[7:]
             if not firstPageTitle:
-                firstPageTitle = pywikibot.input(
-                    u'At which page do you want to start?')
+                firstPageTitle = '!'
             firstpagelink = pywikibot.Link(firstPageTitle,
                                            self.site)
             namespace = firstpagelink.namespace
@@ -739,18 +755,11 @@ class GeneratorFactory(object):
             gen = GoogleSearchPageGenerator(arg[8:])
         elif arg.startswith('-titleregex'):
             if len(arg) == 11:
-                regex = pywikibot.input(u'What page names are you looking for?')
+                self.titlefilter_list.append(pywikibot.input(
+                    'What page names are you looking for?'))
             else:
-                regex = arg[12:]
-            # partial workaround for bug T85389
-            # to use -namespace/ns with -newpages, -ns must be given
-            # before -titleregex, otherwise default namespace is 0.
-            # allpages only accepts a single namespace, and will raise a
-            # TypeError if self.namespaces contains more than one namespace.
-            namespaces = self.namespaces or 0
-            gen = RegexFilterPageGenerator(
-                self.site.allpages(namespace=namespaces),
-                regex)
+                self.titlefilter_list.append(arg[12:])
+            return True
         elif arg.startswith('-grep'):
             if len(arg) == 5:
                 self.articlefilter_list.append(pywikibot.input(
