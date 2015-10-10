@@ -4208,7 +4208,7 @@ class Claim(Property):
                 data['qualifiers-order'] = list(self.qualifiers.keys())
                 for prop, qualifiers in self.qualifiers.items():
                     for qualifier in qualifiers:
-                        qualifier.isQualifier = True
+                        assert qualifier.isQualifier is True
                     data['qualifiers'][prop] = [qualifier.toJSON() for qualifier in qualifiers]
             if len(self.sources) > 0:
                 data['references'] = []
@@ -4217,7 +4217,7 @@ class Claim(Property):
                     for prop, val in collection.items():
                         reference['snaks'][prop] = []
                         for source in val:
-                            source.isReference = True
+                            assert source.isReference is True
                             src_data = source.toJSON()
                             if 'hash' in src_data:
                                 if 'hash' not in reference:
