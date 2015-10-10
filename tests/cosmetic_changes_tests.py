@@ -28,12 +28,118 @@ class TestCosmeticChanges(TestCase):
         cls.cct = CosmeticChangesToolkit(cls.site, namespace=0,
                                          pageTitle='Test')
 
+
+class TestDryCosmeticChanges(TestCosmeticChanges):
+
+    """Test cosmetic_changes not requiring a live wiki."""
+
+    dry = True
+
     def test_fixSelfInterwiki(self):
         """Test fixSelfInterwiki method."""
         self.assertEqual('[[Foo bar]]',
                          self.cct.fixSelfInterwiki('[[de:Foo bar]]'))
         self.assertEqual('[[en:Foo bar]]',
                          self.cct.fixSelfInterwiki('[[en:Foo bar]]'))
+
+    def test_resolveHtmlEntities(self):
+        """Test resolveHtmlEntities method."""
+        self.assertEqual(
+            '&amp;#&nbsp;# #0#&#62;#x',
+            self.cct.resolveHtmlEntities('&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
+
+    def test_removeUselessSpaces(self):
+        """Test removeUselessSpaces method."""
+        self.assertEqual('Foo bar',
+                         self.cct.removeUselessSpaces('Foo  bar '))
+        # inside comments
+        self.assertEqual('<!--Foo  bar -->',
+                         self.cct.removeUselessSpaces('<!--Foo  bar -->'))
+        # startspace
+        self.assertEqual(' Foo  bar ',
+                         self.cct.removeUselessSpaces(' Foo  bar '))
+
+    def test_removeNonBreakingSpaceBeforePercent(self):
+        """Test removeNonBreakingSpaceBeforePercent method."""
+        self.assertEqual(
+            '42 %', self.cct.removeNonBreakingSpaceBeforePercent('42&nbsp;%'))
+
+    def test_cleanUpSectionHeaders(self):
+        """Test cleanUpSectionHeaders method."""
+        self.assertEqual('=== Header ===\n',
+                         self.cct.cleanUpSectionHeaders('===Header===\n'))
+
+    def test_putSpacesInLists(self):
+        """Test putSpacesInLists method."""
+        self.assertEqual('* Foo bar',
+                         self.cct.putSpacesInLists('*Foo bar'))
+        self.assertEqual('** Foo bar',
+                         self.cct.putSpacesInLists('**Foo bar'))
+        self.assertEqual('# Foo bar',
+                         self.cct.putSpacesInLists('#Foo bar'))
+        self.assertEqual('## Foo bar',
+                         self.cct.putSpacesInLists('##Foo bar'))
+        # right except the page is a redirect page
+        self.assertEqual('# redirect',
+                         self.cct.putSpacesInLists('#redirect'))
+        self.assertEqual('#: Foo bar',
+                         self.cct.putSpacesInLists('#:Foo bar'))
+        self.assertEqual(':Foo bar',
+                         self.cct.putSpacesInLists(':Foo bar'))
+        self.assertEqual(':* Foo bar',
+                         self.cct.putSpacesInLists(':*Foo bar'))
+
+    def test_fixSyntaxSave(self):
+        """Test fixSyntaxSave method."""
+        self.assertEqual(
+            '[https://de.wikipedia.org]',
+            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]]'))
+        self.assertEqual(
+            '[https://de.wikipedia.org]',
+            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]'))
+        self.assertEqual(
+            '[https://de.wikipedia.org/w/api.php API]',
+            self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
+
+    def test_fixHtml(self):
+        """Test fixHtml method."""
+        self.assertEqual("'''Foo''' bar",
+                         self.cct.fixHtml('<b>Foo</b> bar'))
+        self.assertEqual("Foo '''bar'''",
+                         self.cct.fixHtml('Foo <strong>bar</strong>'))
+        self.assertEqual("''Foo'' bar",
+                         self.cct.fixHtml('<i>Foo</i> bar'))
+        self.assertEqual("Foo ''bar''",
+                         self.cct.fixHtml('Foo <em>bar</em>'))
+        self.assertEqual('\n----\n',
+                         self.cct.fixHtml('\n<hr />\n'))
+        self.assertEqual('\n=== Header ===\n',
+                         self.cct.fixHtml('\n<h3>Header</h3>\n'))
+
+    def test_fixReferences(self):
+        """Test fixReferences method."""
+        self.assertEqual('<ref name="Foo" />',
+                         self.cct.fixReferences('<ref name= "Foo" />'))
+        self.assertEqual('<ref name="Foo">bar</ref>',
+                         self.cct.fixReferences('<ref name ="Foo">bar</ref>'))
+        self.assertEqual('<ref name="Foo"/>',
+                         self.cct.fixReferences('<ref name="Foo"></ref>'))
+        self.assertEqual('',
+                         self.cct.fixReferences('<ref />'))
+        self.assertEqual('',
+                         self.cct.fixReferences('<ref> \n</ref>'))
+
+    def test_fixTypo(self):
+        """Test fixTypo method."""
+        self.assertEqual('42&nbsp;cm³',
+                         self.cct.fixTypo('42 ccm'))
+        self.assertEqual('42&nbsp;°C',
+                         self.cct.fixTypo('42 ºC'))
+
+
+class TestLiveCosmeticChanges(TestCosmeticChanges):
+
+    """Test cosmetic_changes requiring a live wiki."""
 
     def test_translateAndCapitalizeNamespaces(self):
         """Test translateAndCapitalizeNamespaces method."""
@@ -95,106 +201,12 @@ class TestCosmeticChanges(TestCase):
         self.assertEqual('text [[title|name]]text',
                          self.cct.cleanUpLinks('text[[title| name]]text'))
 
-    def test_resolveHtmlEntities(self):
-        """Test resolveHtmlEntities method."""
-        self.assertEqual(
-            '&amp;#&nbsp;# #0#&#62;#x',
-            self.cct.resolveHtmlEntities('&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
-
-    def test_removeUselessSpaces(self):
-        """Test removeUselessSpaces method."""
-        self.assertEqual('Foo bar',
-                         self.cct.removeUselessSpaces('Foo  bar '))
-        # inside comments
-        self.assertEqual('<!--Foo  bar -->',
-                         self.cct.removeUselessSpaces('<!--Foo  bar -->'))
-        # startspace
-        self.assertEqual(' Foo  bar ',
-                         self.cct.removeUselessSpaces(' Foo  bar '))
-
-    def test_removeNonBreakingSpaceBeforePercent(self):
-        """Test removeNonBreakingSpaceBeforePercent method."""
-        self.assertEqual(
-            '42 %', self.cct.removeNonBreakingSpaceBeforePercent('42&nbsp;%'))
-
-    def test_cleanUpSectionHeaders(self):
-        """Test cleanUpSectionHeaders method."""
-        self.assertEqual('=== Header ===\n',
-                         self.cct.cleanUpSectionHeaders('===Header===\n'))
-
-    def test_putSpacesInLists(self):
-        """Test putSpacesInLists method."""
-        self.assertEqual('* Foo bar',
-                         self.cct.putSpacesInLists('*Foo bar'))
-        self.assertEqual('** Foo bar',
-                         self.cct.putSpacesInLists('**Foo bar'))
-        self.assertEqual('# Foo bar',
-                         self.cct.putSpacesInLists('#Foo bar'))
-        self.assertEqual('## Foo bar',
-                         self.cct.putSpacesInLists('##Foo bar'))
-        # right except the page is a redirect page
-        self.assertEqual('# redirect',
-                         self.cct.putSpacesInLists('#redirect'))
-        self.assertEqual('#: Foo bar',
-                         self.cct.putSpacesInLists('#:Foo bar'))
-        self.assertEqual(':Foo bar',
-                         self.cct.putSpacesInLists(':Foo bar'))
-        self.assertEqual(':* Foo bar',
-                         self.cct.putSpacesInLists(':*Foo bar'))
-
     def test_replaceDeprecatedTemplates(self):
         """Test replaceDeprecatedTemplates method."""
         self.assertEqual('{{Belege fehlen}}',
                          self.cct.replaceDeprecatedTemplates('{{Belege}}'))
         self.assertEqual('{{Belege fehlen|Test}}',
                          self.cct.replaceDeprecatedTemplates('{{Quelle|Test}}'))
-
-    def test_fixSyntaxSave(self):
-        """Test fixSyntaxSave method."""
-        self.assertEqual(
-            '[https://de.wikipedia.org]',
-            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]]'))
-        self.assertEqual(
-            '[https://de.wikipedia.org]',
-            self.cct.fixSyntaxSave('[[https://de.wikipedia.org]'))
-        self.assertEqual(
-            '[https://de.wikipedia.org/w/api.php API]',
-            self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
-
-    def test_fixHtml(self):
-        """Test fixHtml method."""
-        self.assertEqual("'''Foo''' bar",
-                         self.cct.fixHtml('<b>Foo</b> bar'))
-        self.assertEqual("Foo '''bar'''",
-                         self.cct.fixHtml('Foo <strong>bar</strong>'))
-        self.assertEqual("''Foo'' bar",
-                         self.cct.fixHtml('<i>Foo</i> bar'))
-        self.assertEqual("Foo ''bar''",
-                         self.cct.fixHtml('Foo <em>bar</em>'))
-        self.assertEqual('\n----\n',
-                         self.cct.fixHtml('\n<hr />\n'))
-        self.assertEqual('\n=== Header ===\n',
-                         self.cct.fixHtml('\n<h3>Header</h3>\n'))
-
-    def test_fixReferences(self):
-        """Test fixReferences method."""
-        self.assertEqual('<ref name="Foo" />',
-                         self.cct.fixReferences('<ref name= "Foo" />'))
-        self.assertEqual('<ref name="Foo">bar</ref>',
-                         self.cct.fixReferences('<ref name ="Foo">bar</ref>'))
-        self.assertEqual('<ref name="Foo"/>',
-                         self.cct.fixReferences('<ref name="Foo"></ref>'))
-        self.assertEqual('',
-                         self.cct.fixReferences('<ref />'))
-        self.assertEqual('',
-                         self.cct.fixReferences('<ref> \n</ref>'))
-
-    def test_fixTypo(self):
-        """Test fixTypo method."""
-        self.assertEqual('42&nbsp;cm³',
-                         self.cct.fixTypo('42 ccm'))
-        self.assertEqual('42&nbsp;°C',
-                         self.cct.fixTypo('42 ºC'))
 
 
 if __name__ == '__main__':
