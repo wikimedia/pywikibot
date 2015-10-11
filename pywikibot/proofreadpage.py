@@ -7,6 +7,7 @@ The extension is supported by MW 1.21+.
 This module includes objects:
 * ProofreadPage(Page)
 * FullHeader
+* IndexPage(Page)
 
 """
 #
@@ -69,6 +70,12 @@ class ProofreadPage(pywikibot.Page):
     PROBLEMATIC = 2
     PROOFREAD = 3
     VALIDATED = 4
+    PROOFREAD_LEVELS = [WITHOUT_TEXT,
+                        NOT_PROOFREAD,
+                        PROBLEMATIC,
+                        PROOFREAD,
+                        VALIDATED,
+                        ]
 
     open_tag = '<noinclude>'
     close_tag = '</noinclude>'
@@ -78,7 +85,7 @@ class ProofreadPage(pywikibot.Page):
     def __init__(self, source, title=''):
         """Instantiate a ProofreadPage object.
 
-        Raises UnknownExtension if source Site has no ProofreadPage Extension.
+        @raise UnknownExtension: source Site has no ProofreadPage Extension.
         """
         if not isinstance(source, pywikibot.site.BaseSite):
             site = source.site
@@ -89,6 +96,67 @@ class ProofreadPage(pywikibot.Page):
         if self.namespace() != site.proofread_page_ns:
             raise ValueError('Page %s must belong to %s namespace'
                              % (self.title(), ns))
+        # Ensure that constants are in line with Extension values.
+        if list(self.site.proofread_levels.keys()) != self.PROOFREAD_LEVELS:
+            raise ValueError('QLs do not match site values: %s != %s'
+                             % (self.site.proofread_levels.keys(),
+                                self.PROOFREAD_LEVELS))
+
+    @property
+    def index(self):
+        """Get the Index page which contains ProofreadPage.
+
+        To force reload, delete index and call it again.
+
+        Returns:
+        None:      if ProofreadPage is linked to no or several Index pages
+                   and no inerence can be done from titles.
+        IndexPage: if ProofreadPage is linked to one Index page.
+        """
+        if not hasattr(self, '_index'):
+            index_ns = self.site.proofread_index_ns
+            what_links_here = [IndexPage(page) for
+                               page in self.getReferences(namespaces=index_ns)]
+
+            if not what_links_here:
+                self._index = (None, [])
+            elif len(what_links_here) == 1:
+                self._index = (what_links_here[0], [])
+            else:
+                self._index = (None, what_links_here)
+                # Try to infer names form page titles.
+                base, sep, num = self.title(withNamespace=False).rpartition('/')
+                if sep == '/':
+                    for page in what_links_here:
+                        if page.title(withNamespace=False) == base:
+                            what_links_here.remove(page)
+                            self._index = (page, what_links_here)
+                            break
+
+        page, others = self._index
+        if others:
+            pywikibot.warning('Page %s is linked to several Index pages: %s.'
+                              % (self, others))
+            if page:
+                pywikibot.warning('    %s selected as Index.' % page)
+                pywikibot.warning('    %s remaining.' % others)
+        elif not page:
+            pywikibot.warning('Page %s is not linked to any Index page.'
+                              % self)
+
+        return page
+
+    @index.setter
+    def index(self, value):
+        if not isinstance(value, IndexPage):
+            raise ValueError('value %s must be a IndexPage object.'
+                             % value)
+        self._index = (value, None)
+
+    @index.deleter
+    def index(self):
+        if hasattr(self, "_index"):
+            del self._index
 
     def decompose(fn):
         """Decorator.
@@ -347,7 +415,15 @@ class IndexPage(pywikibot.Page):
             on de wikisource).
         page label is the label associated with a page in the Index page.
 
-        Raises UnknownExtension if source Site has no ProofreadPage Extension.
+        This class provides methods to get pages contained in Index page,
+        and relative page numbers and labels by means of several helper
+        functions.
+
+        It also providesa generator to pages contained in Index page, with
+        possibility to define range, filter by quality levels and page existance.
+
+        @raise UnknownExtension: source Site has no ProofreadPage Extension.
+        @raise ImportError: bs4 is not installed.
         """
         # Check if BeautifulSoup is imported.
         if isinstance(BeautifulSoup, ImportError):
@@ -415,6 +491,7 @@ class IndexPage(pywikibot.Page):
             title = a_tag.get('title')
 
             page = ProofreadPage(self.site, title)
+            page.index = self  # set index property for page
             if page not in self._all_page_links:
                 raise pywikibot.Error('Page %s not recognised.' % page)
 
@@ -458,6 +535,55 @@ class IndexPage(pywikibot.Page):
         """
         return len(self._page_from_numbers)
 
+    def page_gen(self, start=1, end=None, filter_ql=None,
+                 only_existing=False, content=True):
+        """Return a page generator which yields pages contained in Index page.
+
+        Range is [start ... end], extremes included.
+
+        @param start: first page, defaults to 1
+        @type start: int
+        @param end: num_pages if end is None
+        @type end: int
+        @param filter_ql: filters quality levels
+                          if None: all but 'Without Text'.
+        @type filter_ql: list of ints  (corresponding to ql constants
+                         defined in ProofreadPage).
+        @param only_existing: yields only existing pages.
+        @type only_existing: bool
+        @param content: preload content.
+        @type content: bool
+        """
+        if end is None:
+            end = self.num_pages
+
+        if not ((1 <= start <= self.num_pages) and
+                (1 <= end <= self.num_pages) and
+                (start <= end)):
+            raise ValueError('start=%s, end=%s are not in valid range (%s, %s)'
+                             % (start, end, 1, self.num_pages))
+
+        # All but 'Without Text'
+        if filter_ql is None:
+            filter_ql = list(self.site.proofread_levels.keys())
+            filter_ql.remove(ProofreadPage.WITHOUT_TEXT)
+
+        gen = (self.get_page(i) for i in range(start, end + 1))
+        if content:
+            gen = self.site.preloadpages(gen)
+        # Decorate and sort by page number because preloadpages does not
+        # guarantee order.
+        # TODO: remove if preloadpages will guarantee order.
+        gen = ((p, self.get_number(p)) for p in gen)
+        gen = (p[0] for p in sorted(gen, key=lambda x: x[1]))
+        # Filter by QL.
+        gen = (p for p in gen if p.ql in filter_ql)
+        # Yield only existing.
+        if only_existing:
+            gen = (p for p in gen if p.exists())
+
+        return gen
+
     @check_if_cached
     def get_label_from_page(self, page):
         """Return 'page label' for page.
@@ -486,7 +612,7 @@ class IndexPage(pywikibot.Page):
         try:
             return self._labels_from_page_number[page_number]
         except KeyError:
-            raise KeyError('Page number ".../%s" not range.'
+            raise KeyError('Page number ".../%s" not in range.'
                            % page_number)
 
     def _get_from_label(self, mapping_dict, label):
@@ -523,14 +649,26 @@ class IndexPage(pywikibot.Page):
         return self._get_from_label(self._pages_from_label, label)
 
     @check_if_cached
-    def get_page_from_number(self, page_number):
-        """Return a page object from page number.
-
-        @param page_number: int
-        @return: page
-        @rtype: page object
-        """
+    def get_page(self, page_number):
+        """Return a page object from page number."""
         try:
             return self._page_from_numbers[page_number]
         except KeyError:
             raise KeyError('Invalid page number: %s.' % page_number)
+
+    @check_if_cached
+    def pages(self):
+        """Return the list of pages in Index, sorted by page number.
+
+        @return: list of pages
+        @rtype: list
+        """
+        return [self._page_from_numbers[i] for i in range(1, self.num_pages + 1)]
+
+    @check_if_cached
+    def get_number(self, page):
+        """Return a page number from page object."""
+        try:
+            return self._numbers_from_page[page]
+        except KeyError:
+            raise KeyError('Invalid page: %s.' % page)

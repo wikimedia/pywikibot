@@ -86,6 +86,7 @@ class TestProofreadPageValidSite(TestCase):
 
     valid = {
         'title': 'Page:Popular Science Monthly Volume 1.djvu/12',
+        'index': 'Index:Popular Science Monthly Volume 1.djvu',
         'ql': 4,
         'user': 'T. Mazzei',
         'header': u"{{rh|2|''THE POPULAR SCIENCE MONTHLY.''}}",
@@ -94,6 +95,10 @@ class TestProofreadPageValidSite(TestCase):
 
     existing_invalid = {
         'title': 'Main Page',
+    }
+
+    existing_unlinked = {
+        'title': 'Page:Pywikibot unlinked test page',
     }
 
     not_existing_invalid = {
@@ -203,6 +208,61 @@ class TestProofreadPageValidSite(TestCase):
 
 
 @require_modules('bs4')
+class TestProofreadPageIndexProperty(TestCase):
+
+    """Test ProofreadPage index property."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    cached = True
+
+    valid = {
+        'title': 'Page:Popular Science Monthly Volume 1.djvu/12',
+        'index': 'Index:Popular Science Monthly Volume 1.djvu',
+    }
+
+    existing_multilinked = {
+        'title': 'Page:Pywikibot test page 1/1',
+        'index_1': 'Index:Pywikibot test page 1',
+        'index_2': 'Index:Pywikibot test page 2',
+    }
+
+    existing_unlinked = {
+        'title': 'Page:Pywikibot unlinked test page',
+    }
+
+    def test_index(self):
+        """Test index property."""
+        # Page with Index.
+        page = ProofreadPage(self.site, self.valid['title'])
+        index_page = IndexPage(self.site, self.valid['index'])
+
+        # Test propery.
+        self.assertEqual(page.index, index_page)
+
+        # Test deleter
+        del page.index
+        self.assertFalse(hasattr(page, '_index'))
+        # Test setter
+        page.index = index_page
+        self.assertEqual(page.index, index_page)
+
+        # Page without Index.
+        page = ProofreadPage(self.site, self.existing_multilinked['title'])
+        index_page_1 = IndexPage(self.site, self.existing_multilinked['index_1'])
+        index_page_2 = IndexPage(self.site, self.existing_multilinked['index_2'])
+        self.assertEqual(page.index, index_page_1)
+        self.assertNotEqual(page.index, index_page_2)
+        self.assertEqual(page._index, (index_page_1, [index_page_2]))
+
+        # Page without Index.
+        page = ProofreadPage(self.site, self.existing_unlinked['title'])
+        self.assertIs(page.index, None)
+        self.assertEqual(page._index, (None, []))
+
+
+@require_modules('bs4')
 class IndexPageTestCase(TestCase):
 
     """Run tests related to IndexPage ProofreadPage extension."""
@@ -270,7 +330,8 @@ class TestIndexPageValidSite(IndexPageTestCase):
         self.assertEqual(page.namespace(), source.namespace)
 
 
-class TestBasePageMethodsIndexPage(IndexPageTestCase, BasePageMethodsTestBase):
+@require_modules('bs4')
+class TestBasePageMethodsIndexPage(BasePageMethodsTestBase):
 
     """Test behavior of ProofreadPage methods inherited from BasePage."""
 
@@ -439,19 +500,36 @@ class TestIndexPageMappings(IndexPageTestCase):
         # Error if label does not exists.
         self.assertRaises(KeyError, index_page.get_page_from_label, 'dummy label')
 
-        # Test consistency of page <-> numbers mapping on last page_set and
-        # num_set used.
-        for p in page_set:
-            n = index_page._numbers_from_page[p]
-            self.assertEqual(index_page._page_from_numbers[n], p)
+        # Test get_page.
         for n in num_set:
-            p = index_page._page_from_numbers[n]
-            self.assertEqual(index_page._numbers_from_page[p], n)
+            p = index_page.get_page(n)
+            self.assertEqual(index_page.get_number(p), n)
 
-        # Test get_page_from_number.
-        for n in num_set:
-            p = index_page.get_page_from_number(n)
-            self.assertEqual(index_page._numbers_from_page[p], n)
+        # Test get_number.
+        for p in page_set:
+            n = index_page.get_number(p)
+            self.assertEqual(index_page.get_page(n), p)
+
+    def test_page_gen(self, key):
+        """Test Index page generator."""
+        data = self.sites[key]
+        num, title_num, label = data['get_label']
+
+        index_page = IndexPage(self.site, self.sites[key]['index'])
+        page_title = self.sites[key]['page'].format(title_num)
+        proofread_page = ProofreadPage(self.site, page_title)
+
+        # Check start/end limits.
+        self.assertRaises(ValueError, index_page.page_gen, -1, 2)
+        self.assertRaises(ValueError, index_page.page_gen, 1, -1)
+        self.assertRaises(ValueError, index_page.page_gen, 2, 1)
+
+        # Check quality filters.
+        gen = index_page.page_gen(num, num, filter_ql=range(5))
+        self.assertEqual(list(gen), [proofread_page])
+
+        gen = index_page.page_gen(num, num, filter_ql=[0])
+        self.assertEqual(list(gen), [])
 
 
 if __name__ == '__main__':
