@@ -541,41 +541,39 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
 
     cached = True
 
-    with_redlink = {
-        'title': {'blue': 'Page:Pywikibot test page 1/1',
-                  'red': 'Page:Pywikibot test page 2/2',
-                  },
-        'index': 'Index:Pywikibot test page 1'
-    }
+    index_name = 'Index:Pywikibot test page 1'
+    page_names = ['Page:Pywikibot test page 1/1',
+                  'Page:Pywikibot test page 2/2',
+                  ]
+    missing_name = 'Page:Pywikibot test page 2/2'
+
+    @classmethod
+    def setUpClass(cls):
+        """Prepare tests by creating page instances."""
+        super(TestIndexPageMappingsRedlinks, cls).setUpClass()
+        cls.index = IndexPage(cls.site, cls.index_name)
+        cls.pages = [ProofreadPage(cls.site, page) for page in cls.page_names]
+        cls.missing = ProofreadPage(cls.site, cls.missing_name)
 
     def test_index_redlink(self):
         """Test index property with redlink."""
-        page = ProofreadPage(self.site, self.with_redlink['title']['red'])
-        index_page = IndexPage(self.site, self.with_redlink['index'])
-        self.assertEqual(page.index, index_page)
+        self.assertEqual(self.missing.index, self.index)
 
     def test_get_page_and_number_redlink(self):
         """Test IndexPage page get_page_number functions with redlinks."""
-        index_page = IndexPage(self.site, self.with_redlink['index'])
-
-        for title in self.with_redlink['title'].values():
-            p = ProofreadPage(self.site, title)
-            n = index_page.get_number(p)
-            self.assertEqual(index_page.get_page(n), p)
+        for page in self.pages:
+            n = self.index.get_number(page)
+            self.assertEqual(self.index.get_page(n), page)
 
     def test_page_gen_redlink(self):
         """Test Index page generator with redlinks."""
-        index_page = IndexPage(self.site, self.with_redlink['index'])
-        proofread_pages = [ProofreadPage(self.site, page_title) for
-                           page_title in self.with_redlink['title'].values()]
-
         # Check start/end limits.
-        self.assertRaises(ValueError, index_page.page_gen, -1, 2)
-        self.assertRaises(ValueError, index_page.page_gen, 1, -1)
-        self.assertRaises(ValueError, index_page.page_gen, 2, 1)
+        self.assertRaises(ValueError, self.index.page_gen, -1, 2)
+        self.assertRaises(ValueError, self.index.page_gen, 1, -1)
+        self.assertRaises(ValueError, self.index.page_gen, 2, 1)
 
-        gen = index_page.page_gen(1, None, filter_ql=range(5))
-        self.assertEqual(list(gen), proofread_pages)
+        gen = self.index.page_gen(1, None, filter_ql=range(5))
+        self.assertEqual(list(gen), self.pages)
 
 
 if __name__ == '__main__':
