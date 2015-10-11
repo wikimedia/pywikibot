@@ -71,6 +71,7 @@ _pwb_py = join_root_path('pwb.py')
 
 library_test_modules = [
     'python',
+    'plural',
     'deprecation',
     'ui',
     'ui_options',
