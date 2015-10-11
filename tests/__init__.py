@@ -58,7 +58,8 @@ def create_path_func(base_func, subpath):
 
 join_root_path.path = 'root'
 join_tests_path = create_path_func(join_root_path, 'tests')
-join_cache_path = create_path_func(join_tests_path, 'apicache')
+join_cache_path = create_path_func(join_tests_path,
+                                   'apicache-py%d' % PYTHON_VERSION[0])
 join_data_path = create_path_func(join_tests_path, 'data')
 join_pages_path = create_path_func(join_tests_path, 'pages')
 
