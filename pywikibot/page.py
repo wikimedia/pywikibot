@@ -1214,12 +1214,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.purgepages([self], **kwargs)
 
-    def touch(self, callback=None, **kwargs):
+    def touch(self, callback=None, botflag=False, **kwargs):
         """Make a touch edit for this page.
 
         See save() method docs for all parameters.
         The following parameters will be overridden by this method:
-        summary, watch, minor, botflag, force, async
+        - summary, watch, minor, force, async
+
+        Parameter botflag is False by default.
 
         minor and botflag parameters are set to False which prevents hiding
         the edit when it becomes a real edit due to a bug.
@@ -1228,7 +1230,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             # ensure always get the page text and not to change it.
             del self.text
             self.save(summary='Pywikibot touch edit', watch='nochange',
-                      minor=False, botflag=False, force=True, async=False,
+                      minor=False, botflag=botflag, force=True, async=False,
                       callback=callback, apply_cosmetic_changes=False,
                       **kwargs)
         else:

@@ -11,6 +11,7 @@ This script understands various command-line arguments:
 &params;
 
 -purge            Do not touch but purge the page
+-botflag          Force botflag in case of edits with changes.
 
 """
 #
@@ -36,12 +37,15 @@ class TouchBot(MultipleSitesBot):
 
     def __init__(self, generator, **kwargs):
         """Initialize a TouchBot instance with the options and generator."""
+        self.availableOptions.update({
+            'botflag': False,
+        })
         super(TouchBot, self).__init__(generator=generator, **kwargs)
 
     def treat(self, page):
         """Touch the given page."""
         try:
-            page.touch()
+            page.touch(botflag=self.getOption('botflag'))
         except pywikibot.NoPage:
             pywikibot.error(u"Page %s does not exist."
                             % page.title(asLink=True))
@@ -88,6 +92,7 @@ def main(*args):
             pywikibot.output(u'-redirect option is deprecated, '
                              'do not use it anymore.')
         elif not genFactory.handleArg(arg) and arg.startswith("-"):
+            # -botflag
             options[arg[1:].lower()] = True
 
     gen = genFactory.getCombinedGenerator()
