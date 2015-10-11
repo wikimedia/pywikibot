@@ -49,11 +49,10 @@ class TestDateMeta(MetaTestCaseClass):
             return testMapEntry
 
         for formatname in date.formats:
-            # it's explicitly using str() because __name__ must be str
-            test_name = str('test_' + formatname)
-            dct[test_name] = test_method(formatname)
-            dct[test_name].__name__ = test_name
-        return type.__new__(cls, name, bases, dct)
+            cls.add_method(dct, 'test_' + formatname, test_method(formatname),
+                           doc_suffix='using {0} format'.format(formatname))
+
+        return super(TestDateMeta, cls).__new__(cls, name, bases, dct)
 
 
 @add_metaclass

@@ -497,6 +497,7 @@ class MetaTestArgSpec(MetaTestCaseClass):
         """Create a new test case class."""
         def create_test(method):
             def test_method(self):
+                """Test getargspec."""
                 # all expect at least self and param
                 expected = method(1, 2)
                 returned = self.getargspec(method)
@@ -508,9 +509,9 @@ class MetaTestArgSpec(MetaTestCaseClass):
         for name, tested_method in list(dct.items()):
             if name.startswith('_method_test_'):
                 suffix = name[len('_method_test_'):]
-                test_name = 'test_method_' + suffix
-                dct[test_name] = create_test(tested_method)
-                dct[test_name].__doc__ = 'Test getargspec on {0}'.format(suffix)
+                cls.add_method(dct, 'test_method_' + suffix,
+                               create_test(tested_method),
+                               doc_suffix='on {0}'.format(suffix))
 
         dct['net'] = False
         return super(MetaTestArgSpec, cls).__new__(cls, name, bases, dct)

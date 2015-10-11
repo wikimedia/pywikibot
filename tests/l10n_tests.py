@@ -68,9 +68,11 @@ class TestValidTemplateMeta(MetaTestCaseClass):
             for code in codes:
                 current_site = pywikibot.Site(code, dct['family'])
                 test_name = ("test_%s_%s" % (package, code)).replace('-', '_')
-                dct[test_name] = test_method(current_site)
-                dct[test_name].__doc__ = 'Test {0} with language {1}'.format(
-                    package, code)
+                cls.add_method(
+                    dct, test_name, test_method(current_site),
+                    doc_suffix='{0} and language {1}'.format(
+                        package, code))
+
         return super(TestValidTemplateMeta, cls).__new__(cls, name, bases, dct)
 
 

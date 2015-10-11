@@ -332,7 +332,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 return test_skip_script
             return testScript
 
-        argument = dct['_argument']
+        argument = '-' + dct['_argument']
 
         for script_name in script_list:
             # force login to be the first, alphabetically, so the login
@@ -345,18 +345,14 @@ class TestScriptMeta(MetaTestCaseClass):
             else:
                 test_name = 'test_' + script_name
 
-            # it's explicitly using str() because __name__ must be str
-            test_name = str(test_name)
-            dct[test_name] = test_execution(script_name, ['-' + argument])
+            cls.add_method(dct, test_name,
+                           test_execution(script_name, [argument]),
+                           'Test running %s %s.' % (script_name, argument))
 
             if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in dct['_allowed_failures']:
                 dct[test_name] = allowed_failure(dct[test_name])
-
-            dct[test_name].__doc__ = 'Test running %s -%s.' % (script_name,
-                                                               argument)
-            dct[test_name].__name__ = test_name
 
             # Disable test by default in nosetests
             if script_name in unrunnable_script_list:

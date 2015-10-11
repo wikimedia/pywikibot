@@ -848,9 +848,8 @@ class MetaTestCaseClass(type):
             # create test methods processed by unittest
             for (key, sitedata) in dct['sites'].items():
                 test_name = test + '_' + key.replace('-', '_')
-
-                dct[test_name] = wrap_method(key, sitedata, dct[test])
-                dct[test_name].__name__ = str(test_name)
+                cls.add_method(dct, test_name,
+                               wrap_method(key, sitedata, dct[test]))
 
                 if key in dct.get('expected_failures', []):
                     dct[test_name] = unittest.expectedFailure(dct[test_name])
@@ -865,6 +864,21 @@ class MetaTestCaseClass(type):
         if not any(issubclass(base, subclass) for base in bases):
             bases = (subclass, ) + bases
         return bases
+
+    @staticmethod
+    def add_method(dct, test_name, method, doc=None, doc_suffix=None):
+        """Add a method to a dictionary and set its name and documention."""
+        dct[test_name] = method
+        # it's explicitly using str() because __name__ must be str
+        dct[test_name].__name__ = str(test_name)
+        if doc_suffix:
+            if not doc:
+                doc = method.__doc__
+            assert doc[-1] == '.'
+            doc = doc[:-1] + ' ' + doc_suffix + '.'
+
+        if doc:
+            dct[test_name].__doc__ = doc
 
 
 @add_metaclass
