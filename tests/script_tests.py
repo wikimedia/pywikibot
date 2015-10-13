@@ -94,6 +94,7 @@ script_input = {
     'catall': 'q\n',  # q for quit
     'editarticle': 'Test page\n',
     'imageuncat': 'q\n',
+    'imageharvest': 'https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg\n\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
