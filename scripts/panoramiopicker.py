@@ -61,8 +61,7 @@ def downloadPhoto(photoUrl=''):
     return StringIO.StringIO(imageFile)
 
 
-def findDuplicateImages(photo=None,
-                        site=pywikibot.Site(u'commons', u'commons')):
+def findDuplicateImages(photo=None, site=None):
     """Return list of duplicate images.
 
     Takes the photo, calculates the SHA1 hash and asks the mediawiki api
@@ -71,6 +70,9 @@ def findDuplicateImages(photo=None,
     TODO: Add exception handling, fix site thing
 
     """
+    if not site:
+        site = pywikibot.Site('commons', 'commons')
+
     hashObject = hashlib.sha1()
     hashObject.update(photo.getvalue())
     return site.allimages(sha1=base64.b16encode(hashObject.digest()))
@@ -95,12 +97,15 @@ def getLicense(photoInfo=None):
     return photoInfo
 
 
-def getFilename(photoInfo=None, site=pywikibot.Site(u'commons', u'commons'),
+def getFilename(photoInfo=None, site=None,
                 project=u'Panoramio'):
     """Build a good filename for the upload.
 
     The name is based on the username and the title. Prevents naming collisions.
     """
+    if not site:
+        site = pywikibot.Site('commons', 'commons')
+
     username = photoInfo.get(u'owner_name')
     title = photoInfo.get(u'photo_title')
     if title:
@@ -195,18 +200,21 @@ def getDescription(photoInfo=None, panoramioreview=False, reviewer=u'',
 
 
 def processPhoto(photoInfo=None, panoramioreview=False, reviewer=u'',
-                 override=u'', addCategory=u'', autonomous=False):
+                 override=u'', addCategory=u'', autonomous=False, site=None):
     """Process a single Panoramio photo."""
+    if not site:
+        site = pywikibot.Site('commons', 'commons')
+
     if isAllowedLicense(photoInfo) or override:
         # Should download the photo only once
         photo = downloadPhoto(photoInfo.get(u'photo_file_url'))
 
         # Don't upload duplicate images, should add override option
-        duplicates = findDuplicateImages(photo)
+        duplicates = findDuplicateImages(photo, site=site)
         if duplicates:
             pywikibot.output(u'Found duplicate image at %s' % duplicates.pop())
         else:
-            filename = getFilename(photoInfo)
+            filename = getFilename(photoInfo, site=site)
             pywikibot.output(filename)
             description = getDescription(photoInfo, panoramioreview,
                                          reviewer, override, addCategory)
@@ -236,7 +244,7 @@ def processPhoto(photoInfo=None, panoramioreview=False, reviewer=u'',
                                          description=newDescription,
                                          useFilename=newFilename,
                                          keepFilename=True,
-                                         verifyDescription=False)
+                                         verifyDescription=False, site=site)
                 bot.upload_image(debug=False)
                 return 1
     return 0
@@ -289,9 +297,6 @@ def usage():
 
 def main(*args):
     """Process command line arguments and perform task."""
-    site = pywikibot.Site(u'commons', u'commons')
-    config.family = site.family
-    config.lang = site.lang
 #     imagerecat.initLists()
 
     photoset = u''  # public (popular photos), full (all photos), user ID number
@@ -362,12 +367,17 @@ def main(*args):
             autonomous = True
 
     if photoset:
+        site = pywikibot.Site()
+        if site != pywikibot.Site('commons', 'commons'):
+            pywikibot.warning(
+                'Using {0} instead of Wikimedia Commons'.format(site))
+
         for photoInfo in getPhotos(photoset, start_id, end_id):
             photoInfo = getLicense(photoInfo)
             # time.sleep(10)
             uploadedPhotos += processPhoto(photoInfo, panoramioreview,
                                            reviewer, override, addCategory,
-                                           autonomous)
+                                           autonomous, site=site)
             totalPhotos += 1
     else:
         usage()
