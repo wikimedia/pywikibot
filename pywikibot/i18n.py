@@ -338,31 +338,48 @@ def _extract_plural(code, message, parameters):
     @param message: the message to be replaced
     @type message: unicode string
     @param parameters: plural parameters passed from other methods
-    @type parameters: int, basestring, tuple, list, dict
-
+    @type parameters: Mapping of str to int
+    @return: The message with the plural instances replaced
+    @rtype: str
     """
-    plural_items = re.findall(PLURAL_PATTERN, message)
+    def static_plural_value(n):
+        return rule['plural']
+
+    def replace_plural(match):
+        selector = match.group(1)
+        variants = match.group(2)
+        num = parameters[selector]
+        if not isinstance(num, int):
+            issue_deprecation_warning(
+                'type {0} for value {1} ({2})'.format(type(num), selector, num),
+                'an int', 1)
+            num = int(num)
+
+        index = plural_value(num)
+        if rule['nplurals'] == 1:
+            assert index == 0
+
+        plural_entries = variants.split('|')
+        if index >= len(plural_entries):
+            raise IndexError(
+                'requested plural {0} for {1} but only {2} ("{3}") '
+                'provided'.format(
+                    index, selector, len(plural_entries),
+                    '", "'.join(plural_entries)))
+        return plural_entries[index]
+
     assert isinstance(parameters, Mapping), \
         'parameters is not Mapping but {0}'.format(type(parameters))
-    if plural_items:  # we found PLURAL patterns, process it
-        for selector, variants in plural_items:
-            num = parameters[selector]
-            if not isinstance(num, int):
-                issue_deprecation_warning(
-                    'type {0} for value {1} ({2})'.format(type(num), selector, num),
-                    'an int', 1)
-                num = int(num)
-            # TODO: check against plural_rules[code]['nplurals']
-            try:
-                index = plural_rules[code]['plural'](num)
-            except KeyError:
-                index = plural_rules['_default']['plural'](num)
-            except TypeError:
-                # we got an int, not a function
-                index = plural_rules[code]['plural']
-            repl = variants.split('|')[index]
-            message = re.sub(PLURAL_PATTERN, repl, message, count=1)
-    return message
+    try:
+        rule = plural_rules[code]
+    except KeyError:
+        rule = plural_rules['_default']
+    plural_value = rule['plural']
+    if not callable(plural_value):
+        assert rule['nplurals'] == 1
+        plural_value = static_plural_value
+
+    return re.sub(PLURAL_PATTERN, replace_plural, message)
 
 
 class _PluralMappingAlias(Mapping):
@@ -430,6 +447,8 @@ def translate(code, xdict, parameters=None, fallback=False):
     @param fallback: Try an alternate language code. If it's iterable it'll
         also try those entries and choose the first match.
     @type fallback: boolean or iterable
+    @raise IndexError: If the language supports and requires more plurals than
+        defined for the given translation template.
     """
     family = pywikibot.config.family
     # If a site is given instead of a code, use its language
@@ -548,6 +567,8 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
         to the resulting string. If this is True the placeholders must be
         manually applied afterwards.
     @type only_plural: bool
+    @raise IndexError: If the language supports and requires more plurals than
+        defined for the given translation template.
     """
     if not messages_available():
         raise TranslationError(
