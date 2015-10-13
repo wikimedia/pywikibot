@@ -33,6 +33,7 @@ import os
 import pkgutil
 
 from collections import defaultdict, Mapping
+from warnings import warn
 
 import pywikibot
 
@@ -554,7 +555,9 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
     ...     % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
 
-    @param code: The language code
+    @param code: When it's a site it's using the code attribute and otherwise it
+        is using the value directly.
+    @type code: BaseSite or str
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: For passing parameters. It should be a mapping but for
         backwards compatibility can also be a list, tuple or a single value.
@@ -583,6 +586,10 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
         lang = code.code
     # check whether we need the language code back
     elif isinstance(code, list):
+        # For backwards compatibility still support lists, when twntranslate
+        # was not deprecated and needed a way to get the used language code back
+        warn('The code argument should not be a list but either a BaseSite or '
+             'a str/unicode.', DeprecationWarning, 2)
         lang = code.pop()
         code_needed = True
     else:
