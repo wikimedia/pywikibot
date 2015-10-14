@@ -106,6 +106,9 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.16'):
+            raise unittest.SkipTest('requires v1.16+')
+
         old = self.site.siteinfo('general')
         self.assertIn('time', old)
         self.assertEqual(old, self.site.siteinfo['general'])
@@ -1979,10 +1982,17 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertTrue(-12 * 60 <= mysite.siteinfo['timeoffset'] <= +14 * 60)
         self.assertEqual(mysite.siteinfo['timeoffset'] % 15, 0)
         self.assertRegex(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
+        self.assertIn(mysite.siteinfo['case'], ["first-letter", "case-sensitive"])
+
+    def test_siteinfo_v1_16(self):
+        """Test v.16+ siteinfo values."""
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.16'):
+            raise unittest.SkipTest('requires v1.16+')
+
+        mysite = self.get_site()
         self.assertIsInstance(
             datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
             datetime)
-        self.assertIn(mysite.siteinfo['case'], ["first-letter", "case-sensitive"])
         self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
 
     def test_properties_with_defaults(self):
