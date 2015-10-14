@@ -706,7 +706,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not self.isCategory():
             return False
         if not hasattr(self, "_catredirect"):
-            catredirs = self.site.category_redirects()
+            catredirs = self.site._category_redirects()
             for (template, args) in self.templatesWithParams():
                 if template.title(withNamespace=False) in catredirs:
                     # Get target (first template argument)
