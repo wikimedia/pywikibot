@@ -638,6 +638,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         If the page has only one revision, it shall return -1.
 
         @return: long
+
+        @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
         return self.latest_revision.parent_id or -1
 
@@ -649,6 +651,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         DEPRECATED: Use latest_revision.parent_id instead.
 
         @return: long
+
+        @raise AssertionError: Use on MediaWiki prior to v1.16.
         """
         return self.latest_revision.parent_id or -1
 
@@ -4523,6 +4527,14 @@ class Revision(DotReadableDict):
         @type comment: unicode
         @param minor: edit flagged as minor
         @type minor: bool
+        @param rollbacktoken: rollback token
+        @type rollbacktoken: unicode
+        @param parentid: id of parent Revision (v1.16+)
+        @type parentid: long
+        @param contentmodel: content model label (v1.21+)
+        @type contentmodel: unicode
+        @param sha1: sha1 of revision text (v1.19+)
+        @type sha1: unicode
 
         """
         self.revid = revid

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,6 +16,7 @@ from pywikibot import config
 from pywikibot import InvalidTitle
 
 from pywikibot.tools import (
+    MediaWikiVersion,
     PY2,
     StringTypes as basestring,
     UnicodeType as unicode,
@@ -531,10 +532,11 @@ class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
         self.assertDeprecation()
 
         self._reset_messages()
-        self.assertIsInstance(mainpage.previous_revision_id, int)
-        self.assertEqual(mainpage.previous_revision_id,
-                         mainpage.latest_revision.parent_id)
-        self.assertDeprecation()
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.16'):
+            self.assertIsInstance(mainpage.previous_revision_id, int)
+            self.assertEqual(mainpage.previous_revision_id,
+                             mainpage.latest_revision.parent_id)
+            self.assertDeprecation()
 
 
 class TestPageBaseUnicode(DefaultDrySiteTestCase):
