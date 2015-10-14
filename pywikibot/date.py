@@ -85,7 +85,7 @@ def multi(value, tuplst):
 #
 def dh_noConv(value, pattern, limit):
     """Helper for decoding a single integer value, no conversion, no rounding."""
-    return dh(value, pattern, encNoConv, decSinglVal, limit)
+    return dh(value, pattern, lambda i: i, decSinglVal, limit)
 
 
 def dh_dayOfMnth(value, pattern):
@@ -152,40 +152,48 @@ def dh_simpleYearAD(value):
 
 
 def dh_number(value, pattern):
+    """Helper for decoding a number."""
     return dh_noConv(value, pattern, formatLimits['Number'][0])
 
 
 def dh_centuryAD(value, pattern):
+    """Helper for decoding an AD century."""
     return dh_noConv(value, pattern, formatLimits['CenturyAD'][0])
 
 
 def dh_centuryBC(value, pattern):
+    """Helper for decoding an BC century."""
     return dh_noConv(value, pattern, formatLimits['CenturyBC'][0])
 
 
 def dh_millenniumAD(value, pattern):
+    """Helper for decoding an AD millennium."""
     return dh_noConv(value, pattern, formatLimits['MillenniumAD'][0])
 
 
 def dh_millenniumBC(value, pattern):
+    """Helper for decoding an BC millennium."""
     return dh_noConv(value, pattern, formatLimits['MillenniumBC'][0])
 
 
 def decSinglVal(v):
+    """Return first item in list v."""
     return v[0]
 
 
+@deprecated
 def encNoConv(i):
+    """Return i."""
     return i
 
 
 def encDec0(i):
-    # round to the nearest decade, decade starts with a '0'-ending year
+    """Round to the nearest decade, decade starts with a '0'-ending year."""
     return (i // 10) * 10
 
 
 def encDec1(i):
-    # round to the nearest decade, decade starts with a '1'-ending year
+    """Round to the nearest decade, decade starts with a '1'-ending year."""
     return encDec0(i) + 1
 
 
@@ -212,6 +220,7 @@ def slh(value, lst):
 
 
 def dh_singVal(value, match):
+    """Helper function to match a single value to a constant."""
     return dh_constVal(value, 0, match)
 
 
@@ -248,6 +257,7 @@ def alwaysTrue(x):
 
 
 def monthName(lang, ind):
+    """Return the month name for a language."""
     return formats['MonthName'][lang](ind)
 
 
@@ -278,11 +288,12 @@ _guLocalToDigits = dict([(ord(_guDigits[i]), unicode(i)) for i in range(10)])
 
 
 def intToLocalDigitsStr(value, digitsToLocalDict):
-    # Encode an integer value into a textual form.
+    """Encode an integer value into a textual form."""
     return unicode(value).translate(digitsToLocalDict)
 
 
 def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
+    """Convert digits to integer."""
     # First make sure there are no real digits in the string
     tmp = value.translate(digitsToLocalDict)         # Test
     if tmp == value:
@@ -301,12 +312,14 @@ _romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
 
 
 def intToRomanNum(i):
+    """Convert integer to roman numeral."""
     if i >= len(_romanNumbers):
         raise IndexError(u'Roman value %i is not defined' % i)
     return _romanNumbers[i]
 
 
 def romanNumToInt(v):
+    """Convert roman numeral to integer."""
     return _romanNumbers.index(v)
 
 # Each tuple must 3 parts:  a list of all possible digits (symbols), encoder
@@ -457,6 +470,9 @@ def dh(value, pattern, encf, decf, filter=None):
 
         params = encf(value)
 
+        # name 'MakeParameter' kept to avoid breaking blame below
+        MakeParameter = _make_parameter
+
         if type(params) in _listTypes:
             if len(params) != len(decoders):
                 raise AssertionError(
@@ -475,7 +491,7 @@ def dh(value, pattern, encf, decf, filter=None):
             return strPattern % MakeParameter(decoders[0], params)
 
 
-def MakeParameter(decoder, param):
+def _make_parameter(decoder, param):
     newValue = decoder[1](param)
     if len(decoder) == 4 and len(newValue) < decoder[3]:
         # force parameter length by taking the first digit in the list and
@@ -483,6 +499,12 @@ def MakeParameter(decoder, param):
         # This converts "205" into "0205" for "%4d"
         newValue = decoder[0][0] * (decoder[3] - len(newValue)) + newValue
     return newValue
+
+
+@deprecated
+def MakeParameter(decoder, param):
+    """DEPRECATED."""
+    return _make_parameter(decoder, param)
 
 #
 # All years/decades/centuries/millenniums are designed in such a way
@@ -1964,11 +1986,13 @@ def addFmt1(lang, isMnthOfYear, patterns):
 
 
 def addFmt2(lang, isMnthOfYear, pattern, makeUpperCase=None):
+    """Update yrMnthFmts and dayMnthFmts using addFmt1."""
     addFmt1(lang, isMnthOfYear,
             makeMonthNamedList(lang, pattern, makeUpperCase))
 
 
 def makeMonthList(pattern):
+    """Return a list of 12 elements based on the number of the month."""
     return [pattern % m for m in range(1, 13)]
 
 
@@ -2370,6 +2394,7 @@ class FormatDate(object):
 
 
 def formatYear(lang, year):
+    """Return year name in a language."""
     if year < 0:
         return formats['YearBC'][lang](-year)
     else:
