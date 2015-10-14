@@ -46,7 +46,11 @@ class TextEditor(ScrolledText):
     """
 
     def __init__(self, master=None, **kwargs):
-        # get default settings from user's IDLE configuration
+        """
+        Constructor.
+
+        Get default settings from user's IDLE configuration.
+        """
         currentTheme = idleConf.CurrentTheme()
         textcf = dict(padx=5, wrap='word', undo='True',
                       foreground=idleConf.GetHighlight(currentTheme,
@@ -77,6 +81,7 @@ class TextEditor(ScrolledText):
         ScrolledText.__init__(self, master, **textcf)
 
     def add_bindings(self):
+        """Assign key and events bindings to methods."""
         # due to IDLE dependencies, this can't be called from __init__
         # add key and event bindings
         self.bind("<<cut>>", self.cut)
@@ -113,38 +118,46 @@ class TextEditor(ScrolledText):
                 self.event_add(event, *keylist)
 
     def cut(self, event):
+        """Perform cut operation."""
         if self.tag_ranges("sel"):
             self.event_generate("<<Cut>>")
         return "break"
 
     def copy(self, event):
+        """Perform copy operation."""
         if self.tag_ranges("sel"):
             self.event_generate("<<Copy>>")
         return "break"
 
     def paste(self, event):
+        """Perform paste operation."""
         self.event_generate("<<Paste>>")
         return "break"
 
     def select_all(self, event=None):
+        """Perform select all operation."""
         self.tag_add("sel", "1.0", "end-1c")
         self.mark_set("insert", "1.0")
         self.see("insert")
         return "break"
 
     def remove_selection(self, event=None):
+        """Perform remove operation."""
         self.tag_remove("sel", "1.0", "end")
         self.see("insert")
 
     def del_word_left(self, event):
+        """Perform delete word (left) operation."""
         self.event_generate('<Meta-Delete>')
         return "break"
 
     def del_word_right(self, event=None):
+        """Perform delete word (right) operation."""
         self.event_generate('<Meta-d>')
         return "break"
 
     def find_event(self, event=None):
+        """Perform find operation."""
         if not self.tag_ranges("sel"):
             found = self.tag_ranges("found")
             if found:
@@ -155,14 +168,17 @@ class TextEditor(ScrolledText):
         return "break"
 
     def find_again_event(self, event=None):
+        """Perform find again operation."""
         SearchDialog.find_again(self)
         return "break"
 
     def find_selection_event(self, event=None):
+        """Perform find selection operation."""
         SearchDialog.find_selection(self)
         return "break"
 
     def replace_event(self, event=None):
+        """Perform replace operation."""
         ReplaceDialog.replace(self)
         return "break"
 
@@ -225,6 +241,7 @@ class TextEditor(ScrolledText):
         self.focus_set()
 
     def goto_line_event(self, event):
+        """Perform goto line operation."""
         lineno = tkSimpleDialog.askinteger("Goto", "Go to line number:",
                                            parent=self)
         if lineno is None:
@@ -241,6 +258,7 @@ class EditBoxWindow(Tkinter.Frame):
     """Edit box window."""
 
     def __init__(self, parent=None, **kwargs):
+        """Constructor."""
         if parent is None:
             # create a new window
             parent = Tkinter.Tk()
@@ -370,21 +388,28 @@ class EditBoxWindow(Tkinter.Frame):
         return self.text
 
     def find_all(self, target):
+        """Perform find all operation."""
         self.textfield.insert(Tkinter.END, target)
         self.editbox.find_all(target)
 
     def find(self):
+        """Perform find operation."""
         # get text to search for
         s = self.textfield.get()
         if s:
             self.editbox.find_all(s)
 
     def config_dialog(self, event=None):
+        """Show config dialog."""
         configDialog.ConfigDialog(self, 'Settings')
 
     def pressedOK(self):
-        # called when user pushes the OK button.
-        # saves the buffer into a variable, and closes the window.
+        """
+        Perform OK operation.
+
+        Called when user pushes the OK button.
+        Saves the buffer into a variable, and closes the window.
+        """
         self.text = self.editbox.get('1.0', Tkinter.END)
         # if the editbox contains ASCII characters only, get() will
         # return string, otherwise unicode (very annoying). We only want
@@ -394,6 +419,7 @@ class EditBoxWindow(Tkinter.Frame):
         self.parent.destroy()
 
     def debug(self, event=None):
+        """Call quit() and return 'break'."""
         self.quit()
         return "break"
 
@@ -406,10 +432,15 @@ class ListBoxWindow(object):
     # called when user pushes the OK button.
     # closes the window.
     def pressedOK(self):
-        # ok closes listbox
+        """
+        Perform OK operation.
+
+        Closes listbox.
+        """
         self.parent.destroy()
 
     def __init__(self, parent=None):
+        """Constuctor."""
         if parent is None:
             # create a new window
             parent = Tkinter.Tk()
@@ -429,7 +460,7 @@ class ListBoxWindow(object):
         # idea: set title to cur_disambiguation
 
     def list(self, list):
-        # put list of alternatives into listbox
+        """Put list of alternatives into listbox."""
         self.list = list
         # find required area
         laenge = len(list)
