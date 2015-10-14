@@ -356,11 +356,24 @@ def _extract_plural(code, message, parameters):
                 'an int', 1)
             num = int(num)
 
+        plural_entries = []
+        specific_entries = {}
+        for number, plural in re.findall(r'\|?(?: *(\d+) *= *)?([^|]+)',
+                                         variants):
+            if number:
+                specific_entries[int(number)] = plural
+            else:
+                assert not specific_entries, \
+                    'generic entries defined after specific in "{0}"'.format(variants)
+                plural_entries += [plural]
+
+        if num in specific_entries:
+            return specific_entries[num]
+
         index = plural_value(num)
         if rule['nplurals'] == 1:
             assert index == 0
 
-        plural_entries = variants.split('|')
         if index >= len(plural_entries):
             raise IndexError(
                 'requested plural {0} for {1} but only {2} ("{3}") '

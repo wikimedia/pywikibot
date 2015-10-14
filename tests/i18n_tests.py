@@ -413,6 +413,36 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         self.assertIn('dummy output: ', self.output_text)
 
 
+class TestExtractPlural(TestCase):
+
+    """Test extracting plurals from a dummy string."""
+
+    net = False
+
+    def test_standard(self):
+        """Test default usage using a dict and no specific plurals."""
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|other}}', {'foo': 42}),
+            'other')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|other}}', {'foo': 1}),
+            'one')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|other}}', {'foo': 0}),
+            'other')
+
+    def test_specific(self):
+        """Test using a specific plural."""
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|other|12=dozen}}',
+                                 {'foo': 42}),
+            'other')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|other|12=dozen}}',
+                                 {'foo': 12}),
+            'dozen')
+
+
 if __name__ == '__main__':
     try:
         unittest.main()
