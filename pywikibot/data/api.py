@@ -3062,8 +3062,6 @@ def update_page(page, pagedict, props=[]):
     if 'revisions' in pagedict:
         # TODO: T102735: Use the page content model for <1.21
         for rev in pagedict['revisions']:
-            assert 'parentid' in rev, 'parentid missing in revision %r' % rev
-
             revision = pywikibot.page.Revision(
                 revid=rev['revid'],
                 timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
