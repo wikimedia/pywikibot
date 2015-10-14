@@ -38,6 +38,7 @@ from pywikibot.tools import (
     redirect_func, issue_deprecation_warning,
     manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
     merge_unique_dicts,
+    PY2,
 )
 from pywikibot.comms.http import get_authentication
 from pywikibot.tools.ip import is_IP
@@ -2341,32 +2342,37 @@ class APISite(BaseSite):
     def list_to_text(self, args):
         """Convert a list of strings into human-readable text.
 
-        The MediaWiki message 'and' is used as separator
+        The MediaWiki messages 'and' and 'word-separator' are used as separator
         between the last two arguments.
-        If present, other arguments are joined using a comma.
+        If more than two arguments are given, other arguments are
+        joined using MediaWiki message 'comma-separator'.
 
         @param args: text to be expanded
-        @type args: iterable
+        @type args: iterable of unicode
 
         @return: unicode
         """
+        NEEDED_MW_MESSAGES = ('and', 'comma-separator', 'word-separator')
         if not args:
             return u''
+        if PY2 and any(isinstance(arg, str) for arg in args):
+            issue_deprecation_warning('arg of type str', 'type unicode', 2)
+
         args = [unicode(e) for e in args]
-        msgs = {
-            'and': ',',
-            'comma-separator': ', ',
-            'word-separator': ' '
-        }
         try:
-            self.mediawiki_messages(list(msgs.keys()))
+            msgs = self.mediawiki_messages(NEEDED_MW_MESSAGES)
         except KeyError:
-            pass
-        for msg in msgs:
-            try:
-                msgs[msg] = self.mediawiki_message(msg)
-            except KeyError:
-                pass
+            raise NotImplementedError(
+                'MediaWiki messages missing: {0}'.format(NEEDED_MW_MESSAGES))
+
+        if MediaWikiVersion(self.version()) < MediaWikiVersion('1.16'):
+            for key, value in msgs.items():
+                if key == 'and' and value == ',&#32;and':
+                    # v1.14 defined and as ',&#32;and'; fixed in v1.15
+                    msgs['and'] = ' and'
+                else:
+                    msgs[key] = pywikibot.html2unicode(value)
+
         concat = msgs['and'] + msgs['word-separator']
         return msgs['comma-separator'].join(args[:-2] + [concat.join(args[-2:])])
 
