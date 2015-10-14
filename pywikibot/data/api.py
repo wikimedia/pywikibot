@@ -3061,8 +3061,6 @@ def update_page(page, pagedict, props=[]):
             page._protection[item['type']] = item['level'], item['expiry']
     if 'revisions' in pagedict:
         # TODO: T102735: Use the page content model for <1.21
-        # TODO: Add rvprop 'contentmodel' to all revisions calls, but only
-        # on 1.21+ otherwise it causes API warnings
         for rev in pagedict['revisions']:
             assert 'parentid' in rev, 'parentid missing in revision %r' % rev
 

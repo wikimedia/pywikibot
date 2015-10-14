@@ -3668,8 +3668,13 @@ class APISite(BaseSite):
 
         rvargs = {'type_arg': 'info|revisions'}
 
+        rvargs['rvprop'] = ['ids', 'timestamp', 'flags', 'comment', 'user']
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.21'):
+            rvargs['rvprop'].append('contentmodel')
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.19'):
+            rvargs['rvprop'].append('sha1')
         if getText:
-            rvargs[u"rvprop"] = u"ids|flags|timestamp|user|comment|content|sha1"
+            rvargs['rvprop'].append('content')
             if section is not None:
                 rvargs[u"rvsection"] = unicode(section)
         if rollback:
