@@ -91,6 +91,60 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
 
     def test_fixSyntaxSave(self):
         """Test fixSyntaxSave method."""
+        # necessary as the fixer needs the article path to fix it
+        self.cct.site._siteinfo._cache['general'] = (
+            {'articlepath': '/wiki/$1'}, True)
+        self.assertEqual(
+            '[[Example|Page]]\n[[Example|Page]]\n[[Example|Page]]\n'
+            '[[Example]]\n[[Example]]\n[[Example]]\n'
+            '[https://de.wikipedia.org/w/index.php?title=Example&'
+            'oldid=68181978 Page]\n'
+            '[https://de.wikipedia.org/w/index.php?title=Example&'
+            'oldid=68181978&diff=next Page]\n'
+            '[https://en.wikipedia.org/w/index.php?title=Example]\n'
+            '[https://de.wiktionary.org/w/index.php?title=Example]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/w/index.php?title=Example Page]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example Page ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example  Page ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example  ]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example&'
+                'oldid=68181978 Page]\n'
+                '[https://de.wikipedia.org/w/index.php?title=Example&'
+                'oldid=68181978&diff=next Page]\n'
+                '[https://en.wikipedia.org/w/index.php?title=Example]\n'
+                '[https://de.wiktionary.org/w/index.php?title=Example]\n'
+            ))
+        self.assertEqual(
+            '[[Example]]\n[[Example]]\n[[Example]]\n'
+            '[https://de.wikipedia.org/wiki/Example?oldid=68181978 Page]\n'
+            '[https://de.wikipedia.org/wiki/Example?'
+            'oldid=68181978&diff=next Page]\n'
+            '[[Example]]\n[[Example]]\n[[Example]]\n'
+            '[https://de.wikipedia.org/w/index.php/Example?'
+            'oldid=68181978 Page]\n'
+            '[https://de.wikipedia.org/w/index.php/Example?'
+            'oldid=68181978&diff=next Page]\n'
+            '[[&]]\n[[&]]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/wiki/Example]\n'
+                '[https://de.wikipedia.org/wiki/Example ]\n'
+                '[https://de.wikipedia.org/wiki/Example  ]\n'
+                '[https://de.wikipedia.org/wiki/Example?oldid=68181978 Page]\n'
+                '[https://de.wikipedia.org/wiki/Example?'
+                'oldid=68181978&diff=next Page]\n'
+                '[https://de.wikipedia.org/w/index.php/Example]\n'
+                '[https://de.wikipedia.org/w/index.php/Example ]\n'
+                '[https://de.wikipedia.org/w/index.php/Example  ]\n'
+                '[https://de.wikipedia.org/w/index.php/Example?'
+                'oldid=68181978 Page]\n'
+                '[https://de.wikipedia.org/w/index.php/Example?'
+                'oldid=68181978&diff=next Page]\n'
+                '[https://de.wikipedia.org/wiki/&]\n'
+                '[https://de.wikipedia.org/w/index.php/&]\n'
+            ))
         self.assertEqual(
             '[https://de.wikipedia.org]',
             self.cct.fixSyntaxSave('[[https://de.wikipedia.org]]'))

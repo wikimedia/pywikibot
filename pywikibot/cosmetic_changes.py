@@ -696,16 +696,42 @@ class CosmeticChangesToolkit(object):
 
     # from fixes.py
     def fixSyntaxSave(self, text):
+        def replace_link(match):
+            replacement = '[[' + match.group('link')
+            if match.group('title'):
+                replacement += '|' + match.group('title')
+            return replacement + ']]'
+
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
         # link to the wiki working on
-        # TODO: disable this for difflinks and titled links,
-        # to prevent edits like this:
-        # https://de.wikipedia.org/w/index.php?title=Wikipedia%3aVandalismusmeldung&diff=103109563&oldid=103109271
-#        text = textlib.replaceExcept(text,
-#                                     r'\[https?://%s\.%s\.org/wiki/(?P<link>\S+)\s+(?P<title>.+?)\s?\]'
-#                                     % (self.site.code, self.site.family.name),
-#                                     r'[[\g<link>|\g<title>]]', exceptions)
+        # Do not use the first entry as it is not actually a prefix
+        for suffix in self.site._interwiki_urls()[1:]:
+            http_url = self.site.base_url(suffix, 'http')
+            if self.site.protocol() == 'http':
+                https_url = None
+            else:
+                https_url = self.site.base_url(suffix, 'https')
+            # compare strings without the protocol, if they are empty support
+            # also no prefix (//en.wikipedia.org/…)
+            if http_url[4:] == https_url[5:]:
+                urls = ['(?:https?:)?' + re.escape(http_url[5:])]
+            else:
+                urls = [re.escape(url) for url in (http_url, https_url)
+                        if url is not None]
+            for url in urls:
+                # Only include links which don't include the separator as
+                # the wikilink won't support additional parameters
+                separator = '?'
+                if '?' in suffix:
+                    separator += '&'
+                # Match first a non space in the title to prevent that multiple
+                # spaces at the end without title will be matched by it
+                text = textlib.replaceExcept(
+                    text,
+                    r'\[\[?' + url + r'(?P<link>[^' + separator + r']+?)'
+                    r'(\s+(?P<title>[^\s].*?))?\s*\]\]?',
+                    replace_link, exceptions, site=self.site)
         # external link in/starting with double brackets
         text = textlib.replaceExcept(
             text,

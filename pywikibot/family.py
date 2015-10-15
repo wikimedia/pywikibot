@@ -1076,18 +1076,28 @@ class Family(object):
         # Override this ONLY if the wiki family requires a path prefix
         return ''
 
-    def _hostname(self, code):
+    def _hostname(self, code, protocol=None):
         """Return the protocol and hostname."""
-        protocol = self.protocol(code)
+        if protocol is None:
+            protocol = self.protocol(code)
         if protocol == 'https':
             host = self.ssl_hostname(code)
         else:
             host = self.hostname(code)
         return protocol, host
 
-    def base_url(self, code, uri):
-        """Prefix uri with port and hostname."""
-        protocol, host = self._hostname(code)
+    def base_url(self, code, uri, protocol=None):
+        """
+        Prefix uri with port and hostname.
+
+        @param code: The site code
+        @param uri: The absolute path after the hostname
+        @param protocol: The protocol which is used. If None it'll determine the
+            protocol from the code.
+        @return: The full URL
+        @rtype: str
+        """
+        protocol, host = self._hostname(code, protocol)
         if protocol == 'https':
             uri = self.ssl_pathprefix(code) + uri
         return urlparse.urljoin('{0}://{1}'.format(protocol, host), uri)
