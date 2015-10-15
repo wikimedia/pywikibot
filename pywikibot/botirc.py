@@ -57,6 +57,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
     }
 
     def __init__(self, site, channel, nickname, server, port=6667, **kwargs):
+        """Constructor."""
         pywikibot.Bot.__init__(self, **kwargs)
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.channel = channel
@@ -75,15 +76,19 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
             .replace('^B', '\002').replace('^C', '\003').replace('^U', '\037'))
 
     def on_nicknameinuse(self, c, e):
+        """Provide an alternative nickname."""
         c.nick(c.get_nickname() + "_")
 
     def on_welcome(self, c, e):
+        """Join channel."""
         c.join(self.channel)
 
     def on_privmsg(self, c, e):
+        """Ignore private message."""
         pass
 
     def on_pubmsg(self, c, e):
+        """Respond to public message."""
         match = self.re_edit.match(e.arguments()[0])
         if not match:
             return
@@ -108,13 +113,17 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         pywikibot.output(str((entry[0], name)))
 
     def on_dccmsg(self, c, e):
+        """Ignore DCC message."""
         pass
 
     def on_dccchat(self, c, e):
+        """Ignore DCC chat."""
         pass
 
     def do_command(self, e, cmd):
+        """Ignore command request."""
         pass
 
     def on_quit(self, e, cmd):
+        """Ignore quit request."""
         pass
