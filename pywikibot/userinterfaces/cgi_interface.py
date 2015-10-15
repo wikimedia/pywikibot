@@ -9,13 +9,12 @@ class UI(object):
 
     """CGI user interface."""
 
-    def __init__(self):
-        pass
-
     def output(self, text, colors=None, newline=True, toStdout=False):
+        """Output text to CGI stream if toStdout is True."""
         if not toStdout:
             return
         sys.stdout.write(text.encode('UTF-8', 'replace'))
 
     def input(self, question, colors=None):
-        self.output(question + ' ', newline=False, showcgi=True)
+        """Output question to CGI stream."""
+        self.output(question + ' ', newline=False, toStdout=True)
