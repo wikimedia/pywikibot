@@ -939,12 +939,16 @@ class Family(object):
         return cls
 
     @property
+    @deprecated('Family.codes or APISite.validLanguageLinks')
     def iwkeys(self):
+        """DEPRECATED: List of (interwiki_forward's) family codes."""
         if self.interwiki_forward:
             return list(pywikibot.Family(self.interwiki_forward).langs.keys())
         return list(self.langs.keys())
 
+    @deprecated('APISite.interwiki')
     def get_known_families(self, site):
+        """DEPRECATED: Return dict of inter-family interwiki links."""
         return self.known_families
 
     def linktrail(self, code, fallback='_default'):
@@ -966,7 +970,8 @@ class Family(object):
                 "ERROR: linktrail in language %(language_code)s unknown"
                 % {'language_code': code})
 
-    def category_redirects(self, code, fallback="_default"):
+    def _category_redirects(self, code, fallback='_default'):
+        """Return list of category redirect templates."""
         if not hasattr(self, "_catredirtemplates") or \
            code not in self._catredirtemplates:
             self.get_cr_templates(code, fallback)
@@ -976,7 +981,8 @@ class Family(object):
             raise KeyError("ERROR: title for category redirect template in "
                            "language '%s' unknown" % code)
 
-    def get_cr_templates(self, code, fallback):
+    def _get_cr_templates(self, code, fallback):
+        """Build list of category redirect templates."""
         if not hasattr(self, "_catredirtemplates"):
             self._catredirtemplates = {}
         if code in self.category_redirect_templates:
@@ -998,7 +1004,18 @@ class Family(object):
                     cr_list.append(newtitle)
         self._catredirtemplates[code] = cr_list
 
+    @deprecated('Page.isCategoryRedirect')
+    def category_redirects(self, code, fallback="_default"):
+        """DEPRECATED: Return list of category redirect templates."""
+        return self._category_redirects(code, fallback)
+
+    @deprecated('Page.isCategoryRedirect')
+    def get_cr_templates(self, code, fallback):
+        """DEPRECATED: Build list of category redirect templates."""
+        return self._get_cr_templates(code, fallback)
+
     def disambig(self, code, fallback='_default'):
+        """"Return list of disambiguation templates."""
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
         elif fallback:
@@ -1069,33 +1086,41 @@ class Family(object):
         return protocol, host
 
     def base_url(self, code, uri):
+        """Prefix uri with port and hostname."""
         protocol, host = self._hostname(code)
         if protocol == 'https':
             uri = self.ssl_pathprefix(code) + uri
         return urlparse.urljoin('{0}://{1}'.format(protocol, host), uri)
 
     def path(self, code):
+        """Return path to index.php."""
         return '%s/index.php' % self.scriptpath(code)
 
     def querypath(self, code):
+        """Return path to query.php."""
         return '%s/query.php' % self.scriptpath(code)
 
     def apipath(self, code):
+        """Return path to api.php."""
         return '%s/api.php' % self.scriptpath(code)
 
     @deprecated('APISite.article_path')
     def nicepath(self, code):
+        """DEPRECATED: Return nice path prefix, e.g. '/wiki/'."""
         return '/wiki/'
 
     def rcstream_host(self, code):
+        """Hostname for RCStream."""
         raise NotImplementedError("This family does not support RCStream")
 
     @deprecated_args(name='title')
     def get_address(self, code, title):
+        """Return the path to title using index.php with redirects disabled."""
         return '%s?title=%s&redirect=no' % (self.path(code), title)
 
     @deprecated('APISite.nice_get_address(title)')
     def nice_get_address(self, code, title):
+        """DEPRECATED: Return the nice path to title using index.php."""
         return '%s%s' % (self.nicepath(code), title)
 
     def interface(self, code):
@@ -1186,10 +1211,11 @@ class Family(object):
                 .format(url, ', '.join(str(s) for s in matched_sites)))
 
     def maximum_GET_length(self, code):
+        """Return the maximum URL length for GET instead of POST."""
         return config.maximum_GET_length
 
     def dbName(self, code):
-        # returns the name of the MySQL database
+        """Return the name of the MySQL database."""
         return '%s%s' % (code, self.name)
 
     # Which version of MediaWiki is used?
@@ -1392,6 +1418,7 @@ class SingleSiteFamily(Family):
         return (self.domain, )
 
     def hostname(self, code):
+        """Return the domain as the hostname."""
         return self.domain
 
 
@@ -1538,15 +1565,18 @@ class WikimediaFamily(Family):
 
     @property
     def interwiki_removals(self):
+        """Return a list of interwiki codes to be removed from wiki pages."""
         return frozenset(self.removed_wikis + self.closed_wikis)
 
     @property
     def interwiki_replacements(self):
+        """Return an interwiki code replacement mapping."""
         rv = self.code_aliases.copy()
         rv.update(self.interwiki_replacement_overrides)
         return FrozenDict(rv)
 
     def shared_image_repository(self, code):
+        """Return Wikimedia Commons as the shared image repository."""
         return ('commons', 'commons')
 
     def protocol(self, code):
@@ -1554,6 +1584,7 @@ class WikimediaFamily(Family):
         return 'https'
 
     def rcstream_host(self, code):
+        """Return 'stream.wikimedia.org' as the RCStream hostname."""
         return 'stream.wikimedia.org'
 
 
