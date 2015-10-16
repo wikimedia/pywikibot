@@ -6147,6 +6147,10 @@ class APISite(BaseSite):
         assert 'create' in self.protection_types(), \
             "'create' should be a valid protection type."
         if type == 'create':
+            if MediaWikiVersion(self.version()) < MediaWikiVersion('1.15'):
+                raise NotImplementedError(
+                    'protectedpages(type=create) requires MW 1.15+')
+
             return self._generator(
                 api.PageGenerator, type_arg='protectedtitles',
                 namespaces=namespaces, gptlevel=level, total=total)

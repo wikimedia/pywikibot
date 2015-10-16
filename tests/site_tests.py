@@ -828,6 +828,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.15'):
+            raise unittest.SkipTest('requires v1.15+')
+
         pages = list(self.get_site().protectedpages(type='create', total=10))
         for page in pages:
             self.assertFalse(page.exists())
