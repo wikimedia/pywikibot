@@ -833,6 +833,7 @@ class CosmeticChangesToolkit(object):
             return
         exceptions = [
             'gallery',
+            'file',
             'hyperlink',
             'interwiki',
             # FIXME: but changes letters inside wikilinks
@@ -856,16 +857,9 @@ class CosmeticChangesToolkit(object):
         new = digits.pop(self.site.code)
         # This only works if there are only two items in digits dict
         old = digits[digits.keys()[0]]
-        # do not change inside file links
-        namespaces = list(self.site.namespace(6, all=True))
-        pattern = re.compile(
-            u'\\[\\[(%s):.+?\\.\\w+? *(\\|((\\[\\[.*?\\]\\])|.)*)?\\]\\]'
-            % u'|'.join(namespaces),
-            re.UNICODE)
         # not to let bot edits in latin content
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
                                      % {'fa': faChrs}))
-        exceptions.append(pattern)
         text = textlib.replaceExcept(text, u',', u'،', exceptions)
         if self.site.code == 'ckb':
             text = textlib.replaceExcept(text,

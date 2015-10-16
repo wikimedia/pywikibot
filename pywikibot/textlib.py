@@ -99,6 +99,21 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 (?P<unhandled_depth>{{\s*[^{\|#0-9][^{\|#]*?\s* [^{]* {{ .* }})
 """, re.VERBOSE)
 
+# The following regex supports wikilinks anywhere after the first pipe
+# and correctly matches the end of the file link if the wikilink contains
+# [[ or ]].
+# The namespace names must be substituted into this regex.
+# e.g. FILE_LINK_REGEX % 'File' or FILE_LINK_REGEX % '|'.join(site.namespaces)
+FILE_LINK_REGEX = r"""
+\[\[\s*(?:%s)\s*:[^|]*?\s*
+  (\|
+    ( \[\[ [^[]*? \[\[ [^]]*? \]\] [^]]*? \]\]  # capture invalid syntax
+     | ( \[\[ .*? \]\] )? [^[]*?
+     | \[ [^]]*? \]
+    )*
+  )?
+\]\]
+"""
 
 NON_LATIN_DIGITS = {
     'ckb': u'٠١٢٣٤٥٦٧٨٩',
@@ -180,7 +195,7 @@ def _create_default_regexes():
         'category':     ('\[\[ *(?:%s)\s*:.*?\]\]',
                          lambda site: '|'.join(site.namespaces[14])),
         # files
-        'file':         ('\[\[ *(?:%s)\s*:.*?\]\]',
+        'file':         (FILE_LINK_REGEX,
                          lambda site: '|'.join(site.namespaces[6])),
     })
 
@@ -208,7 +223,7 @@ def _get_regexes(keys, site):
                     if (exc, site) not in _regex_cache:
                         re_text, re_var = _regex_cache[exc]
                         _regex_cache[(exc, site)] = re.compile(
-                            re_text % re_var(site))
+                            re_text % re_var(site), re.VERBOSE)
 
                     result.append(_regex_cache[(exc, site)])
                 else:
