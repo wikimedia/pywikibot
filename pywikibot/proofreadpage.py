@@ -5,6 +5,7 @@ Objects representing objects used with ProofreadPage Extension.
 The extension is supported by MW 1.21+.
 
 This module includes objects:
+
 * ProofreadPage(Page)
 * FullHeader
 * IndexPage(Page)
@@ -105,12 +106,15 @@ class ProofreadPage(pywikibot.Page):
     def index(self):
         """Get the Index page which contains ProofreadPage.
 
+        If there are many Index pages link to this ProofreadPage, and
+        the ProofreadPage is titled Page:<index title>/<page number>,
+        the Index page with the same title will be returned.
+        Otherwise None is returned in the case of multiple linked Index pages.
+
         To force reload, delete index and call it again.
 
-        Returns:
-        None:      if ProofreadPage is linked to no or several Index pages
-                   and no inerence can be done from titles.
-        IndexPage: if ProofreadPage is linked to one Index page.
+        @return: the Index page for this ProofreadPage
+        @rtype: IndexPage or None
         """
         if not hasattr(self, '_index'):
             index_ns = self.site.proofread_index_ns
