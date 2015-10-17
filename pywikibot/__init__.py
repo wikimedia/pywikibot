@@ -227,6 +227,8 @@ class Coordinate(_WbRepresentation):
     in the future we can use it for the GeoData extension.
     """
 
+    _items = ('lat', 'lon', 'globe')
+
     def __init__(self, lat, lon, alt=None, precision=None, globe='earth',
                  typ="", name="", dim=None, site=None, entity=''):
         """
@@ -265,13 +267,6 @@ class Coordinate(_WbRepresentation):
             self.site = Site().data_repository()
         else:
             self.site = site
-
-    def __repr__(self):
-        string = 'Coordinate(%s, %s' % (self.lat, self.lon)
-        if self.globe != 'earth':
-            string += ', globe="%s"' % self.globe
-        string += ')'
-        return string
 
     @property
     def entity(self):
@@ -369,6 +364,9 @@ class WbTime(_WbRepresentation):
 
     FORMATSTR = '{0:+012d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
+    _items = ('year', 'month', 'day', 'hour', 'minute', 'second',
+              'precision', 'before', 'after', 'timezone', 'calendarmodel')
+
     def __init__(self, year=None, month=None, day=None,
                  hour=None, minute=None, second=None,
                  precision=None, before=0, after=0,
@@ -465,17 +463,12 @@ class WbTime(_WbRepresentation):
                                ts[u'before'], ts[u'after'],
                                ts[u'timezone'], ts[u'calendarmodel'])
 
-    def __repr__(self):
-        return u"WbTime(year=%(year)d, month=%(month)d, day=%(day)d, " \
-            u"hour=%(hour)d, minute=%(minute)d, second=%(second)d, " \
-            u"precision=%(precision)d, before=%(before)d, after=%(after)d, " \
-            u"timezone=%(timezone)d, calendarmodel='%(calendarmodel)s')" \
-            % self.__dict__
-
 
 class WbQuantity(_WbRepresentation):
 
     """A Wikibase quantity representation."""
+
+    _items = ('amount', 'upperBound', 'lowerBound', 'unit')
 
     def __init__(self, amount, unit=None, error=None):
         u"""
@@ -523,10 +516,6 @@ class WbQuantity(_WbRepresentation):
         lowerBound = eval(wb['lowerBound'])
         error = (upperBound - amount, amount - lowerBound)
         return cls(amount, wb['unit'], error)
-
-    def __repr__(self):
-        return (u"WbQuantity(amount=%(amount)s, upperBound=%(upperBound)s, "
-                u"lowerBound=%(lowerBound)s, unit=%(unit)s)" % self.__dict__)
 
 
 _sites = {}
