@@ -1245,6 +1245,33 @@ class TestUserRecentChanges(DefaultSiteTestCase):
                 self.assertNotIn("patrolled", change)
 
 
+class TestUserWatchedPages(DefaultSiteTestCase):
+
+    """Test user watched pages."""
+
+    user = True
+
+    def test_watched_pages(self):
+        """Test the site.watched_pages() method."""
+        gen = self.site.watched_pages(total=5, force=False)
+        self.assertIsInstance(gen.request, api.CachedRequest)
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+        # repeat to use the cache
+        gen = self.site.watched_pages(total=5, force=False)
+        self.assertIsInstance(gen.request, api.CachedRequest)
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+
+    def test_watched_pages_uncached(self):
+        """Test the site.watched_pages() method uncached."""
+        gen = self.site.watched_pages(total=5, force=True)
+        self.assertIsInstance(gen.request, api.Request)
+        self.assertFalse(issubclass(gen.request_class, api.CachedRequest))
+        for page in gen:
+            self.assertIsInstance(page, pywikibot.Page)
+
+
 class SearchTestCase(DefaultSiteTestCase):
 
     """Test search method."""

@@ -1513,6 +1513,9 @@ class Request(MutableMapping):
         @return: The normalized keyword arguments.
         @rtype: dict
         """
+        if 'expiry' in kwargs and kwargs['expiry'] is None:
+            del kwargs['expiry']
+
         args = set()
         for super_cls in inspect.getmro(cls):
             if not super_cls.__name__.endswith('Request'):
@@ -2194,6 +2197,7 @@ class CachedRequest(Request):
 
         @param expiry: either a number of days or a datetime.timedelta object
         """
+        assert expiry is not None
         super(CachedRequest, self).__init__(*args, **kwargs)
         if not isinstance(expiry, datetime.timedelta):
             expiry = datetime.timedelta(expiry)
