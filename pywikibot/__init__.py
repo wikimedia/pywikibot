@@ -16,7 +16,6 @@ import math
 import re
 import sys
 import threading
-import json
 
 if sys.version_info[0] > 2:
     from queue import Queue
@@ -216,7 +215,10 @@ class Timestamp(datetime.datetime):
             return newdt
 
 
-class Coordinate(object):
+from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
+
+
+class Coordinate(_WbRepresentation):
 
     """
     Class for handling and storing Coordinates.
@@ -344,7 +346,7 @@ class Coordinate(object):
         raise NotImplementedError
 
 
-class WbTime(object):
+class WbTime(_WbRepresentation):
 
     """A Wikibase time representation."""
 
@@ -463,13 +465,6 @@ class WbTime(object):
                                ts[u'before'], ts[u'after'],
                                ts[u'timezone'], ts[u'calendarmodel'])
 
-    def __str__(self):
-        return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
-                          separators=(',', ': '))
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
-
     def __repr__(self):
         return u"WbTime(year=%(year)d, month=%(month)d, day=%(day)d, " \
             u"hour=%(hour)d, minute=%(minute)d, second=%(second)d, " \
@@ -478,7 +473,7 @@ class WbTime(object):
             % self.__dict__
 
 
-class WbQuantity(object):
+class WbQuantity(_WbRepresentation):
 
     """A Wikibase quantity representation."""
 
@@ -528,13 +523,6 @@ class WbQuantity(object):
         lowerBound = eval(wb['lowerBound'])
         error = (upperBound - amount, amount - lowerBound)
         return cls(amount, wb['unit'], error)
-
-    def __str__(self):
-        return json.dumps(self.toWikibase(), indent=4, sort_keys=True,
-                          separators=(',', ': '))
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
 
     def __repr__(self):
         return (u"WbQuantity(amount=%(amount)s, upperBound=%(upperBound)s, "
