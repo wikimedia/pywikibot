@@ -4428,9 +4428,8 @@ class Claim(Property):
             except TypeError:
                 pass
 
-            if (abs(self.target.lat - coord_args[0]) <= precision and
-                    abs(self.target.lon - coord_args[1]) <= precision):
-                return True
+            return (abs(self.target.lat - coord_args[0]) <= precision and
+                    abs(self.target.lon - coord_args[1]) <= precision)
 
         if self.target == value:
             return True
