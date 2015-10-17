@@ -148,6 +148,10 @@ def main(*args):
         pywikibot.bot.suggest_help(unknown_parameters=unknown_args)
         return False
 
+    if password is not None:
+        pywikibot.warning('The -pass argument is not implemented yet. See: '
+                          'https://phabricator.wikimedia.org/T102477')
+
     if logall:
         if sysop and not oauth:
             namedict = config.sysopnames
