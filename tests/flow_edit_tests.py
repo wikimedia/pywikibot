@@ -173,6 +173,128 @@ class TestFlowLockTopic(TestCase):
         self.assertFalse(topic.is_locked)
 
 
+class TestFlowHide(TestCase):
+
+    """Hiding topics and posts."""
+
+    family = 'test'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def test_hide_topic(self):
+        """Hide and restore a test topic."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        if topic.is_moderated:
+            topic.restore('Pywikibot test')
+        self.assertFalse(topic.is_moderated)
+        # Hide
+        topic.hide('Pywikibot test')
+        self.assertTrue(topic.is_moderated)
+        # Restore
+        topic.restore('Pywikibot test')
+        self.assertFalse(topic.is_moderated)
+
+    def test_hide_post(self):
+        """Hide and restore a test post."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        post = Post(topic, 'sq1qvoig1az8w7cd')
+        if post.is_moderated:
+            post.restore('Pywikibot test')
+        self.assertFalse(post.is_moderated)
+        # Hide
+        post.hide('Pywikibot test')
+        self.assertTrue(post.is_moderated)
+        # Restore
+        post.restore('Pywikibot test')
+        self.assertFalse(post.is_moderated)
+
+
+class TestFlowDelete(TestCase):
+
+    """Deleting topics and posts."""
+
+    family = 'test'
+    code = 'test'
+
+    user = True
+    write = True
+    sysop = True
+
+    def test_delete_topic(self):
+        """Delete and restore a test topic."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        if topic.is_moderated:
+            topic.restore('Pywikibot test')
+        self.assertFalse(topic.is_moderated)
+        # Delete
+        topic.delete_mod('Pywikibot test')
+        self.assertTrue(topic.is_moderated)
+        # Restore
+        topic.restore('Pywikibot test')
+        self.assertFalse(topic.is_moderated)
+
+    def test_delete_post(self):
+        """Delete and restore a test post."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        post = Post(topic, 'sq1qvoig1az8w7cd')
+        if post.is_moderated:
+            post.restore('Pywikibot test')
+        self.assertFalse(post.is_moderated)
+        # Delete
+        post.delete('Pywikibot test')
+        self.assertTrue(post.is_moderated)
+        # Restore
+        post.restore('Pywikibot test')
+        self.assertFalse(post.is_moderated)
+
+
+class TestFlowSuppress(TestCase):
+
+    """Suppressing topics and posts."""
+
+    family = 'test'
+    code = 'test'
+
+    user = True
+    write = True
+    sysop = True
+
+    def test_suppress_post(self):
+        """Suppress and restore a test post."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        post = Post(topic, 'sq1qvoig1az8w7cd')
+        if post.is_moderated:
+            post.restore('Pywikibot test')
+        self.assertFalse(post.is_moderated)
+        # Suppress
+        post.suppress('Pywikibot test')
+        self.assertTrue(post.is_moderated)
+        # Restore
+        post.restore('Pywikibot test')
+        self.assertFalse(post.is_moderated)
+
+    def test_suppress_topic(self):
+        """Suppress and restore a test topic."""
+        # Setup
+        topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
+        if topic.is_moderated:
+            topic.restore('Pywikibot test')
+        self.assertFalse(topic.is_moderated)
+        # Suppress
+        topic.suppress('Pywikibot test')
+        self.assertTrue(topic.is_moderated)
+        # Restore
+        topic.restore('Pywikibot test')
+        self.assertFalse(topic.is_moderated)
+
+
 class TestFlowEditFailure(TestCase):
 
     """Flow-related edit failure tests."""

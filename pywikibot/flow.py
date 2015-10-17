@@ -164,6 +164,10 @@ class Topic(FlowPage):
             self._data = self.site.load_topic(self, format)
         return self._data
 
+    def _reload(self):
+        """Forcibly reload the topic's root post."""
+        self.root._load(load_from_topic=True)
+
     @classmethod
     def create_topic(cls, board, title, content, format='wikitext'):
         """Create and return a Topic object for a new topic on a Board.
@@ -219,6 +223,11 @@ class Topic(FlowPage):
         """Whether this topic is locked."""
         return self.root._current_revision['isLocked']
 
+    @property
+    def is_moderated(self):
+        """Whether this topic is moderated."""
+        return self.root._current_revision['isModerated']
+
     def replies(self, format='wikitext', force=False):
         """A list of replies to this topic's root post.
 
@@ -243,23 +252,60 @@ class Topic(FlowPage):
         """
         return self.root.reply(content, format)
 
-    def lock(self, reason='Closed'):
+    # Moderation
+    def lock(self, reason):
         """Lock this topic.
 
         @param reason: The reason for locking this topic
         @type reason: unicode
         """
         self.site.lock_topic(self, True, reason)
-        self.root._load(load_from_topic=True)
+        self._reload()
 
-    def unlock(self, reason='Reopened'):
+    def unlock(self, reason):
         """Unlock this topic.
 
         @param reason: The reason for unlocking this topic
         @type reason: unicode
         """
         self.site.lock_topic(self, False, reason)
-        self.root._load(load_from_topic=True)
+        self._reload()
+
+    def delete_mod(self, reason):
+        """Delete this topic through the Flow moderation system.
+
+        @param reason: The reason for deleting this topic.
+        @type reason: unicode
+        """
+        self.site.delete_topic(self, reason)
+        self._reload()
+
+    def hide(self, reason):
+        """Hide this topic.
+
+        @param reason: The reason for hiding this topic.
+        @type reason: unicode
+        """
+        self.site.hide_topic(self, reason)
+        self._reload()
+
+    def suppress(self, reason):
+        """Suppress this topic.
+
+        @param reason: The reason for suppressing this topic.
+        @type reason: unicode
+        """
+        self.site.suppress_topic(self, reason)
+        self._reload()
+
+    def restore(self, reason):
+        """Restore this topic.
+
+        @param reason: The reason for restoring this topic.
+        @type reason: unicode
+        """
+        self.site.restore_topic(self, reason)
+        self._reload()
 
 
 # Flow non-page-like objects
@@ -375,6 +421,13 @@ class Post(object):
         """
         return self._page
 
+    @property
+    def is_moderated(self):
+        """Whether this post is moderated."""
+        if not hasattr(self, '_current_revision'):
+            self._load()
+        return self._current_revision['isModerated']
+
     def get(self, format='wikitext', force=False, sysop=False):
         """Return the contents of the post in the given format.
 
@@ -445,3 +498,40 @@ class Post(object):
         data = self.site.reply_to_post(self.page, reply_to, content, format)
         post = Post(self.page, data['post-id'])
         return post
+
+    # Moderation
+    def delete(self, reason):
+        """Delete this post through the Flow moderation system.
+
+        @param reason: The reason for deleting this post.
+        @type reason: unicode
+        """
+        self.site.delete_post(self, reason)
+        self._load()
+
+    def hide(self, reason):
+        """Hide this post.
+
+        @param reason: The reason for hiding this post.
+        @type reason: unicode
+        """
+        self.site.hide_post(self, reason)
+        self._load()
+
+    def suppress(self, reason):
+        """Suppress this post.
+
+        @param reason: The reason for suppressing this post.
+        @type reason: unicode
+        """
+        self.site.suppress_post(self, reason)
+        self._load()
+
+    def restore(self, reason):
+        """Restore this post.
+
+        @param reason: The reason for restoring this post.
+        @type reason: unicode
+        """
+        self.site.restore_post(self, reason)
+        self._load()
