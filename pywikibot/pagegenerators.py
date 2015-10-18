@@ -2451,8 +2451,6 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
         xmlFilename = filename
         xmlStart = start
 
-        if text_predicate is None:
-            text_predicate = lambda text: True
         self.text_predicate = text_predicate
 
         self.xmlStart = xmlStart
@@ -2478,7 +2476,7 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
             if not self.namespaces == []:
                 if page.namespace() not in self.namespaces:
                     continue
-            if self.text_predicate(entry.text):
+            if not self.text_predicate or self.text_predicate(entry.text):
                 page.text = entry.text
                 return page
 
