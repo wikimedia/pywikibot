@@ -703,8 +703,8 @@ class CosmeticChangesToolkit(object):
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
         # link to the wiki working on
-        # Do not use the first entry as it is not actually a prefix
-        for suffix in self.site._interwiki_urls()[1:]:
+        # Only use suffixes for article paths
+        for suffix in self.site._interwiki_urls(True):
             http_url = self.site.base_url(suffix, 'http')
             if self.site.protocol() == 'http':
                 https_url = None
