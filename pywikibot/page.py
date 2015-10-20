@@ -339,7 +339,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return True if title of this Page is in the autoFormat dictionary."""
         return self.autoFormat()[0] is not None
 
-    @deprecated_args(throttle=None, change_edit_time=None)
+    @deprecated_args(throttle=None,
+                     change_edit_time=None,
+                     expandtemplates=None)
     def get(self, force=False, get_redirect=False, sysop=False):
         """Return the wiki-text of the page.
 
@@ -3292,15 +3294,20 @@ class WikibasePage(BasePage):
 
         @param force: override caching
         @type force: bool
-        @param args: may be used to specify custom props.
+        @raise NotImplementedError: a value in args or kwargs
         """
+        if args or kwargs:
+            raise NotImplementedError(
+                '{0}.get does not implement var args: {1!r} and {2!r}'.format(
+                    self.__class__, args, kwargs))
+
         lazy_loading_id = not hasattr(self, 'id') and hasattr(self, '_site')
         if force or not hasattr(self, '_content'):
             identification = self._defined_by()
             if not identification:
                 raise pywikibot.NoPage(self)
 
-            data = self.repo.loadcontent(identification, *args)
+            data = self.repo.loadcontent(identification)
             item_index = list(data.keys())[0]
             if lazy_loading_id or item_index != '-1':
                 self.id = item_index
@@ -3725,9 +3732,9 @@ class ItemPage(WikibasePage):
         @param get_redirect: return the item content, do not follow the
                              redirect, do not raise an exception.
         @type get_redirect: bool
-        @param args: values of props
+        @raise NotImplementedError: a value in args or kwargs
         """
-        data = super(ItemPage, self).get(force=force, *args, **kwargs)
+        data = super(ItemPage, self).get(force, *args, **kwargs)
 
         if self.isRedirectPage() and not get_redirect:
             raise pywikibot.IsRedirectPage(self)
@@ -4035,15 +4042,20 @@ class PropertyPage(WikibasePage, Property):
                 u"'%s' is not an property page title" % title)
         Property.__init__(self, source, self.id)
 
-    def get(self, force=False, *args):
+    def get(self, force=False, *args, **kwargs):
         """
         Fetch the property entity, and cache it.
 
         @param force: override caching
-        @param args: values of props
+        @type force: bool
+        @raise NotImplementedError: a value in args or kwargs
         """
+        if args or kwargs:
+            raise NotImplementedError(
+                'PropertyPage.get only implements "force".')
+
         if force or not hasattr(self, '_content'):
-            WikibasePage.get(self, force=force, *args)
+            WikibasePage.get(self, force)
         self._type = self._content['datatype']
 
     def newClaim(self, *args, **kwargs):
