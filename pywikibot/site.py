@@ -917,12 +917,13 @@ class BaseSite(ComparableMixin):
         return [lang for lang in self.languages()
                 if self.namespaces.lookup_normalized_name(lang) is None]
 
-    def _interwiki_urls(self):
-        site_paths = [self.path()] * 3
-        site_paths[1] += '/'
-        site_paths[2] += '?title='
-        site_paths += [self.article_path]
-        return site_paths
+    def _interwiki_urls(self, only_article_suffixes=False):
+        base_path = self.path()
+        if not only_article_suffixes:
+            yield base_path
+        yield base_path + '/'
+        yield base_path + '?title='
+        yield self.article_path
 
     def interwiki(self, prefix):
         """
