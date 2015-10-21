@@ -5,7 +5,6 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 from pywikibot import family
-from pywikibot.tools import deprecated
 
 
 # The Anarchopedia family
@@ -73,10 +72,9 @@ class Family(family.SubdomainFamily):
 
         self.nocapitalize = list(self.langs.keys())
 
-    @deprecated('APISite.version()')
-    def version(self, code):
+    def force_version(self, code):
         """Return the version for this family."""
-        return "1.14alpha"
+        return '1.14'
 
     def scriptpath(self, code):
         """Return the script path for this family."""
