@@ -18,6 +18,7 @@ __version__ = '$Id$'
 import datetime
 import hashlib
 import itertools
+import functools
 import os
 import re
 import sys
@@ -6625,20 +6626,21 @@ class DataSite(APISite):
             props = attr.replace("get_", "")
             if props in ['info', 'sitelinks', 'aliases', 'labels',
                          'descriptions', 'urls']:
+                issue_deprecation_warning('DataSite.{0}()'.format(attr),
+                                          'WikibasePage', 2)
                 if props == 'urls':
                     props = 'sitelinks/urls'
                 method = self._get_propertyitem
-                f = lambda *args, **params: \
-                    method(props, *args, **params)
+                f = functools.partial(method, props)
                 if hasattr(method, "__doc__"):
                     f.__doc__ = method.__doc__
                 return f
+
         return super(APISite, self).__getattr__(attr)
 
-    @deprecated("pywikibot.PropertyPage")
     def _get_propertyitem(self, props, source, **params):
         """Generic method to get the data for multiple Wikibase items."""
-        wbdata = self.get_item(source, props=props, **params)
+        wbdata = self._get_item(source, props=props, **params)
         if props == 'info':
             return wbdata
 
@@ -6652,6 +6654,14 @@ class DataSite(APISite):
     @deprecated("pywikibot.WikibasePage")
     def get_item(self, source, **params):
         """Get the data for multiple Wikibase items."""
+        return self._get_item(source, **params)
+
+    # Only separated from get_item to avoid the deprecation message via
+    # _get_propertyitem
+    def _get_item(self, source, **params):
+        assert set(params) <= set(['props']), \
+            'Only "props" is a valid kwarg, not {0}'.format(set(params) -
+                                                            set(['props']))
         if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)

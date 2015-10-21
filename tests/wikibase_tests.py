@@ -1044,56 +1044,47 @@ class TestDeprecatedDataSiteMethods(WikidataTestCase, DeprecationTestCase):
     """Test deprecated DataSite get_* methods."""
 
     cached = True
-    # These methods are implemented using __getattr__,
-    # so the filename will be detected as site.py,
-    # requiring _do_test_warning_filename = False
 
     def test_get_info(self):
         """Test get_info."""
-        self._do_test_warning_filename = False
         data = self.repo.get_info(60)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
         self.assertIn('title', data)
         self.assertEqual(data['title'], 'Q60')
 
     def test_get_labels(self):
         """Test get_labels."""
-        self._do_test_warning_filename = False
         data = self.repo.get_labels(60)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
         self.assertIn('en', data)
 
     def test_get_aliases(self):
         """Test get_aliases."""
-        self._do_test_warning_filename = False
         data = self.repo.get_aliases(60)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
         self.assertIn('en', data)
 
     def test_get_descriptions(self):
         """Test get_descriptions."""
-        self._do_test_warning_filename = False
         data = self.repo.get_descriptions(60)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
         self.assertIn('en', data)
 
     def test_get_sitelinks(self):
         """Test get_sitelinks."""
-        self._do_test_warning_filename = False
         data = self.repo.get_sitelinks(60)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
         self.assertIn('enwiki', data)
 
     def test_get_urls(self):
         """Test get_urls."""
-        self._do_test_warning_filename = False
         data = self.repo.get_urls(60)
-        self.assertDeprecation()
+        self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
         self.assertIn('enwiki', data)
 
