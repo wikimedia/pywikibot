@@ -50,6 +50,15 @@ These parameters are supported to specify which pages titles to print:
          valid python encoding: utf-8, etc.).
          If not specified, it defaults to config.textfile_encoding.
 
+-put:    Save the list to the defined page of the wiki. By default it does not
+         overwrite an exisiting page.
+
+-overwrite    Overwrite the page if it exists. Can only by applied with -put.
+
+-summary:     The summary text when the page is written. If it's one word just
+              containing letters, dashes and underscores it uses that as a
+              translation key.
+
 
 Custom format can be applied to the following items extrapolated from a
     page object:
@@ -83,10 +92,11 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import re
 import os
 
 import pywikibot
-from pywikibot import config2 as config
+from pywikibot import config2 as config, i18n
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 
 docuReplacements = {'&params;': parameterHelp}
@@ -172,6 +182,9 @@ def main(*args):
     page_get = False
     base_dir = None
     encoding = config.textfile_encoding
+    page_target = None
+    overwrite = False
+    summary = 'listpages-save-list'
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -191,6 +204,12 @@ def main(*args):
             base_dir = arg.partition(':')[2] or '.'
         elif arg.startswith('-encode:'):
             encoding = arg.partition(':')[2]
+        elif arg.startswith('-put:'):
+            page_target = arg.partition(':')[2]
+        elif arg.startswith('-overwrite'):
+            overwrite = True
+        elif arg.startswith('-summary:'):
+            summary = arg.partition(':')[2]
         else:
             genFactory.handleArg(arg)
 
@@ -214,13 +233,26 @@ def main(*args):
                               % base_dir)
             base_dir = None
 
+    if page_target:
+        site = pywikibot.Site()
+        page_target = pywikibot.Page(site, page_target)
+        if not overwrite and page_target.exists():
+            pywikibot.bot.suggest_help(
+                additional_text='Page "{0}" already exists.'.format(
+                    page_target.title()))
+            return False
+        if re.match('^[a-z_-]+$', summary):
+            summary = i18n.twtranslate(site, summary)
+
     gen = genFactory.getCombinedGenerator()
     if gen:
         i = 0
+        output_list = []
         for i, page in enumerate(gen, start=1):
             if not notitle:
                 page_fmt = Formatter(page, outputlang)
-                pywikibot.stdout(page_fmt.output(num=i, fmt=fmt))
+                output_list += [page_fmt.output(num=i, fmt=fmt)]
+                pywikibot.stdout(output_list[-1])
             if page_get:
                 try:
                     pywikibot.output(page.text, toStdout=True)
@@ -232,6 +264,9 @@ def main(*args):
                 with open(filename, mode='wb') as f:
                     f.write(page.text.encode(encoding))
         pywikibot.output(u"%i page(s) found" % i)
+        if page_target:
+            page_target.text = '\n'.join(output_list)
+            page_target.save(summary=summary)
         return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
