@@ -5,29 +5,43 @@ This script runs commands on each entry in the API caches.
 
 Syntax:
 
-    python pwb.py cache [-password] [-delete] [-c "..."] [dir ...]
+    python pwb.py cache [-password] [-delete] [-c "..."] [-o "..."] [dir ...]
 
 If no directory are specified, it will detect the API caches.
 
 If no command is specified, it will print the filename of all entries.
 If only -delete is specified, it will delete all entries.
 
-The option '-c' must be followed by a command in python syntax.
+-delete           Delete each command filtered. If that option is set the
+                  default output will be nothing.
+
+-c                Filter command in python syntax. It must evaulate to True to
+                  output anything.
+
+-o                Output command which is output when the filter evaluated to
+                  True. If it returns None it won't output anything.
 
 Example commands:
   Print the filename of any entry with 'wikidata' in the key:
 
-    entry if "wikidata" in entry._uniquedescriptionstr() else None
+    -c "wikidata" in entry._uniquedescriptionstr()
 
   Customised output if the site code is 'ar':
 
-    entry.site.code == "ar" and print("%s" % entry._uniquedescriptionstr())
+    -c entry.site.code == "ar"
+    -o uniquedesc(entry)
 
   Or the state of the login
-    entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED and \
-print("%s" % entry._uniquedescriptionstr())
 
-  These functions can be used as a command:
+    -c entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED
+    -o uniquedesc(entry)
+
+  If the function only uses one parameter for the entry it can be omitted:
+
+    -c has_password
+    -o uniquedesc
+
+Available filter commands:
     has_password(entry)
     is_logout(entry)
     empty_response(entry)
@@ -39,9 +53,13 @@ print("%s" % entry._uniquedescriptionstr())
   There are helper functions which can be part of a command:
     older_than(entry, interval)
     newer_than(entry, interval)
+
+Available output commands:
+
+    uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -182,7 +200,8 @@ class CacheEntry(api.CachedRequest):
         os.remove(self._cachefile_path())
 
 
-def process_entries(cache_path, func, use_accesstime=None):
+def process_entries(cache_path, func, use_accesstime=None, output_func=None,
+                    action_func=None):
     """
     Check the contents of the cache.
 
@@ -251,8 +270,33 @@ def process_entries(cache_path, func, use_accesstime=None):
             pywikibot.exception(e, tb=True)
             continue
 
-        func(entry)
+        if func is None or func(entry):
+            if output_func or action_func is None:
+                if output_func is None:
+                    output = entry
+                else:
+                    output = output_func(entry)
+                if output is not None:
+                    pywikibot.output(output)
+            if action_func:
+                action_func(entry)
 
+
+def _parse_command(command, name):
+    obj = globals().get(command)
+    if callable(obj):
+        return obj
+    else:
+        try:
+            return eval('lambda entry: ' + command)
+        except:
+            pywikibot.exception()
+            pywikibot.error(
+                'Cannot compile {0} command: {1}'.format(name, command))
+            return None
+
+
+# Filter commands
 
 def has_password(entry):
     """Entry has a password in the entry."""
@@ -306,15 +350,33 @@ def recent(entry):
         return entry
 
 
+# Output commands
+
+def uniquedesc(entry):
+    """Return the unique description string."""
+    return entry._uniquedescriptionstr()
+
+
+def parameters(entry):
+    """Return a pretty formatted parameters list."""
+    lines = ''
+    for key, items in sorted(entry._params.items()):
+        lines += '{0}={1}\n'.format(key, ', '.join(items))
+    return lines
+
+
 def main():
     local_args = pywikibot.handleArgs()
     cache_paths = None
     delete = False
     command = None
+    output = None
 
     for arg in local_args:
         if command == '':
             command = arg
+        elif output == '':
+            output = arg
         elif arg == '-delete':
             delete = True
         elif arg == '-password':
@@ -324,13 +386,16 @@ def main():
                 pywikibot.error('Only one command may be executed.')
                 exit(1)
             command = ''
+        elif arg == '-o':
+            if output:
+                pywikibot.error('Only one output may be defined.')
+                exit(1)
+            output = ''
         else:
             if not cache_paths:
                 cache_paths = [arg]
             else:
                 cache_paths.append(arg)
-
-    func = None
 
     if not cache_paths:
         cache_paths = ['apicache', 'tests/apicache']
@@ -346,26 +411,30 @@ def main():
                 os.path.join(os.path.expanduser('~/.pywikibot'), 'apicache')]
 
     if delete:
-        action_func = lambda entry: entry._delete()
+        action_func = CacheEntry._delete
     else:
-        action_func = lambda entry: pywikibot.output(entry)
+        action_func = None
+
+    if output:
+        output_func = _parse_command(output, 'output')
+        if output_func is None:
+            return False
+    else:
+        output_func = None
 
     if command:
-        try:
-            command_func = eval('lambda entry: ' + command)
-        except:
-            pywikibot.exception()
-            pywikibot.error(u'Can not compile command: %s' % command)
-            exit(1)
-
-        func = lambda entry: command_func(entry) and action_func(entry)
+        filter_func = _parse_command(command, 'filter')
+        if filter_func is None:
+            return False
     else:
-        func = action_func
+        filter_func = None
 
     for cache_path in cache_paths:
         if len(cache_paths) > 1:
             pywikibot.output(u'Processing %s' % cache_path)
-        process_entries(cache_path, func)
+        process_entries(cache_path, filter_func, output_func=output_func,
+                        action_func=action_func)
+
 
 if __name__ == '__main__':
     main()
