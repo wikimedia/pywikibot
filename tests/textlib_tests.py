@@ -1088,6 +1088,10 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                'x', 'y', ['source'],
                                                site=self.site),
                          '<syntaxhighlight lang="xml">x</syntaxhighlight>')
+        self.assertEqual(textlib.replaceExcept('<includeonly>x</includeonly>',
+                                               'x', 'y', ['includeonly'],
+                                               site=self.site),
+                         '<includeonly>x</includeonly>')
         self.assertEqual(textlib.replaceExcept('<ref>x</ref>', 'x', 'y',
                                                ['ref'], site=self.site),
                          '<ref>x</ref>')
