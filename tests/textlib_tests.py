@@ -224,6 +224,14 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         new = textlib.replaceCategoryInPlace(temp, dummy, cats[3], site=self.site)
         self.assertEqual(self.old, new)
 
+        # Testing removing categories
+        temp = textlib.replaceCategoryInPlace(self.old, cats[0], None, site=self.site)
+        self.assertNotEqual(temp, self.old)
+        temp_cats = textlib.getCategoryLinks(temp, site=self.site)
+        self.assertNotIn(cats[0], temp_cats)
+        # First and third categories are the same
+        self.assertEqual([cats[1], cats[3]], temp_cats)
+
         new_cats = textlib.getCategoryLinks(new, site=self.site)
         self.assertEqual(cats, new_cats)
 
@@ -1225,6 +1233,17 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
                          set(['Site']))
         self.assertEqual(set(lang_links), self.sites_set - set([self.site]))
 
+
+class TestUnescape(TestCase):
+
+    """Test to verify that unescaping HTML chars are correctly done."""
+
+    net = False
+
+    def test_unescape(self):
+        """Test unescaping HTML chars."""
+        self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
+                         '!23<>\'"&&')
 
 if __name__ == '__main__':
     try:
