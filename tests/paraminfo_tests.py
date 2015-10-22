@@ -87,7 +87,15 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
 
     def test_watchlist_type(self):
         """Test watchlist type."""
-        known = ['edit', 'external', 'new', 'log']  # 'external' is likely new
+        known = ['edit', 'new', 'log']
+
+        _version = MediaWikiVersion(self.site.version())
+
+        if _version >= MediaWikiVersion('1.20'):
+            known.append('external')
+        if _version.version >= (1, 27):
+            if _version >= MediaWikiVersion('1.27.0-wmf.4') or _version.suffix == 'alpha':
+                known.append('categorize')
 
         self._check_param_values(self.site, 'query+watchlist', 'type', known)
 
@@ -110,10 +118,12 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         base = [
             'text/x-wiki',
             'text/javascript',
-            'application/json',
             'text/css',
             'text/plain',
         ]
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.24'):
+            base.append('application/json')
+
         self._check_param_values(self.site, 'edit', 'contentformat', base)
         self._check_param_values(self.site, 'parse', 'contentformat', base)
 
@@ -122,7 +132,6 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         base = [
             'wikitext',
             'javascript',
-            'json',
             'css',
             'text',
         ]
@@ -133,6 +142,9 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
             'Scribunto',
             'JsonSchema',
         ]
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.24'):
+            base.append('json')
+
         self._check_param_subset(self.site, 'edit', 'contentmodel', base)
         self._check_param_subset(self.site, 'parse', 'contentmodel', base)
 
