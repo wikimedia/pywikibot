@@ -889,6 +889,7 @@ class TestAlternateNamespaces(WikidataTestCase):
 
     """Test cases to test namespaces of Wikibase entities."""
 
+    cached = False
     dry = True
 
     @classmethod

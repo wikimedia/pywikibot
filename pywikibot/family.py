@@ -876,6 +876,9 @@ class Family(object):
         elif name == 'known_families':
             issue_deprecation_warning('known_families',
                                       'APISite.interwiki(prefix)', 2)
+        elif name == 'shared_data_repository':
+            issue_deprecation_warning('shared_data_repository',
+                                      'APISite.data_repository()', 2)
         return super(Family, self).__getattribute__(name)
 
     @staticmethod
@@ -1323,8 +1326,12 @@ class Family(object):
         """Return the shared image repository, if any."""
         return (None, None)
 
+    # Deprecated via __getattribute__
     def shared_data_repository(self, code, transcluded=False):
         """Return the shared Wikibase repository, if any."""
+        repo = pywikibot.Site(code, self).data_repository()
+        if repo is not None:
+            return repo.code, repo.family.name
         return (None, None)
 
     @deprecated("Site.server_time()")

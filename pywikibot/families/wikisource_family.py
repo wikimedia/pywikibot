@@ -124,7 +124,3 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sv': (u'/dok', ),
             'uk': (u'/документація', ),
         }
-
-    def shared_data_repository(self, code, transcluded=False):
-        """Return the shared data repository for this site."""
-        return ('wikidata', 'wikidata')
