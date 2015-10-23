@@ -171,7 +171,7 @@ badtitles = {
     'en': '',
     'fr': '.*(404|page|site).*en +travaux.*',
     'es': '.*sitio.*no +disponible.*',
-    'it': '((pagina|sito) (non trovata|inesistente)|accedi)',
+    'it': '((pagina|sito) (non trovat[ao]|inesistente)|accedi|errore)',
     'ru': u'.*(Страница|страница).*(не[ ]*найдена|осутствует).*',
 }
 
