@@ -27,7 +27,3 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = ['es', 'ru', ]
-
-    def shared_data_repository(self, code, transcluded=False):
-        """Return the shared data repository for this site."""
-        return ('wikidata', 'wikidata')

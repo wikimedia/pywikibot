@@ -59,6 +59,7 @@ from pywikibot.exceptions import (
     CascadeLockedPage,
     LockedNoPage,
     NoPage,
+    SiteDefinitionError,
     UnknownSite,
     UnknownExtension,
     FamilyMaintenanceWarning,
@@ -2639,14 +2640,12 @@ class APISite(BaseSite):
     @property
     def has_data_repository(self):
         """Return True if site has a shared data repository like Wikidata."""
-        code, fam = self.shared_data_repository()
-        return bool(code or fam)
+        return self.data_repository() is not None
 
     @property
     def has_transcluded_data(self):
         """Return True if site has a shared data repository like Wikidata."""
-        code, fam = self.shared_data_repository(True)
-        return bool(code or fam)
+        return self.data_repository() is not None
 
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
@@ -2655,18 +2654,40 @@ class APISite(BaseSite):
             return pywikibot.Site(code, fam, self.username())
 
     def data_repository(self):
-        """Return Site object for data repository e.g. Wikidata."""
-        code, fam = self.shared_data_repository()
-        if bool(code or fam):
-            return pywikibot.Site(code, fam, self.username(),
-                                  interface="DataSite")
+        """
+        Return the data repository connected to this site.
+
+        @return: The data repository if one is connected or None otherwise.
+        @rtype: DataSite or None
+        """
+        def handle_warning(mod, warning):
+            return (mod == 'query' and
+                    warning == "Unrecognized value for parameter 'meta': "
+                               "wikibase")
+
+        req = self._simple_request(action='query', meta='wikibase')
+        req._warning_handler = handle_warning
+        data = req.submit()
+        if 'query' in data and 'wikibase' in data['query']:
+            data = data['query']['wikibase']['repo']['url']
+            url = data['base'] + data['scriptpath'] + '/index.php'
+            try:
+                return pywikibot.Site(url=url, user=self.username(),
+                                      interface='DataSite')
+            except SiteDefinitionError as e:
+                pywikibot.warning('Site "{0}" supports wikibase at "{1}", but '
+                                  'creation failed: {2}.'.format(self, url, e))
+                return None
+        else:
+            assert 'warnings' in data
+            return None
 
     def is_image_repository(self):
         """Return True if Site object is the image repository."""
         return self is self.image_repository()
 
     def is_data_repository(self):
-        """Return True if Site object is the data repository."""
+        """Return True if its data repository is itself."""
         return self is self.data_repository()
 
     def nice_get_address(self, title):

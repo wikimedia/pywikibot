@@ -449,7 +449,20 @@ class DrySite(pywikibot.site.APISite):
 
     def data_repository(self):
         """Return Site object for data repository e.g. Wikidata."""
-        code, fam = self.shared_data_repository()
+        if self.hostname().endswith('.beta.wmflabs.org'):
+            # TODO: Use definition for beta cluster's wikidata
+            code, fam = None, None
+            fam_name = self.hostname().split('.')[-4]
+        else:
+            code, fam = 'wikidata', 'wikidata'
+            fam_name = self.family.name
+
+        # Only let through valid entries
+        if fam_name not in ('commons', 'wikibooks', 'wikidata', 'wikinews',
+                            'wikipedia', 'wikiquote', 'wikisource',
+                            'wikivoyage'):
+            code, fam = None, None
+
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username(),
                                   interface=DryDataSite)

@@ -906,9 +906,8 @@ class TestCase(TestTimerMixin, TestCaseBase):
             cls.sites = {}
 
         # If the test is not cached, create new Site objects for this class
-        if not hasattr(cls, 'cached') or not cls.cached:
-            orig_sites = pywikibot._sites
-            pywikibot._sites = {}
+        cm = cls._uncached()
+        cm.__enter__()
 
         interface = None  # defaults to 'APISite'
         dry = hasattr(cls, 'dry') and cls.dry
@@ -933,13 +932,22 @@ class TestCase(TestTimerMixin, TestCaseBase):
                     # without a mapping to a hostname.
                     pass
 
-        if not hasattr(cls, 'cached') or not cls.cached:
-            pywikibot._sites = orig_sites
+        cm.__exit__(None, None, None)
 
         if len(cls.sites) == 1:
             key = next(iter(cls.sites.keys()))
             if 'site' in cls.sites[key]:
                 cls.site = cls.sites[key]['site']
+
+    @classmethod
+    @contextmanager
+    def _uncached(cls):
+        if not hasattr(cls, 'cached') or not cls.cached:
+            orig_sites = pywikibot._sites
+            pywikibot._sites = {}
+        yield
+        if not hasattr(cls, 'cached') or not cls.cached:
+            pywikibot._sites = orig_sites
 
     @classmethod
     def get_site(cls, name=None):
@@ -1259,23 +1267,24 @@ class WikibaseTestCase(TestCase):
         """
         super(WikibaseTestCase, cls).setUpClass()
 
-        for data in cls.sites.values():
-            if 'site' not in data:
-                continue
+        with cls._uncached():
+            for data in cls.sites.values():
+                if 'site' not in data:
+                    continue
 
-            site = data['site']
-            if not site.has_data_repository:
-                raise unittest.SkipTest(
-                    u'%s: %r does not have data repository'
-                    % (cls.__name__, site))
+                site = data['site']
+                if not site.has_data_repository:
+                    raise unittest.SkipTest(
+                        u'%s: %r does not have data repository'
+                        % (cls.__name__, site))
 
-            if (hasattr(cls, 'repo') and
-                    cls.repo != site.data_repository()):
-                raise Exception(
-                    '%s: sites do not all have the same data repository'
-                    % cls.__name__)
+                if (hasattr(cls, 'repo') and
+                        cls.repo != site.data_repository()):
+                    raise Exception(
+                        '%s: sites do not all have the same data repository'
+                        % cls.__name__)
 
-            cls.repo = site.data_repository()
+                cls.repo = site.data_repository()
 
     @classmethod
     def get_repo(cls):

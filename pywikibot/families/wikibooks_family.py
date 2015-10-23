@@ -141,7 +141,3 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'pl': self.alphabetic,
             'simple': self.alphabetic
         }
-
-    def shared_data_repository(self, code, transcluded=False):
-        """Return the shared data repository for this family."""
-        return ('wikidata', 'wikidata')
