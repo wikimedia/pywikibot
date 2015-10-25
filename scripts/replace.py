@@ -144,6 +144,12 @@ import time
 import sys
 import warnings
 
+if sys.version_info[0] > 2:
+    from queue import Queue
+    long = int
+else:
+    from Queue import Queue
+
 import pywikibot
 
 from pywikibot import i18n, textlib, pagegenerators, Bot
@@ -541,6 +547,7 @@ class ReplaceRobot(Bot):
         self.sleep = sleep
         self.summary = summary
         self.changed_pages = 0
+        self._pending_processed_titles = Queue()
 
     def isTitleExcepted(self, title, exceptions=None):
         """
@@ -630,11 +637,14 @@ class ReplaceRobot(Bot):
             new_text = self.apply_replacements(original_text, set(), page=page)
         return new_text
 
-    def count_changes(self, page, err):  # pylint: disable=unused-argument
-        """Count succesfully changed pages."""
+    def _count_changes(self, page, err):
+        """Count succesfully changed pages; log changed titles for display."""
         # This is an async put callback
         if not isinstance(err, Exception):
             self.changed_pages += 1
+            self._pending_processed_titles.put((page.title(asLink=True), True))
+        else:  # unsuccessful pages
+            self._pending_processed_titles.put((page.title(asLink=True), False))
 
     def generate_summary(self, applied_replacements):
         """Generate a summary message for the replacements."""
@@ -743,13 +753,20 @@ class ReplaceRobot(Bot):
                 if choice == 'a':
                     self.options['always'] = True
                 if choice == 'y':
-                    page.put_async(new_text, self.generate_summary(applied),
-                                   callback=self.count_changes)
+                    page.text = new_text
+                    page.save(self.generate_summary(applied), async=True,
+                              callback=self._count_changes, quiet=True)
+                while not self._pending_processed_titles.empty():
+                    proc_title, res = self._pending_processed_titles.get()
+                    pywikibot.output('Page %s%s saved'
+                                     % (proc_title, '' if res else ' not'))
                 # choice must be 'N'
                 break
             if self.getOption('always') and new_text != original_text:
                 try:
-                    page.put(new_text, self.generate_summary(applied), callback=self.count_changes)
+                    page.text = new_text
+                    page.save(self.generate_summary(applied),
+                              callback=self._count_changes, quiet=True)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
                                      % (page.title(),))
@@ -763,6 +780,11 @@ class ReplaceRobot(Bot):
                 except pywikibot.PageNotSaved as error:
                     pywikibot.output(u'Error putting page: %s'
                                      % (error.args,))
+                if self._pending_processed_titles.qsize() > 50:
+                    while not self._pending_processed_titles.empty():
+                        proc_title, res = self._pending_processed_titles.get()
+                        pywikibot.output('Page %s%s saved'
+                                         % (proc_title, '' if res else ' not'))
 
 
 def prepareRegexForMySQL(pattern):
