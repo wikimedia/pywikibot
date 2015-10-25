@@ -1086,6 +1086,10 @@ class checkImagesBot(object):
         if not rep_text:
             rep_text = self.rep_text
 
+        if addings:
+            # Adding the name of the image in the report if not done already
+            rep_text = rep_text % image_to_report
+
         another_page = pywikibot.Page(self.site, rep_page)
         try:
             text_get = another_page.get()
@@ -1120,9 +1124,6 @@ class checkImagesBot(object):
             reported = False
         else:
             # Adding the log
-            if addings:
-                # Adding the name of the image in the report if not done already
-                rep_text = rep_text % image_to_report
             another_page.put(text_get + rep_text, summary=com, force=True,
                              minorEdit=False)
             pywikibot.output(u"...Reported...")
