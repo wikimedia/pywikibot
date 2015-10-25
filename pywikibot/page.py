@@ -1124,18 +1124,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
             raise pywikibot.OtherPageSaveError(
                 self, "Editing restricted by {{bots}} template")
         if async:
-            pywikibot.async_request(self._save, summary=summary, minor=minor,
-                                    watch=watch, botflag=botflag,
+            pywikibot.async_request(self._save, summary=summary, watch=watch,
+                                    minor=minor, botflag=botflag,
                                     async=async, callback=callback,
                                     cc=apply_cosmetic_changes,
                                     quiet=quiet, **kwargs)
         else:
-            self._save(summary=summary, minor=minor, watch=watch,
+            self._save(summary=summary, watch=watch, minor=minor,
                        botflag=botflag, async=async, callback=callback,
-                       cc=apply_cosmetic_changes, **kwargs)
+                       cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
-    def _save(self, summary, minor, watch, botflag, async, callback,
-              cc, quiet=False, **kwargs):
+    def _save(self, summary=None, watch=None, minor=True, botflag=None,
+              async=False, callback=None, cc=None, quiet=False, **kwargs):
         """Helper function for save()."""
         err = None
         link = self.title(asLink=True)
