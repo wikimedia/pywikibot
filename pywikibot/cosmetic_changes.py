@@ -712,7 +712,7 @@ class CosmeticChangesToolkit(object):
                 https_url = self.site.base_url(suffix, 'https')
             # compare strings without the protocol, if they are empty support
             # also no prefix (//en.wikipedia.org/…)
-            if http_url[4:] == https_url[5:]:
+            if https_url is not None and http_url[4:] == https_url[5:]:
                 urls = ['(?:https?:)?' + re.escape(http_url[5:])]
             else:
                 urls = [re.escape(url) for url in (http_url, https_url)
