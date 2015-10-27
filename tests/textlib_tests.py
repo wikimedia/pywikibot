@@ -953,7 +953,7 @@ class TestLocalDigits(TestCase):
     net = False
 
     def test_to_local(self):
-        """Test converting Arabic digits to local digits."""
+        """Test converting Latin digits to local digits."""
         self.assertEqual(textlib.to_local_digits(299792458, 'en'), 299792458)
         self.assertEqual(
             textlib.to_local_digits(299792458, 'fa'), u"۲۹۹۷۹۲۴۵۸")
