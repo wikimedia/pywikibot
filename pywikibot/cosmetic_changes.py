@@ -50,7 +50,7 @@ or by adding a list to the given one:
 """
 #
 # (C) xqt, 2009-2015
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -854,7 +854,7 @@ class CosmeticChangesToolkit(object):
 
     def fixArabicLetters(self, text):
         if self.site.code not in ['ckb', 'fa']:
-            return
+            return text
         exceptions = [
             'gallery',
             'file',
@@ -880,11 +880,11 @@ class CosmeticChangesToolkit(object):
         faChrs = u'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
         new = digits.pop(self.site.code)
         # This only works if there are only two items in digits dict
-        old = digits[digits.keys()[0]]
+        old = digits[list(digits.keys())[0]]
         # not to let bot edits in latin content
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
                                      % {'fa': faChrs}))
-        text = textlib.replaceExcept(text, u',', u'،', exceptions)
+        text = textlib.replaceExcept(text, ',', '،', exceptions, site=self.site)
         if self.site.code == 'ckb':
             text = textlib.replaceExcept(text,
                                          '\u0647([.\u060c_<\\]\\s])',

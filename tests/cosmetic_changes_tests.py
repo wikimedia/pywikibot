@@ -214,6 +214,12 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('42&nbsp;°C',
                          self.cct.fixTypo('42 ºC'))
 
+    def test_fixArabicLetters(self):
+        """Test fixArabicLetters."""
+        text = '1234,كىي'
+        # fixArabicLetters must not change text when site is not fa or ckb
+        self.assertEqual(text, self.cct.fixArabicLetters(text))
+
 
 class TestLiveCosmeticChanges(TestCosmeticChanges):
 
@@ -286,6 +292,21 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('{{Belege fehlen|Test}}',
                          self.cct.replaceDeprecatedTemplates('{{Quelle|Test}}'))
 
+
+class TestCosmeticChangesPersian(TestCosmeticChanges):
+
+    """Test cosmetic changes methods in Persian Wikipedia."""
+
+    family = 'wikipedia'
+    code = 'fa'
+
+    def test_fixArabicLetters(self):
+        """Test fixArabicLetters."""
+        self.assertEqual(self.cct.fixArabicLetters('A,b,ا,۴,'),
+                         'A,b،ا،۴،')
+        self.assertEqual(self.cct.fixArabicLetters('كي'),
+                         'کی')
+        # Once numbering fixes are enabled we can add tests.
 
 if __name__ == '__main__':
     try:
