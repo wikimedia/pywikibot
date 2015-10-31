@@ -4122,7 +4122,7 @@ class APISite(BaseSite):
         """Iterate Pages that contain links to the given URL.
 
         @param url: The URL to search for (without the protocol prefix);
-            this many include a '*' as a wildcard, only at the start of the
+            this may include a '*' as a wildcard, only at the start of the
             hostname
         @param protocol: The protocol prefix (default: "http")
 

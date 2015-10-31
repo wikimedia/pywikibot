@@ -2054,13 +2054,17 @@ def RandomRedirectPageGenerator(total=10, site=None):
         yield page
 
 
-@deprecated_args(euprotocol='protocol')
-def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
+@deprecated_args(link='url', euprotocol='protocol')
+def LinksearchPageGenerator(url, namespaces=None, step=None, total=None,
                             site=None, protocol='http'):
-    """Yield all pages that include a specified link.
+    """Yield all pages that link to a certain URL, like Special:Linksearch.
 
-    Obtains data from [[Special:Linksearch]].
-
+    @param url: The URL to search for (without the protocol prefix);
+            this may include a '*' as a wildcard, only at the start of the
+            hostname
+    @type url: str
+    @param namespaces: list of namespace numbers to fetch contribs from
+    @type namespaces: list of int
     @param step: Maximum number of pages to retrieve per API query
     @type step: int
     @param total: Maxmum number of pages to retrieve in total
@@ -2070,7 +2074,7 @@ def LinksearchPageGenerator(link, namespaces=None, step=None, total=None,
     """
     if site is None:
         site = pywikibot.Site()
-    return site.exturlusage(link, namespaces=namespaces, protocol=protocol,
+    return site.exturlusage(url, namespaces=namespaces, protocol=protocol,
                             step=step, total=total, content=False)
 
 
