@@ -129,6 +129,7 @@ script_test_modules = [
     'script',
     'l10n',
     'archivebot',
+    'category_bot',
     'checkimages',
     'data_ingestion',
     'deletionbot',

@@ -542,13 +542,18 @@ class CategoryMoveRobot(object):
         if self.newcat and self.move_oldcat:
             if self.can_move_cats:
                 if can_move_page:
-                    oldcattitle = self.oldcat.title()
+                    old_cat_title = self.oldcat.title()
+                    old_cat_text = self.oldcat.text
                     self.newcat = self.oldcat.move(self.newcat.title(),
                                                    reason=self.comment,
                                                    movetalkpage=can_move_talk)
+                    # Copy over the article text so it can be stripped of
+                    # CFD templates and re-saved. This is faster than
+                    # reloading the article in place.
+                    self.newcat.text = old_cat_text
                     self._strip_cfd_templates()
                     self.oldcat = pywikibot.Category(self.oldcat.site,
-                                                     oldcattitle)
+                                                     old_cat_title)
             else:
                 if can_move_page:
                     self._movecat()
@@ -657,11 +662,11 @@ class CategoryMoveRobot(object):
         comma = self.site.mediawiki_message('comma-separator')
         authors = comma.join(self.oldcat.contributingUsers())
         template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
-        comment = i18n.twtranslate(self.site, 'category-renamed', template_vars)
+        summary = i18n.twtranslate(self.site, 'category-renamed', template_vars)
         self.newcat.text = self.oldcat.text
-        self._strip_cfd_templates(comment)
+        self._strip_cfd_templates(summary)
 
-    def _strip_cfd_templates(self, comment=None):
+    def _strip_cfd_templates(self, summary=None, commit=True):
         """Private function to strip out CFD templates from the new category.
 
         The new category is saved.
@@ -669,7 +674,8 @@ class CategoryMoveRobot(object):
         Do not use this function from outside the class.
         """
         # Remove all substed CFD templates
-        REGEX = r"<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->"
+        REGEX = (r'<!--\s*BEGIN CFD TEMPLATE\s*-->.*?'
+                 r'<!--\s*END CFD TEMPLATE\s*-->\n?')
         match = re.compile(REGEX,
                            re.IGNORECASE | re.MULTILINE | re.DOTALL)
         self.newcat.text = match.sub('', self.newcat.text)
@@ -680,10 +686,11 @@ class CategoryMoveRobot(object):
             self.newcat.text = match.sub('', self.newcat.text)
         # Remove leading whitespace
         self.newcat.text = self.newcat.text.lstrip()
-        if not comment:
-            comment = i18n.twtranslate(self.site,
+        if not summary:
+            summary = i18n.twtranslate(self.site,
                                        'category-strip-cfd-templates')
-        self.newcat.save(comment)
+        if commit:
+            self.newcat.save(summary=summary)
 
     def _movetalk(self):
         """Private function to move the category talk page.
