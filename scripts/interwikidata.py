@@ -79,7 +79,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         self.iwlangs = pywikibot.textlib.getLanguageLinks(
             self.current_page.text, insite=self.current_page.site)
         if not self.iwlangs:
-            output('No interlanguagelinks on {page}'.fromat(
+            output('No interlanguagelinks on {page}'.format(
                 page=self.current_page.title(asLink=True)))
             return False
         try:
