@@ -4410,6 +4410,27 @@ class Claim(Property):
         else:
             self.qualifiers[qualifier.getID()] = [qualifier]
 
+    def removeQualifier(self, qualifier, **kwargs):
+        """
+        Remove the qualifier.  Calls removeQualifiers().
+
+        @param qualifier: the qualifier to remove
+        @type qualifier: Claim
+        """
+        self.removeQualifiers([qualifier], **kwargs)
+
+    def removeQualifiers(self, qualifiers, **kwargs):
+        """
+        Remove the qualifiers.
+
+        @param qualifiers: the qualifiers to remove
+        @type qualifiers: list Claim
+        """
+        data = self.repo.remove_qualifiers(self, qualifiers, **kwargs)
+        self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+        for qualifier in qualifiers:
+            self.qualifiers[qualifier.getID()].remove(qualifier)
+
     def target_equals(self, value):
         """
         Check whether the Claim's target is equal to specified value.

@@ -7060,7 +7060,7 @@ class DataSite(APISite):
         """
         Remove claims.
 
-        @param claims: Claims to be added
+        @param claims: Claims to be removed
         @type claims: list of Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
@@ -7116,6 +7116,38 @@ class DataSite(APISite):
 
         params['statement'] = claim.snak
         params['references'] = '|'.join(source.hash for source in sources)
+        params['token'] = self.tokens['edit']
+
+        req = self._simple_request(**params)
+        data = req.submit()
+        return data
+
+    @must_be(group='user')
+    def remove_qualifiers(self, claim, qualifiers,
+                          bot=True, summary=None, baserevid=None):
+        """
+        Remove qualifiers.
+
+        @param claim: A Claim object to remove the qualifier from
+        @type claim: Claim
+        @param qualifiers: Claim objects currently used as a qualifiers
+        @type qualifiers: list of Claim
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
+        @param summary: Edit summary
+        @type summary: str
+        @param baserevid: Base revision id override, used to detect conflicts.
+            When omitted, revision of claim.on_item is used. DEPRECATED.
+        @type baserevid: long
+        """
+        params = dict(action='wbremovequalifiers',
+                      claim=claim.snak,
+                      baserevid=self._get_baserevid(claim, baserevid),
+                      summary=summary,
+                      bot=bot,
+                      )
+
+        params['qualifiers'] = [qualifier.hash for qualifier in qualifiers]
         params['token'] = self.tokens['edit']
 
         req = self._simple_request(**params)

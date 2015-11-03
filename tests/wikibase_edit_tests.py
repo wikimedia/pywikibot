@@ -172,6 +172,81 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertEqual(new_item.getRedirectTarget(), target_item)
 
 
+class TestWikibaseRemoveQualifier(WikibaseTestCase):
+
+    """Run wikibase write tests to remove qualifiers."""
+
+    family = 'wikidata'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def setUp(self):
+        """Add a claim with two qualifiers."""
+        super(TestWikibaseRemoveQualifier, self).setUp()
+        testsite = self.get_repo()
+        item = pywikibot.ItemPage(testsite, 'Q68')
+        item.get()
+        # Create claim with qualifier
+        if 'P115' in item.claims:
+            item.removeClaims(item.claims['P115'])
+
+        claim = pywikibot.page.Claim(testsite, 'P115', datatype='wikibase-item')
+        target = pywikibot.ItemPage(testsite, 'Q271')
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        item.get(force=True)
+
+        qual_1 = pywikibot.page.Claim(testsite, 'P88', isQualifier=True)
+        qual_1.setTarget(pywikibot.WbTime(year=2012))
+        item.claims['P115'][0].addQualifier(qual_1)
+
+        qual_2 = pywikibot.page.Claim(testsite, 'P580', isQualifier=True)
+        qual_2.setTarget(pywikibot.ItemPage(testsite, 'Q67'))
+        item.claims['P115'][0].addQualifier(qual_2)
+
+    def test_remove_single(self):
+        """Test adding a claim with two qualifiers, then removing one."""
+        self.setUp()
+        testsite = self.get_repo()
+        item = pywikibot.ItemPage(testsite, 'Q68')
+        item.get(force=True)
+
+        # Remove qualifier
+        claim = item.claims['P115'][0]
+        qual_3 = claim.qualifiers[u'P580'][0]
+        claim.removeQualifier(qual_3)
+
+        # Check P580 qualifier removed but P88 qualifier remains
+        item = pywikibot.ItemPage(testsite, 'Q68')
+        item.get(force=True)
+        claim = item.claims['P115'][0]
+        self.assertNotIn('P580', claim.qualifiers.keys())
+        self.assertIn('P88', claim.qualifiers.keys())
+
+    def test_remove_multiple(self):
+        """Test adding a claim with two qualifiers, then removing both."""
+        self.setUp()
+        testsite = self.get_repo()
+        item = pywikibot.ItemPage(testsite, 'Q68')
+        item.get(force=True)
+
+        # Remove qualifiers
+        item.get(force=True)
+        claim = item.claims['P115'][0]
+        qual_3 = claim.qualifiers[u'P580'][0]
+        qual_4 = claim.qualifiers[u'P88'][0]
+        claim.removeQualifiers([qual_3, qual_4])
+
+        # Check P580 and P88 qualifiers are removed
+        item = pywikibot.ItemPage(testsite, 'Q68')
+        item.get(force=True)
+        claim = item.claims['P115'][0]
+        self.assertNotIn('P580', claim.qualifiers.keys())
+        self.assertNotIn('P88', claim.qualifiers.keys())
+
 if __name__ == '__main__':
     try:
         unittest.main()
