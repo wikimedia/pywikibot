@@ -506,9 +506,9 @@ class MetaTestArgSpec(MetaTestCaseClass):
                 self.assertNoDeprecation()
             return test_method
 
-        for name, tested_method in list(dct.items()):
-            if name.startswith('_method_test_'):
-                suffix = name[len('_method_test_'):]
+        for attr, tested_method in list(dct.items()):
+            if attr.startswith('_method_test_'):
+                suffix = attr[len('_method_test_'):]
                 cls.add_method(dct, 'test_method_' + suffix,
                                create_test(tested_method),
                                doc_suffix='on {0}'.format(suffix))
