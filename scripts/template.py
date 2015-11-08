@@ -118,14 +118,16 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators, textlib, Bot
 
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
+from pywikibot.tools import deprecated
 
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
+@deprecated('XMLDumpPageGenerator')
 class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
 
     """
@@ -220,20 +222,9 @@ class TemplateRobot(ReplaceBot):
 
         replacements = []
         exceptions = {}
-        namespace = self.site.namespaces[10]
+        builder = textlib._MultiTemplateMatchBuilder(site)
         for old, new in self.templates.items():
-            if namespace.case == 'first-letter':
-                pattern = '[' + \
-                          re.escape(old[0].upper()) + \
-                          re.escape(old[0].lower()) + \
-                          ']' + re.escape(old[1:])
-            else:
-                pattern = re.escape(old)
-            pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-            templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespace) +
-                                       r':|[mM][sS][gG]:)?' + pattern +
-                                       r'(?P<parameters>\s*\|.+?|) *}}',
-                                       re.DOTALL)
+            templateRegex = builder.pattern(old)
 
             if self.getOption('subst') and self.getOption('remove'):
                 replacements.append((templateRegex,
@@ -344,9 +335,14 @@ def main(*args):
         oldTemplates.append(oldTemplate)
 
     if xmlfilename:
-        gen = XmlDumpTemplatePageGenerator(oldTemplates, xmlfilename)
+        builder = textlib._MultiTemplateMatchBuilder(site)
+        predicate = builder.search_any_predicate(oldTemplates)
+
+        gen = XmlDumpTemplatePageGenerator(
+            xmlfilename, site=site, text_predicate=predicate)
     else:
         gen = genFactory.getCombinedGenerator()
+
     if not gen:
         gens = [
             pagegenerators.ReferringPageGenerator(t, onlyTemplateInclusion=True)

@@ -42,6 +42,7 @@ from pywikibot.tools import (
     deprecated,
     DeprecatedRegex,
     OrderedDict,
+    StringTypes,
     UnicodeType,
     issue_deprecation_warning
 )
@@ -142,6 +143,52 @@ def unescape(s):
     s = s.replace("&quot;", '"')
     s = s.replace("&amp;", "&")  # Must be last
     return s
+
+
+class _MultiTemplateMatchBuilder(object):
+
+    """Build template matcher."""
+
+    def __init__(self, site):
+        """Constructor."""
+        self.site = site
+
+    def pattern(self, template, flags=re.DOTALL):
+        """Return a compiled regex to match template."""
+        # TODO: add ability to also match contents within the template
+        # TODO: add option for template to be None to match any template
+        # TODO: use NESTED_TEMPLATE_REGEX with <parameters> instead of <params>
+        namespace = self.site.namespaces[10]
+        if isinstance(template, pywikibot.Page):
+            if template.namespace() == 10:
+                old = template.title(withNamespace=False)
+            else:
+                raise ValueError(
+                    '{0} is not a template Page object'.format(template))
+        elif isinstance(template, StringTypes):
+            old = template
+        else:
+            raise ValueError(
+                '{0!r} is not a valid template'.format(template))
+
+        if namespace.case == 'first-letter':
+            pattern = '[' + \
+                      re.escape(old[0].upper()) + \
+                      re.escape(old[0].lower()) + \
+                      ']' + re.escape(old[1:])
+        else:
+            pattern = re.escape(old)
+        pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
+        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespace) +
+                                   r':|[mM][sS][gG]:)?' + pattern +
+                                   r'(?P<parameters>\s*\|.+?|) *}}',
+                                   flags)
+        return templateRegex
+
+    def search_any_predicate(self, templates):
+        """Return a predicate that matches any template."""
+        predicates = [self.pattern(template).search for template in templates]
+        return lambda text: any(predicate(text) for predicate in predicates)
 
 
 def _create_default_regexes():
