@@ -93,7 +93,7 @@ from pywikibot.tools.formatter import color_format
 if sys.version_info[0] > 2:
     import _thread as thread
 else:
-    import thread
+    import thread  # noqa: H237: module does not exist in Python 3
 
 
 bot_config = {
