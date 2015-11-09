@@ -91,7 +91,6 @@ __version__ = '$Id$'
 
 import re
 import time
-import sys
 
 import pywikibot
 
@@ -100,10 +99,7 @@ from pywikibot import i18n
 
 from pywikibot.exceptions import NotEmailableError
 from pywikibot.family import Family
-from pywikibot.tools import deprecated
-
-if sys.version_info[0] > 2:
-    basestring = (str, )
+from pywikibot.tools import deprecated, StringTypes
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
@@ -337,26 +333,6 @@ report_page = {
     'zh': u'User:Alexsh/checkimagereport',
 }
 
-# Adding the date after the signature.
-timeselected = u' ~~~~~'
-
-# The text added in the report
-report_text = {
-    'commons': u"\n*[[:File:%s]] " + timeselected,
-    'ar': u"\n*[[:ملف:%s]] " + timeselected,
-    'de': u"\n*[[:Datei:%s]] " + timeselected,
-    'en': u"\n*[[:File:%s]] " + timeselected,
-    'fa': u"n*[[:پرونده:%s]] " + timeselected,
-    'ga': u"\n*[[:File:%s]] " + timeselected,
-    'hu': u"\n*[[:Kép:%s]] " + timeselected,
-    'it': u"\n*[[:File:%s]] " + timeselected,
-    'ja': u"\n*[[:File:%s]] " + timeselected,
-    'ko': u"\n*[[:그림:%s]] " + timeselected,
-    'ta': u"\n*[[:படிமம்:%s]] " + timeselected,
-    'ur': u"\n*[[:تصویر:%s]] " + timeselected,
-    'zh': u"\n*[[:File:%s]] " + timeselected,
-}
-
 # The summary of the report
 msg_comm10 = {
     'commons': u'Bot: Updating the log',
@@ -575,11 +551,13 @@ class checkImagesBot(object):
         self.logFullError = logFullError
         self.logFulNumber = logFulNumber
         self.rep_page = i18n.translate(self.site, report_page)
-        self.rep_text = i18n.translate(self.site, report_text)
+        self.rep_text = '\n* [[:{0}:%s]] ~~~~~'.format(
+            self.site.namespaces.FILE.custom_name)
         self.com = i18n.translate(self.site, msg_comm10)
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
-        self.hiddentemplates = set([pywikibot.Page(self.site, tmp)
-                                    for tmp in hiddentemplatesRaw])
+        self.hiddentemplates = set(
+            [pywikibot.Page(self.site, tmp, ns=self.site.namespaces.TEMPLATE)
+             for tmp in hiddentemplatesRaw])
         self.pageHidden = i18n.translate(self.site, PageWithHiddenTemplates)
         self.pageAllowed = i18n.translate(self.site, PageWithAllowedTemplates)
         self.comment = i18n.twtranslate(self.site.lang,
@@ -721,7 +699,7 @@ class checkImagesBot(object):
             pywikibot.output(
                 u"Seems that %s has only the description and not the file..."
                 % self.image_to_report)
-            repme = u"\n*[[:File:%s]] problems '''with the APIs'''"
+            repme = "\n* [[:File:%s]] problems '''with the APIs'''"
             self.report_image(self.image_to_report, self.rep_page, self.com,
                               repme)
             return
@@ -866,7 +844,7 @@ class checkImagesBot(object):
     @deprecated('Page.revision_count()')
     def countEdits(self, pagename, userlist):
         """Function to count the edit of a user or a list of users in a page."""
-        if isinstance(userlist, basestring):
+        if isinstance(userlist, StringTypes):
             userlist = [userlist]
         page = pywikibot.Page(self.site, pagename)
         return page.revision_count(userlist)
@@ -914,8 +892,8 @@ class checkImagesBot(object):
             # It's not only on commons but the image needs a check
             # the second usually is a url or something like that.
             # Compare the two in equal way, both url.
-            repme = (u"\n*[[:File:%s]] is also on '''Commons''': "
-                     u"[[commons:File:%s]]"
+            repme = ("\n* [[:File:%s]] is also on '''Commons''': "
+                     "[[commons:File:%s]]"
                      % (self.imageName,
                         commons_image_with_this_hash.title(
                             withNamespace=False)))
@@ -1050,18 +1028,18 @@ class checkImagesBot(object):
 
             if self.duplicatesReport or only_report:
                 if only_report:
-                    repme = (u"\n*[[:File:%s]] has the following duplicates "
-                             u"('''forced mode'''):"
+                    repme = ('\n* [[:File:%s]] has the following duplicates '
+                             "('''forced mode'''):"
                              % self.image.title(asUrl=True))
                 else:
-                    repme = (u"\n*[[:File:%s]] has the following duplicates:"
+                    repme = ('\n* [[:File:%s]] has the following duplicates:'
                              % self.image.title(asUrl=True))
 
                 for dup_page in duplicates:
                     if dup_page.title(asUrl=True) == self.image.title(asUrl=True):
                         # the image itself, not report also this as duplicate
                         continue
-                    repme += u"\n**[[:File:%s]]" % dup_page.title(asUrl=True)
+                    repme += '\n** [[:File:%s]]' % dup_page.title(asUrl=True)
 
                 result = self.report_image(self.imageName, self.rep_page,
                                            self.com, repme, addings=False)
@@ -1098,7 +1076,19 @@ class checkImagesBot(object):
         except pywikibot.IsRedirectPage:
             text_get = another_page.getRedirectTarget().get()
 
-        if len(text_get) >= self.logFulNumber:
+        # Don't care for differences inside brackets.
+        end = rep_text.find('(', max(0, rep_text.find(']]')))
+        if end < 0:
+            end = None
+        short_text = rep_text[rep_text.find('[['):end].strip()
+
+        reported = True
+        # Skip if the message is already there.
+        if short_text in text_get:
+            pywikibot.output(u"%s is already in the report page."
+                             % image_to_report)
+            reported = False
+        elif len(text_get) >= self.logFulNumber:
             if self.logFullError:
                 raise LogIsFull(
                     u"The log page (%s) is full! Please delete the old files "
@@ -1110,24 +1100,11 @@ class checkImagesBot(object):
                 # Don't report, but continue with the check
                 # (we don't now if this is the first time we check this file
                 # or not)
-                return True
-
-        # Skip if the message is already there.
-        # Don't care for differences inside brackets.
-        end = rep_text.find('(', max(0, rep_text.find(']]')))
-        if end < 0:
-            end = None
-        short_text = rep_text[:end].strip()
-        if short_text in text_get:
-            pywikibot.output(u"%s is already in the report page."
-                             % image_to_report)
-            reported = False
         else:
             # Adding the log
             another_page.put(text_get + rep_text, summary=com, force=True,
                              minorEdit=False)
             pywikibot.output(u"...Reported...")
-            reported = True
         return reported
 
     def takesettings(self):
@@ -1343,7 +1320,7 @@ class checkImagesBot(object):
                 self.some_problem = False
         else:
             if not self.seems_ok and self.license_found:
-                rep_text_license_fake = u"\n*[[:File:%s]] seems to have " \
+                rep_text_license_fake = u"\n* [[:File:%s]] seems to have " \
                                         % self.imageName + \
                     "a ''fake license'', license detected: <nowiki>%s</nowiki>" \
                                         % self.license_found
