@@ -107,16 +107,29 @@ class i18nBot(object):
         if 'en' not in keys:
             print('WARNING: "en" key missing for message %s' % newmsg)
 
-    def run(self):
-        """Run the bot, read the messages from source and print the dict."""
+    def run(self, quiet=False):
+        """
+        Run the bot, read the messages from source and print the dict.
+
+        @param quiet: print the result if False
+        @type quiet: bool
+        """
         for item in self.messages.items():
             self.read(*item)
-        self.print_all()
+        if not quiet:
+            self.print_all()
 
-    def to_json(self):
-        """Run the bot and create json files."""
+    def to_json(self, quiet=True):
+        """
+        Run the bot and create json files.
+
+        @param quiet: Print the result if False
+        @type quiet: bool
+        """
+        IDENT = 4
+
         if not self.dict:
-            self.run()
+            self.run(quiet)
         json_dir = os.path.join(
             config.base_dir, 'scripts/i18n', self.scriptname)
         if not os.path.exists(json_dir):
@@ -131,8 +144,10 @@ class i18nBot(object):
             new_dict['@metadata'] = new_dict.get('@metadata', {'authors': []})
             with codecs.open(file_name, 'w', 'utf-8') as json_file:
                 new_dict.update(self.dict[lang])
-                json.dump(new_dict, json_file, ensure_ascii=False,
-                          sort_keys=True, indent=4, separators=(',', ': '))
+                s = json.dumps(new_dict, ensure_ascii=False, sort_keys=True,
+                               indent=IDENT, separators=(',', ': '))
+                s = s.replace(' ' * IDENT, '\t')
+                json_file.write(s)
 
 if __name__ == '__main__':
     print(__doc__)
