@@ -1052,7 +1052,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @deprecated_args(comment='summary', sysop=None)
     def save(self, summary=None, watch=None, minor=True, botflag=None,
              force=False, async=False, callback=None,
-             apply_cosmetic_changes=None, **kwargs):
+             apply_cosmetic_changes=None, quiet=False, **kwargs):
         """Save the current contents of page's text to the wiki.
 
         @param summary: The edit summary for the modification (optional, but
@@ -1087,6 +1087,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param apply_cosmetic_changes: Overwrites the cosmetic_changes
             configuration value to this value unless it's None.
         @type apply_cosmetic_changes: bool or None
+        @param quiet: enable/disable successful save operation message;
+            defaults to False.
+            In async mode, if True, it is up to the calling bot to manage the
+            ouput e.g. via callback.
+        @type quiet: bool
         """
         if not summary:
             summary = config.default_edit_summary
@@ -1101,14 +1106,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
             pywikibot.async_request(self._save, summary=summary, minor=minor,
                                     watch=watch, botflag=botflag,
                                     async=async, callback=callback,
-                                    cc=apply_cosmetic_changes, **kwargs)
+                                    cc=apply_cosmetic_changes,
+                                    quiet=quiet, **kwargs)
         else:
             self._save(summary=summary, minor=minor, watch=watch,
                        botflag=botflag, async=async, callback=callback,
                        cc=apply_cosmetic_changes, **kwargs)
 
     def _save(self, summary, minor, watch, botflag, async, callback,
-              cc, **kwargs):
+              cc, quiet=False, **kwargs):
         """Helper function for save()."""
         err = None
         link = self.title(asLink=True)
@@ -1118,9 +1124,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
             done = self.site.editpage(self, summary=summary, minor=minor,
                                       watch=watch, bot=botflag, **kwargs)
             if not done:
-                pywikibot.warning(u"Page %s not saved" % link)
+                if not quiet:
+                    pywikibot.warning(u"Page %s not saved" % link)
                 raise pywikibot.PageNotSaved(self)
-            else:
+            if not quiet:
                 pywikibot.output(u"Page %s saved" % link)
         # TODO: other "expected" error types to catch?
         except pywikibot.Error as edit_err:
