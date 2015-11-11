@@ -15,7 +15,7 @@ import math
 from string import Formatter
 
 from pywikibot.logging import output
-from pywikibot.tools import UnicodeType
+from pywikibot.tools import PY2, UnicodeType
 from pywikibot.userinterfaces.terminal_interface_base import colors
 
 
@@ -74,6 +74,13 @@ class _ColorFormatter(Formatter):
         super(_ColorFormatter, self).__init__()
         self._depth = len(inspect.stack())
 
+    def get_value(self, key, args, kwargs):
+        """Get value, filling in 'color' when it is a valid color."""
+        if key == 'color' and kwargs['color'] in self.colors:
+            return '\03{{{0}}}'.format(kwargs[key])
+        else:
+            return super(_ColorFormatter, self).get_value(key, args, kwargs)
+
     def parse(self, format_string):
         """Yield results similar to parse but skip colors."""
         previous_literal = ''
@@ -116,9 +123,11 @@ class _ColorFormatter(Formatter):
         @rtype: unicode
         """
         result = super(_ColorFormatter, self)._vformat(*args, **kwargs)
-        if not isinstance(result, UnicodeType):
+        if PY2 and isinstance(result, str):
             assert result == b''
             result = ''  # This is changing it into a unicode
+        elif not isinstance(result, UnicodeType):
+            result = UnicodeType(result)
         return result
 
     def vformat(self, format_string, args, kwargs):
@@ -149,6 +158,9 @@ def color_format(text, *args, **kwargs):
 
     It is automatically adding \03 in front of color fields so it's
     unnecessary to add them manually. Any other \03 in the text is disallowed.
+
+    You may use a variant {color} by assigning a valid color to a named
+    parameter color.
 
     @param text: The format template string
     @type text: unicode

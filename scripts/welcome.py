@@ -195,6 +195,7 @@ import pywikibot
 
 from pywikibot import config
 from pywikibot import i18n
+from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -882,8 +883,8 @@ def showStatus(n=0):
         4: 'Warning',
         5: 'Done ',
     }
-    pywikibot.output("\03{%s}[%s]\03{default} "
-                     % (staColor[n], staMsg[n]), newline=False)
+    pywikibot.output(color_format('{color}[{0}]{default} ',
+                                  staMsg[n], color=staColor[n]), newline=False)
 
 
 def load_word_function(raw):

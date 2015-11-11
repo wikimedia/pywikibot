@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Diff module."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,6 +30,7 @@ from pywikibot.tools import chars
 
 from pywikibot.backports import format_range_unified  # introduced in 2.7.2
 from pywikibot.tools import deprecated_args
+from pywikibot.tools.formatter import color_format
 
 
 class Hunk(object):
@@ -147,7 +148,8 @@ class Hunk(object):
 
         if line_ref is None:
             if color in self.colors:
-                colored_line = '\03{%s}%s\03{default}' % (self.colors[color], line)
+                colored_line = color_format('{color}{0}{default}',
+                                            line, color=self.colors[color])
                 return colored_line
             else:
                 return line
@@ -158,16 +160,17 @@ class Hunk(object):
             char_tagged = char
             if color_closed:
                 if char_ref != ' ':
-                    char_tagged = '\03{%s}%s' % (self.colors[color], char)
+                    char_tagged = color_format('{color}{0}',
+                                               char, self.colors[color])
                     color_closed = False
             else:
                 if char_ref == ' ':
-                    char_tagged = '\03{default}%s' % char
+                    char_tagged = color_format('{default}{0}', char)
                     color_closed = True
             colored_line += char_tagged
 
         if not color_closed:
-            colored_line += '\03{default}'
+            colored_line += color_format('{default}')
 
         return colored_line
 
@@ -351,9 +354,10 @@ class PatchManager(object):
 
         context_range = self._get_context_range(hunks)
 
-        output = ('\03{aqua}' +
-                  Hunk.get_header_text(*context_range) + '\03{default}\n' +
-                  extend_context(context_range[0][0], hunks[0].a_rng[0]))
+        output = color_format('{aqua}{0}{default}\n{1}',
+                              Hunk.get_header_text(*context_range),
+                              extend_context(context_range[0][0],
+                                             hunks[0].a_rng[0]))
         previous_hunk = None
         for hunk in hunks:
             if previous_hunk:
@@ -498,10 +502,10 @@ class PatchManager(object):
                                super_hunks[position + 1:])
                 pywikibot.output('Split into {0} hunks'.format(len(super_hunk._hunks)))
             elif choice == '?':
-                pywikibot.output(
-                    '\03{purple}%s\03{default}' % '\n'.join(
+                pywikibot.output(color_format(
+                    '{purple}{0}{default}', '\n'.join(
                         '{0} -> {1}'.format(answer, help_msg[answer])
-                        for answer in answers))
+                        for answer in answers)))
             else:
                 assert False, '%s is not a valid option' % choice
 
@@ -539,22 +543,24 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     by_letter: if text_a and text_b are single lines, comparison can be done
 
     """
+    FORMAT = '{2}{lightpurple}{0:{1}^50}{default}{2}'
+
     patch = PatchManager(oldtext, newtext, n=n, by_letter=by_letter)
-    pywikibot.output('\03{{lightpurple}}\n{0:*^50}\03{{default}}\n'.format('  ALL CHANGES  '))
+    pywikibot.output(color_format(FORMAT, '  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
         pywikibot.output(hunk.diff_text)
-    pywikibot.output('\03{{lightpurple}}\n{0:*^50}\03{{default}}\n'.format('  REVIEW CHANGES  '))
+    pywikibot.output(color_format(FORMAT, '  REVIEW CHANGES  ', '*', '\n'))
 
     text_list = patch.apply()
-    pywikibot.output('\03{{lightpurple}}\n{0:*^50}\03{{default}}\n'.format('  APPROVED CHANGES  '))
+    pywikibot.output(color_format(FORMAT, '  APPROVED CHANGES  ', '*', '\n'))
 
     if any(hunk.reviewed == hunk.APPR for hunk in patch.hunks):
         for hunk in patch.hunks:
             if hunk.reviewed == hunk.APPR:
                 pywikibot.output(hunk.diff_text)
     else:
-        pywikibot.output('\03{{lightpurple}}{0:^50}\03{{default}}'.format('None.'))
+        pywikibot.output(color_format(FORMAT, 'None.', '', ''))
 
     text = ''.join(text_list)
 
