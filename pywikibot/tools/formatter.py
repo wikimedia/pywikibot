@@ -76,7 +76,7 @@ class _ColorFormatter(Formatter):
 
     def get_value(self, key, args, kwargs):
         """Get value, filling in 'color' when it is a valid color."""
-        if key == 'color' and kwargs['color'] in self.colors:
+        if key == 'color' and kwargs.get('color') in self.colors:
             return '\03{{{0}}}'.format(kwargs[key])
         else:
             return super(_ColorFormatter, self).get_value(key, args, kwargs)
