@@ -755,7 +755,7 @@ class ReplaceRobot(Bot):
                     self.options['always'] = True
                 if choice == 'y':
                     page.text = new_text
-                    page.save(self.generate_summary(applied), async=True,
+                    page.save(summary=self.generate_summary(applied), async=True,
                               callback=self._count_changes, quiet=True)
                 while not self._pending_processed_titles.empty():
                     proc_title, res = self._pending_processed_titles.get()
@@ -766,7 +766,7 @@ class ReplaceRobot(Bot):
             if self.getOption('always') and new_text != original_text:
                 try:
                     page.text = new_text
-                    page.save(self.generate_summary(applied),
+                    page.save(summary=self.generate_summary(applied),
                               callback=self._count_changes, quiet=True)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
