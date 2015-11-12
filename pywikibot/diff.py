@@ -161,7 +161,7 @@ class Hunk(object):
             if color_closed:
                 if char_ref != ' ':
                     char_tagged = color_format('{color}{0}',
-                                               char, self.colors[color])
+                                               char, color=self.colors[color])
                     color_closed = False
             else:
                 if char_ref == ' ':
