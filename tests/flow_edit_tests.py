@@ -14,6 +14,9 @@ from tests.aspects import TestCase
 from tests import unittest
 
 
+MODERATION_REASON = 'Pywikibot test'
+
+
 class TestFlowCreateTopic(TestCase):
 
     """Test the creation of Flow topics."""
@@ -28,9 +31,9 @@ class TestFlowCreateTopic(TestCase):
         """Test creation of topic."""
         content = 'If you can read this, the Flow code in Pywikibot works!'
         board = Board(self.site, 'Talk:Pywikibot test')
-        topic = board.new_topic('Pywikibot test', content, 'wikitext')
+        topic = board.new_topic(MODERATION_REASON, content, 'wikitext')
         first_post = topic.replies()[0]
-        wikitext = first_post.get(format='wikitext')
+        wikitext = first_post.get(content_format='wikitext')
         self.assertIn('wikitext', first_post._content)
         self.assertNotIn('html', first_post._content)
         self.assertIsInstance(wikitext, str)
@@ -62,7 +65,7 @@ class TestFlowReply(TestCase):
         # Reply
         reply_post = topic.reply(content, 'wikitext')
         # Test content
-        wikitext = reply_post.get(format='wikitext')
+        wikitext = reply_post.get(content_format='wikitext')
         self.assertIn('wikitext', reply_post._content)
         self.assertNotIn('html', reply_post._content)
         self.assertIsInstance(wikitext, str)
@@ -82,7 +85,7 @@ class TestFlowReply(TestCase):
         # Reply
         reply_post = topic_root.reply(content, 'wikitext')
         # Test content
-        wikitext = reply_post.get(format='wikitext')
+        wikitext = reply_post.get(content_format='wikitext')
         self.assertIn('wikitext', reply_post._content)
         self.assertNotIn('html', reply_post._content)
         self.assertIsInstance(wikitext, str)
@@ -101,7 +104,7 @@ class TestFlowReply(TestCase):
         # Reply
         reply_post = root_post.reply(content, 'wikitext')
         # Test content
-        wikitext = reply_post.get(format='wikitext')
+        wikitext = reply_post.get(content_format='wikitext')
         self.assertIn('wikitext', reply_post._content)
         self.assertNotIn('html', reply_post._content)
         self.assertIsInstance(wikitext, str)
@@ -122,7 +125,7 @@ class TestFlowReply(TestCase):
         old_root_replies = topic_root.replies(force=True)[:]
         first_reply_post = topic_root.reply(first_content, 'wikitext')
         # Test first reply's content
-        first_wikitext = first_reply_post.get(format='wikitext')
+        first_wikitext = first_reply_post.get(content_format='wikitext')
         self.assertIn('wikitext', first_reply_post._content)
         self.assertNotIn('html', first_reply_post._content)
         self.assertIsInstance(first_wikitext, str)
@@ -137,7 +140,7 @@ class TestFlowReply(TestCase):
         second_reply_post = first_reply_post.reply(second_content,
                                                    'wikitext')
         # Test nested reply's content
-        second_wikitext = second_reply_post.get(format='wikitext')
+        second_wikitext = second_reply_post.get(content_format='wikitext')
         self.assertIn('wikitext', second_reply_post._content)
         self.assertNotIn('html', second_reply_post._content)
         self.assertIsInstance(second_wikitext, str)
@@ -169,13 +172,13 @@ class TestFlowLockTopic(TestCase):
         # Setup
         topic = Topic(self.site, 'Topic:Sn12rdih4iducjsd')
         if topic.is_locked:
-            topic.unlock()
+            topic.unlock(MODERATION_REASON)
         self.assertFalse(topic.is_locked)
         # Lock topic
-        topic.lock('Pywikibot test')
+        topic.lock(MODERATION_REASON)
         self.assertTrue(topic.is_locked)
         # Unlock topic
-        topic.unlock('Pywikibot test')
+        topic.unlock(MODERATION_REASON)
         self.assertFalse(topic.is_locked)
 
 
@@ -194,13 +197,13 @@ class TestFlowHide(TestCase):
         # Setup
         topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         if topic.is_moderated:
-            topic.restore('Pywikibot test')
+            topic.restore(MODERATION_REASON)
         self.assertFalse(topic.is_moderated)
         # Hide
-        topic.hide('Pywikibot test')
+        topic.hide(MODERATION_REASON)
         self.assertTrue(topic.is_moderated)
         # Restore
-        topic.restore('Pywikibot test')
+        topic.restore(MODERATION_REASON)
         self.assertFalse(topic.is_moderated)
 
     def test_hide_post(self):
@@ -209,13 +212,13 @@ class TestFlowHide(TestCase):
         topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         post = Post(topic, 'sq1qvoig1az8w7cd')
         if post.is_moderated:
-            post.restore('Pywikibot test')
+            post.restore(MODERATION_REASON)
         self.assertFalse(post.is_moderated)
         # Hide
-        post.hide('Pywikibot test')
+        post.hide(MODERATION_REASON)
         self.assertTrue(post.is_moderated)
         # Restore
-        post.restore('Pywikibot test')
+        post.restore(MODERATION_REASON)
         self.assertFalse(post.is_moderated)
 
 
@@ -235,13 +238,13 @@ class TestFlowDelete(TestCase):
         # Setup
         topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         if topic.is_moderated:
-            topic.restore('Pywikibot test')
+            topic.restore(MODERATION_REASON)
         self.assertFalse(topic.is_moderated)
         # Delete
-        topic.delete_mod('Pywikibot test')
+        topic.delete_mod(MODERATION_REASON)
         self.assertTrue(topic.is_moderated)
         # Restore
-        topic.restore('Pywikibot test')
+        topic.restore(MODERATION_REASON)
         self.assertFalse(topic.is_moderated)
 
     def test_delete_post(self):
@@ -250,13 +253,13 @@ class TestFlowDelete(TestCase):
         topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         post = Post(topic, 'sq1qvoig1az8w7cd')
         if post.is_moderated:
-            post.restore('Pywikibot test')
+            post.restore(MODERATION_REASON)
         self.assertFalse(post.is_moderated)
         # Delete
-        post.delete('Pywikibot test')
+        post.delete(MODERATION_REASON)
         self.assertTrue(post.is_moderated)
         # Restore
-        post.restore('Pywikibot test')
+        post.restore(MODERATION_REASON)
         self.assertFalse(post.is_moderated)
 
 
@@ -277,13 +280,13 @@ class TestFlowSuppress(TestCase):
         topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         post = Post(topic, 'sq1qvoig1az8w7cd')
         if post.is_moderated:
-            post.restore('Pywikibot test')
+            post.restore(MODERATION_REASON)
         self.assertFalse(post.is_moderated)
         # Suppress
-        post.suppress('Pywikibot test')
+        post.suppress(MODERATION_REASON)
         self.assertTrue(post.is_moderated)
         # Restore
-        post.restore('Pywikibot test')
+        post.restore(MODERATION_REASON)
         self.assertFalse(post.is_moderated)
 
     def test_suppress_topic(self):
@@ -291,13 +294,13 @@ class TestFlowSuppress(TestCase):
         # Setup
         topic = Topic(self.site, 'Topic:Sl4svodmrhzmpjjh')
         if topic.is_moderated:
-            topic.restore('Pywikibot test')
+            topic.restore(MODERATION_REASON)
         self.assertFalse(topic.is_moderated)
         # Suppress
-        topic.suppress('Pywikibot test')
+        topic.suppress(MODERATION_REASON)
         self.assertTrue(topic.is_moderated)
         # Restore
-        topic.restore('Pywikibot test')
+        topic.restore(MODERATION_REASON)
         self.assertFalse(topic.is_moderated)
 
 

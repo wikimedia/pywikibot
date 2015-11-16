@@ -6408,7 +6408,8 @@ class APISite(BaseSite):
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    def load_topiclist(self, page, format='wikitext', limit=100,
+    @deprecate_arg('format', 'content_format')
+    def load_topiclist(self, page, content_format: str = 'wikitext', limit=100,
                        sortby='newest', toconly=False, offset=None,
                        offset_id=None, reverse=False, include_offset=False):
         """
@@ -6416,8 +6417,8 @@ class APISite(BaseSite):
 
         @param page: A Flow board
         @type page: Board
-        @param format: The content format to request the data in.
-        @type format: str (either 'wikitext', 'html', or 'fixed-html')
+        @param content_format: The content format to request the data in.
+            must be either 'wikitext', 'html', or 'fixed-html'
         @param limit: The number of topics to fetch in each request.
         @type limit: int
         @param sortby: Algorithm to sort topics by.
@@ -6441,7 +6442,7 @@ class APISite(BaseSite):
 
         params = {'action': 'flow', 'submodule': 'view-topiclist',
                   'page': page,
-                  'vtlformat': format, 'vtlsortby': sortby,
+                  'vtlformat': content_format, 'vtlsortby': sortby,
                   'vtllimit': limit, 'vtloffset-dir': offset_dir,
                   'vtloffset': offset, 'vtloffset-id': offset_id,
                   'vtlinclude-offset': include_offset, 'vtltoconly': toconly}
@@ -6450,25 +6451,27 @@ class APISite(BaseSite):
         return data['flow']['view-topiclist']['result']['topiclist']
 
     @need_extension('Flow')
-    def load_topic(self, page, format):
+    @deprecate_arg('format', 'content_format')
+    def load_topic(self, page, content_format: str):
         """
         Retrieve the data for a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
-        @param format: The content format to request the data in.
-        @type format: str (either 'wikitext', 'html', or 'fixed-html')
+        @param content_format: The content format to request the data in.
+            Must ne either 'wikitext', 'html', or 'fixed-html'
         @return: A dict representing the topic's data.
         @rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
                                    submodule='view-topic',
-                                   vtformat=format)
+                                   vtformat=content_format)
         data = req.submit()
         return data['flow']['view-topic']['result']['topic']
 
     @need_extension('Flow')
-    def load_post_current_revision(self, page, post_id, format):
+    @deprecate_arg('format', 'content_format')
+    def load_post_current_revision(self, page, post_id, content_format: str):
         """
         Retrieve the data for a post to a Flow topic.
 
@@ -6476,20 +6479,21 @@ class APISite(BaseSite):
         @type page: Topic
         @param post_id: The UUID of the Post
         @type post_id: str
-        @param format: The content format used for the returned content
-        @type format: str (either 'wikitext', 'html', or 'fixed-html')
+        @param content_format: The content format used for the returned
+            content; must be either 'wikitext', 'html', or 'fixed-html'
         @return: A dict representing the post data for the given UUID.
         @rtype: dict
         """
         req = self._simple_request(action='flow', page=page,
                                    submodule='view-post', vppostId=post_id,
-                                   vpformat=format)
+                                   vpformat=content_format)
         data = req.submit()
         return data['flow']['view-post']['result']['topic']
 
     @need_right('edit')
     @need_extension('Flow')
-    def create_new_topic(self, page, title, content, format):
+    @deprecate_arg('format', 'content_format')
+    def create_new_topic(self, page, title, content, content_format):
         """
         Create a new topic on a Flow board.
 
@@ -6499,14 +6503,14 @@ class APISite(BaseSite):
         @type title: str
         @param content: The content of the topic's initial post
         @type content: str
-        @param format: The content format of the value supplied for content
-        @type format: str (either 'wikitext' or 'html')
+        @param content_format: The content format of the supplied content
+        @type content_format: str (either 'wikitext' or 'html')
         @return: The metadata of the new topic
         @rtype: dict
         """
         token = self.tokens['csrf']
         params = {'action': 'flow', 'page': page, 'token': token,
-                  'submodule': 'new-topic', 'ntformat': format,
+                  'submodule': 'new-topic', 'ntformat': content_format,
                   'nttopic': title, 'ntcontent': content}
         req = self._request(parameters=params, use_get=False)
         data = req.submit()
@@ -6514,24 +6518,23 @@ class APISite(BaseSite):
 
     @need_right('edit')
     @need_extension('Flow')
-    def reply_to_post(self, page, reply_to_uuid, content, format):
+    @deprecate_arg('format', 'content_format')
+    def reply_to_post(self, page, reply_to_uuid: str, content: str,
+                      content_format: str) -> dict:
         """Reply to a post on a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
         @param reply_to_uuid: The UUID of the Post to create a reply to
-        @type reply_to_uuid: str
         @param content: The content of the reply
-        @type content: str
-        @param format: The content format used for the supplied content
-        @type format: str (either 'wikitext' or 'html')
+        @param content_format: The content format used for the supplied
+            content; must be either 'wikitext' or 'html'
         @return: Metadata returned by the API
-        @rtype: dict
         """
         token = self.tokens['csrf']
         params = {'action': 'flow', 'page': page, 'token': token,
                   'submodule': 'reply', 'repreplyTo': reply_to_uuid,
-                  'repcontent': content, 'repformat': format}
+                  'repcontent': content, 'repformat': content_format}
         req = self._request(parameters=params, use_get=False)
         data = req.submit()
         return data['flow']['reply']['committed']['topic']
