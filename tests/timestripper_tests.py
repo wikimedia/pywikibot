@@ -136,51 +136,51 @@ class TestTimeStripperLanguage(TestCase):
         'cswiki': {
             'family': 'wikipedia',
             'code': 'cs',
-            'match': u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
+            'match': u'3. 2. 2011, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
         },
         'enwiki': {
             'family': 'wikipedia',
             'code': 'en',
-            'match': u'3 February 2010 19:48 (UTC) 7 February 2010 19:48 (UTC)',
-            'nomatch': u'3. 2. 2010, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
+            'match': u'3 February 2011 19:48 (UTC) 7 February 2010 19:48 (UTC)',
+            'nomatch': u'3. 2. 2011, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
         },
         'fawiki': {
             'family': 'wikipedia',
             'code': 'fa',
-            'match': u'۳ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC) ۷ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC)',
+            'match': u'۳ فوریهٔ  ۲۰۱۱، ساعت ۱۹:۴۸ (UTC) ۷ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC)',
             'nomatch': u'۳ ۲ ۲۰۱۴ ۱۹:۴۸ (UTC) ۷ ۲ ۲۰۱۰ ۱۹:۴۸ (UTC)',
         },
         'frwiki': {
             'family': 'wikipedia',
             'code': 'fr',
-            'match': u'3 février 2010 à 19:48 (CET) 7 février 2010 à 19:48 (CET)',
-            'nomatch': u'3 March 2010 19:48 (CET) 7 March 2010 19:48 (CET)',
+            'match': u'3 février 2011 à 19:48 (CET) 7 février 2010 à 19:48 (CET)',
+            'nomatch': u'3 March 2011 19:48 (CET) 7 March 2010 19:48 (CET)',
         },
         'kowiki': {
             'family': 'wikipedia',
             'code': 'ko',
-            'match': u'2010년 2월 3일 (수) 19:48 (KST) 2010년 2월 7일 (수) 19:48 (KST)',
+            'match': u'2011년 2월 3일 (수) 19:48 (KST) 2010년 2월 7일 (수) 19:48 (KST)',
         },
         'nowiki': {
             'family': 'wikipedia',
             'code': 'no',
-            'match': u'3. feb 2010 kl. 19:48 (CET) 7. feb 2010 kl. 19:48 (UTC)',
+            'match': u'3. feb 2011 kl. 19:48 (CET) 7. feb 2010 kl. 19:48 (UTC)',
         },
         'ptwiki': {
             'family': 'wikipedia',
             'code': 'pt',
-            'match': '19h48min de 3 de fevereiro de 2010‎ (UTC) 19h48min '
+            'match': '19h48min de 3 de fevereiro de 2011‎ (UTC) 19h48min '
                      'de 7 de fevereiro de 2010‎ (UTC)',
         },
         'viwiki': {
             'family': 'wikipedia',
             'code': 'vi',
-            'match': '19:48, ngày 15 tháng 9 năm 2008 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
-            'match2': '16:41, ngày 15 tháng 9 năm 2008 (UTC) 16:41, '
+            'match': '19:48, ngày 3 tháng 2 năm 2011 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
+            'match2': '16:41, ngày 15 tháng 9 năm 2001 (UTC) 16:41, '
                       'ngày 12 tháng 9 năm 2008 (UTC)',
-            'match3':  '21:18, ngày 13 tháng 8 năm 2014 (UTC) 21:18, '
+            'match3':  '21:18, ngày 13 tháng 8 năm 2011 (UTC) 21:18, '
                        'ngày 14 tháng 8 năm 2014 (UTC)',
-            'nomatch1': '21:18, ngày 13 March 8 năm 2014 (UTC) 21:18, '
+            'nomatch1': '21:18, ngày 13 March 8 năm 2011 (UTC) 21:18, '
                         'ngày 14 March 8 năm 2014 (UTC)',
         },
     }
@@ -225,7 +225,7 @@ class TestTimeStripperLanguage(TestCase):
         if 'nomatch' in self.sites[key]:
             txtNoMatch = self.sites[key]['nomatch']
         else:
-            txtNoMatch = u'3 March 2010 19:48 (UTC) 7 March 2010 19:48 (UTC)'
+            txtNoMatch = u'3 March 2011 19:48 (UTC) 7 March 2010 19:48 (UTC)'
 
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
