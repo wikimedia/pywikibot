@@ -136,7 +136,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         if user['name'] != self.username:
             # Report the same error as server error code NotExists
-            raise NoUsername('Username \'%s\' is invalid on %s'
+            raise NoUsername('Username \'%s\' does not exist on %s'
                              % (self.username, self.site))
 
     def botAllowed(self):
