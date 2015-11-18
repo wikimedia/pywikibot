@@ -13,28 +13,45 @@ import datetime
 
 from pywikibot.textlib import TimeStripper, tzoneFixedOffset
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import (
+    unittest,
+    TestCase,
+    DefaultSiteTestCase,
+    DeprecationTestCase,
+)
 
 
-class TestTimeStripperWithNoDigitsAsMonths(TestCase):
+class TestTimeStripperCase(TestCase):
 
-    """Test cases for TimeStripper methods."""
-
-    family = 'wikipedia'
-    code = 'fr'
+    """Basic class to test the TimeStripper class."""
 
     cached = True
 
     def setUp(self):
         """Set up test cases."""
-        super(TestTimeStripperWithNoDigitsAsMonths, self).setUp()
+        super(TestTimeStripperCase, self).setUp()
         self.ts = TimeStripper(self.get_site())
+
+
+class DeprecatedTestTimeStripperCase(TestTimeStripperCase, DeprecationTestCase,
+                                     DefaultSiteTestCase):
+
+    """Test deprecated parts of the TimeStripper class."""
 
     def test_findmarker(self):
         """Test that string which is not part of text is found."""
         txt = u'this is a string with a maker is @@@@already present'
         self.assertEqual(self.ts.findmarker(txt, base=u'@@', delta='@@'),
                          '@@@@@@')
+        self.assertOneDeprecation()
+
+
+class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
+
+    """Test cases for TimeStripper methods."""
+
+    family = 'wikipedia'
+    code = 'fr'
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
@@ -88,19 +105,12 @@ class TestTimeStripperWithNoDigitsAsMonths(TestCase):
         self.assertEqual(self.ts.timestripper(txtHourOutOfRange), None)
 
 
-class TestTimeStripperWithDigitsAsMonths(TestCase):
+class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
 
     """Test cases for TimeStripper methods."""
 
     family = 'wikipedia'
     code = 'cs'
-
-    cached = True
-
-    def setUp(self):
-        """Setup a timestripper for the configured site."""
-        super(TestTimeStripperWithDigitsAsMonths, self).setUp()
-        self.ts = TimeStripper(self.get_site())
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
@@ -236,7 +246,7 @@ class TestTimeStripperLanguage(TestCase):
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
 
-class TestTimeStripperDoNotArchiveUntil(TestCase):
+class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
 
     """Test cases for Do Not Archive Until templates.
 
@@ -247,8 +257,6 @@ class TestTimeStripperDoNotArchiveUntil(TestCase):
     family = 'wikisource'
     code = 'en'
 
-    cached = True
-
     username = '[[User:DoNotArchiveUntil]]'
     date = '06:57 06 June 2015 (UTC)'
     user_and_date = username + ' ' + date
@@ -256,7 +264,7 @@ class TestTimeStripperDoNotArchiveUntil(TestCase):
 
     def test_timestripper_match(self):
         """Test that dates in comments  are correctly recognised."""
-        ts = TimeStripper(self.get_site())
+        ts = self.ts
 
         txt_match = '<!-- [[User:Do___ArchiveUntil]] ' + self.date + ' -->'
         res = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=self.tzone)
@@ -272,7 +280,7 @@ class TestTimeStripperDoNotArchiveUntil(TestCase):
 
     def test_timestripper_match_only(self):
         """Test that latest date is used instead of other dates."""
-        ts = TimeStripper(self.get_site())
+        ts = self.ts
 
         later_date = '10:57 06 June 2015 (UTC)'
         txt_match = '<!-- --> ' + self.user_and_date + ' <!-- -->' + later_date

@@ -39,6 +39,7 @@ from pywikibot import config2 as config
 from pywikibot.exceptions import InvalidTitle
 from pywikibot.family import Family
 from pywikibot.tools import (
+    deprecated,
     DeprecatedRegex,
     OrderedDict,
     UnicodeType,
@@ -1747,11 +1748,10 @@ class TimeStripper(object):
         self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
 
+    @deprecated('module function')
     def findmarker(self, text, base=u'@@', delta='@'):
         """Find a string which is not part of text."""
-        while base in text:
-            base += delta
-        return base
+        return findmarker(text, base, delta)
 
     def fix_digits(self, line):
         """Make non-latin digits like Persian to latin to parse."""
@@ -1772,7 +1772,7 @@ class TimeStripper(object):
             cnt += 1
 
         if m:
-            marker = self.findmarker(txt)
+            marker = findmarker(txt)
             # month and day format might be identical (e.g. see bug 69315),
             # avoid to wipe out day, after month is matched.
             # replace all matches but the last two
