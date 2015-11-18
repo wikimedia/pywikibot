@@ -1684,7 +1684,7 @@ class tzoneFixedOffset(datetime.tzinfo):
 
 class TimeStripper(object):
 
-    """Find timestamp in page and return it as timezone aware datetime object."""
+    """Find timestamp in page and return it as pywikibot.Timestamp object."""
 
     def __init__(self, site=None):
         """Constructor."""
@@ -1795,6 +1795,8 @@ class TimeStripper(object):
 
         All the following items must be matched, otherwise None is returned:
         -. year, month, hour, time, day, minute, tzinfo
+        @return: A timestamp found on the given line
+        @rtype: pywikibot.Timestamp
         """
         # match date fields
         dateDict = dict()
@@ -1846,7 +1848,7 @@ class TimeStripper(object):
             # find timezone
             dateDict['tzinfo'] = self.tzinfo
 
-            timestamp = datetime.datetime(**dateDict)
+            timestamp = pywikibot.Timestamp(**dateDict)
         else:
             timestamp = None
 
