@@ -294,10 +294,10 @@ def get_base_dir(test_directory=None):
             base_dir_cand = []
             home = os.path.expanduser("~")
             if OSWIN32:
-                win_version = int(platform.version()[0])
+                win_version = int(platform.version().split(".")[0])
                 if win_version == 5:
                     sub_dir = ["Application Data"]
-                elif win_version == 6:
+                elif win_version in (6, 10):
                     sub_dir = ["AppData", "Roaming"]
                 else:
                     raise WindowsError(u'Windows version %s not supported yet.'
