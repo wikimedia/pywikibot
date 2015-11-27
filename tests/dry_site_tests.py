@@ -210,6 +210,7 @@ class TestNeedVersion(DeprecationTestCase):
     # Implemented without setUpClass(cls) and global variables as objects
     # were not completely disposed and recreated but retained 'memory'
     def setUp(self):
+        """Set up test method."""
         super(TestNeedVersion, self).setUp()
         self.version = lambda: "1.13"
 

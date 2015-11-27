@@ -20,6 +20,7 @@ class WbRepresentation(object):
     """Abstract class for Wikibase representations."""
 
     def __init__(self):
+        """Constructor."""
         raise NotImplementedError
 
     def toWikibase(self):

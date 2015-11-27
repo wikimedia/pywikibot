@@ -38,7 +38,10 @@ class TestColorFormat(TestCase):
 
     class DummyUnicode(UnicodeMixin):
 
+        """Dummy class that __unicode__ returns a non-ascii unicode value."""
+
         def __unicode__(self):
+            """Return ä."""
             return 'ä'
 
     net = False
