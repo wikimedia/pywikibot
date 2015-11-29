@@ -27,6 +27,7 @@ class TestTranslate(TestCase):
     net = False
 
     def setUp(self):
+        """Set up test method."""
         self.msg_localized = {'en': u'test-localized EN',
                               'nl': u'test-localized NL',
                               'fy': u'test-localized FY'}

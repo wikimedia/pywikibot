@@ -120,11 +120,13 @@ def deprecated_func_arg3(foo=None):
 
 @remove_last_args(['foo', 'bar'])
 def deprecated_all():
+    """Test remove_last_args with all args removed."""
     return None
 
 
 @remove_last_args(['bar'])
 def deprecated_all2(foo):
+    """Test remove_last_args with one arg removed."""
     return foo
 
 

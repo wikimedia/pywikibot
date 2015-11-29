@@ -179,6 +179,7 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase, TWNBotTestCase):
 
     @classmethod
     def setUpClass(cls):
+        """Set up test class."""
         super(TestIsbnWikibaseBot, cls).setUpClass()
 
         # Check if the unit test item page and the property both exist
