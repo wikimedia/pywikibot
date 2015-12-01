@@ -41,7 +41,7 @@ class Family(family.WikimediaOrgFamily):
         }
 
         self.disambcatname = {
-            'commons':  u'Disambiguation'
+            'commons': 'Disambiguation'
         }
 
         # Subpages for documentation.

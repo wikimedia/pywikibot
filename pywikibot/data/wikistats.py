@@ -37,10 +37,10 @@ class WikiStats(object):
 
     FAMILY_MAPPING = {
         'anarchopedia': 'anarchopedias',
-        'wikipedia':    'wikipedias',
-        'wikiquote':    'wikiquotes',
-        'wikisource':   'wikisources',
-        'wiktionary':   'wiktionaries',
+        'wikipedia': 'wikipedias',
+        'wikiquote': 'wikiquotes',
+        'wikisource': 'wikisources',
+        'wiktionary': 'wiktionaries',
     }
 
     MISC_SITES_TABLE = 'mediawikis'

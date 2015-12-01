@@ -821,10 +821,10 @@ def main(*args):
     replacements = []
     # Don't edit pages which contain certain texts.
     exceptions = {
-        'title':         [],
+        'title': [],
         'text-contains': [],
-        'inside':        [],
-        'inside-tags':   [],
+        'inside': [],
+        'inside-tags': [],
         'require-title': [],  # using a seperate requirements dict needs some
     }                        # major refactoring of code.
 

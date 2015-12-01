@@ -192,7 +192,7 @@ lists_name = {
     'fa': (BACK, u"فهرست برگزیده"),
     'id': (BACK, u'Featured list'),
     'ja': (BACK, u'Featured List'),
-    'ksh': (CAT,  u"Joode Leß"),
+    'ksh': (CAT, 'Joode Leß'),
     'no': (BACK, u'God liste'),
     'pl': (BACK, u'Medalista'),
     'pt': (BACK, u'Anexo destacado'),
@@ -222,7 +222,7 @@ class FeaturedBot(pywikibot.Bot):
     def __init__(self, **kwargs):
         """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
-            'async':  False,  # asynchron putting a page?
+            'async': False,  # True for asynchronously putting a page
             'afterpage': u"!",
             'count': False,   # featuredcount
             'featured': False,

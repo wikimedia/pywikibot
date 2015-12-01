@@ -188,8 +188,8 @@ class TestTimeStripperLanguage(TestCase):
             'match': '19:48, ngày 3 tháng 2 năm 2011 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
             'match2': '16:41, ngày 15 tháng 9 năm 2001 (UTC) 16:41, '
                       'ngày 12 tháng 9 năm 2008 (UTC)',
-            'match3':  '21:18, ngày 13 tháng 8 năm 2011 (UTC) 21:18, '
-                       'ngày 14 tháng 8 năm 2014 (UTC)',
+            'match3': '21:18, ngày 13 tháng 8 năm 2011 (UTC) 21:18, '
+                      'ngày 14 tháng 8 năm 2014 (UTC)',
             'nomatch1': '21:18, ngày 13 March 8 năm 2011 (UTC) 21:18, '
                         'ngày 14 March 8 năm 2014 (UTC)',
         },

@@ -92,7 +92,7 @@ nowCommonsTemplate = {
 }
 
 moveToCommonsTemplate = {
-    'de': [u'NowCommons', u'NC', u'NCT',  u'Nowcommons'],
+    'de': ['NowCommons', 'NC', 'NCT', 'Nowcommons'],
     'en': [u'Commons ok', u'Copy to Wikimedia Commons', u'Move to commons',
            u'Movetocommons', u'To commons',
            u'Copy to Wikimedia Commons by BotMultichill'],

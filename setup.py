@@ -52,7 +52,7 @@ csv_dep = 'unicodecsv!=0.14.0' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
 extra_deps = {
     # Core library dependencies
     'isbn': ['python-stdnum'],
-    'Graphviz':  ['pydot>=1.0.28'],
+    'Graphviz': ['pydot>=1.0.28'],
     'Google': ['google>=1.7'],
     'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],

@@ -146,7 +146,8 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         self.templ = templ.title()
         self.cron = cron.title()
         self.refs = {self.templ: templ,
-                     self.cron:  cron, }
+                     self.cron: cron,
+                     }
         pywikibot.output(u'** Pre-loading all relevant page contents')
         for item in self.refs:
             # security; first check if page is protected, reject any data if not

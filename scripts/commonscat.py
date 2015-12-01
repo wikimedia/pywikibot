@@ -136,7 +136,7 @@ commonscatTemplates = {
     'sco': ('Commons category', ['Commonscat', 'Commons cat']),
     'ru': (u'Commonscat', [u'Викисклад-кат', u'Commons category']),
     'simple': (u'Commonscat',
-               [u'Commons cat',  u'Commons cat multi', u'Commons category',
+               ['Commons cat', 'Commons cat multi', 'Commons category',
                 u'Commons category multi', u'CommonsCompact',
                 u'Commons-inline']),
     'sh': (u'Commonscat', [u'Commons cat']),

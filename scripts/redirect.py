@@ -527,7 +527,7 @@ class RedirectRobot(Bot):
         for redir_name in self.generator.retrieve_double_redirects():
             self.fix_1_double_redirect(redir_name)
 
-    def fix_1_double_redirect(self,  redir_name):
+    def fix_1_double_redirect(self, redir_name):
         if isinstance(redir_name, basestring):
             redir = pywikibot.Page(self.site, redir_name)
         else:
