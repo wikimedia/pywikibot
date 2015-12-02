@@ -1532,7 +1532,6 @@ class checkImagesBot(object):
         # Here begins the check block.
         if brackets and license_found:
             # It works also without this... but i want only to be sure ^^
-            brackets = False
             return True
         elif delete:
             pywikibot.output(u"%s is not a file!" % self.imageName)
@@ -1542,7 +1541,6 @@ class checkImagesBot(object):
             notification = din % self.imageName
             head = dih
             self.report(canctext, self.imageName, notification, head)
-            delete = False
             return True
         elif self.imageCheckText in nothing:
             pywikibot.output(
