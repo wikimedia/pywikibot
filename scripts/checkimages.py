@@ -82,7 +82,7 @@ right parameter.
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -192,67 +192,67 @@ delete_immediately = {
 
 # The header of the Unknown extension's message.
 delete_immediately_head = {
-    'commons': u"\n== Unknown extension! ==\n",
-    'ar': u"\n== امتداد غير معروف! ==\n",
-    'en': u"\n== Unknown extension! ==\n",
-    'fa': u"\n==بارگذاری تصاویر موجود در انبار==\n",
-    'ga': u"\n== Iarmhír neamhaithnid! ==\n",
-    'fr': u'\n== Extension inconnue ==\n',
-    'hu': u'\n== Ismeretlen kiterjesztésű fájl ==\n',
-    'it': u'\n\n== File non specificato ==\n',
-    'ko': u'\n== 잘못된 파일 형식 ==\n',
-    'ta': u'\n== இனங்காணப்படாத கோப்பு நீட்சி! ==\n',
-    'ur': u"\n== نامعلوم توسیع! ==\n",
-    'zh': u'\n==您上載的檔案格式可能有誤==\n',
+    'ar': 'امتداد غير معروف!',
+    'en': 'Unknown extension!',
+    'fa': 'بارگذاری تصاویر موجود در انبار',
+    'ga': 'Iarmhír neamhaithnid!',
+    'fr': 'Extension inconnue',
+    'hu': 'Ismeretlen kiterjesztésű fájl',
+    'it': 'File non specificato',
+    'ko': '잘못된 파일 형식',
+    'ta': 'இனங்காணப்படாத கோப்பு நீட்சி!',
+    'ur': 'نامعلوم توسیع!',
+    'zh': '您上載的檔案格式可能有誤',
 }
 
 # Text that will be add if the bot find a unknown extension.
 delete_immediately_notification = {
-    'ar': u'الملف [[:File:%s]] يبدو أن امتداده خاطيء, من فضلك تحقق. ~~~~',
-    'commons': u'The [[:File:%s]] file seems to have a wrong extension, please check. ~~~~',
-    'en': u'The [[:File:%s]] file seems to have a wrong extension, please check. ~~~~',
-    'fa': u'به نظر می‌آید تصویر [[:تصویر:%s]] مسیر نادرستی داشته باشد لطفا بررسی کنید.~~~~',
-    'ga': u'Tá iarmhír mícheart ar an comhad [[:File:%s]], scrúdaigh le d\'thoil. ~~~~',
-    'fr': u'Le fichier [[:File:%s]] semble avoir une mauvaise extension, veuillez vérifier. ~~~~',
-    'hu': u'A [[:Kép:%s]] fájlnak rossz a kiterjesztése, kérlek ellenőrízd. ~~~~',
-    'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Ext|%s|~~~}} --~~~~',
-    'ko': u'[[:그림:%s]]의 파일 형식이 잘못되었습니다. 확인 바랍니다.--~~~~',
-    'ta': '[[:படிமம்:%s]] இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு செய்து ஒ'
-          'ரு முறை சரி பார்க்கவும் ~~~~',
-    'ur': u'ملف [[:File:%s]] کی توسیع شاید درست نہیں ہے، براہ کرم جانچ لیں۔ ~~~~',
-    'zh': u'您好，你上傳的[[:File:%s]]無法被識別，請檢查您的檔案，謝謝。--~~~~',
+    'ar': 'الملف %(file)s يبدو أن امتداده خاطيء, من فضلك تحقق.',
+    'en': 'The %(file)s file seems to have a wrong extension, please check.',
+    'fa': 'به نظر می‌آید تصویر %(file)s مسیر نادرستی داشته باشد لطفا بررسی کنید.',
+    'ga': "Tá iarmhír mícheart ar an comhad %(file)s, scrúdaigh le d'thoil.",
+    'fr': 'Le fichier %(file)s semble avoir une mauvaise extension, veuillez vérifier.',
+    'hu': 'A %(file)s fájlnak rossz a kiterjesztése, kérlek ellenőrízd.',
+    'it': ('A quanto ci risulta, %(file)s sembra non essere un file utile '
+           "all'enciclopedia. Se così non fosse, e' consigliato che tu scriva "
+           "al mio programmatore. Grazie per l'attenzione. "
+           '<u>Questo è un messaggio automatico di</u>'),
+    'ko': '%(file)s의 파일 형식이 잘못되었습니다. 확인 바랍니다.',
+    'ta': '%(file)s இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு செய்து ஒ'
+          'ரு முறை சரி பார்க்கவும்',
+    'ur': 'ملف %(file)s کی توسیع شاید درست نہیں ہے، براہ کرم جانچ لیں۔',
+    'zh': '您好，你上傳的%(file)s無法被識別，請檢查您的檔案，謝謝。',
 }
 
 # Summary of the delete immediately.
 # (e.g: Adding {{db-meta|The file has .%s as extension.}})
 msg_del_comm = {
-    'ar': u'بوت: إضافة %s',
-    'commons': u'Bot: Adding %s',
-    'en': u'Bot: Adding %s',
-    'fa': u'ربات: اضافه کردن %s',
-    'ga': u'Róbó: Cuir %s leis',
-    'fr': u'Robot : Ajouté %s',
-    'hu': u'Robot:"%s" hozzáadása',
-    'it': u'Bot: Aggiungo %s',
-    'ja': u'ロボットによる: 追加 %s',
-    'ko': u'로봇 : %s 추가',
-    'ta': u'Bot: Adding %s',
-    'ur': u'روبالہ: اضافہ %s',
-    'zh': u'機器人: 正在新增 %s',
+    'ar': 'بوت: إضافة %(adding)s',
+    'en': 'Bot: Adding %(adding)s',
+    'fa': 'ربات: اضافه کردن %(adding)s',
+    'ga': 'Róbó: Cuir %(adding)s leis',
+    'fr': 'Robot : Ajouté %(adding)s',
+    'hu': 'Robot:"%(adding)s" hozzáadása',
+    'it': 'Bot: Aggiungo %(adding)s',
+    'ja': 'ロボットによる: 追加 %(adding)s',
+    'ko': '로봇 : %(adding)s 추가',
+    'ta': 'Bot: Adding %(adding)s',
+    'ur': 'روبالہ: اضافہ %(adding)s',
+    'zh': '機器人: 正在新增 %(adding)s',
 }
 
 # This is the most important header, because it will be used a lot. That's the
 # header that the bot will add if the image hasn't the license.
 nothing_head = {
-    'ar': u"\n== صورة بدون ترخيص ==\n",
-    'de': u"\n== Bild ohne Lizenz ==\n",
-    'en': u"\n== Image without license ==\n",
-    'fa': u"\n== تصویر بدون اجازہ ==\n",
-    'ga': u"\n== Comhad gan ceadúnas ==\n",
-    'fr': u"\n== Fichier sans licence ==\n",
-    'hu': u"\n== Licenc nélküli kép ==\n",
-    'it': u"\n\n== File senza licenza ==\n",
-    'ur': u"\n== تصویر بدون اجازہ ==\n",
+    'ar': 'صورة بدون ترخيص',
+    'de': 'Bild ohne Lizenz',
+    'en': 'Image without license',
+    'fa': 'تصویر بدون اجازہ',
+    'ga': 'Comhad gan ceadúnas',
+    'fr': 'Fichier sans licence',
+    'hu': 'Licenc nélküli kép',
+    'it': 'File senza licenza',
+    'ur': 'تصویر بدون اجازہ',
 }
 # That's the text that the bot will add if it doesn't find the license.
 # Note: every __botnick__ will be repleaced with your bot's nickname
@@ -337,7 +337,6 @@ report_page = {
 
 # The summary of the report
 msg_comm10 = {
-    'commons': u'Bot: Updating the log',
     'ar': u'بوت: تحديث السجل',
     'de': u'Bot: schreibe Log',
     'en': u'Bot: Updating the log',
@@ -365,7 +364,6 @@ msg_comm10 = {
 HiddenTemplate = {
     # Put the other in the page on the project defined below
     'commons': [u'Template:Information'],
-
     'ar': [u'Template:معلومات'],
     'de': [u'Template:Information'],
     'en': [u'Template:Information'],
@@ -373,11 +371,9 @@ HiddenTemplate = {
     'fr': [u'Template:Information'],
     'ga': [u'Template:Information'],
     'hu': [u'Template:Információ', u'Template:Enwiki', u'Template:Azonnali'],
-    # Put the other in the page on the project defined below
     'it': [u'Template:EDP', u'Template:Informazioni file',
            u'Template:Information', u'Template:Trademark',
            u'Template:Permissionotrs'],
-
     'ja': [u'Template:Information'],
     'ko': [u'Template:그림 정보'],
     'ta': [u'Template:Information'],
@@ -429,7 +425,9 @@ duplicatesText = {
 
 # Head of the message given to the author
 duplicate_user_talk_head = {
-    'it': u'\n\n== File doppio ==\n',
+    'de': 'Datei-Duplikat',
+    'en': 'Duplicate file',
+    'it': 'File doppio',
 }
 
 # Message to put in the talk
@@ -440,16 +438,16 @@ duplicates_user_talk_text = {
 
 # Comment used by the bot while it reports the problem in the uploader's talk
 duplicates_comment_talk = {
-    'commons': u'Bot: Dupe file found',
     'ar': u'بوت: ملف مكرر تم العثور عليه',
+    'en': 'Bot: Notify that the file already exists on Commons',
     'fa': u'ربات: تصویر تکراری یافت شد',
     'it': u"Bot: Notifico il file doppio trovato",
 }
 
 # Comment used by the bot while it reports the problem in the image
 duplicates_comment_image = {
-    'commons': u'Bot: Tagging dupe file',
     'de': u'Bot: Datei liegt auf Commons',
+    'en': 'Bot: File already on Commons, may be deleted',
     'ar': u'بوت: وسم ملف مكرر',
     'fa': u'ربات: برچسب زدن بر تصویر تکراری',
     'it': u'Bot: File doppio, da cancellare',
@@ -554,7 +552,7 @@ class checkImagesBot(object):
         self.rep_page = i18n.translate(self.site, report_page)
         self.rep_text = '\n* [[:{0}:%s]] ~~~~~'.format(
             self.site.namespaces.FILE.custom_name)
-        self.com = i18n.translate(self.site, msg_comm10)
+        self.com = i18n.translate(self.site, msg_comm10, fallback=True)
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         self.hiddentemplates = set(
             [pywikibot.Page(self.site, tmp, ns=self.site.namespaces.TEMPLATE)
@@ -764,7 +762,8 @@ class checkImagesBot(object):
         if second_text:
             newText = u"%s\n\n%s" % (testoattuale, self.notification2)
         else:
-            newText = testoattuale + self.head + self.notification
+            newText = '{0}\n\n== {1} ==\n{2}'.format(testoattuale, self.head,
+                                                     self.notification)
 
         try:
             self.talk_page.put(newText, summary=commentox, minorEdit=False)
@@ -909,10 +908,13 @@ class checkImagesBot(object):
         """Function to check the duplicated files."""
         dupText = i18n.translate(self.site, duplicatesText)
         dupRegex = i18n.translate(self.site, duplicatesRegex)
-        dupTalkHead = i18n.translate(self.site, duplicate_user_talk_head)
+        dupTalkHead = i18n.translate(self.site, duplicate_user_talk_head,
+                                     fallback=True)
         dupTalkText = i18n.translate(self.site, duplicates_user_talk_text)
-        dupComment_talk = i18n.translate(self.site, duplicates_comment_talk)
-        dupComment_image = i18n.translate(self.site, duplicates_comment_image)
+        dupComment_talk = i18n.translate(self.site, duplicates_comment_talk,
+                                         fallback=True)
+        dupComment_image = i18n.translate(self.site, duplicates_comment_image,
+                                          fallback=True)
         imagePage = pywikibot.FilePage(self.site, self.imageName)
         hash_found = imagePage.latest_file_info.sha1
         duplicates = list(self.site.allimages(sha1=hash_found))
@@ -1157,7 +1159,6 @@ class checkImagesBot(object):
             pywikibot.output(u'>> Loaded the real-time page... <<')
         else:
             pywikibot.output(u'>> No additional settings found! <<')
-        return self.settingsData  # Useless, but it doesn't harm..
 
     def load_licenses(self):
         """Load the list of the licenses."""
@@ -1314,7 +1315,7 @@ class checkImagesBot(object):
                     reported = self.report_image(self.imageName)
                 if reported:
                     self.report(self.mex_used, self.imageName, self.text_used,
-                                u"\n%s\n" % self.head_used, None,
+                                self.head_used, None,
                                 self.imagestatus_used, self.summary_used)
                 else:
                     pywikibot.output(u"Skipping the file...")
@@ -1437,6 +1438,8 @@ class checkImagesBot(object):
                 break
             summary = tupla[5]
             head_2 = tupla[6]
+            if head_2.count('==') == 2:
+                head_2 = re.findall('\s*== *(.+?) *==\s*', head_2)[0]
             text = tupla[7] % self.imageName
             mexCatched = tupla[8]
             for k in find_list:
@@ -1494,9 +1497,10 @@ class checkImagesBot(object):
         HiddenTN = i18n.translate(self.site, HiddenTemplateNotification)
         self.unvertext = i18n.translate(self.site, n_txt)
         di = i18n.translate(self.site, delete_immediately)
-        dih = i18n.translate(self.site, delete_immediately_head)
-        din = i18n.translate(self.site, delete_immediately_notification)
-        nh = i18n.translate(self.site, nothing_head)
+        dih = i18n.translate(self.site, delete_immediately_head, fallback=True)
+        din = i18n.translate(self.site, delete_immediately_notification,
+                             fallback=True) + ' ~~~~'
+        nh = i18n.translate(self.site, nothing_head, fallback=True)
         nn = i18n.translate(self.site, nothing_notification)
         dels = i18n.translate(self.site, msg_del_comm, fallback=True)
         smwl = i18n.translate(self.site, second_message_without_license)
@@ -1536,19 +1540,18 @@ class checkImagesBot(object):
             return True
         elif delete:
             pywikibot.output(u"%s is not a file!" % self.imageName)
-            if not (di and din and dih):
-                pywikibot.output(
-                    "No localized message given for 'delete_immediately' or "
-                    "'delete_immediately_notification' or "
-                    "'delete_immediately_head'. Skipping.")
+            if not di:
+                pywikibot.output('No localized message given for '
+                                 "'delete_immediately'. Skipping.")
                 return
             # Some formatting for delete immediately template
-            dels = dels % di
+            dels = dels % {'adding': di}
             di = '\n' + di
             # Modify summary text
             pywikibot.setAction(dels)
             canctext = di % extension
-            notification = din % self.imageName
+            notification = din % {'file': self.image.title(asLink=True,
+                                                           textlink=True)}
             head = dih
             self.report(canctext, self.imageName, notification, head)
             return True
