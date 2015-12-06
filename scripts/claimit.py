@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-A script that adds claims to Wikidata items based on categories.
+A script that adds claims to Wikidata items based on a list of pages.
 
 ------------------------------------------------------------------------------
 
@@ -9,8 +9,8 @@ Usage:
 
     python pwb.py claimit [pagegenerators] P1 Q2 P123 Q456
 
-You can use any typical pagegenerator to provide with a list of pages.
-Then list the property-->target pairs to add.
+You can use any typical pagegenerator (like categories) to provide with a
+list of pages. Then list the property-->target pairs to add.
 
 ------------------------------------------------------------------------------
 
