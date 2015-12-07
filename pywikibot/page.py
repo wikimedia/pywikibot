@@ -746,6 +746,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return Category(Link(self._catredirect, self.site))
         raise pywikibot.IsNotRedirectPage(self)
 
+    @deprecated("interwiki.page_empty_check(page)")
     def isEmpty(self):
         """Return True if the page text has less than 4 characters.
 

@@ -1372,7 +1372,7 @@ class Subject(interwiki_graph.Subject):
 
             # must be behind the page.isRedirectPage() part
             # otherwise a redirect error would be raised
-            elif not page.isCategory() and page.isEmpty():
+            elif page_empty_check(page):
                 globalvar.remove.append(unicode(page))
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: %s is empty. Skipping." % page)
@@ -1839,7 +1839,7 @@ class Subject(interwiki_graph.Subject):
         except pywikibot.NoPage:
             pywikibot.output(u"Not editing %s: page does not exist" % page)
             raise SaveError(u'Page doesn\'t exist')
-        if not page.isCategory() and page.isEmpty():
+        if page_empty_check(page):
             pywikibot.output(u"Not editing %s: page is empty" % page)
             raise SaveError(u'Page is empty.')
 
@@ -2196,10 +2196,6 @@ class InterwikiBot(object):
                     if page.isTalkPage():
                         pywikibot.output(u'Skipping: %s is a talk page' % page)
                         continue
-                    # doesn't work: page must be preloaded for this test
-                    # if page.isEmpty():
-                    #    pywikibot.output(u'Skipping: %s is a empty page' % page.title())
-                    #    continue
                     if page.namespace() == 10:
                         loc = None
                         try:
@@ -2456,6 +2452,31 @@ def readWarnfile(filename, bot):
         hintStrings = ['%s:%s' % (hintedPage.site.lang,
                                   hintedPage.title()) for hintedPage in pagelist]
         bot.add(page, hints=hintStrings)
+
+
+def page_empty_check(page):
+    """
+    Return True if page should be skipped as it is almost empty.
+
+    Pages in content namespaces are considered empty if they contain less than 50
+    characters, and other pages are considered empty if they are not category
+    pages and contain less than 4 characters excluding interlanguage links and
+    categories.
+
+    @rtype: bool
+    """
+    # Check if the page is in content namespace
+    if page.namespace() == 0:
+        # Check if the page contains at least 50 characters
+        return len(page.text) < 50
+    else:
+        if not page.isCategory():
+            txt = page.get()
+            txt = textlib.removeLanguageLinks(txt, site=page.site)
+            txt = textlib.removeCategoryLinks(txt, site=page.site)
+            return len(txt) < 4
+        else:
+            return False
 
 
 def main(*args):
