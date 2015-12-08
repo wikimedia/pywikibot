@@ -16,6 +16,7 @@ ADD . /srv/pwb
 RUN pip3 install -U pip
 
 RUN pip3 install -r /srv/pwb/requirements.txt
+RUN pip3 install -r /srv/pwb/dev-requirements.txt
 RUN pip3 install /srv/pwb/
 
 CMD /bin/bash
