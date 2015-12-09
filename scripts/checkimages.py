@@ -1700,7 +1700,7 @@ def main(*args):
     if site.code not in project_inserted:
         pywikibot.output(u"Your project is not supported by this script.\n"
                          u"You have to edit the script and add it!")
-        return
+        return False
 
     # Reading the log of the new images if another generator is not given.
     if normal:
@@ -1764,10 +1764,11 @@ def main(*args):
 if __name__ == "__main__":
     start = time.time()
     try:
-        main()
+        ret = main()
     except SystemExit:
         pass
     else:
-        final = time.time()
-        delta = int(final - start)
-        pywikibot.output("Execution time: %s seconds\n" % delta)
+        if ret is not False:
+            final = time.time()
+            delta = int(final - start)
+            pywikibot.output("Execution time: %s seconds\n" % delta)
