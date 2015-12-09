@@ -29,7 +29,9 @@ This script understands the following command-line arguments:
 
 -break              To break the bot after the first check (default: recursive)
 
--time[:#]           Time in seconds between repeat runs (default: 30)
+-sleep[:#]          Time in seconds between repeat runs (default: 30)
+
+-time[:#]           The -time option is deprecated. Use -sleep instead.
 
 -wait[:#]           Wait x second before check the images (default: 0)
 
@@ -1600,12 +1602,17 @@ def main(*args):
                     u'How many files do you want to check?'))
             else:
                 limit = int(arg[7:])
-        if arg.startswith('-time'):
-            if len(arg) == 5:
-                time_sleep = int(pywikibot.input(
-                    u'How many seconds do you want runs to be apart?'))
+        if arg.startswith('-sleep') or arg.startswith('-time'):
+            if arg.startswith('-sleep'):
+                length = len('-sleep')
             else:
-                time_sleep = int(arg[6:])
+                pywikibot.tools.issue_deprecation_warning('-time', '-sleep', 2)
+                length = len('-time')
+            if len(arg) == length:
+                time_sleep = int(pywikibot.input(
+                    'How many seconds do you want runs to be apart?'))
+            else:
+                time_sleep = int(arg[length + 1:])
         elif arg == '-break':
             repeat = False
         elif arg == '-nologerror':
