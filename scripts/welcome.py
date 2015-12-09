@@ -917,7 +917,7 @@ def main(*args):
         elif arg.startswith('-timeoffset'):
             if len(arg) == 11:
                 globalvar.timeoffset = int(pywikibot.input(
-                    u'Which time offset (in minutest) for new users would you like to use?'))
+                    'Which time offset (in minutes) for new users would you like to use?'))
             else:
                 globalvar.timeoffset = int(arg[12:])
         elif arg.startswith('-time'):
