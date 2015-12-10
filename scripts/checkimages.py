@@ -1478,8 +1478,14 @@ class checkImagesBot(object):
 
         # Don't put "}}" here, please. Useless and can give problems.
         something = ['{{']
-        # Unused file extensions. Does not contain PDF.
-        notallowed = ("xcf", "xls", "sxw", "sxi", "sxc", "sxd")
+        # Allowed extensions
+        try:
+            allowed_formats = self.site.siteinfo.get(
+                'fileextensions', get_default=False)
+        except KeyError:
+            allowed_formats = []
+        else:
+            allowed_formats = [item['ext'].lower() for item in allowed_formats]
         brackets = False
         delete = False
         notification = None
@@ -1527,9 +1533,8 @@ class checkImagesBot(object):
                 # There's a template, probably a license
                 brackets = True
         # Is the extension allowed? (is it an image or f.e. a .xls file?)
-        for parl in notallowed:
-            if parl.lower() in extension.lower():
-                delete = True
+        if allowed_formats and extension.lower() not in allowed_formats:
+            delete = True
         (license_found, hiddenTemplateFound) = self.smartDetection()
         # Here begins the check block.
         if brackets and license_found:
