@@ -6,7 +6,6 @@ six
 
 nose
 
-pep8
 pep257>=0.6
 pyflakes>=0.9
 flake8
