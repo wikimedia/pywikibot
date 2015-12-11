@@ -973,6 +973,47 @@ class TestBadTokenRecovery(TestCase):
         page.save(summary='Bad token test')
 
 
+class TestUrlEncoding(TestCase):
+
+    """Test url_encode."""
+
+    family = 'wikipedia'
+    code = 'test'
+
+    def test_url_encoding_from_list(self):
+        """Test moving 'token' parameters from a list to the end."""
+        query = [('action', 'edit'), ('token', 'a'), ('supertoken', 'b'),
+                 ('text', 'text')]
+        expect = 'action=edit&text=text&token=a&supertoken=b'
+        result = api.encode_url(query)
+        self.assertEqual(result, expect)
+        self.assertIsInstance(result, str)
+
+    def test_url_encoding_from_dict(self):
+        """Test moving 'token' parameters from a dict to the end."""
+        # do not add other keys because dictionary is not deterministic
+        query = {'supertoken': 'b', 'text': 'text'}
+        expect = 'text=text&supertoken=b'
+        result = api.encode_url(query)
+        self.assertEqual(result, expect)
+        self.assertIsInstance(result, str)
+
+    def test_url_encoding_from_unicode(self):
+        """Test encoding unicode values."""
+        query = {'token': 'токен'}
+        expect = 'token=%D1%82%D0%BE%D0%BA%D0%B5%D0%BD'
+        result = api.encode_url(query)
+        self.assertEqual(result, expect)
+        self.assertIsInstance(result, str)
+
+    def test_moving_special_tokens(self):
+        """Test moving wpEditToken to the very end."""
+        query = {'wpEditToken': 'c', 'token': 'b', 'text': 'a'}
+        expect = 'text=a&token=b&wpEditToken=c'
+        result = api.encode_url(query)
+        self.assertEqual(result, expect)
+        self.assertIsInstance(result, str)
+
 if __name__ == '__main__':
     try:
         unittest.main()

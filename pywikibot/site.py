@@ -1212,10 +1212,10 @@ class BaseSite(ComparableMixin):
         """Return Family object for this Site."""
         return self.family
 
-    @deprecated("urllib.urlencode()")
+    @deprecated("pywikibot.data.api.encode_url")
     def urlEncode(self, query):
         """DEPRECATED."""
-        return urlencode(query)
+        return api.encode_url(query)
 
     @deprecated('pywikibot.data.api.Request or pywikibot.comms.http.request')
     @deprecated_args(compress=None, no_hostname=None, cookies_only=None,
