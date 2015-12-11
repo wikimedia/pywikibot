@@ -176,6 +176,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self._link.namespace
 
     @property
+    def namespace_obj(self):
+        """Return the namespace object of the page."""
+        return self.site.namespaces[self.namespace()]
+
+    @property
     def content_model(self):
         """Return the content model for this page.
 
@@ -186,6 +191,20 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not hasattr(self, '_contentmodel'):
             self.site.loadpageinfo(self)
         return self._contentmodel
+
+    @property
+    def depth(self):
+        """Return the depth/subpage level of the page."""
+        if not hasattr(self, '_depth'):
+            # Check if the namespace allows subpages
+            if self.namespace_obj.subpages:
+                # Count how many '/'s we have in the title
+                _depth = len(list(re.finditer('/', self.title())))
+            else:
+                # Does not allow subpages, which means depth is always 0
+                _depth = 0
+
+        return _depth
 
     @deprecated_args(decode=None, savetitle="asUrl")
     def title(self, underscore=False, withNamespace=True,
