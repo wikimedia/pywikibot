@@ -259,9 +259,12 @@ class ImageTransferBot(object):
                         break
                     todo = int(todo)
                 if todo in range(len(imagelist)):
-                    if imagelist[todo].fileIsShared():
+                    if (imagelist[todo].fileIsShared() and
+                            imagelist[todo].site.image_repository() ==
+                            self.targetSite.image_repository()):
                         pywikibot.output(
-                            u'The image is already on Wikimedia Commons.')
+                            'The image is already shared on {0}.'.format(
+                                self.targetSite.image_repository()))
                     else:
                         self.transferImage(imagelist[todo])
                     # remove the selected image from the list
