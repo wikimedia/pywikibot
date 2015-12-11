@@ -516,6 +516,21 @@ class TestPageObject(DefaultSiteTestCase):
         page_copy.isDisambig()
         self.assertTrue(page_copy.isRedirectPage())
 
+    def test_depth(self):
+        """Test page depth calculation."""
+        site = self.get_site()
+        page_d0 = pywikibot.Page(site, '/home/test/')
+        if site.namespaces[0].subpages:
+            self.assertEqual(page_d0.depth, 3)
+        else:
+            self.assertEqual(page_d0.depth, 0)
+
+        page_user_d0 = pywikibot.Page(site, 'User:Sn1per')
+        self.assertEqual(page_user_d0.depth, 0)
+
+        page_d3 = pywikibot.Page(site, 'User:Sn1per/ProtectTest1/test/test')
+        self.assertEqual(page_d3.depth, 3)
+
 
 class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
 

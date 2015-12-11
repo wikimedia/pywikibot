@@ -1372,6 +1372,29 @@ class Siteinfo(Container):
     WARNING_REGEX = re.compile(u"^Unrecognized values? for parameter "
                                u"'siprop': ([^,]+(?:, [^,]+)*)$")
 
+    # Until we get formatversion=2, we have to convert empty-string properties
+    # into booleans so they are easier to use.
+    BOOLEAN_PROPS = {
+        'general': [
+            'imagewhitelistenabled',
+            'langconversion',
+            'titleconversion',
+            'rtl',
+            'readonly',
+            'writeapi',
+            'variantarticlepath',
+            'misermode',
+        ],
+        'namespaces': [  # for each namespace
+            'subpages',
+            'content',
+            'nonincludable',
+        ],
+        'magicwords': [  # for each magicword
+            'case-sensitive',
+        ],
+    }
+
     def __init__(self, site):
         """Initialise it with an empty cache."""
         self._site = site
@@ -1412,11 +1435,31 @@ class Siteinfo(Container):
         """Do some default handling of data. Directly modifies data."""
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number
+
         if prop == 'general':
             if 'articlepath' not in data:  # Introduced in 1.16.0
                 # Old version of MediaWiki, extract from base
                 path = urlparse(data['base'])[2].rsplit('/', 1)[0] + '/$1'
                 data['articlepath'] = path
+
+        # Convert boolean props from empty strings to actual boolean values
+        if prop in Siteinfo.BOOLEAN_PROPS.keys():
+            # siprop=namespaces and magicwords has properties per item in result
+            if prop == 'namespaces' or prop == 'magicwords':
+                for index, value in enumerate(data):
+                    # namespaces uses a dict, while magicwords uses a list
+                    key = index if type(data) is list else value
+                    for p in Siteinfo.BOOLEAN_PROPS[prop]:
+                        if p in data[key]:
+                            data[key][p] = True
+                        else:
+                            data[key][p] = False
+            else:
+                for p in Siteinfo.BOOLEAN_PROPS[prop]:
+                    if p in data:
+                        data[p] = True
+                    else:
+                        data[p] = False
 
     def _get_siteinfo(self, prop, expiry):
         """
