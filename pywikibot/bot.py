@@ -1866,7 +1866,6 @@ class WikidataBot(Bot):
         if 'summary' in kwargs:
             pywikibot.output(u'Change summary: %s' % kwargs['summary'])
 
-        # TODO async in editEntity should actually have some effect (bug T86074)
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
         self._save_page(item, item.editEntity, data, **kwargs)
