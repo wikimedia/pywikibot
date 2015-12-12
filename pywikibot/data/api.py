@@ -38,6 +38,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import (
     MediaWikiVersion, deprecated, itergroup, ip, PY2, getargspec,
+    UnicodeType
 )
 from pywikibot.tools.formatter import color_format
 
@@ -3046,7 +3047,12 @@ def encode_url(query):
         query = list(query.items())
 
     if PY2:
-        query = [(pair[0], pair[1].encode('utf-8')) for pair in query]
+        def _encode(x):
+            if isinstance(x, UnicodeType):
+                return x.encode('utf-8')
+            else:
+                return x
+        query = [(pair[0], _encode(pair[1])) for pair in query]
 
     # parameters ending on 'token' should go last
     # wpEditToken should go very last

@@ -975,7 +975,7 @@ class TestBadTokenRecovery(TestCase):
 
 class TestUrlEncoding(TestCase):
 
-    """Test url_encode."""
+    """Test encode_url() function."""
 
     net = False
 
@@ -1001,6 +1001,17 @@ class TestUrlEncoding(TestCase):
         """Test encoding unicode values."""
         query = {'token': 'токен'}
         expect = 'token=%D1%82%D0%BE%D0%BA%D0%B5%D0%BD'
+        result = api.encode_url(query)
+        self.assertEqual(result, expect)
+        self.assertIsInstance(result, str)
+
+    def test_url_encoding_from_basestring(self):
+        """Test encoding basestring values."""
+        if PY2:
+            query = {'token': str('test\xe2\x80\x94test'.encode('utf-8'))}
+        else:
+            query = {'token': 'test\xe2\x80\x94test'}
+        expect = str('token=test%C3%A2%C2%80%C2%94test')
         result = api.encode_url(query)
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
