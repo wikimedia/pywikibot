@@ -977,8 +977,7 @@ class TestUrlEncoding(TestCase):
 
     """Test url_encode."""
 
-    family = 'wikipedia'
-    code = 'test'
+    net = False
 
     def test_url_encoding_from_list(self):
         """Test moving 'token' parameters from a list to the end."""

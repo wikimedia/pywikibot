@@ -3043,9 +3043,11 @@ def encode_url(query):
     @rtype: str
     """
     if hasattr(query, 'items'):
-        query = query.items()
+        query = list(query.items())
+
     if PY2:
         query = [(pair[0], pair[1].encode('utf-8')) for pair in query]
+
     # parameters ending on 'token' should go last
     # wpEditToken should go very last
     query.sort(key=lambda x: x[0].lower().endswith('token') +
