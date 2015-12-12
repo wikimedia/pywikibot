@@ -1764,7 +1764,7 @@ class Request(MutableMapping):
 
         URL encodes the parameters provided by _encoded_items()
         """
-        return urlencode(self._encoded_items())
+        return encode_url(self._encoded_items())
 
     def __str__(self):
         """Return a string representation."""
@@ -3026,6 +3026,31 @@ class LoginManager(login.LoginManager):
     def storecookiedata(self, data):
         """Ignore data; cookies are set by threadedhttp module."""
         http.cookie_jar.save()
+
+
+def encode_url(query):
+    """
+    Encode parameters to pass with a url.
+
+    Reorder parameters so that token parameters go last and call wraps
+    L{urlencode}. Return an HTTP URL query fragment which complies with
+    https://www.mediawiki.org/wiki/API:Edit#Parameters
+    (See the 'token' bullet.)
+
+    @param query: keys and values to be uncoded for passing with a url
+    @type query: mapping object or a sequence of two-element tuples
+    @return: encoded parameters with token parameters at the end
+    @rtype: str
+    """
+    if hasattr(query, 'items'):
+        query = query.items()
+    if PY2:
+        query = [(pair[0], pair[1].encode('utf-8')) for pair in query]
+    # parameters ending on 'token' should go last
+    # wpEditToken should go very last
+    query.sort(key=lambda x: x[0].lower().endswith('token') +
+               (x[0] == 'wpEditToken'))
+    return urlencode(query)
 
 
 def update_page(page, pagedict, props=[]):
