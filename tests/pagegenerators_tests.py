@@ -22,6 +22,7 @@ from pywikibot import pagegenerators, date
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
     PreloadingGenerator,
+    CategorizedPageGenerator
 )
 
 from tests import join_data_path
@@ -231,6 +232,33 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_start=nine_days_ago)
         self.assertEqual(len(list(gen)), 0)
+
+
+class SubpageFilterGeneratorTestCase(TestCase):
+
+    """Test SubpageFilterGenerator."""
+
+    family = 'test'
+    code = 'test'
+
+    def test_subpage_filter(self):
+        site = self.get_site()
+        test_cat = pywikibot.Category(site, 'Subpage testing')
+
+        gen = CategorizedPageGenerator(test_cat)
+        gen = pagegenerators.SubpageFilterGenerator(gen, 0)
+        expect_0 = ('/home/test',)
+        self.assertPagelistTitles(gen, titles=expect_0, site=site)
+
+        gen = CategorizedPageGenerator(test_cat)
+        gen = pagegenerators.SubpageFilterGenerator(gen, 3)
+        expect_3 = (
+            '/home/test',
+            'User:Sn1per/ProtectTest1/test',
+            'User:Sn1per/ProtectTest1/test/test',
+            'User:Sn1per/sandbox',
+        )
+        self.assertPagelistTitles(gen, titles=expect_3, site=site)
 
 
 class TestRepeatingGenerator(RecentChangesTestCase):
