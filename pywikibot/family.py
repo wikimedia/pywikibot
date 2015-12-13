@@ -1019,7 +1019,7 @@ class Family(object):
         return self._get_cr_templates(code, fallback)
 
     def disambig(self, code, fallback='_default'):
-        """"Return list of disambiguation templates."""
+        """Return list of disambiguation templates."""
         if code in self.disambiguationTemplates:
             return self.disambiguationTemplates[code]
         elif fallback:
