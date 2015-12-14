@@ -53,8 +53,9 @@ Furthermore, the following command line parameters are supported:
 
 -notalk      Overrides the report_dead_links_on_talk config variable, disabling
              the feature.
--day         the first time found dead link longer than x day ago, it should
-             probably be fixed or removed. if no set, default is 7 day.
+
+-day         Do not report broken link if the link is there only since
+             x days or less. If not set, the default is 7 days.
 
 The following config variables are supported:
 
@@ -70,6 +71,9 @@ report_dead_links_on_talk - If set to true, causes the script to report dead
                             links on the article's talk page if (and ONLY if)
                             the linked page has been unavailable at least two
                             times during a timespan of at least one week.
+
+weblink_dead_days         - sets the timespan (default: one week) after which
+                            a dead link will be reported
 
 Syntax examples:
     python pwb.py weblinkchecker -start:!
@@ -563,7 +567,8 @@ class LinkCheckThread(threading.Thread):
         else:
             pywikibot.output('*[[%s]] links to %s - %s.'
                              % (self.page.title(), self.url, message))
-            self.history.setLinkDead(self.url, message, self.page, self.day)
+            self.history.setLinkDead(self.url, message, self.page,
+                                     config.weblink_dead_days)
 
 
 class History(object):
@@ -637,7 +642,7 @@ class History(object):
             self.reportThread.report(url, errorReport, containingPage,
                                      archiveURL)
 
-    def setLinkDead(self, url, error, page, day):
+    def setLinkDead(self, url, error, page, weblink_dead_days):
         """Add the fact that the link was found dead to the .dat file."""
         self.semaphore.acquire()
         now = time.time()
@@ -651,7 +656,7 @@ class History(object):
             # if the first time we found this link longer than x day ago
             # (default is a week), it should probably be fixed or removed.
             # We'll list it in a file so that it can be removed manually.
-            if timeSinceFirstFound > 60 * 60 * 24 * day:
+            if timeSinceFirstFound > 60 * 60 * 24 * weblink_dead_days:
                 # search for archived page
                 try:
                     archiveURL = get_archive_url(url)
@@ -886,7 +891,6 @@ def main(*args):
     gen = None
     xmlFilename = None
     HTTPignore = []
-    day = 7
 
     if isinstance(memento_client, ImportError):
         warn('memento_client not imported: %s' % memento_client, ImportWarning)
@@ -905,7 +909,7 @@ def main(*args):
         elif arg.startswith('-ignore:'):
             HTTPignore.append(int(arg[8:]))
         elif arg.startswith('-day:'):
-            day = int(arg[5:])
+            config.weblink_dead_days = int(arg[5:])
         elif arg.startswith('-xmlstart'):
             if len(arg) == 9:
                 xmlStart = pywikibot.input(
@@ -935,7 +939,7 @@ def main(*args):
         pageNumber = max(240, config.max_external_links * 2)
         gen = pagegenerators.PreloadingGenerator(gen, step=pageNumber)
         gen = pagegenerators.RedirectFilterPageGenerator(gen)
-        bot = WeblinkCheckerRobot(gen, HTTPignore, day)
+        bot = WeblinkCheckerRobot(gen, HTTPignore, config.weblink_dead_days)
         try:
             bot.run()
         finally:
