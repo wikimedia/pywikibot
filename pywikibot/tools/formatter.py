@@ -123,6 +123,18 @@ class _ColorFormatter(Formatter):
         @rtype: unicode
         """
         result = super(_ColorFormatter, self)._vformat(*args, **kwargs)
+        if isinstance(result, tuple):
+            additional_params = result[1:]
+            result = result[0]
+        else:
+            additional_params = tuple()
+        result = self._convert_bytes(result)
+        if additional_params:
+            result = (result, ) + additional_params
+        return result
+
+    def _convert_bytes(self, result):
+        """Convert everything into unicode."""
         if PY2 and isinstance(result, str):
             assert result == b''
             result = ''  # This is changing it into a unicode
