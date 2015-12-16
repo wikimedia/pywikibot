@@ -124,17 +124,17 @@ class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""
 
-    hostname = 'testssl-expire.disig.sk'
+    hostname = 'testssl-expire-r2i2.disig.sk'
 
     def test_https_cert_error(self):
         """Test if http.fetch respects disable_ssl_certificate_validation."""
         self.assertRaises(pywikibot.FatalServerError,
                           http.fetch,
-                          uri='https://testssl-expire.disig.sk/index.en.html')
+                          uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
 
         with warnings.catch_warnings(record=True) as warning_log:
             response = http.fetch(
-                uri='https://testssl-expire.disig.sk/index.en.html',
+                uri='https://testssl-expire-r2i2.disig.sk/index.en.html',
                 disable_ssl_certificate_validation=True)
         r = response.content
         self.assertIsInstance(r, unicode)
@@ -144,7 +144,7 @@ class HttpsCertificateTestCase(TestCase):
         http.session.close()  # but first clear the connection
         self.assertRaises(pywikibot.FatalServerError,
                           http.fetch,
-                          uri='https://testssl-expire.disig.sk/index.en.html')
+                          uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
 
         # Verify that the warning occurred
         self.assertEqual(len(warning_log), 1)
