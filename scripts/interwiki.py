@@ -2466,7 +2466,7 @@ def page_empty_check(page):
     @rtype: bool
     """
     # Check if the page is in content namespace
-    if page.namespace() == 0:
+    if page._namespace_obj.content:
         # Check if the page contains at least 50 characters
         return len(page.text) < 50
     else:

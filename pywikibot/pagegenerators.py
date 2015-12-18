@@ -190,6 +190,10 @@ parameterHelp = u"""\
                   of pages, only retrieve n pages at a time from the wiki
                   server.
 
+-subpage:n        Filters pages to only those that have depth n
+                  i.e. a depth of 0 filters out all pages that are subpages, and
+                  a depth of 1 filters out all pages that are subpages of subpages.
+
 -titleregex       A regular expression that needs to match the article title
                   otherwise the page won't be returned.
                   Multiple -titleregex:regexpr can be provided and the page will
@@ -339,6 +343,7 @@ class GeneratorFactory(object):
         self.titlefilter_list = []
         self.claimfilter_list = []
         self.intersect = False
+        self.subpage_max_depth = None
         self._site = site
 
     @property
@@ -406,9 +411,10 @@ class GeneratorFactory(object):
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
-            if self.titlefilter_list or self.articlefilter_list:
+            if self.titlefilter_list or self.articlefilter_list or \
+               self.claimfilter_list or self.subpage_max_depth is not None:
                 pywikibot.warning(
-                    'grep/titleregex filters specified but no generators.')
+                    'filter(s) specified but no generators.')
             return None
         elif len(self.gens) == 1:
             gensList = self.gens[0]
@@ -424,6 +430,11 @@ class GeneratorFactory(object):
             else:
                 gensList = CombinedPageGenerator(self.gens)
                 dupfiltergen = self._filter_unique(gensList)
+
+        # Add on subpage filter generator
+        if self.subpage_max_depth is not None:
+            dupfiltergen = SubpageFilterGenerator(
+                dupfiltergen, self.subpage_max_depth)
 
         if self.claimfilter_list:
             dupfiltergen = PreloadingItemGenerator(dupfiltergen)
@@ -799,6 +810,13 @@ class GeneratorFactory(object):
             gen = MySQLPageGenerator(query, site=self.site)
         elif arg.startswith('-intersect'):
             self.intersect = True
+            return True
+        elif arg.startswith('-subpage'):
+            max_depth = arg[len('-subpage:'):]
+            if not max_depth:
+                max_depth = pywikibot.input(
+                    'Maximum subpage depth:')
+            self.subpage_max_depth = int(max_depth)
             return True
         elif arg.startswith('-logevents:'):
             gen = self._parse_log_events(*arg[len('-logevents:'):].split(','))
@@ -1374,6 +1392,32 @@ class ItemClaimFilter(object):
 
 # name the generator methods
 ItemClaimFilterPageGenerator = ItemClaimFilter.filter
+
+
+def SubpageFilterGenerator(generator, max_depth=0, show_filtered=False):
+    """
+    Generator which filters out subpages based on depth.
+
+    It looks at the namespace of each page and checks if that namespace has
+    subpages enabled. If so, pages with forward slashes ('/') are excluded.
+
+    @param generator: A generator object
+    @type generator: any generator or iterator
+    @param max_depth: Max depth of subpages to yield, at least zero
+    @type max_depth: int
+    @param show_filtered: Output a message for each page not yielded
+    @type show_filtered: bool
+    """
+    assert max_depth >= 0, 'Max subpage depth must be at least 0'
+
+    for page in generator:
+        if page.depth <= max_depth:
+            yield page
+        else:
+            if show_filtered:
+                pywikibot.output(
+                    'Page %s is a subpage that is too deep. Skipping.'
+                    % page)
 
 
 class RegexFilter(object):

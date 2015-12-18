@@ -2015,6 +2015,14 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertRegex(mysite.siteinfo['timezone'], "([A-Z]{3,4}|[A-Z][a-z]+/[A-Z][a-z]+)")
         self.assertIn(mysite.siteinfo['case'], ["first-letter", "case-sensitive"])
 
+    def test_siteinfo_boolean(self):
+        """Test conversion of boolean properties from empty strings to True/False."""
+        mysite = self.get_site()
+        self.assertIsInstance(mysite.siteinfo['titleconversion'], bool)
+
+        self.assertIsInstance(mysite.namespaces[0].subpages, bool)
+        self.assertIsInstance(mysite.namespaces[0].content, bool)
+
     def test_siteinfo_v1_16(self):
         """Test v.16+ siteinfo values."""
         if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.16'):
