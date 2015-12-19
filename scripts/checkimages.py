@@ -1602,7 +1602,7 @@ def main(*args):
     # Here below there are the parameters.
     for arg in pywikibot.handle_args(args):
         if arg.startswith('-limit'):
-            if len(arg) == 7:
+            if len(arg) == 6:
                 limit = int(pywikibot.input(
                     u'How many files do you want to check?'))
             else:
