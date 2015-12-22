@@ -11,6 +11,11 @@ import pywikibot
 
 __version__ = '$Id$'
 
+try:
+    from stdnum.exceptions import ValidationError as StdNumValidationError
+except ImportError:
+    StdNumValidationError = None
+
 from pywikibot import Bot, Claim, ItemPage
 from pywikibot.cosmetic_changes import CosmeticChangesToolkit, CANCEL_MATCH
 
@@ -25,6 +30,11 @@ from tests.aspects import (
     WikibaseTestCase, ScriptMainTestCase,
 )
 from tests.bot_tests import TWNBotTestCase
+
+if StdNumValidationError:
+    AnyIsbnValidationException = (StdNumValidationError, IsbnExc)
+else:
+    AnyIsbnValidationException = IsbnExc
 
 
 class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
@@ -45,10 +55,18 @@ class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
         """Test that it'll fail when the ISBN is invalid."""
         cc = CosmeticChangesToolkit(self.site, namespace=0)
 
-        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 0975229LOL')  # Invalid characters
-        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 0975229801')  # Invalid checksum
-        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 09752298')  # Invalid length
-        self.assertRaises(Exception, cc.fix_ISBN, 'ISBN 09752X9801')  # X in the middle
+        # Invalid characters
+        self.assertRaises(AnyIsbnValidationException,
+                          cc.fix_ISBN, 'ISBN 0975229LOL')
+        # Invalid checksum
+        self.assertRaises(AnyIsbnValidationException,
+                          cc.fix_ISBN, 'ISBN 0975229801')
+        # Invalid length
+        self.assertRaises(AnyIsbnValidationException,
+                          cc.fix_ISBN, 'ISBN 09752298')
+        # X in the middle
+        self.assertRaises(AnyIsbnValidationException,
+                          cc.fix_ISBN, 'ISBN 09752X9801')
 
     def test_ignore_invalid_isbn(self):
         """Test fixing ISBN numbers with an invalid ISBN."""
