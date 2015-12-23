@@ -2579,7 +2579,7 @@ class Category(Page):
         if targetCat.exists():
             pywikibot.output(u'Target page %s already exists!'
                              % targetCat.title(),
-                             level=pywikibot.WARNING)
+                             level=pywikibot.logging.WARNING)
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
