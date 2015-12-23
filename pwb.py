@@ -187,7 +187,7 @@ try:
 except RuntimeError as err:
     # user-config.py to be created
     print("NOTE: 'user-config.py' was not found!")
-    if not filename.startswith('generate_'):
+    if filename is not None and not filename.startswith('generate_'):
         print("Please follow the prompts to create it:")
         run_python_file('generate_user_files.py',
                         ['generate_user_files.py'],
