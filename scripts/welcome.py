@@ -151,7 +151,7 @@ NOTE: The white space and <pre></pre> aren't required but I suggest you to
 *                                                                          *
 * The regex to load the user might be slightly different from project to   *
 * project. (In this case, write to Filnik or the PWRF for help...)         *
-* Use a class to group toghether the functions used.                       *
+* Use a class to group together the functions used.                        *
 *                                                                          *
 ******************************** Badwords **********************************
 
@@ -164,7 +164,7 @@ you can add them directly in the source code that you are using without adding
 or deleting.
 
 Some words, like "Administrator" or "Dio" (God in italian) or "Jimbo" aren't
-badword at all but can be used for some bad-nickname.
+badwords at all but can be used for some bad-nickname.
 """
 #
 # (C) Alfio, 2005
