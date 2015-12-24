@@ -84,7 +84,10 @@ class TestMementoDefault(MementoTestCase):
 
     def test_invalid(self):
         """Test getting memento for invalid URL."""
-        self.assertRaises(Exception, self._get_archive_url, 'invalid')
+        # memento_client raises 'Exception', not a subclass.
+        self.assertRaisesRegexp(
+            Exception, 'Only HTTP URIs are supported',
+            self._get_archive_url, 'invalid')
 
 
 if __name__ == '__main__':
