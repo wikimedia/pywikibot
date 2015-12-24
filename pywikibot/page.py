@@ -34,13 +34,19 @@ except ImportError:
 from collections import defaultdict, namedtuple
 from warnings import warn
 
-if sys.version_info[0] > 2:
+from pywikibot.tools import PY2
+
+if not PY2:
     unicode = basestring = str
     long = int
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
 else:
-    chr = unichr  # flake8 F821 (undefined name) disabled by tox.ini
+    if __debug__ and not PY2:
+        unichr = NotImplemented  # pyflakes workaround
+
+    chr = unichr
+
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
@@ -60,16 +66,36 @@ from pywikibot.exceptions import (
 from pywikibot.family import Family
 from pywikibot.site import Namespace
 from pywikibot.tools import (
-    PYTHON_VERSION, PY2,
+    PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     first_upper, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
 )
-from pywikibot.tools.ip import ip_regexp  # flake8: disable=F401 (unused import)
+from pywikibot.tools.ip import ip_regexp
 from pywikibot.tools.ip import is_IP
 
+__all__ = (
+    'BasePage',
+    'Page',
+    'FilePage',
+    'Category',
+    'User',
+    'WikibasePage',
+    'ItemPage',
+    'Property',
+    'PropertyPage',
+    'Claim',
+    'Revision',
+    'FileInfo',
+    'Link',
+    'html2unicode',
+    'UnicodeToAsciiHtml',
+    'unicode2html',
+    'url2unicode',
+    'ip_regexp',  # unused & deprecated
+)
 
 logger = logging.getLogger("pywiki.wiki.page")
 

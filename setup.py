@@ -14,9 +14,12 @@ import sys
 try:
     # Work around a traceback on Python < 2.7.4 and < 3.3.1
     # http://bugs.python.org/issue15881#msg170215
-    import multiprocessing  # flake8: disable=F401 (unused import)
+    import multiprocessing
 except ImportError:
     pass
+
+# pyflakes workaround
+__unused__ = (multiprocessing, )
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
@@ -108,7 +111,8 @@ dependency_links = [
 if PYTHON_VERSION < (2, 7, 3):
     # work around distutils hardcoded unittest dependency
     # work around T106512
-    import unittest  # flake8: disable=F401 (unused import)
+    import unittest
+    __unused__ += (unittest, )
     if 'test' in sys.argv:
         import unittest2
         sys.modules['unittest'] = unittest2
@@ -142,7 +146,8 @@ if sys.version_info[0] == 2:
     script_deps['data_ingestion.py'] = extra_deps['csv']
 
 try:
-    import bz2  # flake8: disable=F401 (unused import)
+    import bz2
+    __unused__ += (bz2, )
 except ImportError:
     # Use bz2file if the python is not compiled with bz2 support.
     dependencies.append('bz2file')

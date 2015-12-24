@@ -72,7 +72,7 @@ def tryimport_pwb():
     """
     global pwb
     try:
-        import pywikibot  # flake8: disable=F811
+        import pywikibot
         pwb = pywikibot
     except RuntimeError:
         remove_modules()
@@ -184,7 +184,8 @@ try:
     if sys.platform == 'win32' and sys.version_info[0] < 3:
         _pwb_dir = str(_pwb_dir)
     os.environ[str('PYWIKIBOT2_DIR_PWB')] = _pwb_dir
-    import pywikibot  # flake8: disable=F401
+    import pywikibot
+    pwb = pywikibot
 except RuntimeError as err:
     # user-config.py to be created
     print("NOTE: 'user-config.py' was not found!")

@@ -77,8 +77,17 @@ import pywikibot
 from pywikibot.data import api
 
 # The follow attributes are used by eval()
-from pywikibot.page import User  # flake8: disable=F401 (unused import)
-from pywikibot.site import APISite, DataSite, LoginStatus  # flake8: disable=F401
+from pywikibot.page import User
+from pywikibot.site import APISite, DataSite, LoginStatus
+
+__all__ = (
+    'User', 'APISite', 'DataSite', 'LoginStatus',
+    'ParseError', 'CacheEntry', 'process_entries', 'main',
+    'has_password', 'is_logout', 'empty_response', 'not_accessed',
+    'incorrect_hash',
+    'older_than', 'newer_than', 'older_than_one_day', 'recent',
+    'uniquedesc', 'parameters',
+)
 
 
 class ParseError(Exception):
