@@ -19,6 +19,8 @@ from distutils.version import LooseVersion
 import pywikibot
 from pywikibot import pagegenerators, date
 
+from pywikibot.exceptions import UnknownExtension
+
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
     PreloadingGenerator,
@@ -179,6 +181,33 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'talk',
                                                           quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
+
+
+class TestQualityFilterPageGenerator(TestCase):
+
+    """Test QualityFilterPageGenerator methods."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    cached = True
+
+    base_title = 'Page:Popular Science Monthly Volume 1.djvu/%s'
+
+    def setUp(self):
+        super(TestQualityFilterPageGenerator, self).setUp()
+        self.site = self.get_site()
+        self.titles = [self.base_title % i for i in range(1, 11)]
+
+    def test_QualityFilterPageGenerator(self):
+        site = self.site
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.QualityFilterPageGenerator(gen, [0])
+        self.assertEqual(len(tuple(gen)), 7)
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.NamespaceFilterPageGenerator(gen, [4])
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        self.assertEqual(len(tuple(gen)), 10)
 
 
 class EdittimeFilterPageGeneratorTestCase(TestCase):
@@ -510,6 +539,10 @@ class DryFactoryGeneratorTest(TestCase):
         self.assertIsInstance(gf.namespaces, frozenset)
         gf.handleArg('-ns:0')
         self.assertEqual(gf.namespaces, set([1, 6]))
+
+    def test_unsupported_quality_level_filter(self):
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        self.assertRaises(UnknownExtension, gf.handleArg, '-ql:2')
 
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):

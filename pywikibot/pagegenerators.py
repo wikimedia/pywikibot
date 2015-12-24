@@ -48,7 +48,8 @@ from pywikibot.tools import (
 
 from pywikibot import date, config, i18n, xmlreader
 from pywikibot.comms import http
-from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.exceptions import ArgumentDeprecationWarning, UnknownExtension
+from pywikibot.proofreadpage import ProofreadPage
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -278,6 +279,12 @@ parameterHelp = u"""\
                   Case insensitive regular expressions will be used and
                   dot matches any character, including a newline.
 
+-ql               Filter pages based on page quality.
+                  This is only applicable if contentmodel equals
+                  'proofread-page', otherwise has no effects.
+                  Valid values are in range 0-4.
+                  Multiple values can be comma-separated.
+
 -onlyif           A claim the page needs to contain, otherwise the item won't
                   be returned.
                   The format is property=value,qualifier=value. Multiple (or
@@ -339,6 +346,7 @@ class GeneratorFactory(object):
         self._namespaces = []
         self.step = None
         self.limit = None
+        self.qualityfilter_list = []
         self.articlefilter_list = []
         self.titlefilter_list = []
         self.claimfilter_list = []
@@ -411,8 +419,11 @@ class GeneratorFactory(object):
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
-            if self.titlefilter_list or self.articlefilter_list or \
-               self.claimfilter_list or self.subpage_max_depth is not None:
+            if (self.titlefilter_list or
+                self.articlefilter_list or
+                self.claimfilter_list or
+                self.subpage_max_depth is not None or
+                    self.qualityfilter_list):
                 pywikibot.warning(
                     'filter(s) specified but no generators.')
             return None
@@ -442,6 +453,10 @@ class GeneratorFactory(object):
                 dupfiltergen = ItemClaimFilterPageGenerator(dupfiltergen,
                                                             claim[0], claim[1],
                                                             claim[2], claim[3])
+
+        if self.qualityfilter_list:
+            dupfiltergen = QualityFilterPageGenerator(
+                dupfiltergen, self.qualityfilter_list)
 
         if self.titlefilter_list:
             dupfiltergen = RegexFilterPageGenerator(
@@ -777,6 +792,19 @@ class GeneratorFactory(object):
                     u'Which pattern do you want to grep?'))
             else:
                 self.articlefilter_list.append(arg[6:])
+            return True
+        elif arg.startswith('-ql:'):
+            if not self.site.has_extension('ProofreadPage'):
+                raise UnknownExtension(
+                    'Ql filtering needs a site with ProofreadPage extension.')
+            value = map(int, arg[4:].split(','))
+            if min(value) < 0 or max(value) > 4:  # Invalid input ql.
+                valid_ql = ['{0}: {1}'.format(*i) for
+                            i in self.site.proofread_levels.items()]
+                valid_ql = ', '.join(valid_ql)
+                pywikibot.warning('Acceptable values for -ql are:\n    %s'
+                                  % valid_ql)
+            self.qualityfilter_list = value
             return True
         elif arg.startswith('-onlyif') or arg.startswith('-onlyifnot'):
             ifnot = arg.startswith('-onlyifnot')
@@ -1500,6 +1528,27 @@ class RegexFilter(object):
         reg = cls.__precompile(regex, re.IGNORECASE | re.DOTALL)
         return (page for page in generator
                 if cls.__filter_match(reg, page.text, quantifier))
+
+
+def QualityFilterPageGenerator(generator, quality):
+    """
+    Wrap a generator to filter pages according to quality levels.
+
+    This is possible only for pages with content_model 'proofread-page'.
+    In all the other cases, no filter is applied.
+
+    @param generator: A generator object
+    @param quality: proofread-page quality levels (valid range 0-4)
+    @type quality: list of int
+
+    """
+    for page in generator:
+        if page.namespace() == page.site.proofread_page_ns:
+            page = ProofreadPage(page)
+            if page.quality_level in quality:
+                yield page
+        else:
+            yield page
 
 # name the generator methods
 RegexFilterPageGenerator = RegexFilter.titlefilter

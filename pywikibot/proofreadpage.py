@@ -161,6 +161,26 @@ class ProofreadPage(pywikibot.Page):
         if hasattr(self, "_index"):
             del self._index
 
+    @property
+    def quality_level(self):
+        """Return the quality level of this page when it is retrieved from API.
+
+        This is only applicable if contentmodel equals 'proofread-page'.
+        None is returned otherwise.
+
+        This property is read-only and is applicable only when page is loaded.
+        If quality level is overwritten during page processing, this property
+        is no longer necessarily aligned with the new value.
+
+        In this way, no text parsing is necessary to check quality level when
+        fetching a page.
+        # TODO: align this value with ProofreadPage.ql
+
+        """
+        if self.content_model == 'proofread-page' and hasattr(self, '_quality'):
+            return self._quality
+        return self.ql
+
     def decompose(fn):
         """Decorator.
 

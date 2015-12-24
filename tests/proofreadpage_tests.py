@@ -207,6 +207,24 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
 
 
+class TestPageQuality(TestCase):
+
+    """Test page quality."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    cached = True
+
+    def test_applicable_quality_level(self):
+        """Test Page.quality_level when applicable."""
+        site = self.get_site()
+        title = 'Page:Popular Science Monthly Volume 49.djvu/1'
+        page = ProofreadPage(site, title)
+        self.assertEqual(page.content_model, 'proofread-page')
+        self.assertEqual(page.quality_level, 0)
+
+
 @require_modules('bs4')
 class TestProofreadPageIndexProperty(TestCase):
 
