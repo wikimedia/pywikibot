@@ -443,8 +443,9 @@ class UI(object):
                     u'What is the solution of the CAPTCHA that is shown in '
                     u'your web browser?')
             else:
-                raise
-        except:
+                raise webbrowser.Error(
+                    'webbrowser.open failed to open a web browser')
+        except Exception:
             pywikibot.output(u'Error in opening web browser: %s'
                              % sys.exc_info()[0])
             pywikibot.output(
