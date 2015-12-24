@@ -2000,7 +2000,11 @@ class APISite(BaseSite):
         return auth_token is not None and len(auth_token) == 4
 
     def login(self, sysop=False):
-        """Log the user in if not already logged in."""
+        """
+        Log the user in if not already logged in.
+
+        U{https://www.mediawiki.org/wiki/API:Login}
+        """
         # TODO: this should include an assert that loginstatus
         #       is not already IN_PROGRESS, however the
         #       login status may be left 'IN_PROGRESS' because
@@ -2069,9 +2073,11 @@ class APISite(BaseSite):
         self.login(old_status)
 
     def logout(self):
-        """Logout of the site and load details for the logged out user.
+        """
+        Logout of the site and load details for the logged out user.
 
         Also logs out of the global account if linked to the user.
+        U{https://www.mediawiki.org/wiki/API:Logout}
 
         @raises APIError: Logout is not available when OAuth enabled.
         """
@@ -2094,6 +2100,8 @@ class APISite(BaseSite):
           - rights: list of rights (could be empty)
           - message: present if user has a new message on talk page
           - blockinfo: present if user is blocked (dict)
+
+        U{https://www.mediawiki.org/wiki/API:Userinfo}
 
         @param force: force to retrieve userinfo ignoring cache
         @type force: bool
@@ -2151,6 +2159,7 @@ class APISite(BaseSite):
 
         To check whether a user can perform an action,
         the method has_right should be used.
+        U{https://www.mediawiki.org/wiki/API:Userinfo}
 
         @param sysop: If true, log in to sysop account (if available)
         @type sysop: bool
@@ -2234,6 +2243,7 @@ class APISite(BaseSite):
         * Actions: edit, move, delete, protect, upload
         * User levels: autoconfirmed, sysop, bot
 
+        U{https://www.mediawiki.org/wiki/API:Userinfo}
         """
         if not self.logged_in(sysop):
             self.login(sysop)
@@ -2244,6 +2254,7 @@ class APISite(BaseSite):
 
         Possible values of 'group' may vary depending on wiki settings,
         but will usually include bot.
+        U{https://www.mediawiki.org/wiki/API:Userinfo}
 
         """
         if not self.logged_in(sysop):
