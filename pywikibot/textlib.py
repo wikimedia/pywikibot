@@ -993,7 +993,7 @@ def interwikiSort(sites, insite=None):
 # Functions dealing with category links
 # -------------------------------------
 
-def getCategoryLinks(text, site=None, include=[]):
+def getCategoryLinks(text, site=None, include=[], expand_text=False):
     """Return a list of category links found in text.
 
     @param include: list of tags which should not be removed by
@@ -1013,7 +1013,7 @@ def getCategoryLinks(text, site=None, include=[]):
     R = re.compile(r'\[\[\s*(?P<namespace>%s)\s*:\s*(?P<rest>.+?)\]\]'
                    % catNamespace, re.I)
     for match in R.finditer(text):
-        if '{{' in match.group('rest'):
+        if expand_text and '{{' in match.group('rest'):
             rest = site.expand_text(match.group('rest'))
         else:
             rest = match.group('rest')

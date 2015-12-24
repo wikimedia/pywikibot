@@ -265,24 +265,25 @@ class TestTemplatesInCategory(TestCase):
         """Test normal templates inside category links."""
         self.site = self.get_site()
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|Foo}}]]', self.site),
+            '[[Category:{{P1|Foo}}]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo')])
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|Foo}}|bar]]', self.site),
+            '[[Category:{{P1|Foo}}|bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='bar')])
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]', self.site),
+            '[[Category:{{P1|{{P2|L33t|Foo}}}}|bar]]',
+            self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='bar')])
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:Foo{{!}}bar]]', self.site),
+            '[[Category:Foo{{!}}bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='bar')])
         self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}bar]][[Category:Wiki{{P2||pedia}}]]',
-            self.site),
+            self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='bar'),
              pywikibot.page.Category(self.site, 'Wikipedia')])
         self.assertEqual(textlib.getCategoryLinks(
-            '[[Category:Foo{{!}}and{{!}}bar]]', self.site),
+            '[[Category:Foo{{!}}and{{!}}bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='and|bar')])
         self.assertRaises(pywikibot.InvalidTitle, textlib.getCategoryLinks,
                           '[[Category:nasty{{{!}}]]', self.site)
