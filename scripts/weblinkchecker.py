@@ -175,6 +175,8 @@ ignorelist = [
     re.compile(r'.*[\./@]britannica\.com(/.*)?'),  # HTTP redirect loop
     # bot rejected on the site:
     re.compile(r'.*[\./@]quickfacts\.census\.gov(/.*)?'),
+    # bot rejected on the site, already archived
+    re.compile(r'.*[\./@]web\.archive\.org(/.*)?'),
 ]
 
 
