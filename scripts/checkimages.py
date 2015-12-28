@@ -215,7 +215,7 @@ delete_immediately_notification = {
     'ga': u'Tá iarmhír mícheart ar an comhad [[:File:%s]], scrúdaigh le d\'thoil. ~~~~',
     'fr': u'Le fichier [[:File:%s]] semble avoir une mauvaise extension, veuillez vérifier. ~~~~',
     'hu': u'A [[:Kép:%s]] fájlnak rossz a kiterjesztése, kérlek ellenőrízd. ~~~~',
-    'it': u'{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Ext|%s|__botnick__}} --~~~~',
+    'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Ext|%s|~~~}} --~~~~',
     'ko': u'[[:그림:%s]]의 파일 형식이 잘못되었습니다. 확인 바랍니다.--~~~~',
     'ta': '[[:படிமம்:%s]] இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு செய்து ஒ'
           'ரு முறை சரி பார்க்கவும் ~~~~',
@@ -259,12 +259,12 @@ nothing_head = {
 # (feel free not to use if you don't need it)
 nothing_notification = {
     'commons': (u"\n{{subst:User:Filnik/untagged|File:%s}}\n\n''This message "
-                u"was '''added automatically by __botnick__''', if you need "
+                u"was '''added automatically by ~~~''', if you need "
                 u"some help about it, please read the text above again and "
                 u"follow the links in it, if you still need help ask at the "
                 u"[[File:Human-help-browser.svg|18px|link=Commons:Help desk|?]] "
                 u"'''[[Commons:Help desk|->]][[Commons:Help desk]]''' in any "
-                u"language you like to use.'' --__botnick__ ~~~~~"""),
+                u"language you like to use.'' --~~~~"""),
     'ar': u"{{subst:مصدر الصورة|File:%s}} --~~~~",
     'en': u"{{subst:image source|File:%s}} --~~~~",
     'fa': u"{{جا:اخطار نگاره|%s}}",
@@ -273,7 +273,7 @@ nothing_notification = {
           u"helyezte el a vitalapodon, kérdéseddel fordulj a gazdájához, vagy "
           u"a [[WP:KF|Kocsmafalhoz]]. --~~~~",
     'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza licenza|'
-          '%s|__botnick__}} --~~~~',
+          '%s|~~~}} --~~~~',
     'ja': u"\n{{subst:Image copyright|File:%s}}--~~~~",
     'ko': u'\n{{subst:User:Kwjbot IV/untagged|%s}} --~~~~',
     'ta': u'\n{{subst:Di-no license-notice|படிமம்:%s}} ~~~~',
@@ -306,7 +306,7 @@ second_message_without_license = {
           u'képek]]ről szóló oldalunk, és segítségért fordulj a [[WP:KF-JO|'
           u'Jogi kocsmafalhoz]]. Köszönöm --~~~~',
     'it': u':{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Senza'
-          u'licenza2|%s|__botnick__}} --~~~~',
+          u'licenza2|%s|~~~}} --~~~~',
 }
 
 # You can add some settings to a wiki page. In this way, you can change them
@@ -405,14 +405,14 @@ PageWithAllowedTemplates = {
 # (feel free not to use if you don't need it)
 HiddenTemplateNotification = {
     'commons': (u"\n{{subst:User:Filnik/whitetemplate|File:%s}}\n\n''This "
-                u"message was added automatically by __botnick__, if you need "
+                u"message was added automatically by ~~~, if you need "
                 u"some help about it please read the text above again and "
                 u"follow the links in it, if you still need help ask at the "
                 u"[[File:Human-help-browser.svg|18px|link=Commons:Help desk|?]]"
                 u" '''[[Commons:Help desk|→]] [[Commons:Help desk]]''' in any "
-                u"language you like to use.'' --__botnick__ ~~~~~"),
+                u"language you like to use.'' --~~~~"),
     'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/'
-          'Template_insufficiente|%s|__botnick__}} --~~~~',
+          'Template_insufficiente|%s|~~~}} --~~~~',
     'ko': u"\n{{subst:User:Kwj2772/whitetemplates|%s}} --~~~~",
 }
 
@@ -434,9 +434,8 @@ duplicate_user_talk_head = {
 
 # Message to put in the talk
 duplicates_user_talk_text = {
-    'commons': u'{{subst:User:Filnik/duplicates|File:%s|File:%s}}',  # FIXME: it doesn't exist
     'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Duplicati|'
-          '%s|%s|__botnick__}} --~~~~',
+          '%s|%s|~~~}} --~~~~',
 }
 
 # Comment used by the bot while it reports the problem in the uploader's talk
