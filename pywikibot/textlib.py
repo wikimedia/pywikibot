@@ -785,7 +785,11 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
             if site == insite:
                 continue
             try:
+                previous_key_count = len(result)
                 result[site] = pywikibot.Page(site, pagetitle)
+                if previous_key_count == len(result):
+                    pywikibot.warning('[getLanguageLinks] 2 or more interwiki '
+                                      'links point to site %s.' % site)
             except pywikibot.InvalidTitle:
                 pywikibot.output(u'[getLanguageLinks] Text contains invalid '
                                  u'interwiki link [[%s:%s]].'
