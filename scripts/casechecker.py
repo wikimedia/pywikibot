@@ -2,7 +2,7 @@
 # -*- coding: utf-8  -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2015
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,6 +12,7 @@ __version__ = '$Id$'
 import codecs
 import os
 import re
+from string import ascii_letters
 import sys
 
 import pywikibot
@@ -107,7 +108,7 @@ class CaseChecker(object):
     localKeyboard = u'йцукенгшщзфывапролдячсмить'
     latinKeyboard = u'qwertyuiopasdfghjklzxcvbnm'
 
-    romanNumChars = u'IVXLMC'
+    romanNumChars = u'IVXLCDM'
     # all letters that may be used as suffixes after roman numbers:  "Iый"
     romannumSuffixes = localLowerLtr
     romanNumSfxPtrn = re.compile(
@@ -116,8 +117,6 @@ class CaseChecker(object):
     whitelists = {
         'ru': u'ВП:КЛ/Проверенные',
     }
-
-    latLtr = u'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
     lclClrFnt = u'<font color=green>'
     latClrFnt = u'<font color=brown>'
@@ -249,10 +248,11 @@ class CaseChecker(object):
             self.latToLclKeybDict = {}
 
         badPtrnStr = u'([%s][%s]|[%s][%s])' \
-                     % (self.latLtr, self.localLtr, self.localLtr, self.latLtr)
+                     % (ascii_letters, self.localLtr,
+                        self.localLtr, ascii_letters)
         self.badWordPtrn = re.compile(u'[%s%s]*%s[%s%s]*'
-                                      % (self.latLtr, self.localLtr,
-                                         badPtrnStr, self.latLtr,
+                                      % (ascii_letters, self.localLtr,
+                                         badPtrnStr, ascii_letters,
                                          self.localLtr))
 
         # Get whitelist
@@ -539,7 +539,7 @@ class CaseChecker(object):
                 else:
                     if mightBeLcl and l not in self.latinSuspects:
                         mightBeLcl = False
-                    if l not in self.latLtr:
+                    if l not in ascii_letters:
                         raise ValueError(u'Assert failed')
 
             # Some words are well known and frequently mixed-typed
@@ -703,7 +703,7 @@ class CaseChecker(object):
                     else:
                         res += self.suffixClr + self.lclClrFnt
                     lastIsCyr = True
-            elif l in self.latLtr:
+            elif l in ascii_letters:
                 if lastIsCyr:
                     if toScreen:
                         SetColor(FOREGROUND_RED)
