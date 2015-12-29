@@ -21,56 +21,12 @@ import pywikibot
 from pywikibot import i18n
 
 from pywikibot.data import api
-from pywikibot.tools import first_lower, first_upper
+from pywikibot.tools import first_lower, first_upper, formatter
 
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
 if sys.version_info[0] > 2:
     xrange = range
-
-# Windows Concole colors
-# This code makes this script Windows ONLY!!!
-# Feel free to adapt it to another platform
-#
-# Adapted from https://code.activestate.com/recipes/496901/
-#
-STD_OUTPUT_HANDLE = -11
-
-FOREGROUND_BLUE = 0x01  # text color contains blue.
-FOREGROUND_GREEN = 0x02  # text color contains green.
-FOREGROUND_RED = 0x04  # text color contains red.
-FOREGROUND_INTENSITY = 0x08  # text color is intensified.
-BACKGROUND_BLUE = 0x10  # background color contains blue.
-BACKGROUND_GREEN = 0x20  # background color contains green.
-BACKGROUND_RED = 0x40  # background color contains red.
-BACKGROUND_INTENSITY = 0x80  # background color is intensified.
-
-FOREGROUND_WHITE = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED
-
-try:
-    import ctypes
-    std_out_handle = ctypes.windll.kernel32.GetStdHandle(STD_OUTPUT_HANDLE)
-except:
-    std_out_handle = None
-
-
-def SetColor(color):
-    """Set windows color."""
-    if std_out_handle:
-        try:
-            return ctypes.windll.kernel32.SetConsoleTextAttribute(
-                std_out_handle, color)
-        except:
-            pass
-
-    if color == FOREGROUND_BLUE:
-        print('(b:', end=' ')
-    if color == FOREGROUND_GREEN:
-        print('(g:', end=' ')
-    if color == FOREGROUND_RED:
-        print('(r:', end=' ')
-
-# end of console code
 
 
 class CaseChecker(object):
@@ -107,6 +63,10 @@ class CaseChecker(object):
     lclClrFnt = u'<font color=green>'
     latClrFnt = u'<font color=brown>'
     suffixClr = u'</font>'
+
+    colorFormatLocalColor = '{green}'
+    colorFormatLatinColor = '{red}'
+    colorFormatSuffix = '{default}'
 
     wordBreaker = re.compile(r'[ _\-/\|#[\]():]')
     stripChars = u' \t,'
@@ -676,43 +636,47 @@ class CaseChecker(object):
     def ColorCodeWord(self, word, toScreen=False):
         """Colorize code word."""
         if not toScreen:
-            res = u"<b>"
+            return self._ColorCodeWordHtml(word)
+        else:
+            return self._ColorCodeWordScreen(word)
+
+    def _ColorCodeWordHtml(self, word):
+        res = '<b>'
         lastIsCyr = word[0] in self.localLtr
         if lastIsCyr:
-            if toScreen:
-                SetColor(FOREGROUND_GREEN)
-            else:
-                res += self.lclClrFnt
+            res += self.lclClrFnt
         else:
-            if toScreen:
-                SetColor(FOREGROUND_RED)
-            else:
-                res += self.latClrFnt
-
+            res += self.latClrFnt
         for l in word:
             if l in self.localLtr:
                 if not lastIsCyr:
-                    if toScreen:
-                        SetColor(FOREGROUND_GREEN)
-                    else:
-                        res += self.suffixClr + self.lclClrFnt
+                    res += self.suffixClr + self.lclClrFnt
                     lastIsCyr = True
             elif l in ascii_letters:
                 if lastIsCyr:
-                    if toScreen:
-                        SetColor(FOREGROUND_RED)
-                    else:
-                        res += self.suffixClr + self.latClrFnt
+                    res += self.suffixClr + self.latClrFnt
                     lastIsCyr = False
-            if toScreen:
-                pywikibot.output(l, newline=False)
-            else:
-                res += l
+            res += l
+        return res + self.suffixClr + '</b>'
 
-        if toScreen:
-            SetColor(FOREGROUND_WHITE)
+    def _ColorCodeWordScreen(self, word):
+        res = ''
+        lastIsCyr = word[0] in self.localLtr
+        if lastIsCyr:
+            res += self.colorFormatLocalColor
         else:
-            return res + self.suffixClr + u"</b>"
+            res += self.colorFormatLatinColor
+        for l in word:
+            if l in self.localLtr:
+                if not lastIsCyr:
+                    res += self.colorFormatLocalColor
+                    lastIsCyr = True
+            elif l in self.latLtr:
+                if lastIsCyr:
+                    res += self.colorFormatLatinColor
+                    lastIsCyr = False
+            res += l
+        return formatter.color_format(res + self.colorFormatSuffix)
 
     def AddNoSuggestionTitle(self, title):
         """Add backlinks to log."""
