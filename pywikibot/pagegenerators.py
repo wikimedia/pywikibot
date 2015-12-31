@@ -700,6 +700,10 @@ class GeneratorFactory(object):
             if not url:
                 url = pywikibot.input(
                     u'Pages with which weblink should be processed?')
+            # If url is * we make it None in order to search for every page
+            # with any URL.
+            if url == "*":
+                url = None
             gen = LinksearchPageGenerator(url, site=self.site)
         elif arg.startswith('-transcludes'):
             transclusionPageTitle = arg[len('-transcludes:'):]
