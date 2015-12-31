@@ -1501,10 +1501,6 @@ class checkImagesBot(object):
         dels = i18n.translate(self.site, msg_del_comm, fallback=True)
         smwl = i18n.translate(self.site, second_message_without_license)
 
-        # Some formatting for delete immediately template
-        di = u'\n%s' % di
-        dels = dels % di
-
         try:
             self.imageCheckText = self.image.get()
         except pywikibot.NoPage:
@@ -1537,10 +1533,18 @@ class checkImagesBot(object):
         (license_found, hiddenTemplateFound) = self.smartDetection()
         # Here begins the check block.
         if brackets and license_found:
-            # It works also without this... but i want only to be sure ^^
             return True
         elif delete:
             pywikibot.output(u"%s is not a file!" % self.imageName)
+            if not (di and din and dih):
+                pywikibot.output(
+                    "No localized message given for 'delete_immediately' or "
+                    "'delete_immediately_notification' or "
+                    "'delete_immediately_head'. Skipping.")
+                return
+            # Some formatting for delete immediately template
+            dels = dels % di
+            di = '\n' + di
             # Modify summary text
             pywikibot.setAction(dels)
             canctext = di % extension
