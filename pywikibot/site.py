@@ -1384,6 +1384,7 @@ class Siteinfo(Container):
             'writeapi',
             'variantarticlepath',
             'misermode',
+            'uploadsenabled',
         ],
         'namespaces': [  # for each namespace
             'subpages',
@@ -5473,10 +5474,13 @@ class APISite(BaseSite):
     def is_uploaddisabled(self):
         """Return True if upload is disabled on site.
 
+        When the version is at least 1.27wmf9, uses general siteinfo.
         If not called directly, it is cached by the first attempted
         upload action.
 
         """
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.27wmf9'):
+            return not self._siteinfo.get('general')['uploadsenabled']
         if hasattr(self, '_uploaddisabled'):
             return self._uploaddisabled
         else:
