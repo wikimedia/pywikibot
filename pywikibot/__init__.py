@@ -540,6 +540,43 @@ class WbQuantity(_WbRepresentation):
         return cls(amount, wb['unit'], error)
 
 
+class WbMonolingualText(_WbRepresentation):
+    """A Wikibase monolingual text representation."""
+
+    def __init__(self, text, language):
+        """
+        Create a new WbMonolingualText object.
+
+        @param text: text string
+        @type text: str
+        @param language: language code of the string
+        @type language: str
+        """
+        self.text = text
+        self.language = language
+
+    def toWikibase(self):
+        """
+        Convert the data to a JSON object for the Wikibase API.
+
+        @return: Wikibase JSON
+        @rtype: dict
+        """
+        json = {'text': self.text,
+                'language': self.language
+                }
+        return json
+
+    @classmethod
+    def fromWikibase(cls, wb):
+        """
+        Create a WbMonolingualText from the JSON data given by the Wikibase API.
+
+        @param wb: Wikibase JSON
+        @type wb: dict
+        """
+        return cls(wb['text'], wb['language'])
+
 _sites = {}
 _url_cache = {}  # The code/fam pair for each URL
 

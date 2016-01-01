@@ -4114,6 +4114,8 @@ class Claim(Property):
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
         'time': lambda value, site: pywikibot.WbTime.fromWikibase(value),
         'quantity': lambda value, site: pywikibot.WbQuantity.fromWikibase(value),
+        'monolingualtext': lambda value, site:
+            pywikibot.WbMonolingualText.fromWikibase(value)
     }
 
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
@@ -4532,7 +4534,8 @@ class Claim(Property):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(withNamespace=False)
-        elif self.type in ('globe-coordinate', 'time', 'quantity'):
+        elif self.type in ('globe-coordinate', 'time',
+                           'quantity', 'monolingualtext'):
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'
