@@ -62,6 +62,9 @@ _logger = "pagegenerators"
 
 parameterHelp = u"""\
 
+-catfilter        Filter the page generator to only yield pages in the
+                  specified category. See -cat for argument format.
+
 -cat              Work on all pages which are in a specific category.
                   Argument can also be given as "-cat:categoryname" or
                   as "-cat:categoryname|fromtitle" (using # instead of |
@@ -350,6 +353,7 @@ class GeneratorFactory(object):
         self.articlefilter_list = []
         self.titlefilter_list = []
         self.claimfilter_list = []
+        self.catfilter_list = []
         self.intersect = False
         self.subpage_max_depth = None
         self._site = site
@@ -422,6 +426,7 @@ class GeneratorFactory(object):
             if (self.titlefilter_list or
                 self.articlefilter_list or
                 self.claimfilter_list or
+                self.catfilter_list or
                 self.subpage_max_depth is not None or
                     self.qualityfilter_list):
                 pywikibot.warning(
@@ -466,11 +471,14 @@ class GeneratorFactory(object):
             dupfiltergen = RegexBodyFilterPageGenerator(
                 PreloadingGenerator(dupfiltergen), self.articlefilter_list)
 
+        if self.catfilter_list:
+            dupfiltergen = CategoryFilterPageGenerator(
+                dupfiltergen, self.catfilter_list, self.site)
+
         return dupfiltergen
 
-    def getCategoryGen(self, arg, recurse=False, content=False,
-                       gen_func=None):
-        """Return generator based on Category defined by arg and gen_func."""
+    def getCategory(self, arg):
+        """Return Category and start as defined by arg."""
         categoryname = arg.partition(':')[2]
         if not categoryname:
             categoryname = i18n.input(
@@ -491,6 +499,12 @@ class GeneratorFactory(object):
                                              categoryname)
         cat = pywikibot.Category(pywikibot.Link(categoryname,
                                                 defaultNamespace=14))
+        return cat, startfrom
+
+    def getCategoryGen(self, arg, recurse=False, content=False,
+                       gen_func=None):
+        """Return generator based on Category defined by arg and gen_func."""
+        cat, startfrom = self.getCategory(arg)
 
         return gen_func(cat,
                         start=startfrom,
@@ -651,6 +665,10 @@ class GeneratorFactory(object):
         elif arg.startswith('-catr'):
             gen = self.getCategoryGen(arg, recurse=True,
                                       gen_func=CategorizedPageGenerator)
+        elif arg.startswith('-catfilter'):
+            cat, _ = self.getCategory(arg)
+            self.catfilter_list.append(cat)
+            return True
         elif arg.startswith('-category'):
             gen = self.getCategoryGen(arg, gen_func=CategorizedPageGenerator)
         elif arg.startswith('-cat'):
@@ -1549,6 +1567,23 @@ def QualityFilterPageGenerator(generator, quality):
                 yield page
         else:
             yield page
+
+
+def CategoryFilterPageGenerator(generator, category_list, site=None):
+    """
+    Wrap a generator to filter pages by categories specified.
+
+    @param generator: A generator object
+    @param category_list: categories used to filter generated pages
+    @type category_list: list of category objects
+
+    """
+    if site is None:
+        site = pywikibot.Site()
+    for page in generator:
+        if all(x in site.pagecategories(page) for x in category_list):
+            yield page
+
 
 # name the generator methods
 RegexFilterPageGenerator = RegexFilter.titlefilter

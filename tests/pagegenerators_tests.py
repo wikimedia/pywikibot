@@ -183,6 +183,29 @@ class TestDryPageGenerators(TestCase):
         self.assertEqual(len(tuple(gen)), 9)
 
 
+class TestCategoryFilterPageGenerator(TestCase):
+
+    """Test CategoryFilterPageGenerator method."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    base_title = 'Page:06-24-1920 -The Story of the Jones County Calf Case.pdf/%s'
+    category_list = ['Category:Validated']
+
+    def setUp(self):
+        super(TestCategoryFilterPageGenerator, self).setUp()
+        self.site = self.get_site()
+        self.titles = [self.base_title % i for i in range(1, 11)]
+        self.catfilter_list = [pywikibot.Category(self.site, cat) for cat in self.category_list]
+
+    def test_CategoryFilterPageGenerator(self):
+        site = self.site
+        gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
+        gen = pagegenerators.CategoryFilterPageGenerator(gen, self.catfilter_list, site)
+        self.assertEqual(len(tuple(gen)), 7)
+
+
 class TestQualityFilterPageGenerator(TestCase):
 
     """Test QualityFilterPageGenerator methods."""
