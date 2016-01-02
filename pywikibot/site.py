@@ -5387,16 +5387,58 @@ class APISite(BaseSite):
         return data
 
     @must_be(group='user')
+    def watch(self, pages, unwatch=False):
+        """Add or remove pages from watchlist.
+
+        @param pages: A single page or a sequence of pages.
+        @type pages: A page object, a page-title string, or sequence of them.
+            Also accepts a single pipe-separated string like 'title1|title2'.
+        @param unwatch: If True, remove pages from watchlist;
+            if False add them (default).
+        @return: True if API returned expected response; False otherwise
+        @rtype: bool
+
+        """
+        parameters = {'action': 'watch',
+                      'token': self.tokens['watch'],
+                      'unwatch': unwatch}
+        unwatch = 'unwatched' if unwatch else 'watched'
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.23'):
+            parameters['titles'] = pages
+            req = self._simple_request(**parameters)
+            results = req.submit()
+            return all(unwatch in r for r in results['watch'])
+
+        # MW version < 1.23
+        if isinstance(pages, str):
+            if '|' in pages:
+                pages = pages.split('|')
+            else:
+                pages = (pages,)
+
+        for page in pages:
+            parameters['title'] = page
+            req = self._simple_request(**parameters)
+            result = req.submit()
+            if unwatch not in result['watch']:
+                return False
+        return True
+
+    @must_be(group='user')
+    @deprecated('Site().watch')
     def watchpage(self, page, unwatch=False):
         """Add or remove page from watchlist.
 
+        DEPRECATED: Use Site().watch() instead.
+
+        @param page: A single page.
+        @type page: A page object, a page-title string.
         @param unwatch: If True, remove page from watchlist; if False (default),
             add it.
         @return: True if API returned expected response; False otherwise
+        @rtype: bool
 
         """
-        # TODO: Separated parameters to allow easy conversion to 'watchpages'
-        # as the API now allows 'titles'.
         parameters = {'action': 'watch',
                       'title': page,
                       'token': self.tokens['watch'],

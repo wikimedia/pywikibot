@@ -1240,7 +1240,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @return: bool; True if successful, False otherwise.
         """
-        return self.site.watchpage(self, unwatch)
+        return self.site.watch(self, unwatch)
 
     def purge(self, **kwargs):
         """Purge the server's cache for this page.
