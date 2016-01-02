@@ -4226,7 +4226,7 @@ class APISite(BaseSite):
             documentation for available types, which will include "block",
             "protect", "rights", "delete", "upload", "move", "import",
             "patrol", "merge")
-        @param logtype: basestring
+        @type logtype: basestring
         @param user: only iterate entries that match this user name
         @type user: basestring
         @param page: only iterate entries affecting this page
