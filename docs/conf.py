@@ -47,8 +47,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Pywikibot'
-copyright = u'2015, Pywikibot team'
+project = 'Pywikibot'
+copyright = '2016, Pywikibot team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
