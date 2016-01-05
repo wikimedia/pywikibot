@@ -467,6 +467,26 @@ class CosmeticChangesToolkit(object):
         return text
 
     def cleanUpLinks(self, text):
+        """Tidy up wikilinks found in a string.
+
+        This function will:
+        * Replace underscores with spaces
+
+        * Move leading and trailing spaces out of the wikilink and into the
+          surrounding text
+
+        * Convert URL-encoded characters into Unicode-encoded characters
+
+        * Move trailing characters out of the link and make the link without
+          using a pipe, if possible
+
+        * Capitalize the article title of the link, if appropriate
+
+        @param text: string to perform the clean-up on
+        @type text: str
+        @return: text with tidied wikilinks
+        @rtype: str
+        """
         # helper function which works on one link and either returns it
         # unmodified, or returns a replacement.
         def handleOneLink(match):
