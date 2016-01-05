@@ -738,6 +738,53 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertTrue(all(isinstance(tup[2], unicode) for tup in the_list))
         self.assertTrue(all(isinstance(tup[3], unicode) for tup in the_list))
 
+    def test_longpages(self):
+        """Test the site.longpages() method."""
+        mysite = self.get_site()
+        longpages = list(mysite.longpages(total=10))
+
+        # Make sure each object returned by site.longpages() is
+        # a tuple of a Page object and an int
+        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 2) for tup in longpages)
+        self.assertTrue(all(isinstance(tup[0], pywikibot.Page) for tup in longpages))
+        self.assertTrue(all(isinstance(tup[1], int) for tup in longpages))
+
+    def test_shortpages(self):
+        """Test the site.shortpages() method."""
+        mysite = self.get_site()
+        shortpages = list(mysite.shortpages(total=10))
+
+        # Make sure each object returned by site.shortpages() is
+        # a tuple of a Page object and an int
+        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 2) for tup in shortpages)
+        self.assertTrue(all(isinstance(tup[0], pywikibot.Page) for tup in shortpages))
+        self.assertTrue(all(isinstance(tup[1], int) for tup in shortpages))
+
+    def test_ancientpages(self):
+        """Test the site.ancientpages() method."""
+        mysite = self.get_site()
+        ancientpages = list(mysite.ancientpages(total=10))
+
+        # Make sure each object returned by site.ancientpages() is
+        # a tuple of a Page object and a Timestamp object
+        self.assertTrue(all(isinstance(tup, tuple) and len(tup) == 2) for tup in ancientpages)
+        self.assertTrue(all(isinstance(tup[0], pywikibot.Page) for tup in ancientpages))
+        self.assertTrue(all(isinstance(tup[1], pywikibot.Timestamp) for tup in ancientpages))
+
+    def test_unwatchedpages(self):
+        """Test the site.unwatchedpages() method."""
+        mysite = self.get_site()
+        try:
+            unwatchedpages = list(mysite.unwatchedpages(total=10))
+        except api.APIError as error:
+            if error.code == 'gqpspecialpage-cantexecute':
+                # User must have correct permissions to use Special:UnwatchedPages
+                raise unittest.SkipTest(error)
+            raise
+
+        # Make sure each object returned by site.unwatchedpages() is a Page object
+        self.assertTrue(all(isinstance(p, pywikibot.Page) for p in unwatchedpages))
+
     def testBlocks(self):
         """Test the site.blocks() method."""
         mysite = self.get_site()
