@@ -1291,6 +1291,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @type content: bool
 
         @return: a generator that yields Page objects.
+        @rtype: generator
         """
         return self.site.pagelinks(self, namespaces=namespaces, step=step,
                                    total=total, content=content)

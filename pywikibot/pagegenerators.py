@@ -1218,7 +1218,21 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
 
 
 def LinkedPageGenerator(linkingPage, step=None, total=None, content=False):
-    """Yield all pages linked from a specific page."""
+    """Yield all pages linked from a specific page.
+
+    See L{pywikibot.page.BasePage.linkedPages} for details.
+
+    @param linkingPage: the page that links to the pages we want
+    @type linkingPage: L{pywikibot.Page}
+    @param step: the limit number of pages to retrieve per API call
+    @type step: int
+    @param total: the total number of pages to iterate
+    @type total: int
+    @param content: if True, retrieve the current content of each linked page
+    @type content: bool
+    @return: a generator that yields Page objects of pages linked to linkingPage
+    @rtype: generator
+    """
     return linkingPage.linkedPages(step=step, total=total, content=content)
 
 
