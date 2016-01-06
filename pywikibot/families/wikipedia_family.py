@@ -363,29 +363,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'nds', 'co', 'mi', 'mr', 'id', 'lv', 'sw', 'tt', 'uk', 'vo', 'ga',
             'na', 'es', 'nl', 'da', 'dk', 'sv', 'test']
 
-    def get_known_families(self, site):
-        """Override the family interwiki prefixes for each site."""
-        # In Swedish Wikipedia 's:' is part of page title not a family
-        # prefix for 'wikisource'.
-        if site.code == 'sv':
-            d = self.known_families.copy()
-            d.pop('s')
-            d['src'] = 'wikisource'
-            return d
-        else:
-            return self.known_families
-
-    def code2encodings(self, code):
-        """Return a list of historical encodings for a specific site."""
-        # Historic compatibility
-        if code == 'pl':
-            return 'utf-8', 'iso8859-2'
-        if code == 'ru':
-            return 'utf-8', 'iso8859-5'
-        if code in self.latin1old:
-            return 'utf-8', 'iso-8859-1'
-        return self.code2encoding(code),
-
         # Subpages for documentation.
         # TODO: List is incomplete, to be completed for missing languages.
         # TODO: Remove comments for appropriate pages
@@ -414,3 +391,26 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sv': (u'/dok', ),
             'uk': (u'/Документація', ),
         }
+
+    def get_known_families(self, site):
+        """Override the family interwiki prefixes for each site."""
+        # In Swedish Wikipedia 's:' is part of page title not a family
+        # prefix for 'wikisource'.
+        if site.code == 'sv':
+            d = self.known_families.copy()
+            d.pop('s')
+            d['src'] = 'wikisource'
+            return d
+        else:
+            return self.known_families
+
+    def code2encodings(self, code):
+        """Return a list of historical encodings for a specific site."""
+        # Historic compatibility
+        if code == 'pl':
+            return 'utf-8', 'iso8859-2'
+        if code == 'ru':
+            return 'utf-8', 'iso8859-5'
+        if code in self.latin1old:
+            return 'utf-8', 'iso-8859-1'
+        return self.code2encoding(code)
