@@ -134,12 +134,13 @@ parameterHelp = u"""\
                   -ns:0,2,4
                   -ns:Help,MediaWiki
 
-                  If used with -newpages, -namepace/ns must be provided
-                  before -newpages.
+                  If used with -newpages/-random/-randomredirect,
+                  -namespace/ns must be provided before
+                  -newpages/-random/-randomredirect.
                   If used with -recentchanges, efficiency is improved if
-                  -namepace/ns is provided before -recentchanges.
+                  -namespace/ns is provided before -recentchanges.
 
-                  If used with -start, -namepace/ns shall contain only one
+                  If used with -start, -namespace/ns shall contain only one
                   value.
 
 -interwiki        Work on the given page and all equivalent pages in other
@@ -601,16 +602,29 @@ class GeneratorFactory(object):
                                                  self.site))
             gen = InterwikiPageGenerator(page)
         elif arg.startswith('-randomredirect'):
+            # partial workaround for bug T119940
+            # to use -namespace/ns with -randomredirect, -ns must be given
+            # before -randomredirect
+            # otherwise default namespace is 0
+            namespaces = self.namespaces or 0
             if len(arg) == 15:
-                gen = RandomRedirectPageGenerator(site=self.site)
+                gen = RandomRedirectPageGenerator(site=self.site,
+                                                  namespaces=namespaces)
             else:
                 gen = RandomRedirectPageGenerator(total=int(arg[16:]),
-                                                  site=self.site)
+                                                  site=self.site,
+                                                  namespaces=namespaces)
         elif arg.startswith('-random'):
+            # partial workaround for bug T119940
+            # to use -namespace/ns with -random, -ns must be given
+            # before -random
+            # otherwise default namespace is 0
+            namespaces = self.namespaces or 0
             if len(arg) == 7:
-                gen = RandomPageGenerator(site=self.site)
+                gen = RandomPageGenerator(site=self.site, namespaces=namespaces)
             else:
-                gen = RandomPageGenerator(total=int(arg[8:]), site=self.site)
+                gen = RandomPageGenerator(total=int(arg[8:]), site=self.site,
+                                          namespaces=namespaces)
         elif arg.startswith('-recentchanges'):
             if len(arg) >= 15:
                 total = int(arg[15:])
@@ -2169,7 +2183,7 @@ def ShortPagesPageGenerator(total=100, site=None):
 
 
 @deprecated_args(number="total")
-def RandomPageGenerator(total=10, site=None):
+def RandomPageGenerator(total=10, site=None, namespaces=None):
     """
     Random page generator.
 
@@ -2180,12 +2194,12 @@ def RandomPageGenerator(total=10, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.randompages(total=total):
+    for page in site.randompages(total=total, namespaces=namespaces):
         yield page
 
 
 @deprecated_args(number="total")
-def RandomRedirectPageGenerator(total=10, site=None):
+def RandomRedirectPageGenerator(total=10, site=None, namespaces=None):
     """
     Random redirect generator.
 
@@ -2196,7 +2210,8 @@ def RandomRedirectPageGenerator(total=10, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.randompages(total=total, redirects=True):
+    for page in site.randompages(total=total, namespaces=namespaces,
+                                 redirects=True):
         yield page
 
 
