@@ -49,11 +49,17 @@ class TestFlowReply(TestCase):
     user = True
     write = True
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up class."""
+        super(TestFlowReply, cls).setUpClass()
+        cls._topic_title = 'Topic:Stf56oxx0sd4dkj1'
+
     def test_reply_to_topic(self):
         """Test replying to "topic" (really the topic's root post)."""
         # Setup
         content = 'I am a reply to the topic. Replying works!'
-        topic = Topic(self.site, 'Topic:Sl4ssgh123c3e1bh')
+        topic = Topic(self.site, self._topic_title)
         old_replies = topic.replies(force=True)[:]
         # Reply
         reply_post = topic.reply(content, 'wikitext')
@@ -71,7 +77,7 @@ class TestFlowReply(TestCase):
         """Test replying to the topic's root post directly."""
         # Setup
         content = "I am a reply to the topic's root post. Replying still works!"
-        topic = Topic(self.site, 'Topic:Sl4ssgh123c3e1bh')
+        topic = Topic(self.site, self._topic_title)
         topic_root = topic.root
         old_replies = topic_root.replies(force=True)[:]
         # Reply
@@ -90,8 +96,8 @@ class TestFlowReply(TestCase):
         """Test replying to an ordinary post."""
         # Setup
         content = 'I am a nested reply to a regular post. Still going strong!'
-        topic = Topic(self.site, 'Topic:Sl4ssgh123c3e1bh')
-        root_post = Post(topic, 'smjnql768bl0h0kt')
+        topic = Topic(self.site, self._topic_title)
+        root_post = Post(topic, 'stf5bamzx32rj1gt')
         old_replies = root_post.replies(force=True)[:]
         # Reply
         reply_post = root_post.reply(content, 'wikitext')
@@ -110,7 +116,7 @@ class TestFlowReply(TestCase):
         # Setup
         first_content = 'I am a reply to the topic with my own replies. Great!'
         second_content = 'I am a nested reply. This conversation is getting pretty good!'
-        topic = Topic(self.site, 'Topic:Sl4ssgh123c3e1bh')
+        topic = Topic(self.site, self._topic_title)
         topic_root = topic.root
         # First reply
         old_root_replies = topic_root.replies(force=True)[:]
