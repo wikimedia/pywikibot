@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """
-This script will display the list of pages transcluding a given list of templates.
+Display the list of pages transcluding a given list of templates.
 
 It can also be used to simply count the number of pages (rather than
 listing each individually).
@@ -31,8 +31,8 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
 """
 #
-# (C) Pywikibot team, 2006-2014
-# (C) xqt, 2009-2014
+# (C) Pywikibot team, 2006-2016
+# (C) xqt, 2009-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,6 +53,17 @@ class TemplateCountRobot(object):
 
     @classmethod
     def countTemplates(cls, templates, namespaces):
+        """
+        Display number of transclusions for a list of templates.
+
+        Displays the number of transcluded page in the given 'namespaces' for
+        each template given by 'templates' list.
+
+        @param templates: list of template names
+        @type templates: list
+        @param namespaces: list of namespace numbers
+        @type namespaces: list
+        """
         templateDict = cls.template_dict(templates, namespaces)
         pywikibot.output(u'\nNumber of transclusions per template',
                          toStdout=True)
@@ -70,6 +81,17 @@ class TemplateCountRobot(object):
 
     @classmethod
     def listTemplates(cls, templates, namespaces):
+        """
+        Display transcluded pages for a list of templates.
+
+        Displays each transcluded page in the given 'namespaces' for
+        each template given by 'templates' list.
+
+        @param templates: list of template names
+        @type templates: list
+        @param namespaces: list of namespace numbers
+        @type namespaces: list
+        """
         templateDict = cls.template_dict(templates, namespaces)
         pywikibot.output(u'\nList of pages transcluding templates:',
                          toStdout=True)
@@ -88,6 +110,19 @@ class TemplateCountRobot(object):
 
     @classmethod
     def template_dict(cls, templates, namespaces):
+        """
+        Create a dict of templates and its transcluded pages.
+
+        The names of the templates are the keys, and lists of pages
+        transcluding templates in the given namespaces are the values.
+
+        @param templates: list of template names
+        @type templates: list
+        @param namespaces: list of namespace numbers
+        @type namespaces: list
+
+        @rtype: dict
+        """
         gen = cls.template_dict_generator(templates, namespaces)
         templateDict = {}
         for template, transcludingArray in gen:
@@ -96,9 +131,21 @@ class TemplateCountRobot(object):
 
     @staticmethod
     def template_dict_generator(templates, namespaces):
+        """
+        Yield transclusions of each template in 'templates'.
+
+        For each template in 'templates', yield a tuple
+        (template, transclusions), where 'transclusions' is a list of all pages
+        in 'namespaces' where the template has been transcluded.
+
+        @param templates: list of template names
+        @type templates: list
+        @param namespaces: list of namespace numbers
+        @type namespaces: list
+
+        @rtype: generator
+        """
         mysite = pywikibot.Site()
-        # The names of the templates are the keys, and lists of pages
-        # transcluding templates are the values.
         mytpl = mysite.namespaces.TEMPLATE
         for template in templates:
             transcludingArray = []
