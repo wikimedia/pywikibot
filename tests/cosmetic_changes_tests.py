@@ -42,6 +42,12 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('[[en:Foo bar]]',
                          self.cct.fixSelfInterwiki('[[en:Foo bar]]'))
 
+    def test_standardizePageFooter(self):
+        """Test standardizePageFooter method."""
+        self.assertEqual('Foo\n{{link fa}}\n\n[[Category:Foo]]',
+                         self.cct.standardizePageFooter(
+                             'Foo [[category:foo]] {{link fa}}'))
+
     def test_resolveHtmlEntities(self):
         """Test resolveHtmlEntities method."""
         self.assertEqual(

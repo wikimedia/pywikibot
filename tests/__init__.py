@@ -128,6 +128,7 @@ script_test_modules = [
     'pwb',
     'script',
     'l10n',
+    'add_text',
     'archivebot',
     'category_bot',
     'checkimages',
