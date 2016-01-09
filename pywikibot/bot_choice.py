@@ -202,12 +202,12 @@ class IntegerOption(Option):
 
     @property
     def minimum(self):
-        """return the minimum value."""
+        """Return the minimum value."""
         return self._min
 
     @property
     def maximum(self):
-        """return the maximum value."""
+        """Return the maximum value."""
         return self._max
 
     def format(self, default):
@@ -301,7 +301,7 @@ class ListOption(IntegerOption):
 
     @property
     def maximum(self):
-        """return the maximum value."""
+        """Return the maximum value."""
         return len(self._list)
 
     def result(self, value):
