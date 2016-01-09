@@ -570,6 +570,17 @@ class TestPageRepr(TestPageBaseUnicode):
 
     """Test for Page's repr implementation."""
 
+    def setUp(self):
+        """Force the console encoding to UTF-8."""
+        super(TestPageRepr, self).setUp()
+        self._old_encoding = config.console_encoding
+        config.console_encoding = 'utf8'
+
+    def tearDown(self):
+        """Restore the original console encoding."""
+        config.console_encoding = self._old_encoding
+        super(TestPageRepr, self).tearDown()
+
     def test_mainpage_type(self):
         u"""Test the return type of repr(Page(<main page>)) is str."""
         mainpage = self.get_mainpage()
