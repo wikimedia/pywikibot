@@ -39,7 +39,7 @@ def choosecats(pagetext):
     done = False
     length = 1000
     # TODO: → input_choice
-    print("""Give the new categories, one per line.
+    pywikibot.output("""Give the new categories, one per line.
 Empty line: if the first, don't change. Otherwise: Ready.
 -: I made a mistake, let me start over.
 ?: Give the text of the page with GUI.
@@ -110,8 +110,8 @@ def main(*args):
             cats = p.categories()
             if not cats:
                 pywikibot.output(u"========== %s ==========" % p.title())
-                print("No categories")
-                print("-" * 40)
+                pywikibot.output('No categories')
+                pywikibot.output('-' * 40)
                 newcats = choosecats(text)
                 if newcats != [] and newcats is not None:
                     make_categories(p, newcats, mysite)
@@ -119,7 +119,7 @@ def main(*args):
                 pywikibot.output(u"========== %s ==========" % p.title())
                 for c in cats:
                     pywikibot.output(c.title())
-                print("-" * 40)
+                pywikibot.output('-' * 40)
                 newcats = choosecats(text)
                 if newcats is None:
                     make_categories(p, [], mysite)

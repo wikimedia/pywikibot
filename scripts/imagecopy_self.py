@@ -319,7 +319,7 @@ class imageFetcher(threading.Thread):
         for page in self.pagegenerator:
             self.processImage(page)
         self.prefetchQueue.put(None)
-        print(u'Fetched all images.')
+        pywikibot.output('Fetched all images.')
         return True
 
     def processImage(self, page):
@@ -592,7 +592,7 @@ class userInteraction(threading.Thread):
             else:
                 break
         self.uploadQueue.put(None)
-        print(u'User worked on all images.')
+        pywikibot.output('User worked on all images.')
         return True
 
     def setAutonomous(self):

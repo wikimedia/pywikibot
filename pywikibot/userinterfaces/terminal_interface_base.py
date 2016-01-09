@@ -428,7 +428,7 @@ class UI(object):
         try:
             from pywikibot.userinterfaces import gui
         except ImportError as e:
-            print('Could not load GUI modules: %s' % e)
+            pywikibot.warning('Could not load GUI modules: {0}'.format(e))
             return text
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)

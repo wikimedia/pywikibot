@@ -243,7 +243,8 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
         try:
             entry._load_cache()
         except ValueError as e:
-            print('Failed loading %s' % entry._cachefile_path())
+            pywikibot.error('Failed loading {0}'.format(
+                entry._cachefile_path()))
             pywikibot.exception(e, tb=True)
             continue
 

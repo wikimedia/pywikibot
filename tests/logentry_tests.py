@@ -19,6 +19,7 @@ from pywikibot.tools import (
     UnicodeType as unicode,
 )
 
+from tests import unittest_print
 from tests.aspects import (
     unittest, MetaTestCaseClass, TestCase, DeprecationTestCase
 )
@@ -139,8 +140,9 @@ class TestSimpleLogentries(TestLogentriesBase):
             try:
                 self._test_logevent(simple_type)
             except StopIteration:
-                print('Unable to test "{0}" on "{1}" because there are no log '
-                      'entries with that type.'.format(simple_type, key))
+                unittest_print(
+                    'Unable to test "{0}" on "{1}" because there are no log '
+                    'entries with that type.'.format(simple_type, key))
 
 
 class TestLogentryParams(TestLogentriesBase):

@@ -462,7 +462,7 @@ class LinkChecker(object):
                 try:
                     msg = error[1]
                 except IndexError:
-                    print(u'### DEBUG information for #2972249')
+                    pywikibot.output('### DEBUG information for T57282')
                     raise IndexError(type(error))
             # TODO: decode msg. On Linux, it's encoded in UTF-8.
             # How is it encoded in Windows? Or can we somehow just

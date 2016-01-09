@@ -33,6 +33,7 @@ from pywikibot.tools import (
     UnicodeType as unicode,
 )
 
+from tests import unittest_print
 from tests.aspects import (
     unittest, TestCase, DeprecationTestCase,
     TestCaseBase,
@@ -485,11 +486,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
         # Example: https://travis-ci.org/wikimedia/pywikibot-core/jobs/54552081#L505
         namespace_links = set(mysite.pagelinks(mainpage, namespaces=[0, 1]))
         if namespace_links - links:
-            print('FAILURE wrt T92856:')
-            print(u'Sym. difference: "{0}"'.format(
-                  u'", "'.join(
-                      u'{0}@{1}'.format(link.namespace(), link.title(withNamespace=False))
-                      for link in namespace_links ^ links)))
+            unittest_print(
+                'FAILURE wrt T92856:\nSym. difference: "{0}"'.format(
+                    '", "'.join(
+                        '{0}@{1}'.format(link.namespace(),
+                                         link.title(withNamespace=False))
+                        for link in namespace_links ^ links)))
         self.assertCountEqual(
             set(mysite.pagelinks(mainpage, namespaces=[0, 1])) - links, [])
         for target in mysite.preloadpages(mysite.pagelinks(mainpage,
@@ -587,8 +589,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertTrue(mysite.page_exists(page))
             if (len(page.text.encode(mysite.encoding())) > 200 and
                     mysite.data_repository() == mysite):
-                print('%s.text is > 200 bytes while raw JSON is <= 200'
-                      % page)
+                unittest_print(
+                    '{0}.text is > 200 bytes while raw JSON is <= 200'.format(
+                        page))
                 continue
             self.assertLessEqual(len(page.text.encode(mysite.encoding())),
                                  200)
@@ -1015,8 +1018,9 @@ class TestImageUsage(DefaultSiteTestCase):
         for using in mysite.imageusage(imagepage, filterredir=False, total=5):
             self.assertIsInstance(using, pywikibot.Page)
             if using.isRedirectPage():
-                print('{0} is a redirect, although just non-redirects were '
-                      'searched. See also bug 73120'.format(using))
+                unittest_print(
+                    '{0} is a redirect, although just non-redirects were '
+                    'searched. See also T75120'.format(using))
             self.assertFalse(using.isRedirectPage())
 
 
@@ -1147,7 +1151,7 @@ class TestRecentChanges(DefaultSiteTestCase):
             # 1st image on main page
             imagepage = next(iter(mysite.allimages()))
         except StopIteration:
-            print("No images on site {0!r}".format(mysite))
+            unittest_print('No images on site {0!r}'.format(mysite))
             imagepage = None
         cls.imagepage = imagepage
 
