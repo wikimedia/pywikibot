@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -94,7 +94,8 @@ class PageInUse(pywikibot.Error):
 
 class LoginStatus(object):
 
-    """Enum for Login statuses.
+    """
+    Enum for Login statuses.
 
     >>> LoginStatus.NOT_ATTEMPTED
     -3
@@ -137,7 +138,8 @@ Family = redirect_func(pywikibot.family.Family.load,
 
 class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
-    """Namespace site data object.
+    """
+    Namespace site data object.
 
     This is backwards compatible with the structure of entries
     in site._namespaces which were a list of::
@@ -416,7 +418,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     @staticmethod
     def normalize_name(name):
-        """Remove an optional colon before and after name.
+        """
+        Remove an optional colon before and after name.
 
         TODO: reject illegal characters.
         """
@@ -441,14 +444,15 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     @classmethod
     @deprecated('NamespacesDict.lookup_name')
     def lookup_name(cls, name, namespaces=None):
-        """Find the Namespace for a name.
+        """
+        Find the Namespace for a name.
 
         @param name: Name of the namespace.
         @type name: basestring
         @param namespaces: namespaces to search
                            default: builtins only
         @type namespaces: dict of Namespace
-        @return: Namespace or None
+        @rtype: Namespace or None
         """
         if not namespaces:
             namespaces = cls.builtin_namespaces()
@@ -472,6 +476,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         @type namespaces: dict of Namespace
         @return: list of Namespace objects in the same order as the
             identifiers
+        @rtype: list
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -552,7 +557,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         @param name: Name of the namespace.
         @type name: basestring
-        @return: Namespace or None
+        @rtype: Namespace or None
         """
         name = Namespace.normalize_name(name)
         if name is False:
@@ -567,7 +572,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         @param name: Name of the namespace.
         @type name: basestring
-        @return: Namespace or None
+        @rtype: Namespace or None
         """
         return self._namespace_names.get(name)
 
@@ -598,6 +603,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
             or a single instance of those types
         @return: list of Namespace objects in the same order as the
             identifiers
+        @rtype: list
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -717,7 +723,6 @@ class BaseSite(ComparableMixin):
         @type user: str
         @param sysop: sysop account user name (optional)
         @type sysop: str
-
         """
         if code.lower() != code:
             # Note the Site function in __init__ also emits a UserWarning
@@ -799,11 +804,11 @@ class BaseSite(ComparableMixin):
 
     @property
     def code(self):
-        """The identifying code for this Site.
+        """
+        The identifying code for this Site.
 
         By convention, this is usually an ISO language code, but it does
         not have to be.
-
         """
         return self.__code
 
@@ -812,16 +817,15 @@ class BaseSite(ComparableMixin):
         """The ISO language code for this Site.
 
         Presumed to be equal to the wiki prefix, but this can be overridden.
-
         """
         return self.__code
 
     @property
     def doc_subpage(self):
-        """Return the documentation subpage for this Site.
+        """
+        Return the documentation subpage for this Site.
 
-        @return: tuple
-
+        @rtype: tuple
         """
         if not hasattr(self, '_doc_subpage'):
             try:
@@ -1005,7 +1009,8 @@ class BaseSite(ComparableMixin):
         return self._namespaces
 
     def ns_normalize(self, value):
-        """Return canonical local form of namespace name.
+        """
+        Return canonical local form of namespace name.
 
         @param value: A namespace name
         @type value: unicode
@@ -1035,7 +1040,8 @@ class BaseSite(ComparableMixin):
         return [u"PAGENAMEE"]
 
     def lock_page(self, page, block=True):
-        """Lock page for writing.  Must be called before writing any page.
+        """
+        Lock page for writing.  Must be called before writing any page.
 
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
@@ -1057,7 +1063,8 @@ class BaseSite(ComparableMixin):
             self._pagemutex.release()
 
     def unlock_page(self, page):
-        """Unlock page.  Call as soon as a write operation has completed.
+        """
+        Unlock page.  Call as soon as a write operation has completed.
 
         @param page: the page to be locked
         @type page: pywikibot.Page
@@ -1088,7 +1095,7 @@ class BaseSite(ComparableMixin):
         @param othersite: Generate a interwiki link for use on this site.
         @type othersite: Site (optional)
 
-        @return: unicode
+        @rtype: unicode
         """
         return pywikibot.Link(title, self).astext(othersite)
 
@@ -1811,10 +1818,10 @@ class NonMWAPISite(BaseSite):
 
 class APISite(BaseSite):
 
-    """API interface to MediaWiki site.
+    """
+    API interface to MediaWiki site.
 
     Do not instantiate directly; use pywikibot.Site function.
-
     """
 
     def __init__(self, code, fam=None, user=None, sysop=None):
@@ -1961,7 +1968,7 @@ class APISite(BaseSite):
                      instead of the normal user.
         @type sysop: bool
 
-        @return: bool
+        @rtype: bool
         """
         if not hasattr(self, "_userinfo"):
             return False
@@ -1987,7 +1994,7 @@ class APISite(BaseSite):
                      instead of the normal user.
         @type sysop: bool
 
-        @return: bool
+        @rtype: bool
         """
         return self.logged_in(sysop) and self.user()
 
@@ -2134,7 +2141,6 @@ class APISite(BaseSite):
           - groups: list of groups (could be empty)
           - rights: list of rights (could be empty)
           - editcount: global editcount
-
         """
         if not hasattr(self, "_globaluserinfo"):
             uirequest = self._simple_request(
@@ -2310,7 +2316,7 @@ class APISite(BaseSite):
         @param keys: MediaWiki messages to fetch
         @type keys: set of str, '*' or ['*']
 
-        @return: dict
+        @rtype dict
         """
         if keys == '*' or keys == ['*']:
             issue_deprecation_warning('mediawiki_messages("*")',
@@ -2346,7 +2352,7 @@ class APISite(BaseSite):
         @param key: name of MediaWiki message
         @type key: str
 
-        @return: unicode
+        @rtype unicode
         """
         return self.mediawiki_messages([key])[key]
 
@@ -2356,7 +2362,7 @@ class APISite(BaseSite):
         @param key: name of MediaWiki message
         @type key: str
 
-        @return: bool
+        @rtype: bool
         """
         return self.has_all_mediawiki_messages([key])
 
@@ -2366,7 +2372,7 @@ class APISite(BaseSite):
         @param keys: names of MediaWiki messages
         @type keys: set of str
 
-        @return: bool
+        @rtype: bool
         """
         try:
             self.mediawiki_messages(keys)
@@ -2382,6 +2388,7 @@ class APISite(BaseSite):
         be in the original site language.
 
         @return: list of tuples (month name, abbreviation)
+        @rtype: list
         """
         if hasattr(self, "_months_names"):
             return self._months_names
@@ -2412,7 +2419,7 @@ class APISite(BaseSite):
         @param args: text to be expanded
         @type args: iterable of unicode
 
-        @return: unicode
+        @rtype: unicode
         """
         NEEDED_MW_MESSAGES = ('and', 'comma-separator', 'word-separator')
         if not args:
@@ -2454,8 +2461,7 @@ class APISite(BaseSite):
         @type title: unicode
         @param includecomments: if True do not strip comments
         @type includecomments: bool
-        @return: unicode
-
+        @rtype: unicode
         """
         if not isinstance(text, basestring):
             raise ValueError('text must be a string')
@@ -2773,7 +2779,6 @@ class APISite(BaseSite):
         @return: A tuple containing _proofread_index_ns, self._proofread_page_ns
             and self._proofread_levels.
         @rtype: Namespace, Namespace, dict
-
         """
         if (not hasattr(self, '_proofread_index_ns') or
                 not hasattr(self, '_proofread_page_ns') or
@@ -2825,7 +2830,6 @@ class APISite(BaseSite):
 
         If optional argument 'all' is true, return a list of all recognized
         values for this namespace.
-
         """
         if all:
             return self.namespaces[num]
@@ -2901,7 +2905,6 @@ class APISite(BaseSite):
         """Load image info from api and save in page attributes.
 
         @param history: if true, return the image's version history
-
         """
         title = page.title(withSection=False)
         args = {"titles": title}
@@ -2971,7 +2974,7 @@ class APISite(BaseSite):
           - page is unprotected, and bot has an account for this site, or
           - page is protected, and bot has a sysop account for this site.
 
-        @return: bool
+        @rtype: bool
         """
         rest = self.page_restrictions(page)
         sysop_protected = "edit" in rest and rest['edit'][0] == 'sysop'
@@ -3148,7 +3151,6 @@ class APISite(BaseSite):
         """Validate if requested tokens are acceptable.
 
         Valid tokens depend on mw version.
-
         """
         _version = MediaWikiVersion(self.version())
         if _version < MediaWikiVersion('1.20'):
@@ -3212,7 +3214,7 @@ class APISite(BaseSite):
         @type all: bool
 
         return: a dict with retrieved valid tokens.
-
+        rtype: dict
         """
         def warn_handler(mod, text):
             """Filter warnings for not available tokens."""
@@ -3298,7 +3300,6 @@ class APISite(BaseSite):
         @param page: the Page for which a token should be retrieved
         @param tokentype: the type of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
-
         """
         return self.tokens[tokentype]
 
@@ -3494,7 +3495,6 @@ class APISite(BaseSite):
         @param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the
             category description page, not the pages contained in the category
-
         """
         clargs = {}
         if hasattr(page, "_pageid"):
@@ -3721,7 +3721,6 @@ class APISite(BaseSite):
         @param excludeuser: retrieve all revisions not authored by this user
         @param sysop: if True, switch to sysop account (if available) to
             retrieve this page
-
         """
         latest = (revids is None and
                   startid is None and
@@ -3829,7 +3828,6 @@ class APISite(BaseSite):
 
         @param include_obsolete: if true, yield even Link objects whose
                                  site is obsolete
-
         """
         lltitle = page.title(withSection=False)
         llquery = self._generator(api.PropertyGenerator,
@@ -3963,7 +3961,6 @@ class APISite(BaseSite):
         """Yield all pages with a given prefix. Deprecated.
 
         Use allpages() with the prefix= parameter instead of this method.
-
         """
         return self.allpages(prefix=prefix, namespace=namespace,
                              filterredir=includeredirects)
@@ -4019,7 +4016,6 @@ class APISite(BaseSite):
         @param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the category
             description page, not the pages that are members of the category
-
         """
         acgen = self._generator(api.PageGenerator,
                                 type_arg="allcategories", gacfrom=start,
@@ -4051,7 +4047,6 @@ class APISite(BaseSite):
         the user is a member of at least 1 group, and will be a list of
         unicodes; all the other values are unicodes and should always be
         present.
-
         """
         if not hasattr(self, "_bots"):
             self._bots = {}
@@ -4077,7 +4072,6 @@ class APISite(BaseSite):
         @param prefix: only iterate usernames starting with this substring
         @param group: only iterate users that are members of this group
         @type group: str
-
         """
         augen = self._generator(api.ListGenerator, type_arg="allusers",
                                 auprop="editcount|groups|registration",
@@ -4106,7 +4100,6 @@ class APISite(BaseSite):
         @param content: if True, load the current content of each iterated page
             (default False); note that this means the content of the image
             description page, not the image itself
-
         """
         aigen = self._generator(api.PageGenerator,
                                 type_arg="allimages", gaifrom=start,
@@ -4139,7 +4132,6 @@ class APISite(BaseSite):
         @param reverse: if True, iterate oldest blocks first (default: newest)
         @param blockids: only iterate blocks with these id numbers
         @param users: only iterate blocks affecting these usernames or IPs
-
         """
         if starttime and endtime:
             if reverse:
@@ -4560,7 +4552,6 @@ class APISite(BaseSite):
         @param reverse: Iterate oldest revisions first (default: newest)
         @param get_text: If True, retrieve the content of each revision and
             an undelete token
-
         """
         if start and end:
             self.assert_valid_iter_params('deletedrevs', start, end, reverse)
@@ -4609,7 +4600,6 @@ class APISite(BaseSite):
 
         @param usernames: a list of user names
         @type usernames: list, or other iterable, of unicodes
-
         """
         if not isinstance(usernames, basestring):
             usernames = u"|".join(usernames)
@@ -4625,7 +4615,7 @@ class APISite(BaseSite):
         DEPRECATED.
 
         @param redirect: Return a random redirect page
-        @return: pywikibot.Page
+        @rtype: pywikibot.Page
         """
         return self.randompages(total=1, redirects=redirect)
 
@@ -4731,6 +4721,7 @@ class APISite(BaseSite):
         @kwarg undo: Revision id to undo. Overrides Page.text
         @type undo: int
         @return: True if edit succeeded, False if it failed
+        @rtype: bool
         @raises Error: No text to be saved
         @raises NoPage: recreate is disabled and page does not exist
         """
@@ -4924,7 +4915,7 @@ class APISite(BaseSite):
         @param noredirect: if True, suppress creation of a redirect from the
             old title to the new one
         @return: Page object with the new title
-
+        @rtype: pywikibot.Page
         """
         oldtitle = page.title(withSection=False)
         newlink = pywikibot.Link(newtitle, self)
@@ -5427,7 +5418,8 @@ class APISite(BaseSite):
     @must_be(group='user')
     @deprecated('Site().watch')
     def watchpage(self, page, unwatch=False):
-        """Add or remove page from watchlist.
+        """
+        Add or remove page from watchlist.
 
         DEPRECATED: Use Site().watch() instead.
 
@@ -5452,11 +5444,12 @@ class APISite(BaseSite):
 
     @must_be(group='user')
     def purgepages(self, pages, **kwargs):
-        """Purge the server's cache for one or multiple pages.
+        """
+        Purge the server's cache for one or multiple pages.
 
         @param pages: list of Page objects
         @return: True if API returned expected response; False otherwise
-
+        @rtype: bool
         """
         req = self._simple_request(action='purge',
                                    titles=[page for page in set(pages)])
@@ -5562,7 +5555,8 @@ class APISite(BaseSite):
                comment=None, text=None, watch=False, ignore_warnings=False,
                chunk_size=0, _file_key=None, _offset=0, _verify_stash=None,
                report_success=None):
-        """Upload a file to the wiki.
+        """
+        Upload a file to the wiki.
 
         Either source_filename or source_url, but not both, must be provided.
 
@@ -6286,7 +6280,8 @@ class APISite(BaseSite):
 
     @need_version("1.18")
     def compare(self, old, diff):
-        """Corresponding method to the 'action=compare' API action.
+        """
+        Corresponding method to the 'action=compare' API action.
 
         See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
         Use pywikibot.diff's html_comparator() method to parse result.
@@ -6329,7 +6324,8 @@ class APISite(BaseSite):
     # Flow API calls
     @need_extension('Flow')
     def load_board(self, page):
-        """Retrieve the data for a Flow board.
+        """
+        Retrieve the data for a Flow board.
 
         @param page: A Flow board
         @type page: Board
@@ -6346,7 +6342,8 @@ class APISite(BaseSite):
     def load_topiclist(self, page, format='wikitext', limit=100,
                        sortby='newest', toconly=False, offset=None,
                        offset_id=None, reverse=False, include_offset=False):
-        """Retrieve the topiclist of a Flow board.
+        """
+        Retrieve the topiclist of a Flow board.
 
         @param page: A Flow board
         @type page: Board
@@ -6384,7 +6381,8 @@ class APISite(BaseSite):
 
     @need_extension('Flow')
     def load_topic(self, page, format):
-        """Retrieve the data for a Flow topic.
+        """
+        Retrieve the data for a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6401,7 +6399,8 @@ class APISite(BaseSite):
 
     @need_extension('Flow')
     def load_post_current_revision(self, page, post_id, format):
-        """Retrieve the data for a post to a Flow topic.
+        """
+        Retrieve the data for a post to a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6421,7 +6420,8 @@ class APISite(BaseSite):
     @must_be('user')
     @need_extension('Flow')
     def create_new_topic(self, page, title, content, format):
-        """Create a new topic on a Flow board.
+        """
+        Create a new topic on a Flow board.
 
         @param page: A Flow board
         @type page: Board
@@ -6469,7 +6469,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-lock')
     @need_extension('Flow')
     def lock_topic(self, page, lock, reason):
-        """Lock or unlock a Flow topic.
+        """
+        Lock or unlock a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6492,7 +6493,8 @@ class APISite(BaseSite):
     @must_be('user')
     @need_extension('Flow')
     def moderate_topic(self, page, state, reason):
-        """Moderate a Flow topic.
+        """
+        Moderate a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6514,7 +6516,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-delete')
     @need_extension('Flow')
     def delete_topic(self, page, reason):
-        """Delete a Flow topic.
+        """
+        Delete a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6528,7 +6531,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-hide')
     @need_extension('Flow')
     def hide_topic(self, page, reason):
-        """Hide a Flow topic.
+        """
+        Hide a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6542,7 +6546,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-suppress')
     @need_extension('Flow')
     def suppress_topic(self, page, reason):
-        """Suppress a Flow topic.
+        """
+        Suppress a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6556,7 +6561,8 @@ class APISite(BaseSite):
     @must_be('user')
     @need_extension('Flow')
     def restore_topic(self, page, reason):
-        """Restore a Flow topic.
+        """
+        Restore a Flow topic.
 
         @param page: A Flow topic
         @type page: Topic
@@ -6570,7 +6576,8 @@ class APISite(BaseSite):
     @must_be('user')
     @need_extension('Flow')
     def moderate_post(self, post, state, reason):
-        """Moderate a Flow post.
+        """
+        Moderate a Flow post.
 
         @param post: A Flow post
         @type post: Post
@@ -6594,7 +6601,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-delete')
     @need_extension('Flow')
     def delete_post(self, post, reason):
-        """Delete a Flow post.
+        """
+        Delete a Flow post.
 
         @param post: A Flow post
         @type post: Post
@@ -6608,7 +6616,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-hide')
     @need_extension('Flow')
     def hide_post(self, post, reason):
-        """Hide a Flow post.
+        """
+        Hide a Flow post.
 
         @param post: A Flow post
         @type post: Post
@@ -6622,7 +6631,8 @@ class APISite(BaseSite):
     @must_be('user', 'flow-suppress')
     @need_extension('Flow')
     def suppress_post(self, post, reason):
-        """Suppress a Flow post.
+        """
+        Suppress a Flow post.
 
         @param post: A Flow post
         @type post: Post
@@ -6636,7 +6646,8 @@ class APISite(BaseSite):
     @must_be('user')
     @need_extension('Flow')
     def restore_post(self, post, reason):
-        """Restore a Flow post.
+        """
+        Restore a Flow post.
 
         @param post: A Flow post
         @type post: Post
@@ -6757,7 +6768,8 @@ class DataSite(APISite):
         return baserevid
 
     def __getattr__(self, attr):
-        """Provide data access methods.
+        """
+        Provide data access methods.
 
         Methods provided are get_info, get_sitelinks, get_aliases,
         get_labels, get_descriptions, and get_urls.
@@ -6852,7 +6864,8 @@ class DataSite(APISite):
         return data['entities']
 
     def preloaditempages(self, pagelist, groupsize=50):
-        """Yield ItemPages with content prefilled.
+        """
+        Yield ItemPages with content prefilled.
 
         Note that pages will be iterated in a different order
         than in the underlying pagelist.
@@ -7266,6 +7279,7 @@ class DataSite(APISite):
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @return: dict API output
+        @rtype: dict
         """
         params = {
             'action': 'wblinktitles',
@@ -7297,6 +7311,7 @@ class DataSite(APISite):
         @param summary: Edit summary
         @type summary: str
         @return: dict API output
+        @rtype: dict
         """
         params = {
             'action': 'wbmergeitems',
@@ -7341,6 +7356,7 @@ class DataSite(APISite):
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @return: pywikibot.ItemPage of newly created item
+        @rtype: pywikibot.ItemPage
         """
         sitelinks = {
             page.site.dbName(): {
@@ -7382,6 +7398,7 @@ class DataSite(APISite):
             case of no limit.
         @type limit: int or None
         @return: 'search' list from API output.
+        @rtype: api.APIGenerator
         """
         lang_codes = [lang['code'] for lang in self._siteinfo.get('languages')]
         if language not in lang_codes:
