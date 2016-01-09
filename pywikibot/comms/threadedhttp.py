@@ -106,7 +106,7 @@ class HttpRequest(UnicodeMixin):
 
     @property
     def status(self):
-        """HTTP response status.
+        """Return the HTTP response status.
 
         @rtype: int
         """

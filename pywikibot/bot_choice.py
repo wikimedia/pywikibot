@@ -202,12 +202,12 @@ class IntegerOption(Option):
 
     @property
     def minimum(self):
-        """Return the minimum value."""
+        """Return the lower bound of the range of allowed values."""
         return self._min
 
     @property
     def maximum(self):
-        """Return the maximum value."""
+        """Return the upper bound of the range of allowed values."""
         return self._max
 
     def format(self, default):

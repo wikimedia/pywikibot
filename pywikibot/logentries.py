@@ -257,7 +257,7 @@ class UploadEntry(LogEntry):
 
     def page(self):
         """
-        FilePage on which action was performed.
+        Return FilePage on which action was performed.
 
         Note: title may be missing in data dict e.g. by oversight action to
               hide the title. In that case a KeyError exception will raise
