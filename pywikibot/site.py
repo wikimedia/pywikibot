@@ -885,7 +885,7 @@ class BaseSite(ComparableMixin):
             return getattr(self.__class__, attr)
         try:
             method = getattr(self.family, attr)
-            f = lambda *args, **kwargs: method(self.code, *args, **kwargs)
+            f = functools.partial(method, self.code)
             if hasattr(method, "__doc__"):
                 f.__doc__ = method.__doc__
             return f
@@ -5665,8 +5665,8 @@ class APISite(BaseSite):
                                       3)
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
-            ignore_warnings = lambda warnings: all(w.code in ignored_warnings
-                                                   for w in warnings)
+            ignore_warnings = lambda warnings: all(  # noqa: E731
+                w.code in ignored_warnings for w in warnings)
         ignore_all_warnings = not callable(ignore_warnings) and ignore_warnings
         if text is None:
             text = filepage.text

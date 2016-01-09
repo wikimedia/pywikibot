@@ -2006,7 +2006,7 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
 
     """
     if makeUpperCase is None:
-        f = lambda s: s
+        return [pattern % monthName(lang, m) for m in range(1, 13)]
     elif makeUpperCase:
         f = first_upper
     else:
