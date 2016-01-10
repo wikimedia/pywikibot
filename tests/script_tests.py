@@ -139,9 +139,7 @@ auto_run_script_list = [
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user_config.py
-    'editarticle': 'Nothing changed',  # This masks related bug 68645 but that
-                                       # bug is more broadly about config
-                                       # rather than editarticle.
+    'editarticle': 'Nothing changed',
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
     'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
@@ -154,7 +152,7 @@ no_args_expected_results = {
     'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
     'shell': ('>>> ', 'Welcome to the'),
-    'transferbot': 'Target site not different from source site',  # Bug 68662
+    'transferbot': 'Target site not different from source site',
     'unusedfiles': ('Working on', None),
     'watchlist': 'Retrieving watchlist',
 

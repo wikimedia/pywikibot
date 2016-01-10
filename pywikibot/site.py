@@ -2984,7 +2984,7 @@ class APISite(BaseSite):
     def page_isredirect(self, page):
         """Return True if and only if page is a redirect."""
         if not hasattr(page, "_isredir"):
-            page._isredir = False  # bug 54684
+            page._isredir = False  # bug T56684
             self.loadpageinfo(page)
         return page._isredir
 
@@ -3368,10 +3368,10 @@ class APISite(BaseSite):
                                 namespaces=namespaces, step=step, total=total,
                                 g_content=content, **blargs)
         if followRedirects:
-            # bug: see https://bugzilla.wikimedia.org/show_bug.cgi?id=7304
             # links identified by MediaWiki as redirects may not really be,
             # so we have to check each "redirect" page and see if it
             # really redirects to this page
+            # see fixed MediaWiki bug T9304
             redirgen = self._generator(api.PageGenerator,
                                        type_arg="backlinks",
                                        gbltitle=bltitle,
@@ -5753,7 +5753,7 @@ class APISite(BaseSite):
                                                  comment=comment, text=text,
                                                  filekey=_file_key)
         elif source_filename:
-            # TODO: Dummy value to allow also Unicode names, see bug 73661
+            # TODO: Dummy value to allow also Unicode names, see bug T75661
             mime_filename = 'FAKE-NAME'
             # upload local file
             throttle = True
@@ -6904,9 +6904,7 @@ class DataSite(APISite):
         data = req.submit()
 
         # the IDs returned from the API can be upper or lowercase, depending
-        # on the version. See for more information:
-        # https://bugzilla.wikimedia.org/show_bug.cgi?id=53894
-        # https://lists.wikimedia.org/pipermail/wikidata-tech/2013-September/000296.html
+        # on the version. See bug T55894 for more information.
         try:
             dtype = data['entities'][prop.getID()]['datatype']
         except KeyError:

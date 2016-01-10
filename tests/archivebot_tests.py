@@ -44,7 +44,7 @@ class TestArchiveBot(TestCase):
     def test_archivebot(self, code=None):
         """Test archivebot for one site."""
         site = self.get_site(code)
-        if code != 'de':  # bug 67663
+        if code != 'de':  # bug T69663
             page = pywikibot.Page(site, 'user talk:xqt')
         else:
             page = pywikibot.Page(site, 'user talk:ladsgroup')

@@ -283,7 +283,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             elif e.code == 'Illegal':
                 raise NoUsername(u"Username '%s' is invalid on %s"
                                  % (self.username, self.site))
-            # TODO: investigate other unhandled API codes (bug 73539)
+            # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
                 return self.login(retry=True)

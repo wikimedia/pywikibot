@@ -144,7 +144,7 @@ class BlockEntry(LogEntry):
         """Constructor."""
         super(BlockEntry, self).__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
-        # ( https://bugzilla.wikimedia.org/show_bug.cgi?id=17781 )
+        # See bug T19781
         pos = self.data['title'].find('#')
         self.isAutoblockRemoval = pos > 0
         if self.isAutoblockRemoval:

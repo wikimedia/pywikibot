@@ -430,7 +430,7 @@ class CosmeticChangesToolkit(object):
                     assert u'Kép' in namespaces
                     namespaces.remove(u'Kép')
                 elif self.site.code == 'pt':
-                    # bug 55242 should be implemented
+                    # TODO: bug T57242
                     continue
             # lowerspaced and underscored namespaces
             for i in range(len(namespaces)):
@@ -615,7 +615,7 @@ class CosmeticChangesToolkit(object):
     def resolveHtmlEntities(self, text):
         ignore = [
             38,     # Ampersand (&amp;)
-            39,     # Single quotation mark (&quot;) - Bugzilla 24093
+            39,     # Single quotation mark (&quot;) - bug T26093
             60,     # Less than (&lt;)
             62,     # Great than (&gt;)
             91,     # Opening square bracket ([)

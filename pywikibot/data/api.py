@@ -1789,7 +1789,7 @@ class Request(MutableMapping):
     def _is_wikibase_error_retryable(self, error):
         ERR_MSG = u'edit-already-exists'
         messages = error.pop("messages", None)
-        # bug 66619, after gerrit 124323 breaking change we have a
+        # bug T68619; after Wikibase breaking change 1ca9cee change we have a
         # list of messages
         if isinstance(messages, list):
             for item in messages:
@@ -1868,7 +1868,7 @@ class Request(MutableMapping):
                 if '*' in warning:
                     text = warning['*']
                 elif 'html' in warning:
-                    # Bugzilla 49978
+                    # bug T51978
                     text = warning['html']['*']
                 else:
                     pywikibot.warning(
@@ -2089,9 +2089,9 @@ class Request(MutableMapping):
                 del error['code']  # is added via class_name
                 e = APIMWException(class_name, **error)
 
-                retry = class_name in ['DBConnectionError',  # bug 62974
-                                       'DBQueryError',  # bug 58158
-                                       'ReadOnlyError'  # bug 59227
+                retry = class_name in ['DBConnectionError',  # T64974
+                                       'DBQueryError',  # T60158
+                                       'ReadOnlyError'  # T61227
                                        ]
 
                 pywikibot.error("Detected MediaWiki API exception %s%s"
@@ -2116,8 +2116,7 @@ class Request(MutableMapping):
 
                 raise e
 
-            # bugs 46535, 62126, 64494, 66619
-            # maybe removed when it 46535 is solved
+            # Phab. tickets T48535, T64126, T68494, T68619
             if code == "failed-save" and \
                self.action == 'wbeditentity' and \
                self._is_wikibase_error_retryable(result["error"]):
@@ -2692,7 +2691,7 @@ class QueryGenerator(_RequestWrapper):
                         # self.resultkey in data in last request.submit()
                         new_limit = min(self.query_limit, self.limit - count)
                     else:
-                        # only "(query-)continue" returned. See Bug 72209.
+                        # only "(query-)continue" returned. See Bug T74209.
                         # increase new_limit to advance faster until new
                         # useful data are found again.
                         new_limit = min(new_limit * 2, self.query_limit)

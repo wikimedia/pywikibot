@@ -308,7 +308,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 # We cannot just insert the new string, as it may contain regex
                 # group references such as \2 or \g<name>.
                 # On the other hand, this approach does not work because it
-                # can't handle lookahead or lookbehind (see bug #1731008):
+                # can't handle lookahead or lookbehind (see bug T123185):
                 #
                 #  replacement = old.sub(new, text[match.start():match.end()])
                 #  text = text[:match.start()] + replacement + text[match.end():]
@@ -1777,7 +1777,7 @@ class TimeStripper(object):
 
         if m:
             marker = findmarker(txt)
-            # month and day format might be identical (e.g. see bug 69315),
+            # month and day format might be identical (e.g. see bug T71315),
             # avoid to wipe out day, after month is matched.
             # replace all matches but the last two
             # (i.e. allow to search for dd. mm.)

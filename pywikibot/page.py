@@ -572,7 +572,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @return: dict
         """
         if not hasattr(self, '_pageprops') or force:
-            self._pageprops = {}  # page may not have pageprops (see bug 54868)
+            self._pageprops = {}  # page may not have pageprops (see bug T56868)
             self.site.loadpageprops(self)
         return self._pageprops
 
@@ -1448,7 +1448,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @return: a generator that yields Category objects.
 
         """
-        # FIXME: bug 73561: withSortKey is ignored by Site.pagecategories
+        # FIXME: bug T75561: withSortKey is ignored by Site.pagecategories
         if withSortKey:
             raise NotImplementedError('withSortKey is not implemented')
 
@@ -3364,7 +3364,7 @@ class WikibasePage(BasePage):
         self.labels = {}
         if 'labels' in self._content:
             for lang in self._content['labels']:
-                if 'removed' not in self._content['labels'][lang]:  # Bug 54767
+                if 'removed' not in self._content['labels'][lang]:  # Bug T56767
                     self.labels[lang] = self._content['labels'][lang]['value']
 
         # descriptions
