@@ -138,6 +138,7 @@ script_test_modules = [
     'isbn',
     'protectbot',
     'reflinks',
+    'template_bot',
     'replacebot',
     'uploadbot',
     'weblinkchecker',

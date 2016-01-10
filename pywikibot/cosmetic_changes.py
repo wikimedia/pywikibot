@@ -71,6 +71,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config, textlib
+from pywikibot.textlib import _MultiTemplateMatchBuilder
 from pywikibot.tools import deprecate_arg, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
@@ -306,6 +307,7 @@ class CosmeticChangesToolkit(object):
         5. interwiki links
 
         """
+        # TODO: T123150
         starsList = [
             u'bueno',
             u'bom interwiki',
@@ -694,6 +696,8 @@ class CosmeticChangesToolkit(object):
 
     def replaceDeprecatedTemplates(self, text):
         exceptions = ['comment', 'math', 'nowiki', 'pre']
+        builder = _MultiTemplateMatchBuilder(self.site)
+
         if self.site.family.name in deprecatedTemplates and \
            self.site.code in deprecatedTemplates[self.site.family.name]:
             for template in deprecatedTemplates[
@@ -704,12 +708,12 @@ class CosmeticChangesToolkit(object):
                     new = ''
                 else:
                     new = '{{%s}}' % new
-                if self.site.namespaces[10].case == 'first-letter':
-                    old = '[' + old[0].upper() + old[0].lower() + ']' + old[1:]
+
                 text = textlib.replaceExcept(
                     text,
-                    r'\{\{([mM][sS][gG]:)?%s(?P<parameters>\|[^}]+|)}}' % old,
+                    builder.pattern(old),
                     new, exceptions)
+
         return text
 
     # from fixes.py

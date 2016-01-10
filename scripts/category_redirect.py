@@ -293,6 +293,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             with open(datafile + ".bak", "wb") as f:
                 cPickle.dump(record, f, protocol=config.pickle_protocol)
         # regex to match soft category redirects
+        # TODO: enhance and use textlib._MultiTemplateMatchBuilder
         #  note that any templates containing optional "category:" are
         #  incorrect and will be fixed by the bot
         template_regex = re.compile(

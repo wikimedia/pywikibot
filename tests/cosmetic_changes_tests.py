@@ -102,10 +102,10 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
     def test_replaceDeprecatedTemplates(self):
         """Test replaceDeprecatedTemplates method."""
         self.assertEqual(
-            '{{Quellen fehlen }}'
+            '{{Belege fehlen}}'
             '{{Belege fehlen| }}'
             '{{Belege fehlen|foo}}'
-            '{{Quellen_fehlen|foo}}',
+            '{{Belege fehlen|foo}}',
             self.cct.replaceDeprecatedTemplates(
                 '{{Quellen fehlen }}'
                 '{{Quellen fehlen| }}'

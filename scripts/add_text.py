@@ -196,6 +196,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
                                                    categoriesInside, site,
                                                    True)
             # Dealing the stars' issue
+            # TODO: T123150
             allstars = []
             starstext = textlib.removeDisabledParts(text)
             for star in starsList:
