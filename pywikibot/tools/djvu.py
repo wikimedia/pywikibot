@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,7 @@ __version__ = '$Id$'
 import os.path
 import subprocess
 
-import pywikibot
+from pywikibot.logging import error
 
 
 class DjVuFile(object):
@@ -47,7 +47,7 @@ class DjVuFile(object):
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdoutdata, stderrdata) = dp.communicate()
             if dp.returncode != 0:
-                pywikibot.error('djvulibre library error!\n%s' % stderrdata)
+                error('djvulibre library error!\n%s' % stderrdata)
             self._image_count = int(stdoutdata)
         return self._image_count
 
@@ -58,7 +58,7 @@ class DjVuFile(object):
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             (stdoutdata, stderrdata) = dp.communicate()
             if dp.returncode != 0:
-                pywikibot.error('djvulibre library error!\n%s' % stderrdata)
+                error('djvulibre library error!\n%s' % stderrdata)
             txt = stdoutdata.decode('utf-8')
             self._has_text = 'TXTz' in txt
         return self._has_text
@@ -91,5 +91,5 @@ class DjVuFile(object):
                               stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (stdoutdata, stderrdata) = dp.communicate()
         if dp.returncode != 0:
-            pywikibot.error('djvulibre library error!\n%s' % stderrdata)
+            error('djvulibre library error!\n%s' % stderrdata)
         return self._remove_control_chars(stdoutdata)
