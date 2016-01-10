@@ -2090,7 +2090,7 @@ addFmt1('hr', False, [u"%d. siječnja", u"%d. veljače", u"%d. ožujka",
                       u"%d. travnja", u"%d. svibnja", u"%d. lipnja",
                       u"%d. srpnja", u"%d. kolovoza", u"%d. rujna",
                       u"%d. listopada", u"%d. studenog", u"%d. prosinca"])
-addFmt2('hu', False, u"%s %%d", True)
+addFmt2('hu', False, u"%s %%d.", True)
 addFmt2('ia', False, u"%%d de %s", False)
 addFmt2('id', False, u"%%d %s", True)
 addFmt2('ie', False, u"%%d %s", False)
