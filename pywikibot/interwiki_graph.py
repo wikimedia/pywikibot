@@ -191,8 +191,9 @@ class GraphDrawer(object):
                     # bugfix for pydot >= 1.0.3
                     oppositeEdge = oppositeEdge[0]
                 oppositeEdge.set_dir('both')
-            # workaround for bug [ 1722739 ]: prevent duplicate edges
+            # workaround for sf.net bug 401: prevent duplicate edges
             # (it is unclear why duplicate edges occur)
+            # https://sourceforge.net/p/pywikipediabot/bugs/401/
             elif self.graph.get_edge(sourceLabel, targetLabel):
                 pywikibot.output(
                     u'BUG: Tried to create duplicate edge from %s to %s'
