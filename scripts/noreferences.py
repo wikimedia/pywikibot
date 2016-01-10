@@ -529,7 +529,7 @@ class NoReferencesBot(Bot):
                              r'< */?\s*references */? *>', re.DOTALL)
         if pattern.search(oldText):
             pywikibot.output('Repairing references tag')
-            return re.sub(pattern, '<references>\1</references>', oldText)
+            return re.sub(pattern, r'<references>\1</references>', oldText)
         # Repair single unclosed references tag
         pattern = re.compile(r'< *references *>')
         if pattern.search(oldText):
