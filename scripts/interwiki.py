@@ -145,8 +145,7 @@ These arguments are useful to provide hints to the bot:
                       * scand:     All Scandinavian languages.
 
                    Names of families that forward their interlanguage links
-                   to the wiki family being worked upon can be used (with
-                   -family=wikipedia only), they are:
+                   to the wiki family being worked upon can be used, they are:
                       * commons:   Interlanguage links of Mediawiki Commons.
                       * incubator: Links in pages on the Mediawiki Incubator.
                       * meta:      Interlanguage links of named pages on Meta.
@@ -348,7 +347,6 @@ __version__ = '$Id$'
 #
 
 import codecs
-import datetime
 import os
 import pickle
 import re
@@ -1723,65 +1721,9 @@ class Subject(interwiki_graph.Subject):
                             break
         else:
             for (site, page) in new.items():
-                # edit restriction for some templates on zh-wiki where
-                # interlanguage keys are included by /doc subpage
-                smallWikiAllowed = not (page.site.sitename == 'wikipedia:zh' and
-                                        page.namespace() == 10 and
-                                        u'Country data' in page.title(withNamespace=False))
-                # edit restriction on is-wiki
-                # https://is.wikipedia.org/wiki/Wikipediaspjall:V%C3%A9lmenni
-                # and zh-wiki for template namespace which prevents increasing the queue
-                # allow edits for the same conditions as -whenneeded
-                # or the last edit wasn't a bot
-                # or the last edit was 1 month ago
-                if (smallWikiAllowed and
-                    globalvar.autonomous and
-                    (page.site.sitename == 'wikipedia:is' or
-                     page.site.sitename == 'wikipedia:zh' and
-                     page.namespace() == 10
-                     )):
-                    old = {}
-                    try:
-                        for mypage in new[page.site].interwiki():
-                            old[mypage.site] = mypage
-                    except pywikibot.NoPage:
-                        pywikibot.output(u"BUG>>> %s no longer exists?"
-                                         % new[site])
-                        continue
-                    mods, mcomment, adding, removing, modifying \
-                        = compareLanguages(old, new, insite=site)
-                    # cannot create pywikibot.User with IP
-                    smallWikiAllowed = (
-                        page.isIpEdit() or
-                        len(removing) > 0 or
-                        len(old) == 0 or
-                        len(adding) + len(modifying) > 2 or
-                        (
-                            len(removing) + len(modifying) == 0 and
-                            adding == [page.site]
-                        )
-                    )
-                    if not smallWikiAllowed:
-                        user = pywikibot.User(page.site, page.userName())
-                        # erstmal auch keine namen mit bot
-                        if 'bot' not in user.groups() \
-                           and 'bot' not in page.userName().lower():
-                            smallWikiAllowed = True
-                        else:
-                            _now = datetime.datetime.utcnow()
-                            _editTime = page.editTime()
-                            if abs((_now - _editTime).days) > 30:
-                                smallWikiAllowed = True
-                            else:
-                                pywikibot.output(
-                                    u'NOTE: number of edits are restricted at %s'
-                                    % page.site.sitename
-                                )
-
                 # if we have an account for this site
                 if site.family.name in config.usernames and \
                    site.code in config.usernames[site.family.name] and \
-                   smallWikiAllowed and \
                    not site.has_transcluded_data:
                     # Try to do the changes
                     try:
@@ -1915,11 +1857,7 @@ class Subject(interwiki_graph.Subject):
                 # put it to new means don't delete it
                 if (
                     not globalvar.cleanup or
-                    unicode(rmPage) not in globalvar.remove or
-                    (
-                        rmPage.site.sitename() == 'wikipedia:hi' and
-                        page.site.sitename() != 'wikipedia:de'  # work-arround for bug #3081100 (do not remove hi-pages)
-                    )
+                    unicode(rmPage) not in globalvar.remove
                 ):
                     new[rmsite] = rmPage
                     pywikibot.output(
