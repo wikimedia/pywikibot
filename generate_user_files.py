@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
-"""Script to create user files (user-config.py, user-fixes.py)."""
+"""Script to create user-config.py."""
 #
 # (C) Pywikibot team, 2010-2015
 #
@@ -12,7 +12,6 @@ __version__ = '$Id$'
 import codecs
 import os
 import re
-import shutil
 import sys
 
 from textwrap import wrap
@@ -246,50 +245,45 @@ def create_user_config(args=None, force=False):
     config_text = ''
     config_content = SMALL_CONFIG
 
-    if ((force and not config.verbose_output) or
-            pywikibot.input_yn('Would you like the extended version of '
-                               'user-config.py, with explanations '
-                               'included?', automatic_quit=False,
-                               default=True, force=force)):
-        try:
-            # config2.py will be in the pywikibot/ directory relative to this
-            # script (generate_user_files)
-            install = os.path.dirname(os.path.abspath(__file__))
-            with codecs.open(os.path.join(install, "pywikibot", "config2.py"),
-                             "r", "utf-8") as config_f:
-                config_file = config_f.read()
+    try:
+        # config2.py will be in the pywikibot/ directory relative to this
+        # script (generate_user_files)
+        install = os.path.dirname(os.path.abspath(__file__))
+        with codecs.open(os.path.join(install, "pywikibot", "config2.py"),
+                         "r", "utf-8") as config_f:
+            config_file = config_f.read()
 
-            res = re.findall("^(# ############# (?:"
-                             "LOGFILE|"
-                             "INTERWIKI|"
-                             "SOLVE_DISAMBIGUATION|"
-                             "IMAGE RELATED|"
-                             "TABLE CONVERSION BOT|"
-                             "WEBLINK CHECKER|"
-                             "DATABASE|"
-                             "SEARCH ENGINE|"
-                             "COPYRIGHT|"
-                             "FURTHER"
-                             ") SETTINGS .*)^(?=#####|# =====)",
-                             config_file, re.MULTILINE | re.DOTALL)
+        res = re.findall("^(# ############# (?:"
+                         "LOGFILE|"
+                         "INTERWIKI|"
+                         "SOLVE_DISAMBIGUATION|"
+                         "IMAGE RELATED|"
+                         "TABLE CONVERSION BOT|"
+                         "WEBLINK CHECKER|"
+                         "DATABASE|"
+                         "SEARCH ENGINE|"
+                         "COPYRIGHT|"
+                         "FURTHER"
+                         ") SETTINGS .*)^(?=#####|# =====)",
+                         config_file, re.MULTILINE | re.DOTALL)
 
-            if not res:
-                warn('Extended config extraction failed', UserWarning)
+        if not res:
+            warn('Extended config extraction failed', UserWarning)
 
-            config_text = '\n'.join(res)
-            if len(config_text.splitlines()) < 350:
-                warn('Extended config extraction too short: %d'
-                     % len(config_text.splitlines()),
-                     UserWarning)
+        config_text = '\n'.join(res)
+        if len(config_text.splitlines()) < 350:
+            warn('Extended config extraction too short: %d'
+                 % len(config_text.splitlines()),
+                 UserWarning)
 
-            config_content = EXTENDED_CONFIG
-        except Exception as e:
-            # If the warning was explicitly enabled, raise
-            if isinstance(e, UserWarning):
-                raise
-            pywikibot.output('Exception while creating extended user-config; '
-                             'falling back to simple user-config.')
-            pywikibot.exception()
+        config_content = EXTENDED_CONFIG
+    except Exception as e:
+        # If the warning was explicitly enabled, raise
+        if isinstance(e, UserWarning):
+            raise
+        pywikibot.output('Exception while creating extended user-config; '
+                         'falling back to simple user-config.')
+        pywikibot.exception()
 
     try:
         with codecs.open(_fnc, "w", "utf-8") as f:
@@ -305,31 +299,6 @@ def create_user_config(args=None, force=False):
         except:
             pass
         raise
-
-
-def create_user_fixes():
-    """Create a basic user-fixes.py in base_dir."""
-    _fnf = os.path.join(base_dir, "user-fixes.py")
-    if not file_exists(_fnf):
-        with codecs.open(_fnf, "w", "utf-8") as f:
-            f.write(r"""# -*- coding: utf-8  -*-
-
-#
-# This is only an example. Don't use it.
-#
-
-fixes['example'] = {
-    'regex': True,
-    'msg': {
-        '_default': u'no summary specified',
-    },
-    'replacements': [
-        (r'\bword\b', u'two words'),
-    ]
-}
-
-""")
-        pywikibot.output(u"'%s' written." % _fnf)
 
 
 def main(*args):
@@ -349,6 +318,8 @@ def main(*args):
     # and 'force' mode can be activated below.
     (config.family, config.mylang) = ('wikipedia', None)
 
+    pywikibot.output('You can abort at any time by pressing ctrl-c')
+
     local_args = pywikibot.handle_args(args)
     if local_args:
         pywikibot.output('Unknown arguments: %s' % ' '.join(local_args))
@@ -365,67 +336,27 @@ def main(*args):
     username = config.usernames[config.family].get(config.mylang)
     args = (config.family, config.mylang, username)
 
-    while not force or config.verbose_output:
+    # Only give option for directory change if user-config.py already exists
+    # in the directory. This will repeat if user-config.py also exists in
+    # the requested directory.
+    if not force or config.verbose_output:
         pywikibot.output(u'\nYour default user directory is "%s"' % base_dir)
-        if pywikibot.input_yn("Do you want to use that directory?",
-                              default=True, automatic_quit=False,
-                              force=force):
-            break
-        else:
-            new_base = change_base_dir()
-            if new_base:
-                base_dir = new_base
+        while os.path.isfile(os.path.join(base_dir, "user-config.py")):
+            pywikibot.output('user-config.py already exists'
+                             ' in the target directory.')
+            if pywikibot.input_yn('Would you like to change the directory?',
+                                  default=True,
+                                  automatic_quit=False, force=force):
+                new_base = change_base_dir()
+                if new_base:
+                    base_dir = new_base
+            else:
                 break
 
-    copied_config = False
-    copied_fixes = False
-    while not force or config.verbose_output:
-        if os.path.exists(os.path.join(base_dir, "user-config.py")):
-            break
-        if pywikibot.input_yn(
-                "Do you want to copy user files from an existing Pywikibot "
-                "installation?",
-                default=False, force=force,
-                automatic_quit=False):
-            oldpath = pywikibot.input("Path to existing user-config.py?")
-            if not os.path.exists(oldpath):
-                pywikibot.error("Not a valid path")
-                continue
-            if os.path.isfile(oldpath):
-                # User probably typed /user-config.py at the end, so strip it
-                oldpath = os.path.dirname(oldpath)
-            if not os.path.isfile(os.path.join(oldpath, "user-config.py")):
-                pywikibot.error("No user_config.py found in that directory")
-                continue
-            shutil.copyfile(os.path.join(oldpath, "user-config.py"),
-                            os.path.join(base_dir, "user-config.py"))
-            copied_config = True
-
-            if os.path.isfile(os.path.join(oldpath, "user-fixes.py")):
-                shutil.copyfile(os.path.join(oldpath, "user-fixes.py"),
-                                os.path.join(base_dir, "user-fixes.py"))
-                copied_fixes = True
-
-        else:
-            break
+    # user-fixes.py also used to be created here, but has
+    # been replaced by an example file.
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
-        if ((force and not config.verbose_output) or
-                pywikibot.input_yn('Create user-config.py file? Required for '
-                                   'running bots.',
-                                   default=True, automatic_quit=False,
-                                   force=force)):
-            create_user_config(args, force=force)
-    elif not copied_config:
-        pywikibot.output("user-config.py already exists in the directory")
-    if not os.path.isfile(os.path.join(base_dir, "user-fixes.py")):
-        if ((force and not config.verbose_output) or
-                pywikibot.input_yn('Create user-fixes.py file? Optional and '
-                                   'for advanced users.',
-                                   force=force,
-                                   default=False, automatic_quit=False)):
-            create_user_fixes()
-    elif not copied_fixes:
-        pywikibot.output("user-fixes.py already exists in the directory")
+        create_user_config(args, force=force)
 
 if __name__ == '__main__':
     main()
