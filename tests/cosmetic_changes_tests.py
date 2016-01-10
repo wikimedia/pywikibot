@@ -99,6 +99,20 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(':* Foo bar',
                          self.cct.putSpacesInLists(':*Foo bar'))
 
+    def test_replaceDeprecatedTemplates(self):
+        """Test replaceDeprecatedTemplates method."""
+        self.assertEqual(
+            '{{Quellen fehlen }}'
+            '{{Belege fehlen| }}'
+            '{{Belege fehlen|foo}}'
+            '{{Quellen_fehlen|foo}}',
+            self.cct.replaceDeprecatedTemplates(
+                '{{Quellen fehlen }}'
+                '{{Quellen fehlen| }}'
+                '{{Quellen fehlen|foo}}'
+                '{{Quellen_fehlen|foo}}'
+            ))
+
     def test_fixSyntaxSave(self):
         """Test fixSyntaxSave method."""
         # necessary as the fixer needs the article path to fix it
