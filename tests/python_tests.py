@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Tests Python features."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -13,15 +13,9 @@ try:
 except ImportError:
     unicodedata2 = None
 
-from pywikibot.tools import PYTHON_VERSION
-
 from tests.aspects import TestCase, unittest
-from tests.utils import expected_failure_if
 
 # TODO:
-# very old
-# http://bugs.python.org/issue2517
-#
 # unicode
 # http://sourceforge.net/p/pywikipediabot/bugs/1246/
 # http://bugs.python.org/issue10254
@@ -37,7 +31,6 @@ from tests.utils import expected_failure_if
 # http://sourceforge.net/p/pywikipediabot/bugs/509/
 # https://phabricator.wikimedia.org/T57329
 # http://bugs.python.org/issue1528074
-# http://bugs.python.org/issue1678345
 
 
 class PythonTestCase(TestCase):
@@ -46,11 +39,9 @@ class PythonTestCase(TestCase):
 
     net = False
 
-    @expected_failure_if((2, 7, 0) <= PYTHON_VERSION < (2, 7, 2) or
-                         PYTHON_VERSION == (2, 6, 6))
     def test_issue_10254(self):
         """Test Python issue #10254."""
-        # Python 2.6.6, 2.7.0 and 2.7.1 have a bug in this routine.
+        # Python 2.7.0 and 2.7.1 have a bug in this routine.
         # See T102461 and http://bugs.python.org/issue10254
         text = 'Li̍t-sṳ́'
         self.assertEqual(text, unicodedata.normalize('NFC', text))

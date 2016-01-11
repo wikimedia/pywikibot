@@ -21,14 +21,6 @@ Subpackages
 Submodules
 ----------
 
-pywikibot.backports module
---------------------------
-
-.. automodule:: pywikibot.backports
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 pywikibot.bot module
 --------------------
 

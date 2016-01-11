@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,6 @@ import sys
 
 from pywikibot.tools import (
     PY2,
-    PYTHON_VERSION,
     StringTypes,
 )
 
@@ -39,10 +38,6 @@ script_deps = {
     'states_redirect': ['pycountry'],
     'patrol': ['mwparserfromhell'],
 }
-
-if PYTHON_VERSION < (2, 7):
-    script_deps['replicate_wiki'] = ['argparse']
-    script_deps['editarticle'] = ['argparse']
 
 if PY2:
     script_deps['data_ingestion'] = ['unicodecsv']

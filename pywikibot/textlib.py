@@ -13,7 +13,7 @@ and return a unicode string.
 #
 from __future__ import absolute_import, unicode_literals
 
-import collections
+from collections import OrderedDict, Sequence
 import datetime
 import re
 import sys
@@ -39,7 +39,6 @@ from pywikibot.tools import (
     deprecate_arg,
     deprecated,
     DeprecatedRegex,
-    OrderedDict,
     StringTypes,
     UnicodeType,
     issue_deprecation_warning
@@ -645,7 +644,7 @@ def replace_links(text, replace, site=None):
             title += '#' + l.section
         return title
 
-    if isinstance(replace, collections.Sequence):
+    if isinstance(replace, Sequence):
         if len(replace) != 2:
             raise ValueError('When used as a sequence, the "replace" '
                              'argument must contain exactly 2 items.')

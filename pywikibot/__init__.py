@@ -135,13 +135,6 @@ deprecated = redirect_func(__deprecated)
 deprecate_arg = redirect_func(_deprecate_arg)
 
 
-if sys.version_info[:2] == (2, 6):
-    warn(
-        'Pywikibot will soon drop support for Python 2.6',
-        DeprecationWarning,
-    )
-
-
 class Timestamp(datetime.datetime):
 
     """Class for handling MediaWiki timestamps.

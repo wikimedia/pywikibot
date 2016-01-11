@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -100,59 +100,6 @@ class NotImplementedClass(object):
         """Constructor."""
         raise NotImplementedError(
             '%s: %s' % (self.__class__.__name__, self.__doc__))
-
-
-if PYTHON_VERSION < (2, 7):
-    try:
-        import future.backports.misc
-    except ImportError:
-        warn("""
-pywikibot support of Python 2.6 relies on package future for many features.
-Please upgrade to Python 2.7+ or Python 3.4+, or run:
-    "pip install future>=0.15.0"
-""", RuntimeWarning)
-        try:
-            from ordereddict import OrderedDict
-        except ImportError:
-            class OrderedDict(NotImplementedClass):
-
-                """OrderedDict not found."""
-
-                pass
-
-        try:
-            from counter import Counter
-        except ImportError:
-            class Counter(NotImplementedClass):
-
-                """Counter not found."""
-
-                pass
-        count = None
-    else:
-        Counter = future.backports.misc.Counter
-        OrderedDict = future.backports.misc.OrderedDict
-
-        try:
-            count = future.backports.misc.count
-        except AttributeError:
-            warn('Please update the "future" package to at least version '
-                 '0.15.0 to use its count.', RuntimeWarning, 2)
-            count = None
-        del future
-
-    if count is None:
-        def count(start=0, step=1):
-            """Backported C{count} to support keyword arguments and step."""
-            while True:
-                yield start
-                start += step
-
-
-else:
-    Counter = collections.Counter
-    OrderedDict = collections.OrderedDict
-    count = itertools.count
 
 
 def has_module(module):
@@ -1536,7 +1483,7 @@ def deprecated_args(**arg_pairs):
         if wrapper.__signature__:
             # Build a new signature with deprecated args added.
             # __signature__ is only available in Python 3 which has OrderedDict
-            params = OrderedDict()
+            params = collections.OrderedDict()
             for param in wrapper.__signature__.parameters.values():
                 params[param.name] = param.replace()
             for old_arg, new_arg in arg_pairs.items():
@@ -1837,3 +1784,9 @@ def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
             bytes_to_read -= len(read_bytes)
             sha.update(read_bytes)
     return sha.hexdigest()
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('Counter', collections.Counter)
+wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict)
+wrapper._add_deprecated_attr('count', itertools.count)

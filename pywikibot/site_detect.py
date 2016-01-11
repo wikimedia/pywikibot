@@ -23,9 +23,9 @@ if not PY2:
     from html.parser import HTMLParser
     from urllib.parse import urljoin, urlparse
 else:
-    try:
-        from future.backports.html.parser import HTMLParser
-    except ImportError:
+    if PYTHON_VERSION == (2, 7, 2):
+        from future.backports.html.parser import HTMLParser  # T175873
+    else:
         from HTMLParser import HTMLParser
     from urlparse import urljoin, urlparse
 

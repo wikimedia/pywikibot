@@ -1,6 +1,6 @@
 # This is a PIP 6+ requirements file for development dependencies
 #
-unittest2==0.8.0 ; python_full_version < '2.7.3'
+unittest2==0.8.0 ; python_full_version == '2.7.2'
 
 pytest>=2.8.0
 pytest-timeout
@@ -8,7 +8,7 @@ pytest-runner
 pytest-cov
 pytest-attrib
 pytest-httpbin
-httpbin<0.6.0 ; os_name != 'posix' or python_version < '2.7'
+httpbin<0.6.0 ; os_name != 'posix'
 
 six
 
@@ -35,5 +35,3 @@ vcrpy-unittest
 # are not useful on the Appveyor Win32 builds since the relevant UI tests
 # also require accessing the menu of the console window, which doesnt exist
 # in the Appveyor environment.
-
-setuptools_scm ; python_version == '2.6'

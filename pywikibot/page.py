@@ -29,7 +29,7 @@ try:
 except ImportError:
     import unicodedata
 
-from collections import defaultdict, namedtuple
+from collections import Counter, defaultdict, namedtuple, OrderedDict
 from warnings import warn
 
 from pywikibot.tools import PY2
@@ -65,13 +65,11 @@ from pywikibot.family import Family
 from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
     compute_file_hash,
-    PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     add_full_name, manage_wrapping,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     first_upper, redirect_func, remove_last_args, _NotImplementedWarning,
-    OrderedDict, Counter,
 )
 from pywikibot.tools.ip import ip_regexp
 from pywikibot.tools.ip import is_IP
@@ -5421,9 +5419,6 @@ class Link(ComparableMixin):
         @type defaultNamespace: int
 
         @raises UnicodeError: text could not be converted to unicode.
-            On Python 2.6.6 without unicodedata2, this could also be raised
-            if the text contains combining characters.
-            See https://phabricator.wikimedia.org/T102461
         """
         source_is_page = isinstance(source, BasePage)
 
@@ -5460,16 +5455,6 @@ class Link(ComparableMixin):
 
         # Normalize unicode string to a NFC (composed) format to allow
         # proper string comparisons to strings output from MediaWiki API.
-        # Due to Python issue 10254, this is not possible on Python 2.6.6
-        # if the string contains combining characters. See T102461.
-        if (PYTHON_VERSION == (2, 6, 6) and
-                unicodedata.__name__ != 'unicodedata2' and
-                any(unicodedata.combining(c) for c in t)):
-            raise UnicodeError(
-                'Link(%r, %s): combining characters detected, which are '
-                'not supported by Pywikibot on Python 2.6.6. See '
-                'https://phabricator.wikimedia.org/T102461'
-                % (t, self._source))
         t = unicodedata.normalize('NFC', t)
 
         # This code was adapted from Title.php : secureAndSplit()

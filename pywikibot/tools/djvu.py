@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
+from collections import Counter
 import os
 import re
 import subprocess
@@ -15,7 +16,6 @@ import subprocess
 import pywikibot
 
 from pywikibot.tools import (
-    Counter,
     deprecated, deprecated_args,
     StringTypes,
     UnicodeType,

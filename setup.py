@@ -23,22 +23,19 @@ __unused__ = (multiprocessing, )
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
-PY26 = (PYTHON_VERSION < (2, 7))
 
 versions_required_message = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 2.6.5+, 2.7.2+ or 3.4+.
+This version of Pywikibot only supports Python 2.7.2+ or 3.4+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
     # Any change to this must be copied to pwb.py
-    return (PYTHON_VERSION >= (3, 4, 0) or
-            (PY2 and PYTHON_VERSION >= (2, 7, 2)) or
-            (PY26 and PYTHON_VERSION >= (2, 6, 5)))
+    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 2)
 
 
 if not python_is_supported():
@@ -48,25 +45,15 @@ test_deps = ['bz2file', 'mock']
 
 dependencies = ['requests>=2.9,!=2.18.2']
 
-# the irc module has no Python 2.6 support since 10.0
-irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
-csv_dep = 'unicodecsv!=0.14.0' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
-
-# According to https://pillow.readthedocs.io/en/latest/installation.html#notes
-if PY26:
-    pillow = 'Pillow<4.0.0'
-else:
-    pillow = 'Pillow'
-
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient>=0.0.18'],
     'isbn': ['python-stdnum'],
     'Graphviz': ['pydot>=1.0.28'],
     'Google': ['google>=1.7'],
-    'IRC': [irc_dep],
+    'IRC': ['irc'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': [pillow],
+    'Tkinter': ['Pillow'],
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
@@ -75,31 +62,21 @@ extra_deps = {
 if PY2:
     # Additional core library dependencies which are only available on Python 2
     extra_deps.update({
-        'csv': [csv_dep],
+        'csv': ['unicodecsv'],
         'MySQL': ['oursql'],
         'unicode7': ['unicodedata2>=7.0.0-2'],
     })
 
 script_deps = {
-    'flickrripper.py': [pillow],
+    'flickrripper.py': ['flickrapi', 'Pillow'],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client>=0.5.1,!=0.6.0'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],
 }
-# flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
-# The problem doesnt exist in flickrapi 2.x.
-# pywikibot accepts flickrapi 1.4.5+ on Python 2, as it has been stable for a
-# long time, and only depends on python-requests 1.x, whereas flickrapi 2.x
-# depends on python-requests 2.x, which is first packaged in Ubuntu 14.04
-# and will be first packaged for Fedora Core 21.
-# flickrapi 1.4.x does not run on Python 3, and setuptools can only
-# select flickrapi 2.x for Python 3 installs.
-script_deps['flickrripper.py'].append(
-    'flickrapi>=1.4.5,<2' if PY26 else 'flickrapi')
 
 # lunatic-python is only available for Linux
 if sys.platform.startswith('linux'):
-    script_deps['script_wui.py'] = [irc_dep, 'lunatic-python', 'crontab']
+    script_deps['script_wui.py'] = ['irc', 'lunatic-python', 'crontab']
 
 # The main pywin32 repository contains a Python 2 only setup.py with a small
 # wrapper setup3.py for Python 3.
@@ -113,7 +90,7 @@ dependency_links = [
     'git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29',
 ]
 
-if PYTHON_VERSION < (2, 7, 3):
+if PYTHON_VERSION == (2, 7, 2):
     # work around distutils hardcoded unittest dependency
     # work around T106512
     import unittest
@@ -123,12 +100,6 @@ if PYTHON_VERSION < (2, 7, 3):
         sys.modules['unittest'] = unittest2
 
 if sys.version_info[0] == 2:
-    if PY26:
-        script_deps['replicate_wiki.py'] = ['argparse']
-        dependencies.append('future>=0.15.0')  # provides collections backports
-
-        dependencies += extra_deps['unicode7']  # T102461 workaround
-
     # tools.ip does not have a hard dependency on an IP address module,
     # as it falls back to using regexes if one is not available.
     # The functional backport of py3 ipaddress is acceptable:
@@ -139,7 +110,7 @@ if sys.version_info[0] == 2:
     # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
 
-    if sys.version_info < (2, 7, 3):
+    if sys.version_info == (2, 7, 2):
         dependencies.append('future>=0.15.0')  # Bug fixes for HTMLParser
 
     if sys.version_info < (2, 7, 9):
@@ -257,7 +228,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
