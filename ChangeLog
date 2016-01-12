@@ -1,6 +1,100 @@
+Release 2.0rc4 (15 December 2015)
+=================================
+
+Bugfixes (core)
+---------------
+e42891d Remove dependency on pYsearch
+ecc39ce Require google>=0.7
+fa431a4 Desupport Python 2.6 for Pywikibot 2.0 release branch
+b1f6f39 config: Don't crash on later get_base_dir calls
+0925c51 cosmetic_changes: merge similar regexes
+4bf39f3 Update revId upon claim change
+ea11626 Update WOW hostnames
+2a5a4fa Mark site.patrol() as a user write action
+4f568c5 Fix interwikiFormat support for Link
+7cb6962 Changes are wrongly detected in the last langlink
+5c5d658 getLanguageLinks: Skip own site
+7ee8ec2 fix intersection of sets of namespaces
+94b0c43 Import textlib.TimeStripper
+584d7c1 Change "PyWikiBot" to "Pywikibot"
+1f8d57e Stop crashing item loads due to support of units
+c19dcfa __all__ items must be bytes on Python 2
+e6aa6ca Omit includeredirects parameter for allpages generator
+687ec9e Performance fix for sites using interwiki_putfirst option
+28db3d2 Fix Persian Wikipedia configuration
+3944f5e rollback: Use Revision instance properly
+860af34 Add must_be to DataSite write actions
+f8af8e0 Remove unneeded site argument to AutoFamily
+bf49a7d Fix ComparableMixin
+1d36e45 Deprecate ParamInfo.query_modules_with_limits
+e83c6a3 be-x-old is renamed to be-tarask
+19bbe7e Correctly identify qualifier from JSON
+
+Bugfixes (scripts)
+------------------
+4e78c27 checkimages: Expect NoPage exception
+fbb6266 interwiki: Optimize/remove unneeded calls to Page.isEmpty()
+428420a interwiki: Allow Subject.originPage to be updated
+a305d7b interwiki: Allow titletranslate.translate page to be None
+a786226 interwiki: '-ignore' parameter throws exception
+ab7abf5 interwiki: check for category before emptiness
+0db2e87 interwiki: do not automatically log in
+47ed5d5 nowcommons: Query at most one users
+
+Release 2.0rc3 (30 September 2015)
+==================================
+
+Bugfixes (core)
+---------------
+6406479 New Wikipedia site: azb
+b503a1e Indexes in str.format
+d1854f5 MediaWikiVersion: Accept new wmf style
+718e4a1 i18n: always follow master
+
+Release 2.0rc2 (9 July 2015)
+============================
+
+Bugfixes (scripts)
+------------------
+8d76870 replace.py: remove line endings when reading from file
+bfe60b0 archive.py: Don't ignore "DoNotArchiveUntil" timestamps
+0df272b redirect.py: Don't break the script for hidden pages.
+9806a7a upload.py: allow all formats allowed by commons
+1dcbfd8, 0592360 replace.py: fix handling of addedCat
+
+Small new features (scripts)
+----------------------------
+a47c0d7 clean_sandbox.py: Use pagegenerators
+288b9ce replace.py: Inform about missing user-fixes.py
+
+Configuration updates
+---------------------
+d721249 Changing the sandbox content template on Fa WP
+
+Family file updates
+-------------------
+21d6a8d Remove broken wikis from battlestarwiki family
+3c2bcc5 Adding euskara and sicilianu languages to Vikidia family
+a3a3d53 WOW Wiki subdomains hr, ro & sr deleted
+474c786 Add new Wikipedia languages gom and lrc
+
+Bugfixes (core)
+---------------
+c7a12b5 fix UnicodeDecodeError on api error
+ea00683 pwb.py now correctly passes arguments to generate_family_file
+3685a24 Fix Win32 config.editor detection
+3333251 open_compressed: Wrap BZ2File in Py 2.7
+f2309e5 Skip RC entries without a title
+ab9fdfb PatrolEntry: Allow cur/prev id to be str
+156bdd0, 0b6fda9 Updates to i18n changes
+49fc65f Do not use ParamInfo during action=login
+796f273 Let pydot encode labels for Python 3 support
+3488a4b Fix and test interwiki_graph
+ba6b671 textlib: replaceExcept: Handle empty matches
+
 
 Release 2.0rc1 (25 May 2015)
-
+============================
 Major improvements include:
 - Sphinx documentation at https://doc.wikimedia.org/pywikibot/
 - Initial ProofreadPage support
