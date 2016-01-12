@@ -77,7 +77,7 @@ def tryimport_pwb():
     except RuntimeError:
         remove_modules()
 
-        pwb = lambda: None
+        pwb = lambda: None  # noqa: E731
         pwb.argvu = []
 
 
