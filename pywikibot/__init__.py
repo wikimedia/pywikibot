@@ -242,7 +242,7 @@ class Coordinate(_WbRepresentation):
         @type lat: float
         @param lon: Longitude
         @type lon: float
-        @param alt: Altitute? TODO FIXME
+        @param alt: Altitude? TODO FIXME
         @param precision: precision
         @type precision: float
         @param globe: Which globe the point is on
@@ -253,6 +253,8 @@ class Coordinate(_WbRepresentation):
         @type name: str
         @param dim: Dimension (in meters)
         @type dim: int
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         @param entity: The URL entity of a Wikibase item
         @type entity: str
         """
@@ -283,6 +285,9 @@ class Coordinate(_WbRepresentation):
         Export the data to a JSON object for the Wikibase API.
 
         FIXME: Should this be in the DataSite object?
+
+        @return: Wikibase JSON
+        @rtype: dict
         """
         if self.globe not in self.site.globes():
             raise CoordinateGlobeUnknownException(
@@ -297,7 +302,15 @@ class Coordinate(_WbRepresentation):
 
     @classmethod
     def fromWikibase(cls, data, site):
-        """Constructor to create an object from Wikibase's JSON output."""
+        """
+        Constructor to create an object from Wikibase's JSON output.
+
+        @param data: Wikibase JSON
+        @type data: dict
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.Coordinate
+        """
         globes = {}
         for k in site.globes():
             globes[site.globes()[k]] = k
@@ -381,6 +394,39 @@ class WbTime(_WbRepresentation):
         The precision can be set by the Wikibase int value (0-14) or by a human
         readable string, e.g., 'hour'. If no precision is given, it is set
         according to the given time units.
+
+        Timezone information is given in three different ways depending on the time:
+        * Times after the implementation of UTC (1972): as an offset from UTC in minutes;
+        * Times before the implementation of UTC: the offset of the time zone from universal time;
+        * Before the implementation of time zones: The longitude of the place of
+          the event, in the range −180° to 180°, multiplied by 4 to convert to minutes.
+
+        @param year: The year as a signed integer of between 1 and 16 digits.
+        @type year: long
+        @param month: Month
+        @type month: int
+        @param day: Day
+        @type day: int
+        @param hour: Hour
+        @type hour: int
+        @param minute: Minute
+        @type minute: int
+        @param second: Second
+        @type second: int
+        @param precision: The unit of the precision of the time.
+        @type precision: int or str
+        @param before: Number of units after the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type before: int
+        @param after: Number of units before the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type after: int
+        @param timezone: Timezone information in minutes.
+        @type timezone: int
+        @param calendarmodel: URI identifying the calendar model
+        @type calendarmodel: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         """
         if year is None:
             raise ValueError('no year given')
@@ -428,6 +474,33 @@ class WbTime(_WbRepresentation):
     @classmethod
     def fromTimestr(cls, datetimestr, precision=14, before=0, after=0,
                     timezone=0, calendarmodel=None, site=None):
+        """
+        Create a new WbTime object from a UTC date/time string.
+
+        The timestamp differs from ISO 8601 in that:
+        * The year is always signed and having between 1 and 16 digits;
+        * The month, day and time are zero if they are unknown;
+        * The Z is discarded since time zone is determined from the timezone param.
+
+        @param datetimestr: Timestamp in a format resembling ISO 8601,
+            e.g. +2013-01-01T00:00:00Z
+        @type datetimestr: str
+        @param precision: The unit of the precision of the time.
+        @type precision: int or str
+        @param before: Number of units after the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type before: int
+        @param after: Number of units before the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type after: int
+        @param timezone: Timezone information in minutes.
+        @type timezone: int
+        @param calendarmodel: URI identifying the calendar model
+        @type calendarmodel: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.WbTime
+        """
         match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
         if not match:
@@ -441,7 +514,8 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a UTC date/time string.
 
-        @return: str
+        @return: Timestamp in a format resembling ISO 8601
+        @rtype: str
         """
         return self.FORMATSTR.format(self.year, self.month, self.day,
                                      self.hour, self.minute, self.second)
@@ -450,7 +524,8 @@ class WbTime(_WbRepresentation):
         """
         Convert the data to a JSON object for the Wikibase API.
 
-        @return: dict
+        @return: Wikibase JSON
+        @rtype: dict
         """
         json = {'time': self.toTimestr(),
                 'precision': self.precision,
@@ -463,6 +538,13 @@ class WbTime(_WbRepresentation):
 
     @classmethod
     def fromWikibase(cls, ts):
+        """
+        Create a WbTime from the JSON data given by the Wikibase API.
+
+        @param ts: Wikibase JSON
+        @type ts: dict
+        @rtype: pywikibot.WbTime
+        """
         return cls.fromTimestr(ts[u'time'], ts[u'precision'],
                                ts[u'before'], ts[u'after'],
                                ts[u'timezone'], ts[u'calendarmodel'])
@@ -476,14 +558,26 @@ class WbQuantity(_WbRepresentation):
 
     @staticmethod
     def _todecimal(value):
-        """Convert a string to a Decimal for use in WbQuantity."""
+        """
+        Convert a string to a Decimal for use in WbQuantity.
+
+        @param value: decimal number to convert
+        @type value: str
+        @rtype: Decimal
+        """
         if isinstance(value, Decimal):
             return value
         return Decimal(str(value))
 
     @staticmethod
     def _fromdecimal(value):
-        """Convert a Decimal to a string representation suitable for WikiBase."""
+        """
+        Convert a Decimal to a string representation suitable for WikiBase.
+
+        @param value: decimal number to convert
+        @type value: Decimal
+        @rtype: str
+        """
         return format(value, "+g")
 
     def __init__(self, amount, unit=None, error=None):
@@ -518,7 +612,12 @@ class WbQuantity(_WbRepresentation):
         self.lowerBound = self.amount - lowerError
 
     def toWikibase(self):
-        """Convert the data to a JSON object for the Wikibase API."""
+        """
+        Convert the data to a JSON object for the Wikibase API.
+
+        @return: Wikibase JSON
+        @rtype: dict
+        """
         json = {'amount': self._fromdecimal(self.amount),
                 'upperBound': self._fromdecimal(self.upperBound),
                 'lowerBound': self._fromdecimal(self.lowerBound),
@@ -532,6 +631,8 @@ class WbQuantity(_WbRepresentation):
         Create a WbQuanity from the JSON data given by the Wikibase API.
 
         @param wb: Wikibase JSON
+        @type wb: dict
+        @rtype: pywikibot.WbQuanity
         """
         amount = cls._todecimal(wb['amount'])
         upperBound = cls._todecimal(wb['upperBound'])
@@ -574,6 +675,7 @@ class WbMonolingualText(_WbRepresentation):
 
         @param wb: Wikibase JSON
         @type wb: dict
+        @rtype: pywikibot.WbMonolingualText
         """
         return cls(wb['text'], wb['language'])
 
@@ -724,11 +826,11 @@ stopped = False
 
 
 def stopme():
-    """Drop this process from the throttle log, after pending threads finish.
+    """
+    Drop this process from the throttle log, after pending threads finish.
 
     Can be called manually if desired, but if not, will be called automatically
     at Python exit.
-
     """
     global stopped
     _logger = "wiki"
