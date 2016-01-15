@@ -52,7 +52,12 @@ from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
 )
 from pywikibot.logging import critical, debug, error, log, warning
-from pywikibot.tools import deprecate_arg, issue_deprecation_warning, PY2
+from pywikibot.tools import (
+    deprecate_arg,
+    issue_deprecation_warning,
+    PY2,
+    StringTypes,
+)
 
 import pywikibot.version
 
@@ -197,6 +202,33 @@ def user_agent(site=None, format_string=None):
     # clean up after any blank components
     formatted = formatted.replace(u'()', u'').replace(u'  ', u' ').strip()
     return formatted
+
+
+def get_fake_user_agent():
+    """
+    Return a user agent to be used when faking a web browser.
+
+    @rtype: str
+    """
+    # Check fake_user_agent configuration variable
+    if isinstance(config.fake_user_agent, StringTypes):
+        return pywikibot.config2.fake_user_agent
+
+    if config.fake_user_agent is None or config.fake_user_agent is True:
+        try:
+            import browseragents
+            return browseragents.core.random()
+        except ImportError:
+            pass
+
+        try:
+            import fake_useragent
+            return fake_useragent.fake.UserAgent().random
+        except ImportError:
+            pass
+
+    # Use the default real user agent
+    return user_agent()
 
 
 @deprecate_arg('ssl', None)

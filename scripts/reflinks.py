@@ -47,8 +47,6 @@ __version__ = '$Id$'
 #
 
 import codecs
-import gzip
-import io
 import os
 import re
 import socket
@@ -60,22 +58,22 @@ from functools import partial
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, textlib, Bot
+from pywikibot import comms, i18n, pagegenerators, textlib, Bot
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
 from pywikibot.tools.formatter import color_format
 
+import requests
+
 from scripts import noreferences
 
 if sys.version_info[0] > 2:
-    from urllib.parse import quote
-    from urllib.request import urlopen
-    from urllib.error import HTTPError, URLError
     import http.client as httplib
+    from urllib.error import URLError
 else:
-    from urllib2 import quote, urlopen, HTTPError, URLError
     import httplib
+    from urllib2 import URLError
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
@@ -178,7 +176,7 @@ badtitles = {
 # Regex that match bare references
 linksInRef = re.compile(
     # bracketed URLs
-    r'(?i)<ref(?P<name>[^>]*)>\s*\[?(?P<url>(?:http|https|ftp)://(?:' +
+    r'(?i)<ref(?P<name>[^>]*)>\s*\[?(?P<url>(?:http|https)://(?:' +
     # unbracketed with()
     r'^\[\]\s<>"]+\([^\[\]\s<>"]+[^\[\]\s\.:;\\,<>\?"]+|' +
     # unbracketed without ()
@@ -394,6 +392,8 @@ class ReferencesRobot(Bot):
         super(ReferencesRobot, self).__init__(**kwargs)
         self.generator = generator
         self.site = pywikibot.Site()
+        self._user_agent = comms.http.get_fake_user_agent()
+        pywikibot.log('Using fake user agent: {0}'.format(self._user_agent))
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
         code = None
@@ -428,7 +428,7 @@ class ReferencesRobot(Bot):
         # Regex to grasp content-type meta HTML tag in HTML source
         self.META_CONTENT = re.compile(br'(?i)<meta[^>]*content\-type[^>]*>')
         # Extract the encoding from a charset property (from content-type !)
-        self.CHARSET = re.compile(br'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
+        self.CHARSET = re.compile(r'(?i)charset\s*=\s*(?P<enc>[^\'",;>/]*)')
         # Extract html title from page
         self.TITLE = re.compile(r'(?is)(?<=<title>).*?(?=</title>)')
         # Matches content inside <script>/<style>/HTML comments
@@ -454,7 +454,8 @@ class ReferencesRobot(Bot):
         pywikibot.output(u'PDF file.')
         fd, infile = tempfile.mkstemp()
         urlobj = os.fdopen(fd, 'r+w')
-        urlobj.write(f.read())
+        urlobj.write(f.content)
+
         try:
             pdfinfo_out = subprocess.Popen([r"pdfinfo", "/dev/stdin"],
                                            stdin=urlobj, stdout=subprocess.PIPE,
@@ -488,8 +489,9 @@ class ReferencesRobot(Bot):
                 'http://www.twoevils.org/files/wikipedia/404-links.txt.gz '
                 'and to ungzip it in the same directory')
             raise
-        socket.setdefaulttimeout(30)
+
         editedpages = 0
+        headers = {'user-agent': self._user_agent}
         for page in self.generator:
             try:
                 # Load the page's text from the wiki
@@ -519,19 +521,12 @@ class ReferencesRobot(Bot):
 
                 ref = RefLink(link, match.group('name'))
                 f = None
+
                 try:
-                    socket.setdefaulttimeout(20)
-                    try:
-                        f = urlopen(ref.url.decode("utf8"))
-                    except UnicodeError:
-                        ref.url = quote(ref.url.encode("utf8"), "://")
-                        f = urlopen(ref.url)
+                    f = requests.get(ref.url, headers=headers, timeout=60)
+
                     # Try to get Content-Type from server
-                    headers = f.info()
-                    if sys.version_info[0] > 2:
-                        contentType = headers.get_content_type()
-                    else:
-                        contentType = headers.getheader('Content-Type')
+                    contentType = f.headers.get('content-type')
                     if contentType and not self.MIME.search(contentType):
                         if ref.link.lower().endswith('.pdf') and \
                            not self.getOption('ignorepdf'):
@@ -556,8 +551,9 @@ class ReferencesRobot(Bot):
                             repl = ref.refLink()
                         new_text = new_text.replace(match.group(), repl)
                         continue
+
                     # Get the real url where we end (http redirects !)
-                    redir = f.geturl()
+                    redir = f.url
                     if redir != ref.link and \
                        domain.findall(redir) == domain.findall(link):
                         if soft404.search(redir) and \
@@ -573,37 +569,26 @@ class ReferencesRobot(Bot):
                                 u'Redirect to root : {0} ', ref.link))
                             continue
 
-                    # uncompress if necessary
-                    if headers.get('Content-Encoding') in ('gzip', 'x-gzip'):
-                        # XXX: small issue here: the whole page is downloaded
-                        # through f.read(). It might fetch big files/pages.
-                        # However, truncating an encoded gzipped stream is not
-                        # an option, or unzipping will fail.
-                        compressed = io.BytesIO(f.read())
-                        f = gzip.GzipFile(fileobj=compressed)
+                    if f.status_code != requests.codes.ok:
+                        pywikibot.output(u'HTTP error (%s) for %s on %s'
+                                         % (f.status_code, ref.url,
+                                            page.title(asLink=True)),
+                                         toStdout=True)
+                        # 410 Gone, indicates that the resource has been purposely
+                        # removed
+                        if f.status_code == 410 or \
+                           (f.status_code == 404 and (u'\t%s\t' % ref.url in deadLinks)):
+                            repl = ref.refDead()
+                            new_text = new_text.replace(match.group(), repl)
+                        continue
 
-                    # Read the first 1,000,000 bytes (0.95 MB)
-                    linkedpagetext = f.read(1000000)
-                    socket.setdefaulttimeout(None)
-
+                    linkedpagetext = f.content
                 except UnicodeError:
                     # example : http://www.adminet.com/jo/20010615¦/ECOC0100037D.html
                     # in [[fr:Cyanure]]
                     pywikibot.output(color_format(
                         '{lightred}Bad link{default} : %s in %s',
                         ref.url, page.title(asLink=True)))
-                    continue
-                except HTTPError as e:
-                    pywikibot.output(u'HTTP error (%s) for %s on %s'
-                                     % (e.code, ref.url,
-                                        page.title(asLink=True)),
-                                     toStdout=True)
-                    # 410 Gone, indicates that the resource has been purposely
-                    # removed
-                    if e.code == 410 or \
-                       (e.code == 404 and (u'\t%s\t' % ref.url in deadLinks)):
-                        repl = ref.refDead()
-                        new_text = new_text.replace(match.group(), repl)
                     continue
                 except (URLError,
                         socket.error,
@@ -616,10 +601,6 @@ class ReferencesRobot(Bot):
                     # Known bug of httplib, google for :
                     # "httplib raises ValueError reading chunked content"
                     continue
-                finally:
-                    if f:
-                        f.close()
-
                 # remove <script>/<style>/comments/CDATA tags
                 linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
 
@@ -636,7 +617,7 @@ class ReferencesRobot(Bot):
                         contentType = tag
                     if not s:
                         # use charset from html
-                        s = self.CHARSET.search(tag)
+                        s = self.CHARSET.search(str(tag))
                 if s:
                     tmp = s.group('enc').strip("\"' ").lower()
                     naked = re.sub(r'[ _\-]', '', tmp)
