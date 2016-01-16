@@ -145,7 +145,7 @@ class Photo(pywikibot.FilePage):
 
 
 def CSVReader(fileobj, urlcolumn, site=None, *args, **kwargs):
-    """CSV reader."""
+    """Yield Photo objects for each row of a CSV file."""
     reader = csv.DictReader(fileobj, *args, **kwargs)
     for line in reader:
         yield Photo(line[urlcolumn], line, site=site)

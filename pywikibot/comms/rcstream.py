@@ -147,7 +147,7 @@ class RcListenerThread(threading.Thread):
 
 
 def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
-    """RC Changes Generator. Yields changes received from RCstream.
+    """Yield changes received from RCstream.
 
     @param wikihost: the hostname of the wiki we want to get changes for. This
                      is passed to rcstream using a 'subscribe' command. Pass
@@ -195,7 +195,7 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
 
 
 def site_rc_listener(site, total=None):
-    """RC Changes Generator. Yields changes received from RCstream.
+    """Yield changes received from RCstream.
 
     @param site: the Pywikibot.Site object to yield live recent changes for
     @type site: Pywikibot.BaseSite

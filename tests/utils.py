@@ -204,7 +204,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
     def __enter__(self):
         """Enter the context manager."""
         def detailed_show_warning(*args, **kwargs):
-            """warnings.showwarning replacement handler."""
+            """Replacement handler for warnings.showwarning."""
             entry = warnings.WarningMessage(*args, **kwargs)
 
             skip_lines = 0

@@ -33,7 +33,7 @@ class TestDjVuFile(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        """SetUp tests."""
+        """Setup tests."""
         super(TestDjVuFile, cls).setUpClass()
         try:
             subprocess.Popen(['djvudump'],

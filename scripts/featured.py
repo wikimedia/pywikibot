@@ -544,7 +544,7 @@ class FeaturedBot(pywikibot.Bot):
     def add_template(self, source, dest, task, fromsite):
         """Place or remove the Link_GA/FA template on/from a page."""
         def compile_link(site, templates):
-            """compile one link template list."""
+            """Compile one link template list."""
             findtemplate = '(%s)' % '|'.join(templates)
             return re.compile(r"\{\{%s\|%s\}\}"
                               % (findtemplate.replace(u' ', u'[ _]'),

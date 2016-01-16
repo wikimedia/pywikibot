@@ -199,7 +199,7 @@ def patch():
 
 
 def unpatch():
-    """un-patch standard terminal files."""
+    """Un-patch standard terminal files."""
     ui._print = org_print
     ui._raw_input = org_input
 
