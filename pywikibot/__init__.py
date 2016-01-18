@@ -331,6 +331,11 @@ class Coordinate(_WbRepresentation):
         u"""
         Return the precision of the geo coordinate.
 
+        The precision is calculated if the Coordinate does not have a precision,
+        and self._dim is set.
+
+        When no precision and no self._dim exists, None is returned.
+
         The biggest error (in degrees) will be given by the longitudinal error;
         the same error in meters becomes larger (in degrees) further up north.
         We can thus ignore the latitudinal error.
@@ -346,12 +351,18 @@ class Coordinate(_WbRepresentation):
 
         Therefore::
             precision = math.degrees(self._dim/(radius*math.cos(math.radians(self.lat))))
+
+        @rtype: float or None
         """
-        if not self._precision:
+        if self._precision is None and self._dim is not None:
             radius = 6378137  # TODO: Support other globes
             self._precision = math.degrees(
                 self._dim / (radius * math.cos(math.radians(self.lat))))
         return self._precision
+
+    @precision.setter
+    def precision(self, value):
+        self._precision = value
 
     def precisionToDim(self):
         """Convert precision from Wikibase to GeoData's dim."""
