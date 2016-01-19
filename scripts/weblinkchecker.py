@@ -122,7 +122,7 @@ except ImportError as e:
 
 import pywikibot
 
-from pywikibot import i18n, config, pagegenerators, textlib, weblib
+from pywikibot import comms, i18n, config, pagegenerators, textlib, weblib
 
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.pagegenerators import (
@@ -292,15 +292,11 @@ class LinkChecker(object):
         redirectChain is a list of redirects which were resolved by
         resolveRedirect(). This is needed to detect redirect loops.
         """
+        self._user_agent = comms.http.get_fake_user_agent()
         self.url = url
         self.serverEncoding = serverEncoding
         self.header = {
-            # 'User-agent': pywikibot.useragent,
-            # we fake being Firefox because some webservers block unknown
-            # clients, e.g. https://images.google.de/images?q=Albit gives a 403
-            # when using the Pywikibot user agent.
-            'User-agent': 'Mozilla/5.0 (X11; U; Linux i686; de; rv:1.8) '
-                          'Gecko/20051128 SUSE/1.5-0.1 Firefox/1.5',
+            'User-agent': self._user_agent,
             'Accept': 'text/xml,application/xml,application/xhtml+xml,'
                       'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
             'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
