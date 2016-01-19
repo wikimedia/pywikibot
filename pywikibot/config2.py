@@ -137,6 +137,17 @@ disambiguation_comment = collections.defaultdict(dict)
 user_agent_format = ('{script_product} ({script_comments}) {pwb} ({revision}) '
                      '{http_backend} {python}')
 
+# Fake user agent
+# Used to retrieve pages in reflinks.py,
+# to work around user-agent sniffing webpages
+# When None or True,
+# Use random user agent if either browseragents or fake_useragent
+# packages are installed
+# Otherwise use pywikibot.comms.http.user_agent()
+# When set to False,
+# disables use of automatic user agents
+fake_user_agent = None
+
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
 site_interface = 'APISite'
