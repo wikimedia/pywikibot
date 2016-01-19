@@ -1,5 +1,10 @@
 # -*- coding: utf-8  -*-
-"""Tests for editing Wikibase items."""
+"""
+Tests for editing Wikibase items.
+
+Tests which should fail should instead be in the TestWikibaseSaveTest
+class in edit_failiure_tests.py
+"""
 #
 # (C) Pywikibot team, 2014
 #
@@ -170,6 +175,33 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         new_item = pywikibot.ItemPage(testsite, item.getID())
         self.assertTrue(new_item.isRedirectPage())
         self.assertEqual(new_item.getRedirectTarget(), target_item)
+
+
+class TestWbMonolingualText(WikibaseTestCase):
+
+    """Run wikibase write tests for WbMonolingualText."""
+
+    family = 'wikidata'
+    code = 'test'
+
+    user = True
+    write = True
+
+    def test_WbMonolingualText_edit(self):
+        """Attempt adding a monolingual text with valid input."""
+        # Clean the slate in preparation for test."""
+        testsite = self.get_repo()
+        item = pywikibot.ItemPage(testsite, 'Q68')
+        item.get()
+        if 'P271' in item.claims:
+            item.removeClaims(item.claims['P271'])
+        item.get(force=True)
+
+        # set new claim
+        claim = pywikibot.page.Claim(testsite, 'P271', datatype='monolingualtext')
+        target = pywikibot.WbMonolingualText(text='Test this!', language='en')
+        claim.setTarget(target)
+        item.addClaim(claim)
 
 
 class TestWikibaseRemoveQualifier(WikibaseTestCase):

@@ -244,7 +244,7 @@ class TestWikibaseTypes(WikidataTestCase):
         q = pywikibot.WbMonolingualText.fromWikibase({'text': 'Test this!',
                                                       'language': u'en'})
         self.assertEqual(q.toWikibase(),
-                         {'text': 'Test this!', 'language': 'en', })
+                         {'text': 'Test this!', 'language': 'en'})
 
     def test_WbMonolingualText_errors(self):
         # test WbMonolingualText error handling

@@ -129,6 +129,28 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q6')
         self.assertRaises(pywikibot.PageNotSaved, item.save)
 
+    def _make_WbMonolingualText_claim(self, repo, text, language):
+        """Make a WbMonolingualText and set its value."""
+        claim = pywikibot.page.Claim(repo, 'P271', datatype='monolingualtext')
+        target = pywikibot.WbMonolingualText(text=text, language=language)
+        claim.setTarget(target)
+        return claim
+
+    def test_WbMonolingualText_invalid_language(self):
+        """Attempt adding a monolingual text with an invalid language."""
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q68')
+        claim = self._make_WbMonolingualText_claim(repo, text='Test this!',
+                                                   language='foo')
+        self.assertAPIError('modification-failed', None, item.addClaim, claim)
+
+    def test_WbMonolingualText_invalid_text(self):
+        """Attempt adding a monolingual text with an invalid non-string text."""
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q68')
+        claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
+        self.assertAPIError('invalid-snak', None, item.addClaim, claim)
+
 
 if __name__ == '__main__':
     try:
