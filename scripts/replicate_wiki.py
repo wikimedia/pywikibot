@@ -59,7 +59,7 @@ from pywikibot.tools import deprecated
 
 @deprecated('BaseSite.namespaces')
 def namespaces(site):
-    """dict from namespace number to prefix."""
+    """Return a dictionary from namespace number to prefix."""
     return dict((n.id, n.custom_name) for n in site.namespaces)
 
 

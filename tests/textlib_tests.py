@@ -525,7 +525,7 @@ class TestTemplateParams(TestCase):
                          [(None, OrderedDict())])
 
     def test_regexes(self):
-        """_ETP_REGEX, NESTED_TEMPLATE_REGEX and TEMP_REGEX tests."""
+        """Test _ETP_REGEX, NESTED_TEMPLATE_REGEX and TEMP_REGEX."""
         func = textlib._ETP_REGEX.search
 
         self.assertIsNotNone(func('{{{1}}}'))
