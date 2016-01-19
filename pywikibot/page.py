@@ -4078,6 +4078,7 @@ class Property(object):
              'url': basestring,
              'time': pywikibot.WbTime,
              'quantity': pywikibot.WbQuantity,
+             'monolingualtext': pywikibot.WbMonolingualText,
              }
 
     value_types = {'wikibase-item': 'wikibase-entityid',
