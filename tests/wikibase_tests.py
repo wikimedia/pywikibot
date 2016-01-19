@@ -225,6 +225,36 @@ class TestWikibaseTypes(WikidataTestCase):
         self.assertRaises(ValueError, pywikibot.WbQuantity, amount=None,
                           error=1)
 
+    def test_WbMonolingualText_string(self):
+        q = pywikibot.WbMonolingualText(text='Test that basics work', language='en')
+        q_dict = {'text': 'Test that basics work', 'language': 'en'}
+        self.assertEqual(q.toWikibase(), q_dict)
+
+    def test_WbMonolingualText_unicode(self):
+        q = pywikibot.WbMonolingualText(text='Testa det här', language='sv')
+        q_dict = {'text': 'Testa det här', 'language': 'sv'}
+        self.assertEqual(q.toWikibase(), q_dict)
+
+    def test_WbMonolingualText_equality(self):
+        q = pywikibot.WbMonolingualText(text='Thou shall test this!', language='en-gb')
+        self.assertEqual(q, q)
+
+    def test_WbMonolingualText_fromWikibase(self):
+        # test WbMonolingualText.fromWikibase() instantiating
+        q = pywikibot.WbMonolingualText.fromWikibase({'text': 'Test this!',
+                                                      'language': u'en'})
+        self.assertEqual(q.toWikibase(),
+                         {'text': 'Test this!', 'language': 'en', })
+
+    def test_WbMonolingualText_errors(self):
+        # test WbMonolingualText error handling
+        self.assertRaises(ValueError, pywikibot.WbMonolingualText,
+                          text='', language='sv')
+        self.assertRaises(ValueError, pywikibot.WbMonolingualText,
+                          text='Test this!', language='')
+        self.assertRaises(ValueError, pywikibot.WbMonolingualText,
+                          text=None, language='sv')
+
 
 class TestItemPageExtensibility(TestCase):
 

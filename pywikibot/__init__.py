@@ -653,6 +653,8 @@ class WbMonolingualText(_WbRepresentation):
         @param language: language code of the string
         @type language: str
         """
+        if not text or not language:
+            raise ValueError('text and language cannot be empty')
         self.text = text
         self.language = language
 
