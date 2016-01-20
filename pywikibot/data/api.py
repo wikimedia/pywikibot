@@ -1831,14 +1831,15 @@ class Request(MutableMapping):
 
     @classmethod
     def _build_mime_request(cls, params, mime_params):
-        """Construct a MIME multipart form post.
+        """
+        Construct a MIME multipart form post.
 
         @param params: HTTP request params
         @type params: dict
         @param mime_params: HTTP request parts which must be sent in the body
         @type mime_params: dict of (content, keytype, headers)
         @return: HTTP request headers and body
-        @rtype: (headers, body)
+        @rtype: tuple (dict, str)
         """
         # construct a MIME message containing all API key/values
         container = MIMEMultipart(_subtype='form-data')
@@ -1883,10 +1884,11 @@ class Request(MutableMapping):
                         pywikibot.warning(u"API warning (%s): %s" % (mod, single_warning))
 
     def submit(self):
-        """Submit a query and parse the response.
+        """
+        Submit a query and parse the response.
 
         @return: a dict containing data retrieved from api.php
-
+        @rtype: dict
         """
         self._add_defaults()
         if (not config.enable_GET_without_SSL and
@@ -2216,11 +2218,13 @@ class CachedRequest(Request):
 
     @classmethod
     def _get_cache_dir(cls):
-        """Return the base directory path for cache entries.
+        """
+        Return the base directory path for cache entries.
 
         The directory will be created if it does not already exist.
 
-        @return: basestring
+        @return: base directory path for cache entries
+        @rtype: basestring
         """
         path = os.path.join(pywikibot.config2.base_dir, 'apicache')
         cls._make_dir(path)
@@ -2228,14 +2232,16 @@ class CachedRequest(Request):
 
     @staticmethod
     def _make_dir(dir):
-        """Create directory if it does not exist already.
+        """
+        Create directory if it does not exist already.
 
         The directory name (dir) is returned unmodified.
 
         @param dir: directory path
         @type dir: basestring
 
-        @return: basestring
+        @return: directory name
+        @rtype: basestring
         """
         try:
             os.makedirs(dir)
@@ -2352,7 +2358,8 @@ class _RequestWrapper(object):
 
 class APIGenerator(_RequestWrapper):
 
-    """Iterator that handle API responses containing lists.
+    """
+    Iterator that handle API responses containing lists.
 
     The iterator will iterate each item in the query response and use the
     continue request parameter to retrieve the next portion of items
@@ -2425,7 +2432,8 @@ class APIGenerator(_RequestWrapper):
                         % (self.__class__.__name__, self.limit), _logger)
 
     def __iter__(self):
-        """Submit request and iterate the response.
+        """
+        Submit request and iterate the response.
 
         Continues response as needed until limit (if defined) is reached.
         """
@@ -2458,7 +2466,8 @@ class APIGenerator(_RequestWrapper):
 
 class QueryGenerator(_RequestWrapper):
 
-    """Base class for iterators that handle responses to API action=query.
+    """
+    Base class for iterators that handle responses to API action=query.
 
     By default, the iterator will iterate each item in the query response,
     and use the (query-)continue element, if present, to continue iterating as
@@ -2475,7 +2484,8 @@ class QueryGenerator(_RequestWrapper):
     """
 
     def __init__(self, **kwargs):
-        """Construct a QueryGenerator object.
+        """
+        Construct a QueryGenerator object.
 
         kwargs are used to create a Request object; see that object's
         documentation for values. 'action'='query' is assumed.
