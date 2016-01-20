@@ -128,7 +128,10 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
+from pywikibot.tools import deprecated
 from pywikibot.tools.formatter import color_format
+
+import requests
 
 # TODO: Convert to httlib2
 if sys.version_info[0] > 2:
@@ -268,6 +271,7 @@ class NotAnURLError(BaseException):
     """The link is not an URL."""
 
 
+@deprecated('requests')
 class LinkChecker(object):
 
     """
@@ -537,7 +541,17 @@ class LinkCheckThread(threading.Thread):
         threading.Thread.__init__(self)
         self.page = page
         self.url = url
+        self._user_agent = comms.http.get_fake_user_agent()
         self.history = history
+        self.header = {
+            'User-agent': self._user_agent,
+            'Accept': 'text/xml,application/xml,application/xhtml+xml,'
+                      'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
+            'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            'Keep-Alive': '30',
+            'Connection': 'keep-alive',
+        }
         # identification for debugging purposes
         self.setName((u'%s - %s' % (page.title(), url)).encode('utf-8',
                                                                'replace'))
@@ -545,19 +559,24 @@ class LinkCheckThread(threading.Thread):
         self.day = day
 
     def run(self):
-        linkChecker = LinkChecker(self.url, HTTPignore=self.HTTPignore)
+        ok = False
         try:
-            ok, message = linkChecker.check()
-        except NotAnURLError:
-            ok = False
+            header = self.header
+            timeout = pywikibot.config.socket_timeout
+            r = requests.get(self.url, headers=header, timeout=timeout)
+        except requests.exceptions.InvalidURL:
             message = i18n.twtranslate(self.page.site,
                                        'weblinkchecker-badurl_msg',
                                        {'URL': self.url})
-
         except:
             pywikibot.output('Exception while processing URL %s in page %s'
                              % (self.url, self.page.title()))
             raise
+        if (r.status_code == requests.codes.ok and
+                str(r.status_code) not in self.HTTPignore):
+            ok = True
+        else:
+            message = '{0} {1}'.format(r.status_code, r.reason)
         if ok:
             if self.history.setLinkAlive(self.url):
                 pywikibot.output('*Link to %s in [[%s]] is back alive.'
@@ -871,8 +890,9 @@ def countLinkCheckThreads():
     return i
 
 
+@deprecated('requests')
 def check(url):
-    """Peform a check on URL."""
+    """DEPRECATED: Use requests instead. Perform a check on URL."""
     c = LinkChecker(url)
     return c.check()
 
