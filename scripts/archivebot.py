@@ -155,12 +155,16 @@ def str2localized_duration(site, string):
     Translates a duration written in the shorthand notation (ex. "24h", "7d")
     into an expression in the local language of the wiki ("24 hours", "7 days").
     """
-    if string[-1] == 'd':
-        template = site.mediawiki_message('Days')
-    elif string[-1] == 'h':
+    if string[-1] == 'h':
         template = site.mediawiki_message('Hours')
+    elif string[-1] == 'd':
+        template = site.mediawiki_message('Days')
+    elif string[-1] == 'w':
+        template = site.mediawiki_message('Weeks')
+    elif string[-1] == 'y':
+        template = site.mediawiki_message('Years')
     if template:
-        exp = i18n.translate(site.code, template, int(string[:-1]))
+        exp = i18n.translate(site.code, template, {'$1': int(string[:-1])})
         return to_local_digits(exp.replace('$1', string[:-1]), site.code)
     else:
         return to_local_digits(string, site.code)
@@ -173,12 +177,18 @@ def str2time(string):
     Accepts a string defining a time period:
     7d - 7 days
     36h - 36 hours
+    2w - 2 weeks (14 days)
+    1y - 366 days # to be on the safe side
     Returns the corresponding timedelta object.
     """
-    if string.endswith('d'):
-        return datetime.timedelta(days=int(string[:-1]))
-    elif string.endswith('h'):
+    if string.endswith('h'):
         return datetime.timedelta(hours=int(string[:-1]))
+    elif string.endswith('d'):
+        return datetime.timedelta(days=int(string[:-1]))
+    elif string.endswith('w'):
+        return datetime.timedelta(weeks=int(string[:-1]))
+    elif string.endswith('y'):
+        return datetime.timedelta(days=int(string[:-1]) * 366)
     else:
         return datetime.timedelta(seconds=int(string))
 
