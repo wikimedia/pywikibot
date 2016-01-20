@@ -896,7 +896,7 @@ class Family(object):
             fam = config.family
 
         assert all(x in NAME_CHARACTERS for x in fam), \
-            'Name of family must be ASCII character'
+            'Name of family %s must be ASCII characters and digits' % fam
 
         if fam in Family._families:
             return Family._families[fam]
