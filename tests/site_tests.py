@@ -182,10 +182,25 @@ class TestBaseSiteProperties(TestCase):
     """Test properties for BaseSite."""
 
     sites = {
-        'enwk': {
+        'enwikinews': {
+            'family': 'wikinews',
+            'code': 'en',
+            'result': (),  # To be changed when wikinews will have doc_subpage.
+        },
+        'enwikibooks': {
+            'family': 'wikibooks',
+            'code': 'en',
+            'result': ('/doc',),
+        },
+        'enwikiquote': {
+            'family': 'wikiquote',
+            'code': 'en',
+            'result': ('/doc',),
+        },
+        'enwiktionary': {
             'family': 'wiktionary',
             'code': 'en',
-            'result': (),  # To be changed when wiktionary will have doc_subpage.
+            'result': ('/doc',),
         },
         'enws': {
             'family': 'wikisource',

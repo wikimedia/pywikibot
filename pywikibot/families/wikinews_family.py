@@ -53,3 +53,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'hu': ['en'],
             'pl': self.alphabetic,
         }
+
+        # TODO:
+        # Change site_tests.py when wikinews will have doc_subpage.

@@ -158,3 +158,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.interwiki_on_one_line = ['pl']
 
         self.interwiki_attop = ['pl']
+
+        # Subpages for documentation.
+        # TODO: List is incomplete, to be completed for missing languages.
+        self.doc_subpages = {
+            '_default': ((u'/doc', ),
+                         ['en']
+                         ),
+        }
