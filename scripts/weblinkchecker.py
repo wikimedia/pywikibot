@@ -224,6 +224,9 @@ def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
     """
     text = textlib.removeDisabledParts(text)
 
+    # Ignore links in fullurl template
+    text = re.sub(r'{{\s?fullurl:.[^}]*}}', '', text)
+
     # MediaWiki parses templates before parsing external links. Thus, there
     # might be a | or a } directly after a URL which does not belong to
     # the URL itself.
