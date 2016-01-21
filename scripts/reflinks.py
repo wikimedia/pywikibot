@@ -597,10 +597,7 @@ class ReferencesRobot(Bot):
                     pywikibot.output(u'Can\'t retrieve page %s : %s'
                                      % (ref.url, e))
                     continue
-                except ValueError:
-                    # Known bug of httplib, google for :
-                    # "httplib raises ValueError reading chunked content"
-                    continue
+
                 # remove <script>/<style>/comments/CDATA tags
                 linkedpagetext = self.NON_HTML.sub(b'', linkedpagetext)
 
