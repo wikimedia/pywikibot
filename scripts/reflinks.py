@@ -38,7 +38,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
                   one from i18n/reflinks.py
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -587,7 +587,7 @@ class ReferencesRobot(Bot):
                     # example : http://www.adminet.com/jo/20010615¦/ECOC0100037D.html
                     # in [[fr:Cyanure]]
                     pywikibot.output(color_format(
-                        '{lightred}Bad link{default} : %s in %s',
+                        '{lightred}Bad link{default} : {0} in {1}',
                         ref.url, page.title(asLink=True)))
                     continue
                 except (URLError,
@@ -635,7 +635,7 @@ class ReferencesRobot(Bot):
                     continue
                 elif not self.MIME.search(contentType):
                     pywikibot.output(color_format(
-                        '{lightyellow}WARNING{default} : media : %s ',
+                        '{lightyellow}WARNING{default} : media : {0} ',
                         ref.link))
                     repl = ref.refLink()
                     new_text = new_text.replace(match.group(), repl)
