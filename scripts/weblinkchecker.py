@@ -169,6 +169,10 @@ ignorelist = [
 
     # bot rejected on the site, already archived
     re.compile(r'.*[\./@]web\.archive\.org(/.*)?'),
+
+    # Ignore links containing * in domain name
+    # as they are intentionally fake
+    re.compile(r'https?\:\/\/\*(/.*)?'),
 ]
 
 
