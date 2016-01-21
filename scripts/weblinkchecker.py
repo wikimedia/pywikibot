@@ -133,7 +133,6 @@ from pywikibot.tools.formatter import color_format
 
 import requests
 
-# TODO: Convert to httlib2
 if sys.version_info[0] > 2:
     import http.client as httplib
     import urllib.parse as urlparse
@@ -164,20 +163,10 @@ ignorelist = [
     re.compile(r'.*[\./@]example\.org(/.*)?'),
 
     # Other special cases
-    # bot somehow can't handle their redirects:
-    re.compile(r'.*[\./@]gso\.gbv\.de(/.*)?'),
     re.compile(r'.*[\./@]berlinonline\.de(/.*)?'),
     # above entry to be manually fixed per request at [[de:Benutzer:BLueFiSH.as/BZ]]
     # bot can't handle their redirects:
-    re.compile(r'.*[\./@]bodo\.kommune\.no(/.*)?'),
-    re.compile(r'.*[\./@]jpl\.nasa\.gov(/.*)?'),  # bot rejected on the site
-    re.compile(r'.*[\./@]itis\.gov(/.*)?'),  # bot rejected on the site
-    re.compile(r'.*[\./@]cev\.lu(/.*)?'),  # bot rejected on the site
-    # very slow response resulting in bot error:
-    re.compile(r'.*[\./@]science\.ksc\.nasa\.gov(/.*)?'),
-    re.compile(r'.*[\./@]britannica\.com(/.*)?'),  # HTTP redirect loop
-    # bot rejected on the site:
-    re.compile(r'.*[\./@]quickfacts\.census\.gov(/.*)?'),
+
     # bot rejected on the site, already archived
     re.compile(r'.*[\./@]web\.archive\.org(/.*)?'),
 ]
