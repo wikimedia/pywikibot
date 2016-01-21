@@ -60,6 +60,8 @@ from pywikibot.exceptions import (
     NoCreateError,
     UserBlocked,
     EntityTypeUnknownException,
+    FatalServerError,
+    PageSaveRelatedError,
 )
 from pywikibot.family import WikimediaFamily
 from pywikibot.throttle import Throttle
@@ -4950,6 +4952,114 @@ class APISite(BaseSite):
                 return False
 
     OnErrorExc = namedtuple('OnErrorExc', 'exception on_new_page')
+
+    # catalog of merge history errors for use in error messages
+    _mh_errors = {
+        'noapiwrite': 'API editing not enabled on {site} wiki',
+        'writeapidenied':
+            'User {user} is not authorized to edit on {site} wiki',
+        'mergehistory-fail-invalid-source': 'Source {source} is invalid '
+            '(this may be caused by an invalid page ID in the database)',
+        'mergehistory-fail-invalid-dest': 'Destination {dest} is invalid '
+            '(this may be caused by an invalid page ID in the database)',
+        'mergehistory-fail-no-change':
+            'History merge did not merge any revisions; '
+            'please recheck the page and timestamp parameters',
+        'mergehistory-fail-permission':
+            'User {user} has insufficient permissions to merge history',
+        'mergehistory-fail-timestamps-overlap':
+            'Source revisions from {source} overlap or come after '
+            'destination revisions of {dest}'
+    }
+
+    @must_be(group='sysop', right='mergehistory')
+    def merge_history(self, source, dest, timestamp=None, reason=None):
+        """Merge revisions from one page into another.
+
+        Revisions dating up to the given timestamp in the source will be
+        moved into the destination page history. History merge fails if
+        the timestamps of source and dest revisions overlap (all source
+        revisions must be dated before the earliest dest revision).
+
+        @param source: Source page from which revisions will be merged
+        @type source: pywikibot.Page
+        @param dest: Destination page to which revisions will be merged
+        @type dest: pywikibot.Page
+        @param timestamp: Revisions from this page dating up to this timestamp
+            will be merged into the destination page (if not given or False,
+            all revisions will be merged)
+        @type timestamp: pywikibot.Timestamp
+        @param reason: Optional reason for the history merge
+        @type reason: str
+        """
+        # Check wiki version to see if action=mergehistory is supported
+        min_version = MediaWikiVersion('1.27.0-wmf.13')
+        if MediaWikiVersion(self.version()) < min_version:
+            raise FatalServerError(str(self) + ' version must be '
+                                   '1.27.0-wmf.13 or newer to support the '
+                                   'history merge API.')
+
+        # Data for error messages
+        errdata = {
+            'site': self,
+            'source': source,
+            'dest': dest,
+            'user': self.user(),
+        }
+
+        # Check if pages exist before continuing
+        if not source.exists():
+            raise NoPage(source,
+                         'Cannot merge revisions from source {source} because '
+                         'it does not exist on {site}'
+                         .format(**errdata))
+        if not dest.exists():
+            raise NoPage(dest,
+                         'Cannot merge revisions to destination {dest} '
+                         'because it does not exist on {site}'
+                         .format(**errdata))
+
+        if source == dest:  # Same pages
+            raise PageSaveRelatedError('Cannot merge revisions of {source} to itself'
+                                       .format(**errdata))
+
+        # Send the merge API request
+        token = self.tokens['csrf']
+        req = self._simple_request(action='mergehistory',
+                                   token=token)
+        req['from'] = source
+        req['to'] = dest
+        if reason:
+            req['reason'] = reason
+        if timestamp:
+            req['timestamp'] = timestamp
+
+        self.lock_page(source)
+        self.lock_page(dest)
+        try:
+            result = req.submit()
+            pywikibot.debug('mergehistory response: {result}'
+                            .format(result=result),
+                            _logger)
+        except api.APIError as err:
+            if err.code in self._mh_errors:
+                on_error = self._mh_errors[err.code]
+                raise Error(on_error.format(**errdata))
+            else:
+                pywikibot.debug(
+                    "mergehistory: Unexpected error code '{code}' received"
+                    .format(code=err.code),
+                    _logger
+                )
+                raise
+        finally:
+            self.unlock_page(source)
+            self.unlock_page(dest)
+
+        if 'mergehistory' not in result:
+            pywikibot.error('mergehistory: {error}'.format(error=result))
+            raise Error('mergehistory: unexpected response')
+
     # catalog of move errors for use in error messages
     _mv_errors = {
         "noapiwrite": "API editing not enabled on %(site)s wiki",

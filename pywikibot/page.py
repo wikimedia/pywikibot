@@ -1736,6 +1736,23 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return [{'user': rev.user, 'timestamp': unicode(rev.timestamp.isoformat())}
                 for rev in self.revisions(total=total)]
 
+    def merge_history(self, dest, timestamp=None, reason=None):
+        """
+        Merge revisions from this page into another page.
+
+        See L{APISite.merge_history} for details.
+
+        @param dest: Destination page to which revisions will be merged
+        @type dest: pywikibot.Page
+        @param timestamp: Revisions from this page dating up to this timestamp
+            will be merged into the destination page (if not given or False,
+            all revisions will be merged)
+        @type timestamp: pywikibot.Timestamp
+        @param reason: Optional reason for the history merge
+        @type reason: str
+        """
+        self.site.merge_history(self, dest, timestamp, reason)
+
     @deprecate_arg("throttle", None)
     def move(self, newtitle, reason=None, movetalkpage=True, sysop=False,
              deleteAndMove=False, safe=True):
