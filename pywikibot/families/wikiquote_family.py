@@ -105,6 +105,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'pt': self.alphabetic,
         }
 
+        # Subpages for documentation.
+        # TODO: List is incomplete, to be completed for missing languages.
+        self.doc_subpages = {
+            '_default': ((u'/doc', ),
+                         ['en']
+                         ),
+        }
+
     def code2encodings(self, code):
         """
         Return a list of historical encodings for a specific language.

@@ -141,3 +141,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'pl': self.alphabetic,
             'simple': self.alphabetic
         }
+
+        # Subpages for documentation.
+        # TODO: List is incomplete, to be completed for missing languages.
+        self.doc_subpages = {
+            '_default': ((u'/doc', ),
+                         ['en']
+                         ),
+        }
