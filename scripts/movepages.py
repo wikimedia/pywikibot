@@ -274,10 +274,12 @@ def main(*args):
         bot = MovePagesBot(preloadingGen, **options)
         bot.run()
         return True
-    else:
-        # in theory pairs could be missing too
+
+    if not fromToPairs:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
+    else:
+        return True
 
 if __name__ == '__main__':
     main()
