@@ -43,7 +43,7 @@ These parameters are supported to specify which pages titles to print:
 -get     Page content is printed.
 
 -save    Save Page content to a file named as page.title(as_filename=True).
-         Directory can be set with -dir:dir_name
+         Directory can be set with -save:dir_name
          If no dir is specified, current direcory will be used.
 
 -encode  File encoding can be specified with '-encode:name' (name must be a
