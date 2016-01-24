@@ -82,15 +82,33 @@ def deprecated_func(foo=None):
     return foo
 
 
+@deprecated()
+def deprecated_func_docstring(foo=None):
+    """DEPRECATED. Deprecated function."""
+    return foo
+
+
 @deprecated
 def deprecated_func2(foo=None):
     """Deprecated function."""
     return foo
 
 
+@deprecated
+def deprecated_func2_docstring(foo=None):
+    """DEPRECATED, don't use this. Deprecated function."""
+    return foo
+
+
 @deprecated(instead='baz')
 def deprecated_func_instead(foo=None):
     """Deprecated function."""
+    return foo
+
+
+@deprecated(instead='baz')
+def deprecated_func_instead_docstring(foo=None):
+    """DEPRECATED, don't use this. Deprecated function."""
     return foo
 
 
@@ -103,6 +121,22 @@ def deprecated_func_bad_args(self):
 @deprecate_arg('bah', 'foo')
 def deprecated_func_arg(foo=None):
     """Deprecated arg 'bah'."""
+    return foo
+
+
+@deprecated
+def deprecated_func_docstring_arg(foo=None):
+    """@param foo: Foo. DEPRECATED."""
+    return foo
+
+
+@deprecated
+def deprecated_func_docstring_arg2(foo=None):
+    """
+    DEPRECATED.
+
+    @param foo: Foo. DEPRECATED.
+    """
     return foo
 
 
@@ -254,6 +288,26 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertEqual(rv, 'a')
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_instead',
                                        'baz')
+
+    def test_deprecated_function_docstring(self):
+        """Test @deprecated docstring modification."""
+        testcases = [
+            (deprecated_func, 'Deprecated.\n\nDeprecated function.'),
+            (deprecated_func_docstring, 'DEPRECATED. Deprecated function.'),
+            (deprecated_func2, 'Deprecated.\n\nDeprecated function.'),
+            (deprecated_func2_docstring, 'DEPRECATED, don\'t use this. '
+             'Deprecated function.'),
+            (deprecated_func_instead, 'Deprecated; use baz instead.\n\n'
+             'Deprecated function.'),
+            (deprecated_func_instead_docstring, 'DEPRECATED, don\'t use '
+             'this. Deprecated function.'),
+            (deprecated_func_docstring_arg, 'Deprecated.\n\n'
+             '@param foo: Foo. DEPRECATED.'),
+            (deprecated_func_docstring_arg2, '\n    DEPRECATED.\n\n'
+             '    @param foo: Foo. DEPRECATED.\n    '),
+        ]
+        for rv, doc in testcases:
+            self.assertEqual(rv.__doc__, doc)
 
     def test_deprecated_function_bad_args(self):
         rv = deprecated_func_bad_args(None)
