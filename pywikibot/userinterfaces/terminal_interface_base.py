@@ -433,27 +433,6 @@ class UI(object):
         editor = gui.EditBoxWindow()
         return editor.edit(text, jumpIndex=jumpIndex, highlight=highlight)
 
-    def askForCaptcha(self, url):
-        """Show the user a CAPTCHA image and return the answer."""
-        try:
-            import webbrowser
-            pywikibot.output(u'Opening CAPTCHA in your web browser...')
-            if webbrowser.open(url):
-                return pywikibot.input(
-                    u'What is the solution of the CAPTCHA that is shown in '
-                    u'your web browser?')
-            else:
-                raise webbrowser.Error(
-                    'webbrowser.open failed to open a web browser')
-        except Exception:
-            pywikibot.output(u'Error in opening web browser: %s'
-                             % sys.exc_info()[0])
-            pywikibot.output(
-                u'Please copy this url to your web browser and open it:\n %s'
-                % url)
-            return pywikibot.input(
-                u'What is the solution of the CAPTCHA at this url ?')
-
     def argvu(self):
         """Return the decoded arguments from argv."""
         try:
