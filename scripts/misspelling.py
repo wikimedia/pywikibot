@@ -22,7 +22,7 @@ Command line options:
                wikipedia, user, etc. namespaces.
 """
 # (C) Daniel Herding, 2007
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -128,9 +128,11 @@ class MisspellingRobot(DisambiguationRobot):
             self.alternatives.append(disambPage.getRedirectTarget().title())
             return True
         if self.misspellingTemplate.get(disambPage.site.code) is not None:
+            templates = self.misspellingTemplate[disambPage.site.code]
+            if isinstance(templates, basestring):
+                templates = (templates, )
             for template, params in disambPage.templatesWithParams():
-                if (template.title(withNamespace=False) ==
-                        self.misspellingTemplate[disambPage.site.code]):
+                if template.title(withNamespace=False) in templates:
                     # The correct spelling is in the last paramter.
                     correctSpelling = params[-1]
                     # On de.wikipedia, there are some cases where the
