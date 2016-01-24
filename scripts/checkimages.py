@@ -526,11 +526,6 @@ class LogIsFull(pywikibot.Error):
     """Log is full and the Bot cannot add other data to prevent Errors."""
 
 
-class NothingFound(pywikibot.Error):
-
-    """Regex returned [] instead of results."""
-
-
 def printWithTimeZone(message):
     """Print the messages followed by the TimeZone encoded correctly."""
     if message[-1] != ' ':
@@ -1471,9 +1466,6 @@ class checkImagesBot(object):
 
     def checkStep(self):
         """Check a single file page."""
-        # nothing = Defining an empty image description
-        nothing = ['', ' ', '  ', '   ', '\n', '\n ', '\n  ', '\n\n', '\n \n',
-                   ' \n', ' \n ', ' \n \n']
         # something = Minimal requirements for an image description.
         # If this fits, no tagging will take place
         # (if there aren't other issues)
@@ -1511,11 +1503,11 @@ class checkImagesBot(object):
         except pywikibot.NoPage:
             pywikibot.output(u"Skipping %s because it has been deleted."
                              % self.imageName)
-            return True
+            return
         except pywikibot.IsRedirectPage:
             pywikibot.output(u"Skipping %s because it's a redirect."
                              % self.imageName)
-            return True
+            return
         # Delete the fields where the templates cannot be loaded
         regex_nowiki = re.compile(r'<nowiki>(.*?)</nowiki>', re.DOTALL)
         regex_pre = re.compile(r'<pre>(.*?)</pre>', re.DOTALL)
@@ -1525,7 +1517,7 @@ class checkImagesBot(object):
         # in the image the original text will be reloaded, don't worry).
         if self.isTagged():
             printWithTimeZone(u'%s is already tagged...' % self.imageName)
-            return True
+            return
 
         # something is the array with {{, MIT License and so on.
         for a_word in something:
@@ -1538,7 +1530,7 @@ class checkImagesBot(object):
         (license_found, hiddenTemplateFound) = self.smartDetection()
         # Here begins the check block.
         if brackets and license_found:
-            return True
+            return
         elif delete:
             pywikibot.output(u"%s is not a file!" % self.imageName)
             if not di:
@@ -1555,8 +1547,8 @@ class checkImagesBot(object):
                                                            textlink=True)}
             head = dih
             self.report(canctext, self.imageName, notification, head)
-            return True
-        elif self.imageCheckText in nothing:
+            return
+        elif not self.imageCheckText.strip():  # empty image description
             pywikibot.output(
                 u"The file's description for %s does not contain a license "
                 u" template!" % self.imageName)
@@ -1567,7 +1559,7 @@ class checkImagesBot(object):
             head = nh
             self.report(self.unvertext, self.imageName, notification, head,
                         smwl)
-            return True
+            return
         else:
             pywikibot.output(u"%s has only text and not the specific license..."
                              % self.imageName)
@@ -1578,7 +1570,7 @@ class checkImagesBot(object):
             head = nh
             self.report(self.unvertext, self.imageName, notification, head,
                         smwl)
-            return True
+            return
 
 
 def main(*args):
@@ -1769,8 +1761,7 @@ def main(*args):
             if duplicatesActive:
                 if not Bot.checkImageDuplicated(duplicates_rollback):
                     continue
-            if Bot.checkStep():
-                continue
+            Bot.checkStep()
 
         if repeat:
             pywikibot.output(u"Waiting for %s seconds," % time_sleep)
