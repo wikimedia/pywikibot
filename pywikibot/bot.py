@@ -162,7 +162,7 @@ class LoggingFormatter(_LoggingFormatter):
 # level name.
 #
 # UserInterface objects must also define methods input(), input_choice(),
-# editText(), and askForCaptcha(), all of which are documented in
+# and editText(), all of which are documented in
 # userinterfaces/terminal_interface.py
 
 _handlers_initialized = False
