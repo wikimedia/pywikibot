@@ -338,7 +338,7 @@ def main(*args):
         builder = textlib._MultiTemplateMatchBuilder(site)
         predicate = builder.search_any_predicate(oldTemplates)
 
-        gen = XmlDumpTemplatePageGenerator(
+        gen = XMLDumpPageGenerator(
             xmlfilename, site=site, text_predicate=predicate)
     else:
         gen = genFactory.getCombinedGenerator()
@@ -361,7 +361,7 @@ def main(*args):
 
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
 
-    bot = TemplateRobot(preloadingGen, templates, **options)
+    bot = TemplateRobot(preloadingGen, templates, site=site, **options)
     bot.run()
 
 if __name__ == "__main__":
