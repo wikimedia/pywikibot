@@ -29,13 +29,13 @@ Command line options:
              info will be loaded from the maintenance page of the live wiki.
              argument can also be given as "-xml:filename.xml".
 
--user:       Only process pages edited by a given user
+-onlyuser:   Only process pages edited by a given user
 
 -skipuser:   Only process pages not edited by a given user
 
--timestamp:  (With -user or -skipuser). Only check for a user where his edit is
-             not older than the given timestamp. Timestamp must be writen in
-             MediaWiki timestamp format which is "%Y%m%d%H%M%S"
+-timestamp:  (With -onlyuser or -skipuser). Only check for a user where his
+             edit is not older than the given timestamp. Timestamp must be
+             writen in MediaWiki timestamp format which is "%Y%m%d%H%M%S".
              If this parameter is missed, all edits are checked but this is
              restricted to the last 100 edits.
 
@@ -102,8 +102,8 @@ pages:
 #
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2015
-# (C) Pywikibot team, 2004-2015
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -301,8 +301,8 @@ def main(*args):
             options['addedCat'] = arg[len('-addcat:'):]
         elif arg.startswith('-summary:'):
             options['summary'] = arg[len('-summary:'):]
-        elif arg.startswith('-user:'):
-            user = arg[len('-user:'):]
+        elif arg.startswith('-onlyuser:'):
+            user = arg[len('-onlyuser:'):]
         elif arg.startswith('-skipuser:'):
             user = arg[len('-skipuser:'):]
             skip = True
