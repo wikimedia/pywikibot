@@ -56,8 +56,6 @@ and arguments can be:
 -until:title   The possible last page title in each namespace. Page needs not
                exist.
 
--step:n        The number of entries retrieved at once via API
-
 -total:n       The maximum count of redirects to work upon. If omitted, there
                is no limit.
 
@@ -87,7 +85,9 @@ import sys
 import pywikibot
 
 from pywikibot import i18n, xmlreader, Bot
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -105,7 +105,7 @@ class RedirectGenerator(object):
 
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
                  use_move_log=False, use_api=False, start=None, until=None,
-                 number=None, step=None, page_title=None):
+                 number=None, page_title=None):
         """Constructor."""
         self.site = pywikibot.Site()
         self.xmlFilename = xmlFilename
@@ -118,7 +118,6 @@ class RedirectGenerator(object):
         self.api_start = start
         self.api_until = until
         self.api_number = number
-        self.api_step = step
         self.page_title = page_title
 
     def get_redirects_from_dump(self, alsoGetPageTitles=False):
@@ -192,8 +191,6 @@ class RedirectGenerator(object):
                                      filterredir=True)
             if self.api_number:
                 gen.set_maximum_items(self.api_number)
-            if self.api_step:
-                gen.set_query_increment(self.api_step)
             for p in gen:
                 done = (self.api_until and
                         p.title(withNamespace=False) >= self.api_until)
@@ -749,7 +746,6 @@ def main(*args):
     start = ''
     until = ''
     number = None
-    step = None
     pagename = None
 
     for arg in pywikibot.handle_args(args):
@@ -794,7 +790,8 @@ def main(*args):
         elif arg.startswith('-total:'):
             number = int(arg[7:])
         elif arg.startswith('-step:'):
-            step = int(arg[6:])
+            issue_deprecation_warning(
+                'The usage of "{0}"'.format(arg), 2, ArgumentDeprecationWarning)
         elif arg.startswith('-page:'):
             pagename = arg[6:]
         elif arg == '-always':
@@ -819,7 +816,7 @@ def main(*args):
     else:
         pywikibot.Site().login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
-                                fullscan, start, until, number, step, pagename)
+                                fullscan, start, until, number, pagename)
         bot = RedirectRobot(action, gen, number=number, **options)
         bot.run()
 

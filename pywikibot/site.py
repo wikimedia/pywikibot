@@ -1886,8 +1886,9 @@ class APISite(BaseSite):
         """Return whether this site has an API."""
         return True
 
+    @deprecated_args(step=None)
     def _generator(self, gen_class, type_arg=None, namespaces=None,
-                   step=None, total=None, **args):
+                   total=None, **args):
         """Convenience method that returns an API generator.
 
         All generic keyword arguments are passed as MW API parameter except for
@@ -1904,8 +1905,6 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types.  May be a '|' separated
             list of namespace identifiers.
-        @param step: if not None, limit each API call to this many items
-        @type step: int
         @param total: if not None, limit the generator to yielding this many
             items in total
         @type total: int
@@ -1925,8 +1924,6 @@ class APISite(BaseSite):
             gen = gen_class(**req_args)
         if namespaces is not None:
             gen.set_namespace(namespaces)
-        if step is not None and int(step) > 0:
-            gen.set_query_increment(int(step))
         if total is not None and int(total) > 0:
             gen.set_maximum_items(int(total))
         return gen
@@ -3338,7 +3335,7 @@ class APISite(BaseSite):
     # following group of methods map more-or-less directly to API queries
 
     def pagebacklinks(self, page, followRedirects=False, filterRedirects=None,
-                      namespaces=None, step=None, total=None, content=False):
+                      namespaces=None, total=None, content=False):
         """Iterate all pages that link to the given page.
 
         @param page: The Page to get links to.
@@ -3352,7 +3349,6 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types.  May be a '|' separated
             list of namespace identifiers.
-        @param step: Limit on number of pages to retrieve per API query.
         @param total: Maximum number of pages to retrieve in total.
         @param content: if True, load the current content of each iterated page
             (default False)
@@ -3366,7 +3362,7 @@ class APISite(BaseSite):
             blargs["gblfilterredir"] = (filterRedirects and "redirects" or
                                         "nonredirects")
         blgen = self._generator(api.PageGenerator, type_arg="backlinks",
-                                namespaces=namespaces, step=step, total=total,
+                                namespaces=namespaces, total=total,
                                 g_content=content, **blargs)
         if followRedirects:
             # links identified by MediaWiki as redirects may not really be,
@@ -3397,8 +3393,9 @@ class APISite(BaseSite):
             return itertools.chain(*list(genlist.values()))
         return blgen
 
+    @deprecated_args(step=None)
     def page_embeddedin(self, page, filterRedirects=None, namespaces=None,
-                        step=None, total=None, content=False):
+                        total=None, content=False):
         """Iterate all pages that embedded the given page as a template.
 
         @param page: The Page to get inclusions for.
@@ -3422,13 +3419,14 @@ class APISite(BaseSite):
             eiargs["geifilterredir"] = (filterRedirects and "redirects" or
                                         "nonredirects")
         eigen = self._generator(api.PageGenerator, type_arg="embeddedin",
-                                namespaces=namespaces, step=step, total=total,
+                                namespaces=namespaces, total=total,
                                 g_content=content, **eiargs)
         return eigen
 
+    @deprecated_args(step=None)
     def pagereferences(self, page, followRedirects=False, filterRedirects=None,
                        withTemplateInclusion=True, onlyTemplateInclusion=False,
-                       namespaces=None, step=None, total=None, content=False):
+                       namespaces=None, total=None, content=False):
         """
         Convenience method combining pagebacklinks and page_embeddedin.
 
@@ -3444,24 +3442,25 @@ class APISite(BaseSite):
         if onlyTemplateInclusion:
             return self.page_embeddedin(page, namespaces=namespaces,
                                         filterRedirects=filterRedirects,
-                                        step=step, total=total, content=content)
+                                        total=total, content=content)
         if not withTemplateInclusion:
             return self.pagebacklinks(page, followRedirects=followRedirects,
                                       filterRedirects=filterRedirects,
                                       namespaces=namespaces,
-                                      step=step, total=total, content=content)
+                                      total=total, content=content)
         return itertools.islice(
             itertools.chain(
                 self.pagebacklinks(
                     page, followRedirects, filterRedirects,
-                    namespaces=namespaces, step=step, content=content),
+                    namespaces=namespaces, content=content),
                 self.page_embeddedin(
                     page, filterRedirects, namespaces=namespaces,
-                    step=step, content=content)
+                    content=content)
             ), total)
 
+    @deprecated_args(step=None)
     def pagelinks(self, page, namespaces=None, follow_redirects=False,
-                  step=None, total=None, content=False):
+                  total=None, content=False):
         """Iterate internal wikilinks contained (or transcluded) on page.
 
         @param namespaces: Only iterate pages in these namespaces (default: all)
@@ -3483,13 +3482,14 @@ class APISite(BaseSite):
             pltitle = page.title(withSection=False).encode(self.encoding())
             plargs['titles'] = pltitle
         plgen = self._generator(api.PageGenerator, type_arg="links",
-                                namespaces=namespaces, step=step, total=total,
+                                namespaces=namespaces, total=total,
                                 g_content=content, redirects=follow_redirects,
                                 **plargs)
         return plgen
 
-    @deprecate_arg("withSortKey", None)  # Sortkey doesn't work with generator
-    def pagecategories(self, page, step=None, total=None, content=False):
+    # Sortkey doesn't work with generator
+    @deprecated_args(withSortKey=None, step=None)
+    def pagecategories(self, page, total=None, content=False):
         """Iterate categories to which page belongs.
 
         @param content: if True, load the current content of each iterated page
@@ -3503,11 +3503,12 @@ class APISite(BaseSite):
             clargs['titles'] = page.title(
                 withSection=False).encode(self.encoding())
         clgen = self._generator(api.PageGenerator,
-                                type_arg="categories", step=step, total=total,
+                                type_arg='categories', total=total,
                                 g_content=content, **clargs)
         return clgen
 
-    def pageimages(self, page, step=None, total=None, content=False):
+    @deprecated_args(step=None)
+    def pageimages(self, page, total=None, content=False):
         """Iterate images used (not just linked) on the page.
 
         @param content: if True, load the current content of each iterated page
@@ -3517,12 +3518,12 @@ class APISite(BaseSite):
         """
         imtitle = page.title(withSection=False).encode(self.encoding())
         imgen = self._generator(api.PageGenerator, type_arg="images",
-                                titles=imtitle, step=step, total=total,
+                                titles=imtitle, total=total,
                                 g_content=content)
         return imgen
 
-    def pagetemplates(self, page, namespaces=None, step=None, total=None,
-                      content=False):
+    @deprecated_args(step=None)
+    def pagetemplates(self, page, namespaces=None, total=None, content=False):
         """Iterate templates transcluded (not just linked) on the page.
 
         @param namespaces: Only iterate pages in these namespaces
@@ -3539,12 +3540,13 @@ class APISite(BaseSite):
         tltitle = page.title(withSection=False).encode(self.encoding())
         tlgen = self._generator(api.PageGenerator, type_arg="templates",
                                 titles=tltitle, namespaces=namespaces,
-                                step=step, total=total, g_content=content)
+                                total=total, g_content=content)
         return tlgen
 
+    @deprecated_args(step=None)
     def categorymembers(self, category, namespaces=None, sortby=None,
                         reverse=False, starttime=None, endtime=None,
-                        startsort=None, endsort=None, step=None, total=None,
+                        startsort=None, endsort=None, total=None,
                         content=False, member_type=None):
         """Iterate members of specified category.
 
@@ -3680,14 +3682,14 @@ class APISite(BaseSite):
                              "invalid combination of 'sortby' and 'endsort'")
 
         cmgen = self._generator(api.PageGenerator, namespaces=namespaces,
-                                step=step, total=total, g_content=content,
-                                **cmargs)
+                                total=total, g_content=content, **cmargs)
         return cmgen
 
     def loadrevisions(self, page, getText=False, revids=None,
                       startid=None, endid=None, starttime=None,
                       endtime=None, rvdir=None, user=None, excludeuser=None,
-                      section=None, sysop=False, step=None, total=None, rollback=False):
+                      section=None, sysop=False, step=None, total=None,
+                      rollback=False):
         """Retrieve and store revision information.
 
         By default, retrieves the last (current) revision of the page,
@@ -3796,8 +3798,9 @@ class APISite(BaseSite):
         # TODO if sysop: something
 
         # assemble API request
-        rvgen = self._generator(api.PropertyGenerator,
-                                step=step, total=total, **rvargs)
+        rvgen = self._generator(api.PropertyGenerator, total=total, **rvargs)
+        if step > 0:
+            rvgen.set_query_increment = step
 
         if latest or "revids" in rvgen.request:
             rvgen.set_maximum_items(-1)  # suppress use of rvlimit parameter
@@ -3822,8 +3825,8 @@ class APISite(BaseSite):
         parsed_text = data['parse']['text']['*']
         return parsed_text
 
-    def pagelanglinks(self, page, step=None, total=None,
-                      include_obsolete=False):
+    @deprecated_args(step=None)
+    def pagelanglinks(self, page, total=None, include_obsolete=False):
         """Iterate all interlanguage links on page, yielding Link objects.
 
         @param include_obsolete: if true, yield even Link objects whose
@@ -3833,7 +3836,7 @@ class APISite(BaseSite):
         llquery = self._generator(api.PropertyGenerator,
                                   type_arg="langlinks",
                                   titles=lltitle.encode(self.encoding()),
-                                  step=step, total=total)
+                                  total=total)
         for pageitem in llquery:
             if not self.sametitle(pageitem['title'], lltitle):
                 raise Error(
@@ -3850,12 +3853,13 @@ class APISite(BaseSite):
                 else:
                     yield link
 
-    def page_extlinks(self, page, step=None, total=None):
+    @deprecated_args(step=None)
+    def page_extlinks(self, page, total=None):
         """Iterate all external links on page, yielding URL strings."""
         eltitle = page.title(withSection=False)
         elquery = self._generator(api.PropertyGenerator, type_arg="extlinks",
                                   titles=eltitle.encode(self.encoding()),
-                                  step=step, total=total)
+                                  total=total)
         for pageitem in elquery:
             if not self.sametitle(pageitem['title'], eltitle):
                 raise RuntimeError(
@@ -3884,12 +3888,12 @@ class APISite(BaseSite):
                                  'subcats': 0}
         return category._catinfo
 
-    @deprecated_args(throttle=None, limit='total',
+    @deprecated_args(throttle=None, limit='total', step=None,
                      includeredirects='filterredir')
     def allpages(self, start="!", prefix="", namespace=0, filterredir=None,
                  filterlanglinks=None, minsize=None, maxsize=None,
                  protect_type=None, protect_level=None, reverse=False,
-                 step=None, total=None, content=False):
+                 total=None, content=False):
         """Iterate pages in a single namespace.
 
         @param start: Start at this title (page need not exist).
@@ -3933,7 +3937,7 @@ class APISite(BaseSite):
 
         apgen = self._generator(api.PageGenerator, type_arg="allpages",
                                 namespaces=namespace,
-                                gapfrom=start, step=step, total=total,
+                                gapfrom=start, total=total,
                                 g_content=content)
         if prefix:
             apgen.request["gapprefix"] = prefix
@@ -3965,8 +3969,9 @@ class APISite(BaseSite):
         return self.allpages(prefix=prefix, namespace=namespace,
                              filterredir=includeredirects)
 
+    @deprecated_args(step=None)
     def alllinks(self, start="!", prefix="", namespace=0, unique=False,
-                 fromids=False, step=None, total=None):
+                 fromids=False, total=None):
         """Iterate all links to pages (which need not exist) in one namespace.
 
         Note that, in practice, links that were found on pages that have
@@ -3990,7 +3995,7 @@ class APISite(BaseSite):
             raise Error("alllinks: unique and fromids cannot both be True.")
         algen = self._generator(api.ListGenerator, type_arg="alllinks",
                                 namespaces=namespace, alfrom=start,
-                                step=step, total=total, alunique=unique)
+                                total=total, alunique=unique)
         if prefix:
             algen.request["alprefix"] = prefix
         if fromids:
@@ -4001,7 +4006,8 @@ class APISite(BaseSite):
                 p._fromid = link['fromid']
             yield p
 
-    def allcategories(self, start="!", prefix="", step=None, total=None,
+    @deprecated_args(step=None)
+    def allcategories(self, start='!', prefix='', total=None,
                       reverse=False, content=False):
         """Iterate categories used (which need not have a Category page).
 
@@ -4019,7 +4025,7 @@ class APISite(BaseSite):
         """
         acgen = self._generator(api.PageGenerator,
                                 type_arg="allcategories", gacfrom=start,
-                                step=step, total=total, g_content=content)
+                                total=total, g_content=content)
         if prefix:
             acgen.request["gacprefix"] = prefix
         if reverse:
@@ -4039,7 +4045,8 @@ class APISite(BaseSite):
         """Return True is username is a bot user."""
         return username in [userdata['name'] for userdata in self.botusers()]
 
-    def botusers(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def botusers(self, total=None):
         """Iterate bot users.
 
         Iterated values are dicts containing 'name', 'userid', 'editcount',
@@ -4052,14 +4059,14 @@ class APISite(BaseSite):
             self._bots = {}
 
         if not self._bots:
-            for item in self.allusers(group='bot', step=step, total=total):
+            for item in self.allusers(group='bot', total=total):
                 self._bots.setdefault(item['name'], item)
 
         for value in self._bots.values():
             yield value
 
-    def allusers(self, start="!", prefix="", group=None, step=None,
-                 total=None):
+    @deprecated_args(step=None)
+    def allusers(self, start='!', prefix='', group=None, total=None):
         """Iterate registered users, ordered by username.
 
         Iterated values are dicts containing 'name', 'editcount',
@@ -4075,15 +4082,16 @@ class APISite(BaseSite):
         """
         augen = self._generator(api.ListGenerator, type_arg="allusers",
                                 auprop="editcount|groups|registration",
-                                aufrom=start, step=step, total=total)
+                                aufrom=start, total=total)
         if prefix:
             augen.request["auprefix"] = prefix
         if group:
             augen.request["augroup"] = group
         return augen
 
+    @deprecated_args(step=None)
     def allimages(self, start="!", prefix="", minsize=None, maxsize=None,
-                  reverse=False, sha1=None, sha1base36=None, step=None,
+                  reverse=False, sha1=None, sha1base36=None,
                   total=None, content=False):
         """Iterate all images, ordered by image title.
 
@@ -4103,7 +4111,7 @@ class APISite(BaseSite):
         """
         aigen = self._generator(api.PageGenerator,
                                 type_arg="allimages", gaifrom=start,
-                                step=step, total=total, g_content=content)
+                                total=total, g_content=content)
         if prefix:
             aigen.request["gaiprefix"] = prefix
         if isinstance(minsize, int):
@@ -4118,8 +4126,9 @@ class APISite(BaseSite):
             aigen.request["gaisha1base36"] = sha1base36
         return aigen
 
+    @deprecated_args(step=None)
     def blocks(self, starttime=None, endtime=None, reverse=False,
-               blockids=None, users=None, step=None, total=None):
+               blockids=None, users=None, total=None):
         """Iterate all current blocks, in order of creation.
 
         Note that logevents only logs user blocks, while this method
@@ -4145,7 +4154,7 @@ class APISite(BaseSite):
                         "blocks: "
                         "endtime must be before starttime with reverse=False")
         bkgen = self._generator(api.ListGenerator, type_arg="blocks",
-                                step=step, total=total)
+                                total=total)
         bkgen.request["bkprop"] = "id|user|by|timestamp|expiry|reason|range|flags"
         if starttime:
             bkgen.request["bkstart"] = starttime
@@ -4165,8 +4174,9 @@ class APISite(BaseSite):
             bkgen.request["bkusers"] = users
         return bkgen
 
+    @deprecated_args(step=None)
     def exturlusage(self, url=None, protocol="http", namespaces=None,
-                    step=None, total=None, content=False):
+                    total=None, content=False):
         """Iterate Pages that contain links to the given URL.
 
         @param url: The URL to search for (without the protocol prefix);
@@ -4177,12 +4187,13 @@ class APISite(BaseSite):
         """
         eugen = self._generator(api.PageGenerator, type_arg="exturlusage",
                                 geuquery=url, geuprotocol=protocol,
-                                namespaces=namespaces, step=step,
+                                namespaces=namespaces,
                                 total=total, g_content=content)
         return eugen
 
+    @deprecated_args(step=None)
     def imageusage(self, image, namespaces=None, filterredir=None,
-                   step=None, total=None, content=False):
+                   total=None, content=False):
         """Iterate Pages that contain links to the given FilePage.
 
         @param image: the image to search for (FilePage need not exist on
@@ -4205,13 +4216,13 @@ class APISite(BaseSite):
             iuargs['giufilterredir'] = ('redirects' if filterredir else
                                         'nonredirects')
         iugen = self._generator(api.PageGenerator, type_arg="imageusage",
-                                namespaces=namespaces, step=step,
+                                namespaces=namespaces,
                                 total=total, g_content=content, **iuargs)
         return iugen
 
+    @deprecated_args(step=None)
     def logevents(self, logtype=None, user=None, page=None, namespace=None,
-                  start=None, end=None, reverse=False, tag=None,
-                  step=None, total=None):
+                  start=None, end=None, reverse=False, tag=None, total=None):
         """Iterate all log entries.
 
         @param logtype: only iterate entries of this type (see wiki
@@ -4233,8 +4244,6 @@ class APISite(BaseSite):
         @type reverse: bool
         @param tag: only iterate entries tagged with this tag
         @type tag: basestring
-        @param step: request batch size
-        @type step: int
         @param total: maximum number of events to iterate
         @type total: int
         @rtype: iterable
@@ -4247,7 +4256,7 @@ class APISite(BaseSite):
             self.assert_valid_iter_params('logevents', start, end, reverse)
 
         legen = self._generator(api.LogEntryListGenerator, type_arg=logtype,
-                                step=step, total=total)
+                                total=total)
         if logtype is not None:
             legen.request["letype"] = logtype
         if user is not None:
@@ -4302,14 +4311,14 @@ class APISite(BaseSite):
 
     @deprecated_args(returndict=None, nobots=None, rcshow=None, rcprop=None,
                      rctype='changetype', revision=None, repeat=None,
-                     rcstart='start', rcend='end', rcdir=None,
+                     rcstart='start', rcend='end', rcdir=None, step=None,
                      includeredirects='showRedirects', namespace='namespaces',
                      rcnamespace='namespaces', number='total', rclimit='total')
     def recentchanges(self, start=None, end=None, reverse=False,
                       namespaces=None, pagelist=None, changetype=None,
                       showMinor=None, showBot=None, showAnon=None,
                       showRedirects=None, showPatrolled=None, topOnly=False,
-                      step=None, total=None, user=None, excludeuser=None):
+                      total=None, user=None, excludeuser=None):
         """Iterate recent changes.
 
         @param start: Timestamp to start listing from
@@ -4360,7 +4369,7 @@ class APISite(BaseSite):
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
                                        "|sizes|redirect|loginfo|flags",
-                                namespaces=namespaces, step=step,
+                                namespaces=namespaces,
                                 total=total, rctoponly=topOnly)
         if start is not None:
             rcgen.request["rcstart"] = start
@@ -4397,10 +4406,10 @@ class APISite(BaseSite):
 
         return rcgen
 
-    @deprecated_args(number='total', key='searchstring',
+    @deprecated_args(number='total', step=None, key='searchstring',
                      getredirects='get_redirects')
     def search(self, searchstring, namespaces=None, where="text",
-               get_redirects=False, step=None, total=None, content=False):
+               get_redirects=False, total=None, content=False):
         """Iterate Pages that contain the searchstring.
 
         Note that this may include non-existing Pages if the wiki's database
@@ -4433,15 +4442,16 @@ class APISite(BaseSite):
             namespaces = [0]
         srgen = self._generator(api.PageGenerator, type_arg="search",
                                 gsrsearch=searchstring, gsrwhat=where,
-                                namespaces=namespaces, step=step,
+                                namespaces=namespaces,
                                 total=total, g_content=content)
         if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
             srgen.request['gsrredirects'] = get_redirects
         return srgen
 
+    @deprecated_args(step=None)
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
                      reverse=False, namespaces=None, showMinor=None,
-                     step=None, total=None, top_only=False):
+                     total=None, top_only=False):
         """Iterate contributions by a particular user.
 
         Iterated values are in the same format as recentchanges.
@@ -4473,7 +4483,7 @@ class APISite(BaseSite):
 
         ucgen = self._generator(api.ListGenerator, type_arg="usercontribs",
                                 ucprop="ids|title|timestamp|comment|flags",
-                                namespaces=namespaces, step=step,
+                                namespaces=namespaces,
                                 total=total, uctoponly=top_only)
         if user:
             ucgen.request["ucuser"] = user
@@ -4490,9 +4500,10 @@ class APISite(BaseSite):
         ucgen.request['ucshow'] = option_set
         return ucgen
 
+    @deprecated_args(step=None)
     def watchlist_revs(self, start=None, end=None, reverse=False,
                        namespaces=None, showMinor=None, showBot=None,
-                       showAnon=None, step=None, total=None):
+                       showAnon=None, total=None):
         """Iterate revisions to pages on the bot user's watchlist.
 
         Iterated values will be in same format as recentchanges.
@@ -4520,7 +4531,7 @@ class APISite(BaseSite):
         wlgen = self._generator(api.ListGenerator, type_arg="watchlist",
                                 wlprop="user|comment|timestamp|title|ids|flags",
                                 wlallrev="", namespaces=namespaces,
-                                step=step, total=total)
+                                total=total)
         # TODO: allow users to ask for "patrol" as well?
         if start is not None:
             wlgen.request["wlstart"] = start
@@ -4536,8 +4547,9 @@ class APISite(BaseSite):
         return wlgen
 
     # TODO: T75370
+    @deprecated_args(step=None)
     def deletedrevs(self, page, start=None, end=None, reverse=None,
-                    get_text=False, step=None, total=None):
+                    get_text=False, total=None):
         """Iterate deleted revisions.
 
         Each value returned by the iterator will be a dict containing the
@@ -4583,7 +4595,7 @@ class APISite(BaseSite):
         drgen = self._generator(api.ListGenerator, type_arg="deletedrevs",
                                 titles=page.title(withSection=False),
                                 drprop="revid|user|comment|minor",
-                                step=step, total=total)
+                                total=total)
         if get_text:
             drgen.request['drprop'] = (drgen.request['drprop'] +
                                        ['content', 'token'])
@@ -4628,7 +4640,8 @@ class APISite(BaseSite):
         """
         return self.randompages(total=1, redirects=True)
 
-    def randompages(self, step=None, total=10, namespaces=None,
+    @deprecated_args(step=None)
+    def randompages(self, total=10, namespaces=None,
                     redirects=False, content=False):
         """Iterate a number of random pages.
 
@@ -4649,7 +4662,7 @@ class APISite(BaseSite):
             type such as NoneType or bool
         """
         rngen = self._generator(api.PageGenerator, type_arg="random",
-                                namespaces=namespaces, step=step, total=total,
+                                namespaces=namespaces, total=total,
                                 g_content=content, grnredirect=redirects)
         return rngen
 
@@ -5916,10 +5929,11 @@ class APISite(BaseSite):
                      rcshow=None,
                      rc_show=None,
                      get_redirect=None)
+    @deprecated_args(step=None)
     def newpages(self, user=None, returndict=False,
                  start=None, end=None, reverse=False, showBot=False,
                  showRedirects=False, excludeuser=None,
-                 showPatrolled=None, namespaces=None, step=None, total=None):
+                 showPatrolled=None, namespaces=None, total=None):
         """Yield new articles (as Page objects) from recent changes.
 
         Starts with the newest article and fetches the number of articles
@@ -5950,7 +5964,7 @@ class APISite(BaseSite):
             namespaces=namespaces, changetype="new", user=user,
             excludeuser=excludeuser, showBot=showBot,
             showRedirects=showRedirects, showPatrolled=showPatrolled,
-            step=step, total=total
+            total=total
         )
         for pageitem in gen:
             newpage = pywikibot.Page(self, pageitem['title'])
@@ -5961,9 +5975,9 @@ class APISite(BaseSite):
                        u'', pageitem['user'], pageitem['comment'])
 
     @deprecated_args(lestart='start', leend='end', leuser='user', letitle=None,
-                     repeat=None, number='total')
+                     repeat=None, number='total', step=None)
     def newfiles(self, user=None, start=None, end=None, reverse=False,
-                 step=None, total=None):
+                 total=None):
         """Yield information about newly uploaded files.
 
         Yields a tuple of FilePage, Timestamp, user(unicode), comment(unicode).
@@ -5975,7 +5989,7 @@ class APISite(BaseSite):
         # TODO: update docstring
         for event in self.logevents(logtype="upload", user=user,
                                     start=start, end=end, reverse=reverse,
-                                    step=step, total=total):
+                                    total=total):
             filepage = event.page()
             date = event.timestamp()
             user = event.user()
@@ -5992,264 +6006,250 @@ class APISite(BaseSite):
         """
         return self.newfiles(*args, **kwargs)
 
-    @deprecated_args(number='total', repeat=None)
-    def longpages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def longpages(self, total=None):
         """Yield Pages and lengths from Special:Longpages.
 
         Yields a tuple of Page object, length(int).
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         lpgen = self._generator(api.ListGenerator,
                                 type_arg="querypage", qppage="Longpages",
-                                step=step, total=total)
+                                total=total)
         for pageitem in lpgen:
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecated_args(number="total", repeat=None)
-    def shortpages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def shortpages(self, total=None):
         """Yield Pages and lengths from Special:Shortpages.
 
         Yields a tuple of Page object, length(int).
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         spgen = self._generator(api.ListGenerator,
                                 type_arg="querypage", qppage="Shortpages",
-                                step=step, total=total)
+                                total=total)
         for pageitem in spgen:
             yield (pywikibot.Page(self, pageitem['title']),
                    int(pageitem['value']))
 
-    @deprecated_args(number='total', repeat=None)
-    def deadendpages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def deadendpages(self, total=None):
         """Yield Page objects retrieved from Special:Deadendpages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         degen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Deadendpages",
-                                step=step, total=total)
+                                total=total)
         return degen
 
-    @deprecated_args(number='total', repeat=None)
-    def ancientpages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def ancientpages(self, total=None):
         """Yield Pages, datestamps from Special:Ancientpages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         apgen = self._generator(api.ListGenerator,
                                 type_arg="querypage", qppage="Ancientpages",
-                                step=step, total=total)
+                                total=total)
         for pageitem in apgen:
             yield (pywikibot.Page(self, pageitem['title']),
                    pywikibot.Timestamp.fromISOformat(pageitem['timestamp']))
 
-    @deprecated_args(number='total', repeat=None)
-    def lonelypages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def lonelypages(self, total=None):
         """Yield Pages retrieved from Special:Lonelypages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         lpgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Lonelypages",
-                                step=step, total=total)
+                                total=total)
         return lpgen
 
-    @deprecated_args(number='total', repeat=None)
-    def unwatchedpages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def unwatchedpages(self, total=None):
         """Yield Pages from Special:Unwatchedpages (requires Admin privileges).
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         uwgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Unwatchedpages",
-                                step=step, total=total)
+                                total=total)
         return uwgen
 
-    def wantedpages(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def wantedpages(self, total=None):
         """Yield Pages from Special:Wantedpages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         wpgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Wantedpages",
-                                step=step, total=total)
+                                total=total)
         return wpgen
 
-    @deprecated_args(number='total', repeat=None)
-    def wantedcategories(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def wantedcategories(self, total=None):
         """Yield Pages from Special:Wantedcategories.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         wcgen = self._generator(api.PageGenerator,
                                 type_arg="querypage", gqppage="Wantedcategories",
-                                step=step, total=total)
+                                total=total)
 
         return wcgen
 
-    @deprecated_args(number='total', repeat=None)
-    def uncategorizedcategories(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def uncategorizedcategories(self, total=None):
         """Yield Categories from Special:Uncategorizedcategories.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         ucgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedcategories",
-                                step=step, total=total)
+                                total=total)
         return ucgen
 
-    @deprecated_args(number='total', repeat=None)
-    def uncategorizedimages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def uncategorizedimages(self, total=None):
         """Yield FilePages from Special:Uncategorizedimages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         uigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedimages",
-                                step=step, total=total)
+                                total=total)
         return uigen
 
     # synonym
     uncategorizedfiles = uncategorizedimages
 
-    @deprecated_args(number='total', repeat=None)
-    def uncategorizedpages(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def uncategorizedpages(self, total=None):
         """Yield Pages from Special:Uncategorizedpages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         upgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedpages",
-                                step=step, total=total)
+                                total=total)
         return upgen
 
-    @deprecated_args(number='total', repeat=None)
-    def uncategorizedtemplates(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def uncategorizedtemplates(self, total=None):
         """Yield Pages from Special:Uncategorizedtemplates.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         utgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Uncategorizedtemplates",
-                                step=step, total=total)
+                                total=total)
         return utgen
 
-    @deprecated_args(number='total', repeat=None)
-    def unusedcategories(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def unusedcategories(self, total=None):
         """Yield Category objects from Special:Unusedcategories.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         ucgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedcategories",
-                                step=step, total=total)
+                                total=total)
         return ucgen
 
-    @deprecated_args(extension=None, number='total', repeat=None)
-    def unusedfiles(self, step=None, total=None):
+    @deprecated_args(extension=None, number='total', step=None, repeat=None)
+    def unusedfiles(self, total=None):
         """Yield FilePage objects from Special:Unusedimages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         uigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Unusedimages",
-                                step=step, total=total)
+                                total=total)
         return uigen
 
     @deprecated("Site().unusedfiles()")
-    @deprecated_args(extension=None, number='total', repeat=None)
-    def unusedimages(self, step=None, total=None):
+    @deprecated_args(extension=None, number='total', step=None, repeat=None)
+    def unusedimages(self, total=None):
         """Yield FilePage objects from Special:Unusedimages.
 
         DEPRECATED: Use L{APISite.unusedfiles} instead.
         """
-        return self.unusedfiles(step, total)
+        return self.unusedfiles(total)
 
-    @deprecated_args(number='total', repeat=None)
-    def withoutinterwiki(self, step=None, total=None):
+    @deprecated_args(number='total', step=None, repeat=None)
+    def withoutinterwiki(self, total=None):
         """Yield Pages without language links from Special:Withoutinterwiki.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         wigen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Withoutinterwiki",
-                                step=step, total=total)
+                                total=total)
         return wigen
 
     @need_version("1.18")
-    def broken_redirects(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def broken_redirects(self, total=None):
         """Yield Pages without language links from Special:BrokenRedirects.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         brgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="BrokenRedirects",
-                                step=step, total=total)
+                                total=total)
         return brgen
 
     @need_version("1.18")
-    def double_redirects(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def double_redirects(self, total=None):
         """Yield Pages without language links from Special:BrokenRedirects.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         drgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="DoubleRedirects",
-                                step=step, total=total)
+                                total=total)
         return drgen
 
     @need_version("1.18")
-    def redirectpages(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def redirectpages(self, total=None):
         """Yield redirect pages from Special:ListRedirects.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         lrgen = self._generator(api.PageGenerator,
                                 type_arg="querypage",
                                 gqppage="Listredirects",
-                                step=step, total=total)
+                                total=total)
         return lrgen
 
-    def unconnected_pages(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
 
-        @param step: request batch size
         @param total: number of pages to return
         """
         upgen = self._generator(api.PageGenerator,
                                 type_arg='querypage',
                                 gqppage='UnconnectedPages',
-                                step=step, total=total)
+                                total=total)
         return upgen
 
     @deprecated_args(lvl='level')
@@ -6666,7 +6666,8 @@ class APISite(BaseSite):
         """
         return self.moderate_post(post, 'restore', reason)
 
-    def watched_pages(self, sysop=False, force=False, step=None, total=None):
+    @deprecated_args(step=None)
+    def watched_pages(self, sysop=False, force=False, total=None):
         """
         Return watchlist.
 
@@ -6682,8 +6683,7 @@ class APISite(BaseSite):
             total = pywikibot.config.special_page_limit
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',
-                                expiry=expiry,
-                                step=step, gwrlimit=total)
+                                expiry=expiry, gwrlimit=total)
         return gen
 
     # aliases for backwards compatibility

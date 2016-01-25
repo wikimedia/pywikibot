@@ -39,7 +39,7 @@ Commandline parameters
 
 """
 #
-# (C) Pywikibot team, 2011-2015
+# (C) Pywikibot team, 2011-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -444,15 +444,15 @@ class LinkedPagesRule(PatrolRule):
                 return p
 
 
-def api_feed_repeater(gen, delay=0, repeat=False, number=1000, namespaces=None,
+def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
                       user=None, recent_new_gen=True):
     """Generator which loads pages details to be processed."""
     while True:
         if recent_new_gen:
-            generator = gen(step=number, namespaces=namespaces, user=user,
+            generator = gen(namespaces=namespaces, user=user,
                             showPatrolled=False)
         else:
-            generator = gen(step=number, namespaces=namespaces, user=user,
+            generator = gen(namespaces=namespaces, user=user,
                             returndict=True, showPatrolled=False)
         for page in generator:
             if recent_new_gen:
@@ -511,11 +511,9 @@ def main(*args):
     if usercontribs:
         pywikibot.output(u'Processing user: %s' % usercontribs)
 
-    newpage_count = 300
     if not newpages and not recentchanges and not usercontribs:
         if site.family.name == 'wikipedia':
             newpages = True
-            newpage_count = 5000
         else:
             recentchanges = True
 
@@ -525,7 +523,7 @@ def main(*args):
         pywikibot.output(u'Newpages:')
         gen = site.newpages
         feed = api_feed_repeater(gen, delay=60, repeat=repeat,
-                                 number=newpage_count, user=usercontribs,
+                                 user=usercontribs,
                                  namespaces=genFactory.namespaces,
                                  recent_new_gen=False)
         bot.run(feed)
@@ -533,7 +531,7 @@ def main(*args):
     if recentchanges or usercontribs:
         pywikibot.output(u'Recentchanges:')
         gen = site.recentchanges
-        feed = api_feed_repeater(gen, delay=60, repeat=repeat, number=1000,
+        feed = api_feed_repeater(gen, delay=60, repeat=repeat,
                                  namespaces=genFactory.namespaces,
                                  user=usercontribs)
         bot.run(feed)

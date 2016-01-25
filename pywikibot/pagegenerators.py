@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -191,10 +191,6 @@ parameterHelp = u"""\
 
 -prefixindex      Work on pages commencing with a common prefix.
 
--step:n           When used with any other argument that specifies a set
-                  of pages, only retrieve n pages at a time from the wiki
-                  server.
-
 -subpage:n        Filters pages to only those that have depth n
                   i.e. a depth of 0 filters out all pages that are subpages, and
                   a depth of 1 filters out all pages that are subpages of subpages.
@@ -351,7 +347,6 @@ class GeneratorFactory(object):
         """
         self.gens = []
         self._namespaces = []
-        self.step = None
         self.limit = None
         self.qualityfilter_list = []
         self.articlefilter_list = []
@@ -416,8 +411,6 @@ class GeneratorFactory(object):
             if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
                 if self.namespaces:
                     self.gens[i].set_namespace(self.namespaces)
-                if self.step:
-                    self.gens[i].set_query_increment(self.step)
                 if self.limit:
                     self.gens[i].set_maximum_items(self.limit)
             else:
@@ -662,10 +655,9 @@ class GeneratorFactory(object):
             self._namespaces += value.split(",")
             return True
         elif arg == '-step':
-            if not value:
-                value = pywikibot.input('What is the step value?')
-            self.step = int(value)
-            return True
+            issue_deprecation_warning(
+                'The usage of "{0}"'.format(arg), 2, ArgumentDeprecationWarning)
+            return False
         elif arg == '-limit':
             if not value:
                 value = pywikibot.input('What is the limit value?')
@@ -868,16 +860,15 @@ class GeneratorFactory(object):
             return False
 
 
+@deprecated_args(step=None)
 def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
-                          site=None, step=None, total=None, content=False):
+                          site=None, total=None, content=False):
     """
     Iterate Page objects for all titles in a single namespace.
 
     If includeredirects is False, redirects are not included. If
     includeredirects equals the string 'only', only redirects are added.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maxmum number of pages to retrieve in total
     @type total: int
     @param content: If True, load current version of each page (default False)
@@ -895,18 +886,16 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
     else:
         filterredir = False
     return site.allpages(start=start, namespace=namespace,
-                         filterredir=filterredir, step=step, total=total,
-                         content=content)
+                         filterredir=filterredir, total=total, content=content)
 
 
+@deprecated_args(step=None)
 def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
-                           site=None, step=None, total=None, content=False):
+                           site=None, total=None, content=False):
     """
     Prefixed Page generator.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param content: If True, load current version of each page (default False)
     @param site: Site for generator results.
@@ -926,8 +915,7 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
     else:
         filterredir = False
     return site.allpages(prefix=title, namespace=namespace,
-                         filterredir=filterredir, step=step, total=total,
-                         content=content)
+                         filterredir=filterredir, total=total, content=content)
 
 
 @deprecated_args(number="total", mode="logtype", repeat=None)
@@ -985,14 +973,12 @@ def LogpagesPageGenerator(total=500, logtype='', user=None,
                                   site=site, namespace=namespace)
 
 
-@deprecated_args(number='total', namespace='namespaces', repeat=None,
-                 get_redirect=None)
-def NewpagesPageGenerator(site=None, namespaces=[0], step=None, total=None):
+@deprecated_args(number='total', step=None, namespace='namespaces',
+                 repeat=None, get_redirect=None)
+def NewpagesPageGenerator(site=None, namespaces=[0], total=None):
     """
     Iterate Page objects for all new titles in a single namespace.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maxmium number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
@@ -1004,17 +990,17 @@ def NewpagesPageGenerator(site=None, namespaces=[0], step=None, total=None):
     if site is None:
         site = pywikibot.Site()
     for item in site.recentchanges(changetype='new', namespaces=namespaces,
-                                   step=step, total=total):
+                                   total=total):
         yield pywikibot.Page(pywikibot.Link(item["title"], site))
 
 
-@deprecated_args(nobots=None)
+@deprecated_args(nobots=None, step=None)
 def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                namespaces=None, pagelist=None,
                                changetype=None, showMinor=None,
                                showBot=None, showAnon=None,
                                showRedirects=None, showPatrolled=None,
-                               topOnly=False, step=None, total=None,
+                               topOnly=False, total=None,
                                user=None, excludeuser=None, site=None,
                                _filter_unique=None):
     """
@@ -1067,7 +1053,7 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                              showBot=showBot, showAnon=showAnon,
                              showRedirects=showRedirects,
                              showPatrolled=showPatrolled,
-                             topOnly=topOnly, step=step, total=total,
+                             topOnly=topOnly, total=total,
                              user=user, excludeuser=excludeuser)
 
     gen = (pywikibot.Page(site, x['title'])
@@ -1078,12 +1064,11 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
     return gen
 
 
-def UnconnectedPageGenerator(site=None, step=None, total=None):
+@deprecated_args(step=None)
+def UnconnectedPageGenerator(site=None, total=None):
     """
     Iterate Page objects for all unconnected pages to a Wikibase repository.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
@@ -1093,19 +1078,20 @@ def UnconnectedPageGenerator(site=None, step=None, total=None):
         site = pywikibot.Site()
     if not site.data_repository():
         raise ValueError('The given site does not have Wikibase repository.')
-    for page in site.unconnected_pages(step=step, total=total):
+    for page in site.unconnected_pages(total=total):
         yield page
 
 
-@deprecated_args(referredImagePage='referredFilePage')
-def FileLinksGenerator(referredFilePage, step=None, total=None, content=False):
+@deprecated_args(referredImagePage='referredFilePage', step=None)
+def FileLinksGenerator(referredFilePage, total=None, content=False):
     """Yield Pages on which the file referredFilePage is displayed."""
-    return referredFilePage.usingPages(step=step, total=total, content=content)
+    return referredFilePage.usingPages(total=total, content=content)
 
 
-def ImagesPageGenerator(pageWithImages, step=None, total=None, content=False):
+@deprecated_args(step=None)
+def ImagesPageGenerator(pageWithImages, total=None, content=False):
     """Yield FilePages displayed on pageWithImages."""
-    return pageWithImages.imagelinks(step=step, total=total, content=content)
+    return pageWithImages.imagelinks(total=total, content=content)
 
 
 def InterwikiPageGenerator(page):
@@ -1114,26 +1100,29 @@ def InterwikiPageGenerator(page):
         yield pywikibot.Page(link)
 
 
-def LanguageLinksPageGenerator(page, step=None, total=None):
+@deprecated_args(step=None)
+def LanguageLinksPageGenerator(page, total=None):
     """Iterate over all interwiki language links on a page."""
-    for link in page.iterlanglinks(step=step, total=total):
+    for link in page.iterlanglinks(total=total):
         yield pywikibot.Page(link)
 
 
+@deprecated_args(step=None)
 def ReferringPageGenerator(referredPage, followRedirects=False,
                            withTemplateInclusion=True,
                            onlyTemplateInclusion=False,
-                           step=None, total=None, content=False):
+                           total=None, content=False):
     """Yield all pages referring to a specific page."""
     return referredPage.getReferences(
         follow_redirects=followRedirects,
         withTemplateInclusion=withTemplateInclusion,
         onlyTemplateInclusion=onlyTemplateInclusion,
-        step=step, total=total, content=content)
+        total=total, content=content)
 
 
+@deprecated_args(step=None)
 def CategorizedPageGenerator(category, recurse=False, start=None,
-                             step=None, total=None, content=False,
+                             total=None, content=False,
                              namespaces=None):
     """Yield all pages in a specific category.
 
@@ -1149,7 +1138,7 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     retrieved page will be downloaded.
 
     """
-    kwargs = dict(recurse=recurse, step=step, total=total,
+    kwargs = dict(recurse=recurse, total=total,
                   content=content, namespaces=namespaces)
     if start:
         kwargs['sortby'] = 'sortkey'
@@ -1158,8 +1147,9 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
         yield a
 
 
+@deprecated_args(step=None)
 def SubCategoriesPageGenerator(category, recurse=False, start=None,
-                               step=None, total=None, content=False):
+                               total=None, content=False):
     """Yield all subcategories in a specific category.
 
     If recurse is True, pages in subcategories are included as well; if
@@ -1175,21 +1165,20 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
 
     """
     # TODO: page generator could be modified to use cmstartsortkey ...
-    for s in category.subcategories(recurse=recurse, step=step,
+    for s in category.subcategories(recurse=recurse,
                                     total=total, content=content):
         if start is None or s.title(withNamespace=False) >= start:
             yield s
 
 
-def LinkedPageGenerator(linkingPage, step=None, total=None, content=False):
+@deprecated_args(step=None)
+def LinkedPageGenerator(linkingPage, total=None, content=False):
     """Yield all pages linked from a specific page.
 
     See L{pywikibot.page.BasePage.linkedPages} for details.
 
     @param linkingPage: the page that links to the pages we want
     @type linkingPage: L{pywikibot.Page}
-    @param step: the limit number of pages to retrieve per API call
-    @type step: int
     @param total: the total number of pages to iterate
     @type total: int
     @param content: if True, retrieve the current content of each linked page
@@ -1197,7 +1186,7 @@ def LinkedPageGenerator(linkingPage, step=None, total=None, content=False):
     @return: a generator that yields Page objects of pages linked to linkingPage
     @rtype: generator
     """
-    return linkingPage.linkedPages(step=step, total=total, content=content)
+    return linkingPage.linkedPages(total=total, content=content)
 
 
 def TextfilePageGenerator(filename=None, site=None):
@@ -1253,14 +1242,11 @@ def PagesFromTitlesGenerator(iterable, site=None):
         yield pywikibot.Page(pywikibot.Link(title, site))
 
 
-@deprecated_args(number="total")
+@deprecated_args(number='total', step=None)
 def UserContributionsGenerator(username, namespaces=None, site=None,
-                               step=None, total=None,
-                               _filter_unique=filter_unique):
+                               total=None, _filter_unique=filter_unique):
     """Yield unique pages edited by user:username.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maxmum number of pages to retrieve in total
     @type total: int
     @param namespaces: list of namespace numbers to fetch contribs from
@@ -1274,7 +1260,7 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
     return _filter_unique(
         pywikibot.Page(pywikibot.Link(contrib["title"], source=site))
         for contrib in site.usercontribs(user=username, namespaces=namespaces,
-                                         step=step, total=total)
+                                         total=total)
     )
 
 
@@ -1768,14 +1754,14 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
             yield item
 
 
-@deprecated_args(pageNumber="step", lookahead=None)
-def PreloadingGenerator(generator, step=50):
+@deprecated_args(pageNumber='groupsize', step='groupsize', lookahead=None)
+def PreloadingGenerator(generator, groupsize=50):
     """
     Yield preloaded pages taken from another generator.
 
     @param generator: pages to iterate over
-    @param step: how many pages to preload at once
-    @type step: int
+    @param groupsize: how many pages to preload at once
+    @type groupsize: int
     """
     # pages may be on more than one site, for example if an interwiki
     # generator is used, so use a separate preloader for each site
@@ -1784,26 +1770,27 @@ def PreloadingGenerator(generator, step=50):
     for page in generator:
         site = page.site
         sites.setdefault(site, []).append(page)
-        if len(sites[site]) >= step:
-            # if this site is at the step, process it
+        if len(sites[site]) >= groupsize:
+            # if this site is at the groupsize, process it
             group = sites[site]
             sites[site] = []
-            for i in site.preloadpages(group, step):
+            for i in site.preloadpages(group, groupsize):
                 yield i
     for site in sites:
         if sites[site]:
-            # process any leftover sites that never reached the step
-            for i in site.preloadpages(sites[site], step):
+            # process any leftover sites that never reached the groupsize
+            for i in site.preloadpages(sites[site], groupsize):
                 yield i
 
 
-def DequePreloadingGenerator(generator, step=50):
+@deprecated_args(step='groupsize')
+def DequePreloadingGenerator(generator, groupsize=50):
     """Preload generator of type DequeGenerator."""
     assert isinstance(generator, DequeGenerator), \
         'generator must be a DequeGenerator object'
 
     while True:
-        page_count = min(len(generator), step)
+        page_count = min(len(generator), groupsize)
         if not page_count:
             return
 
@@ -1811,15 +1798,16 @@ def DequePreloadingGenerator(generator, step=50):
             yield page
 
 
-def PreloadingItemGenerator(generator, step=50):
+@deprecated_args(step='groupsize')
+def PreloadingItemGenerator(generator, groupsize=50):
     """
     Yield preloaded pages taken from another generator.
 
     Function basically is copied from above, but for ItemPage's
 
     @param generator: pages to iterate over
-    @param step: how many pages to preload at once
-    @type step: int
+    @param groupsize: how many pages to preload at once
+    @type groupsize: int
     """
     sites = {}
     for page in generator:
@@ -1835,26 +1823,24 @@ def PreloadingItemGenerator(generator, step=50):
 
         site = page.site
         sites.setdefault(site, []).append(page)
-        if len(sites[site]) >= step:
-            # if this site is at the step, process it
+        if len(sites[site]) >= groupsize:
+            # if this site is at the groupsize, process it
             group = sites[site]
             sites[site] = []
-            for i in site.preloaditempages(group, step):
+            for i in site.preloaditempages(group, groupsize):
                 yield i
     for site in sites:
         if sites[site]:
-            # process any leftover sites that never reached the step
-            for i in site.preloaditempages(sites[site], step):
+            # process any leftover sites that never reached the groupsize
+            for i in site.preloaditempages(sites[site], groupsize):
                 yield i
 
 
-@deprecated_args(number='total', repeat=None)
-def NewimagesPageGenerator(step=None, total=None, site=None):
+@deprecated_args(number='total', step=None, repeat=None)
+def NewimagesPageGenerator(total=None, site=None):
     """
     New file generator.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maxmum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
@@ -1862,7 +1848,7 @@ def NewimagesPageGenerator(step=None, total=None, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for entry in site.logevents(logtype="upload", step=step, total=total):
+    for entry in site.logevents(logtype='upload', total=total):
         # entry is an UploadEntry object
         # entry.page() returns a Page object
         yield entry.page()
@@ -2165,8 +2151,8 @@ def RandomRedirectPageGenerator(total=10, site=None, namespaces=None):
         yield page
 
 
-@deprecated_args(link='url', euprotocol='protocol')
-def LinksearchPageGenerator(url, namespaces=None, step=None, total=None,
+@deprecated_args(link='url', euprotocol='protocol', step=None)
+def LinksearchPageGenerator(url, namespaces=None, total=None,
                             site=None, protocol='http'):
     """Yield all pages that link to a certain URL, like Special:Linksearch.
 
@@ -2176,8 +2162,6 @@ def LinksearchPageGenerator(url, namespaces=None, step=None, total=None,
     @type url: str
     @param namespaces: list of namespace numbers to fetch contribs from
     @type namespaces: list of int
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maxmum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
@@ -2186,17 +2170,14 @@ def LinksearchPageGenerator(url, namespaces=None, step=None, total=None,
     if site is None:
         site = pywikibot.Site()
     return site.exturlusage(url, namespaces=namespaces, protocol=protocol,
-                            step=step, total=total, content=False)
+                            total=total, content=False)
 
 
-@deprecated_args(number='total')
-def SearchPageGenerator(query, step=None, total=None, namespaces=None,
-                        site=None):
+@deprecated_args(number='total', step=None)
+def SearchPageGenerator(query, total=None, namespaces=None, site=None):
     """
     Yield pages from the MediaWiki internal search engine.
 
-    @param step: Maximum number of pages to retrieve per API query
-    @type step: int
     @param total: Maxmum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
@@ -2204,8 +2185,7 @@ def SearchPageGenerator(query, step=None, total=None, namespaces=None,
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.search(query, step=step, total=total,
-                            namespaces=namespaces):
+    for page in site.search(query, total=total, namespaces=namespaces):
         yield page
 
 

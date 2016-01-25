@@ -23,7 +23,7 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -225,7 +225,8 @@ class CategoryRedirectBot(pywikibot.Bot):
 
         # generator yields all hard redirect pages in namespace 14
         for page in pagegenerators.PreloadingGenerator(
-                self.site.allpages(namespace=14, filterredir=True), step=250):
+                self.site.allpages(namespace=14, filterredir=True),
+                groupsize=250):
             if page.isCategoryRedirect():
                 # this is already a soft-redirect, so skip it (for now)
                 continue

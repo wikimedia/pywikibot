@@ -48,7 +48,7 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1817,8 +1817,7 @@ class WikidataBot(Bot):
         @type property_name: str
         """
         ns = self.site.data_repository().property_namespace
-        for page in self.site.search(property_name, step=1, total=1,
-                                     namespaces=ns):
+        for page in self.site.search(property_name, total=1, namespaces=ns):
             page = pywikibot.PropertyPage(self.site.data_repository(),
                                           page.title())
             pywikibot.output(u"Assuming that %s property is %s." %

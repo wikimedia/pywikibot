@@ -902,9 +902,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         disambigInPage = disambigs.intersection(templates)
         return self.namespace() != 10 and len(disambigInPage) > 0
 
+    @deprecated_args(step=None)
     def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
                       onlyTemplateInclusion=False, redirectsOnly=False,
-                      namespaces=None, step=None, total=None, content=False):
+                      namespaces=None, total=None, content=False):
         """
         Return an iterator all pages that refer to or embed the page.
 
@@ -919,7 +920,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
             is used as a template.
         @param redirectsOnly: if True, only iterate redirects to self.
         @param namespaces: only iterate pages in these namespaces
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each referring page (default False)
@@ -936,13 +936,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
             withTemplateInclusion=withTemplateInclusion,
             onlyTemplateInclusion=onlyTemplateInclusion,
             namespaces=namespaces,
-            step=step,
             total=total,
             content=content
         )
 
+    @deprecated_args(step=None)
     def backlinks(self, followRedirects=True, filterRedirects=None,
-                  namespaces=None, step=None, total=None, content=False):
+                  namespaces=None, total=None, content=False):
         """
         Return an iterator for pages that link to this page.
 
@@ -951,7 +951,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param filterRedirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
         @param namespaces: only iterate pages in these namespaces
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each referring page (default False)
@@ -961,12 +960,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
             followRedirects=followRedirects,
             filterRedirects=filterRedirects,
             namespaces=namespaces,
-            step=step,
             total=total,
             content=content
         )
 
-    def embeddedin(self, filter_redirects=None, namespaces=None, step=None,
+    @deprecated_args(step=None)
+    def embeddedin(self, filter_redirects=None, namespaces=None,
                    total=None, content=False):
         """
         Return an iterator for pages that embed this page as a template.
@@ -974,7 +973,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param filter_redirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
         @param namespaces: only iterate pages in these namespaces
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each embedding page (default False)
@@ -983,7 +981,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self,
             filterRedirects=filter_redirects,
             namespaces=namespaces,
-            step=step,
             total=total,
             content=content
         )
@@ -1304,7 +1301,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             raise pywikibot.NoPage(self)
 
-    def linkedPages(self, namespaces=None, step=None, total=None,
+    @deprecated_args(step=None)
+    def linkedPages(self, namespaces=None, total=None,
                     content=False):
         """
         Iterate Pages that this Page links to.
@@ -1316,8 +1314,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param namespaces: only iterate links in these namespaces
         @param namespaces: int, or list of ints
-        @param step: limit each API call to this number of pages
-        @type step: int
         @param total: iterate no more than this number of pages in total
         @type total: int
         @param content: if True, retrieve the content of the current version
@@ -1327,7 +1323,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @return: a generator that yields Page objects.
         @rtype: generator
         """
-        return self.site.pagelinks(self, namespaces=namespaces, step=step,
+        return self.site.pagelinks(self, namespaces=namespaces,
                                    total=total, content=content)
 
     def interwiki(self, expand=True):
@@ -1389,11 +1385,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             return [i for i in self._langlinks if not i.site.obsolete]
 
-    def iterlanglinks(self, step=None, total=None, include_obsolete=False):
+    @deprecated_args(step=None)
+    def iterlanglinks(self, total=None, include_obsolete=False):
         """
         Iterate all inter-language links on this page.
 
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param include_obsolete: if true, yield even Link object whose site
                                  is obsolete
@@ -1408,7 +1404,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # method is called. If we do this, we'll have to think
         # about what will happen if the generator is not completely
         # iterated upon.
-        return self.site.pagelanglinks(self, step=step, total=total,
+        return self.site.pagelanglinks(self, total=total,
                                        include_obsolete=include_obsolete)
 
     def data_item(self):
@@ -1443,7 +1439,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         return self._templates
 
-    def itertemplates(self, step=None, total=None, content=False):
+    @deprecated_args(step=None)
+    def itertemplates(self, total=None, content=False):
         """
         Iterate Page objects for templates used on this Page.
 
@@ -1451,7 +1448,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         templates, not template pages that happen to be referenced through
         a normal link.
 
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each template (default False)
@@ -1459,31 +1455,26 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         if hasattr(self, '_templates'):
             return iter(self._templates)
-        return self.site.pagetemplates(self, step=step, total=total,
-                                       content=content)
+        return self.site.pagetemplates(self, total=total, content=content)
 
-    @deprecated_args(followRedirects=None, loose=None)
-    def imagelinks(self, step=None, total=None, content=False):
+    @deprecated_args(followRedirects=None, loose=None, step=None)
+    def imagelinks(self, total=None, content=False):
         """
         Iterate FilePage objects for images displayed on this Page.
 
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each image description page (default False)
         @return: a generator that yields FilePage objects.
         """
-        return self.site.pageimages(self, step=step, total=total,
-                                    content=content)
+        return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(nofollow_redirects=None, get_redirect=None)
-    def categories(self, withSortKey=False, step=None, total=None,
-                   content=False):
+    @deprecated_args(nofollow_redirects=None, get_redirect=None, step=None)
+    def categories(self, withSortKey=False, total=None, content=False):
         """
         Iterate categories that the article is in.
 
         @param withSortKey: if True, include the sort key in each Category.
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each category description page (default False)
@@ -1494,19 +1485,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if withSortKey:
             raise NotImplementedError('withSortKey is not implemented')
 
-        return self.site.pagecategories(self, step=step, total=total,
-                                        content=content)
+        return self.site.pagecategories(self, total=total, content=content)
 
-    def extlinks(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def extlinks(self, total=None):
         """
         Iterate all external URLs (not interwiki links) from this page.
 
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @return: a generator that yields unicode objects containing URLs.
         @rtype: generator
         """
-        return self.site.page_extlinks(self, step=step, total=total)
+        return self.site.page_extlinks(self, total=total)
 
     def coordinates(self, primary_only=False):
         """
@@ -1573,14 +1563,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
         else:
             return lastmove.target_page
 
-    @deprecated_args(getText='content', reverseOrder='reverse')
-    def revisions(self, reverse=False, step=None, total=None, content=False,
+    @deprecated_args(getText='content', reverseOrder='reverse', step=None)
+    def revisions(self, reverse=False, total=None, content=False,
                   rollback=False, starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
         self.site.loadrevisions(self, getText=content, rvdir=reverse,
                                 starttime=starttime, endtime=endtime,
-                                step=step, total=total, rollback=rollback)
+                                total=total, rollback=rollback)
         return (self._revisions[rev] for rev in
                 sorted(self._revisions, reverse=not reverse)[:total])
 
@@ -1588,9 +1578,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
     #                  returned no more than 500 revisions; now, it iterates
     #                  all revisions unless 'total' argument is used
     @deprecated('Page.revisions()')
-    @deprecated_args(forceReload=None, revCount='total', getAll=None,
-                     reverseOrder='reverse')
-    def getVersionHistory(self, reverse=False, step=None, total=None):
+    @deprecated_args(forceReload=None, revCount='total', step=None,
+                     getAll=None, reverseOrder='reverse')
+    def getVersionHistory(self, reverse=False, total=None):
         """
         Load the version history page and return history information.
 
@@ -1599,20 +1589,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
         edit summary. Starts with the most current revision, unless
         reverse is True.
 
-        @param step: limit each API call to this number of revisions
         @param total: iterate no more than this number of revisions in total
         """
         return [rev.hist_entry()
-                for rev in self.revisions(reverse=reverse,
-                                          step=step, total=total)
+                for rev in self.revisions(reverse=reverse, total=total)
                 ]
 
-    @deprecated_args(forceReload=None, reverseOrder='reverse')
-    def getVersionHistoryTable(self, reverse=False, step=None, total=None):
+    @deprecated_args(forceReload=None, reverseOrder='reverse', step=None)
+    def getVersionHistoryTable(self, reverse=False, total=None):
         """Return the version history as a wiki table."""
         result = '{| class="wikitable"\n'
         result += '! oldid || date/time || username || edit summary\n'
-        for entry in self.revisions(reverse=reverse, step=step, total=total):
+        for entry in self.revisions(reverse=reverse, total=total):
             result += '|----\n'
             result += ('| {r.revid} || {r.timestamp} || {r.user} || '
                        '<nowiki>{r.comment}</nowiki>\n'.format(r=entry))
@@ -1620,23 +1608,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return result
 
     @deprecated("Page.revisions(content=True)")
-    @deprecated_args(reverseOrder='reverse', rollback=None)
-    def fullVersionHistory(self, reverse=False, step=None, total=None):
+    @deprecated_args(reverseOrder='reverse', rollback=None, step=None)
+    def fullVersionHistory(self, reverse=False, total=None):
         """Iterate previous versions including wikitext.
 
         Takes same arguments as getVersionHistory.
         """
         return [rev.full_hist_entry()
                 for rev in self.revisions(content=True, reverse=reverse,
-                                          step=step, total=total)
+                                          total=total)
                 ]
 
-    def contributors(self, step=None, total=None,
-                     starttime=None, endtime=None):
+    @deprecated_args(step=None)
+    def contributors(self, total=None, starttime=None, endtime=None):
         """
         Compile contributors of this page with edit counts.
 
-        @param step: limit each API call to this number of revisions
         @param total: iterate no more than this number of revisions in total
         @param starttime: retrieve revisions starting at this Timestamp
         @param endtime: retrieve revisions ending at this Timestamp
@@ -1645,20 +1632,20 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @rtype: L{collections.Counter}
         """
         return Counter(rev.user for rev in
-                       self.revisions(step=step, total=total,
+                       self.revisions(total=total,
                                       starttime=starttime, endtime=endtime))
 
     @deprecated('contributors()')
-    def contributingUsers(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def contributingUsers(self, total=None):
         """
         Return a set of usernames (or IPs) of users who edited this page.
 
-        @param step: limit each API call to this number of revisions
         @param total: iterate no more than this number of revisions in total
 
         @rtype: set
         """
-        return self.contributors(step=step, total=total).keys()
+        return self.contributors(total=total).keys()
 
     def revision_count(self, contributors=None):
         """
@@ -1776,7 +1763,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 self.text = template + self.text
                 return self.save(summary=reason)
 
-    def loadDeletedRevisions(self, step=None, total=None):
+    @deprecated_args(step=None)
+    def loadDeletedRevisions(self, total=None):
         """
         Retrieve deleted revisions for this Page.
 
@@ -1789,7 +1777,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         if not hasattr(self, "_deletedRevs"):
             self._deletedRevs = {}
-        for item in self.site.deletedrevs(self, step=step, total=total):
+        for item in self.site.deletedrevs(self, total=total):
             for rev in item.get("revisions", []):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
@@ -2393,17 +2381,16 @@ class FilePage(Page):
         return ('{| border="1"\n! date/time || username || resolution || size '
                 '|| edit summary\n|----\n\n|----\n'.join(lines) + '\n|}')
 
-    def usingPages(self, step=None, total=None, content=False):
+    @deprecated_args(step=None)
+    def usingPages(self, total=None, content=False):
         """
         Yield Pages on which the file is displayed.
 
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in total
         @param content: if True, load the current content of each iterated page
             (default False)
         """
-        return self.site.imageusage(
-            self, step=step, total=total, content=content)
+        return self.site.imageusage(self, total=total, content=content)
 
 
 wrapper = _ModuleDeprecationWrapper(__name__)
@@ -2447,9 +2434,8 @@ class Category(Page):
             titleWithSortKey = self.title(withSection=False)
         return '[[%s]]' % titleWithSortKey
 
-    @deprecated_args(startFrom=None, cacheResults=None)
-    def subcategories(self, recurse=False, step=None, total=None,
-                      content=False):
+    @deprecated_args(startFrom=None, cacheResults=None, step=None)
+    def subcategories(self, recurse=False, total=None, content=False):
         """
         Iterate all subcategories of the current category.
 
@@ -2458,7 +2444,6 @@ class Category(Page):
             levels. (Example: recurse=1 will iterate direct subcats and
             first-level sub-sub-cats, but no deeper.)
         @type recurse: int or bool
-        @param step: limit each API call to this number of categories
         @param total: iterate no more than this number of
             subcategories in total (at all levels)
         @param content: if True, retrieve the content of the current version
@@ -2469,8 +2454,7 @@ class Category(Page):
         if not hasattr(self, "_subcats"):
             self._subcats = []
             for member in self.site.categorymembers(
-                    self, member_type='subcat', step=step,
-                    total=total, content=content):
+                    self, member_type='subcat', total=total, content=content):
                 subcat = Category(member)
                 self._subcats.append(subcat)
                 yield subcat
@@ -2480,7 +2464,7 @@ class Category(Page):
                         return
                 if recurse:
                     for item in subcat.subcategories(
-                            recurse, step=step, total=total, content=content):
+                            recurse, total=total, content=content):
                         yield item
                         if total is not None:
                             total -= 1
@@ -2495,15 +2479,15 @@ class Category(Page):
                         return
                 if recurse:
                     for item in subcat.subcategories(
-                            recurse, step=step, total=total, content=content):
+                            recurse, total=total, content=content):
                         yield item
                         if total is not None:
                             total -= 1
                             if total == 0:
                                 return
 
-    @deprecate_arg("startFrom", "startsort")
-    def articles(self, recurse=False, step=None, total=None,
+    @deprecated_args(startFrom='startsort', step=None)
+    def articles(self, recurse=False, total=None,
                  content=False, namespaces=None, sortby=None,
                  reverse=False, starttime=None, endtime=None,
                  startsort=None, endsort=None):
@@ -2518,7 +2502,6 @@ class Category(Page):
             levels. (Example: recurse=1 will iterate articles in first-level
             subcats, but no deeper.)
         @type recurse: int or bool
-        @param step: limit each API call to this number of pages
         @param total: iterate no more than this number of pages in
             total (at all levels)
         @param namespaces: only yield pages in the specified namespaces
@@ -2547,7 +2530,7 @@ class Category(Page):
         """
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
-                                                step=step, total=total,
+                                                total=total,
                                                 content=content, sortby=sortby,
                                                 reverse=reverse,
                                                 starttime=starttime,
@@ -2564,8 +2547,8 @@ class Category(Page):
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
-            for subcat in self.subcategories(step=step):
-                for article in subcat.articles(recurse, step=step, total=total,
+            for subcat in self.subcategories():
+                for article in subcat.articles(recurse, total=total,
                                                content=content,
                                                namespaces=namespaces,
                                                sortby=sortby,
@@ -2581,11 +2564,12 @@ class Category(Page):
                         if total == 0:
                             return
 
-    def members(self, recurse=False, namespaces=None, step=None, total=None,
+    @deprecated_args(step=None)
+    def members(self, recurse=False, namespaces=None, total=None,
                 content=False):
         """Yield all category contents (subcats, pages, and files)."""
         for member in self.site.categorymembers(
-                self, namespaces, step=step, total=total, content=content):
+                self, namespaces, total=total, content=content):
             yield member
             if total is not None:
                 total -= 1
@@ -2594,10 +2578,9 @@ class Category(Page):
         if recurse:
             if not isinstance(recurse, bool) and recurse:
                 recurse = recurse - 1
-            for subcat in self.subcategories(step=step):
+            for subcat in self.subcategories():
                 for article in subcat.members(
-                        recurse, namespaces, step=step,
-                        total=total, content=content):
+                        recurse, namespaces, total=total, content=content):
                     yield article
                     if total is not None:
                         total -= 1

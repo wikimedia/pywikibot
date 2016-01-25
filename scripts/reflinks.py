@@ -795,7 +795,7 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
 
-    generator = pagegenerators.PreloadingGenerator(generator, step=50)
+    generator = pagegenerators.PreloadingGenerator(generator)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
     bot = ReferencesRobot(generator, **options)
     bot.run()

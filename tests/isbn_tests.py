@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -202,7 +202,7 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase, TWNBotTestCase):
 
         # Check if the unit test item page and the property both exist
         item_ns = cls.get_repo().item_namespace
-        for page in cls.get_site().search('IsbnWikibaseBotUnitTest', step=1,
+        for page in cls.get_site().search('IsbnWikibaseBotUnitTest',
                                           total=1, namespaces=item_ns):
             cls.test_page_qid = page.title()
             item_page = ItemPage(cls.get_repo(), page.title())
