@@ -1026,6 +1026,26 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
             textlib.replaceExcept('A123B', r'A(?P<a>\d)2(\d)B',
                                   r'A\g<a>x\2B', [], site=self.site),
             'A1x3B')
+        # test regex with lookbehind.
+        self.assertEqual(
+            textlib.replaceExcept('A behindB C', r'(?<=behind)\w',
+                                  r'Z', [], site=self.site),
+            'A behindZ C')
+        # test regex with lookbehind and groups.
+        self.assertEqual(
+            textlib.replaceExcept('A behindB C D', r'(?<=behind)\w( )',
+                                  r'\g<1>Z', [], site=self.site),
+            'A behind ZC D')
+        # test regex with lookahead.
+        self.assertEqual(
+            textlib.replaceExcept('A Bahead C', r'\w(?=ahead)',
+                                  r'Z', [], site=self.site),
+            'A Zahead C')
+        # test regex with lookahead and groups.
+        self.assertEqual(
+            textlib.replaceExcept('A Bahead C D', r'( )\w(?=ahead)',
+                                  r'Z\g<1>', [], site=self.site),
+            'AZ ahead C D')
 
     def test_case_sensitive(self):
         """Test replacing with different case sensitivity."""
