@@ -263,6 +263,85 @@ class MergeUniqueDicts(TestCase):
             ValueError, '42', tools.merge_unique_dicts, self.dct1, **self.dct1)
 
 
+class TestIsSliceWithEllipsis(TestCase):
+
+    """Test islice_with_ellipsis."""
+
+    net = False
+
+    it = ['a', 'b', 'c', 'd', 'f']
+    it_null = []
+
+    def test_show_default_marker(self):
+        """Test marker is shown without kwargs."""
+        stop = 2
+        it = list(tools.islice_with_ellipsis(self.it, stop))
+        self.assertEqual(len(it), stop + 1)  # +1 to consider marker.
+        self.assertEqual(it[:-1], self.it[:stop])
+        self.assertEqual(it[-1], '…')
+
+    def test_show_custom_marker(self):
+        """Test correct marker is shown with kwargs.."""
+        stop = 2
+        it = list(tools.islice_with_ellipsis(self.it, stop, marker='new'))
+        self.assertEqual(len(it), stop + 1)  # +1 to consider marker.
+        self.assertEqual(it[:-1], self.it[:stop])
+        self.assertNotEqual(it[-1], '…')
+        self.assertEqual(it[-1], 'new')
+
+    def test_show_marker_with_start_stop(self):
+        """Test marker is shown with start and stop without kwargs."""
+        start = 1
+        stop = 3
+        it = list(tools.islice_with_ellipsis(self.it, start, stop))
+        self.assertEqual(len(it), stop - start + 1)  # +1 to consider marker.
+        self.assertEqual(it[:-1], self.it[start:stop])
+        self.assertEqual(it[-1], '…')
+
+    def test_show_custom_marker_with_start_stop(self):
+        """Test marker is shown with start and stop with kwargs."""
+        start = 1
+        stop = 3
+        it = list(tools.islice_with_ellipsis(self.it, start, stop, marker='new'))
+        self.assertEqual(len(it), stop - start + 1)  # +1 to consider marker.
+        self.assertEqual(it[:-1], self.it[start:stop])
+        self.assertNotEqual(it[-1], '…')
+        self.assertEqual(it[-1], 'new')
+
+    def test_show_marker_with_stop_zero(self):
+        """Test marker is shown with stop for non empty iterable."""
+        stop = 0
+        it = list(tools.islice_with_ellipsis(self.it, stop))
+        self.assertEqual(len(it), stop + 1)  # +1 to consider marker.
+        self.assertEqual(it[-1], '…')
+
+    def test_do_not_show_marker_with_stop_zero(self):
+        """Test marker is shown with stop for empty iterable."""
+        stop = 0
+        it = list(tools.islice_with_ellipsis(self.it_null, stop))
+        self.assertEqual(len(it), stop)
+
+    def test_do_not_show_marker(self):
+        """Test marker is not shown when no marker is specified."""
+        import itertools
+        stop = 2
+        it_1 = list(tools.islice_with_ellipsis(self.it, stop, marker=None))
+        it_2 = list(itertools.islice(self.it, stop))
+        self.assertEqual(it_1, it_2)  # same behavior as islice().
+
+    def test_do_not_show_marker_when_get_all(self):
+        """Test marker is not shown when all elements are retrieved."""
+        stop = None
+        it = list(tools.islice_with_ellipsis(self.it, stop))
+        self.assertEqual(len(it), len(self.it))
+        self.assertEqual(it, self.it)
+        self.assertNotEqual(it[-1], '…')
+
+    def test_accept_only_keyword_marker(self):
+        """Test that the only kwargs accepted is 'marker'."""
+        self.assertRaises(TypeError, tools.islice_with_ellipsis(self.it, 1, t=''))
+
+
 def passthrough(x):
     """Return x."""
     return x
