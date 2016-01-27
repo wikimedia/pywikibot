@@ -3342,6 +3342,82 @@ class TestPropertyNames(DefaultSiteTestCase):
             self.assertIn(item, pnames)
 
 
+class TestPageFromWikibase(DefaultSiteTestCase):
+
+    """Test page_from_repository method."""
+
+    sites = {
+        'it.wb': {
+            'family': 'wikibooks',
+            'code': 'it',
+            'result': 'Hello world',
+        },
+        'de.wp': {
+            'family': 'wikipedia',
+            'code': 'de',
+            'result': 'Hallo-Welt-Programm',
+        },
+        'en.wp': {
+            'family': 'wikipedia',
+            'code': 'en',
+            'result': '"Hello, World!" program',
+        },
+    }
+
+    ITEM = 'Q131303'
+
+    def test_page_from_repository(self, key):
+        """Validate page_from_repository."""
+        site = self.get_site(key)
+        page = site.page_from_repository(self.ITEM)
+        self.assertIsInstance(page, pywikibot.Page)
+        self.assertEqual(page.title(), self.sites[key]['result'])
+
+    def test_page_from_repository_none(self):
+        """Validate page_from_repository return NoneType."""
+        site = pywikibot.Site('pdc', 'wikipedia')
+        page = site.page_from_repository(self.ITEM)
+        self.assertIsNone(page)
+
+
+class TestCategoryFromWikibase(DefaultSiteTestCase):
+
+    """Test page_from_repository method."""
+
+    sites = {
+        'it.wb': {
+            'family': 'wikinews',
+            'code': 'it',
+            'result': 'Categoria:2016',
+        },
+        'de.wp': {
+            'family': 'wikipedia',
+            'code': 'de',
+            'result': 'Kategorie:2016',
+        },
+        'en.wp': {
+            'family': 'wikipedia',
+            'code': 'en',
+            'result': 'Category:2016',
+        },
+    }
+
+    ITEM = 'Q6939656'
+
+    def test_page_from_repository(self, key):
+        """Validate page_from_repository."""
+        site = self.get_site(key)
+        page = site.page_from_repository(self.ITEM)
+        self.assertIsInstance(page, pywikibot.Category)
+        self.assertEqual(page.title(), self.sites[key]['result'])
+
+    def test_page_from_repository_none(self):
+        """Validate page_from_repository return NoneType."""
+        site = pywikibot.Site('pdc', 'wikipedia')
+        page = site.page_from_repository(self.ITEM)
+        self.assertIsNone(page)
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()

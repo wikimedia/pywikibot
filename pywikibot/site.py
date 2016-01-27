@@ -2790,6 +2790,37 @@ class APISite(BaseSite):
         """Return True if its data repository is itself."""
         return self is self.data_repository()
 
+    def page_from_repository(self, item):
+        """
+        Return a Page for this site object specified by wikibase item.
+
+        @param item: id number of item, "Q###",
+        @type item: str
+        @return: Page, or Category object given by wikibase item number
+            for this site object.
+        @rtype: pywikibot.Page or None
+
+        @raises UnknownExtension: site has no wikibase extension
+        @raises NotimplementedError: method not implemented for a wikibase site
+        """
+        if not self.has_data_repository:
+            raise UnknownExtension(
+                'Wikibase is not implemented for {0}.'.format(self))
+        if self.is_data_repository():
+            raise NotImplementedError(
+                'page_from_repository method is not implemented for '
+                'Wikibase {0}.'.format(self))
+        repo = self.data_repository()
+        dp = pywikibot.ItemPage(repo, item)
+        try:
+            page_title = dp.getSitelink(self)
+        except pywikibot.NoPage:
+            return None
+        page = pywikibot.Page(self, page_title)
+        if page.namespace() == Namespace.CATEGORY:
+            page = pywikibot.Category(page)
+        return page
+
     def nice_get_address(self, title):
         """Return shorter URL path to retrieve page titled 'title'."""
         # 'title' is expected to be URL-encoded already
