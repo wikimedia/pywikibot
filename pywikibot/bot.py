@@ -860,8 +860,7 @@ def handle_args(args=None, do_help=True):
             if value:
                 config.logfilename = value
         elif option == '-nolog':
-            if moduleName in config.log:
-                config.log.remove(moduleName)
+            config.log = []
         elif option in ('-cosmeticchanges', '-cc'):
             config.cosmetic_changes = not config.cosmetic_changes
             output(u'NOTE: option cosmetic_changes is %s\n'
