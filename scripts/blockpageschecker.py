@@ -50,7 +50,7 @@ Furthermore, the following command line parameters are supported:
 # (C) Monobi a.k.a. Wikihermit, 2007
 # (C) Filnik, 2007-2011
 # (C) Nicolas Dumazet (NicDumZ), 2008-2009
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,7 +79,6 @@ docuReplacements = {
 # PREFERENCES
 
 templateSemiProtection = {
-    'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccoparziale(?:|[ _]scad\|.*?|\|.*?)\}\}',
            r'\{\{(?:[Tt]emplate:|)[Aa]bp(?:|[ _]scad\|(?:.*?))\}\}'],
     'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
@@ -89,7 +88,6 @@ templateSemiProtection = {
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
-    'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisoblocco(?:|[ _]scad\|(?:.*?)|minaccia|cancellata)\}\}',
            r'\{\{(?:[Tt]emplate:|)(?:[Cc][Tt]|[Cc]anc fatte|[Cc][Ee])\}\}',
            r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">(?:\s|\n)*?[Qq]uesta pagina'],
@@ -103,7 +101,6 @@ templateTotalProtection = {
 
 # Regex to get the semi-protection move template
 templateSemiMoveProtection = {
-    'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動半保護' +
            r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
@@ -111,7 +108,6 @@ templateSemiMoveProtection = {
 
 # Regex to get the total-protection move template
 templateTotalMoveProtection = {
-    'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動保護' +
            r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
@@ -121,7 +117,6 @@ templateTotalMoveProtection = {
 # You may use only one template or an unique template and some other "old"
 # template that the script should still check (as on it.wikipedia)
 templateUnique = {
-    'en': None,
     'it': [r'\{\{(?:[Tt]emplate:|)[Pp]rotetta\}\}'],
 }
 
@@ -136,7 +131,7 @@ templateNoRegex = {
 
 # Category where the bot will check
 categoryToCheck = {
-    'en': [u'Category:Protected'],
+    'en': [u'Category:Wikipedia protected pages'],
     'ar': [u'تصنيف:محتويات محمية'],
     'fr': [u'Category:Page semi-protégée', u'Category:Page protégée',
            u'Catégorie:Article protégé'],
@@ -153,7 +148,7 @@ categoryToCheck = {
 }
 
 # Check list to block the users that haven't set their preferences
-project_inserted = ['en', 'fr', 'it', 'ja', 'pt', 'zh']
+project_inserted = ['fr', 'it', 'ja', 'pt', 'zh']
 
 # END PREFERENCES
 
@@ -327,6 +322,12 @@ def main(*args):
         if not editRestr:
             # page is not edit-protected
             # Deleting the template because the page doesn't need it.
+            if not (TTP or TSP):
+                raise pywikibot.Error(
+                    'This script is not localized to use it on \n{0}. '
+                    'Missing "templateSemiProtection" or'
+                    '"templateTotalProtection"'.format(site.sitename))
+
             if TU:
                 replaceToPerform = u'|'.join(TTP + TSP + TU)
             else:
@@ -349,6 +350,12 @@ def main(*args):
                     msg += ', skipping...'
                 pywikibot.output(msg)
             else:
+                if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
+                    raise pywikibot.Error(
+                        'This script is not localized to use it on \n{0}. '
+                        'Missing "templateNoRegex"'.format(
+                            site.sitename))
+
                 pywikibot.output(u'The page is protected to the sysop, but the '
                                  u'template seems not correct. Fixing...')
                 if TU:
@@ -365,6 +372,11 @@ def main(*args):
                     msg += ', skipping...'
                 pywikibot.output(msg)
             else:
+                if not TNR or TU and not TNR[4] or not (TU or TNR[1]):
+                    raise pywikibot.Error(
+                        'This script is not localized to use it on \n{0}. '
+                        'Missing "templateNoRegex"'.format(
+                            site.sitename))
                 pywikibot.output(u'The page is editable only for the '
                                  u'autoconfirmed users, but the template '
                                  u'seems not correct. Fixing...')
