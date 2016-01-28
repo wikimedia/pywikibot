@@ -128,7 +128,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -494,53 +494,58 @@ class XmlDumpReplacePageGenerator(object):
 
 class ReplaceRobot(Bot):
 
-    """A bot that can do text replacements."""
+    """A bot that can do text replacements.
+
+    @param generator: generator that yields Page objects
+    @type generator: generator
+    @param replacements: a list of Replacement instances or sequences of
+        length 2 with the  original text (as a compiled regular expression)
+        and replacement text (as a string).
+    @type replacements: list
+    @param exceptions: a dictionary which defines when not to change an
+        occurrence. This dictionary can have these keys:
+
+        title
+            A list of regular expressions. All pages with titles that
+            are matched by one of these regular expressions are skipped.
+        text-contains
+            A list of regular expressions. All pages with text that
+            contains a part which is matched by one of these regular
+            expressions are skipped.
+        inside
+            A list of regular expressions. All occurrences are skipped which
+            lie within a text region which is matched by one of these
+            regular expressions.
+        inside-tags
+            A list of strings. These strings must be keys from the
+            exceptionRegexes dictionary in textlib.replaceExcept().
+
+    @type exceptions: dict
+    @param allowoverlap: when matches overlap, all of them are replaced.
+    @type allowoverlap: bool
+    @param recursive: Recurse replacement as long as possible.
+    @type recursice: bool
+    @warning: Be careful, this might lead to an infinite loop.
+    @param addedCat: category to be added to every page touched
+    @type addedCat: pywikibot.Category or str or None
+    @param sleep: slow down between processing multiple regexes
+    @type sleep: int
+    @param summary: Set the summary message text bypassing the default
+    @type summary: str
+    @keyword always: the user won't be prompted before changes are made
+    @type keyword: bool
+    @keyword site: Site the bot is working on.
+    @warning: site parameter should be passed to constructor.
+        Otherwise the bot takes the current site and warns the operator
+        about the missing site
+    """
 
     @deprecated_args(acceptall='always')
     def __init__(self, generator, replacements, exceptions={},
-                 always=False, allowoverlap=False, recursive=False,
-                 addedCat=None, sleep=None, summary='', site=None, **kwargs):
-        """
-        Constructor.
-
-        Arguments:
-            * generator    - A generator that yields Page objects.
-            * replacements - A list of Replacement instances or sequences of
-                             length 2 with the  original text (as a compiled
-                             regular expression) and replacement text (as a
-                             string).
-            * exceptions   - A dictionary which defines when not to change an
-                             occurrence. See below.
-            * always       - If True, the user won't be prompted before changes
-                             are made.
-            * allowoverlap - If True, when matches overlap, all of them are
-                             replaced.
-            * addedCat     - If set to a value, add this category to every page
-                             touched.
-                             It can be a string or a Category object.
-
-        Structure of the exceptions dictionary:
-        This dictionary can have these keys:
-
-            title
-                A list of regular expressions. All pages with titles that
-                are matched by one of these regular expressions are skipped.
-            text-contains
-                A list of regular expressions. All pages with text that
-                contains a part which is matched by one of these regular
-                expressions are skipped.
-            inside
-                A list of regular expressions. All occurrences are skipped which
-                lie within a text region which is matched by one of these
-                regular expressions.
-            inside-tags
-                A list of strings. These strings must be keys from the
-                exceptionRegexes dictionary in textlib.replaceExcept().
-
-        """
+                 allowoverlap=False, recursive=False, addedCat=None,
+                 sleep=None, summary='', **kwargs):
+        """Constructor."""
         super(ReplaceRobot, self).__init__(generator=generator,
-                                           always=always,
-                                           site=site,
                                            **kwargs)
 
         for i, replacement in enumerate(replacements):
@@ -554,7 +559,6 @@ class ReplaceRobot(Bot):
                                                             replacement[1])
         self.replacements = replacements
         self.exceptions = exceptions
-        self.acceptall = always  # deprecated
         self.allowoverlap = allowoverlap
         self.recursive = recursive
 
@@ -1130,9 +1134,9 @@ LIMIT 200""" % (whereClause, exceptClause)
         return False
 
     preloadingGen = pagegenerators.PreloadingGenerator(gen)
-    bot = ReplaceRobot(preloadingGen, replacements, exceptions, acceptall,
+    bot = ReplaceRobot(preloadingGen, replacements, exceptions,
                        allowoverlap, recursive, add_cat, sleep, edit_summary,
-                       site)
+                       always=acceptall, site=site)
     site.login()
     bot.run()
 
