@@ -2,14 +2,21 @@
 """
 SocketIO-based rcstream client.
 
-(c) 2014 Merlijn van Deen
-
-This file is part of the Pywikibot framework, and is licensed under the MIT license.
+This file is part of the Pywikibot framework.
 
 This module requires socketIO_client to be installed:
     pip install socketIO_client
 """
+#
+# (C) 2014 Merlijn van Deen
+# (C) Pywikibot team, 2014-2016
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
+
+__version__ = '$Id$'
+#
 
 import sys
 import threading
@@ -62,7 +69,7 @@ class RcListenerThread(threading.Thread):
      'server_url': 'http://en.wikipedia.org', 'id': 703158386,
      'revision': {'new': 640271171, 'old': 468264850},
      'type': 'edit', 'namespace': 0}
-    >>> t.stop()  # optional, the thread will shut down on exiting python as well
+    >>> t.stop()  # optional, the thread will shut down on exiting python
     """
 
     def __init__(self, wikihost, rchost, rcport=80, rcpath='/rc', total=None):
@@ -132,7 +139,11 @@ class RcListenerThread(threading.Thread):
         )
 
     def run(self):
-        """Threaded function. Runs insided the thread when started with .start()."""
+        """
+        Threaded function.
+
+        Runs inside the thread when started with .start().
+        """
         self.running = True
         while self.running:
             self.client.wait(seconds=0.1)
@@ -160,15 +171,15 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
     @param total: the maximum number of entries to return. The underlying thread
                   is shut down then this number is reached.
 
-    @yields dict: dict as formatted by MediaWiki's MachineReadableRCFeedFormatter[1],
-                  which consists of at least id (recent changes id), type ('edit',
-                  'new', 'log' or 'external'), namespace, title, comment, timestamp,
-                  user and bot (bot flag for the change). See [1] for more details.
-
+    @return: yield dict as formatted by MediaWiki's
+        MachineReadableRCFeedFormatter, which consists of at least id
+        (recent changes id), type ('edit', 'new', 'log' or 'external'),
+        namespace, title, comment, timestamp, user and bot (bot flag for the
+        change).
+    @see: U{MachineReadableRCFeedFormatter<https://doc.wikimedia.org/
+        mediawiki-core/master/php/classMachineReadableRCFeedFormatter.html>}
+    @rtype: generator
     @raises ImportError
-
-    [1]: See mediawiki/includes/rcfeed/MachineReadableRCFeedFormatter.php
-
     """
     if isinstance(socketIO_client, Exception):
         raise ImportError('socketIO_client is required for the rc stream;\n'
