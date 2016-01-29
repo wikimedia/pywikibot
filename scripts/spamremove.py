@@ -20,10 +20,12 @@ Command line options:
 
 -namespace:       Filters the search to a given namespace. If this is specified
                   multiple times it will search all given namespaces
+-protocol:        The protocol prefix (default: "http")
+-summary:         A string to be used instead of the default summary
 
 """
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,6 +55,8 @@ def main(*args):
     always = False
     namespaces = []
     spamSite = ''
+    protocol = 'http'
+    summary = None
     for arg in pywikibot.handle_args(args):
         if arg == "-always":
             always = True
@@ -61,6 +65,10 @@ def main(*args):
                 namespaces.append(int(arg[len('-namespace:'):]))
             except ValueError:
                 namespaces.append(arg[len('-namespace:'):])
+        elif arg.startswith('-protocol:'):
+            protocol = arg.partition(':')[2]
+        elif arg.startswith('-summary:'):
+            summary = arg.partition(':')[2]
         else:
             spamSite = arg
 
@@ -69,10 +77,16 @@ def main(*args):
         return False
 
     mysite = pywikibot.Site()
-    pages = mysite.exturlusage(spamSite, namespaces=namespaces, content=True)
+    pages = mysite.exturlusage(
+        spamSite, protocol=protocol, namespaces=namespaces, content=True
+    )
 
-    summary = i18n.twtranslate(mysite, 'spamremove-remove',
-                               {'url': spamSite})
+    if not summary:
+        summary = i18n.twtranslate(
+            mysite,
+            'spamremove-remove',
+            {'url': spamSite}
+        )
     for i, p in enumerate(pages, 1):
         text = p.text
         if spamSite not in text:
