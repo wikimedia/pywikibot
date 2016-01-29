@@ -171,8 +171,8 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
 
     """
     if isinstance(socketIO_client, Exception):
-        raise ImportError('socketIO_client is required for the rc stream; '
-                          'install it with pip install socketIO_client')
+        raise ImportError('socketIO_client is required for the rc stream;\n'
+                          'install it with pip install "socketIO_client==0.5.6"')
 
     rc_thread = RcListenerThread(
         wikihost=wikihost,
