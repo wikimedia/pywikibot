@@ -23,6 +23,8 @@ from tests.utils import allowed_failure, execute_pwb, add_metaclass
 
 scripts_path = join_root_path('scripts')
 
+archive_path = join_root_path('scripts', 'archive')
+
 if PY2:
     TK_IMPORT = 'Tkinter'
 else:
@@ -77,13 +79,18 @@ unrunnable_script_list = [
     'script_wui',   # depends on lua compiling
 ]
 
+
+def list_scripts(path, exclude=None):
+    """Return list of scripts in given path."""
+    scripts = [name[0:-3] for name in os.listdir(path)  # strip '.py'
+               if name.endswith('.py') and
+               not name.startswith('_') and  # skip __init__.py and _*
+               name != exclude]
+    return scripts
+
 script_list = (['login'] +
-               [name[0:-3] for name in os.listdir(scripts_path)  # strip '.py'
-                if name.endswith('.py') and
-                not name.startswith('_') and  # skip __init__.py and _*
-                name != 'login.py'        # this is moved to be first
-                ]
-               )
+               list_scripts(scripts_path, 'login.py') +
+               list_scripts(archive_path))
 
 runnable_script_list = (['login'] +
                         sorted(set(script_list) -
@@ -115,7 +122,6 @@ auto_run_script_list = [
     'checkimages',
     'clean_sandbox',
     'disambredir',
-    'featured',
     'imagerecat',
     'login',
     'lonelypages',

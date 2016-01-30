@@ -209,6 +209,11 @@ def main():
                                     'scripts',
                                     filename)
             file_package = 'scripts'
+            if not os.path.exists(testpath):
+                testpath = os.path.join(
+                    os.path.split(__file__)[0], 'scripts/archive', filename)
+                file_package = 'scripts.archive'
+
             if os.path.exists(testpath):
                 filename = testpath
             else:
