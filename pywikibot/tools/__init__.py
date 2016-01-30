@@ -1235,10 +1235,40 @@ def deprecated(*args, **kwargs):
             issue_deprecation_warning(name, instead, depth)
             return obj(*args, **kwargs)
 
+        def add_docstring(wrapper):
+            """Add a Deprecated notice to the docstring."""
+            deprecation_notice = 'Deprecated'
+            if instead:
+                deprecation_notice += '; use ' + instead + ' instead'
+            deprecation_notice += '.\n\n'
+            if wrapper.__doc__:  # Append old docstring after the notice
+                wrapper.__doc__ = deprecation_notice + wrapper.__doc__
+            else:
+                wrapper.__doc__ = deprecation_notice
+
         if not __debug__:
             return obj
 
         manage_wrapping(wrapper, obj)
+
+        # Regular expression to find existing deprecation notices
+        deprecated_notice = re.compile(r'(^|\s)DEPRECATED[.:;,]',
+                                       re.IGNORECASE)
+
+        # Add the deprecation notice to the docstring if not present
+        if not wrapper.__doc__:
+            add_docstring(wrapper)
+        else:
+            if not deprecated_notice.search(wrapper.__doc__):
+                add_docstring(wrapper)
+            else:
+                # Get docstring up to @params so deprecation notices for
+                # parameters don't disrupt it
+                trim_params = re.compile(r'^.*?((?=@param)|$)', re.DOTALL)
+                trimmed_doc = trim_params.match(wrapper.__doc__).group(0)
+
+                if not deprecated_notice.search(trimmed_doc):  # No notice
+                    add_docstring(wrapper)
 
         return wrapper
 
