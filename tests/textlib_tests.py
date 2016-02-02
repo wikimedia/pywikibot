@@ -1155,16 +1155,130 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept('{{#invoke:x}}', 'x', 'y',
                                                ['invoke'], site=self.site),
                          '{{#invoke:x}}')
+
+    def test_replace_tag_category(self):
+        """Test replacing not inside category links."""
         for ns_name in self.site.namespaces[14]:
             self.assertEqual(textlib.replaceExcept('[[%s:x]]' % ns_name,
                                                    'x', 'y', ['category'],
                                                    site=self.site),
                              '[[%s:x]]' % ns_name)
+
+    def test_replace_tag_file(self):
+        """Test replacing not inside file links."""
         for ns_name in self.site.namespaces[6]:
             self.assertEqual(textlib.replaceExcept('[[%s:x]]' % ns_name,
                                                    'x', 'y', ['file'],
                                                    site=self.site),
                              '[[%s:x]]' % ns_name)
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:x|foo]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:x|foo]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:x|]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:x|]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:x|foo|bar x]] x',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:x|foo|bar x]] y')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:x|]][[File:x|foo]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:x|]][[File:x|foo]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[NonFile:x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[NonFile:y]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:]]',
+                'File:', 'NonFile:', ['file'], site=self.site),
+            '[[File:]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:x|[[foo]].]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:x|[[foo]].]]')
+
+        # ensure only links inside file are captured
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]].x]][[y]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]][[bar]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]][[bar]].x]][[y]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]][[bar]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]][[bar]].x]][[y]]')
+
+        # Correctly handle single brackets in the text.
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]] [bar].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]] [bar].x]][[y]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[bar] [[foo]] .x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[bar] [[foo]] .x]][[y]]')
+
+    def test_replace_tag_file_invalid(self):
+        """Test replacing not inside file links with invalid titles."""
+        # Correctly handle [ and ] inside wikilinks inside file link
+        # even though these are an invalid title.
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]] [[bar [invalid] ]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]] [[bar [invalid] ]].x]][[y]]')
+
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]] [[bar [invalid ]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
+
+        # Even handle balanced [[ ]] inside the wikilink.
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]] [[bar [[invalid]] ]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]] [[bar [[invalid]] ]].x]][[y]]')
+
+    @unittest.expectedFailure
+    def test_replace_tag_file_failure(self):
+        """Test showing limits of the file link regex."""
+        # When the double brackets are unbalanced, the regex
+        # does not correctly detect the end of the file link.
+        self.assertEqual(
+            textlib.replaceExcept(
+                '[[File:a|[[foo]] [[bar [[invalid ]].x]][[x]]',
+                'x', 'y', ['file'], site=self.site),
+            '[[File:a|[[foo]] [[bar [invalid] ]].x]][[y]]')
 
     def test_replace_tags_interwiki(self):
         """Test replacing not inside interwiki links."""
