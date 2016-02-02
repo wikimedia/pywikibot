@@ -7,7 +7,7 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__release__ = '2.0b3'
+__release__ = '3.0-dev'
 __version__ = '$Id$'
 __url__ = 'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot'
 
