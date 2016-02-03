@@ -1667,7 +1667,6 @@ class TestSiteSysopWrite(TestCase):
     write = True
     sysop = True
 
-    @unittest.expectedFailure
     def test_protect(self):
         """Test the site.protect() method."""
         site = self.get_site()
