@@ -151,6 +151,14 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
         self.assertAPIError('invalid-snak', None, item.addClaim, claim)
 
+    def test_math_invalid_function(self):
+        """Attempt adding invalid latex to a math claim."""
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q68')
+        claim = pywikibot.page.Claim(repo, 'P717', datatype='math')
+        claim.setTarget('\foo')
+        self.assertAPIError('modification-failed', None, item.addClaim, claim)
+
 
 if __name__ == '__main__':
     try:

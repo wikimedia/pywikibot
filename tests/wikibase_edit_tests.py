@@ -177,9 +177,9 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         self.assertEqual(new_item.getRedirectTarget(), target_item)
 
 
-class TestWbMonolingualText(WikibaseTestCase):
+class TestWikibaseMakeClaim(WikibaseTestCase):
 
-    """Run wikibase write tests for WbMonolingualText."""
+    """Run wikibase write tests for claims."""
 
     family = 'wikidata'
     code = 'test'
@@ -187,21 +187,56 @@ class TestWbMonolingualText(WikibaseTestCase):
     user = True
     write = True
 
+    def _clean_item(self, repo, prop):
+        """
+        Return an item without any existing claims of the given property.
+
+        @param repo: repository to fetch item from
+        @type: pywikibot.site.DataSite
+        @param prop: P-value of the property to scrub
+        @type prop: str
+        @return: scrubbed item
+        @rtype: pywikibot.ItemPage
+        """
+        item = pywikibot.ItemPage(repo, 'Q68')
+        item.get()
+        if prop in item.claims:
+            item.removeClaims(item.claims[prop])
+        item.get(force=True)
+        return item
+
+    def test_math_edit(self):
+        """Attempt adding a math claim with valid input."""
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P717')
+
+        # set new claim
+        claim = pywikibot.page.Claim(testsite, 'P717', datatype='math')
+        target = 'a^2 + b^2 = c^2'
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P717'][0]
+        self.assertEqual(claim.getTarget(), target)
+
     def test_WbMonolingualText_edit(self):
         """Attempt adding a monolingual text with valid input."""
         # Clean the slate in preparation for test."""
         testsite = self.get_repo()
-        item = pywikibot.ItemPage(testsite, 'Q68')
-        item.get()
-        if 'P271' in item.claims:
-            item.removeClaims(item.claims['P271'])
-        item.get(force=True)
+        item = self._clean_item(testsite, 'P271')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P271', datatype='monolingualtext')
         target = pywikibot.WbMonolingualText(text='Test this!', language='en')
         claim.setTarget(target)
         item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P271'][0]
+        self.assertEqual(claim.getTarget(), target)
 
 
 class TestWikibaseRemoveQualifier(WikibaseTestCase):

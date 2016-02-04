@@ -645,13 +645,24 @@ class TestClaimSetValue(WikidataTestCase):
     """Test setting claim values."""
 
     def test_set_website(self):
+        """Test setting claim of url type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertEqual(claim.type, 'url')
         claim.setTarget('https://en.wikipedia.org/')
         self.assertEqual(claim.target, 'https://en.wikipedia.org/')
 
+    def test_set_WbMonolingualText(self):
+        """Test setting claim of monolingualtext type."""
+        wikidata = self.get_repo()
+        claim = pywikibot.Claim(wikidata, 'P1450')
+        self.assertEqual(claim.type, 'monolingualtext')
+        target = pywikibot.WbMonolingualText(text='Test this!', language='en')
+        claim.setTarget(target)
+        self.assertEqual(claim.target, target)
+
     def test_set_date(self):
+        """Test setting claim of time type."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P569')
         self.assertEqual(claim.type, 'time')
@@ -661,11 +672,14 @@ class TestClaimSetValue(WikidataTestCase):
         self.assertEqual(claim.target.day, 1)
 
     def test_set_incorrect_target_value(self):
+        """Test setting claim of the incorrect value."""
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P569')
         self.assertRaises(ValueError, claim.setTarget, 'foo')
         claim = pywikibot.Claim(wikidata, 'P856')
         self.assertRaises(ValueError, claim.setTarget, pywikibot.WbTime(2001, site=wikidata))
+        claim = pywikibot.Claim(wikidata, 'P1450')
+        self.assertRaises(ValueError, claim.setTarget, 'foo')
 
 
 class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
