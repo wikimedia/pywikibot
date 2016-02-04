@@ -142,14 +142,18 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text='Test this!',
                                                    language='foo')
-        self.assertAPIError('modification-failed', None, item.addClaim, claim)
+        self.assertAPIError('modification-failed', 'Illegal value: foo',
+                            item.addClaim, claim)
 
     def test_WbMonolingualText_invalid_text(self):
         """Attempt adding a monolingual text with an invalid non-string text."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
-        self.assertAPIError('invalid-snak', None, item.addClaim, claim)
+        self.assertAPIError('invalid-snak',
+                            'Invalid snak (Can only construct a '
+                            'MonolingualTextValue with a string value.)',
+                            item.addClaim, claim)
 
     def test_math_invalid_function(self):
         """Attempt adding invalid latex to a math claim."""
@@ -159,6 +163,25 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim.setTarget('\foo')
         self.assertAPIError('modification-failed', None, item.addClaim, claim)
 
+    def test_url_malformed_url(self):
+        """Attempt adding a malformed URL to a url claim."""
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q68')
+        claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
+        claim.setTarget('Not a URL at all')
+        self.assertAPIError('modification-failed',
+                            'Malformed URL: Not a URL at all',
+                            item.addClaim, claim)
+
+    def test_url_invalid_protocol(self):
+        """Attempt adding invalid latex to a math claim."""
+        repo = self.get_repo()
+        item = pywikibot.ItemPage(repo, 'Q68')
+        claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
+        claim.setTarget('wtf://wikiba.se')
+        self.assertAPIError('modification-failed',
+                            'Unsupported URL scheme: wtf',
+                            item.addClaim, claim)
 
 if __name__ == '__main__':
     try:
