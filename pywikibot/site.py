@@ -5887,10 +5887,10 @@ class APISite(BaseSite):
                      UserWarning, 3)
             warning = list(result["warnings"].keys())[0]
             message = result["warnings"][warning]
-            raise pywikibot.UploadWarning(warning, upload_warnings[warning]
-                                          % {'msg': message},
-                                          file_key=_file_key,
-                                          offset=result.get('offset', False))
+            raise api.UploadWarning(warning, upload_warnings[warning]
+                                    % {'msg': message},
+                                    file_key=_file_key,
+                                    offset=result.get('offset', False))
         elif "result" not in result:
             pywikibot.output(u"Upload: unrecognized response: %s" % result)
         if result["result"] == "Success":
