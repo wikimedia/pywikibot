@@ -238,6 +238,22 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P271'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    def test_identifier_edit(self):
+        """Attempt adding a math claim with valid input."""
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P718')
+
+        # set new claim
+        claim = pywikibot.page.Claim(testsite, 'P718', datatype='external-id')
+        target = 'CrazyURI123_:)'
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P718'][0]
+        self.assertEqual(claim.getTarget(), target)
+
 
 class TestWikibaseRemoveQualifier(WikibaseTestCase):
 
