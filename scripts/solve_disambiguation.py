@@ -81,7 +81,6 @@ __version__ = '$Id$'
 #
 
 import codecs
-import itertools
 import os
 import re
 
@@ -362,18 +361,23 @@ class ReferringPageGeneratorWithIgnore(object):
 
     """Referring Page generator, with an ignore manager."""
 
-    def __init__(self, disambPage, primary=False, minimum=0):
+    def __init__(self, disambPage, primary=False, minimum=0, main_only=False):
         self.disambPage = disambPage
         # if run with the -primary argument, enable the ignore manager
         self.primaryIgnoreManager = PrimaryIgnoreManager(disambPage,
                                                          enabled=primary)
         self.minimum = minimum
+        self.main_only = main_only
 
     def __iter__(self):
         # TODO: start yielding before all referring pages have been found
-        refs = [page for page in
-                self.disambPage.getReferences(follow_redirects=False,
-                                              withTemplateInclusion=False)]
+        refs = [
+            page for page in self.disambPage.getReferences(
+                follow_redirects=False,
+                withTemplateInclusion=False,
+                namespaces=0 if self.main_only else None
+            )
+        ]
         pywikibot.output(u"Found %d references." % len(refs))
         # Remove ignorables
         if self.disambPage.site.family.name in ignore_title and \
@@ -669,8 +673,9 @@ class DisambiguationRobot(Bot):
                     [('yes', 'y'), ('no', 'n'), ('change redirect', 'c')], 'n',
                     automatic_quit=False)
                 if choice == 'y':
-                    gen = ReferringPageGeneratorWithIgnore(refPage,
-                                                           self.primary)
+                    gen = ReferringPageGeneratorWithIgnore(
+                        refPage, self.primary, main_only=self.main_only
+                    )
                     preloadingGen = pagegenerators.PreloadingGenerator(gen)
                     for refPage2 in preloadingGen:
                         # run until the user selected 'quit'
@@ -1021,14 +1026,6 @@ or press enter to quit:""")
                      'count': len(new_targets)})
 
     def run(self):
-        if self.main_only:
-            if self.mysite.family.name not in ignore_title:
-                ignore_title[self.mysite.family.name] = {}
-            if self.mylang not in ignore_title[self.mysite.family.name]:
-                ignore_title[self.mysite.family.name][self.mylang] = []
-
-            ignore_title[self.mysite.family.name][self.mylang] += [
-                '%s:' % ns for ns in itertools.chain(self.mysite.namespaces)]
 
         for disambPage in self.generator:
             self.primaryIgnoreManager = PrimaryIgnoreManager(
@@ -1046,8 +1043,12 @@ or press enter to quit:""")
                 self.alternatives.sort()
             SequenceOutputter(self.alternatives).output()
 
-            gen = ReferringPageGeneratorWithIgnore(disambPage, self.primary,
-                                                   minimum=self.minimum)
+            gen = ReferringPageGeneratorWithIgnore(
+                disambPage,
+                self.primary,
+                minimum=self.minimum,
+                main_only=self.main_only
+            )
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
             for refPage in preloadingGen:
                 if not self.primaryIgnoreManager.isIgnored(refPage):
