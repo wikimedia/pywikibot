@@ -5195,7 +5195,7 @@ class APISite(BaseSite):
 
         req = self._simple_request(**parameters)
         try:
-            req.submit()
+            result = req.submit()
         except api.APIError as err:
             errdata = {
                 'site': self,
@@ -5207,6 +5207,14 @@ class APISite(BaseSite):
                             % err.code,
                             _logger)
             raise
+        else:
+            protection = {}
+            for d in result['protect']['protections']:
+                expiry = d.pop('expiry')
+                ptype, level = d.popitem()
+                if level:
+                    protection[ptype] = (level, expiry)
+            page._protection = protection
         finally:
             self.unlock_page(page)
 
