@@ -7071,6 +7071,7 @@ class DataSite(APISite):
 
         req = self._simple_request(**params)
         data = req.submit()
+        claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         return data
 
     @must_be(group='user')
