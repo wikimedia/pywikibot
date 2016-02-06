@@ -487,7 +487,7 @@ class EditOption(StandardOption):
     def result(self, value):
         """Open a text editor and let the user change it."""
         editor = editarticle.TextEditor()
-        self.new_text = editor.edit(self._text, jumpIndex=self._start(),
+        self.new_text = editor.edit(self._text, jumpIndex=self._start,
                                     highlight=self._title)
         return super(EditOption, self).result(value)
 
