@@ -108,14 +108,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'de', 'fr', 'hu', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'he',
-            'vi', 'ca', 'id', 'sq', 'fi', 'ru', 'fa', 'cs', 'zh', 'sv', 'hr',
-            'tr', 'ro', 'sr', 'ar', 'no', 'th', 'ko', 'gl', 'da', 'ta', 'mk',
-            'az', 'tl', 'is', 'ka', 'lt', 'tt', 'uk', 'eo', 'bg', 'sk', 'sl',
-            'el', 'hy', 'ms', 'sa', 'si', 'li', 'la', 'ml', 'ur', 'bn', 'ang',
-            'ia', 'cv', 'et', 'hi', 'km', 'mr', 'eu', 'oc', 'kk', 'fy', 'ne',
-            'ie', 'te', 'af', 'tg', 'ky', 'bs', 'pa', 'be', 'mg', 'cy',
-            'zh-min-nan', 'ku', 'uz',
+            'en', 'de', 'hu', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'vi',
+            'he', 'ca', 'id', 'fi', 'sq', 'fa', 'ru', 'cs', 'zh', 'az', 'sv',
+            'th', 'hr', 'tr', 'sr', 'ar', 'no', 'ko', 'gl', 'da', 'ta', 'ro',
+            'mk', 'tl', 'is', 'uk', 'ka', 'lt', 'tt', 'sa', 'eo', 'sk', 'bg',
+            'el', 'hy', 'si', 'ms', 'sl', 'bn', 'hi', 'li', 'la', 'ur', 'ml',
+            'ang', 'ia', 'cv', 'et', 'km', 'mr', 'eu', 'oc', 'kk', 'ne', 'fy',
+            'pa', 'ie', 'te', 'af', 'tg', 'ku', 'ky', 'bs', 'be', 'mg', 'cy',
+            'zh-min-nan', 'uz',
         ]
 
         super(Family, self).__init__()

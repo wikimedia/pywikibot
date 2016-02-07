@@ -80,20 +80,20 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'sh', 'es', 'zh', 'ru', 'lt', 'pl', 'sv', 'ku',
-            'el', 'nl', 'de', 'ko', 'it', 'tr', 'ta', 'hu', 'fi', 'kn', 'io',
-            'vi', 'pt', 'chr', 'no', 'ja', 'ml', 'id', 'ro', 'ca', 'uz', 'li',
-            'my', 'et', 'te', 'or', 'cs', 'fa', 'jv', 'ar', 'eu', 'hy', 'gl',
-            'lo', 'uk', 'az', 'br', 'th', 'fj', 'eo', 'bg', 'da', 'hr', 'ps',
-            'oc', 'cy', 'simple', 'vo', 'is', 'zh-min-nan', 'sr', 'ast', 'scn',
-            'af', 'he', 'wa', 'tl', 'sw', 'fy', 'hi', 'nn', 'lv', 'la', 'ka',
-            'pnb', 'sl', 'sq', 'nah', 'bs', 'lb', 'tg', 'nds', 'kk', 'sk', 'sm',
-            'tk', 'hsb', 'mk', 'mn', 'ky', 'be', 'ms', 'km', 'ga', 'ur', 'wo',
-            'sa', 'ang', 'co', 'gn', 'bn', 'mr', 'tt', 'csb', 'vec', 'ug', 'gd',
-            'so', 'st', 'sd', 'si', 'kl', 'an', 'jbo', 'ln', 'fo', 'zu', 'na',
-            'gv', 'kw', 'gu', 'rw', 'om', 'qu', 'ss', 'mt', 'pa', 'ie', 'su',
-            'roa-rup', 'iu', 'am', 'mi', 'ne', 'ia', 'dv', 'tpi', 'yi', 'ti',
-            'sg', 'tn', 'ts', 'ha', 'ks', 'ay',
+            'en', 'mg', 'fr', 'sh', 'es', 'zh', 'ru', 'lt', 'sv', 'pl', 'nl',
+            'de', 'ku', 'el', 'it', 'tr', 'ta', 'ko', 'hu', 'fi', 'io', 'kn',
+            'vi', 'pt', 'chr', 'ca', 'ja', 'no', 'ro', 'ml', 'id', 'th', 'uz',
+            'hy', 'li', 'et', 'my', 'or', 'te', 'cs', 'fa', 'jv', 'ar', 'eu',
+            'gl', 'sr', 'az', 'lo', 'uk', 'br', 'fj', 'hr', 'eo', 'da', 'bg',
+            'oc', 'ps', 'simple', 'cy', 'vo', 'is', 'zh-min-nan', 'scn', 'wa',
+            'ast', 'he', 'af', 'tl', 'sw', 'fy', 'tg', 'hi', 'nn', 'sk', 'lv',
+            'pnb', 'mn', 'la', 'ka', 'sl', 'sq', 'nah', 'lb', 'bs', 'nds', 'kk',
+            'sm', 'tk', 'hsb', 'mk', 'ky', 'bn', 'be', 'ms', 'km', 'ga', 'an',
+            'ur', 'co', 'wo', 'sa', 'ang', 'vec', 'tt', 'gn', 'mr', 'so', 'csb',
+            'ug', 'gd', 'sd', 'st', 'mt', 'roa-rup', 'si', 'ie', 'ia', 'ay',
+            'mi', 'kl', 'pa', 'jbo', 'fo', 'ln', 'zu', 'na', 'gv', 'kw', 'gu',
+            'rw', 'ts', 'om', 'qu', 'ss', 'ha', 'su', 'iu', 'am', 'ne', 'dv',
+            'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
         ]
 
         super(Family, self).__init__()
