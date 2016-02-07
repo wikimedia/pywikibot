@@ -314,6 +314,11 @@ ignore_title = {
             u'Wikipedia:Woorden die niet als zoekterm gebruikt kunnen worden',
             u'Overleg gebruiker:Taka(/.*)?',
             u"Wikipedia:Links naar doorverwijspagina's/Artikelen",
+            u"Wikipedia:Wikiproject/Redirects/.*",
+            u"Wikipedia:Wikiproject/Muziek/Overzicht/.*",
+            u"Wikipedia:Wikiproject/Roemeense gemeenten/Doorverwijspagina's",
+            u"Overleg Wikipedia:Wikiproject/Redirects.*",
+            u"Wikipedia:Links naar doorverwijspagina's/Amsterdamconstructie",
         ],
         'pl': [
             u'Wikipedysta:.+',
