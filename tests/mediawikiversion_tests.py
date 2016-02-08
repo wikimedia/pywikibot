@@ -65,6 +65,7 @@ class TestMediaWikiVersion(TestCase):
         self._version_check('1.23', (1, 23), (4, ), '')
         self._version_check('1.23wmf1', (1, 23), (0, 1), 'wmf1')
         self._version_check('1.23alpha', (1, 23), (1, ), 'alpha')
+        self._version_check('1.27.0-alpha', (1, 27, 0), (1, ), '-alpha')
         self._version_check('1.23beta1', (1, 23), (2, 1), 'beta1')
         self._version_check('1.23rc1', (1, 23), (3, 1), 'rc1')
         self._version_check('1.23-rc1', (1, 23), (3, 1), '-rc1')
