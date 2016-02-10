@@ -823,34 +823,33 @@ class GeneratorFactory(object):
                     'Maximum subpage depth:')
             self.subpage_max_depth = int(value)
             return True
-        elif arg == '-logevents:':
+        elif arg == '-logevents':
             gen = self._parse_log_events(*value.split(','))
         elif arg.startswith('-'):
-            mode, log, user = arg.partition('log')
+            mode, log, tail = arg.partition('log')
             # exclude -log, -nolog
-            if log == 'log' and mode not in ['-', '-no']:
+            if log == 'log' and mode not in ['-', '-no'] and not tail:
                 mode = mode[1:]
-                user = user[1:]
                 total = 500
-                if user:
+                if value:
                     try:
-                        total = int(user)
+                        total = int(value)
                     except:
-                        params = user.split(';')
+                        params = value.split(';')
                         if len(params) == 2:
-                            user, total = params
+                            value, total = params
                         else:
-                            user = params[0]
+                            value = params[0]
                     else:
-                        user = None
+                        value = None
                 else:
-                    user = None
+                    value = None
                 issue_deprecation_warning(
                     'The usage of "{0}"'.format(arg),
                     '-logevents:"{0}"'.format(
-                        ','.join((mode, user or '', str(total)))),
+                        ','.join((mode, value or '', str(total)))),
                     2, ArgumentDeprecationWarning)
-                gen = self._parse_log_events(mode, user, total)
+                gen = self._parse_log_events(mode, value, total)
 
         if gen:
             self.gens.append(gen)
