@@ -64,7 +64,7 @@ or you need some help regarding this script, you can find us here:
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -305,42 +305,30 @@ def main(*args):
 
     # Loading the arguments
     for arg in local_args:
-        if arg.startswith('-textfile'):
-            if len(arg) == 9:
-                textfile = pywikibot.input(
-                    u'Which textfile do you want to add?')
-            else:
-                textfile = arg[10:]
-        elif arg.startswith('-text'):
-            if len(arg) == 5:
-                addText = pywikibot.input(u'What text do you want to add?')
-            else:
-                addText = arg[6:]
-        elif arg.startswith('-summary'):
-            if len(arg) == 8:
-                summary = pywikibot.input(u'What summary do you want to use?')
-            else:
-                summary = arg[9:]
-        elif arg.startswith('-excepturl'):
-            if len(arg) == 10:
-                regexSkipUrl = pywikibot.input(u'What text should I skip?')
-            else:
-                regexSkipUrl = arg[11:]
-        elif arg.startswith('-except'):
-            if len(arg) == 7:
-                regexSkip = pywikibot.input(u'What text should I skip?')
-            else:
-                regexSkip = arg[8:]
-        elif arg == '-up':
+        option, sep, value = arg.partition(':')
+        if option == '-textfile':
+            textfile = value or pywikibot.input(
+                'Which textfile do you want to add?')
+        elif option == '-text':
+            addText = value or pywikibot.input('What text do you want to add?')
+        elif option == '-summary':
+            summary = value or pywikibot.input(
+                'What summary do you want to use?')
+        elif option == '-excepturl':
+            regexSkipUrl = value or pywikibot.input('What text should I skip?')
+        elif option == '-except':
+            regexSkip = value or pywikibot.input('What text should I skip?')
+        elif option == '-up':
             up = True
-        elif arg == '-noreorder':
+        elif option == '-noreorder':
             reorderEnabled = False
-        elif arg == '-always':
+        elif option == '-always':
             always = True
-        elif arg == '-talk' or arg == '-talkpage':
+        elif option in ('-talk', '-talkpage'):
             talkPage = True
         else:
             genFactory.handleArg(arg)
+
     if textfile and not addText:
         with codecs.open(textfile, 'r', config.textfile_encoding) as f:
             addText = f.read()
