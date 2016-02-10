@@ -83,7 +83,10 @@ class TestLogentriesBase(TestCase):
         self.assertIsInstance(logentry.pageid(), int)
         self.assertIsInstance(logentry.timestamp(), pywikibot.Timestamp)
         if 'title' in logentry.data:  # title may be missing
-            self.assertIsInstance(logentry.page(), pywikibot.Page)
+            if logtype == 'block' and logentry.isAutoblockRemoval:
+                self.assertIsInstance(logentry.page(), int)
+            else:
+                self.assertIsInstance(logentry.page(), pywikibot.Page)
         else:
             self.assertRaises(KeyError, logentry.page)
         self.assertEqual(logentry.type(), logtype)
