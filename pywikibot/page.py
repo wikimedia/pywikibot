@@ -4080,6 +4080,7 @@ class Property(object):
              'quantity': pywikibot.WbQuantity,
              'monolingualtext': pywikibot.WbMonolingualText,
              'math': basestring,
+             'external-id': basestring,
              }
 
     value_types = {'wikibase-item': 'wikibase-entityid',
@@ -4087,6 +4088,7 @@ class Property(object):
                    'url': 'string',
                    'globe-coordinate': 'globecoordinate',
                    'math': 'string',
+                   'external-id': 'string',
                    }
 
     def __init__(self, site, id=None, datatype=None):
@@ -4628,7 +4630,7 @@ class Claim(Property):
         if self.type == 'wikibase-item':
             value = {'entity-type': 'item',
                      'numeric-id': self.getTarget().getID(numeric=True)}
-        elif self.type in ('string', 'url', 'math'):
+        elif self.type in ('string', 'url', 'math', 'external-id'):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(withNamespace=False)
