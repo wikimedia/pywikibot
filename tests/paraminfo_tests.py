@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -217,7 +217,7 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     def test_datatypes(self):
         """Test known datatypes."""
-        unsupported = set(['monolingualtext', 'wikibase-property'])
+        unsupported = set(['wikibase-property'])
         known = set(Property.types) | unsupported
         self._check_param_values(self.repo, 'wbformatvalue', 'datatype', known)
 
