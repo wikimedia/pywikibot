@@ -1380,6 +1380,12 @@ class SearchTestCase(DefaultSiteTestCase):
                                      get_redirects=True):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 0)
+
+            se = list(mysite.search("wiki", total=100, checkSnippet=True))
+            self.assertLessEqual(len(se), 100)
+            self.assertTrue(all(isinstance(hit, pywikibot.Page)
+                                for hit in se))
+
         except pywikibot.data.api.APIError as e:
             if e.code == "gsrsearch-error" and "timed out" in e.info:
                 raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
