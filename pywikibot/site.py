@@ -4420,6 +4420,7 @@ class APISite(BaseSite):
             list of namespace identifiers.
         @param get_redirects: if True, include redirects in results. Since
             version MediaWiki 1.23 it will always return redirects.
+        @param total: Maximum number of items to retrieve
         @param content: if True, load the current content of each iterated page
             (default False)
         @param checkSnippet: if True, only yield pages that contain an exact match 
@@ -4449,6 +4450,8 @@ class APISite(BaseSite):
                                       srsearch=searchstring, srwhat=where,
                                       srnamespace=namespaces[0], step=step,
                                       g_content=content)
+
+            srgen.set_maximum_items(total)
 
             if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
                 srgen.request['srredirects'] = get_redirects
@@ -4482,6 +4485,8 @@ class APISite(BaseSite):
                                     gsrsearch=searchstring, gsrwhat=where,
                                     namespaces=namespaces, step=step,
                                     total=total, g_content=content)
+
+            srgen.set_maximum_items(total)
 
             if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
                 srgen.request['gsrredirects'] = get_redirects
