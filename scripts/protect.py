@@ -46,7 +46,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting.
 # Written by https://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -99,15 +99,10 @@ class ProtectionRobot(SingleSiteBot):
         the protections using this function.
         """
         self.current_page = page
-        if not self.getOption('always'):
-            choice = pywikibot.input_choice(
-                u'Do you want to change the protection level of %s?'
-                % page.title(asLink=True, forceInterwiki=True),
-                [('yes', 'y'), ('No', 'n'), ('all', 'a')], 'n')
-            if choice == 'n':
-                return
-            elif choice == 'a':
-                self.options['always'] = True
+        if not self.user_confirm(
+                'Do you want to change the protection level of %s?'
+                % page.title(asLink=True, forceInterwiki=True)):
+            return
         applicable = page.applicable_protections()
         protections = dict(
             prot for prot in self.protections.items() if prot[0] in applicable)

@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikibot team, 2006-2014
+# (C) Pywikibot team, 2006-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -109,20 +109,8 @@ class MovePagesBot(MultipleSitesBot):
         if self.getOption('prefix'):
             newPageTitle = (u'%s%s' % (self.getOption('prefix'), pagetitle))
         if self.getOption('prefix') or self.appendAll or self.regexAll:
-            if not self.getOption('always'):
-                choice2 = pywikibot.input_choice(
-                    u'Change the page title to "%s"?' % newPageTitle,
-                    [('yes', 'y'), ('no', 'n'), ('all', 'a')])
-                if choice2 == 'y':
-                    self.moveOne(page, newPageTitle)
-                elif choice2 == 'a':
-                    self.options['always'] = True
-                    self.moveOne(page, newPageTitle)
-                elif choice2 == 'n':
-                    pass
-                else:
-                    self.treat(page)
-            else:
+            if self.user_confirm('Change the page title to "%s"?'
+                                 % newPageTitle):
                 self.moveOne(page, newPageTitle)
         else:
             choice = pywikibot.input_choice(u'What do you want to do?',
@@ -153,10 +141,6 @@ class MovePagesBot(MultipleSitesBot):
                 elif choice2 == 'a':
                     self.appendAll = True
                     self.moveOne(page, newPageTitle)
-                elif choice2 == 'n':
-                    pass
-                else:
-                    self.treat(page)
             elif choice == 'r':
                 searchPattern = pywikibot.input(u'Enter the search pattern:')
                 self.replacePattern = pywikibot.input(
@@ -183,14 +167,6 @@ class MovePagesBot(MultipleSitesBot):
                 elif choice2 == 'a':
                     self.regexAll = True
                     self.moveOne(page, newPageTitle)
-                elif choice2 == 'n':
-                    pass
-                else:
-                    self.treat(page)
-            elif choice == 'n':
-                pass
-            else:
-                self.treat(page)
 
 
 def main(*args):
