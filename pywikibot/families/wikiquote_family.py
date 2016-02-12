@@ -70,8 +70,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'bs', 'uk', 'tr', 'lt', 'bg', 'he', 'ca', 'sl', 'eo', 'el', 'nn',
             'id', 'zh', 'hr', 'hy', 'th', 'hu', 'li', 'nl', 'su', 'ko', 'ja',
             'sv', 'ur', 'te', 'ar', 'fi', 'cy', 'az', 'la', 'no', 'gl', 'ml',
-            'et', 'ku', 'kn', 'sr', 'eu', 'ro', 'ta', 'ka', 'sa', 'da', 'is',
-            'vi', 'be', 'hi', 'sq', 'gu', 'mr', 'br', 'uz', 'af', 'zh-min-nan',
+            'et', 'ku', 'kn', 'sr', 'eu', 'ro', 'ta', 'ka', 'da', 'sa', 'is',
+            'gu', 'vi', 'be', 'hi', 'sq', 'mr', 'br', 'uz', 'af', 'zh-min-nan',
             'am', 'wo', 'ky',
         ]
 
