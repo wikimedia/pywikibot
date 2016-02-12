@@ -2241,7 +2241,7 @@ def LinksearchPageGenerator(url, namespaces=None, step=None, total=None,
 
 @deprecated_args(number='total')
 def SearchPageGenerator(query, step=None, total=None, namespaces=None,
-                        site=None):
+                        site=None, checkSnippet=True):
     """
     Yield pages from the MediaWiki internal search engine.
 
@@ -2255,7 +2255,7 @@ def SearchPageGenerator(query, step=None, total=None, namespaces=None,
     if site is None:
         site = pywikibot.Site()
     for page in site.search(query, step=step, total=total,
-                            namespaces=namespaces):
+                            namespaces=namespaces, checkSnippet=checkSnippet):
         yield page
 
 
