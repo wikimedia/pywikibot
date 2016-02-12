@@ -208,17 +208,15 @@ def main():
         if not filename.endswith('.py'):
             filename += '.py'
         if not os.path.exists(filename):
-            testpath = os.path.join(os.path.split(__file__)[0],
-                                    'scripts',
-                                    filename)
-            file_package = 'scripts'
-            if not os.path.exists(testpath):
-                testpath = os.path.join(
-                    os.path.split(__file__)[0], 'scripts/archive', filename)
-                file_package = 'scripts.archive'
-
-            if os.path.exists(testpath):
-                filename = testpath
+            script_paths = ['scripts',
+                            'scripts.maintenance',
+                            'scripts.archive']
+            for file_package in script_paths:
+                paths = file_package.split('.') + [filename]
+                testpath = os.path.join(_pwb_dir, *paths)
+                if os.path.exists(testpath):
+                    filename = testpath
+                    break
             else:
                 raise OSError("%s not found!" % filename)
 
