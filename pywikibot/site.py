@@ -4401,7 +4401,7 @@ class APISite(BaseSite):
                      getredirects='get_redirects')
     def search(self, searchstring, namespaces=None, where="text",
                get_redirects=False, step=None, total=None, content=False, 
-               checkSnippet=False):
+               checkSnippet=False, skipAfterNrMisses=-1):
         """Iterate Pages that contain the searchstring.
 
         Note that this may include non-existing Pages if the wiki's database
@@ -4425,6 +4425,8 @@ class APISite(BaseSite):
             (default False)
         @param checkSnippet: if True, only yield pages that contain an exact match 
             (default False)
+        @param skipAfterNrMisses: Stop retrieving items after this many
+            non-matches were retrieved (default -1)
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -4458,6 +4460,7 @@ class APISite(BaseSite):
 
             import re
             wordsearch = re.compile(r'<span class="searchmatch">([^<]*)</span>')
+            nr_misses = 0
             for pagedata in srgen:
 
                 snippet = pagedata["snippet"]
@@ -4475,8 +4478,9 @@ class APISite(BaseSite):
                     # api.update_page(p, pagedata)
                     yield p
                 else:
-                    # Abort search as we have reached the end of the exact matches ... 
-                    break
+                    nr_misses += 1
+                    if skipAfterNrMisses > 0 and nr_misses > skipAfterNrMisses:
+                        break
 
         else:
 
