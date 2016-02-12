@@ -80,13 +80,7 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
         else:
             pywikibot.output(u'%s doesn\'t exist'
                              % page_cap.title(asLink=True))
-            if not self.getOption('always'):
-                choice = pywikibot.input_choice(
-                    u'Do you want to create a redirect?',
-                    [('Yes', 'y'), ('No', 'n'), ('All', 'a')], 'n')
-                if choice == 'a':
-                    self.options['always'] = True
-            if self.getOption('always') or choice == 'y':
+            if self.user_confirm('Do you want to create a redirect?'):
                 comment = i18n.twtranslate(
                     site,
                     'capitalize_redirects-create-redirect',
