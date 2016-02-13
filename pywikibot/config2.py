@@ -52,7 +52,6 @@ import types
 
 from warnings import warn
 
-from pywikibot import __url__
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import PY2
 
@@ -410,7 +409,7 @@ except:
 #    transliteration_target = console_encoding
 # After emitting the warning, this last option will be set.
 
-transliteration_target = 'not set'
+transliteration_target = None
 
 # The encoding in which textfiles are stored, which contain lists of page
 # titles. The most used is: 'utf-8'. 'utf-8-sig' recognizes BOM but it is
@@ -1055,19 +1054,6 @@ for _key in _modified:
 
 if console_encoding is None:
     console_encoding = 'utf-8'
-
-# Fix up transliteration_target
-if transliteration_target == 'not set':
-    if OSWIN32:
-        transliteration_target = console_encoding
-        warning(
-            'Running on Windows and transliteration_target is not set.\n'
-            'Please see {0}/Windows'.format(__url__))
-    else:
-        transliteration_target = None
-elif transliteration_target in ('None', 'none'):
-    transliteration_target = None
-
 
 if OSWIN32 and editor is None:
     editor = _detect_win32_editor()
