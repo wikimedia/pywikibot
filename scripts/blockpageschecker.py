@@ -228,21 +228,19 @@ def main(*args):
 
     # Process local args
     for arg in local_args:
-        if arg == '-always':
+        option, sep, value = arg.partition(':')
+        if option == '-always':
             always = True
-        elif arg == '-move':
+        elif option == '-move':
             moveBlockCheck = True
-        elif arg == '-show':
+        elif option == '-show':
             show = True
-        elif arg.startswith('-protectedpages'):
+        elif option in ('-protectedpages', '-moveprotected'):
             protectedpages = True
-            if len(arg) > 15:
-                namespace = int(arg[16:])
-        elif arg.startswith('-moveprotected'):
-            protectedpages = True
-            protectType = 'move'
-            if len(arg) > 14:
-                namespace = int(arg[15:])
+            if option == '-moveprotected':
+                protectType = 'move'
+            if value:
+                namespace = int(value)
         else:
             genFactory.handleArg(arg)
 
