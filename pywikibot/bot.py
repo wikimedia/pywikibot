@@ -1216,8 +1216,10 @@ class BaseBot(object):
         choice = pywikibot.input_choice(question,
                                         [('Yes', 'y'),
                                          ('No', 'N'),
-                                         ('All', 'a')],
-                                        default='N')
+                                         ('All', 'a'),
+                                         ('Quit', 'q')],
+                                        default='N',
+                                        automatic_quit=False)
 
         if choice == 'n':
             return False
