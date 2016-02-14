@@ -67,6 +67,10 @@ class i18nBot(object):
 
     def print_all(self):
         """Pretty print the dict as a file content to screen."""
+        if not self.dict:
+            print('No messages found, read them first.\n'
+                  'Use "run" or "to_json" methods')
+            return
         keys = list(self.dict.keys())
         keys.remove('qqq')
         keys.sort()
