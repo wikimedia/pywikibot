@@ -3,8 +3,8 @@
 """Script to determine the Pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2008
-# (C) xqt, 2010-2014
-# (C) Pywikibot team, 2007-2014
+# (C) xqt, 2010-2016
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,8 @@ def check_environ(environ_name):
     pywikibot.output('{0}: {1}'.format(environ_name, os.environ.get(environ_name, 'Not set')))
 
 
-if __name__ == '__main__':
+def main(*args):
+    """Print pywikibot version and important settings."""
     pywikibot.output('Pywikibot: %s' % getversion())
     pywikibot.output('Release version: %s' % pywikibot.__release__)
     pywikibot.output('requests version: %s' % requests.__version__)
@@ -81,3 +82,6 @@ if __name__ == '__main__':
                 elif sysop_name == username:
                     sysop_name = 'also sysop'
                 pywikibot.output('\t{0}: {1} ({2})'.format(lang, username, sysop_name))
+
+if __name__ == '__main__':
+    main()
