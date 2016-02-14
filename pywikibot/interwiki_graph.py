@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import itertools
 import threading
 
 try:
@@ -20,6 +21,7 @@ except ImportError as e:
 import pywikibot
 
 from pywikibot import config2 as config
+from pywikibot.tools import Counter
 
 # deprecated value
 pydotfound = not isinstance(pydot, ImportError)
@@ -150,6 +152,18 @@ class GraphDrawer(object):
         """Get label for page."""
         return '"%s:%s"' % (page.site.code, page.title())
 
+    def _octagon_site_set(self):
+        """Build a list of sites with more than one valid page."""
+        page_list = self.subject.found_in.keys()
+
+        # Only track sites of normal pages
+        each_site = [page.site for page in page_list
+                     if page.exists() and not page.isRedirectPage()]
+
+        return set(x[0] for x in itertools.takewhile(
+            lambda x: x[1] > 1,
+            Counter(each_site).most_common()))
+
     def addNode(self, page):
         """Add a node for page."""
         node = pydot.Node(self.getLabel(page), shape='rectangle')
@@ -168,11 +182,7 @@ class GraphDrawer(object):
         if page.namespace() != self.subject.originPage.namespace():
             node.set_color('green')
             node.set_style('filled,bold')
-        # if we found more than one valid page for this language:
-        # TODO: Only iterate through at most 2 elements
-        if len([p for p in self.subject.foundIn.keys()
-                if p.site == page.site and p.exists() and
-                not p.isRedirectPage()]) > 1:          # noqa
+        if page.site in self.octagon_sites:
             # mark conflict by octagonal node
             node.set_shape('octagon')
         self.graph.add_node(node)
@@ -232,6 +242,9 @@ class GraphDrawer(object):
         # create empty graph
         self.graph = pydot.Dot()
         # self.graph.set('concentrate', 'true')
+
+        self.octagon_sites = self._octagon_site_set()
+
         for page in self.subject.foundIn.keys():
             # a node for each found page
             self.addNode(page)

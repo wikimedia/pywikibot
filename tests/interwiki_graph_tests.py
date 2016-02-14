@@ -72,6 +72,8 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
 
         drawer = interwiki_graph.GraphDrawer(data)
 
+        self.assertEqual(set(['en']), drawer._octagon_site_set())
+
         drawer.createGraph()
 
         nodes = drawer.graph.obj_dict['nodes']
