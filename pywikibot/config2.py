@@ -564,6 +564,7 @@ interwiki_contents_on_disk = False
 # disambiguation_comment['wikipedia']['en'] = \
 #    "Robot-assisted disambiguation ([[WP:DPL|you can help!]]): %s"
 
+# Sorting order for alternatives. Set to True to ignore case for sorting order.
 sort_ignore_case = False
 
 # ############# IMAGE RELATED SETTINGS ##############
