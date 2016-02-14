@@ -2,7 +2,7 @@
 # -*- coding: utf-8  -*-
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -255,6 +255,7 @@ def create_user_config(args=None, force=False):
 
         res = re.findall("^(# ############# (?:"
                          "LOGFILE|"
+                         'EXTERNAL SCRIPT PATH|'
                          "INTERWIKI|"
                          "SOLVE_DISAMBIGUATION|"
                          "IMAGE RELATED|"

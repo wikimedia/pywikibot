@@ -33,7 +33,7 @@ build paths relative to base_dir:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -515,6 +515,22 @@ log_pywiki_repo_version = False
 # if True, include a lot of debugging info in logfile
 # (overrides log setting above)
 debug_log = []
+
+# ############# EXTERNAL SCRIPT PATH SETTING ##############
+# set your own script path to lookup for your script files.
+# your private script path must be located inside the
+# framework folder, subfolders must be delimited by '.'.
+# every folder must contain an (empty) __init__.py file.
+#
+# The search order is
+# 1. user_script_paths in the given order
+# 2. scripts
+# 3. scripts/maintenance
+# 4. scripts/archive
+#
+# sample:
+# user_script_paths = ['scripts.myscripts']
+user_script_paths = []
 
 # ############# INTERWIKI SETTINGS ##############
 
