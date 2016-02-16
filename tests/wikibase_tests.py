@@ -661,6 +661,14 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
+    def test_set_math(self):
+        """Test setting claim of math type."""
+        wikidata = self.get_repo()
+        claim = pywikibot.Claim(wikidata, 'P2535')
+        self.assertEqual(claim.type, 'math')
+        claim.setTarget('a^2 + b^2 = c^2')
+        self.assertEqual(claim.target, 'a^2 + b^2 = c^2')
+
     def test_set_date(self):
         """Test setting claim of time type."""
         wikidata = self.get_repo()
