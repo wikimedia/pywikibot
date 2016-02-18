@@ -54,6 +54,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
         """Replace all source links by target."""
         mysite = pywikibot.Site()
         linktrail = mysite.linktrail()
+        catNamespace = '|'.join(mysite.namespaces.CATEGORY)
 
         # make a backup of the original text so we can show the changes later
         linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?'
@@ -108,7 +109,11 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             # remove preleading ":"
             if new_page_title[0] == ':':
                 new_page_title = new_page_title[1:]
-
+            
+            # prefix category-links with ":"
+            if re.match('^('+catNamespace+')', new_page_title):
+                new_page_title = ':' + new_page_title
+            
             if (new_page_title == link_text and not section):
                 newlink = "[[%s]]" % new_page_title
             # check if we can create a link with trailing characters instead of a
