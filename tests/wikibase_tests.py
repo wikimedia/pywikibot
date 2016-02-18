@@ -669,6 +669,14 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget('a^2 + b^2 = c^2')
         self.assertEqual(claim.target, 'a^2 + b^2 = c^2')
 
+    def test_set_identifier(self):
+        """Test setting claim of external-id type."""
+        wikidata = self.get_repo()
+        claim = pywikibot.Claim(wikidata, 'P214')
+        self.assertEqual(claim.type, 'external-id')
+        claim.setTarget('Any string is avalid identifier')
+        self.assertEqual(claim.target, 'Any string is avalid identifier')
+
     def test_set_date(self):
         """Test setting claim of time type."""
         wikidata = self.get_repo()
@@ -682,12 +690,12 @@ class TestClaimSetValue(WikidataTestCase):
     def test_set_incorrect_target_value(self):
         """Test setting claim of the incorrect value."""
         wikidata = self.get_repo()
-        claim = pywikibot.Claim(wikidata, 'P569')
-        self.assertRaises(ValueError, claim.setTarget, 'foo')
-        claim = pywikibot.Claim(wikidata, 'P856')
-        self.assertRaises(ValueError, claim.setTarget, pywikibot.WbTime(2001, site=wikidata))
-        claim = pywikibot.Claim(wikidata, 'P1450')
-        self.assertRaises(ValueError, claim.setTarget, 'foo')
+        date_claim = pywikibot.Claim(wikidata, 'P569')
+        self.assertRaises(ValueError, date_claim.setTarget, 'foo')
+        url_claim = pywikibot.Claim(wikidata, 'P856')
+        self.assertRaises(ValueError, url_claim.setTarget, pywikibot.WbTime(2001, site=wikidata))
+        mono_claim = pywikibot.Claim(wikidata, 'P1450')
+        self.assertRaises(ValueError, mono_claim.setTarget, 'foo')
 
 
 class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
