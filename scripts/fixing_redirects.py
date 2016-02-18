@@ -103,7 +103,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             if link_text[0].isupper() or link_text[0].isdigit():
                 new_page_title = targetPage.title()
             else:
-                new_page_title = first_lower(targetPage.title())
+                new_page_title = firstcap(targetPage.title())
 
             # remove preleading ":"
             if new_page_title[0] == ':':
