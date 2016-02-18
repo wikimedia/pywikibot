@@ -2993,11 +2993,18 @@ class LoginManager(login.LoginManager):
                 pywikibot.warning(u"Too many tries, waiting %s seconds before retrying."
                                   % diff.seconds)
                 time.sleep(diff.seconds)
+
+        # base login request
         login_request = self.site._request(
             use_get=False,
             parameters=dict(action='login',
                             lgname=self.username,
                             lgpassword=self.password))
+
+        # get token using meta=tokens if supported
+        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.27'):
+            login_request["lgtoken"] = self.get_login_token()
+
         self.site._loginstatus = -2
         while True:
             login_result = login_request.submit()
@@ -3013,6 +3020,7 @@ class LoginManager(login.LoginManager):
                 self.username = login_result['login']['lgusername']
                 return "\n".join(cookies)
             elif login_result['login']['result'] == "NeedToken":
+                # Kept for backwards compatibility
                 token = login_result['login']['token']
                 login_request["lgtoken"] = token
                 continue
@@ -3027,6 +3035,25 @@ class LoginManager(login.LoginManager):
     def storecookiedata(self, data):
         """Ignore data; cookies are set by threadedhttp module."""
         http.cookie_jar.save()
+
+    def get_login_token(self):
+        """Fetch login token from action=query&meta=tokens.
+
+        Requires MediaWiki >= 1.27.
+
+        @return: login token
+        @rtype: str
+        """
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.27'):
+            raise NotImplementedError('The method get_login_token() requires '
+                                      'at least MediaWiki version 1.27.')
+        login_token_request = self.site._request(
+            use_get=False,
+            parameters=dict(action='query',
+                            meta='tokens',
+                            type='login'))
+        login_token_result = login_token_request.submit()
+        return login_token_result['query']['tokens'].get('logintoken')
 
 
 def encode_url(query):
