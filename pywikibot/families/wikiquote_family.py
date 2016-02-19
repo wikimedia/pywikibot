@@ -88,23 +88,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'wo', 'zh',
         ]
 
-        # Which languages have a special order for putting interlanguage links,
-        # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
-        # languages are put in the order given there. All other languages are
-        # put after those, in code-alphabetical order.
-        self.interwiki_putfirst = {
-            'en': self.alphabetic,
-            'fi': self.alphabetic,
-            'fr': self.alphabetic,
-            'he': ['en'],
-            'hu': ['en'],
-            'pl': self.alphabetic,
-            'simple': self.alphabetic,
-            'pt': self.alphabetic,
-        }
-
         # Subpages for documentation.
         # TODO: List is incomplete, to be completed for missing languages.
         self.doc_subpages = {
