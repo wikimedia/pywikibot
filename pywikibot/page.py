@@ -89,6 +89,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
     Will be subclassed by Page, WikibasePage, and FlowPage.
     """
 
+    _cache_attrs = (
+        '_text', '_pageid', '_catinfo', '_templates', '_protection',
+        '_contentmodel', '_langlinks', '_isredir', '_coords',
+        '_preloadedtext', '_timestamp', '_applicable_protections',
+        '_flowinfo', '_quality', '_pageprops', '_revid', '_quality_text'
+    )
+
     def __init__(self, source, title=u"", ns=0):
         """
         Instantiate a Page object.
@@ -1270,12 +1277,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.watch(self, unwatch)
 
+    def clear_cache(self):
+        """Clear the cached attributes of the page."""
+        self._revisions = {}
+        for attr in self._cache_attrs:
+            try:
+                delattr(self, attr)
+            except AttributeError:
+                pass
+
     def purge(self, **kwargs):
         """
         Purge the server's cache for this page.
 
         @rtype: bool
         """
+        self.clear_cache()
         return self.site.purgepages([self], **kwargs)
 
     def touch(self, callback=None, botflag=False, **kwargs):
@@ -3579,7 +3596,7 @@ class WikibasePage(BasePage):
 
     @latest_revision_id.deleter
     def latest_revision_id(self, value):
-        del self._revid
+        self.clear_cache()
 
     @staticmethod
     def _normalizeLanguages(data):

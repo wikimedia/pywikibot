@@ -5127,6 +5127,8 @@ class APISite(BaseSite):
                             % err.code,
                             _logger)
             raise
+        else:
+            page.clear_cache()
         finally:
             self.unlock_page(page)
 
