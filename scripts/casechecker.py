@@ -10,6 +10,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 __version__ = '$Id$'
 
 import codecs
+import itertools
 import os
 import re
 from string import ascii_letters
@@ -27,22 +28,6 @@ from scripts.category import CategoryMoveRobot as CategoryMoveBot
 if sys.version_info[0] > 2:
     xrange = range
 
-
-#
-# Permutations code was taken from
-# https://code.activestate.com/recipes/190465/
-#
-def xuniqueCombinations(items, n):
-    if n == 0:
-        yield []
-    else:
-        for i in xrange(len(items)):
-            for cc in xuniqueCombinations(items[i + 1:], n - 1):
-                yield [items[i]] + cc
-# End of permutation code
-#
-
-#
 # Windows Concole colors
 # This code makes this script Windows ONLY!!!
 # Feel free to adapt it to another platform
@@ -609,8 +594,8 @@ class CaseChecker(object):
                 # latin character.
                 for itemCntToPick in xrange(0, len(ambigBadWords) + 1):
                     title2 = title
-                    for uc in xuniqueCombinations(list(ambigBadWords),
-                                                  itemCntToPick):
+                    for uc in itertools.combinations(list(ambigBadWords),
+                                                     itemCntToPick):
                         wordsToLat = ambigBadWords.copy()
                         for bw in uc:
                             title2 = title2.replace(bw, mapLcl[bw])
