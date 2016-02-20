@@ -89,8 +89,6 @@ This script understands the following command-line arguments:
 
    -quiet          Prevents users without contributions are displayed
 
-   -quick          Provide quick check by API bulk-retrieve user datas
-
 ********************************* GUIDE ***********************************
 
 Report, Bad and white list guide:
@@ -147,12 +145,6 @@ Example:
 NOTE: The white space and <pre></pre> aren't required but I suggest you to
       use them.
 
-*************************** Known issues/FIXMEs ****************************
-*                                                                          *
-* The regex to load the user might be slightly different from project to   *
-* project. (In this case, write to Filnik or the PWRF for help...)         *
-* Use a class to group together the functions used.                        *
-*                                                                          *
 ******************************** Badwords **********************************
 
 The list of Badwords of the code is opened. If you think that a word is
@@ -173,8 +165,8 @@ badwords at all but can be used for some bad-nickname.
 # (C) Filnik, 2007-2011
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
-# (C) xqt, 2009-2015
-# (C) Pywikibot team, 2008-2015
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -193,9 +185,9 @@ from random import choice
 
 import pywikibot
 
-from pywikibot import config
-from pywikibot import i18n
+from pywikibot import config, i18n
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
     unicode = str
@@ -206,16 +198,11 @@ locale.setlocale(locale.LC_ALL, '')
 # page/user/summary/etc so the need to specify language and project have
 # been eliminated.
 # FIXME: Not all language/project combinations have been defined yet.
-#       Add the following strings to customise for a language:
-#       logbook, talk_page, netext, user, con, report_page
-#       bad_pag, report_text, logt, random_sign and whitelist_pg.
+#        Add the following strings to customise for a language:
+#        logbook, talk_page, netext, user, con, report_page
+#        bad_pag, report_text, logt, random_sign and whitelist_pg.
 
 ############################################################################
-############################################################################
-############################################################################
-
-# The text below are dictionaries. Copy the 'en' line, change 'en' in your
-# language (e.g. 'de') and modify/translate the text.
 
 # The page where the bot will save the log (e.g. Wikipedia:Welcome log).
 #
@@ -442,7 +429,6 @@ class Global(object):
     defaultSign = '--~~~~'  # default signature
     queryLimit = 50         # number of users that the bot load to check
     quiet = False           # Prevents users without contributions are displayed
-    quick = False           # Provide quick check by API bulk-retrieve user datas
 
 
 class WelcomeBot(object):
@@ -732,12 +718,8 @@ class WelcomeBot(object):
     def run(self):
         while True:
             welcomed_count = 0
-            if globalvar.quick and self.site.has_api():
-                us = [x for x in self.parseNewUserLog()]
-                showStatus()
-                pywikibot.User.getall(self.site, us)
-            else:
-                us = (pywikibot.User(self.site, users.user()) for users in self.parseNewUserLog())
+            us = (pywikibot.User(self.site, users.user())
+                  for users in self.parseNewUserLog())
             for users in us:
                 if users.isBlocked():
                     showStatus(3)
@@ -982,7 +964,7 @@ def main(*args):
         elif arg == '-quiet':
             globalvar.quiet = True
         elif arg == '-quick':
-            globalvar.quick = True
+            issue_deprecation_warning('The usage of "-quick" option', None, 2)
 
     # Filename and Pywikibot path
     # file where is stored the random signature index
