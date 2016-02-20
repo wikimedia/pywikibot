@@ -121,6 +121,7 @@ class ImageTransferBot(object):
 
     def __init__(self, generator, targetSite=None, interwiki=False,
                  keep_name=False, ignore_warning=False):
+        """Constructor."""
         self.generator = generator
         self.interwiki = interwiki
         self.targetSite = targetSite
@@ -197,6 +198,7 @@ class ImageTransferBot(object):
                                         summary=reason)
 
     def showImageList(self, imagelist):
+        """Print image list."""
         for i in range(len(imagelist)):
             image = imagelist[i]
             print("-" * 60)
@@ -232,6 +234,7 @@ class ImageTransferBot(object):
         print("=" * 60)
 
     def run(self):
+        """Run the bot."""
         for page in self.generator:
             if self.interwiki:
                 imagelist = []

@@ -63,9 +63,11 @@ class ReCheck(object):
     """Helper class."""
 
     def __init__(self):
+        """Constructor."""
         self.result = None
 
     def check(self, pattern, text):
+        """Search pattern."""
         self.result = pattern.search(text)
         return self.result
 
@@ -175,12 +177,16 @@ def main(*args):
         robot = None
 
 
-# This function grabs the wiki source of a category page and attempts to
-# extract a link to the CFD per-day discussion page from the CFD template.
-# If the CFD template is not there, it will return the value of the second
-# parameter, which is essentially a fallback that is extracted from the
-# per-day subheadings on the working page.
 def findDay(pageTitle, oldDay):
+    """
+    Find day link from CFD template.
+
+    This function grabs the wiki source of a category page and attempts to
+    extract a link to the CFD per-day discussion page from the CFD template.
+    If the CFD template is not there, it will return the value of the second
+    parameter, which is essentially a fallback that is extracted from the
+    per-day subheadings on the working page.
+    """
     page = pywikibot.Page(pywikibot.Site(), u"Category:" + pageTitle)
     try:
         pageSrc = page.text

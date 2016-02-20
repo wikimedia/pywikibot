@@ -575,21 +575,25 @@ class checkImagesBot(object):
     @property
     @deprecated
     def project(self):
+        """Return family name."""
         return self.site.family.name
 
     @property
     @deprecated
     def botolist(self):
+        """Return bots."""
         return self.bots
 
     @botolist.setter
     @deprecated
     def botolist(self, value):
+        """Set bots."""
         self.bots = value
 
     @property
     @deprecated
     def botnick(self):
+        """Return username."""
         return self.site.username()
 
     def setParameters(self, imageName):

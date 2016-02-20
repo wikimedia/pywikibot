@@ -49,6 +49,7 @@ class BaseRevertBot(object):
     """
 
     def __init__(self, site, user=None, comment=None, rollback=False):
+        """Constructor."""
         self.site = site
         self.comment = comment
         self.user = user
@@ -57,6 +58,7 @@ class BaseRevertBot(object):
         self.rollback = rollback
 
     def get_contributions(self, max=500, ns=None):
+        """Get contributions."""
         count = 0
         iterator = pywikibot.tools.empty_iterator()
         never_continue = False
@@ -73,7 +75,7 @@ class BaseRevertBot(object):
                 yield item
 
     def revert_contribs(self, callback=None):
-
+        """Revert contrubutions."""
         if callback is None:
             callback = self.callback
 
@@ -92,9 +94,11 @@ class BaseRevertBot(object):
                 return
 
     def callback(self, item):
+        """Callback funktion."""
         return 'top' in item
 
     def revert(self, item):
+        """Revert a single item."""
         page = pywikibot.Page(self.site, item['title'])
         history = list(page.revisions(total=2))
         if len(history) > 1:
@@ -133,6 +137,7 @@ class BaseRevertBot(object):
         return u"The edit(s) made in %s by %s was rollbacked" % (page.title(), self.user)
 
     def log(self, msg):
+        """Log the message msg."""
         pywikibot.output(msg)
 
 
@@ -141,6 +146,7 @@ class myRevertBot(BaseRevertBot):
     """Example revert bot."""
 
     def callback(self, item):
+        """Callback funktion for 'private' revert bot."""
         if 'top' in item:
             page = pywikibot.Page(self.site, item['title'])
             text = page.get(get_redirect=True)

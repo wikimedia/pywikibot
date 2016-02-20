@@ -196,6 +196,7 @@ class RefLink(object):
     """Container to handle a single bare reference."""
 
     def __init__(self, link, name):
+        """Constructor."""
         self.refname = name
         self.link = link
         self.site = pywikibot.Site()
@@ -273,6 +274,7 @@ class DuplicateReferences(object):
     """
 
     def __init__(self):
+        """Constructor."""
         # Match references
         self.REFS = re.compile(
             r'(?i)<ref(?P<params>[^>/]*)>(?P<content>.*?)</ref>')
@@ -283,6 +285,7 @@ class DuplicateReferences(object):
         self.autogen = i18n.twtranslate(pywikibot.Site(), 'reflinks-autogen')
 
     def process(self, text):
+        """Process the page."""
         # keys are ref groups
         # values are a dict where :
         #   keys are ref content

@@ -45,6 +45,7 @@ exceptions = ['www']
 
 
 def update_family(families):
+    """Update family files."""
     for family in families or familiesDict.keys():
         pywikibot.output('\nChecking family %s:' % family)
 

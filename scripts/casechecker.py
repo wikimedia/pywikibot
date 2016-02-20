@@ -55,6 +55,7 @@ except:
 
 
 def SetColor(color):
+    """Set windows color."""
     if std_out_handle:
         try:
             return ctypes.windll.kernel32.SetConsoleTextAttribute(
@@ -128,7 +129,7 @@ class CaseChecker(object):
     filterredir = 'nonredirects'
 
     def __init__(self):
-
+        """Constructor with arg parsing."""
         for arg in pywikibot.handle_args():
             if arg.startswith('-from'):
                 if arg.startswith('-from:'):
@@ -281,6 +282,7 @@ class CaseChecker(object):
                              % self.site.code)
 
     def RunQuery(self, params):
+        """API query."""
         while True:
             # Get data
             req = api.Request(**params)
@@ -314,6 +316,7 @@ class CaseChecker(object):
             continue
 
     def Run(self):
+        """Run the bot."""
         try:
             self.lastLetter = ''
 
@@ -343,6 +346,7 @@ class CaseChecker(object):
             raise
 
     def ProcessDataBlock(self, data):
+        """Process data block given by RunQuery()."""
         if 'query' not in data or 'pages' not in data['query']:
             return
 
@@ -489,15 +493,18 @@ class CaseChecker(object):
                     raise ValueError(u'Stopping because we are done')
 
     def WikiLog(self, text):
+        """Write log."""
         pywikibot.output(text)
         self.wikilog.write(text + u'\n')
         self.wikilog.flush()
 
     def FindBadWords(self, title):
+        """Retrieve bad words."""
         for m in self.badWordPtrn.finditer(title):
             yield title[m.span()[0]:m.span()[1]]
 
     def ProcessTitle(self, title):
+        """Process title."""
         badWords = list(self.FindBadWords(title))
         if len(badWords) > 0:
             # Allow known words, allow any roman numerals with local suffixes
@@ -612,6 +619,7 @@ class CaseChecker(object):
         return (infoText, possibleAlternatives)
 
     def PickTarget(self, title, original, candidates):
+        """Pick target from candidates."""
         if len(candidates) == 0:
             return
         if len(candidates) == 1:
@@ -666,6 +674,7 @@ class CaseChecker(object):
                 return candidates[int(choice) - 1]
 
     def ColorCodeWord(self, word, toScreen=False):
+        """Colorize code word."""
         if not toScreen:
             res = u"<b>"
         lastIsCyr = word[0] in self.localLtr
@@ -706,6 +715,7 @@ class CaseChecker(object):
             return res + self.suffixClr + u"</b>"
 
     def AddNoSuggestionTitle(self, title):
+        """Add backlinks to log."""
         if title in self.seenUnresolvedLinks:
             return True
         self.seenUnresolvedLinks.add(title)
@@ -737,6 +747,7 @@ class CaseChecker(object):
         return False
 
     def PutNewPage(self, pageObj, pageTxt, msg):
+        """Save new page."""
         title = pageObj.title(asLink=True, textlink=True)
         coloredMsg = u', '.join([self.ColorCodeWord(m) for m in msg])
         if pageObj.text == pageTxt:
@@ -761,29 +772,34 @@ class CaseChecker(object):
         return False
 
     def MakeMoveSummary(self, fromTitle, toTitle):
+        """Move summary from i18n."""
         return i18n.twtranslate(self.site, "casechecker-replacement-linklist",
                                 {'source': fromTitle, 'target': toTitle})
 
     def MakeLink(self, title, colorcode=True):
+        """Create a colored link string."""
         prf = u'' if self.Page(title).namespace() == 0 else u':'
         cc = u'|««« %s »»»' % self.ColorCodeWord(title) if colorcode else u''
         return u"[[%s%s%s]]" % (prf, title, cc)
 
     def OpenLogFile(self, filename):
+        """Open logfile."""
         try:
             return codecs.open(filename, 'a', 'utf-8')
         except IOError:
             return codecs.open(filename, 'w', 'utf-8')
 
     def AppendLineToLog(self, filename, text):
+        """Write text to logfile."""
         with self.OpenLogFile(filename) as f:
             f.write(text + u'\n')
 
     def Page(self, title):
+        """Create Page object from title."""
         return pywikibot.Page(self.site, title)
 
     def ReplaceLink(self, text, oldtxt, newtxt):
-
+        """Replace links."""
         frmParts = [s.strip(self.stripChars)
                     for s in self.wordBreaker.split(oldtxt)]
         toParts = [s.strip(self.stripChars)

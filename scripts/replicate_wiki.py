@@ -75,6 +75,7 @@ class SyncSites(object):
     """Work is done in here."""
 
     def __init__(self, options):
+        """Constructor."""
         self.options = options
 
         if options.original_wiki:
@@ -184,6 +185,7 @@ class SyncSites(object):
             sync_overview_page.save(self.put_message(site))
 
     def put_message(self, site):
+        """Return synchonization message."""
         return ('%s replicate_wiki.py synchronization from %s'
                 % (site.user(), str(self.original)))
 
@@ -234,6 +236,14 @@ class SyncSites(object):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     my_args = pywikibot.handle_args(args)
 
     parser = ArgumentParser(add_help=False)

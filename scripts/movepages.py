@@ -63,6 +63,7 @@ class MovePagesBot(MultipleSitesBot):
     """Page move bot."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'prefix': None,
             'noredirect': False,
@@ -78,6 +79,7 @@ class MovePagesBot(MultipleSitesBot):
         self.noNamespace = False
 
     def moveOne(self, page, newPageTitle):
+        """Move on page to newPageTitle."""
         try:
             msg = self.getOption('summary')
             if not msg:
@@ -91,6 +93,7 @@ class MovePagesBot(MultipleSitesBot):
             pywikibot.output(error)
 
     def treat(self, page):
+        """Treat a single page."""
         self.current_page = page
         if self.getOption('skipredirects') and page.isRedirectPage():
             pywikibot.output(u'Page %s is a redirect; skipping.' % page.title())

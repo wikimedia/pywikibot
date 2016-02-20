@@ -670,12 +670,14 @@ class StoredPage(pywikibot.Page):
               '_deletedRevs']
 
     def SPdeleteStore():
+        """Delete SPStore."""
         if StoredPage.SPpath:
             del StoredPage.SPstore
             os.unlink(StoredPage.SPpath)
     SPdeleteStore = staticmethod(SPdeleteStore)
 
     def __init__(self, page):
+        """Constructor."""
         for attr in StoredPage.SPcopy:
             setattr(self, attr, getattr(page, attr))
 
@@ -693,13 +695,16 @@ class StoredPage(pywikibot.Page):
         self.SPcontentSet = False
 
     def SPgetContents(self):
+        """Get stored content."""
         return StoredPage.SPstore[self.SPkey]
 
     def SPsetContents(self, contents):
+        """Store content."""
         self.SPcontentSet = True
         StoredPage.SPstore[self.SPkey] = contents
 
     def SPdelContents(self):
+        """Delete stored content."""
         if self.SPcontentSet:
             del StoredPage.SPstore[self.SPkey]
 
@@ -715,26 +720,23 @@ class PageTree(object):
     """
 
     def __init__(self):
-        # self.tree :
-        # Dictionary:
-        # keys: Site
-        # values: list of pages
-        # All pages found within Site are kept in
-        # self.tree[site]
+        """Constructor.
 
-        # While using dict values would be faster for
-        # the remove() operation,
-        # keeping list values is important, because
-        # the order in which the pages were found matters:
-        # the earlier a page is found, the closer it is to the
-        # Subject.originPage. Chances are that pages found within
-        # 2 interwiki distance from the originPage are more related
-        # to the original topic than pages found later on, after
-        # 3, 4, 5 or more interwiki hops.
+        While using dict values would be faster for the remove() operation,
+        keeping list values is important, because the order in which the pages
+        were found matters: the earlier a page is found, the closer it is to the
+        Subject.originPage. Chances are that pages found within 2 interwiki
+        distance from the originPage are more related to the original topic
+        than pages found later on, after 3, 4, 5 or more interwiki hops.
 
-        # Keeping this order is hence important to display an ordered
-        # list of pages to the user when he'll be asked to resolve
-        # conflicts.
+        Keeping this order is hence important to display an ordered
+        list of pages to the user when he'll be asked to resolve
+        conflicts.
+
+        @ivar tree: dictionary with Site as keys and list of page as values.
+            All pages found within Site are kept in self.tree[site].
+        @type tree: dict
+        """
         self.tree = {}
         self.size = 0
 
@@ -747,9 +749,11 @@ class PageTree(object):
             pass
 
     def __len__(self):
+        """length of the object."""
         return self.size
 
     def add(self, page):
+        """Add a page to the tree."""
         site = page.site
         if site not in self.tree:
             self.tree[site] = []
@@ -757,6 +761,7 @@ class PageTree(object):
         self.size += 1
 
     def remove(self, page):
+        """Remove a page from the tree."""
         try:
             self.tree[page.site].remove(page)
             self.size -= 1
@@ -777,6 +782,7 @@ class PageTree(object):
             yield site, len(d)
 
     def __iter__(self):
+        """Iterate through all items of the tree."""
         for site, plist in self.tree.items():
             for page in plist:
                 yield page
@@ -784,7 +790,7 @@ class PageTree(object):
 
 class Subject(interwiki_graph.Subject):
 
-    u"""
+    """
     Class to follow the progress of a single 'subject'.
 
     (i.e. a page with all its translations)
@@ -1033,6 +1039,7 @@ class Subject(interwiki_graph.Subject):
             return True
 
     def skipPage(self, page, target, counter):
+        """Return whether page has to be skipped."""
         return self.isIgnored(target) or \
             self.namespaceMismatch(page, target, counter) or \
             self.wiktionaryMismatch(target)
@@ -1114,6 +1121,7 @@ class Subject(interwiki_graph.Subject):
             return False
 
     def wiktionaryMismatch(self, page):
+        """Check for ignoring pages."""
         if self.originPage and globalvar.same == 'wiktionary':
             if page.title().lower() != self.originPage.title().lower():
                 pywikibot.output(u"NOTE: Ignoring %s for %s in wiktionary mode"
@@ -1205,6 +1213,7 @@ class Subject(interwiki_graph.Subject):
         return (False, None)
 
     def isIgnored(self, page):
+        """Return True if pages is to be ignored."""
         if page.site.lang in globalvar.neverlink:
             pywikibot.output(u"Skipping link %s to an ignored language" % page)
             return True
@@ -1214,6 +1223,7 @@ class Subject(interwiki_graph.Subject):
         return False
 
     def reportInterwikilessPage(self, page):
+        """Report interwikiless page."""
         if not globalvar.quiet:
             pywikibot.output(u"NOTE: %s does not have any interwiki links"
                              % self.originPage)
@@ -1225,6 +1235,7 @@ class Subject(interwiki_graph.Subject):
             f.close()
 
     def askForHints(self, counter):
+        """Ask for hints to other sites."""
         if not self.workonme:
             # Do not ask hints for pages that we don't work on anyway
             return
@@ -1510,6 +1521,7 @@ class Subject(interwiki_graph.Subject):
             self.problemfound = True
 
     def whereReport(self, page, indent=4):
+        """Report found interlanguage links with conflicts."""
         for page2 in sorted(self.foundIn[page]):
             if page2 is None:
                 pywikibot.output(u" " * indent + "Given as a hint.")
@@ -1517,6 +1529,7 @@ class Subject(interwiki_graph.Subject):
                 pywikibot.output(u" " * indent + unicode(page2))
 
     def assemble(self):
+        """Assemble language links."""
         # No errors have been seen so far, except....
         errorCount = self.problemfound
         # Build up a dictionary of all pages found, with the site as key.
@@ -2081,6 +2094,7 @@ class InterwikiBot(object):
         self.generateUntil = until
 
     def dump(self, append=True):
+        """Write dump file."""
         site = pywikibot.Site()
         dumpfn = pywikibot.config.datafilepath(
             'data',
@@ -2271,8 +2285,8 @@ class InterwikiBot(object):
         return True
 
     def queryStep(self):
+        """Delete the ones that are done now."""
         self.oneQuery()
-        # Delete the ones that are done now.
         for i in range(len(self.subjects) - 1, -1, -1):
             subj = self.subjects[i]
             if subj.isDone():
@@ -2301,11 +2315,12 @@ class InterwikiBot(object):
             self.queryStep()
 
     def __len__(self):
+        """Return length of subjects."""
         return len(self.subjects)
 
 
 def compareLanguages(old, new, insite):
-
+    """Compare changes and setup i18n message."""
     oldiw = set(old)
     newiw = set(new)
 
@@ -2357,6 +2372,7 @@ def compareLanguages(old, new, insite):
 
 
 def botMayEdit(page):
+    """Test for allowed edits."""
     tmpl = []
     try:
         tmpl, loc = moved_links[page.site.code]
@@ -2378,6 +2394,7 @@ def botMayEdit(page):
 
 
 def readWarnfile(filename, bot):
+    """Read old interlanguage conficts."""
     import warnfile
     reader = warnfile.WarnfileReader(filename)
     # we won't use removeHints

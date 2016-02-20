@@ -228,6 +228,7 @@ moveToCommonsTemplate = {
 
 
 def pageTextPost(url, parameters):
+    """Get data from commons helper page."""
     gotInfo = False
     while not gotInfo:
         try:
@@ -247,12 +248,14 @@ class imageTransfer(threading.Thread):
     """Facilitate transfer of image/file to commons."""
 
     def __init__(self, imagePage, newname, category):
+        """Constructor."""
         self.imagePage = imagePage
         self.newname = newname
         self.category = category
         threading.Thread.__init__(self)
 
     def run(self):
+        """Run the bot."""
         tosend = {'language': self.imagePage.site.language().encode('utf-8'),
                   'image': self.imagePage.title(
                       withNamespace=False).encode('utf-8'),
@@ -395,6 +398,7 @@ class TkdialogIC(Tkdialog):
 
     def __init__(self, image_title, content, uploader, url, templates,
                  commonsconflict=0):
+        """Constructor."""
         super(TkdialogIC, self).__init__()
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)

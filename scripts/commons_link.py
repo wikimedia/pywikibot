@@ -51,6 +51,7 @@ class CommonsLinkBot(Bot):
     """Commons linking bot."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'action': None,
         })
@@ -62,6 +63,7 @@ class CommonsLinkBot(Bot):
         self.findTemplate3 = re.compile(r'\{\{[Cc]ommons')
 
     def run(self):
+        """Run the bot."""
         if not all((self.getOption('action'), self.generator)):
             return
         catmode = (self.getOption('action') == 'categories')

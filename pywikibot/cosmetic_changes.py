@@ -617,6 +617,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def resolveHtmlEntities(self, text):
+        """"Resolve html entities."""
         ignore = [
             38,     # Ampersand (&amp;)
             39,     # Single quotation mark (&quot;) - bug T26093
@@ -697,6 +698,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def replaceDeprecatedTemplates(self, text):
+        """Replace deprecated templates."""
         exceptions = ['comment', 'math', 'nowiki', 'pre']
         builder = _MultiTemplateMatchBuilder(self.site)
 
@@ -720,7 +722,9 @@ class CosmeticChangesToolkit(object):
 
     # from fixes.py
     def fixSyntaxSave(self, text):
+        """Convert weblinks to wikilink, fix link syntax."""
         def replace_link(match):
+            """Create a string to replace a single link."""
             replacement = '[[' + match.group('link')
             if match.group('title'):
                 replacement += '|' + match.group('title')
@@ -781,7 +785,9 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixHtml(self, text):
+        """Relace html markups with wikitext markups."""
         def replace_header(match):
+            """Create a header string for replacing."""
             depth = int(match.group(1))
             return r'{0} {1} {0}'.format('=' * depth, match.group(2))
 
@@ -811,6 +817,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixReferences(self, text):
+        """Fix references tags."""
         # See also https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
@@ -827,9 +834,9 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixStyle(self, text):
+        """Convert prettytable to wikitable class."""
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
-        # convert prettytable to wikitable class
         if self.site.code in ('de', 'en'):
             text = textlib.replaceExcept(text,
                                          r'(class="[^"]*)prettytable([^"]*")',
@@ -837,6 +844,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixTypo(self, text):
+        """Fix units."""
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace', 'gallery', 'hyperlink', 'interwiki', 'link']
         # change <number> ccm -> <number> cm³
@@ -855,6 +863,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixArabicLetters(self, text):
+        """Fix arabic and persian letters."""
         if self.site.code not in ['ckb', 'fa']:
             return text
         exceptions = [

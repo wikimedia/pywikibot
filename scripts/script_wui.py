@@ -125,6 +125,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
     """WikiUserInterface bot."""
 
     def __init__(self, *arg):
+        """Constructor."""
         pywikibot.output(color_format(
             '{lightgreen}* Initialization of bot{default}'))
 

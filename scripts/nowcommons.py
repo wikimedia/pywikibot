@@ -193,6 +193,7 @@ class NowCommonsDeleteBot(Bot):
     """Bot to delete migrated files."""
 
     def __init__(self, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'replace': False,
             'replacealways': False,
@@ -207,6 +208,7 @@ class NowCommonsDeleteBot(Bot):
             sys.exit('Do not run this bot on Commons!')
 
     def ncTemplates(self):
+        """Return nowcommons templates."""
         if self.site.lang in nowCommons:
             return nowCommons[self.site.lang]
         else:
@@ -221,6 +223,7 @@ class NowCommonsDeleteBot(Bot):
         return self._nc_templates
 
     def useHashGenerator(self):
+        """Use hash generator."""
         # https://toolserver.org/~multichill/nowcommons.php?language=it&page=2&filter=
         lang = self.site.lang
         num_page = 0
@@ -280,6 +283,7 @@ class NowCommonsDeleteBot(Bot):
                 break
 
     def getPageGenerator(self):
+        """Generator method."""
         if self.getOption('use_hash'):
             gen = self.useHashGenerator()
         else:
@@ -292,6 +296,7 @@ class NowCommonsDeleteBot(Bot):
         return gen
 
     def findFilenameOnCommons(self, localImagePage):
+        """Find filename on Commons."""
         filenameOnCommons = None
         for templateName, params in localImagePage.templatesWithParams():
             if templateName in self.nc_templates:
@@ -320,6 +325,7 @@ class NowCommonsDeleteBot(Bot):
                 return filenameOnCommons
 
     def run(self):
+        """Run the bot."""
         commons = pywikibot.Site('commons', 'commons')
         comment = i18n.twtranslate(self.site, 'imagetransfer-nowcommons_notice')
 

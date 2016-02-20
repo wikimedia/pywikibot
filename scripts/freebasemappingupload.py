@@ -36,6 +36,7 @@ class FreebaseMapperRobot(object):
     """Freebase Mapping bot."""
 
     def __init__(self, filename):
+        """Constructor."""
         self.repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
         self.filename = filename
         if not os.path.exists(self.filename):
@@ -44,6 +45,7 @@ class FreebaseMapperRobot(object):
             sys.exit(1)
 
     def run(self):
+        """Run the bot."""
         # Set up some items we will use a lot.
         self.claim = pywikibot.Claim(self.repo, 'P646')  # freebase mapping
         # And sources!
@@ -58,6 +60,7 @@ class FreebaseMapperRobot(object):
             self.processLine(line.strip())
 
     def processLine(self, line):
+        """Process a single line."""
         if not line or line.startswith('#'):
             return
         mid, sameas, qid, dot = line.split()

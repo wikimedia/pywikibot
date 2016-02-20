@@ -42,24 +42,30 @@ class TestSectionFunctions(TestCase):
     net = False
 
     def setUp(self):
+        """Setup tests."""
         self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                            % {'LS': config.LS})
         super(TestSectionFunctions, self).setUp()
 
     def contains(self, fn, sn):
+        """Invoke does_text_contain_section()."""
         return textlib.does_text_contain_section(
             files[fn], sn)
 
     def assertContains(self, fn, sn, *args, **kwargs):
+        """Test that files[fn] contains sn."""
         self.assertEqual(self.contains(fn, sn), True, *args, **kwargs)
 
     def assertNotContains(self, fn, sn, *args, **kwargs):
+        """Test that files[fn] does not contain sn."""
         self.assertEqual(self.contains(fn, sn), False, *args, **kwargs)
 
     def testCurrentBehaviour(self):
+        """Test that 'Editing' is found."""
         self.assertContains("enwiki_help_editing", u"Editing")
 
     def testSpacesInSection(self):
+        """Test with spaces in section."""
         self.assertContains("enwiki_help_editing", u"Minor_edits")
         self.assertNotContains('enwiki_help_editing', '#Minor edits',
                                "Incorrect, '#Minor edits' does not work")
@@ -70,17 +76,20 @@ class TestSectionFunctions(TestCase):
 
     @unittest.expectedFailure
     def testNonAlphabeticalCharactersInSection(self):
+        """Test with non-alphabetical chars in section."""
         self.assertContains('enwiki_help_editing', 'Talk_.28discussion.29_pages',
                             'As used in the TOC')
         self.assertContains('enwiki_help_editing', 'Talk_(discussion)_pages',
                             'Understood by mediawiki')
 
     def test_spaces_outside_section(self):
+        """Test with spaces around section."""
         self.assertContains("enwiki_help_editing", u"Naming and_moving")
         self.assertContains("enwiki_help_editing", u" Naming and_moving ")
         self.assertContains("enwiki_help_editing", u" Naming and_moving_")
 
     def test_link_in_section(self):
+        """Test with link inside section."""
         # section is ==[[Wiki markup]]==
         self.assertContains("enwiki_help_editing", u"[[Wiki markup]]", "Link as section header")
         self.assertContains('enwiki_help_editing', '[[:Wiki markup]]',

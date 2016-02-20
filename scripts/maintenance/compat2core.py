@@ -126,10 +126,12 @@ class ConvertBot(object):
     """Script conversion bot."""
 
     def __init__(self, filename=None, warnonly=False):
+        """Constructor."""
         self.source = filename
         self.warnonly = warnonly
 
     def run(self):
+        """Run the bot."""
         self.get_source()
         self.get_dest()
         if not self.warnonly:
@@ -137,6 +139,7 @@ class ConvertBot(object):
         self.warning()
 
     def get_source(self):
+        """Get source script."""
         while True:
             if self.source is None:
                 self.source = pywikibot.input(
@@ -155,6 +158,7 @@ class ConvertBot(object):
             self.source = None
 
     def get_dest(self):
+        """Ask for destination script name."""
         self.dest = u'%s-core.%s' % tuple(self.source.rsplit(u'.', 1))
         if not self.warnonly and not pywikibot.input_yn(
                 u'Destination file is %s.' % self.dest,
@@ -163,6 +167,7 @@ class ConvertBot(object):
             exit()
 
     def convert(self):
+        """Convert script."""
         f = codecs.open(self.source, "r", "utf-8")
         text = f.read()
         f.close()
@@ -173,6 +178,7 @@ class ConvertBot(object):
         g.close()
 
     def warning(self):
+        """Show warnings and hints."""
         filename = self.source if self.warnonly else self.dest
         g = codecs.open(filename, "r", "utf-8")
         for i, line in enumerate(g, start=1):
@@ -183,6 +189,7 @@ class ConvertBot(object):
 
 
 def main():
+    """Process command line arguments and invoke bot."""
     filename = None
     warnonly = False
 

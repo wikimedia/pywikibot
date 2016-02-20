@@ -47,6 +47,7 @@ class FamilyFileGenerator(object):
     """Family file creator."""
 
     def __init__(self, url=None, name=None, dointerwiki=None):
+        """Constructor."""
         if url is None:
             url = raw_input("Please insert URL to wiki: ")
         if name is None:
@@ -59,6 +60,7 @@ class FamilyFileGenerator(object):
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
     def run(self):
+        """Main method, generate family file."""
         print("Generating family file from %s" % self.base_url)
 
         w = Wiki(self.base_url)
@@ -75,6 +77,7 @@ class FamilyFileGenerator(object):
         self.writefile()
 
     def getlangs(self, w):
+        """Determine language of a site."""
         print("Determining other languages...", end="")
         try:
             self.langs = w.langs
@@ -113,6 +116,7 @@ class FamilyFileGenerator(object):
                               if wiki[u'url'] == w.iwpath]
 
     def getapis(self):
+        """Load other language pages."""
         print("Loading wikis... ")
         for lang in self.langs:
             print("  * %s... " % (lang[u'prefix']), end="")
@@ -126,6 +130,7 @@ class FamilyFileGenerator(object):
                 print("in cache")
 
     def writefile(self):
+        """Write the family file."""
         fn = "pywikibot/families/%s_family.py" % self.name
         print("Writing %s... " % fn)
         try:

@@ -35,6 +35,7 @@ from pywikibot.bot import QuitKeyboardInterrupt
 
 
 def choosecats(pagetext):
+    """Coose categories."""
     chosen = []
     done = False
     length = 1000
@@ -71,6 +72,7 @@ q: quit.""")
 
 
 def make_categories(page, list, site=None):
+    """Make categories."""
     if site is None:
         site = pywikibot.Site()
     pllist = []

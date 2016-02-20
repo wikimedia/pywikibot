@@ -67,6 +67,7 @@ def get_imagelinks(url):
 
 
 def main(give_url, image_url, desc):
+    """Run the bot."""
     url = give_url
     image_url = ''
     if url == '':
