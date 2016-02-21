@@ -613,7 +613,6 @@ def main(*args):
     salt = None
     force = False
     calc = None
-    sleep = 10
     args = []
 
     def if_arg_value(arg, name):
@@ -643,8 +642,6 @@ def main(*args):
             pagename = v
         for v in if_arg_value(arg, '-namespace'):
             namespace = v
-        for v in if_arg_value(arg, '-sleep'):
-            sleep = int(v)
         if not arg.startswith('-'):
             args.append(arg)
 
@@ -702,8 +699,6 @@ def main(*args):
             except Exception:
                 pywikibot.error(u'Error occurred while processing page %s' % pg)
                 pywikibot.exception(tb=True)
-            finally:
-                time.sleep(sleep)
 
 if __name__ == '__main__':
     main()
