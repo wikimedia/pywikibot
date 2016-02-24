@@ -1362,12 +1362,16 @@ class SearchTestCase(DefaultSiteTestCase):
 
     """Test search method."""
 
+    def setUp(self):
+        """Skip tests for Wikia Search extension."""
+        super(SearchTestCase, self).setUp()
+        if self.site.has_extension('Wikia Search'):
+            raise unittest.SkipTest(
+                'The site %r does not use MediaWiki search' % self.site)
+
     def testSearch(self):
         """Test the site.search() method."""
-        mysite = self.get_site()
-        if mysite.has_extension("Wikia Search"):
-            raise unittest.SkipTest(
-                'The site %r does not use MediaWiki search' % mysite)
+        mysite = self.site
         try:
             se = list(mysite.search("wiki", total=100))
             self.assertLessEqual(len(se), 100)
@@ -1391,6 +1395,19 @@ class SearchTestCase(DefaultSiteTestCase):
             if e.code == "gsrsearch-error" and "timed out" in e.info:
                 raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
             raise
+
+    def test_search_where(self):
+        """Test the site.search() method with 'where' parameter."""
+        self.assertEqual(list(self.site.search('wiki', total=10)),
+                         list(self.site.search('wiki', total=10, where='text')))
+        self.assertLessEqual(len(list(self.site.search('wiki', total=10,
+                                                       where='nearmatch'))),
+                             len(list(self.site.search('wiki', total=10))))
+        for hit in self.site.search('wiki', namespaces=0, total=10,
+                                    get_redirects=True, where='title'):
+            self.assertIsInstance(hit, pywikibot.Page)
+            self.assertEqual(hit.namespace(), 0)
+            self.assertTrue('wiki' in hit.title().lower())
 
 
 class TestUserContribsAsUser(DefaultSiteTestCase):
