@@ -71,8 +71,8 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004
 # (C) Purodha Blissenbach, 2009
-# (C) xqt, 2009-2015
-# (C) Pywikibot team, 2004-2015
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -421,6 +421,8 @@ class RedirectRobot(Bot):
             pywikibot.output(u'%s doesn\'t exist.' % redir_page.title())
         except pywikibot.InvalidTitle:
             pywikibot.exception()
+        except pywikibot.InterwikiRedirectPage:
+            pywikibot.output('%s is on another site.' % redir_page.title())
         else:
             try:
                 targetPage.get()
