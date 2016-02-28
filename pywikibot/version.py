@@ -2,8 +2,8 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
-# (C) xqt, 2010-2015
-# (C) Pywikibot team, 2007-2015
+# (C) xqt, 2010-2016
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,6 +20,7 @@ import sys
 import time
 import xml.dom.minidom
 
+from distutils import log
 from distutils.sysconfig import get_python_lib
 from io import BytesIO
 from warnings import warn
@@ -93,8 +94,8 @@ def getversiondict():
 
     for vcs_func in (getversion_git,
                      getversion_svn_setuptools,
-                     getversion_nightly,
                      getversion_svn,
+                     getversion_nightly,
                      getversion_package):
         try:
             (tag, rev, date, hsh) = vcs_func(_program_dir)
@@ -220,7 +221,10 @@ def getversion_svn_setuptools(path=None):
     tag = 'pywikibot-core'
     _program_dir = path or _get_program_dir()
     svninfo = svn_utils.SvnInfo(_program_dir)
+    # suppress warning
+    old_level = log.set_threshold(log.ERROR)
     rev = svninfo.get_revision()
+    log.set_threshold(old_level)
     if not isinstance(rev, int):
         raise TypeError('SvnInfo.get_revision() returned type %s' % type(rev))
     if rev < 0:
