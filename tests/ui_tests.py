@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -286,6 +286,13 @@ class TestTerminalOutput(UITestCase):
 
     def test_output_stdout(self):
         pywikibot.output('output', toStdout=True)
+        self.assertEqual(newstdout.getvalue(), 'output\n')
+        self.assertIn('DeprecationWarning: "toStdout" parameter is '
+                      'deprecated; use pywikibot.stdout() instead.\n',
+                      newstderr.getvalue(),)
+
+    def test_stdout(self):
+        pywikibot.stdout('output')
         self.assertEqual(newstdout.getvalue(), 'output\n')
         self.assertEqual(newstderr.getvalue(), '')
 

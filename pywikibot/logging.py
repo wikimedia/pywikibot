@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Logging functions."""
 #
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -131,9 +131,11 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     Other keyword arguments are passed unchanged to the logger; so far, the
     only argument that is useful is "exc_info=True", which causes the
     log message to include an exception traceback.
-
     """
     if toStdout:  # maintained for backwards-compatibity only
+        from pywikibot.tools import issue_deprecation_warning  # noqa
+        issue_deprecation_warning('"toStdout" parameter',
+                                  'pywikibot.stdout()', 2)
         logoutput(text, decoder, newline, STDOUT, **kwargs)
     else:
         logoutput(text, decoder, newline, INFO, **kwargs)
