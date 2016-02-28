@@ -80,7 +80,7 @@ flickr_allowed_license = {
 }
 
 
-def getPhoto(flickr=None, photo_id=''):
+def getPhoto(flickr, photo_id):
     """
     Get the photo info and the photo sizes so we can use these later on.
 
@@ -99,7 +99,7 @@ def getPhoto(flickr=None, photo_id=''):
             time.sleep(30)
 
 
-def isAllowedLicense(photoInfo=None):
+def isAllowedLicense(photoInfo):
     """
     Check if the image contains the right license.
 
@@ -112,7 +112,7 @@ def isAllowedLicense(photoInfo=None):
         return False
 
 
-def getPhotoUrl(photoSizes=None):
+def getPhotoUrl(photoSizes):
     """Get the url of the jpg file with the highest resolution."""
     url = ''
     # The assumption is that the largest image is last
@@ -121,7 +121,7 @@ def getPhotoUrl(photoSizes=None):
     return url
 
 
-def downloadPhoto(photoUrl=''):
+def downloadPhoto(photoUrl):
     """
     Download the photo and store it in a io.BytesIO object.
 
@@ -153,7 +153,7 @@ def findDuplicateImages(photo, site=None):
     return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
 
-def getTags(photoInfo=None):
+def getTags(photoInfo):
     """Get all the tags on a photo."""
     result = []
     for tag in photoInfo.find('photo').find('tags').findall('tag'):
@@ -162,7 +162,7 @@ def getTags(photoInfo=None):
     return result
 
 
-def getFlinfoDescription(photo_id=0):
+def getFlinfoDescription(photo_id):
     """
     Get the description from http://wikipedia.ramselehof.de/flinfo.php.
 
@@ -174,7 +174,7 @@ def getFlinfoDescription(photo_id=0):
         'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).content
 
 
-def getFilename(photoInfo=None, site=None, project=u'Flickr'):
+def getFilename(photoInfo, site=None, project=u'Flickr'):
     """Build a good filename for the upload based on the username and title.
 
     Prevents naming collisions.
@@ -279,7 +279,7 @@ def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
     return description
 
 
-def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
+def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
                  override=u'', addCategory=u'', removeCategories=False,
                  autonomous=False):
     """Process a single Flickr photo."""
@@ -342,7 +342,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
     return 0
 
 
-def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
+def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
               start_id='', end_id='', tags=u''):
     """Loop over a set of Flickr photos."""
     found_start_id = not start_id
