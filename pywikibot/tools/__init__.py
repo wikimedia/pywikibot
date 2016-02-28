@@ -447,7 +447,7 @@ class MediaWikiVersion(Version):
             self._dev_version = (2, int(version_match.group(4)))
         elif version_match.group(5):
             self._dev_version = (3, int(version_match.group(5)))
-        elif version_match.group(2) in {'alpha', '-alpha'}:
+        elif version_match.group(2) in ('alpha', '-alpha'):
             self._dev_version = (1, )
         else:
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
