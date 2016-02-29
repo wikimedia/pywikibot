@@ -272,7 +272,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 result = execute_pwb(cmd, data_in, timeout=timeout, error=error,
                                      overrides=test_overrides)
 
-                stderr = result['stderr'].split('\n')
+                stderr = result['stderr'].splitlines()
                 stderr_sleep = [l for l in stderr
                                 if l.startswith('Sleeping for ')]
                 stderr_other = [l for l in stderr
@@ -288,7 +288,7 @@ class TestScriptMeta(MetaTestCaseClass):
 
                     exit_codes = [0, 1, 2, -9]
                 elif not is_autorun:
-                    if stderr_other == ['']:
+                    if stderr_other == []:
                         stderr_other = None
                     if stderr_other is not None:
                         self.assertIn('Use -help for further information.',
