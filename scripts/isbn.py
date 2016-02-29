@@ -1229,12 +1229,14 @@ class ISBN13(ISBN):
     """ISBN 13."""
 
     def __init__(self, code, checksumMissing=False):
+        """Constructor."""
         self.code = code
         if checksumMissing:
             self.code += str(self.calculateChecksum())
         self.checkValidity()
 
     def possiblePrefixes(self):
+        """Return possible prefixes."""
         return ['978', '979']
 
     def digits(self):
@@ -1249,6 +1251,7 @@ class ISBN13(ISBN):
         return result
 
     def checkValidity(self):
+        """Check validity of ISBN."""
         if len(self.digits()) != 13:
             raise InvalidIsbnException('The ISBN %s is not 13 digits long.'
                                        % self.code)
@@ -1257,7 +1260,11 @@ class ISBN13(ISBN):
                                        % self.code)
 
     def calculateChecksum(self):
-        # See https://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_13
+        """
+        Calculate checksum.
+
+        See https://en.wikipedia.org/wiki/ISBN#Check_digit_in_ISBN_13
+        """
         sum = 0
         for i in range(0, 13 - 1, 2):
             sum += self.digits()[i]
@@ -1271,10 +1278,12 @@ class ISBN10(ISBN):
     """ISBN 10."""
 
     def __init__(self, code):
+        """Constructor."""
         self.code = code
         self.checkValidity()
 
     def possiblePrefixes(self):
+        """Return possible prefixes."""
         return []
 
     def digits(self):
@@ -1302,6 +1311,7 @@ class ISBN10(ISBN):
                                        % self.code)
 
     def checkValidity(self):
+        """Check validity of ISBN."""
         if len(self.digits()) != 10:
             raise InvalidIsbnException('The ISBN %s is not 10 digits long.'
                                        % self.code)
@@ -1325,6 +1335,7 @@ class ISBN10(ISBN):
         return ISBN13(code, checksumMissing=True)
 
     def format(self):
+        """Format ISBN number."""
         # load overridden superclass method
         ISBN.format(self)
         # capitalize checksum
@@ -1471,6 +1482,7 @@ class IsbnBot(Bot):
     """ISBN bot."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'to13': False,
             'format': False,
@@ -1482,6 +1494,7 @@ class IsbnBot(Bot):
         self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
 
     def treat(self, page):
+        """Treat a page."""
         try:
             old_text = page.get()
             for match in self.isbnR.finditer(old_text):
@@ -1517,6 +1530,7 @@ class IsbnBot(Bot):
                              % page.title(asLink=True))
 
     def run(self):
+        """Run the bot."""
         for page in self.generator:
             self.treat(page)
 
@@ -1526,6 +1540,7 @@ class IsbnWikibaseBot(WikidataBot):
     """ISBN bot to be run on Wikibase sites."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'to13': False,
             'format': False,
@@ -1543,6 +1558,7 @@ class IsbnWikibaseBot(WikidataBot):
         self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
 
     def treat(self, page, item):
+        """Treat a page."""
         change_messages = []
 
         if self.isbn_10_prop_id in item.claims:

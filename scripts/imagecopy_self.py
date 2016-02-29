@@ -328,12 +328,14 @@ class imageFetcher(threading.Thread):
     """Tries to fetch information for all images in the generator."""
 
     def __init__(self, pagegenerator, prefetchQueue):
+        """Constructor."""
         self.pagegenerator = pagegenerator
         self.prefetchQueue = prefetchQueue
         imagerecat.initLists()
         threading.Thread.__init__(self)
 
     def run(self):
+        """Run imageFetcher."""
         for page in self.pagegenerator:
             self.processImage(page)
         self.prefetchQueue.put(None)
@@ -605,12 +607,14 @@ class userInteraction(threading.Thread):
     """Prompt all images to the user."""
 
     def __init__(self, prefetchQueue, uploadQueue):
+        """Constructor."""
         self.prefetchQueue = prefetchQueue
         self.uploadQueue = uploadQueue
         self.autonomous = False
         threading.Thread.__init__(self)
 
     def run(self):
+        """Run thread."""
         while True:
             fields = self.prefetchQueue.get()
             if fields:
@@ -673,6 +677,7 @@ class TkdialogICS(Tkdialog):
             imagepage, description, date, source, author, licensetemplate,
             categories
         """
+        """Constructor."""
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         # Always appear the same size and in the bottom-left corner
@@ -848,11 +853,13 @@ class uploader(threading.Thread):
     """Upload all images."""
 
     def __init__(self, uploadQueue):
+        """Constructor."""
         self.uploadQueue = uploadQueue
         self.checktemplate = True
         threading.Thread.__init__(self)
 
     def run(self):
+        """Run uploader."""
         while True:  # Change later
             fields = self.uploadQueue.get()
             if fields:
@@ -1001,6 +1008,7 @@ class uploader(threading.Thread):
 
 
 def main(*args):
+    """Process command line arguments and invoke bot."""
     generator = None
     autonomous = False
     checkTemplate = True

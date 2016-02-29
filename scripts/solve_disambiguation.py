@@ -352,8 +352,12 @@ ignore_title = {
 
 
 def correctcap(link, text):
-    # If text links to a page with title link uncapitalized, uncapitalize link,
-    # otherwise capitalize it
+    """
+    Capitalize link.
+
+    If text links to a page with title link uncapitalized, uncapitalize link,
+    otherwise capitalize it
+    """
     linkupper = link.title()
     linklower = first_lower(linkupper)
     if "[[%s]]" % linklower in text or "[[%s|" % linklower in text:
@@ -367,6 +371,7 @@ class ReferringPageGeneratorWithIgnore(object):
     """Referring Page generator, with an ignore manager."""
 
     def __init__(self, disambPage, primary=False, minimum=0, main_only=False):
+        """Constructor."""
         self.disambPage = disambPage
         # if run with the -primary argument, enable the ignore manager
         self.primaryIgnoreManager = PrimaryIgnoreManager(disambPage,
@@ -375,6 +380,7 @@ class ReferringPageGeneratorWithIgnore(object):
         self.main_only = main_only
 
     def __iter__(self):
+        """Yield pages."""
         # TODO: start yielding before all referring pages have been found
         refs = [
             page for page in self.disambPage.getReferences(
@@ -417,6 +423,7 @@ class PrimaryIgnoreManager(object):
     """
 
     def __init__(self, disambPage, enabled=False):
+        """Constructor."""
         self.disambPage = disambPage
         self.enabled = enabled
         self.ignorelist = []
@@ -445,9 +452,11 @@ class PrimaryIgnoreManager(object):
             pass
 
     def isIgnored(self, refPage):
+        """Return if refPage is to be ignored."""
         return self.enabled and refPage.title(asUrl=True) in self.ignorelist
 
     def ignore(self, refPage):
+        """Write page to ignorelist."""
         if self.enabled:
             # Skip this occurrence next time.
             filename = config.datafilepath(
@@ -559,6 +568,7 @@ class DisambiguationRobot(Bot):
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip, generator,
                  primary, main_only, minimum=0):
+        """Constructor."""
         super(DisambiguationRobot, self).__init__()
         self.always = always
         self.alternatives = alternatives
@@ -594,18 +604,19 @@ class DisambiguationRobot(Bot):
         return None
 
     def makeAlternativesUnique(self):
-        # remove duplicate entries stable
+        """Remove duplicate entries stable."""
         unique = set(self.alternatives)
         self.alternatives = [alt for alt in self.alternatives if alt in unique]
 
     def listAlternatives(self):
+        """Show a list of alternatives."""
         list = u'\n'
         for i in range(len(self.alternatives)):
             list += (u"%3i - %s\n" % (i, self.alternatives[i]))
         pywikibot.output(list)
 
     def setupRegexes(self):
-        # compile regular expressions
+        """Compile regular expressions."""
         self.ignore_contents_regexes = []
         if self.mylang in self.ignore_contents:
             for ig in self.ignore_contents[self.mylang]:
@@ -893,6 +904,7 @@ class DisambiguationRobot(Bot):
         return True
 
     def findAlternatives(self, disambPage):
+        """Look for alternative links of disambiguation pages."""
         if disambPage.isRedirectPage() and not self.primary:
             if (disambPage.site.lang in self.primary_redir_template and
                     self.primary_redir_template[disambPage.site.lang]
@@ -969,6 +981,7 @@ or press enter to quit:""")
 
     def setSummaryMessage(self, disambPage, new_targets=[], unlink_counter=0,
                           dn=False):
+        """Setup i18n summary message."""
         # make list of new targets
         comma = self.mysite.mediawiki_message(u"comma-separator")
         targets = comma.join(u'[[%s]]' % page_title
@@ -1031,7 +1044,7 @@ or press enter to quit:""")
                      'count': len(new_targets)})
 
     def run(self):
-
+        """Run the bot."""
         for disambPage in self.generator:
             self.primaryIgnoreManager = PrimaryIgnoreManager(
                 disambPage, enabled=self.primary)

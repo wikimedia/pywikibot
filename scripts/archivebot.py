@@ -218,6 +218,16 @@ def str2size(string):
 
 
 def generate_transclusions(site, template, namespaces=[]):
+    """
+    Generate transclusions.
+
+    @param site: the site for the template transclusions
+    @type site: Site
+    @param template: normalized title of the template
+    @type template: unicode
+    @param namespace: namespace filter for transcluded pages
+    @type ns: list
+    """
     pywikibot.output(u'Fetching template transclusions...')
     transclusion_page = pywikibot.Page(site, template, ns=10)
     return transclusion_page.getReferences(onlyTemplateInclusion=True,
@@ -253,15 +263,19 @@ class TZoneUTC(datetime.tzinfo):
     """Class building a UTC tzinfo object."""
 
     def utcoffset(self, dt):  # pylint: disable=unused-argument
+        """Subclass implementation, return timedelta(0)."""
         return ZERO
 
     def tzname(self, dt):  # pylint: disable=unused-argument
+        """Subclass implementation."""
         return 'UTC'
 
     def dst(self, dt):  # pylint: disable=unused-argument
+        """Subclass implementation, return timedelta(0)."""
         return ZERO
 
     def __repr__(self):
+        """Return a string representation."""
         return "%s()" % self.__class__.__name__
 
 
@@ -279,6 +293,7 @@ class DiscussionThread(object):
     """
 
     def __init__(self, title, now, timestripper):
+        """Constructor."""
         self.title = title
         self.now = now
         self.ts = timestripper
@@ -287,11 +302,13 @@ class DiscussionThread(object):
         self.timestamp = None
 
     def __repr__(self):
+        """Return a string representation."""
         return '%s("%s",%d bytes)' \
                % (self.__class__.__name__, self.title,
                   len(self.content.encode('utf-8')))
 
     def feed_line(self, line):
+        """Add a line to the content and find the newest timestamp."""
         if not self.content and not line:
             return
 
@@ -305,13 +322,21 @@ class DiscussionThread(object):
             self.timestamp = max(self.timestamp, timestamp)
 
     def size(self):
+        """Return size of discussion thread."""
         return len(self.title.encode('utf-8')) + len(
             self.content.encode('utf-8')) + 12
 
     def to_text(self):
+        """Return wikitext discussion thread."""
         return u"== %s ==\n\n%s" % (self.title, self.content)
 
     def should_be_archived(self, archiver):
+        """
+        Check whether thread has to be archived.
+
+        @return: archiving reason i18n string or empty string.
+        @rtype: string
+        """
         algo = archiver.get_attr('algo')
         re_t = re.search(r'^old\((.*)\)$', algo)
         if re_t:
@@ -337,6 +362,7 @@ class DiscussionPage(pywikibot.Page):
     """
 
     def __init__(self, source, archiver, params=None):
+        """Constructor."""
         super(DiscussionPage, self).__init__(source)
         self.threads = []
         self.full = False
@@ -393,6 +419,7 @@ class DiscussionPage(pywikibot.Page):
                              % (len(self.threads), self))
 
     def feed_thread(self, thread, max_archive_size=(250 * 1024, 'B')):
+        """Check whether archive size exceeded."""
         self.threads.append(thread)
         self.archived_threads += 1
         if max_archive_size[1] == 'B':
@@ -404,10 +431,12 @@ class DiscussionPage(pywikibot.Page):
         return self.full
 
     def size(self):
+        """Return size of talk page threads."""
         return len(self.header.encode('utf-8')) + sum(t.size()
                                                       for t in self.threads)
 
     def update(self, summary, sort_threads=False):
+        """Recombine threads and save page."""
         if sort_threads:
             pywikibot.output(u'Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
@@ -423,7 +452,8 @@ class DiscussionPage(pywikibot.Page):
 
 class PageArchiver(object):
 
-    """A class that encapsulates all archiving methods.
+    """
+    A class that encapsulates all archiving methods.
 
     __init__ expects a pywikibot.Page object.
     Execute by running the .run() method.
@@ -432,6 +462,7 @@ class PageArchiver(object):
     algo = 'none'
 
     def __init__(self, page, tpl, salt, force=False):
+        """Constructor."""
         self.attributes = {
             'algo': ['old(24h)', False],
             'archive': ['', False],
@@ -456,30 +487,36 @@ class PageArchiver(object):
             self.month_num2orig_names[n + 1] = {"long": _long, "short": _short}
 
     def get_attr(self, attr, default=''):
+        """Get an archiver attribute."""
         return self.attributes.get(attr, [default])[0]
 
     def set_attr(self, attr, value, out=True):
+        """Set an archiver attribute."""
         if attr == 'archive':
             value = value.replace('_', ' ')
         self.attributes[attr] = [value, out]
 
     def saveables(self):
+        """Return a list of saveable attributes."""
         return [a for a in self.attributes if self.attributes[a][1] and
                 a != 'maxage']
 
     def attr2text(self):
+        """Return a template with archiver saveable attributes."""
         return '{{%s\n%s\n}}' \
                % (self.tpl.title(withNamespace=(self.tpl.namespace() != 10)),
                   '\n'.join('|%s = %s' % (a, self.get_attr(a))
                             for a in self.saveables()))
 
     def key_ok(self):
+        """Return whether key is valid."""
         s = md5()
         s.update(self.salt + '\n')
         s.update(self.page.title().encode('utf8') + '\n')
         return self.get_attr('key') == s.hexdigest()
 
     def load_config(self):
+        """Load and validate archiver template."""
         pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl.title(), self.page))
         for tpl in self.page.templatesWithParams():
             if tpl[0] == pywikibot.Page(self.site, self.tpl.title(), ns=10):
@@ -493,13 +530,13 @@ class PageArchiver(object):
             raise MissingConfigError('Missing argument "algo" in template')
 
     def feed_archive(self, archive, thread, max_archive_size, params=None):
-        """Feed the thread to one of the archives.
+        """
+        Feed the thread to one of the archives.
 
         If it doesn't exist yet, create it.
         If archive name is an empty string (or None),
         discard the thread.
         Also checks for security violations.
-
         """
         title = archive.title()
         if not title:
@@ -515,6 +552,7 @@ class PageArchiver(object):
         return self.archives[title].feed_thread(thread, max_archive_size)
 
     def analyze_page(self):
+        """Analyze DiscussionPage."""
         max_arch_size = str2size(self.get_attr('maxarchivesize'))
         arch_counter = int(self.get_attr('counter', '1'))
         oldthreads = self.page.threads
@@ -556,6 +594,7 @@ class PageArchiver(object):
         return set(whys)
 
     def run(self):
+        """Run the bot."""
         if not self.page.botMayEdit():
             return
         whys = self.analyze_page()

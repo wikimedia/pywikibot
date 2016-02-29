@@ -467,6 +467,7 @@ class WelcomeBot(object):
                 % (self.site, self.site.code, self.site.family.name))
 
     def badNameFilter(self, name, force=False):
+        """Check for bad names."""
         if not globalvar.filtBadName:
             return False
 
@@ -562,6 +563,7 @@ class WelcomeBot(object):
         return False
 
     def reportBadAccount(self, name=None, final=False):
+        """Report bad account."""
         # Queue process
         if name:
             if globalvar.confirm:
@@ -625,6 +627,7 @@ class WelcomeBot(object):
             return True
 
     def makelogpage(self, queue=None):
+        """Make log page."""
         if queue is None:
             queue = []
         if not globalvar.makeWelcomeLog or len(queue) == 0:
@@ -672,9 +675,11 @@ class WelcomeBot(object):
                 time.sleep(10)
 
     def parseNewUserLog(self):
+        """Retrieve ne users."""
         return self.site.logevents('newusers', total=globalvar.queryLimit)
 
     def defineSign(self, force=False):
+        """Setup signature."""
         if hasattr(self, '_randomSignature') and not force:
             return self._randomSignature
 
@@ -716,6 +721,7 @@ class WelcomeBot(object):
         return self._randomSignature
 
     def run(self):
+        """Run the bot."""
         while True:
             welcomed_count = 0
             us = (pywikibot.User(self.site, users.user())

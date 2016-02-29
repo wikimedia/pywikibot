@@ -309,6 +309,7 @@ class LinkChecker(object):
         self.HTTPignore = HTTPignore
 
     def getConnection(self):
+        """Get a connection."""
         if self.scheme == 'http':
             return httplib.HTTPConnection(self.host)
         elif self.scheme == 'https':
@@ -317,6 +318,7 @@ class LinkChecker(object):
             raise NotAnURLError(self.url)
 
     def getEncodingUsedByServer(self):
+        """Get encodung used by server."""
         if not self.serverEncoding:
             try:
                 pywikibot.output(
@@ -338,6 +340,7 @@ class LinkChecker(object):
         return self.serverEncoding
 
     def readEncodingFromResponse(self, response):
+        """Read encoding from response."""
         if not self.serverEncoding:
             try:
                 ct = response.getheader('Content-Type')
@@ -348,6 +351,7 @@ class LinkChecker(object):
                 pass
 
     def changeUrl(self, url):
+        """Change url."""
         self.url = url
         # we ignore the fragment
         (self.scheme, self.host, self.path, self.query,
@@ -534,6 +538,7 @@ class LinkCheckThread(threading.Thread):
     """
 
     def __init__(self, page, url, history, HTTPignore, day):
+        """Constructor."""
         threading.Thread.__init__(self)
         self.page = page
         self.url = url
@@ -555,6 +560,7 @@ class LinkCheckThread(threading.Thread):
         self.day = day
 
     def run(self):
+        """Run the bot."""
         ok = False
         try:
             header = self.header
@@ -609,6 +615,7 @@ class History(object):
     """
 
     def __init__(self, reportThread, site=None):
+        """Constructor."""
         self.reportThread = reportThread
         if not site:
             self.site = pywikibot.Site()
@@ -723,6 +730,7 @@ class DeadLinkReportThread(threading.Thread):
     """
 
     def __init__(self):
+        """Constructor."""
         threading.Thread.__init__(self)
         self.semaphore = threading.Semaphore()
         self.queue = []
@@ -736,13 +744,16 @@ class DeadLinkReportThread(threading.Thread):
         self.semaphore.release()
 
     def shutdown(self):
+        """Finish thread."""
         self.finishing = True
 
     def kill(self):
+        """Kill thread."""
         # TODO: remove if unneeded
         self.killed = True
 
     def run(self):
+        """Run thread."""
         while not self.killed:
             if len(self.queue) == 0:
                 if self.finishing:

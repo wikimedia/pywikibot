@@ -106,6 +106,7 @@ class RedirectGenerator(object):
     def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
                  use_move_log=False, use_api=False, start=None, until=None,
                  number=None, step=None, page_title=None):
+        """Constructor."""
         self.site = pywikibot.Site()
         self.xmlFilename = xmlFilename
         self.namespaces = namespaces
@@ -274,6 +275,7 @@ class RedirectGenerator(object):
                 yield (redirect, result, target, final)
 
     def retrieve_broken_redirects(self):
+        """Retrieve broken redirects."""
         if self.use_api:
             count = 0
             for (pagetitle, type, target, final) \
@@ -302,6 +304,7 @@ class RedirectGenerator(object):
                 yield page
 
     def retrieve_double_redirects(self):
+        """Retrieve double redirects."""
         if self.use_move_log:
             gen = self.get_moved_pages_redirects()
             for redir_page in gen:
@@ -384,6 +387,7 @@ class RedirectRobot(Bot):
     """Redirect bot."""
 
     def __init__(self, action, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'number': None,
             'delete': False,
@@ -397,11 +401,13 @@ class RedirectRobot(Bot):
         self.exiting = False
 
     def delete_broken_redirects(self):
+        """Process all broken redirects."""
         # get reason for deletion text
         for redir_name in self.generator.retrieve_broken_redirects():
             self.delete_1_broken_redirect(redir_name)
 
     def delete_1_broken_redirect(self, redir_name):
+        """Treat one broken redirect."""
         if isinstance(redir_name, basestring):
             redir_page = pywikibot.Page(self.site, redir_name)
         else:
@@ -526,10 +532,12 @@ class RedirectRobot(Bot):
                         if self.getOption('delete') else "Skipping."))
 
     def fix_double_redirects(self):
+        """Process double redirects."""
         for redir_name in self.generator.retrieve_double_redirects():
             self.fix_1_double_redirect(redir_name)
 
     def fix_1_double_redirect(self, redir_name):
+        """Treat one double redirect."""
         if isinstance(redir_name, basestring):
             redir = pywikibot.Page(self.site, redir_name)
         else:
@@ -684,6 +692,7 @@ class RedirectRobot(Bot):
             break
 
     def fix_double_or_delete_broken_redirects(self):
+        """Process all redirects for 'both' action."""
         # TODO: part of this should be moved to generator, the rest merged into
         # self.run()
         count = 0
