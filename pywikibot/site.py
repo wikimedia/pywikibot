@@ -4400,11 +4400,15 @@ class APISite(BaseSite):
     @deprecated_args(number='total', key='searchstring',
                      getredirects='get_redirects')
     def search(self, searchstring, namespaces=None, where="text",
-               get_redirects=False, step=None, total=None, content=False):
+               get_redirects=False, step=None, total=None, content=False, 
+               checkSnippet=False, skipAfterNrMisses=-1):
         """Iterate Pages that contain the searchstring.
 
         Note that this may include non-existing Pages if the wiki's database
-        table contains outdated entries.
+        table contains outdated entries. Note that sometimes articles can be
+        returned that do not actually contain the searchterm but a closely
+        related term. This can be prevented by checking that the term is
+        actually present (see checkSnippet parameter).
 
         @param searchstring: the text to search for
         @type searchstring: unicode
@@ -4416,8 +4420,13 @@ class APISite(BaseSite):
             list of namespace identifiers.
         @param get_redirects: if True, include redirects in results. Since
             version MediaWiki 1.23 it will always return redirects.
+        @param total: Maximum number of items to retrieve
         @param content: if True, load the current content of each iterated page
             (default False)
+        @param checkSnippet: if True, only yield pages that contain an exact match 
+            (default False)
+        @param skipAfterNrMisses: Stop retrieving items after this many
+            non-matches were retrieved (default -1)
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -4431,13 +4440,63 @@ class APISite(BaseSite):
         if not namespaces:
             pywikibot.warning(u"search: namespaces cannot be empty; using [0].")
             namespaces = [0]
-        srgen = self._generator(api.PageGenerator, type_arg="search",
-                                gsrsearch=searchstring, gsrwhat=where,
-                                namespaces=namespaces, step=step,
-                                total=total, g_content=content)
-        if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
-            srgen.request['gsrredirects'] = get_redirects
-        return srgen
+
+        if MediaWikiVersion(self.version()) > MediaWikiVersion('1.11') and checkSnippet:
+
+            if len(namespaces) > 1:
+                raise Error("Cannot do more than one namespace and check snippets")
+
+            # If we want to get the snippets, we have to use a ListGenerator
+            # and manually yield those pages that contain the correct words.
+            srgen = api.ListGenerator("search", site=self,
+                                      srsearch=searchstring, srwhat=where,
+                                      srnamespace=namespaces[0], step=step,
+                                      g_content=content)
+
+            srgen.set_maximum_items(total)
+
+            if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
+                srgen.request['srredirects'] = get_redirects
+
+            import re
+            wordsearch = re.compile(r'<span class="searchmatch">([^<]*)</span>')
+            nr_misses = 0
+            for pagedata in srgen:
+
+                snippet = pagedata["snippet"]
+                match = wordsearch.search(snippet)
+                if match and match.group(1) == searchstring:
+
+                    # Matching page found, create it and yield
+                    p = pywikibot.Page(self, pagedata['title'], pagedata['ns'])
+                    ns = pagedata['ns']
+                    # Upcast to proper Page subclass.
+                    if ns == 6:
+                        p = pywikibot.FilePage(p)
+                    elif ns == 14:
+                        p = pywikibot.Category(p)
+                    # api.update_page(p, pagedata)
+                    yield p
+                else:
+                    nr_misses += 1
+                    if skipAfterNrMisses > 0 and nr_misses > skipAfterNrMisses:
+                        break
+
+        else:
+
+            # Pagegenerator solution (does not check snippets) 
+            srgen = self._generator(api.PageGenerator, type_arg="search",
+                                    gsrsearch=searchstring, gsrwhat=where,
+                                    namespaces=namespaces, step=step,
+                                    total=total, g_content=content)
+
+            srgen.set_maximum_items(total)
+
+            if MediaWikiVersion(self.version()) < MediaWikiVersion('1.23'):
+                srgen.request['gsrredirects'] = get_redirects
+
+            for p in srgen:
+                yield p
 
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
                      reverse=False, namespaces=None, showMinor=None,
