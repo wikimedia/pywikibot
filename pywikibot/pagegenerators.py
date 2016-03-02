@@ -241,6 +241,12 @@ parameterHelp = u"""\
 -wikidataquery    Takes a WikidataQuery query string like claim[31:12280]
                   and works on the resulting pages.
 
+-sparql           Takes a SPARQL SELECT query string including ?item
+                  and works on the resulting pages.
+
+-sparqlendpoint   Specify SPARQL endpoint URL (optional).
+                  (Example : -sparqlendpoint:http://myserver.com/sparql)
+
 -searchitem       Takes a search string and works on Wikibase pages that
                   contain it.
                   Argument can be given as "-searchitem:text", where text
@@ -362,6 +368,7 @@ class GeneratorFactory(object):
         self.subpage_max_depth = None
         self._site = site
         self._positional_arg_name = positional_arg_name
+        self._sparql = None
 
     @property
     def site(self):
@@ -820,6 +827,14 @@ class GeneratorFactory(object):
             if not value:
                 value = pywikibot.input('WikidataQuery string:')
             gen = WikidataQueryPageGenerator(value, site=self.site)
+        elif arg == '-sparqlendpoint':
+            if not value:
+                value = pywikibot.input('SPARQL endpoint:')
+            self._sparql = value
+        elif arg == '-sparql':
+            if not value:
+                value = pywikibot.input('SPARQL query:')
+            gen = WikidataSPARQLPageGenerator(value, site=self.site, endpoint=self._sparql)
         elif arg == '-mysqlquery':
             if not value:
                 value = pywikibot.input('Mysql query string:')
@@ -2570,6 +2585,38 @@ def WikidataQueryPageGenerator(query, site=None):
     pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
     for item in data[u'items']:
         page = pywikibot.ItemPage(repo, u'Q{0}'.format(item))
+        if isinstance(site, pywikibot.site.DataSite):
+            yield page
+            continue
+
+        try:
+            link = page.getSitelink(site)
+        except pywikibot.NoPage:
+            continue
+        yield pywikibot.Page(pywikibot.Link(link, site))
+
+
+def WikidataSPARQLPageGenerator(query, site=None, item_name='item', endpoint=None):
+    """Generate pages that result from the given SPARQL query.
+
+    @param query: the SPARQL query string.
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.BaseSite}
+
+    """
+    from pywikibot.data import sparql
+
+    if site is None:
+        site = pywikibot.Site()
+    repo = site.data_repository()
+    if endpoint is None:
+        endpoint = sparql.WIKIDATA
+
+    query_object = sparql.SparqlQuery(endpoint=endpoint)
+    data = query_object.get_items(query, item_name=item_name)
+
+    for item in data:
+        page = pywikibot.ItemPage(repo, item)
         if isinstance(site, pywikibot.site.DataSite):
             yield page
             continue

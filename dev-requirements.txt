@@ -11,6 +11,7 @@ pyflakes>=0.9
 flake8
 codecov
 coverage
+mock ; python_version < '3'
 
 # pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
 # excluded from this file as they are quite expensive to install, and they
