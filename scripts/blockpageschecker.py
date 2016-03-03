@@ -277,7 +277,7 @@ def main(*args):
                 generator.append(pageCat)
         pywikibot.output(u'Categories loaded, start!')
     # Main Loop
-    preloadingGen = pagegenerators.PreloadingGenerator(generator, step=60)
+    preloadingGen = pagegenerators.PreloadingGenerator(generator, groupsize=60)
     for page in preloadingGen:
         pagename = page.title(asLink=True)
         pywikibot.output('Loading %s...' % pagename)

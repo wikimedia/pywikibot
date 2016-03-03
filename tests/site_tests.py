@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1869,7 +1869,9 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         """
         mysite = self.get_site()
         pages = []
-        for rndpage in mysite.randompages(step=5, total=None):
+        rngen = mysite.randompages(total=None)
+        rngen.set_query_increment = 5
+        for rndpage in rngen:
             self.assertIsInstance(rndpage, pywikibot.Page)
             pages.append(rndpage)
             if len(pages) == 11:
@@ -2071,16 +2073,24 @@ class TestSiteAPILimits(TestCase):
         mypage = pywikibot.Page(mysite, 'Albert Einstein')
         mycat = pywikibot.Page(mysite, 'Category:1879 births')
 
-        cats = [c for c in mysite.pagecategories(mypage, step=5, total=12)]
+        gen = mysite.pagecategories(mypage, total=12)
+        gen.set_query_increment = 5
+        cats = [c for c in gen]
         self.assertEqual(len(cats), 12)
 
-        cat_members = [cm for cm in mysite.categorymembers(mycat, step=5, total=12)]
+        gen = mysite.categorymembers(mycat, total=12)
+        gen.set_query_increment = 5
+        cat_members = [cm for cm in gen]
         self.assertEqual(len(cat_members), 12)
 
-        images = [im for im in mysite.pageimages(mypage, step=3, total=5)]
+        gen = mysite.pageimages(mypage, total=5)
+        gen.set_query_increment = 3
+        images = [im for im in gen]
         self.assertEqual(len(images), 5)
 
-        templates = [tl for tl in mysite.pagetemplates(mypage, step=3, total=5)]
+        gen = mysite.pagetemplates(mypage, total=5)
+        gen.set_query_increment = 3
+        templates = [tl for tl in gen]
         self.assertEqual(len(templates), 5)
 
         mysite.loadrevisions(mypage, step=5, total=12)

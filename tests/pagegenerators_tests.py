@@ -2,7 +2,7 @@
 # -*- coding: utf-8  -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2015
+# (C) Pywikibot team, 2009-2016
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -482,7 +482,7 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=10))
         count = 0
-        for page in PreloadingGenerator(links, step=20):
+        for page in PreloadingGenerator(links, groupsize=20):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
@@ -497,7 +497,7 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         links = list(self.site.pagelinks(mainpage, total=20))
         count = 0
-        for page in PreloadingGenerator(links, step=10):
+        for page in PreloadingGenerator(links, groupsize=10):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
@@ -681,7 +681,6 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handleArg('-start:!'))
         gf.handleArg('-limit:10')
-        gf.handleArg('-step:5')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -759,7 +758,6 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory()
         self.assertTrue(gf.handleArg('-prefixindex:a'))
         gf.handleArg('-limit:10')
-        gf.handleArg('-step:5')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
