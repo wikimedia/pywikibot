@@ -399,15 +399,15 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
 
     callbacks += kwargs.pop('callbacks', [])
 
-    if not headers:
-        headers = {}
+    all_headers = config.extra_headers.copy()
+    all_headers.update(headers or {})
 
-    user_agent_format_string = headers.get("user-agent", None)
+    user_agent_format_string = all_headers.get('user-agent')
     if not user_agent_format_string or '{' in user_agent_format_string:
-        headers["user-agent"] = user_agent(None, user_agent_format_string)
+        all_headers['user-agent'] = user_agent(None, user_agent_format_string)
 
     request = threadedhttp.HttpRequest(
-        uri, method, body, headers, callbacks, **kwargs)
+        uri, method, body, all_headers, callbacks, **kwargs)
     _http_process(session, request)
     return request
 

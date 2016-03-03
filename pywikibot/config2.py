@@ -241,6 +241,16 @@ private_files_permission = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
 # by setting this to true.
 ignore_file_security_warnings = False
 
+# Custom headers to send on all requests.
+# This is mainly intended to support setting the
+# X-Wikimedia-Debug header, which is sometimes
+# needed to debug issues with Wikimedia sites:
+# https://wikitech.wikimedia.org/wiki/Debugging_in_production
+#
+# Note that these headers will be sent with all requests,
+# not just MediaWiki API calls.
+extra_headers = {}
+
 
 def user_home_path(path):
     """Return a file path to a file in the user home."""
