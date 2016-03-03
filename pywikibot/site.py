@@ -3966,8 +3966,14 @@ class APISite(BaseSite):
 
         Use allpages() with the prefix= parameter instead of this method.
         """
+        if not includeredirects:
+            filterredir = False
+        elif includeredirects == 'only':
+            filterredir = True
+        else:
+            filterredir = None
         return self.allpages(prefix=prefix, namespace=namespace,
-                             filterredir=includeredirects)
+                             filterredir=filterredir)
 
     @deprecated_args(step=None)
     def alllinks(self, start="!", prefix="", namespace=0, unique=False,
