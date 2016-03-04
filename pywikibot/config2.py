@@ -95,7 +95,8 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = ['authenticate', 'proxy', 'db_password']
 _deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
-                         'available_ssl_project', 'fake_user_agent']
+                         'available_ssl_project', 'fake_user_agent',
+                         'special_page_limit']
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -646,11 +647,6 @@ noisysleep = 3.0
 # at least 1 second.
 maxlag = 5
 
-# Maximum of pages which can be retrieved by special pages. Increase this if
-# you heavily use redirect.py with action "double", and especially if you're
-# running solve_disambiguation.py with the -primary argument.
-special_page_limit = 500
-
 # Maximum of pages which can be retrieved at one time from wiki server.
 # -1 indicates limit by api restriction
 step = -1
@@ -892,6 +888,10 @@ panoramio = {
     'review': False,  # Do we use automatically make our uploads reviewed?
     'reviewer': u'',  # If so, under what reviewer name?
 }
+
+special_page_limit = 500
+
+# #############################################
 
 
 def makepath(path):
