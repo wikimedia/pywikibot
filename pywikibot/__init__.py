@@ -354,6 +354,8 @@ class Coordinate(_WbRepresentation):
 
         @rtype: float or None
         """
+        if self._dim is None and self._precision is None:
+            raise ValueError('No values set for dim or precision')
         if self._precision is None and self._dim is not None:
             radius = 6378137  # TODO: Support other globes
             self._precision = math.degrees(
@@ -365,8 +367,32 @@ class Coordinate(_WbRepresentation):
         self._precision = value
 
     def precisionToDim(self):
-        """Convert precision from Wikibase to GeoData's dim."""
-        raise NotImplementedError
+        """Convert precision from Wikibase to GeoData's dim and return the latter.
+
+        dim is calculated if the Coordinate doesn't have a dimension, and precision is set.
+        When neither dim nor precision are set, ValueError is thrown.
+
+        Carrying on from the earlier derivation of precision, since
+        precision = math.degrees(dim/(radius*math.cos(math.radians(self.lat)))), we get
+            dim = math.radians(precision)*radius*math.cos(math.radians(self.lat))
+        But this is not valid, since it returns a float value for dim which is an integer.
+        We must round it off to the nearest integer.
+
+        Therefore::
+            dim = int(round(math.radians(precision)*radius*math.cos(math.radians(self.lat))))
+
+        @rtype: int or None
+        """
+        if self._dim is None and self._precision is None:
+            raise ValueError('No values set for dim or precision')
+        if self._dim is None and self._precision is not None:
+            radius = 6378137
+            self._dim = int(
+                round(
+                    math.radians(self._precision) * radius * math.cos(math.radians(self.lat))
+                )
+            )
+        return self._dim
 
 
 class WbTime(_WbRepresentation):

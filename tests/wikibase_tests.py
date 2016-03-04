@@ -144,6 +144,21 @@ class TestWikibaseTypes(WikidataTestCase):
 
     dry = True
 
+    def test_Coordinate_dim(self):
+        """Test Coordinate."""
+        repo = self.get_repo()
+        x = pywikibot.Coordinate(site=repo, lat=12.0, lon=13.0, precision=5.0)
+        self.assertEqual(x.precisionToDim(), 544434)
+        self.assertIsInstance(x.precisionToDim(), int)
+        y = pywikibot.Coordinate(site=repo, lat=12.0, lon=13.0, dim=54444)
+        self.assertEqual(y.precision, 0.500005084017101)
+        self.assertIsInstance(y.precision, float)
+        z = pywikibot.Coordinate(site=repo, lat=12.0, lon=13.0)
+        with self.assertRaises(ValueError):
+            z.precision
+        with self.assertRaises(ValueError):
+            z.precisionToDim()
+
     def test_WbTime(self):
         """Test WbTime."""
         repo = self.get_repo()
