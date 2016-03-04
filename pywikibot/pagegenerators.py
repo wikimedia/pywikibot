@@ -656,7 +656,8 @@ class GeneratorFactory(object):
             return True
         elif arg == '-step':
             issue_deprecation_warning(
-                'The usage of "{0}"'.format(arg), 2, ArgumentDeprecationWarning)
+                'The usage of "{0}"'.format(arg), None, 2,
+                ArgumentDeprecationWarning)
             return False
         elif arg == '-limit':
             if not value:
