@@ -98,7 +98,7 @@ class TestReplacementsMain(TWNBotTestCase):
     def test_invalid_replacements(self):
         """Test invalid command line replacement configurations."""
         # old and new need to be together
-        self.assertFalse(self._run('foo', '-replacementfile:/dev/null', 'bar'))
+        self.assertFalse(self._run('foo', '-pairsfile:/dev/null', 'bar'))
         # only old provided
         self.assertFalse(self._run('foo'))
 
