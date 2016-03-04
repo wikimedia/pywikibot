@@ -618,6 +618,10 @@ maxlag = 5
 # running solve_disambiguation.py with the -primary argument.
 special_page_limit = 500
 
+# Maximum of pages which can be retrieved at one time from wiki server.
+# -1 indicates limit by api restriction
+step = -1
+
 # Maximum number of times to retry an API request before quitting.
 max_retries = 25
 # Minimum time to wait before resubmitting a failed API request.

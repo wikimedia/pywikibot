@@ -908,7 +908,7 @@ def handle_args(args=None, do_help=True):
             daemonize.daemonize(redirect_std=redirect_std)
         else:
             # the argument depends on numerical config settings
-            # e.g. -maxlag:
+            # e.g. -maxlag and -step:
             try:
                 _arg = option[1:]
                 # explicitly check for int (so bool doesn't match)
