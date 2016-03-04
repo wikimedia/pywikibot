@@ -3799,7 +3799,7 @@ class APISite(BaseSite):
 
         # assemble API request
         rvgen = self._generator(api.PropertyGenerator, total=total, **rvargs)
-        if step > 0:
+        if step:
             rvgen.set_query_increment = step
 
         if latest or "revids" in rvgen.request:

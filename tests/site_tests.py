@@ -2221,6 +2221,7 @@ class TestSiteLoadRevisions(TestCase):
         """Test the site.loadrevisions() method."""
         # Load revisions without content
         self.mysite.loadrevisions(self.mainpage, total=15)
+        self.mysite.loadrevisions(self.mainpage)
         self.assertFalse(hasattr(self.mainpage, '_text'))
         self.assertEqual(len(self.mainpage._revisions), 15)
         self.assertIn(self.mainpage._revid, self.mainpage._revisions)
