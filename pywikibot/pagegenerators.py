@@ -2426,7 +2426,8 @@ def MySQLPageGenerator(query, site=None):
             # Limit reached or no more results
             break
         if pageName:
-            namespace = site.namespace(namespaceNumber)
+            # Namespace Dict only supports int
+            namespace = site.namespace(int(namespaceNumber))
             pageName = pageName.decode(site.encoding())
             if namespace:
                 pageTitle = '%s:%s' % (namespace, pageName)
