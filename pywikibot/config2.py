@@ -658,6 +658,9 @@ db_username = ''
 db_password = ''
 db_name_format = '{0}'
 db_connect_file = user_home_path('.my.cnf')
+# local port for mysql server
+# ssh -L 4711:enwiki.labsdb:3306 user@tools-login.wmflabs.org
+db_port = 3306
 
 # ############# SEARCH ENGINE SETTINGS ##############
 

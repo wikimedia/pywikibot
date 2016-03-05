@@ -2408,12 +2408,18 @@ def MySQLPageGenerator(query, site=None):
         import MySQLdb as mysqldb
     if site is None:
         site = pywikibot.Site()
+
     if config.db_connect_file is None:
-        conn = mysqldb.connect(config.db_hostname, db=config.db_name_format.format(site.dbName()),
-                               user=config.db_username, passwd=config.db_password)
+        conn = mysqldb.connect(config.db_hostname,
+                               db=config.db_name_format.format(site.dbName()),
+                               user=config.db_username,
+                               passwd=config.db_password,
+                               port=config.db_port)
     else:
-        conn = mysqldb.connect(config.db_hostname, db=config.db_name_format.format(site.dbName()),
-                               read_default_file=config.db_connect_file)
+        conn = mysqldb.connect(config.db_hostname,
+                               db=config.db_name_format.format(site.dbName()),
+                               read_default_file=config.db_connect_file,
+                               port=config.db_port)
 
     cursor = conn.cursor()
     pywikibot.output(u'Executing query:\n%s' % query)
