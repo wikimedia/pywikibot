@@ -39,7 +39,7 @@ except ImportError as _tk_error:
     Tkdialog = None
 
 
-def isAllowedLicense(photoInfo=None):
+def isAllowedLicense(photoInfo):
     """
     Check if the image contains the right license.
 
@@ -50,7 +50,7 @@ def isAllowedLicense(photoInfo=None):
     return photoInfo[u'license'] in allowed
 
 
-def downloadPhoto(photoUrl=''):
+def downloadPhoto(photoUrl):
     """
     Download the photo and store it in a StrinIO.StringIO object.
 
@@ -61,7 +61,7 @@ def downloadPhoto(photoUrl=''):
     return StringIO.StringIO(imageFile)
 
 
-def findDuplicateImages(photo=None, site=None):
+def findDuplicateImages(photo, site=None):
     """Return list of duplicate images.
 
     Takes the photo, calculates the SHA1 hash and asks the mediawiki api
@@ -78,7 +78,7 @@ def findDuplicateImages(photo=None, site=None):
     return site.allimages(sha1=base64.b16encode(hashObject.digest()))
 
 
-def getLicense(photoInfo=None):
+def getLicense(photoInfo):
     """Adding license to the Panoramio API with a beautiful soup hack."""
     photoInfo['license'] = u'c'
     page = urlopen(photoInfo.get(u'photo_url'))
@@ -97,7 +97,7 @@ def getLicense(photoInfo=None):
     return photoInfo
 
 
-def getFilename(photoInfo=None, site=None,
+def getFilename(photoInfo, site=None,
                 project=u'Panoramio'):
     """Build a good filename for the upload.
 
@@ -152,7 +152,7 @@ def cleanUpTitle(title):
     return title
 
 
-def getDescription(photoInfo=None, panoramioreview=False, reviewer=u'',
+def getDescription(photoInfo, panoramioreview=False, reviewer='',
                    override=u'', addCategory=u''):
     """Build description for the image."""
     desc = u''
@@ -201,7 +201,7 @@ def getDescription(photoInfo=None, panoramioreview=False, reviewer=u'',
     return desc % photoInfo
 
 
-def processPhoto(photoInfo=None, panoramioreview=False, reviewer=u'',
+def processPhoto(photoInfo, panoramioreview=False, reviewer='',
                  override=u'', addCategory=u'', autonomous=False, site=None):
     """Process a single Panoramio photo."""
     if not site:
