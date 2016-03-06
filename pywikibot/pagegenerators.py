@@ -2424,7 +2424,7 @@ class GoogleSearchPageGenerator(object):
                     yield page
 
 
-def MySQLPageGenerator(query, site=None):
+def MySQLPageGenerator(query, site=None, verbose=None):
     """
     Yield a list of pages based on a MySQL query.
 
@@ -2437,43 +2437,25 @@ def MySQLPageGenerator(query, site=None):
         FROM page
         WHERE page_namespace = 0;
 
-    Requires oursql <https://pythonhosted.org/oursql/> or
-    MySQLdb <https://sourceforge.net/projects/mysql-python/>
-
     @param query: MySQL query to execute
     @param site: Site object
     @type site: L{pywikibot.site.BaseSite}
-    @return: iterator of pywikibot.Page
+    @param verbose: if True, print query to be executed;
+        if None, config.verbose_output will be used.
+    @type verbose: None or bool
+    @return: generator which yield pywikibot.Page
     """
-    try:
-        import oursql as mysqldb
-    except ImportError:
-        import MySQLdb as mysqldb
+    from pywikibot.data import mysql
+
     if site is None:
         site = pywikibot.Site()
 
-    if config.db_connect_file is None:
-        conn = mysqldb.connect(config.db_hostname,
-                               db=config.db_name_format.format(site.dbName()),
-                               user=config.db_username,
-                               passwd=config.db_password,
-                               port=config.db_port)
-    else:
-        conn = mysqldb.connect(config.db_hostname,
-                               db=config.db_name_format.format(site.dbName()),
-                               read_default_file=config.db_connect_file,
-                               port=config.db_port)
-
-    cursor = conn.cursor()
-    pywikibot.output(u'Executing query:\n%s' % query)
-    query = query.encode(site.encoding())
-    cursor.execute(query)
-    while True:
-        try:
-            namespaceNumber, pageName = cursor.fetchone()
-        except TypeError:
-            # Limit reached or no more results
-            break
+    row_gen = mysql.mysql_query(query,
+                                dbname=site.dbName(),
+                                encoding=site.encoding(),
+                                verbose=verbose)
+    for row in row_gen:
+        namespaceNumber, pageName = row
         if pageName:
             # Namespace Dict only supports int
             namespace = site.namespace(int(namespaceNumber))
