@@ -475,6 +475,7 @@ class GeneratorFactory(object):
 
         return dupfiltergen
 
+    @deprecated_args(arg='category')
     def getCategory(self, category):
         """
         Return Category and start as defined by category.
@@ -483,7 +484,7 @@ class GeneratorFactory(object):
         @type category: str
         @rtype: tuple
         """
-        if category.startswith('-'):  # old arg parameter
+        if category and category.startswith('-'):
             categoryname = category.partition(':')[2]
             issue_deprecation_warning(
                 'The usage of "{0}" as actual parameter of '
@@ -491,6 +492,7 @@ class GeneratorFactory(object):
                 categoryname, 2, ArgumentDeprecationWarning)
         else:
             categoryname = category
+
         if not categoryname:
             categoryname = i18n.input(
                 'pywikibot-enter-category-name',
@@ -512,6 +514,7 @@ class GeneratorFactory(object):
                                                 defaultNamespace=14))
         return cat, startfrom
 
+    @deprecated_args(arg='category')
     def getCategoryGen(self, category, recurse=False, content=False,
                        gen_func=None):
         """
