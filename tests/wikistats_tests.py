@@ -30,6 +30,9 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('prefix', top)
         self.assertIn('total', top)
         self.assertEqual(top['prefix'], 'en')
+        self.assertTrue(all(isinstance(key, UnicodeType)
+                            for key in top.keys()
+                            if key is not None))
         self.assertIsInstance(top['total'], UnicodeType)
         self.assertEqual(ws.languages_by_size('wikipedia')[0], 'en')
         self.assertEqual(ws.languages_by_size('wikisource')[0], 'fr')
@@ -44,7 +47,13 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('en', data)
         self.assertIn('ht', data)
         self.assertGreater(int(data['en']['total']), 4000000)
-        data = ws.get_dict
+        data = data['en']
+        self.assertTrue(all(isinstance(key, UnicodeType)
+                            for key in data.keys()
+                            if key is not None))
+        self.assertIsInstance(data['total'], UnicodeType)
+        self.assertIn('prefix', data)
+        self.assertIn('total', data)
 
     def test_xml(self):
         """Test XML."""
@@ -54,6 +63,13 @@ class WikiStatsTestCase(TestCase):
         self.assertIn('en', data)
         self.assertIn('id', data)
         self.assertGreater(int(data['fr']['total']), 1600000)
+        data = data['fr']
+        self.assertTrue(all(isinstance(key, UnicodeType)
+                            for key in data.keys()
+                            if key is not None))
+        self.assertIsInstance(data['total'], UnicodeType)
+        self.assertIn('prefix', data)
+        self.assertIn('total', data)
 
 
 if __name__ == '__main__':
