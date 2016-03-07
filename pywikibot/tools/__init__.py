@@ -695,6 +695,7 @@ def intersect_generators(genlist):
 
     for source in genlist:
         threaded_gen = ThreadedGenerator(name=repr(source), target=source)
+        threaded_gen.daemon = True
         thrlist.append(threaded_gen)
 
     while True:
