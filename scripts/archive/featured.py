@@ -76,6 +76,7 @@ from pywikibot import i18n, textlib, config
 
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
     unichr = chr
@@ -620,7 +621,13 @@ def main(*args):
     @type args: list of unicode
     """
     options = {}
-    for arg in pywikibot.handle_args(args):
+    local_args = pywikibot.handle_args(args)
+
+    issue_deprecation_warning(
+        'featured.py script', 'Wikibase Client extension',
+        0, UserWarning)
+
+    for arg in local_args:
         if arg.startswith('-fromlang:'):
             options[arg[1:9]] = arg[10:].split(",")
         elif arg.startswith('-after:'):

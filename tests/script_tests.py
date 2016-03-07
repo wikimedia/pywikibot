@@ -122,6 +122,7 @@ auto_run_script_list = [
     'checkimages',
     'clean_sandbox',
     'disambredir',
+    'featured',
     'imagerecat',
     'login',
     'lonelypages',
