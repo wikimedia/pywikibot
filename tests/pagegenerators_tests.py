@@ -892,6 +892,15 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
 
     """Test GeneratorFactory with pagegenerators.LogeventsPageGenerator."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Setup test class."""
+        super(TestLogeventsFactoryGenerator, cls).setUpClass()
+        site = pywikibot.Site()
+        newuser_logevents = list(site.logevents(logtype='newusers', total=1))
+        if len(newuser_logevents) == 0:
+            raise unittest.SkipTest('No newuser logs found to test with.')
+
     user = True
 
     @unittest.expectedFailure
@@ -952,6 +961,39 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         # (no easy way of checking from pages)
 
         self.assertLessEqual(len(pages), 10)
+        self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
+
+    def test_logevents_with_start_timestamp(self):
+        """Test -logevents which uses timestamp for start."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        # We limit the results to 1 as running this on large websites like
+        # Wikipedia will give an insane number of results as it asks for all
+        # logevents since beginning till now.
+        self.assertTrue(gf.handleArg('-limit:1'))
+        self.assertTrue(gf.handleArg('-logevents:newusers,,21000101'))
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = set(gen)
+        self.assertGreater(len(pages), 0)
+        self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
+
+    def test_logevents_with_start_and_end_timestamp(self):
+        """Test -logevents which uses timestamps for start and end."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertTrue(gf.handleArg('-logevents:newusers,,21000101,20990101'))
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = set(gen)
+        self.assertEqual(len(pages), 0)
+
+    def test_logevents_with_total(self):
+        """Test -logevents which uses total."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertTrue(gf.handleArg('-logevents:newusers,,1'))
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = set(gen)
+        self.assertEqual(len(pages), 1)
         self.assertTrue(all(isinstance(item, pywikibot.Page) for item in pages))
 
 

@@ -103,7 +103,11 @@ parameterHelp = u"""\
                   across all namespaces.
 
 -logevents        Work on articles that were on a specified Special:Log.
-                  The value may be a comma separated list of three values:
+                  The value may be a comma separated list of these values:
+
+                      logevent,username,start,end
+
+                  or for backward compatibility:
 
                       logevent,username,total
 
@@ -123,6 +127,12 @@ parameterHelp = u"""\
                   -logevents:delete,,20 gives 20 pages from deletion log
                   -logevents:protect,Usr gives pages from protect by user Usr
                   -logevents:patrol,Usr,20 gives 20 patroled pages by user Usr
+                  -logevents:upload,,20121231,20100101 gives upload pages
+                  in the 2010s, 2011s, and 2012s
+                  -logevents:review,,20121231 gives review pages since the
+                  beginning till the 31 Dec 2012
+                  -logevents:review,Usr,20121231 gives review pages by user
+                  Usr since the beginning till the 31 Dec 2012
 
                   In some cases it must be written as -logevents:"patrol,Usr,20"
 
@@ -531,7 +541,7 @@ class GeneratorFactory(object):
                         recurse=recurse,
                         content=content)
 
-    def _parse_log_events(self, logtype, user=None, total=None):
+    def _parse_log_events(self, logtype, user=None, start=None, end=None):
         """
         Parse the -logevent argument information.
 
@@ -540,25 +550,47 @@ class GeneratorFactory(object):
         @param user: A username associated to the log events. Ignored if
             empty string or None.
         @type user: str
-        @param total: The total amount of pages returned.
-        @type total: str (castable to int) or int (positive)
+        @param start: Timestamp to start listing from. For backward
+            compatibility, this can also be the total amount of pages
+            that should be returned. It is taken as 'total' if the value does
+            not have 8 digits.
+        @type start: str convertable to Timestamp in the format YYYYMMDD. If
+            the length is not 8: for backward compatibility to use this as
+            'total', it can also be a str (castable to int) or int (positive).
+        @param end: Timestamp to end listing at
+        @type end: str convertable to Timestamp in the format YYYYMMDD
         @return: The generator or None if invalid 'total' value.
         @rtype: LogeventsPageGenerator
         """
         # TODO: Check if logtype is one of the allowed log types
         # TODO: -*log used 500 as default total, also use with -logevents?
-        if total is not None:
+
+        # 'start or None', because start might be an empty string
+        start = start or None
+        if isinstance(start, basestring) and len(start) == 8:
+            total = None
+            start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
+        elif start is not None:
             try:
-                total = int(total)
+                total = int(start)
                 if total <= 0:
                     raise ValueError
             except ValueError:
                 pywikibot.error(u'Total number of log ({0}) events must be a '
                                 'positive int.'.format(total))
                 return None
+            start = None
+
+        if end is not None:
+            if start is None:
+                pywikibot.error('End cannot be given if start is not given.')
+                return None
+            end = pywikibot.Timestamp.strptime(end, '%Y%m%d')
+
         # 'user or None', because user might be an empty string when
         # 'foo,,bar' was used.
-        return LogeventsPageGenerator(logtype, user or None, total=total)
+        return LogeventsPageGenerator(logtype, user or None, total=total,
+                                      start=start, end=end)
 
     def handleArg(self, arg):
         """Parse one argument at a time.
@@ -923,8 +955,8 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
 
 
 @deprecated_args(number="total", mode="logtype", repeat=None)
-def LogeventsPageGenerator(logtype=None, user=None, site=None,
-                           namespace=0, total=None):
+def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=0,
+                           total=None, start=None, end=None, reverse=False):
     """
     Generate Pages for specified modes of logevents.
 
@@ -938,11 +970,18 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None,
     @type namespace: int
     @param total: Maximum number of pages to retrieve in total
     @type total: int
+    @param start: Timestamp to start listing from
+    @type start: pywikibot.Timestamp
+    @param end: Timestamp to end listing at
+    @type end: pywikibot.Timestamp
+    @param reverse: if True, start with oldest changes (default: newest)
+    @type reverse: bool
     """
     if site is None:
         site = pywikibot.Site()
-    for entry in site.logevents(total=total, logtype=logtype,
-                                user=user, namespace=namespace):
+    for entry in site.logevents(total=total, logtype=logtype, user=user,
+                                namespace=namespace, start=start, end=end,
+                                reverse=False):
         try:
             yield entry.page()
         except KeyError as e:

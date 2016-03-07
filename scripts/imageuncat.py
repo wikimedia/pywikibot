@@ -30,7 +30,9 @@ __version__ = '$Id$'
 from datetime import timedelta
 
 import pywikibot
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot import pagegenerators
+from pywikibot.tools import issue_deprecation_warning
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1371,6 +1373,10 @@ def main(*args):
     for arg in local_args:
         if arg.startswith('-yesterday'):
             generator = uploadedYesterday(site)
+            issue_deprecation_warning(
+                'The usage of "-yesterday"',
+                '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
+                2, ArgumentDeprecationWarning)
         elif arg.startswith('-recentchanges'):
             generator = recentChanges(site=site, delay=120)
         else:
