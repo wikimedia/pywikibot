@@ -850,7 +850,7 @@ def handle_args(args=None, do_help=True):
             config.family = value
         elif option == '-lang':
             config.mylang = value
-        elif option == '-user:':
+        elif option == '-user':
             username = value
         elif option in ('-putthrottle', '-pt'):
             config.put_throttle = int(value)
