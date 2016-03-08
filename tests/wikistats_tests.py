@@ -52,7 +52,7 @@ class WikiStatsTestCase(TestCase):
         FAMILY = 'wikipedia'
         ws = WikiStats()
         data = ws.get_dict(FAMILY)
-        last = sys.maxint
+        last = sys.maxsize
         last_code = ''
         for code in ws.languages_by_size(FAMILY):
             curr = int(data[code]['good'])
