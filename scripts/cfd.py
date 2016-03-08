@@ -13,7 +13,7 @@ Syntax:
 """
 #
 # (C) Ben McIlwain, 2008
-# (C) Pywikibot team, 2009-2013
+# (C) Pywikibot team, 2009-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -143,7 +143,7 @@ def main(*args):
                 pywikibot.Site(), dest, ns=14)
             if destpage.isCategoryRedirect():
                 summary = 'CANCELED. Destination is redirect: ' + summary
-                pywikibot.output(summary, toStdout=True)
+                pywikibot.stdout(summary)
                 robot = None
             else:
                 robot = CategoryMoveBot(oldcat=src, newcat=dest, batch=True,
@@ -170,7 +170,7 @@ def main(*args):
             # so ignore it.
             pass
         if summary != "" and robot is not None:
-            pywikibot.output(summary, toStdout=True)
+            pywikibot.stdout(summary)
             # Run, robot, run!
             robot.run()
         summary = ""

@@ -83,7 +83,7 @@ Custom format can be applied to the following items extrapolated from a
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -255,7 +255,7 @@ def main(*args):
                 pywikibot.stdout(output_list[-1])
             if page_get:
                 try:
-                    pywikibot.output(page.text, toStdout=True)
+                    pywikibot.stdout(page.text)
                 except pywikibot.Error as err:
                     pywikibot.output(err)
             if base_dir:

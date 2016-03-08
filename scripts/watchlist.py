@@ -17,7 +17,7 @@ Command line options:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2015
+# (C) Pywikibot team, 2005-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -115,7 +115,7 @@ def main(*args):
         watchlist = refresh(site, sysop=sysop)
         pywikibot.output(u'%i pages in the watchlist.' % len(watchlist))
         for page in watchlist:
-            pywikibot.output(page.title(), toStdout=True)
+            pywikibot.stdout(page.title())
 
 if __name__ == "__main__":
     main()

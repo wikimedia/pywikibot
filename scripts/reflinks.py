@@ -445,8 +445,8 @@ class ReferencesRobot(Bot):
 
     def httpError(self, err_num, link, pagetitleaslink):
         """Log HTTP Error."""
-        pywikibot.output(u'HTTP error (%s) for %s on %s'
-                         % (err_num, link, pagetitleaslink), toStdout=True)
+        pywikibot.stdout('HTTP error ({0}) for {1} on {2}'
+                         ''.format(err_num, link, pagetitleaslink))
 
     def getPDFTitle(self, ref, f):
         """Use pdfinfo to retrieve title from a PDF.
