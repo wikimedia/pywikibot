@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2016
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -14,6 +14,7 @@ import pywikibot
 
 if sys.version_info[0] > 2:
     import csv
+    unicode = str
 else:
     try:
         import unicodecsv as csv
@@ -184,7 +185,7 @@ class WikiStats(object):
             site = {}
 
             for field in row.findall('field'):
-                site[field.get('name')] = field.text
+                site[field.get('name')] = unicode(field.text)
 
             data.append(site)
 
