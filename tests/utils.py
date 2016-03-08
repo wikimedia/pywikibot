@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2015
+# (C) Pywikibot team, 2013-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,10 +10,12 @@ __version__ = '$Id$'
 #
 import inspect
 import json
+import locale
 import os
 import re
 import subprocess
 import sys
+import tempfile
 import time
 import traceback
 import warnings
@@ -42,11 +44,25 @@ from pywikibot.tools import (
 
 from tests import _pwb_py
 from tests import unittest  # noqa
+from tests import unittest_print
 
 OSWIN32 = (sys.platform == 'win32')
 
 PYTHON_26_CRYPTO_WARN = ('Python 2.6 is no longer supported by the Python core '
                          'team, please upgrade your Python.')
+
+WIN32_LOCALE_UPDATE = """
+<gs:GlobalizationServices xmlns:gs="urn:longhornGlobalizationUnattend">
+    <gs:UserList>
+        <gs:User UserID="Current" CopySettingsToDefaultUserAcct="true"
+                                  CopySettingsToSystemAcct="true"/>
+    </gs:UserList>
+
+    <gs:UserLocale>
+        <gs:Locale Name="%s" SetAsCurrent="true" ResetAllSettings="false"/>
+    </gs:UserLocale>
+</gs:GlobalizationServices>
+"""
 
 
 class DrySiteNote(RuntimeWarning):
@@ -626,6 +642,132 @@ class PatchedHttp(object):
         self._module.http = self._old_http
 
 
+def is_simple_locale_with_region(locale):
+    """Check if a locale is only an ISO and region code."""
+    # Some locale are unicode names, which are not valid
+    try:
+        lang, sep, qualifier = locale.partition('_')
+    except UnicodeDecodeError:
+        return False
+    if '-' in lang:
+        return False
+    # Only allow qualifiers that look like a country code, without any suffix
+    if qualifier and len(qualifier) == 2:
+        return True
+    else:
+        return False
+
+
+def get_simple_locales():
+    """Get list of simple locales."""
+    return [locale_code for locale_code in sorted(locale.locale_alias.keys())
+            if is_simple_locale_with_region(locale_code)]
+
+
+def generate_locale(lang, region=True, encoding='utf8'):
+    """
+    Generate a locale string.
+
+    @param lang: language code
+    @type lang: str
+    @param region: region code; if True, a random one will be used
+    @type region: str or True
+    @param encoding: encoding name
+    @type encoding: str
+    @rtype: str
+    """
+    locale_prefix = lang + '_'
+
+    if region is True:
+        locales = get_simple_locales()
+
+        lang_locales = [code for code in locales
+                        if code.startswith(locale_prefix)]
+        assert(lang_locales)
+
+        # Get a region from the first locale
+        lang, sep, region = lang_locales[0].partition('_')
+        assert lang and sep and region
+
+    if region:
+        locale_code = locale_prefix + region.upper()
+    else:
+        locale_code = lang
+
+    if encoding:
+        locale_code += '.' + encoding
+
+    return locale_code
+
+
+def execute_with_temp_text_file(text, command, **kwargs):
+    """
+    Perform command on a temporary file.
+
+    @param text: contents of temporary file
+    @type text: str
+    @param command: command to execute with {0} replaced with the filename
+    @type command: str
+    @param kwargs: parameters for tempfile.mkstemp/tempfile.NamedTemporaryFile,
+        such as prefix, suffix and dir
+    """
+    options = {
+        'shell': True,
+        'stdout': subprocess.PIPE,
+        'stderr': subprocess.STDOUT,
+    }
+
+    # NamedTemporaryFile does not work correctly with win32_set_global_locale
+    # subprocess.Popen is a context handler in Python 3.2+
+    if OSWIN32 or PY2:
+        (fd, filename) = tempfile.mkstemp(text=True, **kwargs)
+        try:
+            os.close(fd)
+            with open(filename, 'wt') as f:
+                f.write(text)
+
+            command = command.format(filename)
+
+            p = subprocess.Popen(command, **options)
+            out = p.communicate()[0]
+
+            # Python 2 raises an exception when attempting to close the process
+            # Python 3 does not allow the file to be removed until the process
+            # has been closed
+            if not PY2:
+                p.terminate()
+        finally:
+            try:
+                os.remove(filename)
+            except OSError:
+                # As it is a temporary file, the OS should clean it up
+                unittest_print('Could not delete {0}'.format(filename))
+    else:
+        with tempfile.NamedTemporaryFile(mode='w+t', **kwargs) as f:
+            f.write(text)
+            f.flush()
+            command = command.format(f.name)
+            with subprocess.Popen(command, **options) as p:
+                out = p.communicate()[0]
+
+    if out:
+        unittest_print('command "{0}" output: {1}'.format(command, out))
+
+
+def win32_set_global_locale(locale_code):
+    """Set global locale on win32."""
+    locale_code = locale_code.split('.')[0]
+    win_locale_code = locale_code.replace('_', '-')
+    locale_update_xml = WIN32_LOCALE_UPDATE % win_locale_code
+    command = 'control.exe intl.cpl,,/f:"{0}"'
+    execute_with_temp_text_file(locale_update_xml, command, suffix='.xml')
+
+    actual_code = locale.getdefaultlocale()[0]
+    assert locale_code == actual_code, \
+        ('locale code {0} not set; actual code is {1}'
+         .format(locale_code, actual_code))
+
+
 def execute(command, data_in=None, timeout=0, error=None):
     """
     Execute a command and capture outputs.
@@ -661,8 +803,26 @@ def execute(command, data_in=None, timeout=0, error=None):
     env[str('PYTHONIOENCODING')] = str(config.console_encoding)
 
     # LC_ALL is used by i18n.input as an alternative for userinterface_lang
-    if pywikibot.config.userinterface_lang:
-        env[str('LC_ALL')] = str(pywikibot.config.userinterface_lang)
+    # A complete locale string needs to be created, so the country code
+    # is guessed, however it is discarded when loading config.
+    if config.userinterface_lang:
+        current_locale = locale.getdefaultlocale()[0].split('.')[0]
+        locale_prefix = str(config.userinterface_lang + '_')
+
+        if not current_locale.startswith(locale_prefix):
+            locale_code = generate_locale(
+                config.userinterface_lang,
+                encoding=config.console_encoding)
+
+            env[str('LC_ALL')] = str(locale_code)
+
+            if OSWIN32:
+                # This is not multiprocessing safe, as it affects all processes
+                win32_set_global_locale(locale_code)
+        else:
+            current_locale = None
+    else:
+        current_locale = None
 
     # Set EDITOR to an executable that ignores all arguments and does nothing.
     env[str('EDITOR')] = str('call' if OSWIN32 else 'true')
@@ -720,6 +880,10 @@ def execute(command, data_in=None, timeout=0, error=None):
         stderr_lines += p.stderr.read()
 
     data_out = p.communicate()
+
+    if OSWIN32 and current_locale:
+        win32_set_global_locale(current_locale)
+
     return {'exit_code': p.returncode,
             'stdout': data_out[0].decode(config.console_encoding),
             'stderr': (stderr_lines + data_out[1]).decode(config.console_encoding)}
