@@ -169,7 +169,7 @@ class GraphDrawer(object):
         node = pydot.Node(self.getLabel(page), shape='rectangle')
         node.set_URL("\"http://%s%s\""
                      % (page.site.hostname(),
-                        page.site.get_address(page.urlname())))
+                        page.site.get_address(page.title(asUrl=True))))
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')
@@ -271,7 +271,7 @@ def getFilename(page, extension=None):
     """
     filename = '%s-%s-%s' % (page.site.family.name,
                              page.site.code,
-                             page.titleForFilename())
+                             page.title(as_filename=True))
     if extension:
         filename += '.%s' % extension
     return filename
