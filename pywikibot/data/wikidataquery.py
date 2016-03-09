@@ -454,7 +454,7 @@ def fromClaim(claim):
 
     if claim.type == 'wikibase-item':
         return HasClaim(claim.getID(numeric=True), claim.getTarget().getID(numeric=True))
-    if claim.type == 'string':
+    if Claim.types.get(claim.type) == basestring:
         return StringClaim(claim.getID(numeric=True), claim.getTarget())
     else:
         raise TypeError("Cannot construct a query from a claim of type %s"
