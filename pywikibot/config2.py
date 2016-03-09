@@ -50,6 +50,7 @@ import stat
 import sys
 import types
 
+from locale import getdefaultlocale
 from warnings import warn
 
 from pywikibot.logging import error, output, warning
@@ -1085,6 +1086,8 @@ if OSWIN32 and editor:
             'forward slashs as a path delimiter or to escape the normal '
             'path delimiter.')
 
+if userinterface_lang is None:
+    userinterface_lang = getdefaultlocale()[0].split('_')[0]
 
 # Fix up default site
 if family == 'wikipedia' and mylang == 'language':
