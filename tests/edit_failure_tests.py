@@ -151,7 +151,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
         self.assertAPIError('invalid-snak',
-                            'Invalid snak (Can only construct a '
+                            'Invalid snak. (Can only construct a '
                             'MonolingualTextValue with a string value.)',
                             item.addClaim, claim)
 
