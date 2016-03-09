@@ -171,6 +171,15 @@ class TestLiveApiFunctions(WikidataTestCase):
         q = query.fromClaim(claim)
         self.assertEqual(str(q), 'string[268:"somestring"]')
 
+        # Datatype: commonsMedia
+        claim = Claim(self.repo, 'P18')
+        claim.setTarget(
+            pywikibot.FilePage(
+                pywikibot.Site(self.family, self.code),
+                'Foo.jpg'))
+        q = query.fromClaim(claim)
+        self.assertEqual(str(q), 'string[18:"Foo.jpg"]')
+
     def testQuerySets(self):
         """Test that we can join queries together correctly."""
         # construct via queries
