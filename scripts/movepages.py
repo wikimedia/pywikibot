@@ -26,9 +26,9 @@ Furthermore, the following command line parameters are supported:
 -summary          Prompt for a custom summary, bypassing the predefined message
                   texts. Argument can also be given as "-summary:XYZ".
 
--pairs            Read pairs of file names from a file. The file must be in a
+-pairsfile        Read pairs of file names from a file. The file must be in a
                   format [[frompage]] [[topage]] [[frompage]] [[topage]] ...
-                  Argument can also be given as "-pairs:filename"
+                  Argument can also be given as "-pairsfile:filename"
 
 """
 #
@@ -47,6 +47,8 @@ import re
 
 import pywikibot
 
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import issue_deprecation_warning
 from pywikibot import i18n, pagegenerators
 
 from pywikibot.bot import MultipleSitesBot
@@ -192,11 +194,16 @@ def main(*args):
 
     for arg in local_args:
         if arg.startswith('-pairs'):
-            if len(arg) == len('-pairs'):
+            issue_deprecation_warning(
+                '-pairs',
+                '-pairsfile',
+                2, ArgumentDeprecationWarning)
+        elif arg.startswith('-pairsfile'):
+            if len(arg) == len('-pairsfile'):
                 filename = pywikibot.input(
                     u'Enter the name of the file containing pairs:')
             else:
-                filename = arg[len('-pairs:'):]
+                filename = arg[len('-pairsfile:'):]
             oldName1 = None
             for page in pagegenerators.TextfilePageGenerator(filename):
                 if oldName1:

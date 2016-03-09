@@ -75,9 +75,9 @@ Furthermore, the following command line parameters are supported:
                   (or no replacements are defined via -fix or the arguments)
                   it'll ask for additional replacements at start.
 
--replacementfile  Lines from the given file name(s) will be read as replacement
+-pairsfile        Lines from the given file name(s) will be read as replacement
                   arguments. i.e. a file containing lines "a" and "b", used as
-                  python pwb.py replace -page:X -replacementfile:file c d
+                  python pwb.py replace -page:X -pairsfile:file c d
                   will replace 'a' with 'b' and 'c' with 'd'.
 
 -always           Don't prompt you for each replacement
@@ -152,6 +152,8 @@ else:
 
 import pywikibot
 
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import issue_deprecation_warning
 from pywikibot import i18n, textlib, pagegenerators, Bot
 
 from pywikibot import editor as editarticle
@@ -917,14 +919,19 @@ def main(*args):
         elif arg.startswith('-manualinput'):
             manual_input = True
         elif arg.startswith('-replacementfile'):
+            issue_deprecation_warning(
+                '-replacementfile',
+                '-pairsfile',
+                2, ArgumentDeprecationWarning)
+        elif arg.startswith('-pairsfile'):
             if len(commandline_replacements) % 2:
                 replacement_file_arg_misplaced = True
 
-            if arg == '-replacementfile':
+            if arg == '-pairsfile':
                 replacement_file = pywikibot.input(
                     u'Please enter the filename to read replacements from:')
             else:
-                replacement_file = arg[len('-replacementfile:'):]
+                replacement_file = arg[len('-pairsfile:'):]
         else:
             commandline_replacements.append(arg)
 
@@ -936,7 +943,7 @@ def main(*args):
 
     if replacement_file_arg_misplaced:
         pywikibot.error(
-            '-replacementfile used between a pattern replacement pair.')
+            '-pairsfile used between a pattern replacement pair.')
         return False
 
     if replacement_file:
