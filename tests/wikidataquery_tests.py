@@ -153,15 +153,21 @@ class TestLiveApiFunctions(WikidataTestCase):
 
     def testQueriesDirectFromClaim(self):
         """Test construction of the right Query from a page.Claim."""
+        # Datatype: item
         claim = Claim(self.repo, 'P17')
         claim.setTarget(pywikibot.ItemPage(self.repo, 'Q35'))
-
         q = query.fromClaim(claim)
         self.assertEqual(str(q), 'claim[17:35]')
 
+        # Datatype: string
+        claim = Claim(self.repo, 'P225')
+        claim.setTarget('somestring')
+        q = query.fromClaim(claim)
+        self.assertEqual(str(q), 'string[225:"somestring"]')
+
+        # Datatype: external-id
         claim = Claim(self.repo, 'P268')
         claim.setTarget('somestring')
-
         q = query.fromClaim(claim)
         self.assertEqual(str(q), 'string[268:"somestring"]')
 
