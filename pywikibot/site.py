@@ -6816,7 +6816,7 @@ class DataSite(APISite):
     def _get_baserevid(self, claim, baserevid):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
-            issue_deprecation_warning('claim without on_item set', 3)
+            issue_deprecation_warning('claim without on_item set', None, 3)
             if not baserevid:
                 warn('Neither claim.on_item nor baserevid provided',
                      UserWarning, 3)
