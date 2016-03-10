@@ -61,6 +61,7 @@ from pywikibot.exceptions import (
     UserBlocked,
     EntityTypeUnknownException,
 )
+from pywikibot.family import WikimediaFamily
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     itergroup, UnicodeMixin, ComparableMixin, SelfCallMixin, SelfCallString,
@@ -4417,8 +4418,8 @@ class APISite(BaseSite):
 
         @param searchstring: the text to search for
         @type searchstring: unicode
-        @param where: Where to search; value must be "text" or "titles" (many
-            wikis do not support title search)
+        @param where: Where to search; value must be "text", "title" or
+            "nearmatch" (many wikis do not support title or nearmatch search)
         @param namespaces: search only in these namespaces (defaults to all)
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types.  May be a '|' separated
@@ -4431,10 +4432,29 @@ class APISite(BaseSite):
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
+        where_types = ['text', 'title', 'titles']
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.17'):
+            where_types.append('nearmatch')
         if not searchstring:
             raise Error("search: searchstring cannot be empty")
-        if where not in ("text", "titles"):
+        if where not in where_types:
             raise Error("search: unrecognized 'where' value: %s" % where)
+        if where in ('title', 'titles'):
+            if isinstance(self.family, WikimediaFamily):
+                # 'title' search was disabled, use intitle instead
+                searchstring = 'intitle:' + searchstring
+                issue_deprecation_warning(
+                    "where='{0}'".format(where),
+                    "searchstring='{0}'".format(searchstring), 2)
+                where = None  # default
+            else:
+                if where == 'titles':
+                    issue_deprecation_warning("where='titles'",
+                                              "where='title'", 2)
+                if MediaWikiVersion(self.version()) < MediaWikiVersion('1.11'):
+                    where = 'titles'
+                else:
+                    where = 'title'
         if namespaces == []:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
         if not namespaces:
