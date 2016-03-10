@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -861,47 +861,59 @@ def showDiff(oldtext, newtext, context=0):
 
 # Throttle and thread handling
 
-stopped = False
-
 
 def stopme():
     """
     Drop this process from the throttle log, after pending threads finish.
 
-    Can be called manually if desired, but if not, will be called automatically
-    at Python exit.
+    Can be called manually if desired. Does not clean async_manager.
+    This should be run when a bot does not interact with the Wiki, or
+    when it has stopped doing so. After a bot has run stopme() it will
+    not slow down other bots any more.
     """
-    global stopped
+    _flush(False)
+
+
+def _flush(stop=True):
+    """
+    Drop this process from the throttle log, after pending threads finish.
+
+    Wait for the page-putter to flush its queue. Also drop this process from the
+    throttle log. Called automatically at Python exit.
+    """
     _logger = "wiki"
 
-    if not stopped:
-        debug(u"stopme() called", _logger)
+    debug('_flush() called', _logger)
 
-        def remaining():
-            remainingPages = page_put_queue.qsize() - 1
+    def remaining():
+        remainingPages = page_put_queue.qsize()
+        if stop:
             # -1 because we added a None element to stop the queue
+            remainingPages -= 1
 
-            remainingSeconds = datetime.timedelta(
-                seconds=(remainingPages * config.put_throttle))
-            return (remainingPages, remainingSeconds)
+        remainingSeconds = datetime.timedelta(
+            seconds=(remainingPages * config.put_throttle))
+        return (remainingPages, remainingSeconds)
 
+    if stop:
+        # None task element leaves async_manager
         page_put_queue.put((None, [], {}))
-        stopped = True
 
-        if page_put_queue.qsize() > 1:
-            num, sec = remaining()
-            output(color_format(
-                '{lightblue}Waiting for {num} pages to be put. '
-                'Estimated time remaining: {sec}{default}', num=num, sec=sec))
+    num, sec = remaining()
+    if num > 0:
+        output(color_format(
+            '{lightblue}Waiting for {num} pages to be put. '
+            'Estimated time remaining: {sec}{default}', num=num, sec=sec))
 
-        while(_putthread.isAlive()):
-            try:
-                _putthread.join(1)
-            except KeyboardInterrupt:
-                if input_yn('There are %i pages remaining in the queue. '
-                            'Estimated time remaining: %s\nReally exit?'
-                            % remaining(), default=False, automatic_quit=False):
-                    return
+    while _putthread.isAlive() and page_put_queue.qsize() > 0:
+        try:
+            _putthread.join(1)
+        except KeyboardInterrupt:
+            if input_yn('There are {0} pages remaining in the queue. '
+                        'Estimated time remaining: {1}\nReally exit?'
+                        ''.format(*remaining()),
+                        default=False, automatic_quit=False):
+                return
 
     # only need one drop() call because all throttles use the same global pid
     try:
@@ -910,7 +922,7 @@ def stopme():
     except IndexError:
         pass
 
-atexit.register(stopme)
+atexit.register(_flush)
 
 
 # Create a separate thread for asynchronous page saves (and other requests)
