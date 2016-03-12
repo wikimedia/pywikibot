@@ -874,9 +874,12 @@ class TestPageDelete(TestCase):
         p = pywikibot.Page(site, u'User:Unicodesnowman/DeleteTest')
         # Ensure the page exists
         p.text = 'pywikibot unit test page'
-        p.save('unit test', botflag=True)
+        p.save('#redirect[[unit test]]', botflag=True)
+        self.assertEqual(p.isRedirectPage(), True)
         # Test deletion
         p.delete(reason='pywikibot unit test', prompt=False, mark=False)
+        self.assertEqual(p._pageid, 0)
+        self.assertEqual(p.isRedirectPage(), False)
         self.assertRaises(pywikibot.NoPage, p.get, force=True)
         # Test undeleting last two revisions
         del_revs = list(p.loadDeletedRevisions())
