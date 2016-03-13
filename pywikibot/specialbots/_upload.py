@@ -47,6 +47,7 @@ class UploadRobot(BaseBot):
                  target_site=None,
                  aborts: Union[bool, list, None] = None,
                  chunk_size: int = 0,
+                 asynchronous: bool = False,
                  summary: Optional[str] = None,
                  filename_prefix: Optional[str] = None, **kwargs):
         """Initializer.
@@ -74,6 +75,8 @@ class UploadRobot(BaseBot):
         @param chunk_size: Upload the file in chunks (more overhead, but
             restartable) specified in bytes. If no value is specified the file
             will be uploaded as whole.
+        @param asynchronous: Make potentially large file operations
+            asynchronous on the server side when possible.
         @param filename_prefix: Specify prefix for the title of every
             file's page.
         @keyword always: Disables any input, requires that either
@@ -101,6 +104,7 @@ class UploadRobot(BaseBot):
         self.ignore_warning = ignore_warning
         self.aborts = aborts or []
         self.chunk_size = chunk_size
+        self.asynchronous = asynchronous
         self.summary = summary
         self.filename_prefix = filename_prefix
 
@@ -394,6 +398,7 @@ class UploadRobot(BaseBot):
                                        ignore_warnings=ignore_warnings,
                                        chunk_size=self.chunk_size,
                                        _file_key=_file_key, _offset=_offset,
+                                       asynchronous=self.asynchronous,
                                        comment=self.summary)
         except APIError as error:
             if error.code == 'uploaddisabled':

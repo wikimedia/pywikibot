@@ -24,6 +24,8 @@ The following parameters are supported:
                     'Mi': Mebibytes (1024x1024 B)
 
                 The suffixes are case insensitive.
+  -async        Make potentially large file operations asynchronous on the
+                server side when possible.
   -always       Don't ask the user anything. This will imply -keep and
                 -noverify and require that either -abortonwarn or -ignorewarn
                 is defined for all. It will also require a valid file name and
@@ -113,6 +115,7 @@ def main(*args) -> None:
     aborts = set()
     ignorewarn = set()
     chunk_size = 0
+    asynchronous = False
     recursive = False
     description_file = None
 
@@ -150,6 +153,8 @@ def main(*args) -> None:
         elif arg == '-chunked':
             match = CHUNK_SIZE_REGEX.match(option)
             chunk_size = get_chunk_size(match)
+        elif arg == '-async':
+            asynchronous = True
         elif arg == '-descfile':
             description_file = value
         elif not url:
@@ -213,6 +218,7 @@ def main(*args) -> None:
                       keep_filename=keep_filename,
                       verify_description=verify_description, aborts=aborts,
                       ignore_warning=ignorewarn, chunk_size=chunk_size,
+                      asynchronous=asynchronous,
                       always=always, summary=summary,
                       filename_prefix=filename_prefix)
     bot.run()
