@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -305,12 +305,14 @@ class UI(object):
 
         @param question: The question, without trailing whitespace.
         @type question: basestring
-        @param options: All available options. Each entry contains the full
-            length answer and a shortcut of only one character. The shortcut
-            must not appear in the answer. Alternatively they may be a
-            Option (or subclass) instance. ChoiceException instances which have
-            a full option and shortcut and will be raised if selected.
-        @type options: iterable containing sequences of length 2 or Option
+        @param options: Iterable of all available options. Each entry contains
+            the full length answer and a shortcut of only one character.
+            Alternatively they may be Option (or subclass) instances or
+            ChoiceException instances which have a full option and shortcut
+            and will be raised if selected.
+        @type options: iterable containing sequences of length 2 or
+            iterable containing Option instances or ChoiceException as well.
+            Singletons of Option and its subclasses are also accepted.
         @param default: The default answer if no was entered. None to require
             an answer.
         @type default: basestring
@@ -329,7 +331,10 @@ class UI(object):
         """
         if force and default is None:
             raise ValueError('With no default option it cannot be forced')
-        options = list(options)
+        if isinstance(options, Option):
+            options = [options]
+        else:  # make a copy
+            options = list(options)
         if len(options) == 0:
             raise ValueError(u'No options are given.')
         if automatic_quit:
