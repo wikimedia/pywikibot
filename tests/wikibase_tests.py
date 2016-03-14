@@ -155,8 +155,6 @@ class TestWikibaseTypes(WikidataTestCase):
         self.assertIsInstance(y.precision, float)
         z = pywikibot.Coordinate(site=repo, lat=12.0, lon=13.0)
         with self.assertRaises(ValueError):
-            z.precision
-        with self.assertRaises(ValueError):
             z.precisionToDim()
 
     def test_WbTime(self):

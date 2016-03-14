@@ -355,7 +355,7 @@ class Coordinate(_WbRepresentation):
         @rtype: float or None
         """
         if self._dim is None and self._precision is None:
-            raise ValueError('No values set for dim or precision')
+            return None
         if self._precision is None and self._dim is not None:
             radius = 6378137  # TODO: Support other globes
             self._precision = math.degrees(
