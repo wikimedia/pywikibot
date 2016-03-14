@@ -91,3 +91,8 @@ pycountry
 
 # scripts/weblinkchecker.py
 memento_client>=0.5.1
+
+# tools/__init__.py
+# pywikibot prefers using the inbuilt bz2 module if python was compiled with
+# bz2 support. But if it wasn't, bz2file is used instead.
+# bz2file

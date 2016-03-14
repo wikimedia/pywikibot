@@ -8,7 +8,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 __version__ = '$Id$'
 
-import bz2
 import collections
 import gzip
 import inspect
@@ -38,6 +37,15 @@ else:
 
 from pywikibot.logging import debug
 
+try:
+    import bz2
+except ImportError as bz2_import_error:
+    try:
+        import bz2file as bz2
+        warn('package bz2 was not found; using bz2file', ImportWarning)
+    except ImportError:
+        warn('package bz2 and bz2file were not found', ImportWarning)
+        bz2 = bz2_import_error
 
 if PYTHON_VERSION < (3, 5):
     # although deprecated in 3 completely no message was emitted until 3.5
@@ -988,6 +996,8 @@ def open_archive(filename, mode='rb', use_extension=True):
             extension = ''
 
     if extension == 'bz2':
+        if isinstance(bz2, ImportError):
+            raise bz2
         return wrap(bz2.BZ2File(filename, mode), 1)
     elif extension == 'gz':
         return wrap(gzip.open(filename, mode), 0)

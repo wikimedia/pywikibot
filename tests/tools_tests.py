@@ -20,7 +20,9 @@ import warnings
 from pywikibot import tools
 
 from tests import join_xml_data_path
-from tests.aspects import unittest, DeprecationTestCase, TestCase, MetaTestCaseClass
+from tests.aspects import (
+    unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
+)
 from tests.utils import expected_failure_if, add_metaclass
 
 
@@ -105,6 +107,29 @@ class OpenArchiveTestCase(TestCase):
         self.assertEqual(self._get_content(self.base_file + '.bz2'), self.original_content)
         self.assertEqual(self._get_content(self.base_file + '.bz2', use_extension=False),
                          self.original_content)
+
+    @require_modules('bz2file')
+    def test_open_archive_with_bz2file(self):
+        """Test open_archive when bz2file library."""
+        old_bz2 = tools.bz2
+        try:
+            tools.bz2 = __import__('bz2file')
+            self.assertEqual(self._get_content(self.base_file + '.bz2'),
+                             self.original_content)
+            self.assertEqual(self._get_content(self.base_file + '.bz2',
+                                               use_extension=False),
+                             self.original_content)
+        finally:
+            tools.bz2 = old_bz2
+
+    def test_open_archive_without_bz2(self):
+        """Test open_archive when bz2 and bz2file are not available."""
+        old_bz2 = tools.bz2
+        try:
+            tools.bz2 = ImportError()
+            self.assertRaises(ImportError, self._get_content, self.base_file + '.bz2')
+        finally:
+            tools.bz2 = old_bz2
 
     def test_open_archive_gz(self):
         """Test open_archive with gz compressor in the standard library."""

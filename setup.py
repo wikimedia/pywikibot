@@ -41,7 +41,7 @@ def python_is_supported():
 if not python_is_supported():
     raise RuntimeError(versions_required_message % sys.version)
 
-test_deps = []
+test_deps = ['bz2file']
 
 dependencies = ['requests']
 
@@ -140,6 +140,12 @@ if sys.version_info[0] == 2:
         dependencies += extra_deps['security']
 
     script_deps['data_ingestion.py'] = extra_deps['csv']
+
+try:
+    import bz2  # noqa: unused import
+except ImportError:
+    # Use bz2file if the python is not compiled with bz2 support.
+    dependencies.append('bz2file')
 
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
