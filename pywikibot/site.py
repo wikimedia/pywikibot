@@ -6982,7 +6982,7 @@ class DataSite(APISite):
         params['token'] = self.tokens['edit']
 
         for arg in kwargs:
-            if arg in ['clear', 'data', 'exclude', 'summary']:
+            if arg in ['clear', 'data', 'summary']:
                 params[arg] = kwargs[arg]
             elif arg != 'baserevid':
                 warn('Unknown wbeditentity parameter {0} ignored'.format(arg),
