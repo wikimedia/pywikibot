@@ -185,7 +185,7 @@ class HarvestRobot(WikidataBot):
                                     continue
 
                                 claim.setTarget(linked_item)
-                            elif claim.type == 'string':
+                            elif claim.type in ('string', 'external-id'):
                                 claim.setTarget(value.strip())
                             elif claim.type == 'commonsMedia':
                                 commonssite = pywikibot.Site("commons", "commons")
