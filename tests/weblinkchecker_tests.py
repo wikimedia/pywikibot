@@ -52,7 +52,8 @@ class WeblibTestMementoWebCite(MementoTestCase, weblib_tests.TestWebCite):
     """Test WebCite Memento using old weblib tests."""
 
     timegate_uri = 'http://timetravel.mementoweb.org/webcite/timegate/'
-    hostname = timegate_uri
+    hostname = ('http://timetravel.mementoweb.org/webcite/'
+                'timemap/json/http://google.com')
 
 
 class TestMementoWebCite(MementoTestCase):
@@ -60,7 +61,8 @@ class TestMementoWebCite(MementoTestCase):
     """New WebCite Memento tests."""
 
     timegate_uri = 'http://timetravel.mementoweb.org/webcite/timegate/'
-    hostname = timegate_uri
+    hostname = ('http://timetravel.mementoweb.org/webcite/'
+                'timemap/json/http://google.com')
 
     def test_newest(self):
         """Test WebCite for newest https://google.com."""
