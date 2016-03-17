@@ -1114,6 +1114,7 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                              topOnly=topOnly, total=total,
                              user=user, excludeuser=excludeuser)
 
+    gen.request['rcprop'] = 'title'
     gen = (pywikibot.Page(site, x['title'])
            for x in gen if x['type'] != 'log' or 'title' in x)
 
