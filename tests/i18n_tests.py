@@ -440,6 +440,20 @@ class TestExtractPlural(TestCase):
             i18n._extract_plural('en', '{{PLURAL:foo|one|other}}', {'foo': 0}),
             'other')
 
+    def test_empty_fields(self):
+        """Test default usage using a dict and no specific plurals."""
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo||other}}', {'foo': 42}),
+            'other')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo||other}}', {'foo': 1}),
+            '')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|}}', {'foo': 1}),
+            'one')
+        with self.assertRaises(IndexError):
+            i18n._extract_plural('en', '{{PLURAL:foo|one}}', {'foo': 0})
+
     def test_specific(self):
         """Test using a specific plural."""
         self.assertEqual(
