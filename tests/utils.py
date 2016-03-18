@@ -806,7 +806,11 @@ def execute(command, data_in=None, timeout=0, error=None):
     # A complete locale string needs to be created, so the country code
     # is guessed, however it is discarded when loading config.
     if config.userinterface_lang:
-        current_locale = locale.getdefaultlocale()[0].split('.')[0]
+        current_locale = locale.getdefaultlocale()[0]
+        if current_locale in [None, 'C']:
+            current_locale = 'en'
+        else:
+            current_locale = current_locale.split('.')[0]
         locale_prefix = str(config.userinterface_lang + '_')
 
         if not current_locale.startswith(locale_prefix):
