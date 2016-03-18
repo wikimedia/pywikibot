@@ -40,6 +40,7 @@ from pywikibot.tools import (
     deprecated_args,
     redirect_func,
     issue_deprecation_warning,
+    itergroup,
     DequeGenerator,
     intersect_generators,
     IteratorNextMixin,
@@ -2594,6 +2595,31 @@ def DayPageGenerator(startMonth=1, endMonth=12, site=None, year=2000):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
 
+def WikidataPageFromItemGenerator(gen, site):
+    """Generate pages from site based on sitelinks of item pages.
+
+    @param gen: generator of L{pywikibot.ItemPage}
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.BaseSite}
+
+    """
+    repo = site.data_repository()
+    for sublist in itergroup(gen, 50):
+        req = {'ids': [item.id for item in sublist],
+               'sitefilter': site.dbName(),
+               'action': 'wbgetentities',
+               'props': 'sitelinks'}
+
+        wbrequest = repo._simple_request(**req)
+        wbdata = wbrequest.submit()
+        entities = (item for item in wbdata['entities'].values() if
+                    'sitelinks' in item and site.dbName() in item['sitelinks'])
+        sitelinks = (item['sitelinks'][site.dbName()]['title']
+                     for item in entities)
+        for sitelink in sitelinks:
+            yield pywikibot.Page(site, sitelink)
+
+
 def WikidataQueryPageGenerator(query, site=None):
     """Generate pages that result from the given WikidataQuery.
 
@@ -2607,24 +2633,22 @@ def WikidataQueryPageGenerator(query, site=None):
     if site is None:
         site = pywikibot.Site()
     repo = site.data_repository()
+    is_repo = isinstance(site, pywikibot.site.DataSite)
 
+    if not is_repo:
+        # limit the results to those with sitelinks to target site
+        query += ' link[%s]' % site.dbName()
     wd_queryset = wdquery.QuerySet(query)
 
     wd_query = wdquery.WikidataQuery(cacheMaxAge=0)
     data = wd_query.query(wd_queryset)
-
     pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
-    for item in data[u'items']:
-        page = pywikibot.ItemPage(repo, u'Q{0}'.format(item))
-        if isinstance(site, pywikibot.site.DataSite):
-            yield page
-            continue
+    items_pages = (pywikibot.ItemPage(repo, 'Q{0}'.format(item))
+                   for item in data[u'items'])
+    if is_repo:
+        return items_pages
 
-        try:
-            link = page.getSitelink(site)
-        except pywikibot.NoPage:
-            continue
-        yield pywikibot.Page(pywikibot.Link(link, site))
+    return WikidataPageFromItemGenerator(items_pages, site)
 
 
 def WikidataSPARQLPageGenerator(query, site=None, item_name='item', endpoint=None):
@@ -2645,18 +2669,11 @@ def WikidataSPARQLPageGenerator(query, site=None, item_name='item', endpoint=Non
 
     query_object = sparql.SparqlQuery(endpoint=endpoint)
     data = query_object.get_items(query, item_name=item_name)
+    items_pages = (pywikibot.ItemPage(repo, item) for item in data)
+    if isinstance(site, pywikibot.site.DataSite):
+        return items_pages
 
-    for item in data:
-        page = pywikibot.ItemPage(repo, item)
-        if isinstance(site, pywikibot.site.DataSite):
-            yield page
-            continue
-
-        try:
-            link = page.getSitelink(site)
-        except pywikibot.NoPage:
-            continue
-        yield pywikibot.Page(pywikibot.Link(link, site))
+    return WikidataPageFromItemGenerator(items_pages, site)
 
 
 def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
