@@ -15,7 +15,7 @@ If only -delete is specified, it will delete all entries.
 -delete           Delete each command filtered. If that option is set the
                   default output will be nothing.
 
--c                Filter command in python syntax. It must evaulate to True to
+-c                Filter command in python syntax. It must evaluate to True to
                   output anything.
 
 -o                Output command which is output when the filter evaluated to
