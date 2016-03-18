@@ -50,7 +50,7 @@ script:
 
   - mkdir ~/.pywikibot
 
-  - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz
+  - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz 'n'
   - if [[ $FAMILY == 'wpbeta' ]]; then
       python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'n' ;
     fi
