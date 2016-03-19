@@ -300,12 +300,46 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
     family = 'wikipedia'
     code = 'fa'
 
-    def test_fixArabicLetters(self):
-        """Test fixArabicLetters."""
+    def test_fixArabicLetters_comma(self):
+        """Test fixArabicLetters comma replacements."""
+        self.assertEqual(self.cct.fixArabicLetters(','), '،')
         self.assertEqual(self.cct.fixArabicLetters('A,b,ا,۴,'),
                          'A,b،ا،۴،')
+
+    def test_fixArabicLetters_comma_skip(self):
+        """Test fixArabicLetters Latin comma not replaced."""
+        self.assertEqual(self.cct.fixArabicLetters('a", b'), 'a", b')
+        self.assertEqual(self.cct.fixArabicLetters('a, "b'), 'a, "b')
+        self.assertEqual(self.cct.fixArabicLetters('a", "b'), 'a", "b')
+        # spaces are not required
+        self.assertEqual(self.cct.fixArabicLetters('a",b'), 'a",b')
+        self.assertEqual(self.cct.fixArabicLetters('a,"b'), 'a,"b')
+        self.assertEqual(self.cct.fixArabicLetters('a","b'), 'a","b')
+        # quotes are a 'non-Farsi' character; additional non-Farsi not needed
+        self.assertEqual(self.cct.fixArabicLetters('",b'), '",b')
+        self.assertEqual(self.cct.fixArabicLetters('a,"'), 'a,"')
+        self.assertEqual(self.cct.fixArabicLetters('","'), '","')
+
+        # A single quotation is a 'non-Farsi' character
+        self.assertEqual(self.cct.fixArabicLetters("',b"), "',b")
+        self.assertEqual(self.cct.fixArabicLetters("a,'"), "a,'")
+        self.assertEqual(self.cct.fixArabicLetters("','"), "','")
+
+        # A space is a 'non-Farsi' character
+        self.assertEqual(self.cct.fixArabicLetters('a", ۴'), 'a", ۴')
+        self.assertEqual(self.cct.fixArabicLetters(' , '), ' , ')
+
+    def test_fixArabicLetters_letters(self):
+        """Test fixArabicLetters letter replacements."""
+        self.assertEqual(self.cct.fixArabicLetters('ك'),
+                         'ک')
+        self.assertEqual(self.cct.fixArabicLetters('ي'),
+                         'ی')
+        self.assertEqual(self.cct.fixArabicLetters('ى'),
+                         'ی')
         self.assertEqual(self.cct.fixArabicLetters('كي'),
                          'کی')
+
         # Once numbering fixes are enabled we can add tests.
 
 if __name__ == '__main__':
