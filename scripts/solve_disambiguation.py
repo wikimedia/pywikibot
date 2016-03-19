@@ -601,15 +601,16 @@ class DisambiguationRobot(SingleSiteBot):
     }
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip,
-                 generator, primary, main_only, first_only=False, minimum=0
-                 ) -> None:
+                 generator, primary, main_only, first_only=False, minimum=0,
+                 **kwargs) -> None:
         """Initializer."""
-        super().__init__()
+        super().__init__(**kwargs)
         self.always = always
         self.alternatives = alternatives
         self.getAlternatives = getAlternatives
         self.dnSkip = dnSkip
-        self.generator = generator
+        if generator:
+            self.generator = generator
         self.primary = primary
         self.main_only = main_only
         self.first_only = first_only

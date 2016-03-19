@@ -31,6 +31,8 @@ from typing import Generator
 import pywikibot
 
 from pywikibot import i18n, pagegenerators
+from pywikibot.bot import SingleSiteBot
+from pywikibot.tools.formatter import color_format
 
 from scripts.solve_disambiguation import DisambiguationRobot
 
@@ -48,62 +50,72 @@ class MisspellingRobot(DisambiguationRobot):
 
     """Spelling bot."""
 
-    misspellingTemplate = {
-        'de': ('Falschschreibung', 'Obsolete Schreibung'),
+    available_options = {
+        'always': None,
+        'start': None,
+        'main': False,
+    }
+
+    misspelling_templates = {
+        'wikipedia:de': ('Falschschreibung', 'Obsolete Schreibung'),
     }
 
     # Optional: if there is a category, one can use the -start
     # parameter.
-    misspellingCategory = {
-        'ar': 'تحويلات أخطاء إملائية',
-        # da: only contains date redirects at the moment
-        'da': 'Omdirigeringer af fejlstavninger',
-        'de': ('Kategorie:Wikipedia:Falschschreibung',
-               'Kategorie:Wikipedia:Obsolete Schreibung'),
-        'en': 'Redirects from misspellings',
-        'hu': 'Átirányítások hibás névről',
-        'nl': 'Categorie:Wikipedia:Redirect voor spelfout',
-    }
+    misspelling_categories = ('Q8644265', 'Q9195708')
 
-    def __init__(self, always, firstPageTitle, main_only) -> None:
+    def __init__(self, **kwargs) -> None:
         """Initializer."""
-        super().__init__(always, [], True, False, None, False, main_only)
-        self.generator = self.createPageGenerator(firstPageTitle)
+        # handle options first;
+        # they are needed for DisambiguationRobot positional arguments
+        SingleSiteBot.__init__(self, **kwargs)
+        super().__init__(always=self.opt.always, alternatives=[],
+                         getAlternatives=True, dnSkip=False, generator=None,
+                         primary=False, main_only=self.opt.main,
+                         **self.options)  # save options
 
-    def createPageGenerator(self, firstPageTitle) -> Generator[pywikibot.Page,
-                                                               None, None]:
+    @property
+    def generator(self) -> Generator[pywikibot.Page, None, None]:
         """Generator to retrieve misspelling pages or misspelling redirects."""
-        mycode = self.site.code
-        if mycode in self.misspellingCategory:
-            categories = self.misspellingCategory[mycode]
-            if isinstance(categories, str):
-                categories = (categories, )
-            generators = (
-                pagegenerators.CategorizedPageGenerator(
-                    pywikibot.Category(self.site, misspellingCategoryTitle),
-                    recurse=True, start=firstPageTitle)
-                for misspellingCategoryTitle in categories)
-        elif mycode in self.misspellingTemplate:
-            templates = self.misspellingTemplate[mycode]
+        templates = self.misspelling_templates.get(self.site.sitename)
+        categories = [cat for cat in (self.site.page_from_repository(item)
+                                      for item in self.misspelling_categories)
+                      if cat is not None]
+
+        if templates:
+            pywikibot.output(color_format(
+                '{yellow}Working on templates...{default}'))
             if isinstance(templates, str):
                 templates = (templates, )
+
             generators = (
-                pagegenerators.ReferringPageGenerator(
-                    pywikibot.Page(self.site, misspellingTemplateName, ns=10),
-                    onlyTemplateInclusion=True)
-                for misspellingTemplateName in templates)
-            if firstPageTitle:
+                pywikibot.Page(self.site, template_name, ns=10).getReferences(
+                    follow_redirects=False,
+                    only_template_inclusion=True)
+                for template_name in templates
+            )
+
+            if self.opt.start:
                 pywikibot.output(
-                    '-start parameter unsupported on this wiki because there '
-                    'is no category for misspellings.')
+                    '-start parameter is not supported on this wiki\n'
+                    'because templates are used for misspellings.')
+        elif categories:
+            pywikibot.output(color_format(
+                '{yellow}Working on categories...{default}'))
+            generators = (
+                pagegenerators.CategorizedPageGenerator(
+                    cat, recurse=True, start=self.opt.start
+                )
+                for cat in categories
+            )
+
         else:
             pywikibot.output(HELP_MSG.format(site=self.site))
+            return
 
-            empty_gen = (i for i in [])
-            return empty_gen
         generator = chain(*generators)
         preloadingGen = pagegenerators.PreloadingGenerator(generator)
-        return preloadingGen
+        yield from preloadingGen
 
     def findAlternatives(self, disambPage) -> bool:
         """
@@ -116,25 +128,30 @@ class MisspellingRobot(DisambiguationRobot):
         if disambPage.isRedirectPage():
             self.alternatives.append(disambPage.getRedirectTarget().title())
             return True
-        if self.misspellingTemplate.get(disambPage.site.code) is not None:
-            templates = self.misspellingTemplate[disambPage.site.code]
-            if isinstance(templates, str):
-                templates = (templates, )
-            for template, params in disambPage.templatesWithParams():
-                if template.title(with_ns=False) in templates:
-                    # The correct spelling is in the last parameter.
-                    correctSpelling = params[-1]
-                    # On de.wikipedia, there are some cases where the
-                    # misspelling is ambiguous, see for example:
-                    # https://de.wikipedia.org/wiki/Buthan
-                    for match in self.linkR.finditer(correctSpelling):
-                        self.alternatives.append(match.group('title'))
 
-                    if not self.alternatives:
-                        # There were no links in the parameter, so there is
-                        # only one correct spelling.
-                        self.alternatives.append(correctSpelling)
-                    return True
+        sitename = disambPage.site.sitename
+        templates = self.misspelling_templates.get(sitename)
+        if templates is None:
+            return False
+
+        if isinstance(templates, str):
+            templates = (templates, )
+
+        for template, params in disambPage.templatesWithParams():
+            if template.title(with_ns=False) in templates:
+                # The correct spelling is in the last parameter.
+                correct_spelling = params[-1]
+                # On de.wikipedia, there are some cases where the
+                # misspelling is ambiguous, see for example:
+                # https://de.wikipedia.org/wiki/Buthan
+                for match in self.linkR.finditer(correct_spelling):
+                    self.alternatives.append(match.group('title'))
+
+                if not self.alternatives:
+                    # There were no links in the parameter, so there is
+                    # only one correct spelling.
+                    self.alternatives.append(correct_spelling)
+                return True
         return False
 
     def setSummaryMessage(self, disambPage, *args, **kwargs) -> None:
@@ -158,23 +175,24 @@ def main(*args) -> None:
     @param args: command line arguments
     @type args: str
     """
-    # the option that's always selected when the bot wonders what to do with
-    # a link. If it's None, the user is prompted (default behaviour).
-    always = None
-    main_only = False
-    firstPageTitle = None
-
+    options = {}
     for arg in pywikibot.handle_args(args):
-        arg, sep, value = arg.partition(':')
-        if arg == '-always':
-            always = value
-        elif arg == '-start':
-            firstPageTitle = value or pywikibot.input(
+        opt, _, value = arg.partition(':')
+        if not opt.startswith('-'):
+            continue
+        opt = opt[1:]
+        if opt == 'always':
+            # the option that's always selected when the bot wonders
+            # what to do with a link. If it's None, the user is prompted
+            # (default behaviour).
+            options[opt] = value
+        elif opt == 'start':
+            options[opt] = value or pywikibot.input(
                 'At which page do you want to start?')
-        elif arg == '-main':
-            main_only = True
+        elif opt == 'main':
+            options[opt] = True
 
-    bot = MisspellingRobot(always, firstPageTitle, main_only)
+    bot = MisspellingRobot(**options)
     bot.run()
 
 
