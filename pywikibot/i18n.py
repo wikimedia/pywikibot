@@ -17,7 +17,7 @@ an __init__.py, and a message bundle called 'pywikibot' containing
 messages.  See L{twntranslate} for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -357,7 +357,9 @@ def _extract_plural(code, message, parameters):
 
         plural_entries = []
         specific_entries = {}
-        for number, plural in re.findall(r'\|?(?: *(\d+) *= *)?([^|]+)',
+        # A plural entry can not start at the end of the variants list,
+        # and must end with | or the end of the variants list.
+        for number, plural in re.findall(r'(?!$)(?: *(\d+) *= *)?(.*?)(?:\||$)',
                                          variants):
             if number:
                 specific_entries[int(number)] = plural
