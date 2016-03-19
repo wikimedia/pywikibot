@@ -20,3 +20,9 @@ class Family(family.WikimediaOrgFamily):
 
         self.interwiki_forward = 'wikipedia'
         self.cross_allowed = ['meta', ]
+
+        self.category_redirect_templates = {
+            'meta': (
+                'Category redirect',
+            ),
+        }
