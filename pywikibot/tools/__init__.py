@@ -759,6 +759,8 @@ def filter_unique(iterable, container=None, key=None, add=None):
     used automatically.  Any other method may be provided explicitly using the
     add parameter.
 
+    Beware that key=id is only useful for cases where id() is not unique.
+
     Note: This is not thread safe.
 
     @param iterable: the source iterable
