@@ -749,26 +749,29 @@ def main(*args):
     pagename = None
 
     for arg in pywikibot.handle_args(args):
-        if arg == 'double' or arg == 'do':
+        arg, sep, value = arg.partition(':')
+        option = arg[1:]
+        # bot options
+        if arg == 'do':
             action = 'double'
-        elif arg == 'broken' or arg == 'br':
+        elif arg == 'br':
             action = 'broken'
-        elif arg == 'both':
-            action = 'both'
-        elif arg == '-fullscan':
+        elif arg in ('both', 'broken', 'double'):
+            action = arg
+        elif option in ('always', 'delete'):
+            options[option] = True
+        elif option == 'total':
+            options['number'] = number = int(value)
+        # generator options
+        elif option == 'fullscan':
             fullscan = True
-        elif arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlFilename = i18n.input('pywikibot-enter-xml-filename')
-            else:
-                xmlFilename = arg[5:]
-        elif arg.startswith('-moves'):
+        elif option == 'xml':
+            xmlFilename = value or i18n.input('pywikibot-enter-xml-filename')
+        elif option == 'moves':
             moved_pages = True
-        elif arg.startswith('-namespace:'):
-            ns = arg[11:]
-            if ns == '':
-                # "-namespace:" does NOT yield -namespace:0 further down the road!
-                ns = i18n.input('pywikibot-enter-namespace-number')
+        elif option == 'namespace':
+            # "-namespace:" does NOT yield -namespace:0 further down the road!
+            ns = value or i18n.input('pywikibot-enter-namespace-number')
             # TODO: at least for some generators enter a namespace by its name
             # or number
             if ns == '':
@@ -781,31 +784,22 @@ def main(*args):
                 pass
             if ns not in namespaces:
                 namespaces.append(ns)
-        elif arg.startswith('-offset:'):
-            offset = int(arg[8:])
-        elif arg.startswith('-start:'):
-            start = arg[7:]
-        elif arg.startswith('-until:'):
-            until = arg[7:]
-        elif arg.startswith('-total:'):
-            number = int(arg[7:])
-        elif arg.startswith('-step:'):
-            issue_deprecation_warning(
-                'The usage of "{0}"'.format(arg), 2, ArgumentDeprecationWarning)
-        elif arg.startswith('-page:'):
-            pagename = arg[6:]
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-delete':
-            options['delete'] = True
+        elif option == 'offset':
+            offset = int(value)
+        elif option == 'start':
+            start = value
+        elif option == 'until':
+            until = value
+        elif option == 'page':
+            pagename = value
+        # deprecated or unknown options
+        elif option == 'step':
+            issue_deprecation_warning('The usage of "{0}"'.format(arg),
+                                      2, ArgumentDeprecationWarning)
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 
-    if (
-        not action or
-        xmlFilename and moved_pages or
-        fullscan and xmlFilename
-    ):
+    if not action or xmlFilename and (moved_pages or fullscan):
         problems = []
         if xmlFilename and moved_pages:
             problems += ['Either use a XML file or the moved pages from the API']
@@ -817,7 +811,7 @@ def main(*args):
         pywikibot.Site().login()
         gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
                                 fullscan, start, until, number, pagename)
-        bot = RedirectRobot(action, gen, number=number, **options)
+        bot = RedirectRobot(action, gen, **options)
         bot.run()
 
 if __name__ == '__main__':
