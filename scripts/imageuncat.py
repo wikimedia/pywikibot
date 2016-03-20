@@ -8,11 +8,14 @@ See imagerecat.py (still working on that one) to add these images to categories.
 This script is working on the given site, so if the commons should be handled,
 the site commons should be given and not a Wikipedia or similar.
 
--yesterday        Go through all uploads from yesterday.
+-yesterday        Go through all uploads from yesterday. (Deprecated here, moved
+                  to pagegenerators)
 
--recentchanges    Go through the changes made between 120 minutes and 70
-                  minutes ago. (This overrides the '-recentchanges' default
-                  generator)
+-recentchanges    Go through the changes made from 'offset' minutes with 'duration'
+                  minutes of timespan. It must be given two arguments as
+                  '-recentchanges:offset,duration'
+
+                  Default value of offset is 120, and that of duration is 70
 
 &params;
 """
@@ -32,7 +35,9 @@ from datetime import timedelta
 import pywikibot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot import pagegenerators
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import (
+    issue_deprecation_warning, deprecated
+)
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1267,6 +1272,7 @@ def uploadedYesterday(site):
         yield logentry.page()
 
 
+@deprecated('RecentChangesPageGenerator')
 def recentChanges(site=None, delay=0, block=70):
     """
     Return a pagegenerator containing all the images edited in a certain timespan.
@@ -1371,6 +1377,9 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory(site)
 
     for arg in local_args:
+        param_arg, sep, param_value = arg.partition(':')
+        if param_value == '':
+            param_value = None
         if arg.startswith('-yesterday'):
             generator = uploadedYesterday(site)
             issue_deprecation_warning(
@@ -1378,7 +1387,13 @@ def main(*args):
                 '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
                 2, ArgumentDeprecationWarning)
         elif arg.startswith('-recentchanges'):
-            generator = recentChanges(site=site, delay=120)
+            if param_value is None:
+                arg = arg + ':120,70'
+                issue_deprecation_warning(
+                    '-recentchanges',
+                    '-recentchanges:offset,duration',
+                    2, ArgumentDeprecationWarning)
+            genFactory.handleArg(arg)
         else:
             genFactory.handleArg(arg)
 
