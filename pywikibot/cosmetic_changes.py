@@ -617,7 +617,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def resolveHtmlEntities(self, text):
-        """"Resolve html entities."""
+        """Replace HTML entities with unicode."""
         ignore = [
             38,     # Ampersand (&amp;)
             39,     # Single quotation mark (&quot;) - bug T26093
