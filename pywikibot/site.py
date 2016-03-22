@@ -4134,7 +4134,8 @@ class APISite(BaseSite):
 
         The iterator yields dicts containing keys corresponding to the
         block properties.
-        @see: L{https://www.mediawiki.org/wiki/API:Blocks})
+
+        @see: U{https://www.mediawiki.org/wiki/API:Blocks}
 
         @note: logevents only logs user blocks, while this method
             iterates all blocks including IP ranges.
@@ -5386,11 +5387,11 @@ class APISite(BaseSite):
             'never', 'infinite', 'indefinite' it never does. If the value is
             given as a basestring it's parsed by php's strtotime function:
 
-                L{http://php.net/manual/en/function.strtotime.php}
+                U{http://php.net/manual/en/function.strtotime.php}
 
             The relative format is described there:
 
-                L{http://php.net/manual/en/datetime.formats.relative.php}
+                U{http://php.net/manual/en/datetime.formats.relative.php}
 
             It is recommended to not use a basestring if possible to be
             independent of the API.
