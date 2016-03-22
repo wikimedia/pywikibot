@@ -4129,19 +4129,34 @@ class APISite(BaseSite):
 
     @deprecated_args(step=None)
     def blocks(self, starttime=None, endtime=None, reverse=False,
-               blockids=None, users=None, total=None):
+               blockids=None, users=None, iprange=None, total=None):
         """Iterate all current blocks, in order of creation.
 
-        Note that logevents only logs user blocks, while this method
-        iterates all blocks including IP ranges.  The iterator yields dicts
-        containing keys corresponding to the block properties
-        (see L{https://www.mediawiki.org/wiki/API:Blocks}).
+        The iterator yields dicts containing keys corresponding to the
+        block properties.
+        @see: L{https://www.mediawiki.org/wiki/API:Blocks})
+
+        @note: logevents only logs user blocks, while this method
+            iterates all blocks including IP ranges.
+        @note: C{userid} key will be given for mw 1.18+ only
+        @note: C{iprange} parameter cannot be used together with C{users}.
 
         @param starttime: start iterating at this Timestamp
+        @type starttime: pywikibot.Timestamp
         @param endtime: stop iterating at this Timestamp
+        @type endtime: pywikibot.Timestamp
         @param reverse: if True, iterate oldest blocks first (default: newest)
-        @param blockids: only iterate blocks with these id numbers
+        @type reverse: bool
+        @param blockids: only iterate blocks with these id numbers. Numbers
+            must be separated by '|' if given by a basestring.
+        @type blockids: basestring, tuple or list
         @param users: only iterate blocks affecting these usernames or IPs
+        @type users: basestring, tuple or list
+        @param iprange: a single IP or an IP range. Ranges broader than
+            IPv4/16 or IPv6/19 are not accepted.
+        @type iprange: str
+        @param total: total amount of block entries
+        @type total: int
         """
         if starttime and endtime:
             if reverse:
@@ -4156,7 +4171,10 @@ class APISite(BaseSite):
                         "endtime must be before starttime with reverse=False")
         bkgen = self._generator(api.ListGenerator, type_arg="blocks",
                                 total=total)
-        bkgen.request["bkprop"] = "id|user|by|timestamp|expiry|reason|range|flags"
+        bkgen.request['bkprop'] = ['id', 'user', 'by', 'timestamp', 'expiry',
+                                   'reason', 'range', 'flags']
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.18'):
+            bkgen.request['bkprop'] += ['userid']
         if starttime:
             bkgen.request["bkstart"] = starttime
         if endtime:
@@ -4173,6 +4191,8 @@ class APISite(BaseSite):
             users = [user.upper() if is_IP(user) and '::' not in user else user
                      for user in users]
             bkgen.request["bkusers"] = users
+        elif iprange:
+            bkgen.request['bkip'] = iprange
         return bkgen
 
     @deprecated_args(step=None)
@@ -4225,6 +4245,9 @@ class APISite(BaseSite):
     def logevents(self, logtype=None, user=None, page=None, namespace=None,
                   start=None, end=None, reverse=False, tag=None, total=None):
         """Iterate all log entries.
+
+        @note: logevents with logtype='block' only logs user blocks whereas
+            site.blocks iterates all blocks including IP ranges.
 
         @param logtype: only iterate entries of this type (see wiki
             documentation for available types, which will include "block",
