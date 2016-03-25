@@ -3209,8 +3209,11 @@ class APISite(BaseSite):
             cache = {}
             # In case of duplicates, return the first entry.
             for priority, page in enumerate(sublist):
-                cache.setdefault(page.title(withSection=False),
-                                 (priority, page))
+                try:
+                    cache.setdefault(page.title(withSection=False),
+                                     (priority, page))
+                except pywikibot.InvalidTitle:
+                    pywikibot.exception()
 
             prio_queue = []
             next_prio = 0
