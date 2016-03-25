@@ -295,8 +295,7 @@ class RedirectGenerator(object):
         elif self.page_title:
             yield self.page_title
         else:
-            # retrieve information from broken redirect special page
-            pywikibot.output(u'Retrieving special page...')
+            pywikibot.output('Retrieving broken redirect special page...')
             for page in self.site.preloadpages(self.site.broken_redirects()):
                 yield page
 
@@ -330,8 +329,7 @@ class RedirectGenerator(object):
         elif self.page_title:
             yield self.page_title
         else:
-            # retrieve information from double redirect special page
-            pywikibot.output(u'Retrieving special page...')
+            pywikibot.output('Retrieving double redirect special page...')
             for page in self.site.preloadpages(self.site.double_redirects()):
                 yield page
 
