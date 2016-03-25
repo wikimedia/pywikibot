@@ -74,6 +74,7 @@ class DjVuTextBot(SingleSiteBot):
         self._djvu = djvu
         self._index = index
         self._prefix = self._index.title(withNamespace=False)
+        self._page_ns = self.site._proofread_page_ns.custom_name
 
         if not pages:
             self._pages = (1, self._djvu.number_of_images())
@@ -99,8 +100,10 @@ class DjVuTextBot(SingleSiteBot):
     def gen(self):
         """Generate pages from specified page interval."""
         for page_number in self.page_number_gen():
-            title = '{prefix}/{number}'.format(prefix=self._prefix,
-                                               number=page_number)
+            title = '{page_ns}:{prefix}/{number}'.format(
+                page_ns=self._page_ns,
+                prefix=self._prefix,
+                number=page_number)
             page = ProofreadPage(self._index.site, title)
             page.page_number = page_number  # remember page number in djvu file
             yield page
