@@ -585,9 +585,9 @@ class GeneratorFactory(object):
         # TODO: -*log used 500 as default total, also use with -logevents?
 
         # 'start or None', because start might be an empty string
+        total = None
         start = start or None
         if isinstance(start, basestring) and len(start) == 8:
-            total = None
             start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
         elif start is not None:
             try:
