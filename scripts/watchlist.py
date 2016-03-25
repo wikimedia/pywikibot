@@ -115,7 +115,10 @@ def main(*args):
         watchlist = refresh(site, sysop=sysop)
         pywikibot.output(u'%i pages in the watchlist.' % len(watchlist))
         for page in watchlist:
-            pywikibot.stdout(page.title())
+            try:
+                pywikibot.stdout(page.title())
+            except pywikibot.InvalidTitle:
+                pywikibot.exception()
 
 if __name__ == "__main__":
     main()
