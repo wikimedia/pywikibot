@@ -1079,15 +1079,14 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
 
     user = True
 
-    @unittest.expectedFailure
     def test_logevents_parse(self):
         """Test wrong logevents option."""
         gf = pagegenerators.GeneratorFactory()
         self.assertFalse(gf.handleArg("-log"))
         self.assertFalse(gf.handleArg("-log:text_here"))
-        # TODO: Throw an error for incorrect logtypes
-        self.assertRaises(gf.handleArg("-this_will_never_be_a_typelog"),
-                          Exception)
+        self.assertRaises(NotImplementedError,
+                          gf.handleArg, '-logevents:anyevent')
+        self.assertRaises(NotImplementedError, gf.handleArg, '-anotherlog')
 
     def test_logevents_default(self):
         """Test old logevents option handling."""
