@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -935,7 +935,6 @@ class TestPageProtect(TestCase):
     write = True
     sysop = True
 
-    @unittest.expectedFailure
     def test_protect(self):
         """Test Page.protect."""
         site = self.get_site()
