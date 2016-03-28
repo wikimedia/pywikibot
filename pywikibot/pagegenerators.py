@@ -981,11 +981,23 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
     """
     Prefixed Page generator.
 
+    @param prefix: The prefix of the pages.
+    @type prefix: str
+    @param namespace: Namespace to retrieve pages from
+    @type namespace: Namespace or int
+    @param includeredirects: If includeredirects is None, False or an empty
+        string, redirects will not be found. If includeredirects equals the
+        string 'only', only redirects will be found. Otherwise redirects will
+        be included.
+    @type includeredirects: None, bool, str
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.BaseSite}
     @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param content: If True, load current version of each page (default False)
-    @param site: Site for generator results.
-    @type site: L{pywikibot.site.BaseSite}
+    @type content: bool
+    @return: a generator that yields Page objects
+    @rtype: generator
     """
     if site is None:
         site = pywikibot.Site()
