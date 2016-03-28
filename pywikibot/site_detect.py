@@ -88,6 +88,18 @@ class MWSite(object):
         if not self.api:
             raise RuntimeError('Unsupported url: {0}'.format(self.fromurl))
 
+        if not self.articlepath:
+            if self.private_wiki:
+                if self.api != self.fromurl and self.private_wiki:
+                    self.articlepath = self.fromurl.rsplit('/', 1)[0] + '/$1'
+                else:
+                    raise RuntimeError(
+                        'Unable to determine articlepath because the wiki is '
+                        'private. Use the Main Page URL instead of the API.')
+            else:
+                raise RuntimeError('Unable to determine articlepath: '
+                                   '{0}'.format(self.fromurl))
+
         if (not self.version or
                 self.version < MediaWikiVersion('1.14')):
             raise RuntimeError('Unsupported version: {0}'.format(self.version))
@@ -145,7 +157,13 @@ class MWSite(object):
     def _parse_post_117(self):
         """Parse 1.17+ siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
-        info = json.loads(response.content)['query']['general']
+        info = json.loads(response.content)
+        self.private_wiki = ('error' in info and
+                             info['error']['code'] == 'readapidenied')
+        if self.private_wiki:
+            return
+
+        info = info['query']['general']
         self.version = MediaWikiVersion.from_generator(info['generator'])
         if self.version < MediaWikiVersion('1.17'):
             return
