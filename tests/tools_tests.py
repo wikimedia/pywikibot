@@ -2,7 +2,7 @@
 # -*- coding: utf-8  -*-
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2016
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -434,13 +434,18 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.decs, container=deduped, key=hash)
         self._test_dedup_int(deduped, deduper, hash)
 
-    @unittest.expectedFailure
     def test_obj_id(self):
         """Test filter_unique with objects using id as key, which fails."""
-        # Two objects which may be equal do not have the same id.
+        # Two objects which may be equal do not necessary have the same id.
         deduped = set()
         deduper = tools.filter_unique(self.decs, container=deduped, key=id)
-        self._test_dedup_int(deduped, deduper, id)
+        self.assertEqual(len(deduped), 0)
+        for _ in self.decs:
+            self.assertEqual(id(next(deduper)), deduped.pop())
+        self.assertRaises(StopIteration, next, deduper)
+        # No. of Decimal with distinct ids != no. of Decimal with distinct value.
+        deduper_ids = list(tools.filter_unique(self.decs, key=id))
+        self.assertNotEqual(len(deduper_ids), len(set(deduper_ids)))
 
     def test_str(self):
         """Test filter_unique with str."""
