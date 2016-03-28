@@ -300,6 +300,10 @@ parameterHelp = u"""\
                   "-page:pagetitle", and supplied multiple times for
                   multiple pages.
 
+-pageid           Work on a single pageid. Argument can also be given as
+                  "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
+                  and supplied multiple times for multiple pages.
+
 -grep             A regular expression that needs to match the article
                   otherwise the page won't be returned.
                   Multiple -grep:regexpr can be provided and the page will
@@ -758,6 +762,10 @@ class GeneratorFactory(object):
             if not value:
                 value = pywikibot.input(u'What page do you want to use?')
             gen = [pywikibot.Page(pywikibot.Link(value, self.site))]
+        elif arg == '-pageid':
+            if not value:
+                value = pywikibot.input(u'What pageid do you want to use?')
+            gen = PagesFromPageidGenerator(value, site=self.site)
         elif arg == '-uncatfiles':
             gen = UnCategorizedImageGenerator(site=self.site)
         elif arg == '-uncatcat':
@@ -1334,6 +1342,25 @@ def PagesFromTitlesGenerator(iterable, site=None):
         if not isinstance(title, basestring):
             break
         yield pywikibot.Page(pywikibot.Link(title, site))
+
+
+def PagesFromPageidGenerator(pageids, site=None):
+    """
+    Return a page generator from pageids.
+
+    Pages are iterated in the same order than in the underlying pageids.
+    Pageids are filtered and only one page is returned in case of
+    duplicate pageid.
+
+    @param pageids: an iterable that returns pageids, or a comma-separated
+                    string of pageids (e.g. '945097,1483753,956608')
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.BaseSite}
+    """
+    if site is None:
+        site = pywikibot.Site()
+
+    return site.load_pages_from_pageids(pageids)
 
 
 @deprecated_args(number='total', step=None)

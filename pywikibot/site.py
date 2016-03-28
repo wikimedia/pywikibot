@@ -19,6 +19,7 @@ import copy
 import datetime
 import functools
 import hashlib
+import heapq
 import itertools
 import json
 import mimetypes
@@ -70,6 +71,7 @@ from pywikibot.tools import (
     manage_wrapping, MediaWikiVersion, first_upper, normalize_username,
     merge_unique_dicts,
     PY2,
+    filter_unique,
 )
 from pywikibot.tools.ip import is_IP
 
@@ -3092,6 +3094,63 @@ class APISite(BaseSite):
             page._redirtarget = target
 
         return page._redirtarget
+
+    def load_pages_from_pageids(self, pageids):
+        """
+        Return a page generator from pageids.
+
+        Pages are iterated in the same order than in the underlying pageids.
+
+        Pageids are filtered and only one page is returned in case of
+        duplicate pageids.
+
+        @param pageids: an iterable that returns pageids (str or int),
+            or a comma- or pipe-separated string of pageids
+            (e.g. '945097,1483753, 956608' or '945097|483753|956608')
+        """
+        if isinstance(pageids, basestring):
+            pageids = pageids.replace('|', ',')
+            pageids = pageids.split(',')
+            pageids = [p.strip() for p in pageids]
+
+        # Validate pageids.
+        gen = (str(int(p)) for p in pageids if int(p) > 0)
+
+        # Find out how many pages can be specified at a time.
+        parameter = self._paraminfo.parameter('query+info', 'prop')
+        if self.logged_in() and self.has_right('apihighlimits'):
+            groupsize = int(parameter['highlimit'])
+        else:
+            groupsize = int(parameter['limit'])
+
+        for sublist in itergroup(filter_unique(gen), groupsize):
+            # Store the order of the input data.
+            priority_dict = dict(zip(sublist, range(len(sublist))))
+
+            prio_queue = []
+            next_prio = 0
+            params = {'pageids': sublist, }
+            rvgen = api.PropertyGenerator('info', site=self, parameters=params)
+
+            for pagedata in rvgen:
+                title = pagedata['title']
+                pageid = str(pagedata['pageid'])
+                page = pywikibot.Page(pywikibot.Link(title, source=self))
+                api.update_page(page, pagedata)
+                priority, page = heapq.heappushpop(prio_queue,
+                                                   (priority_dict[pageid], page))
+                # Smallest priority matches expected one; yield early.
+                if priority == next_prio:
+                    yield page
+                    next_prio += 1
+                else:
+                    # Push onto the heap.
+                    heapq.heappush(prio_queue, (priority, page))
+
+            # Extract data in the same order of the input data.
+            while prio_queue:
+                priority, page = heapq.heappop(prio_queue)
+                yield page
 
     def preloadpages(self, pagelist, groupsize=50, templates=False,
                      langlinks=False, pageprops=False):
