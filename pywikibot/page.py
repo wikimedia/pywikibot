@@ -4873,7 +4873,7 @@ class Link(ComparableMixin):
             self._source = source or pywikibot.Site()
 
         self._text = text
-        self._defaultns = self._source.namespaces[defaultNamespace]
+        self._defaultns = defaultNamespace
 
         # preprocess text (these changes aren't site-dependent)
         # First remove anchor, which is stored unchanged, if there is one
@@ -4988,7 +4988,7 @@ class Link(ComparableMixin):
         while u":" in t:
             # Initial colon indicates main namespace rather than default
             if t.startswith(u":"):
-                self._namespace = self._site.namespaces[0]
+                self._namespace = 0
                 # remove the colon but continue processing
                 # remove any subsequent whitespace
                 t = t.lstrip(u":").lstrip(u" ")
@@ -5146,8 +5146,7 @@ class Link(ComparableMixin):
 
     def canonical_title(self):
         """Return full page title, including localized namespace."""
-        # Avoid that ':' will be added to the title for Main ns.
-        if self.namespace != Namespace.MAIN:
+        if self.namespace:
             return "%s:%s" % (self.site.namespace(self.namespace),
                               self.title)
         else:
@@ -5163,23 +5162,26 @@ class Link(ComparableMixin):
 
         @raise pywikibot.Error: no corresponding namespace is found in onsite
         """
+        ns_id = self.namespace
+        ns = self.site.namespaces[ns_id]
+
         if onsite is None:
-            name = self.namespace.canonical_name
+            namespace = ns.canonical_name
         else:
             # look for corresponding ns in onsite by name comparison
-            for alias in self.namespace:
+            for alias in ns:
                 namespace = onsite.namespaces.lookup_name(alias)
-                if namespace is not None:
-                    name = namespace.custom_name
+                if namespace:
+                    namespace = namespace.custom_name
                     break
             else:
                 # not found
                 raise pywikibot.Error(
                     u'No corresponding namespace found for namespace %s on %s.'
-                    % (self.namespace, onsite))
+                    % (self.site.namespaces[ns_id], onsite))
 
-        if self.namespace != Namespace.MAIN:
-            return u'%s:%s' % (name, self.title)
+        if namespace:
+            return u'%s:%s' % (namespace, self.title)
         else:
             return self.title
 
@@ -5194,7 +5196,7 @@ class Link(ComparableMixin):
         if onsite is None:
             onsite = self._source
         title = self.title
-        if self.namespace != Namespace.MAIN:
+        if self.namespace:
             title = onsite.namespace(self.namespace) + ":" + title
         if self.section:
             title = title + "#" + self.section
