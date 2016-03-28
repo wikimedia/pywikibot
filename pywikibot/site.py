@@ -1196,7 +1196,7 @@ class BaseSite(ComparableMixin):
     @deprecated('list(namespaces.CATEGORY)')
     def category_namespaces(self):
         """Return names for the Category namespace."""
-        return self.namespace(14, all=True)
+        return list(self.namespace(14, all=True))
 
     # site-specific formatting preferences
 
@@ -2826,8 +2826,15 @@ class APISite(BaseSite):
     def namespace(self, num, all=False):
         """Return string containing local name of namespace 'num'.
 
-        If optional argument 'all' is true, return a list of all recognized
+        If optional argument 'all' is true, return all recognized
         values for this namespace.
+
+        @param num: Namespace constant.
+        @type num: int
+        @param all: If True return a Namespace object. Otherwise
+            return the namespace name.
+        @return: local name or Namespace object
+        @rtype: str or Namespace
         """
         if all:
             return self.namespaces[num]
