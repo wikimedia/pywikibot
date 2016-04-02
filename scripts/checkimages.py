@@ -38,7 +38,7 @@ This script understands the following command-line arguments:
 -skip[:#]           The bot skip the first [:#] images (default: 0)
 
 -start[:#]          Use allpages() as generator
-                    (it starts already form File:[:#])
+                    (it starts already from File:[:#])
 
 -cat[:#]            Use a category as generator
 
