@@ -1861,15 +1861,13 @@ def PreloadingGenerator(generator, groupsize=50):
         sites.setdefault(site, []).append(page)
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
-            group = sites[site]
-            sites[site] = []
+            group = sites.pop(site)
             for i in site.preloadpages(group, groupsize):
                 yield i
-    for site in sites:
-        if sites[site]:
-            # process any leftover sites that never reached the groupsize
-            for i in site.preloadpages(sites[site], groupsize):
-                yield i
+    for site, pages in sites.items():
+        # process any leftover sites that never reached the groupsize
+        for i in site.preloadpages(pages, groupsize):
+            yield i
 
 
 @deprecated_args(step='groupsize')
@@ -1914,15 +1912,13 @@ def PreloadingItemGenerator(generator, groupsize=50):
         sites.setdefault(site, []).append(page)
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
-            group = sites[site]
-            sites[site] = []
+            group = sites.pop(site)
             for i in site.preloaditempages(group, groupsize):
                 yield i
-    for site in sites:
-        if sites[site]:
-            # process any leftover sites that never reached the groupsize
-            for i in site.preloaditempages(sites[site], groupsize):
-                yield i
+    for site, pages in sites.items():
+        # process any leftover sites that never reached the groupsize
+        for i in site.preloaditempages(pages, groupsize):
+            yield i
 
 
 @deprecated_args(number='total', step=None, repeat=None)
