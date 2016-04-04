@@ -41,7 +41,7 @@ familiesDict = {
     'wiktionary':   'wiktionaries',
 }
 
-exceptions = ['www']
+exceptions = ['-']
 
 
 def update_family(families):
