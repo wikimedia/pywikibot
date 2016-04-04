@@ -2,7 +2,7 @@
 # -*- coding: utf-8  -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -91,13 +91,12 @@ class CaseChecker(object):
     def __init__(self):
         """Constructor with arg parsing."""
         for arg in pywikibot.handle_args():
-            if arg.startswith('-from'):
-                if arg.startswith('-from:'):
-                    self.apfrom = arg[6:]
-                else:
-                    self.apfrom = pywikibot.input(u'Which page to start from: ')
-            elif arg.startswith('-reqsize:'):
-                self.aplimit = int(arg[9:])
+            arg, sep, value = arg.partition(':')
+            if arg == '-from':
+                self.apfrom = value or pywikibot.input(
+                    'Which page to start from: ')
+            elif arg == '-reqsize':
+                self.aplimit = int(value)
             elif arg == '-links':
                 self.links = True
             elif arg == '-linksonly':
@@ -109,16 +108,16 @@ class CaseChecker(object):
                 self.filterredir = 'all'
             elif arg == '-redironly':
                 self.filterredir = 'redirects'
-            elif arg.startswith('-limit:'):
-                self.stopAfter = int(arg[7:])
-            elif arg == '-autonomous' or arg == '-a':
+            elif arg == '-limit':
+                self.stopAfter = int(value)
+            elif arg in ('-autonomous', '-a'):
                 self.autonomous = True
-            elif arg.startswith('-ns:'):
-                self.namespaces.append(int(arg[4:]))
-            elif arg.startswith('-wikilog:'):
-                self.wikilogfile = arg[9:]
-            elif arg.startswith('-failedlog:'):
-                self.failedTitles = arg[11:]
+            elif arg == '-ns':
+                self.namespaces.append(int(value))
+            elif arg == '-wikilog':
+                self.wikilogfile = value
+            elif arg == '-failedlog':
+                self.failedTitles = value
             elif arg == '-failed':
                 self.doFailed = True
             else:
