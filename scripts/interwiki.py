@@ -336,7 +336,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2014
+# (C) xqt, 2009-2017
 # (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
@@ -1732,7 +1732,7 @@ class Subject(interwiki_graph.Subject):
                 # if we have an account for this site
                 if site.family.name in config.usernames and \
                    site.code in config.usernames[site.family.name] and \
-                   not site.has_transcluded_data:
+                   not site.has_data_repository:
                     # Try to do the changes
                     try:
                         if self.replaceLinks(page, new):

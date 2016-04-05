@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1234,7 +1234,7 @@ class TestUnconnectedClient(TestCase):
         self.assertRaises(pywikibot.WikiBaseError,
                           ItemPage.fromPage, self.wdp)
         self.assertRaisesRegex(pywikibot.WikiBaseError,
-                               'no transcluded data',
+                               'no data repository',
                                self.wdp.data_item)
 
 

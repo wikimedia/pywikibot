@@ -1343,14 +1343,14 @@ class WikibaseClientTestCase(WikibaseTestCase):
         Set up the test class.
 
         Checks that all sites are configured as a Wikibase client,
-        with Site.has_transcluded_data() returning True.
+        with Site.has_data_repository returning True.
         """
         super(WikibaseClientTestCase, cls).setUpClass()
 
         for site in cls.sites.values():
-            if not site['site'].has_transcluded_data:
+            if not site['site'].has_data_repository:
                 raise unittest.SkipTest(
-                    u'%s: %r does not have transcluded data'
+                    '%s: %r does not have data repository'
                     % (cls.__name__, site['site']))
 
 

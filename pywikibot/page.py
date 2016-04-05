@@ -12,7 +12,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -3974,9 +3974,9 @@ class ItemPage(WikibasePage):
 
         @raise NoPage: There is no corresponding ItemPage for the page
         """
-        if not page.site.has_transcluded_data:
-            raise pywikibot.WikiBaseError(u'%s has no transcluded data'
-                                          % page.site)
+        if not page.site.has_data_repository:
+            raise pywikibot.WikiBaseError('{0} has no data repository'
+                                          ''.format(page.site))
         if not lazy_load and not page.exists():
             raise pywikibot.NoPage(page)
 
