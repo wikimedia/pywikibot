@@ -528,10 +528,8 @@ class LogIsFull(pywikibot.Error):
 
 def printWithTimeZone(message):
     """Print the messages followed by the TimeZone encoded correctly."""
-    if message[-1] != ' ':
-        message = u'%s ' % message
     time_zone = time.strftime(u"%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-    pywikibot.output(u"%s%s" % (message, time_zone))
+    pywikibot.output('{0} {1}'.format(message.rstrip(), time_zone))
 
 
 class checkImagesBot(object):
