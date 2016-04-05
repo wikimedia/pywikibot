@@ -812,6 +812,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertRaises(ValueError, gf.handleArg, '-recentchanges:3,2,1')
         self.assertRaises(ValueError, gf.handleArg, '-recentchanges:-10,20')
 
+    def test_recentchanges_default(self):
+        """Test recentchanges generator with default setting."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-recentchanges')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespacesAll(gen, set([0, 1, 2]), skip=True)
+
     def test_recentchanges_ns_default(self):
         """Test recentchanges generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)

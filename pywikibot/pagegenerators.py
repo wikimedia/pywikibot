@@ -688,7 +688,7 @@ class GeneratorFactory(object):
         elif arg == '-recentchanges':
             rcstart = None
             rcend = None
-            params = value.split(',')
+            params = value.split(',') if value else []
             if len(params) == 2:
                 offset = float(params[0])
                 duration = float(params[1])
