@@ -635,7 +635,8 @@ class GeneratorFactory(object):
 
         gen = None
         if not arg.startswith('-') and self._positional_arg_name:
-            arg = u'-{0}:{1}'.format(self._positional_arg_name, arg)
+            value = arg
+            arg = '-' + self._positional_arg_name
 
         if arg == '-filelinks':
             if not value:

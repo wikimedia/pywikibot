@@ -839,6 +839,32 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, set([1, 3]))
 
+    def test_pagegenerator(self):
+        """Test page generator."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-page:Main Page')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+
+    def test_empty_generator(self):
+        """Test empty generator."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gen = gf.getCombinedGenerator()
+        self.assertIsNone(gen)
+
+    def test_positionalargument(self):
+        """Test page generator with positional argument."""
+        gf1 = pagegenerators.GeneratorFactory(site=self.site,
+                                              positional_arg_name='page')
+        gf1.handleArg('Main Page')
+        gen1 = gf1.getCombinedGenerator()
+        self.assertIsNotNone(gen1)
+        gf2 = pagegenerators.GeneratorFactory(site=self.site)
+        gf2.handleArg('-page:Main Page')
+        gen2 = gf1.getCombinedGenerator()
+        self.assertIsNotNone(gen2)
+        self.assertEqual(list(gen1), list(gen2))
+
 
 class TestFactoryGeneratorWikibase(WikidataTestCase):
 
