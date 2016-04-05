@@ -1020,7 +1020,8 @@ class checkImagesBot(object):
                                                  text_for_the_report)
                     # if you want only one edit, the edit found should be more
                     # than 0 -> num - 1
-                    if already_reported_in_past > duplicates_rollback - 1:
+                    if already_reported_in_past > duplicates_rollback - 1 or \
+                            not dupTalkText:
                         only_report = True
                     else:
                         self.report(text_for_the_report, images_to_tag_list[-1],
