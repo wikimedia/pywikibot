@@ -1057,14 +1057,9 @@ class checkImagesBot(object):
     def report_image(self, image_to_report, rep_page=None, com=None,
                      rep_text=None, addings=True):
         """Report the files to the report page when needed."""
-        if not rep_page:
-            rep_page = self.rep_page
-
-        if not com:
-            com = self.com
-
-        if not rep_text:
-            rep_text = self.rep_text
+        rep_page = rep_page or self.rep_page
+        com = com or self.com
+        rep_text = rep_text or self.rep_text
 
         if addings:
             # Adding the name of the image in the report if not done already
@@ -1100,7 +1095,7 @@ class checkImagesBot(object):
                     u"The log page (%s) is full! Please delete the old files "
                     u" reported. Skip!" % another_page.title())
                 # Don't report, but continue with the check
-                # (we don't now if this is the first time we check this file
+                # (we don't know if this is the first time we check this file
                 # or not)
         else:
             # Adding the log
