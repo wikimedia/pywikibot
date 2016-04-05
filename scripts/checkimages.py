@@ -555,8 +555,7 @@ class checkImagesBot(object):
         self.pageHidden = i18n.translate(self.site, PageWithHiddenTemplates)
         self.pageAllowed = i18n.translate(self.site, PageWithAllowedTemplates)
         self.comment = i18n.twtranslate(self.site.lang,
-                                        'checkimages-source-tag-comment',
-                                        fallback=False)
+                                        'checkimages-source-tag-comment')
         # Adding the bot's nickname at the notification text if needed.
         self.bots = i18n.translate(self.site, bot_list)
         if self.bots:
