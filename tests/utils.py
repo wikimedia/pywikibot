@@ -43,7 +43,7 @@ from pywikibot.tools import (
 )
 
 from tests import _pwb_py
-from tests import unittest  # noqa
+from tests import unittest
 from tests import unittest_print
 
 OSWIN32 = (sys.platform == 'win32')

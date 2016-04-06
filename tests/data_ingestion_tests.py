@@ -61,14 +61,14 @@ class TestPhoto(TestCase):
     def test_getDescription(self):
         """Test getDescription()."""
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
-"""{{CrystalTemplate
+                         str("""{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
 |description.en="Sounds" icon
 |license=LGPL
 |name=Sound icon
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
-}}""")  # noqa
+}}"""))
 
 
 class TestCSVReader(TestCase):
@@ -99,7 +99,7 @@ class TestCSVReader(TestCase):
     def test_getDescription(self):
         """Test getDescription()."""
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
-"""{{CrystalTemplate
+                         str("""{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
 |description.en="Sounds" icon
 |license=LGPL
@@ -107,7 +107,7 @@ class TestCSVReader(TestCase):
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
 |url=http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png
-}}""")  # noqa
+}}"""))
 
 
 class TestDataIngestionBot(ScriptMainTestCase):

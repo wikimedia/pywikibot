@@ -13,7 +13,7 @@ import functools
 import os
 import warnings
 
-__all__ = ('requests', 'TestRequest',
+__all__ = ('requests', 'unittest', 'TestRequest',
            'patch_request', 'unpatch_request')
 
 # Verify that the unit tests have a base working environment:
@@ -22,7 +22,7 @@ __all__ = ('requests', 'TestRequest',
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - unittest2; see below
 # - mwparserfromhell is optional, so is only imported in textlib_tests
-import requests  # noqa
+import requests
 
 from pywikibot.tools import PYTHON_VERSION
 

@@ -1151,6 +1151,10 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
 
     def test_logpages(self):
         """Test the deprecated site.logpages() method."""
+        # pyflakes fix for Python 3
+        if not PY2:
+            long = int
+
         le = list(self.site.logpages(number=10))
         self.assertOneDeprecation()
         self.assertLessEqual(len(le), 10)
@@ -1159,7 +1163,7 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
             self.assertIsInstance(entry[0], pywikibot.Page)
             self.assertIsInstance(entry[1], basestring)
             self.assertIsInstance(
-                entry[2], long if PY2 and entry[2] > sys.maxint else int)  # noqa
+                entry[2], long if PY2 and entry[2] > sys.maxint else int)
             self.assertIsInstance(entry[3], basestring)
 
     def test_logpages_dump(self):

@@ -12,6 +12,7 @@ __version__ = '$Id$'
 import calendar
 import datetime
 import json
+import logging
 import sys
 
 from distutils.version import LooseVersion
@@ -1088,7 +1089,7 @@ class LiveRCPageGeneratorTestCase(RecentChangesTestCase):
         """Setup test class."""
         super(LiveRCPageGeneratorTestCase, cls).setUpClass()
         try:
-            import socketIO_client  # noqa
+            import socketIO_client
         except ImportError:
             raise unittest.SkipTest('socketIO_client not available')
 
@@ -1099,7 +1100,6 @@ class LiveRCPageGeneratorTestCase(RecentChangesTestCase):
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""
-        import logging
         lgr = logging.getLogger('socketIO_client')
         lgr.setLevel(logging.DEBUG)
         ch = logging.StreamHandler()
