@@ -395,6 +395,35 @@ class RedirectRobot(Bot):
         self.generator = generator
         self.exiting = False
 
+    def delete_redirect(self, page, summary_key):
+        """Delete the redirect page."""
+        assert page.site == self.site, (
+            'target page is on different site {0}'.format(page.site))
+        reason = i18n.twtranslate(self.site, summary_key)
+        if page.site.logged_in(sysop=True):
+            page.delete(reason, prompt=False)
+        elif i18n.twhas_key(page.site,
+                            'redirect-broken-redirect-template'):
+            pywikibot.output(u"No sysop in user-config.py, "
+                             u"put page to speedy deletion.")
+            try:
+                content = page.get(get_redirect=True)
+            except pywikibot.SectionError:
+                content_page = pywikibot.Page(page.site,
+                                              page.title(withSection=False))
+                content = content_page.get(get_redirect=True)
+            # TODO: Add bot's signature if needed (Bug: T131517)
+            content = i18n.twtranslate(
+                page.site,
+                'redirect-broken-redirect-template') + '\n' + content
+            try:
+                page.put(content, reason)
+            except pywikibot.PageSaveRelatedError as e:
+                pywikibot.error(e)
+        else:
+            pywikibot.output(
+                u'No speedy deletion template available')
+
     def delete_broken_redirects(self):
         """Process all broken redirects."""
         # get reason for deletion text
@@ -483,32 +512,7 @@ class RedirectRobot(Bot):
                         u'Do you want to delete %s?'
                         % (targetPage.title(asLink=True),
                            redir_page.title(asLink=True))):
-                    reason = i18n.twtranslate(self.site,
-                                              'redirect-remove-broken')
-                    if self.site.logged_in(sysop=True):
-                        redir_page.delete(reason, prompt=False)
-                    else:
-                        assert targetPage.site == self.site, (
-                            u'target page is on different site %s'
-                            % targetPage.site)
-                        if i18n.twhas_key(self.site,
-                                          'redirect-broken-redirect-template'):
-                            pywikibot.output(u"No sysop in user-config.py, "
-                                             u"put page to speedy deletion.")
-                            content = redir_page.get(get_redirect=True)
-                            # TODO: Add bot's signature if needed
-                            #       Not supported via TW yet
-                            content = i18n.twtranslate(
-                                targetPage.site,
-                                'redirect-broken-redirect-template'
-                            ) + "\n" + content
-                            try:
-                                redir_page.put(content, reason)
-                            except pywikibot.PageSaveRelatedError as e:
-                                pywikibot.error(e)
-                        else:
-                            pywikibot.output(
-                                u'No speedy deletion template available')
+                    self.delete_redirect(redir_page, 'redirect-remove-broken')
                 elif not (self.getOption('delete') or movedTarget):
                     pywikibot.output(u'Cannot fix or delete the broken redirect')
             except pywikibot.IsRedirectPage:
@@ -617,28 +621,12 @@ class RedirectRobot(Bot):
                         u'Redirect target %s forms a redirect loop.'
                         % targetPage.title(asLink=True))
                     break  # FIXME: doesn't work. edits twice!
-                    try:
-                        content = targetPage.get(get_redirect=True)
-                    except pywikibot.SectionError:
-                        content_page = pywikibot.Page(
-                            targetPage.site,
-                            targetPage.title(withSection=False))
-                        content = content_page.get(get_redirect=True)
-                    if i18n.twhas_key(
-                        targetPage.site,
-                        'redirect-broken-redirect-template') and \
-                        i18n.twhas_key(targetPage.site,
-                                       'redirect-remove-loop'):
-                        pywikibot.output(u"Tagging redirect for deletion")
+                    if self.getOption('delete'):
                         # Delete the two redirects
-                        content = i18n.twtranslate(
-                            targetPage.site,
-                            'redirect-broken-redirect-template'
-                        ) + "\n" + content
-                        summ = i18n.twtranslate(targetPage.site,
-                                                'redirect-remove-loop')
-                        targetPage.put(content, summ)
-                        redir.put(content, summ)
+                        # TODO: Check whether pages aren't vandalized
+                        # and (maybe) do not have a version history
+                        self.delete_redirect(targetPage, 'redirect-remove-loop')
+                        self.delete_redirect(redir, 'redirect-remove-loop')
                     break
                 else:  # redirect target found
                     if targetPage.isStaticRedirect():
@@ -726,7 +714,7 @@ def main(*args):
     @type args: list of unicode
     """
     options = {}
-    # what the bot should do (either resolve double redirs, or delete broken
+    # what the bot should do (either resolve double redirs, or process broken
     # redirs)
     action = None
     # where the bot should get his infos from (either None to load the
