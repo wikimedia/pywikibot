@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,6 +28,10 @@ THREADS = {
     'nl': 9, 'nn': 0, 'no': 0, 'pdc': 25, 'pfl': 3, 'pl': 8, 'pt': 0, 'ro': 1,
     'ru': 20, 'scn': 2, 'simple': 1, 'sr': 0, 'sv': 5, 'th': 1, 'tr': 7,
     'ug': 0, 'uk': 1, 'uz': 1, 'vi': 1, 'zh': 4, 'zh-yue': 2,
+}
+
+THREADS_WITH_UPDATED_FORMAT = {
+    'eo': 1, 'pdc': 1,
 }
 
 
@@ -79,7 +83,7 @@ class TestArchiveBot(TestCase):
                 raise
 
     expected_failures = ['ar', 'eo', 'pdc', 'th']
-    # FIXME:
+    # FIXME: see TestArchiveBotAfterDateUpdate()
     # 'ar': Uses Arabic acronym for TZ
     # 'eo': changed month name setting in wiki from Sep to sep
     #       Localisation updates from https://translatewiki.net.
@@ -91,6 +95,58 @@ class TestArchiveBot(TestCase):
     #   <message name="feb" xml:space="preserve">Han.</message>.
     #   for new entries it should work
     # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
+
+
+class TestArchiveBotAfterDateUpdate(TestCase):
+
+    """
+    Test archivebot script on failures on Wikipedia sites.
+
+    If failure is due to updated date format on wiki, test pages with
+    new format only.
+    """
+
+    family = 'wikipedia'
+    sites = dict([(code, {'family': 'wikipedia', 'code': code})
+                 for code in THREADS_WITH_UPDATED_FORMAT])
+
+    cached = True
+
+    def test_archivebot(self, code=None):
+        """Test archivebot for one site."""
+        site = self.get_site(code)
+        page = pywikibot.Page(site, 'user talk:mpaa')
+        talk = archivebot.DiscussionPage(page, None)
+        self.assertIsInstance(talk.archives, dict)
+        self.assertIsInstance(talk.archived_threads, int)
+        self.assertTrue(talk.archiver is None)
+        self.assertIsInstance(talk.header, basestring)
+        self.assertIsInstance(talk.timestripper, TimeStripper)
+
+        self.assertIsInstance(talk.threads, list)
+        self.assertGreaterEqual(
+            len(talk.threads), THREADS_WITH_UPDATED_FORMAT[code],
+            u'%d Threads found on %s,\n%d or more expected'
+            % (len(talk.threads), talk, THREADS_WITH_UPDATED_FORMAT[code]))
+
+        for thread in talk.threads:
+            self.assertIsInstance(thread, archivebot.DiscussionThread)
+            self.assertIsInstance(thread.title, basestring)
+            self.assertIsInstance(thread.now, datetime)
+            self.assertEqual(thread.now, talk.now)
+            self.assertIsInstance(thread.ts, TimeStripper)
+            self.assertEqual(thread.ts, talk.timestripper)
+            self.assertIsInstance(thread.code, basestring)
+            self.assertEqual(thread.code, talk.timestripper.site.code)
+            self.assertIsInstance(thread.content, basestring)
+            try:
+                self.assertIsInstance(thread.timestamp, datetime)
+            except AssertionError:
+                if thread.code not in self.expected_failures:
+                    pywikibot.output('code %s: %s' % (thread.code, thread.content))
+                raise
+
+    expected_failures = []
 
 
 if __name__ == '__main__':  # pragma: no cover
