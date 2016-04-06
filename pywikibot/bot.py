@@ -996,8 +996,8 @@ Global arguments available for all bots:
 -nolog            Disable the log file (if it is enabled by default).
 
 -maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
-                  edits during periods of database server lag. Default is set by
-                  config.py
+                  edits during periods of database server lag. Default is set
+                  by config.py
 
 -putthrottle:n    Set the minimum time (in seconds) the bot will wait between
 -pt:n             saving pages.

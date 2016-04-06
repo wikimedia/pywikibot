@@ -136,7 +136,7 @@ parameterHelp = u"""\
                   -logevents:review,Usr,20121231 gives review pages by user
                   Usr since the beginning till the 31 Dec 2012
 
-                  In some cases it must be written as -logevents:"patrol,Usr,20"
+                  In some cases it must be written as -logevents:"move,Usr,20"
 
 -namespaces       Filter the page generator to only yield pages in the
 -namespace        specified namespaces. Separate multiple namespace
@@ -174,7 +174,7 @@ parameterHelp = u"""\
 -imagesused       Work on all images that contained on a certain page.
                   Argument can also be given as "-imagesused:linkingpagetitle".
 
--newimages        If given as -newimages:x, it will work on the x newest images.
+-newimages        If given as -newimages:x, it will work on x newest images.
                   Otherwise asks to input the number of wanted images.
 
 -newpages         Work on the most recent new pages. If given as -newpages:x,
@@ -182,15 +182,15 @@ parameterHelp = u"""\
 
 -recentchanges    Work on the pages with the most recent changes. If
                   given as -recentchanges:x, will work on the x most recently
-                  changed pages. If given as -recentchanges:offset,duration it will
-                  work on pages changed from 'offset' minutes with 'duration'
-                  minutes of timespan.
+                  changed pages. If given as -recentchanges:offset,duration it
+                  will work on pages changed from 'offset' minutes with
+                  'duration'  minutes of timespan.
 
                   By default, if no values follow -recentchanges, then we pass
                   -recentchanges:x where x = 60
 
                   Examples:
-                  -recentchanges:20 will give the 20 most recently changed pages
+                  -recentchanges:20 gives the 20 most recently changed pages
                   -recentchanges:120,70 will give pages with 120 offset
                   minutes and 70 minutes of timespan
 
@@ -214,13 +214,14 @@ parameterHelp = u"""\
 -prefixindex      Work on pages commencing with a common prefix.
 
 -subpage:n        Filters pages to only those that have depth n
-                  i.e. a depth of 0 filters out all pages that are subpages, and
-                  a depth of 1 filters out all pages that are subpages of subpages.
+                  i.e. a depth of 0 filters out all pages that are subpages,
+                  and a depth of 1 filters out all pages that are subpages of
+                  subpages.
 
 -titleregex       A regular expression that needs to match the article title
                   otherwise the page won't be returned.
-                  Multiple -titleregex:regexpr can be provided and the page will
-                  be returned if title is matched by any of the regexpr
+                  Multiple -titleregex:regexpr can be provided and the page
+                  will be returned if title is matched by any of the regexpr
                   provided.
                   Case insensitive regular expressions will be used and
                   dot matches any character.
