@@ -1168,27 +1168,27 @@ class BaseSite(ComparableMixin):
 
     # namespace shortcuts for backwards-compatibility
 
-    @deprecated('namespaces.SPECIAL')
+    @deprecated('namespaces.SPECIAL.custom_name')
     def special_namespace(self):
         """Return local name for the Special: namespace."""
         return self.namespace(-1)
 
-    @deprecated('namespaces.FILE')
+    @deprecated('namespaces.FILE.custom_name')
     def image_namespace(self):
         """Return local name for the File namespace."""
         return self.namespace(6)
 
-    @deprecated('namespaces.MEDIAWIKI')
+    @deprecated('namespaces.MEDIAWIKI.custom_name')
     def mediawiki_namespace(self):
         """Return local name for the MediaWiki namespace."""
         return self.namespace(8)
 
-    @deprecated('namespaces.TEMPLATE')
+    @deprecated('namespaces.TEMPLATE.custom_name')
     def template_namespace(self):
         """Return local name for the Template namespace."""
         return self.namespace(10)
 
-    @deprecated('namespaces.CATEGORY')
+    @deprecated('namespaces.CATEGORY.custom_name')
     def category_namespace(self):
         """Return local name for the Category namespace."""
         return self.namespace(14)
