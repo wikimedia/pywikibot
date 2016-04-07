@@ -160,7 +160,7 @@ class ImageRobot(ReplaceBot):
             if not self.getOption('loose'):
                 replacements.append((image_regex,
                                      u'[[%s:%s\\g<parameters>]]'
-                                     % (self.site.namespaces.FILE,
+                                     % (self.site.namespaces.FILE.custom_name,
                                         self.new_image)))
             else:
                 replacements.append((image_regex, self.new_image))
