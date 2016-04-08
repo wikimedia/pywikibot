@@ -49,7 +49,7 @@ or by adding a list to the given one:
     cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 """
 #
-# (C) xqt, 2009-2015
+# (C) xqt, 2009-2016
 # (C) Pywikibot team, 2006-2016
 #
 # Distributed under the terms of the MIT license.
@@ -296,51 +296,18 @@ class CosmeticChangesToolkit(object):
         """
         Standardize page footer.
 
-        Makes sure that interwiki links, categories and star templates are
-        put to the correct position and into the right order. This combines the
-        old instances standardizeInterwiki and standardizeCategories
+        Makes sure that interwiki links and categories are put to the correct
+        position and into the right order. This combines the old instances
+        standardizeInterwiki and standardizeCategories.
         The page footer has the following section in that sequence:
         1. categories
         2. ## TODO: template beyond categories ##
         3. additional information depending on local site policy
-        4. stars templates for featured and good articles
-        5. interwiki links
+        4. interwiki links
 
         """
-        # TODO: T123150
-        starsList = [
-            u'bueno',
-            u'bom interwiki',
-            u'cyswllt[ _]erthygl[ _]ddethol', u'dolen[ _]ed',
-            u'destacado', u'destaca[tu]',
-            u'enllaç[ _]ad',
-            u'enllaz[ _]ad',
-            u'leam[ _]vdc',
-            u'legătură[ _]a[bcf]',
-            u'liamm[ _]pub',
-            u'lien[ _]adq',
-            u'lien[ _]ba',
-            u'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
-            u'liên[ _]kết[ _]chọn[ _]lọc',
-            u'ligam[ _]adq',
-            u'ligazón[ _]a[bd]',
-            u'ligoelstara',
-            u'ligoleginda',
-            u'link[ _][afgu]a', u'link[ _]adq', u'link[ _]f[lm]', u'link[ _]km',
-            u'link[ _]sm', u'linkfa',
-            u'na[ _]lotura',
-            u'nasc[ _]ar',
-            u'tengill[ _][úg]g',
-            u'ua',
-            u'yüm yg',
-            u'רא',
-            u'وصلة مقالة جيدة',
-            u'وصلة مقالة مختارة',
-        ]
-
         categories = None
         interwikiLinks = None
-        allstars = []
 
         # Pywikibot is no longer allowed to touch categories on the
         # German Wikipedia. See
@@ -367,15 +334,6 @@ class CosmeticChangesToolkit(object):
 
             # Removing the interwiki
             text = textlib.removeLanguageLinks(text, site=self.site)
-            # Removing the stars' issue
-            starstext = textlib.removeDisabledParts(text)
-            for star in starsList:
-                regex = re.compile(r'(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
-                                   % star, re.I)
-                found = regex.findall(starstext)
-                if found != []:
-                    text = regex.sub('', text)
-                    allstars += found
 
         # Adding categories
         if categories:
@@ -390,13 +348,6 @@ class CosmeticChangesToolkit(object):
             #            categories.insert(0, name)
             text = textlib.replaceCategoryLinks(text, categories,
                                                 site=self.site)
-        # Adding stars templates
-        if allstars:
-            text = text.strip() + self.site.family.interwiki_text_separator
-            allstars.sort()
-            for element in allstars:
-                text += '%s%s' % (element.strip(), config.line_separator)
-                pywikibot.log(u'%s' % element.strip())
         # Adding the interwiki
         if interwikiLinks:
             text = textlib.replaceLanguageLinks(text, interwikiLinks,

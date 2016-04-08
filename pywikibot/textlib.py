@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1667,6 +1667,108 @@ def glue_template_and_params(template_and_params):
         text += u'|%s=%s\n' % (item, params[item])
 
     return u'{{%s\n%s}}' % (template, text)
+
+
+# ---------------------------------
+# functions dealing with stars list
+# ---------------------------------
+
+starsList = [
+    'bueno',
+    'bom interwiki',
+    'cyswllt[ _]erthygl[ _]ddethol', 'dolen[ _]ed',
+    'destacado', 'destaca[tu]',
+    'enllaç[ _]ad',
+    'enllaz[ _]ad',
+    'leam[ _]vdc',
+    'legătură[ _]a[bcf]',
+    'liamm[ _]pub',
+    'lien[ _]adq',
+    'lien[ _]ba',
+    'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
+    'liên[ _]kết[ _]chọn[ _]lọc',
+    'ligam[ _]adq',
+    'ligazón[ _]a[bd]',
+    'ligoelstara',
+    'ligoleginda',
+    'link[ _][afgu]a', 'link[ _]adq', 'link[ _]f[lm]', 'link[ _]km',
+    'link[ _]sm', 'linkfa',
+    'na[ _]lotura',
+    'nasc[ _]ar',
+    'tengill[ _][úg]g',
+    'ua',
+    'yüm yg',
+    'רא',
+    'وصلة مقالة جيدة',
+    'وصلة مقالة مختارة',
+]
+
+
+def get_stars(text):
+    """
+    Extract stars templates from wikitext.
+
+    @param text: a wiki text
+    @type text: str
+    @return: list  of stars templates
+    @rtype: list
+    """
+    allstars = []
+    starstext = removeDisabledParts(text)
+    for star in starsList:
+        regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
+                           % star, re.I)
+        found = regex.findall(starstext)
+        if found:
+            allstars += found
+    return allstars
+
+
+def remove_stars(text, stars_list):
+    """
+    Remove stars templates from text.
+
+    @param text: a wiki text
+    @type text: str
+    @param start_list: list of stars templates previously found in text
+    @return: modified text
+    @rtype: str
+    """
+    for star in stars_list:
+        text = text.replace(star, '')
+    return text
+
+
+def append_stars(text, stars_list, site=None):
+    """
+    Remove stars templates from text.
+
+    @param text: a wiki text
+    @type text: str
+    @param stars_list: list of stars templates previously found in text
+    @type stars_list: list
+    @param site: a site where the given text is used.
+        interwiki_text_separator is used when a site object is given.
+        Otherwise line_separator is used twice to separate stars list.
+    @type site: BaseSite
+    @return: modified text
+    @rtype: str
+    """
+    LS = (config.line_separator * 2
+          if not site else site.family.interwiki_text_separator)
+    text = text.strip() + LS
+    stars = stars_list[:]
+    stars.sort()
+    for element in stars:
+        text += element.strip() + config.line_separator
+    return text
+
+
+def standardize_stars(text):
+    """Make sure that star templates are in the right order."""
+    allstars = get_stars(text)
+    text = remove_stars(text, allstars)
+    return append_stars(text, allstars)
 
 
 # --------------------------
