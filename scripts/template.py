@@ -214,12 +214,6 @@ class TemplateRobot(ReplaceBot):
                 self.options['summary'] = i18n.twtranslate(
                     site, 'template-changing', params)
 
-        # regular expression to find the original template.
-        # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
-        # The old syntax, {{msg:vfd}}, will also be found.
-        # The group 'parameters' will either match the parameters, or an
-        # empty string if there are none.
-
         replacements = []
         exceptions = {}
         builder = textlib._MultiTemplateMatchBuilder(site)
