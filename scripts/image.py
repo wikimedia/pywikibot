@@ -131,14 +131,6 @@ class ImageRobot(ReplaceBot):
                 else self.old_image,
                 fallback=True)
 
-        # regular expression to find the original template.
-        # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
-        # The old syntax, {{msg:vfd}}, will also be found.
-        # The group 'parameters' will either match the parameters, or an
-        # empty string if there are none.
-
-        replacements = []
-
         namespace = self.site.namespaces[6]
         if namespace.case == 'first-letter':
             case = re.escape(self.old_image[0].upper() +
@@ -156,6 +148,7 @@ class ImageRobot(ReplaceBot):
         else:
             image_regex = re.compile(r'' + escaped)
 
+        replacements = []
         if self.new_image:
             if not self.getOption('loose'):
                 replacements.append((image_regex,
