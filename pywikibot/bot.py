@@ -82,6 +82,7 @@ __all__ = (
 )
 
 
+import atexit
 import codecs
 import configparser
 import datetime
@@ -176,6 +177,7 @@ _logger = 'bot'
 uiModule = __import__('pywikibot.userinterfaces.{}_interface'
                       .format(config.userinterface), fromlist=['UI'])
 ui = uiModule.UI()
+atexit.register(ui.flush)
 pywikibot.argvu = ui.argvu()
 
 _GLOBAL_HELP = """

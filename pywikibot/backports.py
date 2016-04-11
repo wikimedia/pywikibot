@@ -34,6 +34,13 @@ else:
     from contextlib import nullcontext
 
 
+# queue
+if PYTHON_VERSION < (3, 7):
+    from queue import Queue as SimpleQueue
+else:
+    from queue import SimpleQueue
+
+
 # typing
 if PYTHON_VERSION < (3, 5, 2):
     from typing import Dict as DefaultDict

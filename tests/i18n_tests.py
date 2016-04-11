@@ -514,7 +514,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
         self.orig_raw_input = bot.ui._raw_input
         self.orig_output = bot.ui.output
         bot.ui._raw_input = lambda *args, **kwargs: 'dummy input'
-        bot.ui.output = self._capture_output
+        bot.ui.stream_output = self._capture_output
         self.old_cc_setting = config.cosmetic_changes_mylang_only
 
     def tearDown(self):
