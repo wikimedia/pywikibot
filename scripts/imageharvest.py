@@ -31,9 +31,8 @@ import BeautifulSoup
 
 import pywikibot
 
+from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import PY2
-
-from scripts import upload
 
 if not PY2:
     import urllib
@@ -122,7 +121,7 @@ def main(give_url, image_url, desc):
                                       % (mysite.namespace(14), cat))
             desc += "\r\n\r\n" + basicdesc + "\r\n\r\n" + \
                     "\r\n".join(categories)
-            uploadBot = upload.UploadRobot(image, description=desc)
+            uploadBot = UploadRobot(image, description=desc)
             uploadBot.run()
         elif answer == 's':
             break

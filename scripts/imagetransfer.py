@@ -27,7 +27,7 @@ used on a page reachable via interwiki links.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,8 +41,8 @@ import sys
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.specialbots import UploadRobot
 
-from scripts import upload
 
 nowCommonsTemplate = {
     'ar': u'{{الآن كومنز|%s}}',
@@ -168,12 +168,12 @@ class ImageTransferBot(object):
             description = ''
             print("Image description page is redirect.")
         else:
-            bot = upload.UploadRobot(url=url, description=description,
-                                     targetSite=self.targetSite,
-                                     urlEncoding=sourceSite.encoding(),
-                                     keepFilename=self.keep_name,
-                                     verifyDescription=not self.keep_name,
-                                     ignoreWarning=self.ignore_warning)
+            bot = UploadRobot(url=url, description=description,
+                              targetSite=self.targetSite,
+                              urlEncoding=sourceSite.encoding(),
+                              keepFilename=self.keep_name,
+                              verifyDescription=not self.keep_name,
+                              ignoreWarning=self.ignore_warning)
             # try to upload
             targetFilename = bot.run()
             if targetFilename and self.targetSite.family.name == 'commons' and \

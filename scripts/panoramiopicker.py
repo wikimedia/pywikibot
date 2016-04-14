@@ -3,7 +3,7 @@
 """Tool to copy a Panoramio set to Commons."""
 #
 # (C) Multichill, 2010
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,9 +24,10 @@ import pywikibot
 
 from pywikibot import config
 
+from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import PY2
 
-from scripts import imagerecat, upload
+from scripts import imagerecat
 
 if not PY2:
     from urllib.request import urlopen
@@ -242,11 +243,11 @@ def processPhoto(photoInfo, panoramioreview=False, reviewer='',
             # Not that important for this program, but maybe for derived
             # programs
             if not skip:
-                bot = upload.UploadRobot(photoInfo.get(u'photo_file_url'),
-                                         description=newDescription,
-                                         useFilename=newFilename,
-                                         keepFilename=True,
-                                         verifyDescription=False, site=site)
+                bot = UploadRobot(photoInfo.get(u'photo_file_url'),
+                                  description=newDescription,
+                                  useFilename=newFilename,
+                                  keepFilename=True,
+                                  verifyDescription=False, site=site)
                 bot.upload_image(debug=False)
                 return 1
     return 0
