@@ -2409,6 +2409,67 @@ class FilePage(Page):
         """
         return self.site.imageusage(self, total=total, content=content)
 
+    def upload(self, source, **kwargs):
+        """
+        Upload this file to the wiki.
+
+        keyword arguments are from site.upload() method.
+
+        @param source: Path or URL to the file to be uploaded.
+        @type source: str
+
+        @keyword comment: Edit summary; if this is not provided, then
+            filepage.text will be used. An empty summary is not permitted.
+            This may also serve as the initial page text (see below).
+        @keyword text: Initial page text; if this is not set, then
+            filepage.text will be used, or comment.
+        @keyword watch: If true, add filepage to the bot user's watchlist
+        @keyword ignore_warnings: It may be a static boolean, a callable returning
+            a boolean or an iterable. The callable gets a list of UploadWarning
+            instances and the iterable should contain the warning codes for
+            which an equivalent callable would return True if all UploadWarning
+            codes are in thet list. If the result is False it'll not continuing
+            uploading the file and otherwise disable any warning and
+            reattempting to upload the file. NOTE: If report_success is True or
+            None it'll raise an UploadWarning exception if the static boolean is
+            False.
+        @type ignore_warnings: bool or callable or iterable of str
+        @keyword chunk_size: The chunk size in bytesfor chunked uploading (see
+            U{https://www.mediawiki.org/wiki/API:Upload#Chunked_uploading}). It
+            will only upload in chunks, if the version number is 1.20 or higher
+            and the chunk size is positive but lower than the file size.
+        @type chunk_size: int
+        @keyword _file_key: Reuses an already uploaded file using the filekey. If
+            None (default) it will upload the file.
+        @type _file_key: str or None
+        @keyword _offset: When file_key is not None this can be an integer to
+            continue a previously canceled chunked upload. If False it treats
+            that as a finished upload. If True it requests the stash info from
+            the server to determine the offset. By default starts at 0.
+        @type _offset: int or bool
+        @keyword _verify_stash: Requests the SHA1 and file size uploaded and
+            compares it to the local file. Also verifies that _offset is
+            matching the file size if the _offset is an int. If _offset is False
+            if verifies that the file size match with the local file. If None
+            it'll verifies the stash when a file key and offset is given.
+        @type _verify_stash: bool or None
+        @keyword report_success: If the upload was successful it'll print a
+            success message and if ignore_warnings is set to False it'll
+            raise an UploadWarning if a warning occurred. If it's None (default)
+            it'll be True if ignore_warnings is a bool and False otherwise. If
+            it's True or None ignore_warnings must be a bool.
+        @return: It returns True if the upload was successful and False
+            otherwise.
+        @rtype: bool
+        """
+        filename = url = None
+        if '://' in source:
+            url = source
+        else:
+            filename = source
+        return self.site.upload(self, source_filename=filename, source_url=url,
+                                **kwargs)
+
 
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
