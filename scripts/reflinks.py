@@ -746,8 +746,8 @@ def main(*args):
     @type args: list of unicode
     """
     xmlFilename = None
+    xmlStart = None
     options = {}
-    namespaces = []
     generator = None
 
     # Process global args and prepare generator args parser
@@ -755,12 +755,7 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
-        elif arg.startswith('-summary:'):
+        if arg.startswith('-summary:'):
             options['summary'] = arg[9:]
         elif arg == '-always':
             options['always'] = True
@@ -784,11 +779,8 @@ def main(*args):
             genFactory.handleArg(arg)
 
     if xmlFilename:
-        try:
-            xmlStart
-        except NameError:
-            xmlStart = None
-        generator = XmlDumpPageGenerator(xmlFilename, xmlStart, namespaces)
+        generator = XmlDumpPageGenerator(xmlFilename, xmlStart,
+                                         genFactory.namespaces)
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:

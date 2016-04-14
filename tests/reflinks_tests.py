@@ -56,7 +56,6 @@ class TestXMLPageGenerator(TestCase):
         self.assertPagelistTitles(pages, (u'Fake page', u'Talk:Fake page'),
                                   site=self.get_site())
 
-    @unittest.expectedFailure
     def test_namespace_None(self):
         """Test namespaces=None processes all namespaces."""
         gen = XmlDumpPageGenerator(
@@ -68,7 +67,6 @@ class TestXMLPageGenerator(TestCase):
         self.assertPagelistTitles(pages, (u'Fake page', u'Talk:Fake page'),
                                   site=self.get_site())
 
-    @unittest.expectedFailure
     def test_namespace_string_ids(self):
         """Test namespaces with ids as string."""
         gen = XmlDumpPageGenerator(
@@ -91,7 +89,6 @@ class TestXMLPageGenerator(TestCase):
         self.assertPagelistTitles(pages, (u'Talk:Fake page', ),
                                   site=self.get_site())
 
-    @unittest.expectedFailure
     def test_start_with_underscore(self):
         """Test with underscore in start page title."""
         gen = XmlDumpPageGenerator(
@@ -114,7 +111,6 @@ class TestXMLPageGenerator(TestCase):
         self.assertPagelistTitles(pages, (u'Fake page', u'Talk:Fake page'),
                                   site=self.get_site())
 
-    @unittest.expectedFailure
     def test_start_prefix(self):
         """Test with a prefix as a start page title."""
         gen = XmlDumpPageGenerator(
@@ -178,7 +174,6 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPageTitlesCountEqual(gen, [u'Fake page', u'Talk:Fake page'],
                                         site=self.get_site())
 
-    @unittest.expectedFailure
     def test_xml_multiple_namespace_ids_2(self):
         """Test the generator using multiple namespaces in one parameter."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
@@ -187,7 +182,6 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPageTitlesCountEqual(gen, [u'Fake page', u'Talk:Fake page'],
                                         site=self.get_site())
 
-    @unittest.expectedFailure
     def test_xml_start_prefix(self):
         """Test the generator using a start partial page."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
@@ -197,7 +191,6 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
         self.assertPagelistTitles(pages, [u'Talk:Fake page'],
                                   site=self.get_site())
 
-    @unittest.expectedFailure
     def test_xml_start_underscore(self):
         """Test the generator using a start page with an underscore."""
         main('-xml:' + join_xml_data_path('dummy-reflinks.xml'),
