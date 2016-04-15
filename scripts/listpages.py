@@ -36,6 +36,9 @@ These parameters are supported to specify which pages titles to print:
 
          num is the sequential number of the listed page.
 
+         An empty format is equal to -notitle and just shows the total amount
+         of pages.
+
 -outputlang   Language for translation of namespaces.
 
 -notitle Page title is not printed.
@@ -191,25 +194,27 @@ def main(*args):
     genFactory = GeneratorFactory()
 
     for arg in local_args:
-        if arg == '-notitle':
+        option, sep, value = arg.partition(':')
+        if option == '-notitle':
             notitle = True
-        elif arg.startswith('-format:'):
-            fmt = arg[len('-format:'):]
-            fmt = fmt.replace(u'\\03{{', u'\03{{')
-        elif arg.startswith('-outputlang:'):
-            outputlang = arg[len('-outputlang:'):]
-        elif arg == '-get':
+        elif option == '-format':
+            fmt = value.replace('\\03{{', '\03{{')
+            if not fmt.strip():
+                notitle = True
+        elif option == '-outputlang:':
+            outputlang = value
+        elif option == '-get':
             page_get = True
-        elif arg.startswith('-save'):
-            base_dir = arg.partition(':')[2] or '.'
-        elif arg.startswith('-encode:'):
-            encoding = arg.partition(':')[2]
-        elif arg.startswith('-put:'):
-            page_target = arg.partition(':')[2]
-        elif arg.startswith('-overwrite'):
+        elif option == '-save':
+            base_dir = value or '.'
+        elif option == '-encode':
+            encoding = value
+        elif option == '-put':
+            page_target = value
+        elif option == '-overwrite':
             overwrite = True
-        elif arg.startswith('-summary:'):
-            summary = arg.partition(':')[2]
+        elif option == '-summary':
+            summary = value
         else:
             genFactory.handleArg(arg)
 
