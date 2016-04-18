@@ -228,7 +228,7 @@ class UI(object):
         if not PY2:
             return input()
         else:
-            return raw_input()  # noqa
+            return raw_input()
 
     def input(self, question, password=False, default='', force=False):
         """

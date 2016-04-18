@@ -76,8 +76,9 @@ import pywikibot
 
 from pywikibot.data import api
 
-from pywikibot.page import User  # noqa
-from pywikibot.site import APISite, DataSite, LoginStatus  # noqa
+# The follow attributes are used by eval()
+from pywikibot.page import User  # flake8: disable=F401 (unused import)
+from pywikibot.site import APISite, DataSite, LoginStatus  # flake8: disable=F401
 
 
 class ParseError(Exception):

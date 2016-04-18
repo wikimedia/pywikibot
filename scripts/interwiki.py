@@ -2332,10 +2332,10 @@ def compareLanguages(old, new, insite):
     if not globalvar.summary and \
        len(adding) + len(removing) + len(modifying) <= 3:
         # Use an extended format for the string linking to all added pages.
-        fmt = lambda d, site: unicode(d[site])  # noqa: E731
+        fmt = lambda d, site: unicode(d[site])  # flake8: disable=E731
     else:
         # Use short format, just the language code
-        fmt = lambda d, site: site.code  # noqa: E731
+        fmt = lambda d, site: site.code  # flake8: disable=E731
 
     mods = mcomment = u''
 

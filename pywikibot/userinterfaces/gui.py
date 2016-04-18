@@ -36,6 +36,7 @@ from idlelib.MultiCall import MultiCallCreator
 import pywikibot
 
 from pywikibot import __url__
+from pywikibot.tools import PY2, UnicodeType
 
 
 class TextEditor(ScrolledText):
@@ -415,8 +416,8 @@ class EditBoxWindow(Tkinter.Frame):
         # if the editbox contains ASCII characters only, get() will
         # return string, otherwise unicode (very annoying). We only want
         # it to return unicode, so we work around this.
-        if sys.version[0] == 2 and isinstance(self.text, str):
-            self.text = unicode(self.text)  # noqa
+        if PY2 and isinstance(self.text, str):
+            self.text = UnicodeType(self.text)
         self.parent.destroy()
 
     def debug(self, event=None):

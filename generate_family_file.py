@@ -30,8 +30,8 @@ else:
 
 # Disable user-config checks so the family can be created first,
 # and then used when generating the user-config
-_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')  # noqa
-os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'  # noqa
+_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
+os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
 
 from pywikibot.site_detect import MWSite as Wiki
 

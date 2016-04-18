@@ -18,8 +18,8 @@ from textwrap import wrap
 from warnings import warn
 
 # Disable user-config usage as we are creating it here
-_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')  # noqa
-os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'  # noqa
+_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
+os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
 
 import pywikibot
 

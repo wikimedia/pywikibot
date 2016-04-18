@@ -40,7 +40,7 @@ if sys.version_info[0] > 2:
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
 else:
-    chr = unichr  # noqa
+    chr = unichr  # flake8 F821 (undefined name) disabled by tox.ini
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
@@ -67,7 +67,7 @@ from pywikibot.tools import (
     first_upper, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
 )
-from pywikibot.tools.ip import ip_regexp  # noqa & deprecated
+from pywikibot.tools.ip import ip_regexp  # flake8: disable=F401 (unused import)
 from pywikibot.tools.ip import is_IP
 
 

@@ -51,7 +51,7 @@ try:
 except ImportError as e:
     print('This script requires the python flickrapi module. \n'
           'See: http://stuvel.eu/projects/flickrapi')  # noqa: print
-    print(e)  # noqa: print
+    print(e)  # flake8: disable=T003 (print)
     sys.exit(1)
 
 import pywikibot
@@ -355,7 +355,7 @@ def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
                                                user_id=user_id, tags=tags,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-        gen = lambda i: flickr.groups_pools_getPhotos(  # noqa: E731
+        gen = lambda i: flickr.groups_pools_getPhotos(  # flake8: disable=E731
             group_id=group_id, user_id=user_id, tags=tags,
             per_page='100', page=i
         ).find('photos').getchildren()
@@ -365,7 +365,7 @@ def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
         photos = flickr.photosets_getPhotos(photoset_id=photoset_id,
                                             per_page='100', page='1')
         pages = photos.find('photoset').attrib['pages']
-        gen = lambda i: flickr.photosets_getPhotos(  # noqa: E731
+        gen = lambda i: flickr.photosets_getPhotos(  # flake8: disable=E731
             photoset_id=photoset_id, per_page='100', page=i
         ).find('photoset').getchildren()
     # https://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
@@ -374,7 +374,7 @@ def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
         photos = flickr.people_getPublicPhotos(user_id=user_id,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-        gen = lambda i: flickr.people_getPublicPhotos(  # noqa: E731
+        gen = lambda i: flickr.people_getPublicPhotos(  # flake8: disable=E731
             user_id=user_id, per_page='100', page=i
         ).find('photos').getchildren()
     for i in range(1, int(pages) + 1):

@@ -23,7 +23,7 @@ from pywikibot import config
 from pywikibot.tools import deprecated
 
 try:
-    from pywikibot.userinterfaces import gui  # noqa
+    from pywikibot.userinterfaces import gui
 except ImportError as e:
     gui = e
 

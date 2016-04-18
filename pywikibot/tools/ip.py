@@ -15,7 +15,7 @@ import sys
 from distutils.version import StrictVersion
 from warnings import warn
 
-from pywikibot.tools import DeprecatedRegex
+from pywikibot.tools import DeprecatedRegex, UnicodeType
 
 _ipaddress_e = _ipaddr_e = _ipaddr_version = None
 
@@ -61,7 +61,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
 
             def ip_address_patched(IP):
                 """Safe ip_address."""
-                return orig_ip_address(unicode(IP))  # noqa
+                return orig_ip_address(UnicodeType(IP))
 
             ip_address = ip_address_patched
         except ValueError:
