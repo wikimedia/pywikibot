@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ __version__ = '$Id$'
 import collections
 import gzip
 import inspect
+import itertools
 import re
 import subprocess
 import sys
@@ -607,6 +608,49 @@ def itergroup(iterable, size):
             group = []
     if group:
         yield group
+
+
+def islice_with_ellipsis(iterable, *args, **kwargs):
+    u"""
+    Generator which yields the first n elements of the iterable.
+
+    If more elements are available and marker is True, it returns an extra
+    string marker as continuation mark.
+
+    Function takes the
+    and the additional keyword marker.
+
+    @param iterable: the iterable to work on
+    @type  iterable: iterable
+    @param args: same args as:
+        - C{itertools.islice(iterable, stop)}
+        - C{itertools.islice(iterable, start, stop[, step])}
+    @keyword marker: element to yield if iterable still contains elements
+        after showing the required number.
+        Default value: '…'
+        No other kwargs are considered.
+    @type marker: str
+    """
+    s = slice(*args)
+    marker = kwargs.pop('marker', '…')
+    try:
+        k, v = kwargs.popitem()
+        raise TypeError(
+            "islice_with_ellipsis() take only 'marker' as keyword arg, not %s"
+            % k)
+    except KeyError:
+        pass
+
+    _iterable = iter(iterable)
+    for el in itertools.islice(_iterable, *args):
+        yield el
+    if marker and s.stop is not None:
+        try:
+            next(_iterable)
+        except StopIteration:
+            pass
+        else:
+            yield marker
 
 
 class ThreadList(list):
