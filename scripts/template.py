@@ -202,21 +202,19 @@ class TemplateRobot(ReplaceBot):
             params = {'list': comma.join(self.templates.keys()),
                       'num': len(self.templates)}
 
-            site = self.site
-
             if self.getOption('remove'):
                 self.options['summary'] = i18n.twtranslate(
-                    site, 'template-removing', params)
+                    self.site, 'template-removing', params)
             elif self.getOption('subst'):
                 self.options['summary'] = i18n.twtranslate(
-                    site, 'template-substituting', params)
+                    self.site, 'template-substituting', params)
             else:
                 self.options['summary'] = i18n.twtranslate(
-                    site, 'template-changing', params)
+                    self.site, 'template-changing', params)
 
         replacements = []
         exceptions = {}
-        builder = textlib._MultiTemplateMatchBuilder(site)
+        builder = textlib._MultiTemplateMatchBuilder(self.site)
         for old, new in self.templates.items():
             templateRegex = builder.pattern(old)
 
