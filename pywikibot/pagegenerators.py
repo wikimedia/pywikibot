@@ -689,6 +689,7 @@ class GeneratorFactory(object):
         elif arg == '-recentchanges':
             rcstart = None
             rcend = None
+            total = None
             params = value.split(',') if value else []
             if len(params) == 2:
                 offset = float(params[0])
@@ -698,12 +699,13 @@ class GeneratorFactory(object):
             elif len(params) > 2:
                 raise ValueError('More than two parameters passed.')
             else:
-                value = int(value) if value else 60
+                total = int(value) if value else 60
             if len(params) == 2:
                 ts_time = self.site.server_time()
                 rcstart = ts_time + timedelta(minutes=-(offset + duration))
                 rcend = ts_time + timedelta(minutes=-offset)
             gen = RecentChangesPageGenerator(namespaces=self.namespaces,
+                                             total=total,
                                              start=rcstart,
                                              end=rcend,
                                              site=self.site,
