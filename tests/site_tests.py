@@ -163,7 +163,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         self.assertEqual(self.site.category_namespace(),
                          self.site.namespace(14))
         self.assertEqual(self.site.category_namespaces(),
-                         self.site.namespace(14, all=True))
+                         list(self.site.namespace(14, all=True)))
 
 
 class TestSiteDryDeprecatedFunctions(DefaultDrySiteTestCase, DeprecationTestCase):
