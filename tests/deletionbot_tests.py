@@ -107,14 +107,16 @@ class TestDeletionBot(ScriptMainTestCase):
     def test_dry(self):
         """Test dry run of bot."""
         delete.main('-page:Main Page', '-always', '-summary:foo')
-        self.assertEqual(self.delete_args, ['[[Main Page]]', 'foo', False, True])
+        self.assertEqual(self.delete_args, ['[[Main Page]]', 'foo', False,
+                                            True, True])
         delete.main('-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')
         self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
-def delete_dummy(self, reason, prompt, mark):
+def delete_dummy(self, reason, prompt, mark, quit):
     """Dummy delete method."""
-    TestDeletionBot.delete_args = [self.title(asLink=True), reason, prompt, mark]
+    TestDeletionBot.delete_args = [self.title(asLink=True), reason, prompt,
+                                   mark, quit]
 
 
 def undelete_dummy(self, reason):
