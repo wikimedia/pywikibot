@@ -30,6 +30,8 @@ except ImportError as e:
 
 import pywikibot
 
+from pywikibot.data.api import Request
+
 
 class FullHeader(object):
 
@@ -420,6 +422,23 @@ class ProofreadPage(pywikibot.Page):
         return '/* {0.status} */ '.format(self)
 
 
+class PurgeRequest(Request):
+
+    """Subclass of Request which skips the check on write rights.
+
+    Workaround for T128994.
+    # TODO: remove once bug is fixed.
+    """
+
+    def __init__(self, **kwargs):
+        """Monkeypatch action in Request constructor."""
+        action = kwargs['parameters']['action']
+        kwargs['parameters']['action'] = 'dummy'
+        super(PurgeRequest, self).__init__(**kwargs)
+        self.action = action
+        self.update({'action': action})
+
+
 class IndexPage(pywikibot.Page):
 
     """Index Page page used in Mediawiki ProofreadPage extension."""
@@ -481,6 +500,22 @@ class IndexPage(pywikibot.Page):
         else:
             return None
 
+        def purge(self):
+            """Overwrite purge method.
+
+            Workaround for T128994.
+            # TODO: remove once bug is fixed.
+
+            Instead of a proper purge action, use PurgeRequest, which
+            skips the check on write rights.
+            """
+            params = {'action': 'purge', 'titles': [self.title()]}
+            request = PurgeRequest(site=self.site, parameters=params)
+            rawdata = request.submit()
+            error_message = 'Purge action failed for %s' % self
+            assert 'purge' in rawdata, error_message
+            assert 'purged' in rawdata['purge'][0], error_message
+
     def _get_page_mappings(self):
         """Associate label and number for each page linked to the index."""
         # Clean cache, if any.
@@ -517,7 +552,7 @@ class IndexPage(pywikibot.Page):
             self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
-                    'Missing class="qualityN prp-pagequality-N" or'
+                    'Missing class="qualityN prp-pagequality-N" or '
                     'class="new" in: %s.'
                     % self)
 
