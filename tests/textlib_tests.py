@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2015
+# (C) Pywikibot team, 2011-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,11 +74,14 @@ class TestSectionFunctions(TestCase):
         self.assertNotContains('enwiki_help_editing', 'Minor_Edits',
                                'section hashes are case-sensitive')
 
-    @unittest.expectedFailure
-    def testNonAlphabeticalCharactersInSection(self):
-        """Test with non-alphabetical chars in section."""
+    @unittest.expectedFailure  # TODO: T133276
+    def test_encoded_chars_in_section(self):
+        """Test encoded chars in section."""
         self.assertContains('enwiki_help_editing', 'Talk_.28discussion.29_pages',
                             'As used in the TOC')
+
+    def test_underline_characters_in_section(self):
+        """Test with underline chars in section."""
         self.assertContains('enwiki_help_editing', 'Talk_(discussion)_pages',
                             'Understood by mediawiki')
 
