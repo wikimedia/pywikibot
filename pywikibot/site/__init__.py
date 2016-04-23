@@ -3825,24 +3825,33 @@ class APISite(BaseSite):
         """Delete page from the wiki. Requires appropriate privilege level.
 
         @see: U{https://www.mediawiki.org/wiki/API:Delete}
+        Page to be deleted can be given either as Page object or as pageid.
 
-        @param page: Page to be deleted.
-        @type page: pywikibot.Page
+        @param page: Page to be deleted or its pageid.
+        @type page: Page or, in case of pageid, int or str
         @param reason: Deletion reason.
+        @raises TypeError, ValueError: page has wrong type/value.
 
         """
         token = self.tokens['delete']
+        params = {'action': 'delete', 'token': token, 'reason': reason}
+
+        if isinstance(page, pywikibot.Page):
+            params['title'] = page
+            msg = page.title(withSection=False)
+        else:
+            pageid = int(page)
+            params['pageid'] = pageid
+            msg = pageid
+
+        req = self._simple_request(**params)
         self.lock_page(page)
-        req = self._simple_request(action='delete',
-                                   token=token,
-                                   title=page,
-                                   reason=reason)
         try:
             req.submit()
         except api.APIError as err:
             errdata = {
                 'site': self,
-                'title': page.title(with_section=False),
+                'title': msg,
                 'user': self.user(),
             }
             if err.code in self._dl_errors:
