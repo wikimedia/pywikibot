@@ -2463,6 +2463,23 @@ class TestPagePreloading(DefaultSiteTestCase):
 
     """Test site.preloadpages()."""
 
+    def test_order(self):
+        """Test outcome is following same order of input."""
+        mainpage = self.get_mainpage()
+        links = [page for page in self.site.pagelinks(mainpage, total=20)
+                 if page.exists()]
+        pages = list(self.site.preloadpages(links, groupsize=5))
+        self.assertEqual(pages, links)
+
+    def test_duplicates(self):
+        """Test outcome is following same order of input."""
+        mainpage = self.get_mainpage()
+        links = [page for page in self.site.pagelinks(mainpage, total=20)
+                 if page.exists()]
+        dupl_links = links + links[::-1]
+        pages = list(self.site.preloadpages(dupl_links, groupsize=40))
+        self.assertEqual(pages, links)
+
     def test_pageids(self):
         """Test basic preloading with pageids."""
         mysite = self.get_site()

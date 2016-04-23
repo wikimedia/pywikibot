@@ -481,30 +481,46 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
     def test_basic(self):
         """Test PreloadingGenerator with a list of pages."""
         mainpage = self.get_mainpage()
-        links = list(self.site.pagelinks(mainpage, total=10))
+        links = [page for page in self.site.pagelinks(mainpage, total=20)
+                 if page.exists()]
         count = 0
         for page in PreloadingGenerator(links, groupsize=20):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertEqual(len(page._revisions), 1)
-                self.assertIsNotNone(page._revisions[page._revid].text)
-                self.assertFalse(hasattr(page, '_pageprops'))
+            self.assertEqual(len(page._revisions), 1)
+            self.assertIsNotNone(page._revisions[page._revid].text)
+            self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
         self.assertEqual(len(links), count)
 
     def test_low_step(self):
         """Test PreloadingGenerator with a list of pages."""
         mainpage = self.get_mainpage()
-        links = list(self.site.pagelinks(mainpage, total=20))
+        links = [page for page in self.site.pagelinks(mainpage, total=20)
+                 if page.exists()]
         count = 0
         for page in PreloadingGenerator(links, groupsize=10):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertEqual(len(page._revisions), 1)
-                self.assertIsNotNone(page._revisions[page._revid].text)
-                self.assertFalse(hasattr(page, '_pageprops'))
+            self.assertEqual(len(page._revisions), 1)
+            self.assertIsNotNone(page._revisions[page._revid].text)
+            self.assertFalse(hasattr(page, '_pageprops'))
+            count += 1
+        self.assertEqual(len(links), count)
+
+    def test_order(self):
+        """Test outcome is following same order of input."""
+        mainpage = self.get_mainpage()
+        links = [page for page in self.site.pagelinks(mainpage, total=20)
+                 if page.exists()]
+        count = 0
+        for page in PreloadingGenerator(links, groupsize=10):
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertIsInstance(page.exists(), bool)
+            self.assertEqual(len(page._revisions), 1)
+            self.assertIsNotNone(page._revisions[page._revid].text)
+            self.assertFalse(hasattr(page, '_pageprops'))
+            self.assertEqual(page, links[count])
             count += 1
         self.assertEqual(len(links), count)
 

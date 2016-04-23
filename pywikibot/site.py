@@ -19,6 +19,7 @@ import copy
 import datetime
 import functools
 import hashlib
+import heapq
 import itertools
 import json
 import mimetypes
@@ -3091,38 +3092,55 @@ class APISite(BaseSite):
                      langlinks=False, pageprops=False):
         """Return a generator to a list of preloaded pages.
 
-        Note that [at least in current implementation] pages may be iterated
-        in a different order than in the underlying pagelist.
+        Pages are iterated in the same order than in the underlying pagelist.
+        In case of duplicates in a groupsize batch, return the first entry.
 
         @param pagelist: an iterable that returns Page objects
         @param groupsize: how many Pages to query at a time
         @type groupsize: int
-        @param templates: preload list of templates in the pages
-        @param langlinks: preload list of language links found in the pages
+        @param templates: preload pages (typically templates) transcluded in
+            the provided pages
+        @type templates: bool
+        @param langlinks: preload all language links from the provided pages
+            to other languages
+        @type langlinks: bool
+        @param pageprops: preload various properties defined in the page content
+        @type pageprops: bool
 
         """
+        props = 'revisions|info|categoryinfo'
+        if templates:
+            props += '|templates'
+        if langlinks:
+            props += '|langlinks'
+        if pageprops:
+            props += '|pageprops'
+
+        rvprop = ['ids', 'flags', 'timestamp', 'user', 'comment', 'content']
+
         for sublist in itergroup(pagelist, groupsize):
+            # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in sublist
                        if hasattr(p, "_pageid") and p._pageid > 0]
-            cache = dict((p.title(withSection=False), p) for p in sublist)
+            cache = {}
+            # In case of duplicates, return the first entry.
+            for priority, page in enumerate(sublist):
+                cache.setdefault(page.title(withSection=False),
+                                 (priority, page))
 
-            props = "revisions|info|categoryinfo"
-            if templates:
-                props += '|templates'
-            if langlinks:
-                props += '|langlinks'
-            if pageprops:
-                props += '|pageprops'
+            prio_queue = []
+            next_prio = 0
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
             if len(pageids) == len(sublist):
                 # only use pageids if all pages have them
-                rvgen.request["pageids"] = "|".join(pageids)
+                rvgen.request['pageids'] = set(pageids)
             else:
-                rvgen.request["titles"] = "|".join(list(cache.keys()))
-            rvgen.request[u"rvprop"] = u"ids|flags|timestamp|user|comment|content"
+                rvgen.request['titles'] = list(cache.keys())
+            rvgen.request['rvprop'] = rvprop
             pywikibot.output(u"Retrieving %s pages from %s."
                              % (len(cache), self))
+
             for pagedata in rvgen:
                 pywikibot.debug(u"Preloading %s" % pagedata, _logger)
                 try:
@@ -3148,8 +3166,20 @@ class APISite(BaseSite):
                     pywikibot.debug(u"pageids=%s" % pageids, _logger)
                     pywikibot.debug(u"titles=%s" % list(cache.keys()), _logger)
                     continue
-                page = cache[pagedata['title']]
+                priority, page = cache[pagedata['title']]
                 api.update_page(page, pagedata, rvgen.props)
+                priority, page = heapq.heappushpop(prio_queue, (priority, page))
+                # Smallest priority matches expected one; yield.
+                if priority == next_prio:
+                    yield page
+                    next_prio += 1
+                else:
+                    # Push back onto the heap.
+                    heapq.heappush(prio_queue, (priority, page))
+
+            # Empty the heap.
+            while prio_queue:
+                priority, page = heapq.heappop(prio_queue)
                 yield page
 
     def validate_tokens(self, types):
