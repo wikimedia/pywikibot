@@ -104,6 +104,10 @@ class MWSite(object):
                 self.version < MediaWikiVersion('1.14')):
             raise RuntimeError('Unsupported version: {0}'.format(self.version))
 
+    def __repr__(self):
+        return '{0}("{1}")'.format(
+            self.__class__.__name__, self.fromurl)
+
     @property
     def langs(self):
         """Build interwikimap."""
@@ -157,7 +161,9 @@ class MWSite(object):
     def _parse_post_117(self):
         """Parse 1.17+ siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
-        info = json.loads(response.content)
+        # remove preleading newlines and Byte Order Mark (BOM), see T128992
+        content = response.content.strip().lstrip('\uFEFF')
+        info = json.loads(content)
         self.private_wiki = ('error' in info and
                              info['error']['code'] == 'readapidenied')
         if self.private_wiki:
