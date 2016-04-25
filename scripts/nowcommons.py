@@ -51,8 +51,8 @@ Please fix these if you are capable and motivated:
 #
 # (C) Wikipedian, 2006-2007
 # (C) Siebrand Mazeland, 2007-2008
-# (C) xqt, 2010-2014
-# (C) Pywikibot team, 2006-2015
+# (C) xqt, 2010-2016
+# (C) Pywikibot team, 2006-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -451,6 +451,12 @@ class NowCommonsDeleteBot(Bot):
             except (pywikibot.NoPage, pywikibot.IsRedirectPage) as e:
                 pywikibot.output(u'%s' % e[0])
                 continue
+            else:
+                self._treat_counter += 1
+        if not self._treat_counter:
+            pywikibot.output(
+                'No transcluded files found for %s.' % self.ncTemplates[0])
+        self.exit()
 
 
 def main(*args):
