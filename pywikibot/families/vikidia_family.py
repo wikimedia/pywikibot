@@ -14,7 +14,10 @@ class Family(family.SubdomainFamily):
     name = 'vikidia'
     domain = 'vikidia.org'
 
-    codes = ['ca', 'en', 'es', 'eu', 'fr', 'it', 'ru', 'scn']
+    codes = ['ca', 'de', 'en', 'es', 'eu', 'fr', 'it', 'ru', 'scn']
+
+    # Sites we want to edit but not count as real languages
+    test_codes = ['central', 'test']
 
     def protocol(self, code):
         """Return https as the protocol for this family."""
