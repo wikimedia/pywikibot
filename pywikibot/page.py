@@ -2885,10 +2885,7 @@ class User(Page):
 
         @rtype: bool
         """
-        if self.isAnonymous():
-            return False
-        else:
-            return self.getprops(force).get('missing') is None
+        return self.registration(force) is not None
 
     def isAnonymous(self):
         """
