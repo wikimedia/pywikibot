@@ -20,11 +20,6 @@ if sys.version_info[0] > 2:
 else:
     from itertools import izip_longest as zip_longest
 
-try:
-    from bs4 import BeautifulSoup
-except ImportError as bserror:
-    BeautifulSoup = False
-
 import pywikibot
 from pywikibot.tools import chars
 
@@ -579,9 +574,7 @@ def html_comparator(compare_string):
     @return: deleted and added list of contexts
     @rtype: dict
     """
-    # check if BeautifulSoup imported
-    if not BeautifulSoup:
-        raise bserror  # should have been raised and stored earlier.
+    from bs4 import BeautifulSoup
 
     comparands = {'deleted-context': [], 'added-context': []}
     soup = BeautifulSoup(compare_string)

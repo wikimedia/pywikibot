@@ -64,7 +64,7 @@ from scripts import upload
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
 except ImportError as _tk_error:
-    Tkdialog = None
+    Tkdialog = _tk_error
 
 
 flickr_allowed_license = {
@@ -304,7 +304,7 @@ def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
                                                 override, addCategory,
                                                 removeCategories)
             # pywikibot.output(photoDescription)
-            if Tkdialog is not None and not autonomous:
+            if not isinstance(Tkdialog, ImportError) and not autonomous:
                 try:
                     (newPhotoDescription, newFilename, skip) = Tkdialog(
                         photoDescription, photo, filename).show_dialog()
@@ -315,7 +315,7 @@ def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
             elif not autonomous:
                 pywikibot.warning('Switching to autonomous mode because GUI '
                                   'interface cannot be used')
-                pywikibot.warning(_tk_error)
+                pywikibot.warning(Tkdialog)
                 autonomous = True
             if autonomous:
                 newPhotoDescription = photoDescription
