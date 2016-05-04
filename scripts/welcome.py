@@ -165,8 +165,8 @@ badwords at all but can be used for some bad-nickname.
 # (C) Filnik, 2007-2011
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2008-2016
+# (C) xqt, 2009-2017
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -660,7 +660,7 @@ class WelcomeBot(object):
 
         for result in queue:
             # Adding the log... (don't take care of the variable's name...).
-            luser = pywikibot.url2link(result.name(), self.site, self.site)
+            luser = pywikibot.url2link(result.username, self.site, self.site)
             text += u'\n{{WLE|user=%s|contribs=%d}}' % (
                 luser, result.editCount())
         # update log page.
@@ -729,30 +729,30 @@ class WelcomeBot(object):
             for users in us:
                 if users.isBlocked():
                     showStatus(3)
-                    pywikibot.output(u'%s has been blocked!' % users.name())
+                    pywikibot.output('%s has been blocked!' % users.username)
                     continue
                 if 'bot' in users.groups():
                     showStatus(3)
-                    pywikibot.output(u'%s is a bot!' % users.name())
+                    pywikibot.output('%s is a bot!' % users.username)
                     continue
-                if 'bot' in users.name().lower():
+                if 'bot' in users.username.lower():
                     showStatus(3)
                     pywikibot.output(u'%s might be a global bot!'
-                                     % users.name())
+                                     % users.username)
                     continue
                 if users.editCount() >= globalvar.attachEditCount:
                     showStatus(2)
                     pywikibot.output(u'%s has enough edits to be welcomed.'
-                                     % users.name())
+                                     % users.username)
                     ustp = users.getUserTalkPage()
                     if ustp.exists():
                         showStatus(3)
                         pywikibot.output(u'%s has been already welcomed.'
-                                         % users.name())
+                                         % users.username)
                         continue
                     else:
-                        if self.badNameFilter(users.name()):
-                            self.reportBadAccount(users.name())
+                        if self.badNameFilter(users.username):
+                            self.reportBadAccount(users.username)
                             continue
                         welcome_text = i18n.translate(self.site, netext)
                         if globalvar.randomSign:
@@ -807,11 +807,11 @@ class WelcomeBot(object):
                         if not globalvar.quiet:
                             showStatus(1)
                             pywikibot.output(u'%s has no contributions.'
-                                             % users.name())
+                                             % users.username)
                     else:
                         showStatus(1)
                         pywikibot.output(u'%s has only %d contributions.'
-                                         % (users.name(), users.editCount()))
+                                         % (users.username, users.editCount()))
                     # That user mustn't be welcomed.
                     continue
             if globalvar.makeWelcomeLog and i18n.translate(

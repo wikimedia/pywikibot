@@ -12,7 +12,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,7 +52,6 @@ from pywikibot import textlib
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     AutoblockUser,
-    _EmailUserError,
     NotEmailableError,
     SiteDefinitionError,
     UserRightsError,
@@ -2847,9 +2846,12 @@ class User(Page):
             pywikibot.output(
                 "This is an autoblock ID, you can only use to unblock it.")
 
+    @deprecated('User.username')
     def name(self):
         """
         The username.
+
+        DEPRECATED: use username instead.
 
         @rtype: unicode
         """
@@ -2958,10 +2960,7 @@ class User(Page):
 
         @rtype: int or long
         """
-        if 'editcount' in self.getprops(force):
-            return self.getprops()['editcount']
-        else:
-            return 0
+        return self.getprops(force).get('editcount', 0)
 
     def isBlocked(self, force=False):
         """
@@ -2993,13 +2992,10 @@ class User(Page):
 
         @param force: if True, forces reloading the data from API
         @type force: bool
-
+        @return: groups property
         @rtype: list
         """
-        if 'groups' in self.getprops(force):
-            return self.getprops()['groups']
-        else:
-            return []
+        return self.getprops(force).get('groups', [])
 
     def getUserPage(self, subpage=u''):
         """
@@ -3008,6 +3004,8 @@ class User(Page):
         @param subpage: subpage part to be appended to the main
                             page title (optional)
         @type subpage: unicode
+        @return: Page object of user page or user subpage
+        @rtype: Page
         """
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
@@ -3025,6 +3023,8 @@ class User(Page):
         @param subpage: subpage part to be appended to the main
                             talk page title (optional)
         @type subpage: unicode
+        @return: Page object of user talk page or user talk subpage
+        @rtype: Page
         """
         if self._isAutoblock:
             # This user is probably being queried for purpose of lifting
@@ -3033,7 +3033,7 @@ class User(Page):
                 "This is an autoblock ID, you can only use to unblock it.")
         if subpage:
             subpage = u'/' + subpage
-        return Page(Link(self.title(withNamespace=False) + subpage,
+        return Page(Link(self.username + subpage,
                          self.site, defaultNamespace=3))
 
     def send_email(self, subject, text, ccme=False):
@@ -3087,22 +3087,15 @@ class User(Page):
         @type text: unicode
         @param ccme: if True, sends a copy of this email to the bot
         @type ccme: bool
-        @raises _EmailUserError: logged in user does not have 'sendemail' right
-            or the target has disabled receiving emails
+        @raises NotEmailableError: the user of this User is not emailable
+        @raises UserRightsError: logged in user does not have 'sendemail' right
         @return: operation successful indicator
         @rtype: bool
         """
-        if not self.isEmailable():
-            raise _EmailUserError('This user is not mailable')
-
-        if not self.site.has_right('sendemail'):
-            raise _EmailUserError('You don\'t have permission to send mail')
-
         if self.send_email(subject, text, ccme=ccme):
             pywikibot.output('Email sent.')
             return True
-        else:
-            return False
+        return False
 
     def block(self, expiry, reason, anononly=True, nocreate=True,
               autoblock=True, noemail=False, reblock=False):
@@ -3172,8 +3165,7 @@ class User(Page):
             yield (Page(self.site, contrib['title'], contrib['ns']),
                    contrib['revid'],
                    ts,
-                   contrib.get('comment', None)
-                   )
+                   contrib.get('comment'))
 
     @deprecate_arg("number", "total")
     def uploadedImages(self, total=10):
