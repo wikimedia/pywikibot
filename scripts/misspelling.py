@@ -22,7 +22,7 @@ Command line options:
                wikipedia, user, etc. namespaces.
 """
 # (C) Daniel Herding, 2007
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -173,14 +173,12 @@ def main(*args):
     firstPageTitle = None
 
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-always:'):
-            always = arg[8:]
-        elif arg.startswith('-start'):
-            if len(arg) == 6:
-                firstPageTitle = pywikibot.input(
-                    u'At which page do you want to start?')
-            else:
-                firstPageTitle = arg[7:]
+        arg, sep, value = arg.partition(':')
+        if arg == '-always':
+            always = value
+        elif arg == '-start':
+            firstPageTitle = value or pywikibot.input(
+                'At which page do you want to start?')
         elif arg == '-main':
             main_only = True
 
