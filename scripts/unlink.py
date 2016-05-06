@@ -17,10 +17,11 @@ that should be unlinked.
 Example:
 
     python pwb.py unlink "Foo bar" -namespace:0 -namespace:6
-        Removes links to the page [[Foo bar]] in articles and image descriptions.
+        Removes links to the page [[Foo bar]] in articles and image
+        descriptions.
 """
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
