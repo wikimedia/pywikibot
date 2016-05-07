@@ -85,10 +85,11 @@ NL = ''
 
 nowCommonsTemplate = {
     'de': u'{{NowCommons|%s}}',
-    'en': u'{{NowCommons|1=File:%s|date=~~~~~|reviewer={{subst:REVISIONUSER}}}}',
+    'en': '{{NowCommons|1=File:%s|date=~~~~~|reviewer={{subst:REVISIONUSER}}}}',
     'lb': u'{{Elo op Commons|%s}}',
     'nds-nl': u'{{NoenCommons|1=File:%s}}',
-    'shared': u'{{NowCommons|1=File:%s|date=~~~~~|reviewer={{subst:REVISIONUSER}}}}',
+    'shared': ('{{NowCommons|1=File:%s|date=~~~~~|'
+               'reviewer={{subst:REVISIONUSER}}}}'),
 }
 
 moveToCommonsTemplate = {
@@ -262,6 +263,7 @@ sourceGarbage = {
 informationTemplate = {
     'de': 'Information',
     'en': 'Information',
+    'lb': 'Information',
     'nds-nl': 'Information',
     'shared': 'Information',
 }
@@ -277,6 +279,15 @@ informationFields = {
         u'andere Versione': u'other versions',
     },
     'en': {
+        u'location': u'remarks',
+        u'description': u'description',
+        u'source': u'source',
+        u'date': u'date',
+        u'author': u'author',
+        u'permission': u'permission',
+        u'other versions': u'other versions',
+    },
+    'lb': {
         u'location': u'remarks',
         u'description': u'description',
         u'source': u'source',
@@ -316,6 +327,8 @@ def supportedSite():
         skipTemplates,
         licenseTemplates,
         sourceGarbage,
+        informationTemplate,
+        informationFields,
     ]
     for l in lists:
         if not l.get(lang):
@@ -422,24 +435,25 @@ class imageFetcher(threading.Thread):
         other_versions = u''
         contents = {}
 
-        for key, value in informationFields.get(imagepage.site.lang).items():
+        for key, value in informationFields[imagepage.site.lang].items():
             contents[value] = u''
 
         templates = imagepage.templatesWithParams()
+        information = informationTemplate[imagepage.site.lang]
+        fields = informationFields[imagepage.site.lang]
 
         for (template, params) in templates:
-            if template == u'Information':
+            if template == information:
                 for param in params:
                     # Split at =
                     (field, sep, value) = param.partition(u'=')
                     # To lowercase, remove underscores and strip of spaces
                     field = field.lower().replace(u'_', u' ').strip()
+                    key = fields.get(field)
                     # See if first part is in fields list
-                    if field in informationFields.get(
-                            imagepage.site.lang).keys():
+                    if key:
                         # Ok, field is good, store it.
-                        contents[informationFields.get(
-                            imagepage.site.lang).get(field)] = value.strip()
+                        contents[key] = value.strip()
 
         # We now got the contents from the old information template.
         # Let's get the info for the new one
