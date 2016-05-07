@@ -184,7 +184,7 @@ class SiteMatrixKnownTypesTestCase(KnownTypesTestBase,
 
     def test_site_matrix_state(self):
         """Test site matrix state."""
-        known = ['closed', 'private', 'fishbowl', 'all']
+        known = ['closed', 'private', 'fishbowl', 'all', 'nonglobal']
 
         self._check_param_values(self.site, 'sitematrix', 'state', known)
 
