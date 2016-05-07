@@ -24,7 +24,7 @@ and pagegenerator can be one of these:
 """
 #
 # (C) Leonardo Gregianin, 2006
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -88,16 +88,18 @@ class CommonsLinkBot(Bot):
                         if s or s2:
                             pywikibot.output(u'** Already done.')
                         else:
-                            cats = textlib.getCategoryLinks(text, site=page.site)
+                            cats = textlib.getCategoryLinks(text,
+                                                            site=page.site)
                             text = textlib.replaceCategoryLinks(
                                 u'%s{{commons%s|%s}}'
                                 % (text, ('', 'cat')[catmode], pagetitle),
                                 cats, site=page.site)
-                            comment = i18n.twtranslate(page.site,
-                                                       'commons_link%s-template-added'
-                                                       % ('', '-cat')[catmode])
+                            comment = i18n.twtranslate(
+                                page.site, 'commons_link%s-template-added'
+                                % ('', '-cat')[catmode])
                             try:
-                                self.userPut(page, oldText, text, summary=comment)
+                                self.userPut(page, oldText, text,
+                                             summary=comment)
                             except pywikibot.EditConflict:
                                 pywikibot.output(
                                     u'Skipping %s because of edit conflict'

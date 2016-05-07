@@ -25,7 +25,7 @@ Examples:
 """
 #
 # (C) Multichill, Amir, 2013
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of MIT License.
 #
@@ -91,7 +91,8 @@ class HarvestRobot(WikidataBot):
         if temp.isRedirectPage():
             temp = temp.getRedirectTarget()
         titles = [page.title(withNamespace=False)
-                  for page in temp.getReferences(redirectsOnly=True, namespaces=[10],
+                  for page in temp.getReferences(redirectsOnly=True,
+                                                 namespaces=[10],
                                                  follow_redirects=False)]
         titles.append(temp.title(withNamespace=False))
         return titles
@@ -180,7 +181,8 @@ class HarvestRobot(WikidataBot):
                                     continue
 
                                 link_text = match.group(1)
-                                linked_item = self._template_link_target(item, link_text)
+                                linked_item = self._template_link_target(
+                                    item, link_text)
                                 if not linked_item:
                                     continue
 
@@ -188,16 +190,19 @@ class HarvestRobot(WikidataBot):
                             elif claim.type in ('string', 'external-id'):
                                 claim.setTarget(value.strip())
                             elif claim.type == 'commonsMedia':
-                                commonssite = pywikibot.Site("commons", "commons")
-                                imagelink = pywikibot.Link(value, source=commonssite,
+                                commonssite = pywikibot.Site('commons',
+                                                             'commons')
+                                imagelink = pywikibot.Link(value,
+                                                           source=commonssite,
                                                            defaultNamespace=6)
                                 image = pywikibot.FilePage(imagelink)
                                 if image.isRedirectPage():
-                                    image = pywikibot.FilePage(image.getRedirectTarget())
+                                    image = pywikibot.FilePage(
+                                        image.getRedirectTarget())
                                 if not image.exists():
                                     pywikibot.output(
-                                        '[[%s]] doesn\'t exist so I can\'t link to it'
-                                        % (image.title(),))
+                                        "{0} doesn't exist. I can't link to it"
+                                        ''.format(image.title(asLink=True)))
                                     continue
                                 claim.setTarget(image)
                             else:
@@ -206,8 +211,9 @@ class HarvestRobot(WikidataBot):
                                     % claim.type)
                                 continue
 
-                            pywikibot.output('Adding %s --> %s'
-                                             % (claim.getID(), claim.getTarget()))
+                            pywikibot.output(
+                                'Adding %s --> %s'
+                                % (claim.getID(), claim.getTarget()))
                             item.addClaim(claim)
                             # A generator might yield pages from multiple sites
                             source = self.getSource(page.site)
@@ -245,7 +251,8 @@ def main(*args):
             commandline_arguments.append(arg)
 
     if not template_title:
-        pywikibot.error('Please specify either -template or -transcludes argument')
+        pywikibot.error(
+            'Please specify either -template or -transcludes argument')
         return
 
     if len(commandline_arguments) % 2:

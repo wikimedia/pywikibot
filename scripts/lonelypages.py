@@ -53,7 +53,7 @@ from pywikibot.bot import suggest_help, SingleSiteBot
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 

@@ -165,8 +165,8 @@ badwords at all but can be used for some bad-nickname.
 # (C) Filnik, 2007-2011
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2008-2016
+# (C) xqt, 2009-2017
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -210,7 +210,8 @@ locale.setlocale(locale.LC_ALL, '')
 # ATTENTION: Projects not listed won't write a log to the wiki.
 logbook = {
     'ar': u'Project:سجل الترحيب',
-    'fr': u'Wikipedia:Prise de décision/Accueil automatique des nouveaux par un robot/log',
+    'fr': ('Wikipedia:Prise de décision/'
+           'Accueil automatique des nouveaux par un robot/log'),
     'ga': u'Project:Log fáilte',
     'it': u'Project:Benvenuto Bot/Log',
     'ja': u'利用者:Alexbot/Welcomebotログ',
@@ -290,7 +291,8 @@ report_page = {
         'ga': u'Project:Log fáilte/Drochainmneacha',
         'it': u'Project:Benvenuto_Bot/Report',
         'ja': u'利用者:Alexbot/report',
-        'nl': u'Project:Verzoekpagina voor moderatoren/RegBlok/Te controleren gebruikersnamen',
+        'nl': ('Project:Verzoekpagina voor moderatoren'
+               '/RegBlok/Te controleren gebruikersnamen'),
         'no': u'Bruker:JhsBot II/Rapport',
         'pdc': u'Benutzer:Xqt/Report',
         'ru': u'Участник:LatitudeBot/Рапорт',
@@ -397,8 +399,6 @@ logpage_header = {
 # Ok, that's all. What is below, is the rest of code, now the code is fixed
 # and it will run correctly in your project ;)
 ############################################################################
-############################################################################
-############################################################################
 
 
 class FilenameNotSet(pywikibot.Error):
@@ -410,14 +410,14 @@ class Global(object):
 
     """Container class for global settings."""
 
-    attachEditCount = 1     # number of edits that an user required to be welcomed
-    dumpToLog = 15          # number of users that are required to add the log :)
+    attachEditCount = 1     # edit count that an user required to be welcomed
+    dumpToLog = 15          # number of users that are required to add the log
     offset = None           # skip users newer than that timestamp
     timeoffset = 0          # skip users newer than # minutes
     recursive = True        # define if the Bot is recursive or not
     timeRecur = 3600        # how much time (sec.) the bot sleeps before restart
     makeWelcomeLog = True   # create the welcome log or not
-    confirm = False         # should bot ask to add username to bad-username list
+    confirm = False         # should bot ask to add user to bad-username list
     welcomeAuto = False     # should bot welcome auto-created users
     filtBadName = False     # check if the username is ok or not
     randomSign = False      # should signature be random or not
@@ -463,37 +463,40 @@ class WelcomeBot(object):
         # initialize blacklist
         if not hasattr(self, '_blacklist') or force:
             elenco = [
-                ' ano', ' anus', 'anal ', 'babies', 'baldracca', 'balle', 'bastardo',
-                'bestiali', 'bestiale', 'bastarda', 'b.i.t.c.h.', 'bitch', 'boobie',
-                'bordello', 'breast', 'cacata', 'cacca', 'cachapera', 'cagata',
-                'cane', 'cazz', 'cazzo', 'cazzata', 'chiavare', 'chiavata', 'chick',
-                'christ ', 'cristo', 'clitoride', 'coione', 'cojdioonear', 'cojones',
-                'cojo', 'coglione', 'coglioni', 'cornuto', 'cula', 'culatone',
+                ' ano', ' anus', 'anal ', 'babies', 'baldracca', 'balle',
+                'bastardo', 'bestiali', 'bestiale', 'bastarda', 'b.i.t.c.h.',
+                'bitch', 'boobie', 'bordello', 'breast', 'cacata', 'cacca',
+                'cachapera', 'cagata', 'cane', 'cazz', 'cazzo', 'cazzata',
+                'chiavare', 'chiavata', 'chick', 'christ ', 'cristo',
+                'clitoride', 'coione', 'cojdioonear', 'cojones', 'cojo',
+                'coglione', 'coglioni', 'cornuto', 'cula', 'culatone',
                 'culattone', 'culo', 'deficiente', 'deficente', 'dio', 'die ',
-                'died ', 'ditalino', 'ejackulate', 'enculer', 'eroticunt', 'fanculo',
-                'fellatio', 'fica ', 'ficken', 'figa', 'sfiga', 'fottere', 'fotter',
-                'fottuto', 'fuck', 'f.u.c.k.', "funkyass",
-                'gay', 'hentai.com', 'horne', 'horney', 'virgin', 'hotties', 'idiot',
-                '@alice.it', 'incest', 'jesus', 'gesu', 'gesù', 'kazzo', 'kill',
-                'leccaculo', 'lesbian', 'lesbica', 'lesbo', 'masturbazione',
-                'masturbare', 'masturbo', 'merda', 'merdata', 'merdoso', 'mignotta',
-                'minchia', 'minkia', 'minchione', 'mona', 'nudo', 'nuda', 'nudi',
-                'oral', 'sex', 'orgasmso', 'porc', 'pompa', 'pompino', 'porno',
-                'puttana', 'puzza', 'puzzone', "racchia", 'sborone', 'sborrone',
-                'sborata', 'sborolata', 'sboro', 'scopata', 'scopare', 'scroto',
-                'scrotum', 'sega', 'sesso', 'shit', 'shiz', 's.h.i.t.', 'sadomaso',
-                'sodomist', 'stronzata', 'stronzo', 'succhiamelo', 'succhiacazzi',
-                'testicol', 'troia', 'universetoday.net', 'vaffanculo', 'vagina',
-                'vibrator', "vacca", 'yiddiot', "zoccola",
+                'died ', 'ditalino', 'ejackulate', 'enculer', 'eroticunt',
+                'fanculo', 'fellatio', 'fica ', 'ficken', 'figa', 'sfiga',
+                'fottere', 'fotter', 'fottuto', 'fuck', 'f.u.c.k.', 'funkyass',
+                'gay', 'hentai.com', 'horne', 'horney', 'virgin', 'hotties',
+                'idiot', '@alice.it', 'incest', 'jesus', 'gesu', 'gesù',
+                'kazzo', 'kill', 'leccaculo', 'lesbian', 'lesbica', 'lesbo',
+                'masturbazione', 'masturbare', 'masturbo', 'merda', 'merdata',
+                'merdoso', 'mignotta', 'minchia', 'minkia', 'minchione',
+                'mona', 'nudo', 'nuda', 'nudi', 'oral', 'sex', 'orgasmso',
+                'porc', 'pompa', 'pompino', 'porno', 'puttana', 'puzza',
+                'puzzone', 'racchia', 'sborone', 'sborrone', 'sborata',
+                'sborolata', 'sboro', 'scopata', 'scopare', 'scroto',
+                'scrotum', 'sega', 'sesso', 'shit', 'shiz', 's.h.i.t.',
+                'sadomaso', 'sodomist', 'stronzata', 'stronzo', 'succhiamelo',
+                'succhiacazzi', 'testicol', 'troia', 'universetoday.net',
+                'vaffanculo', 'vagina', 'vibrator', 'vacca', 'yiddiot',
+                'zoccola',
             ]
             elenco_others = [
                 '@', ".com", ".sex", ".org", ".uk", ".en", ".it", "admin",
                 "administrator", "amministratore", '@yahoo.com', '@alice.com',
-                "amministratrice", "burocrate", "checkuser", "developer", "http://",
-                "jimbo", "mediawiki", "on wheals", "on wheal", "on wheel", "planante",
-                "razinger", "sysop", "troll", "vandal", " v.f. ", "v. fighter",
-                "vandal f.", "vandal fighter", 'wales jimmy', "wheels", "wales",
-                "www.",
+                'amministratrice', 'burocrate', 'checkuser', 'developer',
+                'http://', 'jimbo', 'mediawiki', 'on wheals', 'on wheal',
+                'on wheel', 'planante', 'razinger', 'sysop', 'troll', 'vandal',
+                ' v.f. ', 'v. fighter', 'vandal f.', 'vandal fighter',
+                'wales jimmy', 'wheels', 'wales', 'www.',
             ]
 
             # blacklist from wikipage
@@ -587,9 +590,10 @@ class WelcomeBot(object):
             if rep_page.exists():
                 text_get = rep_page.get()
             else:
-                text_get = u'This is a report page for the Bad-username, please translate me. --~~~'
+                text_get = ('This is a report page for the Bad-username, '
+                            'please translate me. --~~~')
             pos = 0
-            # The talk page includes "_" between the two names, in this way i
+            # The talk page includes "_" between the two names, in this way
             # replace them to " ".
             for usrna in self._BAQueue:
                 username = pywikibot.url2link(usrna, self.site, self.site)
@@ -1005,7 +1009,9 @@ def main(*args):
             else:
                 import cPickle
             with open(filename, 'wb') as f:
-                cPickle.dump(bot.welcomed_users, f, protocol=config.pickle_protocol)
+                cPickle.dump(bot.welcomed_users, f,
+                             protocol=config.pickle_protocol)
+
 
 if __name__ == "__main__":
     main()
