@@ -109,7 +109,6 @@ class TestXMLPageGenerator(TestCase):
         self.assertPagelistTitles(pages, ['Fake page with msg'],
                                   site=self.site)
 
-    @unittest.expectedFailure
     def test_match_unnecessary_template_prefix(self):
         """Test pages with {{template:..}}."""
         template = pywikibot.Page(self.site, 'Template:Bar')

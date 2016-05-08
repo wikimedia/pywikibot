@@ -16,6 +16,7 @@ import re
 
 import pywikibot
 import pywikibot.textlib as textlib
+from pywikibot.textlib import _MultiTemplateMatchBuilder
 
 from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
@@ -1341,6 +1342,52 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept(r'\g<bar>', r'^(?P<foo>.*)$',
                                                r'X\g<foo>X', [], site=self.site),
                          r'X\g<bar>X')
+
+
+class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
+
+    """Test _MultiTemplateMatchBuilder."""
+
+    dry = True
+
+    def test_noMatch(self):
+        """Test text without any desired templates."""
+        string = 'The quick brown fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNone(re.search(builder.pattern('quick'), string))
+
+    def test_Match(self):
+        """Test text with one match without parameters."""
+        string = 'The {{quick}} brown fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
+        self.assertIsNotNone(re.search(builder.pattern('Quick'), string))
+
+    def test_match_with_params(self):
+        """Test text with one match with parameters."""
+        string = 'The {{Quick|brown}} fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
+        self.assertIsNotNone(re.search(builder.pattern('Quick'), string))
+
+    def test_match_msg(self):
+        """Test text with {{msg:..}}."""
+        string = 'The {{msg:quick}} brown fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
+        self.assertIsNotNone(re.search(builder.pattern('Quick'), string))
+
+    def test_match_template_prefix(self):
+        """Test pages with {{template:..}}."""
+        string = 'The {{%s:%s}} brown fox'
+        template = 'template'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        for t in (template.upper(), template.lower(), template.title()):
+            for q in ('quick', 'Quick'):
+                self.assertIsNotNone(re.search(builder.pattern('quick'),
+                                               string % (t, q)))
+                self.assertIsNotNone(re.search(builder.pattern('Quick'),
+                                               string % (t, q)))
 
 
 class TestGetLanguageLinks(SiteAttributeTestCase):

@@ -193,8 +193,12 @@ class _MultiTemplateMatchBuilder(object):
                       ']' + re.escape(old[1:])
         else:
             pattern = re.escape(old)
+        # namespaces may be any mixed case
+        namespaces = [''.join('[{0}{1}]'.format(char.upper(), char.lower())
+                              for char in ns)
+                      for ns in namespace]
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespace) +
+        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) +
                                    r':|[mM][sS][gG]:)?' + pattern +
                                    r'(?P<parameters>\s*\|.+?|) *}}',
                                    flags)
