@@ -855,6 +855,62 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
 
+    def test_random_generator_default(self):
+        """Test random generator."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-random:1')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = set(gen)
+        self.assertEqual(len(pages), 1)
+
+    def test_random_generator_ns(self):
+        """Test random generator with namespace."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-random:1')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespaces(gen, 1)
+
+    def test_random_generator_ns_multi(self):
+        """Test random generator with multiple namespaces."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-ns:3')
+        gf.handleArg('-random')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespaces(gen, set([1, 3]))
+
+    def test_randomredirect_generator_default(self):
+        """Test random generator."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-randomredirect:1')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = set(gen)
+        self.assertEqual(len(pages), 1)
+
+    def test_randomredirect_generator_ns(self):
+        """Test random generator with namespace."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-randomredirect:1')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespaces(gen, 1)
+
+    def test_randomredirect_generator_ns_multi(self):
+        """Test random generator with multiple namespaces."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-ns:3')
+        gf.handleArg('-randomredirect')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespaces(gen, set([1, 3]))
+
     def test_empty_generator(self):
         """Test empty generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)

@@ -675,17 +675,18 @@ class GeneratorFactory(object):
             # before -randomredirect
             # otherwise default namespace is 0
             namespaces = self.namespaces or 0
-            gen = RandomRedirectPageGenerator(total=intNone(value),
+            gen = RandomRedirectPageGenerator(total=intNone(value) or 10,
                                               site=self.site,
-                                              namespace=namespaces)
+                                              namespaces=namespaces)
         elif arg == '-random':
             # partial workaround for bug T119940
             # to use -namespace/ns with -random, -ns must be given
             # before -random
             # otherwise default namespace is 0
             namespaces = self.namespaces or 0
-            gen = RandomPageGenerator(total=intNone(value), site=self.site,
-                                      namespace=namespaces)
+            gen = RandomPageGenerator(total=intNone(value) or 10,
+                                      site=self.site,
+                                      namespaces=namespaces)
         elif arg == '-recentchanges':
             rcstart = None
             rcend = None
