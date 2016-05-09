@@ -460,16 +460,20 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
-    def permalink(self, oldid=None):
+    def permalink(self, oldid=None, percent_encoded=True):
         """Return the permalink URL of an old revision of this page.
 
         @param oldid: The revid of the revision desired.
         @rtype: unicode
         """
+        if percent_encoded:
+            title = self.title(asUrl=True)
+        else:
+            title = self.title(asUrl=False).replace(' ', '_')
         return "//%s%s/index.php?title=%s&oldid=%s" \
                % (self.site.hostname(),
                   self.site.scriptpath(),
-                  self.title(asUrl=True),
+                  title,
                   (oldid if oldid is not None else self.latest_revision_id))
 
     @property
