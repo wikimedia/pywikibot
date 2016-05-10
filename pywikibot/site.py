@@ -5388,6 +5388,7 @@ class APISite(BaseSite):
 
             yield result['patrol']
 
+    @need_version('1.12')
     @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
                   autoblock=True, noemail=False, reblock=False):
@@ -5439,8 +5440,9 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
+    @need_version('1.12')
     @must_be(group='sysop')
-    def unblockuser(self, user, reason):
+    def unblockuser(self, user, reason=None):
         """
         Remove the block for the user.
 
