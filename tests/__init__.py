@@ -66,6 +66,7 @@ join_pages_path = create_path_func(join_tests_path, 'pages')
 
 join_images_path = create_path_func(join_data_path, 'images')
 join_xml_data_path = create_path_func(join_data_path, 'xml')
+join_html_data_path = create_path_func(join_data_path, 'html')
 
 # Find the root directory of the checkout
 _pwb_py = join_root_path('pwb.py')
@@ -86,6 +87,7 @@ library_test_modules = [
     'tools_ip',
     'xmlreader',
     'textlib',
+    'diff',
     'http',
     'namespace',
     'dry_api',
