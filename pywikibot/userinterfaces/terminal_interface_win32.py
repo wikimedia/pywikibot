@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,6 +40,8 @@ windowsColors = {
     'lightpurple': 13,
     'lightyellow': 14,
     'white':       15,
+    'Blightgreen': 32,   # background color green.
+    'Blightred':   64,   # background color red.
 }
 
 colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(list(windowsColors.keys())))

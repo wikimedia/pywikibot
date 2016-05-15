@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User interface for unix terminals."""
 #
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,6 +31,8 @@ unixColors = {
     'lightpurple': chr(27) + '[95m',    # Light Purple tag (Magenta)
     'lightaqua':   chr(27) + '[96m',    # Light Aqua tag (Cyan)
     'white':       chr(27) + '[97m',    # White start tag (Bright White)
+    'Blightgreen': chr(27) + '[102m',   # Background Light Red tag
+    'Blightred':   chr(27) + '[101m',   # Background Light Green tag
 }
 
 
