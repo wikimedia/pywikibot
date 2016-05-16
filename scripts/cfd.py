@@ -90,9 +90,10 @@ def main(*args):
     page = pywikibot.Page(pywikibot.Site(), cfdPage)
 
     # Variable declarations
-    day = "None"
-    mode = "None"
-    summary = ""
+    day = 'None'
+    mode = 'None'
+    summary = ''
+    action_summary = ''
     robot = None
 
     m = ReCheck()
@@ -130,26 +131,30 @@ def main(*args):
                 summary = (
                     'Robot - Moving category ' + src + ' to [[:Category:' +
                     dest + ']] per [[WP:CFD|CFD]] at ' + thisDay + '.')
+                action_summary = 'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
             elif mode == "Speedy":
                 summary = (
                     'Robot - Speedily moving category ' + src +
                     ' to [[:Category:' + dest + ']] per [[WP:CFDS|CFDS]].')
+                action_summary = 'Robot - Speedily moved per [[WP:CFDS|CFDS]].'
             else:
                 continue
             # If the category is redirect, we do NOT want to move articles to
             # it. The safest thing to do here is abort and wait for human
             # intervention.
-            destpage = pywikibot.Page(
-                pywikibot.Site(), dest, ns=14)
+            destpage = pywikibot.Page(page.site, dest, ns=14)
             if destpage.isCategoryRedirect():
                 summary = 'CANCELED. Destination is redirect: ' + summary
                 pywikibot.stdout(summary)
                 robot = None
             else:
+                deletion_comment_same = (
+                    CategoryMoveBot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT)
                 robot = CategoryMoveBot(oldcat=src, newcat=dest, batch=True,
                                         comment=summary, inplace=True,
                                         move_oldcat=True, delete_oldcat=True,
-                                        deletion_comment=True)
+                                        deletion_comment=deletion_comment_same,
+                                        move_comment=action_summary)
         elif m.check(deletecat, line):
             src = m.result.group(1)
             # I currently don't see any reason to handle these two cases
@@ -161,10 +166,12 @@ def main(*args):
                 summary = (
                     'Robot - Removing category {0} per [[WP:CFD|CFD]] '
                     'at {1}.'.format(src, thisDay))
+                action_summary = 'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
             else:
                 continue
             robot = CategoryMoveBot(oldcat=src, batch=True, comment=summary,
-                                    deletion_comment=True, inplace=True)
+                                    deletion_comment=action_summary,
+                                    inplace=True)
         else:
             # This line does not fit any of our regular expressions,
             # so ignore it.

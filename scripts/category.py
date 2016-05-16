@@ -414,6 +414,7 @@ class CategoryMoveRobot(object):
                  inplace=False, move_oldcat=True, delete_oldcat=True,
                  title_regex=None, history=False, pagesonly=False,
                  deletion_comment=DELETION_COMMENT_AUTOMATIC,
+                 move_comment=None,
                  wikibase=True, allow_split=False, move_together=False,
                  keep_sortkey=None):
         """Store all given parameters in the objects attributes.
@@ -421,8 +422,8 @@ class CategoryMoveRobot(object):
         @param oldcat: The move source.
         @param newcat: The move target.
         @param batch: If True the user has not to confirm the deletion.
-        @param comment: The edit summary for all pages where the
-            category is changed.
+        @param comment: The edit summary for all pages where the category is
+            changed, and also for moves and deletions if not overridden.
         @param inplace: If True the categories are not reordered.
         @param move_oldcat: If True the category page (and talkpage) is
             copied to the new category.
@@ -436,9 +437,12 @@ class CategoryMoveRobot(object):
         @param deletion_comment: Either string or special value:
             DELETION_COMMENT_AUTOMATIC: use a generated message,
             DELETION_COMMENT_SAME_AS_EDIT_COMMENT: use the same message for
-            delete that is also used for move.
-            If the value is not recognized, it's interpreted as
-            DELETION_COMMENT_AUTOMATIC.
+            delete that is used for the edit summary of the pages whose
+            category was changed (see the comment param above). If the value
+            is not recognized, it's interpreted as DELETION_COMMENT_AUTOMATIC.
+        @param move_comment: If set, uses this as the edit summary on the
+            actual move of the category page. Otherwise, defaults to the value
+            of the comment parameter.
         @param wikibase: If True, update the Wikibase item of the
             old category.
         @param allow_split: If False only moves page and talk page together.
@@ -513,6 +517,7 @@ class CategoryMoveRobot(object):
                 # Category is deleted.
                 self.deletion_comment = i18n.twtranslate(self.site,
                                                          'category-was-disbanded')
+        self.move_comment = move_comment if move_comment else self.comment
 
     def run(self):
         """The main bot function that does all the work.
@@ -545,7 +550,7 @@ class CategoryMoveRobot(object):
                     old_cat_title = self.oldcat.title()
                     old_cat_text = self.oldcat.text
                     self.newcat = self.oldcat.move(self.newcat.title(),
-                                                   reason=self.comment,
+                                                   reason=self.move_comment,
                                                    movetalkpage=can_move_talk)
                     # Copy over the article text so it can be stripped of
                     # CFD templates and re-saved. This is faster than
