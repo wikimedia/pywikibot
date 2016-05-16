@@ -3049,7 +3049,7 @@ class User(Page):
         @rtype: bool
         """
         if not self.isEmailable():
-            raise NotEmailableError('%s is not mailable' % self.username)
+            raise NotEmailableError(self)
 
         if not self.site.has_right('sendemail'):
             raise UserRightsError('You don\'t have permission to send mail')
