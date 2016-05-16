@@ -72,7 +72,7 @@ class HarvestRobot(WikidataBot):
 
         """
         super(HarvestRobot, self).__init__()
-        self.generator = pg.PreloadingGenerator(generator)
+        self.generator = generator
         self.templateTitle = templateTitle.replace(u'_', u' ')
         # TODO: Make it a list which also includes the redirects to the template
         self.fields = fields
@@ -262,10 +262,10 @@ def main(*args):
     for i in range(0, len(commandline_arguments), 2):
         fields[commandline_arguments[i]] = commandline_arguments[i + 1]
 
-    generator = gen.getCombinedGenerator()
+    generator = gen.getCombinedGenerator(preload=True)
     if not generator:
         gen.handleArg(u'-transcludes:' + template_title)
-        generator = gen.getCombinedGenerator()
+        generator = gen.getCombinedGenerator(preload=True)
 
     bot = HarvestRobot(generator, template_title, fields)
     bot.run()

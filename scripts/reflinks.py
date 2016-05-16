@@ -38,7 +38,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
                   one from i18n/reflinks.py
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -786,8 +786,8 @@ def main(*args):
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
-
-    generator = pagegenerators.PreloadingGenerator(generator)
+    if not genFactory.nopreload:
+        generator = pagegenerators.PreloadingGenerator(generator)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
     bot = ReferencesRobot(generator, **options)
     bot.run()

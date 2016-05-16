@@ -15,7 +15,7 @@ Usage:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2013-2016
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of MIT License.
 #
@@ -45,7 +45,7 @@ class IllustrateRobot(WikidataBot):
         @type wdproperty: str
         """
         super(IllustrateRobot, self).__init__()
-        self.generator = pagegenerators.PreloadingGenerator(generator)
+        self.generator = generator
         self.wdproperty = wdproperty
         self.cacheSources()
 
@@ -119,7 +119,7 @@ def main(*args):
         else:
             generator_factory.handleArg(arg)
 
-    generator = generator_factory.getCombinedGenerator()
+    generator = generator_factory.getCombinedGenerator(preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False

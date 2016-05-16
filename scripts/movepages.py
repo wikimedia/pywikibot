@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -183,7 +183,6 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    gen = None
     oldName = None
     options = {}
     fromToPairs = []
@@ -253,11 +252,9 @@ def main(*args):
         bot = MovePagesBot(None, **options)
         bot.moveOne(page, pair[1])
 
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = MovePagesBot(preloadingGen, **options)
+        bot = MovePagesBot(gen, **options)
         bot.run()
         return True
 

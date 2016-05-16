@@ -20,7 +20,7 @@ This script understands various command-line arguments:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,7 +48,7 @@ class NewItemRobot(WikidataBot):
         })
 
         super(NewItemRobot, self).__init__(**kwargs)
-        self.generator = pagegenerators.PreloadingGenerator(generator)
+        self.generator = generator
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
         self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(
@@ -160,7 +160,7 @@ def main(*args):
         else:
             options[arg[1:].lower()] = True
 
-    generator = gen.getCombinedGenerator()
+    generator = gen.getCombinedGenerator(preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False

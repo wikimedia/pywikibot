@@ -48,7 +48,7 @@ Please check every article you change.
 """
 #
 # (C) 2003 Thomas R. Koll, <tomk32@tomk32.de>
-# (C) Pywikibot team, 2003-2013
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -594,8 +594,9 @@ LIMIT 200"""
     if gen:
         if namespaces != []:
             gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = Table2WikiRobot(preloadingGen, quietMode)
+        if not genFactory.nopreload:
+            gen = pagegenerators.PreloadingGenerator(gen)
+        bot = Table2WikiRobot(gen, quietMode)
         bot.run()
     else:
         pywikibot.showHelp('table2wiki')
