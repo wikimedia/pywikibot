@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
-
-import re
 
 from pywikibot.userinterfaces import (
     terminal_interface_base,
@@ -41,8 +39,6 @@ windowsColors = {
     'lightyellow': 14,
     'white':       15,
 }
-
-colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(list(windowsColors.keys())))
 
 
 # Compat for python <= 2.5
