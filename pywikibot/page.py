@@ -3131,6 +3131,15 @@ class User(Page):
             else:
                 raise err
 
+    def unblock(self, reason=None):
+        """
+        Remove the block for the user.
+
+        @param reason: Reason for the unblock.
+        @type reason: basestring
+        """
+        self.site.unblockuser(self, reason)
+
     @deprecated("contributions")
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     def editedPages(self, total=500):
