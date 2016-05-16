@@ -113,20 +113,41 @@ class Hunk(object):
         """Color diff lines."""
         diff = iter(self.diff)
 
-        l1, l2 = '', next(diff)
+        fmt, line1, line2 = '', '', next(diff)
         for line in diff:
-            l1, l2 = l2, line
+            fmt, line1, line2 = line1, line2, line
             # do not show lines starting with '?'.
-            if l1.startswith('?'):
+            if line1.startswith('?'):
                 continue
-            if l2.startswith('?'):
-                yield self.color_line(l1, l2)
-            else:
-                yield self.color_line(l1)
+            if line2.startswith('?'):
+                yield self.color_line(line1, line2)
+                continue
+            if line1.startswith('-'):
+                # Color whole line to be removed.
+                yield self.color_line(line1)
+            elif line1.startswith('+'):
+                # Reuse last available fmt as diff line, if possible,
+                # or color whole line to be added.
+                fmt = fmt if fmt.startswith('?') else ''
+                fmt = fmt[:min(len(fmt), len(line1))]
+                fmt = fmt if fmt else None
+                yield self.color_line(line1, fmt)
 
         # handle last line
-        if not l2.startswith('?'):
-            yield self.color_line(l2)
+        # If line line2 is removed, color the whole line.
+        # If line line2 is added, check if line1 is a '?-type' line, to prevent
+        # the entire line line2 to be colored (see T130572).
+        # The case where line2 start with '?' has been covered already.
+        if line2.startswith('-'):
+            # Color whole line to be removed.
+            yield self.color_line(line2)
+        elif line2.startswith('+'):
+            # Reuse last available line1 as diff line, if possible,
+            # or color whole line to be added.
+            fmt = line1 if line1.startswith('?') else ''
+            fmt = fmt[:min(len(fmt), len(line2))]
+            fmt = fmt if fmt else None
+            yield self.color_line(line2, fmt)
 
     def color_line(self, line, line_ref=None):
         """Color line characters.
