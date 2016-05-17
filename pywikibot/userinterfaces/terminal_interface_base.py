@@ -47,6 +47,8 @@ colors = [
     'lightpurple',
     'lightyellow',
     'white',
+    'Blightgreen',
+    'Blightred',
 ]
 
 colorTagR = re.compile('\03{(?P<name>%s|previous)}' % '|'.join(colors))

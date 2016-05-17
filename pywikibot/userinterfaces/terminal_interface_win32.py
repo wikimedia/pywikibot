@@ -38,6 +38,8 @@ windowsColors = {
     'lightpurple': 13,
     'lightyellow': 14,
     'white':       15,
+    'Blightgreen': 32,   # background color green.
+    'Blightred':   64,   # background color red.
 }
 
 
