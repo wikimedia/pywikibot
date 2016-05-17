@@ -970,21 +970,30 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-searchitem:abc')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        self.assertGreater(len(set(gen)), 0)
+        self.assertIsNotNone(next(gen))
 
     def test_searchitem_language(self):
         """Test -searchitem with custom language specified."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:pl:abc')
+        gf.handleArg('-limit:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        pages = set(gen)
+        # ABC disambiguation
+        page1 = next(gen)
+        self.assertEqual(page1.title(), 'Q286874')
+
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:en:abc')
+        gf.handleArg('-limit:2')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        pages2 = set(gen)
-        self.assertNotEqual(pages, pages2)
+        # American Broadcasting Company
+        page1 = next(gen)
+        self.assertEqual(page1.title(), 'Q169889')
+        # ABC disambiguation
+        page2 = next(gen)
+        self.assertEqual(page2.title(), 'Q286874')
 
 
 class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
