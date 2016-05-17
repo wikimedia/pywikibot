@@ -34,6 +34,10 @@ setup.py
 
     python setup.py nosetests --tests tests
 
+::
+
+    pip install pytest-runner
+    python setup.py pytest
 
 Module unittest
 ~~~~~~~~~~~~~~~
@@ -48,6 +52,13 @@ nose
 ::
 
     nosetests -v
+
+pytest
+~~~~~~
+
+::
+
+    py.test
 
 tox
 ~~~
@@ -67,6 +78,7 @@ unittest
 ::
 
     python -m unittest -v tests.api_tests tests.site_tests
+    python -m unittest -v tests.api_tests.TestParamInfo.test_init
 
 nose
 ~~~~
@@ -74,6 +86,15 @@ nose
 ::
 
     nosetests -v tests.api_tests tests.site_tests
+    python -m unittest -v tests.api_tests:TestParamInfo.test_init
+
+pytest
+~~~~~~
+
+::
+
+    py.test -s -v tests/api_tests.py tests/site_tests.py
+    py.test -s -v tests/api_tests.py::TestParamInfo::test_init
 
 pwb
 ~~~
@@ -82,6 +103,7 @@ pwb
 
     python pwb.py tests/api_tests.py -v
     python pwb.py tests/site_tests.py -v
+    python pwb.py tests/api_tests.py -v TestParamInfo.test_init
 
 env
 ~~~
