@@ -2654,6 +2654,8 @@ def WikidataQueryPageGenerator(query, site=None):
 
     wd_query = wdquery.WikidataQuery(cacheMaxAge=0)
     data = wd_query.query(wd_queryset)
+    # This item count should not be copied by other generators,
+    # and should be removed when wdq becomes a real generator (T135592)
     pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
     items_pages = (pywikibot.ItemPage(repo, 'Q{0}'.format(item))
                    for item in data[u'items'])
@@ -2710,7 +2712,6 @@ def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
     repo = site.data_repository()
 
     data = repo.search_entities(text, language, limit=total)
-    pywikibot.output(u'retrieved %d items' % len(list(data)))
     for item in data:
         yield pywikibot.ItemPage(repo, item['id'])
 
