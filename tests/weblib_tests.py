@@ -77,6 +77,7 @@ class TestWebCite(DeprecationTestCase):
         self.assertOneDeprecation()
         return archivedversion
 
+    @unittest.expectedFailure  # See T110640
     def testWebCiteOlder(self):
         """Test WebCite for https://google.com as of January 2013."""
         archivedversion = self._get_archive_url('https://google.com', '20130101')

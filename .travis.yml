@@ -30,7 +30,12 @@ before_install:
   # Instead install requests in the before_script step below.
   - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then rm requirements.txt ; fi
 
-  - if [[ "$SITE_ONLY" == '1' ]]; then export USE_NOSE=1; fi
+  - if [[ "$SITE_ONLY" == '1' ]]; then
+      export USE_NOSE=1 ;
+    elif [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then
+      export USE_PYTEST=1 ;
+    fi
+
   - export GITHUB_USER=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 1`
   - mkdir ~/.python-eggs
   - chmod 700 ~/.python-eggs
@@ -95,6 +100,9 @@ script:
       else
         python setup.py nosetests --tests tests --verbosity=2 --with-trim --with-coverage --cover-package=. ;
       fi ;
+    elif [[ "$USE_PYTEST" == "1" ]]; then
+      pip install --upgrade pytest-runner pytest-cov pytest-timeout "pytest>=2.8.0" ;
+      python setup.py pytest --addopts="-vvv -s --timeout=300 --cov=." ;
     else
       coverage run setup.py test ;
     fi

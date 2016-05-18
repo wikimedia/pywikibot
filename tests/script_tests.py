@@ -363,6 +363,8 @@ class TestScriptMeta(MetaTestCaseClass):
 
             # Disable test by default in nosetests
             if script_name in unrunnable_script_list:
+                # flag them as an expectedFailure due to py.test (T135594)
+                dct[test_name] = unittest.expectedFailure(dct[test_name])
                 dct[test_name].__test__ = False
 
         return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
