@@ -5,6 +5,7 @@ unittest2==0.8.0 ; python_full_version < '2.7.3'
 six
 
 nose
+git+https://github.com/jayvdb/nosetrim@py3
 
 pep257>=0.6
 pyflakes>=0.9
