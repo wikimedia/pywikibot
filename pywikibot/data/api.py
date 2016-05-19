@@ -2165,6 +2165,11 @@ class Request(MutableMapping):
                             ', '.join('{0}: {1}'.format(*e)
                                       for e in user_tokens.items())))
             if 'mwoauth-invalid-authorization' in code:
+                if 'Nonce already used' in info:
+                    pywikibot.error(
+                        'Retrying failed OAuth authentication for {0}: {1}'
+                        .format(self.site, info))
+                    continue
                 raise NoUsername('Failed OAuth authentication for %s: %s'
                                  % (self.site, info))
             # raise error
