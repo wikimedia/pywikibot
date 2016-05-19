@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -439,6 +439,6 @@ class LogEntryFactory(object):
             logtype = logdata['type']
             return LogEntryFactory._getEntryClass(logtype)(logdata, self._site)
         except KeyError:
-            pywikibot.debug(u"API log entry received:\n" + logdata,
+            pywikibot.debug('API log entry received:\n{0}'.format(logdata),
                             _logger)
             raise Error("Log entry has no 'type' key")
