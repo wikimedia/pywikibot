@@ -2,13 +2,11 @@
 #
 unittest2==0.8.0 ; python_full_version < '2.7.3'
 
-pytest
-# These are used by only some Travis builds
-# pytest-timeout needs >=2.8.0
-# pytest>=2.8.0
-# pytest-timeout
-# pytest-runner
-# pytest-cov
+pytest>=2.8.0
+pytest-timeout
+pytest-runner
+pytest-cov
+pytest-attrib
 
 six
 
