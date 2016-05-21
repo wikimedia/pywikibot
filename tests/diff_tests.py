@@ -94,7 +94,7 @@ class TestHTMLComparator(TestCase):
 
 
 @patch('{0}.__import__'.format('__builtin__' if PY2 else 'builtins'),
-       side_effect=ImportError)
+       side_effect=ImportError, autospec=True)
 class TestNoBeautifulSoup(TestCase):
 
     """Test functions when BeautifulSoup is not installes."""
@@ -104,7 +104,7 @@ class TestNoBeautifulSoup(TestCase):
     def test_html_comparator(self, mocked_import):
         """Test html_comparator when bs4 not installed."""
         self.assertRaises(ImportError, html_comparator, '')
-        mocked_import.assert_called_once()
+        self.assertEqual(mocked_import.call_count, 1)
         self.assertIn('bs4', mocked_import.call_args[0])
 
 
