@@ -23,15 +23,14 @@ __version__ = '$Id$'
 #
 
 import re
+import sys
 
 import pywikibot
 
-from pywikibot import config2 as config
-
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
-# The location of the CFD working page.
-cfdPage = u'Wikipedia:Categories for discussion/Working'
+
+DEFAULT_CFD_PAGE = 'Wikipedia:Categories for discussion/Working'
 
 # A list of templates that are used on category pages as part of the CFD
 # process that contain information such as the link to the per-day discussion page.
@@ -81,13 +80,23 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    pywikibot.handle_args(args)
+    cfd_page = DEFAULT_CFD_PAGE
+    local_args = pywikibot.handle_args(args)
 
-    if config.family != 'wikipedia' or config.mylang != 'en':
-        pywikibot.warning('CFD does work only on the English Wikipedia.')
-        return
+    for arg in local_args:
+        if arg.startswith('-page'):
+            if len(arg) == len('-page'):
+                cfd_page = pywikibot.input('Enter the CFD working page to use:')
+            else:
+                cfd_page = arg[len('-page:'):]
 
-    page = pywikibot.Page(pywikibot.Site(), cfdPage)
+    page = pywikibot.Page(pywikibot.Site(), cfd_page)
+    try:
+        page.get()
+    except pywikibot.NoPage:
+        pywikibot.error(
+            'CFD working page "{0}" does not exist!'.format(cfd_page))
+        sys.exit(1)
 
     # Variable declarations
     day = 'None'
