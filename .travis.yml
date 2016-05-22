@@ -115,6 +115,9 @@ script:
 after_success:
     codecov
 
+after_failure:
+    codecov
+
 env:
   global:
     # This is the encrypted password for Wikimedia SUL user 'Pywikibot-test',
