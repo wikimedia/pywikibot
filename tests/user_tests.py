@@ -36,6 +36,16 @@ class TestUserClass(TestCase):
         self.assertTrue(user.isEmailable())
         self.assertIn('userid', user.getprops())
 
+    def test_registered_user_without_timestamp(self):
+        """Test registered user when registration timestamp is None."""
+        user = User(self.site, 'Ulfb')
+        self.assertTrue(user.isRegistered())
+        self.assertFalse(user.isAnonymous())
+        self.assertIsNone(user.registration())
+        self.assertIsNone(user.getprops()['registration'])
+        self.assertGreater(user.editCount(), 0)
+        self.assertIn('userid', user.getprops())
+
     def test_anonymous_user(self):
         """Test registered user."""
         user = User(self.site, '123.45.67.89')
