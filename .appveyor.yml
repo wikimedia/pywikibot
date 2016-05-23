@@ -97,7 +97,10 @@ test_script:
   - set PYSETUP_TEST_NO_UI=1
   - "%CMD_IN_ENV% coverage run setup.py test"
 
-after_test:
+on_failure:
+  - codecov
+
+on_success:
   - codecov
 
 artifacts:
