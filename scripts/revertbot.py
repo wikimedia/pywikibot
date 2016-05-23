@@ -117,7 +117,7 @@ class BaseRevertBot(object):
             page.title(asLink=True, forceInterwiki=True, textlink=True)))
         if not self.rollback:
             old = page.text
-            page.text = rev.text
+            page.text = page.getOldVersion(rev.revid)
             pywikibot.showDiff(old, page.text)
             page.save(comment)
             return comment
