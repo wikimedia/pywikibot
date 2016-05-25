@@ -17,7 +17,7 @@ pep257>=0.6
 pyflakes>=0.9
 flake8
 flake8-docstrings>=0.2.6
-flake8-mock
+git+https://github.com/jayvdb/flake8-mock@use-ascii-readme
 codecov
 coverage
 mock ; python_version < '3'
