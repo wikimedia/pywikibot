@@ -290,5 +290,5 @@ class TestNeedVersion(DeprecationTestCase):
             __name__ + '.TestNeedVersion.deprecated_available_method2')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

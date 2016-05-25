@@ -148,7 +148,7 @@ class TestSparql(TestCase):
         res = q.ask('ASK { ?x ?y ?z }')
         self.assertFalse(res)
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

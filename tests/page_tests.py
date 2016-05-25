@@ -993,7 +993,7 @@ class HtmlEntity(TestCase):
         self.assertEqual(pywikibot.page.html2unicode('&#x70&#x79;'), '&#x70y')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

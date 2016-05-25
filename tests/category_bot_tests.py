@@ -59,7 +59,7 @@ class CfdActions(DefaultSiteTestCase):
         self.assertEqual(bot.newcat.text, expected)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

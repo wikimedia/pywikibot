@@ -1,0 +1,8 @@
+[report]
+exclude_lines =
+    if __debug__ and not PY2:  # pyflakes workaround
+
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    if .PYWIKIBOT_TEST_.*. in os.environ:

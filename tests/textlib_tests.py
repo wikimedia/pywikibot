@@ -1392,7 +1392,7 @@ class TestUnescape(TestCase):
         self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
                          '!23<>\'"&&')
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

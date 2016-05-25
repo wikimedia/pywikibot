@@ -127,7 +127,7 @@ class ExportDotTenTestCase(XmlReaderTestCase):
                          u'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]:&#32;dab')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

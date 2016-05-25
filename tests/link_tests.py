@@ -972,7 +972,7 @@ class TestInvalidInterwikiLinks(WikimediaDefaultSiteTestCase):
             link.parse)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

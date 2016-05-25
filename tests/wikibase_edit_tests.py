@@ -330,7 +330,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
         self.assertNotIn('P580', claim.qualifiers.keys())
         self.assertNotIn('P88', claim.qualifiers.keys())
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

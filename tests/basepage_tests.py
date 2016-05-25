@@ -113,7 +113,7 @@ class BasePageMethodsTestBase(BasePageTestBase):
         self.assertFalse(self._page.isCategoryRedirect())
         self.assertTrue(self._page.botMayEdit())
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

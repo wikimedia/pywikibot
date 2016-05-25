@@ -3149,7 +3149,7 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
         self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_levels, site)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

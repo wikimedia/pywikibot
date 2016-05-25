@@ -83,7 +83,7 @@ class TestOauthLoginManger(DefaultOAuthSiteTestCase):
                          self.site.username(sysop=False))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

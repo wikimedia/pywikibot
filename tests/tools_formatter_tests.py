@@ -108,7 +108,7 @@ class TestColorFormat(TestCase):
         self.assert_format('{color}', '42', color=42)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:
