@@ -147,9 +147,9 @@ Please upgrade to Python 2.7+ or Python 3.3+, or run:
 
 
 else:
-    from collections import Counter  # flake8: disable=F401 (unused import)
-    from collections import OrderedDict
-    from itertools import count  # flake8: disable=F401 (unused import)
+    Counter = collections.Counter
+    OrderedDict = collections.OrderedDict
+    count = itertools.count
 
 
 def empty_iterator():

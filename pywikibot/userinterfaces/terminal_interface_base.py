@@ -53,6 +53,9 @@ colors = [
 
 colorTagR = re.compile('\03{(?P<name>%s|previous)}' % '|'.join(colors))
 
+if __debug__ and not PY2:
+    raw_input = NotImplemented  # pyflakes workaround
+
 
 class UI(object):
 

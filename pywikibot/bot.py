@@ -84,12 +84,12 @@ from pywikibot import backports
 from pywikibot import config
 from pywikibot import daemonize
 from pywikibot import version
-from pywikibot.bot_choice import (  # flake8: disable=F401 (unused imports)
+from pywikibot.bot_choice import (
     Option, StandardOption, NestedOption, IntegerOption, ContextOption,
     ListOption, OutputProxyOption, HighlightContextOption,
     ChoiceException, QuitKeyboardInterrupt,
 )
-from pywikibot.logging import (  # flake8: disable=F401
+from pywikibot.logging import (
     CRITICAL, ERROR, INFO, WARNING,
 )
 from pywikibot.logging import DEBUG, INPUT, STDOUT, VERBOSE
@@ -97,13 +97,34 @@ from pywikibot.logging import (
     add_init_routine,
     debug, error, exception, log, output, stdout, warning,
 )
-from pywikibot.logging import critical  # flake8: disable=F401
+from pywikibot.logging import critical
 from pywikibot.tools import deprecated, deprecated_args, PY2, PYTHON_VERSION
 from pywikibot.tools._logging import (
     LoggingFormatter as _LoggingFormatter,
     RotatingFileHandler,
 )
 from pywikibot.tools.formatter import color_format
+
+__all__ = (
+    'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
+    'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
+    'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
+    'init_handlers', 'writelogheader',
+    'input', 'input_choice', 'input_yn', 'inputChoice', 'input_list_choice',
+    'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
+    'ContextOption', 'ListOption', 'OutputProxyOption',
+    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswer',
+    'Choice', 'AlwaysChoice',
+    'QuitKeyboardInterrupt',
+    'InteractiveReplace',
+    'calledModuleName', 'handle_args', 'handleArgs', 'showHelp', 'suggest_help',
+    'writeToCommandLogFile', 'open_webbrowser',
+    'BaseBot', 'Bot', 'SingleSiteBot', 'MultipleSitesBot',
+    'CurrentPageBot', 'AutomaticTWSummaryBot',
+    'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
+    'RedirectPageBot', 'NoRedirectPageBot',
+    'WikidataBot',
+)
 
 if not PY2:
     unicode = str
