@@ -689,6 +689,7 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
         self.assertEqual(lines, [u'Alpha', u'Bετα', u'Гамма', u'دلتا', u''])
 
 
+# TODO: add tests for background colors.
 class FakeUITest(TestCase):
 
     """Test case to allow doing uncolorized general UI tests."""

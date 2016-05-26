@@ -59,8 +59,8 @@ class Hunk(object):
             '-': 'lightred',
         }
         self.bg_colors = {
-            '+': 'Blightgreen',
-            '-': 'Blightred',
+            '+': 'lightgreen',
+            '-': 'lightred',
         }
 
         self.diff = list(self.create_diff())
@@ -187,7 +187,7 @@ class Hunk(object):
                     if char != ' ':
                         apply_color = self.colors[color]
                     else:
-                        apply_color = self.bg_colors[color]
+                        apply_color = 'default;' + self.bg_colors[color]
                     char_tagged = color_format('{color}{0}',
                                                char, color=apply_color)
                     color_closed = False

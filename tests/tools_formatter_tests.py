@@ -32,6 +32,7 @@ class TestListOutputter(TestCase):
         self.assertEqual(outputter.format_list(), '\nfoo\nbar\n')
 
 
+# TODO: add tests for background colors.
 class TestColorFormat(TestCase):
 
     """Test color_format function in bot module."""
