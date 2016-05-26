@@ -19,10 +19,10 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory; see README.conversion.txt
-requests
+requests>=2.4.1
 
 # requests security extra
-pyOpenSSL ; python_full_version < '2.7.9'
+pyOpenSSL>=0.13 ; python_full_version < '2.7.9'
 ndg-httpsclient ; python_full_version < '2.7.9'
 pyasn1 ; python_full_version < '2.7.9'
 
@@ -82,6 +82,8 @@ oursql ; python_version < '3'
 
 # scripts/script_wui.py depends on Lua, which is not available using pip
 # but can be obtained from: https://github.com/bastibe/lunatic-python
+# However, a better fork is: https://github.com/AlereDevices/lunatic-python
+# Also script_wui.py is not currently functional, so it isnt installed here.
 
 # core HTML comparison parser in diff module
 beautifulsoup4
