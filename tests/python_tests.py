@@ -64,7 +64,7 @@ class PythonTestCase(TestCase):
         self.assertEqual(text, unicodedata2.normalize('NFC', text))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

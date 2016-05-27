@@ -84,7 +84,7 @@ class TestWebCite(DeprecationTestCase):
         self.assertEqual(archivedversion, 'http://www.webcitation.org/6DHSeh2L0')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

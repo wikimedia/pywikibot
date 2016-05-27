@@ -48,7 +48,7 @@ class CharsTestCase(TestCase):
         self.assertCountEqual(invalid.items(), [])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

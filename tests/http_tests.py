@@ -407,7 +407,7 @@ class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
         self.assertIs(main_module_cookie_jar, http.cookie_jar)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

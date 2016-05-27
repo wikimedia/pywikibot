@@ -124,7 +124,7 @@ def undelete_dummy(self, reason):
     TestDeletionBot.undelete_args = [self.title(asLink=True), reason]
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

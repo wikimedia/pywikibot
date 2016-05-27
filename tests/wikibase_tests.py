@@ -1290,7 +1290,7 @@ class TestDeprecatedDataSiteMethods(WikidataTestCase, DeprecationTestCase):
         self.assertIn('enwiki', data)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

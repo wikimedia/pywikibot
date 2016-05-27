@@ -476,5 +476,5 @@ class QueryGenTests(DefaultDrySiteTestCase):
         self.assertCountEqual(qGen1.request._params.items(), qGen2.request._params.items())
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

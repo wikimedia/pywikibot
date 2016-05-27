@@ -691,7 +691,7 @@ class IPAddressModuleTestCase(TestIPBase):
         self._test_T105443_failures()
         self.assertEqual(self.fail, 0)
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

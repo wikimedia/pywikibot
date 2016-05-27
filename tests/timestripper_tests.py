@@ -293,7 +293,7 @@ class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
         self.assertEqual(ts.timestripper(txt_match), res)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

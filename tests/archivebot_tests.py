@@ -93,7 +93,7 @@ class TestArchiveBot(TestCase):
     # 'th': year is 2552 while regex assumes 19..|20.., might be fixed
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

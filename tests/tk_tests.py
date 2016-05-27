@@ -73,7 +73,7 @@ class TestTkinter(DefaultSiteTestCase):
         assert v is None
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

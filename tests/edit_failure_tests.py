@@ -183,7 +183,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                             'Unsupported URL scheme: wtf',
                             item.addClaim, claim)
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

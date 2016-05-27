@@ -26,5 +26,5 @@ class TestSettings(TestCase):
         self.assertEqual(item1[1], 'a deprecated template')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

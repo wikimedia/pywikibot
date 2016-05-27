@@ -864,7 +864,7 @@ class FakeWin32UncolorizedTest(FakeWin32Test):
         self.stream._hConsole = None
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     try:
         try:
             unittest.main()

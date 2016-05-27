@@ -180,7 +180,7 @@ class TestDeprecatedFilePage(DeprecationTestCase):
         self.assertIsInstance(latest[1], unicode)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

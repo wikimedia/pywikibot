@@ -87,7 +87,7 @@ class TestMediaWikiVersion(TestCase):
         self.assertRaises(ValueError, V.from_generator, 'Invalid 1.2.3')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

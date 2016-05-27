@@ -425,7 +425,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
     _results = no_args_expected_results
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

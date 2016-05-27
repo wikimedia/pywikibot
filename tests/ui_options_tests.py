@@ -118,7 +118,7 @@ class TestChoiceOptions(TestCase):
                                              % (prefix, len(options) + 1)))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

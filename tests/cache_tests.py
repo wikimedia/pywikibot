@@ -41,5 +41,5 @@ class RequestCacheTests(TestCase):
         cache.process_entries(join_cache_path(), self._check_cache_entry)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

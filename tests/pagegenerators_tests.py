@@ -1231,7 +1231,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
                                                                 total=5):
                 assert False  # this shouldn't be reached
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

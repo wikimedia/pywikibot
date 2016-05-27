@@ -108,7 +108,7 @@ class TestNoBeautifulSoup(TestCase):
         self.assertIn('bs4', mocked_import.call_args[0])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

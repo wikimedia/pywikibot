@@ -342,7 +342,7 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
 
         # Once numbering fixes are enabled we can add tests.
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

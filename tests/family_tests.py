@@ -259,7 +259,7 @@ class TestOldFamilyMethod(DeprecationTestCase):
         self.assertDeprecationParts('fatal argument of pywikibot.family.Family.load')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:
