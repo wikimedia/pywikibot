@@ -1414,6 +1414,10 @@ class BaseBot(object):
         if PY2:
             maxint = sys.maxint
 
+            # Python 2 does not clear previous exceptions and method `exit`
+            # relies on sys.exc_info returning exceptions occurring in `run`.
+            sys.exc_clear()
+
         try:
             for page in self.generator:
                 try:
