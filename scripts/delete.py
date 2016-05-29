@@ -31,12 +31,12 @@ Furthermore, the following command line parameters are supported:
 -orphansonly:     Specified namespaces. Separate multiple namespace
                   numbers or names with commas.
                   Examples:
-                  -ns:0,2,4
-                  -ns:Help,MediaWiki
+                  -orphansonly:0,2,4
+                  -orphansonly:Help,MediaWiki
 
                   Note that Main ns can be indicated either with a 0 or a ',':
-                  -ns:0,1
-                  -ns:,Talk
+                  -orphansonly:0,1
+                  -orphansonly:,Talk
 
 Usage:
 
