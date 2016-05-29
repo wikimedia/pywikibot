@@ -1353,44 +1353,60 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
 
     dry = True
 
-    def test_noMatch(self):
+    @classmethod
+    def setUpClass(cls):
+        """Cache namespace 10 (Template) case sensitivity."""
+        super(TestMultiTemplateMatchBuilder, cls).setUpClass()
+        cls._template_not_case_sensitive = (
+            cls.get_site().namespaces.TEMPLATE.case != 'case-sensitive')
+
+    def test_no_match(self):
         """Test text without any desired templates."""
         string = 'The quick brown fox'
         builder = _MultiTemplateMatchBuilder(self.site)
         self.assertIsNone(re.search(builder.pattern('quick'), string))
 
-    def test_Match(self):
+    def test_match(self):
         """Test text with one match without parameters."""
         string = 'The {{quick}} brown fox'
         builder = _MultiTemplateMatchBuilder(self.site)
         self.assertIsNotNone(re.search(builder.pattern('quick'), string))
-        self.assertIsNotNone(re.search(builder.pattern('Quick'), string))
+        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
+                         self._template_not_case_sensitive)
 
     def test_match_with_params(self):
         """Test text with one match with parameters."""
-        string = 'The {{Quick|brown}} fox'
+        string = 'The {{quick|brown}} fox'
         builder = _MultiTemplateMatchBuilder(self.site)
         self.assertIsNotNone(re.search(builder.pattern('quick'), string))
-        self.assertIsNotNone(re.search(builder.pattern('Quick'), string))
+        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
+                         self._template_not_case_sensitive)
 
     def test_match_msg(self):
         """Test text with {{msg:..}}."""
         string = 'The {{msg:quick}} brown fox'
         builder = _MultiTemplateMatchBuilder(self.site)
         self.assertIsNotNone(re.search(builder.pattern('quick'), string))
-        self.assertIsNotNone(re.search(builder.pattern('Quick'), string))
+        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
+                         self._template_not_case_sensitive)
 
     def test_match_template_prefix(self):
         """Test pages with {{template:..}}."""
         string = 'The {{%s:%s}} brown fox'
         template = 'template'
         builder = _MultiTemplateMatchBuilder(self.site)
+        if self._template_not_case_sensitive:
+            quick_list = ('quick', 'Quick')
+        else:
+            quick_list = ('quick', )
+
         for t in (template.upper(), template.lower(), template.title()):
-            for q in ('quick', 'Quick'):
+            for q in quick_list:
                 self.assertIsNotNone(re.search(builder.pattern('quick'),
                                                string % (t, q)))
-                self.assertIsNotNone(re.search(builder.pattern('Quick'),
-                                               string % (t, q)))
+                self.assertEqual(bool(re.search(builder.pattern('Quick'),
+                                                string % (t, q))),
+                                 self._template_not_case_sensitive)
 
 
 class TestGetLanguageLinks(SiteAttributeTestCase):
