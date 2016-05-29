@@ -125,6 +125,10 @@ class Hunk(object):
                 continue
             if line2.startswith('?'):
                 yield self.color_line(line1, line2)
+                # do not try to reuse line2 as format at next iteration
+                # if already used for an added line.
+                if line1.startswith('+'):
+                    line2 = ''
                 continue
             if line1.startswith('-'):
                 # Color whole line to be removed.
