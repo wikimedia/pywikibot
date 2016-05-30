@@ -22,10 +22,6 @@ class DummyBot(interwikidata.IWBot):
 
     """A dummy bot to prevent editing in production wikis."""
 
-    def __init__(self, *args, **kwargs):
-        """Initiate the class."""
-        super(DummyBot, self).__init__(*args, **kwargs)
-
     def put_current(self):
         """Prevent editing."""
         return False
