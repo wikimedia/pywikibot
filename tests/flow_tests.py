@@ -22,24 +22,30 @@ from tests.basepage_tests import (
 )
 
 
-class TestBoardBasePageMethods(BasePageMethodsTestBase):
+class TestMediaWikiFlowSandbox(TestCase):
 
-    """Test Flow board pages using BasePage-defined methods."""
+    """Test the Flow sandbox on MediaWiki.org."""
 
     family = 'mediawiki'
     code = 'mediawiki'
 
     def setUp(self):
         """Set up unit test."""
-        self._page = Board(self.site, 'Talk:Sandbox')
-        super(TestBoardBasePageMethods, self).setUp()
+        self._page = Board(self.site, 'Project_talk:Sandbox/Flow test')
+        super(TestMediaWikiFlowSandbox, self).setUp()
+
+
+class TestBoardBasePageMethods(BasePageMethodsTestBase,
+                               TestMediaWikiFlowSandbox):
+
+    """Test Flow board pages using BasePage-defined methods."""
 
     def test_basepage_methods(self):
         """Test basic Page methods on a Flow board page."""
         self._test_invoke()
         self._test_return_datatypes()
         self.assertFalse(self._page.isRedirectPage())
-        self.assertEqual(self._page.latest_revision.parent_id, 0)
+        self.assertGreater(self._page.latest_revision.parent_id, 0)
 
     def test_content_model(self):
         """Test Flow page content model."""
@@ -70,17 +76,10 @@ class TestTopicBasePageMethods(BasePageMethodsTestBase):
         self.assertEqual(self._page.content_model, 'flow-board')
 
 
-class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
+class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
+                               TestMediaWikiFlowSandbox):
 
     """Test site.loadrevisions() caching."""
-
-    family = 'mediawiki'
-    code = 'mediawiki'
-
-    def setUp(self):
-        """Set up unit test."""
-        self._page = Board(self.site, 'Talk:Sandbox')
-        super(TestLoadRevisionsCaching, self).setUp()
 
     def test_page_text(self):
         """Test site.loadrevisions() with Page.text."""
@@ -88,18 +87,15 @@ class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase):
         self._test_page_text()
 
 
-class TestFlowLoading(TestCase):
+class TestFlowLoading(TestMediaWikiFlowSandbox):
 
     """Test loading of Flow objects from the API."""
-
-    family = 'mediawiki'
-    code = 'mediawiki'
 
     cached = True
 
     def test_board_uuid(self):
         """Test retrieval of Flow board UUID."""
-        board = Board(self.site, 'Talk:Sandbox')
+        board = self._page
         self.assertEqual(board.uuid, 'rl7iby6wgksbpfno')
 
     def test_topic_uuid(self):
@@ -150,7 +146,7 @@ class TestFlowLoading(TestCase):
 
     def test_topiclist(self):
         """Test loading of topiclist."""
-        board = Board(self.site, 'Talk:Sandbox')
+        board = self._page
         i = 0
         for topic in board.topics(limit=7):
             i += 1
