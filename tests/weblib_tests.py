@@ -50,7 +50,7 @@ class TestInternetArchive(DeprecationTestCase):
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
-        self.assertTrue(parsed.path.strip('/').endswith('www.google.com'), parsed.path)
+        self.assertTrue(parsed.path.strip('/').endswith('google.com'), parsed.path)
 
     def testInternetArchiveOlder(self):
         """Test Internet Archive for https://google.com as of June 2006."""
@@ -58,7 +58,7 @@ class TestInternetArchive(DeprecationTestCase):
         parsed = urlparse(archivedversion)
         self.assertIn(parsed.scheme, [u'http', u'https'])
         self.assertEqual(parsed.netloc, u'web.archive.org')
-        self.assertTrue(parsed.path.strip('/').endswith('www.google.com'), parsed.path)
+        self.assertTrue(parsed.path.strip('/').endswith('google.com'), parsed.path)
         self.assertIn('200606', parsed.path)
 
 
