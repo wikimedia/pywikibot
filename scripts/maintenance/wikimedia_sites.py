@@ -43,6 +43,9 @@ def update_family(families):
         pywikibot.output('\nChecking family %s:' % family)
 
         original = Family.load(family).languages_by_size
+        for code in exceptions:
+            if code in original:
+                original.remove(code)
         obsolete = Family.load(family).obsolete
 
         new = []
