@@ -2987,13 +2987,27 @@ class APISite(BaseSite):
                                 )
         self._update_page(page, query)
 
-    def loadimageinfo(self, page, history=False):
+    def loadimageinfo(self, page, history=False,
+                      url_width=None, url_height=None, url_param=None):
         """Load image info from api and save in page attributes.
 
+        Parameters correspond to iiprops in:
+        [1] U{https://www.mediawiki.org/wiki/API:Imageinfo}
+
+        Parameters validation and error handling left to the API call.
+
         @param history: if true, return the image's version history
+        @param url_width: see iiurlwidth in [1]
+        @param url_height: see iiurlheigth in [1]
+        @param url_param: see iiurlparam in [1]
+
         """
         title = page.title(withSection=False)
-        args = {"titles": title}
+        args = {'titles': title,
+                'iiurlwidth': url_width,
+                'iiurlheight': url_height,
+                'iiurlparam': url_param,
+                }
         if not history:
             args["total"] = 1
         query = self._generator(api.PropertyGenerator,

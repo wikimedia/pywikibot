@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -136,6 +136,8 @@ class TestFilePage(TestCase):
     family = 'wikipedia'
     code = 'test'
 
+    file_name = 'File:Albert Einstein Head.jpg'
+
     cached = True
 
     def test_file_info_with_no_page(self):
@@ -153,6 +155,68 @@ class TestFilePage(TestCase):
         self.assertTrue(image.exists())
         with self.assertRaises(pywikibot.PageRelatedError):
             image = image.latest_file_info
+
+
+class TestFilePageLatestFileInfo(TestCase):
+
+    """Test FilePage.latest_file_info.
+
+    These tests cover properties and methods in FilePage that rely
+    on site.loadimageinfo.
+
+    """
+
+    family = 'commons'
+    code = 'commons'
+
+    file_name = 'File:Albert Einstein Head.jpg'
+
+    cached = True
+
+    def setUp(self):
+        """Create File page."""
+        super(TestCase, self).setUp()
+        self.image = pywikibot.FilePage(self.site, self.file_name)
+
+    def test_get_file_url(self):
+        """Get File url."""
+        self.assertTrue(self.image.exists())
+        self.assertEqual(self.image.get_file_url(),
+                         'https://upload.wikimedia.org/wikipedia/commons/'
+                         'd/d3/Albert_Einstein_Head.jpg')
+        self.assertEqual(self.image.latest_file_info.url,
+                         'https://upload.wikimedia.org/wikipedia/commons/'
+                         'd/d3/Albert_Einstein_Head.jpg')
+
+    def test_get_file_url_thumburl_from_width(self):
+        """Get File thumburl from width."""
+        self.assertTrue(self.image.exists())
+        # url_param has no precedence over height/width.
+        self.assertEqual(self.image.get_file_url(url_width=100, url_param='1000px'),
+                         'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+                         'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
+        self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
+        self.assertEqual(self.image.latest_file_info.thumbheight, 133)
+
+    def test_get_file_url_thumburl_from_heigth(self):
+        """Get File thumburl from height."""
+        self.assertTrue(self.image.exists())
+        # url_param has no precedence over height/width.
+        self.assertEqual(self.image.get_file_url(url_height=100, url_param='1000px'),
+                         'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+                         'd/d3/Albert_Einstein_Head.jpg/75px-Albert_Einstein_Head.jpg')
+        self.assertEqual(self.image.latest_file_info.thumbwidth, 75)
+        self.assertEqual(self.image.latest_file_info.thumbheight, 100)
+
+    def test_get_file_url_thumburl_from_url_param(self):
+        """Get File thumburl from height."""
+        self.assertTrue(self.image.exists())
+        # url_param has no precedence over height/width.
+        self.assertEqual(self.image.get_file_url(url_param='100px'),
+                         'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+                         'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
+        self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
+        self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
 
 class TestDeprecatedFilePage(DeprecationTestCase):

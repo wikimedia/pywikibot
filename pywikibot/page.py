@@ -2437,10 +2437,43 @@ class FilePage(Page):
             self._imagePageHtml = http.request(self.site, path)
         return self._imagePageHtml
 
+    @deprecated('get_file_url')
     def fileUrl(self):
         """Return the URL for the file described on this page."""
-        # TODO add scaling option?
         return self.latest_file_info.url
+
+    def get_file_url(self, url_width=None, url_height=None, url_param=None):
+        """
+        Return the url or the thumburl of the file described on this page.
+
+        Fetch the information if not available.
+
+        Once retrieved, thumburl information will also be accessible as
+        latest_file_info attributes, named as in [1]:
+        - url, thumburl, thumbwidth and thumbheight
+
+        Parameters correspond to iiprops in:
+        [1] U{https://www.mediawiki.org/wiki/API:Imageinfo}
+
+        Parameters validation and error handling left to the API call.
+
+        @param width: see iiurlwidth in [1]
+        @param height: see iiurlheigth in [1]
+        @param param: see iiurlparam in [1]
+
+        @return: latest file url or thumburl
+        @rtype: unicode
+
+        """
+        # Plain url is requested.
+        if url_width is None and url_height is None and url_param is None:
+            return self.latest_file_info.url
+
+        # Thumburl is requested.
+        self.site.loadimageinfo(self, history=not self._file_revisions,
+                                url_width=url_width, url_height=url_height,
+                                url_param=url_param)
+        return self.latest_file_info.thumburl
 
     @deprecated("fileIsShared")
     def fileIsOnCommons(self):
