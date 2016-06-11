@@ -1278,7 +1278,7 @@ class BaseBot(object):
         @return: whether the page was saved successfully
         @rtype: bool
         """
-        if oldtext == newtext:
+        if oldtext.rstrip() == newtext.rstrip():
             pywikibot.output(u'No changes were needed on %s'
                              % page.title(asLink=True))
             return
