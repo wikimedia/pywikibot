@@ -32,6 +32,9 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - NotEmailableError: The target user has disabled email
   - NoMoveTarget: An expected move target page does not exist
 
+PageLoadRelatedError: any exception which happens while loading a Page.
+  - InconsistentTitleReceived: Page receives a title inconsistent with query
+
 PageSaveRelatedError: page exceptions within the save operation on a Page
 (alias: PageNotSaved).
 
@@ -229,6 +232,30 @@ class NoMoveTarget(PageRelatedError):
     message = "Move target page of %s not found."
 
     pass
+
+
+class PageLoadRelatedError(PageRelatedError):
+
+    """Loading the contents of a Page object has failed."""
+
+    message = u"Page %s was not loaded."
+
+
+class InconsistentTitleReceived(PageLoadRelatedError):
+
+    """Page receives a title inconsistent with query."""
+
+    def __init__(self, page, actual):
+        """Constructor.
+
+        @param page: Page that caused the exception
+        @type page: Page object
+        @param actual: title obtained by query
+        @type reason: basestring
+
+        """
+        self.message = "Query on %s returned data on '{0}'".format(actual)
+        super(InconsistentTitleReceived, self).__init__(page)
 
 
 class SiteDefinitionError(Error):  # noqa
