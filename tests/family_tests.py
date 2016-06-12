@@ -43,7 +43,7 @@ class TestFamily(TestCase):
             self.assertTrue(iter(f.domains))
             for domain in f.domains:
                 self.assertIsInstance(domain, basestring)
-                if domain != 'localhost':
+                if domain.split(':', 1)[0] != 'localhost':
                     self.assertIn('.', domain)
             self.assertEqual(f.name, name)
             self.assertIsInstance(f.languages_by_size, list)
