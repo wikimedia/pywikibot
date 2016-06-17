@@ -6774,6 +6774,25 @@ class APISite(BaseSite):
         comparison = data['compare']['*']
         return comparison
 
+    @need_extension('Thanks')
+    def thank_revision(self, revid, source=None):
+        """Corresponding method to the 'action=thank' API action.
+
+        @param revid: Revision ID for the revision to be thanked.
+        @type revid: int
+        @param source: A source for the thanking operation.
+        @type source: str
+        @raise APIError: On thanking oneself or other API errors.
+        @return: The API response.
+        """
+        token = self.tokens['csrf']
+        req = self._simple_request(action='thank', rev=revid, token=token,
+                                   source=source)
+        data = req.submit()
+        if data['result']['success'] != 1:
+            raise api.APIError('Thanking unsuccessful')
+        return data
+
     # Flow API calls
     @need_extension('Flow')
     def load_board(self, page):
