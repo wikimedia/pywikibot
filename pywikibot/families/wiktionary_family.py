@@ -80,19 +80,19 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'sh', 'es', 'zh', 'ru', 'lt', 'pl', 'sv', 'nl',
-            'de', 'ku', 'el', 'it', 'tr', 'ta', 'ko', 'hu', 'fi', 'io', 'kn',
-            'vi', 'pt', 'chr', 'ca', 'ja', 'no', 'ro', 'ml', 'id', 'th', 'uz',
-            'hy', 'li', 'et', 'my', 'or', 'te', 'cs', 'fa', 'jv', 'ar', 'eu',
-            'gl', 'sr', 'az', 'lo', 'uk', 'br', 'fj', 'hr', 'eo', 'da', 'bg',
-            'oc', 'ps', 'simple', 'cy', 'vo', 'is', 'zh-min-nan', 'scn', 'wa',
-            'ast', 'he', 'af', 'tl', 'sw', 'fy', 'tg', 'hi', 'nn', 'sk', 'pnb',
-            'lv', 'mn', 'la', 'ka', 'sl', 'sq', 'nah', 'lb', 'bs', 'nds', 'kk',
-            'sm', 'tk', 'hsb', 'mk', 'ky', 'bn', 'be', 'ms', 'km', 'ga', 'an',
-            'ur', 'co', 'wo', 'sa', 'ang', 'vec', 'tt', 'gn', 'mr', 'so', 'csb',
-            'ug', 'gd', 'sd', 'st', 'mt', 'roa-rup', 'si', 'ie', 'ia', 'ay',
+            'en', 'mg', 'fr', 'sh', 'es', 'zh', 'ru', 'lt', 'nl', 'sv', 'pl',
+            'de', 'ku', 'el', 'it', 'ta', 'tr', 'hu', 'fi', 'ko', 'io', 'kn',
+            'vi', 'pt', 'chr', 'ca', 'sr', 'hi', 'ja', 'hy', 'ro', 'no', 'ml',
+            'id', 'th', 'et', 'uz', 'li', 'my', 'or', 'te', 'cs', 'fa', 'jv',
+            'ar', 'eu', 'gl', 'az', 'lo', 'uk', 'br', 'da', 'hr', 'fj', 'eo',
+            'oc', 'bg', 'ps', 'simple', 'cy', 'vo', 'is', 'zh-min-nan', 'wa',
+            'scn', 'ast', 'he', 'af', 'tg', 'tl', 'sw', 'fy', 'sk', 'nn', 'la',
+            'co', 'pnb', 'lv', 'mn', 'ka', 'sl', 'sq', 'nah', 'lb', 'bs', 'nds',
+            'ky', 'kk', 'sm', 'tk', 'sa', 'hsb', 'mk', 'km', 'bn', 'be', 'ms',
+            'ga', 'an', 'ur', 'wo', 'ang', 'vec', 'tt', 'gn', 'mr', 'so', 'csb',
+            'ug', 'sd', 'gd', 'st', 'mt', 'roa-rup', 'si', 'ie', 'ia', 'ay',
             'mi', 'kl', 'pa', 'jbo', 'fo', 'ln', 'zu', 'na', 'gv', 'kw', 'gu',
-            'rw', 'ts', 'om', 'qu', 'ss', 'ha', 'su', 'iu', 'am', 'ne', 'dv',
+            'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu', 'am', 'dv',
             'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
         ]
 

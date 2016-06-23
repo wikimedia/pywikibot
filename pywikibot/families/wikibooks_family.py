@@ -109,12 +109,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'de', 'hu', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'vi',
-            'he', 'ca', 'id', 'fi', 'sq', 'fa', 'ru', 'cs', 'zh', 'az', 'sv',
-            'th', 'hr', 'tr', 'sr', 'ar', 'no', 'ko', 'gl', 'da', 'ta', 'ro',
-            'mk', 'tl', 'is', 'uk', 'ka', 'lt', 'tt', 'sa', 'eo', 'sk', 'bg',
-            'el', 'hy', 'si', 'ms', 'sl', 'bn', 'hi', 'li', 'la', 'ur', 'ml',
-            'ang', 'ia', 'cv', 'et', 'km', 'mr', 'eu', 'oc', 'kk', 'ne', 'fy',
-            'pa', 'ie', 'te', 'af', 'tg', 'ku', 'ky', 'bs', 'be', 'mg', 'cy',
+            'he', 'ca', 'id', 'fi', 'sq', 'fa', 'ru', 'cs', 'th', 'az', 'zh',
+            'sv', 'hr', 'tr', 'sr', 'ar', 'ko', 'no', 'da', 'gl', 'ta', 'ro',
+            'tl', 'mk', 'is', 'uk', 'ka', 'lt', 'tt', 'sa', 'eo', 'sk', 'bg',
+            'el', 'hy', 'hi', 'si', 'ms', 'sl', 'bn', 'ur', 'li', 'la', 'ml',
+            'ang', 'ia', 'cv', 'et', 'km', 'mr', 'eu', 'oc', 'kk', 'ne', 'pa',
+            'fy', 'ie', 'te', 'af', 'tg', 'ku', 'ky', 'bs', 'be', 'mg', 'cy',
             'zh-min-nan', 'uz',
         ]
 
