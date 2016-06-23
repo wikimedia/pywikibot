@@ -38,8 +38,6 @@ windowsColors = {
     'lightpurple': 13,
     'lightyellow': 14,
     'white':       15,
-    'Blightgreen': 32,   # background color green.
-    'Blightred':   64,   # background color red.
 }
 
 
@@ -74,8 +72,13 @@ class Win32CtypesUI(Win32BaseUI):
 
     def encounter_color(self, color, target_stream):
         """Set the new color."""
+        fg, bg = self.divide_color(color)
+        windows_color = windowsColors[fg]
+        # Merge foreground/backgroung color if needed.
+        if bg is not None:
+            windows_color = windowsColors[bg] << 4 | windows_color
         ctypes.windll.kernel32.SetConsoleTextAttribute(
-            target_stream._hConsole, windowsColors[color])
+            target_stream._hConsole, windows_color)
 
     def _raw_input(self):
         data = self.stdin.readline()

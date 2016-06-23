@@ -9,6 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import re
 import sys
 
 from pywikibot.userinterfaces import terminal_interface_base
@@ -31,8 +32,6 @@ unixColors = {
     'lightpurple': chr(27) + '[95m',    # Light Purple tag (Magenta)
     'lightaqua':   chr(27) + '[96m',    # Light Aqua tag (Cyan)
     'white':       chr(27) + '[97m',    # White start tag (Bright White)
-    'Blightgreen': chr(27) + '[102m',   # Background Light Red tag
-    'Blightred':   chr(27) + '[101m',   # Background Light Green tag
 }
 
 
@@ -44,9 +43,19 @@ class UnixUI(terminal_interface_base.UI):
         """Return that the target stream supports colors."""
         return True
 
+    def make_unix_bg_color(self, color):
+        """Obtain background color from foreground color."""
+        code = re.search('(?<=\[)\d+', color).group()
+        return chr(27) + '[' + str(int(code) + 10) + 'm'
+
     def encounter_color(self, color, target_stream):
         """Write the unix color directly to the stream."""
-        self._write(unixColors[color], target_stream)
+        fg,  bg = self.divide_color(color)
+        fg = unixColors[fg]
+        self._write(fg, target_stream)
+        if bg is not None:
+            bg = unixColors[bg]
+            self._write(self.make_unix_bg_color(bg), target_stream)
 
     def _write(self, text, target_stream):
         """Optionally encode and write the text to the target stream."""
