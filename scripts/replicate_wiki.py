@@ -5,7 +5,11 @@ This bot replicates pages in a wiki to a second wiki within one family.
 
 Example:
 
-    python pwb.py replicate_wiki [-r] -ns 10 -f wikipedia -o nl li fy
+    python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -o nl li fy
+
+or
+
+    python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -lang:nl li fy
 
 to copy all templates from an nlwiki to liwiki and fywiki. It will show which
 pages have to be changed if -r is not present, and will only actually write
@@ -26,7 +30,7 @@ The following parameters are supported:
 --replace         you will only get an overview page)
 
 -o                original wiki
---original
+--original        (you may use -lang:<code> option instead)
 
 destination_wiki  destination wiki(s)
 
@@ -38,7 +42,7 @@ destination_wiki  destination wiki(s)
 """
 #
 # (C) Kasper Souren, 2012-2013
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2016
 #
 # Distributed under the terms of the MIT license.
 #
