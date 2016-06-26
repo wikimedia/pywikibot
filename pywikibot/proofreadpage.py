@@ -12,7 +12,7 @@ This module includes objects:
 
 """
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,21 +39,26 @@ class FullHeader(object):
 
     p_header = re.compile(
         r'<pagequality level="(?P<ql>\d)" user="(?P<user>.*?)" />'
-        r'<div class="pagetext">(?P<header>.*)',
+        r'(?P<has_div><div class="pagetext">)?(?P<header>.*)',
         re.DOTALL)
 
-    _template = ('<pagequality level="{0.ql}" user="{0.user}" />'
-                 '<div class="pagetext">{0.header}\n\n\n')
+    TEMPLATE_V1 = ('<pagequality level="{0.ql}" user="{0.user}" />'
+                   '<div class="pagetext">{0.header}\n\n\n')
+    TEMPLATE_V2 = ('<pagequality level="{0.ql}" user="{0.user}" />'
+                   '{0.header}')
 
     def __init__(self, text=None):
         """Constructor."""
         self._text = text or ''
+        self._has_div = True
 
         m = self.p_header.search(self._text)
         if m:
             self.ql = int(m.group('ql'))
             self.user = m.group('user')
             self.header = m.group('header')
+            if not m.group('has_div'):
+                self._has_div = False
         else:
             self.ql = ProofreadPage.NOT_PROOFREAD
             self.user = ''
@@ -61,7 +66,10 @@ class FullHeader(object):
 
     def __str__(self):
         """Return a string representation."""
-        return self._template.format(self)
+        if self._has_div:
+            return FullHeader.TEMPLATE_V1.format(self)
+        else:
+            return FullHeader.TEMPLATE_V2.format(self)
 
 
 class ProofreadPage(pywikibot.Page):
@@ -79,6 +87,10 @@ class ProofreadPage(pywikibot.Page):
                         PROOFREAD,
                         VALIDATED,
                         ]
+
+    _FMT = ('{0.open_tag}{0._full_header}{0.close_tag}'
+            '{0._body}'
+            '{0.open_tag}{0._footer}%s{0.close_tag}')
 
     open_tag = '<noinclude>'
     close_tag = '</noinclude>'
@@ -103,6 +115,13 @@ class ProofreadPage(pywikibot.Page):
             raise ValueError('QLs do not match site values: %s != %s'
                              % (self.site.proofread_levels.keys(),
                                 self.PROOFREAD_LEVELS))
+
+    @property
+    def _fmt(self):
+        if self._full_header._has_div:
+            return self._FMT % '</div>'
+        else:
+            return self._FMT % ''
 
     @property
     def index(self):
@@ -378,10 +397,7 @@ class ProofreadPage(pywikibot.Page):
 
     def _compose_page(self):
         """Compose Proofread Page text from header, body and footer."""
-        fmt = ('{0.open_tag}{0._full_header}{0.close_tag}'
-               '{0._body}'
-               '{0.open_tag}{0._footer}</div>{0.close_tag}')
-        self._text = fmt.format(self)
+        self._text = self._fmt.format(self)
         return self._text
 
     def _page_to_json(self):
