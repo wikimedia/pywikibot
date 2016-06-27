@@ -6583,6 +6583,39 @@ class APISite(BaseSite):
             return self.allpages(namespace=namespaces[0], protect_level=level,
                                  protect_type=type, total=total)
 
+    @need_version('1.21')
+    def _get_property_names(self, force=False):
+        """
+        Get property names for pages_with_property().
+
+        @param force: force to retrieve userinfo ignoring cache
+        @type force: bool
+        """
+        if force or not hasattr(self, '_property_names'):
+            ppngen = self._generator(api.ListGenerator, 'pagepropnames')
+            self._property_names = [pn['propname'] for pn in ppngen]
+        return self._property_names
+
+    @need_version('1.21')
+    def pages_with_property(self, propname, total=None):
+        """Yield Page objects from Special:PagesWithProp.
+
+        @param propname: must be a valid property.
+        @type propname: str
+        @param total: number of pages to return
+        @type total: int or None
+        @return: return a generator of Page objects
+        @rtype: iterator
+        """
+        if propname not in self._get_property_names():
+            raise NotImplementedError(
+                '{0} is not a valid page property'.format(propname))
+        pwpgen = self._generator(api.PageGenerator,
+                                 type_arg='pageswithprop',
+                                 gpwppropname=propname,
+                                 total=total)
+        return pwpgen
+
     @need_version("1.18")
     def compare(self, old, diff):
         """
