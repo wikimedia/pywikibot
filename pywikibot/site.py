@@ -2283,8 +2283,14 @@ class APISite(BaseSite):
             params['not' + key] = kwargs[key]
 
         data = self._simple_request(**params).submit()
-        for notif in data['query']['notifications']['list'].values():
-            yield Notification.fromJSON(self, notif)
+        notifications = data['query']['notifications']['list']
+
+        # Support API before 1.27.0-wmf.22
+        if hasattr(notifications, 'values'):
+            notifications = notifications.values()
+
+        for notification in notifications:
+            yield Notification.fromJSON(self, notification)
 
     @need_extension('Echo')
     def notifications_mark_read(self, **kwargs):
