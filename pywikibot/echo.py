@@ -27,8 +27,10 @@ class Notification(object):
         notif.category = data['category']
         notif.timestamp = pywikibot.Timestamp.fromtimestampformat(data['timestamp']['mw'])
 
-        # TODO: use 'namespace-key' + 'text' ?
-        notif.page = pywikibot.Page(site, data['title']['full'])
+        if 'title' in data and 'full' in data['title']:
+            notif.page = pywikibot.Page(site, data['title']['full'])
+        else:
+            notif.page = None
 
         if 'agent' in data and 'name' in data['agent']:
             notif.agent = pywikibot.User(site, data['agent']['name'])
