@@ -3,8 +3,7 @@
 r"""
 This is a Bot to add a text at the end of the content of the page.
 
-By default it adds the text above categories, interwiki and template
-for the stars of the interwiki.
+By default it adds the text above categories and interwiki.
 
 Alternatively it may also add a text at the top of the page.
 These command line parameters can be used to specify which pages to work on:
@@ -80,37 +79,6 @@ docuReplacements = {
 }
 
 
-starsList = [
-    u'bueno',
-    u'bom interwiki',
-    u'cyswllt[ _]erthygl[ _]ddethol', u'dolen[ _]ed',
-    u'destacado', u'destaca[tu]',
-    u'enllaç[ _]ad',
-    u'enllaz[ _]ad',
-    u'leam[ _]vdc',
-    u'legătură[ _]a[bcf]',
-    u'liamm[ _]pub',
-    u'lien[ _]adq',
-    u'lien[ _]ba',
-    u'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
-    u'liên[ _]kết[ _]chọn[ _]lọc',
-    u'ligam[ _]adq',
-    u'ligazón[ _]a[bd]',
-    u'ligoelstara',
-    u'ligoleginda',
-    u'link[ _][afgu]a', u'link[ _]adq', u'link[ _]f[lm]', u'link[ _]km',
-    u'link[ _]sm', u'linkfa',
-    u'na[ _]lotura',
-    u'nasc[ _]ar',
-    u'tengill[ _][úg]g',
-    u'ua',
-    u'yüm yg',
-    u'רא',
-    u'وصلة مقالة جيدة',
-    u'وصلة مقالة مختارة',
-]
-
-
 def add_text(page, addText, summary=None, regexSkip=None,
              regexSkipUrl=None, always=False, up=False, putText=True,
              oldTextGiven=None, reorderEnabled=True, create=False):
@@ -123,10 +91,6 @@ def add_text(page, addText, summary=None, regexSkip=None,
     if not summary:
         summary = i18n.twtranslate(site, 'add_text-adding',
                                    {'adding': addText[:200]})
-
-    # When a page is tagged as "really well written" it has a star in the
-    # interwiki links. This is a list of all the templates used (in regex
-    # format) to make the stars appear.
 
     errorCount = 0
 
@@ -188,22 +152,6 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext = textlib.replaceCategoryLinks(newtext,
                                                    categoriesInside, site,
                                                    True)
-            # Dealing the stars' issue
-            # TODO: T123150
-            allstars = []
-            starstext = textlib.removeDisabledParts(text)
-            for star in starsList:
-                regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
-                                   % star, re.I)
-                found = regex.findall(starstext)
-                if found != []:
-                    newtext = regex.sub('', newtext)
-                    allstars += found
-            if allstars != []:
-                newtext = newtext.strip() + config.line_separator * 2
-                allstars.sort()
-                for element in allstars:
-                    newtext += '%s%s' % (element.strip(), config.LS)
             # Adding the interwiki
             newtext = textlib.replaceLanguageLinks(newtext, interwikiInside,
                                                    site)

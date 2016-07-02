@@ -44,9 +44,9 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
 
     def test_standardizePageFooter(self):
         """Test standardizePageFooter method."""
-        self.assertEqual('Foo\n{{link fa}}\n\n[[Category:Foo]]',
+        self.assertEqual('Foo\n{{any template}}\n\n[[Category:Foo]]',
                          self.cct.standardizePageFooter(
-                             'Foo [[category:foo]] {{link fa}}'))
+                             'Foo\n[[category:foo]]\n{{any template}}'))
 
     def test_resolveHtmlEntities(self):
         """Test resolveHtmlEntities method."""
