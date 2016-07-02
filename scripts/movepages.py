@@ -193,7 +193,7 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-pairs'):
+        if arg == '-pairs' or arg.startswith('-pairs:'):
             issue_deprecation_warning(
                 '-pairs',
                 '-pairsfile',
