@@ -43,6 +43,7 @@ class Notification(object):
             notif.read = False
 
         notif.content = data.get('*', None)
+        notif.revid = data.get('revid', None)
 
         return notif
 
