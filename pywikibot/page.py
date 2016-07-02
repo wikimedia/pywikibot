@@ -235,8 +235,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not hasattr(self, '_depth'):
             # Check if the namespace allows subpages
             if self._namespace_obj.subpages:
-                # Count how many '/'s we have in the title
-                _depth = len(list(re.finditer('/', self.title())))
+                _depth = self.title().count('/')
             else:
                 # Does not allow subpages, which means depth is always 0
                 _depth = 0
