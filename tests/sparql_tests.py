@@ -74,7 +74,7 @@ RESPONSE_FALSE = """
 """
 
 
-class TestContainer(object):
+class Container(object):
     """Simple test container for return values."""
 
     def __init__(self, value):
@@ -90,7 +90,7 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testQuerySelect(self, mock_method):
         """Test SELECT query."""
-        mock_method.return_value = TestContainer(SQL_RESPONSE)
+        mock_method.return_value = Container(SQL_RESPONSE)
         q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }')
         self.assertIsInstance(res, list, 'Result is not a list')
@@ -108,7 +108,7 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testQuerySelectFull(self, mock_method):
         """Test SELECT query with full data."""
-        mock_method.return_value = TestContainer(SQL_RESPONSE)
+        mock_method.return_value = Container(SQL_RESPONSE)
         q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }', full_data=True)
         self.assertIsInstance(res, list, 'Result is not a list')
@@ -130,7 +130,7 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testGetItems(self, mock_method):
         """Test item list retrieval via SPARQL."""
-        mock_method.return_value = TestContainer(SQL_RESPONSE)
+        mock_method.return_value = Container(SQL_RESPONSE)
         q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
         self.assertSetEqual(res, set(['Q498787', 'Q677525']))
@@ -138,13 +138,13 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testQueryAsk(self, mock_method):
         """Test ASK query."""
-        mock_method.return_value = TestContainer(RESPONSE_TRUE)
+        mock_method.return_value = Container(RESPONSE_TRUE)
         q = sparql.SparqlQuery()
 
         res = q.ask('ASK { ?x ?y ?z }')
         self.assertTrue(res)
 
-        mock_method.return_value = TestContainer(RESPONSE_FALSE)
+        mock_method.return_value = Container(RESPONSE_FALSE)
         res = q.ask('ASK { ?x ?y ?z }')
         self.assertFalse(res)
 
