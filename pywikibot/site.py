@@ -2965,9 +2965,7 @@ class APISite(BaseSite):
 
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
-        if not hasattr(page, "_pageid"):
-            self.loadpageinfo(page)
-        return page._pageid > 0
+        return page.pageid > 0
 
     def page_restrictions(self, page):
         """Return a dictionary reflecting page protections."""

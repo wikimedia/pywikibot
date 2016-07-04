@@ -202,7 +202,7 @@ class RedirectGenerator(object):
         """Generator that yields batches of 500 redirects as a list."""
         apiQ = []
         for page in self.get_redirect_pages_via_api():
-            apiQ.append(str(page._pageid))
+            apiQ.append(str(page.pageid))
             if len(apiQ) >= 500:
                 yield apiQ
                 apiQ = []

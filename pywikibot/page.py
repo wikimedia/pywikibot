@@ -242,6 +242,18 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         return _depth
 
+    @property
+    def pageid(self):
+        """
+        Return pageid of the page.
+
+        @return: pageid or 0 if page does not exist
+        @rtype: int
+        """
+        if not hasattr(self, '_pageid'):
+            self.site.loadpageinfo(self)
+        return self._pageid
+
     @deprecated_args(decode=None, savetitle="asUrl")
     def title(self, underscore=False, withNamespace=True,
               withSection=True, asUrl=False, asLink=False,
