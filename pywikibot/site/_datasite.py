@@ -8,7 +8,7 @@ import datetime
 import json
 import uuid
 from contextlib import suppress
-from typing import Optional
+from typing import Any, Dict, List, Optional
 from warnings import warn
 
 import pywikibot
@@ -709,6 +709,47 @@ class DataSite(APISite):
                               data_name='search',
                               total=total, parameters=parameters)
         return gen
+
+    def parsevalue(self, datatype: str, values: List[str],
+                   options: Dict[str, Any], validate: bool) -> List[Any]:
+        """
+        Send data values to the wikibase parser for interpretation.
+
+        :param datatype: datatype of the values being parsed. Refer to
+            https://www.wikidata.org/w/api.php?action=help&modules=wbparsevalue
+            for a valid datatype.
+        :param values: list of values to be parsed
+        :param options: any additional options for wikibase parser
+            (for time, 'precision' should be specified)
+        :param validate: whether parser should provide data validation as well
+            as parsing
+        :return: list of parsed values
+        :raises ValueError: parsing failed due to some invalid input values
+        """
+        params = {
+            'datatype': datatype,
+            'values': values,
+            'options': json.dumps(options),
+            'validate': validate,
+        }
+        req = self.simple_request(action='wbparsevalue', **params)
+        try:
+            data = req.submit()
+        except APIError as e:
+            if e.code == 'wikibase-parse-error-quantity':
+                raise ValueError(e) from None
+            raise
+        if 'results' not in data:
+            raise ValueError('Parsing via wikibase wbparsevalue failed.')
+
+        results = []
+        for result_hash in data['results']:
+            if 'value' not in result_hash:
+                raise ValueError(
+                    'Parsing via wikibase wbparsevalue failed: {}'
+                    .format(result_hash['error-info']))
+            results.append(result_hash['value'])
+        return results
 
     @need_right('edit')
     def _wbset_action(self, itemdef, action: str, action_data,
