@@ -51,7 +51,6 @@ _logger = "wiki.login"
 # second parameter, otherwise it must be None
 botList = {
     'wikipedia': {
-        'en': [u'Wikipedia:Bots/Status/active bots', 'BotS'],
         'simple': [u'Wikipedia:Bots', '/links']
     },
 }
