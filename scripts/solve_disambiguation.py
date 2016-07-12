@@ -71,7 +71,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -352,11 +352,16 @@ ignore_title = {
 
 
 def correctcap(link, text):
-    """
-    Capitalize link.
+    """Return the link capitalized/uncapitalized according to the text.
 
-    If text links to a page with title link uncapitalized, uncapitalize link,
-    otherwise capitalize it
+    @param link: link page
+    @type link: pywikibot.Page
+    @param text: the wikitext that is supposed to refer to the link
+    @type text: str
+    @return: uncapitalized title of the link if the text links to the link
+        with an uncapitalized title, else capitalized
+    @rtype: str
+
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
@@ -371,7 +376,15 @@ class ReferringPageGeneratorWithIgnore(object):
     """Referring Page generator, with an ignore manager."""
 
     def __init__(self, disambPage, primary=False, minimum=0, main_only=False):
-        """Constructor."""
+        """Constructor.
+
+        @type disambPage: pywikibot.Page
+        @type primary: bool
+        @type minimum: int
+        @type main_only: bool
+        @rtype: None
+
+        """
         self.disambPage = disambPage
         # if run with the -primary argument, enable the ignore manager
         self.primaryIgnoreManager = PrimaryIgnoreManager(disambPage,
@@ -423,7 +436,13 @@ class PrimaryIgnoreManager(object):
     """
 
     def __init__(self, disambPage, enabled=False):
-        """Constructor."""
+        """Constructor.
+
+        @type disambPage: pywikibot.Page
+        @type enabled: bool
+        @rtype: None
+
+        """
         self.disambPage = disambPage
         self.enabled = enabled
         self.ignorelist = []
@@ -433,7 +452,12 @@ class PrimaryIgnoreManager(object):
             self._read_ignorelist(folder)
 
     def _read_ignorelist(self, folder):
-        """Read pages to be ignored from file."""
+        """Read pages to be ignored from file.
+
+        @type folder: str
+        @rtype: None
+
+        """
         filename = os.path.join(
             folder, self.disambPage.title(as_filename=True) + '.txt')
         try:
@@ -452,11 +476,21 @@ class PrimaryIgnoreManager(object):
             pass
 
     def isIgnored(self, refPage):
-        """Return if refPage is to be ignored."""
+        """Return if refPage is to be ignored.
+
+        @type refPage: pywikibot.Page
+        @rtype: bool
+
+        """
         return self.enabled and refPage.title(asUrl=True) in self.ignorelist
 
     def ignore(self, refPage):
-        """Write page to ignorelist."""
+        """Write page to ignorelist.
+
+        @type refPage: pywikibot.Page
+        @rtype: None
+
+        """
         if self.enabled:
             # Skip this occurrence next time.
             filename = config.datafilepath(
@@ -487,7 +521,16 @@ class EditOption(StandardOption):
     """Edit the text."""
 
     def __init__(self, option, shortcut, text, start, title):
-        """Constructor."""
+        """Constructor.
+
+        @type option: str
+        @type shortcut: str
+        @type text: str
+        @type start: int
+        @type title: str
+        @rtype: None
+
+        """
         super(EditOption, self).__init__(option, shortcut)
         self._text = text
         self._start = start
@@ -495,7 +538,11 @@ class EditOption(StandardOption):
 
     @property
     def stop(self):
-        """Return whether if user didn't press cancel and changed it."""
+        """Return whether if user didn't press cancel and changed it.
+
+        @rtype: bool
+
+        """
         return self.new_text and self.new_text != self._text
 
     def result(self, value):
@@ -604,9 +651,16 @@ class DisambiguationRobot(Bot):
         return None
 
     def makeAlternativesUnique(self):
-        """Remove duplicate entries stable."""
-        unique = set(self.alternatives)
-        self.alternatives = [alt for alt in self.alternatives if alt in unique]
+        """Remove duplicate items from self.alternatives.
+
+        Preserve the order of alternatives.
+        @rtype: None
+
+        """
+        seen = set()
+        self.alternatives = [
+            i for i in self.alternatives if i not in seen and not seen.add(i)
+        ]
 
     def listAlternatives(self):
         """Show a list of alternatives."""
@@ -643,15 +697,16 @@ class DisambiguationRobot(Bot):
                                 flags=re.X)
 
     def treat(self, refPage, disambPage):
-        """
-        Treat a page.
+        """Treat a page.
 
-        Parameters:
-            disambPage - The disambiguation page or redirect we don't want
-                anything to link to
-            refPage - A page linking to disambPage
-        Returns False if the user pressed q to completely quit the program.
-        Otherwise, returns True.
+        @param disambPage: the disambiguation page or redirect we don't want
+            anything to link to
+        @type disambPage: pywikibot.Page
+        @param refPage: a page linking to disambPage
+        @type refPage: pywikibot.Page
+        @return: False if the user pressed q to completely quit the program,
+            True otherwise
+        @rtype: bool
 
         """
         # TODO: break this function up into subroutines!
@@ -904,7 +959,14 @@ class DisambiguationRobot(Bot):
         return True
 
     def findAlternatives(self, disambPage):
-        """Look for alternative links of disambiguation pages."""
+        """Extend self.alternatives using correctcap of disambPage.linkedPages.
+
+        @param disambPage: the disambiguation page
+        @type disambPage: pywikibot.Page
+        @return: True if everything goes fine, False otherwise
+        @rtype: bool
+
+        """
         if disambPage.isRedirectPage() and not self.primary:
             if (disambPage.site.lang in self.primary_redir_template and
                     self.primary_redir_template[disambPage.site.lang]
@@ -947,6 +1009,7 @@ or press enter to quit:""")
                         u"The specified page is not a redirect. Skipping.")
                     return False
         elif self.getAlternatives:
+            # not disambPage.isRedirectPage() or self.primary
             try:
                 if self.primary:
                     try:
