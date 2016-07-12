@@ -1131,30 +1131,13 @@ class TestOwnClient(TestCase):
         },
     }
 
-    def test_own_repository(self, key):
-        """Test that a data repository family is its own repository."""
-        site = self.get_site(key)
-        self.assertEqual(site, site.data_repository())
-        self.assertTrue(site.is_data_repository)
-
     def test_own_client(self, key):
         """Test that a data repository family can be its own client."""
         site = self.get_site(key)
-        self.assertTrue(site.has_data_repository)
 
-    def test_item_exists(self):
-        """Test that a ItemPage exists for wikidata:wikidata."""
-        site = self.get_site('wikidata')
         page = pywikibot.Page(site, 'Wikidata:Main Page')
         item = pywikibot.ItemPage.fromPage(page)
         self.assertEqual(item.site, site)
-
-    def test_item_not_exists(self):
-        """Test that a ItemPage does not exists for test:wikidata."""
-        site = self.get_site('wikidatatest')
-        page = pywikibot.Page(site, 'Wikidata:Main Page')
-        with self.assertRaises(pywikibot.NoPage):
-            pywikibot.ItemPage.fromPage(page)
 
 
 class TestUnconnectedClient(TestCase):
