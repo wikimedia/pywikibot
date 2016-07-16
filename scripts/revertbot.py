@@ -14,7 +14,7 @@ The following command line parameters are supported:
 """
 #
 # (C) Bryan Tong Minh, 2008
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
 # for Google Code-In 2013
@@ -75,7 +75,7 @@ class BaseRevertBot(object):
                 yield item
 
     def revert_contribs(self, callback=None):
-        """Revert contrubutions."""
+        """Revert contributions."""
         if callback is None:
             callback = self.callback
 
@@ -94,7 +94,7 @@ class BaseRevertBot(object):
                 return
 
     def callback(self, item):
-        """Callback funktion."""
+        """Callback function."""
         return 'top' in item
 
     def revert(self, item):
@@ -146,12 +146,18 @@ class myRevertBot(BaseRevertBot):
     """Example revert bot."""
 
     def callback(self, item):
-        """Callback funktion for 'private' revert bot."""
+        """Callback function for 'private' revert bot.
+
+        @param item: an item from user contributions
+        @type item: dict
+        @rtype: bool
+
+        """
         if 'top' in item:
             page = pywikibot.Page(self.site, item['title'])
             text = page.get(get_redirect=True)
             pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
-            return pattern.search(text) >= 0
+            return bool(pattern.search(text))
         return False
 
 
