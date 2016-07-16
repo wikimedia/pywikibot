@@ -71,7 +71,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -651,9 +651,16 @@ class DisambiguationRobot(Bot):
         return None
 
     def makeAlternativesUnique(self):
-        """Remove duplicate entries stable."""
-        unique = set(self.alternatives)
-        self.alternatives = [alt for alt in self.alternatives if alt in unique]
+        """Remove duplicate items from self.alternatives.
+
+        Preserve the order of alternatives.
+        @rtype: None
+
+        """
+        seen = set()
+        self.alternatives = [
+            i for i in self.alternatives if i not in seen and not seen.add(i)
+        ]
 
     def listAlternatives(self):
         """Show a list of alternatives."""
@@ -954,7 +961,7 @@ class DisambiguationRobot(Bot):
     def findAlternatives(self, disambPage):
         """Extend self.alternatives using correctcap of disambPage.linkedPages.
 
-        @param disambPage: the disabiguation page
+        @param disambPage: the disambiguation page
         @type disambPage: pywikibot.Page
         @return: True if everything goes fine, False otherwise
         @rtype: bool
@@ -1002,6 +1009,7 @@ or press enter to quit:""")
                         u"The specified page is not a redirect. Skipping.")
                     return False
         elif self.getAlternatives:
+            # not disambPage.isRedirectPage() or self.primary
             try:
                 if self.primary:
                     try:
