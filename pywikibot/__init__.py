@@ -744,6 +744,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @param url: Instead of code and fam, does try to get a Site based on the
         URL. Still requires that the family supporting that URL exists.
     @type url: string
+    @rtype: pywikibot.site.APISite
+
     """
     # Either code and fam or only url
     if url and (code or fam):
