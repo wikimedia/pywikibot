@@ -99,7 +99,7 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 }}
 |
 (?P<unhandled_depth>{{\s*[^{\|#0-9][^{\|#]*?\s* [^{]* {{ .* }})
-""", re.VERBOSE)
+""", re.VERBOSE | re.DOTALL)
 
 # The following regex supports wikilinks anywhere after the first pipe
 # and correctly matches the end of the file link if the wikilink contains
