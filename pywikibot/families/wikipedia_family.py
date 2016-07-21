@@ -79,7 +79,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'om', 'chy', 'rmy', 'cu', 'tw', 'tn', 'tum', 'xh', 'rn', 'pih',
             'bi', 'got', 'ss', 'pnt', 'ch', 'bm', 'ts', 'ady', 'iu', 'ee', 'ny',
             'st', 'ks', 'fj', 'ak', 'ik', 'sg', 've', 'dz', 'ff', 'ti', 'cr',
-            'jam',
+            'jam', 'tcy',
         ]
 
         # Sites we want to edit but not count as real languages
