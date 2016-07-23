@@ -153,6 +153,7 @@ cfd_templates = {
                u'yhdistettäväLuokka'],
         'he': [u'הצבעת מחיקה', u'למחוק'],
         'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2'],
+        'cs': ['Přejmenovat kategorii', 'Přesunout kategorii', 'Přejmenování kategorie'],
         # For testing purposes
         'test': [u'delete']
     },
