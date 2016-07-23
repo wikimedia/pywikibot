@@ -637,6 +637,16 @@ class TestTemplateParams(TestCase):
         self.assertIsNotNone(m.group('unhandled_depth'))
         self.assertTrue(m.group(0).endswith('foo {{bar}}'))
 
+        m = func('{{a|\n{{c|{{d|}} }}\n| foo  = bar }} foo {{bar}} baz')
+        self.assertIsNotNone(m)
+        self.assertIsNotNone(m.group(0))
+        self.assertIsNone(m.group('name'))
+        self.assertIsNone(m.group(1))
+        self.assertIsNone(m.group('params'))
+        self.assertIsNone(m.group(2))
+        self.assertIsNotNone(m.group('unhandled_depth'))
+        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+
 
 class TestGenericTemplateParams(PatchingTestCase):
 
