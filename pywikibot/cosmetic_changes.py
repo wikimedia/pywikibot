@@ -226,8 +226,7 @@ class CosmeticChangesToolkit(object):
             self.replaceDeprecatedTemplates,
             # FIXME: fix bugs and re-enable
             # self.resolveHtmlEntities,
-            # FIXME: fix bugs with nested templates and re-enable
-            # self.removeUselessSpaces,
+            self.removeUselessSpaces,
             self.removeNonBreakingSpaceBeforePercent,
 
             self.fixHtml,
