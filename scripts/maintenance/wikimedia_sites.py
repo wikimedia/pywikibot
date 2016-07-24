@@ -14,18 +14,14 @@ __version__ = '$Id$'
 
 import codecs
 import re
-import sys
+
+import requests
 
 from xml.etree import cElementTree
 
 import pywikibot
 
 from pywikibot.family import Family
-
-if sys.version_info[0] > 2:
-    from urllib.request import urlopen
-else:
-    from urllib import urlopen
 
 URL = 'https://wikistats.wmflabs.org/api.php?action=dump&table=%s&format=xml'
 
@@ -52,7 +48,7 @@ def update_family(families):
         original = Family.load(family).languages_by_size
         obsolete = Family.load(family).obsolete
 
-        feed = urlopen(URL % familiesDict[family])
+        feed = requests.get(URL % familiesDict[family])
         tree = cElementTree.parse(feed)
 
         new = []
