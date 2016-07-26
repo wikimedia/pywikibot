@@ -18,13 +18,21 @@ else:
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 
-SQL_RESPONSE = """
+SQL_RESPONSE_CONTAINER = """
 {
   "head" : {
     "vars" : [ "cat", "d", "catLabel" ]
   },
   "results" : {
-    "bindings" : [ {
+    "bindings" : [
+      %s
+    ]
+  }
+}
+"""
+
+ITEM_Q498787 = """
+    {
       "cat" : {
         "type" : "uri",
         "value" : "http://www.wikidata.org/entity/Q498787"
@@ -39,7 +47,11 @@ SQL_RESPONSE = """
         "type" : "literal",
         "value" : "Muezza"
       }
-    }, {
+    }
+"""
+
+ITEM_Q677525 = """
+    {
       "cat" : {
         "type" : "uri",
         "value" : "http://www.wikidata.org/entity/Q677525"
@@ -54,9 +66,7 @@ SQL_RESPONSE = """
         "type" : "literal",
         "value" : "Orangey"
       }
-    } ]
-  }
-}
+    }
 """
 
 RESPONSE_TRUE = """
@@ -90,7 +100,8 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testQuerySelect(self, mock_method):
         """Test SELECT query."""
-        mock_method.return_value = Container(SQL_RESPONSE)
+        mock_method.return_value = Container(
+            SQL_RESPONSE_CONTAINER % ("%s, %s" % (ITEM_Q498787, ITEM_Q677525)))
         q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }')
         self.assertIsInstance(res, list, 'Result is not a list')
@@ -108,7 +119,8 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testQuerySelectFull(self, mock_method):
         """Test SELECT query with full data."""
-        mock_method.return_value = Container(SQL_RESPONSE)
+        mock_method.return_value = Container(
+            SQL_RESPONSE_CONTAINER % ("%s, %s" % (ITEM_Q498787, ITEM_Q677525)))
         q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }', full_data=True)
         self.assertIsInstance(res, list, 'Result is not a list')
@@ -130,10 +142,16 @@ class TestSparql(TestCase):
     @patch.object(sparql.http, 'fetch')
     def testGetItems(self, mock_method):
         """Test item list retrieval via SPARQL."""
-        mock_method.return_value = Container(SQL_RESPONSE)
+        mock_method.return_value = Container(
+            SQL_RESPONSE_CONTAINER % ("%s, %s, %s" % (ITEM_Q498787,
+                                                      ITEM_Q677525,
+                                                      ITEM_Q677525)))
         q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
         self.assertSetEqual(res, set(['Q498787', 'Q677525']))
+        res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat',
+                          result_type=list)
+        self.assertEqual(res, ['Q498787', 'Q677525', 'Q677525'])
 
     @patch.object(sparql.http, 'fetch')
     def testQueryAsk(self, mock_method):

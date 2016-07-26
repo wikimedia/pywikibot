@@ -2665,12 +2665,17 @@ def WikidataQueryPageGenerator(query, site=None):
     return WikidataPageFromItemGenerator(items_pages, site)
 
 
-def WikidataSPARQLPageGenerator(query, site=None, item_name='item', endpoint=None):
+def WikidataSPARQLPageGenerator(query, site=None,
+                                item_name='item', endpoint=None,
+                                result_type=set):
     """Generate pages that result from the given SPARQL query.
 
     @param query: the SPARQL query string.
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
+    @param result_type: type of the iterable in which
+             SPARQL results are stored (default set)
+    @type result_type: iterable
 
     """
     from pywikibot.data import sparql
@@ -2682,7 +2687,9 @@ def WikidataSPARQLPageGenerator(query, site=None, item_name='item', endpoint=Non
         endpoint = sparql.WIKIDATA
 
     query_object = sparql.SparqlQuery(endpoint=endpoint)
-    data = query_object.get_items(query, item_name=item_name)
+    data = query_object.get_items(query,
+                                  item_name=item_name,
+                                  result_type=result_type)
     items_pages = (pywikibot.ItemPage(repo, item) for item in data)
     if isinstance(site, pywikibot.site.DataSite):
         return items_pages

@@ -103,21 +103,24 @@ class SparqlQuery(object):
         data = self.query(query, headers=headers)
         return data['boolean']
 
-    def get_items(self, query, item_name='item'):
+    def get_items(self, query, item_name='item', result_type=set):
         """
-        Retrieve set of items which satisfy given query.
+        Retrieve items which satisfy given query.
 
         Items are returned as Wikibase IDs.
 
         @param query: Query string. Must contain ?{item_name} as one of the projected values.
         @param item_name: Name of the value to extract
-        @return: Set of item ids, e.g. Q1234
-        @rtype: set
+        @param result_type: type of the iterable in which
+              SPARQL results are stored (default set)
+        @type result_type: iterable
+        @return: item ids, e.g. Q1234
+        @rtype: same as result_type
         """
         res = self.select(query, full_data=True)
         if res:
-            return set([r[item_name].getID() for r in res])
-        return set()
+            return result_type(r[item_name].getID() for r in res)
+        return result_type()
 
 
 class URI(object):
