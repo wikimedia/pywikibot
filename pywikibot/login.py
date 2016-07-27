@@ -386,7 +386,7 @@ class OauthLoginManager(LoginManager):
     @property
     def consumer_token(self):
         """
-        OAuth consumer key token and secret token.
+        Return OAuth consumer key token and secret token.
 
         @rtype: tuple of two str
         """
@@ -395,7 +395,7 @@ class OauthLoginManager(LoginManager):
     @property
     def access_token(self):
         """
-        OAuth access key token and secret token.
+        Return OAuth access key token and secret token.
 
         @rtype: tuple of two str
         """

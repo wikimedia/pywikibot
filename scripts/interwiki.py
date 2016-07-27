@@ -749,7 +749,7 @@ class PageTree(object):
             pass
 
     def __len__(self):
-        """length of the object."""
+        """Length of the object."""
         return self.size
 
     def add(self, page):
