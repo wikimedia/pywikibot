@@ -581,7 +581,7 @@ class DryFactoryGeneratorTest(TestCase):
         self.assertEqual(gf.namespaces, set([1, 6]))
 
     def test_immutable_namespaces_on_read(self):
-        """test immutable namespaces on read."""
+        """Test immutable namespaces on read."""
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
         gf.handleArg('-ns:1,6')
         self.assertEqual(gf.namespaces, set([1, 6]))

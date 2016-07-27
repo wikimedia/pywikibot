@@ -2412,7 +2412,7 @@ class TestNonEnglishWikipediaSite(TestCase):
     cached = True
 
     def testNamespaceAliases(self):
-        """test namespace aliases."""
+        """Test namespace aliases."""
         site = self.get_site()
 
         namespaces = site.namespaces

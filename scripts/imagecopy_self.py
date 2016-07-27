@@ -989,7 +989,7 @@ class uploader(threading.Thread):
             imagepage.put(imtxt + addTemplate, comment=commentText)
 
     def replaceUsage(self, imagepage, filename):
-        """replace all usage if image is uploaded under a different name."""
+        """Replace all usage if image is uploaded under a different name."""
         if imagepage.title(withNamespace=False) != filename:
             gen = pagegenerators.FileLinksGenerator(imagepage)
             preloadingGen = pagegenerators.PreloadingGenerator(gen)
