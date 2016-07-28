@@ -7371,7 +7371,7 @@ class DataSite(APISite):
 
     @must_be(group='user')
     @deprecated_args(ignoreconflicts='ignore_conflicts')
-    def mergeItems(self, fromItem, toItem, ignore_conflicts=False,
+    def mergeItems(self, fromItem, toItem, ignore_conflicts=None,
                    summary=None, bot=True):
         """
         Merge two items together.
@@ -7380,8 +7380,10 @@ class DataSite(APISite):
         @type fromItem: pywikibot.ItemPage
         @param toItem: Item to merge into
         @type toItem: pywikibot.ItemPage
-        @param ignore_conflicts: Whether to ignore conflicts
-        @type ignore_conflicts: bool
+        @param ignore_conflicts: Which type of conflicts
+            ('description', 'sitelink', and 'statement')
+            should be ignored
+        @type ignore_conflicts: list of str
         @param summary: Edit summary
         @type summary: str
         @param bot: Whether to mark the edit as a bot edit
