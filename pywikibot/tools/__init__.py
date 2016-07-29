@@ -1057,15 +1057,15 @@ def open_archive(filename, mode='rb', use_extension=True):
                                        stderr=subprocess.PIPE,
                                        bufsize=65535)
         except OSError:
-            raise ValueError('7za is not installed and can not '
+            raise ValueError('7za is not installed or cannot '
                              'uncompress "{0}"'.format(filename))
         else:
             stderr = process.stderr.read()
             process.stderr.close()
-            if b'Everything is Ok' not in stderr:
+            if stderr != b'':
                 process.stdout.close()
-                # OSError is also raised when bz2 is invalid
-                raise OSError('Invalid 7z archive.')
+                raise OSError(
+                    'Unexpected STDERR output from 7za {0}'.format(stderr))
             else:
                 return process.stdout
     else:
