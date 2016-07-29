@@ -7372,7 +7372,7 @@ class DataSite(APISite):
     @must_be(group='user')
     @deprecated_args(ignoreconflicts='ignore_conflicts')
     def mergeItems(self, fromItem, toItem, ignore_conflicts=False,
-                   summary=None):
+                   summary=None, bot=True):
         """
         Merge two items together.
 
@@ -7384,6 +7384,8 @@ class DataSite(APISite):
         @type ignore_conflicts: bool
         @param summary: Edit summary
         @type summary: str
+        @param bot: Whether to mark the edit as a bot edit
+        @type bot: bool
         @return: dict API output
         @rtype: dict
         """
@@ -7395,7 +7397,8 @@ class DataSite(APISite):
             'token': self.tokens['edit'],
             'summary': summary,
         }
-
+        if bot:
+            params['bot'] = 1
         req = self._simple_request(**params)
         data = req.submit()
         return data
