@@ -5706,7 +5706,7 @@ class APISite(BaseSite):
 
         upload_warnings = {
             # map API warning codes to user error messages
-            # %(msg)s will be replaced by message string from API responsse
+            # %(msg)s will be replaced by message string from API response
             'duplicate-archive': "The file is a duplicate of a deleted file %(msg)s.",
             'was-deleted': "The file %(msg)s was previously deleted.",
             'emptyfile': "File %(msg)s is empty.",
@@ -5716,6 +5716,8 @@ class APISite(BaseSite):
             'filetype-unwanted-type': "File %(msg)s type is unwanted type.",
             'exists-normalized': 'File exists with different extension as '
                                  '"%(msg)s".',
+            'bad-prefix': 'Target filename has a bad prefix %(msg)s.',
+            'page-exists': 'Target filename exists but with a different file %(msg)s.',
         }
 
         # An offset != 0 doesn't make sense without a file key
@@ -5877,6 +5879,8 @@ class APISite(BaseSite):
                             if error.code == u'uploaddisabled':
                                 self._uploaddisabled = True
                             raise error
+                        if 'nochange' in data:  # in simulation mode
+                            break
                         _file_key = data['filekey']
                         if 'warnings' in data and not ignore_all_warnings:
                             if callable(ignore_warnings):
