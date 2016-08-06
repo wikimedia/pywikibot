@@ -3003,7 +3003,12 @@ class LoginManager(login.LoginManager):
 
         Parameters are all ignored.
 
-        @return: cookie data if successful, None otherwise.
+        Note, this doesn't actually return or do anything with cookies.
+        The threadedhttp module takes care of all the cookie stuff,
+        this just has a legacy name for now and should be renamed in the
+        future.
+
+        @return: empty string if successful, throws exception on failure
 
         """
         if hasattr(self, '_waituntil'):
@@ -3030,14 +3035,7 @@ class LoginManager(login.LoginManager):
             if u"login" not in login_result:
                 raise RuntimeError("API login response does not have 'login' key.")
             if login_result['login']['result'] == "Success":
-                prefix = login_result['login']['cookieprefix']
-                cookies = []
-                for key in ('Token', 'UserID', 'UserName'):
-                    cookies.append("%s%s=%s"
-                                   % (prefix, key,
-                                      login_result['login']['lg' + key.lower()]))
-                self.username = login_result['login']['lgusername']
-                return "\n".join(cookies)
+                return ''
             elif login_result['login']['result'] == "NeedToken":
                 # Kept for backwards compatibility
                 token = login_result['login']['token']
