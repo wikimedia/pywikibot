@@ -45,14 +45,14 @@ class TestReplacementsMain(TWNBotTestCase):
 
             changed_pages = -42  # show that weird number to show this was used
 
-            def __init__(inner_self, *args, **kwargs):
+            def __init__(inner_self, *args, **kwargs):  # flake8: disable=N805
                 # Unpatch already here, as otherwise super calls will use
                 # this class' super which is the class itself
                 replace.ReplaceRobot = self._original_bot
                 super(FakeReplaceBot, inner_self).__init__(*args, **kwargs)
                 self.bots.append(inner_self)
 
-            def run(inner_self):
+            def run(inner_self):  # flake8: disable=N805
                 """Nothing to do here."""
                 inner_self.changed_pages = -47  # show that run was called
 

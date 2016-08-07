@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the tools.MediaWikiVersion class."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,7 +10,7 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
 
-from pywikibot.tools import MediaWikiVersion as V
+from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, TestCase
 
@@ -23,7 +23,7 @@ class TestMediaWikiVersion(TestCase):
 
     def _make(self, version):
         """Create a MediaWikiVersion instance and check that the str stays."""
-        v = V(version)
+        v = MediaWikiVersion(version)
         self.assertEqual(str(v), version)
         return v
 
@@ -74,17 +74,18 @@ class TestMediaWikiVersion(TestCase):
 
     def test_invalid_versions(self):
         """Verify that insufficient version fail creating."""
-        self.assertRaises(ValueError, V, 'invalid')
-        self.assertRaises(ValueError, V, '1number')
-        self.assertRaises(ValueError, V, '1.missing')
+        self.assertRaises(ValueError, MediaWikiVersion, 'invalid')
+        self.assertRaises(ValueError, MediaWikiVersion, '1number')
+        self.assertRaises(ValueError, MediaWikiVersion, '1.missing')
 
-        self.assertRaises(AssertionError, V, '1.23wmf-1')
+        self.assertRaises(AssertionError, MediaWikiVersion, '1.23wmf-1')
 
     def test_generator(self):
         """Test from_generator classmethod."""
-        self.assertEqual(V.from_generator('MediaWiki 1.2.3'),
+        self.assertEqual(MediaWikiVersion.from_generator('MediaWiki 1.2.3'),
                          self._make('1.2.3'))
-        self.assertRaises(ValueError, V.from_generator, 'Invalid 1.2.3')
+        self.assertRaises(ValueError, MediaWikiVersion.from_generator,
+                          'Invalid 1.2.3')
 
 
 if __name__ == '__main__':  # pragma: no cover

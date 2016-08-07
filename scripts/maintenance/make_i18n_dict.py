@@ -43,7 +43,7 @@ import os
 from pywikibot import config
 
 
-class i18nBot(object):
+class i18nBot(object):  # flake8: disable=N801
 
     """I18n bot."""
 
