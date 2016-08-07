@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -106,6 +106,15 @@ class TestProofreadPageValidSite(TestCase):
         'title1': 'User:Popular Science Monthly Volume 1.djvu/12'
     }
 
+    class_pagetext_fmt = {
+        True: ('<div class="pagetext">\n\n\n', '</div>'),
+        False: ('', ''),
+    }
+
+    fmt = ('<noinclude><pagequality level="1" user="{user}" />'
+           '{class_pagetext}</noinclude>'
+           '<noinclude>{references}{div_end}</noinclude>')
+
     def test_valid_site_source(self):
         """Test ProofreadPage from valid Site as source."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
@@ -167,21 +176,26 @@ class TestProofreadPageValidSite(TestCase):
     def test_preload_from_not_existing_page(self):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
+        # Fetch page text to instantiate page._full_header, in order to allow
+        # for proper test result preparation.
+        page.text
+        class_pagetext, div = self.class_pagetext_fmt[page._full_header._has_div]
         self.assertEqual(page.text,
-                         '<noinclude><pagequality level="1" user="%s" />'
-                         '<div class="pagetext">\n\n\n</noinclude>'
-                         '<noinclude><references/></div></noinclude>'
-                         % self.site.username())
+                         self.fmt.format(user=self.site.username(),
+                                         class_pagetext=class_pagetext,
+                                         references='<references/>',
+                                         div_end=div))
 
     def test_preload_from_empty_text(self):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
         page.text = ''
+        class_pagetext, div = self.class_pagetext_fmt[page._full_header._has_div]
         self.assertEqual(page.text,
-                         '<noinclude><pagequality level="1" user="%s" />'
-                         '<div class="pagetext">\n\n\n</noinclude>'
-                         '<noinclude></div></noinclude>'
-                         % self.site.username())
+                         self.fmt.format(user=self.site.username(),
+                                         class_pagetext=class_pagetext,
+                                         references='',
+                                         div_end=div))
 
     def test_json_format(self):
         """Test conversion to json format."""
