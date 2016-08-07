@@ -1932,7 +1932,7 @@ class TimeStripper(object):
                 line = line.replace(system[i], str(i))
         return line
 
-    def last_match_and_replace(self, txt, pat):
+    def _last_match_and_replace(self, txt, pat):
         """
         Take the rightmost match and replace with marker.
 
@@ -1943,8 +1943,17 @@ class TimeStripper(object):
         for m in pat.finditer(txt):
             cnt += 1
 
+        def marker(m):
+            """
+            Replace exactly the same number of matched characters.
+
+            Same number of chars shall be replaced, in order to be able to
+            compare pos for matches reliably (absolute pos of a match
+            is not altered by replacement).
+            """
+            return '@' * (m.end() - m.start())
+
         if m:
-            marker = findmarker(txt)
             # month and day format might be identical (e.g. see bug T71315),
             # avoid to wipe out day, after month is matched.
             # replace all matches but the last two
@@ -1957,9 +1966,29 @@ class TimeStripper(object):
                     txt = pat.sub(marker, txt)
             else:
                 txt = pat.sub(marker, txt)
-            return (txt, m.groupdict())
+            return (txt, m)
         else:
             return (txt, None)
+
+    @staticmethod
+    def _valid_date_dict_order(dateDict):
+        """Check consistency of reasonable positions for groups."""
+        day_pos = dateDict['day']['pos']
+        month_pos = dateDict['month']['pos']
+        year_pos = dateDict['year']['pos']
+        time_pos = dateDict['time']['pos']
+        tzinfo_pos = dateDict['tzinfo']['pos']
+
+        date_pos = sorted((day_pos, month_pos, year_pos))
+        min_pos, max_pos = date_pos[0], date_pos[-1]
+
+        if tzinfo_pos < min_pos or tzinfo_pos < time_pos:
+            return False
+        if min_pos < tzinfo_pos < max_pos:
+            return False
+        if min_pos < time_pos < max_pos:
+            return False
+        return True
 
     def timestripper(self, line):
         """
@@ -1979,7 +2008,7 @@ class TimeStripper(object):
         for comment in self.comment_pattern.finditer(line):
             # Recursion levels can be maximum two. If a comment is found, it will
             # not for sure be found in the next level.
-            # Nested cmments are excluded by design.
+            # Nested comments are excluded by design.
             timestamp = self.timestripper(comment.group(1))
             most_recent.append(timestamp)
 
@@ -1990,32 +2019,41 @@ class TimeStripper(object):
 
         line = self.fix_digits(line)
         for pat in self.patterns:
-            line, matchDict = self.last_match_and_replace(line, pat)
-            if matchDict:
-                dateDict.update(matchDict)
+            line, match_obj = self._last_match_and_replace(line, pat)
+            if match_obj:
+                for group, value in match_obj.groupdict().items():
+                    pos = match_obj.start(group)
+                    # Store also match pos in line, for later order check.
+                    matchDict = {group: {'value': value, 'pos': pos}}
+                    dateDict.update(matchDict)
 
         # all fields matched -> date valid
-        if all(g in dateDict for g in self.groups):
-            # remove 'time' key, now split in hour/minute and not needed by datetime
+        # groups are in a reasonable order.
+        if (all(g in dateDict for g in self.groups) and
+                self._valid_date_dict_order(dateDict)):
+            # remove 'time' key, now split in hour/minute and not needed
+            # by datetime.
             del dateDict['time']
 
             # replace month name in original language with month number
             try:
-                dateDict['month'] = self.origNames2monthNum[dateDict['month']]
+                value = self.origNames2monthNum[dateDict['month']['value']]
             except KeyError:
                 pywikibot.output(u'incorrect month name "%s" in page in site %s'
-                                 % (dateDict['month'], self.site))
+                                 % (dateDict['month']['value'], self.site))
                 raise KeyError
+            else:
+                dateDict['month']['value'] = value
 
-            # convert to integers
+            # convert to integers and remove the inner dict
             for k, v in dateDict.items():
                 if k == 'tzinfo':
                     continue
                 try:
-                    dateDict[k] = int(v)
+                    dateDict[k] = int(v['value'])
                 except ValueError:
                     raise ValueError('Value: %s could not be converted for key: %s.'
-                                     % (v, k))
+                                     % (v['value'], k))
 
             # find timezone
             dateDict['tzinfo'] = self.tzinfo
