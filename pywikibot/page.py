@@ -1958,7 +1958,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             warn(u'"unprotect" argument of protect() is deprecated',
                  DeprecationWarning, 2)
             protections = dict(
-                [(p_type, "") for p_type in self.applicable_protections()])
+                (p_type, "") for p_type in self.applicable_protections())
         answer = 'y'
         if called_using_deprecated_arg and prompt is None:
             prompt = True
@@ -2160,7 +2160,7 @@ class Page(BasePage):
         """
         # WARNING: may not return all templates used in particularly
         # intricate cases such as template substitution
-        titles = list(t.title() for t in self.templates())
+        titles = [t.title() for t in self.templates()]
         templates = textlib.extract_templates_and_params(self.text)
         # backwards-compatibility: convert the dict returned as the second
         # element into a list in the format used by old scripts

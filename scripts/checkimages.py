@@ -548,8 +548,8 @@ class checkImagesBot(object):
         self.com = i18n.translate(self.site, msg_comm10, fallback=True)
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         self.hiddentemplates = set(
-            [pywikibot.Page(self.site, tmp, ns=self.site.namespaces.TEMPLATE)
-             for tmp in hiddentemplatesRaw])
+            pywikibot.Page(self.site, tmp, ns=self.site.namespaces.TEMPLATE)
+            for tmp in hiddentemplatesRaw)
         self.pageHidden = i18n.translate(self.site, PageWithHiddenTemplates)
         self.pageAllowed = i18n.translate(self.site, PageWithAllowedTemplates)
         self.comment = i18n.twtranslate(self.site.lang,

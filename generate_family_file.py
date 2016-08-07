@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 #
 # (C) Merlijn van Deen, 2010-2013
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license
 #
@@ -81,7 +81,7 @@ class FamilyFileGenerator(object):
         print("Determining other languages...", end="")
         try:
             self.langs = w.langs
-            print(u' '.join(sorted([wiki[u'prefix'] for wiki in self.langs])))
+            print(' '.join(sorted(wiki['prefix'] for wiki in self.langs)))
         except Exception as e:
             self.langs = []
             print(e, "; continuing...")

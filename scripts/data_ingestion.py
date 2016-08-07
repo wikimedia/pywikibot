@@ -8,7 +8,7 @@ usage:
     python pwb.py data_ingestion -csvdir:local_dir/ -page:config_page
 """
 #
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2013-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -105,9 +105,8 @@ class Photo(pywikibot.FilePage):
         """
         hashObject = hashlib.sha1()
         hashObject.update(self.downloadPhoto().getvalue())
-        return list(
-            page.title(withNamespace=False) for page in
-            self.site.allimages(sha1=base64.b16encode(hashObject.digest())))
+        return [page.title(withNamespace=False) for page in
+                self.site.allimages(sha1=base64.b16encode(hashObject.digest()))]
 
     def getTitle(self, fmt):
         """

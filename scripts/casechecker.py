@@ -172,22 +172,20 @@ class CaseChecker(object):
                 self.titleList = [self.Page(t) for t in f]
             self.failedTitles += '.failed'
 
-        self.lclToLatDict = dict([(ord(self.localSuspects[i]),
-                                   self.latinSuspects[i])
-                                  for i in xrange(len(self.localSuspects))])
-        self.latToLclDict = dict([(ord(self.latinSuspects[i]),
-                                   self.localSuspects[i])
-                                  for i in xrange(len(self.localSuspects))])
+        self.lclToLatDict = dict(
+            (ord(self.localSuspects[i]), self.latinSuspects[i])
+            for i in xrange(len(self.localSuspects)))
+        self.latToLclDict = dict(
+            (ord(self.latinSuspects[i]), self.localSuspects[i])
+            for i in xrange(len(self.localSuspects)))
 
         if self.localKeyboard is not None:
             self.lclToLatKeybDict = dict(
-                [(ord(self.localKeyboard[i]),
-                  self.latinKeyboard[i])
-                 for i in xrange(len(self.localKeyboard))])
+                (ord(self.localKeyboard[i]), self.latinKeyboard[i])
+                for i in xrange(len(self.localKeyboard)))
             self.latToLclKeybDict = dict(
-                [(ord(self.latinKeyboard[i]),
-                  self.localKeyboard[i])
-                 for i in xrange(len(self.localKeyboard))])
+                (ord(self.latinKeyboard[i]), self.localKeyboard[i])
+                for i in xrange(len(self.localKeyboard)))
         else:
             self.lclToLatKeybDict = {}
             self.latToLclKeybDict = {}
@@ -467,9 +465,9 @@ class CaseChecker(object):
         badWords = list(self.FindBadWords(title))
         if len(badWords) > 0:
             # Allow known words, allow any roman numerals with local suffixes
-            badWords = set([i for i in badWords
-                            if i not in self.knownWords and
-                            self.romanNumSfxPtrn.match(i) is not None])
+            badWords = set(i for i in badWords
+                           if i not in self.knownWords and
+                           self.romanNumSfxPtrn.match(i) is not None)
 
         if len(badWords) == 0 or self.Page(title).isImage():
             return

@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1049,8 +1049,8 @@ class ParamInfo(Container):
         if not self._with_limits:
             self.fetch(self.submodules('query', True))
             self._with_limits = frozenset(
-                [mod for mod in self.query_modules
-                 if self.parameter('query+' + mod, 'limit')])
+                mod for mod in self.query_modules
+                if self.parameter('query+' + mod, 'limit'))
         return self._with_limits
 
 
@@ -1907,8 +1907,8 @@ class Request(MutableMapping):
                 modules = set([self.action])
             if modules:
                 self.site._paraminfo.fetch(modules)
-                use_get = all(['mustbeposted' not in self.site._paraminfo[mod]
-                               for mod in modules])
+                use_get = all('mustbeposted' not in self.site._paraminfo[mod]
+                              for mod in modules)
             else:
                 # If modules is empty, just 'meta' was given, which doesn't
                 # require POSTs, and is required for ParamInfo

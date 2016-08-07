@@ -40,8 +40,8 @@ class TestArchiveBot(TestCase):
     """Test archivebot script on 40+ Wikipedia sites."""
 
     family = 'wikipedia'
-    sites = dict([(code, {'family': 'wikipedia', 'code': code})
-                 for code in THREADS])
+    sites = dict((code, {'family': 'wikipedia', 'code': code})
+                 for code in THREADS)
 
     cached = True
 
@@ -107,8 +107,8 @@ class TestArchiveBotAfterDateUpdate(TestCase):
     """
 
     family = 'wikipedia'
-    sites = dict([(code, {'family': 'wikipedia', 'code': code})
-                 for code in THREADS_WITH_UPDATED_FORMAT])
+    sites = dict((code, {'family': 'wikipedia', 'code': code})
+                 for code in THREADS_WITH_UPDATED_FORMAT)
 
     cached = True
 

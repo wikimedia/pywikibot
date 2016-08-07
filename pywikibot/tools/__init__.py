@@ -560,8 +560,8 @@ class ThreadedGenerator(threading.Thread):
 
     def run(self):
         """Run the generator and store the results on the queue."""
-        iterable = any([hasattr(self.generator, key)
-                        for key in ['__iter__', '__getitem__']])
+        iterable = any(hasattr(self.generator, key)
+                       for key in ('__iter__', '__getitem__'))
         if iterable and not self.args and not self.kwargs:
             self.__gen = self.generator
         else:
