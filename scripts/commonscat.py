@@ -143,6 +143,7 @@ commonscatTemplates = {
     'sl': (u'Kategorija v Zbirki',
            [u'Commonscat', u'Kategorija v zbirki', u'Commons cat',
             u'Katzbirke']),
+    'sq': (u'Commonscat', [u'Commonskat', u'Commonsart', u'CommonsCat']),
     'sv': (u'Commonscat',
            [u'Commonscat-rad', u'Commonskat', u'Commons cat', u'Commonscatbox',
             u'Commonscat-box']),
