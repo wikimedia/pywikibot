@@ -202,7 +202,7 @@ class ProofreadPage(pywikibot.Page):
             return self._quality
         return self.ql
 
-    def decompose(fn):
+    def decompose(fn):  # flake8: disable=N805
         """Decorator.
 
         Decompose text if needed and recompose text.
@@ -499,7 +499,7 @@ class IndexPage(pywikibot.Page):
 
         self._cached = False
 
-    def check_if_cached(fn):
+    def check_if_cached(fn):  # flake8: disable=N805
         """Decorator to check if data are cached and cache them if needed."""
         def wrapper(self, *args, **kwargs):
             if self._cached is False:

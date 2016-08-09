@@ -141,7 +141,7 @@ class BaseRevertBot(object):
         pywikibot.output(msg)
 
 
-class myRevertBot(BaseRevertBot):
+class RevertBot(BaseRevertBot):
 
     """Example revert bot."""
 
@@ -159,6 +159,9 @@ class myRevertBot(BaseRevertBot):
             pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
             return bool(pattern.search(text))
         return False
+
+
+myRevertBot = RevertBot  # for compatibility only
 
 
 def main(*args):
