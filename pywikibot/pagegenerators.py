@@ -2517,26 +2517,61 @@ def MySQLPageGenerator(query, site=None, verbose=None):
 
 class XMLDumpOldPageGenerator(IteratorNextMixin):
 
-    """Xml generator that yields Page objects with old text loaded."""
+    """
+    Xml generator that yields Page objects with old text loaded.
+
+    @param filename: filename of XML dump
+    @type filename: str
+    @param start: skip entries below that value
+    @type start: str or None
+    @param namespaces: namespace filter
+    @type identifiers: iterable of basestring or Namespace key,
+        or a single instance of those types
+    @param site: current site for the generator
+    @type site: pywikibot.Site or None
+    @param text_predicate: a callable with entry.text as parameter and boolean
+        as result to indicate the generator should return the page or not
+    @type text_predicate: function identifier or None
+
+    @ivar text_predicate: holds text_predicate function
+    @ivar skipping: True if start parameter is given, else False
+    @ivar start: holds start parameter
+    @ivar namespaces: holds namespaces filter
+    @ivar parser: holds the xmlreader.XmlDump parse method
+    """
 
     @deprecated_args(xmlFilename='filename', xmlStart='start')
-    def __init__(self, filename, start=None, namespaces=[], site=None,
+    def __init__(self, filename, start=None, namespaces=None, site=None,
                  text_predicate=None):
         """Constructor."""
-        # xmlFilename and xmlStart mapped to not break git blame
-        # use filename and start on new/changed lines
-        xmlFilename = filename
-        xmlStart = start
-
         self.text_predicate = text_predicate
 
-        self.xmlStart = xmlStart
-        self.namespaces = namespaces
-        self.skipping = bool(xmlStart)
-        self.site = site or pywikibot.Site()
+        self.skipping = bool(start)
+        if self.skipping:
+            self.start = start.replace('_', ' ')
+        else:
+            self.start = None
 
-        dump = xmlreader.XmlDump(xmlFilename)
+        self.site = site or pywikibot.Site()
+        if not namespaces:
+            self.namespaces = self.site.namespaces
+        else:
+            self.namespaces = self.site.namespaces.resolve(namespaces)
+
+        dump = xmlreader.XmlDump(filename)
         self.parser = dump.parse()
+
+    @property
+    @deprecated('self.start')
+    def xmlStart(self):
+        """Getter for deprecated xmlStart instance variable."""
+        return self.start
+
+    @xmlStart.setter
+    @deprecated('self.start')
+    def xmlStart(self, value):
+        """Setter for deprecated xmlStart instance variable."""
+        self.start = value
 
     def __next__(self):
         """Get next Page."""
@@ -2546,13 +2581,12 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
             except StopIteration:
                 raise
             if self.skipping:
-                if entry.title != self.xmlStart:
+                if entry.title < self.start:
                     continue
                 self.skipping = False
             page = pywikibot.Page(self.site, entry.title)
-            if not self.namespaces == []:
-                if page.namespace() not in self.namespaces:
-                    continue
+            if page.namespace() not in self.namespaces:
+                continue
             if not self.text_predicate or self.text_predicate(entry.text):
                 page.text = entry.text
                 return page
