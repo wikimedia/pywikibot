@@ -38,7 +38,7 @@ See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
                   one from i18n/reflinks.py
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -487,11 +487,11 @@ class ReferencesRobot(Bot):
         try:
             deadLinks = codecs.open(listof404pages, 'r', 'latin_1').read()
         except IOError:
-            pywikibot.output(
-                'You need to download '
-                'http://www.twoevils.org/files/wikipedia/404-links.txt.gz '
-                'and to ungzip it in the same directory')
-            raise
+            raise NotImplementedError(
+                '404-links.txt is required for reflinks.py\n'
+                'You need to download\n'
+                'http://www.twoevils.org/files/wikipedia/404-links.txt.gz\n'
+                'and to unzip it in the same directory')
 
         editedpages = 0
         for page in self.generator:
@@ -755,26 +755,20 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-summary:'):
-            options['summary'] = arg[9:]
-        elif arg == '-always':
-            options['always'] = True
-        elif arg == '-ignorepdf':
-            options['ignorepdf'] = True
-        elif arg.startswith('-limit:'):
-            options['limit'] = int(arg[7:])
-        elif arg.startswith('-xmlstart'):
-            if len(arg) == 9:
-                xmlStart = pywikibot.input(
-                    u'Please enter the dumped article to start with:')
-            else:
-                xmlStart = arg[10:]
-        elif arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlFilename = pywikibot.input(
-                    u'Please enter the XML dump\'s filename:')
-            else:
-                xmlFilename = arg[5:]
+        arg, sep, value = arg.partition(':')
+        option = arg.partition('-')[2]
+        if option == 'summary':
+            options[option] = value
+        elif option in ('always', 'ignorepdf'):
+            options[option] = True
+        elif option == 'limit':
+            options[option] = int(value)
+        elif option == 'xmlstart':
+            xmlStart = value or pywikibot.input(
+                'Please enter the dumped article to start with:')
+        elif option == 'xml':
+            xmlFilename = value or pywikibot.input(
+                "Please enter the XML dump's filename:")
         else:
             genFactory.handleArg(arg)
 
