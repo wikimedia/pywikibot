@@ -122,21 +122,24 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         @raises NoUsername: Username doesnt exist in user list.
         """
+        # convert any Special:BotPassword usernames to main account equivalent
+        main_username = self.username.partition('@')[0]
+
         try:
-            data = self.site.allusers(start=self.username, total=1)
+            data = self.site.allusers(start=main_username, total=1)
             user = next(iter(data))
         except pywikibot.data.api.APIError as e:
             if e.code == 'readapidenied':
                 pywikibot.warning('Could not check user %s exists on %s'
-                                  % (self.username, self.site))
+                                  % (main_username, self.site))
                 return
             else:
                 raise
 
-        if user['name'] != self.username:
+        if user['name'] != main_username:
             # Report the same error as server error code NotExists
             raise NoUsername('Username \'%s\' does not exist on %s'
-                             % (self.username, self.site))
+                             % (main_username, self.site))
 
     def botAllowed(self):
         """
