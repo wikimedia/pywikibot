@@ -315,6 +315,26 @@ class CharsetTestCase(TestCase):
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.content, CharsetTestCase.STR)
 
+    def test_content_type_application_json_without_charset(self):
+        """Test decoding without explicit charset but JSON content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = CharsetTestCase.UTF8_BYTES[:]
+        resp.headers = {'content-type': 'application/json'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
+
+    def test_content_type_sparql_json_without_charset(self):
+        """Test decoding without explicit charset but JSON content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = CharsetTestCase.UTF8_BYTES[:]
+        resp.headers = {'content-type': 'application/sparql-results+json'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
+
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
         req = CharsetTestCase._create_request()
