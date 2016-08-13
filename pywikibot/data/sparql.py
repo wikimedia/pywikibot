@@ -13,6 +13,7 @@ else:
     from urllib2 import quote
 
 from pywikibot.comms import http
+from pywikibot.tools import UnicodeMixin, py2_encode_utf_8
 
 WIKIDATA = 'http://query.wikidata.org/sparql'
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
@@ -123,7 +124,18 @@ class SparqlQuery(object):
         return result_type()
 
 
-class URI(object):
+class SparqlNode(UnicodeMixin):
+    """Base class for SPARQL nodes."""
+
+    def __init__(self, value):
+        """Create a SparqlNode."""
+        self.value = value
+
+    def __unicode__(self):
+        return self.value
+
+
+class URI(SparqlNode):
     """Representation of URI result type."""
 
     def __init__(self, data, entity_url, **kwargs):
@@ -132,7 +144,7 @@ class URI(object):
 
         @type data: dict
         """
-        self.value = data.get('value')
+        super(URI, self).__init__(data.get('value'))
         self.entity_url = entity_url
 
     def getID(self):
@@ -147,14 +159,12 @@ class URI(object):
         else:
             return None
 
-    def __str__(self):
-        return self.value
-
+    @py2_encode_utf_8
     def __repr__(self):
         return '<' + self.value + '>'
 
 
-class Literal(object):
+class Literal(SparqlNode):
     """Representation of RDF literal result type."""
 
     def __init__(self, data, **kwargs):
@@ -163,13 +173,11 @@ class Literal(object):
 
         @type data: dict
         """
+        super(Literal, self).__init__(data.get('value'))
         self.type = data.get('datatype')
         self.language = data.get('xml:lang')
-        self.value = data.get('value')
 
-    def __str__(self):
-        return self.value
-
+    @py2_encode_utf_8
     def __repr__(self):
         if self.type:
             return self.value + '^^' + self.type
@@ -178,7 +186,7 @@ class Literal(object):
         return self.value
 
 
-class Bnode(object):
+class Bnode(SparqlNode):
     """Representation of blank node."""
 
     def __init__(self, data, **kwargs):
@@ -187,12 +195,11 @@ class Bnode(object):
 
         @type data: dict
         """
-        self.value = data['value']
+        super(Bnode, self).__init__(data.get('value'))
 
-    def __str__(self):
-        return self.value
-
+    @py2_encode_utf_8
     def __repr__(self):
         return "_:" + self.value
+
 
 VALUE_TYPES = {'uri': URI, 'literal': Literal, 'bnode': Bnode}
