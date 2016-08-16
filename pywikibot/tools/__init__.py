@@ -159,18 +159,21 @@ def empty_iterator():
     yield
 
 
-class UnicodeMixin(object):
+def py2_encode_utf_8(func):
+    """Decorator to optionally encode the string result of a function on Python 2.x."""
+    if PY2:
+        return lambda s: func(s).encode('utf-8')
+    else:
+        return func
 
+
+class UnicodeMixin(object):
     """Mixin class to add __str__ method in Python 2 or 3."""
 
-    if not PY2:
-        def __str__(self):
-            """Return the unicode representation as the str representation."""
-            return self.__unicode__()
-    else:
-        def __str__(self):
-            """Return the str representation of the UTF-8 encoded Unicode."""
-            return self.__unicode__().encode('utf8')
+    @py2_encode_utf_8
+    def __str__(self):
+        """Return the unicode representation as the str representation."""
+        return self.__unicode__()
 
 
 # From http://python3porting.com/preparing.html

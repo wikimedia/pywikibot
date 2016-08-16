@@ -8,6 +8,7 @@ from __future__ import absolute_import, unicode_literals
 import sys
 
 import pywikibot.data.sparql as sparql
+from pywikibot.tools import UnicodeType
 
 from tests.aspects import unittest, TestCase
 
@@ -165,6 +166,54 @@ class TestSparql(TestCase):
         mock_method.return_value = Container(RESPONSE_FALSE)
         res = q.ask('ASK { ?x ?y ?z }')
         self.assertFalse(res)
+
+
+class Shared(object):
+    """Shared test placeholder."""
+
+    class SparqlNodeTests(TestCase):
+        """Tests encoding issues."""
+
+        net = False
+        object_under_test = None
+
+        def test_is_sparql_node(self):
+            """Object should be a SparqlNode."""
+            self.assertIsInstance(self.object_under_test, sparql.SparqlNode)
+
+        def test__repr__returnsStringType(self):
+            """__repr__ should return type str."""
+            self.assertIsInstance(self.object_under_test.__repr__(), str)
+
+        def test__str__returnsStringType(self):
+            """__str__ should return type str."""
+            self.assertIsInstance(self.object_under_test.__str__(), str)
+
+        def test__unicode__returnsUnicodeType(self):
+            """__unicode__ should return type unicode."""
+            self.assertIsInstance(self.object_under_test.__unicode__(), UnicodeType)
+
+
+class LiteralTests(Shared.SparqlNodeTests):
+    """Tests for sparql.Literal."""
+
+    net = False
+    object_under_test = sparql.Literal({'datatype': '', 'lang': 'en', 'value': 'value'})
+
+
+class BnodeTests(Shared.SparqlNodeTests):
+    """Tests for sparql.Bnode."""
+
+    net = False
+    object_under_test = sparql.Bnode({'value': 'Foo'})
+
+
+class URITests(Shared.SparqlNodeTests):
+    """Tests for sparql.URI."""
+
+    net = False
+    object_under_test = sparql.URI({'value': 'http://foo.com'}, 'http://bar.com')
+
 
 if __name__ == '__main__':  # pragma: no cover
     try:
