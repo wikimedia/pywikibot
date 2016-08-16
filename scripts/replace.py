@@ -153,7 +153,6 @@ else:
 import pywikibot
 
 from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import issue_deprecation_warning
 from pywikibot import i18n, textlib, pagegenerators, Bot
 
 from pywikibot import editor as editarticle
@@ -161,7 +160,13 @@ from pywikibot import editor as editarticle
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
 
-from pywikibot.tools import chars, deprecated_args
+from pywikibot.tools import (
+    chars,
+    deprecated,
+    deprecated_args,
+    issue_deprecation_warning,
+)
+
 from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
@@ -629,6 +634,7 @@ class ReplaceRobot(Bot):
 
         return new_text
 
+    @deprecated('apply_replacements')
     def doReplacements(self, original_text, page=None):
         """Apply replacements to the given text and page."""
         if page is None:
