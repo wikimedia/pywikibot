@@ -5,14 +5,14 @@ This bot appends some text to all unused images and notifies uploaders.
 
 Parameters:
 
--always     Don't be asked every time.
-
+-always         Don't be asked every time.
+-nouserwarning  Do not warn uploader about orphaned file.
 """
 #
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
-# (c) xqt, 2011-2014
-# (C) Pywikibot team, 2015
+# (c) xqt, 2011-2016
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,6 +25,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators, Bot
 
 template_to_the_image = {
+    'meta': '{{Orphan file}}',
     'it': u'{{immagine orfana}}',
     'fa': u'{{تصاویر بدون استفاده}}',
 }
@@ -41,20 +42,21 @@ class UnusedFilesBot(Bot):
 
     def __init__(self, site, **kwargs):
         """Constructor."""
+        self.availableOptions.update({
+            'nouserwarning': False  # do not warn uploader
+        })
         super(UnusedFilesBot, self).__init__(**kwargs)
         self.site = site
 
-        template_image = i18n.translate(self.site,
-                                        template_to_the_image)
-        template_user = i18n.translate(self.site,
-                                       template_to_the_user)
+        self.template_image = i18n.translate(self.site,
+                                             template_to_the_image)
+        self.template_user = i18n.translate(self.site,
+                                            template_to_the_user)
         self.summary = i18n.twtranslate(self.site, 'unusedfiles-comment')
-        if not all([template_image, template_user]):
+        if not (self.template_image and
+                (self.template_user or self.getOption('nouserwarning'))):
             raise pywikibot.Error(u'This script is not localized for %s site.'
                                   % self.site)
-
-        self.template_image = template_image
-        self.template_user = template_user
 
         generator = pagegenerators.UnusedFilesGenerator(site=self.site)
         generator = pagegenerators.PreloadingGenerator(generator)
@@ -77,7 +79,8 @@ class UnusedFilesBot(Bot):
                 return
 
             self.append_text(image, '\n\n' + self.template_image)
-
+            if self.getOption('nouserwarning'):
+                return
             uploader = image.getFileVersionHistory().pop(0)['user']
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()
@@ -113,8 +116,7 @@ def main(*args):
     options = {}
 
     for arg in pywikibot.handle_args(args):
-        if arg == '-always':
-            options['always'] = True
+        options[arg[1:]] = True
 
     bot = UnusedFilesBot(pywikibot.Site(), **options)
     try:
