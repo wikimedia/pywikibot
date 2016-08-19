@@ -216,14 +216,20 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         (u"wikipedia", u"my_wikipedia_user", u"my_wikipedia_pass")
         (u"en", u"wikipedia", u"my_en_wikipedia_user", u"my_en_wikipedia_pass")
         """
+        # Set path to password file relative to the user_config
+        # but fall back on absolute path for backwards compatibility
+        password_file = os.path.join(config.base_dir, config.password_file)
+        if not os.path.isfile(password_file):
+            password_file = config.password_file
+
         # We fix password file permission first,
         # lift upper permission (regular file) from st_mode
         # to compare it with private_files_permission.
-        if os.stat(config.password_file).st_mode - stat.S_IFREG \
+        if os.stat(password_file).st_mode - stat.S_IFREG \
                 != config.private_files_permission:
-            os.chmod(config.password_file, config.private_files_permission)
+            os.chmod(password_file, config.private_files_permission)
 
-        password_f = codecs.open(config.password_file, encoding='utf-8')
+        password_f = codecs.open(password_file, encoding='utf-8')
         for line_nr, line in enumerate(password_f):
             if not line.strip():
                 continue
