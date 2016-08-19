@@ -2494,6 +2494,8 @@ class TestPagePreloading(DefaultSiteTestCase):
         # remove the pageids that have already been loaded above by pagelinks
         # so that preloadpages will use the titles instead
         for page in links:
+            if hasattr(page, '_pageid'):
+                self.assertEqual(page.pageid, page._pageid)
             del page._pageid
 
         for page in mysite.preloadpages(links):
