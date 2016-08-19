@@ -44,7 +44,7 @@ def python_is_supported():
 if not python_is_supported():
     raise RuntimeError(versions_required_message % sys.version)
 
-test_deps = ['bz2file']
+test_deps = ['bz2file', 'mock']
 
 dependencies = ['requests']
 
