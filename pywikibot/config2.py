@@ -208,7 +208,8 @@ use_SSL_always = False   # if available, use SSL for all API queries
 available_ssl_project = []
 
 # By default you are asked for a password on the terminal.
-# A password file may be used. e.g. password_file = ".passwd"
+# A password file may be used, e.g. password_file = ".passwd".
+# The path to the password file is relative to that of the user_config file.
 # The password file should consist of lines containing
 # Python tuples of any of the following formats:
 # (code, family, username, password)
