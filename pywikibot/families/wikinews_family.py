@@ -30,7 +30,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.languages_by_size = [
             'sr', 'en', 'fr', 'de', 'pl', 'ru', 'pt', 'es', 'it', 'zh', 'cs',
             'ca', 'ta', 'el', 'ar', 'sv', 'fa', 'ro', 'uk', 'tr', 'ja', 'sq',
-            'no', 'eo', 'ko', 'fi', 'bs', 'he', 'bg',
+            'no', 'eo', 'fi', 'bs', 'he', 'bg', 'ko',
         ]
 
         super(Family, self).__init__()
