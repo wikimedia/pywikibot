@@ -194,6 +194,11 @@ def precompile_exceptions(exceptions, use_regex, flags):
             exceptions[exceptionCategory] = patterns
 
 
+def _get_text_exceptions(exceptions):
+    """Get exceptions on text (inside exceptions)."""
+    return exceptions.get('inside-tags', []) + exceptions.get('inside', [])
+
+
 class ReplacementBase(object):
 
     """The replacement instructions."""
@@ -297,6 +302,10 @@ class Replacement(ReplacementBase):
         """Compile the search regex and exceptions."""
         super(Replacement, self)._compile(use_regex, flags)
         precompile_exceptions(self.exceptions, use_regex, flags)
+
+    def get_inside_exceptions(self):
+        """Get exceptions on text (inside exceptions)."""
+        return _get_text_exceptions(self.exceptions or {})
 
 
 class ReplacementList(list):
@@ -430,17 +439,20 @@ class XmlDumpReplacePageGenerator(object):
                     if entry.title != self.xmlStart:
                         continue
                     self.skipping = False
-                if not self.isTitleExcepted(entry.title) \
-                        and not self.isTextExcepted(entry.text):
-                    new_text = entry.text
-                    for replacement in self.replacements:
-                        # This doesn't do an actual replacement but just
-                        # checks if at least one does apply
-                        new_text = textlib.replaceExcept(
-                            new_text, replacement.old_regex, replacement.new,
-                            self.excsInside, self.site)
-                    if new_text != entry.text:
-                        yield pywikibot.Page(self.site, entry.title)
+                if self.isTitleExcepted(entry.title) \
+                        or self.isTextExcepted(entry.text):
+                    continue
+                new_text = entry.text
+                for replacement in self.replacements:
+                    # This doesn't do an actual replacement but just
+                    # checks if at least one does apply
+                    new_text = textlib.replaceExcept(
+                        new_text, replacement.old_regex, replacement.new,
+                        self.excsInside + replacement.get_inside_exceptions(),
+                        site=self.site)
+                if new_text != entry.text:
+                    yield pywikibot.Page(self.site, entry.title)
+
         except KeyboardInterrupt:
             try:
                 if not self.skipping:
@@ -593,15 +605,12 @@ class ReplaceRobot(Bot):
 
         @rtype: unicode, set
         """
-        def get_exceptions(exceptions):
-            return exceptions.get('inside-tags', []) + exceptions.get('inside', [])
-
         if page is None:
             pywikibot.warn(
                 'You must pass the target page as the "page" parameter to '
                 'apply_replacements().', DeprecationWarning, stacklevel=2)
         new_text = original_text
-        exceptions = get_exceptions(self.exceptions)
+        exceptions = _get_text_exceptions(self.exceptions)
         skipped_containers = set()
         for replacement in self.replacements:
             if self.sleep is not None:
@@ -627,7 +636,7 @@ class ReplaceRobot(Bot):
             old_text = new_text
             new_text = textlib.replaceExcept(
                 new_text, replacement.old_regex, replacement.new,
-                exceptions + get_exceptions(replacement.exceptions or {}),
+                exceptions + replacement.get_inside_exceptions(),
                 allowoverlap=self.allowoverlap, site=self.site)
             if old_text != new_text:
                 applied.add(replacement)
