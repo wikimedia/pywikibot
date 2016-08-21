@@ -44,8 +44,6 @@ class UnusedFilesBot(Bot):
         super(UnusedFilesBot, self).__init__(**kwargs)
         self.site = site
 
-    def run(self):
-        """Start the bot."""
         template_image = i18n.translate(self.site,
                                         template_to_the_image)
         template_user = i18n.translate(self.site,
@@ -54,27 +52,37 @@ class UnusedFilesBot(Bot):
         if not all([template_image, template_user]):
             raise pywikibot.Error(u'This script is not localized for %s site.'
                                   % self.site)
+
+        self.template_image = template_image
+        self.template_user = template_user
+
         generator = pagegenerators.UnusedFilesGenerator(site=self.site)
         generator = pagegenerators.PreloadingGenerator(generator)
-        for image in generator:
-            if not image.exists():
-                pywikibot.output("File '%s' does not exist (see bug T71133)."
-                                 % image.title())
-                continue
-            # Use fileUrl() and fileIsShared() to confirm it is local media
-            # rather than a local page with the same name as shared media.
-            if (image.fileUrl() and not image.fileIsShared() and
-                    u'http://' not in image.text):
-                if template_image in image.text:
-                    pywikibot.output(u"%s done already"
-                                     % image.title(asLink=True))
-                    continue
-                self.append_text(image, u"\n\n" + template_image)
-                uploader = image.getFileVersionHistory().pop(0)['user']
-                user = pywikibot.User(image.site, uploader)
-                usertalkpage = user.getUserTalkPage()
-                msg2uploader = template_user % {'title': image.title()}
-                self.append_text(usertalkpage, msg2uploader)
+
+        self.generator = generator
+
+    def treat(self, image):
+        """Process one image page."""
+        if not image.exists():
+            pywikibot.output("File '%s' does not exist (see bug T71133)."
+                             % image.title())
+            return
+        # Use fileUrl() and fileIsShared() to confirm it is local media
+        # rather than a local page with the same name as shared media.
+        if (image.fileUrl() and not image.fileIsShared() and
+                u'http://' not in image.text):
+            if self.template_image in image.text:
+                pywikibot.output(u"%s done already"
+                                 % image.title(asLink=True))
+                return
+
+            self.append_text(image, '\n\n' + self.template_image)
+
+            uploader = image.getFileVersionHistory().pop(0)['user']
+            user = pywikibot.User(image.site, uploader)
+            usertalkpage = user.getUserTalkPage()
+            msg2uploader = self.template_user % {'title': image.title()}
+            self.append_text(usertalkpage, msg2uploader)
 
     def append_text(self, page, apptext):
         """Append apptext to the page."""
