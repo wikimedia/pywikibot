@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 An incomplete sample script.
 
@@ -203,5 +203,5 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
