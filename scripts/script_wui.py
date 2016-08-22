@@ -22,6 +22,12 @@ Syntax example:
     python pwb.py script_wui -dir:.
         Default operating mode.
 """
+#
+# (C) Dr. Trigon, 2012-2014
+# (C) Pywikibot team, 2014-2016
+#
+# Distributed under the terms of the MIT license.
+#
 #  @package script_wui
 #  @brief   Script WikiUserInterface (WUI) Bot
 #

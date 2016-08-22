@@ -1,6 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8  -*-
 """Unit tests for checkimages script."""
+#
+# (C) Pywikibot team, 2015-2016
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 from scripts import checkimages

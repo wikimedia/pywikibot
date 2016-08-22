@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikivoyage."""
+#
+# (C) Pywikibot team, 2012-2016
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
