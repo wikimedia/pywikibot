@@ -1952,12 +1952,14 @@ class Subject(interwiki_graph.Subject):
             if not globalvar.quiet:
                 pywikibot.output(u"NOTE: Updating live wiki...")
             timeout = 60
+            page.text = newtext
             while True:
                 try:
-                    if globalvar.async:
-                        page.put_async(newtext, summary=mcomment)
-                    else:
-                        page.put(newtext, summary=mcomment)
+                    page.save(summary=mcomment, async=globalvar.async,
+                              nocreate=True)
+                except pywikibot.NoCreateError:
+                    pywikibot.exception()
+                    return False
                 except pywikibot.LockedPage:
                     pywikibot.output(u'Page %s is locked. Skipping.' % page)
                     raise SaveError(u'Locked')
