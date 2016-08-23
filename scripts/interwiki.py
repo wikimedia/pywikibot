@@ -1299,8 +1299,8 @@ class Subject(interwiki_graph.Subject):
                 dictName, year = page.autoFormat()
                 if dictName is not None:
                     if self.originPage:
-                        pywikibot.output(
-                            u'WARNING: %s:%s relates to %s:%s, which is an '
+                        pywikibot.warning(
+                            '%s:%s relates to %s:%s, which is an '
                             u'auto entry %s(%s)'
                             % (self.originPage.site.lang, self.originPage,
                                page.site.lang, page, dictName, year))
@@ -1873,8 +1873,8 @@ class Subject(interwiki_graph.Subject):
                     unicode(rmPage) not in globalvar.remove
                 ):
                     new[rmsite] = rmPage
-                    pywikibot.output(
-                        'WARNING: %s is either deleted or has a mismatching '
+                    pywikibot.warning(
+                        '%s is either deleted or has a mismatching '
                         'disambiguation state.'
                         % rmPage)
             # Re-Check what needs to get done
@@ -2017,8 +2017,8 @@ class Subject(interwiki_graph.Subject):
                     try:
                         linkedPages = set(pywikibot.Page(l) for l in page.iterlanglinks())
                     except pywikibot.NoPage:
-                        pywikibot.output(
-                            u"WARNING: Page %s does no longer exist?!" % page)
+                        pywikibot.warning(
+                            'Page %s does no longer exist?!' % page)
                         break
                     # To speed things up, create a dictionary which maps sites
                     # to pages. This assumes that there is only one interwiki
@@ -2030,14 +2030,14 @@ class Subject(interwiki_graph.Subject):
                         if expectedPage != page:
                             try:
                                 linkedPage = linkedPagesDict[expectedPage.site]
-                                pywikibot.output(
-                                    u"WARNING: %s: %s does not link to %s but to %s"
+                                pywikibot.warning(
+                                    '%s: %s does not link to %s but to %s'
                                     % (page.site.family.name,
                                        page, expectedPage, linkedPage))
                             except KeyError:
                                 if not expectedPage.site.is_data_repository():
-                                    pywikibot.output(
-                                        u"WARNING: %s: %s does not link to %s"
+                                    pywikibot.warning(
+                                        '%s: %s does not link to %s'
                                         % (page.site.family.name,
                                            page, expectedPage))
                     # Check for superfluous links
@@ -2046,8 +2046,8 @@ class Subject(interwiki_graph.Subject):
                             # Check whether there is an alternative page on that language.
                             # In this case, it was already reported above.
                             if linkedPage.site not in expectedSites:
-                                pywikibot.output(
-                                    u"WARNING: %s: %s links to incorrect %s"
+                                pywikibot.warning(
+                                    '%s: %s links to incorrect %s'
                                     % (page.site.family.name,
                                        page, linkedPage))
         except (socket.error, IOError):
