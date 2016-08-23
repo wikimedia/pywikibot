@@ -45,10 +45,6 @@ class Family(family.WikimediaOrgFamily):
             ),
         }
 
-        self.disambcatname = {
-            'commons': 'Disambiguation'
-        }
-
         # Subpages for documentation.
         self.doc_subpages = {
             '_default': ((u'/doc', ), ['commons']),

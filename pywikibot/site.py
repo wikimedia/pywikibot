@@ -1081,12 +1081,32 @@ class BaseSite(ComparableMixin):
 
     def disambcategory(self):
         """Return Category in which disambig pages are listed."""
-        try:
-            name = '%s:%s' % (self.namespace(14),
-                              self.family.disambcatname[self.code])
-        except KeyError:
-            raise Error(u"No disambiguation category name found for %(site)s"
-                        % {'site': self})
+        if self.has_data_repository:
+            repo = self.data_repository()
+            repo_name = repo.family.name
+            try:
+                item = self.family.disambcatname[repo.code]
+            except KeyError:
+                raise Error(
+                    'No {repo} qualifier found for disambiguation category '
+                    'name in {fam}_family file'.format(repo=repo_name,
+                                                       fam=self.family.name))
+            else:
+                dp = pywikibot.ItemPage(repo, item)
+                try:
+                    name = dp.getSitelink(self)
+                except pywikibot.NoPage:
+                    raise Error(
+                        'No disambiguation category name found in {repo} '
+                        'for {site}'.format(repo=repo_name, site=self))
+        else:  # fallback for non WM sites
+            try:
+                name = '%s:%s' % (Namespace.CATEGORY,
+                                  self.family.disambcatname[self.code])
+            except KeyError:
+                raise Error(
+                    'No disambiguation category name found in '
+                    '{site.family.name}_family for {site}'.format(site=self))
         return pywikibot.Category(pywikibot.Link(name, self))
 
     @deprecated("pywikibot.Link")

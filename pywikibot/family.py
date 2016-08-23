@@ -710,7 +710,7 @@ class Family(object):
         # A list with the name in the cross-language flag permissions
         self.cross_allowed = []
 
-        # A list with the name of the category containing disambiguation
+        # A dict with the name of the category containing disambiguation
         # pages for the various languages. Only one category per language,
         # and without the namespace, so add things like:
         # 'en': "Disambiguation"
@@ -1569,6 +1569,14 @@ class WikimediaFamily(Family):
         # Romanian was to be the replacement.
         'mo': 'ro',
     }
+
+    def __init__(self):
+        """Constructor."""
+        super(WikimediaFamily, self).__init__()
+        # WikimediaFamily uses wikibase for the category name containing
+        # disambiguation pages for the various languages. We need the
+        # wikibase code and item number:
+        self.disambcatname = {'wikidata': 'Q1982926'}
 
     @property
     def domain(self):
