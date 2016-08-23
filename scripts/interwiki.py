@@ -1333,13 +1333,11 @@ class Subject(interwiki_graph.Subject):
 
             elif page.isRedirectPage() or page.isCategoryRedirect():
                 if page.isRedirectPage():
-                    redir = u''
-                else:
-                    redir = u'category '
-                if page.isRedirectPage():
                     redirectTargetPage = page.getRedirectTarget()
+                    redir = ''
                 else:
                     redirectTargetPage = page.getCategoryRedirectTarget()
+                    redir = 'category '
                 if not globalvar.quiet:
                     pywikibot.output(u"NOTE: %s is %sredirect to %s"
                                      % (page, redir, redirectTargetPage))
