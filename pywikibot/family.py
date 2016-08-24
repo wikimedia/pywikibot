@@ -934,11 +934,11 @@ class Family(object):
             warn(u'Family name %s contains non-ascii characters' % cls.name,
                  FamilyMaintenanceWarning)
         # FIXME: wikisource uses code '-' for www.wikisource.org
-        if not all(all(x in CODE_CHARACTERS for x in code) and
-                   (cls.name == 'wikisource' or code[0] != '-')
-                   for code in cls.langs.keys()):
-            warn(u'Family %s codes contains non-ascii characters',
-                 FamilyMaintenanceWarning)
+        for code in cls.langs.keys():
+            if not all(x in CODE_CHARACTERS for x in code) and \
+                    (cls.name == 'wikisource' or code[0] != '-'):
+                warn('Family %s code %s contains non-ascii characters' %
+                     (cls.name, code), FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
 
