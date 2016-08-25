@@ -1,3 +1,38 @@
+Release 2.0rc5 (17 August 2016)
+===============================
+
+Bugfixes
+--------
+de630d8 Establish the project's name, once and for all
+fcca7ad setup.py: Add Python 3.4 and 3.5 to pypi classifiers
+e8be996 Remove item count output in page generators
+de75825 Test Python 3.5 on Travis
+f39c8fa Fix docstring capitalization in return types and behavior
+0e9ecb0 Stop reading 'cookieprefix' upon login
+65d62ae Fix travis global environment variables
+18a1574 Fix notifications building from JSON
+c846932 pywikibot: Store ImportError in imported variable
+99d789b Use default tox pip install
+eba4d95 Add asteroids that are being used as locations
+2b95d9e [bugfix] Fix test_translateMagicWords test
+76fa79c Fix ID for Rhea
+4491ed7 [bugfix] pass User page object to NotEmailableError
+ea0c637 Allow pywikibot to run on Windows 10 as well
+8864e34 listpages.py: Fix help docstring
+697b4f6 pwb.py: make sure pywikibot is correctly loaded before starting a script
+c66c463 win32_unicode: force truetype font in console
+16d8ff0 Update main copyright year to 2016
+ae0ddfc [L10N] add "sco" to redirected category pages
+10dc22a date.py: fix Hungarian day-month title
+b47b202 Prevent <references.../> from being destroyed
+c414088 [FIX] Page: Use repr-like if it can't be encoded
+ab2b9cc pywikibot.WARNING -> pywikibot.logging.WARNING
+c4f950c Do not expand text by default in getCategoryLinks
+435f6c4 Typo fix
+2c5944f Prevent AttributeError for when filename is None
+02872b7 Split TestUserContribs between user and non-user
+
+
 Release 2.0rc4 (15 December 2015)
 =================================
 
