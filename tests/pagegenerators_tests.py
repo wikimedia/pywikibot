@@ -191,6 +191,34 @@ class TestDryPageGenerators(TestCase):
         self.assertEqual(len(tuple(gen)), 9)
 
 
+class TestPagesFromPageidGenerator(TestCase):
+
+    """Test PagesFromPageidGenerator method."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    base_title = 'Page:06-24-1920 -The Story of the Jones County Calf Case.pdf/%s'
+
+    def setUp(self):
+        """Setup tests."""
+        super(TestPagesFromPageidGenerator, self).setUp()
+        self.site = self.get_site()
+        self.titles = [self.base_title % i for i in range(1, 11)]
+
+    def test_PagesFromPageidGenerator(self):
+        """Test PagesFromPageidGenerator."""
+        gen_pages = pagegenerators.PagesFromTitlesGenerator(self.titles,
+                                                            self.site)
+        pageids = []
+        for page in gen_pages:
+            page.latest_revision_id  # Force page info loading.
+            pageids.append(page._pageid)
+
+        gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
+        self.assertPagelistTitles(gen, self.titles)
+
+
 class TestCategoryFilterPageGenerator(TestCase):
 
     """Test CategoryFilterPageGenerator method."""
@@ -847,6 +875,30 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, set([1, 3]))
+
+    def test_pageid(self):
+        """Test pageid parameter."""
+        # Get reference pages and their pageids.
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        self.assertTrue(gf.handleArg('-prefixindex:a'))
+        gf.handleArg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        self.assertEqual(len(pages), 10)
+        # pipe-separated used as test reference.
+        pageids = '|'.join(str(page._pageid) for page in pages)
+
+        # Get by pageids.
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-pageid:%s' % pageids)
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages_from_pageid = list(gen)
+        self.assertEqual(len(pages_from_pageid), 10)
+        for page_a, page_b in zip(pages, pages_from_pageid):
+            self.assertIsInstance(page_a, pywikibot.Page)
+            self.assertIsInstance(page_b, pywikibot.Page)
+            self.assertTrue(page_a, page_b)
 
     def test_pagegenerator(self):
         """Test page generator."""
