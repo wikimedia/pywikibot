@@ -62,8 +62,8 @@ def update_family(families):
         # put the missing languages to the right place
         missing = original != new and set(original) - set(new)
         if missing:
-            pywikibot.output(u"WARNING: ['%s'] not listed at wikistats."
-                             % "', '".join(missing))
+            pywikibot.warning("['%s'] not listed at wikistats."
+                              % "', '".join(missing))
             index = {}
             for code in missing:
                 index[original.index(code)] = code
