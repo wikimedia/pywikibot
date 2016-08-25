@@ -3022,7 +3022,7 @@ class LoginManager(login.LoginManager):
         login_request = self.site._request(
             use_get=False,
             parameters=dict(action='login',
-                            lgname=self.username,
+                            lgname=self.login_name,
                             lgpassword=self.password))
 
         # get token using meta=tokens if supported
