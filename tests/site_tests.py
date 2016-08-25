@@ -2474,7 +2474,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def test_load_from_pageids_iterable_of_str(self):
         """Test basic loading with pageids."""
-        pageids = [str(page._pageid) for page in self.links]
+        pageids = [str(page.pageid) for page in self.links]
         gen = self.site.load_pages_from_pageids(pageids)
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
@@ -2486,7 +2486,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def test_load_from_pageids_iterable_of_int(self):
         """Test basic loading with pageids."""
-        pageids = [page._pageid for page in self.links]
+        pageids = [page.pageid for page in self.links]
         gen = self.site.load_pages_from_pageids(pageids)
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
@@ -2498,7 +2498,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def test_load_from_pageids_iterable_in_order(self):
         """Test loading with pageids is ordered."""
-        pageids = [page._pageid for page in self.links]
+        pageids = [page.pageid for page in self.links]
         gen = self.site.load_pages_from_pageids(pageids)
         for page in gen:
             link = self.links.pop(0)
@@ -2510,7 +2510,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def test_load_from_pageids_iterable_with_duplicate(self):
         """Test loading with duplicate pageids."""
-        pageids = [page._pageid for page in self.links]
+        pageids = [page.pageid for page in self.links]
         pageids = pageids + pageids
         gen = self.site.load_pages_from_pageids(pageids)
         for count, page in enumerate(gen, start=1):
@@ -2523,7 +2523,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def test_load_from_pageids_comma_separated(self):
         """Test loading from comma-separated pageids."""
-        pageids = ', '.join(str(page._pageid) for page in self.links)
+        pageids = ', '.join(str(page.pageid) for page in self.links)
         gen = self.site.load_pages_from_pageids(pageids)
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
@@ -2535,7 +2535,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
 
     def test_load_from_pageids_pipe_separated(self):
         """Test loading from comma-separated pageids."""
-        pageids = '|'.join(str(page._pageid) for page in self.links)
+        pageids = '|'.join(str(page.pageid) for page in self.links)
         gen = self.site.load_pages_from_pageids(pageids)
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)

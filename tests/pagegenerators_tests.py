@@ -212,8 +212,7 @@ class TestPagesFromPageidGenerator(TestCase):
                                                             self.site)
         pageids = []
         for page in gen_pages:
-            page.latest_revision_id  # Force page info loading.
-            pageids.append(page._pageid)
+            pageids.append(page.pageid)
 
         gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
         self.assertPagelistTitles(gen, self.titles)
@@ -886,7 +885,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         pages = list(gen)
         self.assertEqual(len(pages), 10)
         # pipe-separated used as test reference.
-        pageids = '|'.join(str(page._pageid) for page in pages)
+        pageids = '|'.join(str(page.pageid) for page in pages)
 
         # Get by pageids.
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
