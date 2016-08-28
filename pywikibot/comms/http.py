@@ -285,7 +285,7 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
     @type site: L{pywikibot.site.BaseSite}
     @param uri: the URI to retrieve
     @type uri: str
-    @param charset: Either a valid charset (usable for str.decode()) or None
+    @keyword charset: Either a valid charset (usable for str.decode()) or None
         to automatically chose the charset from the returned header (defaults
         to latin-1)
     @type charset: CodecInfo, str, None
