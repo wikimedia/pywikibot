@@ -118,7 +118,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sv', 'hr', 'tr', 'sr', 'ar', 'ko', 'no', 'da', 'gl', 'ta', 'ro',
             'tl', 'mk', 'is', 'uk', 'ka', 'lt', 'tt', 'sa', 'eo', 'sk', 'bg',
             'el', 'hy', 'hi', 'si', 'bn', 'ms', 'sl', 'ur', 'li', 'la', 'ml',
-            'ang', 'ia', 'cv', 'et', 'km', 'mr', 'eu', 'oc', 'kk', 'ne', 'pa',
+            'km', 'ang', 'ia', 'cv', 'et', 'mr', 'eu', 'oc', 'kk', 'ne', 'pa',
             'fy', 'ie', 'te', 'af', 'tg', 'ku', 'ky', 'bs', 'be', 'mg', 'cy',
             'zh-min-nan', 'uz',
         ]
