@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,6 +18,7 @@ import pywikibot.login
 import pywikibot.page
 import pywikibot.site
 
+from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
@@ -1025,6 +1026,45 @@ class TestUrlEncoding(TestCase):
         result = api.encode_url(query)
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
+
+
+class DummyThrottle(Throttle):
+
+    """Dummy Throttle class."""
+
+    def lag(self, lag):
+        """Override lag method, save the lag value and exit the api loop."""
+        self._lagvalue = lag  # save the lag value
+        raise SystemExit  # exit the api loop
+
+
+class TestLagpattern(DefaultSiteTestCase):
+
+    """Test the lag pattern."""
+
+    cached = False
+
+    def test_valid_lagpattern(self):
+        """Test whether api.lagpattern is valid."""
+        mysite = self.get_site()
+        mythrottle = DummyThrottle(mysite)
+        mysite._throttle = mythrottle
+        params = {'action': 'query',
+                  'titles': self.get_mainpage().title(),
+                  'maxlag': -1}
+        req = api.Request(site=mysite, parameters=params)
+        try:
+            req.submit()
+        except SystemExit:
+            pass  # expected exception from DummyThrottle instance
+        except api.APIError as e:
+            pywikibot.warning(
+                'Wrong api.lagpattern regex, cannot retrieve lag value')
+            raise e
+        value = mysite.throttle._lagvalue
+        self.assertIsInstance(value, int)
+        self.assertGreaterEqual(value, 0)
+
 
 if __name__ == '__main__':  # pragma: no cover
     try:
