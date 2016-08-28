@@ -305,8 +305,6 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
         r = fetch(uri, method, params, body, headers, **kwargs)
         return r.text
 
-    baseuri = site.base_url(uri)
-
     kwargs.setdefault("disable_ssl_certificate_validation",
                       site.ignore_certificate_error())
 
@@ -314,11 +312,12 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
         headers = {}
         format_string = None
     else:
-        format_string = headers.get('user-agent', None)
-
+        format_string = headers.get('user-agent')
     headers['user-agent'] = user_agent(site, format_string)
 
+    baseuri = site.base_url(uri)
     r = fetch(baseuri, method, params, body, headers, **kwargs)
+    site.throttle.retry_after = int(r.response_headers.get('retry-after', 0))
     return r.text
 
 

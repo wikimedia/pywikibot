@@ -2077,11 +2077,12 @@ class Request(MutableMapping):
 
             if code == "maxlag":
                 lag = lagpattern.search(info)
+                pywikibot.log('Pausing due to database lag: ' + info)
                 if lag:
-                    pywikibot.log(
-                        u"Pausing due to database lag: " + info)
-                    self.site.throttle.lag(int(lag.group("lag")))
-                    continue
+                    lag = lag.group('lag')
+                self.site.throttle.lag(int(lag or 0))
+                continue
+
             elif code == 'help' and self.action == 'help':
                 # The help module returns an error result with the complete
                 # API information. As this data was requested, return the
