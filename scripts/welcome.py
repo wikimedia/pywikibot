@@ -224,7 +224,7 @@ logbook = {
 # that is your signature (the bot has a random parameter to add different
 # sign, so in this way it will change according to your parameters).
 netext = {
-    'commons': {'_default': u'{{subst:welcome}} %s', },
+    'commons': '{{subst:welcome}} %s',
     'wikipedia': {
         'am': u'{{subst:Welcome}} %s',
         'ar': u'{{subst:ترحيب}} %s',
@@ -278,9 +278,8 @@ netext = {
 }
 # The page where the bot will report users with a possibly bad username.
 report_page = {
-    'commons': {
-        '_default': 'Project:Administrators\' noticeboard/User problems/Usernames to be checked',
-    },
+    'commons': ("Project:Administrators'noticeboard/User problems/Usernames"
+                "to be checked"),
     'wikipedia': {
         'am': u'User:Beria/Report',
         'ar': 'Project:إخطار الإداريين/أسماء مستخدمين للفحص',
@@ -303,7 +302,7 @@ report_page = {
 # The page where the bot reads the real-time bad words page
 # (this parameter is optional).
 bad_pag = {
-    'commons': {'_default': u'Project:Welcome log/Bad_names', },
+    'commons': 'Project:Welcome log/Bad_names',
     'wikipedia': {
         'am': u'User:Beria/Bad_names',
         'ar': u'Project:سجل الترحيب/أسماء سيئة',
@@ -326,7 +325,7 @@ timeselected = u' ~~~~~'  # Defining the time used after the signature
 # The text for reporting a possibly bad username
 # e.g. *[[Talk_page:Username|Username]]).
 report_text = {
-    'commons': {'_default': u"\n*{{user3|%s}}" + timeselected, },
+    'commons': '\n*{{user3|%s}}' + timeselected,
     'wikipedia': {
         'am': u"\n*[[User talk:%s]]" + timeselected,
         'ar': u"\n*{{user13|%s}}" + timeselected,
@@ -355,10 +354,8 @@ random_sign = {
     'fa': u'Project:سیاهه خوشامد/امضاها',
     'fr': u'Projet:Service de Parrainage Actif/Signatures',
     'it': u'Project:Benvenuto_Bot/Firme',
-
-    # jawiki comminuty discussion oppose,
+    # jawiki: Don't localize. Community discussion oppose to this feature
     # [[ja:Wikipedia:Bot作業依頼/ウェルカムメッセージ貼り付け依頼]]
-    'ja': None,
     'nap': u'User:Cellistbot/Firme',
     'roa-tara': u'Wikipedia:Bovègne Bot/Firme',
     'ru': u'Участник:LatitudeBot/Sign',
@@ -368,7 +365,6 @@ random_sign = {
 # The page where the bot reads the real-time whitelist page.
 # (this parameter is optional).
 whitelist_pg = {
-    '_default': None,
     'ar': u'Project:سجل الترحيب/قائمة بيضاء',
     'en': u'User:Filnik/whitelist',
     'ga': u'Project:Log fáilte/Bánliosta',
@@ -451,20 +447,12 @@ class WelcomeBot(object):
 
     def check_managed_sites(self):
         """Check that site is managed by welcome.py."""
-        # Raises KeyError if site is not in netext with right family.
-        try:
-            site_netext = netext[self.site.family.name]
-        except KeyError:
+        # Raises KeyError if site is not in netext dict.
+        site_netext = i18n.translate(self.site, netext)
+        if site_netext is None:
             raise KeyError(
-                u'Site %s not managed by welcome.py: family "%s" missing in netext.'
-                % (self.site, self.site.family.name))
-        # Raises KeyError if site is not in netext with language.
-        try:
-            site_netext = site_netext[self.site.code]
-        except KeyError:
-            raise KeyError(
-                u'Site %s not managed by welcome.py: lang "%s" missing in netext[%s].'
-                % (self.site, self.site.code, self.site.family.name))
+                'welcome.py is not localized for site {0} in netext dict.'
+                ''.format(self.site))
 
     def badNameFilter(self, name, force=False):
         """Check for bad names."""
@@ -768,9 +756,10 @@ class WelcomeBot(object):
                               self.site.code != 'it'):
                             welcome_text = (welcome_text
                                             % globalvar.defaultSign)
-                        if self.site.code in final_new_text_additions:
-                            welcome_text += i18n.translate(
-                                self.site, final_new_text_additions)
+                        final_text = i18n.translate(
+                            self.site, final_new_text_additions)
+                        if final_text:
+                            welcome_text += final_text
                         welcome_comment = i18n.twtranslate(self.site,
                                                            'welcome-welcome')
                         try:
