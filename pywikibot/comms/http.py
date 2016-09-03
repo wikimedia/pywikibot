@@ -14,7 +14,7 @@ This module is responsible for
 from __future__ import absolute_import, print_function, unicode_literals
 
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,6 +23,8 @@ __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 import atexit
+import os
+import stat
 import sys
 
 from distutils.version import StrictVersion
@@ -74,8 +76,47 @@ if (isinstance(config.socket_timeout, tuple) and
             'two.')
     config.socket_timeout = min(config.socket_timeout)
 
-cookie_jar = cookielib.LWPCookieJar(
-    config.datafilepath('pywikibot.lwp'))
+
+def mode_check(filename):
+    """Check if filename has mode 600 and, if not, set it."""
+    mode_600 = stat.S_IRUSR | stat.S_IWUSR
+    warn_str = 'File {0} had no {1:o} mode; converted to {1:o} mode'
+    st_mode = os.stat(filename).st_mode
+    if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode_600):
+        os.chmod(filename, mode_600)
+        pywikibot.warning(warn_str.format(filename, mode_600))
+
+
+def mode_check_decorator(func):
+    """Decorate load()/save() CookieJar methods."""
+    def wrapper(cls, **kwargs):
+        try:
+            filename = kwargs['filename']
+        except KeyError:
+            filename = cls.filename
+        res = func(cls, **kwargs)
+        mode_check(filename)
+        return res
+    return wrapper
+
+
+# in PY2 cookielib.LWPCookieJar is not a new-style class.
+class PywikibotCookieJar(cookielib.LWPCookieJar, object):
+
+    """CookieJar which checks file permissions."""
+
+    @mode_check_decorator
+    def load(self, **kwargs):
+        """Load cookies from file."""
+        super(PywikibotCookieJar, self).load()
+
+    @mode_check_decorator
+    def save(self, **kwargs):
+        """Save cookies to file."""
+        super(PywikibotCookieJar, self).save()
+
+
+cookie_jar = PywikibotCookieJar(config.datafilepath('pywikibot.lwp'))
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
