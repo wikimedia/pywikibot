@@ -1112,7 +1112,6 @@ formats = {
     'DecadeAD': {
         'als': lambda v: dh_decAD(v, u'%der'),
         'ar': lambda v: dh_decAD(v, u'%d عقد'),
-        'ast': lambda v: dh_decAD(v, u'Años %d'),
         'ang': lambda v: dh_decAD(v, u'%de'),
         'ast': lambda v: dh_decAD(v, u'Años %d'),
         'bg': lambda v: dh_decAD(v, u'%d-те'),
@@ -1223,7 +1222,6 @@ formats = {
                           lambda ii: (ii[1] - 1) * 100 + ii[0]),
              alwaysTrue)]),
         'pt': lambda v: dh_decAD(v, u'Década de %d'),
-        'ro': lambda v: dh_decAD(v, u'Anii %d'),
         'ro': lambda m: multi(m, [
             (lambda v: dh_constVal(v, 0, u'Primul deceniu d.Hr.'),
              lambda p: p == 0),
@@ -1922,9 +1920,8 @@ formats = {
         'ko': lambda v: dh_singVal(v, u'요즘 화제'),
         'ksh': lambda v: dh_singVal(v, u'Et Neuste'),
         'ku': lambda v: dh_singVal(v, u'Bûyerên rojane'),
-        'la': lambda v: dh_singVal(v, u'Novissima'),
-        'lb': lambda v: dh_singVal(v, u'Aktualitéit'),
         'la': lambda v: dh_singVal(v, u"Nuntii"),
+        'lb': lambda v: dh_singVal(v, u'Aktualitéit'),
         'li': lambda v: dh_singVal(v, u"In 't nuujs"),
         'mn': lambda v: dh_singVal(v, u'Мэдээ'),
         'nl': lambda v: dh_singVal(v, u'In het nieuws'),
