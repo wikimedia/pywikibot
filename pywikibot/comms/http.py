@@ -84,7 +84,9 @@ def mode_check(filename):
     st_mode = os.stat(filename).st_mode
     if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode_600):
         os.chmod(filename, mode_600)
-        pywikibot.warning(warn_str.format(filename, mode_600))
+        # re-read and check changes
+        if os.stat(filename).st_mode != st_mode:
+            pywikibot.warning(warn_str.format(filename, mode_600))
 
 
 def mode_check_decorator(func):
