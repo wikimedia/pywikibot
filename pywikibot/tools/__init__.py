@@ -12,7 +12,9 @@ import collections
 import gzip
 import inspect
 import itertools
+import os
 import re
+import stat
 import subprocess
 import sys
 import threading
@@ -168,6 +170,7 @@ def py2_encode_utf_8(func):
 
 
 class UnicodeMixin(object):
+
     """Mixin class to add __str__ method in Python 2 or 3."""
 
     @py2_encode_utf_8
@@ -1666,3 +1669,21 @@ class ModuleDeprecationWrapper(types.ModuleType):
 def open_compressed(filename, use_extension=False):
     """DEPRECATED: Open a file and uncompress it if needed."""
     return open_archive(filename, use_extension=use_extension)
+
+
+def file_mode_checker(filename, mode=0o600):
+    """Check file mode and update it, if needed.
+
+    @param filename: filename path
+    @type filename: basestring
+    @param mode: requested file mode
+    @type mode: int
+
+    """
+    warn_str = 'File {0} had {1:o} mode; converted to {2:o} mode.'
+    st_mode = os.stat(filename).st_mode
+    if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode):
+        os.chmod(filename, mode)
+        # re-read and check changes
+        if os.stat(filename).st_mode != st_mode:
+            warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))

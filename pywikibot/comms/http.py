@@ -23,8 +23,6 @@ __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 import atexit
-import os
-import stat
 import sys
 
 from distutils.version import StrictVersion
@@ -56,6 +54,7 @@ from pywikibot.exceptions import (
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
     deprecate_arg,
+    file_mode_checker,
     issue_deprecation_warning,
     PY2,
     StringTypes,
@@ -77,18 +76,6 @@ if (isinstance(config.socket_timeout, tuple) and
     config.socket_timeout = min(config.socket_timeout)
 
 
-def mode_check(filename):
-    """Check if filename has mode 600 and, if not, set it."""
-    mode_600 = stat.S_IRUSR | stat.S_IWUSR
-    warn_str = 'File {0} had no {1:o} mode; converted to {1:o} mode'
-    st_mode = os.stat(filename).st_mode
-    if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode_600):
-        os.chmod(filename, mode_600)
-        # re-read and check changes
-        if os.stat(filename).st_mode != st_mode:
-            pywikibot.warning(warn_str.format(filename, mode_600))
-
-
 def mode_check_decorator(func):
     """Decorate load()/save() CookieJar methods."""
     def wrapper(cls, **kwargs):
@@ -97,7 +84,7 @@ def mode_check_decorator(func):
         except KeyError:
             filename = cls.filename
         res = func(cls, **kwargs)
-        mode_check(filename)
+        file_mode_checker(filename, mode=0o600)
         return res
     return wrapper
 
