@@ -807,35 +807,31 @@ class checkImagesBot(object):
             for element in self.load(pageHiddenText):
                 self.hiddentemplates.add(pywikibot.Page(self.site, element))
 
-    def returnOlderTime(self, listGiven, timeListGiven):
-        """Get some time and return the oldest of them."""
-        num = 0
-        num_older = None
-        max_usage = 0
-        for element in listGiven:
-            imageName = element[1]
-            imagePage = pywikibot.FilePage(self.site, imageName)
-            imageUsage = [page for page in imagePage.usingPages()]
-            if len(imageUsage) > 0 and len(imageUsage) > max_usage:
-                max_usage = len(imageUsage)
-                num_older = num
-            num += 1
+    def important_image(self, listGiven):
+        """
+        Get tuples of image and time, return the most used or oldest image.
 
-        if num_older:
-            return listGiven[num_older][1]
+        @param listGiven: a list of tuples which hold seconds and FilePage
+        @type listGiven: list
+        @return: the most used or oldest image
+        @rtype: FilePage
+        """
+        # find the most used image
+        inx_found = None  # index of found image
+        max_usage = 0  # hold max amount of using pages
+        for num, element in enumerate(listGiven):
+            image = element[1]
+            image_used = len([page for page in image.usingPages()])
+            if image_used > max_usage:
+                max_usage = image_used
+                inx_found = num
 
-        for element in listGiven:
-            time = element[0]
-            imageName = element[1]
-            not_the_oldest = False
+        if inx_found is not None:
+            return listGiven[inx_found][1]
 
-            for time_selected in timeListGiven:
-                if time > time_selected:
-                    not_the_oldest = True
-                    break
-
-            if not not_the_oldest:
-                return imageName
+        # find the oldest image
+        sec, image = max(listGiven, key=lambda element: element[0])
+        return image
 
     @deprecated('Page.revision_count()')
     def countEdits(self, pagename, userlist):
@@ -928,7 +924,6 @@ class checkImagesBot(object):
                                              'count': len(duplicates) - 1}))
             if dupText and dupRegex:
                 time_image_list = []
-                time_list = []
 
                 for dup_page in duplicates:
                     if (dup_page.title(asUrl=True) != self.image.title(asUrl=True) or
@@ -939,10 +934,8 @@ class checkImagesBot(object):
                             continue
                     data = self.timestamp.timetuple()
                     data_seconds = time.mktime(data)
-                    time_image_list.append([data_seconds, dup_page.title()])
-                    time_list.append(data_seconds)
-                older_image = self.returnOlderTime(time_image_list, time_list)
-                Page_older_image = pywikibot.FilePage(self.site, older_image)
+                    time_image_list.append([data_seconds, dup_page])
+                Page_older_image = self.important_image(time_image_list)
                 older_page_text = Page_older_image.text
                 # And if the images are more than two?
                 string = ''
@@ -950,43 +943,42 @@ class checkImagesBot(object):
 
                 for dup_page in duplicates:
                     if dup_page == Page_older_image:
-                        # the older image, not report also this as duplicate
+                        # the most used or oldest image
+                        # not report also this as duplicate
                         continue
                     try:
                         DupPageText = dup_page.text
                     except pywikibot.NoPage:
-                        continue  # The page doesn't exists
+                        continue
 
-                    duplicate = dup_page.title()
                     if not (re.findall(dupRegex, DupPageText) or
                             re.findall(dupRegex, older_page_text)):
                         pywikibot.output(
                             u'%s is a duplicate and has to be tagged...'
-                            % duplicate)
-                        images_to_tag_list.append(duplicate)
-                        string += u"*[[:%s%s]]\n" % (self.image_namespace,
-                                                     duplicate)
+                            % dup_page)
+                        images_to_tag_list.append(dup_page.title())
+                        string += '* {0}\n'.format(
+                            dup_page.title(asLink=True, textlink=True))
                     else:
                         pywikibot.output(
                             u"Already put the dupe-template in the files's page"
                             u" or in the dupe's page. Skip.")
                         return  # Ok - Let's continue the checking phase
 
-                older_image_ns = u'%s%s' % (self.image_namespace, older_image)
-
                 # true if the image are not to be tagged as dupes
                 only_report = False
 
                 # put only one image or the whole list according to the request
                 if u'__images__' in dupText:
-                    text_for_the_report = re.sub(r'__images__',
-                                                 r'\n%s*[[:%s]]\n'
-                                                 % (string, older_image_ns),
-                                                 dupText)
+                    text_for_the_report = dupText.replace(
+                        '__images__',
+                        '\n{0}* {1}\n'.format(
+                            string,
+                            Page_older_image.title(asLink=True, textlink=True)))
                 else:
-                    text_for_the_report = re.sub(r'__image__',
-                                                 r'%s' % older_image_ns,
-                                                 dupText)
+                    text_for_the_report = dupText.replace(
+                        '__image__',
+                        Page_older_image.title(asLink=True, textlink=True))
 
                 # Two iteration: report the "problem" to the user only once
                 # (the last)
@@ -1021,10 +1013,13 @@ class checkImagesBot(object):
                             not dupTalkText:
                         only_report = True
                     else:
-                        self.report(text_for_the_report, images_to_tag_list[-1],
-                                    dupTalkText % (older_image_ns, string),
-                                    dupTalkHead, commTalk=dupComment_talk,
-                                    commImage=dupComment_image, unver=True)
+                        self.report(
+                            text_for_the_report, images_to_tag_list[-1],
+                            dupTalkText
+                            % (Page_older_image.title(withNamespace=True),
+                               string),
+                            dupTalkHead, commTalk=dupComment_talk,
+                            commImage=dupComment_image, unver=True)
 
             if self.duplicatesReport or only_report:
                 if only_report:
@@ -1046,7 +1041,7 @@ class checkImagesBot(object):
                 if not result:
                     return True  # If Errors, exit (but continue the check)
 
-            if older_image != self.imageName:
+            if Page_older_image.title() != self.imageName:
                 # The image is a duplicate, it will be deleted. So skip the
                 # check-part, useless
                 return
