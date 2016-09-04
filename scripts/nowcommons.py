@@ -84,10 +84,10 @@ nowCommons = {
     'de': [
         u'NowCommons',
         u'NC',
-        u'NCT',
         u'Nowcommons',
+        'Now Commons',
         u'NowCommons/Mängel',
-        u'NowCommons-Überprüft',
+        'NC/M',
     ],
     'en': [
         u'NowCommons',
