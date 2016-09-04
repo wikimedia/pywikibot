@@ -392,6 +392,10 @@ class ReplacementListEntry(ReplacementBase):
         super(ReplacementListEntry, self)._compile(use_regex, flags)
         self.fix_set._compile_exceptions(use_regex, flags)
 
+    def get_inside_exceptions(self):
+        """Get exceptions on text (inside exceptions)."""
+        return _get_text_exceptions(self.fix_set.exceptions or {})
+
 
 class XmlDumpReplacePageGenerator(object):
 
