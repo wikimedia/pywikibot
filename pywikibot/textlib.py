@@ -281,11 +281,10 @@ def _get_regexes(keys, site):
                 else:
                     result.append(_regex_cache[exc])
             else:
-                # nowiki, noinclude, includeonly, timeline, math ond other
+                # nowiki, noinclude, includeonly, timeline, math and other
                 # extensions
-                if exc not in _regex_cache:
-                    _regex_cache[exc] = re.compile(r'(?is)<%s>.*?</%s>'
-                                                   % (exc, exc))
+                _regex_cache[exc] = re.compile(
+                    r'(?is)<{0}>.*?</{0}>'.format(exc))
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
