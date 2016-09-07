@@ -2398,7 +2398,10 @@ class APIGenerator(_RequestWrapper):
         self.limit_name = limit_name
         self.data_name = data_name
 
-        self.query_increment = 50
+        if config.step > 0:
+            self.query_increment = config.step
+        else:
+            self.query_increment = None
         self.limit = None
         self.starting_offset = kwargs['parameters'].pop(self.continue_name, 0)
         self.request = self.request_class(**kwargs)
@@ -2408,7 +2411,7 @@ class APIGenerator(_RequestWrapper):
         """
         Set the maximum number of items to be retrieved per API query.
 
-        If not called, the default is 50.
+        If not called, the default is config.step.
 
         @param value: The value of maximum number of items to be retrieved
             per API request to set.
@@ -2562,7 +2565,10 @@ class QueryGenerator(_RequestWrapper):
                 else:
                     self.request[prefix + 'limit'] = int(param["max"])
 
-        self.api_limit = None
+        if config.step > 0:
+            self.api_limit = config.step
+        else:
+            self.api_limit = None
 
         if self.limited_module:
             self.prefix = self.site._paraminfo['query+' + self.limited_module]['prefix']
@@ -2625,13 +2631,15 @@ class QueryGenerator(_RequestWrapper):
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'limit')
         if self.site.logged_in() and self.site.has_right('apihighlimits'):
-            self.api_limit = int(param["highmax"])
+            limit = int(param['highmax'])
         else:
-            self.api_limit = int(param["max"])
-        pywikibot.debug(u"%s: Set query_limit to %i."
-                        % (self.__class__.__name__,
-                           self.api_limit),
-                        _logger)
+            limit = int(param['max'])
+        if self.api_limit is None or limit < self.api_limit:
+            self.api_limit = limit
+            pywikibot.debug(
+                '{0}: Set query_limit to {1}.'.format(self.__class__.__name__,
+                                                      self.api_limit),
+                _logger)
 
     def set_namespace(self, namespaces):
         """Set a namespace filter on this query.

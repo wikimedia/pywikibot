@@ -735,11 +735,6 @@ class GeneratorFactory(object):
                     u'What namespace are you filtering on?')
             self._namespaces += value.split(",")
             return True
-        elif arg == '-step':
-            issue_deprecation_warning(
-                'The usage of "{0}"'.format(arg), None, 2,
-                ArgumentDeprecationWarning)
-            return False
         elif arg == '-limit':
             if not value:
                 value = pywikibot.input('What is the limit value?')
