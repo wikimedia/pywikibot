@@ -1612,8 +1612,12 @@ class WikimediaFamily(Family):
         return 'https'
 
     def rcstream_host(self, code):
-        """Return 'stream.wikimedia.org' as the RCStream hostname."""
-        return 'stream.wikimedia.org'
+        """Return 'https://stream.wikimedia.org' as the RCStream hostname."""
+        return 'https://stream.wikimedia.org'
+
+    def rcstream_port(self, code):
+        """Return 443 as the RCStream port number."""
+        return 443
 
 
 class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):

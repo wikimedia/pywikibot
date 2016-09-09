@@ -45,7 +45,7 @@ class RcListenerThread(threading.Thread):
                      is passed to rcstream using a 'subscribe' command. Pass
                      '*' to listen to all wikis for a given rc host.
     @param rchost: the recent changes stream host to connect to. For Wikimedia
-                   wikis, this is 'stream.wikimedia.org'
+                   wikis, this is 'https://stream.wikimedia.org'
     @param rcport: the port to connect to (default: 80)
     @param rcpath: the sockets.io path. For Wikimedia wikis, this is '/rc'.
                    (default: '/rc')
@@ -58,7 +58,7 @@ class RcListenerThread(threading.Thread):
 
     Usage:
 
-    >>> t = RcListenerThread('en.wikipedia.org', 'stream.wikimedia.org')
+    >>> t = RcListenerThread('en.wikipedia.org', 'https://stream.wikimedia.org')
     >>> t.start()
     >>> change = t.queue.get()
     >>> change
@@ -164,7 +164,7 @@ def rc_listener(wikihost, rchost, rcport=80, rcpath='/rc', total=None):
                      is passed to rcstream using a 'subscribe' command. Pass
                      '*' to listen to all wikis for a given rc host.
     @param rchost: the recent changes stream host to connect to. For Wikimedia
-                   wikis, this is 'stream.wikimedia.org'
+                   wikis, this is 'https://stream.wikimedia.org'
     @param rcport: the port to connect to (default: 80)
     @param rcpath: the sockets.io path. For Wikimedia wikis, this is '/rc'.
                    (default: '/rc')
@@ -218,5 +218,6 @@ def site_rc_listener(site, total=None):
     return rc_listener(
         wikihost=site.hostname(),
         rchost=site.rcstream_host(),
+        rcport=site.rcstream_port(),
         total=total,
     )
