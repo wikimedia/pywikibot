@@ -219,6 +219,7 @@ def _create_default_regexes():
         # preformatted text
         'pre':          re.compile(r'(?ism)<pre>.*?</pre>'),
         'source':       re.compile(r'(?is)<source .*?</source>'),
+        'score':        re.compile(r'(?ism)<score[ >].*?</score>'),
         # inline references
         'ref':          re.compile(r'(?ism)<ref[ >].*?</ref>'),
         'template':     NESTED_TEMPLATE_REGEX,
