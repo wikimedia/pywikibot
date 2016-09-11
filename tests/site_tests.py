@@ -588,7 +588,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
 
-    @allowed_failure  # T78276
     def test_allpages_langlinks_enabled(self):
         """Test allpages with langlinks enabled."""
         mysite = self.get_site()
