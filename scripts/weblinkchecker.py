@@ -862,13 +862,20 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
                 # Limit the number of threads started at the same time. Each
                 # thread will check one page, then die.
                 while threading.activeCount() >= config.max_external_links:
-                    # wait 100 ms
-                    time.sleep(0.1)
+                    time.sleep(config.retry_wait)
                 thread = LinkCheckThread(page, url, self.history,
                                          self.HTTPignore, self.day)
                 # thread dies when program terminates
                 thread.setDaemon(True)
-                thread.start()
+                try:
+                    thread.start()
+                except threading.ThreadError:
+                    pywikibot.warning(
+                        "Can't start a new thread.\nPlease decrease "
+                        "max_external_links in your user-config.py or use\n"
+                        "'-max_external_links:' option with a smaller value. "
+                        "Default is 50.")
+                    raise
 
 
 def RepeatPageGenerator():
