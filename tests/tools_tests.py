@@ -17,12 +17,19 @@ import subprocess
 import tempfile
 import warnings
 
+try:
+    import mock
+except ImportError as e:
+    mock = e
+
 from pywikibot import tools
 
 from tests import join_xml_data_path
+
 from tests.aspects import (
     unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
 )
+
 from tests.utils import expected_failure_if, add_metaclass
 
 
@@ -673,6 +680,48 @@ class TestPythonArgSpec(TestArgSpec):
             if tools.PYTHON_VERSION >= (3, 5):
                 warnings.simplefilter('ignore', DeprecationWarning)
             return inspect.getargspec(method)
+
+
+@require_modules('mock')
+class TestFileModeChecker(TestCase):
+
+    """Test parsing password files."""
+
+    net = False
+
+    def patch(self, name):
+        """Patch up <name> in self.setUp."""
+        patcher = mock.patch(name)
+        self.addCleanup(patcher.stop)
+        return patcher.start()
+
+    def setUp(self):
+        """Patch a variety of dependencies."""
+        super(TestFileModeChecker, self).setUp()
+        self.stat = self.patch('os.stat')
+        self.chmod = self.patch('os.chmod')
+        self.file = '~FakeFile'
+
+    def test_auto_chmod_for_dir(self):
+        """Do not chmod files that have mode private_files_permission."""
+        self.stat.return_value.st_mode = 0o040600  # dir
+        tools.file_mode_checker(self.file, mode=0o600)
+        self.stat.assert_called_with(self.file)
+        self.assertFalse(self.chmod.called)
+
+    def test_auto_chmod_OK(self):
+        """Do not chmod files that have mode private_files_permission."""
+        self.stat.return_value.st_mode = 0o100600  # regular file
+        tools.file_mode_checker(self.file, mode=0o600)
+        self.stat.assert_called_with(self.file)
+        self.assertFalse(self.chmod.called)
+
+    def test_auto_chmod_not_OK(self):
+        """Chmod files that do not have mode private_files_permission."""
+        self.stat.return_value.st_mode = 0o100644  # regular file
+        tools.file_mode_checker(self.file, mode=0o600)
+        self.stat.assert_called_with(self.file)
+        self.chmod.assert_called_once_with(self.file, 0o600)
 
 
 if __name__ == '__main__':  # pragma: no cover

@@ -3,7 +3,7 @@
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,8 +13,9 @@ __version__ = '$Id$'
 #
 import codecs
 import os
-import stat
 import webbrowser
+
+from pywikibot.tools import file_mode_checker
 
 from warnings import warn
 
@@ -236,12 +237,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         if not os.path.isfile(password_file):
             password_file = config.password_file
 
-        # We fix password file permission first,
-        # lift upper permission (regular file) from st_mode
-        # to compare it with private_files_permission.
-        if os.stat(password_file).st_mode - stat.S_IFREG \
-                != config.private_files_permission:
-            os.chmod(password_file, config.private_files_permission)
+        # We fix password file permission first.
+        file_mode_checker(password_file, mode=config.private_files_permission)
 
         password_f = codecs.open(password_file, encoding='utf-8')
         for line_nr, line in enumerate(password_f):
