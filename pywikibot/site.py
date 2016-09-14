@@ -4947,7 +4947,6 @@ class APISite(BaseSite):
         token = self.tokens['edit']
         if bot is None:
             bot = ("bot" in self.userinfo["rights"])
-        self.lock_page(page)
         params = dict(action='edit', title=page,
                       text=text, token=token, summary=summary, bot=bot,
                       recreate=recreate, createonly=createonly,
@@ -4973,92 +4972,91 @@ class APISite(BaseSite):
                 u"editpage: Invalid watch value '%(watch)s' ignored."
                 % {'watch': watch})
         req = self._simple_request(**params)
-        while True:
-            try:
-                result = req.submit()
-                pywikibot.debug(u"editpage response: %s" % result,
-                                _logger)
-            except api.APIError as err:
-                self.unlock_page(page)
-                if err.code.endswith("anon") and self.logged_in():
+
+        self.lock_page(page)
+        try:
+            while True:
+                try:
+                    result = req.submit()
+                    pywikibot.debug(u"editpage response: %s" % result,
+                                    _logger)
+                except api.APIError as err:
+                    if err.code.endswith("anon") and self.logged_in():
+                        pywikibot.debug(
+                            u"editpage: received '%s' even though bot is logged in"
+                            % err.code,
+                            _logger)
+                    if err.code in self._ep_errors:
+                        if isinstance(self._ep_errors[err.code], basestring):
+                            errdata = {
+                                'site': self,
+                                'title': page.title(withSection=False),
+                                'user': self.user(),
+                                'info': err.info
+                            }
+                            raise Error(self._ep_errors[err.code] % errdata)
+                        else:
+                            raise self._ep_errors[err.code](page)
                     pywikibot.debug(
-                        u"editpage: received '%s' even though bot is logged in"
+                        u"editpage: Unexpected error code '%s' received."
                         % err.code,
                         _logger)
-                if err.code in self._ep_errors:
-                    if isinstance(self._ep_errors[err.code], basestring):
-                        errdata = {
-                            'site': self,
-                            'title': page.title(withSection=False),
-                            'user': self.user(),
-                            'info': err.info
-                        }
-                        raise Error(self._ep_errors[err.code] % errdata)
-                    else:
-                        raise self._ep_errors[err.code](page)
-                pywikibot.debug(
-                    u"editpage: Unexpected error code '%s' received."
-                    % err.code,
-                    _logger)
-                raise
-            assert "edit" in result and "result" in result["edit"], result
-            if result["edit"]["result"] == "Success":
-                self.unlock_page(page)
-                if "nochange" in result["edit"]:
-                    # null edit, page not changed
-                    pywikibot.log(u"Page [[%s]] saved without any changes."
-                                  % page.title())
+                    raise
+                assert "edit" in result and "result" in result["edit"], result
+                if result["edit"]["result"] == "Success":
+                    if "nochange" in result["edit"]:
+                        # null edit, page not changed
+                        pywikibot.log(u"Page [[%s]] saved without any changes."
+                                      % page.title())
+                        return True
+                    page.latest_revision_id = result["edit"]["newrevid"]
+                    # see https://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
+                    # not safe to assume that saved text is the same as sent
+                    del page.text
                     return True
-                page.latest_revision_id = result["edit"]["newrevid"]
-                # see https://www.mediawiki.org/wiki/API:Wikimania_2006_API_discussion#Notes
-                # not safe to assume that saved text is the same as sent
-                del page.text
-                return True
-            elif result["edit"]["result"] == "Failure":
-                if "captcha" in result["edit"]:
-                    captcha = result["edit"]["captcha"]
-                    req['captchaid'] = captcha['id']
-                    if captcha["type"] == "math":
-                        # TODO: Should the input be parsed through eval in py3?
-                        req['captchaword'] = input(captcha["question"])
-                        continue
-                    elif "url" in captcha:
-                        import webbrowser
-                        webbrowser.open('%s://%s%s'
-                                        % (self.protocol(),
-                                           self.hostname(),
-                                           captcha["url"]))
-                        req['captchaword'] = pywikibot.input(
-                            "Please view CAPTCHA in your browser, "
-                            "then type answer here:")
-                        continue
-                    else:
-                        self.unlock_page(page)
+                elif result["edit"]["result"] == "Failure":
+                    if "captcha" in result["edit"]:
+                        captcha = result["edit"]["captcha"]
+                        req['captchaid'] = captcha['id']
+                        if captcha["type"] == "math":
+                            # TODO: Should the input be parsed through eval in py3?
+                            req['captchaword'] = input(captcha["question"])
+                            continue
+                        elif "url" in captcha:
+                            import webbrowser
+                            webbrowser.open('%s://%s%s'
+                                            % (self.protocol(),
+                                               self.hostname(),
+                                               captcha["url"]))
+                            req['captchaword'] = pywikibot.input(
+                                "Please view CAPTCHA in your browser, "
+                                "then type answer here:")
+                            continue
+                        else:
+                            pywikibot.error(
+                                u"editpage: unknown CAPTCHA response %s, "
+                                u"page not saved"
+                                % captcha)
+                            return False
+                    elif 'spamblacklist' in result['edit']:
+                        raise SpamfilterError(page, result['edit']['spamblacklist'])
+                    elif 'code' in result['edit'] and 'info' in result['edit']:
                         pywikibot.error(
-                            u"editpage: unknown CAPTCHA response %s, "
-                            u"page not saved"
-                            % captcha)
+                            u"editpage: %s\n%s, "
+                            % (result['edit']['code'], result['edit']['info']))
                         return False
-                elif 'spamblacklist' in result['edit']:
-                    raise SpamfilterError(page, result['edit']['spamblacklist'])
-                elif 'code' in result['edit'] and 'info' in result['edit']:
-                    self.unlock_page(page)
-                    pywikibot.error(
-                        u"editpage: %s\n%s, "
-                        % (result['edit']['code'], result['edit']['info']))
-                    return False
+                    else:
+                        pywikibot.error(u"editpage: unknown failure reason %s"
+                                        % str(result))
+                        return False
                 else:
-                    self.unlock_page(page)
-                    pywikibot.error(u"editpage: unknown failure reason %s"
-                                    % str(result))
+                    pywikibot.error(
+                        u"editpage: Unknown result code '%s' received; "
+                        u"page not saved" % result["edit"]["result"])
+                    pywikibot.log(str(result))
                     return False
-            else:
-                self.unlock_page(page)
-                pywikibot.error(
-                    u"editpage: Unknown result code '%s' received; "
-                    u"page not saved" % result["edit"]["result"])
-                pywikibot.log(str(result))
-                return False
+        finally:
+            self.unlock_page(page)
 
     OnErrorExc = namedtuple('OnErrorExc', 'exception on_new_page')
 
