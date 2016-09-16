@@ -48,6 +48,7 @@ from pywikibot.exceptions import (
     IsNotRedirectPage,
     CircularRedirect,
     InterwikiRedirectPage,
+    InconsistentTitleReceived,
     LockedPage,
     CascadeLockedPage,
     LockedNoPage,
@@ -2892,14 +2893,11 @@ class APISite(BaseSite):
         except api.APIError:  # May occur if you are not logged in (no API read permissions).
             return (0, 0, 0)
 
-    def _update_page(self, page, query, method_name):
+    def _update_page(self, page, query):
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
                                   page.title(withSection=False)):
-                pywikibot.warning(
-                    u"{0}: Query on {1} returned data on '{2}'".format(
-                        method_name, page, pageitem['title']))
-                continue
+                raise InconsistentTitleReceived(page, pageitem['title'])
             api.update_page(page, pageitem, query.props)
 
     def loadpageinfo(self, page, preload=False):
@@ -2913,7 +2911,7 @@ class APISite(BaseSite):
                                 type_arg="info",
                                 titles=title.encode(self.encoding()),
                                 inprop=inprop)
-        self._update_page(page, query, 'loadpageinfo')
+        self._update_page(page, query)
 
     def loadcoordinfo(self, page):
         """Load [[mw:Extension:GeoData]] info."""
@@ -2925,7 +2923,7 @@ class APISite(BaseSite):
                                         'country', 'region',
                                         'globe'],
                                 coprimary='all')
-        self._update_page(page, query, 'loadcoordinfo')
+        self._update_page(page, query)
 
     def loadpageprops(self, page):
         """Load page props for the given page."""
@@ -2934,7 +2932,7 @@ class APISite(BaseSite):
                                 type_arg="pageprops",
                                 titles=title.encode(self.encoding()),
                                 )
-        self._update_page(page, query, 'loadpageprops')
+        self._update_page(page, query)
 
     def loadimageinfo(self, page, history=False):
         """Load image info from api and save in page attributes.
@@ -2956,9 +2954,7 @@ class APISite(BaseSite):
         # self._update_page() pattern and remove return
         for pageitem in query:
             if not self.sametitle(pageitem['title'], title):
-                raise Error(
-                    u"loadimageinfo: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
+                raise InconsistentTitleReceived(page, pageitem['title'])
             api.update_page(page, pageitem, query.props)
 
             if "imageinfo" not in pageitem:
@@ -3933,9 +3929,7 @@ class APISite(BaseSite):
         for pagedata in rvgen:
             if not self.sametitle(pagedata['title'],
                                   page.title(withSection=False)):
-                raise Error(
-                    u"loadrevisions: Query on %s returned data on '%s'"
-                    % (page, pagedata['title']))
+                raise InconsistentTitleReceived(page, pagedata['title'])
             if "missing" in pagedata:
                 raise NoPage(page)
             api.update_page(page, pagedata, rvgen.props)
@@ -3964,9 +3958,7 @@ class APISite(BaseSite):
                                   total=total)
         for pageitem in llquery:
             if not self.sametitle(pageitem['title'], lltitle):
-                raise Error(
-                    u"getlanglinks: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
+                raise InconsistentTitleReceived(page, pageitem['title'])
             if 'langlinks' not in pageitem:
                 continue
             for linkdata in pageitem['langlinks']:
@@ -3987,9 +3979,7 @@ class APISite(BaseSite):
                                   total=total)
         for pageitem in elquery:
             if not self.sametitle(pageitem['title'], eltitle):
-                raise RuntimeError(
-                    "getlanglinks: Query on %s returned data on '%s'"
-                    % (page, pageitem['title']))
+                raise InconsistentTitleReceived(page, pageitem['title'])
             if 'extlinks' not in pageitem:
                 continue
             for linkdata in pageitem['extlinks']:
