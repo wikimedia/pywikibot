@@ -57,7 +57,7 @@ character.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2015
+# (C) Pywikibot team, 2005-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,7 +74,8 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import config, Bot, i18n
+from pywikibot import config, i18n
+from pywikibot.bot import SingleSiteBot, CurrentPageBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 
 
@@ -87,7 +88,7 @@ class NoTitle(Exception):
         self.offset = offset
 
 
-class PageFromFileRobot(Bot):
+class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
     """
     Responsible for writing pages to the wiki.
@@ -96,7 +97,7 @@ class PageFromFileRobot(Bot):
 
     """
 
-    def __init__(self, reader, **kwargs):
+    def __init__(self, **kwargs):
         """Constructor."""
         self.availableOptions.update({
             'always': True,
@@ -113,34 +114,35 @@ class PageFromFileRobot(Bot):
         super(PageFromFileRobot, self).__init__(**kwargs)
         self.availableOptions.update(
             {'always': False if self.getOption('showdiff') else True})
-        self.reader = reader
 
-    def run(self):
-        """Start file processing and upload content."""
-        for title, contents in self.reader.run():
-            self.save(title, contents)
+    def init_page(self, page):
+        """Do not try to update site before calling treat."""
+        pass
 
-    def save(self, title, contents):
+    def treat(self, page_tuple):
+        """Process page tuple, set page to current page and treat it."""
+        title, content = page_tuple
+        page = pywikibot.Page(self.site, title)
+        page.text = content.strip()
+        super(PageFromFileRobot, self).treat(page)
+
+    def treat_page(self):
         """Upload page content."""
-        mysite = pywikibot.Site()
-
-        page = pywikibot.Page(mysite, title)
-        self.current_page = page
+        page = self.current_page
+        title = page.title()
+        contents = page.text
 
         if self.getOption('summary'):
             comment = self.getOption('summary')
         else:
-            comment = i18n.twtranslate(mysite, 'pagefromfile-msg')
+            comment = i18n.twtranslate(self.site, 'pagefromfile-msg')
 
         comment_top = comment + " - " + i18n.twtranslate(
-            mysite, 'pagefromfile-msg_top')
+            self.site, 'pagefromfile-msg_top')
         comment_bottom = comment + " - " + i18n.twtranslate(
-            mysite, 'pagefromfile-msg_bottom')
+            self.site, 'pagefromfile-msg_bottom')
         comment_force = "%s *** %s ***" % (
-            comment, i18n.twtranslate(mysite, 'pagefromfile-msg_force'))
-
-        # Remove trailing newlines (cause troubles when creating redirects)
-        contents = re.sub('^[\r\n]*', '', contents)
+            comment, i18n.twtranslate(self.site, 'pagefromfile-msg_force'))
 
         if page.exists():
             if not self.getOption('redirect') and page.isRedirectPage():
@@ -175,24 +177,16 @@ class PageFromFileRobot(Bot):
                 return
         else:
             if self.getOption('autosummary'):
-                comment = ''
-                config.default_edit_summary = ''
+                comment = config.default_edit_summary = ''
 
-        self.userPut(page, page.text, contents,
-                     summary=comment,
-                     minor=self.getOption('minor'),
-                     show_diff=self.getOption('showdiff'),
-                     ignore_save_related_errors=True)
+        self.put_current(contents, summary=comment,
+                         minor=self.getOption('minor'),
+                         show_diff=self.getOption('showdiff'))
 
 
 class PageFromFileReader(object):
 
-    """
-    Responsible for reading the file.
-
-    The run() method yields a (title, contents) tuple for each found page.
-
-    """
+    """Generator class, responsible for reading the file."""
 
     def __init__(self, filename, pageStartMarker, pageEndMarker,
                  titleStartMarker, titleEndMarker, include, notitle):
@@ -210,8 +204,8 @@ class PageFromFileReader(object):
         self.include = include
         self.notitle = notitle
 
-    def run(self):
-        """Read file and yield page title and content."""
+    def __iter__(self):
+        """Read file and yield a tuple of page title and content."""
         pywikibot.output('\n\nReading \'%s\'...' % self.filename)
         try:
             with codecs.open(self.filename, 'r',
@@ -351,7 +345,7 @@ def main(*args):
         reader = PageFromFileReader(filename, pageStartMarker, pageEndMarker,
                                     titleStartMarker, titleEndMarker, include,
                                     notitle)
-        bot = PageFromFileRobot(reader, **options)
+        bot = PageFromFileRobot(generator=reader, **options)
         bot.run()
 
 if __name__ == "__main__":
