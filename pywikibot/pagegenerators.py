@@ -909,7 +909,7 @@ class GeneratorFactory(object):
             self.intersect = True
             return True
         elif arg == '-subpage':
-            if value:
+            if not value:
                 value = pywikibot.input(
                     'Maximum subpage depth:')
             self.subpage_max_depth = int(value)
