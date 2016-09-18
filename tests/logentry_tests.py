@@ -1,7 +1,7 @@
 # -*- coding: utf-8  -*-
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ class TestLogentriesBase(TestCase):
     def _test_logevent(self, logtype):
         """Test a single logtype entry."""
         logentry = self._get_logentry(logtype)
-        if logtype in LogEntryFactory._logtypes:
+        if logtype in LogEntryFactory.logtypes:
             self.assertEqual(logentry._expectedType, logtype)
         else:
             self.assertIsNone(logentry._expectedType)
@@ -110,7 +110,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
             return test_logevent
 
         # create test methods for the support logtype classes
-        for logtype in LogEntryFactory._logtypes:
+        for logtype in LogEntryFactory.logtypes:
             cls.add_method(dct, 'test_%sEntry' % logtype.title(),
                            test_method(logtype))
 
@@ -136,7 +136,7 @@ class TestSimpleLogentries(TestLogentriesBase):
         # initialized yet.
         available_types = set(self.site._paraminfo.parameter(
             'query+logevents', 'type')['type'])
-        for simple_type in available_types - set(LogEntryFactory._logtypes):
+        for simple_type in available_types - set(LogEntryFactory.logtypes):
             if not simple_type:
                 # paraminfo also reports an empty string as a type
                 continue

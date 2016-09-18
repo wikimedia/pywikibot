@@ -23,6 +23,7 @@ except ImportError as e:
     mock = e
 
 from pywikibot import tools
+from pywikibot.tools import classproperty
 
 from tests import join_xml_data_path
 
@@ -722,6 +723,30 @@ class TestFileModeChecker(TestCase):
         tools.file_mode_checker(self.file, mode=0o600)
         self.stat.assert_called_with(self.file)
         self.chmod.assert_called_once_with(self.file, 0o600)
+
+
+class Foo(object):
+
+    """Test class to verify classproperty decorator."""
+
+    _bar = 'baz'
+
+    @classproperty
+    def bar(cls):  # flake8: disable=N805
+        """Class property method."""
+        return cls._bar
+
+
+class TestClassProperty(TestCase):
+
+    """Test classproperty decorator."""
+
+    net = False
+
+    def test_classproperty(self):
+        """Test for classproperty decorator."""
+        self.assertEqual(Foo.bar, 'baz')
+        self.assertEqual(Foo.bar, Foo._bar)
 
 
 if __name__ == '__main__':  # pragma: no cover
