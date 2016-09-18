@@ -3454,7 +3454,7 @@ class WikibasePage(BasePage):
         """
         if not hasattr(self, '_content'):
             try:
-                self.get()
+                self.get(get_redirect=True)
                 return True
             except pywikibot.NoPage:
                 return False
