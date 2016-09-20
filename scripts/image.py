@@ -37,7 +37,7 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2015
+# (C) Pywikibot team, 2013-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -57,50 +57,6 @@ from scripts.replace import ReplaceRobot as ReplaceBot
 class ImageRobot(ReplaceBot):
 
     """This bot will replace or remove all occurrences of an old image."""
-
-    # Summary messages for replacing images
-    msg_replace = {
-        'ar': u'روبوت - استبدال الصورة %s مع %s',
-        'de': u'Bot: Ersetze Bild %s durch %s',
-        'en': u'Bot: Replacing image %s with %s',
-        'es': u'Robot - Reemplazando imagen %s por %s',
-        'fa': u'ربات: جایگزین کردن تصویر %s با %s',
-        'fr': u'Bot: Remplace image %s par %s',
-        'he': u'בוט: מחליף את התמונה %s בתמונה %s',
-        'it': u"Bot: Sostituisco l'immagine %s con %s",
-        'ja': u'ロボットによる：画像置き換え %s から %s へ',
-        'ko': u'로봇 - 그림 %s을 %s로 치환',
-        'lt': u'robotas: vaizdas %s keičiamas į %s',
-        'nn': u'robot: erstatta biletet %s med %s',
-        'no': u'robot: erstatter bildet %s med %s',
-        'nl': u'Bot: afbeelding %s vervangen door %s',
-        'pl': u'Robot zamienia obraz %s na %s',
-        'pt': u'Bot: Alterando imagem %s para %s',
-        'ru': u'Бот: Замена файла %s на %s',
-        'zh': u'機器人：取代圖像 %s 至 %s',
-    }
-
-    # Summary messages for removing images
-    msg_remove = {
-        'ar': u'روبوت - إزالة الصورة %s',
-        'de': u'Bot: Entferne Bild %s',
-        'en': u'Robot: Removing image %s',
-        'es': u'Robot - Retirando imagen %s',
-        'fa': u'ربات: برداشتن تصویر %s',
-        'fr': u'Bot: Enleve image %s',
-        'he': u'בוט: מסיר את התמונה %s',
-        'it': u"Bot: Rimuovo l'immagine %s",
-        'ja': u'ロボットによる：画像削除 %s',
-        'ko': u'로봇 - %s 그림을 제거',
-        'lt': u'robotas: Šalinamas vaizdas %s',
-        'nl': u'Bot: afbeelding %s verwijderd',
-        'no': u'robot: fjerner bildet %s',
-        'nn': u'robot: fjerna biletet %s',
-        'pl': u'Robot usuwa obraz %s',
-        'pt': u'Bot: Alterando imagem %s',
-        'ru': u'Бот: удалил файл %s',
-        'zh': u'機器人：移除圖像 %s',
-    }
 
     def __init__(self, generator, old_image, new_image=None, **kwargs):
         """
@@ -123,13 +79,15 @@ class ImageRobot(ReplaceBot):
 
         self.old_image = old_image
         self.new_image = new_image
+        param = {
+            'old': self.old_image,
+            'new': self.new_image,
+            'file': self.old_image,
+        }
 
-        if not self.getOption('summary'):
-            self.options['summary'] = i18n.translate(
-                self.site, self.msg_replace,
-                (self.old_image, self.new_image) if self.new_image
-                else self.old_image,
-                fallback=True)
+        summary = self.getOption('summary') or i18n.twtranslate(
+            self.site, 'image-replace' if self.new_image else 'image-remove',
+            param)
 
         namespace = self.site.namespaces[6]
         if namespace.case == 'first-letter':
@@ -162,7 +120,7 @@ class ImageRobot(ReplaceBot):
 
         super(ImageRobot, self).__init__(self.generator, replacements,
                                          always=self.getOption('always'),
-                                         summary=self.getOption('summary'))
+                                         summary=summary)
 
 
 def main(*args):
