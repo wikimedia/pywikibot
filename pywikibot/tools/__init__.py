@@ -169,6 +169,33 @@ def py2_encode_utf_8(func):
         return func
 
 
+class classproperty(object):  # flake8: disable=N801
+
+    """
+    Metaclass to accesss a class method as a property.
+
+    This class may be used as a decorator::
+
+        class Foo(object):
+
+            _bar = 'baz'  # a class property
+
+            @classproperty
+            def bar(cls):  # a class property method
+                return cls._bar
+
+    Foo.bar gives 'baz'.
+    """
+
+    def __init__(self, cls_method):
+        """Hold the class method."""
+        self.method = cls_method
+
+    def __get__(self, instance, owner):
+        """Get the attribute of the owner class by its method."""
+        return self.method(owner)
+
+
 class UnicodeMixin(object):
 
     """Mixin class to add __str__ method in Python 2 or 3."""

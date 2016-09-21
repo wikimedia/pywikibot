@@ -14,7 +14,7 @@ import sys
 
 import pywikibot
 from pywikibot.exceptions import Error
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, classproperty
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -371,7 +371,7 @@ class LogEntryFactory(object):
     Only available method is create()
     """
 
-    _logtypes = {
+    logtypes = {
         'block': BlockEntry,
         'protect': ProtectEntry,
         'rights': RightsEntry,
@@ -403,6 +403,12 @@ class LogEntryFactory(object):
             logclass = LogEntryFactory._getEntryClass(logtype)
             self._creator = lambda data: logclass(data, self._site)
 
+    @classproperty
+    @deprecated('LogEntryFactory.logtypes')
+    def _logtypes(cls):  # flake8: disable=N805
+        """DEPRECATED LogEntryFactory class attribute of log types."""
+        return cls.logtypes
+
     def create(self, logdata):
         """
         Instantiate the LogEntry object representing logdata.
@@ -423,7 +429,7 @@ class LogEntryFactory(object):
         @rtype: class
         """
         try:
-            return cls._logtypes[logtype]
+            return cls.logtypes[logtype]
         except KeyError:
             return LogEntry
 
