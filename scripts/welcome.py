@@ -9,14 +9,6 @@ Albanian, Italian Wikipedia, Wikimedia Commons and English Wikiquote.
 
 Ensure you have community support before running this bot!
 
-URLs to current implementations:
-* Wikimedia Commons: https://commons.wikimedia.org/wiki/Commons:Welcome_log
-* Dutch Wikipedia: https://nl.wikipedia.org/wiki/Wikipedia:Logboek_welkom
-* Italian Wikipedia: https://it.wikipedia.org/wiki/Wikipedia:Benvenuto_log
-* English Wikiquote: https://en.wikiquote.org/wiki/Wikiquote:Welcome_log
-* Persian Wikipedia: https://fa.wikipedia.org/wiki/ویکی‌پدیا:سیاهه_خوشامد
-* Korean Wikipedia: https://ko.wikipedia.org/wiki/위키백과:Welcome_log
-
 Everything that needs customisation to support additional projects is
 indicated by comments.
 
