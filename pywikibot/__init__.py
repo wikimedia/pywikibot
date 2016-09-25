@@ -902,7 +902,7 @@ def _flush(stop=True):
         page_put_queue.put((None, [], {}))
 
     num, sec = remaining()
-    if num > 0:
+    if num > 0 and sec.total_seconds() > config.noisysleep:
         output(color_format(
             '{lightblue}Waiting for {num} pages to be put. '
             'Estimated time remaining: {sec}{default}', num=num, sec=sec))
