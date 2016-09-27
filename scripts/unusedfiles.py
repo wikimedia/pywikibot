@@ -7,6 +7,9 @@ Parameters:
 
 -always         Don't be asked every time.
 -nouserwarning  Do not warn uploader about orphaned file.
+-total          Specify number of pages to work on with "-total:n" where
+                n is the maximum number of articles to work on.
+                If not used, all pages are used.
 """
 #
 # (C) Leonardo Gregianin, 2007
@@ -57,11 +60,6 @@ class UnusedFilesBot(Bot):
                 (self.template_user or self.getOption('nouserwarning'))):
             raise pywikibot.Error(u'This script is not localized for %s site.'
                                   % self.site)
-
-        generator = pagegenerators.UnusedFilesGenerator(site=self.site)
-        generator = pagegenerators.PreloadingGenerator(generator)
-
-        self.generator = generator
 
     def treat(self, image):
         """Process one image page."""
@@ -114,11 +112,22 @@ def main(*args):
     @type args: list of unicode
     """
     options = {}
+    total = None
 
-    for arg in pywikibot.handle_args(args):
-        options[arg[1:]] = True
+    local_args = pywikibot.handle_args(args)
 
-    bot = UnusedFilesBot(pywikibot.Site(), **options)
+    for arg in local_args:
+        arg, sep, value = arg.partition(':')
+        if arg == '-total':
+            total = value
+        else:
+            options[arg[1:]] = True
+
+    site = pywikibot.Site()
+    gen = pagegenerators.UnusedFilesGenerator(total=total, site=site)
+    gen = pagegenerators.PreloadingGenerator(gen)
+
+    bot = UnusedFilesBot(site, generator=gen, **options)
     try:
         bot.run()
     except pywikibot.Error as e:
