@@ -34,9 +34,9 @@ archive              Name of the page to which archived threads will be put.
                      Must be a subpage of the current page. Variables are
                      supported.
 algo                 specifies the maximum age of a thread. Must be in the form
-                     old(<delay>) where <delay> specifies the age in hours or
-                     days like 24h or 5d.
-                     Default is old(24h)
+                     old(<delay>) where <delay> specifies the age in minutes(m),
+                     hours (h), days (d), weeks(w), months (M) or years (y)
+                     like 24h or 5d. Default is old(24h)
 counter              The current value of a counter which could be assigned as
                      variable. Will be actualized by bot. Initial value is 1.
 maxarchivesize       The maximum archive size before incrementing the counter.
@@ -87,8 +87,8 @@ Options (may be omitted):
 """
 #
 # (C) Misza13, 2006-2010
-# (C) xqt, 2009-2014
-# (C) Pywikibot team, 2007-2014
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,17 +155,22 @@ def str2localized_duration(site, string):
     Translates a duration written in the shorthand notation (ex. "24h", "7d")
     into an expression in the local language of the wiki ("24 hours", "7 days").
     """
-    if string[-1] == 'h':
-        template = site.mediawiki_message('Hours')
-    elif string[-1] == 'd':
-        template = site.mediawiki_message('Days')
-    elif string[-1] == 'w':
-        template = site.mediawiki_message('Weeks')
-    elif string[-1] == 'y':
-        template = site.mediawiki_message('Years')
+    mw_keys = {
+        'm': 'minutes',
+        'h': 'hours',
+        'd': 'days',
+        'w': 'weeks',
+        'M': 'months',
+        'y': 'years',
+    }
+
+    template = site.mediawiki_message(mw_keys[string[-1]])
     if template:
-        exp = i18n.translate(site.code, template, {'$1': int(string[:-1])})
-        return to_local_digits(exp.replace('$1', string[:-1]), site.code)
+        duration = string[:-1]
+        # replace plural variants
+        exp = i18n.translate(site.code, template, {'$1': int(duration)})
+
+        return exp.replace('$1', to_local_digits(duration, site.code))
     else:
         return to_local_digits(string, site.code)
 
