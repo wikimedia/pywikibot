@@ -836,7 +836,8 @@ class DisambiguationRobot(Bot):
 
                 # TODO: Output context on each question
                 answer = pywikibot.input_choice('Option', options,
-                                                default=self.always)
+                                                default=self.always,
+                                                force=True)
                 if answer == 'x':
                     assert edited, 'invalid option before editing'
                     break
