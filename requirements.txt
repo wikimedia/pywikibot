@@ -25,6 +25,8 @@ requests>=2.4.1
 pyOpenSSL>=0.13 ; python_full_version < '2.7.9'
 ndg-httpsclient ; python_full_version < '2.7.9'
 pyasn1 ; python_full_version < '2.7.9'
+# https://github.com/eliben/pycparser/issues/147
+pycparser != 2.14
 
 future>=0.15.0 ; python_version < '2.7'
 
