@@ -235,7 +235,8 @@ class CosmeticChangesToolkit(object):
             self.fixTypo,
 
             self.fixArabicLetters,
-            self.fix_ISBN,
+            # FIXME: T144288
+            # self.fix_ISBN,
         )
 
     @classmethod
