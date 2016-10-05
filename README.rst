@@ -43,7 +43,8 @@ If you wish to write your own script it's very easy to get started:
     page.text = page.text.replace('foo', 'bar')
     page.save('Replacing "foo" with "bar"')  # Saves the page
 
-=======
+-------------------------------------------------------------------------------------------
+
 For more documentation on pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
 
