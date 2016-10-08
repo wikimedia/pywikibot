@@ -173,6 +173,35 @@ class NestedOption(OutputOption, StandardOption):
         pywikibot.output(self._output)
 
 
+class ContextOption(OutputOption, StandardOption):
+
+    """An option to show more and more context."""
+
+    def __init__(self, option, shortcut, text, context, delta=100, start=0, end=0):
+        """Constructor."""
+        super(ContextOption, self).__init__(option, shortcut, False)
+        self.text = text
+        self.context = context
+        self.delta = delta
+        self.start = start
+        self.end = end
+
+    def result(self, value):
+        """Add the delta to the context and output it."""
+        self.context += self.delta
+        super(ContextOption, self).result(value)
+
+    def output(self):
+        """Output the context."""
+        start = max(0, self.start - self.context)
+        end = min(len(self.text), self.end + self.context)
+        self.output_range(start, end)
+
+    def output_range(self, start_context, end_context):
+        """Output a section from the text."""
+        pywikibot.output(self.text[start_context:end_context])
+
+
 class IntegerOption(Option):
 
     """An option allowing a range of integers."""
@@ -248,34 +277,6 @@ class IntegerOption(Option):
     def result(self, value):
         """Return the value converted into int."""
         return (self.prefix, self.parse(value))
-
-
-class ContextOption(OutputOption, StandardOption):
-
-    """An option to show more and more context."""
-
-    def __init__(self, option, shortcut, text, context, delta=100, start=0, end=0):
-        """Constructor."""
-        super(ContextOption, self).__init__(option, shortcut, False)
-        self.text = text
-        self.context = context
-        self.delta = delta
-        self.start = start
-        self.end = end
-
-    def result(self, value):
-        """Add the delta to the context."""
-        self.context += self.delta
-
-    def output(self):
-        """Output the context."""
-        start = max(0, self.start - self.context)
-        end = min(len(self.text), self.end + self.context)
-        self.output_range(start, end)
-
-    def output_range(self, start_context, end_context):
-        """Output a section from the text."""
-        pywikibot.output(self.text[start_context:end_context])
 
 
 class ListOption(IntegerOption):
