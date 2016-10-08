@@ -2,8 +2,8 @@
 # -*- coding: utf-8  -*-
 """Script that updates the language lists in Wikimedia family files."""
 #
-# (C) xqt, 2009-2014
-# (C) Pywikibot team, 2008-2014
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,49 +15,41 @@ __version__ = '$Id$'
 import codecs
 import re
 
-import requests
-
-from xml.etree import cElementTree
-
 import pywikibot
 
+from pywikibot.data import wikistats
 from pywikibot.family import Family
 
-URL = 'https://wikistats.wmflabs.org/api.php?action=dump&table=%s&format=xml'
-
-familiesDict = {
-    'anarchopedia': 'anarchopedias',
-    'wikibooks':    'wikibooks',
-    'wikinews':     'wikinews',
-    'wikipedia':    'wikipedias',
-    'wikiquote':    'wikiquotes',
-    'wikisource':   'wikisources',
-    'wikiversity':  'wikiversity',
-    'wikivoyage':   'wikivoyage',
-    'wiktionary':   'wiktionaries',
-}
+# supported families by this script
+families_list = [
+    'anarchopedia',
+    'wikibooks',
+    'wikinews',
+    'wikipedia',
+    'wikiquote',
+    'wikisource',
+    'wikiversity',
+    'wikivoyage',
+    'wiktionary',
+]
 
 exceptions = ['-']
 
 
 def update_family(families):
     """Update family files."""
-    for family in families or familiesDict.keys():
+    ws = wikistats.WikiStats()
+    for family in families or families_list:
         pywikibot.output('\nChecking family %s:' % family)
 
         original = Family.load(family).languages_by_size
         obsolete = Family.load(family).obsolete
 
-        feed = requests.get(URL % familiesDict[family])
-        tree = cElementTree.parse(feed)
-
         new = []
-        for field in tree.findall('row/field'):
-            if field.get('name') == 'prefix':
-                code = field.text
-                if not (code in obsolete or code in exceptions):
-                    new.append(code)
-                continue
+        table = ws.languages_by_size(family)
+        for code in table:
+            if not (code in obsolete or code in exceptions):
+                new.append(code)
 
         # put the missing languages to the right place
         missing = original != new and set(original) - set(new)
@@ -100,8 +92,8 @@ def update_family(families):
 
 
 if __name__ == '__main__':
-    fam = []
-    for arg in pywikibot.handleArgs():
-        if arg in familiesDict.keys() and arg not in fam:
-            fam.append(arg)
+    fam = set()
+    for arg in pywikibot.handle_args():
+        if arg in families_list:
+            fam.add(arg)
     update_family(fam)
