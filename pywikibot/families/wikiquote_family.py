@@ -71,12 +71,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'it', 'pl', 'ru', 'cs', 'de', 'pt', 'es', 'uk', 'sk', 'fa',
-            'bs', 'fr', 'tr', 'he', 'lt', 'bg', 'ca', 'eo', 'sl', 'el', 'nn',
-            'id', 'hy', 'zh', 'hr', 'th', 'hu', 'li', 'su', 'nl', 'ko', 'ja',
-            'az', 'ar', 'sv', 'gl', 'ur', 'gu', 'te', 'fi', 'cy', 'la', 'ta',
-            'no', 'ml', 'et', 'kn', 'ku', 'sr', 'eu', 'ro', 'ka', 'hi', 'da',
-            'sa', 'vi', 'is', 'be', 'sq', 'mr', 'br', 'uz', 'af', 'zh-min-nan',
+            'en', 'it', 'pl', 'ru', 'cs', 'de', 'pt', 'es', 'uk', 'fa', 'sk',
+            'bs', 'fr', 'tr', 'he', 'lt', 'bg', 'ca', 'eo', 'sl', 'el', 'hy',
+            'nn', 'id', 'hr', 'zh', 'th', 'hu', 'li', 'su', 'nl', 'ko', 'ja',
+            'az', 'ar', 'sv', 'gl', 'ur', 'gu', 'te', 'fi', 'cy', 'ta', 'la',
+            'no', 'ml', 'et', 'kn', 'ku', 'sr', 'eu', 'vi', 'ro', 'ka', 'hi',
+            'da', 'sa', 'is', 'be', 'sq', 'mr', 'br', 'uz', 'af', 'zh-min-nan',
             'am', 'wo', 'ky',
         ]
 
