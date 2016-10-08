@@ -9,7 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pywikibot
 import pywikibot.page
@@ -33,6 +33,68 @@ THREADS = {
 THREADS_WITH_UPDATED_FORMAT = {
     'eo': 1, 'pdc': 1,
 }
+
+
+class TestArchiveBotFunctionsWithSites(TestCase):
+
+    """Test functions dependent to sites in archivebot."""
+
+    sites = {
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+        },
+        'frwikt': {
+            'family': 'wiktionary',
+            'code': 'fr',
+        },
+        'jawiki': {
+            'family': 'wikipedia',
+            'code': 'ja',
+        }
+    }
+
+    def test_str2localized_duraction_English(self):
+        """Test English localizations of duration."""
+        site = self.get_site('enwiki')
+        self.assertEqual(archivebot.str2localized_duration(site, '0m'), '0 minutes')
+        self.assertEqual(archivebot.str2localized_duration(site, '1d'), '1 day')
+        self.assertEqual(archivebot.str2localized_duration(site, '10h'), '10 hours')
+
+    def test_str2localized_duraction_French(self):
+        """Test French localizations of duration."""
+        site = self.get_site('frwikt')
+        self.assertEqual(archivebot.str2localized_duration(site, '10d'), '10 jours')
+        self.assertEqual(archivebot.str2localized_duration(site, '1y'), '1 an')
+
+    def test_str2localized_duraction_Japanese(self):
+        """Test Japanese localizations of duration."""
+        site = self.get_site('jawiki')
+        self.assertEqual(archivebot.str2localized_duration(site, '4000m'), '4000 分')
+
+
+class TestArchiveBotFunctions(TestCase):
+
+    """Test functions in archivebot."""
+
+    net = False
+
+    def test_str2time(self):
+        """Test for parsing the shorthand notation of durations."""
+        self.assertEqual(archivebot.str2time('0'), timedelta(0))
+        self.assertEqual(archivebot.str2time('4000h'), timedelta(hours=4000))
+        self.assertEqual(archivebot.str2time('4000h'), timedelta(hours=4000))
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time, '4000@')
+        self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time, '$1')
+
+    def test_str2size(self):
+        """Test for parsing the shorthand notation of sizes."""
+        self.assertEqual(archivebot.str2size('0'), (0, 'B'))
+        self.assertEqual(archivebot.str2size('3000'), (3000, 'B'))
+        self.assertEqual(archivebot.str2size('4 K'), (4096, 'B'))
+        self.assertEqual(archivebot.str2size('2T'), (2, 'T'))
+        # TODO: should probably be recognized 2000?
+        self.assertEqual(archivebot.str2size('2 000'), (2, 'B'))
 
 
 class TestArchiveBot(TestCase):

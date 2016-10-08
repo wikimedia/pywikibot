@@ -195,7 +195,10 @@ def str2time(string):
     elif string.endswith('y'):
         return datetime.timedelta(days=int(string[:-1]) * 366)
     else:
-        return datetime.timedelta(seconds=int(string))
+        if string.isdigit():
+            return datetime.timedelta(seconds=int(string))
+        else:
+            raise MalformedConfigError('Unrecognized parameter in template: %s' % string)
 
 
 def str2size(string):
