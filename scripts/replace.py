@@ -128,7 +128,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1023,6 +1023,7 @@ def main(*args):
 
     # Perform one of the predefined actions.
     missing_fixes_summaries = []  # which a fixes/replacements miss a summary
+    generators_given = bool(genFactory.gens)
     for fix_name in fixes_set:
         try:
             fix = fixes.fixes[fix_name]
@@ -1044,6 +1045,12 @@ def main(*args):
                 set_summary = i18n.translate(site, fix['msg'], fallback=True)
         else:
             set_summary = None
+        if not generators_given and 'generator' in fix:
+            gen_args = fix['generator']
+            if isinstance(gen_args, basestring):
+                gen_args = [gen_args]
+            for gen_arg in gen_args:
+                genFactory.handleArg(gen_arg)
         replacement_set = ReplacementList(fix.get('regex'),
                                           fix.get('exceptions'),
                                           fix.get('nocase'),
