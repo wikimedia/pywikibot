@@ -2981,7 +2981,7 @@ class APISite(BaseSite):
                                 type_arg="flowinfo",
                                 titles=title.encode(self.encoding()),
                                 )
-        self._update_page(page, query, 'loadflowinfo')
+        self._update_page(page, query)
 
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
@@ -3991,7 +3991,7 @@ class APISite(BaseSite):
         ciquery = self._generator(api.PropertyGenerator,
                                   type_arg="categoryinfo",
                                   titles=cititle.encode(self.encoding()))
-        self._update_page(category, ciquery, 'categoryinfo')
+        self._update_page(category, ciquery)
 
     def categoryinfo(self, category):
         """Retrieve data on contents of category."""
