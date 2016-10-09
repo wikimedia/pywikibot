@@ -35,8 +35,9 @@ archive              Name of the page to which archived threads will be put.
                      supported.
 algo                 specifies the maximum age of a thread. Must be in the form
                      old(<delay>) where <delay> specifies the age in
-                     minutes (m), hours (h), days (d), weeks(w), months (M) or
-                     years (y)  like 24h or 5d. Default is old(24h)
+                     seconds (s), hours (h), days (d), weeks(w), or years (y)
+                     like 24h or 5d.
+                     Default is old(24h).
 counter              The current value of a counter which could be assigned as
                      variable. Will be actualized by bot. Initial value is 1.
 maxarchivesize       The maximum archive size before incrementing the counter.
@@ -98,6 +99,7 @@ __version__ = '$Id$'
 #
 import datetime
 import locale
+import math
 import os
 import re
 import time
@@ -107,11 +109,22 @@ from math import ceil
 
 import pywikibot
 
+from pywikibot.date import apply_month_delta
 from pywikibot import i18n
 from pywikibot.textlib import TimeStripper
 from pywikibot.textlib import to_local_digits
+from pywikibot.tools import issue_deprecation_warning, FrozenDict
 
 ZERO = datetime.timedelta(0)
+
+MW_KEYS = FrozenDict({
+    's': 'seconds',
+    'h': 'hours',
+    'd': 'days',
+    'w': 'weeks',
+    'y': 'years',
+    # 'months' and 'minutes' were removed because confusion outweights merit
+}, 'MW_KEYS is a dict constant')
 
 
 class ArchiveBotSiteConfigError(pywikibot.Error):
@@ -155,50 +168,62 @@ def str2localized_duration(site, string):
     Translates a duration written in the shorthand notation (ex. "24h", "7d")
     into an expression in the local language of the wiki ("24 hours", "7 days").
     """
-    mw_keys = {
-        'm': 'minutes',
-        'h': 'hours',
-        'd': 'days',
-        'w': 'weeks',
-        'M': 'months',
-        'y': 'years',
-    }
-
-    template = site.mediawiki_message(mw_keys[string[-1]])
+    template = site.mediawiki_message(MW_KEYS[string[-1]])
     if template:
         duration = string[:-1]
         # replace plural variants
         exp = i18n.translate(site.code, template, {'$1': int(duration)})
-
         return exp.replace('$1', to_local_digits(duration, site.code))
     else:
         return to_local_digits(string, site.code)
 
 
-def str2time(string):
+def str2time(string, timestamp=None):
     """
     Return a timedelta for a shorthand duration.
 
-    Accepts a string defining a time period:
-    7d - 7 days
-    36h - 36 hours
-    2w - 2 weeks (14 days)
-    1y - 366 days # to be on the safe side
-    Returns the corresponding timedelta object.
+    @param string: a string defining a time period:
+        300s - 300 seconds
+        36h - 36 hours
+        7d - 7 days
+        2w - 2 weeks (14 days)
+        1y - 1 year
+    @type string: str
+    @param timestamp: a timestamp to calulate a more accurate duration offset
+        used by years
+    @type timestamp: datetime.datetime
+    @return: the corresponding timedelta object
+    @rtype: datetime.timedelta
     """
-    if string.endswith('h'):
-        return datetime.timedelta(hours=int(string[:-1]))
-    elif string.endswith('d'):
-        return datetime.timedelta(days=int(string[:-1]))
-    elif string.endswith('w'):
-        return datetime.timedelta(weeks=int(string[:-1]))
-    elif string.endswith('y'):
-        return datetime.timedelta(days=int(string[:-1]) * 366)
+    key = string[-1]
+    if string.isdigit():
+        key = 's'
+        duration = string
+        issue_deprecation_warning('Time period without qualifier',
+                                  string + key, 1, UserWarning)
     else:
-        if string.isdigit():
-            return datetime.timedelta(seconds=int(string))
-        else:
-            raise MalformedConfigError('Unrecognized parameter in template: %s' % string)
+        duration = string[:-1]
+
+    if duration.isdigit():
+        duration = int(duration)
+    else:
+        key = ''
+
+    if key in ['d', 's', 'h', 'w']:  # days, seconds, minutes, hours, weeks
+        return datetime.timedelta(**{MW_KEYS[key]: duration})
+
+    if key == 'y':  # years
+        days = math.ceil(duration * 365.25)
+        duration *= 12
+    else:
+        raise MalformedConfigError(
+            'Unrecognized parameter in template: {0}'.format(string))
+
+    if timestamp:
+        return apply_month_delta(
+            timestamp.date(), month_delta=duration) - timestamp.date()
+    else:
+        return datetime.timedelta(days=days)
 
 
 def str2size(string):
@@ -352,7 +377,7 @@ class DiscussionThread(object):
                 return ''
             # TODO: handle this:
             # return 'unsigned'
-            maxage = str2time(re_t.group(1))
+            maxage = str2time(re_t.group(1), self.timestamp)
             if self.now - self.timestamp > maxage:
                 duration = str2localized_duration(archiver.site, re_t.group(1))
                 return i18n.twtranslate(self.code,
