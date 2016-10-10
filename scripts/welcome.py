@@ -176,6 +176,7 @@ __version__ = '$Id$'
 #
 
 import codecs
+from datetime import timedelta
 import locale
 import re
 import sys
@@ -199,8 +200,8 @@ locale.setlocale(locale.LC_ALL, '')
 # been eliminated.
 # FIXME: Not all language/project combinations have been defined yet.
 #        Add the following strings to customise for a language:
-#        logbook, talk_page, netext, user, con, report_page
-#        bad_pag, report_text, logt, random_sign and whitelist_pg.
+#        logbook, netext, report_page, bad_pag, report_text, random_sign,
+#        whitelist_pg, final_new_text_additions, logpage_header
 
 ############################################################################
 
@@ -411,7 +412,7 @@ class Global(object):
 
     attachEditCount = 1     # number of edits that an user required to be welcomed
     dumpToLog = 15          # number of users that are required to add the log :)
-    offset = 0              # skip users newer than that timestamp
+    offset = None           # skip users newer than that timestamp
     timeoffset = 0          # skip users newer than # minutes
     recursive = True        # define if the Bot is recursive or not
     timeRecur = 3600        # how much time (sec.) the bot sleeps before restart
@@ -663,8 +664,17 @@ class WelcomeBot(object):
                 time.sleep(10)
 
     def parseNewUserLog(self):
-        """Retrieve ne users."""
-        return self.site.logevents('newusers', total=globalvar.queryLimit)
+        """Retrieve new users."""
+        if globalvar.timeoffset != 0:
+            start = self.site.server_time() - timedelta(
+                minutes=globalvar.timeoffset)
+        else:
+            start = globalvar.offset
+        for ue in self.site.logevents('newusers', total=globalvar.queryLimit,
+                                      start=start):
+            if ue.action == 'create' or (
+                    ue.action == 'autocreate' and globalvar.welcomeAuto):
+                yield pywikibot.User(ue.page())
 
     def defineSign(self, force=False):
         """Setup signature."""
@@ -712,9 +722,7 @@ class WelcomeBot(object):
         """Run the bot."""
         while True:
             welcomed_count = 0
-            us = (pywikibot.User(self.site, users.user())
-                  for users in self.parseNewUserLog())
-            for users in us:
+            for users in self.parseNewUserLog():
                 if users.isBlocked():
                     showStatus(3)
                     pywikibot.output(u'%s has been blocked!' % users.name())
@@ -905,26 +913,28 @@ def main(*args):
                 globalvar.timeRecur = int(arg[6:])
         elif arg.startswith('-offset'):
             if len(arg) == 7:
-                globalvar.offset = int(pywikibot.input(
-                    u'Which time offset for new users would you like to use? (yyyymmddhhmmss)'))
+                val = pywikibot.input(
+                    'Which time offset for new users would you like to use? (yyyymmddhhmmss)')
             else:
-                globalvar.offset = int(arg[8:])
-            if len(str(globalvar.offset)) != 14:
+                val = arg[8:]
+            try:
+                globalvar.offset = pywikibot.Timestamp.fromtimestampformat(val)
+            except ValueError:
                 # upon request, we might want to check for software version here
                 raise ValueError(
                     "Mediawiki has changed, -offset:# is not supported "
                     "anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP "
                     "is yyyymmddhhmmss. -timeoffset is now also supported. "
                     "Please read this script source header for documentation.")
-        elif arg.startswith('-file:'):
+        elif arg.startswith('-file'):
             globalvar.randomSign = True
-            if len(arg) == 6:
+            if len(arg) <= 6:
                 globalvar.signFileName = pywikibot.input(
                     u'Where have you saved your signatures?')
             else:
                 globalvar.signFileName = arg[6:]
-        elif arg.startswith('-sign:'):
-            if len(arg) == 6:
+        elif arg.startswith('-sign'):
+            if len(arg) <= 6:
                 globalvar.defaultSign = pywikibot.input(
                     u'Which signature to use?')
             else:
