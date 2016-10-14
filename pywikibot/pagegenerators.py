@@ -226,6 +226,9 @@ parameterHelp = u"""\
                   Case insensitive regular expressions will be used and
                   dot matches any character.
 
+-titleregexnot    Like -titleregex, but return the page only if the regular
+                  expression does not match.
+
 -transcludes      Work on all pages that use a certain template.
                   Argument can also be given as "-transcludes:Title".
 
@@ -384,6 +387,7 @@ class GeneratorFactory(object):
         self.qualityfilter_list = []
         self.articlefilter_list = []
         self.titlefilter_list = []
+        self.titlenotfilter_list = []
         self.claimfilter_list = []
         self.catfilter_list = []
         self.intersect = False
@@ -456,6 +460,7 @@ class GeneratorFactory(object):
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
             if (self.titlefilter_list or
+                self.titlenotfilter_list or
                 self.articlefilter_list or
                 self.claimfilter_list or
                 self.catfilter_list or
@@ -498,6 +503,10 @@ class GeneratorFactory(object):
         if self.titlefilter_list:
             dupfiltergen = RegexFilterPageGenerator(
                 dupfiltergen, self.titlefilter_list)
+
+        if self.titlenotfilter_list:
+            dupfiltergen = RegexFilterPageGenerator(
+                dupfiltergen, self.titlenotfilter_list, 'none')
 
         if self.articlefilter_list:
             dupfiltergen = RegexBodyFilterPageGenerator(
@@ -854,6 +863,12 @@ class GeneratorFactory(object):
                 value = pywikibot.input(
                     'What page names are you looking for?')
             self.titlefilter_list.append(value)
+            return True
+        elif arg == '-titleregexnot':
+            if not value:
+                value = pywikibot.input(
+                    'All pages except which ones?')
+            self.titlenotfilter_list.append(value)
             return True
         elif arg == '-grep':
             if not value:

@@ -15,6 +15,10 @@ unavailable, the bot ONLY reports links which were reported dead at least
 two times, with a time lag of at least one week. Such links will be logged to a
 .txt file in the deadlinks subdirectory.
 
+The .txt file uses wiki markup and so it may be useful to post it on the
+wiki and then exclude that page from subsequent runs. For example if the
+page is named Broken Links, exclude it with '-titleregexnot:^Broken Links$'
+
 After running the bot and waiting for at least one week, you can re-check those
 pages where dead links were found, using the -repeat parameter.
 

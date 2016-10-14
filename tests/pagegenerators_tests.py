@@ -786,6 +786,46 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertLessEqual(len(pages), 10)
         self.assertPagesInNamespaces(pages, 1)
 
+    def test_regexfilternot_default(self):
+        """Test allpages generator with titleregexnot filter."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start'))
+        # matches titles with less than 11 characters
+        self.assertTrue(gf.handleArg('-titleregexnot:.{11,}'))
+        gf.handleArg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertNotRegex(page.title().lower(), '.{11,}')
+
+    def test_regexfilternot_ns_after(self):
+        """Test allpages generator with titleregexnot and namespace filter."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start'))
+        self.assertTrue(gf.handleArg('-titleregexnot:zzzz'))
+        gf.handleArg('-ns:1')
+        gf.handleArg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(pages, 1)
+
+    def test_regexfilternot_ns_before(self):
+        """Test allpages generator with namespace and titleregexnot filter."""
+        gf = pagegenerators.GeneratorFactory()
+        self.assertTrue(gf.handleArg('-start'))
+        gf.handleArg('-ns:1')
+        self.assertTrue(gf.handleArg('-titleregexnot:zzzz'))
+        gf.handleArg('-limit:10')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 10)
+        self.assertPagesInNamespaces(pages, 1)
+
     def test_allpages_with_two_ns(self):
         """Test that allpages fails with two ns as parameter."""
         gf = pagegenerators.GeneratorFactory()

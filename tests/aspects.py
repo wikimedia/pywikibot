@@ -85,6 +85,15 @@ class TestCaseBase(unittest.TestCase):
             """
             return self.assertRegexpMatches(*args, **kwargs)
 
+    if not hasattr(unittest.TestCase, 'assertNotRegex'):
+        def assertNotRegex(self, *args, **kwargs):
+            """
+            Wrapper of unittest.assertNotRegexpMatches for Python 2 unittest.
+
+            assertNotRegexpMatches is deprecated in Python 3.
+            """
+            return self.assertNotRegexpMatches(*args, **kwargs)
+
     if not hasattr(unittest.TestCase, 'assertCountEqual'):
 
         def assertCountEqual(self, *args, **kwargs):
