@@ -184,12 +184,17 @@ parameterHelp = """\
                   given as -recentchanges:x, will work on the x most recently
                   changed pages. If given as -recentchanges:offset,duration it
                   will work on pages changed from 'offset' minutes with
-                  'duration'  minutes of timespan.
+                  'duration'  minutes of timespan. rctags are supported too.
+                  The rctag must be the very first parameter part.
 
                   Examples:
                   -recentchanges:20 gives the 20 most recently changed pages
                   -recentchanges:120,70 will give pages with 120 offset
                   minutes and 70 minutes of timespan
+                  -recentchanges:visualeditor,10 gives the 10 most recently
+                  changed pages marked with 'visualeditor'
+                  -recentchanges:"mobile edit,60,35" will retrieve pages marked
+                  with 'mobile edit' for the given offset and timespan
 
 -unconnectedpages Work on the most recent unconnected pages to the Wikibase
                   repository. Given as -unconnectedpages:x, will work on the
@@ -690,8 +695,11 @@ class GeneratorFactory(object):
         elif arg == '-recentchanges':
             rcstart = None
             rcend = None
+            rctag = None
             total = None
             params = value.split(',') if value else []
+            if params and not params[0].isdigit():
+                rctag = params.pop(0)
             if len(params) == 2:
                 offset = float(params[0])
                 duration = float(params[1])
@@ -700,7 +708,7 @@ class GeneratorFactory(object):
             elif len(params) > 2:
                 raise ValueError('More than two parameters passed.')
             else:
-                total = int(value) if value else 60
+                total = int(params[0]) if params else 60
             if len(params) == 2:
                 ts_time = self.site.server_time()
                 rcstart = ts_time + timedelta(minutes=-(offset + duration))
@@ -711,6 +719,7 @@ class GeneratorFactory(object):
                                              end=rcend,
                                              site=self.site,
                                              reverse=True,
+                                             tag=rctag,
                                              _filter_unique=self._filter_unique)
 
         elif arg == '-liverecentchanges':
@@ -1089,7 +1098,7 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                                showRedirects=None, showPatrolled=None,
                                topOnly=False, total=None,
                                user=None, excludeuser=None, site=None,
-                               _filter_unique=None):
+                               tag=None, _filter_unique=None):
     """
     Generate pages that are in the recent changes list, including duplicates.
 
@@ -1129,7 +1138,8 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
     @type excludeuser: basestring|list
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
-
+    @param tag: a recent changes tag
+    @type tag: str
     """
     if site is None:
         site = pywikibot.Site()
@@ -1141,7 +1151,7 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
                              showRedirects=showRedirects,
                              showPatrolled=showPatrolled,
                              topOnly=topOnly, total=total,
-                             user=user, excludeuser=excludeuser)
+                             user=user, excludeuser=excludeuser, tag=tag)
 
     gen.request['rcprop'] = 'title'
     gen = (pywikibot.Page(site, x['title'])

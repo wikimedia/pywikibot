@@ -4463,7 +4463,7 @@ class APISite(BaseSite):
                       namespaces=None, pagelist=None, changetype=None,
                       showMinor=None, showBot=None, showAnon=None,
                       showRedirects=None, showPatrolled=None, topOnly=False,
-                      total=None, user=None, excludeuser=None):
+                      total=None, user=None, excludeuser=None, tag=None):
         """Iterate recent changes.
 
         @param start: Timestamp to start listing from
@@ -4504,6 +4504,8 @@ class APISite(BaseSite):
         @type user: basestring|list
         @param excludeuser: if not None, exclude edits by this user or users
         @type excludeuser: basestring|list
+        @param tag: a recent changes tag
+        @type tag: str
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -4513,7 +4515,7 @@ class APISite(BaseSite):
 
         rcgen = self._generator(api.ListGenerator, type_arg="recentchanges",
                                 rcprop="user|comment|timestamp|title|ids"
-                                       "|sizes|redirect|loginfo|flags",
+                                       '|sizes|redirect|loginfo|flags|tags',
                                 namespaces=namespaces,
                                 total=total, rctoponly=topOnly)
         if start is not None:
@@ -4548,7 +4550,7 @@ class APISite(BaseSite):
 
         if excludeuser:
             rcgen.request['rcexcludeuser'] = excludeuser
-
+        rcgen.request['rctag'] = tag
         return rcgen
 
     @deprecated_args(number='total', step=None, key='searchstring',
