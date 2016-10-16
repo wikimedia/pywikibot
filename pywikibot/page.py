@@ -4637,14 +4637,12 @@ class Claim(Property):
         @rtype: bool
         """
         if (isinstance(self.target, pywikibot.ItemPage) and
-                isinstance(value, basestring) and
-                self.target.id == value):
-            return True
+                isinstance(value, basestring)):
+            return self.target.id == value
 
         if (isinstance(self.target, pywikibot.WbTime) and
-                not isinstance(value, pywikibot.WbTime) and
-                self.target.year == int(value)):
-            return True
+                not isinstance(value, pywikibot.WbTime)):
+            return self.target.year == int(value)
 
         if (isinstance(self.target, pywikibot.Coordinate) and
                 isinstance(value, basestring)):
@@ -4662,10 +4660,7 @@ class Claim(Property):
             return (abs(self.target.lat - coord_args[0]) <= precision and
                     abs(self.target.lon - coord_args[1]) <= precision)
 
-        if self.target == value:
-            return True
-
-        return False
+        return self.target == value
 
     def has_qualifier(self, qualifier_id, target):
         """
