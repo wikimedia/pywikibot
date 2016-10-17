@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This module offers a wide variety of page generators.
 
@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1784,26 +1784,22 @@ def CombinedPageGenerator(generators):
     return itertools.chain(*generators)
 
 
-def CategoryGenerator(generator):
-    """Yield pages from another generator as Category objects.
+def PageClassGenerator(generator):
+    """
+    Yield pages from another generator as Page subclass objects.
 
-    Makes sense only if it is ascertained that only categories are being
-    retrieved.
-
+    The page class type depends on the page namespace.
+    Objects may be Category, FilePage, Userpage or Page.
     """
     for page in generator:
-        yield pywikibot.Category(page)
-
-
-def FileGenerator(generator):
-    """
-    Yield pages from another generator as FilePage objects.
-
-    Makes sense only if it is ascertained
-    that only images are being retrieved.
-    """
-    for page in generator:
-        yield pywikibot.FilePage(page)
+        if page.namespace() == page.site.namespaces.USER:
+            yield pywikibot.User(page)
+        elif page.namespace() == page.site.namespaces.FILE:
+            yield pywikibot.FilePage(page)
+        elif page.namespace() == page.site.namespaces.CATEGORY:
+            yield pywikibot.Category(page)
+        else:
+            yield page
 
 
 def PageWithTalkPageGenerator(generator, return_talk_only=False):
@@ -2780,7 +2776,10 @@ def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
 
 
 # Deprecated old names available for compatibility with compat.
-ImageGenerator = redirect_func(FileGenerator, old_name='ImageGenerator')
+ImageGenerator = redirect_func(PageClassGenerator, old_name='ImageGenerator')
+FileGenerator = redirect_func(PageClassGenerator, old_name='FileGenerator')
+CategoryGenerator = redirect_func(PageClassGenerator,
+                                  old_name='CategoryGenerator')
 UnCategorizedTemplatesGenerator = redirect_func(
     UnCategorizedTemplateGenerator, old_name='UnCategorizedTemplatesGenerator')
 RecentchangesPageGenerator = redirect_func(
