@@ -130,7 +130,10 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         """Upload page content."""
         page = self.current_page
         title = page.title()
+        # save the content retrieved from generator
         contents = page.text
+        # delete page's text to get it from live wiki
+        del page.text
 
         if self.getOption('summary'):
             comment = self.getOption('summary')
@@ -148,7 +151,7 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
             if not self.getOption('redirect') and page.isRedirectPage():
                 pywikibot.output(u"Page %s is redirect, skipping!" % title)
                 return
-            pagecontents = page.get(get_redirect=True)
+            pagecontents = page.text
             nocontent = self.getOption('nocontent')
             if nocontent and (
                     nocontent in pagecontents or
