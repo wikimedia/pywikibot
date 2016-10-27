@@ -288,7 +288,7 @@ class CosmeticChangesToolkit(object):
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
-            interwikiR = re.compile(r'\[\[%s\s?:([^\[\]\n]*)\]\]'
+            interwikiR = re.compile(r'\[\[(?: *:)? *%s *: *([^\[\]\n]*)\]\]'
                                     % self.site.code)
             text = interwikiR.sub(r'[[\1]]', text)
         return text

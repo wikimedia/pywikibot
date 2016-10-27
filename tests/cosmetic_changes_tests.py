@@ -39,6 +39,10 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         """Test fixSelfInterwiki method."""
         self.assertEqual('[[Foo bar]]',
                          self.cct.fixSelfInterwiki('[[de:Foo bar]]'))
+        self.assertEqual('[[Foo bar]]',
+                         self.cct.fixSelfInterwiki('[[:de: Foo bar]]'))
+        self.assertEqual('[[Foo bar|Bar baz]]',
+                         self.cct.fixSelfInterwiki('[[ de: Foo bar|Bar baz]]'))
         self.assertEqual('[[en:Foo bar]]',
                          self.cct.fixSelfInterwiki('[[en:Foo bar]]'))
 
