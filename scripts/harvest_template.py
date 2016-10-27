@@ -53,7 +53,7 @@ def _signal_handler(signal, frame):
 signal.signal(signal.SIGINT, _signal_handler)
 
 import pywikibot
-from pywikibot import pagegenerators as pg, textlib, WikidataBot
+from pywikibot import pagegenerators as pg, WikidataBot
 
 docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
 
@@ -140,8 +140,7 @@ class HarvestRobot(WikidataBot):
                              'Skipping.' % (page, item.title()))
             return
 
-        pagetext = page.get()
-        templates = textlib.extract_templates_and_params(pagetext)
+        templates = page.raw_extracted_templates
         for (template, fielddict) in templates:
             # Clean up template
             try:
