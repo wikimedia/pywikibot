@@ -893,30 +893,24 @@ def main(*args):
     @type args: list of unicode
     """
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-edit'):
-            if len(arg) == 5:
-                globalvar.attachEditCount = int(pywikibot.input(
-                    u'After how many edits would you like to welcome new users? (0 is allowed)'))
-            else:
-                globalvar.attachEditCount = int(arg[6:])
-        elif arg.startswith('-timeoffset'):
-            if len(arg) == 11:
-                globalvar.timeoffset = int(pywikibot.input(
-                    'Which time offset (in minutes) for new users would you like to use?'))
-            else:
-                globalvar.timeoffset = int(arg[12:])
-        elif arg.startswith('-time'):
-            if len(arg) == 5:
-                globalvar.timeRecur = int(pywikibot.input(
-                    u'For how many seconds would you like to bot to sleep before checking again?'))
-            else:
-                globalvar.timeRecur = int(arg[6:])
-        elif arg.startswith('-offset'):
-            if len(arg) == 7:
+        arg, sep, val = arg.partition(':')
+        if arg == '-edit':
+            globalvar.attachEditCount = int(val or pywikibot.input(
+                'After how many edits would you like to welcome new users? '
+                '(0 is allowed)'))
+        elif arg == '-timeoffset':
+            globalvar.timeoffset = int(val or pywikibot.input(
+                'Which time offset (in minutes) for new users would you like '
+                'to use?'))
+        elif arg == '-time':
+            globalvar.timeRecur = int(val or pywikibot.input(
+                'For how many seconds would you like to bot to sleep before '
+                'checking again?'))
+        elif arg == '-offset':
+            if not val:
                 val = pywikibot.input(
-                    'Which time offset for new users would you like to use? (yyyymmddhhmmss)')
-            else:
-                val = arg[8:]
+                    'Which time offset for new users would you like to use? '
+                    '(yyyymmddhhmmss)')
             try:
                 globalvar.offset = pywikibot.Timestamp.fromtimestampformat(val)
             except ValueError:
@@ -926,19 +920,13 @@ def main(*args):
                     "anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP "
                     "is yyyymmddhhmmss. -timeoffset is now also supported. "
                     "Please read this script source header for documentation.")
-        elif arg.startswith('-file'):
+        elif arg == '-file':
             globalvar.randomSign = True
-            if len(arg) <= 6:
-                globalvar.signFileName = pywikibot.input(
-                    u'Where have you saved your signatures?')
-            else:
-                globalvar.signFileName = arg[6:]
-        elif arg.startswith('-sign'):
-            if len(arg) <= 6:
-                globalvar.defaultSign = pywikibot.input(
-                    u'Which signature to use?')
-            else:
-                globalvar.defaultSign = arg[6:]
+            globalvar.signFileName = val or pywikibot.input(
+                'Where have you saved your signatures?')
+        elif arg == '-sign':
+            globalvar.defaultSign = val or pywikibot.input(
+                'Which signature to use?')
             globalvar.defaultSign += timeselected
         elif arg == '-break':
             globalvar.recursive = False
@@ -954,18 +942,13 @@ def main(*args):
             globalvar.randomSign = True
         elif arg == '-sul':
             globalvar.welcomeAuto = True
-        elif arg.startswith('-limit'):
-            if len(arg) == 6:
-                globalvar.queryLimit = int(pywikibot.input(
-                    u'How many of the latest new users would you like to load?'))
-            else:
-                globalvar.queryLimit = int(arg[7:])
-        elif arg.startswith('-numberlog'):
-            if len(arg) == 10:
-                globalvar.dumpToLog = int(pywikibot.input(
-                    u'After how many welcomed users would you like to update the welcome log?'))
-            else:
-                globalvar.dumpToLog = int(arg[11:])
+        elif arg == '-limit':
+            globalvar.queryLimit = int(val or pywikibot.input(
+                u'How many of the latest new users would you like to load?'))
+        elif arg == '-numberlog':
+            globalvar.dumpToLog = int(val or pywikibot.input(
+                'After how many welcomed users would you like to update the '
+                'welcome log?'))
         elif arg == '-quiet':
             globalvar.quiet = True
         elif arg == '-quick':
