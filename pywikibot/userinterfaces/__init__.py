@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """User interfaces."""
 #
 # (C) Pywikibot team, 2007

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for scripts/interwikidata.py."""
 #
 # (C) Pywikibot team, 2015

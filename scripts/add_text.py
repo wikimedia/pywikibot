@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 This is a Bot to add a text at the end of the content of the page.
 

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
 # (C) Pywikibot team, 2009-2016

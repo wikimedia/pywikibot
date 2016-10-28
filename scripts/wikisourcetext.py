@@ -68,7 +68,7 @@ class UploadTextBot(SingleSiteBot):
         Constructor.
 
         @param generator: page generator
-        @type  generator: generator
+        @type generator: generator
         """
         self.availableOptions.update({
             'force': False,

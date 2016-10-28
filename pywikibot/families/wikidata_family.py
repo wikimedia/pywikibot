@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikidata."""
 #
 # (C) Pywikibot team, 2012-2016

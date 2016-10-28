@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test Interwiki Link functionality."""
 #
 # (C) Pywikibot team, 2014

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Logging functions."""
 #
 # (C) Pywikibot team, 2010-2016
@@ -45,12 +45,12 @@ def _init():
 # User output/logging functions
 
 # Six output functions are defined. Each requires a unicode or string
-# argument.  All of these functions generate a message to the log file if
+# argument. All of these functions generate a message to the log file if
 # logging is enabled ("-log" or "-debug" command line arguments).
 
 # The functions output(), stdout(), warning(), and error() all display a
 # message to the user through the logger object; the only difference is the
-# priority level,  which can be used by the application layer to alter the
+# priority level, which can be used by the application layer to alter the
 # display. The stdout() function should be used only for data that is
 # the "result" of a script, as opposed to information messages to the
 # user.

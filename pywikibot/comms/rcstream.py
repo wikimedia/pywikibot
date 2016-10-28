@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 SocketIO-based rcstream client.
 
@@ -49,8 +49,8 @@ class RcListenerThread(threading.Thread):
     @param rcport: the port to connect to (default: 80)
     @param rcpath: the sockets.io path. For Wikimedia wikis, this is '/rc'.
                    (default: '/rc')
-    @param total:  the maximum number of entries to return. The underlying
-                   thread is shut down then this number is reached.
+    @param total: the maximum number of entries to return. The underlying
+                  thread is shut down then this number is reached.
 
     This part of the rc listener runs in a Thread. It makes the actual
     socketIO/websockets connection to the rc stream server, subscribes

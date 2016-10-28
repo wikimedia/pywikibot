@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
 # (C) Pywikibot team, 2006-2016
@@ -51,7 +51,7 @@ class CaseChecker(object):
     latinKeyboard = u'qwertyuiopasdfghjklzxcvbnm'
 
     romanNumChars = u'IVXLCDM'
-    # all letters that may be used as suffixes after roman numbers:  "Iый"
+    # all letters that may be used as suffixes after roman numbers: "Iый"
     romannumSuffixes = localLowerLtr
     romanNumSfxPtrn = re.compile(
         u'^[' + romanNumChars + ']+[' + localLowerLtr + ']+$')

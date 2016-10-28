@@ -175,7 +175,7 @@ if sys.version_info[0] > 2:
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
     '&fixes-help;': fixes.parameter_help,
 }
 
@@ -503,7 +503,7 @@ class ReplaceRobot(Bot):
     @param generator: generator that yields Page objects
     @type generator: generator
     @param replacements: a list of Replacement instances or sequences of
-        length 2 with the  original text (as a compiled regular expression)
+        length 2 with the original text (as a compiled regular expression)
         and replacement text (as a string).
     @type replacements: list
     @param exceptions: a dictionary which defines when not to change an

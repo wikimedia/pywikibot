@@ -50,7 +50,7 @@ class UnixUI(terminal_interface_base.UI):
 
     def encounter_color(self, color, target_stream):
         """Write the unix color directly to the stream."""
-        fg,  bg = self.divide_color(color)
+        fg, bg = self.divide_color(color)
         fg = unixColors[fg]
         self._write(fg, target_stream)
         if bg is not None:

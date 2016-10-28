@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikiquote."""
 #
 # (C) Pywikibot team, 2005-2016

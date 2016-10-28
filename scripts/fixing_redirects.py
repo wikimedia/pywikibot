@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Correct all redirect links in featured pages or only one page of each wiki.
 
@@ -34,7 +34,7 @@ from pywikibot.tools import first_lower, first_upper as firstcap
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 # Featured articles categories

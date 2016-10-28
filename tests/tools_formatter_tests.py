@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the C{pywikibot.tools.formatter} module."""
 #
 # (C) Pywikibot team, 2015

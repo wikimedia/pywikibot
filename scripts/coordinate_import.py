@@ -45,9 +45,7 @@ class CoordImportRobot(WikidataBot):
         """
         Constructor.
 
-        Arguments:
-            * generator    - A generator that yields Page objects.
-
+        @param generator: A generator that yields Page objects.
         """
         super(CoordImportRobot, self).__init__()
         self.generator = pagegenerators.PreloadingGenerator(generator)
@@ -59,7 +57,7 @@ class CoordImportRobot(WikidataBot):
         Check if self.prop is used as property for a qualifier.
 
         @param claims: the Wikibase claims to check in
-        @type  claims: dict
+        @type claims: dict
         @return: the first property for which self.prop
             is used as qualifier, or None if any
         @return: unicode or None

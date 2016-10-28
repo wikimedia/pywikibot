@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 Print a list of pages, as defined by page generator parameters.
 

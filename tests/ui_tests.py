@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
 # (C) Pywikibot team, 2008-2016

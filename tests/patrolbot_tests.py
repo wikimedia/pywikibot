@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the patrol script."""
 #
 # (C) Pywikibot team, 2015

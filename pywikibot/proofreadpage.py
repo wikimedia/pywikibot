@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Objects representing objects used with ProofreadPage Extension.
 
@@ -350,9 +350,8 @@ class ProofreadPage(pywikibot.Page):
         @param value: New value or None
         @param value: basestring
 
-        Raises:
-        exception Error:   the page is not formatted according to ProofreadPage
-                           extension.
+        @raise Error: the page is not formatted according to ProofreadPage
+            extension.
         """
         self._text = value
         if self._text:
@@ -369,9 +368,8 @@ class ProofreadPage(pywikibot.Page):
     def _decompose_page(self):
         """Split Proofread Page text in header, body and footer.
 
-        Raises:
-        exception Error:   the page is not formatted according to ProofreadPage
-                           extension.
+        @raise Error: the page is not formatted according to ProofreadPage
+            extension.
         """
         # Property force page text loading.
         if not (hasattr(self, '_text') or self.text):
@@ -647,7 +645,7 @@ class IndexPage(pywikibot.Page):
         @type end: int
         @param filter_ql: filters quality levels
                           if None: all but 'Without Text'.
-        @type filter_ql: list of ints  (corresponding to ql constants
+        @type filter_ql: list of ints (corresponding to ql constants
                          defined in ProofreadPage).
         @param only_existing: yields only existing pages.
         @type only_existing: bool

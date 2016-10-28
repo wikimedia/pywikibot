@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test tools.chars package."""
 #
 # (C) Pywikibot team, 2015

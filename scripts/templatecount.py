@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Display the list of pages transcluding a given list of templates.
 
@@ -16,7 +16,7 @@ Command line options:
 -list         Gives the list of all of the pages transcluding the templates
               (rather than just counting them).
 
--namespace:   Filters the search to a given namespace.  If this is specified
+-namespace:   Filters the search to a given namespace. If this is specified
               multiple times it will search all given namespaces
 
 Examples:

@@ -1,2 +1,2 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test i18n data package."""

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for archivebot.py/Timestripper."""
 #
 # (C) Pywikibot team, 2016
@@ -267,7 +267,7 @@ class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
     tzone = tzoneFixedOffset(0, 'UTC')
 
     def test_timestripper_match(self):
-        """Test that dates in comments  are correctly recognised."""
+        """Test that dates in comments are correctly recognised."""
         ts = self.ts
 
         txt_match = '<!-- [[User:Do___ArchiveUntil]] ' + self.date + ' -->'

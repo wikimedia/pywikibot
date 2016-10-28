@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 

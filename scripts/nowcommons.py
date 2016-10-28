@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 Script to delete files that are also present on Wikimedia Commons.
 
@@ -24,12 +24,11 @@ This script understands various command-line arguments:
     -replacealways  replace links if the files are equal and the file names
                     differ without asking for confirmation
 
-    -replaceloose   Do loose replacements.  This will replace all occurrences
+    -replaceloose   Do loose replacements. This will replace all occurrences
                     of the name of the image (and not just explicit image
                     syntax).  This should work to catch all instances of the
                     file, including where it is used as a template parameter
-                    or in galleries.  However, it can also make more
-                    mistakes.
+                    or in galleries. However, it can also make more mistakes.
 
     -replaceonly    Use this if you do not have a local sysop account, but do
                     wish to replace links from the NowCommons template.

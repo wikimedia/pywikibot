@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
 # (C) Pywikibot team, 2008-2016
@@ -2802,7 +2802,7 @@ class TestPagePreloading(DefaultSiteTestCase):
 
     def _test_preload_langlinks_long(self):
         """Test preloading continuation works."""
-        # FIXME: test fails.  It is disabled as it takes more
+        # FIXME: test fails. It is disabled as it takes more
         # than 10 minutes on travis for English Wikipedia
         mysite = self.get_site()
         mainpage = self.get_mainpage()

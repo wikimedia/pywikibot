@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikimedia Strategy Wiki."""
 #
 # (C) Pywikibot team, 2009-2015

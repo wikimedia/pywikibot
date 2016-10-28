@@ -60,11 +60,11 @@ class DjVuTextBot(SingleSiteBot):
         Constructor.
 
         @param djvu: djvu from where to fetch the text layer
-        @type  djvu: DjVuFile object
+        @type djvu: DjVuFile object
         @param index: index page in the Index: namespace
-        @type  index: Page object
+        @type index: Page object
         @param pages: page interval to upload (start, end)
-        @type  pages: tuple
+        @type pages: tuple
         """
         self.availableOptions.update({
             'force': False,

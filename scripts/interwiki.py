@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Script to check language links for general pages.
 
@@ -15,10 +15,10 @@ These command-line arguments can be used to specify which pages to work on:
 &pagegenerators_help;
 
     -days:         Like -years, but runs through all date pages. Stops at
-                   Dec 31.  If the argument is given in the form -days:X,
+                   Dec 31. If the argument is given in the form -days:X,
                    it will start at month no. X through Dec 31. If the
                    argument is simply given as -days, it will run from
-                   Jan 1 through Dec 31.  E.g. for -days:9 it will run
+                   Jan 1 through Dec 31. E.g. for -days:9 it will run
                    from Sep 1 through Dec 31.
 
     -years:        run on all year pages in numerical order. Stop at year 2050.
@@ -112,10 +112,10 @@ These arguments control miscellanous bot behaviour:
                    This will only be used in non-autonomous mode.
 
     -hintsonly     The bot does not ask for a page to work on, even if none of
-                   the above page sources was specified.  This will make the
+                   the above page sources was specified. This will make the
                    first existing page of -hint or -hinfile slip in as the start
                    page, determining properties like namespace, disambiguation
-                   state, and so on.  When no existing page is found in the
+                   state, and so on. When no existing page is found in the
                    hints, the bot does nothing.
                    Hitting return without input on the "Which page to check:"
                    prompt has the same effect as using -hintsonly.
@@ -154,7 +154,7 @@ These arguments are useful to provide hints to the bot:
                       * test:      Take interwiki links from Test Wikipedia
 
                    Languages, groups and families having the same page title
-                   can be combined, as  -hint:5,scand,sr,pt,commons:New_York
+                   can be combined, as -hint:5,scand,sr,pt,commons:New_York
 
     -hintfile:     similar to -hint, except that hints are taken from the given
                    file, enclosed in [[]] each, instead of the command line.
@@ -399,7 +399,7 @@ moved_links = {
            u'/doc'),
     'bn': (u'documentation', u'/doc'),
     'ca': (u'ús de la plantilla', u'/ús'),
-    'cs': (u'dokumentace',   u'/doc'),
+    'cs': ('dokumentace', '/doc'),
     'da': (u'dokumentation', u'/doc'),
     'de': (u'dokumentation', u'/Meta'),
     'dsb': ([u'dokumentacija', u'doc'], u'/Dokumentacija'),
@@ -420,17 +420,17 @@ moved_links = {
            u'/Documentation'),
     'hsb': ([u'dokumentacija', u'doc'], u'/Dokumentacija'),
     'hu': (u'sablondokumentáció', u'/doc'),
-    'id': (u'template doc',  u'/doc'),
+    'id': ('template doc', '/doc'),
     'ilo': (u'documentation', u'/doc'),
     'ja': (u'documentation', u'/doc'),
-    'ka': (u'თარგის ინფო',   u'/ინფო'),
+    'ka': ('თარგის ინფო', '/ინფო'),
     'ko': (u'documentation', u'/설명문서'),
     'ms': (u'documentation', u'/doc'),
     'no': (u'dokumentasjon', u'/dok'),
     'nn': (u'dokumentasjon', u'/dok'),
-    'pl': (u'dokumentacja',  u'/opis'),
+    'pl': ('dokumentacja', '/opis'),
     'pt': ([u'documentação', u'/doc'], u'/doc'),
-    'ro': (u'documentaţie',  u'/doc'),
+    'ro': ('documentaţie', '/doc'),
     'ru': (u'doc', u'/doc'),
     'simple': ([u'documentation',
                 u'template documentation',

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Title translate module."""
 #
 # (C) Rob W.W. Hooft, 2003

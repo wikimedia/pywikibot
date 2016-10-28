@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Wikibase data type classes."""
 #
 # (C) Pywikibot team, 2013-2015

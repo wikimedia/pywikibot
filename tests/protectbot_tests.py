@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for scripts/protect.py."""
 #
 # (C) Pywikibot team, 2014

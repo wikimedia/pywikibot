@@ -38,8 +38,8 @@ cfdTemplates = ['Cfd full', 'Cfr full']
 
 # Regular expression declarations
 # See the en-wiki CFD working page at [[Wikipedia:Categories for discussion/Working]]
-# to see how these work in context.  To get this bot working on other wikis you will
-# need to adjust these regular expressions at the very least.
+# to see how these work in context. To get this bot working on other wikis you
+# will need to adjust these regular expressions at the very least.
 nobots = re.compile(r"NO\s*BOTS", re.IGNORECASE)
 example = re.compile(r"\[\[:Category:(.)\1\1\1\1\]\]", re.IGNORECASE)
 speedymode = re.compile(r"^===*\s*Speedy Moves\s*===*\s*$", re.IGNORECASE)

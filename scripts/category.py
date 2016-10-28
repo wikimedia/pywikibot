@@ -35,7 +35,7 @@ Options for "listify" action:
 
 Options for "remove" action:
  * -nodelsum    - This specifies not to use the custom edit summary as the
-                  deletion reason.  Instead, it uses the default deletion reason
+                  deletion reason. Instead, it uses the default deletion reason
                   for the language, which is "Category was disbanded" in
                   English.
 
@@ -69,7 +69,7 @@ Options for several actions:
                 - Also, the name of the list to make in the listify option
          NOTE: If the category names have spaces in them you may need to use
          a special syntax in your shell so that the names aren't treated as
-         separate parameters.  For instance, in BASH, use single quotes,
+         separate parameters. For instance, in BASH, use single quotes,
          e.g. -from:'Polar bears'
  * -batch       - Don't prompt to delete emptied categories (do it
                   automatically).

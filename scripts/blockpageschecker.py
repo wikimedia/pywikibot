@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 A bot to remove stale protection templates from pages that are not protected.
 
@@ -73,7 +73,7 @@ from pywikibot.tools.formatter import color_format
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 # PREFERENCES

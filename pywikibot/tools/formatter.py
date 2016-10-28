@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module containing various formatting related utilities."""
 #
 # (C) Pywikibot team, 2015-2016

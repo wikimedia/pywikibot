@@ -84,7 +84,7 @@ class UI(object):
 
         This method initializes handler(s) for output levels VERBOSE (if
         enabled by config.verbose_output), INFO, STDOUT, WARNING, ERROR,
-        and CRITICAL.  STDOUT writes its output to sys.stdout; all the
+        and CRITICAL. STDOUT writes its output to sys.stdout; all the
         others write theirs to sys.stderr.
 
         """
@@ -257,7 +257,7 @@ class UI(object):
         Works like raw_input(), but returns a unicode string instead of ASCII.
 
         Unlike raw_input, this function automatically adds a colon and space
-        after the question if they are not already present.  Also recognises
+        after the question if they are not already present. Also recognises
         a trailing question mark.
 
         @param question: The question, without trailing whitespace.

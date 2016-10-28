@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Objects representing WikidataQuery query syntax and API."""
 #
 # (C) Pywikibot team, 2013

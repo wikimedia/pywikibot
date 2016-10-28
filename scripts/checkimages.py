@@ -51,7 +51,7 @@ This script understands the following command-line arguments:
 -nologerror         If given, this option will disable the error that is risen
                     when the log is full.
 
----- Instructions for the real-time settings  ----
+---- Instructions for the real-time settings ----
 * For every new block you have to add:
 
 <------- ------->

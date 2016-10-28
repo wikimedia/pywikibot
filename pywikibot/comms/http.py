@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Basic HTTP access interface.
 
@@ -400,7 +400,7 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
     Callbacks, including the default error handler if enabled, are run in the
     HTTP thread, where exceptions are logged but are not able to be caught.
     The default error handler is called first, then 'callback' (singular),
-    followed by each callback in 'callbacks' (plural).  All callbacks are
+    followed by each callback in 'callbacks' (plural). All callbacks are
     invoked, even if the default error handler detects a problem, so they
     must check request.exception before using the response data.
 

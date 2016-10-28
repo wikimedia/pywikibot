@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Various i18n functions.
 
@@ -6,15 +6,15 @@ Helper functions for both the internal translation system
 and for TranslateWiki-based translations.
 
 By default messages are assumed to reside in a package called
-'scripts.i18n'.  In pywikibot 2.0, that package is not packaged
+'scripts.i18n'. In pywikibot 2.0, that package is not packaged
 with pywikibot, and pywikibot 2.0 does not have a hard dependency
-on any i18n messages.  However, there are three user input questions
+on any i18n messages. However, there are three user input questions
 in pagegenerators which will use i18 messages if they can be loaded.
 
 The default message location may be changed by calling
-L{set_message_package} with a package name.  The package must contain
+L{set_message_package} with a package name. The package must contain
 an __init__.py, and a message bundle called 'pywikibot' containing
-messages.  See L{twntranslate} for more information on the messages.
+messages. See L{twntranslate} for more information on the messages.
 """
 #
 # (C) Pywikibot team, 2004-2016
@@ -44,8 +44,8 @@ from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
-# Package name for the translation messages.  The messages data must loaded
-# relative to that package name.  In the top of this package should be
+# Package name for the translation messages. The messages data must loaded
+# relative to that package name. In the top of this package should be
 # directories named after for each script/message bundle, and each directory
 # should contain JSON files called <lang>.json
 _messages_package_name = 'scripts.i18n'

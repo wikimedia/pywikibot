@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Objects representing MediaWiki sites (wikis).
 
@@ -473,7 +473,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
         Identifiers may be any value for which int() produces a valid
         namespace id, except bool, or any string which Namespace.lookup_name
-        successfully finds.  A numerical string is resolved as an integer.
+        successfully finds. A numerical string is resolved as an integer.
 
         @param identifiers: namespace identifiers
         @type identifiers: iterable of basestring or Namespace key,
@@ -602,7 +602,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
 
         Identifiers may be any value for which int() produces a valid
         namespace id, except bool, or any string which Namespace.lookup_name
-        successfully finds.  A numerical string is resolved as an integer.
+        successfully finds. A numerical string is resolved as an integer.
 
         @param identifiers: namespace identifiers
         @type identifiers: iterable of basestring or Namespace key,
@@ -798,7 +798,7 @@ class BaseSite(ComparableMixin):
 
     @property
     def throttle(self):
-        """Return this Site's throttle.  Initialize a new one if needed."""
+        """Return this Site's throttle. Initialize a new one if needed."""
         if not hasattr(self, "_throttle"):
             self._throttle = Throttle(self, multiplydelay=True)
         return self._throttle
@@ -1047,7 +1047,7 @@ class BaseSite(ComparableMixin):
 
     def lock_page(self, page, block=True):
         """
-        Lock page for writing.  Must be called before writing any page.
+        Lock page for writing. Must be called before writing any page.
 
         We don't want different threads trying to write to the same page
         at the same time, even to different sections.
@@ -1070,7 +1070,7 @@ class BaseSite(ComparableMixin):
 
     def unlock_page(self, page):
         """
-        Unlock page.  Call as soon as a write operation has completed.
+        Unlock page. Call as soon as a write operation has completed.
 
         @param page: the page to be locked
         @type page: pywikibot.Page
@@ -1226,7 +1226,7 @@ class BaseSite(ComparableMixin):
     # site-specific formatting preferences
 
     def category_on_one_line(self):
-        # TODO: is this even needed?  No family in the framework uses it.
+        # TODO: is this even needed? No family in the framework uses it.
         """Return True if this site wants all category links on one line."""
         return self.code in self.family.category_on_one_line
 
@@ -1753,7 +1753,7 @@ class TokenWallet(object):
         Preload one or multiple tokens.
 
         @param types: the types of token.
-        @type  types: iterable
+        @type types: iterable
         @param all: load all available tokens, if None only if it can be done
             in one request.
         @type all: bool
@@ -1929,7 +1929,7 @@ class APISite(BaseSite):
         @param namespaces: if not None, limit the query to namespaces in this
             list
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param total: if not None, limit the generator to yielding this many
             items in total
@@ -2040,7 +2040,7 @@ class APISite(BaseSite):
         #       is not already IN_PROGRESS, however the
         #       login status may be left 'IN_PROGRESS' because
         #       of exceptions or if the first method of login
-        #       (below) is successful.  Instead, log the problem,
+        #       (below) is successful. Instead, log the problem,
         #       to be increased to 'warning' level once majority
         #       of issues are resolved.
         if self._loginstatus == LoginStatus.IN_PROGRESS:
@@ -3326,7 +3326,7 @@ class APISite(BaseSite):
 
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
-        @type  types: iterable
+        @type types: iterable
         @param all: load all available tokens, if None only if it can be done
             in one request.
         @type all: bool
@@ -3468,7 +3468,7 @@ class APISite(BaseSite):
         @param namespaces: If present, only return links from the namespaces
             in this list.
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param total: Maximum number of pages to retrieve in total.
         @param content: if True, load the current content of each iterated page
@@ -3526,7 +3526,7 @@ class APISite(BaseSite):
         @param namespaces: If present, only return links from the namespaces
             in this list.
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
             (default False)
@@ -3554,7 +3554,7 @@ class APISite(BaseSite):
         @param namespaces: If present, only return links from the namespaces
             in this list.
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
@@ -3586,7 +3586,7 @@ class APISite(BaseSite):
 
         @param namespaces: Only iterate pages in these namespaces (default: all)
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param follow_redirects: if True, yields the target of any redirects,
             rather than the redirect page
@@ -3649,7 +3649,7 @@ class APISite(BaseSite):
 
         @param namespaces: Only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param content: if True, load the current content of each iterated page
             (default False)
@@ -3676,7 +3676,7 @@ class APISite(BaseSite):
             these namespaces. To yield subcategories or files, use
             parameter member_type instead.
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param sortby: determines the order in which results are generated,
             valid values are "sortkey" (default, results ordered by category
@@ -4343,7 +4343,7 @@ class APISite(BaseSite):
         @type image: FilePage
         @param namespaces: If present, only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param filterredir: if True, only yield redirects; if False (and not
             None), only yield non-redirects (default: yield both)
@@ -4474,7 +4474,7 @@ class APISite(BaseSite):
         @type reverse: bool
         @param namespaces: only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param pagelist: iterate changes to pages in this list only
         @param pagelist: list of Pages
@@ -4566,7 +4566,7 @@ class APISite(BaseSite):
             "nearmatch" (many wikis do not support title or nearmatch search)
         @param namespaces: search only in these namespaces (defaults to all)
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param get_redirects: if True, include redirects in results. Since
             version MediaWiki 1.23 it will always return redirects.
@@ -4628,7 +4628,7 @@ class APISite(BaseSite):
         @param reverse: Iterate oldest contributions first (default: newest)
         @param namespaces: only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param showMinor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
@@ -4677,7 +4677,7 @@ class APISite(BaseSite):
         @param reverse: Iterate oldest revisions first (default: newest)
         @param namespaces: only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param showMinor: if True, only list minor edits; if False (and not
             None), only list non-minor edits
@@ -4815,7 +4815,7 @@ class APISite(BaseSite):
         @param total: the maximum number of pages to iterate (default: 1)
         @param namespaces: only iterate pages in these namespaces.
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @param redirects: if True, include only redirect pages in results
             (default: include only non-redirects)
@@ -5459,9 +5459,9 @@ class APISite(BaseSite):
             'create', and 'upload'. Valid protection levels (in MediaWiki 1.12)
             are '' (equivalent to 'none'), 'autoconfirmed', and 'sysop'.
             If None is given, however, that protection will be skipped.
-        @type  protections: dict
+        @type protections: dict
         @param reason: Reason for the action
-        @type  reason: basestring
+        @type reason: basestring
         @param expiry: When the block should expire. This expiry will be applied
             to all protections. If None, 'infinite', 'indefinite', 'never', or ''
             is given, there is no expiry.
@@ -6226,7 +6226,7 @@ class APISite(BaseSite):
 
         @param namespaces: only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate

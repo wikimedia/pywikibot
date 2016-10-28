@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test i18n module."""
 #
 # (C) Pywikibot team, 2007-2014

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module with the Graphviz drawing calls."""
 #
 # (C) Pywikibot team, 2006-2016
@@ -103,7 +103,7 @@ class Subject(object):
     def originPage(self):
         """Deprecated property for the origin page.
 
-        DEPRECATED.  Use origin.
+        DEPRECATED. Use origin.
         """
         # TODO: deprecate this property
         return self.origin
@@ -112,7 +112,7 @@ class Subject(object):
     def originPage(self, value):
         """Deprecated property for the origin page.
 
-        DEPRECATED.  Use origin.
+        DEPRECATED. Use origin.
         """
         self.origin = value
 
@@ -120,7 +120,7 @@ class Subject(object):
     def foundIn(self):
         """Mapping of pages to others pages interwiki linked to it.
 
-        DEPRECATED.  Use found_in.
+        DEPRECATED. Use found_in.
         """
         # TODO: deprecate this property
         return self.found_in

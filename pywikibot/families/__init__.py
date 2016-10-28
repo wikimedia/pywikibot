@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Families package."""
 #
 # (C) Pywikibot team, 2007

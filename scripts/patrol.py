@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 The bot is meant to mark the edits based on info obtained by whitelist.
 
@@ -80,12 +80,11 @@ class PatrolBot(SingleSiteBot):
         """
         Constructor.
 
-        @kwarg feed            - The changes feed to work on (Newpages
-                                  or Recentchanges)
-        @kwarg ask             - If True, confirm each patrol action
-        @kwarg whitelist       - page title for whitelist (optional)
-        @kwarg autopatroluserns - Takes user consent to automatically patrol
-        @kwarg versionchecktime - Check versionchecktime lapse in sec
+        @kwarg feed: The changes feed to work on (Newpages or Recentchanges)
+        @kwarg ask: If True, confirm each patrol action
+        @kwarg whitelist: page title for whitelist (optional)
+        @kwarg autopatroluserns: Takes user consent to automatically patrol
+        @kwarg versionchecktime: Check versionchecktime lapse in sec
         """
         self.availableOptions.update({
             'ask': False,
@@ -388,7 +387,7 @@ class PatrolRule(object):
         Constructor.
 
         @param page_title: The page title for this rule
-        @type  page_title: pywikibot.Page
+        @type page_title: pywikibot.Page
         """
         self.page_title = page_title
 
@@ -409,7 +408,7 @@ class LinkedPagesRule(PatrolRule):
         """Constructor.
 
         @param page_title: The page title for this rule
-        @type  page_title: pywikibot.Page
+        @type page_title: pywikibot.Page
         """
         self.site = pywikibot.Site()
         self.page_title = page_title

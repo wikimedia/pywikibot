@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """IP address tools module."""
 #
 # (C) Pywikibot team, 2015
@@ -97,7 +97,7 @@ def is_IP(IP):
     """
     Verify the IP address provided is valid.
 
-    No logging is performed.  Use ip_address instead to catch errors.
+    No logging is performed. Use ip_address instead to catch errors.
 
     @param IP: IP address
     @type IP: unicode

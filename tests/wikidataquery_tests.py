@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test cases for the WikidataQuery query syntax and API."""
 #
 # (C) Pywikibot team, 2014

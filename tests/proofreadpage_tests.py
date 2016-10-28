@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the proofreadpage module."""
 #
 # (C) Pywikibot team, 2015-2016

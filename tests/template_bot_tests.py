@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test template bot module."""
 #
 # (C) Pywikibot team, 2015

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test valid templates."""
 #
 # (C) Pywikibot team, 2015
@@ -45,7 +45,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                     # known problem
                     if site.code == 'simple':
                         raise unittest.SkipTest(
-                            "'simple' wiki has 'en' language  code but "
+                            "'simple' wiki has 'en' language code but "
                             "missing template. Must be solved by the "
                             "corresponding script.")
                     # check whether template exists

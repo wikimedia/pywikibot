@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Unit tests for data_ingestion.py script."""
 #
 # (C) Pywikibot team, 2012-2015

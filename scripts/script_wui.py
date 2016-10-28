@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Bot which runs python framework scripts as (sub-)bot.
 
@@ -90,7 +90,7 @@ import lua
 
 # The crontab package is https://github.com/josiahcarlson/parse-crontab
 # version 0.20 installs a package called 'tests' which conflicts with our
-# test suite.  The patch to fix this has been merged, but is not released.
+# test suite. The patch to fix this has been merged, but is not released.
 # TODO: Use https://github.com/jayvdb/parse-crontab until it is fixed.
 import crontab
 
