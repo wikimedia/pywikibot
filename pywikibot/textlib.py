@@ -39,6 +39,7 @@ from pywikibot import config2 as config
 from pywikibot.exceptions import InvalidTitle
 from pywikibot.family import Family
 from pywikibot.tools import (
+    deprecate_arg,
     deprecated,
     DeprecatedRegex,
     OrderedDict,
@@ -799,8 +800,8 @@ def replace_links(text, replace, site=None):
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Articulo]]".
 
-def getLanguageLinks(text, insite=None, pageLink="[[]]",
-                     template_subpage=False):
+@deprecate_arg("pageLink", None)
+def getLanguageLinks(text, insite=None, template_subpage=False):
     """
     Return a dict of inter-language links found in text.
 
