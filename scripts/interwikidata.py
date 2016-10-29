@@ -52,7 +52,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
 
     """The bot for interwiki."""
 
-    def __init__(self, generator, site, **kwargs):
+    def __init__(self, **kwargs):
         """Construct the bot."""
         self.availableOptions.update({
             'clean': False,
@@ -60,15 +60,15 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             'summary': None,
             'ignore_ns': False,  # used by interwikidata_tests only
         })
-        super(IWBot, self).__init__(generator=generator, site=site, **kwargs)
+        super(IWBot, self).__init__(**kwargs)
         if not self.site.has_data_repository:
             raise ValueError('{site} does not have a data repository, '
                              'use interwiki.py instead.'.format(
                                  site=self.site))
-        self.repo = site.data_repository()
+        self.repo = self.site.data_repository()
         if not self.getOption('summary'):
             self.options['summary'] = pywikibot.i18n.twtranslate(
-                site, 'interwikidata-clean-summary')
+                self.site, 'interwikidata-clean-summary')
 
     def treat_page(self):
         """Check page."""
@@ -182,15 +182,14 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    generator = None
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
     options = {}
     for arg in local_args:
-        option, sep, value = arg.partition(':')
-        option = option[1:] if option.startswith('-') else None
         if genFactory.handleArg(arg):
             continue
+        option, sep, value = arg.partition(':')
+        option = option[1:] if option.startswith('-') else None
         if option == 'summary':
             options[option] = value
         else:
@@ -198,11 +197,10 @@ def main(*args):
 
     site = pywikibot.Site()
 
-    if not generator:
-        generator = genFactory.getCombinedGenerator()
+    generator = genFactory.getCombinedGenerator()
     if generator:
         generator = pagegenerators.PreloadingGenerator(generator)
-        bot = IWBot(generator, site, **options)
+        bot = IWBot(generator=generator, site=site, **options)
         bot.run()
     else:
         suggest_help(missing_generator=True)
