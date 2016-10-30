@@ -1466,11 +1466,7 @@ def _isbn10toIsbn13(match):
     except InvalidIsbnException:
         # don't change
         return isbn
-    i1x = getIsbn(isbn)
-    if not isinstance(i1x, ISBN13):
-        i13 = i1x.toISBN13()
-    else:
-        i13 = i1x
+    i13 = getIsbn(isbn).toISBN13()
     return i13.code
 
 
