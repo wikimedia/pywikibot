@@ -110,8 +110,7 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 FILE_LINK_REGEX = r"""
 \[\[\s*(?:%s)\s*:[^|]*?\s*
   (\|
-    ( \[\[ [^[]*? \[\[ [^]]*? \]\] [^]]*? \]\]  # capture invalid syntax
-     | ( \[\[ .*? \]\] )? [^[]*?
+    ( ( \[\[ .*? \]\] )? [^[]*?
      | \[ [^]]*? \]
     )*
   )?
