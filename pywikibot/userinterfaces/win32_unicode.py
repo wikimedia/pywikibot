@@ -35,42 +35,18 @@ from io import IOBase, UnsupportedOperation
 
 OSWIN32 = (sys.platform == "win32")
 
-
-# If any exception occurs in this code, we'll probably try to print it on stderr,
-# which makes for frustrating debugging if stderr is directed to our wrapper.
-# So be paranoid about catching errors and reporting them to original_stderr,
-# so that we can at least see them.
-def _complain(message):
-    print(isinstance(message, str) and message or repr(message),
-          file=sys.stderr)  # noqa: print
-
-
 if sys.version_info[0] > 2:
     unicode = str
     PY3 = True
-    try:
-        stdout = sys.stdout.buffer
-        stderr = sys.stderr.buffer
-        stdin = sys.stdin.buffer
-    except AttributeError as e:
-        _complain("Cannot find buffer interface for stdout, stderr or stdin.\n"
-                  "Using (incorrect) text interfaces instead. This is likely to\n"
-                  "break on non-ascii text.")
-        stdout = sys.stdout
-        stderr = sys.stderr
-        stdin = sys.stdin
-
 else:
     PY3 = False
-    stdout = sys.stdout
-    stderr = sys.stderr
-    stdin = sys.stdin
 
+stdin = sys.stdin
+stdout = sys.stdout
+stderr = sys.stderr
 argv = sys.argv
 
-original_stdout = stdout
-original_stderr = stderr
-original_stdin = stdin
+original_stderr = sys.stderr
 
 if OSWIN32:
     from ctypes import WINFUNCTYPE, windll, POINTER, WinError
@@ -145,7 +121,7 @@ class UnicodeOutput(IOBase):
         """Write the text to the output."""
         try:
             if self._hConsole is None:
-                if isinstance(text, unicode):
+                if not PY3 and isinstance(text, unicode):
                     text = text.encode('utf-8')
                 self._stream.write(text)
             else:
@@ -191,6 +167,15 @@ def old_fileno(std_name):
             return std.fileno()
         except UnsupportedOperation:
             pass
+
+
+# If any exception occurs in this code, we'll probably try to print it on stderr,
+# which makes for frustrating debugging if stderr is directed to our wrapper.
+# So be paranoid about catching errors and reporting them to original_stderr,
+# so that we can at least see them.
+def _complain(message):
+    print(isinstance(message, str) and message or repr(message),
+          file=original_stderr)  # noqa: print
 
 
 def register_cp65001():
@@ -331,17 +316,17 @@ def get_unicode_console():
                 stdin = UnicodeInput(hStdin, name='<Unicode console stdin>')
 
             if real_stdout:
-                stdout = UnicodeOutput(hStdout, original_stdout, STDOUT_FILENO,
+                stdout = UnicodeOutput(hStdout, sys.stdout, STDOUT_FILENO,
                                        '<Unicode console stdout>')
             else:
-                stdout = UnicodeOutput(None, original_stdout, old_stdout_fileno,
+                stdout = UnicodeOutput(None, sys.stdout, old_stdout_fileno,
                                        '<Unicode redirected stdout>')
 
             if real_stderr:
-                stderr = UnicodeOutput(hStderr, original_stderr, STDERR_FILENO,
+                stderr = UnicodeOutput(hStderr, sys.stderr, STDERR_FILENO,
                                        '<Unicode console stderr>')
             else:
-                stderr = UnicodeOutput(None, original_stderr, old_stderr_fileno,
+                stderr = UnicodeOutput(None, sys.stderr, old_stderr_fileno,
                                        '<Unicode redirected stderr>')
     except Exception as e:
         _complain("exception %r while fixing up sys.stdout and sys.stderr" % (e,))
