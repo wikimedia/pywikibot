@@ -3939,6 +3939,11 @@ class ItemPage(WikibasePage):
         data['sitelinks'] = self.sitelinks
         return data
 
+    @pywikibot.site.need_version("1.28-wmf.23")
+    def concept_url(self):
+        """Return the full concept URL."""
+        return '{0}{1}'.format(self.site.concept_base_uri, self.id)
+
     def getRedirectTarget(self):
         """Return the redirect target for this page."""
         target = super(ItemPage, self).getRedirectTarget()
