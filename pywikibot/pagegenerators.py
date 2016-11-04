@@ -40,13 +40,13 @@ import pywikibot
 from pywikibot.tools import (
     deprecated,
     deprecated_args,
-    redirect_func,
-    issue_deprecation_warning,
-    itergroup,
     DequeGenerator,
-    intersect_generators,
-    IteratorNextMixin,
     filter_unique,
+    intersect_generators,
+    issue_deprecation_warning,
+    IteratorNextMixin,
+    itergroup,
+    redirect_func,
 )
 
 from pywikibot import date, config, i18n, xmlreader
@@ -2727,7 +2727,16 @@ def WikidataSPARQLPageGenerator(query, site=None,
         site = pywikibot.Site()
     repo = site.data_repository()
     if endpoint is None:
-        endpoint = sparql.WIKIDATA
+        try:
+            endpoint = repo.sparql_endpoint
+        except NotImplementedError:
+            raise NotImplementedError(
+                'Wiki version must be 1.28-wmf.23 or newer to automatically '
+                'extract the sparql endpoint. Please provide the endpoint '
+                'parameter as well.')
+        if not endpoint:
+            pywikibot.error('The site {0} does not provide a sparql endpoint.'
+                            .format(repo))
 
     query_object = sparql.SparqlQuery(endpoint=endpoint)
     data = query_object.get_items(query,

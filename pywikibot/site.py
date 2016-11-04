@@ -7057,6 +7057,17 @@ class DataSite(APISite):
                 % self)
 
     @property
+    @need_version("1.28-wmf.3")
+    def sparql_endpoint(self):
+        """
+        Return the sparql endpoint url, if any has been set.
+
+        @return: sparql endpoint url
+        @rtype: str|None
+        """
+        return self.siteinfo['general'].get('wikibase-sparql')
+
+    @property
     @need_version("1.28-wmf.23")
     def concept_base_uri(self):
         """
