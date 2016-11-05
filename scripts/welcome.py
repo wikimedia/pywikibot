@@ -861,14 +861,14 @@ def showStatus(n=0):
         5: 'lightblue'
     }
     staMsg = {
-        0: 'MSG  ',
+        0: 'MSG',
         1: 'NoAct',
         2: 'Match',
-        3: 'Skip ',
+        3: 'Skip',
         4: 'Warning',
-        5: 'Done ',
+        5: 'Done',
     }
-    pywikibot.output(color_format('{color}[{0}]{default} ',
+    pywikibot.output(color_format('{color}[{0:5}]{default} ',
                                   staMsg[n], color=staColor[n]), newline=False)
 
 
