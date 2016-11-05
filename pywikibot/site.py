@@ -7032,6 +7032,17 @@ class DataSite(APISite):
                 '%r does not support entity type "property"'
                 % self)
 
+    @property
+    @need_version("1.28-wmf.23")
+    def concept_base_uri(self):
+        """
+        Return the base uri for concepts/entities.
+
+        @return: concept base uri
+        @rtype: str
+        """
+        return self.siteinfo['general']['wikibase-conceptbaseuri']
+
     def _get_baserevid(self, claim, baserevid):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
