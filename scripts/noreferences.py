@@ -130,6 +130,7 @@ placeBeforeSections = {
     ],
     'fr': [
         u'Liens externes',
+        u'Lien externe',
         u'Voir aussi',
         u'Notes'
     ],
@@ -425,6 +426,7 @@ referencesSubstitute = {
         'dsb': u'{{referency}}',
         'fa': u'{{پانویس}}',
         'fi': u'{{viitteet}}',
+        'fr': u'{{références}}',
         'he': u'{{הערות שוליים}}',
         'hsb': u'{{referency}}',
         'hu': u'{{Források}}',
