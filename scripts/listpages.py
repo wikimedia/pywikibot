@@ -8,60 +8,62 @@ in the current directory.
 
 These parameters are supported to specify which pages titles to print:
 
--format  Defines the output format.
+-format     Defines the output format.
 
-         Can be a custom string according to python string.format() notation or
-         can be selected by a number from following list (1 is default format):
-         1 - u'{num:4d} {page.title}'
-             --> 10 PageTitle
+            Can be a custom string according to python string.format() notation
+            or can be selected by a number from following list
+            (1 is default format):
+            1 - u'{num:4d} {page.title}'
+                --> 10 PageTitle
 
-         2 - u'{num:4d} {[[page.title]]}'
-             --> 10 [[PageTitle]]
+            2 - u'{num:4d} {[[page.title]]}'
+                --> 10 [[PageTitle]]
 
-         3 - u'{page.title}'
-             --> PageTitle
+            3 - u'{page.title}'
+                --> PageTitle
 
-         4 - u'{[[page.title]]}'
-             --> [[PageTitle]]
+            4 - u'{[[page.title]]}'
+                --> [[PageTitle]]
 
-         5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
-             --> 10 PageTitle (colorised in lightred)
+            5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
+                --> 10 PageTitle (colorised in lightred)
 
-         6 - u'{num:4d} {page.loc_title:<40} {page.can_title:<40}'
-             --> 10 localised_Namespace:PageTitle canonical_Namespace:PageTitle
+            6 - u'{num:4d} {page.loc_title:<40} {page.can_title:<40}'
+                --> 10 localised_Namespace:PageTitle
+                       canonical_Namespace:PageTitle
 
-         7 - u'{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
-             --> 10 localised_Namespace:PageTitle outputlang_Namespace:PageTitle
-             (*) requires "outputlang:lang" set.
+            7 - u'{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
+                --> 10 localised_Namespace:PageTitle
+                       outputlang_Namespace:PageTitle
+                (*) requires "outputlang:lang" set.
 
-         num is the sequential number of the listed page.
+            num is the sequential number of the listed page.
 
-         An empty format is equal to -notitle and just shows the total amount
-         of pages.
+            An empty format is equal to -notitle and just shows the total
+            amount of pages.
 
--outputlang   Language for translation of namespaces.
+-outputlang Language for translation of namespaces.
 
--notitle Page title is not printed.
+-notitle    Page title is not printed.
 
--get     Page content is printed.
+-get        Page content is printed.
 
--save    Save Page content to a file named as page.title(as_filename=True).
-         Directory can be set with -save:dir_name
-         If no dir is specified, current direcory will be used.
+-save       Save Page content to a file named as page.title(as_filename=True).
+            Directory can be set with -save:dir_name
+            If no dir is specified, current direcory will be used.
 
--encode  File encoding can be specified with '-encode:name' (name must be a
-         valid python encoding: utf-8, etc.).
-         If not specified, it defaults to config.textfile_encoding.
+-encode     File encoding can be specified with '-encode:name' (name must be
+            a valid python encoding: utf-8, etc.).
+            If not specified, it defaults to config.textfile_encoding.
 
--put:    Save the list to the defined page of the wiki. By default it does not
-         overwrite an exisiting page.
+-put:       Save the list to the defined page of the wiki. By default it does
+            not overwrite an exisiting page.
 
--overwrite    Overwrite the page if it exists. Can only by applied with -put.
+-overwrite  Overwrite the page if it exists. Can only by applied with -put.
 
--summary:     The summary text when the page is written. If it's one word just
-              containing letters, dashes and underscores it uses that as a
-              translation key.
-
+-summary:   The summary text when the page is written. If it's one word just
+            containing letters, dashes and underscores it uses that as a
+            translation key.
 
 Custom format can be applied to the following items extrapolated from a
     page object:
