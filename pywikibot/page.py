@@ -4984,8 +4984,7 @@ class Link(ComparableMixin):
         # Replace underscores by spaces
         t = t.replace(u"_", u" ")
         # replace multiple spaces with a single space
-        while u"  " in t:
-            t = t.replace(u"  ", u" ")
+        t = re.sub(' {2,}', ' ', t)
         # Strip spaces at both ends
         t = t.strip()
         # Remove left-to-right and right-to-left markers.
