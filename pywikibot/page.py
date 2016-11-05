@@ -64,7 +64,7 @@ from pywikibot.exceptions import (
     UserRightsError,
 )
 from pywikibot.family import Family
-from pywikibot.site import Namespace
+from pywikibot.site import Namespace, need_version
 from pywikibot.tools import (
     PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
@@ -1893,8 +1893,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             raise ValueError(u'Timestamp %d is not a deleted revision' % timestamp)
         self._deletedRevs[timestamp]['marked'] = undelete
 
-    @deprecate_arg('throttle', None)
-    @deprecate_arg('comment', 'reason')
+    @deprecated_args(comment='reason', throttle=None)
     def undelete(self, reason=None):
         """
         Undelete revisions based on the markers set by previous calls.
@@ -2167,8 +2166,7 @@ class Page(BasePage):
 
     """Page: A MediaWiki page."""
 
-    @deprecate_arg("insite", None)
-    @deprecate_arg("defaultNamespace", "ns")
+    @deprecated_args(defaultNamespace='ns', insite=None)
     def __init__(self, source, title=u"", ns=0):
         """Instantiate a Page object."""
         if isinstance(source, pywikibot.site.BaseSite):
@@ -2663,7 +2661,7 @@ class Category(Page):
                         if total == 0:
                             return
 
-    @pywikibot.site.need_version("1.13")
+    @need_version('1.13')
     def isEmptyCategory(self):
         """
         Return True if category has no members (including subcategories).
@@ -2673,7 +2671,7 @@ class Category(Page):
         ci = self.categoryinfo
         return sum(ci[k] for k in ['files', 'pages', 'subcats']) == 0
 
-    @pywikibot.site.need_version("1.11")
+    @need_version('1.11')
     def isHiddenCategory(self):
         """
         Return True if the category is hidden.
@@ -3215,8 +3213,7 @@ class User(Page):
         for item in self.contributions(total=total):
             yield item[0]
 
-    @deprecate_arg("limit", "total")  # To be consistent with rest of framework
-    @deprecate_arg("namespace", "namespaces")
+    @deprecated_args(limit='total', namespace='namespaces')
     def contributions(self, total=500, namespaces=[]):
         """
         Yield tuples describing this user edits.
@@ -3939,7 +3936,7 @@ class ItemPage(WikibasePage):
         data['sitelinks'] = self.sitelinks
         return data
 
-    @pywikibot.site.need_version("1.28-wmf.23")
+    @need_version('1.28-wmf.23')
     def concept_url(self):
         """Return the full concept URL."""
         return '{0}{1}'.format(self.site.concept_base_uri, self.id)
