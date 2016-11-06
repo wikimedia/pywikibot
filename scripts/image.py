@@ -120,6 +120,7 @@ class ImageRobot(ReplaceBot):
 
         super(ImageRobot, self).__init__(self.generator, replacements,
                                          always=self.getOption('always'),
+                                         site=self.site,
                                          summary=summary)
 
 
@@ -156,7 +157,8 @@ def main(*args):
         old_imagepage = pywikibot.FilePage(site, old_image)
         gen = pagegenerators.FileLinksGenerator(old_imagepage)
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = ImageRobot(preloadingGen, old_image, new_image, **options)
+        bot = ImageRobot(preloadingGen, old_image, new_image,
+                         site=site, **options)
         bot.run()
         return True
     else:
