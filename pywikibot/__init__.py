@@ -70,6 +70,7 @@ from pywikibot.tools import (
     deprecated as __deprecated,
     deprecate_arg as __deprecate_arg,
     normalize_username,
+    MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     PY2,
@@ -594,9 +595,29 @@ class WbQuantity(_WbRepresentation):
     _items = ('amount', 'upperBound', 'lowerBound', 'unit')
 
     @staticmethod
+    def _require_errors(site):
+        """
+        Check if the Wikibase site is so old it requires error bounds to be given.
+
+        If no site item is supplied it raises a warning and returns True.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: bool
+        """
+        if not site:
+            warning(
+                "WbQuantity now expects a 'site' parameter. This is needed to "
+                "ensure correct handling of error bounds.")
+            return True
+        return MediaWikiVersion(site.version()) < MediaWikiVersion('1.29.0-wmf.2')
+
+    @staticmethod
     def _todecimal(value):
         """
         Convert a string to a Decimal for use in WbQuantity.
+
+        None value is returned as is.
 
         @param value: decimal number to convert
         @type value: str
@@ -604,6 +625,8 @@ class WbQuantity(_WbRepresentation):
         """
         if isinstance(value, Decimal):
             return value
+        elif value is None:
+            return None
         return Decimal(str(value))
 
     @staticmethod
@@ -611,13 +634,17 @@ class WbQuantity(_WbRepresentation):
         """
         Convert a Decimal to a string representation suitable for WikiBase.
 
+        None value is returned as is.
+
         @param value: decimal number to convert
         @type value: Decimal
         @rtype: str
         """
+        if value is None:
+            return None
         return format(value, "+g")
 
-    def __init__(self, amount, unit=None, error=None):
+    def __init__(self, amount, unit=None, error=None, site=None):
         u"""
         Create a new WbQuantity object.
 
@@ -628,6 +655,8 @@ class WbQuantity(_WbRepresentation):
         @param error: the uncertainty of the amount (e.g. ±1)
         @type error: same as amount, or tuple of two values, where the first value is
                      the upper error and the second is the lower error value.
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         """
         if amount is None:
             raise ValueError('no amount given')
@@ -637,16 +666,19 @@ class WbQuantity(_WbRepresentation):
         self.amount = self._todecimal(amount)
         self.unit = unit
 
-        if error is None:
-            upperError = lowerError = Decimal(0)
-        elif isinstance(error, tuple):
-            upperError = self._todecimal(error[0])
-            lowerError = self._todecimal(error[1])
+        if error is None and not self._require_errors(site):
+            self.upperBound = self.lowerBound = None
         else:
-            upperError = lowerError = self._todecimal(error)
+            if error is None:
+                self.upperBound = self.lowerBound = Decimal(0)
+            elif isinstance(error, tuple):
+                upperError = self._todecimal(error[0])
+                lowerError = self._todecimal(error[1])
+            else:
+                upperError = lowerError = self._todecimal(error)
 
-        self.upperBound = self.amount + upperError
-        self.lowerBound = self.amount - lowerError
+            self.upperBound = self.amount + upperError
+            self.lowerBound = self.amount - lowerError
 
     def toWikibase(self):
         """
@@ -663,7 +695,7 @@ class WbQuantity(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, wb):
+    def fromWikibase(cls, wb, site=None):
         """
         Create a WbQuanity from the JSON data given by the Wikibase API.
 
@@ -672,10 +704,12 @@ class WbQuantity(_WbRepresentation):
         @rtype: pywikibot.WbQuanity
         """
         amount = cls._todecimal(wb['amount'])
-        upperBound = cls._todecimal(wb['upperBound'])
-        lowerBound = cls._todecimal(wb['lowerBound'])
-        error = (upperBound - amount, amount - lowerBound)
-        return cls(amount, wb['unit'], error)
+        upperBound = cls._todecimal(wb.get('upperBound'))
+        lowerBound = cls._todecimal(wb.get('lowerBound'))
+        error = None
+        if (upperBound and lowerBound) or cls._require_errors(site):
+            error = (upperBound - amount, amount - lowerBound)
+        return cls(amount, wb['unit'], error, site)
 
 
 class WbMonolingualText(_WbRepresentation):
