@@ -252,6 +252,22 @@ GENERATOR OPTIONS
                     is the string to look for, or "-searchitem:lang:text",
                     where lang is the langauge to search items in.
 
+-wantedpages        Work on pages that are linked, but do not exist;
+                    may be given as "-wantedpages:n" where n is the maximum
+                    number of articles to work on.
+
+-wantedcategories   Work on categories that are used, but do not exist;
+                    may be given as "-wantedcategories:n" where n is the
+                    maximum number of categories to work on.
+
+-wantedfiles        Work on files that are used, but do not exist;
+                    may be given as "-wantedfiles:n" where n is the maximum
+                    number of files to work on.
+
+-wantedtemplates    Work on templates that are used, but do not exist;
+                    may be given as "-wantedtemplates:n" where n is the
+                    maximum number of templates to work on.
+
 -random             Work on random pages returned by [[Special:Random]].
                     Can also be given as "-random:n" where n is the number
                     of pages to be returned.
@@ -736,6 +752,22 @@ class GeneratorFactory(object):
         """Handle `-unwatched` argument."""
         return UnwatchedPagesPageGenerator(
             total=_int_none(value), site=self.site)
+
+    def _handle_wantedpages(self, value):
+        """Handle `-wantedpages` argument."""
+        return self.site.wantedpages(total=_int_none(value))
+
+    def _handle_wantedfiles(self, value):
+        """Handle `-wantedfiles` argument."""
+        return self.site.wantedfiles(total=_int_none(value))
+
+    def _handle_wantedtemplates(self, value):
+        """Handle `-wantedtemplates` argument."""
+        return self.site.wantedtemplates(total=_int_none(value))
+
+    def _handle_wantedcategories(self, value):
+        """Handle `-wantedcategories` argument."""
+        return self.site.wantedcategories(total=_int_none(value))
 
     def _handle_property(self, value):
         """Handle `-property` argument."""
@@ -2427,6 +2459,7 @@ def page_with_property_generator(name, total=None, site=None):
     return site.pages_with_property(name, total=total)
 
 
+@deprecated('Site.wantedpages', since='20180803')
 def WantedPagesPageGenerator(total=100, site=None):
     """
     Wanted page generator.
@@ -2438,8 +2471,7 @@ def WantedPagesPageGenerator(total=100, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    for page in site.wantedpages(total=total):
-        yield page
+    return site.wantedpages(total=total)
 
 
 @deprecated_args(number="total", repeat=None)
