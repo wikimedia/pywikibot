@@ -142,6 +142,28 @@ class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
                          )
 
 
+class TestTimeStripperNumberAndDate(TestTimeStripperCase):
+
+    """Test cases for lines with (non-year) numbers and timestamps."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_four_digit_is_not_year_with_no_timestamp(self):
+        """A 4-digit number should not be mistaken as year (w/o timestamp)."""
+        self.assertIsNone(
+            self.ts.timestripper(
+                '2000 people will meet on 16 December at 22:00 (UTC).'))
+
+    def test_four_digit_is_not_year_with_timestamp(self):
+        """A 4-digit number should not be mistaken as year (w/ timestamp)."""
+        self.assertEqual(
+            self.ts.timestripper(
+                '2000 people will attend. --12:12, 14 December 2015 (UTC)'),
+            datetime.datetime(
+                2015, 12, 14, 12, 12, tzinfo=tzoneFixedOffset(0, 'UTC')))
+
+
 class TestTimeStripperLanguage(TestCase):
 
     """Test cases for English language."""

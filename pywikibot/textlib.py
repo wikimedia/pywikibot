@@ -128,6 +128,11 @@ NON_LATIN_DIGITS = {
     'or': u'୦୧୨୩୪୫୬୭୮୯',
 }
 
+# Used in TimeStripper. When a timestamp-like line have longer gaps
+# than this between year, month, etc in it, then the line will not be
+# considered to contain a timestamp.
+TIMESTAMP_GAP_LIMIT = 10
+
 
 def to_local_digits(phrase, lang):
     """
@@ -1972,17 +1977,19 @@ class TimeStripper(object):
             return (txt, None)
 
     @staticmethod
-    def _valid_date_dict_order(dateDict):
+    def _valid_date_dict_positions(dateDict):
         """Check consistency of reasonable positions for groups."""
-        day_pos = dateDict['day']['pos']
-        month_pos = dateDict['month']['pos']
-        year_pos = dateDict['year']['pos']
-        time_pos = dateDict['time']['pos']
-        tzinfo_pos = dateDict['tzinfo']['pos']
+        time_pos = dateDict['time']['start']
+        tzinfo_pos = dateDict['tzinfo']['start']
+        date_pos = sorted(
+            (dateDict['day'], dateDict['month'], dateDict['year']),
+            key=lambda x: x['start'])
+        min_pos, max_pos = date_pos[0]['start'], date_pos[-1]['start']
+        max_gap = max(x[1]['start'] - x[0]['end']
+                      for x in zip(date_pos, date_pos[1:]))
 
-        date_pos = sorted((day_pos, month_pos, year_pos))
-        min_pos, max_pos = date_pos[0], date_pos[-1]
-
+        if max_gap > TIMESTAMP_GAP_LIMIT:
+            return False
         if tzinfo_pos < min_pos or tzinfo_pos < time_pos:
             return False
         if min_pos < tzinfo_pos < max_pos:
@@ -2023,15 +2030,16 @@ class TimeStripper(object):
             line, match_obj = self._last_match_and_replace(line, pat)
             if match_obj:
                 for group, value in match_obj.groupdict().items():
-                    pos = match_obj.start(group)
-                    # Store also match pos in line, for later order check.
-                    matchDict = {group: {'value': value, 'pos': pos}}
-                    dateDict.update(matchDict)
+                    start, end = (match_obj.start(group), match_obj.end(group))
+                    # The positions are stored for later validation
+                    dateDict[group] = {
+                        'value': value, 'start': start, 'end': end
+                    }
 
         # all fields matched -> date valid
         # groups are in a reasonable order.
         if (all(g in dateDict for g in self.groups) and
-                self._valid_date_dict_order(dateDict)):
+                self._valid_date_dict_positions(dateDict)):
             # remove 'time' key, now split in hour/minute and not needed
             # by datetime.
             del dateDict['time']
