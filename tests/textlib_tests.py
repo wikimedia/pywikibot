@@ -1179,6 +1179,21 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                ['invoke'], site=self.site),
                          '{{#invoke:x}}')
 
+    def test_replace_with_count(self):
+        """Test replacing with count argument."""
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
+                                               site=self.site),
+                         'y [[y]] y y')
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
+                                               site=self.site, count=5),
+                         'y [[y]] y y')
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
+                                               site=self.site, count=2),
+                         'y [[y]] x x')
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', ['link'],
+                                               site=self.site, count=2),
+                         'y [[x]] y x')
+
     def test_replace_tag_category(self):
         """Test replacing not inside category links."""
         for ns_name in self.site.namespaces[14]:

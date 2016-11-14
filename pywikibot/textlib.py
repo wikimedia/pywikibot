@@ -300,7 +300,7 @@ def _get_regexes(keys, site):
 
 
 def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
-                  allowoverlap=False, marker='', site=None):
+                  allowoverlap=False, marker='', site=None, count=0):
     """
     Return text with 'old' replaced by 'new', ignoring specified types of text.
 
@@ -320,7 +320,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     @type caseInsensitive: bool
     @param marker: a string that will be added to the last replacement;
         if nothing is changed, it is added at the end
-
+    @param count: how many replacements to do at most. See parameter
+        count of re.sub().
+    @type count: int
     """
     # if we got a string, compile it as a regular expression
     if isinstance(old, basestring):
@@ -336,8 +338,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     dontTouchRegexes = _get_regexes(exceptions, site)
 
     index = 0
+    replaced = 0
     markerpos = len(text)
-    while True:
+    while not count or replaced < count:
         if index > len(text):
             break
         match = old.search(text, index)
@@ -412,6 +415,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 # When the regex allows to match nothing, shift by one character
                 index += 1
             markerpos = match.start() + len(replacement)
+            replaced += 1
     text = text[:markerpos] + marker + text[markerpos:]
     return text
 
