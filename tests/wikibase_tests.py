@@ -702,6 +702,15 @@ class TestPropertyPage(WikidataTestCase):
         claim = property_page.newClaim()
         self.assertEqual(claim.type, 'wikibase-item')
 
+    def test_as_target(self):
+        """Test that PropertyPage can be used as a value."""
+        wikidata = self.get_repo()
+        property_page = pywikibot.PropertyPage(wikidata, 'P1687')
+        claim = property_page.newClaim()
+        claim.setTarget(property_page)
+        self.assertEqual(claim.type, 'wikibase-property')
+        self.assertEqual(claim.target, property_page)
+
 
 class TestClaimSetValue(WikidataTestCase):
 

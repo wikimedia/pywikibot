@@ -3805,6 +3805,8 @@ class ItemPage(WikibasePage):
     been looked up, the item is then defined by the qid.
     """
 
+    entity_type = 'item'
+
     def __init__(self, site, title=None, ns=None):
         """
         Constructor.
@@ -4140,6 +4142,7 @@ class Property(object):
     """
 
     types = {'wikibase-item': ItemPage,
+             # 'wikibase-property': PropertyPage, must be declared first
              'string': basestring,
              'commonsMedia': FilePage,
              'globe-coordinate': pywikibot.Coordinate,
@@ -4152,6 +4155,7 @@ class Property(object):
              }
 
     value_types = {'wikibase-item': 'wikibase-entityid',
+                   'wikibase-property': 'wikibase-entityid',
                    'commonsMedia': 'string',
                    'url': 'string',
                    'globe-coordinate': 'globecoordinate',
@@ -4222,6 +4226,8 @@ class PropertyPage(WikibasePage, Property):
         PropertyPage(DataSite, 'P21')
     """
 
+    entity_type = 'property'
+
     def __init__(self, source, title=u""):
         """
         Constructor.
@@ -4263,6 +4269,9 @@ class PropertyPage(WikibasePage, Property):
         return Claim(self.site, self.getID(), datatype=self.type,
                      *args, **kwargs)
 
+# Add PropertyPage to the class attribute "types" after its declaration.
+Property.types['wikibase-property'] = PropertyPage
+
 
 class Claim(Property):
 
@@ -4275,6 +4284,8 @@ class Claim(Property):
     TARGET_CONVERTER = {
         'wikibase-item': lambda value, site:
             ItemPage(site, 'Q' + str(value['numeric-id'])),
+        'wikibase-property': lambda value, site:
+            PropertyPage(site, 'P' + str(value['numeric-id'])),
         'commonsMedia': lambda value, site:
             FilePage(pywikibot.Site('commons', 'commons'), value),
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
@@ -4690,8 +4701,8 @@ class Claim(Property):
         @return: JSON value
         @rtype: dict
         """
-        if self.type == 'wikibase-item':
-            value = {'entity-type': 'item',
+        if self.type in ('wikibase-item', 'wikibase-property'):
+            value = {'entity-type': self.getTarget().entity_type,
                      'numeric-id': self.getTarget().getID(numeric=True)}
         elif self.type in ('string', 'url', 'math', 'external-id'):
             value = self.getTarget()
