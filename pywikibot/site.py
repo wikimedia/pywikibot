@@ -4805,14 +4805,14 @@ class APISite(BaseSite):
         return self.randompages(total=1, redirects=True)
 
     @deprecated_args(step=None)
-    def randompages(self, total=10, namespaces=None,
+    def randompages(self, total=None, namespaces=None,
                     redirects=False, content=False):
         """Iterate a number of random pages.
 
         Pages are listed in a fixed sequence, only the starting point is
         random.
 
-        @param total: the maximum number of pages to iterate (default: 1)
+        @param total: the maximum number of pages to iterate
         @param namespaces: only iterate pages in these namespaces.
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types.  May be a '|' separated
