@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ from decimal import Decimal
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.page import WikibasePage, ItemPage
+from pywikibot.page import WikibasePage, ItemPage, PropertyPage
 from pywikibot.site import Namespace, NamespacesDict
 
 from tests import join_pages_path
@@ -35,7 +35,7 @@ from tests.basepage_tests import (
 )
 
 
-# fetch a page which is very likely to be unconnected, which doesnt have
+# fetch a page which is very likely to be unconnected, which doesn't have
 # a generator, and unit tests may be used to test old versions of pywikibot
 def _get_test_unconnected_page(site):
     """Get unconnected page from site for tests."""
@@ -111,8 +111,8 @@ class TestGeneral(WikidataTestCase):
         repo = self.get_repo()
         item_namespace = repo.namespaces[0]
         self.assertEqual(item_namespace.defaultcontentmodel, 'wikibase-item')
-        item = pywikibot.ItemPage.fromPage(self.mainpage)
-        self.assertIsInstance(item, pywikibot.ItemPage)
+        item = ItemPage.fromPage(self.mainpage)
+        self.assertIsInstance(item, ItemPage)
         self.assertEqual(item.getID(), 'Q5296')
         self.assertEqual(item.title(), 'Q5296')
         self.assertIn('en', item.labels)
@@ -120,22 +120,22 @@ class TestGeneral(WikidataTestCase):
         self.assertIn('en', item.aliases)
         self.assertIn('Home page', item.aliases['en'])
         self.assertEqual(item.namespace(), 0)
-        item2 = pywikibot.ItemPage(repo, 'q5296')
+        item2 = ItemPage(repo, 'q5296')
         self.assertEqual(item2.getID(), 'Q5296')
         item2.get()
         self.assertTrue(item2.labels['en'].lower().endswith('main page'))
-        prop = pywikibot.PropertyPage(repo, 'Property:P21')
+        prop = PropertyPage(repo, 'Property:P21')
         self.assertEqual(prop.type, 'wikibase-item')
         self.assertEqual(prop.namespace(), 120)
         claim = pywikibot.Claim(repo, 'p21')
         self.assertRaises(ValueError, claim.setTarget, value="test")
-        claim.setTarget(pywikibot.ItemPage(repo, 'q1'))
+        claim.setTarget(ItemPage(repo, 'q1'))
         self.assertEqual(claim._formatValue(), {'entity-type': 'item', 'numeric-id': 1})
 
     def test_cmp(self):
         """Test WikibasePage.__cmp__."""
-        self.assertEqual(pywikibot.ItemPage.fromPage(self.mainpage),
-                         pywikibot.ItemPage(self.get_repo(), 'q5296'))
+        self.assertEqual(ItemPage.fromPage(self.mainpage),
+                         ItemPage(self.get_repo(), 'q5296'))
 
 
 class TestWikibaseTypes(WikidataTestCase):
@@ -293,7 +293,7 @@ class TestItemPageExtensibility(TestCase):
 
     def test_ItemPage_extensibility(self):
         """Test ItemPage extensibility."""
-        class MyItemPage(pywikibot.ItemPage):
+        class MyItemPage(ItemPage):
 
             """Dummy ItemPage subclass."""
 
@@ -341,7 +341,7 @@ class TestItemLoad(WikidataTestCase):
     def test_item_normal(self):
         """Test normal wikibase item."""
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata, 'Q60')
+        item = ItemPage(wikidata, 'Q60')
         self.assertEqual(item._link._title, 'Q60')
         self.assertEqual(item._defined_by(), {u'ids': u'Q60'})
         self.assertEqual(item.id, 'Q60')
@@ -357,7 +357,7 @@ class TestItemLoad(WikidataTestCase):
     def test_load_item_set_id(self):
         """Test setting item.id attribute on empty item."""
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata, '-1')
+        item = ItemPage(wikidata, '-1')
         self.assertEqual(item._link._title, '-1')
         item.id = 'Q60'
         self.assertFalse(hasattr(item, '_content'))
@@ -378,7 +378,7 @@ class TestItemLoad(WikidataTestCase):
         highlights that it breaks silently.
         """
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata, 'Q60')
+        item = ItemPage(wikidata, 'Q60')
         item.get()
         self.assertEqual(item.labels['en'], 'New York City')
 
@@ -404,7 +404,7 @@ class TestItemLoad(WikidataTestCase):
         the site parameter, with the title parameter defaulted to None.
         """
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata)
+        item = ItemPage(wikidata)
         self.assertEqual(item._link._title, '-1')
 
     def test_item_invalid_titles(self):
@@ -414,7 +414,7 @@ class TestItemLoad(WikidataTestCase):
                       '-2', '1', '0', '+1',
                       'Q0', 'Q0.5', 'Q', 'Q-1', 'Q+1']:
             self.assertRaises(pywikibot.InvalidTitle,
-                              pywikibot.ItemPage, wikidata, title)
+                              ItemPage, wikidata, title)
 
     def test_item_untrimmed_title(self):
         """
@@ -423,7 +423,7 @@ class TestItemLoad(WikidataTestCase):
         Spaces in the title should not cause an error.
         """
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata, ' Q60 ')
+        item = ItemPage(wikidata, ' Q60 ')
         self.assertEqual(item._link._title, 'Q60')
         self.assertEqual(item.title(), 'Q60')
         item.get()
@@ -432,7 +432,7 @@ class TestItemLoad(WikidataTestCase):
         """Test nmissing item."""
         wikidata = self.get_repo()
         # this item has never existed
-        item = pywikibot.ItemPage(wikidata, 'Q7')
+        item = ItemPage(wikidata, 'Q7')
         self.assertEqual(item._link._title, 'Q7')
         self.assertEqual(item.title(), 'Q7')
         self.assertFalse(hasattr(item, '_content'))
@@ -458,7 +458,7 @@ class TestItemLoad(WikidataTestCase):
         """Test non-existent item."""
         wikidata = self.get_repo()
         # this item has not been created
-        item = pywikibot.ItemPage(wikidata, 'Q9999999999999999999')
+        item = ItemPage(wikidata, 'Q9999999999999999999')
         self.assertFalse(item.exists())
         self.assertEqual(item.getID(), 'Q9999999999999999999')
         self.assertRaises(pywikibot.NoPage, item.get)
@@ -466,7 +466,7 @@ class TestItemLoad(WikidataTestCase):
     def test_fromPage_noprops(self):
         """Test item from page with properties."""
         page = self.nyc
-        item = pywikibot.ItemPage.fromPage(page)
+        item = ItemPage.fromPage(page)
         self.assertEqual(item._link._title, '-1')
         self.assertTrue(hasattr(item, 'id'))
         self.assertTrue(hasattr(item, '_content'))
@@ -481,7 +481,7 @@ class TestItemLoad(WikidataTestCase):
     def test_fromPage_noprops_with_section(self):
         """Test item from page with section."""
         page = pywikibot.Page(self.nyc.site, self.nyc.title() + '#foo')
-        item = pywikibot.ItemPage.fromPage(page)
+        item = ItemPage.fromPage(page)
         self.assertEqual(item._link._title, '-1')
         self.assertTrue(hasattr(item, 'id'))
         self.assertTrue(hasattr(item, '_content'))
@@ -498,7 +498,7 @@ class TestItemLoad(WikidataTestCase):
         page = self.nyc
         # fetch page properties
         page.properties()
-        item = pywikibot.ItemPage.fromPage(page)
+        item = ItemPage.fromPage(page)
         self.assertEqual(item._link._title, 'Q60')
         self.assertEqual(item.id, 'Q60')
         self.assertFalse(hasattr(item, '_content'))
@@ -515,7 +515,7 @@ class TestItemLoad(WikidataTestCase):
     def test_fromPage_lazy(self):
         """Test item from page with lazy_load."""
         page = pywikibot.Page(pywikibot.page.Link("New York City", self.site))
-        item = pywikibot.ItemPage.fromPage(page, lazy_load=True)
+        item = ItemPage.fromPage(page, lazy_load=True)
         self.assertEqual(item._defined_by(),
                          {'sites': u'enwiki', 'titles': u'New York City'})
         self.assertEqual(item._link._title, '-1')
@@ -532,7 +532,7 @@ class TestItemLoad(WikidataTestCase):
     def test_fromPage_invalid_title(self):
         """Test item from page with invalid title."""
         page = pywikibot.Page(pywikibot.page.Link("[]", self.site))
-        self.assertRaises(pywikibot.InvalidTitle, pywikibot.ItemPage.fromPage, page)
+        self.assertRaises(pywikibot.InvalidTitle, ItemPage.fromPage, page)
 
     def _test_fromPage_noitem(self, link):
         """Helper function to test a page without an associated item.
@@ -540,7 +540,7 @@ class TestItemLoad(WikidataTestCase):
         It tests two of the ways to fetch an item:
         1. the Page already has props, which should contain a item id if
            present, and that item id is used to instantiate the item, and
-        2. the page doesnt have props, in which case the site&titles is
+        2. the page doesn't have props, in which case the site&titles is
            used to lookup the item id, but that lookup occurs after
            instantiation, during the first attempt to use the data item.
         """
@@ -550,7 +550,7 @@ class TestItemLoad(WikidataTestCase):
                 if props:
                     page.properties()
 
-                item = pywikibot.ItemPage.fromPage(page, lazy_load=True)
+                item = ItemPage.fromPage(page, lazy_load=True)
 
                 self.assertFalse(hasattr(item, 'id'))
                 self.assertTrue(hasattr(item, '_title'))
@@ -584,7 +584,7 @@ class TestItemLoad(WikidataTestCase):
 
                 # by default, fromPage should always raise the same exception
                 self.assertRaises(pywikibot.NoPage,
-                                  pywikibot.ItemPage.fromPage, page)
+                                  ItemPage.fromPage, page)
 
     def test_fromPage_redirect(self):
         """
@@ -623,10 +623,10 @@ class TestItemLoad(WikidataTestCase):
         # and that exception should refer to the source title 'Test page'
         # not the Item being created.
         self.assertRaisesRegex(pywikibot.NoPage, 'Test page',
-                               pywikibot.ItemPage.fromPage,
+                               ItemPage.fromPage,
                                page, lazy_load=False)
 
-        item = pywikibot.ItemPage.fromPage(page, lazy_load=True)
+        item = ItemPage.fromPage(page, lazy_load=True)
 
         # Now verify that delay loading will result in the desired semantics.
         # It should not raise NoPage on the wikibase item which has a title
@@ -644,19 +644,19 @@ class TestRedirects(WikidataTestCase):
     def test_normal_item(self):
         """Test normal item."""
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata, 'Q1')
+        item = ItemPage(wikidata, 'Q1')
         self.assertFalse(item.isRedirectPage())
         self.assertRaises(pywikibot.IsNotRedirectPage, item.getRedirectTarget)
 
     def test_redirect_item(self):
         """Test redirect item."""
         wikidata = self.get_repo()
-        item = pywikibot.ItemPage(wikidata, 'Q10008448')
+        item = ItemPage(wikidata, 'Q10008448')
         item.get(get_redirect=True)
-        target = pywikibot.ItemPage(wikidata, 'Q8422626')
+        target = ItemPage(wikidata, 'Q8422626')
         self.assertTrue(item.isRedirectPage())
         self.assertEqual(item.getRedirectTarget(), target)
-        self.assertIsInstance(item.getRedirectTarget(), pywikibot.ItemPage)
+        self.assertIsInstance(item.getRedirectTarget(), ItemPage)
         self.assertRaises(pywikibot.IsRedirectPage, item.get)
 
 
@@ -667,12 +667,12 @@ class TestPropertyPage(WikidataTestCase):
     def test_property_empty_property(self):
         """Test creating a PropertyPage without a title."""
         wikidata = self.get_repo()
-        self.assertRaises(pywikibot.Error, pywikibot.PropertyPage, wikidata)
+        self.assertRaises(pywikibot.Error, PropertyPage, wikidata)
 
     def test_globe_coordinate(self):
         """Test a coordinate PropertyPage has the correct type."""
         wikidata = self.get_repo()
-        property_page = pywikibot.PropertyPage(wikidata, 'P625')
+        property_page = PropertyPage(wikidata, 'P625')
         self.assertEqual(property_page.type, 'globe-coordinate')
         self.assertEqual(property_page.getType(), 'globecoordinate')
 
@@ -683,19 +683,19 @@ class TestPropertyPage(WikidataTestCase):
     def test_get(self):
         """Test PropertyPage.get() method."""
         wikidata = self.get_repo()
-        property_page = pywikibot.PropertyPage(wikidata, 'P625')
+        property_page = PropertyPage(wikidata, 'P625')
         property_page.get()
         self.assertEqual(property_page.type, 'globe-coordinate')
 
     def test_new_claim(self):
         """Test that PropertyPage.newClaim uses cached datatype."""
         wikidata = self.get_repo()
-        property_page = pywikibot.PropertyPage(wikidata, 'P625')
+        property_page = PropertyPage(wikidata, 'P625')
         property_page.get()
         claim = property_page.newClaim()
         self.assertEqual(claim.type, 'globe-coordinate')
 
-        # Now verify that it isnt fetching the type from the property
+        # Now verify that it isn't fetching the type from the property
         # data in the repo by setting the cache to the incorrect type
         # and checking that it is the cached value that is used.
         property_page._type = 'wikibase-item'
@@ -705,7 +705,7 @@ class TestPropertyPage(WikidataTestCase):
     def test_as_target(self):
         """Test that PropertyPage can be used as a value."""
         wikidata = self.get_repo()
-        property_page = pywikibot.PropertyPage(wikidata, 'P1687')
+        property_page = PropertyPage(wikidata, 'P1687')
         claim = property_page.newClaim()
         claim.setTarget(property_page)
         self.assertEqual(claim.type, 'wikibase-property')
@@ -823,13 +823,13 @@ class TestDryPageGetNotImplemented(DefaultWikibaseClientTestCase,
 
     def test_item_get_args(self):
         """Test ItemPage.get() with sysop argument."""
-        item = pywikibot.ItemPage(self.repo, 'Q1')
+        item = ItemPage(self.repo, 'Q1')
         item._content = {}
         self.assertRaises(NotImplementedError, item.get, sysop=True)
 
     def test_property_get_args(self):
         """Test PropertyPage.get() with sysop argument."""
-        pp = pywikibot.PropertyPage(self.repo, 'P1')
+        pp = PropertyPage(self.repo, 'P1')
         pp._content = {}
         self.assertRaises(NotImplementedError, pp.get, sysop=True)
 
@@ -857,7 +857,7 @@ class TestLinks(WikidataTestCase):
     def setUp(self):
         """Setup Tests."""
         super(TestLinks, self).setUp()
-        self.wdp = pywikibot.ItemPage(self.get_repo(), 'Q60')
+        self.wdp = ItemPage(self.get_repo(), 'Q60')
         self.wdp.id = 'Q60'
         with open(join_pages_path('Q60_only_sitelinks.wd')) as f:
             self.wdp._content = json.load(f)
@@ -958,7 +958,7 @@ class TestPreloadingItemGenerator(TestCase):
         instance_of_page = pywikibot.Page(site, 'Property:P31')
         ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
         gen = pagegenerators.PreloadingItemGenerator(ref_gen)
-        self.assertTrue(all(isinstance(item, pywikibot.ItemPage) for item in gen))
+        self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
 
 
 class TestNamespaces(WikidataTestCase):
@@ -973,27 +973,27 @@ class TestNamespaces(WikidataTestCase):
         it with minimal arguments
         """
         wikidata = self.get_repo()
-        page = pywikibot.page.WikibasePage(wikidata)
+        page = WikibasePage(wikidata)
         self.assertRaises(AttributeError, page.namespace)
-        page = pywikibot.page.WikibasePage(wikidata, title='')
+        page = WikibasePage(wikidata, title='')
         self.assertRaises(AttributeError, page.namespace)
 
-        page = pywikibot.page.WikibasePage(wikidata, ns=0)
+        page = WikibasePage(wikidata, ns=0)
         self.assertEqual(page.namespace(), 0)
-        page = pywikibot.page.WikibasePage(wikidata, entity_type='item')
+        page = WikibasePage(wikidata, entity_type='item')
         self.assertEqual(page.namespace(), 0)
 
-        page = pywikibot.page.WikibasePage(wikidata, ns=120)
+        page = WikibasePage(wikidata, ns=120)
         self.assertEqual(page.namespace(), 120)
-        page = pywikibot.page.WikibasePage(wikidata, title='', ns=120)
+        page = WikibasePage(wikidata, title='', ns=120)
         self.assertEqual(page.namespace(), 120)
-        page = pywikibot.page.WikibasePage(wikidata, entity_type='property')
+        page = WikibasePage(wikidata, entity_type='property')
         self.assertEqual(page.namespace(), 120)
 
         # mismatch in namespaces
-        self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
+        self.assertRaises(ValueError, WikibasePage, wikidata,
                           ns=0, entity_type='property')
-        self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
+        self.assertRaises(ValueError, WikibasePage, wikidata,
                           ns=120, entity_type='item')
 
     def test_wikibase_link_namespace(self):
@@ -1001,50 +1001,50 @@ class TestNamespaces(WikidataTestCase):
         wikidata = self.get_repo()
         # title without any namespace clues (ns or entity_type)
         # should verify the Link namespace is appropriate
-        page = pywikibot.page.WikibasePage(wikidata, title='Q6')
+        page = WikibasePage(wikidata, title='Q6')
         self.assertEqual(page.namespace(), 0)
-        page = pywikibot.page.WikibasePage(wikidata, title='Property:P60')
+        page = WikibasePage(wikidata, title='Property:P60')
         self.assertEqual(page.namespace(), 120)
 
     def test_wikibase_namespace_selection(self):
         """Test various ways to correctly specify the namespace."""
         wikidata = self.get_repo()
 
-        page = pywikibot.page.ItemPage(wikidata, 'Q60')
+        page = ItemPage(wikidata, 'Q60')
         self.assertEqual(page.namespace(), 0)
         page.get()
 
-        page = pywikibot.page.ItemPage(wikidata, title='Q60')
+        page = ItemPage(wikidata, title='Q60')
         self.assertEqual(page.namespace(), 0)
         page.get()
 
-        page = pywikibot.page.WikibasePage(wikidata, title='Q60', ns=0)
+        page = WikibasePage(wikidata, title='Q60', ns=0)
         self.assertEqual(page.namespace(), 0)
         page.get()
 
-        page = pywikibot.page.WikibasePage(wikidata, title='Q60',
-                                           entity_type='item')
+        page = WikibasePage(wikidata, title='Q60',
+                            entity_type='item')
         self.assertEqual(page.namespace(), 0)
         page.get()
 
-        page = pywikibot.page.PropertyPage(wikidata, 'Property:P6')
+        page = PropertyPage(wikidata, 'Property:P6')
         self.assertEqual(page.namespace(), 120)
         page.get()
 
-        page = pywikibot.page.PropertyPage(wikidata, 'P6')
+        page = PropertyPage(wikidata, 'P6')
         self.assertEqual(page.namespace(), 120)
         page.get()
 
-        page = pywikibot.page.WikibasePage(wikidata, title='Property:P6')
+        page = WikibasePage(wikidata, title='Property:P6')
         self.assertEqual(page.namespace(), 120)
         page.get()
 
-        page = pywikibot.page.WikibasePage(wikidata, title='P6', ns=120)
+        page = WikibasePage(wikidata, title='P6', ns=120)
         self.assertEqual(page.namespace(), 120)
         page.get()
 
-        page = pywikibot.page.WikibasePage(wikidata, title='P6',
-                                           entity_type='property')
+        page = WikibasePage(wikidata, title='P6',
+                            entity_type='property')
         self.assertEqual(page.namespace(), 120)
         page.get()
 
@@ -1053,10 +1053,10 @@ class TestNamespaces(WikidataTestCase):
         wikidata = self.get_repo()
         # All subclasses of WikibasePage raise a ValueError
         # if the namespace for the page title is not correct
-        self.assertRaises(ValueError, pywikibot.page.WikibasePage, wikidata,
+        self.assertRaises(ValueError, WikibasePage, wikidata,
                           title='Wikidata:Main Page')
-        self.assertRaises(ValueError, pywikibot.ItemPage, wikidata, 'File:Q1')
-        self.assertRaises(ValueError, pywikibot.PropertyPage, wikidata, 'File:P60')
+        self.assertRaises(ValueError, ItemPage, wikidata, 'File:Q1')
+        self.assertRaises(ValueError, PropertyPage, wikidata, 'File:P60')
 
     def test_item_unknown_namespace(self):
         """Test unknown namespaces for Wikibase entities."""
@@ -1065,10 +1065,8 @@ class TestNamespaces(WikidataTestCase):
         # TODO: These items have inappropriate titles, which should
         #       raise an error.
         wikidata = self.get_repo()
-        self.assertRaises(pywikibot.InvalidTitle,
-                          pywikibot.ItemPage,
-                          wikidata,
-                          'Invalid:Q1')
+        self.assertRaises(pywikibot.InvalidTitle, ItemPage,
+                          wikidata, 'Invalid:Q1')
 
 
 class TestAlternateNamespaces(WikidataTestCase):
@@ -1096,13 +1094,13 @@ class TestAlternateNamespaces(WikidataTestCase):
 
     def test_alternate_item_namespace(self):
         """Test alternate item namespace."""
-        item = pywikibot.ItemPage(self.repo, 'Q60')
+        item = ItemPage(self.repo, 'Q60')
         self.assertEqual(item.namespace(), 90)
         self.assertEqual(item.id, 'Q60')
         self.assertEqual(item.title(), 'Item:Q60')
         self.assertEqual(item._defined_by(), {'ids': 'Q60'})
 
-        item = pywikibot.ItemPage(self.repo, 'Item:Q60')
+        item = ItemPage(self.repo, 'Item:Q60')
         self.assertEqual(item.namespace(), 90)
         self.assertEqual(item.id, 'Q60')
         self.assertEqual(item.title(), 'Item:Q60')
@@ -1110,13 +1108,13 @@ class TestAlternateNamespaces(WikidataTestCase):
 
     def test_alternate_property_namespace(self):
         """Test alternate property namespace."""
-        prop = pywikibot.PropertyPage(self.repo, 'P21')
+        prop = PropertyPage(self.repo, 'P21')
         self.assertEqual(prop.namespace(), 92)
         self.assertEqual(prop.id, 'P21')
         self.assertEqual(prop.title(), 'Prop:P21')
         self.assertEqual(prop._defined_by(), {'ids': 'P21'})
 
-        prop = pywikibot.PropertyPage(self.repo, 'Prop:P21')
+        prop = PropertyPage(self.repo, 'Prop:P21')
         self.assertEqual(prop.namespace(), 92)
         self.assertEqual(prop.id, 'P21')
         self.assertEqual(prop.title(), 'Prop:P21')
@@ -1145,7 +1143,7 @@ class TestOwnClient(TestCase):
         site = self.get_site(key)
 
         page = pywikibot.Page(site, 'Wikidata:Main Page')
-        item = pywikibot.ItemPage.fromPage(page)
+        item = ItemPage.fromPage(page)
         self.assertEqual(item.site, site)
 
 
@@ -1176,7 +1174,7 @@ class TestUnconnectedClient(TestCase):
 
         self.wdp = pywikibot.Page(site, self.sites[key]['page_title'])
         self.assertRaises(pywikibot.WikiBaseError,
-                          pywikibot.ItemPage.fromPage, self.wdp)
+                          ItemPage.fromPage, self.wdp)
         self.assertRaisesRegex(pywikibot.WikiBaseError,
                                'no transcluded data',
                                self.wdp.data_item)
@@ -1192,7 +1190,7 @@ class TestJSON(WikidataTestCase):
         """Setup test."""
         super(TestJSON, self).setUp()
         wikidata = self.get_repo()
-        self.wdp = pywikibot.ItemPage(wikidata, 'Q60')
+        self.wdp = ItemPage(wikidata, 'Q60')
         self.wdp.id = 'Q60'
         with open(join_pages_path('Q60.wd')) as f:
             self.wdp._content = json.load(f)
