@@ -92,7 +92,7 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
 
 
-Required external programms
+Required external programs
 ---------------------------
 
 It may require the following programs to function properly:
