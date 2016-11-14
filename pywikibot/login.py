@@ -308,6 +308,10 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             elif e.code == 'Illegal':
                 raise NoUsername(u"Username '%s' is invalid on %s"
                                  % (self.login_name, self.site))
+            elif e.code == 'readapidenied':
+                raise NoUsername(
+                    'Username "{0}" does not have read permissions on '
+                    '{1}'.format(self.login_name, self.site))
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
