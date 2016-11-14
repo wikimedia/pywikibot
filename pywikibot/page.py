@@ -4631,6 +4631,7 @@ class Claim(Property):
         - ItemPage ID equality
         - WbTime year equality
         - Coordinate equality, regarding precision
+        - WbMonolingualText text equality
         - direct equality
 
         @param value: the value to compare with
@@ -4661,6 +4662,10 @@ class Claim(Property):
 
             return (abs(self.target.lat - coord_args[0]) <= precision and
                     abs(self.target.lon - coord_args[1]) <= precision)
+
+        if (isinstance(self.target, pywikibot.WbMonolingualText) and
+                isinstance(value, basestring)):
+            return self.target.text == value
 
         return self.target == value
 
