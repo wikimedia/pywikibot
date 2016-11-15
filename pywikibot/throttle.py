@@ -204,12 +204,13 @@ class Throttle(object):
         self.checktime = 0
         processes = []
         try:
-            f = open(self.ctrlfilename, 'r')
+            with open(self.ctrlfilename, 'r') as f:
+                lines = f.readlines()
         except IOError:
             return
         else:
             now = time.time()
-            for line in f.readlines():
+            for line in lines:
                 try:
                     line = line.split(' ')
                     this_pid = int(line[0])
@@ -225,12 +226,11 @@ class Throttle(object):
                                       'site': this_site})
         processes.sort(key=lambda p: p['pid'])
         try:
-            f = open(self.ctrlfilename, 'w')
-            for p in processes:
-                f.write("%(pid)s %(time)s %(site)s\n" % p)
+            with open(self.ctrlfilename, 'w') as f:
+                for p in processes:
+                    f.write("%(pid)s %(time)s %(site)s\n" % p)
         except IOError:
             return
-        f.close()
 
     def wait(self, seconds):
         """Wait for seconds seconds.
