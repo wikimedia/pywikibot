@@ -466,7 +466,7 @@ category_with_licenses = {
     'commons': u'Category:License tags',
     'ar': u'تصنيف:قوالب حقوق الصور',
     'de': u'Kategorie:Vorlage:Lizenz für Bilder',
-    'en': u'Category:Wikipedia image copyright templates',
+    'en': 'Category:Wikipedia file copyright templates',
     'fa': u'رده:الگو:حق تکثیر پرونده',
     'ga': u'Catagóir:Clibeanna cóipchirt d\'íomhánna',
     'it': u'Categoria:Template Licenze copyright',
