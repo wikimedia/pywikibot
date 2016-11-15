@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
 # (C) Pywikibot team, 2008-2014
@@ -565,11 +565,11 @@ class TestItemLoad(WikidataTestCase):
                     self.assertRaises(pywikibot.NoPage, getattr(item, method))
 
                 # The invocation above of a fetching method shouldnt change
-                # the local item, but it does!  The title changes to '-1'.
+                # the local item, but it does! The title changes to '-1'.
                 #
                 # However when identifying the item for 'en:Test page'
                 # (a deleted page), the exception handling is smarter, and no
-                # local data is modified in this scenario.  This case is
+                # local data is modified in this scenario. This case is
                 # separately tested in test_fromPage_missing_lazy.
                 if link.title != 'Test page':
                     self.assertEqual(item._link._title, '-1')

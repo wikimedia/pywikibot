@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This module can do slight modifications to tidy a wiki page's source code.
 
@@ -151,7 +151,7 @@ def _format_isbn_match(match, strict=True):
             import scripts.isbn as scripts_isbn
         except ImportError:
             raise NotImplementedError(
-                'ISBN functionality not available.  Install stdnum package.')
+                'ISBN functionality not available. Install stdnum package.')
 
         warn('package stdnum.isbn not found; using scripts.isbn',
              ImportWarning)

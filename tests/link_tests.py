@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
 # (C) Pywikibot team, 2014-2015
@@ -614,7 +614,7 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
     cached = True
 
     def test_partially_qualified_NS0_family(self):
-        """Test 'en:Main Page' on dewp  is namespace 0."""
+        """Test 'en:Main Page' on dewp is namespace 0."""
         config.mylang = 'de'
         config.family = 'wikipedia'
         link = Link('en:Main Page')

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
 # (C) Pywikibot team, 2014

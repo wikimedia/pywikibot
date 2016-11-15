@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the tests package."""
 #
 # (C) Pywikibot team, 2014

@@ -577,7 +577,7 @@ def replace_links(text, replace, site=None):
     remaining.
 
     @param text: the text in which to replace links
-    @type  text: basestring
+    @type text: basestring
     @param replace: either a callable which reacts like described above.
         The callable must accept four parameters link, text, groups, rng and
         allows for user interaction. The groups are a dict containing 'title',
@@ -590,11 +590,11 @@ def replace_links(text, replace, site=None):
         result by the callable. It'll convert that into a callable where the
         first item (the Link or Page) has to be equal to the found link and in
         that case it will apply the second value from the sequence.
-    @type  replace: sequence of pywikibot.Page/pywikibot.Link/str or
+    @type replace: sequence of pywikibot.Page/pywikibot.Link/str or
         callable
     @param site: a Site object to use if replace is not a sequence or the link
         to be replaced is not a Link or Page instance.
-    @type  site: pywikibot.APISite
+    @type site: pywikibot.APISite
     """
     def to_link(source):
         """Return the link from source when it's a Page otherwise itself."""
@@ -800,7 +800,7 @@ def replace_links(text, replace, site=None):
 #            Families having those have one member only, and do not have
 #            language-specific sites. The name of the target family of their
 #            inter-language links is kept in their interwiki_forward attribute.
-#        These functions only deal with links of these two kinds only.  They
+#        These functions only deal with links of these two kinds only. They
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Articulo]]".
 
@@ -1343,7 +1343,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
 
     Return value is a list of tuples. There is one tuple for each use of a
     template in the page, with the template title as the first entry and a
-    dict of parameters as the second entry.  Parameters are indexed by
+    dict of parameters as the second entry. Parameters are indexed by
     strings; as in MediaWiki, an unnamed parameter is given a parameter name
     with an integer value corresponding to its position among the unnamed
     parameters, and if this results multiple parameters with the same name
@@ -1358,7 +1358,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     The two implementations return nested templates in a different order.
     i.e. for {{a|b={{c}}}}, mwpfh returns [a, c], whereas regex returns [c, a].
 
-    mwpfh preserves whitespace in parameter names and values.  regex excludes
+    mwpfh preserves whitespace in parameter names and values. regex excludes
     anything between <!-- --> before parsing the text.
 
     If there are multiple numbered parameters in the wikitext for the same
@@ -1369,7 +1369,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     @param text: The wikitext from which templates are extracted
     @type text: unicode or string
     @param remove_disabled_parts: Remove disabled wikitext such as comments
-        and pre.  If None (default), this is enabled when mwparserfromhell
+        and pre. If None (default), this is enabled when mwparserfromhell
         is not available or is disabled in the config, and disabled if
         mwparserfromhell is present and enabled in the config.
     @type remove_disabled_parts: bool or None
@@ -1715,7 +1715,7 @@ def get_stars(text):
 
     @param text: a wiki text
     @type text: str
-    @return: list  of stars templates
+    @return: list of stars templates
     @rtype: list
     """
     allstars = []
@@ -1879,7 +1879,8 @@ class TimeStripper(object):
             if _short.endswith('.'):
                 self.origNames2monthNum[_short[:-1]] = n
 
-        self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
+        self.groups = ['year', 'month', 'hour', 'time', 'day', 'minute',
+                       'tzinfo']
 
         timeR = r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h](?P<minute>[0-5]\d))'
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'

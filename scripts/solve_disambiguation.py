@@ -6,10 +6,10 @@ Script to help a human solve disambiguations by presenting a set of options.
 Specify the disambiguation page on the command line.
 
 The program will pick up the page, and look for all alternative links,
-and show them with a number adjacent to them.  It will then automatically
+and show them with a number adjacent to them. It will then automatically
 loop over all pages referring to the disambiguation page,
 and show 30 characters of context on each side of the reference to help you
-make the decision between the alternatives.  It will ask you to type the
+make the decision between the alternatives. It will ask you to type the
 number of the appropriate replacement, and perform the change.
 
 It is possible to choose to replace only the link (just type the number) or

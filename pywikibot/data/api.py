@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
 # (C) Pywikibot team, 2007-2016
@@ -882,7 +882,7 @@ class ParamInfo(Container):
         # output of v1.25, and cant removed from previous API versions.
         # There should be an option to remove this verbose data from the cached
         # version, for earlier versions of the API, and/or extract any useful
-        # data and discard the entire received paraminfo structure.  There are
+        # data and discard the entire received paraminfo structure. There are
         # also params which are common to many modules, such as those provided
         # by the ApiPageSet php class: titles, pageids, redirects, etc.
         try:
@@ -1062,7 +1062,7 @@ class OptionSet(MutableMapping):
 
     If it is instantiated with the associated site, module and parameter it
     will only allow valid names as options. If instantiated 'lazy loaded' it
-    won't checks  if the names are valid until the site has been set (which
+    won't checks if the names are valid until the site has been set (which
     isn't required, but recommended). The site can only be set once if it's not
     None and after setting it, any site (even None) will fail.
     """
@@ -1279,7 +1279,7 @@ class Request(MutableMapping):
 
     Attributes of this object (except for the special parameters listed
     below) get passed as commands to api.php, and can be get or set using
-    the dict interface.  All attributes must be strings (or unicode).  Use
+    the dict interface. All attributes must be strings (or unicode). Use
     an empty string for parameters that don't require a value. For example,
     Request(action="query", titles="Foo bar", prop="info", redirects="")
     corresponds to the API request
@@ -1296,7 +1296,7 @@ class Request(MutableMapping):
 
     Returns a dict containing the JSON data returned by the wiki. Normally,
     one of the dict keys will be equal to the value of the 'action'
-    parameter.  Errors are caught and raise an APIError exception.
+    parameter. Errors are caught and raise an APIError exception.
 
     Example:
 
@@ -1661,7 +1661,7 @@ class Request(MutableMapping):
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
 
-        DEPRECATED.  See _encoded_items for explanation of encoding used.
+        DEPRECATED. See _encoded_items for explanation of encoding used.
         """
         self._add_defaults()
         return self._http_param_string()
@@ -1987,7 +1987,7 @@ class Request(MutableMapping):
                 result = json.loads(rawdata)
             except ValueError:
                 # if the result isn't valid JSON, there must be a server
-                # problem.  Wait a few seconds and try again
+                # problem. Wait a few seconds and try again
                 pywikibot.warning(
                     "Non-JSON response received from server %s; the server may be down."
                     % self.site)
@@ -2082,7 +2082,7 @@ class Request(MutableMapping):
                     continue
             elif code == 'help' and self.action == 'help':
                 # The help module returns an error result with the complete
-                # API information.  As this data was requested, return the
+                # API information. As this data was requested, return the
                 # data instead of raising an exception.
                 return {'help': {'mime': 'text/plain',
                                  'help': result['error']['help']}}
@@ -2482,7 +2482,7 @@ class QueryGenerator(_RequestWrapper):
 
     By default, the iterator will iterate each item in the query response,
     and use the (query-)continue element, if present, to continue iterating as
-    long as the wiki returns additional values.  However, if the iterator's
+    long as the wiki returns additional values. However, if the iterator's
     limit attribute is set to a positive int, the iterator will stop after
     iterating that many values. If limit is negative, the limit parameter
     will not be passed to the API at all.
@@ -2646,7 +2646,7 @@ class QueryGenerator(_RequestWrapper):
 
         @param namespaces: namespace identifiers to limit query results
         @type namespaces: iterable of basestring or Namespace key,
-            or a single instance of those types.  May be a '|' separated
+            or a single instance of those types. May be a '|' separated
             list of namespace identifiers. An empty iterator clears any
             namespace restriction.
         @raises KeyError: a namespace identifier was not resolved
@@ -2956,13 +2956,13 @@ class ListGenerator(QueryGenerator):
 
     """Iterator for queries of type action=query&list=foo.
 
-    See the API documentation for types of lists that can be queried.  Lists
+    See the API documentation for types of lists that can be queried. Lists
     include both side-wide information (such as 'allpages') and page-specific
     information (such as 'backlinks').
 
     This iterator yields a dict object for each member of the list returned
     by the API, with the format of the dict depending on the particular list
-    command used.  For those lists that contain page information, it may be
+    command used. For those lists that contain page information, it may be
     easier to use the PageGenerator class instead, as that will convert the
     returned information into a Page object.
 

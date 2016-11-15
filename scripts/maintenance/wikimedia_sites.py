@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Script that updates the language lists in Wikimedia family files."""
 #
 # (C) xqt, 2009-2016

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """File containing all standard fixes."""
 #
 # (C) Pywikibot team, 2008-2010
@@ -387,7 +387,7 @@ fixes = {
             (r'ISBN: (\d+)', r'ISBN \1'),
             # superfluous word "number"
             (r'ISBN( number| no\.?| No\.?|-Nummer|-Nr\.):? (\d+)', r'ISBN \2'),
-            # Space, minus, dot,  hypen, en dash, em dash, etc. instead of
+            # Space, minus, dot, hypen, en dash, em dash, etc. instead of
             # hyphen-minus as separator, or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
             # these won't be changed.

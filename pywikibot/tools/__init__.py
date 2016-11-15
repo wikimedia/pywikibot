@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
 # (C) Pywikibot team, 2008-2016
@@ -538,7 +538,7 @@ class ThreadedGenerator(threading.Thread):
     Important: the generator thread will stop itself if the generator's
     internal queue is exhausted; but, if the calling program does not use
     all the generated values, it must call the generator's stop() method to
-    stop the background thread.  Example usage:
+    stop the background thread. Example usage:
 
     >>> gen = ThreadedGenerator(target=range, args=(20,))
     >>> try:
@@ -552,7 +552,7 @@ class ThreadedGenerator(threading.Thread):
 
     def __init__(self, group=None, target=None, name="GeneratorThread",
                  args=(), kwargs=None, qsize=65536):
-        """Constructor.  Takes same keyword arguments as threading.Thread.
+        """Constructor. Takes same keyword arguments as threading.Thread.
 
         target must be a generator function (or other callable that returns
         an iterable object).
@@ -654,7 +654,7 @@ def islice_with_ellipsis(iterable, *args, **kwargs):
     and the additional keyword marker.
 
     @param iterable: the iterable to work on
-    @type  iterable: iterable
+    @type iterable: iterable
     @param args: same args as:
         - C{itertools.islice(iterable, stop)}
         - C{itertools.islice(iterable, start, stop[, step])}
@@ -691,7 +691,7 @@ class ThreadList(list):
     """A simple threadpool class to limit the number of simultaneous threads.
 
     Any threading.Thread object can be added to the pool using the append()
-    method.  If the maximum number of simultaneous threads has not been reached,
+    method. If the maximum number of simultaneous threads has not been reached,
     the Thread object will be started immediately; if not, the append() call
     will block until the thread is able to start.
 
@@ -841,7 +841,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     The container can be any object that supports __contains__.
     If the container is a set or dict, the method add or __setitem__ will be
-    used automatically.  Any other method may be provided explicitly using the
+    used automatically. Any other method may be provided explicitly using the
     add parameter.
 
     Beware that key=id is only useful for cases where id() is not unique.
@@ -1128,7 +1128,7 @@ def merge_unique_dicts(*args, **kwargs):
 # Decorators
 #
 # Decorator functions without parameters are _invoked_ differently from
-# decorator functions with function syntax.  For example, @deprecated causes
+# decorator functions with function syntax. For example, @deprecated causes
 # a different invocation to @deprecated().
 
 # The former is invoked with the decorated function as args[0].
@@ -1137,8 +1137,8 @@ def merge_unique_dicts(*args, **kwargs):
 # function as args[0].
 
 # The follow deprecators may support both syntax, e.g. @deprecated and
-# @deprecated() both work.  In order to achieve that, the code inspects
-# args[0] to see if it callable.  Therefore, a decorator must not accept
+# @deprecated() both work. In order to achieve that, the code inspects
+# args[0] to see if it callable. Therefore, a decorator must not accept
 # only one arg, and that arg be a callable, as it will be detected as
 # a deprecator without any arguments.
 
@@ -1149,7 +1149,7 @@ def signature(obj):
 
     inspect.signature was introduced in 3.3, however backports are available.
     In Python 3.3, it does not support all types of callables, and should
-    not be relied upon.  Python 3.4 works correctly.
+    not be relied upon. Python 3.4 works correctly.
 
     Any exception calling inspect.signature is ignored and None is returned.
 

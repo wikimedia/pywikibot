@@ -109,7 +109,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     BasePage: Base object for a MediaWiki page.
 
     This object only implements internally methods that do not require
-    reading from or writing to the wiki.  All other methods are delegated
+    reading from or writing to the wiki. All other methods are delegated
     to the Site object.
 
     Will be subclassed by Page, WikibasePage, and FlowPage.
@@ -130,7 +130,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
           - If the first argument is a Page, create a copy of that object.
             This can be used to convert an existing Page into a subclass
-            object, such as Category or FilePage.  (If the title is also
+            object, such as Category or FilePage. (If the title is also
             given as the second argument, creates a copy with that title;
             this is used when pages are moved.)
           - If the first argument is a Site, create a Page on that Site
@@ -138,7 +138,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             and the third as the namespace number. The namespace number is
             mandatory, even if the title includes the namespace prefix. This
             is the preferred syntax when using an already-normalized title
-            obtained from api.php or a database dump.  WARNING: may produce
+            obtained from api.php or a database dump. WARNING: may produce
             invalid objects if page title isn't in normal form!
           - If the first argument is a Link, create a Page from that link.
             This is the preferred syntax when using a title scraped from
@@ -858,7 +858,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Return other member of the article-talk page pair for this Page.
 
         If self is a talk page, returns the associated content page;
-        otherwise, returns the associated talk page.  The returned page need
+        otherwise, returns the associated talk page. The returned page need
         not actually exist on the wiki.
 
         @return: Page or None if self is a special page.
@@ -1278,7 +1278,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Save the page with the contents of the first argument as the text.
 
         This method is maintained primarily for backwards-compatibility.
-        For new code, using Page.save() is preferred.  See save() method
+        For new code, using Page.save() is preferred. See save() method
         docs for all parameters not listed here.
 
         @param newtext: The complete text of the revised page.
@@ -1299,7 +1299,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         Asynchronous version of put (takes the same arguments), which places
         pages on a queue to be saved by a daemon thread. All arguments are
-        the same as for .put().  This version is maintained solely for
+        the same as for .put(). This version is maintained solely for
         backwards-compatibility.
         """
         self.put(newtext, summary=summary, watchArticle=watchArticle,
@@ -1483,7 +1483,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Return a list of Page objects for templates used on this Page.
 
-        Template parameters are ignored.  This method only returns embedded
+        Template parameters are ignored. This method only returns embedded
         templates, not template pages that happen to be referenced through
         a normal link.
 
@@ -1502,7 +1502,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Iterate Page objects for templates used on this Page.
 
-        Template parameters are ignored.  This method only returns embedded
+        Template parameters are ignored. This method only returns embedded
         templates, not template pages that happen to be referenced through
         a normal link.
 
@@ -1942,12 +1942,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param protections: A dict mapping type of protection to protection
             level of that type.
-        @type  protections: dict
+        @type protections: dict
         @param reason: Reason for the action
-        @type  reason: basestring
+        @type reason: basestring
         @param prompt: Whether to ask user for confirmation (deprecated).
                        Defaults to protections is None
-        @type  prompt: bool
+        @type prompt: bool
         """
         def process_deprecated_arg(value, arg_name):
             # if protections was set and value is None, don't interpret that
@@ -2682,7 +2682,7 @@ class Category(Page):
 
     def copyTo(self, cat, message):
         """
-        Copy text of category page to a new page.  Does not move contents.
+        Copy text of category page to a new page. Does not move contents.
 
         @param cat: New category title (without namespace) or Category object
         @type cat: unicode or Category
@@ -2723,7 +2723,7 @@ class Category(Page):
         Copy partial category page text (not contents) to a new title.
 
         Like copyTo above, except this removes a list of templates (like
-        deletion templates) that appear in the old category text.  It also
+        deletion templates) that appear in the old category text. It also
         removes all text between the two HTML comments BEGIN CFD TEMPLATE
         and END CFD TEMPLATE. (This is to deal with CFD templates that are
         substituted.)
@@ -3860,7 +3860,7 @@ class ItemPage(WikibasePage):
 
         if lazy_loading_id or self._link._text != self.id:
             # If the item is lazy loaded or has been modified,
-            # _link._text is stale.  Removing _link._title
+            # _link._text is stale. Removing _link._title
             # forces Link to re-parse ._text into ._title.
             if hasattr(self._link, '_title'):
                 del self._link._title
@@ -3880,10 +3880,10 @@ class ItemPage(WikibasePage):
         Get the ItemPage for a Page that links to it.
 
         @param page: Page to look for corresponding data item
-        @type  page: pywikibot.Page
+        @type page: pywikibot.Page
         @param lazy_load: Do not raise NoPage if either page or corresponding
                           ItemPage does not exist.
-        @type  lazy_load: bool
+        @type lazy_load: bool
         @rtype: ItemPage
 
         @raise NoPage: There is no corresponding ItemPage for the page
@@ -4191,7 +4191,7 @@ class Property(object):
         Return the type of this property.
 
         It returns 'globecoordinate' for type 'globe-coordinate'
-        in order to be backwards compatible.  See
+        in order to be backwards compatible. See
         https://gerrit.wikimedia.org/r/#/c/135405/ for background.
         """
         if self.type == 'globe-coordinate':
@@ -4566,7 +4566,7 @@ class Claim(Property):
 
     def removeSource(self, source, **kwargs):
         """
-        Remove the source.  Calls removeSources().
+        Remove the source. Call removeSources().
 
         @param source: the source to remove
         @type source: pywikibot.Claim
@@ -4603,7 +4603,7 @@ class Claim(Property):
 
     def removeQualifier(self, qualifier, **kwargs):
         """
-        Remove the qualifier.  Calls removeQualifiers().
+        Remove the qualifier. Call removeQualifiers().
 
         @param qualifier: the qualifier to remove
         @type qualifier: Claim
@@ -4883,7 +4883,7 @@ class Link(ComparableMixin):
 
     Has the following attributes:
 
-      - site:  The Site object for the wiki linked to
+      - site: The Site object for the wiki linked to
       - namespace: The namespace of the page linked to (int)
       - title: The title of the page linked to (unicode); does not include
         namespace or section
@@ -4961,7 +4961,7 @@ class Link(ComparableMixin):
         # Normalize unicode string to a NFC (composed) format to allow
         # proper string comparisons to strings output from MediaWiki API.
         # Due to Python issue 10254, this is not possible on Python 2.6.6
-        # if the string contains combining characters.  See T102461.
+        # if the string contains combining characters. See T102461.
         if (PYTHON_VERSION == (2, 6, 6) and
                 unicodedata.__name__ != 'unicodedata2' and
                 any(unicodedata.combining(c) for c in t)):

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Collection of fixes for tests."""
 #
 # (C) Pywikibot team, 2015

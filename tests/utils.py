@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test utilities."""
 #
 # (C) Pywikibot team, 2013-2016
@@ -90,7 +90,7 @@ def allowed_failure(func):
     Unit test decorator to allow failure.
 
     Test runners each have different interpretations of what should be
-    the result of an @expectedFailure test if it succeeds.  Some consider
+    the result of an @expectedFailure test if it succeeds. Some consider
     it to be a pass; others a failure.
 
     This decorator runs the test and, if it is a failure, reports the result

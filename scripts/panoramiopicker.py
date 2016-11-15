@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tool to copy a Panoramio set to Commons."""
 #
 # (C) Multichill, 2010

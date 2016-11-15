@@ -33,7 +33,7 @@ class DjVuFile(object):
         Constructor.
 
         @param file_djvu: filename (including path) to djvu file
-        @type  file_djvu: string/unicode
+        @type file_djvu: string/unicode
         """
         file_djvu = os.path.expanduser(file_djvu)
         # Check file exists and has read permissions.

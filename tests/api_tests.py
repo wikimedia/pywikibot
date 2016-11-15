@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """API test module."""
 #
 # (C) Pywikibot team, 2007-2016
@@ -893,7 +893,7 @@ class TestLazyLoginBase(TestCase):
     BaseSite on it's own. It's testing against steward.wikimedia.org.
 
     These tests are split into two subclasses as only the first failed login
-    behaves as expected.  All subsequent logins will raise an APIError, making
+    behaves as expected. All subsequent logins will raise an APIError, making
     it impossible to test two scenarios with the same APISite object.
     """
 

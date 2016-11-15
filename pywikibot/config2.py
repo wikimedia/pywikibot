@@ -5,12 +5,12 @@ Module to define and load pywikibot configuration default and user preferences.
 User preferences are loaded from a python file called user-config.py, which
 may be located in directory specified by the environment variable
 PYWIKIBOT2_DIR, or the same directory as pwb.py, or in a directory within
-the users home.  See get_base_dir for more information.
+the users home. See get_base_dir for more information.
 
 If user-config.py can not be found in any of those locations, this module
 will fail to load unless the environment variable PYWIKIBOT2_NO_USER_CONFIG
-is set to a value other than '0'.  i.e. PYWIKIBOT2_NO_USER_CONFIG=1 will
-allow config to load without a user-config.py.  However, warnings will be
+is set to a value other than '0'. i.e. PYWIKIBOT2_NO_USER_CONFIG=1 will
+allow config to load without a user-config.py. However, warnings will be
 shown if user-config.py was not loaded.
 To prevent these warnings, set PYWIKIBOT2_NO_USER_CONFIG=2.
 
@@ -87,7 +87,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 # Note: all variables defined in this module are made available to bots as
 # configuration settings, *except* variable names beginning with an
-# underscore (example: _variable).  Be sure to use an underscore on any
+# underscore (example: _variable). Be sure to use an underscore on any
 # variables that are intended only for internal use and not to be exported
 # to other modules.
 
@@ -199,7 +199,7 @@ authenticate = {}
 #
 # Secure connection overrides
 #
-# These settings are deprecated.  They existed to support the Wikimedia
+# These settings are deprecated. They existed to support the Wikimedia
 # family which only served HTTPS on https://secure.wikimedia.org/<site>/<uri>
 # Use Family.protocol()
 use_SSL_onlogin = False  # if available, use SSL when logging in
@@ -591,7 +591,7 @@ upload_to_commons = False
 # but never more than 'maxthrottle' seconds. However - if you are running
 # more than one bot in parallel the times are lengthened.
 # By default, the get_throttle is turned off, and 'maxlag' is used to
-# control the rate of server access.  Set minthrottle to non-zero to use a
+# control the rate of server access. Set minthrottle to non-zero to use a
 # throttle on read access.
 minthrottle = 0
 maxthrottle = 60
@@ -604,7 +604,7 @@ put_throttle = 10
 # than 'noisysleep' seconds, it is logged on the screen.
 noisysleep = 3.0
 
-# Defer bot edits during periods of database server lag.  For details, see
+# Defer bot edits during periods of database server lag. For details, see
 # https://www.mediawiki.org/wiki/Maxlag_parameter
 # You can set this variable to a number of seconds, or to None (or 0) to
 # disable this behavior. Higher values are more aggressive in seeking

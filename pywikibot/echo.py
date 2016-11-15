@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Classes and functions for working with the Echo extension."""
 #
 # (C) Pywikibot team, 2014-2016

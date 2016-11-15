@@ -73,7 +73,7 @@ from pywikibot.tools import islice_with_ellipsis
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 
@@ -119,7 +119,7 @@ class PageWithRefs(Page):
         Returns a set with namespaces where a ref to page is present.
 
         @param namespaces: Namespace to check
-        @type  namespaces: iterable of Namespace objects
+        @type namespaces: iterable of Namespace objects
         @rtype set: namespaces where a ref to page is present
         """
         if namespaces is None:
@@ -137,9 +137,9 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         Constructor.
 
         @param generator: the pages to work on
-        @type  generator: iterable
+        @type generator: iterable
         @param summary: the reason for the (un)deletion
-        @type  summary: unicode
+        @type summary: unicode
         """
         self.availableOptions.update({
             'undelete': False,

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """CGI user interface."""
 #
 # (C) Pywikibot team, 2007-2015

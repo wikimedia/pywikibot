@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikibooks."""
 #
 # (C) Pywikibot team, 2005-2016

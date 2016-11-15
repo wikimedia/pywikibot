@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the replace script and ReplaceRobot class."""
 #
 # (C) Pywikibot team, 2015

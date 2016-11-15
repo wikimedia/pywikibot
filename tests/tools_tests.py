@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test tools package alone which don't fit into other tests."""
 #
 # (C) Pywikibot team, 2016

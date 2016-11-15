@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the User page."""
 #
 # (C) Pywikibot team, 2016

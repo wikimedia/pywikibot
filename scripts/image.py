@@ -13,15 +13,15 @@ all pages.
 
 Command line options:
 
--summary:  Provide a custom edit summary.  If the summary includes spaces,
+-summary:  Provide a custom edit summary. If the summary includes spaces,
            surround it with single quotes, such as:
            -summary:'My edit summary'
 -always    Don't prompt to make changes, just do them.
--loose     Do loose replacements.  This will replace all occurrences of the name
-           of the image (and not just explicit image syntax).  This should work
+-loose     Do loose replacements. This will replace all occurrences of the name
+           of the image (and not just explicit image syntax). This should work
            to catch all instances of the image, including where it is used as a
-           template parameter or in image galleries.  However, it can also make
-           more mistakes.  This only works with image replacement, not image
+           template parameter or in image galleries. However, it can also make
+           more mistakes. This only works with image replacement, not image
            removal.
 
 Examples:
@@ -63,12 +63,12 @@ class ImageRobot(ReplaceBot):
         Constructor.
 
         @param generator: the pages to work on
-        @type  generator: iterable
+        @type generator: iterable
         @param old_image: the title of the old image (without namespace)
-        @type  old_image: unicode
+        @type old_image: unicode
         @param new_image: the title of the new image (without namespace), or
                           None if you want to remove the image
-        @type  new_image: unicode or None
+        @type new_image: unicode or None
         """
         self.availableOptions.update({
             'summary': None,

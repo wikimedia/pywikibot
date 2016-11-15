@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """SPARQL Query interface."""
 #
 # Distributed under the terms of the MIT license.

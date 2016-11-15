@@ -1,8 +1,8 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -159,7 +159,7 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
         username = username.replace("'", "\\'")
     return fam.name, mylang, username
 
-EXTENDED_CONFIG = u"""# -*- coding: utf-8  -*-
+EXTENDED_CONFIG = """# -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
 # This is an automatically generated file. You can find more configuration
@@ -206,7 +206,7 @@ mylang = '{main_lang}'
 
 {config_text}"""
 
-SMALL_CONFIG = (u"# -*- coding: utf-8  -*-\n"
+SMALL_CONFIG = ('# -*- coding: utf-8 -*-\n'
                 u"from __future__ import absolute_import, unicode_literals\n"
                 u"family = '{main_family}'\n"
                 u"mylang = '{main_lang}'\n"

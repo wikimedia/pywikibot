@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
@@ -182,10 +182,12 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         Login to the site.
 
-        remember    Remember login (default: True)
-        captchaId   A dictionary containing the captcha id and answer, if any
+        @param remember: Remember login (default: True)
+        @type remember: bool
+        @param captchaId: A dictionary containing the captcha id and answer,
+            if any
 
-        Returns cookie data if successful, None otherwise.
+        @return: cookie data if successful, None otherwise.
         """
         # NOT IMPLEMENTED - see data/api.py for implementation
 

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Vikidia."""
 #
 # (C) Pywikibot team, 2010-2016

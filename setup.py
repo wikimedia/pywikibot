@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Installer script for Pywikibot 2.0 framework."""
 #
 # (C) Pywikibot team, 2009-2015
@@ -132,7 +132,7 @@ if sys.version_info[0] == 2:
     # However the Debian package python-ipaddr is also supported:
     # https://pypi.python.org/pypi/ipaddr
     # Other backports are likely broken.
-    # ipaddr 2.1.10+ is distributed with Debian and Fedora.  See T105443.
+    # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
 
     if sys.version_info < (2, 7, 9):
@@ -162,7 +162,7 @@ except ImportError:
 # Microsoft makes available a compiler for Python 2.7
 # http://www.microsoft.com/en-au/download/details.aspx?id=44266
 # If you set up your own compiler for Python 3, on 3.3 two demo files
-# packaged with pywin32 may fail.  Remove com/win32com/demos/ie*.py
+# packaged with pywin32 may fail. Remove com/win32com/demos/ie*.py
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
     # FIXME: tests/ui_tests.py suggests pywinauto 0.4.2
     # which isnt provided on pypi.

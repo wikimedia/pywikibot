@@ -42,7 +42,7 @@ import pywikibot
 from pywikibot import textlib, pagegenerators, i18n, Bot
 
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 

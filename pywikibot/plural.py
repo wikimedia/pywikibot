@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module containing plural rules of various languages."""
 #
 # (C) xqt, 2011

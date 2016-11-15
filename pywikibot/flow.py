@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
 # (C) Pywikibot team, 2015

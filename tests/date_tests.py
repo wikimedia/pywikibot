@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the date module."""
 #
 # (C) Pywikibot team, 2012-2015

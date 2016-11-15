@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Objects representing Mediawiki log entries."""
 #
 # (C) Pywikibot team, 2007-2016

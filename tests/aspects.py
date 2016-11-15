@@ -1,9 +1,9 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Test aspects to allow fine grained control over what tests are executed.
 
 Several parts of the test infrastructure are implemented as mixins,
-such as API result caching and excessive test durations.  An unused
+such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
@@ -535,7 +535,7 @@ class SiteWriteMixin(TestCaseBase):
     Test cases involving writing to the server.
 
     When editing, the API should not be patched to use
-    CachedRequest.  This class prevents that.
+    CachedRequest. This class prevents that.
     """
 
     @classmethod
@@ -780,7 +780,7 @@ class MetaTestCaseClass(type):
             # Prevent use of pywikibot.Site
             bases = cls.add_base(bases, DisableSiteMixin)
 
-            # 'pwb' tests will _usually_ require a site.  To ensure the
+            # 'pwb' tests will _usually_ require a site. To ensure the
             # test class dependencies are declarative, this requires the
             # test writer explicitly sets 'site=False' so code reviewers
             # check that the script invoked by pwb will not load a site.

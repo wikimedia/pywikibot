@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikimedia outreach wiki."""
 #
 # (C) Pywikibot team, 2014-2015

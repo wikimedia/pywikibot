@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module to daemonize the current process on Unix."""
 #
 # (C) Pywikibot team, 2007-2015

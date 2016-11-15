@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Classes for detecting a MediaWiki site."""
 #
 # (C) Pywikibot team, 2010-2015

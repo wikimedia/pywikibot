@@ -39,12 +39,12 @@ Command line options:
              If this parameter is missed, all edits are checked but this is
              restricted to the last 100 edits.
 
--summary:    Lets you pick a custom edit summary.  Use quotes if edit summary
+-summary:    Lets you pick a custom edit summary. Use quotes if edit summary
              contains spaces.
 
 -always      Don't bother asking to confirm any of the changes, Just Do It.
 
--addcat:     Appends the given category to every page that is edited.  This is
+-addcat:     Appends the given category to every page that is edited. This is
              useful when a category is being broken out from a template
              parameter or when templates are being upmerged but more information
              must be preserved.
@@ -179,11 +179,11 @@ class TemplateRobot(ReplaceBot):
         Constructor.
 
         @param generator: the pages to work on
-        @type  generator: iterable
+        @type generator: iterable
         @param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
-        @type  templates: dict
+        @type templates: dict
         """
         self.availableOptions.update({
             'subst': False,

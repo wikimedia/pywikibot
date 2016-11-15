@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Battlestar Wiki."""
 #
 # (C) Pywikibot team, 2007-2015

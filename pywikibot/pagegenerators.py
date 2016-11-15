@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This module offers a wide variety of page generators.
 
@@ -293,7 +293,7 @@ parameterHelp = u"""\
                   Argument can also be given as "-google:searchstring".
 
 -yahoo            Work on all pages that are found in a Yahoo search.
-                  Depends on python module pYsearch.  See yahoo_appid in
+                  Depends on python module pYsearch. See yahoo_appid in
                   config.py for instructions.
 
 -page             Work on a single page. Argument can also be given as
@@ -621,7 +621,7 @@ class GeneratorFactory(object):
 
         If it is recognized as an argument that specifies a generator, a
         generator is created and added to the accumulation list, and the
-        function returns true.  Otherwise, it returns false, so that caller
+        function returns true. Otherwise, it returns false, so that caller
         can try parsing the argument. Call getCombinedGenerator() after all
         arguments have been parsed to get the final output generator.
 
@@ -1395,7 +1395,7 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
     @type namespaces: iterable of basestring or Namespace key,
         or a single instance of those types.
     @param site: Site for generator results; mandatory if
-        namespaces contains namespace names.  Defaults to the default site.
+        namespaces contains namespace names. Defaults to the default site.
     @type site: L{pywikibot.site.BaseSite}
     @raises KeyError: a namespace identifier was not resolved
     @raises TypeError: a namespace identifier has an inappropriate
@@ -2012,13 +2012,13 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
             if not has_item:
                 if show_filtered:
                     pywikibot.output(
-                        '%s has a wikidata item.  Skipping.' % page)
+                        '%s has a wikidata item. Skipping.' % page)
                 continue
         else:
             if has_item:
                 if show_filtered:
                     pywikibot.output(
-                        '%s doesn\'t have a wikidata item.  Skipping.' % page)
+                        '%s doesn\'t have a wikidata item. Skipping.' % page)
                 continue
 
         yield page

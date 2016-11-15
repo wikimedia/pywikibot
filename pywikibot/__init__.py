@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """The initialization file for the Pywikibot framework."""
 #
 # (C) Pywikibot team, 2008-2016
@@ -136,7 +136,7 @@ class Timestamp(datetime.datetime):
     """Class for handling MediaWiki timestamps.
 
     This inherits from datetime.datetime, so it can use all of the methods
-    and operations of a datetime object.  To ensure that the results of any
+    and operations of a datetime object. To ensure that the results of any
     operation are also a Timestamp object, be sure to use only Timestamp
     objects (and datetime.timedeltas) in any operation.
 

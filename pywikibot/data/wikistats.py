@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Objects representing WikiStats API."""
 #
 # (C) Pywikibot team, 2014-2016

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Wrapper script to use Pywikibot in 'directory' mode.
 
 Run scripts using:

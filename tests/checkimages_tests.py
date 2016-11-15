@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Unit tests for checkimages script."""
 #
 # (C) Pywikibot team, 2015-2016

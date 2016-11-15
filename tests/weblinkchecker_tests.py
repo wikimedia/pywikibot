@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """weblinkchecker test module."""
 #
 # (C) Pywikibot team, 2015

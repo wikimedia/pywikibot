@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Stdout, stderr and argv support for unicode."""
 #
 # (C) David-Sarah Hopwood, 2010

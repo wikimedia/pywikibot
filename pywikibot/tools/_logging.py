@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Logging tools."""
 #
 # (C) Pywikibot team, 2009-2015
@@ -121,7 +121,7 @@ class LoggingFormatter(logging.Formatter):
         Make sure that the exception trace is converted to unicode.
 
         L{exceptions.Error} traces are encoded in our console encoding, which
-        is needed for plainly printing them.  However, when logging them
+        is needed for plainly printing them. However, when logging them
         using logging.exception, the Python logging module will try to use
         these traces, and it will fail if they are console encoded strings.
 

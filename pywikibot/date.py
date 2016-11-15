@@ -1,12 +1,12 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Date data and manipulation module."""
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Ævar Arnfjörð Bjarmason, 2004
 # (C) Andre Engels, 2004-2005
-# (C) Yuri Astrakhan, 2005-2006  (<Firstname><Lastname>@gmail.com)
-#       (years/decades/centuries/millenniums  str <=> int  conversions)
+# (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
+#       (years/decades/centuries/millenniums str <=> int conversions)
 # (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
@@ -322,7 +322,7 @@ def romanNumToInt(v):
     """Convert roman numeral to integer."""
     return _romanNumbers.index(v)
 
-# Each tuple must 3 parts:  a list of all possible digits (symbols), encoder
+# Each tuple must 3 parts: a list of all possible digits (symbols), encoder
 # (from int to a u-string) and decoder (from u-string to an int)
 _digitDecoders = {
     # %% is a %
@@ -356,8 +356,7 @@ _digitDecoders = {
 _reParameters = re.compile(u'|'.join(u'(%%[1-9]?%s)' % s
                                      for s in _digitDecoders))
 
-# A map of   sitecode+pattern  to  (re matching object and corresponding
-# decoders)
+# A map of sitecode+pattern to (re matching object and corresponding decoders)
 _escPtrnCache2 = {}
 
 _listTypes = [list, tuple]
@@ -586,10 +585,9 @@ formats = {
         'cy': lambda v: slh(v, [u"Ionawr", u"Chwefror", u"Mawrth", u"Ebrill",
                                 u"Mai", u"Mehefin", u"Gorffennaf", u"Awst",
                                 u"Medi", u"Hydref", u"Tachwedd", u"Rhagfyr"]),
-        'da': lambda v: slh(v, [u"januar", u"februar", u"marts",  u"april",
-                                u"maj", u"juni", u"juli", u"august",
-                                u"september", u"oktober", u"november",
-                                u"december"]),
+        'da': lambda v: slh(v, ['januar', 'februar', 'marts', 'april', 'maj',
+                                'juni', 'juli', 'august', 'september',
+                                'oktober', 'november', 'december']),
         'de': lambda v: slh(v, [u"Januar", u"Februar", u"März", u"April",
                                 u"Mai", u"Juni", u"Juli", u"August",
                                 u"September", u"Oktober", u"November",
@@ -1016,7 +1014,7 @@ formats = {
         'scn': dh_simpleYearAD,
         'se': dh_simpleYearAD,
         'sh': dh_simpleYearAD,
-        'simple':  dh_simpleYearAD,
+        'simple': dh_simpleYearAD,
         'sk': dh_simpleYearAD,
         'sl': dh_simpleYearAD,
         'sm': dh_simpleYearAD,
@@ -2011,7 +2009,7 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     return [pattern % f(monthName(lang, m)) for m in range(1, 13)]
 
 #
-# Add day of the month formats to the formatting table:   "en:May 15"
+# Add day of the month formats to the formatting table: "en:May 15"
 #
 addFmt2('af', False, u"%%d %s", True)
 addFmt2('als', False, u"%%d. %s", True)

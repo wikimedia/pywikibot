@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 User-interface related functions for building bots.
 
@@ -179,7 +179,7 @@ class LoggingFormatter(_LoggingFormatter):
 # The UserInterface object must define its own init_handlers() method
 # which takes the root logger as its only argument, and which adds to that
 # logger whatever handlers and formatters are needed to process output and
-# display it to the user.  The default (terminal) interface sends level
+# display it to the user. The default (terminal) interface sends level
 # STDOUT to sys.stdout (as all interfaces should) and sends all other
 # levels to sys.stderr; levels WARNING and above are labeled with the
 # level name.
@@ -1218,7 +1218,7 @@ class BaseBot(object):
         This also prevents the same title from being printed twice.
 
         @param page: the working page
-        @type  page: pywikibot.Page
+        @type page: pywikibot.Page
         """
         if page != self._current_page:
             self._current_page = page
@@ -1513,7 +1513,7 @@ class Bot(BaseBot):
         # self.site causes bugs in subclasses.
         # If the subclass has set self.site before run(), it may be that the
         # bot processes pages on sites other than self.site, and therefore
-        # this method cant alter self.site.  To use this functionality, don't
+        # this method cant alter self.site. To use this functionality, don't
         # set self.site in __init__, and use page.site in treat().
         self._auto_update_site = not self._site
         if not self._auto_update_site:

@@ -16,14 +16,15 @@ Other options:
 -shown      Choose images shown on the page as well as linked from it
 -justshown  Choose _only_ images shown on the page, not those linked
 """
-#  (C) Pywikibot team, 2004-2015
 #
-#   Distributed under the terms of the MIT license.
+# (C) Pywikibot team, 2004-2016
+#
+# Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
-
+#
 import os
 
 import BeautifulSoup

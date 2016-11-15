@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the Category class."""
 #
 # (C) Pywikibot team, 2014-2015

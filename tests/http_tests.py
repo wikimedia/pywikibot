@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for http module."""
 #
 # (C) Pywikibot team, 2014-2015
