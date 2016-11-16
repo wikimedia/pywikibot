@@ -63,6 +63,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError,
     UserRightsError,
 )
+from pywikibot.data.api import APIError
 from pywikibot.family import Family
 from pywikibot.site import Namespace, need_version
 from pywikibot.tools import (
@@ -3182,7 +3183,7 @@ class User(Page):
         try:
             self.site.blockuser(self, expiry, reason, anononly, nocreate,
                                 autoblock, noemail, reblock)
-        except pywikibot.data.api.APIError as err:
+        except APIError as err:
             if err.code == 'invalidrange':
                 raise ValueError("%s is not a valid IP range." % self.username)
             else:
@@ -3492,7 +3493,12 @@ class WikibasePage(BasePage):
             if not identification:
                 raise pywikibot.NoPage(self)
 
-            data = self.repo.loadcontent(identification)
+            try:
+                data = self.repo.loadcontent(identification)
+            except APIError as err:
+                if err.code == 'no-such-entity':
+                    raise pywikibot.NoPage(self)
+                raise
             item_index = list(data.keys())[0]
             if lazy_loading_id or item_index != '-1':
                 self.id = item_index
