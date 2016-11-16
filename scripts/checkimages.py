@@ -114,6 +114,7 @@ from pywikibot.tools import deprecated, StringTypes
 # right day/month/year )
 n_txt = {
     'commons': u'{{subst:nld}}',
+    'meta': '{{No license}}',
     'ar': u'{{subst:لم}}',
     'de': u'{{Dateiüberprüfung}}',
     'en': u'{{subst:nld}}',
@@ -138,6 +139,7 @@ n_txt = {
 txt_find = {
     'commons': [u'{{no license', u'{{no license/en',
                 u'{{nld', u'{{no permission', u'{{no permission since'],
+    'meta': ['{{no license', '{{nolicense', '{{nld'],
     'ar': [u'{{لت', u'{{لا ترخيص'],
     'de': [u'{{DÜP', u'{{Düp', u'{{Dateiüberprüfung'],
     'en': [u'{{nld', u'{{no license'],
@@ -157,6 +159,7 @@ txt_find = {
 # no source without the welcome, isn't it?
 empty = {
     'commons': u'{{subst:welcome}}\n~~~~\n',
+    'meta': '{{subst:Welcome}}\n~~~~\n',
     'ar': u'{{ترحيب}}\n~~~~\n',
     'de': u'{{subst:willkommen}} ~~~~',
     'en': u'{{welcome}}\n~~~~\n',
@@ -177,6 +180,7 @@ empty = {
 # In reality, there aren't unknown extension, they are only not allowed...
 delete_immediately = {
     'commons': u"{{speedy|The file has .%s as extension. Is it ok? Please check.}}",
+    'meta': '{{Delete|The file has .%s as extension.}}',
     'ar': u"{{شطب|الملف له .%s كامتداد.}}",
     'en': u"{{db-meta|The file has .%s as extension.}}",
     'fa': u"{{حذف سریع|تصویر %s اضافی است.}}",
@@ -265,6 +269,7 @@ nothing_notification = {
                 u"[[File:Human-help-browser.svg|18px|link=Commons:Help desk|?]] "
                 u"'''[[Commons:Help desk|->]][[Commons:Help desk]]''' in any "
                 u"language you like to use.'' --~~~~"""),
+    'meta': '{{subst:No license notice|File:%s}}',
     'ar': u"{{subst:مصدر الصورة|File:%s}} --~~~~",
     'en': u"{{subst:image source|File:%s}} --~~~~",
     'fa': u"{{جا:اخطار نگاره|%s}}",
@@ -286,6 +291,7 @@ nothing_notification = {
 bot_list = {
     'commons': [u'Siebot', u'CommonsDelinker', u'Filbot', u'John Bot',
                 u'Sz-iwbot', u'ABFbot'],
+    'meta': ['MABot'],
     'de': [u'Xqbot'],
     'en': [u'OrphanBot'],
     'fa': [u'Amirobot'],
@@ -322,6 +328,7 @@ page_with_settings = {
 # image on commons) This is the page where the bot will store them.
 report_page = {
     'commons': u'User:Filbot/Report',
+    'meta': 'User:MABot/Report',
     'de': u'Benutzer:Xqbot/Report',
     'en': u'User:Filnik/Report',
     'fa': u'کاربر:Amirobot/گزارش تصویر',
@@ -364,6 +371,7 @@ msg_comm10 = {
 HiddenTemplate = {
     # Put the other in the page on the project defined below
     'commons': [u'Template:Information'],
+    'meta': ['Template:Information'],
     'ar': [u'Template:معلومات'],
     'de': [u'Template:Information'],
     'en': [u'Template:Information'],
@@ -464,6 +472,7 @@ duplicatesRegex = {
 # licenses.
 category_with_licenses = {
     'commons': u'Category:License tags',
+    'meta': 'Category:License templates',
     'ar': u'تصنيف:قوالب حقوق الصور',
     'de': u'Kategorie:Vorlage:Lizenz für Bilder',
     'en': 'Category:Wikipedia file copyright templates',
@@ -505,7 +514,7 @@ serviceTemplates = {
 
 # Add your project (in alphabetical order) if you want that the bot starts
 project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
-                    'ko', 'ta', 'ur', 'zh']
+                    'ko', 'meta', 'ta', 'ur', 'zh']
 
 # END OF CONFIGURATION.
 
