@@ -25,6 +25,9 @@ This script understands the following command-line arguments:
 -duplicatesreport   Report the duplicates in a log *AND* put the template in
                     the images.
 
+-duplicatereport    The -duplicatereport option is deprecated. Use
+                    -duplicatesreport instead.
+
 -sendemail          Send an email after tagging.
 
 -break              To break the bot after the first check (default: recursive)
@@ -1624,14 +1627,18 @@ def main(*args):
             logFullError = False
         elif arg == '-commons':
             commonsActive = True
+        elif arg == '-duplicatesreport' or arg == '-duplicatereport':
+            if arg == '-duplicatereport':
+                pywikibot.tools.issue_deprecation_warning('-duplicatereport',
+                                                          '-duplicatesreport',
+                                                          2)
+            duplicatesReport = True
         elif arg.startswith('-duplicates'):
             duplicatesActive = True
             if len(arg) == 11:
                 duplicates_rollback = 1
             elif len(arg) > 11:
                 duplicates_rollback = int(arg[12:])
-        elif arg == '-duplicatereport':
-            duplicatesReport = True
         elif arg == '-sendemail':
             sendemailActive = True
         elif arg.startswith('-skip'):
