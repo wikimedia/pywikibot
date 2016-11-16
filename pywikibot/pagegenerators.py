@@ -62,7 +62,7 @@ _logger = "pagegenerators"
 # most of these functions just wrap a Site or Page method that returns
 # a generator
 
-parameterHelp = u"""\
+parameterHelp = """\
 
 -catfilter        Filter the page generator to only yield pages in the
                   specified category. See -cat for argument format.
@@ -174,20 +174,17 @@ parameterHelp = u"""\
 -imagesused       Work on all images that contained on a certain page.
                   Argument can also be given as "-imagesused:linkingpagetitle".
 
--newimages        If given as -newimages:x, it will work on x newest images.
-                  Otherwise asks to input the number of wanted images.
+-newimages        Work on the most recent new images. If given as -newimages:x,
+                  will work on x newest images.
 
 -newpages         Work on the most recent new pages. If given as -newpages:x,
-                  will work on the x newest pages.
+                  will work on x newest pages.
 
 -recentchanges    Work on the pages with the most recent changes. If
                   given as -recentchanges:x, will work on the x most recently
                   changed pages. If given as -recentchanges:offset,duration it
                   will work on pages changed from 'offset' minutes with
                   'duration'  minutes of timespan.
-
-                  By default, if no values follow -recentchanges, then we pass
-                  -recentchanges:x where x = 60
 
                   Examples:
                   -recentchanges:20 gives the 20 most recently changed pages
@@ -274,12 +271,12 @@ parameterHelp = u"""\
 
 -random           Work on random pages returned by [[Special:Random]].
                   Can also be given as "-random:n" where n is the number
-                  of pages to be returned, otherwise the default is 10 pages.
+                  of pages to be returned.
 
 -randomredirect   Work on random redirect pages returned by
                   [[Special:RandomRedirect]]. Can also be given as
                   "-randomredirect:n" where n is the number of pages to be
-                  returned, else 10 pages are returned.
+                  returned.
 
 -untagged         Work on image pages that don't have any license template on a
                   site given in the format "<language>.<project>.org, e.g.
@@ -587,7 +584,6 @@ class GeneratorFactory(object):
         @rtype: LogeventsPageGenerator
         """
         # TODO: Check if logtype is one of the allowed log types
-        # TODO: -*log used 500 as default total, also use with -logevents?
 
         # 'start or None', because start might be an empty string
         total = None
@@ -679,7 +675,7 @@ class GeneratorFactory(object):
             # before -randomredirect
             # otherwise default namespace is 0
             namespaces = self.namespaces or 0
-            gen = RandomRedirectPageGenerator(total=intNone(value) or 10,
+            gen = RandomRedirectPageGenerator(total=intNone(value),
                                               site=self.site,
                                               namespaces=namespaces)
         elif arg == '-random':
@@ -688,7 +684,7 @@ class GeneratorFactory(object):
             # before -random
             # otherwise default namespace is 0
             namespaces = self.namespaces or 0
-            gen = RandomPageGenerator(total=intNone(value) or 10,
+            gen = RandomPageGenerator(total=intNone(value),
                                       site=self.site,
                                       namespaces=namespaces)
         elif arg == '-recentchanges':
@@ -718,7 +714,7 @@ class GeneratorFactory(object):
                                              _filter_unique=self._filter_unique)
 
         elif arg == '-liverecentchanges':
-            gen = LiveRCPageGenerator(self.site, total=intNone(value))
+            gen = LiveRCPageGenerator(site=self.site, total=intNone(value))
         elif arg == '-file':
             if not value:
                 value = pywikibot.input('Please enter the local file name:')
@@ -810,24 +806,19 @@ class GeneratorFactory(object):
                     u'What page names are you looking for?')
             gen = PrefixingPageGenerator(prefix=value, site=self.site)
         elif arg == '-newimages':
-            if not value:
-                value = pywikibot.input(
-                    'How many images do you want to load?')
-            gen = NewimagesPageGenerator(total=int(value), site=self.site)
+            gen = NewimagesPageGenerator(total=intNone(value), site=self.site)
         elif arg == '-newpages':
             # partial workaround for bug T69249
             # to use -namespace/ns with -newpages, -ns must be given
             # before -newpages
             # otherwise default namespace is 0
             namespaces = self.namespaces or 0
-            value = value if value else 60
             gen = NewpagesPageGenerator(namespaces=namespaces,
-                                        total=int(value),
+                                        total=intNone(value),
                                         site=self.site)
         elif arg == '-unconnectedpages':
-            namespaces = self.namespaces or 0
-            value = value if value else 60
-            gen = UnconnectedPageGenerator(total=int(value), site=self.site)
+            gen = UnconnectedPageGenerator(total=intNone(value),
+                                           site=self.site)
         elif arg == '-imagesused':
             if not value:
                 value = pywikibot.input(
@@ -921,7 +912,7 @@ class GeneratorFactory(object):
             # exclude -log, -nolog
             if log == 'log' and mode not in ['-', '-no'] and not tail:
                 mode = mode[1:]
-                total = 500
+                total = None
                 if value:
                     try:
                         total = int(value)
@@ -1520,6 +1511,7 @@ class ItemClaimFilter(object):
             if cls.__filter_match(page, prop, claim, qualifiers) and not negate:
                 yield page
 
+
 # name the generator methods
 ItemClaimFilterPageGenerator = ItemClaimFilter.filter
 
@@ -2025,7 +2017,7 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
 
 
 @deprecated_args(extension=None, number="total", repeat=None)
-def UnusedFilesGenerator(total=100, site=None):
+def UnusedFilesGenerator(total=None, site=None):
     """
     Unused files generator.
 
@@ -2041,7 +2033,7 @@ def UnusedFilesGenerator(total=100, site=None):
 
 
 @deprecated_args(number="total", repeat=None)
-def WithoutInterwikiPageGenerator(total=100, site=None):
+def WithoutInterwikiPageGenerator(total=None, site=None):
     """
     Page lacking interwikis generator.
 
@@ -2120,7 +2112,7 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
 
 
 @deprecated_args(number="total", repeat=None)
-def LonelyPagesPageGenerator(total=100, site=None):
+def LonelyPagesPageGenerator(total=None, site=None):
     """
     Lonely page generator.
 
@@ -2136,7 +2128,7 @@ def LonelyPagesPageGenerator(total=100, site=None):
 
 
 @deprecated_args(number="total", repeat=None)
-def UnwatchedPagesPageGenerator(total=100, site=None):
+def UnwatchedPagesPageGenerator(total=None, site=None):
     """
     Unwatched page generator.
 
@@ -2231,7 +2223,7 @@ def ShortPagesPageGenerator(total=100, site=None):
 
 
 @deprecated_args(number="total")
-def RandomPageGenerator(total=10, site=None, namespaces=None):
+def RandomPageGenerator(total=None, site=None, namespaces=None):
     """
     Random page generator.
 
@@ -2247,7 +2239,7 @@ def RandomPageGenerator(total=10, site=None, namespaces=None):
 
 
 @deprecated_args(number="total")
-def RandomRedirectPageGenerator(total=10, site=None, namespaces=None):
+def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
     """
     Random redirect generator.
 
