@@ -723,7 +723,7 @@ class TestPropertyPage(WikidataTestCase):
     def test_property_empty_property(self):
         """Test creating a PropertyPage without a title."""
         wikidata = self.get_repo()
-        self.assertRaises(pywikibot.Error, PropertyPage, wikidata)
+        self.assertRaises(pywikibot.InvalidTitle, PropertyPage, wikidata)
 
     def test_globe_coordinate(self):
         """Test a coordinate PropertyPage has the correct type."""
