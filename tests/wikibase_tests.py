@@ -646,6 +646,7 @@ class TestRedirects(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q1')
         self.assertFalse(item.isRedirectPage())
+        self.assertTrue(item.exits())
         self.assertRaises(pywikibot.IsNotRedirectPage, item.getRedirectTarget)
 
     def test_redirect_item(self):
@@ -654,10 +655,21 @@ class TestRedirects(WikidataTestCase):
         item = ItemPage(wikidata, 'Q10008448')
         item.get(get_redirect=True)
         target = ItemPage(wikidata, 'Q8422626')
+        # tests after get operation
         self.assertTrue(item.isRedirectPage())
+        self.assertTrue(item.exists())
         self.assertEqual(item.getRedirectTarget(), target)
         self.assertIsInstance(item.getRedirectTarget(), ItemPage)
         self.assertRaises(pywikibot.IsRedirectPage, item.get)
+
+    def test_redirect_item_without_get(self):
+        """Test redirect item without explicit get operation."""
+        wikidata = self.get_repo()
+        item = pywikibot.ItemPage(wikidata, 'Q10008448')
+        self.assertTrue(item.exists())
+        self.assertTrue(item.isRedirectPage())
+        target = pywikibot.ItemPage(wikidata, 'Q8422626')
+        self.assertEqual(item.getRedirectTarget(), target)
 
 
 class TestPropertyPage(WikidataTestCase):
