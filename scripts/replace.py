@@ -672,6 +672,16 @@ class ReplaceRobot(Bot):
         else:  # unsuccessful pages
             self._pending_processed_titles.put((page.title(asLink=True), False))
 
+    def _replace_async_callback(self, page, err):
+        """Callback for asynchronous page edit."""
+        self._count_changes(page, err)
+
+    def _replace_sync_callback(self, page, err):
+        """Callback for synchronous page edit."""
+        self._count_changes(page, err)
+        if isinstance(err, Exception):
+            raise err
+
     def generate_summary(self, applied_replacements):
         """Generate a summary message for the replacements."""
         # all replacements which are merged into the default message
@@ -781,7 +791,7 @@ class ReplaceRobot(Bot):
                 if choice == 'y':
                     page.text = new_text
                     page.save(summary=self.generate_summary(applied), async=True,
-                              callback=self._count_changes, quiet=True)
+                              callback=self._replace_async_callback, quiet=True)
                 while not self._pending_processed_titles.empty():
                     proc_title, res = self._pending_processed_titles.get()
                     pywikibot.output('Page %s%s saved'
@@ -792,7 +802,7 @@ class ReplaceRobot(Bot):
                 try:
                     page.text = new_text
                     page.save(summary=self.generate_summary(applied),
-                              callback=self._count_changes, quiet=True)
+                              callback=self._replace_sync_callback, quiet=True)
                 except pywikibot.EditConflict:
                     pywikibot.output(u'Skipping %s because of edit conflict'
                                      % (page.title(),))
