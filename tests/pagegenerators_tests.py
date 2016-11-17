@@ -351,7 +351,6 @@ class SubpageFilterGeneratorTestCase(TestCase):
             '/home/test',
             'User:Sn1per/ProtectTest1/test',
             'User:Sn1per/ProtectTest1/test/test',
-            'User:Sn1per/sandbox',
         )
         self.assertPagelistTitles(gen, titles=expect_3, site=site)
 
@@ -824,7 +823,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_newpages_default(self):
         """Test newpages generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-newpages')
+        gf.handleArg('-newpages:60')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
@@ -860,7 +859,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_recentchanges_default(self):
         """Test recentchanges generator with default setting."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-recentchanges')
+        gf.handleArg('-recentchanges:60')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespacesAll(gen, set([0, 1, 2]), skip=True)
@@ -946,7 +945,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-ns:1')
         gf.handleArg('-ns:3')
-        gf.handleArg('-random')
+        gf.handleArg('-random:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, set([1, 3]))
@@ -974,7 +973,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-ns:1')
         gf.handleArg('-ns:3')
-        gf.handleArg('-randomredirect')
+        gf.handleArg('-randomredirect:10')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, set([1, 3]))
