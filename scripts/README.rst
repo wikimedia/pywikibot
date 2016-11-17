@@ -28,8 +28,6 @@ The contents of the package
     | blockpagechecker.py    | Deletes any protection templates that are on pages      |
     |                        | which aren't actually protected.                        |
     +------------------------+---------------------------------------------------------+
-    | blockreview.py         | Bot implements blocking review process for de-wiki first|
-    +------------------------+---------------------------------------------------------+
     | capitalize_redirects.py| Script to create a redirect of capitalize articles.     |
     +------------------------+---------------------------------------------------------+
     | casechecker.py         | Script to enumerate all pages in the wikipedia and      |
