@@ -646,7 +646,7 @@ class TestRedirects(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q1')
         self.assertFalse(item.isRedirectPage())
-        self.assertTrue(item.exits())
+        self.assertTrue(item.exists())
         self.assertRaises(pywikibot.IsNotRedirectPage, item.getRedirectTarget)
 
     def test_redirect_item(self):
