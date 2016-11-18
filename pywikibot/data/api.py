@@ -2435,7 +2435,7 @@ class APIGenerator(_RequestWrapper):
         @type value: int
         """
         self.limit = int(value)
-        if self.limit < self.query_increment:
+        if self.query_increment and self.limit < self.query_increment:
             self.request[self.limit_name] = self.limit
             pywikibot.debug(u"%s: Set request item limit to %i"
                             % (self.__class__.__name__, self.limit), _logger)
