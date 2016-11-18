@@ -1006,7 +1006,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         """Test -onlyif without qualifiers."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-page:Q15745378')
-        gf.handleArg('-onlyif:P357=International Journal of Minerals\, '
+        gf.handleArg('-onlyif:P1476=International Journal of Minerals\, '
                      'Metallurgy\, and Materials')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
@@ -1016,7 +1016,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         """Test -onlyifnot without qualifiers."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-page:Q15745378')
-        gf.handleArg('-onlyifnot:P357=International Journal of Minerals\, '
+        gf.handleArg('-onlyifnot:P1476=International Journal of Minerals\, '
                      'Metallurgy\, and Materials')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
