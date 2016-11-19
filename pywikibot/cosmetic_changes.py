@@ -450,7 +450,12 @@ class CosmeticChangesToolkit(object):
             trailingChars = match.group('linktrail')
             newline = match.group('newline')
 
-            if not self.site.isInterwikiLink(titleWithSection):
+            try:
+                is_interwiki = self.site.isInterwikiLink(titleWithSection)
+            except ValueError:  # T111513
+                is_interwiki = True
+
+            if not is_interwiki:
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
                 # We only work on namespace 0 because pipes and linktrails work
