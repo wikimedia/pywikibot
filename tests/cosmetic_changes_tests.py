@@ -244,6 +244,18 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '[[File:Foo.bar|miniatur]]',
             self.cct.translateMagicWords('[[File:Foo.bar|mini]]'))
+        self.assertEqual(
+            '[[File:Foo.bar|links|miniatur]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|left|thumb]]'))
+        self.assertEqual(
+            '[[File:Foo.bar|250px|links]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|250px|left]]'))
+        self.assertEqual(
+            '[[File:Foo.bar|links|250px]]',
+            self.cct.translateMagicWords('[[File:Foo.bar| left |250px]]'))
+        self.assertEqual(
+            '[[File:Foo.bar|250px|zentriert|Baz]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|250px|center|Baz]]'))
 
     def test_cleanUpLinks_pipes(self):
         """Test cleanUpLinks method."""
