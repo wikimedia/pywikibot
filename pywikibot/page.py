@@ -4247,12 +4247,14 @@ class Property(object):
                    'external-id': 'string',
                    }
 
-    def __init__(self, site, id=None, datatype=None):
+    def __init__(self, site, id, datatype=None):
         """
         Constructor.
 
         @param site: data repository
         @type site: pywikibot.site.DataSite
+        @param id: id of the property
+        @type id: basestring
         @param datatype: datatype of the property;
             if not given, it will be queried via the API
         @type datatype: basestring
