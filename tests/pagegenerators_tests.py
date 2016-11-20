@@ -705,7 +705,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         """Test ItemClaimFilterPageGenerator on sample page without qualifiers."""
         self._simple_claim_test('P474', '+91', None, True)
         self._simple_claim_test('P463', 'Q37470', None, True)
-        self._simple_claim_test('P625', '21,78', None, True)
+        self._simple_claim_test('P625', '21,77', None, True)
         self._simple_claim_test('P625', '21,78.05,0.01', None, False)
 
 
