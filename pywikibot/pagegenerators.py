@@ -2741,7 +2741,8 @@ def WikidataSPARQLPageGenerator(query, site=None,
     data = query_object.get_items(query,
                                   item_name=item_name,
                                   result_type=result_type)
-    items_pages = (pywikibot.ItemPage(repo, item) for item in data)
+    items_pages = (pywikibot.ItemPage(repo, item) for item in data
+                   if pywikibot.ItemPage.is_valid_id(item))
     if isinstance(site, pywikibot.site.DataSite):
         return items_pages
 
