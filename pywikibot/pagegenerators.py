@@ -906,7 +906,7 @@ class GeneratorFactory(object):
             # exclude -log, -nolog
             if log == 'log' and mode not in ['-', '-no'] and not tail:
                 mode = mode[1:]
-                total = None
+                total = 500
                 if value:
                     try:
                         total = int(value)
