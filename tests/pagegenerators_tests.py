@@ -895,7 +895,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test pageid parameter."""
         # Get reference pages and their pageids.
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
-        self.assertTrue(gf.handleArg('-prefixindex:a'))
+        self.assertTrue(gf.handleArg('-random'))
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
