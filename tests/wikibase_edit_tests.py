@@ -18,6 +18,7 @@ __version__ = '$Id$'
 import time
 
 import pywikibot
+from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, WikibaseTestCase
 
@@ -236,6 +237,28 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         # confirm new claim
         item.get(force=True)
         claim = item.claims['P271'][0]
+        self.assertEqual(claim.getTarget(), target)
+
+    def test_WbQuantity_edit_unbound(self):
+        """Attempt adding a quantity with unbound errors."""
+        # Clean the slate in preparation for test.
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P69')
+
+        # Make sure the wiki supports wikibase-conceptbaseuri
+        if MediaWikiVersion(testsite.version()) < MediaWikiVersion('1.29.0-wmf.2'):
+            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
+                                    'newer to support unbound uncertainties.')
+
+        # set new claim
+        claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')
+        target = pywikibot.WbQuantity(amount=1234)
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P69'][0]
         self.assertEqual(claim.getTarget(), target)
 
     def test_identifier_edit(self):
