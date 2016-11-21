@@ -609,7 +609,7 @@ class WbQuantity(_WbRepresentation):
             warning(
                 "WbQuantity now expects a 'site' parameter. This is needed to "
                 "ensure correct handling of error bounds.")
-            return True
+            return False
         return MediaWikiVersion(site.version()) < MediaWikiVersion('1.29.0-wmf.2')
 
     @staticmethod
