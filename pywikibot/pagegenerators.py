@@ -849,7 +849,7 @@ class GeneratorFactory(object):
             if not self.site.has_extension('ProofreadPage'):
                 raise UnknownExtension(
                     'Ql filtering needs a site with ProofreadPage extension.')
-            value = map(int, value.split(','))
+            value = [int(_) for _ in value.split(',')]
             if min(value) < 0 or max(value) > 4:  # Invalid input ql.
                 valid_ql = ['{0}: {1}'.format(*i) for
                             i in self.site.proofread_levels.items()]
