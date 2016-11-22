@@ -1409,18 +1409,34 @@ class SearchTestCase(DefaultSiteTestCase):
                 raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
             raise
 
-    def test_search_where(self):
-        """Test the site.search() method with 'where' parameter."""
+    def test_search_where_text(self):
+        """Test the site.search() method with 'where' parameter set to text."""
         self.assertEqual(list(self.site.search('wiki', total=10)),
-                         list(self.site.search('wiki', total=10, where='text')))
+                         list(self.site.search('wiki', total=10,
+                                               where='text')))
+
+    def test_search_where_nearmatch(self):
+        """Test the site.search().
+
+        'where' parameter set to 'nearmatch'.
+        """
         self.assertLessEqual(len(list(self.site.search('wiki', total=10,
                                                        where='nearmatch'))),
                              len(list(self.site.search('wiki', total=10))))
-        for hit in self.site.search('wiki', namespaces=0, total=10,
-                                    get_redirects=True, where='title'):
-            self.assertIsInstance(hit, pywikibot.Page)
-            self.assertEqual(hit.namespace(), 0)
-            self.assertTrue('wiki' in hit.title().lower())
+
+    def test_search_where_title(self):
+        """Test site.search() method with 'where' parameter set to title."""
+        try:
+            for hit in self.site.search('wiki', namespaces=0, total=10,
+                                        get_redirects=True, where='title'):
+                self.assertIsInstance(hit, pywikibot.Page)
+                self.assertEqual(hit.namespace(), 0)
+                self.assertTrue('wiki' in hit.title().lower())
+        except pywikibot.data.api.APIError as e:
+            if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
+                raise unittest.SkipTest(
+                    'Title search disabled on site: {0}'.format(self.site))
+            raise
 
 
 class TestUserContribsAsUser(DefaultSiteTestCase):
