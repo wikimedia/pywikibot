@@ -131,6 +131,7 @@ class HttpsCertificateTestCase(TestCase):
         self.assertRaises(pywikibot.FatalServerError,
                           http.fetch,
                           uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        http.session.close()  # clear the connection
 
         with warnings.catch_warnings(record=True) as warning_log:
             response = http.fetch(
@@ -139,12 +140,13 @@ class HttpsCertificateTestCase(TestCase):
         r = response.content
         self.assertIsInstance(r, unicode)
         self.assertTrue(re.search(r'<title>.*</title>', r))
+        http.session.close()  # clear the connection
 
         # Verify that it now fails again
-        http.session.close()  # but first clear the connection
         self.assertRaises(pywikibot.FatalServerError,
                           http.fetch,
                           uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        http.session.close()  # clear the connection
 
         # Verify that the warning occurred
         self.assertEqual(len(warning_log), 1)
