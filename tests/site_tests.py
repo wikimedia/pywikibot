@@ -2468,8 +2468,10 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         """Setup tests."""
         super(TestLoadPagesFromPageids, self).setUp()
         self.site = self.get_site()
-        mainpage = pywikibot.Page(pywikibot.Link('Main Page', self.site))
-        self.links = list(self.site.pagelinks(mainpage, total=10))
+        mainpage = self.get_mainpage()
+        self.links = [
+            page for page in self.site.pagelinks(mainpage, total=10)
+            if page.exists()]
 
     def test_load_from_pageids_iterable_of_str(self):
         """Test basic loading with pageids."""
@@ -2478,9 +2480,9 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, '_pageid'))
-                self.assertIn(page, self.links)
+            self.assertTrue(page.exists())
+            self.assertTrue(hasattr(page, '_pageid'))
+            self.assertIn(page, self.links)
         self.assertEqual(count, len(self.links))
 
     def test_load_from_pageids_iterable_of_int(self):
@@ -2490,9 +2492,9 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, '_pageid'))
-                self.assertIn(page, self.links)
+            self.assertTrue(page.exists())
+            self.assertTrue(hasattr(page, '_pageid'))
+            self.assertIn(page, self.links)
         self.assertEqual(count, len(self.links))
 
     def test_load_from_pageids_iterable_in_order(self):
@@ -2503,9 +2505,9 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
             link = self.links.pop(0)
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, '_pageid'))
-                self.assertEqual(page, link)
+            self.assertTrue(page.exists())
+            self.assertTrue(hasattr(page, '_pageid'))
+            self.assertEqual(page, link)
 
     def test_load_from_pageids_iterable_with_duplicate(self):
         """Test loading with duplicate pageids."""
@@ -2515,9 +2517,9 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, '_pageid'))
-                self.assertIn(page, self.links)
+            self.assertTrue(page.exists())
+            self.assertTrue(hasattr(page, '_pageid'))
+            self.assertIn(page, self.links)
         self.assertEqual(count, len(self.links))
 
     def test_load_from_pageids_comma_separated(self):
@@ -2527,9 +2529,9 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, '_pageid'))
-                self.assertIn(page, self.links)
+            self.assertTrue(page.exists())
+            self.assertTrue(hasattr(page, '_pageid'))
+            self.assertIn(page, self.links)
         self.assertEqual(count, len(self.links))
 
     def test_load_from_pageids_pipe_separated(self):
@@ -2539,9 +2541,9 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            if page.exists():
-                self.assertTrue(hasattr(page, '_pageid'))
-                self.assertIn(page, self.links)
+            self.assertTrue(page.exists())
+            self.assertTrue(hasattr(page, '_pageid'))
+            self.assertIn(page, self.links)
         self.assertEqual(count, len(self.links))
 
 
