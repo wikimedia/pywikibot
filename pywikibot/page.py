@@ -5292,10 +5292,10 @@ class Link(ComparableMixin):
             raise pywikibot.Error(
                 "Title contains illegal char (\\uFFFD 'REPLACEMENT CHARACTER')")
 
-        # Replace underscores by spaces
-        t = t.replace(u"_", u" ")
-        # replace multiple spaces with a single space
-        t = re.sub(' {2,}', ' ', t)
+        # Cleanup whitespace
+        t = re.sub(
+            '[_ \xa0\u1680\u180E\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+',
+            ' ', t)
         # Strip spaces at both ends
         t = t.strip()
         # Remove left-to-right and right-to-left markers.

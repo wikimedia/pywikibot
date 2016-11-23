@@ -90,6 +90,8 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(Link('A &eacute; B', self.get_site()).title, u'A é B')
         self.assertEqual(Link('A &#233; B', self.get_site()).title, u'A é B')
         self.assertEqual(Link('A &#x00E9; B', self.get_site()).title, u'A é B')
+        self.assertEqual(Link('A &nbsp; B', self.get_site()).title, 'A B')
+        self.assertEqual(Link('A &#160; B', self.get_site()).title, 'A B')
 
         l = Link('A | B', self.get_site())
         self.assertEqual(l.title, 'A')
