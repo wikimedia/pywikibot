@@ -61,10 +61,10 @@ script:
 
   - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz 'n'
   - if [[ $FAMILY == 'wpbeta' ]]; then
-      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'n' ;
+      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'y' ;
     fi
   - if [[ $FAMILY == 'wsbeta' ]]; then
-      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'n' ;
+      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
     fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
