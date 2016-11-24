@@ -2635,8 +2635,14 @@ class APISite(BaseSite):
 
         for item in self.siteinfo.get('namespacealiases'):
             ns = int(item['id'])
-            if item['*'] not in _namespaces[ns]:
-                _namespaces[ns].aliases.append(item['*'])
+            try:
+                namespace = _namespaces[ns]
+            except KeyError:
+                pywikibot.warning(
+                    'Broken namespace alias "{0}" (id: {1}) on {2}'.format(
+                        item['*'], item['id'], self))
+            if item['*'] not in namespace:
+                namespace.aliases.append(item['*'])
 
         return _namespaces
 
