@@ -116,6 +116,7 @@ mylang = 'language'
 # If you have a unique username for all languages of a family,
 # you can use '*'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
+# You may use '*' for family name in a similar manner.
 #
 # If you have a sysop account on some wikis, this will be used to delete pages
 # or to edit locked pages if you add such lines to your

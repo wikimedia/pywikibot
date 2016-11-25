@@ -13,8 +13,13 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 #
-import mock
+from collections import defaultdict
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 
+from pywikibot.exceptions import NoUsername
 from pywikibot.login import LoginManager
 
 from tests.aspects import (
@@ -35,17 +40,15 @@ class FakeSite(object):
     code = "~FakeCode"
     family = FakeFamily
 
+
 FakeUsername = "~FakeUsername"
 
 
 class FakeConfig(object):
     """Mock."""
 
-    usernames = {
-        FakeFamily.name: {
-            FakeSite.code: FakeUsername
-        }
-    }
+    usernames = defaultdict(dict)
+    usernames[FakeFamily.name] = {FakeSite.code: FakeUsername}
 
 
 @mock.patch("pywikibot.Site", FakeSite)
@@ -62,6 +65,24 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
         self.assertEqual(obj.username, FakeUsername)
         self.assertEqual(obj.login_name, FakeUsername)
         self.assertIsNone(obj.password)
+
+    @mock.patch.dict(
+        FakeConfig.usernames,
+        {'*': {'*': FakeUsername}},
+        clear=True
+    )
+    def test_star_family(self):
+        """Test LoginManager with '*' as family."""
+        lm = LoginManager()
+        self.assertEqual(lm.username, FakeUsername)
+
+        del FakeConfig.usernames['*']
+        FakeConfig.usernames['*']['en'] = FakeUsername
+        self.assertRaises(NoUsername, LoginManager)
+
+        FakeConfig.usernames['*']['*'] = FakeUsername
+        lm = LoginManager()
+        self.assertEqual(lm.username, FakeUsername)
 
 
 @mock.patch("pywikibot.Site", FakeSite)
@@ -165,6 +186,7 @@ class TestPasswordFile(DefaultDrySiteTestCase):
             ('~FakeUsername', BotPassword('~FakeSuffix', '~FakePassword'))
             """, '~FakePassword')
         self.assertEqual(obj.login_name, "~FakeUsername@~FakeSuffix")
+
 
 if __name__ == '__main__':  # pragma: no cover
     unittest.main()
