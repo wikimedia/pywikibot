@@ -26,7 +26,7 @@ These parameters are supported to specify which pages titles to print:
                 --> [[PageTitle]]
 
             5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
-                --> 10 PageTitle (colorised in lightred)
+                --> 10 localised_Namespace:PageTitle (colorised in lightred)
 
             6 - u'{num:4d} {page.loc_title:<40} {page.can_title:<40}'
                 --> 10 localised_Namespace:PageTitle
