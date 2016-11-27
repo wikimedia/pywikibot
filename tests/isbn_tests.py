@@ -138,6 +138,11 @@ class TestIsbn(TestCase):
                          'ISBN 978-0-9752298-0-4')
         self.assertEqual(convertIsbn10toIsbn13('ISBN 0-9752298-0-1'),
                          'ISBN 0-9752298-0-1')  # Invalid ISBN - no changes
+        # Should not fail for ISBN13
+        self.assertEqual(
+            convertIsbn10toIsbn13('ISBN 978-0-7869-3669-4'),
+            'ISBN 978-0-7869-3669-4'
+        )
 
         # Errors
         isbn = ISBN10('9492098059')
