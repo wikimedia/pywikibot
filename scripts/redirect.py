@@ -17,9 +17,9 @@ do             Shortcut action command is "do".
 
 broken         Tries to fix redirect which point to nowhere by using the last
 br             moved target of the destination page. If this fails and the
-               -delete option is set, it either deletes the page or marks it for
-               deletion depending on whether the account has admin rights. It
-               will mark the redirect not for deletion if there is no speedy
+               -delete option is set, it either deletes the page or marks it
+               for deletion depending on whether the account has admin rights.
+               It will mark the redirect not for deletion if there is no speedy
                deletion template available. Shortcut action command is "br".
 
 both           Both of the above. Retrieves redirect pages from live wiki,

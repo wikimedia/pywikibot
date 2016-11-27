@@ -17,8 +17,8 @@ edited a page on their white list it gets patrolled. It will also patrol pages
 which start with the mentioned link (e.g. [[foo]] will also patrol [[foobar]]).
 
 To avoid redlinks it's possible to use Special:PrefixIndex as a prefix so that
-it will list all pages which will be patrolled. The page after the slash will be
-used then.
+it will list all pages which will be patrolled. The page after the slash will
+be used then.
 
 On Wikisource, it'll also check if the page is on the author namespace in which
 case it'll also patrol pages which are linked from that page.

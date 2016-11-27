@@ -11,7 +11,8 @@ Usage:
 This will work on all pages in the category "coordinates not on Wikidata" and
 will import the coordinates on these pages to Wikidata.
 
-The data from the "GeoData" extension (https://www.mediawiki.org/wiki/GeoData)
+The data from the "GeoData" extension
+(https://www.mediawiki.org/wiki/Extension:GeoData)
 is used so that extension has to be setup properly. You can look at the
 [[Special:Nearby]] page on your local Wiki to see if it's populated.
 

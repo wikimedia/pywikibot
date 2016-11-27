@@ -33,17 +33,17 @@ Arguments:
 It is possible to combine -abortonwarn and -ignorewarn so that if the specific
 warning is given it won't apply the general one but more specific one. So if it
 should ignore specific warnings and abort on the rest it's possible by defining
-no warning for -abortonwarn and the specific warnings for -ignorewarn. The order
-does not matter. If both are unspecific or a warning is specified by both, it'll
-prefer aborting.
+no warning for -abortonwarn and the specific warnings for -ignorewarn. The
+order does not matter. If both are unspecific or a warning is specified by
+both, it'll prefer aborting.
 
-If any other arguments are given, the first is either URL, filename or directory
-to upload, and the rest is a proposed description to go with the upload. If none
-of these are given, the user is asked for the directory, file or URL to upload.
-The bot will then upload the image to the wiki.
+If any other arguments are given, the first is either URL, filename or
+directory to upload, and the rest is a proposed description to go with the
+upload. If none of these are given, the user is asked for the directory, file
+or URL to upload. The bot will then upload the image to the wiki.
 
-The script will ask for the location of an image(s), if not given as a parameter,
-and for a description.
+The script will ask for the location of an image(s), if not given as a
+parameter, and for a description.
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004

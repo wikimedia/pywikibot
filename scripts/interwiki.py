@@ -49,9 +49,9 @@ These command-line arguments can be used to specify which pages to work on:
                    process interrupts again, it saves all unprocessed pages in
                    one new dump file of the given site.
 
-    -continue:     like restore, but after having gone through the dumped pages,
-                   continue alphabetically starting at the last of the dumped
-                   pages. The dump file will be subsequently removed.
+    -continue:     like restore, but after having gone through the dumped
+                   pages, continue alphabetically starting at the last of the
+                   dumped pages. The dump file will be subsequently removed.
 
     -warnfile:     used as -warnfile:filename, reads all warnings from the
                    given file that apply to the home wiki language,
@@ -113,7 +113,7 @@ These arguments control miscellanous bot behaviour:
 
     -hintsonly     The bot does not ask for a page to work on, even if none of
                    the above page sources was specified. This will make the
-                   first existing page of -hint or -hinfile slip in as the start
+                   first existing page of -hint or -hinfile slip in as start
                    page, determining properties like namespace, disambiguation
                    state, and so on. When no existing page is found in the
                    hints, the bot does nothing.
@@ -134,23 +134,23 @@ These arguments are useful to provide hints to the bot:
 
                    There are some special hints, trying a number of languages
                    at once:
-                      * all:       All languages with at least ca. 100 articles.
+                      * all:       All languages with at least ca. 100 articles
                       * 10:        The 10 largest languages (sites with most
                                    articles). Analogous for any other natural
-                                   number.
-                      * arab:      All languages using the Arabic alphabet.
-                      * cyril:     All languages that use the Cyrillic alphabet.
-                      * chinese:   All Chinese dialects.
-                      * latin:     All languages using the Latin script.
-                      * scand:     All Scandinavian languages.
+                                   number
+                      * arab:      All languages using the Arabic alphabet
+                      * cyril:     All languages that use the Cyrillic alphabet
+                      * chinese:   All Chinese dialects
+                      * latin:     All languages using the Latin script
+                      * scand:     All Scandinavian languages
 
                    Names of families that forward their interlanguage links
                    to the wiki family being worked upon can be used, they are:
-                      * commons:   Interlanguage links of Mediawiki Commons.
-                      * incubator: Links in pages on the Mediawiki Incubator.
-                      * meta:      Interlanguage links of named pages on Meta.
-                      * species:   Interlanguage links of the wikispecies wiki.
-                      * strategy:  Links in pages on Wikimedias strategy wiki.
+                      * commons:   Interlanguage links of Mediawiki Commons
+                      * incubator: Links in pages on the Mediawiki Incubator
+                      * meta:      Interlanguage links of named pages on Meta
+                      * species:   Interlanguage links of the wikispecies wiki
+                      * strategy:  Links in pages on Wikimedias strategy wiki
                       * test:      Take interwiki links from Test Wikipedia
 
                    Languages, groups and families having the same page title
@@ -337,7 +337,7 @@ that you have to break it off, use "-continue" next time.
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
 # (C) xqt, 2009-2014
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #

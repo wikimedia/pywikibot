@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Script to copy self published files from English Wikipedia to Wikimedia Commons.
+Script to copy self published files from English Wikipedia to Commons.
 
 This bot is based on imagecopy.py and intended to be used to empty out
 http://en.wikipedia.org/wiki/Category:Self-published_work

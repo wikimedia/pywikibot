@@ -60,10 +60,8 @@ In this way the Bot can understand where the block starts in order to take the
 right parameter.
 
 * Name=     Set the name of the block
-* Find=     Use it to define what search in the text of the image's description,
-            while
-  Findonly= search only if the exactly text that you give is in the image's
-            description.
+* Find=     search this text in the image's description
+* Findonly= search for exactly this text in the image's description
 * Summary=  That's the summary that the bot will use when it will notify the
             problem.
 * Head=     That's the incipit that the bot will use for the message.
@@ -71,8 +69,7 @@ right parameter.
             image's problem.
 
 ---- Known issues/FIXMEs: ----
-* Clean the code, some passages are pretty difficult to understand if you're not
-  the coder.
+* Clean the code, some passages are pretty difficult to understand.
 * Add the "catch the language" function for commons.
 * Fix and reorganise the new documentation
 * Add a report for the image tagged.

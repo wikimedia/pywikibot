@@ -48,8 +48,8 @@ Command line options:
 
 -addcat:     Appends the given category to every page that is edited. This is
              useful when a category is being broken out from a template
-             parameter or when templates are being upmerged but more information
-             must be preserved.
+             parameter or when templates are being upmerged but more
+             information must be preserved.
 
 other:       First argument is the old template name, second one is the new
              name.

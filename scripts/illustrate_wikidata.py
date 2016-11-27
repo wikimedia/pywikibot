@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Bot to add images to Wikidata items. The image is extracted from the page_props.
+Bot to add images to Wikidata items.
 
-For this to be available the PageImages extension
-(https://www.mediawiki.org/wiki/Extension:PageImages) needs to be installed
+The image is extracted from the page_props. For this to be available the
+PageImages extension (https://www.mediawiki.org/wiki/Extension:PageImages)
+needs to be installed
 
 Usage:
 

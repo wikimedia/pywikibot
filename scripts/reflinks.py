@@ -3,13 +3,13 @@
 """
 Fetch and add titles for bare links in references.
 
-This bot will search for references which are only made of a link without title,
+This bot will search for references which are only made of a link without title
 (i.e. <ref>[https://www.google.fr/]</ref> or <ref>https://www.google.fr/</ref>)
 and will fetch the html title from the link to use it as the title of the wiki
 link in the reference, i.e.
 <ref>[https://www.google.fr/search?q=test test - Google Search]</ref>
 
-The bot checks every 20 edits a special stop page : if the page has been edited,
+The bot checks every 20 edits a special stop page. If the page has been edited,
 it stops.
 
 DumZiBoT is running that script on en: & fr: at every new dump, running it on

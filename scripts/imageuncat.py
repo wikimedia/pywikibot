@@ -3,16 +3,17 @@
 """
 Program to add uncat template to images without categories at commons.
 
-See imagerecat.py (still working on that one) to add these images to categories.
+See imagerecat.py to add these images to categories.
 
 This script is working on the given site, so if the commons should be handled,
 the site commons should be given and not a Wikipedia or similar.
 
--yesterday        Go through all uploads from yesterday. (Deprecated here, moved
-                  to pagegenerators)
+-yesterday        Go through all uploads from yesterday. (Deprecated here,
+                  moved to pagegenerators)
 
--recentchanges    Go through the changes made from 'offset' minutes with 'duration'
-                  minutes of timespan. It must be given two arguments as
+-recentchanges    Go through the changes made from 'offset' minutes with
+                  'duration' minutes of timespan. It must be given two
+                  arguments as
                   '-recentchanges:offset,duration'
 
                   Default value of offset is 120, and that of duration is 70

@@ -9,8 +9,8 @@ some filters and adds the result.
 
 The following command line parameters are supported:
 
--onlyfilter     Don't use Commonsense to get categories, just filter the current
-                categories
+-onlyfilter     Don't use Commonsense to get categories, just filter the
+                current categories
 
 -onlyuncat      Only work on uncategorized images. Will prevent the bot from
                 working on an image multiple times.

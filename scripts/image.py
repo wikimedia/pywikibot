@@ -26,8 +26,8 @@ Command line options:
 
 Examples:
 
-The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first remove it
-from everything that displays it:
+The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first remove
+it from everything that displays it:
 
     python pwb.py image FlagrantCopyvio.jpg
 

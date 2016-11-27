@@ -26,8 +26,8 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--always         Doesn't ask every time if the bot should make the change or not,
-                do it always.
+-always         Doesn't ask every time whether the bot should make the change.
+                Do it always.
 
 -show           When the bot can't delete the template from the page (wrong
                 regex or something like that) it will ask you if it should show

@@ -34,9 +34,9 @@ archive              Name of the page to which archived threads will be put.
                      Must be a subpage of the current page. Variables are
                      supported.
 algo                 specifies the maximum age of a thread. Must be in the form
-                     old(<delay>) where <delay> specifies the age in minutes(m),
-                     hours (h), days (d), weeks(w), months (M) or years (y)
-                     like 24h or 5d. Default is old(24h)
+                     old(<delay>) where <delay> specifies the age in
+                     minutes (m), hours (h), days (d), weeks(w), months (M) or
+                     years (y)  like 24h or 5d. Default is old(24h)
 counter              The current value of a counter which could be assigned as
                      variable. Will be actualized by bot. Initial value is 1.
 maxarchivesize       The maximum archive size before incrementing the counter.
