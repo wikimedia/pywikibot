@@ -25,9 +25,6 @@ This script understands the following command-line arguments:
 -duplicatesreport   Report the duplicates in a log *AND* put the template in
                     the images.
 
--duplicatereport    The -duplicatereport option is deprecated. Use
-                    -duplicatesreport instead.
-
 -sendemail          Send an email after tagging.
 
 -break              To break the bot after the first check (default: recursive)
@@ -102,9 +99,9 @@ import pywikibot
 from pywikibot import i18n
 from pywikibot import pagegenerators as pg
 
-from pywikibot.exceptions import NotEmailableError
+from pywikibot.exceptions import ArgumentDeprecationWarning, NotEmailableError
 from pywikibot.family import Family
-from pywikibot.tools import deprecated, StringTypes
+from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
@@ -1614,7 +1611,8 @@ def main(*args):
             if arg.startswith('-sleep'):
                 length = len('-sleep')
             else:
-                pywikibot.tools.issue_deprecation_warning('-time', '-sleep', 2)
+                issue_deprecation_warning('-time', '-sleep', 2,
+                                          ArgumentDeprecationWarning)
                 length = len('-time')
             if len(arg) == length:
                 time_sleep = int(pywikibot.input(
@@ -1629,9 +1627,9 @@ def main(*args):
             commonsActive = True
         elif arg == '-duplicatesreport' or arg == '-duplicatereport':
             if arg == '-duplicatereport':
-                pywikibot.tools.issue_deprecation_warning('-duplicatereport',
-                                                          '-duplicatesreport',
-                                                          2)
+                issue_deprecation_warning('-duplicatereport',
+                                          '-duplicatesreport',
+                                          2, ArgumentDeprecationWarning)
             duplicatesReport = True
         elif arg.startswith('-duplicates'):
             duplicatesActive = True
