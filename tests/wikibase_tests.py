@@ -265,10 +265,12 @@ class TestWikibaseTypes(WikidataTestCase):
 
     def test_WbQuantity_fromWikibase(self):
         """Test WbQuantity.fromWikibase() instantiating."""
+        repo = self.get_repo()
         q = pywikibot.WbQuantity.fromWikibase({u'amount': u'+0.0229',
                                                u'lowerBound': u'0',
                                                u'upperBound': u'1',
-                                               u'unit': u'1'})
+                                               u'unit': u'1'},
+                                              site=repo)
         # note that the bounds are inputted as INT but are returned as FLOAT
         self.assertEqual(q.toWikibase(),
                          {'amount': '+0.0229', 'lowerBound': '+0.0000',
