@@ -2486,9 +2486,9 @@ class FilePage(Page):
             a boolean or an iterable. The callable gets a list of UploadWarning
             instances and the iterable should contain the warning codes for
             which an equivalent callable would return True if all UploadWarning
-            codes are in thet list. If the result is False it'll not continuing
+            codes are in thet list. If the result is False it'll not continue
             uploading the file and otherwise disable any warning and
-            reattempting to upload the file. NOTE: If report_success is True or
+            reattempt to upload the file. NOTE: If report_success is True or
             None it'll raise an UploadWarning exception if the static boolean is
             False.
         @type ignore_warnings: bool or callable or iterable of str
