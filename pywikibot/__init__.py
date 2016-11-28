@@ -701,6 +701,8 @@ class WbQuantity(_WbRepresentation):
 
         @param wb: Wikibase JSON
         @type wb: dict
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         @rtype: pywikibot.WbQuanity
         """
         amount = cls._todecimal(wb['amount'])
