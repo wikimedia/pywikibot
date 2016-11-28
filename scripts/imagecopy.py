@@ -95,9 +95,10 @@ import pywikibot
 
 from pywikibot import pagegenerators, config, i18n
 
+from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import PY2
 
-from scripts import image, upload
+from scripts import image
 
 if not PY2:
     import tkinter as Tkinter
@@ -292,11 +293,10 @@ class imageTransfer(threading.Thread):
                             'added categories -->', '')
             CH += u'[[Category:' + self.category + u']]'
 
-        bot = upload.UploadRobot(url=self.imagePage.fileUrl(), description=CH,
-                                 useFilename=self.newname, keepFilename=True,
-                                 verifyDescription=False, ignoreWarning=True,
-                                 targetSite=pywikibot.Site('commons',
-                                                           'commons'))
+        bot = UploadRobot(url=self.imagePage.fileUrl(), description=CH,
+                          useFilename=self.newname, keepFilename=True,
+                          verifyDescription=False, ignoreWarning=True,
+                          targetSite=pywikibot.Site('commons', 'commons'))
         bot.run()
 
         # Should check if the image actually was uploaded

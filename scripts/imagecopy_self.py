@@ -63,9 +63,10 @@ import pywikibot
 
 from pywikibot import pagegenerators, i18n
 
+from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import PY2
 
-from scripts import imagerecat, image, upload
+from scripts import imagerecat, image
 
 if not PY2:
     import tkinter as Tkinter
@@ -890,13 +891,12 @@ class uploader(threading.Thread):
         """Work on a single image."""
         cid = self.buildNewImageDescription(fields)
         pywikibot.output(cid)
-        bot = upload.UploadRobot(url=fields.get('imagepage').fileUrl(),
-                                 description=cid,
-                                 useFilename=fields.get('filename'),
-                                 keepFilename=True, verifyDescription=False,
-                                 ignoreWarning=True,
-                                 targetSite=pywikibot.Site('commons',
-                                                           'commons'))
+        bot = UploadRobot(url=fields.get('imagepage').fileUrl(),
+                          description=cid,
+                          useFilename=fields.get('filename'),
+                          keepFilename=True, verifyDescription=False,
+                          ignoreWarning=True,
+                          targetSite=pywikibot.Site('commons', 'commons'))
         bot.run()
 
         self.tagNowcommons(fields.get('imagepage'), fields.get('filename'))

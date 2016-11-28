@@ -25,7 +25,7 @@ Todo:
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikibot team, 2009-2014
+# (C) Pywikibot team, 2009-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,7 +59,7 @@ import pywikibot
 from pywikibot import config, textlib
 from pywikibot.comms.http import fetch
 
-from scripts import upload
+from pywikibot.specialbots import UploadRobot
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
@@ -330,11 +330,11 @@ def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
             # Would be nice to check before I upload if the file is already at Commons
             # Not that important for this program, but maybe for derived programs
             if not skip:
-                bot = upload.UploadRobot(photoUrl,
-                                         description=newPhotoDescription,
-                                         useFilename=newFilename,
-                                         keepFilename=True,
-                                         verifyDescription=False)
+                bot = UploadRobot(photoUrl,
+                                  description=newPhotoDescription,
+                                  useFilename=newFilename,
+                                  keepFilename=True,
+                                  verifyDescription=False)
                 bot.upload_image(debug=False)
                 return 1
     else:

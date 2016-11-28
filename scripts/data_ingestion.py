@@ -38,9 +38,8 @@ import pywikibot
 from pywikibot import pagegenerators
 
 from pywikibot.comms.http import fetch
+from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import deprecated, deprecated_args
-
-from scripts import upload
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
@@ -203,12 +202,12 @@ class DataIngestionBot(pywikibot.Bot):
         title = photo.getTitle(self.titlefmt)
         description = photo.getDescription(self.pagefmt)
 
-        bot = upload.UploadRobot(url=photo.URL,
-                                 description=description,
-                                 useFilename=title,
-                                 keepFilename=True,
-                                 verifyDescription=False,
-                                 targetSite=self.site)
+        bot = UploadRobot(url=photo.URL,
+                          description=description,
+                          useFilename=title,
+                          keepFilename=True,
+                          verifyDescription=False,
+                          targetSite=self.site)
         bot._contents = photo.downloadPhoto().getvalue()
         bot._retrieved = True
         bot.run()
