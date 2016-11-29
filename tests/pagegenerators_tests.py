@@ -864,6 +864,14 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen)
         self.assertPagesInNamespacesAll(gen, set([0, 1, 2]), skip=True)
 
+    def test_recentchanges_rctag(self):
+        """Test recentchanges generator with recent changes tag."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-recentchanges:visualeditor')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespacesAll(gen, set([0, 1, 2]), skip=True)
+
     def test_recentchanges_ns_default(self):
         """Test recentchanges generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)

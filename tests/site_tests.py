@@ -1314,6 +1314,16 @@ class TestRecentChanges(DefaultSiteTestCase):
             self.assertIsInstance(change, dict)
             self.assertNotIn("redirect", change)
 
+    def test_tag_filter(self):
+        """Test the site.recentchanges() with tag filter."""
+        mysite = self.site
+        for tag in ('visualeditor', 'mobile edit'):
+            for change in mysite.recentchanges(tag=tag, total=5):
+                self.assertIsInstance(change, dict)
+                self.assertIn('tags', change)
+                self.assertIsInstance(change['tags'], list)
+                self.assertIn(tag, change['tags'])
+
 
 class TestUserRecentChanges(DefaultSiteTestCase):
 
