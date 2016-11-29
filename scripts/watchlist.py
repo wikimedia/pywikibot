@@ -53,7 +53,7 @@ def isWatched(pageName, site=None):
 
 def refresh(site, sysop=False):
     """Fetch the watchlist."""
-    pywikibot.output(u'Retrieving watchlist for %s via API.' % str(site))
+    pywikibot.output('Retrieving watchlist for {0}.'.format(str(site)))
     return list(site.watched_pages(sysop=sysop, force=True))
 
 
