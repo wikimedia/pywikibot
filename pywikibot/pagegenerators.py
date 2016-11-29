@@ -50,6 +50,7 @@ from pywikibot.tools import (
 
 from pywikibot import date, config, i18n, xmlreader
 from pywikibot.exceptions import ArgumentDeprecationWarning, UnknownExtension
+from pywikibot.logentries import LogEntryFactory
 from pywikibot.proofreadpage import ProofreadPage
 
 if sys.version_info[0] > 2:
@@ -909,12 +910,19 @@ class GeneratorFactory(object):
             self.subpage_max_depth = int(value)
             return True
         elif arg == '-logevents':
-            gen = self._parse_log_events(*value.split(','))
+            params = value.split(',')
+            if params[0] not in LogEntryFactory.logtypes:
+                raise NotImplementedError(
+                    'Invalid -logevents parameter "{0}"'.format(params[0]))
+            gen = self._parse_log_events(*params)
         elif arg.startswith('-'):
             mode, log, tail = arg.partition('log')
             # exclude -log, -nolog
             if log == 'log' and mode not in ['-', '-no'] and not tail:
-                mode = mode[1:]
+                logtype = mode[1:]
+                if logtype not in LogEntryFactory.logtypes:
+                    raise NotImplementedError(
+                        'Invalid logevent option "{0}log"'.format(mode))
                 total = 500
                 if value:
                     try:
@@ -932,9 +940,9 @@ class GeneratorFactory(object):
                 issue_deprecation_warning(
                     'The usage of "{0}"'.format(arg),
                     '-logevents:"{0}"'.format(
-                        ','.join((mode, value or '', str(total)))),
+                        ','.join((logtype, value or '', str(total)))),
                     2, ArgumentDeprecationWarning)
-                gen = self._parse_log_events(mode, value, total)
+                gen = self._parse_log_events(logtype, value, total)
 
         if gen:
             self.gens.append(gen)
