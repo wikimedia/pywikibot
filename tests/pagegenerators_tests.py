@@ -854,7 +854,11 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         self.assertRaises(ValueError, gf.handleArg, '-recentchanges:3,2,1')
-        self.assertRaises(ValueError, gf.handleArg, '-recentchanges:-10,20')
+        self.assertRaises(ValueError, gf.handleArg, '-recentchanges:12,-12')
+        self.assertRaises(
+            ValueError, gf.handleArg, '-recentchanges:visualeditor,3,2,1')
+        self.assertRaises(
+            ValueError, gf.handleArg, '-recentchanges:"mobile edit,-10,20"')
 
     def test_recentchanges_default(self):
         """Test recentchanges generator with default setting."""
