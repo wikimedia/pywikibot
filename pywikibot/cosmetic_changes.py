@@ -521,8 +521,7 @@ class CosmeticChangesToolkit(object):
                     # instead of a pipelink
                     elif (len(titleWithSection) <= len(label) and
                           label[:len(titleWithSection)] == titleWithSection and
-                          re.sub(trailR, '',
-                                 label[len(titleWithSection):]) == ''):
+                          trailR.sub('', label[len(titleWithSection):]) == ''):
                         newLink = "[[%s]]%s" % (label[:len(titleWithSection)],
                                                 label[len(titleWithSection):])
                     else:
