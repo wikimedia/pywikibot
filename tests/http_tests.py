@@ -24,7 +24,7 @@ from pywikibot.tools import (
 )
 
 from tests import join_images_path
-from tests.aspects import unittest, TestCase, DeprecationTestCase
+from tests.aspects import unittest, TestCase, DeprecationTestCase, require_modules
 
 
 class HttpTestCase(TestCase):
@@ -283,6 +283,57 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertNotIn(';)', http.user_agent())
         self.assertIn('requests/', http.user_agent())
         self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
+
+
+class FakeUserAgentTestCase(TestCase):
+
+    """Test the generation of fake user agents.
+
+    If the method cannot import either browseragents or fake_useragent, the
+    default user agent will be returned, causing tests to fail. Therefore tests
+    will skip if neither is present.
+    """
+
+    net = False
+
+    def setUp(self):
+        """Set up unit test."""
+        self.orig_fake_user_agent = config.fake_user_agent
+
+    def tearDown(self):
+        """Tear down unit test."""
+        config.fake_user_agent = self.orig_fake_user_agent
+
+    def _test_fake_user_agent_config(self):
+        """Test if method honours configuration toggle."""
+        # ON: True and None in config are considered turned on.
+        config.fake_user_agent = True
+        self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
+        config.fake_user_agent = None
+        self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
+
+        # OFF: All other values won't make it return random UA.
+        config.fake_user_agent = False
+        self.assertEqual(http.get_fake_user_agent(), http.user_agent())
+        config.fake_user_agent = 'ArbitraryValue'
+        self.assertEqual(http.get_fake_user_agent(), 'ArbitraryValue')
+
+    def _test_fake_user_agent_randomness(self):
+        """Test if user agent returns are randomized."""
+        config.fake_user_agent = True
+        self.assertNotEqual(http.get_fake_user_agent(), http.get_fake_user_agent())
+
+    @require_modules('browseragents')
+    def test_with_browseragents(self):
+        """Test fake user agent generation with browseragents module."""
+        self._test_fake_user_agent_config()
+        self._test_fake_user_agent_randomness()
+
+    @require_modules('fake_useragent')
+    def test_with_fake_useragent(self):
+        """Test fake user agent generation with fake_useragent module."""
+        self._test_fake_user_agent_config()
+        self._test_fake_user_agent_randomness()
 
 
 class CharsetTestCase(TestCase):
