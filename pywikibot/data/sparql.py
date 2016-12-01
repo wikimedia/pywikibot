@@ -65,13 +65,17 @@ class SparqlQuery(object):
             for row in data['results']['bindings']:
                 values = {}
                 for var in qvars:
-                    if full_data:
-                        if row[var]['type'] not in VALUE_TYPES:
-                            raise ValueError('Unknown type: %s' % row[var]['type'])
-                        valtype = VALUE_TYPES[row[var]['type']]
-                        values[var] = valtype(row[var], entity_url=self.entity_url)
+                    if var in row:
+                        if full_data:
+                            if row[var]['type'] not in VALUE_TYPES:
+                                raise ValueError('Unknown type: %s' % row[var]['type'])
+                            valtype = VALUE_TYPES[row[var]['type']]
+                            values[var] = valtype(row[var], entity_url=self.entity_url)
+                        else:
+                            values[var] = row[var]['value']
                     else:
-                        values[var] = row[var]['value']
+                        # var is not available (OPTIONAL is probably used)
+                        values[var] = None
                 result.append(values)
             return result
         else:
