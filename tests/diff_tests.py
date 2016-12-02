@@ -11,7 +11,7 @@ __version__ = '$Id$'
 
 import sys
 
-from pywikibot.diff import html_comparator
+from pywikibot.diff import html_comparator, PatchManager
 from pywikibot.tools import PY2
 
 from tests import join_html_data_path
@@ -97,7 +97,7 @@ class TestHTMLComparator(TestCase):
        side_effect=ImportError, autospec=True)
 class TestNoBeautifulSoup(TestCase):
 
-    """Test functions when BeautifulSoup is not installes."""
+    """Test functions when BeautifulSoup is not installed."""
 
     net = False
 
@@ -106,6 +106,90 @@ class TestNoBeautifulSoup(TestCase):
         self.assertRaises(ImportError, html_comparator, '')
         self.assertEqual(mocked_import.call_count, 1)
         self.assertIn('bs4', mocked_import.call_args[0])
+
+
+class TestPatchManager(TestCase):
+
+    """Test PatchManager class with given strings as test cases."""
+
+    net = False
+
+    # each tuple: (before, after, expected hunks
+    cases = [(' test',
+              '_test',
+              {0: '@@ -1 +1 @@\n\n'
+                  '-  test\n'
+                  '? ^\n'
+                  '+ _test\n'
+                  '? ^\n'}),
+             ('The quick brown fox jumps over the lazy dog.',
+              'quick brown dog jumps quickly over the lazy fox.',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- The quick brown fox jumps over the lazy dog.\n'
+                  '? ----            ^ ^                     ^ ^\n'
+                  '+ quick brown dog jumps quickly over the lazy fox.\n'
+                  '?             ^ ^       ++++++++              ^ ^\n'}),
+             ('spam',
+              'eggs',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- spam\n'
+                  '+ eggs\n'}),
+             ('Lorem\n'
+              'ipsum\n'
+              'dolor',
+              'Quorem\n'
+              'ipsum\n'
+              'dolom',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- Lorem\n'
+                  '? ^\n'
+                  '+ Quorem\n'
+                  '? ^^\n',
+               1: '@@ -3 +3 @@\n\n'
+                  '- dolor\n'
+                  '?     ^\n'
+                  '+ dolom\n'
+                  '?     ^\n'}),
+             ('.foola.Pywikipediabot',
+              '.foo.Pywikipediabot.foo.',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- .foola.Pywikipediabot\n'
+                  '?     --\n'
+                  '+ .foo.Pywikipediabot.foo.\n'
+                  '?                    +++++\n'}),
+             ('{foola}Pywikipediabot',
+              '{foo}Pywikipediabot{foo}',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- {foola}Pywikipediabot\n'
+                  '?     --\n'
+                  '+ {foo}Pywikipediabot{foo}\n'
+                  '?                    +++++\n'}),
+             ('{default}Foo bar Pywikipediabot foo bar',
+              '{default}Foo  bar  Pywikipediabot  foo  bar',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- {default}Foo bar Pywikipediabot foo bar\n'
+                  '+ {default}Foo  bar  Pywikipediabot  foo  bar\n'
+                  '?              +   +                +    +\n'}),
+             ('Pywikipediabot foo',
+              'Pywikipediabot  foo',
+              {0: '@@ -1 +1 @@\n\n'
+                  '- Pywikipediabot foo\n'
+                  '+ Pywikipediabot  foo\n'
+                  '?                +\n'}),
+             ('  Pywikipediabot    ',
+              '   Pywikipediabot   ',
+              {0: '@@ -1 +1 @@\n\n'
+                  '-   Pywikipediabot    \n'
+                  '?                    -\n'
+                  '+    Pywikipediabot   \n'
+                  '? +\n'})]
+
+    def test_patch_manager(self):
+        """Test PatchManager."""
+        for case in self.cases:
+            p = PatchManager(case[0], case[1])
+            for key in case[2].keys():  # for each hunk
+                self.assertEqual(p.hunks[key].diff_plain_text, case[2][key])
 
 
 if __name__ == '__main__':  # pragma: no cover
