@@ -17,7 +17,9 @@ Command line options:
 
 -subst       Resolves the template by putting its text directly into the
              article. This is done by changing {{...}} or {{msg:...}} into
-             {{subst:...}}
+             {{subst:...}}.
+             Substitution is not available inside <ref>...</ref>,
+             <gallery>...</gallery> and <poem>...</poem> tags.
 
 -assubst     Replaces the first argument as old template with the second
              argument as new template but substitutes it like -subst does.
@@ -221,11 +223,11 @@ class TemplateRobot(ReplaceBot):
             if self.getOption('subst') and self.getOption('remove'):
                 replacements.append((templateRegex,
                                      r'{{subst:%s\g<parameters>}}' % new))
-                exceptions['inside-tags'] = ['ref', 'gallery']
+                exceptions['inside-tags'] = ['ref', 'gallery', 'poem']
             elif self.getOption('subst'):
                 replacements.append((templateRegex,
                                      r'{{subst:%s\g<parameters>}}' % old))
-                exceptions['inside-tags'] = ['ref', 'gallery']
+                exceptions['inside-tags'] = ['ref', 'gallery', 'poem']
             elif self.getOption('remove'):
                 replacements.append((templateRegex, ''))
             else:
