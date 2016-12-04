@@ -38,10 +38,11 @@ except ImportError as e:
 
 if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
-    from urllib.parse import quote
+    from urllib.parse import quote, urlparse
 else:
     import cookielib
     from urllib2 import quote
+    from urlparse import urlparse
 
 from pywikibot import config
 
@@ -53,6 +54,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
+    deprecated,
     deprecate_arg,
     file_mode_checker,
     issue_deprecation_warning,
@@ -234,31 +236,43 @@ def user_agent(site=None, format_string=None):
     return formatted
 
 
+@deprecated('pywikibot.comms.http.fake_user_agent')
 def get_fake_user_agent():
     """
-    Return a user agent to be used when faking a web browser.
+    Return a fake user agent depending on `fake_user_agent` option in config.
+
+    Deprecated, use fake_user_agent() instead.
 
     @rtype: str
     """
-    # Check fake_user_agent configuration variable
     if isinstance(config.fake_user_agent, StringTypes):
-        return pywikibot.config2.fake_user_agent
+        return config.fake_user_agent
+    elif config.fake_user_agent or config.fake_user_agent is None:
+        return fake_user_agent()
+    else:
+        return user_agent()
 
-    if config.fake_user_agent is None or config.fake_user_agent is True:
-        try:
-            import browseragents
-            return browseragents.core.random()
-        except ImportError:
-            pass
 
-        try:
-            import fake_useragent
-            return fake_useragent.fake.UserAgent().random
-        except ImportError:
-            pass
+def fake_user_agent():
+    """
+    Return a fake user agent.
 
-    # Use the default real user agent
-    return user_agent()
+    @rtype: str
+    """
+    try:
+        import browseragents
+        return browseragents.core.random()
+    except ImportError:
+        pass
+
+    try:
+        import fake_useragent
+        return fake_useragent.fake.UserAgent().random
+    except ImportError:
+        pass
+
+    raise ImportError(  # Actually complain when neither is installed.
+        'Either browseragents or fake_useragent must be installed to get fake UAs.')
 
 
 @deprecate_arg('ssl', None)
@@ -443,7 +457,7 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
 
 
 def fetch(uri, method="GET", body=None, headers=None,
-          default_error_handling=True, **kwargs):
+          default_error_handling=True, use_fake_user_agent=False, **kwargs):
     """
     Blocking HTTP request.
 
@@ -454,8 +468,27 @@ def fetch(uri, method="GET", body=None, headers=None,
 
     @param default_error_handling: Use default error handling
     @type default_error_handling: bool
+    @type use_fake_user_agent: bool, str
+    @param use_fake_user_agent: Set to True to use fake UA, False to use
+        pywikibot's UA, str to specify own UA. This behaviour might be
+        overridden by domain in config.
     @rtype: L{threadedhttp.HttpRequest}
     """
+    # Change user agent depending on fake UA settings.
+    # Set header to new UA if needed.
+    headers = headers or {}
+    if not headers.get('user-agent', None):  # Skip if already specified in request.
+        # Get fake UA exceptions from `fake_user_agent_exceptions` config.
+        uri_domain = urlparse(uri).netloc
+        use_fake_user_agent = config.fake_user_agent_exceptions.get(
+            uri_domain, use_fake_user_agent)
+
+        if use_fake_user_agent and isinstance(
+                use_fake_user_agent, StringTypes):  # Custom UA.
+            headers['user-agent'] = use_fake_user_agent
+        elif use_fake_user_agent is True:
+            headers['user-agent'] = fake_user_agent()
+
     request = _enqueue(uri, method, body, headers, **kwargs)
     assert(request._data is not None)  # if there's no data in the answer we're in trouble
     # Run the error handling callback in the callers thread so exceptions

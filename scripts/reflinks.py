@@ -59,6 +59,7 @@ from functools import partial
 import pywikibot
 
 from pywikibot import comms, i18n, pagegenerators, textlib, Bot
+from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
@@ -395,8 +396,7 @@ class ReferencesRobot(Bot):
         super(ReferencesRobot, self).__init__(**kwargs)
         self.generator = generator
         self.site = pywikibot.Site()
-        self._user_agent = comms.http.get_fake_user_agent()
-        pywikibot.log('Using fake user agent: {0}'.format(self._user_agent))
+        self._use_fake_user_agent = config.fake_user_agent_default.get('reflinks', False)
         # Check
         manual = 'mw:Manual:Pywikibot/refLinks'
         code = None
@@ -494,7 +494,6 @@ class ReferencesRobot(Bot):
             raise
 
         editedpages = 0
-        headers = {'user-agent': self._user_agent}
         for page in self.generator:
             try:
                 # Load the page's text from the wiki
@@ -526,10 +525,11 @@ class ReferencesRobot(Bot):
                 f = None
 
                 try:
-                    f = requests.get(ref.url, headers=headers, timeout=60)
+                    f = comms.http.fetch(
+                        ref.url, use_fake_user_agent=self._use_fake_user_agent)
 
                     # Try to get Content-Type from server
-                    contentType = f.headers.get('content-type')
+                    contentType = f.response_headers.get('content-type')
                     if contentType and not self.MIME.search(contentType):
                         if ref.link.lower().endswith('.pdf') and \
                            not self.getOption('ignorepdf'):
@@ -556,7 +556,7 @@ class ReferencesRobot(Bot):
                         continue
 
                     # Get the real url where we end (http redirects !)
-                    redir = f.url
+                    redir = f.data.url
                     if redir != ref.link and \
                        domain.findall(redir) == domain.findall(link):
                         if soft404.search(redir) and \
@@ -572,15 +572,15 @@ class ReferencesRobot(Bot):
                                 u'Redirect to root : {0} ', ref.link))
                             continue
 
-                    if f.status_code != requests.codes.ok:
+                    if f.status != requests.codes.ok:
                         pywikibot.output(u'HTTP error (%s) for %s on %s'
-                                         % (f.status_code, ref.url,
+                                         % (f.status, ref.url,
                                             page.title(asLink=True)),
                                          toStdout=True)
                         # 410 Gone, indicates that the resource has been purposely
                         # removed
-                        if f.status_code == 410 or \
-                           (f.status_code == 404 and (u'\t%s\t' % ref.url in deadLinks)):
+                        if f.status == 410 or \
+                           (f.status == 404 and (u'\t%s\t' % ref.url in deadLinks)):
                             repl = ref.refDead()
                             new_text = new_text.replace(match.group(), repl)
                         continue

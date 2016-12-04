@@ -93,7 +93,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
 _private_values = ['authenticate', 'proxy', 'db_password']
 _deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
-                         'available_ssl_project']
+                         'available_ssl_project', 'fake_user_agent']
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -137,16 +137,22 @@ disambiguation_comment = collections.defaultdict(dict)
 user_agent_format = ('{script_product} ({script_comments}) {pwb} ({revision}) '
                      '{http_backend} {python}')
 
-# Fake user agent
-# Used to retrieve pages in reflinks.py,
-# to work around user-agent sniffing webpages
-# When None or True,
-# Use random user agent if either browseragents or fake_useragent
-# packages are installed
-# Otherwise use pywikibot.comms.http.user_agent()
-# When set to False,
-# disables use of automatic user agents
-fake_user_agent = None
+# Fake user agent.
+# Some external websites reject bot-like user agents. It is possible to use
+# fake user agents in requests to these websites.
+# It is recommended to default this to False and use on an as-needed basis.
+#
+# Default behaviours in modules that can utilize fake UAs.
+# True for enabling fake UA, False for disabling / using pywikibot's own UA, str
+# to specify custom UA.
+fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
+# Website domains excepted to the default behaviour.
+# True for enabling, False for disabling, str to hardcode a UA.
+# Example: {'problematic.site.example': True,
+#           'prefers.specific.ua.example': 'snakeoil/4.2'}
+fake_user_agent_exceptions = {}
+# This following option is deprecated in favour of finer control options above.
+fake_user_agent = False
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
