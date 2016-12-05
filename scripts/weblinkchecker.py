@@ -279,6 +279,8 @@ class LinkChecker(object):
     Returns a (boolean, string) tuple saying if the page is online and including
     a status reason.
 
+    Per-domain user-agent faking is not supported in this deprecated class.
+
     Warning: Also returns false if your Internet connection isn't working
     correctly! (This will give a Socket Error)
 
@@ -292,11 +294,19 @@ class LinkChecker(object):
         redirectChain is a list of redirects which were resolved by
         resolveRedirect(). This is needed to detect redirect loops.
         """
-        self._user_agent = comms.http.get_fake_user_agent()
         self.url = url
         self.serverEncoding = serverEncoding
+
+        fake_ua_config = config.fake_user_agent_default.get(
+            'weblinkchecker', False)
+        if fake_ua_config and isinstance(fake_ua_config, str):
+            user_agent = fake_ua_config
+        elif fake_ua_config:
+            user_agent = comms.http.fake_user_agent()
+        else:
+            user_agent = comms.http.user_agent()
         self.header = {
-            'User-agent': self._user_agent,
+            'user-agent': user_agent,
             'Accept': 'text/xml,application/xml,application/xhtml+xml,'
                       'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
             'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
@@ -542,10 +552,8 @@ class LinkCheckThread(threading.Thread):
         threading.Thread.__init__(self)
         self.page = page
         self.url = url
-        self._user_agent = comms.http.get_fake_user_agent()
         self.history = history
         self.header = {
-            'User-agent': self._user_agent,
             'Accept': 'text/xml,application/xml,application/xhtml+xml,'
                       'text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5',
             'Accept-Language': 'de-de,de;q=0.8,en-us;q=0.5,en;q=0.3',
@@ -557,6 +565,8 @@ class LinkCheckThread(threading.Thread):
         self.setName((u'%s - %s' % (page.title(), url)).encode('utf-8',
                                                                'replace'))
         self.HTTPignore = HTTPignore
+        self._use_fake_user_agent = config.fake_user_agent_default.get(
+            'weblinkchecker', False)
         self.day = day
 
     def run(self):
@@ -564,8 +574,8 @@ class LinkCheckThread(threading.Thread):
         ok = False
         try:
             header = self.header
-            timeout = pywikibot.config.socket_timeout
-            r = requests.get(self.url, headers=header, timeout=timeout)
+            r = comms.http.fetch(
+                self.url, headers=header, use_fake_user_agent=self._use_fake_user_agent)
         except requests.exceptions.InvalidURL:
             message = i18n.twtranslate(self.page.site,
                                        'weblinkchecker-badurl_msg',
@@ -574,11 +584,11 @@ class LinkCheckThread(threading.Thread):
             pywikibot.output('Exception while processing URL %s in page %s'
                              % (self.url, self.page.title()))
             raise
-        if (r.status_code == requests.codes.ok and
-                str(r.status_code) not in self.HTTPignore):
+        if (r.status == requests.codes.ok and
+                str(r.status) not in self.HTTPignore):
             ok = True
         else:
-            message = '{0} {1}'.format(r.status_code, r.reason)
+            message = '{0}'.format(r.status)
         if ok:
             if self.history.setLinkAlive(self.url):
                 pywikibot.output('*Link to %s in [[%s]] is back alive.'

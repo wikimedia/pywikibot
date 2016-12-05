@@ -285,7 +285,7 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
 
 
-class FakeUserAgentTestCase(TestCase):
+class DryFakeUserAgentTestCase(TestCase):
 
     """Test the generation of fake user agents.
 
@@ -296,15 +296,96 @@ class FakeUserAgentTestCase(TestCase):
 
     net = False
 
+    def _test_fake_user_agent_randomness(self):
+        """Test if user agent returns are randomized."""
+        self.assertNotEqual(http.fake_user_agent(), http.fake_user_agent())
+
+    @require_modules('browseragents')
+    def test_with_browseragents(self):
+        """Test fake user agent generation with browseragents module."""
+        self._test_fake_user_agent_randomness()
+
+    @require_modules('fake_useragent')
+    def test_with_fake_useragent(self):
+        """Test fake user agent generation with fake_useragent module."""
+        self._test_fake_user_agent_randomness()
+
+
+class LiveFakeUserAgentTestCase(TestCase):
+
+    """Test the usage of fake user agent."""
+
+    sites = {
+        'httpbin': {
+            'hostname': 'httpbin.org',
+        },
+    }
+
+    def setUp(self):
+        """Set up the unit test."""
+        self.orig_fake_user_agent_exceptions = config.fake_user_agent_exceptions
+        super(LiveFakeUserAgentTestCase, self).setUp()
+
+    def tearDown(self):
+        """Tear down unit test."""
+        config.fake_user_agent_exceptions = self.orig_fake_user_agent_exceptions
+        super(LiveFakeUserAgentTestCase, self).tearDown()
+
+    def _test_fetch_use_fake_user_agent(self):
+        """Test `use_fake_user_agent` argument of http.fetch."""
+        # Existing headers
+        r = http.fetch(
+            'http://httpbin.org/status/200', headers={'user-agent': 'EXISTING'})
+        self.assertEqual(r.headers['user-agent'], 'EXISTING')
+
+        # Argument value changes
+        r = http.fetch('http://httpbin.org/status/200', use_fake_user_agent=True)
+        self.assertNotEqual(r.headers['user-agent'], http.user_agent())
+        r = http.fetch('http://httpbin.org/status/200', use_fake_user_agent=False)
+        self.assertEqual(r.headers['user-agent'], http.user_agent())
+        r = http.fetch(
+            'http://httpbin.org/status/200', use_fake_user_agent='ARBITRARY')
+        self.assertEqual(r.headers['user-agent'], 'ARBITRARY')
+
+        # Manually overridden domains
+        config.fake_user_agent_exceptions = {'httpbin.org': 'OVERRIDDEN'}
+        r = http.fetch(
+            'http://httpbin.org/status/200', use_fake_user_agent=False)
+        self.assertEqual(r.headers['user-agent'], 'OVERRIDDEN')
+
+    @require_modules('browseragents')
+    def test_fetch_with_browseragents(self):
+        """Test method with browseragents module."""
+        self._test_fetch_use_fake_user_agent()
+
+    @require_modules('fake_useragent')
+    def test_fetch_with_fake_useragent(self):
+        """Test method with fake_useragent module."""
+        self._test_fetch_use_fake_user_agent()
+
+
+class GetFakeUserAgentTestCase(TestCase):
+
+    """Test the deprecated get_fake_user_agent()."""
+
+    net = False
+
     def setUp(self):
         """Set up unit test."""
         self.orig_fake_user_agent = config.fake_user_agent
+        super(GetFakeUserAgentTestCase, self).setUp()
 
     def tearDown(self):
         """Tear down unit test."""
         config.fake_user_agent = self.orig_fake_user_agent
+        super(GetFakeUserAgentTestCase, self).tearDown()
 
-    def _test_fake_user_agent_config(self):
+    def _test_fake_user_agent_randomness(self):
+        """Test if user agent returns are randomized."""
+        config.fake_user_agent = True
+        self.assertNotEqual(http.get_fake_user_agent(), http.get_fake_user_agent())
+
+    def _test_config_settings(self):
         """Test if method honours configuration toggle."""
         # ON: True and None in config are considered turned on.
         config.fake_user_agent = True
@@ -315,25 +396,20 @@ class FakeUserAgentTestCase(TestCase):
         # OFF: All other values won't make it return random UA.
         config.fake_user_agent = False
         self.assertEqual(http.get_fake_user_agent(), http.user_agent())
-        config.fake_user_agent = 'ArbitraryValue'
-        self.assertEqual(http.get_fake_user_agent(), 'ArbitraryValue')
-
-    def _test_fake_user_agent_randomness(self):
-        """Test if user agent returns are randomized."""
-        config.fake_user_agent = True
-        self.assertNotEqual(http.get_fake_user_agent(), http.get_fake_user_agent())
+        config.fake_user_agent = 'ARBITRARY'
+        self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
 
     @require_modules('browseragents')
     def test_with_browseragents(self):
-        """Test fake user agent generation with browseragents module."""
-        self._test_fake_user_agent_config()
+        """Test method with browseragents module."""
         self._test_fake_user_agent_randomness()
+        self._test_config_settings()
 
     @require_modules('fake_useragent')
     def test_with_fake_useragent(self):
-        """Test fake user agent generation with fake_useragent module."""
-        self._test_fake_user_agent_config()
+        """Test method with fake_useragent module."""
         self._test_fake_user_agent_randomness()
+        self._test_config_settings()
 
 
 class CharsetTestCase(TestCase):
