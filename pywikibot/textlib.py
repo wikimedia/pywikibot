@@ -403,9 +403,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                         replacement += new[last:group_match.start()]
                         replacement += match.group(group_id) or ''
                     except IndexError:
-                        pywikibot.output('\nInvalid group reference: %s' % group_id)
-                        pywikibot.output('Groups found:\n%s' % match.groups())
-                        raise IndexError
+                        raise IndexError(
+                            'Invalid group reference: {0}\nGroups found: {1}'
+                            ''.format(group_id, match.groups()))
                     last = group_match.end()
                 replacement += new[last:]
 
