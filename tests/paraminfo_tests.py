@@ -81,20 +81,9 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.24'):
             types.append('unread')
 
-        ores_installed = {
-            'wikipedia': ('en', 'fa', 'nl', 'pl', 'pt', 'ru', 'tr'),
-            'wikidata': ('en',),
-        }
-
-        if (
-            self.site.family in ores_installed and
-            self.site.lang in ores_installed[self.site.family]
-        ):
-            types.append('oresreview')
-
         known = types + ['!%s' % item for item in types]
 
-        self._check_param_values(self.site, 'query+watchlist', 'show', known)
+        self._check_param_subset(self.site, 'query+watchlist', 'show', known)
 
     def test_watchlist_type(self):
         """Test watchlist type."""
