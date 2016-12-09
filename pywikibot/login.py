@@ -91,9 +91,12 @@ class LoginManager(object):
         if user:
             self.username = user
         elif sysop:
+            config_names = config.sysopnames
+            family_sysopnames = (
+                config_names[self.site.family.name] or config_names['*']
+            )
+            self.username = family_sysopnames.get(self.site.code, None)
             try:
-                family_sysopnames = config.sysopnames[self.site.family.name]
-                self.username = family_sysopnames.get(self.site.code, None)
                 self.username = self.username or family_sysopnames['*']
             except KeyError:
                 raise NoUsername(u"""\
@@ -104,11 +107,14 @@ sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                  % {'fam_name': self.site.family.name,
                                     'wiki_code': self.site.code})
         else:
+            config_names = config.usernames
+            family_usernames = (
+                config_names[self.site.family.name] or config_names['*']
+            )
+            self.username = family_usernames.get(self.site.code, None)
             try:
-                family_usernames = config.usernames[self.site.family.name]
-                self.username = family_usernames.get(self.site.code, None)
                 self.username = self.username or family_usernames['*']
-            except:
+            except KeyError:
                 raise NoUsername(u"""\
 ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have an account for that site, please add a line to user-config.py:

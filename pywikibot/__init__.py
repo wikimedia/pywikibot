@@ -827,13 +827,16 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
     interface = interface or fam.interface(code)
 
-    # config.usernames is initialised with a dict for each family name
+    # config.usernames is initialised with a defaultdict for each family name
     family_name = str(fam)
-    if family_name in config.usernames:
-        user = user or config.usernames[family_name].get(code) \
-            or config.usernames[family_name].get('*')
-        sysop = sysop or config.sysopnames[family_name].get(code) \
-            or config.sysopnames[family_name].get('*')
+
+    code_to_user = config.usernames['*'].copy()
+    code_to_user.update(config.usernames[family_name])
+    user = user or code_to_user.get(code) or code_to_user.get('*')
+
+    code_to_sysop = config.sysopnames['*'].copy()
+    code_to_sysop.update(config.sysopnames[family_name])
+    sysop = sysop or code_to_sysop.get(code) or code_to_sysop.get('*')
 
     if not isinstance(interface, type):
         # If it isnt a class, assume it is a string
