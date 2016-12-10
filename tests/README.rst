@@ -226,6 +226,68 @@ To enable 'write' tests, set PYWIKIBOT2_TEST_WRITE=1
 Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
 automatically.
 
+Decorators
+=====================
+
+pywikibot's test suite, including Python's unittest module, provides decorators
+to modify the behaviour of the test cases.
+
+@unittest.skipIf
+-----------------
+Skip a test if the condition is true. Refer to unittest's documentation.
+
+::
+
+  import unittest
+  [......]
+  @unittest.skipIf(check_if_fatal(), 'Something is not okay.')
+  def test_skipIf(self):
+
+@unittest.skipUnless
+---------------------
+Skip a test unless the condition is true. Refer to unittest's documentation.
+
+::
+
+  import unittest
+  [......]
+  @unittest.skipUnless(check_if_true(), 'Something must happen.')
+  def test_skipUnless(self):
+
+@tests.aspects.require_modules
+-------------------------------
+Require that the given list of modules can be imported.
+
+::
+
+  from tests.aspects import require_modules
+  [......]
+  @require_modules(['important1', 'musthave2'])
+  def test_require_modules(self):
+
+@(unittest.)mock.patch
+-----------------------
+Replaces `target` with object specified in `new`. Refer to mock's documentation.
+This is especially useful in tests, where requests to third-parties should be
+avoided.
+
+In Python 3, this is part of the built-in unittest module.
+
+::
+
+  if sys.version_info[0] > 2:
+    from unittest.mock import patch
+  else:
+    from mock import patch
+
+
+  def fake_ping(url):
+    return 'pong'
+  [......]
+  @patch('http_ping', side_effect=fake_ping)
+  def test_patch(self):
+    self.assertEqual('pong', http_ping())
+
 Contributing tests
 ==================
 
@@ -293,4 +355,3 @@ Other class attributes
 - ``user = True`` : test class needs to login to site
 - ``sysop = True`` : test class needs to login to site as a sysop
 - ``write = True`` : test class needs to write to a site
-
