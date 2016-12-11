@@ -54,6 +54,8 @@ class MWSite(object):
         r = fetch(fromurl)
         if r.status == 503:
             raise ServerError('Service Unavailable')
+        elif r.status == 500:
+            raise ServerError('Internal Server Error')
 
         if fromurl != r.data.url:
             pywikibot.log('{0} redirected to {1}'.format(fromurl, r.data.url))
