@@ -9,7 +9,7 @@ Run scripts using:
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
 """
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -212,6 +212,14 @@ def main():
             script_paths = ['scripts',
                             'scripts.maintenance',
                             'scripts.archive']
+            from pywikibot import config  # flake8: disable=E402
+            if config.user_script_paths:
+                if isinstance(config.user_script_paths, (tuple, list)):
+                    script_paths = config.user_script_paths + script_paths
+                else:
+                    warn("'user_script_paths' must be a list or tuple,\n"
+                         'found: {0}. Ignoring this setting.'
+                         ''.format(type(config.user_script_paths)))
             for file_package in script_paths:
                 paths = file_package.split('.') + [filename]
                 testpath = os.path.join(_pwb_dir, *paths)

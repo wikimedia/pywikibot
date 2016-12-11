@@ -255,6 +255,7 @@ def create_user_config(args=None, force=False):
 
         res = re.findall("^(# ############# (?:"
                          "LOGFILE|"
+                         'EXTERNAL SCRIPT PATH|'
                          "INTERWIKI|"
                          "SOLVE_DISAMBIGUATION|"
                          "IMAGE RELATED|"
