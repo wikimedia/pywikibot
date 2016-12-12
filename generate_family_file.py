@@ -64,7 +64,7 @@ class FamilyFileGenerator(object):
         print("Generating family file from %s" % self.base_url)
 
         w = Wiki(self.base_url)
-        self.wikis[w.iwpath] = w
+        self.wikis[w.lang] = w
         print()
         print("==================================")
         print("api url: %s" % w.api)
@@ -122,9 +122,9 @@ class FamilyFileGenerator(object):
         print("Loading wikis... ")
         for lang in self.langs:
             print("  * %s... " % (lang[u'prefix']), end="")
-            if lang[u'url'] not in self.wikis:
+            if lang['prefix'] not in self.wikis:
                 try:
-                    self.wikis[lang[u'url']] = Wiki(lang[u'url'])
+                    self.wikis[lang['prefix']] = Wiki(lang['url'])
                     print("downloaded")
                 except Exception as e:
                     print(e)
@@ -167,38 +167,37 @@ class Family(family.Family):
         self.langs = {
 """.lstrip() % {'url': self.base_url, 'name': self.name})
 
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             f.write("            '%(lang)s': '%(hostname)s',\n"
-                    % {'lang': w.lang, 'hostname': urlparse(w.server).netloc})
+                    % {'lang': k, 'hostname': urlparse(w.server).netloc})
 
         f.write("        }\n\n")
-
         f.write("    def scriptpath(self, code):\n")
         f.write("        return {\n")
 
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             f.write("            '%(lang)s': '%(path)s',\n"
-                    % {'lang': w.lang, 'path': w.scriptpath})
+                    % {'lang': k, 'path': w.scriptpath})
         f.write("        }[code]\n")
         f.write("\n")
 
         f.write("    @deprecated('APISite.version()')\n")
         f.write("    def version(self, code):\n")
         f.write("        return {\n")
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             if w.version is None:
-                f.write("            '%(lang)s': None,\n" % {'lang': w.lang})
+                f.write("            '%(lang)s': None,\n" % {'lang': k})
             else:
                 f.write("            '%(lang)s': u'%(ver)s',\n"
-                        % {'lang': w.lang, 'ver': w.version})
+                        % {'lang': k, 'ver': w.version})
         f.write("        }[code]\n")
 
         f.write("\n")
         f.write("    def protocol(self, code):\n")
         f.write("        return {\n")
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             f.write("            '%(lang)s': u'%(protocol)s',\n"
-                    % {'lang': w.lang, 'protocol': urlparse(w.server).scheme})
+                    % {'lang': k, 'protocol': urlparse(w.server).scheme})
         f.write("        }[code]\n")
 
 
