@@ -5930,6 +5930,12 @@ class APISite(BaseSite):
                                  '"%(msg)s".',
             'bad-prefix': 'Target filename has a bad prefix %(msg)s.',
             'page-exists': 'Target filename exists but with a different file %(msg)s.',
+
+            # API-returned message string will be timestamps, not much use here
+            'nochange': 'The upload is an exact duplicate of the current version of '
+                        'this file.',
+            'duplicateversions': 'The upload is an exact duplicate of older '
+                                 'version(s) of this file.',
         }
 
         # An offset != 0 doesn't make sense without a file key
