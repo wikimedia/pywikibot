@@ -39,10 +39,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
         super(Family, self).__init__()
 
-        # FIXME: '-' is invalid at the beginning of a hostname, and
-        # '-' is not a valid subdomain.
-        self.langs['-'] = self.domain
-        self.languages_by_size.append('-')
+        # All requests to 'mul.wikisource.org/*' are redirected to
+        # the main page, so using 'wikisource.org'
+        self.langs['mul'] = self.domain
+        self.languages_by_size.append('mul')
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation

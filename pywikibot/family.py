@@ -1557,6 +1557,8 @@ class WikimediaFamily(Family):
 
         # Renamed; see T11823
         'be-x-old': 'be-tarask',
+
+        '-': 'mul',  # T114574
     }
 
     # Not open for edits; stewards can still edit.
