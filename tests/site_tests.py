@@ -811,7 +811,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
         try:
             unwatchedpages = list(mysite.unwatchedpages(total=10))
         except api.APIError as error:
-            if error.code == 'gqpspecialpage-cantexecute':
+            if error.code in ('specialpage-cantexecute',
+                              'gqpspecialpage-cantexecute'):
                 # User must have correct permissions to use Special:UnwatchedPages
                 raise unittest.SkipTest(error)
             raise
