@@ -61,7 +61,11 @@ class SiteDetectionTestCase(TestCase):
         @type url: str
         @raises AssertionError: Site under url is not MediaWiki powered
         """
-        self.assertIsInstance(MWSite(url), MWSite)
+        try:
+            self.assertIsInstance(MWSite(url), MWSite)
+        except (AttributeError, ConnectionError, RuntimeError, ServerError,
+                Timeout):
+            raise AssertionError
 
     def assertNoSite(self, url):
         """
