@@ -5,266 +5,300 @@
 #
 # Distributed under the terms of the MIT license.
 #
+
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
-from requests.exceptions import Timeout
+from requests.exceptions import ConnectionError, Timeout
 
 from pywikibot.exceptions import ServerError
 from pywikibot.site_detect import MWSite
-from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, TestCase
 
 
-class TestWikiSiteDetection(TestCase):
+__version__ = '$Id$'
 
-    """Test Case for MediaWiki detection and site object creation."""
 
-    # This list is intentionally shared between all classes
-    _urls_tested = set()
-    # Whether it allows multiple tests of the same URL
-    allow_multiple = False
+def _retry_few_times(retry_limit):
+    """
+    Decorator to retry test on failure.
 
-    def setUp(self):
-        """Set up test."""
-        self.skips = {}
-        self.failures = {}
-        self.errors = {}
-        self.passes = {}
-        self.all = []
-        # reset after end of test
-        self._previous_multiple = self.allow_multiple
-        super(TestWikiSiteDetection, self).setUp()
+    Swallow AssertionError retry_limit times before failing test.
 
-    def tearDown(self):
-        """Tear Down test."""
-        def norm(url):
-            res = None
-            typ = -1
-            for pos, result in enumerate([self.passes, self.errors,
-                                          self.failures, self.skips]):
-                if url in result:
-                    assert res is None
-                    res = result[url]
-                    typ = pos
-            if res is None:
-                typ = len(PREFIXES) - 1
-                res = 'Missing'
-            assert 0 <= pos < len(PREFIXES)
-            return typ, url, res
+    @param retry_limit: Retry limit before failing test
+    @type retry_limit: int
+    @return: a decorator to retry test on failure
+    @rtype: function
+    @raises AssertionError: all retries of test failed
+    """
+    def actual_decorator(wrapped_func):
+        def wrapper_func(*args, **kwargs):
+            for retry_no in range(1, retry_limit + 1):
+                try:
+                    wrapped_func(*args, **kwargs)
+                except AssertionError:
+                    if retry_no == retry_limit:
+                        raise
+                except:
+                    raise
+                else:
+                    return
+        return wrapper_func
+    return actual_decorator
 
-        self.allow_multiple = self._previous_multiple
-        super(TestWikiSiteDetection, self).tearDown()
-        print('Out of %d sites, %d tests passed, %d tests failed, '
-              '%d tests skiped and %d tests raised an error'
-              % (len(self.all), len(self.passes), len(self.failures),
-                 len(self.skips), len(self.errors))
-              )
 
-        PREFIXES = ['PASS', 'ERR ', 'FAIL', 'SKIP', 'MISS']
+class SiteDetectionTestCase(TestCase):
 
-        sorted_all = sorted((norm(url) for url in self.all),
-                            key=lambda item: item[0])
-        width = max(len(item[1]) for item in sorted_all)
-        print('Results:\n' + '\n'.join(
-            '{0} {1:{3}} : {2}'.format(PREFIXES[i[0]], i[1], i[2], width)
-            for i in sorted_all))
+    """Testcase for MediaWiki detection and site object creation."""
 
-    def _wiki_detection(self, url, result):
-        """Perform one load test."""
-        self.all += [url]
-        if url in self._urls_tested:
-            msg = 'Testing URL "{0}" multiple times!'.format(url)
-            if self.allow_multiple:
-                print(msg)
-            else:
-                self.errors[url] = msg
-                return
-        self._urls_tested.add(url)
-        try:
-            site = MWSite(url)
-        except (ServerError, Timeout) as e:
-            self.skips[url] = e
-            return
-        except Exception as e:
-            print('failure {0} on {1}: {2}'.format(
-                url, type(e), e))
-            self.errors[url] = e
-            return
-        try:
-            if result is None:
-                self.assertIsNone(site)
-            else:
-                self.assertIsInstance(site, result)
-            self.passes[url] = site
-        except AssertionError as error:
-            self.failures[url] = error
+    net = True
 
     def assertSite(self, url):
-        """Assert a MediaWiki site can be loaded from the url."""
-        self._wiki_detection(url, MWSite)
+        """
+        Assert a MediaWiki site can be loaded from the url.
+
+        @param url: Url of tested site
+        @type url: str
+        @raises AssertionError: Site under url is not MediaWiki powered
+        """
+        self.assertIsInstance(MWSite(url), MWSite)
 
     def assertNoSite(self, url):
-        """Assert a url is not a MediaWiki site."""
-        self._wiki_detection(url, None)
+        """
+        Assert a url is not a MediaWiki site.
 
-    def assertAllPass(self):
-        """Assert that all urls were detected as a MediaWiki site."""
-        self.assertEqual(set(self.passes), set(self.all) - set(self.skips))
-        self.assertEqual(self.failures, {})
-        self.assertEqual(self.errors, {})
-
-    def assertAllError(self):
-        """Assert that all urls were not detected as a MediaWiki site."""
-        self.assertEqual(self.passes, {})
-        self.assertEqual(self.failures, {})
-        self.assertEqual(set(self.errors), set(self.all) - set(self.skips))
+        @param url: Url of tested site
+        @type url: str
+        @raises AssertionError: Site under url is MediaWiki powered
+        """
+        self.assertRaises((AttributeError, ConnectionError, RuntimeError,
+                           ServerError, Timeout), MWSite, url)
 
 
-class InterWikiMapDetection(TestWikiSiteDetection):
+class StandardVersionSiteTestCase(SiteDetectionTestCase):
 
-    """Test all urls on the interwiki map."""
+    """Test detection of MediaWiki sites."""
 
-    family = 'meta'
-    code = 'meta'
-    net = True
-
-    allow_multiple = True
-
-    def test_IWM(self):
-        """Test the load_site method for MW sites on the IWM list."""
-        data = self.get_site().siteinfo['interwikimap']
-        for item in data:
-            if 'local' not in item:
-                url = item['url']
-                self.all += [url]
-                try:
-                    site = MWSite(url)
-                except Exception as error:
-                    print('failed to load ' + url)
-                    self.errors[url] = error
-                    continue
-                if type(site) is MWSite:
-                    try:
-                        version = site.version
-                    except Exception as error:
-                        print('failed to get version of ' + url)
-                        self.errors[url] = error
-                    else:
-                        try:
-                            self.assertIsInstance(version, MediaWikiVersion)
-                            self.passes[url] = site
-                        except AssertionError as error:
-                            print('failed to parse version of ' + url)
-                            self.failures[url] = error
-
-
-class SiteDetectionTestCase(TestWikiSiteDetection):
-
-    """Test all urls on the interwiki map."""
-
-    net = True
-
-    def test_detect_site(self):
-        """Test detection of MediaWiki sites."""
+    def test_hrwiki(self):
+        """Test detection of MediaWiki sites for www.hrwiki.org."""
         self.assertSite('http://www.hrwiki.org/index.php/$1')  # v 1.15
+
+    def test_proofwiki(self):
+        """Test detection of MediaWiki sites for www.proofwiki.org."""
         self.assertSite('http://www.proofwiki.org/wiki/$1')
+
+    def test_ck_wissen(self):
+        """Test detection of MediaWiki sites for www.ck-wissen.de."""
         self.assertSite(
             'http://www.ck-wissen.de/ckwiki/index.php?title=$1')
+
+    def test_citizendium(self):
+        """Test detection of MediaWiki sites for en.citizendium.org."""
         self.assertSite('http://en.citizendium.org/wiki/$1')
-        self.assertSite(
-            'http://www.lojban.org/tiki/tiki-index.php?page=$1')
+
+    @_retry_few_times(10)
+    def test_wikichristian(self):
+        """Test detection of MediaWiki sites for www.wikichristian.org.
+
+        Server that hosts www.wikichristian.org is unreliable - it occasionally
+        responding with 500 error (see: T151368).
+        """
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
+
+    def test_wikifur(self):
+        """Test detection of MediaWiki sites for en.wikifur.com."""
         self.assertSite('https://en.wikifur.com/wiki/$1')
+
+    def test_bluwiki(self):
+        """Test detection of MediaWiki sites for bluwiki.com."""
         self.assertSite('http://bluwiki.com/go/$1')
+
+    def test_kino_skirpov(self):
+        """Test detection of MediaWiki sites for kino.skripov.com."""
         self.assertSite('http://kino.skripov.com/index.php/$1')
-        self.assertAllPass()
 
-    def test_wikisophia(self):
-        """Test wikisophia.org which has redirect problems."""
-        # /index.php?title=$1 reports 404, however a wiki exists there,
-        # but the API is also hidden.
-        self.assertNoSite('http://wikisophia.org/index.php?title=$1')
-        self.assertAllError()
 
-    def test_pre_114_sites(self):
-        """Test pre 1.14 sites which should be detected as unsupported."""
-        # v1.12
-        self.assertNoSite('http://www.livepedia.gr/index.php?title=$1')
-        # v1.11
-        self.assertNoSite('http://www.wikifon.org/$1')
-        self.assertNoSite('http://glossary.reuters.com/index.php?title=$1')
+class NonStandardVersionSiteTestCase(SiteDetectionTestCase):
+
+    """Test non-standard version string sites."""
+
+    def test_gentoo(self):
+        """Test detection of MediaWiki sites for wiki.gentoo.org."""
+        self.assertSite('https://wiki.gentoo.org/wiki/$1')
+
+    def test_arabeyes(self):
+        """Test detection of MediaWiki sites for wiki.arabeyes.org."""
+        self.assertSite('http://wiki.arabeyes.org/$1')
+
+    def test_tfwiki(self):
+        """Test detection of MediaWiki sites for tfwiki.net."""
+        self.assertSite('http://tfwiki.net/wiki/$1')
+
+
+class Pre114SiteTestCase(SiteDetectionTestCase):
+
+    """Test pre 1.14 sites which should be detected as unsupported."""
+
+    def test_livepedia(self):
+        """Test detection of MediaWiki sites for www.livepedia.gr."""
+        self.assertNoSite(
+            'http://www.livepedia.gr/index.php?title=$1')  # v1.12
+
+    def test_wikifon(self):
+        """Test detection of MediaWiki sites for www.wikifon.org."""
+        self.assertNoSite('http://www.wikifon.org/$1')  # v1.11
+
+    def test_reuters(self):
+        """Test detection of MediaWiki sites for glossary.reuters.com."""
+        self.assertNoSite(
+            'http://glossary.reuters.com/index.php?title=$1')  # v1.11
+
+    def test_wikitree(self):
+        """Test detection of MediaWiki sites for wikitree.org."""
         # v1.11, with no query module
         self.assertNoSite('http://wikitree.org/index.php?title=$1')
-        # v1.9
-        self.assertNoSite('http://www.wikinvest.com/$1')
-        self.assertAllError()
 
-    def test_non_standard_version_sites(self):
-        """Test non-standard version string sites."""
-        self.assertSite('https://wiki.gentoo.org/wiki/$1')
-        self.assertSite('http://wiki.arabeyes.org/$1')
-        self.assertSite('http://tfwiki.net/wiki/$1')
-        self.assertAllPass()
+    def test_wikinvest(self):
+        """Test detection of MediaWiki sites for www.wikinvest.com."""
+        self.assertNoSite('http://www.wikinvest.com/$1')  # v1.9
 
-    @unittest.expectedFailure  # Test no longer valid
-    def test_detect_failure(self):
-        """Test detection failure for MediaWiki sites with an API."""
-        # SSL certificate verification fails
-        self.assertNoSite('http://hackerspaces.org/wiki/$1')
-        self.assertAllError()
+
+class PreAPISiteTestCase(SiteDetectionTestCase):
+
+    """Test detection of MediaWiki sites prior to the API."""
+
+    def test_wikif1(self):
+        """Test detection of MediaWiki sites for www.wikif1.org."""
+        self.assertNoSite('http://www.wikif1.org/$1')
+
+    def test_thelemapedia(self):
+        """Test detection of MediaWiki sites for www.thelemapedia.org."""
+        self.assertNoSite('http://www.thelemapedia.org/index.php/$1')
+
+    def test_blahus(self):
+        """Test detection of MediaWiki sites for esperanto.blahus.cz."""
+        self.assertNoSite('http://esperanto.blahus.cz/cxej/vikio/index.php/$1')
+
+    def test_werelate(self):
+        """Test detection of MediaWiki sites for www.werelate.org."""
+        self.assertNoSite('http://www.werelate.org/wiki/$1')
+
+    def test_otterstedt(self):
+        """Test detection of MediaWiki sites for www.otterstedt.de."""
+        self.assertNoSite('http://www.otterstedt.de/wiki/index.php/$1')
+
+    def test_mozillazine(self):
+        """Test detection of MediaWiki sites for kb.mozillazine.org."""
+        self.assertNoSite('http://kb.mozillazine.org/$1')
+
+
+class APIHiddenTestCase(SiteDetectionTestCase):
+
+    """Test MediaWiki sites with a hidden enabled API."""
+
+    def test_wikisophia(self):
+        """Test wikisophia.org which has redirect problems.
+
+        /index.php?title=$1 reports 404, however a wiki exists there,
+        but the API is also hidden.
+        """
+        self.assertNoSite('http://wikisophia.org/index.php?title=$1')
 
     @unittest.expectedFailure
-    def test_api_hidden(self):
-        """Test MediaWiki sites with a hidden enabled API."""
-        # api.php is not available
-        self.assertNoSite('http://wiki.animutationportal.com/index.php/$1')
-        # HTML looks like it has an API, but redirect rules prevent access
+    def test_ecoreality(self):
+        """Test detection of MediaWiki sites for www.EcoReality.org.
+
+        api.php is not available. HTML looks like it has an API, but redirect
+        rules prevent access.
+        """
         self.assertNoSite('http://www.EcoReality.org/wiki/$1')
-        self.assertAllError()
 
-    def test_api_disabled(self):
-        """Test MediaWiki sites without an enabled API."""
+
+class FailingSiteTestCase(SiteDetectionTestCase):
+
+    """Test detection failure for MediaWiki sites with an API."""
+
+    def test_animutationportal(self):
+        """Test detection of MediaWiki sites for wiki.animutationportal.com.
+
+        SSL certificate verification fails.
+        """
+        self.assertNoSite('http://wiki.animutationportal.com/index.php/$1')
+
+    @unittest.expectedFailure
+    def test_hackerspaces(self):
+        """Test detection of MediaWiki sites for hackerspaces.org."""
+        self.assertNoSite('http://hackerspaces.org/wiki/$1')
+
+
+class APIDisabledTestCase(SiteDetectionTestCase):
+
+    """Test MediaWiki sites without an enabled API."""
+
+    def test_linuxquestions(self):
+        """Test detection of MediaWiki sites for wiki.linuxquestions.org."""
         self.assertNoSite('http://wiki.linuxquestions.org/wiki/$1')
-        self.assertAllError()
 
-    def test_offline_sites(self):
-        """Test offline sites."""
-        self.assertNoSite('http://seattlewiki.org/wiki/$1')
-        self.assertAllError()
 
-    def test_pre_api_sites(self):
-        """Test detection of MediaWiki sites prior to the API."""
-        self.assertNoSite('http://www.wikif1.org/$1')
-        self.assertNoSite('http://www.thelemapedia.org/index.php/$1')
-        self.assertNoSite('http://esperanto.blahus.cz/cxej/vikio/index.php/$1')
-        self.assertNoSite('http://www.werelate.org/wiki/$1')
-        self.assertNoSite('http://www.otterstedt.de/wiki/index.php/$1')
-        self.assertNoSite('http://kb.mozillazine.org/$1')
-        self.assertAllError()
+class NoSiteTestCase(SiteDetectionTestCase):
 
-    def test_detect_nosite(self):
-        """Test detection of non-wiki sites."""
+    """Test detection of non-wiki sites."""
+
+    def test_imdb(self):
+        """Test detection of MediaWiki sites for www.imdb.com."""
         self.assertNoSite('http://www.imdb.com/name/nm$1/')
-        self.assertNoSite('http://www.ecyrd.com/JSPWiki/Wiki.jsp?page=$1')
-        self.assertNoSite('http://operawiki.info/$1')
-        self.assertNoSite(
-            'http://www.tvtropes.org/pmwiki/pmwiki.php/Main/$1')
-        self.assertNoSite('http://c2.com/cgi/wiki?$1')
-        self.assertNoSite('https://phabricator.wikimedia.org/$1')
-        self.assertNoSite(
-            'http://www.merriam-webster.com/cgi-bin/dictionary?book=Dictionary&va=$1')
-        self.assertNoSite('http://arxiv.org/abs/$1')
-        self.assertAllError()
 
-    def test_musicbrainz_doc(self):
-        """Test http://musicbrainz.org/doc/ which has a page 'api.php'."""
-        # Possible false positive caused by the existance of a page
-        # called http://musicbrainz.org/doc/api.php
+    def test_ecyrd(self):
+        """Test detection of MediaWiki sites for www.ecyrd.com."""
+        self.assertNoSite('http://www.ecyrd.com/JSPWiki/Wiki.jsp?page=$1')
+
+    def test_operawiki(self):
+        """Test detection of MediaWiki sites for operawiki.info."""
+        self.assertNoSite('http://operawiki.info/$1')
+
+    def test_tvtropes(self):
+        """Test detection of MediaWiki sites for www.tvtropes.org."""
+        self.assertNoSite('http://www.tvtropes.org/pmwiki/pmwiki.php/Main/$1')
+
+    def test_c2(self):
+        """Test detection of MediaWiki sites for c2.com."""
+        self.assertNoSite('http://c2.com/cgi/wiki?$1')
+
+    def test_phabricator(self):
+        """Test detection of MediaWiki sites for phabricator.wikimedia.org."""
+        self.assertNoSite('https://phabricator.wikimedia.org/$1')
+
+    def test_merriam_webster(self):
+        """Test detection of MediaWiki sites for www.merriam-webster.com."""
+        self.assertNoSite(
+            'http://www.merriam-webster.com/'
+            'cgi-bin/dictionary?book=Dictionary&va=$1')
+
+    def test_arxiv(self):
+        """Test detection of MediaWiki sites for arxiv.org."""
+        self.assertNoSite('http://arxiv.org/abs/$1')
+
+
+class OfflineSiteTestCase(SiteDetectionTestCase):
+
+    """Test offline sites."""
+
+    def test_seattlewiki(self):
+        """Test detection of MediaWiki sites for seattlewiki.org."""
+        self.assertNoSite('http://seattlewiki.org/wiki/$1')
+
+
+class OtherSiteTestCase(SiteDetectionTestCase):
+
+    """Test other non-MediaWiki sites."""
+
+    def test_musicbrainz(self):
+        """Test http://musicbrainz.org/doc/ which has a page 'api.php'.
+
+        Possible false positive caused by the existance of a page called
+        http://musicbrainz.org/doc/api.php.
+        """
         self.assertNoSite('http://musicbrainz.org/doc/$1')
-        self.assertAllError()
 
 
 if __name__ == '__main__':  # pragma: no cover
