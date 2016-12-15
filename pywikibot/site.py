@@ -1402,8 +1402,8 @@ class Siteinfo(Container):
     All values of the siteinfo property 'general' are directly available.
     """
 
-    WARNING_REGEX = re.compile(u"^Unrecognized values? for parameter "
-                               u"'siprop': ([^,]+(?:, [^,]+)*)$")
+    WARNING_REGEX = re.compile('^Unrecognized values? for parameter '
+                               '["\']siprop["\']: (.+?)\.?$')
 
     # Until we get formatversion=2, we have to convert empty-string properties
     # into booleans so they are easier to use.
