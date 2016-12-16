@@ -20,20 +20,19 @@ This script understands various command-line arguments:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 from datetime import timedelta
 
 import pywikibot
-
 from pywikibot import pagegenerators, WikidataBot
+from pywikibot.exceptions import LockedPage, NoPage, PageNotSaved
+
+__version__ = '$Id$'
 
 
 class NewItemRobot(WikidataBot):
@@ -52,15 +51,32 @@ class NewItemRobot(WikidataBot):
         self.generator = pagegenerators.PreloadingGenerator(generator)
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
-        self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(days=self.pageAge)
-        self.lastEditBefore = self.repo.getcurrenttime() - timedelta(days=self.lastEdit)
+        self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(
+            days=self.pageAge)
+        self.lastEditBefore = self.repo.getcurrenttime() - timedelta(
+            days=self.lastEdit)
         self.treat_missing_item = True
         pywikibot.output('Page age is set to %s days so only pages created'
                          '\nbefore %s will be considered.'
                          % (self.pageAge, self.pageAgeBefore.isoformat()))
-        pywikibot.output('Last edit is set to %s days so only pages last edited'
-                         '\nbefore %s will be considered.'
-                         % (self.lastEdit, self.lastEditBefore.isoformat()))
+        pywikibot.output(
+            'Last edit is set to {0} days so only pages last edited'
+            '\nbefore {1} will be considered.'.format(
+                self.lastEdit, self.lastEditBefore.isoformat()))
+
+    @staticmethod
+    def _touch_page(page):
+        try:
+            page.touch()
+        except NoPage:
+            pywikibot.error('Page {0} does not exist.'.format(
+                page.title(asLink=True)))
+        except LockedPage:
+            pywikibot.error('Page {0} is locked.'.format(
+                page.title(asLink=True)))
+        except PageNotSaved:
+            pywikibot.error('Page {0} not saved.'.format(
+                page.title(asLink=True)))
 
     def treat(self, page, item):
         """Treat page/item."""
@@ -68,7 +84,7 @@ class NewItemRobot(WikidataBot):
             pywikibot.output(u'%s already has an item: %s.' % (page, item))
             if self.getOption('touch'):
                 pywikibot.output(u'Doing a null edit on the page.')
-                page.put(page.text)
+                self._touch_page(page)
             return
 
         self.current_page = page
@@ -116,7 +132,7 @@ class NewItemRobot(WikidataBot):
         item = pywikibot.ItemPage(page.site.data_repository())
         item.editEntity(data, summary=summary)
         # And do a null edit to force update
-        page.put(page.text)
+        self._touch_page(page)
 
 
 def main(*args):
@@ -152,6 +168,7 @@ def main(*args):
     bot = NewItemRobot(generator, **options)
     bot.run()
     return True
+
 
 if __name__ == "__main__":
     main()
