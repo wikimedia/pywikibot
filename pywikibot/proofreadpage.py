@@ -514,21 +514,21 @@ class IndexPage(pywikibot.Page):
         else:
             return None
 
-        def purge(self):
-            """Overwrite purge method.
+    def purge(self):
+        """Overwrite purge method.
 
-            Workaround for T128994.
-            # TODO: remove once bug is fixed.
+        Workaround for T128994.
+        # TODO: remove once bug is fixed.
 
-            Instead of a proper purge action, use PurgeRequest, which
-            skips the check on write rights.
-            """
-            params = {'action': 'purge', 'titles': [self.title()]}
-            request = PurgeRequest(site=self.site, parameters=params)
-            rawdata = request.submit()
-            error_message = 'Purge action failed for %s' % self
-            assert 'purge' in rawdata, error_message
-            assert 'purged' in rawdata['purge'][0], error_message
+        Instead of a proper purge action, use PurgeRequest, which
+        skips the check on write rights.
+        """
+        params = {'action': 'purge', 'titles': [self.title()]}
+        request = PurgeRequest(site=self.site, parameters=params)
+        rawdata = request.submit()
+        error_message = 'Purge action failed for %s' % self
+        assert 'purge' in rawdata, error_message
+        assert 'purged' in rawdata['purge'][0], error_message
 
     def _get_page_mappings(self):
         """Associate label and number for each page linked to the index."""
