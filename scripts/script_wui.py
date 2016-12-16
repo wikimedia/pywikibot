@@ -73,7 +73,6 @@ __version__ = '$Id$'
 import datetime
 import gc
 import logging
-import os
 import re
 import resource
 import sys
@@ -107,14 +106,11 @@ else:
 
 
 bot_config = {
-    'BotName': pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
+    'BotName': "{username}",
 
-    # protected !!! ('CSS' or other semi-protected page is essential here)
-    'ConfCSSshell': 'User:DrTrigon/DrTrigonBot/script_wui-shell.css',
-    'ConfCSScrontab': u'User:DrTrigon/DrTrigonBot/script_wui-crontab.css',
-
-    # (may be protected but not that important... 'CSS' is not needed here !!!)
-    'ConfCSSoutput': u'User:DrTrigonBot/Simulation',
+    'ConfCSSshell': u'User:{username}/script_wui-shell.css',
+    'ConfCSScrontab': u'User:{username}/script_wui-crontab.css',
+    'ConfCSSoutput': u'User:{username}/Simulation',
 
     'CRONMaxDelay': 5 * 60.0,       # check all ~5 minutes
 
@@ -157,15 +153,20 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
                      }
         pywikibot.output(u'** Pre-loading all relevant page contents')
         for item in self.refs:
-            # security; first check if page is protected, reject any data if not
-            if os.path.splitext(self.refs[item].title().lower())[1] not in ['.css', '.js']:
+            # First check if page is protected, reject any data if not
+            parts = self.refs[item].title().lower().rsplit('.')
+            if len(parts) == 1 or parts[1] not in ['.css', '.js']:
                 raise ValueError(u'%s config %s = %s is not a secure page; '
                                  u'it should be a css or js userpage which are '
                                  u'automatically semi-protected.'
                                  % (self.__class__.__name__, item,
                                     self.refs[item]))
-            self.refs[item].get(force=True)   # load all page contents
-
+            try:
+                self.refs[item].get(force=True)   # load all page contents
+            except pywikibot.NoPage:
+                pywikibot.error("The configuation page %s doesn't exists"
+                                % self.refs[item].title(asLink=True))
+                raise
         # init background timer
         pywikibot.output(u'** Starting crontab background timer thread')
         self.on_timer()
@@ -326,6 +327,12 @@ def main(*args):
     site = pywikibot.Site()
     site.login()
     chan = '#' + site.code + '.' + site.family.name
+
+    bot_user_name = pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang]
+    for key, value in bot_config.items():
+        if hasattr(value, 'format'):
+            bot_config[key] = value.format(username=bot_user_name)
+
     bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
     try:
         bot.start()
