@@ -5,13 +5,12 @@
 #
 # Distributed under the terms of the MIT license.
 #
+# The new wikivoyage family that is hosted at wikimedia
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
-# The new wikivoyage family that is hosted at wikimedia
-
 from pywikibot import family
+
+__version__ = '$Id$'
 
 
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -23,8 +22,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'de', 'fa', 'it', 'fr', 'ru', 'pl', 'nl', 'pt', 'es', 'he',
-            'zh', 'vi', 'sv', 'el', 'ro', 'uk',
+            'en', 'de', 'fa', 'it', 'fr', 'ru', 'pl', 'nl', 'pt', 'fi', 'es',
+            'zh', 'he', 'vi', 'sv', 'el', 'ro', 'uk',
         ]
 
         super(Family, self).__init__()
