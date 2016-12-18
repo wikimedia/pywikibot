@@ -94,6 +94,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     def setUp(self):
         """Set up test by configuring config.authenticate."""
+        super(TestGetAuthenticationConfig, self).setUp()
         self._authenticate = config.authenticate
         config.authenticate = {
             'zh.wikipedia.beta.wmflabs.org': ('1', '2'),
@@ -104,6 +105,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     def tearDown(self):
         """Tear down test by resetting config.authenticate."""
+        super(TestGetAuthenticationConfig, self).tearDown()
         config.authenticate = self._authenticate
 
     def test_url_based_authentication(self):
@@ -264,12 +266,14 @@ class DefaultUserAgentTestCase(TestCase):
 
     def setUp(self):
         """Set up unit test."""
+        super(DefaultUserAgentTestCase, self).setUp()
         self.orig_format = config.user_agent_format
         config.user_agent_format = ('{script_product} ({script_comments}) {pwb} '
                                     '({revision}) {http_backend} {python}')
 
     def tearDown(self):
         """Tear down unit test."""
+        super(DefaultUserAgentTestCase, self).tearDown()
         config.user_agent_format = self.orig_format
 
     def test_default_user_agent(self):

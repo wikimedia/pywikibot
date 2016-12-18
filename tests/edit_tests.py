@@ -201,6 +201,7 @@ class OAuthEditTest(OAuthSiteTestCase):
 
     def tearDown(self):
         """Tear down test by resetting config.authenticate."""
+        super(OAuthEditTest, self).tearDown()
         config.authenticate = self._authenticate
 
     def test_edit(self):

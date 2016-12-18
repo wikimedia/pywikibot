@@ -218,6 +218,7 @@ class UITestCase(unittest.TestCase):
     net = False
 
     def setUp(self):
+        super(UITestCase, self).setUp()
         patch()
 
         pywikibot.config.colorized_output = True
@@ -226,6 +227,7 @@ class UITestCase(unittest.TestCase):
         pywikibot.ui.encoding = 'utf-8'
 
     def tearDown(self):
+        super(UITestCase, self).tearDown()
         unpatch()
 
     def _encode(self, string, encoding='utf-8'):

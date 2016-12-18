@@ -1964,12 +1964,14 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def setUp(self):
         """Store version."""
+        super(TestSiteTokens, self).setUp()
         self.mysite = self.get_site()
         self._version = MediaWikiVersion(self.mysite.version())
         self.orig_version = self.mysite.version
 
     def tearDown(self):
         """Restore version."""
+        super(TestSiteTokens, self).tearDown()
         self.mysite.version = self.orig_version
 
     def _test_tokens(self, version, test_version, additional_token):
