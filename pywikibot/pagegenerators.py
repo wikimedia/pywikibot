@@ -27,6 +27,7 @@ import calendar
 import codecs
 import datetime
 import itertools
+import json
 import re
 import sys
 import time
@@ -46,12 +47,21 @@ from pywikibot.tools import (
     intersect_generators,
     IteratorNextMixin,
     filter_unique,
+    PY2,
 )
 
 from pywikibot import date, config, i18n, xmlreader
+from pywikibot.comms import http
 from pywikibot.exceptions import ArgumentDeprecationWarning, UnknownExtension
 from pywikibot.logentries import LogEntryFactory
 from pywikibot.proofreadpage import ProofreadPage
+
+if PY2:
+    from urllib import urlencode
+    import urlparse
+else:
+    import urllib.parse as urlparse
+    from urllib.parse import urlencode
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -2762,6 +2772,92 @@ def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
     data = repo.search_entities(text, language, limit=total)
     for item in data:
         yield pywikibot.ItemPage(repo, item['id'])
+
+
+class PetScanPageGenerator(object):
+    """Queries PetScan (https://petscan.wmflabs.org/) to generate pages."""
+
+    def __init__(self, categories, subset_combination=True, namespaces=None,
+                 site=None, extra_options=None):
+        """
+        Constructor.
+
+        :param categories: List of categories to retrieve pages from
+            (as strings)
+        :param subset_combination: Combination mode.
+            If True, returns the intersection of the results of the categories,
+            else returns the union of the results of the categories
+        :param namespaces: List of namespaces to search in
+            (default is None, meaning all namespaces)
+        :param site: Site to operate on
+            (default is the default site from the user config)
+        :param extra_options: Dictionary of extra options to use (optional)
+        """
+        if site is None:
+            site = pywikibot.Site()
+
+        self.site = site
+        self.opts = self.buildQuery(categories, subset_combination,
+                                    namespaces, extra_options)
+
+    def buildQuery(self, categories, subset_combination, namespaces,
+                   extra_options):
+        """
+        Get the querystring options to query PetScan.
+
+        :param categories: List of categories (as strings)
+        :param subset_combination: Combination mode.
+            If True, returns the intersection of the results of the categories,
+            else returns the union of the results of the categories
+        :param namespaces: List of namespaces to search in
+        :param extra_options: Dictionary of extra options to use
+        :return: Dictionary of querystring parameters to use in the query
+        """
+        extra_options = extra_options or {}
+
+        query = {
+            'language': self.site.lang,
+            'project': self.site.family,
+            'combination': 'subset' if subset_combination else 'union',
+            'categories': '\r\n'.join(categories),
+            'format': 'json',
+            'doit': ''
+        }
+
+        # test wikipedia
+        if self.site.code == 'test' and self.site.family == 'test':
+            query['language'] = 'test'
+            query['project'] = 'wikipedia'
+
+        if namespaces:
+            for namespace in namespaces:
+                query['ns[{0}]'.format(int(namespace))] = 1
+
+        query_final = query.copy()
+        query_final.update(extra_options)
+
+        return query_final
+
+    def query(self):
+        """Query PetScan."""
+        url = urlparse.urlunparse(('https',                   # scheme
+                                   'petscan.wmflabs.org',     # netloc
+                                   '',                        # path
+                                   '',                        # params
+                                   urlencode(self.opts),      # query
+                                   ''))                       # fragment
+
+        req = http.fetch(url)
+        j = json.loads(req.content)
+        raw_pages = j['*'][0]['a']['*']
+        for raw_page in raw_pages:
+            yield raw_page
+
+    def __iter__(self):
+        for raw_page in self.query():
+            page = pywikibot.Page(self.site, raw_page['title'],
+                                  int(raw_page['namespace']))
+            yield page
 
 
 # Deprecated old names available for compatibility with compat.
