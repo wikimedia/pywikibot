@@ -3422,7 +3422,14 @@ class WikibasePage(BasePage):
 
         # .site forces a parse of the Link title to determine site
         self.repo = self.site
+        # Link.__init__, called from Page.__init__, has cleaned the title
+        # stripping whitespace and uppercasing the first letter according
+        # to the namespace case=first-letter.
         self.id = self._link.title
+        if not self.is_valid_id(self.id):
+            raise pywikibot.InvalidTitle(
+                "'%s' is not a valid %s page title"
+                % (self.id, self.entity_type))
 
     def _defined_by(self, singular=False):
         """
@@ -3709,6 +3716,21 @@ class WikibasePage(BasePage):
 
         return self.id
 
+    @classmethod
+    def is_valid_id(cls, entity_id):
+        """
+        Whether the string can be a valid id of the entity type.
+
+        @param entity_id: The ID to test.
+        @type entity_id: basestring
+
+        @rtype: bool
+        """
+        if not hasattr(cls, 'title_pattern'):
+            return True
+
+        return bool(re.match(cls.title_pattern, entity_id))
+
     @property
     def latest_revision_id(self):
         """
@@ -3873,6 +3895,7 @@ class ItemPage(WikibasePage):
     """
 
     entity_type = 'item'
+    title_pattern = r'^(Q[1-9]\d*|-1)$'
 
     def __init__(self, site, title=None, ns=None):
         """
@@ -3895,17 +3918,11 @@ class ItemPage(WikibasePage):
             assert self.id == '-1'
             return
 
+        # we don't want empty titles
+        if not title:
+            raise pywikibot.InvalidTitle("Item's title cannot be empty")
+
         super(ItemPage, self).__init__(site, title, ns=ns)
-
-        # Link.__init__, called from Page.__init__, has cleaned the title
-        # stripping whitespace and uppercasing the first letter according
-        # to the namespace case=first-letter.
-
-        # Validate the title is 'Q' and a positive integer.
-        if not re.match(r'^Q[1-9]\d*$', self._link.title):
-            raise pywikibot.InvalidTitle(
-                u"'%s' is not a valid item page title"
-                % self._link.title)
 
         assert self.id == self._link.title
 
@@ -4294,6 +4311,7 @@ class PropertyPage(WikibasePage, Property):
     """
 
     entity_type = 'property'
+    title_pattern = r'^P[1-9]\d*$'
 
     def __init__(self, source, title=u""):
         """
@@ -4304,11 +4322,11 @@ class PropertyPage(WikibasePage, Property):
         @param title: page name of property, like "P##"
         @type title: str
         """
+        if not title:
+            raise pywikibot.InvalidTitle("Property's title cannot be empty")
+
         WikibasePage.__init__(self, source, title,
                               ns=source.property_namespace)
-        if not title or not self.id.startswith('P'):
-            raise pywikibot.InvalidTitle(
-                u"'%s' is not an property page title" % title)
         Property.__init__(self, source, self.id)
 
     def get(self, force=False, *args, **kwargs):
