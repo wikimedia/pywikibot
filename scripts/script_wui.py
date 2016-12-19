@@ -74,7 +74,6 @@ import datetime
 import gc
 import logging
 import re
-import resource
 import sys
 import threading
 import traceback
@@ -104,6 +103,10 @@ if sys.version_info[0] > 2:
 else:
     import thread  # flake8: disable=H237 (module does not exist in Python 3)
 
+try:
+    import resource
+except ImportError:
+    resource = None
 
 bot_config = {
     'BotName': "{username}",
@@ -273,12 +276,16 @@ def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unuse
     # safety; restore settings
     pywikibot.config.simulate = __simulate
     sys.argv = __sys_argv
-
-    pywikibot.output(
-        u'environment: garbage; %s / memory; %s / members; %s' % (
-            gc.collect(),
-            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * resource.getpagesize(),
-            len(dir())))
+    if resource:
+        pywikibot.output(
+            u'environment: garbage; %s / memory; %s / members; %s' % (
+                gc.collect(),
+                resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * resource.getpagesize(),
+                len(dir())))
+    else:
+        pywikibot.output(
+            u'environment: garbage; %s / members; %s' % (
+                gc.collect(), len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
     # append result to output page
