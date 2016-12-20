@@ -6102,10 +6102,24 @@ class APISite(BaseSite):
                         _file_key = data['filekey']
                         if 'warnings' in data and not ignore_all_warnings:
                             if callable(ignore_warnings):
+                                restart = False
                                 if 'offset' not in data:
+                                    # This is a result of a warning in the
+                                    # first chunk. The chunk is not actually
+                                    # stashed so upload must be restarted if
+                                    # the warning is allowed.
+                                    # T112416 and T112405#1637544
+                                    restart = True
                                     data['offset'] = True
                                 if ignore_warnings(create_warnings_list(data)):
                                     # Future warnings of this run can be ignored
+                                    if restart:
+                                        return self.upload(
+                                            filepage, source_filename,
+                                            source_url, comment, text, watch,
+                                            True, chunk_size, None, 0,
+                                            report_success=False)
+
                                     ignore_warnings = True
                                     ignore_all_warnings = True
                                     offset = data['offset']
