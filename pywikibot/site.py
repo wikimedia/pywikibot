@@ -1730,7 +1730,9 @@ class Siteinfo(Container):
 
     def __call__(self, key='general', force=False, dump=False):
         """DEPRECATED: Return the entry for key or dump the complete cache."""
-        issue_deprecation_warning('Calling siteinfo', 'itself', 2)
+        issue_deprecation_warning(
+            'Calling siteinfo', 'itself as a dictionary', 2
+        )
         if not dump:
             return self.get(key, expiry=0 if force else False)
         else:

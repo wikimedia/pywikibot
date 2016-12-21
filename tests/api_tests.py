@@ -1047,6 +1047,11 @@ class TestLagpattern(DefaultSiteTestCase):
     def test_valid_lagpattern(self):
         """Test whether api.lagpattern is valid."""
         mysite = self.get_site()
+        if mysite.siteinfo['dbrepllag'][0]['lag'] == -1:
+            raise unittest.SkipTest(
+                '{0} is not running on a replicated database cluster.'
+                .format(mysite)
+            )
         mythrottle = DummyThrottle(mysite)
         mysite._throttle = mythrottle
         params = {'action': 'query',
