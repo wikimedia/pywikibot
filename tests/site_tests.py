@@ -124,12 +124,15 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase, DeprecationTestCase
         old = self.site.siteinfo('general')
         self.assertIn('DUMMY', old)
         self.assertNotEqual(self.site.siteinfo('general', force=True), old)
-        self.assertOneDeprecationParts('Calling siteinfo', 'itself', 4)
+        self.assertOneDeprecationParts('Calling siteinfo',
+                                       'itself as a dictionary',
+                                       4)
 
     def test_siteinfo_dump(self):
         """Test calling the Siteinfo with dump=True."""
         self.assertIn('statistics', self.site.siteinfo('statistics', dump=True))
-        self.assertOneDeprecationParts('Calling siteinfo', 'itself')
+        self.assertOneDeprecationParts('Calling siteinfo',
+                                       'itself as a dictionary')
 
     def test_language_method(self):
         """Test if the language method returns the same as the lang property."""
