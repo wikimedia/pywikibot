@@ -1390,7 +1390,7 @@ class SearchTestCase(DefaultSiteTestCase):
         """Test the site.search() method."""
         mysite = self.site
         try:
-            se = list(mysite.search("wiki", total=100))
+            se = list(mysite.search("wiki", total=100, namespaces=0))
             self.assertLessEqual(len(se), 100)
             self.assertTrue(all(isinstance(hit, pywikibot.Page)
                                 for hit in se))

@@ -4609,11 +4609,8 @@ class APISite(BaseSite):
                     where = 'titles'
                 else:
                     where = 'title'
-        if namespaces == []:
+        if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
-        if not namespaces:
-            pywikibot.warning(u"search: namespaces cannot be empty; using [0].")
-            namespaces = [0]
         srgen = self._generator(api.PageGenerator, type_arg="search",
                                 gsrsearch=searchstring, gsrwhat=where,
                                 namespaces=namespaces,
