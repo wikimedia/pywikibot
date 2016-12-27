@@ -276,8 +276,8 @@ def fake_user_agent():
 
 
 @deprecate_arg('ssl', None)
-def request(site=None, uri=None, method='GET', body=None, headers=None,
-            **kwargs):
+def request(site=None, uri=None, method='GET', params=None, body=None,
+            headers=None, data=None, **kwargs):
     """
     Request to Site with default error handling and response decoding.
 
@@ -299,12 +299,17 @@ def request(site=None, uri=None, method='GET', body=None, headers=None,
     @return: The received data
     @rtype: a unicode string
     """
+    # body and data parameters both map to the data parameter of
+    # requests.Session.request.
+    if data:
+        body = data
+
     assert(site or uri)
     if not site:
         # +1 because of @deprecate_arg
         issue_deprecation_warning(
             'Invoking http.request without argument site', 'http.fetch()', 3)
-        r = fetch(uri, method, body, headers, **kwargs)
+        r = fetch(uri, method, params, body, headers, **kwargs)
         return r.content
 
     baseuri = site.base_url(uri)
@@ -320,7 +325,7 @@ def request(site=None, uri=None, method='GET', body=None, headers=None,
 
     headers['user-agent'] = user_agent(site, format_string)
 
-    r = fetch(baseuri, method, body, headers, **kwargs)
+    r = fetch(baseuri, method, params, body, headers, **kwargs)
     return r.content
 
 
@@ -350,6 +355,7 @@ def get_authentication(uri):
 def _http_process(session, http_request):
     method = http_request.method
     uri = http_request.uri
+    params = http_request.params
     body = http_request.body
     headers = http_request.headers
     if PY2 and headers:
@@ -370,8 +376,8 @@ def _http_process(session, http_request):
         # Note that the connections are pooled which mean that a future
         # HTTPS request can succeed even if the certificate is invalid and
         # verify=True, when a request with verify=False happened before
-        response = session.request(method, uri, data=body, headers=headers,
-                                   auth=auth, timeout=timeout,
+        response = session.request(method, uri, params=params, data=body,
+                                   headers=headers, auth=auth, timeout=timeout,
                                    verify=not ignore_validation)
     except Exception as e:
         http_request.data = e
@@ -407,7 +413,8 @@ def error_handling_callback(request):
         warning('Http response status {0}'.format(request.data.status_code))
 
 
-def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
+def _enqueue(uri, method="GET", params=None, body=None, headers=None, data=None,
+             **kwargs):
     """
     Enqueue non-blocking threaded HTTP request with callback.
 
@@ -432,6 +439,11 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
     @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
     """
+    # body and data parameters both map to the data parameter of
+    # requests.Session.request.
+    if data:
+        body = data
+
     default_error_handling = kwargs.pop('default_error_handling', None)
     callback = kwargs.pop('callback', None)
 
@@ -451,13 +463,14 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
         all_headers['user-agent'] = user_agent(None, user_agent_format_string)
 
     request = threadedhttp.HttpRequest(
-        uri, method, body, all_headers, callbacks, **kwargs)
+        uri, method, params, body, all_headers, callbacks, **kwargs)
     _http_process(session, request)
     return request
 
 
-def fetch(uri, method="GET", body=None, headers=None,
-          default_error_handling=True, use_fake_user_agent=False, **kwargs):
+def fetch(uri, method="GET", params=None, body=None, headers=None,
+          default_error_handling=True, use_fake_user_agent=False, data=None,
+          **kwargs):
     """
     Blocking HTTP request.
 
@@ -474,6 +487,11 @@ def fetch(uri, method="GET", body=None, headers=None,
         overridden by domain in config.
     @rtype: L{threadedhttp.HttpRequest}
     """
+    # body and data parameters both map to the data parameter of
+    # requests.Session.request.
+    if data:
+        body = data
+
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
@@ -489,7 +507,7 @@ def fetch(uri, method="GET", body=None, headers=None,
         elif use_fake_user_agent is True:
             headers['user-agent'] = fake_user_agent()
 
-    request = _enqueue(uri, method, body, headers, **kwargs)
+    request = _enqueue(uri, method, params, body, headers, **kwargs)
     assert(request._data is not None)  # if there's no data in the answer we're in trouble
     # Run the error handling callback in the callers thread so exceptions
     # may be caught.

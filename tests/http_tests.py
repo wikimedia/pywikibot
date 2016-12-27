@@ -9,6 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import json
 import re
 import warnings
 
@@ -554,6 +555,77 @@ class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
                                        'pywikibot.comms.http.cookie_jar')
 
         self.assertIs(main_module_cookie_jar, http.cookie_jar)
+
+
+class QueryStringParamsTestCase(TestCase):
+
+    """
+    Test the query string parameter of request methods.
+
+    The /get endpoint of httpbin returns JSON that can include an 'args' key with
+    urldecoded query string parameters.
+    """
+
+    sites = {
+        'httpbin': {
+            'hostname': 'httpbin.org',
+        },
+    }
+
+    def test_no_params(self):
+        """Test fetch method with no parameters."""
+        r = http.fetch(uri='https://httpbin.org/get', params={})
+        self.assertEqual(r.status, 200)
+
+        content = json.loads(r.content)
+        self.assertDictEqual(content['args'], {})
+
+    def test_unencoded_params(self):
+        """
+        Test fetch method with unencoded parameters, which should be encoded internally.
+
+        HTTPBin returns the args in their urldecoded form, so what we put in should be
+        the same as what we get out.
+        """
+        r = http.fetch(uri='https://httpbin.org/get', params={'fish&chips': 'delicious'})
+        self.assertEqual(r.status, 200)
+
+        content = json.loads(r.content)
+        self.assertDictEqual(content['args'], {'fish&chips': 'delicious'})
+
+    def test_encoded_params(self):
+        """
+        Test fetch method with encoded parameters, which should be re-encoded internally.
+
+        HTTPBin returns the args in their urldecoded form, so what we put in should be
+        the same as what we get out.
+        """
+        r = http.fetch(uri='https://httpbin.org/get',
+                       params={'fish%26chips': 'delicious'})
+        self.assertEqual(r.status, 200)
+
+        content = json.loads(r.content)
+        self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})
+
+
+class DataBodyParameterTestCase(TestCase):
+    """Test that the data and body parameters of fetch/request methods are equivalent."""
+
+    sites = {
+        'httpbin': {
+            'hostname': 'httpbin.org',
+        },
+    }
+
+    def test_fetch(self):
+        """Test that using the data parameter and body parameter produce same results."""
+        r_data = http.fetch(uri='https://httpbin.org/post', method='POST',
+                            data={'fish&chips': 'delicious'})
+        r_body = http.fetch(uri='https://httpbin.org/post', method='POST',
+                            body={'fish&chips': 'delicious'})
+
+        self.assertDictEqual(json.loads(r_data.content),
+                             json.loads(r_body.content))
 
 
 if __name__ == '__main__':  # pragma: no cover

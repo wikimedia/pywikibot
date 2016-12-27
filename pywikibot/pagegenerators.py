@@ -47,7 +47,6 @@ from pywikibot.tools import (
     intersect_generators,
     IteratorNextMixin,
     filter_unique,
-    PY2,
 )
 
 from pywikibot import date, config, i18n, xmlreader
@@ -55,13 +54,6 @@ from pywikibot.comms import http
 from pywikibot.exceptions import ArgumentDeprecationWarning, UnknownExtension
 from pywikibot.logentries import LogEntryFactory
 from pywikibot.proofreadpage import ProofreadPage
-
-if PY2:
-    from urllib import urlencode
-    import urlparse
-else:
-    import urllib.parse as urlparse
-    from urllib.parse import urlencode
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -2840,14 +2832,9 @@ class PetScanPageGenerator(object):
 
     def query(self):
         """Query PetScan."""
-        url = urlparse.urlunparse(('https',                   # scheme
-                                   'petscan.wmflabs.org',     # netloc
-                                   '',                        # path
-                                   '',                        # params
-                                   urlencode(self.opts),      # query
-                                   ''))                       # fragment
+        url = 'https://petscan.wmflabs.org'
 
-        req = http.fetch(url)
+        req = http.fetch(url, params=self.opts)
         j = json.loads(req.content)
         raw_pages = j['*'][0]['a']['*']
         for raw_page in raw_pages:
