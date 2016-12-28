@@ -31,7 +31,7 @@ class HttpRequest(UnicodeMixin):
     * an exception
     """
 
-    def __init__(self, uri, method="GET", body=None, headers=None,
+    def __init__(self, uri, method="GET", params=None, body=None, headers=None,
                  callbacks=None, charset=None, **kwargs):
         """
         Constructor.
@@ -40,6 +40,7 @@ class HttpRequest(UnicodeMixin):
         """
         self.uri = uri
         self.method = method
+        self.params = params
         self.body = body
         self.headers = headers
         if isinstance(charset, codecs.CodecInfo):
