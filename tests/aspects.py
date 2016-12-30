@@ -29,6 +29,7 @@ __version__ = '$Id$'
         UITestCase:
             Not integrated; direct subclass of unittest.TestCase.
 """
+import imp
 import inspect
 import itertools
 import os
@@ -482,6 +483,20 @@ class CheckHostnameMixin(TestCaseBase):
 
         if not hasattr(cls, 'sites'):
             return
+
+        # Check is pytest is used and pytest_httpbin module is installed.
+        if hasattr(sys, '_test_runner_pytest'):
+            try:
+                imp.find_module('pytest_httpbin')
+                httpbin_used = True
+            except ImportError:
+                httpbin_used = False
+        else:
+            httpbin_used = False
+
+        # If pytest_httpbin will be used during tests, then remove httpbin.org from sites.
+        if httpbin_used:
+            cls.sites = {k: v for k, v in cls.sites.items() if 'httpbin.org' not in v['hostname']}
 
         for key, data in cls.sites.items():
             if 'hostname' not in data:
