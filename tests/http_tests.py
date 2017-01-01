@@ -27,6 +27,56 @@ from pywikibot.tools import (
 from tests import join_images_path
 from tests.aspects import unittest, TestCase, DeprecationTestCase, require_modules
 
+try:
+    import pytest_httpbin
+    optional_pytest_httpbin_cls_decorator = pytest_httpbin.use_class_based_httpbin
+except ImportError:
+    pytest_httpbin = None
+
+    def optional_pytest_httpbin_cls_decorator(f):
+        """Empty decorator in case pytest_httpbin is not installed."""
+        return f
+
+
+@optional_pytest_httpbin_cls_decorator
+class HttpbinTestCase(TestCase):
+
+    """
+    Custom test case class, which allows doing dry httpbin tests using pytest-httpbin.
+
+    Test cases, which use httpbin, need to inherit this class.
+    """
+
+    sites = {
+        'httpbin': {
+            'hostname': 'httpbin.org',
+        },
+    }
+
+    def get_httpbin_url(self, path=''):
+        """
+        Return url of httpbin.
+
+        If pytest is used, returns url of local httpbin server.
+        Otherwise, returns: http://httpbin.org
+        """
+        if hasattr(self, 'httpbin'):
+            return self.httpbin.url + path
+        else:
+            return 'http://httpbin.org' + path
+
+    def get_httpbin_hostname(self):
+        """
+        Return httpbin hostname.
+
+        If pytest is used, returns hostname of local httpbin server.
+        Otherwise, returns: httpbin.org
+        """
+        if hasattr(self, 'httpbin'):
+            return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
+        else:
+            return 'httpbin.org'
+
 
 class HttpTestCase(TestCase):
 
@@ -157,7 +207,7 @@ class HttpsCertificateTestCase(TestCase):
                          'InsecureRequestWarning')
 
 
-class TestHttpStatus(TestCase):
+class TestHttpStatus(HttpbinTestCase):
 
     """Test HTTP status code handling and errors."""
 
@@ -177,7 +227,7 @@ class TestHttpStatus(TestCase):
         """Test that a HTTP 504 raises the correct exception."""
         self.assertRaises(pywikibot.Server504Error,
                           http.fetch,
-                          uri='http://httpbin.org/status/504')
+                          uri=self.get_httpbin_url('/status/504'))
 
     def test_server_not_found(self):
         """Test server not found exception."""
@@ -316,15 +366,9 @@ class DryFakeUserAgentTestCase(TestCase):
         self._test_fake_user_agent_randomness()
 
 
-class LiveFakeUserAgentTestCase(TestCase):
+class LiveFakeUserAgentTestCase(HttpbinTestCase):
 
     """Test the usage of fake user agent."""
-
-    sites = {
-        'httpbin': {
-            'hostname': 'httpbin.org',
-        },
-    }
 
     def setUp(self):
         """Set up the unit test."""
@@ -340,22 +384,22 @@ class LiveFakeUserAgentTestCase(TestCase):
         """Test `use_fake_user_agent` argument of http.fetch."""
         # Existing headers
         r = http.fetch(
-            'http://httpbin.org/status/200', headers={'user-agent': 'EXISTING'})
+            self.get_httpbin_url('/status/200'), headers={'user-agent': 'EXISTING'})
         self.assertEqual(r.headers['user-agent'], 'EXISTING')
 
         # Argument value changes
-        r = http.fetch('http://httpbin.org/status/200', use_fake_user_agent=True)
+        r = http.fetch(self.get_httpbin_url('/status/200'), use_fake_user_agent=True)
         self.assertNotEqual(r.headers['user-agent'], http.user_agent())
-        r = http.fetch('http://httpbin.org/status/200', use_fake_user_agent=False)
+        r = http.fetch(self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
         self.assertEqual(r.headers['user-agent'], http.user_agent())
         r = http.fetch(
-            'http://httpbin.org/status/200', use_fake_user_agent='ARBITRARY')
+            self.get_httpbin_url('/status/200'), use_fake_user_agent='ARBITRARY')
         self.assertEqual(r.headers['user-agent'], 'ARBITRARY')
 
         # Manually overridden domains
-        config.fake_user_agent_exceptions = {'httpbin.org': 'OVERRIDDEN'}
+        config.fake_user_agent_exceptions = {self.get_httpbin_hostname(): 'OVERRIDDEN'}
         r = http.fetch(
-            'http://httpbin.org/status/200', use_fake_user_agent=False)
+            self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
         self.assertEqual(r.headers['user-agent'], 'OVERRIDDEN')
 
     @require_modules('browseragents')
@@ -561,7 +605,7 @@ class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
         self.assertIs(main_module_cookie_jar, http.cookie_jar)
 
 
-class QueryStringParamsTestCase(TestCase):
+class QueryStringParamsTestCase(HttpbinTestCase):
 
     """
     Test the query string parameter of request methods.
@@ -570,15 +614,9 @@ class QueryStringParamsTestCase(TestCase):
     urldecoded query string parameters.
     """
 
-    sites = {
-        'httpbin': {
-            'hostname': 'httpbin.org',
-        },
-    }
-
     def test_no_params(self):
         """Test fetch method with no parameters."""
-        r = http.fetch(uri='https://httpbin.org/get', params={})
+        r = http.fetch(uri=self.get_httpbin_url('/get'), params={})
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.content)
@@ -591,7 +629,7 @@ class QueryStringParamsTestCase(TestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in should be
         the same as what we get out.
         """
-        r = http.fetch(uri='https://httpbin.org/get', params={'fish&chips': 'delicious'})
+        r = http.fetch(uri=self.get_httpbin_url('/get'), params={'fish&chips': 'delicious'})
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.content)
@@ -604,7 +642,7 @@ class QueryStringParamsTestCase(TestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in should be
         the same as what we get out.
         """
-        r = http.fetch(uri='https://httpbin.org/get',
+        r = http.fetch(uri=self.get_httpbin_url('/get'),
                        params={'fish%26chips': 'delicious'})
         self.assertEqual(r.status, 200)
 
@@ -612,20 +650,14 @@ class QueryStringParamsTestCase(TestCase):
         self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})
 
 
-class DataBodyParameterTestCase(TestCase):
+class DataBodyParameterTestCase(HttpbinTestCase):
     """Test that the data and body parameters of fetch/request methods are equivalent."""
-
-    sites = {
-        'httpbin': {
-            'hostname': 'httpbin.org',
-        },
-    }
 
     def test_fetch(self):
         """Test that using the data parameter and body parameter produce same results."""
-        r_data = http.fetch(uri='https://httpbin.org/post', method='POST',
+        r_data = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
                             data={'fish&chips': 'delicious'})
-        r_body = http.fetch(uri='https://httpbin.org/post', method='POST',
+        r_body = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
                             body={'fish&chips': 'delicious'})
 
         self.assertDictEqual(json.loads(r_data.content),

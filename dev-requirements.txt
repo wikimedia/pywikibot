@@ -7,6 +7,7 @@ pytest-timeout
 pytest-runner
 pytest-cov
 pytest-attrib
+pytest-httpbin
 
 six
 
