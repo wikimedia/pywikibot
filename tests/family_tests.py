@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,6 +28,11 @@ class TestFamily(TestCase):
 
     """Test cases for Family methods."""
 
+    UNKNOWNFAMILY_RE = 'Family unknown does not exist'
+    FAMILY_TYPEERROR_RE = (
+        'Family.obsolete not updatable; '
+        'use Family.interwiki_removals and Family.interwiki_replacements')
+    FROZENSET_TYPEERROR_RE = '\'frozenset\' object does not support item assignment'
     net = False
 
     def test_family_load_valid(self):
@@ -58,7 +63,11 @@ class TestFamily(TestCase):
 
     def test_family_load_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""
-        self.assertRaises(UnknownFamily, Family.load, 'unknown')
+        self.assertRaisesRegex(
+            UnknownFamily,
+            self.UNKNOWNFAMILY_RE,
+            Family.load,
+            'unknown')
 
     def test_eq_different_families_by_name(self):
         """Test that two Family with same name are equal."""
@@ -96,7 +105,11 @@ class TestFamily(TestCase):
         """Test that Family and string with different name are not equal."""
         family = Family.load('wikipedia')
         other = 'unknown'
-        self.assertRaises(UnknownFamily, family.__eq__, other)
+        self.assertRaisesRegex(
+            UnknownFamily,
+            self.UNKNOWNFAMILY_RE,
+            family.__eq__,
+            other)
 
     def test_get_obsolete_wp(self):
         """Test three types of obsolete codes."""
@@ -132,14 +145,27 @@ class TestFamily(TestCase):
     def test_obsolete_readonly(self):
         """Test obsolete result not updatable."""
         family = Family.load('test')
-        self.assertRaises(TypeError, family.obsolete.update, {})
-        self.assertRaises(TypeError, family.obsolete.__setitem__, 'a', 'b')
+        self.assertRaisesRegex(
+            TypeError,
+            self.FAMILY_TYPEERROR_RE,
+            family.obsolete.update,
+            {})
+        self.assertRaisesRegex(
+            TypeError,
+            self.FAMILY_TYPEERROR_RE,
+            family.obsolete.__setitem__,
+            'a',
+            'b')
 
     def test_WikimediaFamily_obsolete_readonly(self):
         """Test WikimediaFamily obsolete is readonly."""
         family = Family.load('test')
-        self.assertRaises(TypeError, family.__setattr__, 'obsolete',
-                          {'a': 'b', 'c': None})
+        self.assertRaisesRegex(
+            TypeError,
+            self.FROZENSET_TYPEERROR_RE,
+            family.__setattr__,
+            'obsolete',
+            {'a': 'b', 'c': None})
 
 
 class TestFamilyUrlRegex(PatchingTestCase):
@@ -185,8 +211,11 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1'), 'vo')
 
         # Text after $1 is not allowed
-        self.assertRaises(ValueError, f.from_url,
-                          '//vo.wikipedia.org/wiki/$1/foo')
+        self.assertRaisesRegex(
+            ValueError,
+            'Text after the \$1 placeholder is not supported \(T111513\)',
+            f.from_url,
+            '//vo.wikipedia.org/wiki/$1/foo')
 
         # the IWM may contain the wrong protocol, but it's only used to
         # determine a site so using HTTP or HTTPS is not an issue
@@ -225,6 +254,7 @@ class TestOldFamilyMethod(DeprecationTestCase):
 
     """Test cases for old site.Family method."""
 
+    UNKNOWNFAMILY_RE = 'Family unknown does not exist'
     net = False
 
     def test_old_site_family_function(self):
@@ -251,9 +281,17 @@ class TestOldFamilyMethod(DeprecationTestCase):
         # As assertRaises calls the method, unittest is the module
         # invoking the method instead of this test module.
         self._do_test_warning_filename = False
-        self.assertRaises(UnknownFamily, pywikibot.site.Family, 'unknown',
-                          fatal=False)
-        self.assertRaises(UnknownFamily, pywikibot.site.Family, 'unknown')
+        self.assertRaisesRegex(
+            UnknownFamily,
+            self.UNKNOWNFAMILY_RE,
+            pywikibot.site.Family,
+            'unknown',
+            fatal=False)
+        self.assertRaisesRegex(
+            UnknownFamily,
+            self.UNKNOWNFAMILY_RE,
+            pywikibot.site.Family,
+            'unknown')
         self.assertDeprecationParts('pywikibot.site.Family',
                                     'pywikibot.family.Family.load')
         self.assertDeprecationParts('fatal argument of pywikibot.family.Family.load')
