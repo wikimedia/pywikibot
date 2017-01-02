@@ -3034,6 +3034,9 @@ class LoginManager(login.LoginManager):
                             lgname=self.login_name,
                             lgpassword=self.password))
 
+        if self.site.family.ldapDomain:
+            login_request['lgdomain'] = self.site.family.ldapDomain
+
         # get token using meta=tokens if supported
         if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.27'):
             login_request["lgtoken"] = self.get_login_token()
