@@ -16,13 +16,13 @@ These parameters are supported to specify which pages titles to print:
             1 - u'{num:4d} {page.title}'
                 --> 10 PageTitle
 
-            2 - u'{num:4d} {[[page.title]]}'
+            2 - u'{num:4d} [[{page.title}]]'
                 --> 10 [[PageTitle]]
 
             3 - u'{page.title}'
                 --> PageTitle
 
-            4 - u'{[[page.title]]}'
+            4 - u'[[{page.title}]]'
                 --> [[PageTitle]]
 
             5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
