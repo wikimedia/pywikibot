@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,57 +25,13 @@ from pywikibot.tools import (
 )
 
 from tests import join_images_path
-from tests.aspects import unittest, TestCase, DeprecationTestCase, require_modules
-
-try:
-    import pytest_httpbin
-    optional_pytest_httpbin_cls_decorator = pytest_httpbin.use_class_based_httpbin
-except ImportError:
-    pytest_httpbin = None
-
-    def optional_pytest_httpbin_cls_decorator(f):
-        """Empty decorator in case pytest_httpbin is not installed."""
-        return f
-
-
-@optional_pytest_httpbin_cls_decorator
-class HttpbinTestCase(TestCase):
-
-    """
-    Custom test case class, which allows doing dry httpbin tests using pytest-httpbin.
-
-    Test cases, which use httpbin, need to inherit this class.
-    """
-
-    sites = {
-        'httpbin': {
-            'hostname': 'httpbin.org',
-        },
-    }
-
-    def get_httpbin_url(self, path=''):
-        """
-        Return url of httpbin.
-
-        If pytest is used, returns url of local httpbin server.
-        Otherwise, returns: http://httpbin.org
-        """
-        if hasattr(self, 'httpbin'):
-            return self.httpbin.url + path
-        else:
-            return 'http://httpbin.org' + path
-
-    def get_httpbin_hostname(self):
-        """
-        Return httpbin hostname.
-
-        If pytest is used, returns hostname of local httpbin server.
-        Otherwise, returns: httpbin.org
-        """
-        if hasattr(self, 'httpbin'):
-            return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
-        else:
-            return 'httpbin.org'
+from tests.aspects import (
+    unittest,
+    TestCase,
+    DeprecationTestCase,
+    HttpbinTestCase,
+    require_modules,
+)
 
 
 class HttpTestCase(TestCase):

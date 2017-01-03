@@ -7,7 +7,7 @@ such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,7 +29,6 @@ __version__ = '$Id$'
         UITestCase:
             Not integrated; direct subclass of unittest.TestCase.
 """
-import imp
 import inspect
 import itertools
 import os
@@ -60,6 +59,16 @@ from tests.utils import (
     add_metaclass, execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
 )
+
+try:
+    import pytest_httpbin
+    optional_pytest_httpbin_cls_decorator = pytest_httpbin.use_class_based_httpbin
+except ImportError:
+    pytest_httpbin = None
+
+    def optional_pytest_httpbin_cls_decorator(f):
+        """Empty decorator in case pytest_httpbin is not installed."""
+        return f
 
 OSWIN32 = (sys.platform == 'win32')
 
@@ -484,13 +493,10 @@ class CheckHostnameMixin(TestCaseBase):
         if not hasattr(cls, 'sites'):
             return
 
-        # Check is pytest is used and pytest_httpbin module is installed.
-        if hasattr(sys, '_test_runner_pytest'):
-            try:
-                imp.find_module('pytest_httpbin')
-                httpbin_used = True
-            except ImportError:
-                httpbin_used = False
+        if issubclass(cls, HttpbinTestCase):
+            # If test uses httpbin, then check is pytest test runner is used
+            # and pytest_httpbin module is installed.
+            httpbin_used = hasattr(sys, '_test_runner_pytest') and pytest_httpbin
         else:
             httpbin_used = False
 
@@ -1658,3 +1664,43 @@ class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
         CapturingTestCase.process_assert,
         CapturingTestCase.patch_assert,
     ]
+
+
+@optional_pytest_httpbin_cls_decorator
+class HttpbinTestCase(TestCase):
+
+    """
+    Custom test case class, which allows doing dry httpbin tests using pytest-httpbin.
+
+    Test cases, which use httpbin, need to inherit this class.
+    """
+
+    sites = {
+        'httpbin': {
+            'hostname': 'httpbin.org',
+        },
+    }
+
+    def get_httpbin_url(self, path=''):
+        """
+        Return url of httpbin.
+
+        If pytest is used, returns url of local httpbin server.
+        Otherwise, returns: http://httpbin.org
+        """
+        if hasattr(self, 'httpbin'):
+            return self.httpbin.url + path
+        else:
+            return 'http://httpbin.org' + path
+
+    def get_httpbin_hostname(self):
+        """
+        Return httpbin hostname.
+
+        If pytest is used, returns hostname of local httpbin server.
+        Otherwise, returns: httpbin.org
+        """
+        if hasattr(self, 'httpbin'):
+            return '{0}:{1}'.format(self.httpbin.host, self.httpbin.port)
+        else:
+            return 'httpbin.org'
