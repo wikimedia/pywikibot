@@ -1413,21 +1413,6 @@ class SearchTestCase(DefaultSiteTestCase):
                 raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
             raise
 
-    def test_search_where_text(self):
-        """Test the site.search() method with 'where' parameter set to text."""
-        self.assertEqual(list(self.site.search('wiki', total=10)),
-                         list(self.site.search('wiki', total=10,
-                                               where='text')))
-
-    def test_search_where_nearmatch(self):
-        """Test the site.search().
-
-        'where' parameter set to 'nearmatch'.
-        """
-        self.assertLessEqual(len(list(self.site.search('wiki', total=10,
-                                                       where='nearmatch'))),
-                             len(list(self.site.search('wiki', total=10))))
-
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         try:
