@@ -20,6 +20,8 @@ class TestChoiceOptions(TestCase):
 
     """Test cases for input_choice Option."""
 
+    TEST_RE = '\'int\' object has no attribute \'lower\''
+    SEQ_EMPTY_RE = 'The sequence is empty.'
     net = False
 
     def test_formatted(self):
@@ -29,7 +31,7 @@ class TestChoiceOptions(TestCase):
     def test_output(self):
         """Test OutputOption."""
         option = bot_choice.OutputOption()
-        with self.assertRaises(NotImplementedError):
+        with self.assertRaisesRegex(NotImplementedError, ''):
             message('?', [option], None)
 
     def test_standard(self):
@@ -75,7 +77,7 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.format(), 'r<number> [1-5]')
         self.assertEqual(message('?', [option], None), '? (r<number> [1-5])')
         self.assertEqual(message('?', [option], 'r3'), '? (r<number> [1-[3]-5])')
-        self.assertRaises(AttributeError, option.test, 1)
+        self.assertRaisesRegex(AttributeError, self.TEST_RE, option.test, 1)
         self.assertFalse(option.test('0'))
         self.assertFalse(option.test('r0'))
         self.assertFalse(option.test('r6'))
@@ -87,7 +89,7 @@ class TestChoiceOptions(TestCase):
 
     def test_List(self):
         """Test ListOption."""
-        self.assertRaises(ValueError, bot.ListOption, [])
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, bot.ListOption, [])
         options = ['foo', 'bar']
         option = bot.ListOption(options)
         self.assertEqual(message('?', [option], None), '? (<number> [1-2])')
@@ -99,8 +101,8 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(message('?', [option], None), '? (<number> [1])')
         self.assertEqual(message('?', [option], '1'), '? (<number> [[1]])')
         options.pop()
-        self.assertRaises(ValueError, option.format, None)
-        self.assertRaises(ValueError, option.format)
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format, None)
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format)
         self.assertFalse(option.test('0'))
         options += ['baz', 'quux', 'norf']
         self.assertEqual(message('?', [option], None), '? (<number> [1-3])')
