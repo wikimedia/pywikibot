@@ -133,13 +133,14 @@ class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""
 
+    CERT_VERIFY_FAILED_RE = 'certificate verify failed'
     hostname = 'testssl-expire-r2i2.disig.sk'
 
     def test_https_cert_error(self):
         """Test if http.fetch respects disable_ssl_certificate_validation."""
-        self.assertRaises(pywikibot.FatalServerError,
-                          http.fetch,
-                          uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        self.assertRaisesRegex(pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE,
+                               http.fetch,
+                               uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
 
         with warnings.catch_warnings(record=True) as warning_log:
@@ -152,9 +153,9 @@ class HttpsCertificateTestCase(TestCase):
         http.session.close()  # clear the connection
 
         # Verify that it now fails again
-        self.assertRaises(pywikibot.FatalServerError,
-                          http.fetch,
-                          uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        self.assertRaisesRegex(pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE,
+                               http.fetch,
+                               uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
         http.session.close()  # clear the connection
 
         # Verify that the warning occurred
@@ -181,23 +182,25 @@ class TestHttpStatus(HttpbinTestCase):
 
     def test_http_504(self):
         """Test that a HTTP 504 raises the correct exception."""
-        self.assertRaises(pywikibot.Server504Error,
-                          http.fetch,
-                          uri=self.get_httpbin_url('/status/504'))
+        self.assertRaisesRegex(pywikibot.Server504Error, 'Server ([^\:]+|[^\:]+:[0-9]+) timed out',
+                               http.fetch,
+                               uri=self.get_httpbin_url('/status/504'))
 
     def test_server_not_found(self):
         """Test server not found exception."""
-        self.assertRaises(requests.exceptions.ConnectionError,
-                          http.fetch,
-                          uri='http://ru-sib.wikipedia.org/w/api.php',
-                          default_error_handling=True)
+        self.assertRaisesRegex(requests.exceptions.ConnectionError,
+                               'Max retries exceeded with url: /w/api.php',
+                               http.fetch,
+                               uri='http://ru-sib.wikipedia.org/w/api.php',
+                               default_error_handling=True)
 
     def test_invalid_scheme(self):
         """Test invalid scheme."""
         # A InvalidSchema is raised within requests
-        self.assertRaises(requests.exceptions.InvalidSchema,
-                          http.fetch,
-                          uri='invalid://url')
+        self.assertRaisesRegex(requests.exceptions.InvalidSchema,
+                               'No connection adapters were found for \'invalid://url\'',
+                               http.fetch,
+                               uri='invalid://url')
 
     def test_follow_redirects(self):
         """Test follow 301 redirects correctly."""
@@ -421,6 +424,7 @@ class CharsetTestCase(TestCase):
 
     """Test that HttpRequest correct handles the charsets given."""
 
+    CODEC_CANT_DECODE_RE = 'codec can\'t decode byte'
     net = False
 
     STR = u'äöü'
@@ -507,9 +511,9 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('utf16',
                                               CharsetTestCase.LATIN1_BYTES)
         self.assertEqual('utf16', req.charset)
-        self.assertRaises(UnicodeDecodeError, lambda: req.encoding)
+        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
-        self.assertRaises(UnicodeDecodeError, lambda: req.content)
+        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.content)
 
 
 class BinaryTestCase(TestCase):
