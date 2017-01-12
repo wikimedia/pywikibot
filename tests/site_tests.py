@@ -2438,8 +2438,8 @@ class TestNonEnglishWikipediaSite(TestCase):
         self.assertEqual(str(image_namespace), ':File:')
         self.assertEqual(image_namespace.custom_prefix(), ':Fil:')
         self.assertEqual(image_namespace.canonical_prefix(), ':File:')
-        self.assertEqual(image_namespace.aliases, ['Image'])
-        self.assertEqual(len(image_namespace), 3)
+        self.assertEqual(sorted(image_namespace.aliases), ['Bilde', 'Image'])
+        self.assertEqual(len(image_namespace), 4)
 
         self.assertEqual(len(namespaces[1].aliases), 0)
         self.assertEqual(len(namespaces[4].aliases), 1)
