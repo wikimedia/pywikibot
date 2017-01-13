@@ -1028,7 +1028,20 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen1)
         gf2 = pagegenerators.GeneratorFactory(site=self.site)
         gf2.handleArg('-page:Main Page')
-        gen2 = gf1.getCombinedGenerator()
+        gen2 = gf2.getCombinedGenerator()
+        self.assertIsNotNone(gen2)
+        self.assertEqual(list(gen1), list(gen2))
+
+    def test_positionalargument_with_colon(self):
+        """Test page generator with positional argument with colon."""
+        gf1 = pagegenerators.GeneratorFactory(site=self.site,
+                                              positional_arg_name='page')
+        gf1.handleArg('Project:Main Page')
+        gen1 = gf1.getCombinedGenerator()
+        self.assertIsNotNone(gen1)
+        gf2 = pagegenerators.GeneratorFactory(site=self.site)
+        gf2.handleArg('-page:Project:Main Page')
+        gen2 = gf2.getCombinedGenerator()
         self.assertIsNotNone(gen2)
         self.assertEqual(list(gen1), list(gen2))
 

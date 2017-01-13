@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -632,14 +632,15 @@ class GeneratorFactory(object):
             """Return None if v is None or '' else return int(v)."""
             return v if (v is None or v is '') else int(v)
 
-        arg, sep, value = arg.partition(':')
-        if value == '':
-            value = None
-
         gen = None
         if not arg.startswith('-') and self._positional_arg_name:
             value = arg
             arg = '-' + self._positional_arg_name
+        else:
+            arg, sep, value = arg.partition(':')
+
+        if value == '':
+            value = None
 
         if arg == '-filelinks':
             if not value:
