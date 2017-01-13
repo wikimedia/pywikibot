@@ -274,7 +274,8 @@ def main(*args):
                     summary = i18n.twtranslate(mysite, 'delete-from-category',
                                                {'page': pageName})
                 elif arg.startswith('-links'):
-                    summary = i18n.twtranslate(mysite, un + 'delete-linked-pages',
+                    summary = i18n.twtranslate(mysite,
+                                               un + 'delete-linked-pages',
                                                {'page': pageName})
                 elif arg.startswith('-ref'):
                     summary = i18n.twtranslate(mysite, 'delete-referring-pages',
@@ -291,7 +292,8 @@ def main(*args):
     if generator:
         if summary is None:
             summary = pywikibot.input(u'Enter a reason for the %sdeletion:'
-                                      % ['', 'un'][options.get('undelete', False)])
+                                      % ['', 'un'][options.get('undelete',
+                                                               False)])
         bot = DeletionRobot(generator, summary, **options)
         bot.run()
         return True

@@ -144,7 +144,8 @@ def main(*args):
             options['loose'] = True
         elif arg.startswith('-summary'):
             if len(arg) == len('-summary'):
-                options['summary'] = pywikibot.input(u'Choose an edit summary: ')
+                options['summary'] = pywikibot.input(
+                    'Choose an edit summary: ')
             else:
                 options['summary'] = arg[len('-summary:'):]
         elif old_image:
