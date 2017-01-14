@@ -221,13 +221,13 @@ def _create_default_regexes():
     _regex_cache.update({
         'comment':      re.compile(r'(?s)<!--.*?-->'),
         # section headers
-        'header':       re.compile(r'\r?\n=+.+=+ *\r?\n'),
+        'header':       re.compile(r'(?m)^=+.+=+ *$'),
         # preformatted text
-        'pre':          re.compile(r'(?ism)<pre>.*?</pre>'),
+        'pre':          re.compile(r'(?is)<pre[ >].*?</pre>'),
         'source':       re.compile(r'(?is)<source .*?</source>'),
-        'score':        re.compile(r'(?ism)<score[ >].*?</score>'),
+        'score':        re.compile(r'(?is)<score[ >].*?</score>'),
         # inline references
-        'ref':          re.compile(r'(?ism)<ref[ >].*?</ref>'),
+        'ref':          re.compile(r'(?is)<ref[ >].*?</ref>'),
         'template':     NESTED_TEMPLATE_REGEX,
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
@@ -235,7 +235,7 @@ def _create_default_regexes():
         # tables often have whitespace that is used to improve wiki
         # source code readability.
         # TODO: handle nested tables.
-        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table>.*?</table>'),
+        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table[ >].*?</table>'),
         'hyperlink':    compileLinkR(),
         'gallery':      re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
         # this matches internal wikilinks, but also interwiki, categories, and
@@ -247,11 +247,13 @@ def _create_default_regexes():
                              site.validLanguageLinks() +
                              list(site.family.obsolete.keys()))),
         # Wikibase property inclusions
-        'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
+        'property':     (r'(?i)\{\{\s*\#(?:%s):\s*p\d+.*?\}\}',
+                         lambda site: '|'.join(site.getmagicwords('property'))),
         # Module invocations (currently only Lua)
-        'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
+        'invoke':       (r'(?is)\{\{\s*\#(?:%s):.*?\}\}',
+                         lambda site: '|'.join(site.getmagicwords('invoke'))),
         # categories
-        'category':     ('\[\[ *(?:%s)\s*:.*?\]\]',
+        'category':     (r'\[\[ *(?:%s)\s*:.*?\]\]',
                          lambda site: '|'.join(site.namespaces[14])),
         # files
         'file':         (FILE_LINK_REGEX,
