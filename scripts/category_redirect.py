@@ -93,6 +93,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'sh': u"Kategorija:Preusmjerene kategorije Wikipedije",
             'vi': u"Thể loại:Thể loại đổi hướng",
             'zh': u"Category:已重定向的分类",
+            'ro': 'Categorie:Categorii de redirecționare',
         }
 
         # Category that contains non-empty redirected category pages
