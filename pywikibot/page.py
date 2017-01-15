@@ -4726,7 +4726,7 @@ class Claim(Property):
 
         The function checks for:
 
-        - ItemPage ID equality
+        - WikibasePage ID equality
         - WbTime year equality
         - Coordinate equality, regarding precision
         - WbMonolingualText text equality
@@ -4737,7 +4737,7 @@ class Claim(Property):
             false otherwise
         @rtype: bool
         """
-        if (isinstance(self.target, pywikibot.ItemPage) and
+        if (isinstance(self.target, WikibasePage) and
                 isinstance(value, basestring)):
             return self.target.id == value
 
