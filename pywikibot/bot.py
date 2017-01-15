@@ -505,8 +505,7 @@ def inputChoice(question, answers, hotkeys, default=None):
                            automatic_quit=False)
 
 
-def input_list_choice(question, answers, default=None,
-                      automatic_quit=True, force=False):
+def input_list_choice(question, answers, default=None, force=False):
     """
     Ask the user the question and return one of the valid answers.
 
@@ -1632,7 +1631,7 @@ class CurrentPageBot(BaseBot):
     A bot which automatically sets 'current_page' on each treat().
 
     This class should be always used together with either the MultipleSitesBot
-    or SingleSiteBot class as there is no site managment in this class.
+    or SingleSiteBot class as there is no site management in this class.
     """
 
     ignore_save_related_errors = True
