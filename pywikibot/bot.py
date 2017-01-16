@@ -1313,7 +1313,7 @@ class BaseBot(object):
         @rtype: bool
         """
         if not self.user_confirm('Do you want to accept these changes?'):
-            return
+            return False
 
         if 'async' not in kwargs and self.getOption('always'):
             kwargs['async'] = True
@@ -1871,16 +1871,16 @@ class WikidataBot(Bot):
         @kwarg ignore_save_related_errors: if True, errors related to
           page save will be reported and ignored (default: False)
         @type ignore_save_related_errors: bool
+        @return: whether the item was saved successfully
+        @rtype: bool
         """
-        self.current_page = item
-
         show_diff = kwargs.pop('show_diff', True)
         if show_diff:
             if data is None:
                 diff = item.toJSON(diffto=(
                     item._content if hasattr(item, '_content') else None))
             else:
-                diff = pywikibot.WikibasePage._normalizeData(data)
+                diff = pywikibot.page.WikibasePage._normalizeData(data)
             pywikibot.output(json.dumps(diff, indent=4, sort_keys=True))
 
         if 'summary' in kwargs:
@@ -1889,7 +1889,7 @@ class WikidataBot(Bot):
         # TODO async in editEntity should actually have some effect (bug T86074)
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
-        self._save_page(item, item.editEntity, data, **kwargs)
+        return self._save_page(item, item.editEntity, data, **kwargs)
 
     def getSource(self, site):
         """
