@@ -544,6 +544,7 @@ class GeneratorFactory(object):
             categoryname = u'{0}:{1}'.format(self.site.namespace(14),
                                              categoryname)
         cat = pywikibot.Category(pywikibot.Link(categoryname,
+                                                source=self.site,
                                                 defaultNamespace=14))
         return cat, startfrom
 
