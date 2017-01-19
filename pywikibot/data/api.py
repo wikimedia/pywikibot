@@ -2089,15 +2089,22 @@ class Request(MutableMapping):
 
             pywikibot.warning('API error %s: %s' % (code, info))
 
-            if code.startswith(u'internal_api_error_'):
-                class_name = code[len(u'internal_api_error_'):]
+            if code.startswith('internal_api_error_') or code == 'readonly':
+                if code == 'readonly':  # T154011
+                    class_name = code
+                else:
+                    class_name = code[len(u'internal_api_error_'):]
 
                 del error['code']  # is added via class_name
                 e = APIMWException(class_name, **error)
 
+                # If the error key is in this table, it is probably a temporary problem,
+                # so we will retry the edit.
+                # TODO: T154011: 'ReadOnlyError' seems replaced by 'readonly'
                 retry = class_name in ['DBConnectionError',  # T64974
                                        'DBQueryError',  # T60158
-                                       'ReadOnlyError'  # T61227
+                                       'ReadOnlyError',  # T61227
+                                       'readonly',  # T154011
                                        ]
 
                 pywikibot.error("Detected MediaWiki API exception %s%s"
