@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2016
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import calendar
 import datetime
@@ -38,6 +36,9 @@ from tests.aspects import (
     RecentChangesTestCase,
 )
 from tests.thread_tests import GeneratorIntersectTestCase
+
+
+__version__ = '$Id$'
 
 en_wp_page_titles = (
     # just a bunch of randomly selected titles for English Wikipedia tests
@@ -1109,6 +1110,18 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         # ABC disambiguation
         page2 = next(gen)
         self.assertEqual(page2.title(), 'Q286874')
+
+    def test_get_category_site(self):
+        """Test the getCategory method."""
+        # With default site
+        gf = pagegenerators.GeneratorFactory()
+        cat = gf.getCategory('foo')[0]
+        self.assertEqual(cat.site, pywikibot.Site())
+        # With a user-specified site
+        fa_wikisource = pywikibot.Site('fa', 'wikisource')
+        gf = pagegenerators.GeneratorFactory(fa_wikisource)
+        cat = gf.getCategory('foo')[0]
+        self.assertEqual(cat.site, fa_wikisource)
 
 
 class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
