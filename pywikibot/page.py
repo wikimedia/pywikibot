@@ -2346,7 +2346,7 @@ class FilePage(Page):
             value: instance of FileInfo()
         @rtype: dict
         """
-        if not hasattr(self, '_file_revisions'):
+        if not len(self._file_revisions):
             self.site.loadimageinfo(self, history=True)
         return self._file_revisions
 
