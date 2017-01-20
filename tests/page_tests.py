@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import pickle
+try:
+    import unittest.mock as mock
+except ImportError:
+    import mock
 
 import pywikibot
 import pywikibot.page
@@ -28,6 +30,9 @@ from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
     DefaultDrySiteTestCase, DeprecationTestCase,
 )
+
+
+__version__ = '$Id$'
 
 
 class TestLinkObject(SiteAttributeTestCase):
@@ -564,6 +569,24 @@ class TestPageBaseUnicode(DefaultDrySiteTestCase):
         """Initialize page instance."""
         super(TestPageBaseUnicode, cls).setUpClass()
         cls.page = pywikibot.Page(cls.site, 'Ō')
+
+
+class TestPageGetFileHistory(DefaultDrySiteTestCase):
+
+    """Test the get_file_history method of the FilePage class."""
+
+    def test_get_file_history_cache(self):
+        """Test the cache mechanism of get_file_history."""
+        with mock.patch.object(self.site, 'loadimageinfo', autospec=True):
+            page = pywikibot.FilePage(self.site, 'File:Foo.jpg')
+            _file_revisions = page.get_file_history()
+            # On the first call the history is loaded via API
+            self.assertEqual(_file_revisions, {})
+            # Fill the cache
+            _file_revisions['foo'] = 'bar'
+            # On the second call page._file_revisions is returned
+            self.assertEqual(page.get_file_history(), {'foo': 'bar'})
+            self.site.loadimageinfo.assert_called_once_with(page, history=True)
 
 
 class TestPageRepr(TestPageBaseUnicode):
