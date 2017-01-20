@@ -1509,7 +1509,7 @@ class ItemClaimFilter(object):
         if not isinstance(page, pywikibot.ItemPage):
             pywikibot.output(u'%s is not an ItemPage. Skipping.' % page)
             return False
-        for page_claim in page.get()['claims'][prop]:
+        for page_claim in page.get()['claims'].get(prop, []):
             if page_claim.target_equals(claim):
                 if not qualifiers:
                     return True
