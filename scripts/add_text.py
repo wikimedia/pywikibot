@@ -56,7 +56,7 @@ Furthermore, the following command line parameters are supported:
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -67,11 +67,13 @@ __version__ = '$Id$'
 
 import codecs
 import re
+import sys
 import time
 
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.tools.formatter import color_format
 
 docuReplacements = {
@@ -169,10 +171,13 @@ def add_text(page, addText, summary=None, regexSkip=None,
         # text in the page
         if putText:
             if not always:
-                choice = pywikibot.input_choice(
-                    u'Do you want to accept these changes?',
-                    [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
-                     ('open in Browser', 'b')], 'n', automatic_quit=False)
+                try:
+                    choice = pywikibot.input_choice(
+                        'Do you want to accept these changes?',
+                        [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
+                         ('open in Browser', 'b')], 'n')
+                except QuitKeyboardInterrupt:
+                    sys.exit('User quit bot run.')
                 if choice == 'a':
                     always = True
                 elif choice == 'n':
