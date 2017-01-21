@@ -1518,20 +1518,21 @@ class ItemClaimFilter(object):
                     if not page_claim.has_qualifier(prop, val):
                         return False
                 return True
+        return False
 
     @classmethod
     def filter(cls, generator, prop, claim, qualifiers=None, negate=False):
         """
-        Yield all ItemPages which does contain certain claim in a property.
+        Yield all ItemPages which contain certain claim in a property.
 
         @param prop: property id to check
         @type prop: str
         @param claim: value of the property to check. Can be exact value (for
-            instance, ItemPage instance) or ItemPage ID string (e.g. 'Q37470').
+            instance, ItemPage instance) or a string (e.g. 'Q37470').
         @param qualifiers: dict of qualifiers that must be present, or None if
             qualifiers are irrelevant
         @type qualifiers: dict or None
-        @param negate: true if pages that does *not* contain specified claim
+        @param negate: true if pages that do *not* contain specified claim
             should be yielded, false otherwise
         @type negate: bool
         """
