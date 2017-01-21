@@ -1300,13 +1300,6 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
 
-        # Even handle balanced [[ ]] inside the wikilink.
-        self.assertEqual(
-            textlib.replaceExcept(
-                '[[File:a|[[foo]] [[bar [[invalid]] ]].x]][[x]]',
-                'x', 'y', ['file'], site=self.site),
-            '[[File:a|[[foo]] [[bar [[invalid]] ]].x]][[y]]')
-
     @unittest.expectedFailure
     def test_replace_tag_file_failure(self):
         """Test showing limits of the file link regex."""
