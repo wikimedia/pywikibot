@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -127,7 +127,7 @@ NON_LATIN_DIGITS = {
     'or': u'୦୧୨୩୪୫୬୭୮୯',
 }
 
-# Used in TimeStripper. When a timestamp-like line have longer gaps
+# Used in TimeStripper. When a timestamp-like line has longer gaps
 # than this between year, month, etc in it, then the line will not be
 # considered to contain a timestamp.
 TIMESTAMP_GAP_LIMIT = 10
@@ -137,8 +137,8 @@ def to_local_digits(phrase, lang):
     """
     Change Latin digits based on language to localized version.
 
-    Be aware that this function only returns for several language
-    And doesn't touch the input if other languages are asked.
+    Be aware that this function only returns for several languages,
+    and that it doesn't touch the input if other languages are asked.
     @param phrase: The phrase to convert to localized numerical
     @param lang: language code
     @return: The localized version
