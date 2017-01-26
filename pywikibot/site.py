@@ -6095,6 +6095,30 @@ class APISite(BaseSite):
                             # TODO: catch and process foreseeable errors
                             if error.code == u'uploaddisabled':
                                 self._uploaddisabled = True
+                            elif error.code == u'stashfailed' and \
+                                    'offset' in error.other:
+                                # TODO: Ask MediaWiki to change this
+                                # ambiguous error code.
+
+                                new_offset = int(error.other['offset'])
+                                # If the offset returned from the server
+                                # (the offset it expects now) is equal to
+                                # the offset we sent it, there must be
+                                # something else that prevented the upload,
+                                # instead of simple offset mismatch. This
+                                # also prevents infinite loops when we
+                                # upload the same chunk again and again,
+                                # every time ApiError.
+                                if offset != new_offset:
+                                    pywikibot.log('Old offset: {0}; Returned '
+                                                  'offset: {1}; Chunk size: '
+                                                  '{2}'.format(offset, new_offset,
+                                                               len(chunk)))
+                                    pywikibot.warning('Attempting to correct '
+                                                      'automatically from '
+                                                      'offset mismatch error.')
+                                    offset = new_offset
+                                    continue
                             raise error
                         if 'nochange' in data:  # in simulation mode
                             break
