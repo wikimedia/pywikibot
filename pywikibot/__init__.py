@@ -674,16 +674,6 @@ class WbQuantity(_WbRepresentation):
             return None
         return format(value, "+g")
 
-    def __eq__(self, other):
-        """Override equality to handle different unit representations."""
-        if isinstance(other, self.__class__):
-            self_dict = self.__dict__.copy()
-            other_dict = other.__dict__.copy()
-            self_dict['_unit'] = self.unit
-            other_dict['_unit'] = other.unit
-            return self_dict == other_dict
-        return NotImplemented
-
     def __init__(self, amount, unit=None, error=None, site=None):
         u"""
         Create a new WbQuantity object.

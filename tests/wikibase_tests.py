@@ -242,6 +242,28 @@ class TestWikibaseCoordinateNonDry(WikidataTestCase):
         self.assertEqual(q.get_globe_item(test_repo),
                          ItemPage(test_repo, 'Q123'))
 
+    def test_Coordinate_equality(self):
+        """Test Coordinate equality with different globe representations."""
+        repo = self.get_repo()
+        a = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0.1,
+            globe='moon')
+        b = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0.1,
+            globe_item='http://www.wikidata.org/entity/Q405')
+        c = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0.1,
+            globe_item=ItemPage(repo, 'Q405'))
+        d = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0.1,
+            globe_item='http://test.wikidata.org/entity/Q405')
+        self.assertEqual(a, b)
+        self.assertEqual(b, c)
+        self.assertEqual(c, a)
+        self.assertNotEqual(a, d)
+        self.assertNotEqual(b, d)
+        self.assertNotEqual(c, d)
+
 
 class TestWbTime(WikidataTestCase):
 
@@ -359,7 +381,7 @@ class TestWbQuantity(WikidataTestCase):
                          "upperBound=%(val)s, lowerBound=%(val)s, "
                          "unit=1)" % {'val': '0.044405586'})
 
-    def test_WbQuantity_equality(self):
+    def test_WbQuantity_self_equality(self):
         """Test WbQuantity equality."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
