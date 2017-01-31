@@ -691,6 +691,7 @@ class TestPageBotMayEdit(TestCase):
     cached = True
     user = True
 
+    @mock.patch.object(config, 'ignore_bot_templates', False)
     def test_bot_may_edit_general(self):
         """Test that bot is allowed to edit."""
         site = self.get_site()
