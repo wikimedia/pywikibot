@@ -2761,8 +2761,8 @@ class APISite(BaseSite):
         """
         def handle_warning(mod, warning):
             return (mod == 'query' and
-                    warning == "Unrecognized value for parameter 'meta': "
-                               "wikibase")
+                    re.match(r'Unrecognized value for parameter [\'"]meta[\'"]: wikibase',
+                             warning))
 
         req = self._simple_request(action='query', meta='wikibase')
         req._warning_handler = handle_warning
