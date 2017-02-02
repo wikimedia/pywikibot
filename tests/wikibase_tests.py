@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ from decimal import Decimal
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.page import WikibasePage, ItemPage, PropertyPage
+from pywikibot.page import WikibasePage, ItemPage, Property, PropertyPage
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion
 
@@ -716,6 +716,18 @@ class TestRedirects(WikidataTestCase):
         self.assertTrue(item.isRedirectPage())
         target = pywikibot.ItemPage(wikidata, 'Q8422626')
         self.assertEqual(item.getRedirectTarget(), target)
+
+
+class TestProperty(WikidataTestCase):
+
+    """Test Property."""
+
+    def test_labels(self):
+        """Test retrieving Property labels."""
+        wikidata = self.get_repo()
+        property = Property(wikidata, 'P625')
+        expected = {'language': 'en', 'value': 'coordinate location'}
+        self.assertDictEqual(property.labels['en'], expected)
 
 
 class TestPropertyPage(WikidataTestCase):

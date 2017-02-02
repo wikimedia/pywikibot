@@ -12,7 +12,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -4274,6 +4274,17 @@ class Property(object):
         if not hasattr(self, '_type'):
             self._type = self.repo.getPropertyType(self)
         return self._type
+
+    @property
+    def labels(self):
+        """
+        Return labels of this property.
+
+        @rtype: dict
+        """
+        if not hasattr(self, '_labels'):
+            self._labels = self.repo.get_property_labels(self)
+        return self._labels
 
     @deprecated("Property.type")
     def getType(self):
