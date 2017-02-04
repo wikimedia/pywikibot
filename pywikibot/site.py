@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -7243,30 +7243,6 @@ class DataSite(APISite):
             dtype = data['entities'][prop.getID()]['datatype']
         except KeyError:
             dtype = data['entities'][prop.getID().lower()]['datatype']
-
-        return dtype
-
-    def get_property_labels(self, prop):
-        """
-        Obtain labels of a property.
-
-        Results are cached for 1 day.
-        """
-        params = dict(
-            action='wbgetentities',
-            ids=prop.getID(),
-            props='labels',
-        )
-        expiry = datetime.timedelta(days=1)
-        req = self._request(expiry=expiry, parameters=params)
-        data = req.submit()
-
-        # the IDs returned from the API can be upper or lowercase, depending
-        # on the version. See bug T55894 for more information.
-        try:
-            dtype = data['entities'][prop.getID()]['labels']
-        except KeyError:
-            dtype = data['entities'][prop.getID().lower()]['labels']
 
         return dtype
 
