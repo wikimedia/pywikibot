@@ -4175,9 +4175,15 @@ class ItemPage(WikibasePage):
         Merge the item into another item.
 
         @param item: The item to merge into
-        @type item: pywikibot.ItemPage
+        @type item: ItemPage
         """
-        self.repo.mergeItems(fromItem=self, toItem=item, **kwargs)
+        data = self.repo.mergeItems(fromItem=self, toItem=item, **kwargs)
+        if not data.get('success', 0):
+            return
+        self.latest_revision_id = data['from']['lastrevid']
+        item.latest_revision_id = data['to']['lastrevid']
+        if data.get('redirected', 0):
+            self._isredir = True
 
     def set_redirect_target(self, target_page, create=False, force=False,
                             keep_section=False, save=True, **kwargs):
