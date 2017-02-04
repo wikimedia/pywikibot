@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -137,8 +137,9 @@ def to_local_digits(phrase, lang):
     """
     Change Latin digits based on language to localized version.
 
-    Be aware that this function only returns for several languages,
-    and that it doesn't touch the input if other languages are asked.
+    Be aware that this function only works for several languages,
+    and that it returns an unchanged string if an unsupported language is given.
+
     @param phrase: The phrase to convert to localized numerical
     @param lang: language code
     @return: The localized version
