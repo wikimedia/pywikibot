@@ -1489,34 +1489,38 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
     def test_user_prefix_range(self):
         """Test the site.usercontribs() method."""
         mysite = self.get_site()
+        start = '2008-10-06T01:02:03Z'
         for contrib in mysite.usercontribs(
                 userprefix='Jane',
-                start=pywikibot.Timestamp.fromISOformat("2008-10-06T01:02:03Z"),
+                start=pywikibot.Timestamp.fromISOformat(start),
                 total=5):
-            self.assertLessEqual(contrib['timestamp'], "2008-10-06T01:02:03Z")
+            self.assertLessEqual(contrib['timestamp'], start)
 
+        end = '2008-10-07T02:03:04Z'
         for contrib in mysite.usercontribs(
                 userprefix='Jane',
-                end=pywikibot.Timestamp.fromISOformat("2008-10-07T02:03:04Z"),
+                end=pywikibot.Timestamp.fromISOformat(end),
                 total=5):
-            self.assertGreaterEqual(contrib['timestamp'], "2008-10-07T02:03:04Z")
+            self.assertGreaterEqual(contrib['timestamp'], end)
 
+        start = '2008-10-10T11:59:59Z'
+        end = '2008-10-10T00:00:01Z'
         for contrib in mysite.usercontribs(
-                userprefix='Tim',
-                start=pywikibot.Timestamp.fromISOformat("2008-10-10T11:59:59Z"),
-                end=pywikibot.Timestamp.fromISOformat("2008-10-10T00:00:01Z"),
+                userprefix='Timshiel',
+                start=pywikibot.Timestamp.fromISOformat(start),
+                end=pywikibot.Timestamp.fromISOformat(end),
                 total=5):
-            self.assertTrue(
-                "2008-10-10T00:00:01Z" <= contrib['timestamp'] <= "2008-10-10T11:59:59Z")
+            self.assertTrue(end <= contrib['timestamp'] <= start)
 
     def test_user_prefix_reverse(self):
         """Test the site.usercontribs() method with range reversed."""
         mysite = self.get_site()
+        start = '2008-10-08T03:05:07Z'
         for contrib in mysite.usercontribs(
                 userprefix='Brion',
-                start=pywikibot.Timestamp.fromISOformat("2008-10-08T03:05:07Z"),
+                start=pywikibot.Timestamp.fromISOformat(start),
                 total=5, reverse=True):
-            self.assertGreaterEqual(contrib['timestamp'], "2008-10-08T03:05:07Z")
+            self.assertGreaterEqual(contrib['timestamp'], start)
 
         for contrib in mysite.usercontribs(
                 userprefix='Brion',
@@ -1524,13 +1528,14 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
                 total=5, reverse=True):
             self.assertLessEqual(contrib['timestamp'], "2008-10-09T04:06:08Z")
 
+        start = '2008-10-11T06:00:01Z'
+        end = '2008-10-11T23:59:59Z'
         for contrib in mysite.usercontribs(
-                userprefix='Tim',
-                start=pywikibot.Timestamp.fromISOformat("2008-10-11T06:00:01Z"),
-                end=pywikibot.Timestamp.fromISOformat("2008-10-11T23:59:59Z"),
+                userprefix='Tim symond',
+                start=pywikibot.Timestamp.fromISOformat(start),
+                end=pywikibot.Timestamp.fromISOformat(end),
                 reverse=True, total=5):
-            self.assertTrue(
-                "2008-10-11T06:00:01Z" <= contrib['timestamp'] <= "2008-10-11T23:59:59Z")
+            self.assertTrue(start <= contrib['timestamp'] <= end)
 
     def test_invalid_range(self):
         """Test the site.usercontribs() method with invalid parameters."""
