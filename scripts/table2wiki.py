@@ -7,32 +7,22 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
--xml              Retrieve information from a local XML dump (pages_current, see
-                  http://download.wikimedia.org).
+-always           The bot won't ask for confirmation when putting a page
+
+-skipwarning      Skip processing a page when a warning occurred.
+                  Only used when -always is or becomes True.
+
+-quiet            Don't show diffs in -always mode
+
+-mysqlquery       Retrieve information from a local mirror.
+                  Searches for pages with HTML tables, and tries to convert
+                  them on the live wiki.
+
+-xml              Retrieve information from a local XML dump
+                  (pages_current, see http://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
-                  Searches for pages with HTML tables, and tries to convert them
-                  on the live wiki.
-
--sql              Retrieve information from a local mirror.
-                  Searches for pages with HTML tables, and tries to convert them
-                  on the live wiki.
-
--namespace:n      Number or name of namespace to process. The parameter can be
-                  used multiple times. It works in combination with all other
-                  parameters, except for the -start parameter. If you e.g.
-                  want to iterate over all categories starting at M, use
-                  -start:Category:M.
-
-This SQL query can be used to find pages to work on:
-
-                  SELECT CONCAT('[[', cur_title, ']]')
-                      FROM cur
-                      WHERE (cur_text LIKE '%<table%'
-                          OR cur_text LIKE '%<TABLE%')
-                          AND cur_title REGEXP "^[A-N]"
-                          AND cur_namespace=0
-                      ORDER BY cur_title
-                      LIMIT 500
+                  Searches for pages with HTML tables, and tries to convert
+                  them on the live wiki.
 
 Example:
 
@@ -67,6 +57,11 @@ from pywikibot import i18n
 from pywikibot import pagegenerators
 from pywikibot import xmlreader
 
+from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
+                           suggest_help, input_yn)
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import has_module, issue_deprecation_warning
+
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
@@ -88,14 +83,23 @@ class TableXmlDumpPageGenerator(object):
                 yield pywikibot.Page(pywikibot.Site(), entry.title)
 
 
-class Table2WikiRobot(object):
+class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
-    """Bot to convert HTML tables to wiki syntax."""
+    """Bot to convert HTML tables to wiki syntax.
 
-    def __init__(self, generator, quietMode=False):
+    @param generator: the page generator that determines on which pages
+        to work
+    @type generator: generator
+    """
+
+    def __init__(self, **kwargs):
         """Constructor."""
-        self.generator = generator
-        self.quietMode = quietMode
+        self.availableOptions.update({
+            'quiet': False,       # quiet mode, less output
+            'skipwarning': False  # on warning skip that page
+        })
+
+        super(Table2WikiRobot, self).__init__(site=True, **kwargs)
 
     def convertTable(self, table):
         """
@@ -447,14 +451,10 @@ class Table2WikiRobot(object):
             if not table:
                 # no more HTML tables left
                 break
-            pywikibot.output(">> Table %i <<" % (convertedTables + 1))
+
             # convert the current table
             newTable, warningsThisTable, warnMsgsThisTable = self.convertTable(
                 table)
-            # show the changes for this table
-            if not self.quietMode:
-                pywikibot.showDiff(table.replace('##table##', 'table'),
-                                   newTable)
             warningSum += warningsThisTable
             for msg in warnMsgsThisTable:
                 warningMessages += 'In table %i: %s' % (convertedTables + 1,
@@ -465,23 +465,10 @@ class Table2WikiRobot(object):
         pywikibot.output(warningMessages)
         return text, convertedTables, warningSum
 
-    def treat(self, page):
-        """
-        Load a page, convert all HTML tables in its text to wiki syntax, and save the result.
-
-        Returns True if the converted table was successfully saved, otherwise returns False.
-        """
-        pywikibot.output(u'\n>>> %s <<<' % page.title())
-        site = page.site
-        try:
-            text = page.get()
-        except pywikibot.NoPage:
-            pywikibot.error(u"couldn't find %s" % page.title())
-            return False
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u'Skipping redirect %s' % page.title())
-            return False
-        newText, convertedTables, warningSum = self.convertAllHTMLTables(text)
+    def treat_page(self):
+        """Convert all HTML tables in text to wiki syntax and save it."""
+        text = self.current_page.text
+        newText, convertedTables, warnings = self.convertAllHTMLTables(text)
 
         # Check if there are any marked tags left
         markedTableTagR = re.compile("<##table##|</##table##>", re.IGNORECASE)
@@ -492,33 +479,34 @@ class Table2WikiRobot(object):
 
         if convertedTables == 0:
             pywikibot.output(u"No changes were necessary.")
-        else:
-            if config.table2wikiAskOnlyWarnings and warningSum == 0:
-                doUpload = True
-            else:
-                if config.table2wikiSkipWarnings:
-                    doUpload = True
-                else:
-                    pywikibot.output("There were %i replacement(s) that might lead to bad "
-                                     "output." % warningSum)
-                    doUpload = (pywikibot.input(
-                        u'Do you want to change the page anyway? [y|N]') == "y")
-            if doUpload:
-                # get edit summary message
-                if warningSum == 0:
-                    editSummaryMessage = i18n.twtranslate(site.code, 'table2wiki-no-warning')
-                else:
-                    editSummaryMessage = i18n.twntranslate(
-                        site.code,
-                        'table2wiki-warnings',
-                        {'count': warningSum}
-                    )
-                page.put_async(newText, summary=editSummaryMessage)
+            return
 
-    def run(self):
-        """Check each page passed."""
-        for page in self.generator:
-            self.treat(page)
+        if warnings:
+            if self.getOption('always') and self.getOption('skipwarning'):
+                pywikibot.output(
+                    'There were %i replacements that might lead to bad '
+                    'output. Skipping.' % warnings)
+                return
+            if not self.getOption('always'):
+                pywikibot.output(
+                    'There were %i replacements that might lead to bad '
+                    'output.' % warnings)
+                if not input_yn('Do you want to change the page anyway'):
+                    return
+
+        # get edit summary message
+        if warnings == 0:
+            editSummaryMessage = i18n.twtranslate(
+                self.site.code, 'table2wiki-no-warning')
+        else:
+            editSummaryMessage = i18n.twntranslate(
+                self.site.code,
+                'table2wiki-warnings',
+                {'count': warnings}
+            )
+        self.put_current(newText, summary=editSummaryMessage,
+                         show_diff=not (self.getOption('quiet') and
+                                        self.getOption('always')))
 
 
 def main(*args):
@@ -530,76 +518,62 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    quietMode = False  # use -quiet to get less output
-    # if the -file argument is used, page titles are stored in this array.
-    # otherwise it will only contain one page.
-    articles = []
-    # if -file is not used, this temporary array is used to read the page title.
-    page_title = []
-
-    # Which namespaces should be processed?
-    # default to [] which means all namespaces will be processed
-    namespaces = []
-
-    xmlfilename = None
+    options = {}
     gen = None
+
+    local_args = pywikibot.handle_args(args)
 
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
+    genFactory = pagegenerators.GeneratorFactory(positional_arg_name='page')
 
-    for arg in pywikibot.handle_args(args):
-        if arg.startswith('-xml'):
-            if len(arg) == 4:
-                xmlfilename = pywikibot.input(
-                    u'Please enter the XML dump\'s filename:')
-            else:
-                xmlfilename = arg[5:]
-            gen = TableXmlDumpPageGenerator(xmlfilename)
-        elif arg == '-sql':
-            query = u"""
+    for arg in local_args:
+        option, sep, value = arg.partition(':')
+        if option == '-xml':
+            filename = value or pywikibot.input(
+                "Please enter the XML dump's filename:")
+            gen = TableXmlDumpPageGenerator(filename)
+        elif option == '-auto':
+            issue_deprecation_warning(
+                'The usage of "-auto"', '-always',
+                1, ArgumentDeprecationWarning)
+            options['always'] = True
+        elif option in ['-always', '-quiet', '-skipwarning']:
+            options[option[1:]] = True
+        else:
+            if option in ['-sql', '-mysqlquery']:
+                if not (has_module('oursql') or has_module('MySQLdb')):
+                    raise NotImplementedError(
+                        'Neither "oursql" nor "MySQLdb" library is installed.')
+                if option == '-sql':
+                    issue_deprecation_warning(
+                        'The usage of "-sql"', '-mysqlquery',
+                        1, ArgumentDeprecationWarning)
+
+                query = value or """
 SELECT page_namespace, page_title
 FROM page JOIN text ON (page_id = old_id)
 WHERE old_text LIKE '%<table%'
-LIMIT 200"""
-            gen = pagegenerators.MySQLPageGenerator(query)
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[11:]))
-            except ValueError:
-                namespaces.append(arg[11:])
-        elif arg.startswith('-skip:'):
-            articles = articles[articles.index(arg[6:]):]
-        elif arg.startswith('-auto'):
-            config.table2wikiAskOnlyWarnings = True
-            config.table2wikiSkipWarnings = True
-            pywikibot.output('Automatic mode!\n')
-        elif arg.startswith('-quiet'):
-            quietMode = True
-        else:
-            if not genFactory.handleArg(arg):
-                page_title.append(arg)
+"""
+                arg = '-mysqlquery:' + query
+            genFactory.handleArg(arg)
 
-    # if the page is given as a command line argument,
-    # connect the title's parts with spaces
-    if page_title != []:
-        page_title = ' '.join(page_title)
-        page = pywikibot.Page(pywikibot.Site(), page_title)
-        gen = iter([page])
-
-    if not gen:
+    if gen:
+        gen = pagegenerators.NamespaceFilterPageGenerator(
+            gen, genFactory.namespaces)
+    else:
         gen = genFactory.getCombinedGenerator()
 
     if gen:
-        if namespaces != []:
-            gen = pagegenerators.NamespaceFilterPageGenerator(gen, namespaces)
         if not genFactory.nopreload:
             gen = pagegenerators.PreloadingGenerator(gen)
-        bot = Table2WikiRobot(gen, quietMode)
+        bot = Table2WikiRobot(generator=gen, **options)
         bot.run()
+        return True
     else:
-        pywikibot.showHelp('table2wiki')
+        suggest_help(missing_generator=True)
+        return False
 
 
 if __name__ == "__main__":

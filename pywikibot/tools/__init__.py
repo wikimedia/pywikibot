@@ -155,6 +155,16 @@ else:
     count = itertools.count
 
 
+def has_module(module):
+    """Check whether a module can be imported."""
+    try:
+        __import__(module)
+    except ImportError:
+        return False
+    else:
+        return True
+
+
 def empty_iterator():
     # http://stackoverflow.com/a/13243870/473890
     """An iterator which does nothing."""
