@@ -14,8 +14,7 @@ The following parameters are supported:
 
 &params;
 
--always           If used, the bot won't ask if it should file the message
-                  onto user talk page.
+-always           The bot won't ask for confirmation when putting a page
 
 -text:            Use this text to be added; otherwise 'Test' is used
 
