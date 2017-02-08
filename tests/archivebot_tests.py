@@ -81,9 +81,13 @@ class TestArchiveBotFunctions(TestCase):
 
     def test_str2time(self):
         """Test for parsing the shorthand notation of durations."""
-        self.assertEqual(archivebot.str2time('0'), timedelta(0))
+        date = datetime(2017, 1, 1)  # non leap year
+        self.assertEqual(archivebot.str2time('0d'), timedelta(0))
+        self.assertEqual(archivebot.str2time('4000s'), timedelta(seconds=4000))
         self.assertEqual(archivebot.str2time('4000h'), timedelta(hours=4000))
-        self.assertEqual(archivebot.str2time('4000h'), timedelta(hours=4000))
+        self.assertEqual(archivebot.str2time('7d'), archivebot.str2time('1w'))
+        self.assertEqual(archivebot.str2time('3y'), timedelta(1096))
+        self.assertEqual(archivebot.str2time('3y', date), timedelta(1095))
         self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time, '4000@')
         self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time, '$1')
 
