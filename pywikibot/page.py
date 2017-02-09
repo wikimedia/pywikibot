@@ -4607,7 +4607,8 @@ class ItemPage(WikibasePage):
         if not save or keep_section or create:
             raise NotImplementedError
         data = self.repo.set_redirect_target(
-            from_item=self, to_item=target_page)
+            from_item=self, to_item=target_page,
+            bot=kwargs.get('botflag', True))
         if data.get('success', 0):
             del self.latest_revision_id
             self._isredir = True
