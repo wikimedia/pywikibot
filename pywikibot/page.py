@@ -3837,6 +3837,9 @@ class WikibasePage(BasePage):
         if lazy_loading_id or self.id == '-1':
             self.__init__(self.site, title=updates['entity']['id'])
 
+        self._content = updates['entity']
+        self.get()
+
     def editLabels(self, labels, **kwargs):
         """
         Edit entity labels.
