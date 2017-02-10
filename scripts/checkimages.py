@@ -25,6 +25,9 @@ This script understands the following command-line arguments:
 -duplicatesreport   Report the duplicates in a log *AND* put the template in
                     the images.
 
+-maxusernotify      Maximum nofitications added to a user talk page in a single
+                    check, to avoid email spamming.
+
 -sendemail          Send an email after tagging.
 
 -break              To break the bot after the first check (default: recursive)
@@ -88,6 +91,7 @@ from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 #
 
+import collections
 import re
 import time
 
@@ -543,7 +547,7 @@ class checkImagesBot(object):
     """A robot to check recently uploaded files."""
 
     def __init__(self, site, logFulNumber=25000, sendemailActive=False,
-                 duplicatesReport=False, logFullError=True):
+                 duplicatesReport=False, logFullError=True, max_user_notify=None):
         """Constructor, define some global variable."""
         self.site = site
         self.logFullError = logFullError
@@ -570,6 +574,11 @@ class checkImagesBot(object):
         self.sendemailActive = sendemailActive
         self.skip_list = []
         self.duplicatesReport = duplicatesReport
+
+        if max_user_notify:
+            self.num_notify = collections.defaultdict(lambda: max_user_notify)
+        else:
+            self.num_notify = None
 
         self.image_namespace = u"File:"
         # Load the licenses only once, so do it once
@@ -767,10 +776,18 @@ class checkImagesBot(object):
             newText = '{0}\n\n== {1} ==\n{2}'.format(testoattuale, self.head,
                                                      self.notification)
 
+        # Check maximum number of notifications for this talk page
+        if (self.num_notify is not None and
+                not self.num_notify[self.talk_page.title()]):
+            pywikibot.output('Maximum notifications reached, skip.')
+            return
+
         try:
             self.talk_page.put(newText, summary=commentox, minorEdit=False)
         except pywikibot.LockedPage:
             pywikibot.output(u'Talk page blocked, skip.')
+        else:
+            self.num_notify[self.talk_page.title()] -= 1
 
         if emailPageName and emailSubj:
             emailPage = pywikibot.Page(self.site, emailPageName)
@@ -1592,6 +1609,7 @@ def main(*args):
     regexGen = False  # Use the regex generator
     duplicatesActive = False  # Use the duplicate option
     duplicatesReport = False  # Use the duplicate-report option
+    max_user_notify = None
     sendemailActive = False  # Use the send-email
     logFullError = True  # Raise an error when the log is full
     generator = None
@@ -1634,6 +1652,13 @@ def main(*args):
                 duplicates_rollback = 1
             elif len(arg) > 11:
                 duplicates_rollback = int(arg[12:])
+        elif arg.startswith('-maxusernotify'):
+            if len(arg) == 13:
+                max_user_notify = int(pywikibot.input(
+                    'What should be the maximum number of notifications per '
+                    'user per check?'))
+            elif len(arg) > 13:
+                max_user_notify = int(arg[14:])
         elif arg == '-sendemail':
             sendemailActive = True
         elif arg.startswith('-skip'):
@@ -1727,7 +1752,8 @@ def main(*args):
         # Defing the Main Class.
         Bot = checkImagesBot(site, sendemailActive=sendemailActive,
                              duplicatesReport=duplicatesReport,
-                             logFullError=logFullError)
+                             logFullError=logFullError,
+                             max_user_notify=max_user_notify)
         if normal:
             generator = pg.NewimagesPageGenerator(total=limit, site=site)
         # if urlUsed and regexGen, get the source for the generator
