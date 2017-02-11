@@ -47,6 +47,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import (MultipleSitesBot, ExistingPageBot,
                            NoRedirectPageBot, AutomaticTWSummaryBot)
+from pywikibot.tools import UnicodeType
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -86,9 +87,10 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
         @return: processed text after piping
         @rtype: unicode
         """
-        text = text.encode('utf-8')
+        if not isinstance(text, str):  # py2-py3 compatibility
+            text = text.encode('utf-8')
         pipe = pipes.Template()
-        pipe.append(program.encode('ascii'), '--')
+        pipe.append(str(program), '--')  # py2-py3 compatibility
 
         # Create a temporary filename to save the piped stuff to
         tempFilename = '%s.%s' % (tempfile.mktemp(), 'txt')
@@ -96,8 +98,10 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
             file.write(text)
 
         # Now retrieve the munged text
-        with open(tempFilename, 'r') as mungedText:
-            unicode_text = mungedText.read().decode('utf-8')
+        with open(tempFilename, 'r') as file:
+            unicode_text = file.read()
+        if not isinstance(unicode_text, UnicodeType):  # py2-py3 compatibility
+            unicode_text = unicode_text.decode('utf-8')
 
         # clean up
         os.unlink(tempFilename)
