@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -257,10 +257,6 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
                          self.cct.cleanUpLinks('[[sand|sand]]box'))
         self.assertEqual('[[Sand|demospace]]',
                          self.cct.cleanUpLinks('[[sand|demo]]space'))
-
-    @unittest.expectedFailure
-    def test_cleanUpLinks_pipes_fail(self):
-        """Test cleanUpLinks method."""
         self.assertEqual('[[Title]]',
                          self.cct.cleanUpLinks('[[title|Title]]'))
         self.assertEqual('[[Sand]]box',
