@@ -544,8 +544,10 @@ class PageArchiver(object):
     def key_ok(self):
         """Return whether key is valid."""
         s = md5()
-        s.update(self.salt + '\n')
-        s.update(self.page.title().encode('utf8') + '\n')
+        s.update(self.salt.encode('utf-8'))
+        s.update(b'\n')
+        s.update(self.page.title().encode('utf8'))
+        s.update(b'\n')
         return self.get_attr('key') == s.hexdigest()
 
     def load_config(self):
