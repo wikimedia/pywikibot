@@ -31,3 +31,8 @@ class Family(family.WikimediaOrgFamily):
                 'Category redirect',
             ),
         }
+
+        # Subpages for documentation.
+        self.doc_subpages = {
+            '_default': (('/doc',), ['meta']),
+        }
