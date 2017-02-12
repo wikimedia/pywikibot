@@ -1150,7 +1150,7 @@ class BaseBot(object):
     # The values are the default values
     # Extend this in subclasses!
     availableOptions = {
-        'always': False,  # ask for confirmation when putting a page?
+        'always': False,  # By default ask for confirmation when putting a page
     }
 
     _current_page = None
