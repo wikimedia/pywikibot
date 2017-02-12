@@ -291,6 +291,16 @@ def template_title_regex(tpl_page):
     return re.compile(r'(?:(?:%s):)%s%s' % (u'|'.join(ns), marker, title))
 
 
+def calc_md5_hexdigest(txt, salt):
+    """Return md5 hexdigest computed from text and salt."""
+    s = md5()
+    s.update(salt.encode('utf-8'))
+    s.update(b'\n')
+    s.update(txt.encode('utf8'))
+    s.update(b'\n')
+    return s.hexdigest()
+
+
 class TZoneUTC(datetime.tzinfo):
 
     """Class building a UTC tzinfo object."""
@@ -543,12 +553,9 @@ class PageArchiver(object):
 
     def key_ok(self):
         """Return whether key is valid."""
-        s = md5()
-        s.update(self.salt.encode('utf-8'))
-        s.update(b'\n')
-        s.update(self.page.title().encode('utf8'))
-        s.update(b'\n')
-        return self.get_attr('key') == s.hexdigest()
+        hexdigest = calc_md5_hexdigest(self.page.title().encode('utf8'),
+                                       self.salt)
+        return self.get_attr('key') == hexdigest
 
     def load_config(self):
         """Load and validate archiver template."""
@@ -684,7 +691,7 @@ def main(*args):
     filename = None
     pagename = None
     namespace = None
-    salt = None
+    salt = ''
     force = False
     calc = None
     args = []
@@ -730,14 +737,8 @@ def main(*args):
             calc = page.title()
         else:
             pywikibot.output(u'NOTE: the specified page "%s" does not (yet) exist.' % calc)
-        s = md5()
-        s.update(salt + '\n')
-        s.update(calc + '\n')
-        pywikibot.output(u'key = ' + s.hexdigest())
+        pywikibot.output('key = %s' % calc_md5_hexdigest(calc, salt))
         return
-
-    if not salt:
-        salt = ''
 
     if not args:
         pywikibot.bot.suggest_help(additional_text='No template was specified.')
