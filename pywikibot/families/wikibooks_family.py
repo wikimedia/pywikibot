@@ -136,7 +136,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
         self.cross_allowed = [
-            'af', 'ang', 'ca', 'fa', 'fy', 'it', 'nl', 'ru', 'th', 'zh',
+            'af', 'ca', 'fa', 'fy', 'gl', 'it', 'nl', 'ru', 'th', 'zh',
         ]
 
         # Subpages for documentation.
