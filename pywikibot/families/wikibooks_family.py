@@ -145,4 +145,5 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             '_default': ((u'/doc', ),
                          ['en']
                          ),
+            'es': ('/uso', '/doc'),
         }
