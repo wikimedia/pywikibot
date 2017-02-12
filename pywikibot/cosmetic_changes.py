@@ -53,7 +53,7 @@ or by adding a list to the given one:
 """
 #
 # (C) xqt, 2009-2018
-# (C) Pywikibot team, 2006-2018
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,6 +71,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config, textlib
+from pywikibot.page import url2unicode
 from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
                                _get_regexes)
 from pywikibot.tools import deprecated_args, first_lower, first_upper
@@ -511,112 +512,109 @@ class CosmeticChangesToolkit(object):
             except ValueError:  # T111513
                 is_interwiki = True
 
-            if not is_interwiki:
-                # The link looks like this:
-                # [[page_title|link_text]]trailing_chars
-                # We only work on namespace 0 because pipes and linktrails work
-                # differently for images and categories.
-                page = pywikibot.Page(pywikibot.Link(titleWithSection,
-                                                     self.site))
-                try:
-                    namespace = page.namespace()
-                except pywikibot.InvalidTitle:
-                    return match.group()
-                if namespace == 0:
-                    # Replace underlines by spaces, also multiple underlines
-                    titleWithSection = re.sub('_+', ' ', titleWithSection)
-                    # Remove double spaces
-                    titleWithSection = re.sub('  +', ' ', titleWithSection)
-                    # Remove unnecessary leading spaces from title,
-                    # but remember if we did this because we eventually want
-                    # to re-add it outside of the link later.
-                    titleLength = len(titleWithSection)
-                    titleWithSection = titleWithSection.lstrip()
-                    hadLeadingSpaces = (len(titleWithSection) != titleLength)
-                    hadTrailingSpaces = False
-                    # Remove unnecessary trailing spaces from title,
-                    # but remember if we did this because it may affect
-                    # the linktrail and because we eventually want to
-                    # re-add it outside of the link later.
-                    if not trailingChars:
-                        titleLength = len(titleWithSection)
-                        titleWithSection = titleWithSection.rstrip()
-                        hadTrailingSpaces = (len(titleWithSection)
-                                             != titleLength)
+            if is_interwiki:
+                return match.group()
 
-                    # Convert URL-encoded characters to unicode
-                    from pywikibot.page import url2unicode
-                    titleWithSection = url2unicode(titleWithSection,
-                                                   encodings=self.site)
+            # The link looks like this:
+            # [[page_title|link_text]]trailing_chars
+            # We only work on namespace 0 because pipes and linktrails work
+            # differently for images and categories.
+            page = pywikibot.Page(pywikibot.Link(titleWithSection, self.site))
+            try:
+                in_main_namespace = page.namespace() == 0
+            except pywikibot.InvalidTitle:
+                in_main_namespace = False
+            if not in_main_namespace:
+                return match.group()
 
-                    if titleWithSection == '':
-                        # just skip empty links.
-                        return match.group()
+            # Replace underlines by spaces, also multiple underlines
+            titleWithSection = re.sub('_+', ' ', titleWithSection)
+            # Remove double spaces
+            titleWithSection = re.sub('  +', ' ', titleWithSection)
+            # Remove unnecessary leading spaces from title,
+            # but remember if we did this because we eventually want
+            # to re-add it outside of the link later.
+            titleLength = len(titleWithSection)
+            titleWithSection = titleWithSection.lstrip()
+            hadLeadingSpaces = len(titleWithSection) != titleLength
+            hadTrailingSpaces = False
+            # Remove unnecessary trailing spaces from title,
+            # but remember if we did this because it may affect
+            # the linktrail and because we eventually want to
+            # re-add it outside of the link later.
+            if not trailingChars:
+                titleLength = len(titleWithSection)
+                titleWithSection = titleWithSection.rstrip()
+                hadTrailingSpaces = len(titleWithSection) != titleLength
 
-                    # Remove unnecessary initial and final spaces from label.
-                    # Please note that some editors prefer spaces around pipes.
-                    # (See [[en:Wikipedia:Semi-bots]]). We remove them anyway.
-                    if label is not None:
-                        # Remove unnecessary leading spaces from label,
-                        # but remember if we did this because we want
-                        # to re-add it outside of the link later.
-                        labelLength = len(label)
-                        label = label.lstrip()
-                        hadLeadingSpaces = (len(label) != labelLength)
-                        # Remove unnecessary trailing spaces from label,
-                        # but remember if we did this because it affects
-                        # the linktrail.
-                        if not trailingChars:
-                            labelLength = len(label)
-                            label = label.rstrip()
-                            hadTrailingSpaces = (len(label) != labelLength)
-                    else:
-                        label = titleWithSection
-                    if trailingChars:
-                        label += trailingChars
+            # Convert URL-encoded characters to unicode
+            titleWithSection = url2unicode(titleWithSection,
+                                           encodings=self.site)
 
-                    if self.site.siteinfo['case'] == 'first-letter':
-                        firstcase_title = first_lower(titleWithSection)
-                        firstcase_label = first_lower(label)
-                    else:
-                        firstcase_title = titleWithSection
-                        firstcase_label = label
+            if not titleWithSection:
+                # just skip empty links.
+                return match.group()
 
-                    if firstcase_label == firstcase_title:
-                        newLink = '[[%s]]' % label
-                    # Check if we can create a link with trailing characters
-                    # instead of a pipelink
-                    elif (firstcase_label.startswith(firstcase_title)
-                          and trailR.sub('',
-                                         label[len(titleWithSection):]) == ''):
-                        newLink = '[[%s]]%s' % (
-                            label[:len(titleWithSection)],
-                            label[len(titleWithSection):])
+            # Remove unnecessary initial and final spaces from label.
+            # Please note that some editors prefer spaces around pipes.
+            # (See [[en:Wikipedia:Semi-bots]]). We remove them anyway.
+            if label is not None:
+                # Remove unnecessary leading spaces from label,
+                # but remember if we did this because we want
+                # to re-add it outside of the link later.
+                labelLength = len(label)
+                label = label.lstrip()
+                hadLeadingSpaces = len(label) != labelLength
+                # Remove unnecessary trailing spaces from label,
+                # but remember if we did this because it affects
+                # the linktrail.
+                if not trailingChars:
+                    labelLength = len(label)
+                    label = label.rstrip()
+                    hadTrailingSpaces = len(label) != labelLength
+            else:
+                label = titleWithSection
+            if trailingChars:
+                label += trailingChars
 
-                    else:
-                        # Try to capitalize the first letter of the title.
-                        # Not useful for languages that don't capitalize nouns.
-                        # TODO: Add a configuration variable for each site,
-                        # which determines if the link target is written in
-                        # uppercase
-                        if self.site.sitename == 'wikipedia:de':
-                            titleWithSection = first_upper(titleWithSection)
-                        newLink = '[[%s|%s]]' % (titleWithSection, label)
-                    # re-add spaces that were pulled out of the link.
-                    # Examples:
-                    #   text[[ title ]]text        -> text [[title]] text
-                    #   text[[ title | name ]]text -> text [[title|name]] text
-                    #   text[[ title |name]]text   -> text[[title|name]]text
-                    #   text[[title| name]]text    -> text [[title|name]]text
-                    if hadLeadingSpaces and not newline:
-                        newLink = ' ' + newLink
-                    if hadTrailingSpaces:
-                        newLink = newLink + ' '
-                    if newline:
-                        newLink = newline + newLink
-                    return newLink
-            # don't change anything
-            return match.group()
+            if self.site.siteinfo['case'] == 'first-letter':
+                firstcase_title = first_lower(titleWithSection)
+                firstcase_label = first_lower(label)
+            else:
+                firstcase_title = titleWithSection
+                firstcase_label = label
+
+            if firstcase_label == firstcase_title:
+                newLink = '[[%s]]' % label
+            # Check if we can create a link with trailing characters
+            # instead of a pipelink
+            elif (firstcase_label.startswith(firstcase_title)
+                  and trailR.sub('', label[len(titleWithSection):]) == ''):
+                newLink = '[[%s]]%s' % (label[:len(titleWithSection)],
+                                        label[len(titleWithSection):])
+
+            else:
+                # Try to capitalize the first letter of the title.
+                # Not useful for languages that don't capitalize nouns.
+                # TODO: Add a configuration variable for each site,
+                # which determines if the link target is written in
+                # uppercase
+                if self.site.sitename == 'wikipedia:de':
+                    titleWithSection = first_upper(titleWithSection)
+                newLink = '[[%s|%s]]' % (titleWithSection, label)
+            # re-add spaces that were pulled out of the link.
+            # Examples:
+            #   text[[ title ]]text        -> text [[title]] text
+            #   text[[ title | name ]]text -> text [[title|name]] text
+            #   text[[ title |name]]text   -> text[[title|name]]text
+            #   text[[title| name]]text    -> text [[title|name]]text
+            if hadLeadingSpaces and not newline:
+                newLink = ' ' + newLink
+            if hadTrailingSpaces:
+                newLink = newLink + ' '
+            if newline:
+                newLink = newline + newLink
+            return newLink
 
         trailR = re.compile(self.site.linktrail())
     # The regular expression which finds links. Results consist of four groups:
