@@ -26,6 +26,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'ak',
         # https://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
         'als',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikibooks_2
+        'ang',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wikibooks
         'as',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Asturianu_Wikibooks
@@ -54,6 +56,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'gu',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kannada_Wikibooks
         'kn',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Interlingue_Wikibooks
+        'ie',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikibooks
         'ks',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_L%C3%ABtzebuergesch_Wikibooks
@@ -92,6 +96,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'tk',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uyghur_Wikibooks
         'ug',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uzbek_Wikibooks_(2)
+        'uz',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volap%C3%BCk_Wikibooks
         'vo',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Walon_Wikibooks
@@ -102,6 +108,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'yo',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikibooks
         'za',
+        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Min_Nan_Wikibooks
+        'zh-min-nan',
         # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zulu_Wikibooks
         'zu',
     ]
