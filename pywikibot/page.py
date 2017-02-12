@@ -5535,7 +5535,7 @@ def html2unicode(text, ignore=None):
     # This regular expression will match any decimal and hexadecimal entity and
     # also entities that might be named entities.
     entityR = re.compile(
-        r'&(?:amp;)?(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));')
+        r'&(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));')
     # These characters are Html-illegal, but sadly you *can* find some of
     # these and converting them to chr(decimal) is unsuitable
     convertIllegalHtmlEntities = {
@@ -5569,7 +5569,8 @@ def html2unicode(text, ignore=None):
     }
     # ensuring that illegal &#129; &#141; and &#157, which have no known values,
     # don't get converted to chr(129), chr(141) or chr(157)
-    ignore = set(ignore) | set([129, 141, 157])
+    ignore = (set(map(lambda x: convertIllegalHtmlEntities.get(x, x), ignore)) |
+              set([129, 141, 157]))
 
     def handle_entity(match):
         if match.group('decimal'):
@@ -5583,10 +5584,10 @@ def html2unicode(text, ignore=None):
                 unicodeCodepoint = htmlentitydefs.name2codepoint[name]
             else:
                 unicodeCodepoint = False
-        try:
+
+        if unicodeCodepoint in convertIllegalHtmlEntities:
             unicodeCodepoint = convertIllegalHtmlEntities[unicodeCodepoint]
-        except KeyError:
-            pass
+
         if unicodeCodepoint and unicodeCodepoint not in ignore:
             if unicodeCodepoint > sys.maxunicode:
                 # solve narrow Python 2 build exception (UTF-16)
