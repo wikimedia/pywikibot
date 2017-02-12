@@ -778,7 +778,7 @@ class checkImagesBot(object):
 
         # Check maximum number of notifications for this talk page
         if (self.num_notify is not None and
-                not self.num_notify[self.talk_page.title()]):
+                self.num_notify[self.talk_page.title()] == 0):
             pywikibot.output('Maximum notifications reached, skip.')
             return
 
@@ -787,7 +787,8 @@ class checkImagesBot(object):
         except pywikibot.LockedPage:
             pywikibot.output(u'Talk page blocked, skip.')
         else:
-            self.num_notify[self.talk_page.title()] -= 1
+            if self.num_notify is not None:
+                self.num_notify[self.talk_page.title()] -= 1
 
         if emailPageName and emailSubj:
             emailPage = pywikibot.Page(self.site, emailPageName)
