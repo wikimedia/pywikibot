@@ -553,8 +553,7 @@ class PageArchiver(object):
 
     def key_ok(self):
         """Return whether key is valid."""
-        hexdigest = calc_md5_hexdigest(self.page.title().encode('utf8'),
-                                       self.salt)
+        hexdigest = calc_md5_hexdigest(self.page.title(), self.salt)
         return self.get_attr('key') == hexdigest
 
     def load_config(self):
