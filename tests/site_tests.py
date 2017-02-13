@@ -2499,6 +2499,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         """Test basic loading with pageids."""
         pageids = [str(page.pageid) for page in self.links]
         gen = self.site.load_pages_from_pageids(pageids)
+        count = 0
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
@@ -2511,6 +2512,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         """Test basic loading with pageids."""
         pageids = [page.pageid for page in self.links]
         gen = self.site.load_pages_from_pageids(pageids)
+        count = 0
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
@@ -2536,6 +2538,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         pageids = [page.pageid for page in self.links]
         pageids = pageids + pageids
         gen = self.site.load_pages_from_pageids(pageids)
+        count = 0
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
@@ -2548,6 +2551,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         """Test loading from comma-separated pageids."""
         pageids = ', '.join(str(page.pageid) for page in self.links)
         gen = self.site.load_pages_from_pageids(pageids)
+        count = 0
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
@@ -2560,6 +2564,7 @@ class TestLoadPagesFromPageids(DefaultSiteTestCase):
         """Test loading from comma-separated pageids."""
         pageids = '|'.join(str(page.pageid) for page in self.links)
         gen = self.site.load_pages_from_pageids(pageids)
+        count = 0
         for count, page in enumerate(gen, start=1):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
