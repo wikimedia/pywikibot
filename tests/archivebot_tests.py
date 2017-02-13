@@ -57,20 +57,26 @@ class TestArchiveBotFunctionsWithSites(TestCase):
     def test_str2localized_duraction_English(self):
         """Test English localizations of duration."""
         site = self.get_site('enwiki')
-        self.assertEqual(archivebot.str2localized_duration(site, '0m'), '0 minutes')
-        self.assertEqual(archivebot.str2localized_duration(site, '1d'), '1 day')
-        self.assertEqual(archivebot.str2localized_duration(site, '10h'), '10 hours')
+        self.assertEqual(
+            archivebot.str2localized_duration(site, '0s'), '0 seconds')
+        self.assertEqual(
+            archivebot.str2localized_duration(site, '1d'), '1 day')
+        self.assertEqual(
+            archivebot.str2localized_duration(site, '10h'), '10 hours')
 
     def test_str2localized_duraction_French(self):
         """Test French localizations of duration."""
         site = self.get_site('frwikt')
-        self.assertEqual(archivebot.str2localized_duration(site, '10d'), '10 jours')
-        self.assertEqual(archivebot.str2localized_duration(site, '1y'), '1 an')
+        self.assertEqual(
+            archivebot.str2localized_duration(site, '10d'), '10 jours')
+        self.assertEqual(
+            archivebot.str2localized_duration(site, '1y'), '1 an')
 
     def test_str2localized_duraction_Japanese(self):
         """Test Japanese localizations of duration."""
         site = self.get_site('jawiki')
-        self.assertEqual(archivebot.str2localized_duration(site, '4000m'), '4000 分')
+        self.assertEqual(
+            archivebot.str2localized_duration(site, '4000s'), '4000 秒')
 
 
 class TestArchiveBotFunctions(TestCase):
