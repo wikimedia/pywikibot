@@ -89,6 +89,7 @@ import sys
 import pywikibot
 
 from pywikibot import i18n, xmlreader, Bot
+from pywikibot.bot import OptionHandler
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 from pywikibot.tools.formatter import color_format
@@ -104,26 +105,35 @@ def space_to_underscore(link):
     return link.canonical_title().replace(' ', '_')
 
 
-class RedirectGenerator(object):
+class RedirectGenerator(OptionHandler):
 
     """Redirect generator."""
 
-    def __init__(self, xmlFilename=None, namespaces=[], offset=-1,
-                 use_move_log=False, use_api=False, start=None, until=None,
-                 number=None, page_title=None):
+    availableOptions = {
+        'fullscan': False,
+        'moves': False,
+        'namespaces': [0],
+        'offset': -1,
+        'page': None,
+        'start': None,
+        'total': None,
+        'until': None,
+        'xml': None,
+    }
+
+    def __init__(self, **kwargs):
         """Constructor."""
+        super(RedirectGenerator, self).__init__(**kwargs)
         self.site = pywikibot.Site()
-        self.xmlFilename = xmlFilename
-        self.namespaces = namespaces
-        if use_api and not self.namespaces:
-            self.namespaces = [0]
-        self.offset = offset
-        self.use_move_log = use_move_log
-        self.use_api = use_api
-        self.api_start = start
-        self.api_until = until
-        self.api_number = number
-        self.page_title = page_title
+        self.use_api = self.getOption('fullscan')
+        self.use_move_log = self.getOption('moves')
+        self.namespaces = self.getOption('namespaces')
+        self.offset = self.getOption('offset')
+        self.page_title = self.getOption('page')
+        self.api_start = self.getOption('start')
+        self.api_number = self.getOption('total')
+        self.api_until = self.getOption('until')
+        self.xmlFilename = self.getOption('xml')
 
     def get_redirects_from_dump(self, alsoGetPageTitles=False):
         """
@@ -386,10 +396,10 @@ class RedirectRobot(Bot):
 
     """Redirect bot."""
 
-    def __init__(self, action, generator, **kwargs):
+    def __init__(self, action, **kwargs):
         """Constructor."""
         self.availableOptions.update({
-            'number': None,
+            'total': float('inf'),
             'delete': False,
             'sdtemplate': None,
         })
@@ -398,7 +408,6 @@ class RedirectRobot(Bot):
         self.repo = self.site.data_repository()
         self.is_repo = self.repo if self.repo == self.site else None
         self.action = action
-        self.generator = generator
         self.exiting = False
         self.sdtemplate = self.get_sd_template()
 
@@ -717,7 +726,7 @@ class RedirectRobot(Bot):
             else:
                 self.fix_1_double_redirect(redir_name)
                 count += 1
-            if self.getOption('number') and count >= self.getOption('number'):
+            if count >= self.getOption('total'):
                 break
 
     def run(self):
@@ -742,29 +751,16 @@ def main(*args):
     @type args: list of unicode
     """
     options = {}
+    gen_options = {}
     # what the bot should do (either resolve double redirs, or process broken
     # redirs)
     action = None
-    # where the bot should get his infos from (either None to load the
-    # maintenance special page from the live wiki, or the filename of a
-    # local XML dump file)
-    xmlFilename = None
-    # Which namespace should be processed when using a XML dump
-    # default to -1 which means all namespaces will be processed
     namespaces = []
-    # at which redirect shall we start searching double redirects again
-    # (only with dump); default to -1 which means all redirects are checked
-    offset = -1
-    moved_pages = False
-    fullscan = False
-    start = ''
-    until = ''
-    number = None
-    pagename = None
+    source = set()
 
     for arg in pywikibot.handle_args(args):
         arg, sep, value = arg.partition(':')
-        option = arg[1:]
+        option = arg.partition('-')[2]
         # bot options
         if arg == 'do':
             action = 'double'
@@ -775,17 +771,18 @@ def main(*args):
         elif option in ('always', 'delete'):
             options[option] = True
         elif option == 'total':
-            options['number'] = number = int(value)
+            options[option] = gen_options[option] = int(value)
         elif option == 'sdtemplate':
             options['sdtemplate'] = value or pywikibot.input(
                 'Which speedy deletion template to use?')
         # generator options
-        elif option == 'fullscan':
-            fullscan = True
+        elif option in ('fullscan', 'moves'):
+            gen_options[option] = True
+            source.add(arg)
         elif option == 'xml':
-            xmlFilename = value or i18n.input('pywikibot-enter-xml-filename')
-        elif option == 'moves':
-            moved_pages = True
+            gen_options[option] = value or i18n.input(
+                'pywikibot-enter-xml-filename')
+            source.add(arg)
         elif option == 'namespace':
             # "-namespace:" does NOT yield -namespace:0 further down the road!
             ns = value or i18n.input('pywikibot-enter-namespace-number')
@@ -802,13 +799,9 @@ def main(*args):
             if ns not in namespaces:
                 namespaces.append(ns)
         elif option == 'offset':
-            offset = int(value)
-        elif option == 'start':
-            start = value
-        elif option == 'until':
-            until = value
-        elif option == 'page':
-            pagename = value
+            gen_options[option] = int(value)
+        elif option in ('page', 'start', 'until'):
+            gen_options[option] = value
         # deprecated or unknown options
         elif option == 'step':
             issue_deprecation_warning('The usage of "{0}"'.format(arg),
@@ -816,19 +809,20 @@ def main(*args):
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 
-    if not action or xmlFilename and (moved_pages or fullscan):
-        problems = []
-        if xmlFilename and moved_pages:
-            problems += ['Either use a XML file or the moved pages from the API']
-        if xmlFilename and fullscan:
-            problems += ['Either use a XML file or do a full scan using the API']
-        pywikibot.bot.suggest_help(additional_text='\n'.join(problems),
+    gen_options['namespaces'] = namespaces
+
+    if len(source) > 1:
+        problem = 'You can only use one of {0} options.'.format(
+            ' or '.join(source))
+        pywikibot.bot.suggest_help(additional_text=problem,
                                    missing_action=not action)
+        return
+    if not action:
+        pywikibot.bot.suggest_help(missing_action=True)
     else:
         pywikibot.Site().login()
-        gen = RedirectGenerator(xmlFilename, namespaces, offset, moved_pages,
-                                fullscan, start, until, number, pagename)
-        bot = RedirectRobot(action, gen, **options)
+        options['generator'] = RedirectGenerator(**gen_options)
+        bot = RedirectRobot(action, **options)
         bot.run()
 
 if __name__ == '__main__':
