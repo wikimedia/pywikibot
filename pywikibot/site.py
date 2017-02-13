@@ -7160,6 +7160,18 @@ class DataSite(APISite):
             # not implemented yet
             raise NotImplementedError
 
+    def data_repository(self):
+        """
+        Override parent method.
+
+        This avoids pointless API queries since the data repository
+        is this site by definition.
+
+        @return: this Site object
+        @rtype: DataSite
+        """
+        return self
+
     def loadcontent(self, identification, *props):
         """
         Fetch the current content of a Wikibase item.
