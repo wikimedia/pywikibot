@@ -1103,11 +1103,18 @@ def getCategoryLinks(text, site=None, include=[], expand_text=False):
             title, sortKey = rest.split('|', 1)
         else:
             title, sortKey = rest, None
-        cat = pywikibot.Category(pywikibot.Link(
-                                 '%s:%s' % (match.group('namespace'), title),
-                                 site),
-                                 sortKey=sortKey)
-        result.append(cat)
+        try:
+            cat = pywikibot.Category(pywikibot.Link(
+                                     '%s:%s' % (match.group('namespace'), title),
+                                     site),
+                                     sortKey=sortKey)
+        except InvalidTitle:
+            # Category title extracted contains invalid characters
+            # Likely due to on-the-fly category name creation, see T154309
+            pywikibot.warning('Invalid category title extracted: %s' % title)
+        else:
+            result.append(cat)
+
     return result
 
 
