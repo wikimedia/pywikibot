@@ -1020,14 +1020,30 @@ class HtmlEntity(TestCase):
 
     net = False
 
+    def test_no_entities(self):
+        """Test that text is left unchanged."""
+        self.assertEqual(pywikibot.page.html2unicode('foobar'), 'foobar')
+        self.assertEqual(pywikibot.page.html2unicode(' '), ' ')
+
     def test_valid_entities(self):
         """Test valid entities."""
         self.assertEqual(pywikibot.page.html2unicode('A&amp;O'), 'A&O')
         self.assertEqual(pywikibot.page.html2unicode('&#x70;&#x79;'), 'py')
         self.assertEqual(pywikibot.page.html2unicode('&#x10000;'), u'\U00010000')
         self.assertEqual(pywikibot.page.html2unicode('&#x70;&amp;&#x79;'), 'p&y')
+        self.assertEqual(pywikibot.page.html2unicode('&#128;'), '€')
 
-    @unittest.expectedFailure
+    def test_ignore_entities(self):
+        """Test ignore entities."""
+        self.assertEqual(pywikibot.page.html2unicode('A&amp;O', [38]), 'A&amp;O')
+        self.assertEqual(pywikibot.page.html2unicode('A&#38;O', [38]), 'A&#38;O')
+        self.assertEqual(pywikibot.page.html2unicode('A&#x26;O', [38]), 'A&#x26;O')
+        self.assertEqual(pywikibot.page.html2unicode('A&amp;O', [37]), 'A&O')
+        self.assertEqual(pywikibot.page.html2unicode('&#128;', [128]), '&#128;')
+        self.assertEqual(pywikibot.page.html2unicode('&#128;', [8364]), '&#128;')
+        self.assertEqual(pywikibot.page.html2unicode('&#129;&#141;&#157'),
+                         '&#129;&#141;&#157')
+
     def test_recursive_entities(self):
         """Test recursive entities."""
         self.assertEqual(pywikibot.page.html2unicode('A&amp;amp;O'), 'A&amp;O')
