@@ -13,6 +13,10 @@ import codecs
 import functools
 import os
 import re
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 import pywikibot
 import pywikibot.textlib as textlib
@@ -298,8 +302,10 @@ class TestTemplatesInCategory(TestCase):
         self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}and{{!}}bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='and|bar')])
-        self.assertRaises(pywikibot.InvalidTitle, textlib.getCategoryLinks,
-                          '[[Category:nasty{{{!}}]]', self.site)
+        with mock.patch.object(pywikibot, 'warning', autospec=True) as warn:
+            textlib.getCategoryLinks('[[Category:nasty{{{!}}]]', self.site)
+            warn.assert_called_once_with(
+                'Invalid category title extracted: nasty{{{!}}')
 
 
 class TestTemplateParams(TestCase):
