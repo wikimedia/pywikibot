@@ -526,16 +526,15 @@ class CosmeticChangesToolkit(object):
                         firstcase_title = titleWithSection
                         firstcase_label = label
 
-                    if firstcase_label.startswith(firstcase_title):
-                        if firstcase_label == firstcase_title:
-                            newLink = '[[%s]]' % label
-                        # Check if we can create a link with trailing characters
-                        # instead of a pipelink
-                        elif trailR.sub('',
-                                        label[len(titleWithSection):]) == '':
-                            newLink = '[[%s]]%s' % (
-                                label[:len(titleWithSection)],
-                                label[len(titleWithSection):])
+                    if firstcase_label == firstcase_title:
+                        newLink = '[[%s]]' % label
+                    # Check if we can create a link with trailing characters
+                    # instead of a pipelink
+                    elif (firstcase_label.startswith(firstcase_title) and
+                          trailR.sub('', label[len(titleWithSection):]) == ''):
+                        newLink = '[[%s]]%s' % (
+                            label[:len(titleWithSection)],
+                            label[len(titleWithSection):])
 
                     else:
                         # Try to capitalize the first letter of the title.
