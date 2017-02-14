@@ -54,7 +54,7 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         }
     }
 
-    def test_str2localized_duraction_English(self):
+    def test_str2localized_duration_English(self):
         """Test English localizations of duration."""
         site = self.get_site('enwiki')
         self.assertEqual(
@@ -64,7 +64,7 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         self.assertEqual(
             archivebot.str2localized_duration(site, '10h'), '10 hours')
 
-    def test_str2localized_duraction_French(self):
+    def test_str2localized_duration_French(self):
         """Test French localizations of duration."""
         site = self.get_site('frwikt')
         self.assertEqual(
@@ -72,7 +72,7 @@ class TestArchiveBotFunctionsWithSites(TestCase):
         self.assertEqual(
             archivebot.str2localized_duration(site, '1y'), '1 an')
 
-    def test_str2localized_duraction_Japanese(self):
+    def test_str2localized_duration_Japanese(self):
         """Test Japanese localizations of duration."""
         site = self.get_site('jawiki')
         self.assertEqual(
