@@ -33,7 +33,7 @@ build paths relative to base_dir:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2016
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -227,7 +227,7 @@ password_file = None
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
-default_edit_summary = u'Pywikibot v.2'
+default_edit_summary = u'Pywikibot 3.0-dev'
 
 # What permissions to use to set private files to it
 # such as password file.
