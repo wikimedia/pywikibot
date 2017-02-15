@@ -247,7 +247,7 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
 
     def test_cleanUpLinks_pipes(self):
         """Test cleanUpLinks method."""
-        self.assertEqual('[[no|no change]]',
+        self.assertEqual('[[No|no change]]',
                          self.cct.cleanUpLinks('[[no|no change]]'))
         self.assertEqual('[[title]]',
                          self.cct.cleanUpLinks('[[title|title]]'))
