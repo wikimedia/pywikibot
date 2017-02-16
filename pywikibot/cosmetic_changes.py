@@ -619,8 +619,6 @@ class CosmeticChangesToolkit(object):
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
         manually.
-
-        FIXME: which version should this be run on?
         """
         text = textlib.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
                                      ['timeline'])
