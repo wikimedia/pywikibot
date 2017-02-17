@@ -58,7 +58,10 @@ content = {
     'az': u'<!--- LÜTFƏN, BU SƏTRƏ TOXUNMAYIN --->\n{{Qaralama dəftəri}}\n'
           u'<!-- AŞAĞIDAKI XƏTTİN ALTINDAN YAZA BİLƏRSİNİZ --->',
     'bar': '{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\n',
-    'cs': u'{{subst:/uhrabat}}',
+    'cs': '{{Tento řádek neměňte}}\n<!-- ************  Prosíme, '
+          'NEMĚŇTE nic nad tímto řádkem.  Díky.  ************ -->\n\n'
+          "== Bábovičky ==\n#'''první'''\n#''druhá''\n*třetí\n"
+          "*'''''čtvrtá'''''\n pátá\n;šestá\n:sedmá",
     'da': u'{{subst:Sandkasse tekst}}',
     'de': u'{{subst:Wikipedia:Spielwiese/Vorlage}}',
     'en': u'{{Sandbox heading}}\n<!-- Hello! Feel free to try your formatting '
