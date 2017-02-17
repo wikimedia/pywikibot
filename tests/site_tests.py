@@ -281,7 +281,15 @@ class TestSiteObject(DefaultSiteTestCase):
         try:
             dabcat = mysite.disambcategory()
         except pywikibot.Error as e:
-            self.assertIn('No disambiguation category name found', str(e))
+            try:
+                self.assertIn('No disambiguation category name found', str(e))
+            except AssertionError:
+                self.assertIn(
+                    'No {repo} qualifier found for disambiguation category '
+                    'name in {fam}_family file'.format(
+                        repo=mysite.data_repository().family.name,
+                        fam=mysite.family.name),
+                    str(e))
         else:
             self.assertIsInstance(dabcat, pywikibot.Category)
 
