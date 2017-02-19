@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -2742,9 +2742,10 @@ class APISite(BaseSite):
         return self.data_repository() is not None
 
     @property
+    @deprecated('has_data_repository')
     def has_transcluded_data(self):
         """Return True if site has a shared data repository like Wikidata."""
-        return self.data_repository() is not None
+        return self.has_data_repository
 
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
