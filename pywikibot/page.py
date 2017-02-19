@@ -4348,9 +4348,10 @@ class PropertyPage(WikibasePage, Property):
             raise NotImplementedError(
                 'PropertyPage.get only implements "force".')
 
-        if force or not hasattr(self, '_content'):
-            WikibasePage.get(self, force)
+        data = WikibasePage.get(self, force)
         self._type = self._content['datatype']
+        data['datatype'] = self._content['datatype']
+        return data
 
     def newClaim(self, *args, **kwargs):
         """
