@@ -79,38 +79,40 @@ docuReplacements = {
 # PREFERENCES
 
 templateSemiProtection = {
+    'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]p|[Pp])'
+           r'olozamčeno(|[^\}]*)\}\}\s*'],
+    'fr': [r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccoparziale(?:|[ _]scad\|.*?|\|.*?)\}\}',
            r'\{\{(?:[Tt]emplate:|)[Aa]bp(?:|[ _]scad\|(?:.*?))\}\}'],
-    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
-           r'|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' +
-           u'半保護' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)半保護'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
+    'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]z|[Zz])'
+           r'amčeno(|[^\}]*)\}\}\s*'],
+    'fr': [r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Pp]rotection(|[^\}]*)\}\}',
+           r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)(?:[Pp]age|[Aa]rchive|'
+           r'[Mm]odèle) protégée?(|[^\}]*)\}\}'],
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisoblocco(?:|[ _]scad\|(?:.*?)|minaccia|cancellata)\}\}',
            r'\{\{(?:[Tt]emplate:|)(?:[Cc][Tt]|[Cc]anc fatte|[Cc][Ee])\}\}',
-           r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">(?:\s|\n)*?[Qq]uesta pagina'],
-    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
-           r'|)[Pp]rotection(|[^\}]*)\}\}',
-           r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' + r'|)(?:[Pp]age|[Aa]rchive|' +
-           u'[Mm]odèle) protégée' + r'?(|[^\}]*)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'保護(?:性急|)' +
-           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+           r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">\s*?[Qq]uesta pagina'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)保護(?:性急|)'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
 }
 
 # Regex to get the semi-protection move template
 templateSemiMoveProtection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動半保護' +
-           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動半保護'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
 }
 
 # Regex to get the total-protection move template
 templateTotalMoveProtection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動保護' +
-           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動保護'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
 }
 
 # If you use only one template for all the type of protection, put it here.
@@ -123,9 +125,10 @@ templateUnique = {
 # Array: 0 => Semi-block, 1 => Total Block, 2 => Semi-Move, 3 => Total-Move,
 #        4 => template-unique
 templateNoRegex = {
+    'cs': ['{{Polozamčeno}}', '{{Zamčeno}}', None, None, None],
+    'fr': ['{{Semi-protection}}', '{{Protection}}', None, None, None],
     'it': ['{{Avvisobloccoparziale}}', '{{Avvisoblocco}}', None, None,
            '{{Protetta}}'],
-    'fr': ['{{Semi-protection}}', '{{Protection}}', None, None, None],
     'ja': [u'{{半保護}}', u'{{保護}}', u'{{移動半保護}}', u'{{移動保護}}', None],
 }
 
@@ -133,6 +136,10 @@ templateNoRegex = {
 categoryToCheck = {
     'en': [u'Category:Wikipedia protected pages'],
     'ar': [u'تصنيف:محتويات محمية'],
+    'cs': ['Kategorie:Wikipedie:Zamčené stránky',
+           'Kategorie:Wikipedie:Polozamčené stránky',
+           'Kategorie:Wikipedie:Dlouhodobě zamčené stránky',
+           'Kategorie:Wikipedie:Dlouhodobě polozamčené stránky'],
     'fr': [u'Category:Page semi-protégée', u'Category:Page protégée',
            u'Catégorie:Article protégé'],
     'he': [u'קטגוריה:ויקיפדיה: דפים מוגנים',
@@ -148,7 +155,7 @@ categoryToCheck = {
 }
 
 # Check list to block the users that haven't set their preferences
-project_inserted = ['fr', 'it', 'ja', 'pt', 'zh']
+project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'zh']
 
 # END PREFERENCES
 
