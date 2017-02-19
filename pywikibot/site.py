@@ -7231,6 +7231,8 @@ class DataSite(APISite):
             for qid in data['entities']:
                 item = pywikibot.ItemPage(self, qid)
                 item._content = data['entities'][qid]
+                # No api call is made because item._content is given
+                item.get(get_redirect=True)
                 yield item
 
     def getPropertyType(self, prop):
