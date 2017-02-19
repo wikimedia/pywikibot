@@ -4018,7 +4018,6 @@ class ItemPage(WikibasePage):
                 self.sitelinks[dbname] = self._content[
                     'sitelinks'][dbname]['title']
 
-        data['claims'] = self.claims
         data['sitelinks'] = self.sitelinks
         return data
 
