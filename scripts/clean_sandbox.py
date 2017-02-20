@@ -48,6 +48,7 @@ from pywikibot import i18n, Bot, pagegenerators
 
 content = {
     'commons': u'{{Sandbox}}\n<!-- Please edit only below this line. -->',
+    'wikidata': '{{Please leave this line alone (sandbox heading)}}',
     'als': u'{{subst:/Vorlage}}',
     'ar': u'{{عنوان الملعب}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق '
           u'والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ '
@@ -105,6 +106,7 @@ content = {
 
 sandboxTitle = {
     'commons': u'Project:Sandbox',
+    'wikidata': 'Project:Sandbox',
     'als': u'Project:Sandchaschte',
     'ar': u'Project:ملعب',
     'arz': u'Project:السبوره',
