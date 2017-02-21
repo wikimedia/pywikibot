@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,16 +11,19 @@ __version__ = '$Id$'
 #
 
 import collections
-import imp
 import logging
 import re
 import string
 import sys
 import warnings
 
-if sys.version_info[0] > 2:
+PY3 = sys.version_info[0] > 2
+if PY3:
+    from os.path import basename, dirname, splitext
+    from importlib import import_module
     import urllib.parse as urlparse
 else:
+    import imp
     import urlparse
 
 from warnings import warn
@@ -917,6 +920,8 @@ class Family(object):
                 myfamily = AutoFamily(fam, family_file)
                 Family._families[fam] = myfamily
                 return Family._families[fam]
+        else:
+            raise UnknownFamily('Family %s does not exist' % fam)
 
         try:
             # Ignore warnings due to dots in family names.
@@ -924,8 +929,13 @@ class Family(object):
             #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
-                mod = imp.load_source(fam, config.family_files[fam])
-        except (ImportError, KeyError):
+                if PY3:
+                    sys.path.append(dirname(family_file))
+                    mod = import_module(splitext(basename(family_file))[0])
+                else:
+                    # Python 2.6 has no importlib.import_module
+                    mod = imp.load_source(fam, family_file)
+        except ImportError:
             raise UnknownFamily(u'Family %s does not exist' % fam)
         cls = mod.Family()
         if cls.name != fam:
