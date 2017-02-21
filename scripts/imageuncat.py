@@ -8,21 +8,11 @@ See imagerecat.py to add these images to categories.
 This script is working on the given site, so if the commons should be handled,
 the site commons should be given and not a Wikipedia or similar.
 
--yesterday        Go through all uploads from yesterday. (Deprecated here,
-                  moved to pagegenerators)
-
--recentchanges    Go through the changes made from 'offset' minutes with
-                  'duration' minutes of timespan. It must be given two
-                  arguments as
-                  '-recentchanges:offset,duration'
-
-                  Default value of offset is 120, and that of duration is 70
-
 &params;
 """
 #
 # (C) Multichill, 2008
-# (C) Pywikibot team, 2009-2015
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,9 +26,7 @@ from datetime import timedelta
 import pywikibot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot import pagegenerators
-from pywikibot.tools import (
-    issue_deprecation_warning, deprecated
-)
+from pywikibot.tools import issue_deprecation_warning
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
@@ -1264,33 +1252,13 @@ def uploadedYesterday(site):
     """
     Return a pagegenerator containing all the pictures uploaded yesterday.
 
-    Should probably copied to somewhere else
+    DEPRECATED. Only used by a deprecated option.
     """
     today = pywikibot.Timestamp.utcnow()
     yesterday = today + timedelta(days=-1)
 
     for logentry in site.logevents(logtype='upload', start=yesterday, end=today, reverse=True):
         yield logentry.page()
-
-
-@deprecated('RecentChangesPageGenerator')
-def recentChanges(site=None, delay=0, block=70):
-    """
-    Return a pagegenerator containing all the images edited in a certain timespan.
-
-    The delay is the amount of minutes to wait and the block is the timespan to return images in.
-    Should probably be copied to somewhere else
-    """
-    rcstart = site.getcurrenttime() + timedelta(minutes=-(delay + block))
-    rcend = site.getcurrenttime() + timedelta(minutes=-delay)
-
-    gen = site.recentchanges(start=rcstart, end=rcend, reverse=True,
-                             namespaces=6, changetype='edit|log',
-                             showBot=False)
-    # remove 'patrolled' from rcprop since we can't get it
-    gen.request['rcprop'] = 'title|user|comment|ids'
-    for p in gen:
-        yield pywikibot.Page(site, p['title'], p['ns'])
 
 
 def isUncat(page):
@@ -1391,7 +1359,7 @@ def main(*args):
             if param_value is None:
                 arg = arg + ':120,70'
                 issue_deprecation_warning(
-                    '-recentchanges',
+                    '-recentchanges without parameters',
                     '-recentchanges:offset,duration',
                     2, ArgumentDeprecationWarning)
             genFactory.handleArg(arg)
