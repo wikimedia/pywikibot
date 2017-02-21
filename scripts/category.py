@@ -855,10 +855,6 @@ class CategoryTidyRobot(pywikibot.Bot):
     you to find out what the article is about and in which other categories it
     currently is.
 
-    Important:
-     * this bot is written to work with the MonoBook skin, so make sure your bot
-       account uses this skin
-
     """
 
     def __init__(self, catTitle, catDB, namespaces=None):
