@@ -10,6 +10,7 @@ __version__ = '$Id$'
 
 import collections
 import gzip
+import hashlib
 import inspect
 import itertools
 import os
@@ -1714,3 +1715,41 @@ def file_mode_checker(filename, mode=0o600):
         # re-read and check changes
         if os.stat(filename).st_mode != st_mode:
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
+
+
+def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
+    """Compute file hash.
+
+    Result is expressed as hexdigest().
+
+    @param filename: filename path
+    @type filename: basestring
+
+    @param func: hashing function among the following in hashlib:
+        md5(), sha1(), sha224(), sha256(), sha384(), and sha512()
+        function name shall be passed as string, e.g. 'sha1'.
+    @type filename: basestring
+
+    @param bytes_to_read: only the first bytes_to_read will be considered;
+        if file size is smaller, the whole file will be considered.
+    @type bytes_to_read: None or int
+
+    """
+    size = os.path.getsize(filename)
+    if bytes_to_read is None:
+        bytes_to_read = size
+    else:
+        bytes_to_read = min(bytes_to_read, size)
+    step = 1 << 20
+
+    shas = ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
+    assert sha in shas
+    sha = getattr(hashlib, sha)()  # sha instance
+
+    with open(filename, 'rb') as f:
+        while bytes_to_read > 0:
+            read_bytes = f.read(min(bytes_to_read, step))
+            assert read_bytes  # make sure we actually read bytes
+            bytes_to_read -= len(read_bytes)
+            sha.update(read_bytes)
+    return sha.hexdigest()

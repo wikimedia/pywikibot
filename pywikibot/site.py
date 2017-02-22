@@ -18,7 +18,6 @@ __version__ = '$Id$'
 import copy
 import datetime
 import functools
-import hashlib
 import heapq
 import itertools
 import json
@@ -68,6 +67,7 @@ from pywikibot.exceptions import (
 from pywikibot.family import WikimediaFamily
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
+    compute_file_hash,
     itergroup, UnicodeMixin, ComparableMixin, SelfCallMixin, SelfCallString,
     deprecated, deprecate_arg, deprecated_args, remove_last_args,
     redirect_func, issue_deprecation_warning,
@@ -6027,15 +6027,7 @@ class APISite(BaseSite):
                 # The SHA1 was also requested so calculate and compare it
                 assert 'sha1' in stash_info, \
                     'sha1 not in stash info: {0}'.format(stash_info)
-                sha1 = hashlib.sha1()
-                bytes_to_read = offset
-                with open(source_filename, 'rb') as f:
-                    while bytes_to_read > 0:
-                        read_bytes = f.read(min(bytes_to_read, 1 << 20))
-                        assert read_bytes  # make sure we actually read bytes
-                        bytes_to_read -= len(read_bytes)
-                        sha1.update(read_bytes)
-                sha1 = sha1.hexdigest()
+                sha1 = compute_file_hash(source_filename, bytes_to_read=offset)
                 if sha1 != stash_info['sha1']:
                     raise ValueError(
                         'The SHA1 of {0} bytes of the stashed "{1}" is {2} '
