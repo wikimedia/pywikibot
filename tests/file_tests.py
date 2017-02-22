@@ -9,9 +9,13 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import os
+
 import pywikibot
 
 from pywikibot.tools import UnicodeType as unicode
+
+from tests import join_images_path
 
 from tests.aspects import unittest, TestCase, DeprecationTestCase
 
@@ -178,6 +182,31 @@ class TestDeprecatedFilePage(DeprecationTestCase):
         self.assertEqual(len(latest), 2)
         self.assertIsInstance(latest[0], unicode)
         self.assertIsInstance(latest[1], unicode)
+
+
+class TestFilePageDownload(TestCase):
+
+    """Test dowload fo FilePage to local file."""
+
+    family = 'commons'
+    code = 'commons'
+
+    cached = True
+
+    def test_successful_download(self):
+        """Test successful_download."""
+        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
+        filename = join_images_path('Albert Einstein.jpg')
+        status_code = page.download(filename)
+        self.assertTrue(status_code)
+        os.unlink(filename)
+
+    def test_not_existing_download(self):
+        """Test not existing download."""
+        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg_notexisting')
+        filename = join_images_path('Albert Einstein.jpg')
+        with self.assertRaises(pywikibot.NoPage):
+            page.download(filename)
 
 
 if __name__ == '__main__':  # pragma: no cover
