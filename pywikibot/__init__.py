@@ -662,7 +662,7 @@ class WbQuantity(_WbRepresentation):
         @param amount: number representing this quantity
         @type amount: string or Decimal. Other types are accepted, and converted
                       via str to Decimal.
-        @param unit: the Wikibase item for the unit or the URL entity of this
+        @param unit: the Wikibase item for the unit or the entity URI of this
                      Wikibase item.
         @type unit: pywikibot.ItemPage, str or None
         @param error: the uncertainty of the amount (e.g. ±1)
@@ -676,11 +676,12 @@ class WbQuantity(_WbRepresentation):
 
         self.amount = self._todecimal(amount)
         self._unit = unit
+        self.site = site or Site().data_repository()
 
-        # also allow entity urls to be provided via unit parameter
+        # also allow entity URIs to be provided via unit parameter
         if isinstance(unit, basestring) and \
                 unit.partition('://')[0] not in ('http', 'https'):
-            raise ValueError("'unit' must be an ItemPage or entity url.")
+            raise ValueError("'unit' must be an ItemPage or entity uri.")
 
         if error is None and not self._require_errors(site):
             self.upperBound = self.lowerBound = None
@@ -698,10 +699,34 @@ class WbQuantity(_WbRepresentation):
 
     @property
     def unit(self):
-        """Return _unit's entity url or '1' if _unit is None."""
+        """Return _unit's entity uri or '1' if _unit is None."""
         if isinstance(self._unit, ItemPage):
-            return self._unit.concept_url()
+            return self._unit.concept_uri()
         return self._unit or '1'
+
+    def get_unit_item(self, repo=None, lazy_load=False):
+        """
+        Return the ItemPage corresponding to the unit.
+
+        Note that the unit need not be in the same data repository as the
+        WbQuantity itself.
+
+        A successful lookup is stored as an internal value to avoid the need
+        for repeated lookups.
+
+        @param repo: the Wikibase site for the unit, if different from that
+            provided with the WbQuantity.
+        @type repo: pywikibot.site.DataSite
+        @param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        @type lazy_load: bool
+        @return: pywikibot.ItemPage
+        """
+        if not isinstance(self._unit, basestring):
+            return self._unit
+
+        repo = repo or self.site
+        self._unit = ItemPage.from_entity_uri(repo, self._unit, lazy_load)
+        return self._unit
 
     def toWikibase(self):
         """

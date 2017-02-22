@@ -65,13 +65,13 @@ from pywikibot.exceptions import (
 )
 from pywikibot.data.api import APIError
 from pywikibot.family import Family
-from pywikibot.site import Namespace, need_version
+from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot.tools import (
     PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    first_upper, remove_last_args, _NotImplementedWarning,
+    first_upper, redirect_func, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
 )
 from pywikibot.tools.ip import ip_regexp
@@ -3973,6 +3973,7 @@ class ItemPage(WikibasePage):
         @rtype: ItemPage
 
         @raise NoPage: There is no corresponding ItemPage for the page
+        @raise WikiBaseError: The site of the page has no data repository.
         """
         if not page.site.has_data_repository:
             raise pywikibot.WikiBaseError('{0} has no data repository'
@@ -3994,6 +3995,40 @@ class ItemPage(WikibasePage):
         if not lazy_load and not i.exists():
             raise pywikibot.NoPage(i)
         return i
+
+    @classmethod
+    def from_entity_uri(cls, site, uri, lazy_load=False):
+        """
+        Get the ItemPage from its entity uri.
+
+        @param site: The Wikibase site for the item.
+        @type site: pywikibot.site.DataSite
+        @param uri: Entity uri for the Wikibase item.
+        @type uri: basestring
+        @param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        @type lazy_load: bool
+        @rtype: ItemPage
+
+        @raise TypeError: Site is not a valid DataSite.
+        @raise ValueError: Site does not match the base of the provided uri.
+        @raise NoPage: Uri points to non-existent item.
+        """
+        if not isinstance(site, DataSite):
+            raise TypeError('{0} is not a data repository.'.format(site))
+
+        base_uri, _, qid = uri.rpartition('/')
+        if base_uri != site.concept_base_uri.rstrip('/'):
+            raise ValueError(
+                'The supplied data repository ({repo}) does not correspond to '
+                'that of the item ({item})'.format(
+                    repo=site.concept_base_uri.rstrip('/'),
+                    item=base_uri))
+
+        item = cls(site, qid)
+        if not lazy_load and not item.exists():
+            raise pywikibot.NoPage(item)
+
+        return item
 
     def get(self, force=False, get_redirect=False, *args, **kwargs):
         """
@@ -4022,8 +4057,8 @@ class ItemPage(WikibasePage):
         return data
 
     @need_version('1.28-wmf.23')
-    def concept_url(self):
-        """Return the full concept URL."""
+    def concept_uri(self):
+        """Return the full concept URI."""
         return '{0}{1}'.format(self.site.concept_base_uri, self.id)
 
     def getRedirectTarget(self):
@@ -4214,6 +4249,10 @@ class ItemPage(WikibasePage):
             self._isredir = self.id != self._content.get('id', self.id)
             return self._isredir
         return super(ItemPage, self).isRedirectPage()
+
+    # alias for backwards compatibility
+    concept_url = redirect_func(concept_uri, old_name='concept_url',
+                                class_name='ItemPage')
 
 
 class Property(object):
