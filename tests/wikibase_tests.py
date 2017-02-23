@@ -214,16 +214,6 @@ class TestWikibaseTypes(WikidataTestCase):
                   'upperBound': '+0.044405586', 'unit': '1', }
         self.assertEqual(q.toWikibase(), q_dict)
 
-    def test_WbQuantity_unbound(self):
-        """Test WbQuantity for integer value without bounds."""
-        repo = self.get_repo()
-        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.29.0-wmf.2'):
-            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
-                                    'newer to support unbound uncertainties.')
-        q = pywikibot.WbQuantity(amount=1234.5, site=repo)
-        self.assertEqual(q.toWikibase(),
-                         {'amount': '+1234.5', 'unit': '1', })
-
     def test_WbQuantity_formatting(self):
         """Test other WbQuantity methods."""
         q = pywikibot.WbQuantity(amount='0.044405586', error='0')
@@ -237,25 +227,6 @@ class TestWikibaseTypes(WikidataTestCase):
         self.assertEqual("%r" % q,
                          "WbQuantity(amount=%(val)s, "
                          "upperBound=%(val)s, lowerBound=%(val)s, "
-                         "unit=1)" % {'val': '0.044405586'})
-
-    def test_WbQuantity_formatting_unbound(self):
-        """Test WbQuantity formatting without bounds."""
-        repo = self.get_repo()
-        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.29.0-wmf.2'):
-            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
-                                    'newer to support unbound uncertainties.')
-        q = pywikibot.WbQuantity(amount='0.044405586', site=repo)
-        self.assertEqual("%s" % q,
-                         '{\n'
-                         '    "amount": "+%(val)s",\n'
-                         '    "lowerBound": null,\n'
-                         '    "unit": "1",\n'
-                         '    "upperBound": null\n'
-                         '}' % {'val': '0.044405586'})
-        self.assertEqual("%r" % q,
-                         "WbQuantity(amount=%(val)s, "
-                         "upperBound=None, lowerBound=None, "
                          "unit=1)" % {'val': '0.044405586'})
 
     def test_WbQuantity_equality(self):
@@ -276,23 +247,29 @@ class TestWikibaseTypes(WikidataTestCase):
                          {'amount': '+0.0229', 'lowerBound': '+0.0000',
                           'upperBound': '+1.0000', 'unit': '1', })
 
-    def test_WbQuantity_fromWikibase_unbound(self):
-        """Test WbQuantity.fromWikibase() instantiating without bounds."""
-        repo = self.get_repo()
-        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.29.0-wmf.2'):
-            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
-                                    'newer to support unbound uncertainties.')
-        q = pywikibot.WbQuantity.fromWikibase({u'amount': u'+0.0229',
-                                               u'unit': u'1'},
-                                              site=repo)
-        self.assertEqual(q.toWikibase(),
-                         {'amount': '+0.0229', 'lowerBound': None,
-                          'upperBound': None, 'unit': '1', })
-
     def test_WbQuantity_errors(self):
         """Test WbQuantity error handling."""
         self.assertRaises(ValueError, pywikibot.WbQuantity, amount=None,
                           error=1)
+
+    def test_WbQuantity_entity_unit(self):
+        """Test WbQuantity with entity url unit."""
+        q = pywikibot.WbQuantity(amount=1234, error=1,
+                                 unit='http://www.wikidata.org/entity/Q712226')
+        self.assertEqual(q.toWikibase(),
+                         {'amount': '+1234', 'lowerBound': '+1233',
+                          'upperBound': '+1235',
+                          'unit': 'http://www.wikidata.org/entity/Q712226', })
+
+    def test_WbQuantity_unit_fromWikibase(self):
+        """Test WbQuantity recognising unit from Wikibase output."""
+        q = pywikibot.WbQuantity.fromWikibase({
+            'amount': '+1234', 'lowerBound': '+1233', 'upperBound': '+1235',
+            'unit': 'http://www.wikidata.org/entity/Q712226', })
+        self.assertEqual(q.toWikibase(),
+                         {'amount': '+1234', 'lowerBound': '+1233',
+                          'upperBound': '+1235',
+                          'unit': 'http://www.wikidata.org/entity/Q712226', })
 
     def test_WbMonolingualText_string(self):
         """Test WbMonolingualText string."""
@@ -326,6 +303,97 @@ class TestWikibaseTypes(WikidataTestCase):
                           text='Test this!', language='')
         self.assertRaises(ValueError, pywikibot.WbMonolingualText,
                           text=None, language='sv')
+
+
+class TestWikibaseTypesNonDry(WikidataTestCase):
+
+    """
+    Test Wikibase data types (non-dry).
+
+    These can be moved to TestWikibaseTypes once DrySite has been bumped to
+    the appropriate version.
+    """
+
+    def test_WbQuantity_unbound(self):
+        """Test WbQuantity for integer value without bounds."""
+        repo = self.get_repo()
+        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.29.0-wmf.2'):
+            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
+                                    'newer to support unbound uncertainties.')
+        q = pywikibot.WbQuantity(amount=1234.5, site=repo)
+        self.assertEqual(q.toWikibase(),
+                         {'amount': '+1234.5', 'unit': '1',
+                          'upperBound': None, 'lowerBound': None})
+
+    def test_WbQuantity_formatting_unbound(self):
+        """Test WbQuantity formatting without bounds."""
+        repo = self.get_repo()
+        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.29.0-wmf.2'):
+            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
+                                    'newer to support unbound uncertainties.')
+        q = pywikibot.WbQuantity(amount='0.044405586', site=repo)
+        self.assertEqual("%s" % q,
+                         '{\n'
+                         '    "amount": "+%(val)s",\n'
+                         '    "lowerBound": null,\n'
+                         '    "unit": "1",\n'
+                         '    "upperBound": null\n'
+                         '}' % {'val': '0.044405586'})
+        self.assertEqual("%r" % q,
+                         "WbQuantity(amount=%(val)s, "
+                         "upperBound=None, lowerBound=None, "
+                         "unit=1)" % {'val': '0.044405586'})
+
+    def test_WbQuantity_fromWikibase_unbound(self):
+        """Test WbQuantity.fromWikibase() instantiating without bounds."""
+        repo = self.get_repo()
+        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.29.0-wmf.2'):
+            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
+                                    'newer to support unbound uncertainties.')
+        q = pywikibot.WbQuantity.fromWikibase({u'amount': u'+0.0229',
+                                               u'unit': u'1'},
+                                              site=repo)
+        self.assertEqual(q.toWikibase(),
+                         {'amount': '+0.0229', 'lowerBound': None,
+                          'upperBound': None, 'unit': '1', })
+
+    def test_WbQuantity_ItemPage_unit(self):
+        """Test WbQuantity with ItemPage unit."""
+        repo = self.get_repo()
+        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.28-wmf.23'):
+            raise unittest.SkipTest('Wiki version must be 1.28-wmf.23 or '
+                                    'newer to expose wikibase-conceptbaseuri.')
+
+        q = pywikibot.WbQuantity(amount=1234, error=1,
+                                 unit=pywikibot.ItemPage(repo, 'Q712226'))
+        self.assertEqual(q.toWikibase(),
+                         {'amount': '+1234', 'lowerBound': '+1233',
+                          'upperBound': '+1235',
+                          'unit': 'http://www.wikidata.org/entity/Q712226', })
+
+    def test_WbQuantity_equality(self):
+        """Test WbQuantity equality with different unit representations."""
+        repo = self.get_repo()
+        if MediaWikiVersion(repo.version()) < MediaWikiVersion('1.28-wmf.23'):
+            raise unittest.SkipTest('Wiki version must be 1.28-wmf.23 or '
+                                    'newer to expose wikibase-conceptbaseuri.')
+
+        a = pywikibot.WbQuantity(
+            amount=1234, error=1,
+            unit=pywikibot.ItemPage(repo, 'Q712226'))
+        b = pywikibot.WbQuantity(
+            amount=1234, error=1,
+            unit='http://www.wikidata.org/entity/Q712226')
+        c = pywikibot.WbQuantity(
+            amount=1234, error=1,
+            unit='http://test.wikidata.org/entity/Q712226')
+        d = pywikibot.WbQuantity(
+            amount=1234, error=2,
+            unit='http://www.wikidata.org/entity/Q712226')
+        self.assertEqual(a, b)
+        self.assertNotEqual(a, c)
+        self.assertNotEqual(b, c)
+        self.assertNotEqual(b, d)
 
 
 class TestItemPageExtensibility(TestCase):
@@ -791,6 +859,16 @@ class TestClaimSetValue(WikidataTestCase):
         claim.setTarget(target)
         self.assertEqual(claim.target, target)
 
+    def test_set_WbQuantity(self):
+        """Test setting claim of quantity type."""
+        wikidata = self.get_repo()
+        claim = pywikibot.Claim(wikidata, 'P1106')
+        self.assertEqual(claim.type, 'quantity')
+        target = pywikibot.WbQuantity(
+            amount=1234, error=1, unit='http://www.wikidata.org/entity/Q11573')
+        claim.setTarget(target)
+        self.assertEqual(claim.target, target)
+
     def test_set_math(self):
         """Test setting claim of math type."""
         wikidata = self.get_repo()
@@ -826,6 +904,8 @@ class TestClaimSetValue(WikidataTestCase):
         self.assertRaises(ValueError, url_claim.setTarget, pywikibot.WbTime(2001, site=wikidata))
         mono_claim = pywikibot.Claim(wikidata, 'P1450')
         self.assertRaises(ValueError, mono_claim.setTarget, 'foo')
+        quantity_claim = pywikibot.Claim(wikidata, 'P1106')
+        self.assertRaises(ValueError, quantity_claim.setTarget, 'foo')
 
 
 class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
