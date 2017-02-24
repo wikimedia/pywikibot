@@ -23,6 +23,7 @@ __version__ = '$Id$'
 
 import hashlib
 import logging
+import os.path
 import re
 import sys
 
@@ -67,6 +68,7 @@ from pywikibot.data.api import APIError
 from pywikibot.family import Family
 from pywikibot.site import Namespace, need_version
 from pywikibot.tools import (
+    compute_file_hash,
     PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
@@ -2527,6 +2529,38 @@ class FilePage(Page):
             filename = source
         return self.site.upload(self, source_filename=filename, source_url=url,
                                 **kwargs)
+
+    def download(self, filename=None, chunk_size=100 * 1024):
+        """
+        Download to filename file of FilePage.
+
+        @param filename: filename where to save file:
+            None: self.title(as_filename=True, withNamespace=False)
+            will be used
+            str: provided filename will be used.
+        @type None or str
+        @return: True if download is successful, False otherwise.
+        @raise: IOError if filename cannot be written for any reason.
+        """
+        if filename is None:
+            filename = self.title(as_filename=True, withNamespace=False)
+
+        filename = os.path.expanduser(filename)
+
+        req = http.fetch(self.latest_file_info.url, stream=True)
+        if req.status == 200:
+            try:
+                with open(filename, 'wb') as f:
+                    for chunk in req.data.iter_content(chunk_size):
+                        f.write(chunk)
+            except IOError as e:
+                raise e
+
+            sha1 = compute_file_hash(filename)
+            return sha1 == self.latest_file_info.sha1
+        else:
+            pywikibot.warning('Unsuccesfull request (%s): %s' % (req.status, req.uri))
+            return False
 
 
 wrapper = _ModuleDeprecationWrapper(__name__)
