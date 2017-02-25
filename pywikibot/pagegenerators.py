@@ -2381,7 +2381,7 @@ def LiveRCPageGenerator(site=None, total=None):
     if site is None:
         site = pywikibot.Site()
 
-    from pywikibot.comms.rcstream import site_rc_listener
+    from pywikibot.comms.eventstreams import site_rc_listener
 
     for entry in site_rc_listener(site, total=total):
         # The title in a log entry may have been suppressed
