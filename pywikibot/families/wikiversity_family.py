@@ -29,5 +29,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         super(Family, self).__init__()
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['ja', ]
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
+        self.cross_allowed = ['ja', 'ko', ]

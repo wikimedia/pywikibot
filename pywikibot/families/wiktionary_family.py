@@ -20,66 +20,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wiktionary'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wiktionary
-        'aa',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Abkhaz_Wiktionary
-        'ab',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wiktionary
-        'ak',
-        # https://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
-        'als',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wiktionary
-        'as',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Avar_Wiktionary
-        'av',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wiktionary
-        'ba',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bihari_Wiktionary
-        'bh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bislama_Wiktionary
-        'bi',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wiktionary
-        'bm',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tibetan_Wiktionary
-        'bo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wiktionary
-        'ch',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wiktionary
-        'cr',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Dzongkha_Wiktionary
-        'dz',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Inupiak_Wiktionary
-        'ik',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wiktionary
-        'mh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wiktionary
-        'mo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pali_Bhasa_Wiktionary
-        'pi',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rhaetian_Wiktionary
-        'rm',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kirundi_Wiktionary
-        'rn',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sardinian_Wiktionary
-        'sc',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Shona_Wiktionary
-        'sn',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tongan_Wiktionary
-        'to',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Klingon_Wiktionary
-        'tlh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Twi_Wiktionary
-        'tw',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wiktionary
-        'xh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wiktionary
-        'yo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wiktionary
-        'za',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'aa', 'ab', 'ak', 'als', 'as', 'av', 'ba', 'bh', 'bi', 'bm', 'bo',
+        'ch', 'cr', 'dz', 'ik', 'mh', 'mo', 'pi', 'rm', 'rn', 'sc', 'sn',
+        'to', 'tw', 'xh', 'yo', 'za',
     ]
 
     removed_wikis = [
-        'tokipona',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
+        'dk', 'ba', 'tlh', 'tokipona',
     ]
 
     def __init__(self):
@@ -92,28 +41,34 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'jv', 'eu', 'gl', 'az', 'lo', 'uk', 'br', 'da', 'hr', 'eo', 'fj',
             'oc', 'bg', 'ps', 'simple', 'cy', 'vo', 'is', 'zh-min-nan', 'wa',
             'scn', 'tg', 'ast', 'sk', 'he', 'af', 'tl', 'la', 'sw', 'fy', 'nn',
-            'ky', 'co', 'pnb', 'lv', 'mn', 'ka', 'sl', 'sq', 'nds', 'nah', 'lb',
-            'bs', 'kk', 'tk', 'km', 'sm', 'sa', 'mk', 'hsb', 'bn', 'be', 'ms',
-            'ga', 'ur', 'an', 'wo', 'ang', 'vec', 'pa', 'tt', 'gn', 'sd', 'mr',
-            'so', 'csb', 'ug', 'gd', 'st', 'mt', 'roa-rup', 'si', 'ia', 'ie',
-            'mi', 'ay', 'kl', 'jbo', 'fo', 'ln', 'zu', 'na', 'gv', 'kw', 'gu',
-            'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu', 'am', 'dv',
-            'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
+            'ky', 'co', 'pnb', 'lv', 'mn', 'ka', 'sl', 'sq', 'nds', 'nah',
+            'lb', 'bs', 'kk', 'tk', 'km', 'sm', 'sa', 'mk', 'hsb', 'bn', 'be',
+            'ms', 'ga', 'ur', 'an', 'wo', 'ang', 'vec', 'pa', 'tt', 'gn', 'sd',
+            'mr', 'so', 'csb', 'ug', 'gd', 'st', 'mt', 'roa-rup', 'si', 'ia',
+            'ie', 'mi', 'ay', 'kl', 'jbo', 'fo', 'ln', 'zu', 'na', 'gv', 'kw',
+            'gu', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu', 'am',
+            'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
         ]
 
         super(Family, self).__init__()
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
         self.cross_allowed = [
-            'am', 'an', 'ang', 'ast', 'ay', 'az', 'be', 'bg', 'bn', 'br', 'bs',
-            'ca', 'chr', 'co', 'cy', 'da', 'dv', 'eo', 'es', 'et', 'eu', 'fa',
-            'fi', 'fj', 'fo', 'fy', 'ga', 'gd', 'gl', 'gn', 'gv', 'hu', 'ia',
-            'id', 'ie', 'io', 'jv', 'ka', 'kl', 'kn', 'ku', 'ky', 'lb', 'lo',
-            'lt', 'lv', 'mg', 'mk', 'ml', 'mn', 'my', 'ne', 'nl', 'no', 'oc',
-            'or', 'pt', 'sh', 'simple', 'sk', 'sl', 'sm', 'su', 'tg', 'th',
-            'ti', 'tk', 'tn', 'tpi', 'ts', 'ug', 'uk', 'vo', 'wa', 'wo', 'zh',
-            'zh-min-nan', 'zu',
+            'am', 'af', 'am', 'ang', 'an', 'ar', 'ast', 'ay', 'az', 'be',
+            'bg', 'bn', 'br', 'bs', 'ca', 'chr', 'co', 'csb', 'cs', 'cy',
+            'da', 'dv', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fj', 'fo',
+            'fy', 'ga', 'gd', 'gl', 'gn', 'gu', 'gv', 'ha', 'hsb', 'hu', 'hy',
+            'ia', 'id', 'ie', 'io', 'iu', 'jbo', 'jv', 'ka', 'kk', 'kl', 'km',
+            'kn', 'ko', 'ks', 'ku', 'kw', 'ky', 'la', 'lb', 'ln', 'lo', 'lt',
+            'lv', 'mg', 'mi', 'mk', 'ml', 'mn', 'ms', 'mt', 'my', 'nah', 'na',
+            'nds', 'ne', 'nl', 'nn', 'no', 'oc', 'om', 'or', 'pa', 'pnb',
+            'ps', 'pt', 'qu', 'roa_rup', 'rw', 'sa', 'scn', 'sd', 'sg', 'sh',
+            'simple', 'si', 'sk', 'sl', 'sm', 'so', 'sq', 'sr', 'ss', 'st',
+            'su', 'sv', 'sw', 'ta', 'te', 'tg', 'th', 'ti', 'tk', 'tl', 'tn',
+            'tpi', 'tr', 'ts', 'tt', 'ug', 'uk', 'ur', 'uz', 'vec', 'vi', 'vo',
+            'wa', 'wo', 'yi', 'zh_min_nan', 'zh', 'zu',
         ]
 
         # Other than most Wikipedias, page names must not start with a capital

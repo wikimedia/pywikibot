@@ -20,14 +20,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikinews'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hungarian_Wikinews
-        'hu',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Dutch_Wikinews
-        'nl',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sindhi_Wikinews
-        'sd',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Thai_Wikinews
-        'th',
+        # https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'hu', 'nl', 'sd', 'th',
     ]
 
     def __init__(self):
@@ -41,8 +35,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         super(Family, self).__init__()
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
-        self.cross_allowed = ['ca', 'cs', 'en', 'fa', 'ko', ]
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
+        self.cross_allowed = [
+            'ar', 'bg', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he',
+            'ja', 'ko', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr', 'uk',
+            'zh',
+        ]
 
         # TODO:
         # Change site_tests.py when wikinews will have doc_subpage.

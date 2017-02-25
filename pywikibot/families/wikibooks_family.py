@@ -20,102 +20,18 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikibooks'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikibooks
-        'aa',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Akan_Wikibooks
-        'ak',
-        # https://als.wikipedia.org/wiki/Wikipedia:Stammtisch/Archiv_2008-1#Afterwards.2C_closure_and_deletion_of_Wiktionary.2C_Wikibooks_and_Wikiquote_sites
-        'als',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikibooks_2
-        'ang',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Assamese_Wikibooks
-        'as',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Asturianu_Wikibooks
-        'ast',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Aymar_Wikibooks
-        'ay',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bashkir_Wikibooks
-        'ba',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bislama_Wikibooks
-        'bi',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikibooks
-        'bm',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tibetan_Wikibooks
-        'bo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Chamorro_Wikibooks
-        'ch',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Corsu_Wikibooks
-        'co',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikibooks
-        'ga',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gothic_Wikibooks
-        'got',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Guarani_Wikibooks
-        'gn',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gujarati_Wikibooks
-        'gu',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kannada_Wikibooks
-        'kn',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Interlingue_Wikibooks
-        'ie',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikibooks
-        'ks',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_L%C3%ABtzebuergesch_Wikibooks
-        'lb',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Lingala_Wikibooks
-        'ln',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Latvian_Wikibooks
-        'lv',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Maori_Wikibooks
-        'mi',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Mongolian_Wikibooks
-        'mn',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Burmese_Wikibooks
-        'my',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikibooks
-        'na',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nahuatl_Wikibooks
-        'nah',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Plattd%C3%BC%C3%BCtsch_Wikibooks
-        'nds',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Pashto_Wikibooks
-        'ps',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikibooks
-        'qu',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Rumantsch_Wikibooks
-        'rm',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Sami_Wikibooks
-        'se',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_Wikibooks_(3)
-        'simple',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Basa_Sunda_Wikibooks_(2)
-        'su',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Swahili_Wikibooks
-        'sw',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikibooks
-        'tk',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uyghur_Wikibooks
-        'ug',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Uzbek_Wikibooks_(2)
-        'uz',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volap%C3%BCk_Wikibooks
-        'vo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Walon_Wikibooks
-        'wa',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Xhosa_Wikibooks
-        'xh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yoruba_Wikibooks
-        'yo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikibooks
-        'za',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Min_Nan_Wikibooks
-        'zh-min-nan',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zulu_Wikibooks
-        'zu',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay', 'ba',
+        'bi', 'bm', 'bo', 'ch', 'co', 'ga', 'got', 'gn',
+        'gu', 'kn', 'ie', 'ks', 'lb', 'ln', 'lv', 'mi',
+        'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm',
+        'se', 'simple', 'su', 'sw', 'tk', 'ug', 'uz',
+        'vo', 'wa', 'xh', 'yo', 'za', 'zh-min-nan', 'zu',
     ]
 
     removed_wikis = [
-        'tokipona',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'dk', 'tokipona',
     ]
 
     def __init__(self):
@@ -134,7 +50,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         super(Family, self).__init__()
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
         self.cross_allowed = [
             'af', 'ca', 'fa', 'fy', 'gl', 'it', 'nl', 'ru', 'th', 'zh',
         ]
