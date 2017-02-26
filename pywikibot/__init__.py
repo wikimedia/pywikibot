@@ -731,8 +731,9 @@ class WbQuantity(_WbRepresentation):
         amount = cls._todecimal(wb['amount'])
         upperBound = cls._todecimal(wb.get('upperBound'))
         lowerBound = cls._todecimal(wb.get('lowerBound'))
+        bounds_provided = (upperBound is not None and lowerBound is not None)
         error = None
-        if (upperBound and lowerBound) or cls._require_errors(site):
+        if bounds_provided or cls._require_errors(site):
             error = (upperBound - amount, amount - lowerBound)
         if wb['unit'] == '1':
             unit = None
