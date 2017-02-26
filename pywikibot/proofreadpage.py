@@ -544,14 +544,16 @@ class IndexPage(pywikibot.Page):
 
         self._parsed_text = self._get_parsed_page()
         self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
-        attrs = {'class': re.compile('prp-pagequality|new')}
+        # Do not search for "new" here, to avoid to skip purging if links
+        # to non-existing pages are present.
+        attrs = {'class': re.compile('prp-pagequality')}
 
         # Search for attribute "prp-pagequality" in tags:
         # Existing pages:
         # <a href="/wiki/Page:xxx.djvu/n"
         #    title="Page:xxx.djvu/n">m
         #    class="quality1 prp-pagequality-1"
-        # </a> or
+        # </a>
         # Non-existing pages:
         # <a href="/w/index.php?title=xxx&amp;action=edit&amp;redlink=1"
         #    class="new"
@@ -570,6 +572,8 @@ class IndexPage(pywikibot.Page):
                     'class="new" in: %s.'
                     % self)
 
+        # Search for attribute "prp-pagequality" or "new" in tags:
+        attrs = {'class': re.compile('prp-pagequality|new')}
         page_cnt = 0
         for a_tag in self._soup.find_all('a', attrs=attrs):
             label = a_tag.text.lstrip('0')  # Label is not converted to int.
