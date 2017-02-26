@@ -97,6 +97,15 @@ class TestArchiveBotFunctions(TestCase):
         self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time, '4000@')
         self.assertRaises(archivebot.MalformedConfigError, archivebot.str2time, '$1')
 
+    def test_checkstr(self):
+        """Test for extracting key and duration from shorthand notation of durations."""
+        self.assertEqual(archivebot.checkstr('400s'), ('s', '400'))
+        self.assertEqual(archivebot.checkstr('3000'), ('s', '3000'))
+        self.assertEqual(archivebot.checkstr('7d'), ('d', '7'))
+        self.assertEqual(archivebot.checkstr('3y'), ('y', '3'))
+        # Should pass, because the key is verified in str2time
+        self.assertEqual(archivebot.checkstr('4000@'), ('@', '4000'))
+
     def test_str2size(self):
         """Test for parsing the shorthand notation of sizes."""
         self.assertEqual(archivebot.str2size('0'), (0, 'B'))

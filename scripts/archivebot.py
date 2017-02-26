@@ -168,9 +168,9 @@ def str2localized_duration(site, string):
     Translates a duration written in the shorthand notation (ex. "24h", "7d")
     into an expression in the local language of the wiki ("24 hours", "7 days").
     """
-    template = site.mediawiki_message(MW_KEYS[string[-1]])
+    key, duration = checkstr(string)
+    template = site.mediawiki_message(MW_KEYS[key])
     if template:
-        duration = string[:-1]
         # replace plural variants
         exp = i18n.translate(site.code, template, {'$1': int(duration)})
         return exp.replace('$1', to_local_digits(duration, site.code))
@@ -195,14 +195,7 @@ def str2time(string, timestamp=None):
     @return: the corresponding timedelta object
     @rtype: datetime.timedelta
     """
-    key = string[-1]
-    if string.isdigit():
-        key = 's'
-        duration = string
-        issue_deprecation_warning('Time period without qualifier',
-                                  string + key, 1, UserWarning)
-    else:
-        duration = string[:-1]
+    key, duration = checkstr(string)
 
     if duration.isdigit():
         duration = int(duration)
@@ -224,6 +217,31 @@ def str2time(string, timestamp=None):
             timestamp.date(), month_delta=duration) - timestamp.date()
     else:
         return datetime.timedelta(days=days)
+
+
+def checkstr(string):
+    """
+    Return the key and duration extracted from the string.
+
+    @param string: a string defining a time period:
+        300s - 300 seconds
+        36h - 36 hours
+        7d - 7 days
+        2w - 2 weeks (14 days)
+        1y - 1 year
+    @type string: str
+    @return: key and duration extracted form the string
+    @rtype: (str, str)
+    """
+    key = string[-1]
+    if string.isdigit():
+        key = 's'
+        duration = string
+        issue_deprecation_warning('Time period without qualifier',
+                                  string + key, 1, UserWarning)
+    else:
+        duration = string[:-1]
+    return key, duration
 
 
 def str2size(string):
