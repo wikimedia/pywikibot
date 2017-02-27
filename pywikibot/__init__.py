@@ -720,13 +720,13 @@ class WbQuantity(_WbRepresentation):
     @classmethod
     def fromWikibase(cls, wb, site=None):
         """
-        Create a WbQuanity from the JSON data given by the Wikibase API.
+        Create a WbQuantity from the JSON data given by the Wikibase API.
 
         @param wb: Wikibase JSON
         @type wb: dict
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
-        @rtype: pywikibot.WbQuanity
+        @rtype: pywikibot.WbQuantity
         """
         amount = cls._todecimal(wb['amount'])
         upperBound = cls._todecimal(wb.get('upperBound'))
