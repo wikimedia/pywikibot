@@ -20,51 +20,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiquote'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
-        'als',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikiquote
-        'ang',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Asturianu_Wikiquote
-        'ast',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
-        'bm',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Corsu_Wikiquote
-        'co',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
-        'cr',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
-        'ga',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kazakh_Wikiquote
-        'kk',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
-        'kr',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
-        'ks',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote
-        'kw',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Luxembourgish_Wikiquote
-        'lb',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikiquote
-        'na',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Low_Saxon_Wikiquote
-        'nds',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikiquote
-        'qu',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_Wikiquote_(3)
-        'simple',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikiquote
-        'tk',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tatar_Wikiquote
-        'tt',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oyghurque_Wikiquote
-        'ug',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volapuk_Wikiquote
-        'vo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikiquote
-        'za',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'als', 'am', 'ang', 'ast', 'bm', 'co', 'cr', 'ga', 'kk',
+        'kr', 'ks', 'kw', 'lb', 'na', 'nds', 'qu', 'simple',
+        'tk', 'tt', 'ug', 'vo', 'za', 'zh_min_nan',
     ]
 
     removed_wikis = [
+        # See https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
         'tokipona',
     ]
 
@@ -83,14 +46,16 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         super(Family, self).__init__()
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
         self.cross_allowed = [
-            'af', 'am', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'da',
-            'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi',
-            'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ku', 'ky', 'la',
-            'li', 'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sk',
-            'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'tr', 'uk', 'uz', 'vi',
-            'wo', 'zh',
+            'af', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs',
+            'cy', 'da', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi',
+            'fr', 'gl', 'gu', 'he', 'hi', 'hu', 'hy', 'id', 'is',
+            'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
+            'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru',
+            'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'tr',
+            'uk', 'ur', 'uz', 'vi', 'wo', 'zh',
         ]
 
         # Subpages for documentation.

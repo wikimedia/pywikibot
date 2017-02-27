@@ -20,37 +20,17 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikipedia'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Afar_Wikipedia
-        'aa',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Choctaw_Wikipedia
-        'cho',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Hiri_Motu_Wikipedia
-        'ho',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Herero_Wikipedia
-        'hz',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Yi_Wikipedia
-        'ii',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kwanyama_Wikipedia
-        'kj',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikipedia
-        'kr',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Marshallese_Wikipedia
-        'mh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Moldovan_Wikipedia
-        'mo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Muscogee_Wikipedia
-        'mus',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'aa', 'advisory', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mo',
+        'mus', 'ng', 'quality', 'strategy', 'ten', 'usability',
+        'wikimania2005', 'wikimania2006', 'wikimania2007', 'wikimania2008',
+        'wikimania2009', 'wikimania2010', 'wikimania2011', 'wikimania2012',
+        'wikimania2013', 'wikimania2014', 'wikimania2015',
     ]
 
     removed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Ndonga_Wikipedia
-        'ng',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Siberian_Wikipedia
-        'ru-sib',
-        # Klingon, locked in 2005, and moved to http://klingon.wikia.com/
-        'tlh',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tokipona_Wikipedia
-        'tokipona',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
+        'dk', 'ru-sib', 'tlh', 'tokipona', 'zh_cn', 'zh_tw',
     ]
 
     def __init__(self):
@@ -183,32 +163,35 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         ]
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
         self.cross_allowed = [
             'ab', 'ace', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar', 'arc',
-            'arz', 'as', 'ast', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg', 'bcl',
-            'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo', 'bpy', 'bug',
-            'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'chr', 'chy',
-            'ckb', 'co', 'cr', 'crh', 'csb', 'cu', 'cv', 'cy', 'da', 'diq',
-            'dsb', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et', 'eu', 'ext', 'fa',
-            'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur', 'ga', 'gag', 'gan',
-            'gd', 'glk', 'gn', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'he',
-            'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy', 'ia', 'ie', 'ig', 'ik',
-            'ilo', 'io', 'iu', 'ja', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kdb',
-            'kg', 'ki', 'kk', 'kl', 'km', 'kn', 'ko', 'koi', 'krc', 'ks', 'ku',
-            'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lg', 'li',
-            'lij', 'lmo', 'ln', 'lo', 'lt', 'ltg', 'lv', 'map-bms', 'mdf', 'mg',
-            'mhr', 'mi', 'mk', 'ml', 'mn', 'mrj', 'ms', 'mwl', 'my', 'myv',
-            'mzn', 'na', 'nah', 'nap', 'nds-nl', 'ne', 'new', 'nl', 'no', 'nov',
-            'nrm', 'nso', 'nv', 'ny', 'oc', 'om', 'or', 'os', 'pa', 'pag',
-            'pam', 'pap', 'pdc', 'pfl', 'pi', 'pih', 'pms', 'pnb', 'pnt', 'ps',
-            'qu', 'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
-            'sa', 'sah', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'si',
-            'simple', 'sk', 'sm', 'sn', 'so', 'srn', 'ss', 'st', 'stq', 'su',
-            'sv', 'sw', 'szl', 'ta', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl',
-            'tn', 'to', 'tpi', 'tr', 'ts', 'tt', 'tum', 'tw', 'ty', 'udm', 'ug',
-            'uz', 've', 'vec', 'vep', 'vls', 'vo', 'wa', 'war', 'wo', 'wuu',
-            'xal', 'xh', 'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical',
+            'arz', 'as', 'ast', 'av', 'ay', 'az', 'ba', 'bar', 'bat-smg',
+            'bcl', 'be', 'be-tarask', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bo',
+            'bpy', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch',
+            'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 'csb', 'cu', 'cv', 'cy',
+            'da', 'diq', 'dsb', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'et',
+            'eu', 'ext', 'fa', 'ff', 'fi', 'fj', 'fo', 'frp', 'frr', 'fur',
+            'ga', 'gag', 'gan', 'gd', 'glk', 'gn', 'got', 'gu', 'gv', 'ha',
+            'hak', 'haw', 'he', 'hi', 'hif', 'hr', 'hsb', 'ht', 'hu', 'hy',
+            'ia', 'ie', 'ig', 'ik', 'ilo', 'io', 'iu', 'ja', 'jbo', 'jv',
+            'ka', 'kaa', 'kab', 'kdb', 'kg', 'ki', 'kk', 'kl', 'km', 'kn',
+            'ko', 'koi', 'krc', 'ks', 'ku', 'kv', 'kw', 'ky', 'la', 'lad',
+            'lb', 'lbe', 'lez', 'lg', 'li', 'lij', 'lmo', 'ln', 'lo',
+            'lt', 'ltg', 'lv', 'map-bms', 'mdf', 'mg', 'mhr', 'mi', 'mk',
+            'ml', 'mn', 'mrj', 'ms', 'mwl', 'my', 'myv', 'mzn', 'na', 'nah',
+            'nap', 'nds-nl', 'ne', 'new', 'nl', 'no', 'nov', 'nrm', 'nso',
+            'nv', 'ny', 'oc', 'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap',
+            'pdc', 'pfl', 'pi', 'pih', 'pms', 'pnb', 'pnt', 'ps', 'qu',
+            'rm', 'rmy', 'rn', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw',
+            'sa', 'sah', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh',
+            'si', 'simple', 'sk', 'sm', 'sn', 'so', 'srn', 'ss', 'st',
+            'stq', 'su', 'sv', 'sw', 'szl', 'ta', 'te', 'tet', 'tg',
+            'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'tr', 'ts', 'tt',
+            'tum', 'tw', 'ty', 'udm', 'ug', 'uz', 've', 'vec', 'vep',
+            'vls', 'vo', 'wa', 'war', 'wo', 'wuu', 'xal', 'xh',
+            'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical',
             'zh-min-nan', 'zh-yue', 'zu',
         ]
 

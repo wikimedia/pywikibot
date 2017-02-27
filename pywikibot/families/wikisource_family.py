@@ -20,10 +20,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikisource'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
-        'ang',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
-        'ht',
+        # https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'ang', 'ht',
+    ]
+    removed_wikis = [
+        # https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
+        'tokipona',
     ]
 
     def __init__(self):
@@ -45,7 +47,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.languages_by_size.append('mul')
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
         self.cross_allowed = [
             'ca', 'el', 'fa', 'it', 'ko', 'no', 'pl', 'vi', 'zh',
         ]
