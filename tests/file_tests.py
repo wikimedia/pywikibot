@@ -69,7 +69,8 @@ class TestShareFiles(TestCase):
 
     def testLocalOnly(self):
         """Test fileIsShared() on file page with local file only."""
-        title = 'File:April Fools Day Adminship discussion (2005).png'
+        title = 'File:Untitled (Three Forms), stainless steel sculpture by ' \
+                '--James Rosati--, 1975-1976, --Honolulu Academy of Arts--.JPG'
 
         commons = self.get_site('commons')
         enwp = self.get_site('enwiki')
