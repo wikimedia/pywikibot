@@ -79,6 +79,7 @@ class Family(family.WikimediaFamily):
             'phoebe': 'http://www.wikidata.org/entity/Q17975',
             'pluto': 'http://www.wikidata.org/entity/Q339',
             'rhea': 'http://www.wikidata.org/entity/Q15050',
+            'steins': 'http://www.wikidata.org/entity/Q150249',
             'tethys': 'http://www.wikidata.org/entity/Q15047',
             'titan': 'http://www.wikidata.org/entity/Q2565',
             'titania': 'http://www.wikidata.org/entity/Q3322',
