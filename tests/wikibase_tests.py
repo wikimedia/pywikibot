@@ -1395,6 +1395,7 @@ class TestJSON(WikidataTestCase):
         del self.wdp._content['id']
         del self.wdp._content['type']
         del self.wdp._content['lastrevid']
+        del self.wdp._content['pageid']
 
     def test_itempage_json(self):
         """Test itempage json."""
