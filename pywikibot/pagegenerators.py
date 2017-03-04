@@ -1537,7 +1537,7 @@ class ItemClaimFilter(object):
         @type negate: bool
         """
         for page in generator:
-            if cls.__filter_match(page, prop, claim, qualifiers) and not negate:
+            if cls.__filter_match(page, prop, claim, qualifiers) is not negate:
                 yield page
 
 

@@ -666,7 +666,7 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
     """Test item claim filter page generator generator."""
 
-    def _simple_claim_test(self, prop, claim, qualifiers, valid):
+    def _simple_claim_test(self, prop, claim, qualifiers, valid, negate=False):
         """
         Test given claim on sample (India) page.
 
@@ -678,10 +678,12 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         @param valid: true if the page should be yielded by the generator,
             false otherwise
         @type valid: bool
+        @param negate: true to swap the filters' behavior
+        @type negate: bool
         """
         item = pywikibot.ItemPage(self.get_repo(), 'Q668')
-        gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop,
-                                                          claim, qualifiers)
+        gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop, claim,
+                                                          qualifiers, negate)
         pages = set(gen)
         self.assertEqual(len(pages), 1 if valid else 0)
 
@@ -731,6 +733,11 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         self._simple_claim_test('P463', 'Q37470', None, True)
         self._simple_claim_test('P625', '21,77', None, True)
         self._simple_claim_test('P625', '21,78.05,0.01', None, False)
+
+    def test_negative_filter(self):
+        """Test negative ItemClaimFilterPageGenerator."""
+        self._simple_claim_test('P463', 'Q37470', None, False, True)
+        self._simple_claim_test('P463', 'Q37471', None, True, True)
 
 
 class TestFactoryGenerator(DefaultSiteTestCase):
