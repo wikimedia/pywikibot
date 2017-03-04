@@ -3133,6 +3133,8 @@ class APISite(BaseSite):
             or a comma- or pipe-separated string of pageids
             (e.g. '945097,1483753, 956608' or '945097|483753|956608')
         """
+        if not pageids:
+            return
         if isinstance(pageids, basestring):
             pageids = pageids.replace('|', ',')
             pageids = pageids.split(',')
