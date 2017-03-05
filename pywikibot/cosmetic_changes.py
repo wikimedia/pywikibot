@@ -50,7 +50,7 @@ or by adding a list to the given one:
 """
 #
 # (C) xqt, 2009-2016
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -221,8 +221,7 @@ class CosmeticChangesToolkit(object):
             self.cleanUpSectionHeaders,
             self.putSpacesInLists,
             self.translateAndCapitalizeNamespaces,
-            # FIXME: fix bugs and re-enable
-            # self.translateMagicWords,
+            self.translateMagicWords,
             self.replaceDeprecatedTemplates,
             # FIXME: fix bugs and re-enable
             # self.resolveHtmlEntities,
@@ -406,19 +405,22 @@ class CosmeticChangesToolkit(object):
         """Use localized magic words."""
         # not wanted at ru
         # arz uses english stylish codes
-        if self.site.code not in ['arz', 'ru']:
+        # no need to run on English wikis
+        if self.site.code not in ['arz', 'en', 'ru']:
             exceptions = ['nowiki', 'comment', 'math', 'pre']
             for magicWord in ['img_thumbnail', 'img_left', 'img_center',
                               'img_right', 'img_none', 'img_framed',
                               'img_frameless', 'img_border', 'img_upright', ]:
-                aliases = self.site.getmagicwords(magicWord)
+                aliases = list(self.site.getmagicwords(magicWord))
+                preferred = aliases.pop(0)
                 if not aliases:
                     continue
                 text = textlib.replaceExcept(
                     text,
-                    r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +
-                    r') *(?P<right>(\|.*?)?\]\])',
-                    r'[[\g<left>' + aliases[0] + r'\g<right>', exceptions)
+                    r'\[\[(?P<left>.+?:.+?\..+?\|(.*?\|)*?) *(' +
+                    '|'.join(aliases) +
+                    r') *(?P<right>(\|.*?)*?\]\])',
+                    r'[[\g<left>' + preferred + r'\g<right>', exceptions)
         return text
 
     def cleanUpLinks(self, text):
