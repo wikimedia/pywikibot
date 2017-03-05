@@ -241,7 +241,7 @@ class TestCategoryFilterPageGenerator(TestCase):
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.CategoryFilterPageGenerator(gen, self.catfilter_list, site)
-        self.assertEqual(len(tuple(gen)), 7)
+        self.assertEqual(len(tuple(gen)), 9)
 
 
 class TestQualityFilterPageGenerator(TestCase):
