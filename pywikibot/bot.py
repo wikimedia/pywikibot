@@ -48,7 +48,7 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1665,15 +1665,18 @@ class CurrentPageBot(BaseBot):
         @type ignore_server_errors: bool or None
         @param kwargs: Additional parameters directly given to L{Bot.userPut}.
         @type kwargs: dict
+        @return: whether the page was saved successfully
+        @rtype: bool
         """
         if ignore_save_related_errors is None:
             ignore_save_related_errors = self.ignore_save_related_errors
         if ignore_server_errors is None:
             ignore_server_errors = self.ignore_server_errors
-        self.userPut(self.current_page, self.current_page.text, new_text,
-                     ignore_save_related_errors=ignore_save_related_errors,
-                     ignore_server_errors=ignore_server_errors,
-                     **kwargs)
+        return self.userPut(
+            self.current_page, self.current_page.text, new_text,
+            ignore_save_related_errors=ignore_save_related_errors,
+            ignore_server_errors=ignore_server_errors,
+            **kwargs)
 
 
 class AutomaticTWSummaryBot(CurrentPageBot):
