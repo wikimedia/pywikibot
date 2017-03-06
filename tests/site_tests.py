@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,6 +46,9 @@ from tests.aspects import (
 )
 from tests.basepage_tests import BasePageLoadRevisionsCachingTestBase
 from tests.utils import allowed_failure, allowed_failure_if, entered_loop
+
+if not PY2:
+    long = int  # Must be global: T159700
 
 
 class TokenTestBase(TestCaseBase):
@@ -1162,10 +1165,6 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
 
     def test_logpages(self):
         """Test the deprecated site.logpages() method."""
-        # pyflakes fix for Python 3
-        if not PY2:
-            long = int
-
         le = list(self.site.logpages(number=10))
         self.assertOneDeprecation()
         self.assertLessEqual(len(le), 10)
