@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Objects representing various types of MediaWiki, including Wikibase, pages.
 
