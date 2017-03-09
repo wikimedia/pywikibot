@@ -964,7 +964,7 @@ def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
     If includeredirects is False, redirects are not included. If
     includeredirects equals the string 'only', only redirects are added.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param content: If True, load current version of each page (default False)
     @param site: Site for generator results.
@@ -1382,7 +1382,7 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
                                total=None, _filter_unique=filter_unique):
     """Yield unique pages edited by user:username.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param namespaces: list of namespace numbers to fetch contribs from
     @type namespaces: list of int
@@ -1970,7 +1970,7 @@ def NewimagesPageGenerator(total=None, site=None):
     """
     New file generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2046,7 +2046,7 @@ def UnusedFilesGenerator(total=None, site=None):
     """
     Unused files generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2062,7 +2062,7 @@ def WithoutInterwikiPageGenerator(total=None, site=None):
     """
     Page lacking interwikis generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     """
@@ -2077,7 +2077,7 @@ def UnCategorizedCategoryGenerator(total=100, site=None):
     """
     Uncategorized category generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2093,7 +2093,7 @@ def UnCategorizedImageGenerator(total=100, site=None):
     """
     Uncategorized file generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2109,7 +2109,7 @@ def UnCategorizedPageGenerator(total=100, site=None):
     """
     Uncategorized page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2125,7 +2125,7 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
     """
     Uncategorized template generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2141,7 +2141,7 @@ def LonelyPagesPageGenerator(total=None, site=None):
     """
     Lonely page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2157,7 +2157,7 @@ def UnwatchedPagesPageGenerator(total=None, site=None):
     """
     Unwatched page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2172,7 +2172,7 @@ def WantedPagesPageGenerator(total=100, site=None):
     """
     Wanted page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2188,7 +2188,7 @@ def AncientPagesPageGenerator(total=100, site=None):
     """
     Ancient page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2204,7 +2204,7 @@ def DeadendPagesPageGenerator(total=100, site=None):
     """
     Dead-end page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2220,7 +2220,7 @@ def LongPagesPageGenerator(total=100, site=None):
     """
     Long page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2236,7 +2236,7 @@ def ShortPagesPageGenerator(total=100, site=None):
     """
     Short page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2252,7 +2252,7 @@ def RandomPageGenerator(total=None, site=None, namespaces=None):
     """
     Random page generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2268,7 +2268,7 @@ def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
     """
     Random redirect generator.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2291,7 +2291,7 @@ def LinksearchPageGenerator(url, namespaces=None, total=None,
     @type url: str
     @param namespaces: list of namespace numbers to fetch contribs from
     @type namespaces: list of int
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
@@ -2307,7 +2307,7 @@ def SearchPageGenerator(query, total=None, namespaces=None, site=None):
     """
     Yield pages from the MediaWiki internal search engine.
 
-    @param total: Maxmum number of pages to retrieve in total
+    @param total: Maximum number of pages to retrieve in total
     @type total: int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
