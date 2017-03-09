@@ -219,55 +219,61 @@ class TestWbQuantity(WikidataTestCase):
 
     def test_WbQuantity_integer(self):
         """Test WbQuantity for integer value."""
-        q = pywikibot.WbQuantity(amount=1234, error=1)
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount=1234, error=1, site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
                           'upperBound': '+1235', 'unit': '1', })
-        q = pywikibot.WbQuantity(amount=5, error=(2, 3))
+        q = pywikibot.WbQuantity(amount=5, error=(2, 3), site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+5', 'lowerBound': '+2',
                           'upperBound': '+7', 'unit': '1', })
-        q = pywikibot.WbQuantity(amount=0, error=(0, 0))
+        q = pywikibot.WbQuantity(amount=0, error=(0, 0), site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+0', 'lowerBound': '+0',
                           'upperBound': '+0', 'unit': '1', })
-        q = pywikibot.WbQuantity(amount=-5, error=(2, 3))
+        q = pywikibot.WbQuantity(amount=-5, error=(2, 3), site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '-5', 'lowerBound': '-8',
                           'upperBound': '-3', 'unit': '1', })
 
     def test_WbQuantity_float_27(self):
         """Test WbQuantity for float value."""
-        q = pywikibot.WbQuantity(amount=0.044405586, error=0.0)
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount=0.044405586, error=0.0, site=repo)
         q_dict = {'amount': '+0.044405586', 'lowerBound': '+0.044405586',
                   'upperBound': '+0.044405586', 'unit': '1', }
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_scientific(self):
         """Test WbQuantity for scientific notation."""
-        q = pywikibot.WbQuantity(amount='1.3e-13', error='1e-14')
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount='1.3e-13', error='1e-14', site=repo)
         q_dict = {'amount': '+1.3e-13', 'lowerBound': '+1.2e-13',
                   'upperBound': '+1.4e-13', 'unit': '1', }
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_decimal(self):
         """Test WbQuantity for decimal value."""
+        repo = self.get_repo()
         q = pywikibot.WbQuantity(amount=Decimal('0.044405586'),
-                                 error=Decimal('0.0'))
+                                 error=Decimal('0.0'), site=repo)
         q_dict = {'amount': '+0.044405586', 'lowerBound': '+0.044405586',
                   'upperBound': '+0.044405586', 'unit': '1', }
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_string(self):
         """Test WbQuantity for decimal notation."""
-        q = pywikibot.WbQuantity(amount='0.044405586', error='0')
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
         q_dict = {'amount': '+0.044405586', 'lowerBound': '+0.044405586',
                   'upperBound': '+0.044405586', 'unit': '1', }
         self.assertEqual(q.toWikibase(), q_dict)
 
     def test_WbQuantity_formatting_bound(self):
         """Test WbQuantity formatting with bounds."""
-        q = pywikibot.WbQuantity(amount='0.044405586', error='0')
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
         self.assertEqual("%s" % q,
                          '{\n'
                          '    "amount": "+%(val)s",\n'
@@ -282,7 +288,8 @@ class TestWbQuantity(WikidataTestCase):
 
     def test_WbQuantity_equality(self):
         """Test WbQuantity equality."""
-        q = pywikibot.WbQuantity(amount='0.044405586', error='0')
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
         self.assertEqual(q, q)
 
     def test_WbQuantity_fromWikibase(self):
@@ -304,8 +311,9 @@ class TestWbQuantity(WikidataTestCase):
                           error=1)
 
     def test_WbQuantity_entity_unit(self):
-        """Test WbQuantity with entity url unit."""
-        q = pywikibot.WbQuantity(amount=1234, error=1,
+        """Test WbQuantity with entity uri unit."""
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount=1234, error=1, site=repo,
                                  unit='http://www.wikidata.org/entity/Q712226')
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
@@ -314,9 +322,11 @@ class TestWbQuantity(WikidataTestCase):
 
     def test_WbQuantity_unit_fromWikibase(self):
         """Test WbQuantity recognising unit from Wikibase output."""
+        repo = self.get_repo()
         q = pywikibot.WbQuantity.fromWikibase({
             'amount': '+1234', 'lowerBound': '+1233', 'upperBound': '+1235',
-            'unit': 'http://www.wikidata.org/entity/Q712226', })
+            'unit': 'http://www.wikidata.org/entity/Q712226', },
+            site=repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+1234', 'lowerBound': '+1233',
                           'upperBound': '+1235',
@@ -414,6 +424,31 @@ class TestWbQuantityNonDry(WikidataTestCase):
         self.assertNotEqual(b, c)
         self.assertNotEqual(b, d)
 
+    def test_WbQuantity_get_unit_item(self):
+        """Test getting unit item from WbQuantity."""
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount=1234, error=1, site=repo,
+                                 unit='http://www.wikidata.org/entity/Q123')
+        self.assertEqual(q.get_unit_item(),
+                         ItemPage(repo, 'Q123'))
+
+    def test_WbQuantity_get_unit_item_provide_repo(self):
+        """Test getting unit item from WbQuantity, providing repo."""
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount=1234, error=1,
+                                 unit='http://www.wikidata.org/entity/Q123')
+        self.assertEqual(q.get_unit_item(repo),
+                         ItemPage(repo, 'Q123'))
+
+    def test_WbQuantity_get_unit_item_different_repo(self):
+        """Test getting unit item in different repo from WbQuantity."""
+        repo = self.get_repo()
+        test_repo = pywikibot.Site('test', 'wikidata')
+        q = pywikibot.WbQuantity(amount=1234, error=1, site=repo,
+                                 unit='http://test.wikidata.org/entity/Q123')
+        self.assertEqual(q.get_unit_item(test_repo),
+                         ItemPage(test_repo, 'Q123'))
+
 
 class TestWbMonolingualText(WikidataTestCase):
 
@@ -485,6 +520,7 @@ class TestItemLoad(WikidataTestCase):
     1. by Q id
     2. ItemPage.fromPage(page)
     3. ItemPage.fromPage(page_with_props_loaded)
+    4. ItemPage.from_entity_uri(site, uri)
 
     Test various invalid scenarios:
     1. invalid Q ids
@@ -808,6 +844,52 @@ class TestItemLoad(WikidataTestCase):
         # It should raise NoPage on the source page, with title 'Test page'
         # as that is what the bot operator needs to see in the log output.
         self.assertRaisesRegex(pywikibot.NoPage, 'Test page', item.get)
+
+    def test_from_entity_uri(self):
+        """Test ItemPage.from_entity_uri."""
+        repo = self.get_repo()
+        entity_uri = 'http://www.wikidata.org/entity/Q124'
+        self.assertEqual(ItemPage.from_entity_uri(repo, entity_uri),
+                         ItemPage(repo, 'Q124'))
+
+    def test_from_entity_uri_not_a_data_repo(self):
+        """Test ItemPage.from_entity_uri with a non-Wikibase site."""
+        repo = self.site
+        entity_uri = 'http://www.wikidata.org/entity/Q124'
+        self.assertRaises(TypeError,
+                          ItemPage.from_entity_uri, repo, entity_uri)
+
+    def test_from_entity_uri_wrong_repo(self):
+        """Test ItemPage.from_entity_uri with unexpected item repo."""
+        repo = self.get_repo()
+        entity_uri = 'http://test.wikidata.org/entity/Q124'
+        self.assertRaises(ValueError,
+                          ItemPage.from_entity_uri, repo, entity_uri)
+
+    def test_from_entity_uri_invalid_title(self):
+        """Test ItemPage.from_entity_uri with an invalid item title format."""
+        repo = self.get_repo()
+        entity_uri = 'http://www.wikidata.org/entity/Nonsense'
+        self.assertRaises(pywikibot.InvalidTitle,
+                          ItemPage.from_entity_uri, repo, entity_uri)
+
+    def test_from_entity_uri_no_item(self):
+        """Test ItemPage.from_entity_uri with non-exitent item."""
+        repo = self.get_repo()
+        entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
+        self.assertRaises(pywikibot.NoPage,
+                          ItemPage.from_entity_uri, repo, entity_uri)
+
+    def test_from_entity_uri_no_item_lazy(self):
+        """Test ItemPage.from_entity_uri with lazy loaded non-exitent item."""
+        repo = self.get_repo()
+        entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
+        expected_item = ItemPage(repo, 'Q999999999999999999')
+        self.assertEqual(
+            ItemPage.from_entity_uri(repo, entity_uri, lazy_load=True),
+            expected_item)
+
+        self.assertFalse(expected_item.exists())  # ensure actually missing
 
 
 class TestRedirects(WikidataTestCase):
