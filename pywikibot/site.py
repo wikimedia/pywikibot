@@ -6584,7 +6584,7 @@ class APISite(BaseSite):
                                  protect_type=type, total=total)
 
     @need_version('1.21')
-    def _get_property_names(self, force=False):
+    def get_property_names(self, force=False):
         """
         Get property names for pages_with_property().
 
@@ -6607,9 +6607,9 @@ class APISite(BaseSite):
         @return: return a generator of Page objects
         @rtype: iterator
         """
-        if propname not in self._get_property_names():
+        if propname not in self.get_property_names():
             raise NotImplementedError(
-                '{0} is not a valid page property'.format(propname))
+                '"{0}" is not a valid page property'.format(propname))
         pwpgen = self._generator(api.PageGenerator,
                                  type_arg='pageswithprop',
                                  gpwppropname=propname,

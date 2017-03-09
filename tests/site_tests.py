@@ -1000,7 +1000,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
             raise unittest.SkipTest('requires v1.21+')
         mysite = self.get_site()
-        pnames = mysite._get_property_names()
+        pnames = mysite.get_property_names()
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
                      'hiddencat', 'invalid_property'):
             if item in pnames:
@@ -3328,9 +3328,9 @@ class TestPropertyNames(DefaultSiteTestCase):
     cached = True
 
     def test_get_property_names(self, key):
-        """Test _get_property_names method."""
+        """Test get_property_names method."""
         mysite = self.get_site(key)
-        pnames = mysite._get_property_names()
+        pnames = mysite.get_property_names()
         self.assertIsInstance(pnames, list)
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
                      'forcetoc', 'graph_specs', 'hiddencat', 'newsectionlink',
