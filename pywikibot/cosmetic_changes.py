@@ -50,7 +50,7 @@ or by adding a list to the given one:
 """
 #
 # (C) xqt, 2009-2016
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +71,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config, textlib
-from pywikibot.textlib import _MultiTemplateMatchBuilder
+from pywikibot.textlib import _MultiTemplateMatchBuilder, FILE_LINK_REGEX
 from pywikibot.tools import deprecated_args, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
@@ -223,8 +223,7 @@ class CosmeticChangesToolkit(object):
             self.cleanUpSectionHeaders,
             self.putSpacesInLists,
             self.translateAndCapitalizeNamespaces,
-            # FIXME: fix bugs and re-enable
-            # self.translateMagicWords,
+            self.translateMagicWords,
             self.replaceDeprecatedTemplates,
             # FIXME: fix bugs and re-enable
             # self.resolveHtmlEntities,
@@ -408,19 +407,31 @@ class CosmeticChangesToolkit(object):
         """Use localized magic words."""
         # not wanted at ru
         # arz uses english stylish codes
-        if self.site.code not in ['arz', 'ru']:
-            exceptions = ['nowiki', 'comment', 'math', 'pre']
-            for magicWord in ['img_thumbnail', 'img_left', 'img_center',
-                              'img_right', 'img_none', 'img_framed',
-                              'img_frameless', 'img_border', 'img_upright', ]:
-                aliases = self.site.getmagicwords(magicWord)
-                if not aliases:
-                    continue
-                text = textlib.replaceExcept(
-                    text,
-                    r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +
-                    r') *(?P<right>(\|.*?)?\]\])',
-                    r'[[\g<left>' + aliases[0] + r'\g<right>', exceptions)
+        # no need to run on English wikis
+        if self.site.code not in ['arz', 'en', 'ru']:
+            def replace_magicword(match):
+                split = match.group().split('|')
+                # push ']]' out and re-add below
+                split[-1] = split[-1][:-2]
+                for magicword in ['img_thumbnail', 'img_left', 'img_center',
+                                  'img_right', 'img_none', 'img_framed',
+                                  'img_frameless', 'img_border', 'img_upright',
+                                  ]:
+                    aliases = list(self.site.getmagicwords(magicword))
+                    preferred = aliases.pop(0)
+                    if not aliases:
+                        continue
+                    split[1:] = list(map(
+                        lambda x: preferred if x.strip() in aliases else x,
+                        split[1:]))
+                return '|'.join(split) + ']]'
+
+            exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']
+            regex = re.compile(
+                FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
+                flags=re.X)
+            text = textlib.replaceExcept(text, regex, replace_magicword,
+                                         exceptions)
         return text
 
     def cleanUpLinks(self, text):

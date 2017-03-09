@@ -242,6 +242,38 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '[[File:Foo.bar|miniatur]]',
             self.cct.translateMagicWords('[[File:Foo.bar|mini]]'))
+        # test local namespace
+        self.assertEqual(
+            '[[Datei:Foo.bar|miniatur]]',
+            self.cct.translateMagicWords('[[Datei:Foo.bar|thumb]]'))
+        # test multiple magic words
+        self.assertEqual(
+            '[[File:Foo.bar|links|miniatur]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|left|thumb]]'))
+        # test magic words at the end
+        self.assertEqual(
+            '[[File:Foo.bar|250px|links]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|250px|left]]'))
+        # test touching unstripped parts and stripping magic words
+        self.assertEqual(
+            '[[File:Foo.bar|links| 250px]]',
+            self.cct.translateMagicWords('[[File:Foo.bar| left | 250px]]'))
+        # test magic word with a caption
+        self.assertEqual(
+            '[[File:Foo.bar|250px|zentriert|Bar]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|250px|center|Bar]]'))
+
+    @unittest.expectedFailure
+    def test_translateMagicWords_fail(self):
+        """
+        Test translateMagicWords method.
+
+        The current implementation doesn't check whether the magic word is
+        inside a template.
+        """
+        self.assertEqual(
+            '[[File:Foo.bar|{{Baz|thumb|foo}}]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|{{Baz|thumb|foo}}]]'))
 
     def test_cleanUpLinks_pipes(self):
         """Test cleanUpLinks method."""
