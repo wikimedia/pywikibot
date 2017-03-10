@@ -996,6 +996,26 @@ class TestSiteGenerators(DefaultSiteTestCase):
             cnt += 1
         self.assertLessEqual(cnt, 5)
 
+    def test_pages_with_property(self):
+        """Test pages_with_property method."""
+        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
+            raise unittest.SkipTest('requires v1.21+')
+        mysite = self.get_site()
+        pnames = mysite._get_property_names()
+        for item in ('defaultsort', 'disambiguation', 'displaytitle',
+                     'hiddencat', 'invalid_property'):
+            if item in pnames:
+                for page in mysite.pages_with_property(item, total=5):
+                    self.assertIsInstance(page, pywikibot.Page)
+                    self.assertTrue(mysite.page_exists(page))
+                    if item == 'disambiguation':
+                        self.assertTrue(page.isDisambig)
+            else:
+                with self.assertRaises(NotImplementedError):
+                    mysite.pages_with_property(item)
+                    self.fail(
+                        'NotImplementedError not raised for {0}'.format(item))
+
 
 class TestImageUsage(DefaultSiteTestCase):
 
@@ -3289,6 +3309,37 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
         self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_index_ns, site)
         self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_page_ns, site)
         self.assertRaises(pywikibot.UnknownExtension, lambda x: x.proofread_levels, site)
+
+
+class TestPropertyNames(DefaultSiteTestCase):
+
+    """Test Special:PagesWithProp method."""
+
+    sites = {
+        'en.ws': {
+            'family': 'wikisource',
+            'code': 'en',
+        },
+        'de.wp': {
+            'family': 'wikipedia',
+            'code': 'de',
+        },
+    }
+
+    cached = True
+
+    def test_get_property_names(self, key):
+        """Test _get_property_names method."""
+        mysite = self.get_site(key)
+        pnames = mysite._get_property_names()
+        self.assertIsInstance(pnames, list)
+        for item in ('defaultsort', 'disambiguation', 'displaytitle',
+                     'forcetoc', 'graph_specs', 'hiddencat', 'newsectionlink',
+                     'noeditsection', 'noexternallanglinks', 'nogallery',
+                     'noindex', 'nonewsectionlink', 'notoc',
+                     'page_top_level_section_count', 'score', 'templatedata',
+                     'wikibase-badge-Q17437796', 'wikibase_item'):
+            self.assertIn(item, pnames)
 
 
 if __name__ == '__main__':  # pragma: no cover
