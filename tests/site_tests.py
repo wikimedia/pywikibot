@@ -605,10 +605,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_allpages_langlinks_enabled(self):
         """Test allpages with langlinks enabled."""
         mysite = self.get_site()
-        for page in mysite.allpages(filterlanglinks=True, total=5):
+        for page in mysite.allpages(
+                filterlanglinks=True, total=3, namespace=4):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(mysite.page_exists(page))
-            self.assertEqual(page.namespace(), 0)
+            self.assertEqual(page.namespace(), 4)
             self.assertNotEqual(page.langlinks(), [])
 
     def test_allpages_langlinks_disabled(self):
