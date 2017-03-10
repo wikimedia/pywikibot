@@ -12,6 +12,7 @@ __version__ = '$Id$'
 
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
+from pywikibot.site import DataSite
 from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import (
@@ -123,6 +124,9 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         ]
         if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.24'):
             base.append('application/json')
+        if isinstance(self.site, DataSite):
+            # It is not clear when this format has been added, see T129281.
+            base.append('application/vnd.php.serialized')
 
         self._check_param_values(self.site, 'edit', 'contentformat', base)
         self._check_param_values(self.site, 'parse', 'contentformat', base)
