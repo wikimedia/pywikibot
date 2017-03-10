@@ -2957,7 +2957,7 @@ class ListGenerator(QueryGenerator):
     """Iterator for queries of type action=query&list=foo.
 
     See the API documentation for types of lists that can be queried. Lists
-    include both side-wide information (such as 'allpages') and page-specific
+    include both site-wide information (such as 'allpages') and page-specific
     information (such as 'backlinks').
 
     This iterator yields a dict object for each member of the list returned
