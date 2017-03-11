@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """Script that updates the language lists in Wikimedia family files."""
 #
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2008-2016
+# (C) xqt, 2009-2017
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,16 +71,16 @@ def update_family(families):
             pywikibot.output(u'The lists match!')
         else:
             pywikibot.output(u"The lists don't match, the new list is:")
-            text = u'        self.languages_by_size = [\r\n'
+            text = '        self.languages_by_size = [\n'
             line = ' ' * 11
             for code in new:
                 if len(line) + len(code) <= 76:
                     line += u" '%s'," % code
                 else:
-                    text += u'%s\r\n' % line
+                    text += '%s\n' % line
                     line = ' ' * 11
                     line += u" '%s'," % code
-            text += u'%s\r\n' % line
+            text += '%s\n' % line
             text += u'        ]'
             pywikibot.output(text)
             family_file_name = 'pywikibot/families/%s_family.py' % family
