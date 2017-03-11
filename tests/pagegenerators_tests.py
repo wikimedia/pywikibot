@@ -1021,6 +1021,29 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, set([1, 3]))
 
+    def test_pages_with_property_generator(self):
+        """Test the pages_with_property_generator method."""
+        mysite = self.get_site()
+        for item in ('defaultsort', 'disambiguation', 'displaytitle',
+                     'hiddencat', 'invalid_property'):
+            if item in mysite.get_property_names():
+                gf = pagegenerators.GeneratorFactory()
+                gf.handleArg('-property:{0}'.format(item))
+                gf.handleArg('-limit:10')
+                gen = gf.getCombinedGenerator()
+                self.assertIsNotNone(gen)
+                pages = list(gen)
+                self.assertLessEqual(len(pages), 10)
+                for page in pages:
+                    self.assertIsInstance(page, pywikibot.Page)
+                    if item == 'disambiguation':
+                        self.assertTrue(page.isDisambig())
+            else:
+                with self.assertRaises(NotImplementedError):
+                    mysite.pages_with_property(item)
+                    self.fail(
+                        'NotImplementedError not raised for {0}'.format(item))
+
     def test_empty_generator(self):
         """Test empty generator."""
         gf = pagegenerators.GeneratorFactory(site=self.site)

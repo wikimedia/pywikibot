@@ -50,6 +50,7 @@ from pywikibot.tools import (
 )
 
 from pywikibot import date, config, i18n, xmlreader
+from pywikibot.bot import ListOption
 from pywikibot.comms import http
 from pywikibot.exceptions import ArgumentDeprecationWarning, UnknownExtension
 from pywikibot.logentries import LogEntryFactory
@@ -246,6 +247,9 @@ parameterHelp = """\
 -unwatched        Work on all articles that are not watched by anyone.
                   Argument can be given as "-unwatched:n" where
                   n is the maximum number of articles to work on.
+
+-property:name    Work on all pages with a given propery name from
+                  Special:PagesWithProp.
 
 -usercontribs     Work on all articles that were edited by a certain user.
                   (Example : -usercontribs:DumZiBoT)
@@ -661,6 +665,20 @@ class GeneratorFactory(object):
         elif arg == '-unwatched':
             gen = UnwatchedPagesPageGenerator(total=intNone(value),
                                               site=self.site)
+        elif arg == '-property':
+            if not value:
+                question = 'Which property name to be used?'
+                value = pywikibot.input(question + ' (List [?])')
+                pnames = self.site.get_property_names()
+                # also use the default by <enter> key
+                if value in '?' or value not in pnames:
+                    for i, item in enumerate(pnames, start=1):
+                        pywikibot.output(
+                            '{0:{1}}: {2}'.format(i, len(str(len(pnames))),
+                                                  item))
+                    prefix, value = pywikibot.input_choice(
+                        question, ListOption(self.site.get_property_names()))
+            gen = page_with_property_generator(value, site=self.site)
         elif arg == '-usercontribs':
             gen = UserContributionsGenerator(value)
         elif arg == '-withoutinterwiki':
@@ -2166,6 +2184,22 @@ def UnwatchedPagesPageGenerator(total=None, site=None):
         site = pywikibot.Site()
     for page in site.unwatchedpages(total=total):
         yield page
+
+
+def page_with_property_generator(name, total=None, site=None):
+    """
+    Special:PagesWithProperty page generator.
+
+    @param name: Property name of pages to be retrieved
+    @type name: str
+    @param total: Maximum number of pages to retrieve in total
+    @type total: int
+    @param site: Site for generator results.
+    @type site: L{pywikibot.site.BaseSite}
+    """
+    if site is None:
+        site = pywikibot.Site()
+    return site.pages_with_property(name, total=total)
 
 
 def WantedPagesPageGenerator(total=100, site=None):
