@@ -223,11 +223,13 @@ class TemplateRobot(ReplaceBot):
             if self.getOption('subst') and self.getOption('remove'):
                 replacements.append((templateRegex,
                                      r'{{subst:%s\g<parameters>}}' % new))
-                exceptions['inside-tags'] = ['ref', 'gallery', 'poem']
+                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
+                                             'pagelist', ]
             elif self.getOption('subst'):
                 replacements.append((templateRegex,
                                      r'{{subst:%s\g<parameters>}}' % old))
-                exceptions['inside-tags'] = ['ref', 'gallery', 'poem']
+                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
+                                             'pagelist', ]
             elif self.getOption('remove'):
                 replacements.append((templateRegex, ''))
             else:

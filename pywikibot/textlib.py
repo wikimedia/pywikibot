@@ -258,6 +258,8 @@ def _create_default_regexes():
         # files
         'file':         (FILE_LINK_REGEX,
                          lambda site: '|'.join(site.namespaces[6])),
+        # pagelist tag (used in Proofread extension).
+        'pagelist':      re.compile(r'(?is)<pagelist.*?/>'),
     })
 
 
