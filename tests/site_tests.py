@@ -2200,7 +2200,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertIsInstance(
             datetime.strptime(mysite.siteinfo['time'], '%Y-%m-%dT%H:%M:%SZ'),
             datetime)
-        self.assertEqual(re.findall("\$1", mysite.siteinfo['articlepath']), ["$1"])
+        self.assertEqual(re.findall(r'\$1', mysite.siteinfo['articlepath']), ['$1'])
 
     def test_properties_with_defaults(self):
         """Test the siteinfo properties with defaults."""

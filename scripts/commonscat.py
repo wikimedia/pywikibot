@@ -352,17 +352,17 @@ class CommonscatBot(Bot):
                               oldcat.lower() in page.title().lower()):
             linktitle = oldcat
         if linktitle and newcat != page.title(withNamespace=False):
-            newtext = re.sub(u'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s|%s|%s}}' % (newtemplate, newcat, linktitle),
                              page.get())
         elif newcat == page.title(withNamespace=False):
-            newtext = re.sub(u'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s}}' % newtemplate,
                              page.get())
         elif oldcat.strip() != newcat:  # strip trailing white space
-            newtext = re.sub(u'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s|%s}}' % (newtemplate, newcat),
                              page.get())

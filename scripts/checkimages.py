@@ -1451,7 +1451,7 @@ class checkImagesBot(object):
             summary = tupla[5]
             head_2 = tupla[6]
             if head_2.count('==') == 2:
-                head_2 = re.findall('\s*== *(.+?) *==\s*', head_2)[0]
+                head_2 = re.findall(r'\s*== *(.+?) *==\s*', head_2)[0]
             text = tupla[7] % self.imageName
             mexCatched = tupla[8]
             for k in find_list:

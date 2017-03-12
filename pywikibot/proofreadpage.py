@@ -507,7 +507,7 @@ class IndexPage(pywikibot.Page):
 
     def _parse_redlink(self, href):
         """Parse page title when link in Index is a redlink."""
-        p_href = re.compile('/w/index\.php\?title=(.+?)&action=edit&redlink=1')
+        p_href = re.compile(r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
         title = p_href.search(href)
         if title:
             return title.group(1)

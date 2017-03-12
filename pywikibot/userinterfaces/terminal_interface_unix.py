@@ -45,7 +45,7 @@ class UnixUI(terminal_interface_base.UI):
 
     def make_unix_bg_color(self, color):
         """Obtain background color from foreground color."""
-        code = re.search('(?<=\[)\d+', color).group()
+        code = re.search(r'(?<=\[)\d+', color).group()
         return chr(27) + '[' + str(int(code) + 10) + 'm'
 
     def encounter_color(self, color, target_stream):

@@ -151,10 +151,10 @@ def getCommonshelperCats(imagepage):
         return [], [], []
 
     commonsenseRe = re.compile(
-        '^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s'
-        '#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)'
-        '#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s'
-        '#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$',
+        r'^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s'
+        r'#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)'
+        r'#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s'
+        r'#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$',
         re.MULTILINE + re.DOTALL)
 
     gotInfo = False
