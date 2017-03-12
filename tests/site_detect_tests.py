@@ -19,34 +19,6 @@ from tests.aspects import unittest, TestCase
 __version__ = '$Id$'
 
 
-def _retry_few_times(retry_limit):
-    """
-    Decorator to retry test on failure.
-
-    Swallow AssertionError retry_limit times before failing test.
-
-    @param retry_limit: Retry limit before failing test
-    @type retry_limit: int
-    @return: a decorator to retry test on failure
-    @rtype: function
-    @raises AssertionError: all retries of test failed
-    """
-    def actual_decorator(wrapped_func):
-        def wrapper_func(*args, **kwargs):
-            for retry_no in range(1, retry_limit + 1):
-                try:
-                    wrapped_func(*args, **kwargs)
-                except AssertionError:
-                    if retry_no == retry_limit:
-                        raise
-                except:
-                    raise
-                else:
-                    return
-        return wrapper_func
-    return actual_decorator
-
-
 class SiteDetectionTestCase(TestCase):
 
     """Testcase for MediaWiki detection and site object creation."""
@@ -63,9 +35,8 @@ class SiteDetectionTestCase(TestCase):
         """
         try:
             self.assertIsInstance(MWSite(url), MWSite)
-        except (AttributeError, ConnectionError, RuntimeError, ServerError,
-                Timeout):
-            raise AssertionError
+        except (ServerError, Timeout) as e:
+            self.skipTest(e)
 
     def assertNoSite(self, url):
         """
@@ -100,7 +71,6 @@ class StandardVersionSiteTestCase(SiteDetectionTestCase):
         """Test detection of MediaWiki sites for en.citizendium.org."""
         self.assertSite('http://en.citizendium.org/wiki/$1')
 
-    @_retry_few_times(10)
     def test_wikichristian(self):
         """Test detection of MediaWiki sites for www.wikichristian.org.
 
