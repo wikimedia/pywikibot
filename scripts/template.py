@@ -19,7 +19,8 @@ Command line options:
              article. This is done by changing {{...}} or {{msg:...}} into
              {{subst:...}}.
              Substitution is not available inside <ref>...</ref>,
-             <gallery>...</gallery> and <poem>...</poem> tags.
+             <gallery>...</gallery>, <poem>...</poem> and <pagelist ... />
+             tags.
 
 -assubst     Replaces the first argument as old template with the second
              argument as new template but substitutes it like -subst does.
