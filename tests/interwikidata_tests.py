@@ -93,9 +93,15 @@ class TestInterwikidataBot(SiteAttributeTestCase):
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
         self.assertRaises(ValueError, DummyBot, generator=[wt_page], site=self.wt)
 
-        self.assertRaises(ValueError, interwikidata.main,
-                          '-page:User:Ladsgroup', '-lang:fa',
-                          '-family:wiktionary')
+        fa_wiktionary = pywikibot.Site('fa', 'wiktionary')
+        self.assertRaisesRegex(
+            ValueError,
+            r'wiktionary:fa does not have a data repository, '
+            r'use interwiki\.py instead.',
+            interwikidata.IWBot,
+            generator=[pywikibot.Page(fa_wiktionary, 'User:Dalba')],
+            site=fa_wiktionary,
+        )
 
 
 if __name__ == '__main__':  # pragma: no cover
