@@ -107,43 +107,7 @@ content = {
     'zh': '{{subst:User:Sz-iwbot/sandbox}}\n',
 }
 
-sandboxTitle = {
-    'commons': u'Project:Sandbox',
-    'wikidata': 'Project:Sandbox',
-    'als': u'Project:Sandchaschte',
-    'ar': u'Project:ملعب',
-    'arz': u'Project:السبوره',
-    'az': u'Vikipediya:Qaralama dəftəri',
-    'bar': u'Project:Spuiwiesn',
-    'cs': u'Project:Pískoviště',
-    'da': u'Project:Sandkassen',
-    'de': u'Project:Spielwiese',
-    'en': u'Project:Sandbox',
-    'eo': 'Project:Provejo',
-    'fa': [u'Project:صفحه تمرین', u'Project:آشنایی با ویرایش'],
-    'fi': u'Project:Hiekkalaatikko',
-    'fr': u'Project:Bac à sable',
-    'he': u'Project:ארגז חול',
-    'id': u'Project:Bak pasir',
-    'it': u'Project:Pagina delle prove',
-    'ja': u'Project:サンドボックス',
-    'ko': u'Project:연습장',
-    'ksh': u'Project:Shpillplaz',
-    'mzn': u'Project:چنگ‌مویی صفحه',
-    'nds': u'Project:Speelwisch',
-    'nl': u'Project:Zandbak',
-    'no': u'Project:Sandkasse',
-    'pl': u'Project:Brudnopis',
-    'pt': u'Project:Página de testes',
-    'ru': u'Project:Песочница',
-    'simple': u'Project:Sandbox',
-    'sco': u'Project:Saundbox',
-    'sr': u'Project:Песак',
-    'sv': u'Project:Sandlådan',
-    'th': u'Project:ทดลองเขียน',
-    'tr': u'Vikipedi:Deneme tahtası',
-    'zh': u'Project:沙盒',
-}
+sandbox_titles = ('Q3938', )
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -180,14 +144,15 @@ class SandboxBot(Bot):
             pywikibot.error(u'No content is given for pages, exiting.')
             raise RuntimeError
         if not self.generator:
-            if self.site.code not in sandboxTitle:
+            pages = []
+            for item in sandbox_titles:
+                p = self.site.page_from_repository(item)
+                if p is not None:
+                    pages.append(p)
+            if not pages:
                 pywikibot.bot.suggest_help(missing_generator=True)
                 raise RuntimeError
-            local_sandbox_title = sandboxTitle[self.site.code]
-            if not isinstance(local_sandbox_title, list):
-                local_sandbox_title = [local_sandbox_title]
-            self.generator = [pywikibot.Page(self.site, page_name) for
-                              page_name in local_sandbox_title]
+            self.generator = pages
 
     def run(self):
         """Run bot."""
