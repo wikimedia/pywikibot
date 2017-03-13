@@ -1737,7 +1737,7 @@ def get_stars(text):
     allstars = []
     starstext = removeDisabledParts(text)
     for star in starsList:
-        regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
+        regex = re.compile(r'(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
                            % star, re.I)
         found = regex.findall(starstext)
         if found:
