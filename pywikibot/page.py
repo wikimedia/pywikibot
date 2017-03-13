@@ -1266,16 +1266,16 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not cc:
             return
 
-        # cc depends on page directly and via several other imports
-        from pywikibot.cosmetic_changes import CosmeticChangesToolkit  # noqa
         old = self.text
         pywikibot.log(u'Cosmetic changes for %s-%s enabled.'
                       % (family, self.site.lang))
+        # cc depends on page directly and via several other imports
+        from pywikibot.cosmetic_changes import (
+            CANCEL_MATCH, CosmeticChangesToolkit)  # noqa
         ccToolkit = CosmeticChangesToolkit(self.site,
-                                           redirect=self.isRedirectPage(),
                                            namespace=self.namespace(),
                                            pageTitle=self.title(),
-                                           ignore=3)  # CANCEL_MATCH
+                                           ignore=CANCEL_MATCH)
         self.text = ccToolkit.change(old)
         if comment and \
            old.strip().replace('\r\n',

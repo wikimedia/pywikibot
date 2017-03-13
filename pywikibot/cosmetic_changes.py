@@ -72,7 +72,7 @@ import pywikibot
 
 from pywikibot import config, textlib
 from pywikibot.textlib import _MultiTemplateMatchBuilder
-from pywikibot.tools import deprecate_arg, first_lower, first_upper
+from pywikibot.tools import deprecated_args, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
 
@@ -199,13 +199,12 @@ class CosmeticChangesToolkit(object):
 
     """Cosmetic changes toolkit."""
 
-    @deprecate_arg('debug', 'diff')
-    def __init__(self, site, diff=False, redirect=False, namespace=None,
-                 pageTitle=None, ignore=CANCEL_ALL):
+    @deprecated_args(debug='diff', redirect=None)
+    def __init__(self, site, diff=False, namespace=None, pageTitle=None,
+                 ignore=CANCEL_ALL):
         """Constructor."""
         self.site = site
         self.diff = diff
-        self.redirect = redirect
         try:
             self.namespace = self.site.namespaces.resolve(namespace).pop(0)
         except (KeyError, TypeError, IndexError):
