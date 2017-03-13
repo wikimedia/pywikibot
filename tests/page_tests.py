@@ -487,8 +487,8 @@ class TestPageObject(DefaultSiteTestCase):
 
     def testLinks(self):
         """Test the different types of links from a page."""
-        if self.site.family.name == 'wpbeta':
-            raise unittest.SkipTest('Test fails on betawiki; T69931')
+        if self.site.family.name in ('wpbeta', 'wsbeta'):
+            raise unittest.SkipTest('Test fails on betawiki; T69931; T160308')
         mainpage = self.get_mainpage()
         for p in mainpage.linkedPages():
             self.assertIsInstance(p, pywikibot.Page)
