@@ -27,7 +27,7 @@ For further information see pywikibot/cosmetic_changes.py
 """
 #
 # (C) xqt, 2009-2013
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,20 +71,13 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     def treat_page(self):
         """Treat page with the cosmetic toolkit."""
-        try:
-            ccToolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
-                self.current_page, False, self.getOption('ignore'))
-            changedText = ccToolkit.change(self.current_page.get())
-            if changedText is not False:
-                self.put_current(new_text=changedText,
-                                 summary=self.getOption('summary'),
-                                 async=self.getOption('async'))
-        except pywikibot.LockedPage:
-            pywikibot.output("Page %s is locked?!"
-                             % self.current_page.title(asLink=True))
-        except pywikibot.EditConflict:
-            pywikibot.output("An edit conflict has occurred at %s."
-                             % self.current_page.title(asLink=True))
+        ccToolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
+            self.current_page, False, self.getOption('ignore'))
+        changedText = ccToolkit.change(self.current_page.get())
+        if changedText is not False:
+            self.put_current(new_text=changedText,
+                             summary=self.getOption('summary'),
+                             async=self.getOption('async'))
 
 
 def main(*args):
