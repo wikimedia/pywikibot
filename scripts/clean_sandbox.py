@@ -107,7 +107,7 @@ content = {
     'zh': '{{subst:User:Sz-iwbot/sandbox}}\n',
 }
 
-sandbox_titles = ('Q3938', )
+sandbox_titles = ('Q3938', 'Q28939665')
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
