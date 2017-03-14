@@ -6532,7 +6532,7 @@ class APISite(BaseSite):
     @need_version("1.18")
     @deprecated_args(step=None)
     def broken_redirects(self, total=None):
-        """Yield Pages without language links from Special:BrokenRedirects.
+        """Yield Pages with broken redirects from Special:BrokenRedirects.
 
         @param total: number of pages to return
         """
@@ -6545,7 +6545,7 @@ class APISite(BaseSite):
     @need_version("1.18")
     @deprecated_args(step=None)
     def double_redirects(self, total=None):
-        """Yield Pages without language links from Special:BrokenRedirects.
+        """Yield Pages with double redirects from Special:DoubleRedirects.
 
         @param total: number of pages to return
         """
