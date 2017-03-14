@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -7351,6 +7351,10 @@ class DataSite(APISite):
         super(DataSite, self).__init__(*args, **kwargs)
         self._item_namespace = None
         self._property_namespace = None
+        self._type_to_class = {
+            'item': pywikibot.ItemPage,
+            'property': pywikibot.PropertyPage,
+        }
 
     def _cache_entity_namespaces(self):
         """Find namespaces for each known wikibase entity type."""
@@ -7587,9 +7591,9 @@ class DataSite(APISite):
             raise api.APIError(data['errors'])
         return data['entities']
 
-    def preloaditempages(self, pagelist, groupsize=50):
+    def preload_entities(self, pagelist, groupsize=50):
         """
-        Yield ItemPages with content prefilled.
+        Yield subclasses of WikibasePage's with content prefilled.
 
         Note that pages will be iterated in a different order
         than in the underlying pagelist.
@@ -7607,23 +7611,34 @@ class DataSite(APISite):
                     for key in ident:
                         req[key].append(ident[key])
                 else:
-                    assert p.site.has_data_repository, \
-                        'Site must have a data repository'
-                    if (p.site == p.site.data_repository() and
-                            p.namespace() == p.data_repository.item_namespace):
+                    if p.site == self and p.namespace() in (
+                            self.item_namespace, self.property_namespace):
                         req['ids'].append(p.title(withNamespace=False))
                     else:
+                        assert p.site.has_data_repository, \
+                            'Site must have a data repository'
                         req['sites'].append(p.site.dbName())
                         req['titles'].append(p._link._text)
 
             req = self._simple_request(action='wbgetentities', **req)
             data = req.submit()
-            for qid in data['entities']:
-                item = pywikibot.ItemPage(self, qid)
-                item._content = data['entities'][qid]
+            for entity in data['entities']:
+                if 'missing' in data['entities'][entity]:
+                    continue
+                cls = self._type_to_class[data['entities'][entity]['type']]
+                page = cls(self, entity)
                 # No api call is made because item._content is given
-                item.get(get_redirect=True)
-                yield item
+                page._content = data['entities'][entity]
+                try:
+                    page.get()  # cannot provide get_redirect=True (T145971)
+                except pywikibot.IsRedirectPage:
+                    pass
+                yield page
+
+    @deprecated('DataSite.preload_entities')
+    def preloaditempages(self, pagelist, groupsize=50):
+        """DEPRECATED."""
+        return self.preload_entities(pagelist, groupsize)
 
     def getPropertyType(self, prop):
         """
