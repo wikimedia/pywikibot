@@ -26,7 +26,7 @@ to show warnings about deprecated methods:
 """
 #
 # (C) xqt, 2014-2015
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -168,24 +168,23 @@ class ConvertBot(object):
 
     def convert(self):
         """Convert script."""
-        f = codecs.open(self.source, "r", "utf-8")
-        text = f.read()
-        f.close()
+        with codecs.open(self.source, 'r', 'utf-8') as f:
+            text = f.read()
         for r in replacements:
             text = re.sub(r[0], r[1], text)
-        g = codecs.open(self.dest, "w", "utf-8")
-        g.write(text)
-        g.close()
+        with codecs.open(self.dest, 'w', 'utf-8') as g:
+            g.write(text)
 
     def warning(self):
         """Show warnings and hints."""
         filename = self.source if self.warnonly else self.dest
-        g = codecs.open(filename, "r", "utf-8")
-        for i, line in enumerate(g, start=1):
-            for w in warnings:
-                if w[0] in line:
-                    pywikibot.warning(u'line %d: %s>>> %s\n' % (i, line, w[1]))
-        g.close()
+        with codecs.open(filename, 'r', 'utf-8') as g:
+            lines = enumerate(g.readlines(), start=1)
+            for i, line in lines:
+                for w in warnings:
+                    if w[0] in line:
+                        pywikibot.warning(
+                            'line {0}: {1}>>> {2}\n'.format(i, line, w[1]))
 
 
 def main():
