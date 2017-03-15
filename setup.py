@@ -59,7 +59,7 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': ['Pillow'],
+    'Tkinter': ['Pillow<3.5.0' if PY26 else 'Pillow'],
     # 0.6.1 supports socket.io 1.0, but WMF is using 0.9 (T91393 and T85716)
     'rcstream': ['socketIO-client<0.6.1'],
     'security': ['requests[security]', 'pycparser!=2.14'],
@@ -76,7 +76,7 @@ if PY2:
     })
 
 script_deps = {
-    'flickrripper.py': ['Pillow'],
+    'flickrripper.py': ['Pillow<3.5.0' if PY26 else 'Pillow'],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client>=0.5.1'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],
