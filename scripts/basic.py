@@ -90,7 +90,7 @@ class BasicBot(
         # call constructor of the super class
         super(BasicBot, self).__init__(site=True, **kwargs)
 
-        # handle old -dry paramter
+        # handle old -dry parameter
         self._handle_dry_param(**kwargs)
 
         # assign the generator to the bot
@@ -185,7 +185,7 @@ def main(*args):
                 pywikibot.input('Please enter a value for ' + arg)
             options[option] = value
         # take the remaining options as booleans.
-        # You will get a hint if they aren't pre-definded in your bot class
+        # You will get a hint if they aren't pre-defined in your bot class
         else:
             options[option] = True
 
