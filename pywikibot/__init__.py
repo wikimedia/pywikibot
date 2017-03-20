@@ -234,10 +234,10 @@ class Coordinate(_WbRepresentation):
     in the future we can use it for the GeoData extension.
     """
 
-    _items = ('lat', 'lon', 'globe')
+    _items = ('lat', 'lon', 'entity')
 
     @_deprecate_arg('entity', 'globe_item')
-    def __init__(self, lat, lon, alt=None, precision=None, globe='earth',
+    def __init__(self, lat, lon, alt=None, precision=None, globe=None,
                  typ='', name='', dim=None, site=None, globe_item=None):
         """
         Represent a geo coordinate.
@@ -260,26 +260,34 @@ class Coordinate(_WbRepresentation):
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
         @param globe_item: The Wikibase item for the globe, or the entity URI
-                           of this Wikibase item.
+                           of this Wikibase item. Takes precedence over 'globe'
+                           if present.
         @type globe_item: pywikibot.ItemPage or str
         """
         self.lat = lat
         self.lon = lon
         self.alt = alt
         self._precision = precision
-        if globe:
-            globe = globe.lower()
-        self.globe = globe
         self._entity = globe_item
         self.type = typ
         self.name = name
         self._dim = dim
         self.site = site or Site().data_repository()
 
+        if globe:
+            globe = globe.lower()
+        elif not globe_item:
+            globe = site.default_globe()
+        self.globe = globe
+
     @property
     def entity(self):
         """Return the entity uri of the globe."""
         if not self._entity:
+            if self.globe not in self.site.globes():
+                raise CoordinateGlobeUnknownException(
+                    u"%s is not supported in Wikibase yet."
+                    % self.globe)
             return self.site.globes()[self.globe]
 
         if isinstance(self._entity, ItemPage):
@@ -296,10 +304,6 @@ class Coordinate(_WbRepresentation):
         @return: Wikibase JSON
         @rtype: dict
         """
-        if self.globe not in self.site.globes():
-            raise CoordinateGlobeUnknownException(
-                u"%s is not supported in Wikibase yet."
-                % self.globe)
         return {'latitude': self.lat,
                 'longitude': self.lon,
                 'altitude': self.alt,
@@ -318,16 +322,14 @@ class Coordinate(_WbRepresentation):
         @type site: pywikibot.site.DataSite
         @rtype: pywikibot.Coordinate
         """
-        globes = {}
-        for k in site.globes():
-            globes[site.globes()[k]] = k
+        globe = None
 
-        globekey = data['globe']
-        if globekey:
+        if data['globe']:
+            globes = {}
+            for name, entity in site.globes().items():
+                globes[entity] = name
+
             globe = globes.get(data['globe'])
-        else:
-            # Default to earth or should we use None here?
-            globe = 'earth'
 
         return cls(data['latitude'], data['longitude'],
                    data['altitude'], data['precision'],
