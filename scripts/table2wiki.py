@@ -118,8 +118,8 @@ class Table2WikiRobot(object):
         # bring every <tag> into one single line.
         num = 1
         while num != 0:
-            newTable, num = re.subn("([^\r\n]{1})(<[tT]{1}[dDhHrR]{1})",
-                                    r"\1\r\n\2", newTable)
+            newTable, num = re.subn(r'([^\r\n]{1})(<[tT]{1}[dDhHrR]{1})',
+                                    r'\1\r\n\2', newTable)
 
         ##################
         # every open-tag gets a new line.
@@ -128,45 +128,45 @@ class Table2WikiRobot(object):
         # Note that we added the ## characters in markActiveTables().
         # <table> tag with attributes, with more text on the same line
         newTable = re.sub(
-            "(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>(?P<more>[\w\W]*?)[\r\n ]*",
-            r"\r\n{| \g<attr>\r\n\g<more>", newTable)
+            r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>(?P<more>[\w\W]*?)[\r\n ]*',
+            r'\r\n{| \g<attr>\r\n\g<more>', newTable)
         # <table> tag without attributes, with more text on the same line
-        newTable = re.sub("(?i)[\r\n]*?<##table##>(?P<more>[\w\W]*?)[\r\n ]*",
-                          r"\r\n{|\n\g<more>\r\n", newTable)
+        newTable = re.sub(r'(?i)[\r\n]*?<##table##>(?P<more>[\w\W]*?)[\r\n ]*',
+                          r'\r\n{|\n\g<more>\r\n', newTable)
         # <table> tag with attributes, without more text on the same line
-        newTable = re.sub("(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>[\r\n ]*",
-                          r"\r\n{| \g<attr>\r\n", newTable)
+        newTable = re.sub(r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>[\r\n ]*',
+                          r'\r\n{| \g<attr>\r\n', newTable)
         # <table> tag without attributes, without more text on the same line
-        newTable = re.sub("(?i)[\r\n]*?<##table##>[\r\n ]*",
-                          "\r\n{|\r\n", newTable)
+        newTable = re.sub(r'(?i)[\r\n]*?<##table##>[\r\n ]*',
+                          '\r\n{|\r\n', newTable)
         # end </table>
-        newTable = re.sub("(?i)[\s]*<\/##table##>",
-                          "\r\n|}", newTable)
+        newTable = re.sub(r'(?i)[\s]*<\/##table##>',
+                          '\r\n|}', newTable)
 
         ##################
         # caption with attributes
         newTable = re.sub(
-            "(?i)<caption (?P<attr>[\w\W]*?)>(?P<caption>[\w\W]*?)<\/caption>",
-            r"\r\n|+\g<attr> | \g<caption>", newTable)
+            r'(?i)<caption (?P<attr>[\w\W]*?)>(?P<caption>[\w\W]*?)<\/caption>',
+            r'\r\n|+\g<attr> | \g<caption>', newTable)
         # caption without attributes
-        newTable = re.sub("(?i)<caption>(?P<caption>[\w\W]*?)<\/caption>",
-                          r"\r\n|+ \g<caption>", newTable)
+        newTable = re.sub(r'(?i)<caption>(?P<caption>[\w\W]*?)<\/caption>',
+                          r'\r\n|+ \g<caption>', newTable)
 
         ##################
         # <th> often people don't write them within <tr>, be warned!
         # <th> with attributes
         newTable = re.sub(
-            "(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)<\/th>",
+            r"(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)<\/th>",
             r"\r\n!\g<attr> | \g<header>\r\n", newTable)
 
         # <th> without attributes
-        newTable = re.sub("(?i)[\r\n]+<th>(?P<header>[\w\W]*?)<\/th>",
-                          r"\r\n! \g<header>\r\n", newTable)
+        newTable = re.sub(r"(?i)[\r\n]+<th>(?P<header>[\w\W]*?)<\/th>",
+                          r'\r\n! \g<header>\r\n', newTable)
 
         # fail save. sometimes people forget </th>
         # <th> without attributes, without closing </th>
-        newTable, n = re.subn("(?i)[\r\n]+<th>(?P<header>[\w\W]*?)[\r\n]+",
-                              r"\r\n! \g<header>\r\n", newTable)
+        newTable, n = re.subn(r'(?i)[\r\n]+<th>(?P<header>[\w\W]*?)[\r\n]+',
+                              r'\r\n! \g<header>\r\n', newTable)
         if n > 0:
             warning_messages.append(
                 u'WARNING: found <th> without </th>. (%d occurences)\n' % n)
@@ -174,8 +174,8 @@ class Table2WikiRobot(object):
 
         # <th> with attributes, without closing </th>
         newTable, n = re.subn(
-            "(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)[\r\n]+",
-            r"\n!\g<attr> | \g<header>\r\n", newTable)
+            r'(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)[\r\n]+',
+            r'\n!\g<attr> | \g<header>\r\n', newTable)
         if n > 0:
             warning_messages.append(
                 u'WARNING: found <th ...> without </th>. (%d occurences\n)' % n)
@@ -192,14 +192,14 @@ class Table2WikiRobot(object):
 
         ##################
         # normal <td> without arguments
-        newTable = re.sub("(?i)[\r\n]+<td>(?P<cell>[\w\W]*?)<\/td>",
-                          r"\r\n| \g<cell>\r\n", newTable)
+        newTable = re.sub(r'(?i)[\r\n]+<td>(?P<cell>[\w\W]*?)<\/td>',
+                          r'\r\n| \g<cell>\r\n', newTable)
 
         ##################
         # normal <td> with arguments
         newTable = re.sub(
-            "(?i)[\r\n]+<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)<\/td>",
-            r"\r\n|\g<attr> | \g<cell>", newTable)
+            r'(?i)[\r\n]+<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)<\/td>',
+            r'\r\n|\g<attr> | \g<cell>', newTable)
 
         # WARNING: this sub might eat cells of bad HTML, but most likely it
         # will correct errors
@@ -231,25 +231,25 @@ class Table2WikiRobot(object):
 
         # fail save. sometimes people forget </td>
         # <td> without arguments, with missing </td>
-        newTable, n = re.subn("(?i)<td>(?P<cell>[^<]*?)[\r\n]+",
-                              r"\r\n| \g<cell>\r\n", newTable)
+        newTable, n = re.subn(r'(?i)<td>(?P<cell>[^<]*?)[\r\n]+',
+                              r'\r\n| \g<cell>\r\n', newTable)
         if n > 0:
             warning_messages.append(u"NOTE: Found <td> without </td>. This "
                                     u"shouldn't cause problems.\n")
 
         # <td> with attributes, with missing </td>
         newTable, n = re.subn(
-            "(?i)[\r\n]*<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)[\r\n]+",
-            r"\r\n|\g<attr> | \g<cell>\r\n", newTable)
+            r'(?i)[\r\n]*<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)[\r\n]+',
+            r'\r\n|\g<attr> | \g<cell>\r\n', newTable)
         if n > 0:
             warning_messages.append(u"NOTE: Found <td> without </td>. This "
                                     u"shouldn't cause problems.\n")
 
         ##################
         # Garbage collecting ;-)
-        newTable = re.sub("(?i)<td>[\r\n]*<\/tr>", "", newTable)
+        newTable = re.sub(r'(?i)<td>[\r\n]*<\/tr>', '', newTable)
         # delete closing tags
-        newTable = re.sub("(?i)[\r\n]*<\/t[rdh]>", "", newTable)
+        newTable = re.sub(r'(?i)[\r\n]*<\/t[rdh]>', '', newTable)
 
         ##################
         # OK, that's only theory but works most times.
@@ -265,8 +265,8 @@ class Table2WikiRobot(object):
         ##################
         # most <th> come with '''title'''. Senseless in my eyes cuz
         # <th> should be bold anyways.
-        newTable = re.sub("[\r\n]+\!([^'\n\r]*)'''([^'\r\n]*)'''",
-                          r"\r\n!\1\2", newTable)
+        newTable = re.sub(r"[\r\n]+\!([^'\n\r]*)'''([^'\r\n]*)'''",
+                          r'\r\n!\1\2', newTable)
 
         ##################
         # kills indention within tables. Be warned, it might seldom bring
@@ -275,29 +275,29 @@ class Table2WikiRobot(object):
         if config.deIndentTables:
             num = 1
             while num != 0:
-                newTable, num = re.subn("(\{\|[\w\W]*?)\n[ \t]+([\w\W]*?\|\})",
-                                        r"\1\r\n\2", newTable)
+                newTable, num = re.subn(r'(\{\|[\w\W]*?)\n[ \t]+([\w\W]*?\|\})',
+                                        r'\1\r\n\2', newTable)
 
         ##################
         # kills additional spaces after | or ! or {|
         # This line was creating problems, so I commented it out --Daniel
         # newTable = re.sub("[\r\n]+\|[\t ]+?[\r\n]+", "\r\n| ", newTable)
         # kills trailing spaces and tabs
-        newTable = re.sub("\r\n(.*)[\t\ ]+[\r\n]+",
-                          r"\r\n\1\r\n", newTable)
+        newTable = re.sub(r'\r\n(.*)[\t\ ]+[\r\n]+',
+                          r'\r\n\1\r\n', newTable)
         # kill extra new-lines
-        newTable = re.sub("[\r\n]{4,}(\!|\|)",
-                          r"\r\n\1", newTable)
+        newTable = re.sub(r'[\r\n]{4,}(\!|\|)',
+                          r'\r\n\1', newTable)
 
         ##################
         # shortening if <table> had no arguments/parameters
-        newTable = re.sub("[\r\n]+\{\|[\ ]+\| ", "\r\n\{| ", newTable)
+        newTable = re.sub(r'[\r\n]+\{\|[\ ]+\| ', r'\r\n{| ', newTable)
         # shortening if <td> had no articles
-        newTable = re.sub("[\r\n]+\|[\ ]+\| ", "\r\n| ", newTable)
+        newTable = re.sub(r'[\r\n]+\|[\ ]+\| ', '\r\n| ', newTable)
         # shortening if <th> had no articles
-        newTable = re.sub("\n\|\+[\ ]+\|", "\n|+ ", newTable)
+        newTable = re.sub(r'\n\|\+[\ ]+\|', '\n|+ ', newTable)
         # shortening of <caption> had no articles
-        newTable = re.sub("[\r\n]+\![\ ]+\| ", "\r\n! ", newTable)
+        newTable = re.sub(r'[\r\n]+\![\ ]+\| ', '\r\n! ', newTable)
 
         ##################
         # proper attributes. attribute values need to be in quotation marks.
@@ -331,35 +331,35 @@ class Table2WikiRobot(object):
         num = 1
         while num != 0:
             newTable, num = re.subn(
-                "[\r\n]+(\|[^\|\-\}]{1}[^\n\r]{0,35})" +
-                "[\r\n]+(\|[^\|\-\}]{1}[^\r\n]{0,35})[\r\n]+",
-                r"\r\n\1 |\2\r\n", newTable)
+                r'[\r\n]+(\|[^\|\-\}]{1}[^\n\r]{0,35})'
+                r'[\r\n]+(\|[^\|\-\}]{1}[^\r\n]{0,35})[\r\n]+',
+                r'\r\n\1 |\2\r\n', newTable)
         ####
         # add a new line if first is * or #
-        newTable = re.sub("[\r\n]+\| ([*#]{1})",
-                          r"\r\n|\r\n\1", newTable)
+        newTable = re.sub(r'[\r\n]+\| ([*#]{1})',
+                          r'\r\n|\r\n\1', newTable)
 
         ##################
         # strip <center> from <th>
-        newTable = re.sub("([\r\n]+\![^\r\n]+?)<center>([\w\W]+?)<\/center>",
-                          r"\1 \2", newTable)
+        newTable = re.sub(r'([\r\n]+\![^\r\n]+?)<center>([\w\W]+?)<\/center>',
+                          r'\1 \2', newTable)
         # strip align="center" from <th> because the .css does it
         # if there are no other attributes than align, we don't need
         # that | either
-        newTable = re.sub("([\r\n]+\! +)align\=\"center\" +\|",
-                          r"\1", newTable)
+        newTable = re.sub(r'([\r\n]+\! +)align\=\"center\" +\|',
+                          r'\1', newTable)
         # if there are other attributes, simply strip the align="center"
         newTable = re.sub(
-            "([\r\n]+\![^\r\n\|]+?)align\=\"center\"([^\n\r\|]+?\|)",
-            r"\1 \2", newTable)
+            r'([\r\n]+\![^\r\n\|]+?)align\=\"center\"([^\n\r\|]+?\|)',
+            r'\1 \2', newTable)
 
         ##################
         # kill additional spaces within arguments
         num = 1
         while num != 0:
             newTable, num = re.subn(
-                "[\r\n]+(\||\!)([^|\r\n]*?)[ \t]{2,}([^\r\n]+?)",
-                r"\r\n\1\2 \3", newTable)
+                r'[\r\n]+(\||\!)([^|\r\n]*?)[ \t]{2,}([^\r\n]+?)',
+                r'\r\n\1\2 \3', newTable)
 
         ##################
         # I hate those long lines because they make a wall of letters
@@ -370,8 +370,8 @@ class Table2WikiRobot(object):
                 # TODO: how does this work? docu please.
                 # why are only äöüß used, but not other special characters?
                 newTable, num = re.subn(
-                    "(\r\n[A-Z]{1}[^\n\r]{200,}?[a-zäöüß]\.)\ ([A-ZÄÖÜ]{1}[^\n\r]{200,})",
-                    r"\1\r\n\2", newTable)
+                    r'(\r\n[A-Z]{1}[^\n\r]{200,}?[a-zäöüß]\.)\ ([A-ZÄÖÜ]{1}[^\n\r]{200,})',
+                    r'\1\r\n\2', newTable)
         return newTable, warnings, warning_messages
 
     def markActiveTables(self, text):

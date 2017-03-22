@@ -60,7 +60,7 @@ class UI(object):
 
     """Base for terminal user interfaces."""
 
-    split_col_pat = re.compile('(\w+);?(\w+)?')
+    split_col_pat = re.compile(r'(\w+);?(\w+)?')
 
     def __init__(self):
         """

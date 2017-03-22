@@ -165,99 +165,99 @@ skipTemplates = {
 
 licenseTemplates = {
     'de': [
-        ('\{\{Bild-CC-by-sa/3\.0/de\}\}[\s\r\n]*\{\{Bild-CC-by-sa/3\.0\}\}'
-         '[\s\r\n]*\{\{Bild-GFDL-Neu\}\}',
+        (r'\{\{Bild-CC-by-sa/3\.0/de\}\}[\s\r\n]*\{\{Bild-CC-by-sa/3\.0\}\}'
+         r'[\s\r\n]*\{\{Bild-GFDL-Neu\}\}',
          '{{Self|Cc-by-sa-3.0-de|Cc-by-sa-3.0|GFDL|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at [http://%(lang)s.%'
          '(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Bild-GFDL\}\}[\s\r\n]*\{\{Bild-CC-by-sa/(\d\.\d)\}\}',
-         '{{Self|GFDL|Cc-by-sa-3.0-migrated|Cc-by-sa-\\1|author='
+        (r'\{\{Bild-GFDL\}\}[\s\r\n]*\{\{Bild-CC-by-sa/(\d\.\d)\}\}',
+         r'{{Self|GFDL|Cc-by-sa-3.0-migrated|Cc-by-sa-\1|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Bild-GFDL\}\}',
+        (r'\{\{Bild-GFDL\}\}',
          '{{Self|GFDL|Cc-by-sa-3.0-migrated|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Bild-CC-by-sa/(\d\.\d)\}\}',
-         '{{Self|Cc-by-sa-\\1|author=[[:%(lang)s:User:%(author)s|%(author)s]] '
+        (r'\{\{Bild-CC-by-sa/(\d\.\d)\}\}',
+         r'{{Self|Cc-by-sa-\1|author=[[:%(lang)s:User:%(author)s|%(author)s]] '
          'at [http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Bild-CC-by-sa/(\d\.\d)/de\}\}',
-         '{{Self|Cc-by-sa-\\1-de|author='
+        (r'\{\{Bild-CC-by-sa/(\d\.\d)/de\}\}',
+         r'{{Self|Cc-by-sa-\1-de|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Bild-CC-by/(\d\.\d)\}\}',
-         '{{Self|Cc-by-\\1|author=[[:%(lang)s:User:%(author)s|%(author)s]] at '
+        (r'\{\{Bild-CC-by/(\d\.\d)\}\}',
+         r'{{Self|Cc-by-\1|author=[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Bild-CC-by/(\d\.\d)/de\}\}',
-         '{{Self|Cc-by-\\1-de|author=[[:%(lang)s:User:%(author)s|%(author)s]] '
+        (r'\{\{Bild-CC-by/(\d\.\d)/de\}\}',
+         r'{{Self|Cc-by-\1-de|author=[[:%(lang)s:User:%(author)s|%(author)s]] '
          'at [http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
     ],
     'en': [
-        ('\{\{(self|self2)\|([^\}]+)\}\}',
-         '{{Self|\\2|author=[[:%(lang)s:User:%(author)s|%(author)s]] at '
+        (r'\{\{(self|self2)\|([^\}]+)\}\}',
+         r'{{Self|\2|author=[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{(GFDL-self|GFDL-self-no-disclaimers)\|([^\}]+)\}\}',
-         '{{Self|GFDL|\\2|author=[[:%(lang)s:User:%(author)s|%(author)s]] at '
+        (r'\{\{(GFDL-self|GFDL-self-no-disclaimers)\|([^\}]+)\}\}',
+         r'{{Self|GFDL|\2|author=[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{GFDL-self-with-disclaimers\|([^\}]+)\}\}',
-         '{{Self|GFDL-with-disclaimers|\\1|author='
+        (r'\{\{GFDL-self-with-disclaimers\|([^\}]+)\}\}',
+         r'{{Self|GFDL-with-disclaimers|\1|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{PD-self(\|date=[^\}]+)?\}\}',
+        (r'\{\{PD-self(\|date=[^\}]+)?\}\}',
          '{{PD-user-w|%(lang)s|%(family)s|%(author)s}}'),
-        ('\{\{Multilicense replacing placeholder'
-         '(\|[^\}\|=]+=[^\}\|]+)*(?P<migration>\|[^\}\|=]+=[^\}\|]+)'
-         '(\|[^\}\|=]+=[^\}\|]+)*\}\}',
-         '{{Self|GFDL|Cc-by-sa-2.5,2.0,1.0\\g<migration>|author='
+        (r'\{\{Multilicense replacing placeholder'
+         r'(\|[^\}\|=]+=[^\}\|]+)*(?P<migration>\|[^\}\|=]+=[^\}\|]+)'
+         r'(\|[^\}\|=]+=[^\}\|]+)*\}\}',
+         r'{{Self|GFDL|Cc-by-sa-2.5,2.0,1.0\g<migration>|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
-        ('\{\{Multilicense replacing placeholder new(\|class=[^\}]+)?\}\}',
+        (r'\{\{Multilicense replacing placeholder new(\|class=[^\}]+)?\}\}',
          '{{Self|GFDL|Cc-by-sa-3.0,2.5,2.0,1.0|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at'
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
     ],
     'lb': [
-        ('\{\{(self|self2)\|([^\}]+)\}\}',
-         '{{Self|\\2|author='
+        (r'\{\{(self|self2)\|([^\}]+)\}\}',
+         r'{{Self|\2|author='
          '[[:%(lang)s:User:%(author)s|%(author)s]] at '
          '[http://%(lang)s.%(family)s.org %(lang)s.%(family)s]}}'),
     ],
     'nds-nl': [
-        ('\{\{PD-eigenwark\}\}',
+        (r'\{\{PD-eigenwark\}\}',
          '{{PD-user-w|%(lang)s|%(family)s|%(author)s}}'),
     ],
     'shared': [
-        ('\{\{(self|self2)\|([^\}]+)\}\}',
-         '{{Self|\\2|author=%(author)s at old wikivoyage shared}}'),
+        (r'\{\{(self|self2)\|([^\}]+)\}\}',
+         r'{{Self|\2|author=%(author)s at old wikivoyage shared}}'),
     ],
 }
 
 sourceGarbage = {
-    'de': [u'==\s*Beschreibung,\sQuelle\s*==',
-           u'==\s*Beschrieving\s*==',
-           u'==\s*\[\[Wikipedia:Lizenzvorlagen für Bilder\|Lizenz\]\]\s*==',
+    'de': [r'==\s*Beschreibung,\sQuelle\s*==',
+           r'==\s*Beschrieving\s*==',
+           r'==\s*\[\[Wikipedia:Lizenzvorlagen für Bilder\|Lizenz\]\]\s*==',
            ],
-    'en': [u'==\s*Description\s*==',
-           u'==\s*Summary\s*==',
-           u'==\s*Licensing:?\s*==',
-           u'\{\{'
-           u'(Copy to Wikimedia Commons|Move to Commons|Move to commons|'
-           u'Move to Wikimedia Commons|Copy to commons|Mtc|MtC|MTC|CWC|CtWC|'
-           u'CTWC|Ctwc|Tocommons|Copy to Commons|To Commons|Movetocommons|'
-           u'Move to Wikimedia commons|Move-to-commons|Commons ok|ToCommons|'
-           u'To commons|MoveToCommons|Copy to wikimedia commons|'
-           u'Upload to commons|CopyToCommons|Copytocommons|MITC|MovetoCommons|'
-           u'Do move to Commons|Orphan image)'
-           u'(\|[^\}]+)?\}\}'
+    'en': [r'==\s*Description\s*==',
+           r'==\s*Summary\s*==',
+           r'==\s*Licensing:?\s*==',
+           r'\{\{'
+           '(Copy to Wikimedia Commons|Move to Commons|Move to commons|'
+           'Move to Wikimedia Commons|Copy to commons|Mtc|MtC|MTC|CWC|CtWC|'
+           'CTWC|Ctwc|Tocommons|Copy to Commons|To Commons|Movetocommons|'
+           'Move to Wikimedia commons|Move-to-commons|Commons ok|ToCommons|'
+           'To commons|MoveToCommons|Copy to wikimedia commons|'
+           'Upload to commons|CopyToCommons|Copytocommons|MITC|MovetoCommons|'
+           'Do move to Commons|Orphan image)'
+           r'(\|[^\}]+)?\}\}'
            ],
-    'lb': [u'==\s*Résumé\s*==',
-           u'==\s*Lizenz:\s*==',
+    'lb': [r'==\s*Résumé\s*==',
+           r'==\s*Lizenz:\s*==',
            ],
-    'nds-nl': [u'==\s*Licentie\s*==',
-               u'\{\{DEFAULTSORT:\{\{PAGENAME\}\}\}\}',
+    'nds-nl': [r'==\s*Licentie\s*==',
+               r'\{\{DEFAULTSORT:\{\{PAGENAME\}\}\}\}',
                ],
-    'shared': [u'==\s*Beschreibung,\sQuelle\s*==',
-               u'==\s*Licensing:?\s*==',
+    'shared': [r'==\s*Beschreibung,\sQuelle\s*==',
+               r'==\s*Licensing:?\s*==',
                ],
 }
 

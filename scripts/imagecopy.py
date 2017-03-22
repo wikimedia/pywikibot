@@ -310,8 +310,8 @@ class imageTransfer(threading.Thread):
             if self.imagePage.site.lang in moveToCommonsTemplate:
                 for moveTemplate in moveToCommonsTemplate[
                         self.imagePage.site.lang]:
-                    imtxt = re.sub(u'(?i)\{\{' + moveTemplate + u'[^\}]*\}\}',
-                                   u'', imtxt)
+                    imtxt = re.sub(r'(?i)\{\{' + moveTemplate + r'[^\}]*\}\}',
+                                   '', imtxt)
 
             # add {{NowCommons}}
             if self.imagePage.site.lang in nowCommonsTemplate:
