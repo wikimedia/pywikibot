@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2016
+# (C) Pywikibot team, 2010-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -358,6 +358,9 @@ def main(*args):
     # been replaced by an example file.
     if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
         create_user_config(args, force=force)
+    else:
+        pywikibot.output('user-config.py already exists in the target '
+                         'directory "{0}".'.format(base_dir))
 
 if __name__ == '__main__':
     main()
