@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1683,14 +1683,14 @@ class Request(MutableMapping):
             meta = self._params.get("meta", [])
             if "userinfo" not in meta:
                 meta = set(meta + ['userinfo'])
-                self._params['meta'] = list(meta)
+                self._params['meta'] = sorted(meta)
             uiprop = self._params.get("uiprop", [])
             uiprop = set(uiprop + ["blockinfo", "hasmsg"])
-            self._params["uiprop"] = list(sorted(uiprop))
+            self._params['uiprop'] = sorted(uiprop)
             if 'prop' in self._params:
                 if self.site.has_extension('ProofreadPage'):
                     prop = set(self._params['prop'] + ['proofread'])
-                    self._params['prop'] = list(prop)
+                    self._params['prop'] = sorted(prop)
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'.
@@ -2322,7 +2322,7 @@ class CachedRequest(Request):
                             % (self.__class__.__name__, filename, uniquedescr),
                             _logger)
             return True
-        except IOError as e:
+        except IOError:
             # file not found
             return False
         except Exception as e:
