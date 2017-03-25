@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikibooks."""
 #
-# (C) Pywikibot team, 2005-2016
+# (C) Pywikibot team, 2005-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,13 +37,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'hu', 'de', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'vi', 'pl',
-            'he', 'ca', 'id', 'fi', 'sq', 'fa', 'ru', 'th', 'cs', 'zh', 'az',
-            'sv', 'hr', 'tr', 'sr', 'ar', 'ko', 'no', 'da', 'gl', 'ta', 'ro',
-            'tl', 'mk', 'is', 'uk', 'ka', 'lt', 'tt', 'sa', 'eo', 'sk', 'bg',
-            'el', 'bn', 'hi', 'hy', 'si', 'ms', 'sl', 'ur', 'li', 'la', 'ml',
-            'km', 'ang', 'ia', 'cv', 'et', 'mr', 'eu', 'oc', 'kk', 'ne', 'pa',
-            'fy', 'ie', 'te', 'af', 'tg', 'ku', 'ky', 'bs', 'be', 'mg', 'cy',
+            'en', 'hu', 'de', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'vi',
+            'he', 'ca', 'th', 'fi', 'id', 'sq', 'fa', 'ru', 'zh', 'cs', 'az',
+            'sv', 'hr', 'sr', 'tr', 'ar', 'ko', 'no', 'da', 'gl', 'ro', 'ta',
+            'tl', 'mk', 'is', 'sa', 'ka', 'uk', 'lt', 'tt', 'eo', 'sk', 'el',
+            'bg', 'bn', 'hi', 'hy', 'si', 'ms', 'sl', 'ur', 'li', 'la', 'ml',
+            'km', 'ang', 'ia', 'et', 'cv', 'mr', 'eu', 'kk', 'oc', 'ne', 'pa',
+            'fy', 'ie', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'be', 'cy',
             'zh-min-nan', 'uz',
         ]
 
