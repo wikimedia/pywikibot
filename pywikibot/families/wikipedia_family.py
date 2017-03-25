@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,35 +36,35 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'sv', 'ceb', 'de', 'nl', 'fr', 'ru', 'it', 'es', 'war', 'pl',
-            'vi', 'ja', 'pt', 'zh', 'uk', 'ca', 'fa', 'no', 'ar', 'sh', 'fi',
-            'hu', 'id', 'ro', 'cs', 'ko', 'sr', 'tr', 'ms', 'eu', 'eo', 'bg',
-            'min', 'da', 'kk', 'sk', 'hy', 'zh-min-nan', 'he', 'lt', 'hr', 'ce',
-            'sl', 'et', 'gl', 'nn', 'uz', 'la', 'el', 'be', 'simple', 'vo',
-            'hi', 'th', 'az', 'ka', 'ur', 'ta', 'cy', 'mk', 'oc', 'mg', 'lv',
-            'new', 'bs', 'tt', 'tg', 'te', 'tl', 'pms', 'sq', 'br', 'ky',
-            'be-tarask', 'ht', 'jv', 'zh-yue', 'ast', 'lb', 'ml', 'bn', 'mr',
-            'af', 'pnb', 'sco', 'is', 'ga', 'ba', 'cv', 'fy', 'sw', 'lmo', 'my',
-            'an', 'yo', 'ne', 'io', 'gu', 'nds', 'scn', 'bpy', 'pa', 'ku',
-            'als', 'bar', 'kn', 'qu', 'ia', 'su', 'ckb', 'mn', 'arz', 'bat-smg',
-            'nap', 'wa', 'gd', 'bug', 'yi', 'am', 'map-bms', 'si', 'fo', 'mzn',
-            'azb', 'or', 'li', 'sah', 'hsb', 'vec', 'nah', 'os', 'sa', 'mrj',
-            'ilo', 'hif', 'mhr', 'roa-tara', 'mai', 'xmf', 'pam', 'eml', 'bh',
-            'sd', 'ps', 'nso', 'se', 'hak', 'mi', 'bcl', 'diq', 'nds-nl', 'gan',
-            'glk', 'vls', 'rue', 'bo', 'wuu', 'fiu-vro', 'co', 'szl', 'csb',
-            'sc', 'lrc', 'vep', 'tk', 'crh', 'km', 'gv', 'kv', 'zh-classical',
-            'frr', 'lad', 'as', 'zea', 'so', 'cdo', 'ay', 'ace', 'udm', 'stq',
-            'kw', 'nrm', 'ie', 'koi', 'rm', 'pcd', 'myv', 'lij', 'mt', 'fur',
-            'gn', 'dsb', 'lez', 'dv', 'ug', 'cbk-zam', 'ext', 'ang', 'kab',
-            'ksh', 'mwl', 'ln', 'gag', 'gom', 'sn', 'frp', 'pag', 'pi', 'nv',
-            'av', 'pfl', 'xal', 'krc', 'haw', 'kaa', 'bxr', 'rw', 'pdc', 'olo',
-            'pap', 'lo', 'to', 'nov', 'kl', 'bjn', 'arc', 'kbd', 'jam', 'ha',
-            'tet', 'tyv', 'ki', 'tpi', 'ig', 'na', 'lbe', 'roa-rup', 'jbo',
-            'ty', 'kg', 'za', 'mdf', 'lg', 'wo', 'srn', 'ab', 'ltg', 'chr',
-            'zu', 'sm', 'om', 'tcy', 'bi', 'tn', 'chy', 'xh', 'rmy', 'cu', 'tw',
-            'tum', 'pih', 'rn', 'got', 'pnt', 'ss', 'ch', 'bm', 'ady', 'ts',
-            'iu', 'st', 'ny', 'fj', 'ee', 'ak', 'ks', 'ik', 'sg', 've', 'dz',
-            'ff', 'ti', 'cr',
+            'en', 'ceb', 'sv', 'de', 'nl', 'fr', 'ru', 'it', 'es', 'war', 'pl',
+            'vi', 'ja', 'pt', 'zh', 'uk', 'ca', 'fa', 'ar', 'no', 'sh', 'fi',
+            'hu', 'id', 'cs', 'ko', 'ro', 'sr', 'tr', 'ms', 'eu', 'eo', 'bg',
+            'da', 'min', 'kk', 'hy', 'sk', 'zh-min-nan', 'he', 'lt', 'hr',
+            'ce', 'et', 'sl', 'be', 'gl', 'nn', 'el', 'uz', 'la', 'simple',
+            'vo', 'ur', 'hi', 'az', 'th', 'ka', 'ta', 'cy', 'mk', 'mg', 'oc',
+            'lv', 'bs', 'new', 'tt', 'tg', 'tl', 'te', 'ky', 'sq', 'pms', 'br',
+            'be-tarask', 'zh-yue', 'ht', 'jv', 'bn', 'ml', 'ast', 'lb', 'mr',
+            'af', 'pnb', 'sco', 'is', 'ga', 'cv', 'ba', 'fy', 'sw', 'my',
+            'lmo', 'an', 'yo', 'ne', 'gu', 'io', 'nds', 'scn', 'pa', 'bpy',
+            'ku', 'als', 'bar', 'kn', 'qu', 'ia', 'su', 'ckb', 'mn', 'arz',
+            'bat-smg', 'azb', 'nap', 'wa', 'gd', 'bug', 'yi', 'am', 'map-bms',
+            'si', 'or', 'fo', 'mzn', 'li', 'sah', 'sa', 'hsb', 'vec', 'mai',
+            'ilo', 'os', 'mrj', 'hif', 'xmf', 'mhr', 'roa-tara', 'bh', 'eml',
+            'pam', 'ps', 'nso', 'diq', 'nah', 'sd', 'hak', 'se', 'mi', 'bcl',
+            'nds-nl', 'gan', 'glk', 'zh-classical', 'vls', 'rue', 'bo', 'wuu',
+            'szl', 'sc', 'fiu-vro', 'co', 'vep', 'lrc', 'tk', 'crh', 'csb',
+            'kv', 'km', 'gv', 'frr', 'as', 'lad', 'so', 'zea', 'cdo', 'ace',
+            'ay', 'udm', 'lez', 'kw', 'stq', 'myv', 'nrm', 'ie', 'koi', 'pcd',
+            'rm', 'ug', 'gom', 'lij', 'mt', 'fur', 'gn', 'dsb', 'dv',
+            'cbk-zam', 'ext', 'ang', 'kab', 'nv', 'ksh', 'mwl', 'ln', 'gag',
+            'sn', 'frp', 'pag', 'pi', 'av', 'xal', 'pfl', 'olo', 'krc', 'haw',
+            'bxr', 'kaa', 'rw', 'pdc', 'pap', 'bjn', 'to', 'nov', 'kl', 'lo',
+            'arc', 'jam', 'kbd', 'ha', 'tyv', 'tet', 'tpi', 'ki', 'ig', 'na',
+            'ab', 'lbe', 'roa-rup', 'jbo', 'ty', 'kg', 'mdf', 'za', 'lg', 'wo',
+            'srn', 'zu', 'bi', 'ltg', 'chr', 'tcy', 'sm', 'om', 'tn', 'chy',
+            'xh', 'tw', 'cu', 'rmy', 'tum', 'pih', 'rn', 'got', 'pnt', 'bm',
+            'ss', 'ch', 'ady', 'ts', 'iu', 'st', 'ny', 'fj', 'ee', 'ak', 'ks',
+            'ik', 'sg', 've', 'dz', 'ff', 'ti', 'cr',
         ]
 
         # Sites we want to edit but not count as real languages

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikivoyage."""
 #
-# (C) Pywikibot team, 2012-2016
+# (C) Pywikibot team, 2012-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,7 +23,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'de', 'fa', 'it', 'fr', 'ru', 'pl', 'nl', 'pt', 'fi', 'es',
-            'zh', 'he', 'vi', 'sv', 'el', 'ro', 'uk',
+            'he', 'zh', 'vi', 'sv', 'el', 'ro', 'uk',
         ]
 
         super(Family, self).__init__()
