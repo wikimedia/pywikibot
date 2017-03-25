@@ -33,7 +33,7 @@ families_list = [
     'wiktionary',
 ]
 
-exceptions = ['-']
+exceptions = ['-', 'mul']
 
 
 def update_family(families):
@@ -74,7 +74,7 @@ def update_family(families):
             text = '        self.languages_by_size = [\n'
             line = ' ' * 11
             for code in new:
-                if len(line) + len(code) <= 76:
+                if len(line) + len(code) < 76:
                     line += u" '%s'," % code
                 else:
                     text += '%s\n' % line
