@@ -82,7 +82,7 @@ right parameter.
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -608,14 +608,11 @@ class checkImagesBot(object):
         """Return username."""
         return self.site.username()
 
-    def setParameters(self, imageName):
-        """
-        Set parameters.
-
-        Now only image but maybe it can be used for others in "future".
-        """
-        self.imageName = imageName
-        self.image = pywikibot.FilePage(self.site, self.imageName)
+    def setParameters(self, image):
+        """Set parameters."""
+        # ensure we have a FilePage
+        self.image = pywikibot.FilePage(image)
+        self.imageName = image.title(withNamespace=False)
         self.timestamp = None
         self.uploader = None
 
@@ -1778,7 +1775,7 @@ def main(*args):
             generator = Bot.wait(generator, waitTime)
         for image in generator:
             # Setting the image for the main class
-            Bot.setParameters(image.title(withNamespace=False))
+            Bot.setParameters(image)
             if skip:
                 skip = Bot.skipImages(skip_number, limit)
                 if skip:
