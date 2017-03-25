@@ -680,7 +680,7 @@ class GeneratorFactory(object):
                         question, ListOption(self.site.get_property_names()))
             gen = page_with_property_generator(value, site=self.site)
         elif arg == '-usercontribs':
-            gen = UserContributionsGenerator(value)
+            gen = UserContributionsGenerator(value, site=self.site)
         elif arg == '-withoutinterwiki':
             gen = WithoutInterwikiPageGenerator(total=intNone(value),
                                                 site=self.site)
