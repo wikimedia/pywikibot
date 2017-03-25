@@ -17,7 +17,7 @@ an __init__.py, and a message bundle called 'pywikibot' containing
 messages. See L{twntranslate} for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,8 @@ from pywikibot import __url__
 from pywikibot import config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
-from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
+from pywikibot.tools import (
+    deprecated, deprecated_args, issue_deprecation_warning, StringTypes)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -524,7 +525,8 @@ def translate(code, xdict, parameters=None, fallback=False):
     return trans
 
 
-def twtranslate(code, twtitle, parameters=None, fallback=True,
+@deprecated_args(code='source')
+def twtranslate(source, twtitle, parameters=None, fallback=True,
                 only_plural=False):
     """
     Translate a message using JSON files in messages_package_name.
@@ -569,9 +571,9 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
     ...     % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
 
-    @param code: When it's a site it's using the code attribute and otherwise it
-        is using the value directly.
-    @type code: BaseSite or str
+    @param source: When it's a site it's using the lang attribute and otherwise
+        it is using the value directly.
+    @type source: BaseSite or str
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: For passing parameters. It should be a mapping but for
         backwards compatibility can also be a list, tuple or a single value.
@@ -594,20 +596,20 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
             'Read %s/i18n'
             % (_messages_package_name, twtitle, __url__))
 
-    code_needed = False
-    # If a site is given instead of a code, use its language
-    if hasattr(code, 'code'):
-        lang = code.code
+    source_needed = False
+    # If a site is given instead of a lang, use its language
+    if hasattr(source, 'lang'):
+        lang = source.lang
     # check whether we need the language code back
-    elif isinstance(code, list):
+    elif isinstance(source, list):
         # For backwards compatibility still support lists, when twntranslate
         # was not deprecated and needed a way to get the used language code back
-        warn('The code argument should not be a list but either a BaseSite or '
-             'a str/unicode.', DeprecationWarning, 2)
-        lang = code.pop()
-        code_needed = True
+        warn('The source argument should not be a list but either a BaseSite '
+             'or a str/unicode.', DeprecationWarning, 2)
+        lang = source.pop()
+        source_needed = True
     else:
-        lang = code
+        lang = source
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
@@ -626,9 +628,9 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
             'Read https://mediawiki.org/wiki/PWB/i18n'
             % ('English' if 'en' in langs else "'%s'" % lang,
                twtitle))
-    # send the language code back via the given list
-    if code_needed:
-        code.append(alt)
+    # send the language code back via the given mutable list parameter
+    if source_needed:
+        source.append(alt)
 
     if '{{PLURAL:' in trans:
         # _extract_plural supports in theory non-mappings, but they are
@@ -659,14 +661,16 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
 
 
 @deprecated('twtranslate')
-def twntranslate(code, twtitle, parameters=None):
+@deprecated_args(code='source')
+def twntranslate(source, twtitle, parameters=None):
     """DEPRECATED: Get translated string for the key."""
     if parameters is not None:
         parameters = _PluralMappingAlias(parameters)
-    return twtranslate(code, twtitle, parameters)
+    return twtranslate(source, twtitle, parameters)
 
 
-def twhas_key(code, twtitle):
+@deprecated_args(code='source')
+def twhas_key(source, twtitle):
     """
     Check if a message has a translation in the specified language code.
 
@@ -675,16 +679,15 @@ def twhas_key(code, twtitle):
 
     No code fallback is made.
 
-    @param code: The language code
+    @param source: When it's a site it's using the lang attribute and otherwise
+        it is using the value directly.
+    @type source: BaseSite or str
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     # If a site is given instead of a code, use its language
-    if hasattr(code, 'code'):
-        code = code.code
-    transdict = _get_translation(code, twtitle)
-    if transdict is None:
-        return False
-    return True
+    lang = getattr(source, 'lang', source)
+    transdict = _get_translation(lang, twtitle)
+    return transdict is not None
 
 
 def twget_keys(twtitle):
