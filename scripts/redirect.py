@@ -63,14 +63,18 @@ and arguments can be:
                marked for deletion if the account has no admin rights) instead
                of just skipping them.
 
+-sdtemplate:x  Add the speedy deletion template string including brackets.
+               This enables overriding the default template via i18n or
+               to enable speedy deletion for projects other than wikipedias.
+
 -always        Don't prompt you for each replacement.
 
 """
 #
 # (C) Daniel Herding, 2004
 # (C) Purodha Blissenbach, 2009
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2004-2016
+# (C) xqt, 2009-2017
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -86,6 +90,7 @@ import pywikibot
 
 from pywikibot import i18n, xmlreader, Bot
 from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.textlib import extract_templates_and_params_regex_simple
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import issue_deprecation_warning
 
@@ -386,6 +391,7 @@ class RedirectRobot(Bot):
         self.availableOptions.update({
             'number': None,
             'delete': False,
+            'sdtemplate': None,
         })
         super(RedirectRobot, self).__init__(**kwargs)
         self.site = pywikibot.Site()
@@ -394,6 +400,35 @@ class RedirectRobot(Bot):
         self.action = action
         self.generator = generator
         self.exiting = False
+        self.sdtemplate = self.get_sd_template()
+
+    def get_sd_template(self):
+        """Look for speedy deletion template and return it.
+
+        @return: A valid speedy deletion template.
+        @rtype: str or None
+        """
+        if self.getOption('delete') and not self.site.logged_in(sysop=True):
+            sd = self.getOption('sdtemplate')
+            if not sd and i18n.twhas_key(self.site,
+                                         'redirect-broken-redirect-template'):
+                sd = i18n.twtranslate(self.site,
+                                      'redirect-broken-redirect-template')
+            # TODO: Add bot's signature if needed (Bug: T131517)
+
+            # check whether template exists for this site
+            title = None
+            if sd:
+                template = extract_templates_and_params_regex_simple(sd)
+                if template:
+                    title = template[0][0]
+                    page = pywikibot.Page(self.site, title, ns=10)
+                    if page.exists():
+                        return sd
+            pywikibot.warning(
+                'No speedy deletion template {0}available.'
+                ''.format('"{0}" '.format(title) if title else ''))
+        return None
 
     def delete_redirect(self, page, summary_key):
         """Delete the redirect page."""
@@ -402,8 +437,7 @@ class RedirectRobot(Bot):
         reason = i18n.twtranslate(self.site, summary_key)
         if page.site.logged_in(sysop=True):
             page.delete(reason, prompt=False)
-        elif i18n.twhas_key(page.site,
-                            'redirect-broken-redirect-template'):
+        elif self.sdtemplate:
             pywikibot.output(u"No sysop in user-config.py, "
                              u"put page to speedy deletion.")
             try:
@@ -412,17 +446,11 @@ class RedirectRobot(Bot):
                 content_page = pywikibot.Page(page.site,
                                               page.title(withSection=False))
                 content = content_page.get(get_redirect=True)
-            # TODO: Add bot's signature if needed (Bug: T131517)
-            content = i18n.twtranslate(
-                page.site,
-                'redirect-broken-redirect-template') + '\n' + content
+            content = self.sdtemplate + '\n' + content
             try:
                 page.put(content, reason)
             except pywikibot.PageSaveRelatedError as e:
                 pywikibot.error(e)
-        else:
-            pywikibot.output(
-                u'No speedy deletion template available')
 
     def delete_broken_redirects(self):
         """Process all broken redirects."""
@@ -748,6 +776,9 @@ def main(*args):
             options[option] = True
         elif option == 'total':
             options['number'] = number = int(value)
+        elif option == 'sdtemplate':
+            options['sdtemplate'] = value or pywikibot.input(
+                'Which speedy deletion template to use?')
         # generator options
         elif option == 'fullscan':
             fullscan = True
