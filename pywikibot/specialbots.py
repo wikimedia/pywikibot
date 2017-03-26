@@ -3,7 +3,7 @@
 """Library containing special bots."""
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2016
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,6 @@ __version__ = '$Id$'
 #
 
 import os
-import sys
 import tempfile
 import time
 
@@ -23,12 +22,10 @@ import pywikibot.data.api
 from pywikibot import config
 
 from pywikibot.bot import BaseBot
-from pywikibot.tools import (
-    deprecated
-)
+from pywikibot.tools import PY2, deprecated
 from pywikibot.tools.formatter import color_format
 
-if sys.version_info[0] > 2:
+if not PY2:
     from urllib.parse import urlparse
     from urllib.request import URLopener
 
@@ -141,14 +138,23 @@ class UploadRobot(BaseBot):
                 uo.addheader('Range', 'bytes=%s-' % rlen)
 
             infile = uo.open(file_url)
+            info = infile.info()
 
-            if 'text/html' in infile.info().getheader('Content-Type'):
+            if PY2:
+                content_type = info.getheader('Content-Type')
+                content_len = info.getheader('Content-Length')
+                accept_ranges = info.getheader('Accept-Ranges')
+            else:
+                content_type = info.get('Content-Type')
+                content_len = info.get('Content-Length')
+                accept_ranges = info.get('Accept-Ranges')
+
+            if 'text/html' in content_type:
                 pywikibot.output(u"Couldn't download the image: "
                                  "the requested URL was not found on server.")
                 return
 
-            content_len = infile.info().getheader('Content-Length')
-            accept_ranges = infile.info().getheader('Accept-Ranges') == 'bytes'
+            valid_ranges = accept_ranges == 'bytes'
 
             if resume:
                 _contents += infile.read()
@@ -166,7 +172,7 @@ class UploadRobot(BaseBot):
                     pywikibot.output(
                         u"Connection closed at byte %s (%s left)"
                         % (rlen, content_len))
-                    if accept_ranges and rlen > 0:
+                    if valid_ranges and rlen > 0:
                         resume = True
                     pywikibot.output(u"Sleeping for %d seconds..." % dt)
                     time.sleep(dt)
