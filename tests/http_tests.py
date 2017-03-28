@@ -159,9 +159,8 @@ class HttpsCertificateTestCase(TestCase):
         http.session.close()  # clear the connection
 
         # Verify that the warning occurred
-        self.assertEqual(len(warning_log), 1)
-        self.assertEqual(warning_log[0].category.__name__,
-                         'InsecureRequestWarning')
+        self.assertIn('InsecureRequestWarning',
+                      [w.category.__name__ for w in warning_log])
 
 
 class TestHttpStatus(HttpbinTestCase):
