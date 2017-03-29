@@ -9,11 +9,23 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+try:
+    from unittest.mock import patch, Mock
+except ImportError:
+    from mock import patch, Mock
+
+from pywikibot import BaseSite
+
 from scripts.category import CategoryMoveRobot
 
 from tests.aspects import unittest, DefaultSiteTestCase
 
 
+MOCKED_USERNAME = Mock(return_value='FakeUsername')
+
+
+# Temporarily set a username to circumvent NoUsername error; T161692
+@patch.object(BaseSite, 'username', new=MOCKED_USERNAME)
 class CfdActions(DefaultSiteTestCase):
 
     """Test CFD (Categories for deletion) actions."""
