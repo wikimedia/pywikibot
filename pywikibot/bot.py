@@ -83,6 +83,7 @@ import pywikibot
 from pywikibot import backports
 from pywikibot import config
 from pywikibot import daemonize
+from pywikibot import i18n
 from pywikibot import version
 from pywikibot.bot_choice import (
     Option, StandardOption, NestedOption, IntegerOption, ContextOption,
@@ -1124,7 +1125,6 @@ def writeToCommandLogFile():
 
 def open_webbrowser(page):
     """Open the web browser displaying the page and wait for input."""
-    from pywikibot import i18n
     webbrowser.open(page.full_url())
     i18n.input('pywikibot-enter-finished-browser')
 
@@ -1700,7 +1700,6 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     def put_current(self, *args, **kwargs):
         """Defining a summary if not already defined and then call original."""
         if not kwargs.get('summary'):
-            from pywikibot import i18n
             if self.summary_key is None:
                 raise ValueError('The summary_key must be set.')
             summary = i18n.twtranslate(self.current_page.site, self.summary_key,
@@ -1901,13 +1900,14 @@ class WikidataBot(Bot):
         @param site: site that is the source of assertions.
         @type site: Site
 
-        @return: Claim
+        @return: pywikibot.Claim or None
         """
-        if (site.family.name in self.source_values and
-                site.code in self.source_values[site.family.name]):
+        source = None
+        item = i18n.translate(site, self.source_values)
+        if item:
             source = pywikibot.Claim(self.repo, 'P143')
-            source.setTarget(self.source_values.get(site.family.name).get(site.code))
-            return source
+            source.setTarget(item)
+        return source
 
     def run(self):
         """Process all pages in generator."""
