@@ -37,9 +37,9 @@ from tests.aspects import (
 )
 
 
-EMPTY_TITLE_RE = 'Title must be specified and not empty if source is a Site\.'
-INVALID_TITLE_RE = 'The link does not contain a page title'
-NO_PAGE_RE = 'doesn\'t exist\.'
+EMPTY_TITLE_RE = r'Title must be specified and not empty if source is a Site\.'
+INVALID_TITLE_RE = r'The link does not contain a page title'
+NO_PAGE_RE = r"doesn't exist\."
 
 
 class TestLinkObject(SiteAttributeTestCase):
@@ -856,7 +856,7 @@ class TestPageRedirects(TestCase):
         text = u'This page is used in the [[mw:Manual:Pywikipediabot]] testing suite.'
         self.assertEqual(p1.get(), text)
         self.assertRaisesRegex(pywikibot.exceptions.IsRedirectPage,
-                               '{0} is a redirect page\.'
+                               r'{0} is a redirect page\.'
                                .format(re.escape(str(p2))), p2.get)
         self.assertRaisesRegex(pywikibot.exceptions.NoPage, NO_PAGE_RE, p3.get)
 
@@ -870,7 +870,7 @@ class TestPageRedirects(TestCase):
 
         text = p2.get(get_redirect=True)
         self.assertRaisesRegex(pywikibot.exceptions.IsNotRedirectPage,
-                               '{0} is not a redirect page\.'
+                               r'{0} is not a redirect page\.'
                                .format(re.escape(str(p1))),
                                p1.set_redirect_target, p2)
         self.assertRaisesRegex(pywikibot.exceptions.NoPage, NO_PAGE_RE,
