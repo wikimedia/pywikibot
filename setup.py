@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-"""Installer script for Pywikibot 2.0 framework."""
+"""Installer script for Pywikibot 3.0 framework."""
 #
-# (C) Pywikibot team, 2009-2015
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import itertools
 import os
@@ -190,7 +190,17 @@ else:
 from setuptools import setup, find_packages
 
 name = 'pywikibot'
-version = '3.0-dev'
+version = '3.0'
+
+try:
+    import subprocess
+    date = subprocess.check_output(['git', 'log', '-1', '--format=%ci']).strip()
+    date = date.split(" ")[0].replace("-", "")
+    version = version + "." + date
+except Exception as e:
+    print(e)
+    version = version + "-dev"
+
 github_url = 'https://github.com/wikimedia/pywikibot-core'
 
 setup(
