@@ -772,6 +772,8 @@ class WbQuantity(_WbRepresentation):
 class WbMonolingualText(_WbRepresentation):
     """A Wikibase monolingual text representation."""
 
+    _items = ('text', 'language')
+
     def __init__(self, text, language):
         """
         Create a new WbMonolingualText object.
@@ -808,6 +810,7 @@ class WbMonolingualText(_WbRepresentation):
         @rtype: pywikibot.WbMonolingualText
         """
         return cls(wb['text'], wb['language'])
+
 
 _sites = {}
 _url_cache = {}  # The code/fam pair for each URL
