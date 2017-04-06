@@ -77,7 +77,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
         if changedText is not False:
             self.put_current(new_text=changedText,
                              summary=self.getOption('summary'),
-                             async=self.getOption('async'))
+                             asynchronous=self.getOption('async'))
 
 
 def main(*args):

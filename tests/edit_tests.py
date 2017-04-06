@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for editing pages."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,7 +55,7 @@ class TestGeneralWrite(TestCase):
         ts = str(time.time())
         p = pywikibot.Page(self.site, 'User:John Vandenberg/async test write')
         p.text = ts
-        p.save(async=True, callback=callback)
+        p.save(asynchronous=True, callback=callback)
 
         page_put_queue.join()
 
