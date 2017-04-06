@@ -300,6 +300,25 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P718'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    def test_WbGeoShape_edit(self):
+        """Attempt adding a geo-shape with valid input."""
+        # Clean the slate in preparation for test.
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P27199')
+
+        # set new claim
+        claim = pywikibot.page.Claim(testsite, 'P27199', datatype='geo-shape')
+        commons_site = pywikibot.Site('commons', 'commons')
+        page = pywikibot.Page(commons_site, 'Data:Lyngby Hovedgade.map')
+        target = pywikibot.WbGeoShape(page)
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P27199'][0]
+        self.assertEqual(claim.getTarget(), target)
+
 
 class TestWikibaseRemoveQualifier(WikibaseTestCase):
 

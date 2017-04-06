@@ -50,6 +50,11 @@ class Family(family.WikimediaFamily):
         """Default calendar model for WbTime datatype."""
         return 'http://www.wikidata.org/entity/Q1985727'
 
+    def shared_geo_shape_repository(self, code):
+        """Return Wikimedia Commons as the repository for geo-shapes."""
+        # Per geoShapeStorageFrontendUrl settings in Wikibase
+        return ('commons', 'commons')
+
     def globes(self, code):
         """Supported globes for Coordinate datatype."""
         return {

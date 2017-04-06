@@ -18,7 +18,7 @@ from decimal import Decimal
 import pywikibot
 
 from pywikibot import pagegenerators
-from pywikibot.page import WikibasePage, ItemPage, PropertyPage
+from pywikibot.page import WikibasePage, ItemPage, PropertyPage, Page
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import MediaWikiVersion
 
@@ -488,6 +488,72 @@ class TestWbMonolingualText(WikidataTestCase):
                           text='Test this!', language='')
         self.assertRaises(ValueError, pywikibot.WbMonolingualText,
                           text=None, language='sv')
+
+
+class TestWbGeoShapeNonDry(WikidataTestCase):
+
+    """
+    Test Wikibase WbGeoShape data type (non-dry).
+
+    These require non dry tests due to the page.exists() call.
+    """
+
+    def setUp(self):
+        """Setup tests."""
+        self.commons = pywikibot.Site('commons', 'commons')
+        self.page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
+        super(TestWbGeoShapeNonDry, self).setUp()
+
+    def test_WbGeoShape_page(self):
+        """Test WbGeoShape page."""
+        q = pywikibot.WbGeoShape(self.page)
+        q_val = u'Data:Lyngby Hovedgade.map'
+        self.assertEqual(q.toWikibase(), q_val)
+
+    def test_WbGeoShape_page_and_site(self):
+        """Test WbGeoShape from page and site."""
+        q = pywikibot.WbGeoShape(self.page, self.get_repo())
+        q_val = u'Data:Lyngby Hovedgade.map'
+        self.assertEqual(q.toWikibase(), q_val)
+
+    def test_WbGeoShape_equality(self):
+        """Test WbGeoShape equality."""
+        q = pywikibot.WbGeoShape(self.page, self.get_repo())
+        self.assertEqual(q, q)
+
+    def test_WbGeoShape_fromWikibase(self):
+        """Test WbGeoShape.fromWikibase() instantiating."""
+        repo = self.get_repo()
+        q = pywikibot.WbGeoShape.fromWikibase(
+            'Data:Lyngby Hovedgade.map', repo)
+        self.assertEqual(q.toWikibase(), 'Data:Lyngby Hovedgade.map')
+
+    def test_WbGeoShape_error_on_non_page(self):
+        """Test WbGeoShape error handling when given a non-page."""
+        self.assertRaises(ValueError, pywikibot.WbGeoShape,
+                          'A string', self.get_repo())
+
+    def test_WbGeoShape_error_on_non_exitant_page(self):
+        """Test WbGeoShape error handling of a non-existant page."""
+        page = Page(self.commons, 'Non-existant page... really')
+        self.assertRaises(ValueError, pywikibot.WbGeoShape,
+                          page, self.get_repo())
+
+    def test_WbGeoShape_error_on_wrong_site(self):
+        """Test WbGeoShape error handling of a page on non-filerepo site."""
+        repo = self.get_repo()
+        page = Page(repo, 'Q123')
+        self.assertRaises(ValueError, pywikibot.WbGeoShape,
+                          page, self.get_repo())
+
+    def test_WbGeoShape_error_on_wrong_page_type(self):
+        """Test WbGeoShape error handling of a non-map page."""
+        non_data_page = Page(self.commons, 'File:Foo.jpg')
+        non_map_page = Page(self.commons, 'Data:Templatedata/Graph:Lines.tab')
+        self.assertRaises(ValueError, pywikibot.WbGeoShape,
+                          non_data_page, self.get_repo())
+        self.assertRaises(ValueError, pywikibot.WbGeoShape,
+                          non_map_page, self.get_repo())
 
 
 class TestItemPageExtensibility(TestCase):
