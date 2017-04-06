@@ -48,7 +48,7 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         """Test with delete and no i18n template."""
         with patch.object(pywikibot, 'warning') as w:
             bot = RedirectRobot('broken', None, delete=True)
-        w.assert_called_once_with('No speedy deletion template available.')
+        w.assert_called_with('No speedy deletion template available.')
         self.assertEqual(bot.sdtemplate, None)
 
     def test_with_delete_and_non_existing_sdtemplate(self):
@@ -57,5 +57,5 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         with patch.object(Page, 'exists', new=Mock(return_value=False)):
             with patch.object(pywikibot, 'warning') as w:
                 bot = RedirectRobot('broken', None, **options)
-        w.assert_called_once_with('No speedy deletion template "n" available.')
+        w.assert_called_with('No speedy deletion template "n" available.')
         self.assertEqual(bot.sdtemplate, None)
