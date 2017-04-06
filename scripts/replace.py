@@ -128,7 +128,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -790,7 +790,8 @@ class ReplaceRobot(Bot):
                     self.options['always'] = True
                 if choice == 'y':
                     page.text = new_text
-                    page.save(summary=self.generate_summary(applied), async=True,
+                    page.save(summary=self.generate_summary(applied),
+                              asynchronous=True,
                               callback=self._replace_async_callback, quiet=True)
                 while not self._pending_processed_titles.empty():
                     proc_title, res = self._pending_processed_titles.get()

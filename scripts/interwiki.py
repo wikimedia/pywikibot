@@ -504,7 +504,7 @@ class InterwikiBotConfig(object):
     minlinks = 0
     quiet = False
     restoreAll = False
-    async = False
+    asynchronous = False
     summary = u''
     repository = False
 
@@ -613,7 +613,7 @@ class InterwikiBotConfig(object):
         elif arg == '-quiet':
             self.quiet = True
         elif arg == '-async':
-            self.async = True
+            self.asynchronous = True
         elif arg.startswith('-summary'):
             if len(arg) == 8:
                 self.summary = pywikibot.input(
@@ -1956,7 +1956,8 @@ class Subject(interwiki_graph.Subject):
             page.text = newtext
             while True:
                 try:
-                    page.save(summary=mcomment, async=self.conf.async,
+                    page.save(summary=mcomment,
+                              asynchronous=self.conf.asynchronous,
                               nocreate=True)
                 except pywikibot.NoCreateError:
                     pywikibot.exception()

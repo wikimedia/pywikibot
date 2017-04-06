@@ -1154,9 +1154,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # no restricting template found
         return True
 
+    @deprecate_arg('async', 'asynchronous')  # T106230
     @deprecated_args(comment='summary', sysop=None)
     def save(self, summary=None, watch=None, minor=True, botflag=None,
-             force=False, async=False, callback=None,
+             force=False, asynchronous=False, callback=None,
              apply_cosmetic_changes=None, quiet=False, **kwargs):
         """
         Save the current contents of page's text to the wiki.
@@ -1182,7 +1183,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             True if user has bot status, False if not)
         @param force: if True, ignore botMayEdit() setting
         @type force: bool
-        @param async: if True, launch a separate thread to save
+        @param asynchronous: if True, launch a separate thread to save
             asynchronously
         @param callback: a callable object that will be called after the
             page put operation. This object must take two arguments: (1) a
@@ -1195,8 +1196,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @type apply_cosmetic_changes: bool or None
         @param quiet: enable/disable successful save operation message;
             defaults to False.
-            In async mode, if True, it is up to the calling bot to manage the
-            ouput e.g. via callback.
+            In asynchronous mode, if True, it is up to the calling bot to
+            manage the ouput e.g. via callback.
         @type quiet: bool
         """
         if not summary:
@@ -1208,19 +1209,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not force and not self.botMayEdit():
             raise pywikibot.OtherPageSaveError(
                 self, "Editing restricted by {{bots}} template")
-        if async:
+        if asynchronous:
             pywikibot.async_request(self._save, summary=summary, watch=watch,
                                     minor=minor, botflag=botflag,
-                                    async=async, callback=callback,
+                                    asynchronous=asynchronous,
+                                    callback=callback,
                                     cc=apply_cosmetic_changes,
                                     quiet=quiet, **kwargs)
         else:
             self._save(summary=summary, watch=watch, minor=minor,
-                       botflag=botflag, async=async, callback=callback,
-                       cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
+                       botflag=botflag, asynchronous=asynchronous,
+                       callback=callback, cc=apply_cosmetic_changes,
+                       quiet=quiet, **kwargs)
 
     def _save(self, summary=None, watch=None, minor=True, botflag=None,
-              async=False, callback=None, cc=None, quiet=False, **kwargs):
+              asynchronous=False, callback=None, cc=None, quiet=False,
+              **kwargs):
         """Helper function for save()."""
         err = None
         link = self.title(asLink=True)
@@ -1240,7 +1244,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             err = edit_err  # edit_err will be deleted in the end of the scope
             pywikibot.log(u"Error saving page %s (%s)\n" % (link, err),
                           exc_info=True)
-            if not callback and not async:
+            if not callback and not asynchronous:
                 if isinstance(err, pywikibot.PageSaveRelatedError):
                     raise err
                 raise pywikibot.OtherPageSaveError(self, err)
@@ -1283,9 +1287,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
             comment += i18n.twtranslate(self.site, 'cosmetic_changes-append')
             return comment
 
+    @deprecate_arg('async', 'asynchronous')  # T106230
     @deprecated_args(comment='summary')
     def put(self, newtext, summary=u'', watchArticle=None, minorEdit=True,
-            botflag=None, force=False, async=False, callback=None, **kwargs):
+            botflag=None, force=False, asynchronous=False, callback=None, **kwargs):
         """
         Save the page with the contents of the first argument as the text.
 
@@ -1299,8 +1304,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         self.text = newtext
         self.save(summary=summary, watch=watchArticle, minor=minorEdit,
-                  botflag=botflag, force=force, async=async, callback=callback,
-                  **kwargs)
+                  botflag=botflag, force=force, asynchronous=asynchronous,
+                  callback=callback, **kwargs)
 
     @deprecated_args(comment='summary')
     def put_async(self, newtext, summary=u'', watchArticle=None,
@@ -1315,8 +1320,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         backwards-compatibility.
         """
         self.put(newtext, summary=summary, watchArticle=watchArticle,
-                 minorEdit=minorEdit, botflag=botflag, force=force, async=True,
-                 callback=callback, **kwargs)
+                 minorEdit=minorEdit, botflag=botflag, force=force,
+                 asynchronous=True, callback=callback, **kwargs)
 
     def watch(self, unwatch=False):
         """
@@ -1354,7 +1359,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         See save() method docs for all parameters.
         The following parameters will be overridden by this method:
-        - summary, watch, minor, force, async
+        - summary, watch, minor, force, asynchronous
 
         Parameter botflag is False by default.
 
@@ -1365,9 +1370,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
             # ensure always get the page text and not to change it.
             del self.text
             self.save(summary='Pywikibot touch edit', watch='nochange',
-                      minor=False, botflag=botflag, force=True, async=False,
-                      callback=callback, apply_cosmetic_changes=False,
-                      **kwargs)
+                      minor=False, botflag=botflag, force=True,
+                      asynchronous=False, callback=callback,
+                      apply_cosmetic_changes=False, **kwargs)
         else:
             raise pywikibot.NoPage(self)
 
