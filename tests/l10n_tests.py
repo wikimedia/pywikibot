@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,10 +9,9 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import re
-
 import pywikibot
 from pywikibot import i18n
+from pywikibot.textlib import extract_templates_and_params_regex_simple
 
 from tests.aspects import unittest, MetaTestCaseClass, TestCase
 from tests.utils import add_metaclass
@@ -39,8 +38,9 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                 msg = i18n.twtranslate(lang, package, fallback=False)
                 if msg:
                     # check whether the message contains a template
-                    template = re.findall(u'.*?{{(.*?)[|}]', msg)
-                    self.assertTrue(template)
+                    templates = extract_templates_and_params_regex_simple(msg)
+                    self.assertIsInstance(templates, list)
+                    self.assertGreater(len(templates), 0)
 
                     # known problem
                     if site.code == 'simple':
@@ -49,7 +49,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                             "missing template. Must be solved by the "
                             "corresponding script.")
                     # check whether template exists
-                    title = template[0]
+                    title = templates[0][0]
                     page = pywikibot.Page(site, title, ns=10)
                     self.assertTrue(page.exists())
 
