@@ -12,7 +12,7 @@ import sys
 import pywikibot.data.sparql as sparql
 from pywikibot.tools import UnicodeType
 
-from tests.aspects import unittest, TestCase
+from tests.aspects import unittest, TestCase, WikidataTestCase
 
 if sys.version_info[0] > 2:
     from unittest.mock import patch
@@ -95,10 +95,8 @@ class Container(object):
         self.content = value
 
 
-class TestSparql(TestCase):
+class TestSparql(WikidataTestCase):
     """Test SPARQL queries."""
-
-    net = False
 
     @patch.object(sparql.http, 'fetch')
     def testQuerySelect(self, mock_method):

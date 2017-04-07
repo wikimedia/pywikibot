@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """SPARQL Query interface."""
 #
+# (C) Pywikibot team, 2016-2017
+#
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
@@ -12,10 +14,10 @@ if sys.version_info[0] > 2:
 else:
     from urllib2 import quote
 
+from pywikibot import Site, Error
 from pywikibot.comms import http
 from pywikibot.tools import UnicodeMixin, py2_encode_utf_8
 
-WIKIDATA = 'http://query.wikidata.org/sparql'
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}
 
@@ -27,15 +29,44 @@ class SparqlQuery(object):
     This class allows to run SPARQL queries against any SPARQL endpoint.
     """
 
-    def __init__(self, endpoint=WIKIDATA, entity_url='http://www.wikidata.org/entity/'):
+    def __init__(self, endpoint=None, entity_url=None, repo=None):
         """
         Create endpoint.
 
-        @param endpoint: SPARQL endpoint URL, by default Wikidata query endpoint
+        @param endpoint: SPARQL endpoint URL
+        @type endpoint: string
+        @param entity_url: URL prefix for any entities returned in a query.
+        @type entity_url: string
+        @param repo: The Wikibase site which we want to run queries on. If
+                     provided this overrides any value in endpoint and entity_url.
+                     Defaults to Wikidata.
+        @type repo: pywikibot.site.DataSite
         """
-        self.endpoint = endpoint
+        # default to Wikidata
+        if not repo and not endpoint:
+            repo = Site('wikidata', 'wikidata')
+
+        if repo:
+            try:
+                self.endpoint = repo.sparql_endpoint
+                self.entity_url = repo.concept_base_uri
+            except NotImplementedError:
+                raise NotImplementedError(
+                    'Wiki version must be 1.28-wmf.23 or newer to '
+                    'automatically extract the sparql endpoint. '
+                    'Please provide the endpoint and entity_url '
+                    'parameters instead of a repo.')
+            if not self.endpoint:
+                raise Error('The site {0} does not provide a sparql endpoint.'
+                            .format(repo))
+        else:
+            if not entity_url:
+                raise Error('If initialised with an endpoint the entity_url '
+                            'must be provided.')
+            self.endpoint = endpoint
+            self.entity_url = entity_url
+
         self.last_response = None
-        self.entity_url = entity_url
 
     def get_last_response(self):
         """
