@@ -272,6 +272,117 @@ class TestTimeStripperLanguage(TestCase):
         self.assertEqual(self.ts.timestripper(txtNoMatch), None)
 
 
+class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
+
+    """Test special text behaviour (comments, hyperlinks, wikilinks)."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    date = '06:57 06 June 2015 (UTC)'
+    fake_date = '05:57 06 June 2015 (UTC)'
+    tzone = tzoneFixedOffset(0, 'UTC')
+    expected_date = datetime.datetime(2015, 6, 6, 6, 57, tzinfo=tzone)
+
+    def test_timestripper_match_comment(self):
+        """Test that comments are correctly matched."""
+        ts = self.ts
+
+        txt_match = self.date + '<!--a test comment-->'
+        exp_match = 'a test comment'
+        self.assertEqual(ts._comment_pat.search(txt_match).group(1),
+                         exp_match)
+
+    def test_timestripper_match_hyperlink(self):
+        """Test that hyperlinks are correctly matched."""
+        ts = self.ts
+
+        txt_match = '[http://test.org | a link]'
+        exp_match = '[http://test.org | a link]'
+        self.assertEqual(ts._hyperlink_pat.search(txt_match).group(),
+                         exp_match)
+
+    def test_timestripper_match_wikilink(self):
+        """Test that wikilinks are correctly matched."""
+        ts = self.ts
+
+        txt_match = '[[wikilink|a wikilink with no date]]'
+        exp_match_link = 'wikilink'
+        exp_match_anchor = '|a wikilink with no date'
+        self.assertEqual(ts._wikilink_pat.search(txt_match).group('link'),
+                         exp_match_link)
+        self.assertEqual(ts._wikilink_pat.search(txt_match).group('anchor'),
+                         exp_match_anchor)
+
+    def test_timestripper_match_comment_with_date(self):
+        """Test that dates in comments are correctly matched."""
+        ts = self.ts.timestripper
+
+        txt_match = self.date + '<!--' + self.fake_date + '-->'
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '<!--' + self.fake_date + '-->' + self.date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '<!--' + self.date + '-->' + self.fake_date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '<!--comment|' + self.date + '-->' + self.fake_date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+    def test_timestripper_skip_hyperlink(self):
+        """Test that dates in hyperlinks are correctly skipped."""
+        ts = self.ts.timestripper
+
+        txt_match = self.date + '[http://' + self.fake_date + ']'
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '[http://' + self.fake_date + ']' + self.date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = ('%s [http://www.org | link with date %s]'
+                     % (self.date, self.fake_date))
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '[http://' + self.fake_date + ']' + self.date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+    def test_timestripper_skip_hyperlink_and_do_not_connect(self):
+        """Test that skipping hyperlinks will not make gaps shorter."""
+        ts = self.ts.timestripper
+
+        txt_match = ('%s[http://example.com Here is long enough text]%s'
+                     % (self.date[:9], self.date[9:]))
+        self.assertEqual(ts(txt_match), None)
+
+    def test_timestripper_match_wikilink_with_date(self):
+        """Test that dates in wikilinks are correctly matched."""
+        ts = self.ts.timestripper
+
+        txt_match = self.date + '[[' + self.fake_date + ']]'
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '[[' + self.fake_date + ']]' + self.date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '[[' + self.date + ']]' + self.fake_date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+        txt_match = '[[wikilink|' + self.date + ']]' + self.fake_date
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+    def test_timestripper_skip_wikilink_and_do_not_connect(self):
+        """Test that skipping wikilinks will not make gaps shorter."""
+        ts = self.ts.timestripper
+
+        txt_match = ('%s[[Here is long enough text]]%s'
+                     % (self.date[:9], self.date[9:]))
+        self.assertEqual(ts(txt_match), None)
+
+        txt_match = self.date[:9] + '[[foo]]' + self.date[9:]
+        self.assertEqual(ts(txt_match), self.expected_date)
+
+
 class TestTimeStripperDoNotArchiveUntil(TestTimeStripperCase):
 
     """Test cases for Do Not Archive Until templates.

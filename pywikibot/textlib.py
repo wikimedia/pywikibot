@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1936,11 +1936,25 @@ class TimeStripper(object):
             self.pdayR,
         ]
 
-        self.linkP = compileLinkR()
-        self.comment_pattern = re.compile(r'<!--(.*?)-->')
+        self._hyperlink_pat = re.compile(r'\[\s*?http[s]?://[^\]]*?\]')
+        self._comment_pat = re.compile(r'<!--(.*?)-->')
+        self._wikilink_pat = re.compile(
+            r'\[\[(?P<link>[^\]\|]*?)(?P<anchor>\|[^\]]*)?\]\]')
 
         self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
+
+    @property
+    @deprecated('_hyperlink_pat')
+    def linkP(self):
+        """Deprecated linkP instance variable."""
+        return self._hyperlink_pat
+
+    @property
+    @deprecated('_comment_pat')
+    def comment_pattern(self):
+        """Deprecated comment_pattern instance variable."""
+        return self._comment_pat
 
     @deprecated('module function')
     def findmarker(self, text, base=u'@@', delta='@'):
@@ -2023,23 +2037,47 @@ class TimeStripper(object):
         @return: A timestamp found on the given line
         @rtype: pywikibot.Timestamp
         """
+        # Try to maintain gaps that are used in _valid_date_dict_positions()
+        def censor_match(match):
+            return '_' * (match.end() - match.start())
+
         # match date fields
         dateDict = dict()
+
         # Analyze comments separately from rest of each line to avoid to skip
         # dates in comments, as the date matched by timestripper is the
         # rightmost one.
         most_recent = []
-        for comment in self.comment_pattern.finditer(line):
+        for comment in self._comment_pat.finditer(line):
             # Recursion levels can be maximum two. If a comment is found, it will
             # not for sure be found in the next level.
             # Nested comments are excluded by design.
             timestamp = self.timestripper(comment.group(1))
             most_recent.append(timestamp)
 
+        # Censor comments.
+        line = self._comment_pat.sub(censor_match, line)
+
+        # Censor external links.
+        line = self._hyperlink_pat.sub(censor_match, line)
+
+        for wikilink in self._wikilink_pat.finditer(line):
+            # Recursion levels can be maximum two. If a link is found, it will
+            # not for sure be found in the next level.
+            # Nested links are excluded by design.
+            link, anchor = wikilink.group('link'), wikilink.group('anchor')
+            timestamp = self.timestripper(link)
+            most_recent.append(timestamp)
+            if anchor:
+                timestamp = self.timestripper(anchor)
+                most_recent.append(timestamp)
+
+        # Censor wikilinks.
+        line = self._wikilink_pat.sub(censor_match, line)
+
         # Remove parts that are not supposed to contain the timestamp, in order
         # to reduce false positives.
         line = removeDisabledParts(line)
-        line = self.linkP.sub('', line)  # remove external links
 
         line = self.fix_digits(line)
         for pat in self.patterns:
