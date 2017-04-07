@@ -158,16 +158,89 @@ class TestWikibaseCoordinate(WikidataTestCase):
         with self.assertRaises(ValueError):
             z.precisionToDim()
 
-    def test_Coordinate_entity_globe(self):
-        """Test setting Coordinate globe from entity."""
+    def test_Coordinate_plain_globe(self):
+        """Test setting Coordinate globe from a plain-text value."""
         repo = self.get_repo()
         coord = pywikibot.Coordinate(
             site=repo, lat=12.0, lon=13.0, precision=0,
-            entity='http://www.wikidata.org/entity/Q123')
+            globe='moon')
+        self.assertEqual(coord.toWikibase(),
+                         {'latitude': 12.0, 'longitude': 13.0,
+                          'altitude': None, 'precision': 0,
+                          'globe': 'http://www.wikidata.org/entity/Q405'})
+
+    def test_Coordinate_entity_uri_globe(self):
+        """Test setting Coordinate globe from an entity uri."""
+        repo = self.get_repo()
+        coord = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0,
+            globe_item='http://www.wikidata.org/entity/Q123')
         self.assertEqual(coord.toWikibase(),
                          {'latitude': 12.0, 'longitude': 13.0,
                           'altitude': None, 'precision': 0,
                           'globe': 'http://www.wikidata.org/entity/Q123'})
+
+
+class TestWikibaseCoordinateNonDry(WikidataTestCase):
+
+    """
+    Test Wikibase Coordinate data type (non-dry).
+
+    These can be moved to TestWikibaseCoordinate once DrySite has been bumped
+    to the appropriate version.
+    """
+
+    def test_Coordinate_item_globe(self):
+        """Test setting Coordinate globe from an ItemPage."""
+        repo = self.get_repo()
+        coord = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0,
+            globe_item=ItemPage(repo, 'Q123'))
+        self.assertEqual(coord.toWikibase(),
+                         {'latitude': 12.0, 'longitude': 13.0,
+                          'altitude': None, 'precision': 0,
+                          'globe': 'http://www.wikidata.org/entity/Q123'})
+
+    def test_Coordinate_get_globe_item_from_uri(self):
+        """Test getting globe item from Coordinate with entity uri globe."""
+        repo = self.get_repo()
+        q = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0,
+            globe_item='http://www.wikidata.org/entity/Q123')
+        self.assertEqual(q.get_globe_item(), ItemPage(repo, 'Q123'))
+
+    def test_Coordinate_get_globe_item_from_itempage(self):
+        """Test getting globe item from Coordinate with ItemPage globe."""
+        repo = self.get_repo()
+        globe = ItemPage(repo, 'Q123')
+        q = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0, globe_item=globe)
+        self.assertEqual(q.get_globe_item(), ItemPage(repo, 'Q123'))
+
+    def test_Coordinate_get_globe_item_from_plain_globe(self):
+        """Test getting globe item from Coordinate with plain text globe."""
+        repo = self.get_repo()
+        q = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0, globe='moon')
+        self.assertEqual(q.get_globe_item(), ItemPage(repo, 'Q405'))
+
+    def test_Coordinate_get_globe_item_provide_repo(self):
+        """Test getting globe item from Coordinate, providing repo."""
+        repo = self.get_repo()
+        q = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0,
+            globe_item='http://www.wikidata.org/entity/Q123')
+        self.assertEqual(q.get_globe_item(repo), ItemPage(repo, 'Q123'))
+
+    def test_Coordinate_get_globe_item_different_repo(self):
+        """Test getting globe item in different repo from Coordinate."""
+        repo = self.get_repo()
+        test_repo = pywikibot.Site('test', 'wikidata')
+        q = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0,
+            globe_item='http://test.wikidata.org/entity/Q123')
+        self.assertEqual(q.get_globe_item(test_repo),
+                         ItemPage(test_repo, 'Q123'))
 
 
 class TestWbTime(WikidataTestCase):

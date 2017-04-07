@@ -239,6 +239,30 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P271'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    def test_Coordinate_edit(self):
+        """Attempt adding a Coordinate with globe set via item."""
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P20480')
+
+        # Make sure the wiki supports wikibase-conceptbaseuri
+        version = testsite.version()
+        if MediaWikiVersion(version) < MediaWikiVersion('1.29.0-wmf.2'):
+            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
+                                    'newer to support unbound uncertainties.')
+
+        # set new claim
+        claim = pywikibot.page.Claim(testsite, 'P20480',
+                                     datatype='globe-coordinate')
+        target = pywikibot.Coordinate(site=testsite, lat=12.0, lon=13.0,
+                                      globe_item=item)
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P20480'][0]
+        self.assertEqual(claim.getTarget(), target)
+
     def test_WbQuantity_edit_unbound(self):
         """Attempt adding a quantity with unbound errors."""
         # Clean the slate in preparation for test.
@@ -246,7 +270,8 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         item = self._clean_item(testsite, 'P69')
 
         # Make sure the wiki supports unbound uncertainties
-        if MediaWikiVersion(testsite.version()) < MediaWikiVersion('1.29.0-wmf.2'):
+        version = testsite.version()
+        if MediaWikiVersion(version) < MediaWikiVersion('1.29.0-wmf.2'):
             raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
                                     'newer to support unbound uncertainties.')
 
