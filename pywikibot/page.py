@@ -71,6 +71,7 @@ from pywikibot.tools import (
     PYTHON_VERSION,
     MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
+    add_full_name, manage_wrapping,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     first_upper, redirect_func, remove_last_args, _NotImplementedWarning,
     OrderedDict, Counter,
@@ -100,6 +101,46 @@ __all__ = (
 )
 
 logger = logging.getLogger("pywiki.wiki.page")
+
+
+@add_full_name
+def allow_asynchronous(func):
+    """
+    Decorator to make it possible to run a BasePage method asynchronously.
+
+    This is done when the method is called with kwarg asynchronous=True.
+    Optionally, you can also provide kwarg callback, which, if provided, is
+    a callable that gets the page as the first and a possible exception that
+    occurred during saving in the second thread or None as the second argument.
+    """
+    def handle(func, self, do_async=False, callback=None, *args, **kwargs):
+        err = None
+        try:
+            func(self, *args, **kwargs)
+        # TODO: other "expected" error types to catch?
+        except pywikibot.Error as edit_err:
+            err = edit_err  # edit_err will be deleted in the end of the scope
+            link = self.title(asLink=True)
+            pywikibot.log('Error saving page %s (%s)\n' % (link, err),
+                          exc_info=True)
+            if not callback and not do_async:
+                if isinstance(err, pywikibot.PageSaveRelatedError):
+                    raise err
+                raise pywikibot.OtherPageSaveError(self, err)
+        if callback:
+            callback(self, err)
+
+    def wrapper(self, *args, **kwargs):
+        do_async = kwargs.pop('asynchronous', False)
+        if do_async:
+            pywikibot.async_request(handle, func, self, do_async=True,
+                                    *args, **kwargs)
+        else:
+            handle(func, self, *args, **kwargs)
+
+    manage_wrapping(wrapper, func)
+
+    return wrapper
 
 
 # Note: Link objects (defined later on) represent a wiki-page's title, while
@@ -1197,7 +1238,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param quiet: enable/disable successful save operation message;
             defaults to False.
             In asynchronous mode, if True, it is up to the calling bot to
-            manage the ouput e.g. via callback.
+            manage the output e.g. via callback.
         @type quiet: bool
         """
         if not summary:
@@ -1209,47 +1250,26 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not force and not self.botMayEdit():
             raise pywikibot.OtherPageSaveError(
                 self, "Editing restricted by {{bots}} template")
-        if asynchronous:
-            pywikibot.async_request(self._save, summary=summary, watch=watch,
-                                    minor=minor, botflag=botflag,
-                                    asynchronous=asynchronous,
-                                    callback=callback,
-                                    cc=apply_cosmetic_changes,
-                                    quiet=quiet, **kwargs)
-        else:
-            self._save(summary=summary, watch=watch, minor=minor,
-                       botflag=botflag, asynchronous=asynchronous,
-                       callback=callback, cc=apply_cosmetic_changes,
-                       quiet=quiet, **kwargs)
+        self._save(summary=summary, watch=watch, minor=minor, botflag=botflag,
+                   asynchronous=asynchronous, callback=callback,
+                   cc=apply_cosmetic_changes, quiet=quiet, **kwargs)
 
+    @allow_asynchronous
     def _save(self, summary=None, watch=None, minor=True, botflag=None,
-              asynchronous=False, callback=None, cc=None, quiet=False,
-              **kwargs):
+              cc=None, quiet=False, **kwargs):
         """Helper function for save()."""
-        err = None
         link = self.title(asLink=True)
         if cc or cc is None and config.cosmetic_changes:
             summary = self._cosmetic_changes_hook(summary) or summary
-        try:
-            done = self.site.editpage(self, summary=summary, minor=minor,
-                                      watch=watch, bot=botflag, **kwargs)
-            if not done:
-                if not quiet:
-                    pywikibot.warning(u"Page %s not saved" % link)
-                raise pywikibot.PageNotSaved(self)
+
+        done = self.site.editpage(self, summary=summary, minor=minor,
+                                  watch=watch, bot=botflag, **kwargs)
+        if not done:
             if not quiet:
-                pywikibot.output(u"Page %s saved" % link)
-        # TODO: other "expected" error types to catch?
-        except pywikibot.Error as edit_err:
-            err = edit_err  # edit_err will be deleted in the end of the scope
-            pywikibot.log(u"Error saving page %s (%s)\n" % (link, err),
-                          exc_info=True)
-            if not callback and not asynchronous:
-                if isinstance(err, pywikibot.PageSaveRelatedError):
-                    raise err
-                raise pywikibot.OtherPageSaveError(self, err)
-        if callback:
-            callback(self, err)
+                pywikibot.warning('Page %s not saved' % link)
+            raise pywikibot.PageNotSaved(self)
+        if not quiet:
+            pywikibot.output('Page %s saved' % link)
 
     def _cosmetic_changes_hook(self, comment):
         if self.isTalkPage() or \
@@ -3849,7 +3869,8 @@ class WikibasePage(BasePage):
             return site.dbName()
         return site
 
-    def editEntity(self, data=None, asynchronous=False, **kwargs):
+    @allow_asynchronous
+    def editEntity(self, data=None, **kwargs):
         """
         Edit an entity using Wikibase wbeditentity API.
 
@@ -3861,14 +3882,16 @@ class WikibasePage(BasePage):
 
         @param data: Data to be saved
         @type data: dict, or None to save the current content of the entity.
-        @param asynchronous: if True, launch a separate thread to edit
+        @keyword asynchronous: if True, launch a separate thread to edit
             asynchronously
         @type asynchronous: bool
+        @keyword callback: a callable object that will be called after the entity
+            has been updated. It must take two arguments: (1) a WikibasePage
+            object, and (2) an exception instance, which will be None if the
+            page was saved successfully. This is intended for use by bots that
+            need to keep track of which saves were successful.
+        @type callback: callable
         """
-        if asynchronous:
-            pywikibot.async_request(self.editEntity, data, **kwargs)
-            return
-
         if hasattr(self, '_revid'):
             baserevid = self.latest_revision_id
         else:
