@@ -2462,15 +2462,14 @@ class FilePage(Page):
         """Return the version history in the form of a wiki table."""
         lines = []
         for info in self.getFileVersionHistory():
-            datetime = info['timestamp']
-            username = info['user']
-            resolution = '%dx%d' % (info['height'], info['width'])
-            size = info['size']
-            comment = info['comment']
-            lines.append(u'| %s || %s || %s || %s || <nowiki>%s</nowiki>'
-                         % (datetime, username, resolution, size, comment))
-        return ('{| border="1"\n! date/time || username || resolution || size '
-                '|| edit summary\n|----\n\n|----\n'.join(lines) + '\n|}')
+            dimension = '{width}×{height} px ({size} bytes)'.format(**info)
+            lines.append('| {timestamp} || {user} || {dimension} |'
+                         '| <nowiki>{comment}</nowiki>'
+                         ''.format(dimension=dimension, **info))
+        return ('{| class="wikitable"\n'
+                '! {{int:filehist-datetime}} || {{int:filehist-user}} |'
+                '| {{int:filehist-dimensions}} || {{int:filehist-comment}}\n'
+                '|-\n%s\n|}\n' % '\n|-\n'.join(lines))
 
     @deprecated_args(step=None)
     def usingPages(self, total=None, content=False):
