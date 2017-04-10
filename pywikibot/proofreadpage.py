@@ -473,8 +473,9 @@ class IndexPage(pywikibot.Page):
         and relative page numbers and labels by means of several helper
         functions.
 
-        It also providesa generator to pages contained in Index page, with
-        possibility to define range, filter by quality levels and page existance.
+        It also provides a generator to pages contained in Index page, with
+        possibility to define range, filter by quality levels and page
+        existence.
 
         @raise UnknownExtension: source Site has no ProofreadPage Extension.
         @raise ImportError: bs4 is not installed.
