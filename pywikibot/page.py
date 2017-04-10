@@ -4329,6 +4329,7 @@ class Property(object):
              'monolingualtext': pywikibot.WbMonolingualText,
              'math': basestring,
              'external-id': basestring,
+             'geo-shape': pywikibot.WbGeoShape,
              }
 
     value_types = {'wikibase-item': 'wikibase-entityid',
@@ -4338,6 +4339,7 @@ class Property(object):
                    'globe-coordinate': 'globecoordinate',
                    'math': 'string',
                    'external-id': 'string',
+                   'geo-shape': 'string',
                    }
 
     def __init__(self, site, id, datatype=None):
@@ -4468,8 +4470,9 @@ class Claim(Property):
         'wikibase-property': lambda value, site:
             PropertyPage(site, 'P' + str(value['numeric-id'])),
         'commonsMedia': lambda value, site:
-            FilePage(pywikibot.Site('commons', 'commons'), value),
+            FilePage(pywikibot.Site('commons', 'commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
+        'geo-shape': pywikibot.WbGeoShape.fromWikibase,
         'time': lambda value, site: pywikibot.WbTime.fromWikibase(value),
         'quantity': pywikibot.WbQuantity.fromWikibase,
         'monolingualtext': lambda value, site:
@@ -4895,7 +4898,8 @@ class Claim(Property):
         elif self.type == 'commonsMedia':
             value = self.getTarget().title(withNamespace=False)
         elif self.type in ('globe-coordinate', 'time',
-                           'quantity', 'monolingualtext'):
+                           'quantity', 'monolingualtext',
+                           'geo-shape'):
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'

@@ -7242,6 +7242,13 @@ class DataSite(APISite):
         """
         return self
 
+    def geo_shape_repository(self):
+        """Return Site object for the geo-shapes repository e.g. commons."""
+        # Do this via API instead if T162561 is implemented.
+        code, fam = self.shared_geo_shape_repository()
+        if bool(code or fam):
+            return pywikibot.Site(code, fam, self.username())
+
     def loadcontent(self, identification, *props):
         """
         Fetch the current content of a Wikibase item.
