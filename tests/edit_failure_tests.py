@@ -174,7 +174,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                             item.addClaim, claim)
 
     def test_url_invalid_protocol(self):
-        """Attempt adding invalid latex to a math claim."""
+        """Attempt adding a URL with an invalid protocol to a url claim."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
