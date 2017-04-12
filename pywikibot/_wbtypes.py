@@ -46,7 +46,9 @@ class WbRepresentation(object):
         return '{0}({1})'.format(self.__class__.__name__, attrs)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        if isinstance(other, self.__class__):
+            return self.toWikibase() == other.toWikibase()
+        return NotImplemented
 
     def __ne__(self, other):
         return not self.__eq__(other)
