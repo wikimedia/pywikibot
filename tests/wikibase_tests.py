@@ -271,13 +271,21 @@ class TestWbTime(WikidataTestCase):
 
     dry = True
 
-    def test_WbTime_toTimestr(self):
-        """Test WbTime conversion to UTC date/time string."""
+    def test_WbTime_timestr(self):
+        """Test timestr functions of WbTime."""
         repo = self.get_repo()
+        t = pywikibot.WbTime(site=repo, year=2010, month=0, day=0, hour=12,
+                             minute=43)
+        self.assertEqual(t.toTimestr(), '+00000002010-00-00T12:43:00Z')
+        self.assertEqual(t.toTimestr(force_iso=True), '+2010-01-01T12:43:00Z')
+
         t = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
         self.assertEqual(t.toTimestr(), '+00000002010-01-01T12:43:00Z')
+        self.assertEqual(t.toTimestr(force_iso=True), '+2010-01-01T12:43:00Z')
+
         t = pywikibot.WbTime(site=repo, year=-2010, hour=12, minute=43)
         self.assertEqual(t.toTimestr(), '-00000002010-01-01T12:43:00Z')
+        self.assertEqual(t.toTimestr(force_iso=True), '-2010-01-01T12:43:00Z')
 
     def test_WbTime_fromTimestr(self):
         """Test WbTime creation from UTC date/time string."""
@@ -296,6 +304,30 @@ class TestWbTime(WikidataTestCase):
         self.assertEqual(t, pywikibot.WbTime(site=repo, year=2010, month=0,
                                              day=0, hour=12, minute=43,
                                              precision=14))
+
+    def test_WbTime_timestamp(self):
+        """Test timestamp functions of WbTime."""
+        repo = self.get_repo()
+        timestamp = pywikibot.Timestamp.fromISOformat('2010-01-01T12:43:00Z')
+        t = pywikibot.WbTime(site=repo, year=2010, month=0, day=0, hour=12,
+                             minute=43)
+        self.assertEqual(t.toTimestamp(), timestamp)
+
+        # Roundtrip fails as Timestamp and WbTime interpret month=0 differently
+        self.assertNotEqual(
+            t, pywikibot.WbTime.fromTimestamp(timestamp, site=repo))
+
+        t = pywikibot.WbTime(site=repo, year=2010, hour=12, minute=43)
+        self.assertEqual(t.toTimestamp(), timestamp)
+
+        t = pywikibot.WbTime(site=repo, year=-2010, hour=12, minute=43)
+        self.assertRaises(ValueError, t.toTimestamp)
+
+        t = pywikibot.WbTime(site=repo, year=2010, month=1, day=1, hour=12,
+                             minute=43, second=0)
+        self.assertEqual(t.toTimestamp(), timestamp)
+        self.assertEqual(
+            t, pywikibot.WbTime.fromTimestamp(timestamp, site=repo))
 
     def test_WbTime_errors(self):
         """Test WbTime precision errors."""

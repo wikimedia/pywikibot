@@ -156,6 +156,7 @@ class Timestamp(datetime.datetime):
 
     mediawikiTSFormat = "%Y%m%d%H%M%S"
     ISO8601Format = "%Y-%m-%dT%H:%M:%SZ"
+    _ISO8601Format_new = '{0:+05d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     def clone(self):
         """Clone this instance."""
@@ -578,15 +579,67 @@ class WbTime(_WbRepresentation):
                    int(t[3]), int(t[4]), int(t[5]),
                    precision, before, after, timezone, calendarmodel, site)
 
-    def toTimestr(self):
+    @classmethod
+    def fromTimestamp(cls, timestamp, precision=14, before=0, after=0,
+                      timezone=0, calendarmodel=None, site=None):
+        """
+        Create a new WbTime object from a pywikibot.Timestamp.
+
+        @param timestamp: Timestamp
+        @type timestamp: pywikibot.Timestamp
+        @param precision: The unit of the precision of the time.
+        @type precision: int or str
+        @param before: Number of units after the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type before: int
+        @param after: Number of units before the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type after: int
+        @param timezone: Timezone information in minutes.
+        @type timezone: int
+        @param calendarmodel: URI identifying the calendar model
+        @type calendarmodel: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.WbTime
+        """
+        return cls.fromTimestr(timestamp.isoformat(), precision=precision,
+                               before=before, after=after,
+                               timezone=timezone, calendarmodel=calendarmodel,
+                               site=site)
+
+    def toTimestr(self, force_iso=False):
         """
         Convert the data to a UTC date/time string.
 
+        See fromTimestr() for differences between output with and without
+        force_iso.
+
+        @param force_iso: whether the output should be forced to ISO 8601
+        @type force_iso: bool
         @return: Timestamp in a format resembling ISO 8601
         @rtype: str
         """
+        if force_iso:
+            return Timestamp._ISO8601Format_new.format(
+                self.year, max(1, self.month), max(1, self.day),
+                self.hour, self.minute, self.second)
         return self.FORMATSTR.format(self.year, self.month, self.day,
                                      self.hour, self.minute, self.second)
+
+    def toTimestamp(self):
+        """
+        Convert the data to a pywikibot.Timestamp.
+
+        @return: Timestamp
+        @rtype: pywikibot.Timestamp
+
+        @raises ValueError: instance value can not be represented using Timestamp
+        """
+        if self.year <= 0:
+            raise ValueError('You cannot turn BC dates into a Timestamp')
+        return Timestamp.fromISOformat(
+            self.toTimestr(force_iso=True).lstrip('+'))
 
     def toWikibase(self):
         """
