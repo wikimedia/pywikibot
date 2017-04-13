@@ -6593,6 +6593,7 @@ class APISite(BaseSite):
         return lrgen
 
     @deprecated_args(step=None)
+    @need_extension('Wikibase Client')
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
 
