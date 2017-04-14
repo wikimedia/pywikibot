@@ -3257,7 +3257,14 @@ class APISite(BaseSite):
             next_prio = 0
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
-            if len(pageids) == len(sublist):
+
+            parameter = self._paraminfo.parameter('query+info', 'prop')
+            if self.logged_in() and self.has_right('apihighlimits'):
+                max_ids = int(parameter['highlimit'])
+            else:
+                max_ids = int(parameter['limit'])  # T78333, T161783
+
+            if len(pageids) == len(sublist) and len(set(pageids)) <= max_ids:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)
             else:

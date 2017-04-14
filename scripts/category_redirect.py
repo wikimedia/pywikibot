@@ -223,9 +223,8 @@ class CategoryRedirectBot(pywikibot.Bot):
         comment = i18n.twtranslate(self.site, self.redir_comment)
 
         # generator yields all hard redirect pages in namespace 14
-        for page in pagegenerators.PreloadingGenerator(
-                self.site.allpages(namespace=14, filterredir=True),
-                groupsize=250):
+        for page in self.site.allpages(namespace=14, filterredir=True,
+                                       content=True):
             if page.isCategoryRedirect():
                 # this is already a soft-redirect, so skip it (for now)
                 continue
