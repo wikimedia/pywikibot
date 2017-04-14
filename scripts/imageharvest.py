@@ -17,7 +17,7 @@ Other options:
 -justshown  Choose _only_ images shown on the page, not those linked
 """
 #
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -106,7 +106,8 @@ def main(give_url, image_url, desc):
         ilinks = get_imagelinks(url)
 
     for image in ilinks:
-        if pywikibot.input_yn(u'Include image %s?' % image, default=False, automatic_quit=False):
+        if pywikibot.input_yn('Include image %s?' % image, default=False,
+                              automatic_quit=False):
             desc = pywikibot.input(u"Give the description of this image:")
             categories = []
             while True:

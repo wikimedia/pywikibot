@@ -45,7 +45,7 @@ Todo:
 # English Wikipedia specific bot by:
 # (C) Multichill 2010-2012
 #
-# (C) Pywikibot team, 2010-2016
+# (C) Pywikibot team, 2010-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -86,7 +86,8 @@ NL = ''
 
 nowCommonsTemplate = {
     'de': u'{{NowCommons|%s}}',
-    'en': '{{NowCommons|1=File:%s|date=~~~~~|reviewer={{subst:REVISIONUSER}}}}',
+    'en': ('{{NowCommons|1=File:%s|date=~~~~~|'
+           'reviewer={{subst:REVISIONUSER}}}}'),
     'lb': u'{{Elo op Commons|%s}}',
     'nds-nl': u'{{NoenCommons|1=File:%s}}',
     'shared': ('{{NowCommons|1=File:%s|date=~~~~~|'
@@ -422,7 +423,11 @@ class imageFetcher(threading.Thread):
                 u'skip': False}
 
     def getNewFieldsFromInformation(self, imagepage):
-        """Extract fields from current information template for new template."""
+        """Extract fields from current information template for new template.
+
+        @param imagepage: The file page to get the template.
+        @type imagepage: pywikibot.FilePage
+        """
         # fields = ['location', 'description', 'source', 'date', 'author',
         #           'permission', 'other versions']
         # FIXME: The implementation for German has to be checked for the
@@ -733,8 +738,8 @@ class TkdialogICS(Tkdialog):
 
         self.old_description_label = Tkinter.Label(
             self.root, text='The old description was : ')
-        self.new_description_label = Tkinter.Label(self.root,
-                                                   text='The new fields are : ')
+        self.new_description_label = Tkinter.Label(
+            self.root, text='The new fields are : ')
         self.filename_label = Tkinter.Label(self.root, text=u'Filename : ')
         self.information_description_label = Tkinter.Label(
             self.root, text='Description : ')
@@ -750,8 +755,8 @@ class TkdialogICS(Tkdialog):
 
         self.information_licensetemplate_label = Tkinter.Label(
             self.root, text='License : ')
-        self.information_categories_label = Tkinter.Label(self.root,
-                                                          text=u'Categories : ')
+        self.information_categories_label = Tkinter.Label(
+            self.root, text=u'Categories : ')
 
         self.filename_field = Tkinter.Entry(self.root)
         self.information_description = Tkinter.Entry(self.root)
@@ -937,7 +942,11 @@ class uploader(threading.Thread):
         return cid
 
     def getOriginalUploadLog(self, imagepage):
-        """Get upload log to put at the bottom of the image description page."""
+        """Get upload log to put at the bottom of the image description page.
+
+        @param imagepage: The file page to retrieve the log.
+        @type imagepage: pywikibot.FilePage
+        """
         filehistory = imagepage.getFileVersionHistory()
         filehistory.reverse()
 
@@ -1065,8 +1074,8 @@ def main(*args):
     uploaderThread.daemon = False
 
     if autonomous:
-        pywikibot.output(u'Bot is running in autonomous mode. There will be no '
-                         u'user interaction.')
+        pywikibot.output('Bot is running in autonomous mode. There will be no '
+                         'user interaction.')
         userInteractionThread.setAutonomous()
 
     if not checkTemplate:

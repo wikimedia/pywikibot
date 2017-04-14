@@ -77,7 +77,7 @@ Known issues/FIXMEs (no critical issues known):
 #
 # Another rewrite by:
 # (C) Multichill 2008-2011
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -366,9 +366,10 @@ class imageTransfer(threading.Thread):
 
         # Check if both are found and are equal
         if (informationMatch and selfMatch):
-            if(informationMatch.group('author') == selfMatch.group('author')):
+            if informationMatch.group('author') == selfMatch.group('author'):
                 # Replace |Author=Original uploader was ... with |Author= ...
-                pageText = informationRegex.sub(r'|Author=\g<author>', pageText)
+                pageText = informationRegex.sub(r'|Author=\g<author>',
+                                                pageText)
         return pageText
 
 
@@ -411,7 +412,7 @@ class TkdialogIC(Tkdialog):
         self.uploader = "Unknown"
         # uploader.decode('utf-8')
         scrollbar = Tkinter.Scrollbar(self.root, orient=Tkinter.VERTICAL)
-        label = Tkinter.Label(self.root, text=u"Enter new name or leave blank.")
+        label = Tkinter.Label(self.root, text='Enter new name or leave blank.')
         imageinfo = Tkinter.Label(self.root, text='Uploaded by %s.' % uploader)
         textarea = Tkinter.Text(self.root)
         textarea.insert(Tkinter.END, content.encode('utf-8'))
