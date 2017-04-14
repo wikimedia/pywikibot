@@ -611,7 +611,7 @@ class CategoryMoveRobot(object):
                                                  page.title()):
 
                 page.change_category(self.oldcat, self.newcat,
-                                     comment=self.comment,
+                                     summary=self.comment,
                                      inPlace=self.inplace,
                                      sortKey=self.keep_sortkey)
 
@@ -631,7 +631,7 @@ class CategoryMoveRobot(object):
                 (not self.title_regex or
                  re.search(self.title_regex, doc_page.title()))):
                     doc_page.change_category(self.oldcat, self.newcat,
-                                             comment=self.comment,
+                                             summary=self.comment,
                                              inPlace=self.inplace,
                                              include=['includeonly'],
                                              sortKey=self.keep_sortkey)
@@ -958,7 +958,7 @@ class CategoryTidyRobot(pywikibot.Bot):
                 pywikibot.output('No changes necessary.')
             else:
                 article.change_category(original_cat, current_cat,
-                                        comment=self.editSummary)
+                                        summary=self.editSummary)
         elif choice == 'j':
             newCatTitle = pywikibot.input(u'Please enter the category the '
                                           u'article should be moved to:',
@@ -970,7 +970,7 @@ class CategoryTidyRobot(pywikibot.Bot):
         elif choice == 'r':
             # remove the category tag
             article.change_category(original_cat, None,
-                                    comment=self.editSummary)
+                                    summary=self.editSummary)
         elif choice != 's':
             if choice[0] == 'u':
                 # recurse into supercategory
