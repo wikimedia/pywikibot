@@ -30,6 +30,10 @@ else:
     from urlparse import urljoin, urlparse
 
 
+SERVER_DB_ERROR_MSG = \
+    '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
+
+
 class MWSite(object):
 
     """Minimal wiki site class."""
@@ -56,6 +60,8 @@ class MWSite(object):
             raise ServerError('Service Unavailable')
         elif r.status == 500:
             raise ServerError('Internal Server Error')
+        elif r.status == 200 and SERVER_DB_ERROR_MSG in r.content:
+            raise ServerError('Server cannot access the database')
 
         if fromurl != r.data.url:
             pywikibot.log('{0} redirected to {1}'.format(fromurl, r.data.url))
