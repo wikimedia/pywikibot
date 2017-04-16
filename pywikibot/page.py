@@ -3621,7 +3621,8 @@ class WikibasePage(BasePage):
                     raise pywikibot.NoPage(p)
             raise pywikibot.NoPage(self)
 
-        self._pageid = self._content['pageid']
+        if 'pageid' in self._content:
+            self._pageid = self._content['pageid']
 
         # aliases
         self.aliases = {}
