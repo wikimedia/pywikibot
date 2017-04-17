@@ -942,7 +942,7 @@ def _win32_extension_command(extension):
             return cmd[:-1].strip()
     except WindowsError as e:
         # Catch any key lookup errors
-        output('Unable to detect program for file extension "{0}": {1}'.format(
+        output('Unable to detect program for file extension "{0}": {1!r}'.format(
             extension, e))
 
 
