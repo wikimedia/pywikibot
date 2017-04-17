@@ -88,8 +88,8 @@ import sys
 
 import pywikibot
 
-from pywikibot import i18n, xmlreader, Bot
-from pywikibot.bot import OptionHandler
+from pywikibot import i18n, xmlreader
+from pywikibot.bot import OptionHandler, SingleSiteBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
 from pywikibot.tools.formatter import color_format
@@ -121,7 +121,7 @@ class RedirectGenerator(OptionHandler):
         'xml': None,
     }
 
-    def __init__(self, **kwargs):
+    def __init__(self, action, **kwargs):
         """Constructor."""
         super(RedirectGenerator, self).__init__(**kwargs)
         self.site = pywikibot.Site()
@@ -134,6 +134,15 @@ class RedirectGenerator(OptionHandler):
         self.api_number = self.getOption('total')
         self.api_until = self.getOption('until')
         self.xmlFilename = self.getOption('xml')
+
+        # connect the generator selected by 'action' parameter
+        cls = self.__class__
+        if action == 'double':
+            cls.__iter__ = lambda slf: slf.retrieve_double_redirects()
+        elif action == 'broken':
+            cls.__iter__ = lambda slf: slf.retrieve_broken_redirects()
+        elif action == 'both':
+            cls.__iter__ = lambda slf: slf.get_redirects_via_api(maxlen=2)
 
     def get_redirects_from_dump(self, alsoGetPageTitles=False):
         """
@@ -392,7 +401,7 @@ class RedirectGenerator(OptionHandler):
                 continue
 
 
-class RedirectRobot(Bot):
+class RedirectRobot(SingleSiteBot):
 
     """Redirect bot."""
 
@@ -407,9 +416,19 @@ class RedirectRobot(Bot):
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
         self.is_repo = self.repo if self.repo == self.site else None
-        self.action = action
         self.exiting = False
         self.sdtemplate = self.get_sd_template()
+
+        # connect the action treat
+        if action == 'double':
+            self.action_treat = self.fix_1_double_redirect
+        elif action == 'broken':
+            self.action_treat = self.delete_1_broken_redirect
+        elif action == 'both':
+            self.action_treat = self.fix_double_or_delete_broken_redirect
+        else:
+            raise NotImplementedError('No valid action "{0}" found.'
+                                      ''.format(action))
 
     def get_sd_template(self):
         """Look for speedy deletion template and return it.
@@ -439,6 +458,10 @@ class RedirectRobot(Bot):
                 ''.format('"{0}" '.format(title) if title else ''))
         return None
 
+    def init_page(self, page):
+        """Overwrite super class method."""
+        pass
+
     def delete_redirect(self, page, summary_key):
         """Delete the redirect page."""
         assert page.site == self.site, (
@@ -460,12 +483,6 @@ class RedirectRobot(Bot):
                 page.put(content, reason)
             except pywikibot.PageSaveRelatedError as e:
                 pywikibot.error(e)
-
-    def delete_broken_redirects(self):
-        """Process all broken redirects."""
-        # get reason for deletion text
-        for redir_name in self.generator.retrieve_broken_redirects():
-            self.delete_1_broken_redirect(redir_name)
 
     def delete_1_broken_redirect(self, redir_name):
         """Treat one broken redirect."""
@@ -566,11 +583,6 @@ class RedirectRobot(Bot):
                         targetPage.title(asLink=True),
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))
-
-    def fix_double_redirects(self):
-        """Process double redirects."""
-        for redir_name in self.generator.retrieve_double_redirects():
-            self.fix_1_double_redirect(redir_name)
 
     def fix_1_double_redirect(self, redir_name):
         """Treat one double redirect."""
@@ -711,34 +723,23 @@ class RedirectRobot(Bot):
                         % (redir.title(), error))
             break
 
-    def fix_double_or_delete_broken_redirects(self):
-        """Process all redirects for 'both' action."""
-        # TODO: part of this should be moved to generator, the rest merged into
-        # self.run()
-        count = 0
-        for (redir_name, code, target, final)\
-                in self.generator.get_redirects_via_api(maxlen=2):
-            if code == 1:
-                continue
-            elif code == 0:
-                self.delete_1_broken_redirect(redir_name)
-                count += 1
-            else:
-                self.fix_1_double_redirect(redir_name)
-                count += 1
-            if count >= self.getOption('total'):
-                break
+    def fix_double_or_delete_broken_redirect(self, page):
+        """Treat one broken or double redirect."""
+        redir_name, code, target, final = page
+        if code == 1:
+            return
+        elif code == 0:
+            self.delete_1_broken_redirect(redir_name)
+        else:
+            self.fix_1_double_redirect(redir_name)
 
-    def run(self):
-        """Run the script method selected by 'action' parameter."""
-        # TODO: make all generators return a redirect type indicator,
-        #       thus make them usable with 'both'
-        if self.action == 'double':
-            self.fix_double_redirects()
-        elif self.action == 'broken':
-            self.delete_broken_redirects()
-        elif self.action == 'both':
-            self.fix_double_or_delete_broken_redirects()
+    def treat(self, page):
+        """Treat a single page."""
+        self.action_treat(page)
+        if self._treat_counter >= self.getOption('total'):
+            pywikibot.output('\nNumber of pages reached the total limit. '
+                             'Script terminated.')
+            self.quit()
 
 
 def main(*args):
@@ -821,7 +822,7 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_action=True)
     else:
         pywikibot.Site().login()
-        options['generator'] = RedirectGenerator(**gen_options)
+        options['generator'] = RedirectGenerator(action, **gen_options)
         bot = RedirectRobot(action, **options)
         bot.run()
 
