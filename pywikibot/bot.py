@@ -1916,6 +1916,54 @@ class WikidataBot(Bot):
         # (bug T86083)
         return self._save_page(item, item.editEntity, data, **kwargs)
 
+    def _add_source_callback(self, claim, source, **kwargs):
+        """
+        Make a callback for user_add_claim.
+
+        @return: callback to be executed after saving the claim
+        @rtype: callable or None
+        """
+        callback = None
+        sourceclaim = self.getSource(source)
+        if sourceclaim:
+            def callback(item, err):
+                if err is None and claim.on_item is not None:
+                    claim.addSource(sourceclaim, **kwargs)
+
+        return callback
+
+    def user_add_claim(self, item, claim, source=None, bot=True, **kwargs):
+        """
+        Add a claim to an item, with user confirmation as required.
+
+        @param item: page to be edited
+        @type item: pywikibot.ItemPage
+        @param claim: claim to be saved
+        @type claim: pywikibot.Claim
+        @param source: site where the claim comes from
+        @type source: pywikibot.site.APISite
+        @param bot: whether to flag as bot (if possible)
+        @type bot: bool
+        @kwarg ignore_server_errors: if True, server errors will be reported
+          and ignored (default: False)
+        @type ignore_server_errors: bool
+        @kwarg ignore_save_related_errors: if True, errors related to
+          page save will be reported and ignored (default: False)
+        @type ignore_save_related_errors: bool
+        @return: whether the item was saved successfully
+        @rtype: bool
+        """
+        self.current_page = item
+
+        callback = None
+        if source:
+            callback = self._add_source_callback(claim, source, bot=bot)
+
+        pywikibot.output('Adding %s --> %s' % (claim.getID(),
+                                               claim.getTarget()))
+        return self._save_page(item, item.addClaim, claim, bot=bot,
+                               callback=callback, **kwargs)
+
     def getSource(self, site):
         """
         Create a Claim usable as a source for Wikibase statements.

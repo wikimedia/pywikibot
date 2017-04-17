@@ -71,6 +71,7 @@ class HarvestRobot(WikidataBot):
             * fields        - A dictionary of fields that are of use to us
 
         """
+        self.availableOptions['always'] = True
         super(HarvestRobot, self).__init__()
         self.generator = pg.PreloadingGenerator(generator)
         self.templateTitle = templateTitle.replace(u'_', u' ')
@@ -211,14 +212,8 @@ class HarvestRobot(WikidataBot):
                                     % claim.type)
                                 continue
 
-                            pywikibot.output(
-                                'Adding %s --> %s'
-                                % (claim.getID(), claim.getTarget()))
-                            item.addClaim(claim)
                             # A generator might yield pages from multiple sites
-                            source = self.getSource(page.site)
-                            if source:
-                                claim.addSource(source, bot=True)
+                            self.user_add_claim(item, claim, page.site)
 
 
 def main(*args):

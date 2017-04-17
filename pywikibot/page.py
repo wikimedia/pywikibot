@@ -4263,6 +4263,7 @@ class ItemPage(WikibasePage):
         data = {'sitelinks': data}
         self.editEntity(data, **kwargs)
 
+    @allow_asynchronous
     def addClaim(self, claim, bot=True, **kwargs):
         """
         Add a claim to the item.
@@ -4271,6 +4272,15 @@ class ItemPage(WikibasePage):
         @type claim: Claim
         @param bot: Whether to flag as bot (if possible)
         @type bot: bool
+        @keyword asynchronous: if True, launch a separate thread to add claim
+            asynchronously
+        @type asynchronous: bool
+        @keyword callback: a callable object that will be called after the
+            claim has been added. It must take two arguments: (1) an ItemPage
+            object, and (2) an exception instance, which will be None if the
+            item was saved successfully. This is intended for use by bots that
+            need to keep track of which saves were successful.
+        @type callback: callable
         """
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self

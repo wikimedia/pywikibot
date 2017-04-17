@@ -83,6 +83,7 @@ class ClaimRobot(WikidataBot):
             * exists_arg   - String specifying how to handle duplicate claims
 
         """
+        self.availableOptions['always'] = True
         super(ClaimRobot, self).__init__(use_from_page=None)
         self.generator = generator
         self.claims = claims
@@ -142,15 +143,8 @@ class ClaimRobot(WikidataBot):
                                 break
                             skip = False
                 if not skip:
-                    pywikibot.output('Adding %s --> %s'
-                                     % (claim.getID(), claim.getTarget()))
-                    item.addClaim(claim)
                     # A generator might yield pages from multiple languages
-                    source = self.getSource(page.site)
-                    if source:
-                        claim.addSource(source, bot=True)
-                    # TODO FIXME: We need to check that we aren't adding a
-                    # duplicate
+                    self.user_add_claim(item, claim, page.site)
 
 
 def listsEqual(list1, list2):

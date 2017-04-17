@@ -84,14 +84,8 @@ class IllustrateRobot(WikidataBot):
             return
 
         newclaim.setTarget(image)
-        pywikibot.output('Adding %s --> %s'
-                         % (newclaim.getID(), newclaim.getTarget()))
-        item.addClaim(newclaim)
-
         # A generator might yield pages from multiple sites
-        source = self.getSource(page.site)
-        if source:
-            newclaim.addSource(source, bot=True)
+        self.user_add_claim(item, newclaim, page.site)
 
 
 def main(*args):
