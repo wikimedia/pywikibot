@@ -29,6 +29,7 @@ Arguments:
                 the 'exists' warning.
   -recursive    When the filename is a directory it also uploads the files from
                 the subdirectories.
+  -summary      Pick a custom edit summary for the bot.
 
 It is possible to combine -abortonwarn and -ignorewarn so that if the specific
 warning is given it won't apply the general one but more specific one. So if it
@@ -75,6 +76,7 @@ def main(*args):
     """
     url = u''
     description = []
+    summary = None
     keepFilename = False
     always = False
     useFilename = None
@@ -100,6 +102,8 @@ def main(*args):
                 keepFilename = True
             elif arg.startswith('-filename:'):
                 useFilename = arg[10:]
+            elif arg.startswith('-summary'):
+                summary = arg[9:]
             elif arg.startswith('-noverify'):
                 verifyDescription = False
             elif arg.startswith('-abortonwarn'):
@@ -184,7 +188,8 @@ def main(*args):
                       keepFilename=keepFilename,
                       verifyDescription=verifyDescription,
                       aborts=aborts, ignoreWarning=ignorewarn,
-                      chunk_size=chunk_size, always=always)
+                      chunk_size=chunk_size, always=always,
+                      summary=summary)
     bot.run()
 
 if __name__ == "__main__":

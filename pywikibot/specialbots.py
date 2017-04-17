@@ -43,7 +43,7 @@ class UploadRobot(BaseBot):
                  useFilename=None, keepFilename=False,
                  verifyDescription=True, ignoreWarning=False,
                  targetSite=None, uploadByUrl=False, aborts=[], chunk_size=0,
-                 **kwargs):
+                 summary=None, **kwargs):
         """
         Constructor.
 
@@ -60,6 +60,8 @@ class UploadRobot(BaseBot):
         @param keepFilename: Set to True to keep original names of urls and
             files, otherwise it will ask to enter a name for each file.
         @type keepFilename: bool
+        @param summary: Summary of the upload
+        @type summary: string
         @param verifyDescription: Set to False to not proofread the description.
         @type verifyDescription: bool
         @param ignoreWarning: Set this to True to upload even if another file
@@ -91,7 +93,7 @@ class UploadRobot(BaseBot):
             raise ValueError('When always is set to True, either ignoreWarning '
                              'or aborts must be set to True.')
         if always and not description:
-            raise ValueError('When always is set to True the description must '
+            raise ValueError('When always is set to True, the description must '
                              'be set.')
         self.url = url
         if isinstance(self.url, basestring):
@@ -105,6 +107,7 @@ class UploadRobot(BaseBot):
         self.ignoreWarning = ignoreWarning
         self.aborts = aborts
         self.chunk_size = chunk_size
+        self.summary = summary
         if config.upload_to_commons:
             self.targetSite = targetSite or pywikibot.Site('commons',
                                                            'commons')
@@ -407,7 +410,8 @@ class UploadRobot(BaseBot):
             if self.uploadByUrl:
                 success = site.upload(imagepage, source_url=file_url,
                                       ignore_warnings=apiIgnoreWarnings,
-                                      _file_key=_file_key, _offset=_offset)
+                                      _file_key=_file_key, _offset=_offset,
+                                      comment=self.summary)
             else:
                 if "://" in file_url:
                     temp = self.read_file_content(file_url)
@@ -416,7 +420,8 @@ class UploadRobot(BaseBot):
                 success = site.upload(imagepage, source_filename=temp,
                                       ignore_warnings=apiIgnoreWarnings,
                                       chunk_size=self.chunk_size,
-                                      _file_key=_file_key, _offset=_offset)
+                                      _file_key=_file_key, _offset=_offset,
+                                      comment=self.summary)
 
         except pywikibot.data.api.APIError as error:
             if error.code == u'uploaddisabled':
