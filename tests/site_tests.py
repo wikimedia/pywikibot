@@ -3336,9 +3336,9 @@ class TestPropertyNames(DefaultSiteTestCase):
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
                      'forcetoc', 'graph_specs', 'hiddencat', 'newsectionlink',
                      'noeditsection', 'noexternallanglinks', 'nogallery',
-                     'noindex', 'nonewsectionlink', 'notoc',
-                     'page_top_level_section_count', 'score', 'templatedata',
-                     'wikibase-badge-Q17437796', 'wikibase_item'):
+                     'noindex', 'nonewsectionlink', 'notoc', 'score',
+                     'templatedata', 'wikibase-badge-Q17437796',
+                     'wikibase_item'):
             self.assertIn(item, pnames)
 
 
