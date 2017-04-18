@@ -226,9 +226,9 @@ The contents of the package
     | #statistics_in_wikitable.py| This bot renders statistics provided by             |
     |                            | [[Special:Statistics]] in a table on a wiki page.   |
     |                            | Thus it creates and updates a statistics wikitable. |
-    +----------------------------+-----------------------------------------------------+
-    | #table2wiki.py             | Semi-automatic converting HTML-tables to wiki-tables|
     +------------------------+---+-----------------------------------------------------+
+    | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables    |
+    +------------------------+---------------------------------------------------------+
     | template.py            | change one template (that is {{...}}) into another.     |
     +------------------------+---------------------------------------------------------+
     | templatecount.py       | Display the list of pages transcluding a given list     |
