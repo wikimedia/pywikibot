@@ -567,6 +567,7 @@ class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
                           mainpage.oldest_revision.timestamp.isoformat()))
         self.assertIsInstance(creator[0], unicode)
         self.assertIsInstance(creator[1], unicode)
+        self._ignore_unknown_warning_packages = True  # T163175
         self.assertDeprecation()
 
         self._reset_messages()
