@@ -202,7 +202,7 @@ def str2time(string, timestamp=None):
     else:
         key = ''
 
-    if key in ['d', 's', 'h', 'w']:  # days, seconds, minutes, hours, weeks
+    if key in ['d', 's', 'h', 'w']:  # days, seconds, hours, weeks
         return datetime.timedelta(**{MW_KEYS[key]: duration})
 
     if key == 'y':  # years
