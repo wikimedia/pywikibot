@@ -37,7 +37,7 @@ R(emove) - remove a page that is already in the list
 L(ist) - show current list of pages to include or to check
 """
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2014
+# (C) Pywikibot team, 2005-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ def needcheck(pl):
     return True
 
 
-def include(pl, checklinks=True, realinclude=True, linkterm=None):
+def include(pl, checklinks=True, realinclude=True, linkterm=None, summary=''):
     cl = checklinks
     if linkterm:
         actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
@@ -90,11 +90,13 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
                 for c in cats:
                     if c in parentcats:
                         if removeparent:
-                            pl.change_category(actualworkingcat)
+                            pl.change_category(actualworkingcat,
+                                               summary=summary)
                             break
                 else:
                     pl.put(textlib.replaceCategoryLinks(
-                        text, cats + [actualworkingcat], site=pl.site))
+                        text, cats + [actualworkingcat], site=pl.site),
+                        summary=summary)
     if cl:
         if checkforward:
             for page2 in pl.linkedPages():
@@ -108,7 +110,7 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None):
                     checked[refPage] = refPage
 
 
-def asktoadd(pl):
+def asktoadd(pl, summary):
     if pl.site != mysite:
         return
     if pl.isRedirectPage():
@@ -125,7 +127,7 @@ def asktoadd(pl):
         # (needs the support for 'other options')
         answer = pywikibot.input("[y]es/[n]o/[i]gnore/[o]ther options?")
         if answer == 'y':
-            include(pl)
+            include(pl, summary=summary)
             break
         if answer == 'c':
             include(pl, realinclude=False)
@@ -135,9 +137,9 @@ def asktoadd(pl):
                 if not pl.isRedirectPage():
                     linkterm = pywikibot.input(
                         u"In what manner should it be alphabetized?")
-                    include(pl, linkterm=linkterm)
+                    include(pl, linkterm=linkterm, summary=summary)
                     break
-            include(pl)
+            include(pl, summary=summary)
             break
         elif answer == 'n':
             excludefile.write('%s\n' % pl.title())
@@ -157,7 +159,7 @@ def asktoadd(pl):
             pagetitle = pywikibot.input("Specify page to add:")
             page = pywikibot.Page(pywikibot.Site(), pagetitle)
             if page not in checked.keys():
-                include(page)
+                include(page, summary=summary)
         elif answer == 'x':
             if pl.exists():
                 if pl.isRedirectPage():
@@ -165,7 +167,7 @@ def asktoadd(pl):
                         u"Redirect page. Will be included normally.")
                     include(pl, realinclude=False)
                 else:
-                    include(pl, checklinks=False)
+                    include(pl, checklinks=False, summary=summary)
             else:
                 pywikibot.output(u"Page does not exist; not added.")
             break
@@ -215,7 +217,8 @@ try:
         sys.exit(0)
 
     mysite = pywikibot.Site()
-    pywikibot.setAction(i18n.twtranslate(mysite, 'makecat-create', {'cat': workingcatname}))
+    summary = i18n.twtranslate(mysite, 'makecat-create',
+                               {'cat': workingcatname})
     workingcat = pywikibot.Category(mysite,
                                     u'%s:%s'
                                     % (mysite.namespaces.CATEGORY,
@@ -271,13 +274,13 @@ try:
 
     for pl in articles:
         checked[pl] = pl
-        include(pl)
+        include(pl, summary=summary)
 
     gen = pagegenerators.DequePreloadingGenerator(tocheck)
 
     for page in gen:
         if checkbroken or page.exists():
-            asktoadd(page)
+            asktoadd(page, summary)
 
 finally:
     try:
