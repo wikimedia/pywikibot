@@ -11,8 +11,6 @@ e.g. used to test password-file based login.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 from collections import defaultdict
 try:
     import unittest.mock as mock

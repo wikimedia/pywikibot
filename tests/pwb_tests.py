@@ -13,8 +13,6 @@ https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import sys
 
 from tests import join_tests_path, create_path_func

@@ -8,8 +8,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot import interwiki_graph
 
 from tests.aspects import unittest, require_modules, SiteAttributeTestCase

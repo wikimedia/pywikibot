@@ -7,9 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 from pywikibot.site import BaseSite
 
 import scripts.maintenance.cache as cache

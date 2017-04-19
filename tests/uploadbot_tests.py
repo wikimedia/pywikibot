@@ -11,9 +11,6 @@ These tests write to the wiki.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import os
 
 from scripts import upload

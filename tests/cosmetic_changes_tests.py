@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot.cosmetic_changes import CosmeticChangesToolkit
 
 from tests.aspects import unittest, TestCase

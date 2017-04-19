@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 import pywikibot
 
-__version__ = '$Id$'
-
 try:
     from stdnum.exceptions import ValidationError as StdNumValidationError
 except ImportError:

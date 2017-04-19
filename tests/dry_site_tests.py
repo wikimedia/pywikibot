@@ -7,9 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 from pywikibot.tools import deprecated
 from pywikibot.site import must_be, need_version

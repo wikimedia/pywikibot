@@ -7,8 +7,6 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from distutils.version import StrictVersion
 
 from pywikibot.tools import ip
