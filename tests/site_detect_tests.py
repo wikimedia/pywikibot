@@ -16,9 +16,6 @@ from pywikibot.site_detect import MWSite
 from tests.aspects import unittest, TestCase
 
 
-__version__ = '$Id$'
-
-
 class SiteDetectionTestCase(TestCase):
 
     """Testcase for MediaWiki detection and site object creation."""

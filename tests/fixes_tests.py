@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot import fixes
 
 from tests import unittest, join_data_path

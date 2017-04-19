@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from collections import Iterable
 
 from pywikibot.site import Namespace, NamespacesDict

@@ -8,8 +8,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from scripts import data_ingestion
 
 from tests import join_data_path, join_images_path

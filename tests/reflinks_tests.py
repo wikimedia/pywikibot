@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from scripts.reflinks import XmlDumpPageGenerator, ReferencesRobot, main
 
 from tests import join_xml_data_path

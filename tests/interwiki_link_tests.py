@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot import config2 as config
 
 from pywikibot.exceptions import InvalidTitle

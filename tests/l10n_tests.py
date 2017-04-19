@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import pywikibot
 from pywikibot import i18n
 from pywikibot.textlib import extract_templates_and_params_regex_simple

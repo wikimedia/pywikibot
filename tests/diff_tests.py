@@ -7,8 +7,6 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import sys
 
 from pywikibot.diff import cherry_pick, html_comparator, PatchManager

@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from tests.aspects import unittest, TestCase
 
 from pywikibot.tools import ThreadedGenerator, intersect_generators

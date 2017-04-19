@@ -14,8 +14,6 @@ These tests use special code 'write = -1' for edit failures.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import pywikibot
 from pywikibot import (
     Error,

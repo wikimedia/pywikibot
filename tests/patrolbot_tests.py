@@ -7,14 +7,14 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
+
 try:
     from scripts import patrol
 except ImportError:
     patrol = None  # if mwparserfromhell is not installed
 
 from tests.aspects import require_modules, unittest, DefaultDrySiteTestCase
+
 
 DUMMY_PAGE_TUPLES = """
 This is some text above the entries:

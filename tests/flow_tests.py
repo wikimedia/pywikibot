@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot.exceptions import NoPage
 from pywikibot.flow import Board, Topic, Post
 from pywikibot.tools import UnicodeType as unicode

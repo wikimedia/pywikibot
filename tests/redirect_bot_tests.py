@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 try:
     from unittest.mock import Mock, patch
 except ImportError:
