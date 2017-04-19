@@ -135,13 +135,13 @@ class CategoryRedirectBot(pywikibot.Bot):
                     'newCatLink': newCat.title(),
                     'newCatTitle': newCatTitle,
                 }
-                comment = editSummary % param
+                summary = editSummary % param
                 # Move articles
                 found, moved = 0, 0
                 for article in oldCat.members():
                     found += 1
                     changed = article.change_category(oldCat, newCat,
-                                                      comment=comment)
+                                                      summary=summary)
                     if changed:
                         moved += 1
 
@@ -157,7 +157,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                     except pywikibot.Error:
                         continue
                     changed = doc.change_category(oldCat, newCat,
-                                                  comment=comment)
+                                                  summary=summary)
                     if changed:
                         moved += 1
 
