@@ -298,9 +298,13 @@ class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
 
     def testMultipleNonNumbers(self):
         """Test error handling for multiple non-numbers."""
-        with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
+        with self.assertRaisesRegex(
+            ValueError, r"invalid literal for int\(\) with base 10: 'drei'"
+        ):
             i18n.twntranslate('de', 'test-multiple-plurals', ["drei", "1", 1])
-        with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'elf'"):
+        with self.assertRaisesRegex(
+            ValueError, r"invalid literal for int\(\) with base 10: 'elf'"
+        ):
             i18n.twntranslate('de', 'test-multiple-plurals',
                               {'action': u'Ändere', 'line': "elf", 'page': 2})
 
