@@ -56,12 +56,7 @@ class MWSite(object):
         if fromurl.endswith("$1"):
             fromurl = fromurl[:-2]
         r = fetch(fromurl)
-        if r.status == 503:
-            raise ServerError('Service Unavailable')
-        elif r.status == 500:
-            raise ServerError('Internal Server Error')
-        elif r.status == 200 and SERVER_DB_ERROR_MSG in r.content:
-            raise ServerError('Server cannot access the database')
+        check_response(r)
 
         if fromurl != r.data.url:
             pywikibot.log('{0} redirected to {1}'.format(fromurl, r.data.url))
@@ -87,6 +82,8 @@ class MWSite(object):
         if self.api:
             try:
                 self._parse_post_117()
+            except ServerError:
+                raise
             except Exception as e:
                 pywikibot.log('MW 1.17+ detection failed: {0!r}'.format(e))
 
@@ -169,6 +166,7 @@ class MWSite(object):
     def _parse_post_117(self):
         """Parse 1.17+ siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
+        check_response(response)
         # remove preleading newlines and Byte Order Mark (BOM), see T128992
         content = response.content.strip().lstrip('\uFEFF')
         info = json.loads(content)
@@ -299,3 +297,13 @@ class WikiHTMLPageParser(HTMLParser):
                 self.set_api_url(attrs['href'])
         elif tag == 'script' and 'src' in attrs:
             self.set_api_url(attrs['src'])
+
+
+def check_response(response):
+    """Raise ServerError if the response indicates a server error."""
+    if response.status == 503:
+        raise ServerError('Service Unavailable')
+    elif response.status == 500:
+        raise ServerError('Internal Server Error')
+    elif response.status == 200 and SERVER_DB_ERROR_MSG in response.content:
+        raise ServerError('Server cannot access the database')
