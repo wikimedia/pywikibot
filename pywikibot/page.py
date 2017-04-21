@@ -113,7 +113,9 @@ def allow_asynchronous(func):
     a callable that gets the page as the first and a possible exception that
     occurred during saving in the second thread or None as the second argument.
     """
-    def handle(func, self, do_async=False, callback=None, *args, **kwargs):
+    def handle(func, self, *args, **kwargs):
+        do_async = kwargs.pop('asynchronous', False)
+        callback = kwargs.pop('callback', None)
         err = None
         try:
             func(self, *args, **kwargs)
@@ -131,10 +133,8 @@ def allow_asynchronous(func):
             callback(self, err)
 
     def wrapper(self, *args, **kwargs):
-        do_async = kwargs.pop('asynchronous', False)
-        if do_async:
-            pywikibot.async_request(handle, func, self, do_async=True,
-                                    *args, **kwargs)
+        if kwargs.get('asynchronous'):
+            pywikibot.async_request(handle, func, self, *args, **kwargs)
         else:
             handle(func, self, *args, **kwargs)
 
