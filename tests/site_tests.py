@@ -966,34 +966,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertNotIn(page.protection()['edit'][0], invalid_levels)
         self.assertLessEqual(len(pages), 10)
 
-    def test_unconnected(self):
-        """Test that the ItemPage returned raises NoPage."""
-        if not self.site.data_repository():
-            raise unittest.SkipTest('Site is not using a Wikibase repository')
-        if self.site.hostname() == 'test.wikipedia.org':
-            raise unittest.SkipTest('test.wikipedia is misconfigured; T85358')
-        cnt = 0
-        start_time = datetime.now() - timedelta(minutes=5)
-        # Pages which have been connected recently may still be reported as
-        # unconnected. So try on an version that is a few minutes older if the
-        # tested site appears as a sitelink.
-        for page in self.site.unconnected_pages(total=5):
-            try:
-                item = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
-                pass
-            else:
-                revisions = list(item.revisions(total=1, starttime=start_time,
-                                                content=True))
-                if revisions:
-                    sitelinks = json.loads(revisions[0].text)['sitelinks']
-                    self.assertNotIn(
-                        self.site.dbName(), sitelinks,
-                        'Page "{0}" is connected to a Wikibase '
-                        'repository'.format(page.title()))
-            cnt += 1
-        self.assertLessEqual(cnt, 5)
-
     def test_pages_with_property(self):
         """Test pages_with_property method."""
         if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
@@ -1013,6 +985,39 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     mysite.pages_with_property(item)
                     self.fail(
                         'NotImplementedError not raised for {0}'.format(item))
+
+
+class TestSiteGeneratorsUncached(DefaultSiteTestCase):
+
+    """Test cases for Site methods."""
+
+    def test_unconnected(self):
+        """Test that the ItemPage returned raises NoPage."""
+        if not self.site.data_repository():
+            raise unittest.SkipTest('Site is not using a Wikibase repository')
+        if self.site.hostname() == 'test.wikipedia.org':
+            raise unittest.SkipTest('test.wikipedia is misconfigured; T85358')
+        cnt = 0
+        # Pages which have been connected recently may still be reported as
+        # unconnected. So try on a version that is a few minutes older if the
+        # tested site appears as a sitelink.
+        start_time = datetime.utcnow() - timedelta(minutes=30)
+        for page in self.site.unconnected_pages(total=3):
+            try:
+                item = pywikibot.ItemPage.fromPage(page)
+            except pywikibot.NoPage:
+                pass
+            else:
+                revisions = list(item.revisions(total=1, starttime=start_time,
+                                                content=True))
+                if revisions:
+                    sitelinks = json.loads(revisions[0].text)['sitelinks']
+                    self.assertNotIn(
+                        self.site.dbName(), sitelinks,
+                        'Page "{0}" is connected to {1} on Wikibase '
+                        'repository'.format(page.title(), item))
+            cnt += 1
+        self.assertLessEqual(cnt, 3)
 
 
 class TestImageUsage(DefaultSiteTestCase):
