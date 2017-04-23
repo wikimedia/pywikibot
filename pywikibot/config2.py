@@ -783,7 +783,7 @@ persistent_http = False
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your script.
 # You may assign either a tuple of two int or float values for connection and
 # read timeout, or a single value for both in a tuple (since requests 2.4.0).
-socket_timeout = 30
+socket_timeout = 75
 
 
 # ############# COSMETIC CHANGES SETTINGS ##############
