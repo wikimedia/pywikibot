@@ -4484,8 +4484,9 @@ class PropertyPage(WikibasePage, Property):
                 'PropertyPage.get only implements "force".')
 
         data = WikibasePage.get(self, force)
-        self._type = self._content['datatype']
-        data['datatype'] = self._content['datatype']
+        if 'datatype' in self._content:
+            self._type = self._content['datatype']
+        data['datatype'] = self._type
         return data
 
     def newClaim(self, *args, **kwargs):
