@@ -1,3 +1,102 @@
+Release 3.0.20170403 (03 April 2017)
+====================================
+This is a major release from master branch.
+All previous 2.0 branches and tags are deprecated.
+The following list shows main changes since 01 January 2017.
+
+Bugfixes (core)
+---------------
+0319439 Use default summary when summary value does not contain a string (T160823)
+303ff08 Enable specialbots.py for PY3 (T161457)
+2ddf680 Change tw(n)translate from Site.code to Site.lang dependency (T140624)
+dcf7567 Do not use the `imp` module in Python 3 (T158640)
+6773f74 Make sure the order of parameters does not change (T161291)
+3ff30a0 Use pywikibot.tools.Counter instead of collections.Counter (T160620)
+b6919aa Introduce a new site method page_from_repository()
+83ef386 Add pagelist tag for replaceExcept (T151940)
+c9ade07 logging in python3 when deprecated_args decorator is used (T159077)
+2275630 Avoid ResourceWarning using subprocess in python 3.6 (T159646)
+52ef3d6 load_pages_from_pageids: do not fail on empty string (T153592)
+3f848be Add missing not-equal comparison for wbtypes (T158848)
+fb7f54b textlib.getCategoryLinks catch invalid category title exceptions (T154309)
+28d6dae Fix html2unicode (T130925)
+29111b5 Ignore first letter case on 'first-letter' sites, obey it otherwise (T130917)
+7d79fa4 textlib.py: Limit catastrophic backtracking in FILE_LINK_REGEX (T148959)
+12987c8 FilePage.get_file_history(): Check for len(self._file_revisions) (T155740)
+83c2f9a Fix for positional_arg behavior of GeneratorFactory (T155227)
+ca11a4c Fix broken LDAP based login (T90149)
+
+Improvements (core)
+-------------------
+3e738c0 Simplify User class
+b72e977 Renamed isImage and isCategory
+ff5ad7a Add -property option to pagegenerators.py
+951d079 Add a new site method pages_with_property
+5c8d8be Allow retrieval of unit as ItemPage for WbQuantity (T143594)
+576d7db return result of userPut with put_current method
+7167cb8 Provide a new generator which yields a subclass of Page
+a61d3ab Implement FilePage.download()
+d107d58 make general function to compute file sha
+4e175bc Support adding units to WbQuantity through ItemPage or entity url (T143594)
+37c45bf Make PropertyPage.get() return a dictionary
+aa74f5c Add Wikibase Client extension requirement to APISite.unconnectedpages()
+829637f Make Wikibase Property provide labels data
+851daa3 APISite.data_repository(): handle warning with re.match() (T156596)
+0c33e28 GeneratorFactory: make getCategory respect self.site (T155687)
+b8e7f41 Fix and improve default regexes
+
+Updates (core)
+--------------
+cbe7ac1 Update linktrails
+12e12a1 Update languages_by_size
+288e16a Updating global bot wikis, closed wikis and deleted wikis
+5927889 Deprecate site.has_transcluded_data
+222b919 update plural rules
+3f5d316 Correcting month names in date.py for Euskara (eu)
+9db741d Linktrail for Euskara
+90439d3 Define template documentation subpages for es.wikibooks
+72a8a99 self.doc_subpages for Meta-Wiki
+575bfe1 Updating Wikibooks projects which allows global bots
+c206a52 Updated list of closed projects
+161a35d Add 'Bilde' as a namespace alias for file namespace of nn Wikipedia (T154947)
+
+Bugfixes (scripts)
+------------------
+187a23c archivebot.py:Fix string checking in all functions (T157742)
+44d8566 nowcommons.py: ncTemplates is a method not a property (T144690)
+8a8d7c2 checkimages.py: Prevent TypeError when self.num_notify is None (T157728)
+12117d2 archivebot.py: fix Unicode encodings in py2 and py3 (T157045)
+0c6e5ce solve_disambiguation.py: Don't ask for an option when -always is given (T147159)
+
+Improvements (scripts)
+----------------------
+cc612db Use page_from_repository for category_redirect.py
+d2e244e Rewrite setParameters() in checkimages.py
+dc23e28 use page_from_repository() method for fixing_redirects.py
+6e589e3 Add L10N from wikibase for clean_sandbox.py
+e9f4203 remove misleading -force and -showdiff in wikisourcetext.py
+fac1801 djvu.py: added features and refactored
+545b6cb proofreadpage.py: purge is skipped if redlinks are present
+90ae09b checkimages.py: Add a paramater of maximum number of notifications per user per check (T157728)
+cf1136d Subclass PiperBot from AutomaticTWSummaryBot
+897e2d2 Add [q] option for edit choice in add_text.py (T155045)
+
+Updates (scripts)
+-----------------
+1bb6204 Localize clean_sandbox.py to Czech
+850c7c6 Localize clean_sandbox.py to Wikidata
+d17efd6 Localize blockpageschecker.py to Czech
+13a731b Add French template in category.py
+77d2e87 category_redirect: Add Romanian tracking category
+
+New scripts
+-----------
+9b1ff42 Add surnames_redirects.py script
+03daaa6 Port table2wiki to core (T115104)
+
+TODO: add high level description of changes from pywikibot 2.0rc5
+
+
 Release 2.0rc5 (17 August 2016)
 ===============================
 
@@ -76,6 +175,7 @@ ab7abf5 interwiki: check for category before emptiness
 0db2e87 interwiki: do not automatically log in
 47ed5d5 nowcommons: Query at most one users
 
+
 Release 2.0rc3 (30 September 2015)
 ==================================
 
@@ -85,6 +185,7 @@ Bugfixes (core)
 b503a1e Indexes in str.format
 d1854f5 MediaWikiVersion: Accept new wmf style
 718e4a1 i18n: always follow master
+
 
 Release 2.0rc2 (9 July 2015)
 ============================
@@ -170,7 +271,9 @@ Other changes include:
 - Allow pywikibot to load without i18n data
 - Appveyor CI Win32 builds
 
+
 Release 2.0b3 (30 November 2014)
+================================
 
 Major changes include:
 - Library initialisation no longer connects to servers
@@ -192,10 +295,14 @@ Major changes include:
 - archivebot: support more languages
 - reflinks: changed from GPL to MIT
 
+
 Release 2.0b2 (7 October 2014)
+==============================
 
 TODO: add list of major changes
 
+
 Release 2.0b1 (26 August 2013)
+================================
 
 TODO: add high level description of changes from pywikibot 1.0
