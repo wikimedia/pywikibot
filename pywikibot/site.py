@@ -811,7 +811,7 @@ class BaseSite(ComparableMixin):
     @property
     def code(self):
         """
-        The identifying code for this Site.
+        The identifying code for this Site equal to the wiki prefix.
 
         By convention, this is usually an ISO language code, but it does
         not have to be.
@@ -822,7 +822,7 @@ class BaseSite(ComparableMixin):
     def lang(self):
         """The ISO language code for this Site.
 
-        Presumed to be equal to the wiki prefix, but this can be overridden.
+        Presumed to be equal to the site code, but this can be overridden.
         """
         return self.__code
 
