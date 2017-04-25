@@ -1,3 +1,77 @@
+Release 3.0.20170521 (21 Mai 2017)
+====================================
+
+Bugfixes (core)
+---------------
+a79ce64 Increase the default socket_timeout to 75 seconds (T163635)
+4c8acd8 use repr() of exceptions to prevent UnicodeDecodeErrors (T120222)
+3727717 Handle offset mismatches during chunked upload (T156402)
+f4cc5ee Correct _wbtypes equality comparison (T160282)
+46dff29 Re-enable getFileVersionHistoryTable() method (T162528)
+6f7ecb4 Replaced the word 'async' with 'asynchronous' due to py3.7 (T106230)
+ac1d5ed Raise ImportError if no editor is available (T163632)
+489741f templatesWithParams: cache and standardise params (T113892)
+31eb055 getInternetArchiveURL: Retry http.fetch if there is a ConnectionError (T164208)
+6d8c9e7 Remove wikidataquery from pywikibot (T162585)
+
+Improvements (core)
+-------------------
+345e677 Introduce user_add_claim and allow asynchronous ItemPage.addClaim (T87493)
+eade449 Enable private edit summary in specialbots (T162527)
+d74cb73 Make a decorator for asynchronous methods
+4159a9c Provide options by a separate handler class
+ccdb71a Show a warning when a LogEntry type is not known (T135505)
+aa74f5c Add Wikibase Client extension requirement to APISite.unconnectedpages()
+894d5b9 Update content after editing entity
+ae0d3f9 Make WbTime from Timestamp and vice versa (T131624)
+feaffb7 Add support for geo-shape Wikibase data type (T161726)
+f8fe0a1 Add async parameter to ItemPage.editEntity (T86074)
+a7c02e5 Make sparql use Site to access sparql endpoint and entity_url (T159956)
+df7ab6d timestripper: search wikilinks to reduce false matches
+e54e584 Set Coordinate globe via item
+4e824eb use extract_templates_and_params_regex_simple for template validation
+e26c9b4 Add _items for WbMonolingualText
+c67e069 Allow date-versioned pypi releases from setup.py (T152907)
+2b6509f Provide site to WbTime via WbTime.fromWikibase
+165adc2 Provide preloading via GeneratorFactory.getCombinedGenerator() (T135331)
+f4af75f Accept QuitKeyboardInterrupt in specialbots.Uploadbot (T163970)
+a0c75d8 Remove unnecessary description change message when uploading a file (T163108)
+b5b721b Add 'OptionHandler' to bot.__all__ tuple
+6a56c23 Use FilePage.upload inside UploadRobot
+b6962ab Add support for tabular-data Wikibase data type (T163981)
+2d9e841 Get thumburl information in FilePage() (T137011)
+
+Updates (core)
+--------------
+ec33c23 Update languages_by_size in family files
+d9b9913 wikisource_family.py: Add "pa" to languages_by_size
+6f159c5 Config2: limit the number of retries to 15 (T165898)
+
+Bugfixes (scripts)
+------------------
+3c3bfb8 Remove comments when parsing template in harvest_template.py (T127691)
+b6e5218 Assign object to Tkdialog if it cannot be imported from gui module (T164163)
+a8aa142 weblinkchecker.py: Retry get_memento_info if there is a ConnectionError (T164365)
+09142d7 newitem.py: Test if the page actually exists (T86491)
+
+Improvements (scripts)
+----------------------
+d6dad3c use OptionHandler class for PageFromFileReader
+b6567e4 Do not use the deprecated pywikibot.setAction() in makecat.py
+88bbb2a Update newitem.py to use WikidataBot.user_edit_entity (T87493)
+07a4344 Improve redirect.py (T153883)
+da9021c use OptionHandler for redirect.RedirectGenerator
+bc59339 Enable a new option sdtemplate for customized sd template (T140624)
+cfaf7c0 Rewrite claimit.py (T69284)
+2487c75 Replace private mylang variables with mycode in misspelling.py
+37a4846 se input_yn in states_redirect.py
+0809a60 Use bot classes for table2wiki.py
+
+Updates (scripts)
+-----------------
+f819ef4 Update cfr templates for cswiki
+
+
 Release 3.0.20170403 (03 April 2017)
 ====================================
 This is a major release from master branch.
