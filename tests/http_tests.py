@@ -179,7 +179,8 @@ class TestHttpStatus(HttpbinTestCase):
 
     def test_http_504(self):
         """Test that a HTTP 504 raises the correct exception."""
-        self.assertRaisesRegex(pywikibot.Server504Error, 'Server ([^\:]+|[^\:]+:[0-9]+) timed out',
+        self.assertRaisesRegex(pywikibot.Server504Error,
+                               r'Server ([^\:]+|[^\:]+:[0-9]+) timed out',
                                http.fetch,
                                uri=self.get_httpbin_url('/status/504'))
 

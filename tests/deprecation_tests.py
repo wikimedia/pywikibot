@@ -605,8 +605,11 @@ class DeprecatorTestCase(DeprecationTestCase):
         """Test invalid @remove_last_args on functions."""
         self.assertRaisesRegex(
             TypeError,
-            r"(deprecated_all2\(\) missing 1 required positional argument: 'foo'|"  # Python 3
-            "deprecated_all2\(\) takes exactly 1 argument \(0 given\))",  # Python 2
+            # Python 3
+            r"(deprecated_all2\(\) missing 1 required positional argument: "
+            r"'foo'|"
+            # Python 2
+            r"deprecated_all2\(\) takes exactly 1 argument \(0 given\))",
             deprecated_all2)
 
         self.assertRaisesRegex(
@@ -618,7 +621,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertRaisesRegex(
             TypeError,
             r'deprecated_all2\(\) takes (exactly )?1 (positional )?argument'
-            ' (but 2 were given|\(2 given\))',
+            r' (but 2 were given|\(2 given\))',
             deprecated_all2,
             1, 2, 3)
 
@@ -626,8 +629,11 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         self.assertRaisesRegex(
             TypeError,
-            r"(deprecated_all2\(\) missing 1 required positional argument: 'foo'|"  # Python 3
-            "deprecated_all2\(\) takes exactly 2 arguments \(1 given\))",  # Python 2
+            # Python 3
+            r"(deprecated_all2\(\) missing 1 required positional argument: "
+            r"'foo'|"
+            # Python 2
+            r"deprecated_all2\(\) takes exactly 2 arguments \(1 given\))",
             f.deprecated_all2)
 
         self.assertRaisesRegex(
@@ -639,7 +645,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertRaisesRegex(
             TypeError,
             r'deprecated_all2\(\) takes (exactly )?2 (positional )?arguments '
-            '(but 3 were given|\(3 given\))',
+            r'(but 3 were given|\(3 given\))',
             f.deprecated_all2,
             1, 2, 3)
 
