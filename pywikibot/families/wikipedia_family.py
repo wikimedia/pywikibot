@@ -39,7 +39,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'en', 'ceb', 'sv', 'de', 'nl', 'fr', 'ru', 'it', 'es', 'war', 'pl',
             'vi', 'ja', 'pt', 'zh', 'uk', 'ca', 'fa', 'ar', 'no', 'sh', 'fi',
             'hu', 'id', 'ko', 'cs', 'ro', 'sr', 'tr', 'ms', 'eu', 'eo', 'bg',
-            'da', 'min', 'hy', 'kk', 'sk', 'zh-min-nan', 'he', 'lt', 'hr',
+            'da', 'min', 'hy', 'kk', 'sk', 'he', 'zh-min-nan', 'lt', 'hr',
             'ce', 'et', 'sl', 'be', 'gl', 'nn', 'el', 'uz', 'la', 'simple',
             'ur', 'vo', 'hi', 'az', 'th', 'ka', 'ta', 'cy', 'mk', 'mg', 'oc',
             'lv', 'bs', 'new', 'tt', 'tl', 'tg', 'te', 'ky', 'sq', 'pms', 'br',
@@ -63,8 +63,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'ab', 'lbe', 'roa-rup', 'jbo', 'ty', 'kg', 'mdf', 'za', 'wo', 'lg',
             'bi', 'srn', 'zu', 'ltg', 'chr', 'tcy', 'sm', 'om', 'tn', 'xh',
             'chy', 'tw', 'cu', 'rmy', 'tum', 'pih', 'rn', 'got', 'pnt', 'bm',
-            'ch', 'ss', 'ady', 'iu', 'ts', 'st', 'fj', 'ny', 'ee', 'ak', 'ks',
-            'ik', 'sg', 've', 'dz', 'ff', 'ti', 'cr',
+            'ss', 'ch', 'ady', 'iu', 'ts', 'st', 'fj', 'ny', 'ee', 'ak', 'ks',
+            'ik', 'sg', 've', 'dz', 'ff', 'ti', 'cr', 'dty',
         ]
 
         # Sites we want to edit but not count as real languages
