@@ -1709,7 +1709,7 @@ def open_compressed(filename, use_extension=False):
     return open_archive(filename, use_extension=use_extension)
 
 
-def file_mode_checker(filename, mode=0o600):
+def file_mode_checker(filename, mode=0o600, quiet=False):
     """Check file mode and update it, if needed.
 
     @param filename: filename path
@@ -1723,7 +1723,7 @@ def file_mode_checker(filename, mode=0o600):
     if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode):
         os.chmod(filename, mode)
         # re-read and check changes
-        if os.stat(filename).st_mode != st_mode:
+        if os.stat(filename).st_mode != st_mode and not quiet:
             warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
 
 
