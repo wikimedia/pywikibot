@@ -211,7 +211,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         # Text after $1 is not allowed
         self.assertRaisesRegex(
             ValueError,
-            'Text after the \$1 placeholder is not supported \(T111513\)',
+            r'Text after the \$1 placeholder is not supported \(T111513\)',
             f.from_url,
             '//vo.wikipedia.org/wiki/$1/foo')
 

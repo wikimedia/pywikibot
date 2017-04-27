@@ -623,7 +623,7 @@ class TestDryPageGenerator(TestCase):
         """Test setting the limit to not a number."""
         with self.assertRaisesRegex(
                 ValueError,
-                "invalid literal for int\(\) with base 10: 'test'"):
+                r"invalid literal for int\(\) with base 10: 'test'"):
             self.gen.set_maximum_items('test')
 
     def test_limit_equal_total(self):
