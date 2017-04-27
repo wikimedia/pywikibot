@@ -1355,11 +1355,12 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         if self.site.hostname() == 'test.wikipedia.org':
             raise unittest.SkipTest('test.wikipedia is misconfigured; T85358')
         cnt = 0
-        start_time = datetime.datetime.now() - datetime.timedelta(minutes=5)
         # Pages which have been connected recently may still be reported as
-        # unconnected. So try on an version that is a few minutes older if the
+        # unconnected. So try on a version that is a few minutes older if the
         # tested site appears as a sitelink.
-        for page in self.site.unconnected_pages(total=5):
+        start_time = \
+            datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
+        for page in pagegenerators.UnconnectedPageGenerator(self.site, 3):
             try:
                 item = pywikibot.ItemPage.fromPage(page)
             except pywikibot.NoPage:
@@ -1371,10 +1372,10 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
                     sitelinks = json.loads(revisions[0].text)['sitelinks']
                     self.assertNotIn(
                         self.site.dbName(), sitelinks,
-                        'Page "{0}" is connected to a Wikibase '
-                        'repository'.format(page.title()))
+                        'Page "{0}" is connected to {1} on Wikibase '
+                        'repository'.format(page.title(), item))
             cnt += 1
-        self.assertLessEqual(cnt, 5)
+        self.assertLessEqual(cnt, 3)
 
     def test_unconnected_without_repo(self):
         """Test that it raises a ValueError on sites without repository."""
