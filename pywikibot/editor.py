@@ -5,7 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 #
 # (C) Gerrit Holl, 2004
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -118,7 +118,7 @@ class TextEditor(object):
                 os.unlink(tempFilename)
 
         if isinstance(gui, ImportError):
-            raise pywikibot.Error(
+            raise ImportError(
                 'Could not load GUI modules: %s\nNo editor available.\n'
                 'Set your favourite editor in user-config.py "editor", '
                 'or install python packages tkinter and idlelib, which '

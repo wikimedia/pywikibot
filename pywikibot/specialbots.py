@@ -354,6 +354,8 @@ class UploadRobot(BaseBot):
                 editor = editarticle.TextEditor()
                 try:
                     newDescription = editor.edit(self.description)
+                except ImportError:
+                    raise
                 except Exception as e:
                     pywikibot.error(e)
                     continue
