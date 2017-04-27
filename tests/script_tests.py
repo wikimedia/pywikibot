@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -120,7 +120,6 @@ auto_run_script_list = [
     'checkimages',
     'clean_sandbox',
     'disambredir',
-    'featured',
     'imagerecat',
     'login',
     'lonelypages',
@@ -145,7 +144,6 @@ auto_run_script_list = [
 no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user_config.py
     'editarticle': 'Nothing changed',
-    'featured': '0 pages written.',
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
     'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
