@@ -5,11 +5,12 @@ language: python
 sudo: false
 
 python:
+  - '2.6'
   - '2.7'
   - '3.3'
   - '3.4'
   - '3.5'
-  - '2.6'
+  - '3.6'
 
 # OSX builds do not yet support Python
 os: linux
