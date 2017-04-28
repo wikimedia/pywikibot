@@ -403,15 +403,17 @@ class XmlDumpReplacePageGenerator(object):
     Iterator that will yield Pages that might contain text to replace.
 
     These pages will be retrieved from a local XML dump file.
-    Arguments:
-        * xmlFilename  - The dump's path, either absolute or relative
-        * xmlStart     - Skip all articles in the dump before this one
-        * replacements - A list of 2-tuples of original text (as a
-                         compiled regular expression) and replacement
-                         text (as a string).
-        * exceptions   - A dictionary which defines when to ignore an
-                         occurrence. See docu of the ReplaceRobot
-                         constructor below.
+
+    @param xmlFilename: The dump's path, either absolute or relative
+    @type xmlFilename: str
+    @param xmlStart: Skip all articles in the dump before this one
+    @type xmlStart: str
+    @param replacements: A list of 2-tuples of original text (as a
+        compiled regular expression) and replacement text (as a string).
+    @type replacements: list of 2-tuples
+    @param exceptions: A dictionary which defines when to ignore an
+        occurrence. See docu of the ReplaceRobot constructor below.
+    @type exceptions: dict
     """
 
     def __init__(self, xmlFilename, xmlStart, replacements, exceptions, site):
