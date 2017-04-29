@@ -826,5 +826,6 @@ def main(*args):
         bot = RedirectRobot(action, **options)
         bot.run()
 
+
 if __name__ == '__main__':
     main()

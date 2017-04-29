@@ -88,6 +88,7 @@ class Win32CtypesUI(Win32BaseUI):
             raise EOFError()
         return data.strip()
 
+
 if ctypes_found:
     Win32UI = Win32CtypesUI
 else:

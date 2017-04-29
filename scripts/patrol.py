@@ -538,5 +538,6 @@ def main(*args):
     pywikibot.output(u'%d/%d patrolled'
                      % (bot.patrol_counter, bot.rc_item_counter))
 
+
 if __name__ == '__main__':
     main()

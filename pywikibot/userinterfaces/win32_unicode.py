@@ -368,5 +368,6 @@ def get_unicode_console():
 
     return stdin, stdout, stderr, argv
 
+
 if OSWIN32:
     register_cp65001()

@@ -1158,6 +1158,7 @@ def _flush(stop=True):
     except IndexError:
         pass
 
+
 atexit.register(_flush)
 
 
@@ -1184,6 +1185,7 @@ def async_request(request, *args, **kwargs):
         finally:
             page_put_queue.mutex.release()
     page_put_queue.put((request, args, kwargs))
+
 
 # queue to hold pending requests
 page_put_queue = Queue(config.max_queue_size)

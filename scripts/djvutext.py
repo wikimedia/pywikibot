@@ -204,6 +204,7 @@ def main(*args):
     bot = DjVuTextBot(djvu, index_page, pages, **options)
     bot.run()
 
+
 if __name__ == '__main__':
     try:
         main()

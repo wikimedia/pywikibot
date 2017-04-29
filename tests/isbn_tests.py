@@ -256,5 +256,6 @@ def editEntity_dummy(self, data=None, **kwargs):
     """Avoid that editEntity writes."""
     pass
 
+
 if __name__ == '__main__':  # pragma: no cover
     unittest.main()

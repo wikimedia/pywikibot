@@ -201,5 +201,6 @@ def main(*args):
     elif operation == "list":
         robot.listTemplates(argsList, namespaces)
 
+
 if __name__ == "__main__":
     main()

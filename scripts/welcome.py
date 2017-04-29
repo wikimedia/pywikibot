@@ -876,6 +876,7 @@ def load_word_function(raw):
         pywikibot.output(u'There was no input on the real-time page.')
     return list_loaded
 
+
 globalvar = Global()
 
 

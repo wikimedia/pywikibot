@@ -600,5 +600,6 @@ LIMIT 200"""
     else:
         pywikibot.showHelp('table2wiki')
 
+
 if __name__ == "__main__":
     main()

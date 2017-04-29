@@ -480,5 +480,6 @@ def main(*args):
     bot = CategoryRedirectBot(**options)
     bot.run()
 
+
 if __name__ == "__main__":
     main()

@@ -87,6 +87,7 @@ def list_scripts(path, exclude=None):
                name != exclude]
     return scripts
 
+
 script_list = (['login'] +
                list_scripts(scripts_path, 'login.py') +
                list_scripts(archive_path))

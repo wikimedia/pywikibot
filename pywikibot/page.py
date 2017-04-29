@@ -4498,6 +4498,7 @@ class PropertyPage(WikibasePage, Property):
         return Claim(self.site, self.getID(), datatype=self.type,
                      *args, **kwargs)
 
+
 # Add PropertyPage to the class attribute "types" after its declaration.
 Property.types['wikibase-property'] = PropertyPage
 

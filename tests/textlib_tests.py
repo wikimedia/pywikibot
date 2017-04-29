@@ -1531,6 +1531,7 @@ class TestStarList(TestCase):
                 'foo', ['{{linkfa|en}}\n', '{{linkfa|de}}\n',
                         '{{linkfa|fr}}\n', '{{linkfa|bar}}']))
 
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()

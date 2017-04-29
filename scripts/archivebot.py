@@ -792,5 +792,6 @@ def main(*args):
                 pywikibot.error(u'Error occurred while processing page %s' % pg)
                 pywikibot.exception(tb=True)
 
+
 if __name__ == '__main__':
     main()

@@ -160,5 +160,6 @@ class i18nBot(object):  # flake8: disable=N801
                 s = s.replace(' ' * IDENT, '\t')
                 json_file.write(s)
 
+
 if __name__ == '__main__':
     print(__doc__)

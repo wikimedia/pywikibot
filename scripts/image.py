@@ -166,5 +166,6 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['old image'])
         return False
 
+
 if __name__ == "__main__":
     main()

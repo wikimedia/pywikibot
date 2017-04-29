@@ -2897,6 +2897,7 @@ RecentchangesPageGenerator = redirect_func(
 WikidataItemGenerator = redirect_func(
     WikibaseItemGenerator, old_name='WikidataItemGenerator')
 
+
 if __name__ == "__main__":
     pywikibot.output(u'Pagegenerators cannot be run as script - are you '
                      u'looking for listpages.py?')

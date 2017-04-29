@@ -81,6 +81,7 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
     pass
 
+
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
 # a file user-config.py, and overwrite values in there.
@@ -362,6 +363,7 @@ def get_base_dir(test_directory=None):
             raise RuntimeError(exc_text)
 
     return base_dir
+
 
 _get_base_dir = get_base_dir  # for backward compatibility
 _base_dir = get_base_dir()
@@ -1063,6 +1065,7 @@ def _check_user_config_types(user_config, default_values, skipped):
         elif not name.startswith('_') and name not in skipped:
             warn('Configuration variable {0} is defined but unknown. '
                  'Misspelled?'.format(name), UserWarning)
+
 
 _check_user_config_types(_uc, _glv, _imports)
 

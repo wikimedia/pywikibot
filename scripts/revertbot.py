@@ -187,5 +187,6 @@ def main(*args):
     bot = myRevertBot(site=pywikibot.Site(), user=user, rollback=rollback)
     bot.revert_contribs()
 
+
 if __name__ == "__main__":
     main()

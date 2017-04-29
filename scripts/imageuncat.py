@@ -1381,5 +1381,6 @@ def main(*args):
                     addUncat(page)
         return True
 
+
 if __name__ == "__main__":
     main()
