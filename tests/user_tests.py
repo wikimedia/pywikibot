@@ -77,6 +77,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isEmailable())
         self.assertIn('invalid', user.getprops())
 
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()

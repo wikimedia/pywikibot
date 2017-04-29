@@ -361,6 +361,7 @@ def main(*args):
     bot = TemplateRobot(preloadingGen, templates, site=site, **options)
     bot.run()
 
+
 if __name__ == "__main__":
     try:
         main()

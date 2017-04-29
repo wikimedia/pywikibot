@@ -411,5 +411,6 @@ def main():
     archive = download_setuptools(**_download_args(options))
     return _install(archive, _build_install_args(options))
 
+
 if __name__ == '__main__':
     sys.exit(main())

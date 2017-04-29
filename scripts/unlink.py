@@ -171,5 +171,6 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['page title'])
         return False
 
+
 if __name__ == "__main__":
     main()

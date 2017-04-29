@@ -131,6 +131,8 @@ def _flush():
         log(message)
 
     log('Network session closed.')
+
+
 atexit.register(_flush)
 
 USER_AGENT_PRODUCTS = {

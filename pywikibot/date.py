@@ -301,6 +301,7 @@ def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
     else:
         raise ValueError("string contains regular digits")
 
+
 # Decimal digits used for various matchings
 _decimalDigits = '0123456789'
 
@@ -321,6 +322,7 @@ def intToRomanNum(i):
 def romanNumToInt(v):
     """Convert roman numeral to integer."""
     return _romanNumbers.index(v)
+
 
 # Each tuple must 3 parts: a list of all possible digits (symbols), encoder
 # (from int to a u-string) and decoder (from u-string to an int)
@@ -505,7 +507,7 @@ def MakeParameter(decoder, param):
     """DEPRECATED."""
     return _make_parameter(decoder, param)
 
-#
+
 # All years/decades/centuries/millenniums are designed in such a way
 # as to allow for easy date to string and string to date conversion.
 # For example, using any map with either an integer or a string will produce
@@ -518,7 +520,6 @@ def MakeParameter(decoder, param):
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-#
 formats = {
     'MonthName': {
         'af': lambda v: slh(v, [u"Januarie", u"Februarie", u"Maart", u"April",
@@ -2008,9 +2009,8 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
         f = first_lower
     return [pattern % f(monthName(lang, m)) for m in range(1, 13)]
 
-#
+
 # Add day of the month formats to the formatting table: "en:May 15"
-#
 addFmt2('af', False, u"%%d %s", True)
 addFmt2('als', False, u"%%d. %s", True)
 addFmt1('an', False, [u"%d de chinero", u"%d de frebero", u"%d de marzo",

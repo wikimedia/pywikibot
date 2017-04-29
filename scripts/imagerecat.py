@@ -493,5 +493,6 @@ def main(*args):
     categorizeImages(generator, onlyFilter, onlyUncat)
     pywikibot.output(u'All done')
 
+
 if __name__ == "__main__":
     main()

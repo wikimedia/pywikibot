@@ -83,5 +83,6 @@ def main(*args):
                     sysop_name = 'also sysop'
                 pywikibot.output('\t{0}: {1} ({2})'.format(lang, username, sysop_name))
 
+
 if __name__ == '__main__':
     main()

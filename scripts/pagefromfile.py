@@ -341,5 +341,6 @@ def main(*args):
         bot = PageFromFileRobot(generator=reader, **options)
         bot.run()
 
+
 if __name__ == "__main__":
     main()

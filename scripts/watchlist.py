@@ -120,5 +120,6 @@ def main(*args):
             except pywikibot.InvalidTitle:
                 pywikibot.exception()
 
+
 if __name__ == "__main__":
     main()

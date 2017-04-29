@@ -546,5 +546,6 @@ def main(*args):
     pywikibot.output(u'Total photos: ' + str(totalPhotos))
     pywikibot.output(u'Uploaded photos: ' + str(uploadedPhotos))
 
+
 if __name__ == "__main__":
     main()

@@ -648,7 +648,7 @@ def _load_file(filename):
     else:
         return False
 
-#
+
 # Load the user fixes file.
 filename = config.datafilepath('user-fixes.py')
 if _load_file(filename):

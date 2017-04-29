@@ -127,5 +127,6 @@ def main(*args):
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
 
+
 if __name__ == "__main__":
     main()

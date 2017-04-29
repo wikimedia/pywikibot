@@ -122,5 +122,6 @@ def main(*args):
     bot = FreebaseMapperRobot(filename)
     bot.run()
 
+
 if __name__ == '__main__':
     main()

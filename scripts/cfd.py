@@ -232,5 +232,6 @@ def findDay(pageTitle, oldDay):
                             % (year, month, day))
         return oldDay
 
+
 if __name__ == "__main__":
     main()

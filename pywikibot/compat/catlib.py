@@ -25,6 +25,7 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None,
     """Change the category of the article."""
     return article.change_category(oldCat, newCat, comment, sortKey, inPlace)
 
+
 __all__ = ('Category', 'change_category',)
 
 wrapper = ModuleDeprecationWrapper(__name__)

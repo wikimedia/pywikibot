@@ -270,5 +270,6 @@ def main(*args):
     sync.check_namespaces()
     sync.generate_overviews()
 
+
 if __name__ == '__main__':
     main()

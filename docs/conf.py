@@ -282,4 +282,5 @@ def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
 
+
 pywikibot_env()

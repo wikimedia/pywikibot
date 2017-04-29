@@ -260,6 +260,7 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.diff_by_letter_message)
         mock.assert_any_call(self.none_message)
 
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()

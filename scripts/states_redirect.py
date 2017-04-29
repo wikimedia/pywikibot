@@ -144,5 +144,6 @@ def main(*args):
     bot = StatesRedirectBot(start, force)
     bot.run()
 
+
 if __name__ == "__main__":
     main()

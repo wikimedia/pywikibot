@@ -49,6 +49,7 @@ def _signal_handler(signal, frame):
     else:
         raise KeyboardInterrupt
 
+
 signal.signal(signal.SIGINT, _signal_handler)
 
 import pywikibot
@@ -264,6 +265,7 @@ def main(*args):
 
     bot = HarvestRobot(generator, template_title, fields)
     bot.run()
+
 
 if __name__ == "__main__":
     main()

@@ -159,6 +159,7 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
         username = username.replace("'", "\\'")
     return fam.name, mylang, username
 
+
 EXTENDED_CONFIG = """# -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 
@@ -361,6 +362,7 @@ def main(*args):
     else:
         pywikibot.output('user-config.py already exists in the target '
                          'directory "{0}".'.format(base_dir))
+
 
 if __name__ == '__main__':
     main()
