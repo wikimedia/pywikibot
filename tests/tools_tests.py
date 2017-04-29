@@ -98,12 +98,12 @@ class OpenArchiveTestCase(TestCase):
         super(OpenArchiveTestCase, cls).setUpClass()
         cls.base_file = join_xml_data_path('article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
-            cls.original_content = f.read()
+            cls.original_content = f.read().replace(b'\r\n', b'\n')
 
     def _get_content(self, *args, **kwargs):
         """Use open_archive and return content using a with-statement."""
         with tools.open_archive(*args, **kwargs) as f:
-            return f.read()
+            return f.read().replace(b'\r\n', b'\n')
 
     def test_open_archive_normal(self):
         """Test open_archive with no compression in the standard library."""
@@ -176,7 +176,7 @@ class OpenCompressedTestCase(OpenArchiveTestCase, DeprecationTestCase):
             kwargs['use_extension'] = True
 
         with tools.open_compressed(*args, **kwargs) as f:
-            content = f.read()
+            content = f.read().replace(b'\r\n', b'\n')
         self.assertOneDeprecation(self.INSTEAD)
         return content
 
@@ -193,7 +193,7 @@ class OpenArchiveWriteTestCase(TestCase):
         super(OpenArchiveWriteTestCase, cls).setUpClass()
         cls.base_file = join_xml_data_path('article-pyrus.xml')
         with open(cls.base_file, 'rb') as f:
-            cls.original_content = f.read()
+            cls.original_content = f.read().replace(b'\r\n', b'\n')
 
     def _write_content(self, suffix):
         try:
@@ -754,7 +754,12 @@ class TestFileModeChecker(TestCase):
 
 class TestFileShaCalculator(TestCase):
 
-    """Test calculator of sha of a file."""
+    r"""Test calculator of sha of a file.
+
+    There are two possible hash values for each test. The second one is for
+    files with windows line endings (\r\n).
+
+    """
 
     net = False
 
@@ -767,37 +772,53 @@ class TestFileShaCalculator(TestCase):
     def test_md5_complete_calculation(self):
         """Test md5 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='md5')
-        self.assertEqual(res, '5d7265e290e6733e1e2020630262a6f3')
+        self.assertIn(res, (
+            '5d7265e290e6733e1e2020630262a6f3',
+            '2c941f2fa7e6e629d165708eb02b67f7',
+        ))
 
     def test_md5_partial_calculation(self):
         """Test md5 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='md5',
                                       bytes_to_read=1024)
-        self.assertEqual(res, 'edf6e1accead082b6b831a0a600704bc')
+        self.assertIn(res, (
+            'edf6e1accead082b6b831a0a600704bc',
+            'be0227b6d490baa49e6d7e131c7f596b',
+        ))
 
     def test_sha1_complete_calculation(self):
         """Test sha1 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha1')
-        self.assertEqual(res, '1c12696e1119493a625aa818a35c41916ce32d0c')
+        self.assertIn(res, (
+            '1c12696e1119493a625aa818a35c41916ce32d0c',
+            '146121e6d0461916c9a0fab00dc718acdb6a6b14',
+        ))
 
     def test_sha1_partial_calculation(self):
         """Test sha1 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha1',
                                       bytes_to_read=1024)
-        self.assertEqual(res, 'e56fa7bd5cfdf6bb7e2d8649dd9216c03e7271e6')
+        self.assertIn(res, (
+            'e56fa7bd5cfdf6bb7e2d8649dd9216c03e7271e6',
+            '617ce7d539848885b52355ed597a042dae1e726f',
+        ))
 
     def test_sha224_complete_calculation(self):
         """Test sha224 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha224')
-        self.assertEqual(
-            res, '3d350d9d9eca074bd299cb5ffe1b325a9f589b2bcd7ba1c033ab4d33')
+        self.assertIn(res, (
+            '3d350d9d9eca074bd299cb5ffe1b325a9f589b2bcd7ba1c033ab4d33',
+            '4a2cf33b7da01f7b0530b2cc624e1180c8651b20198e9387aee0c767',
+        ))
 
     def test_sha224_partial_calculation(self):
         """Test sha224 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha224',
                                       bytes_to_read=1024)
-        self.assertEqual(
-            res, 'affa8cb79656a9b6244a079f8af91c9271e382aa9d5aa412b599e169')
+        self.assertIn(res, (
+            'affa8cb79656a9b6244a079f8af91c9271e382aa9d5aa412b599e169',
+            '486467144e683aefd420d576250c4cc984e6d7bf10c85d36e3d249d2',
+        ))
 
 
 class Foo(object):
