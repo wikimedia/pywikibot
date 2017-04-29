@@ -765,35 +765,35 @@ class TestFileShaCalculator(TestCase):
         super(TestFileShaCalculator, self).setUp()
 
     def test_md5_complete_calculation(self):
-        """"Test md5 of complete file."""
+        """Test md5 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='md5')
         self.assertEqual(res, '5d7265e290e6733e1e2020630262a6f3')
 
     def test_md5_partial_calculation(self):
-        """"Test md5 of partial file (1024 bytes)."""
+        """Test md5 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='md5',
                                       bytes_to_read=1024)
         self.assertEqual(res, 'edf6e1accead082b6b831a0a600704bc')
 
     def test_sha1_complete_calculation(self):
-        """"Test sha1 of complete file."""
+        """Test sha1 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha1')
         self.assertEqual(res, '1c12696e1119493a625aa818a35c41916ce32d0c')
 
     def test_sha1_partial_calculation(self):
-        """"Test sha1 of partial file (1024 bytes)."""
+        """Test sha1 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha1',
                                       bytes_to_read=1024)
         self.assertEqual(res, 'e56fa7bd5cfdf6bb7e2d8649dd9216c03e7271e6')
 
     def test_sha224_complete_calculation(self):
-        """"Test sha224 of complete file."""
+        """Test sha224 of complete file."""
         res = tools.compute_file_hash(self.filename, sha='sha224')
         self.assertEqual(
             res, '3d350d9d9eca074bd299cb5ffe1b325a9f589b2bcd7ba1c033ab4d33')
 
     def test_sha224_partial_calculation(self):
-        """"Test sha224 of partial file (1024 bytes)."""
+        """Test sha224 of partial file (1024 bytes)."""
         res = tools.compute_file_hash(self.filename, sha='sha224',
                                       bytes_to_read=1024)
         self.assertEqual(
