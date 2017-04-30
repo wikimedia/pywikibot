@@ -4520,7 +4520,7 @@ class Claim(Property):
             FilePage(pywikibot.Site('commons', 'commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
         'geo-shape': pywikibot.WbGeoShape.fromWikibase,
-        'time': lambda value, site: pywikibot.WbTime.fromWikibase(value),
+        'time': pywikibot.WbTime.fromWikibase,
         'quantity': pywikibot.WbQuantity.fromWikibase,
         'monolingualtext': lambda value, site:
             pywikibot.WbMonolingualText.fromWikibase(value)

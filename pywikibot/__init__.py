@@ -658,17 +658,19 @@ class WbTime(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, ts):
+    def fromWikibase(cls, wb, site=None):
         """
         Create a WbTime from the JSON data given by the Wikibase API.
 
-        @param ts: Wikibase JSON
-        @type ts: dict
+        @param wb: Wikibase JSON
+        @type wb: dict
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         @rtype: pywikibot.WbTime
         """
-        return cls.fromTimestr(ts[u'time'], ts[u'precision'],
-                               ts[u'before'], ts[u'after'],
-                               ts[u'timezone'], ts[u'calendarmodel'])
+        return cls.fromTimestr(wb['time'], wb['precision'],
+                               wb['before'], wb['after'],
+                               wb['timezone'], wb['calendarmodel'], site)
 
 
 class WbQuantity(_WbRepresentation):
