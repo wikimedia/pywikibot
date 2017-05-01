@@ -113,7 +113,7 @@ else:
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
 except ImportError as _tk_error:
-    Tkdialog = None
+    Tkdialog = object
 
 NL = ''
 
