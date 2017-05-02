@@ -21,7 +21,7 @@ import pywikibot.data.api
 
 from pywikibot import config
 
-from pywikibot.bot import BaseBot
+from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
 from pywikibot.tools import PY2, deprecated
 from pywikibot.tools.formatter import color_format
 
@@ -439,6 +439,7 @@ class UploadRobot(BaseBot):
             if success:
                 # No warning, upload complete.
                 pywikibot.output(u"Upload of %s successful." % filename)
+                self._save_counter += 1
                 return filename  # data['filename']
             else:
                 pywikibot.output(u"Upload aborted.")
@@ -459,7 +460,22 @@ class UploadRobot(BaseBot):
                 "User '%s' does not have upload rights on site %s."
                 % (self.targetSite.user(), self.targetSite))
             return
-        if isinstance(self.url, basestring):
-            return self.upload_file(self.url)
-        for file_url in self.url:
-            self.upload_file(file_url)
+
+        try:
+            if isinstance(self.url, basestring):
+                self._treat_counter = 1
+                return self.upload_file(self.url)
+            for file_url in self.url:
+                self.upload_file(file_url)
+                self._treat_counter += 1
+        except QuitKeyboardInterrupt:
+            pywikibot.output('\nUser quit %s bot run...' %
+                             self.__class__.__name__)
+        except KeyboardInterrupt:
+            if config.verbose_output:
+                raise
+            else:
+                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
+                                 self.__class__.__name__)
+        finally:
+            self.exit()
