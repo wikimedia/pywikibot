@@ -7,6 +7,8 @@
 #
 from __future__ import absolute_import, unicode_literals
 
+from requests.exceptions import ConnectionError as RequestsConnectionError
+
 from pywikibot.tools import PY2
 
 if not PY2:
@@ -38,7 +40,11 @@ class TestInternetArchive(DeprecationTestCase):
     def _get_archive_url(self, url, date_string=None):
         with PatchedHttp(weblib, False) as p:
             p.after_fetch = self._test_response
-            archivedversion = weblib.getInternetArchiveURL(url, date_string)
+            try:
+                archivedversion = weblib.getInternetArchiveURL(
+                    url, date_string)
+            except RequestsConnectionError as e:
+                self.skipTest(e)
             self.assertOneDeprecation()
             return archivedversion
 
