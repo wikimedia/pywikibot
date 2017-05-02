@@ -11,6 +11,7 @@ __version__ = '$Id$'
 
 import json
 import sys
+from time import sleep
 import xml.etree.ElementTree as ET
 
 if sys.version_info[0] > 2:
@@ -18,7 +19,10 @@ if sys.version_info[0] > 2:
 else:
     from urllib import urlencode
 
+from requests.exceptions import ConnectionError as RequestsConnectionError
+
 from pywikibot.comms import http
+from pywikibot import config2
 from pywikibot.tools import deprecated
 
 
@@ -42,7 +46,19 @@ def getInternetArchiveURL(url, timestamp=None):
         query['timestamp'] = timestamp
 
     uri = uri + urlencode(query)
-    jsontext = http.fetch(uri).content
+
+    retry_count = 0
+    while retry_count <= config2.max_retries:
+        try:
+            jsontext = http.fetch(uri).content
+            break
+        except RequestsConnectionError as e:
+            error = e
+            retry_count += 1
+            sleep(config2.retry_wait)
+    else:
+        raise error
+
     if "closest" in jsontext:
         data = json.loads(jsontext)
         return data['archived_snapshots']['closest']['url']
