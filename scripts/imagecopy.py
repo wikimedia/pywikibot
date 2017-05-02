@@ -495,7 +495,6 @@ def doiskip(pagetext):
 
 def main(*args):
     """Process command line arguments and invoke bot."""
-    generator = None
     imagepage = None
     always = False
     category = u''
@@ -511,12 +510,10 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    generator = genFactory.getCombinedGenerator()
-    if not generator:
+    pregenerator = genFactory.getCombinedGenerator(preload=True)
+    if not pregenerator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
-
-    pregenerator = pagegenerators.PreloadingGenerator(generator)
 
     for page in pregenerator:
         skip = False

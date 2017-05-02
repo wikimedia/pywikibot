@@ -35,7 +35,7 @@ Furthermore, the following command line parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2009-2015
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1662,13 +1662,12 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
         if use_wikibase:
-            bot = IsbnWikibaseBot(preloadingGen, **options)
+            bot = IsbnWikibaseBot(gen, **options)
         else:
-            bot = IsbnBot(preloadingGen, **options)
+            bot = IsbnBot(gen, **options)
         bot.run()
         return True
     else:

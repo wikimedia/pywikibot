@@ -25,7 +25,7 @@ The following parameters are supported:
 -summary:         Set the action summary message for the edit.
 """
 #
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -189,11 +189,10 @@ def main(*args):
         else:
             options[option] = True
 
-    gen = genFactory.getCombinedGenerator()
+    # The preloading option is responsible for downloading multiple
+    # pages from the wiki simultaneously.
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        # The preloading generator is responsible for downloading multiple
-        # pages from the wiki simultaneously.
-        gen = pagegenerators.PreloadingGenerator(gen)
         # pass generator and private options to the bot
         bot = BasicBot(gen, **options)
         bot.run()  # guess what it does

@@ -1366,14 +1366,13 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    generator = genFactory.getCombinedGenerator(gen=generator)
+    generator = genFactory.getCombinedGenerator(gen=generator, preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
     else:
-        pregenerator = pagegenerators.PreloadingGenerator(generator)
         site.login()
-        for page in pregenerator:
+        for page in generator:
             pywikibot.output(page.title())
             if page.exists() and (page.namespace() == 6) \
                     and (not page.isRedirectPage()):

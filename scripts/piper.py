@@ -142,11 +142,10 @@ def main(*args):
 
     options['filters'] = filters
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
-        gen = pagegenerators.PreloadingGenerator(gen)
         bot = PiperBot(gen, **options)
         bot.run()
         return True

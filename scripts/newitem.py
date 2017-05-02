@@ -49,7 +49,7 @@ class NewItemRobot(WikidataBot):
         })
 
         super(NewItemRobot, self).__init__(**kwargs)
-        self.generator = pagegenerators.PreloadingGenerator(generator)
+        self.generator = generator
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
         self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(
@@ -162,7 +162,7 @@ def main(*args):
         else:
             options[arg[1:].lower()] = True
 
-    generator = gen.getCombinedGenerator()
+    generator = gen.getCombinedGenerator(preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False

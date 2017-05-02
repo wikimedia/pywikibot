@@ -1142,14 +1142,13 @@ JOIN text ON (page_id = old_id)
 LIMIT 200""" % (whereClause, exceptClause)
         gen = pagegenerators.MySQLPageGenerator(query)
 
-    gen = genFactory.getCombinedGenerator(gen)
+    gen = genFactory.getCombinedGenerator(gen, preload=True)
 
     if not gen:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
 
-    preloadingGen = pagegenerators.PreloadingGenerator(gen)
-    bot = ReplaceRobot(preloadingGen, replacements, exceptions,
+    bot = ReplaceRobot(gen, replacements, exceptions,
                        allowoverlap, recursive, add_cat, sleep, edit_summary,
                        always=acceptall, site=site)
     site.login()

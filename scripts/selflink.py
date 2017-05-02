@@ -11,7 +11,7 @@ These command line parameters can be used to specify which pages to work on:
                   ATTENTION: Use this with care!
 """
 #
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,8 +20,7 @@ from __future__ import absolute_import, unicode_literals
 import pywikibot
 
 from pywikibot.bot import Choice, MultipleSitesBot
-from pywikibot.pagegenerators import GeneratorFactory, PreloadingGenerator, \
-    parameterHelp
+from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 
 from scripts.unlink import BaseUnlinkBot
 
@@ -96,13 +95,12 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if not gen:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
 
-    preloadingGen = PreloadingGenerator(gen)
-    bot = SelflinkBot(preloadingGen, **botArgs)
+    bot = SelflinkBot(gen, **botArgs)
     bot.run()
     return True
 
