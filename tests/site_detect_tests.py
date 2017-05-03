@@ -32,7 +32,7 @@ class SiteDetectionTestCase(TestCase):
         """
         try:
             self.assertIsInstance(MWSite(url), MWSite)
-        except (ServerError, Timeout) as e:
+        except (ServerError, Timeout, ConnectionError) as e:
             self.skipTest(e)
 
     def assertNoSite(self, url):
