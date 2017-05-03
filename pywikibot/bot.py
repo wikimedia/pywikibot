@@ -122,6 +122,7 @@ __all__ = (
     'InteractiveReplace',
     'calledModuleName', 'handle_args', 'handleArgs', 'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
+    'OptionHandler',
     'BaseBot', 'Bot', 'SingleSiteBot', 'MultipleSitesBot',
     'CurrentPageBot', 'AutomaticTWSummaryBot',
     'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
