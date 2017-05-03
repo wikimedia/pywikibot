@@ -63,7 +63,7 @@ extra_deps = {
     # 0.6.1 supports socket.io 1.0, but WMF is using 0.9 (T91393 and T85716)
     'rcstream': ['socketIO-client<0.6.1'],
     'security': ['requests[security]', 'pycparser!=2.14'],
-    'mwoauth': ['mwoauth>=0.2.4'],
+    'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
 }
 
