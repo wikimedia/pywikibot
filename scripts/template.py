@@ -144,10 +144,11 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
         """
         Constructor.
 
-        Arguments:
-            * templateNames - A list of Page object representing the searched
-                              templates
-            * xmlfilename   - The dump's path, either absolute or relative
+        @param templateNames: A list of Page objects representing the searched
+            templates
+        @type templateNames: list
+        @param xmlfilename: The dump's path, either absolute or relative
+        @type xmlfilename: str
 
         """
         self.templates = templates

@@ -77,11 +77,12 @@ class ClaimRobot(WikidataBot):
         """
         Constructor.
 
-        Arguments:
-            * generator    - A generator that yields Page objects.
-            * claims       - A list of wikidata claims
-            * exists_arg   - String specifying how to handle duplicate claims
-
+        @param generator: A generator that yields Page objects.
+        @type generator: iterator
+        @param claims: A list of wikidata claims
+        @type claims: list
+        @param exists_arg: String specifying how to handle duplicate claims
+        @type exists_arg: str
         """
         self.availableOptions['always'] = True
         super(ClaimRobot, self).__init__(use_from_page=None)

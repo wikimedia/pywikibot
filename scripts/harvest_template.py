@@ -66,11 +66,12 @@ class HarvestRobot(WikidataBot):
         """
         Constructor.
 
-        Arguments:
-            * generator     - A generator that yields Page objects.
-            * templateTitle - The template to work on
-            * fields        - A dictionary of fields that are of use to us
-
+        @param generator: A generator that yields Page objects
+        @type generator: iterator
+        @param templateTitle: The template to work on
+        @type templateTitle: str
+        @param fields: A dictionary of fields that are of use to us
+        @type fields: dict
         """
         self.availableOptions['always'] = True
         super(HarvestRobot, self).__init__()
