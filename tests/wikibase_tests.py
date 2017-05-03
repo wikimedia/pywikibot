@@ -680,6 +680,72 @@ class TestWbGeoShapeNonDry(WikidataTestCase):
                           non_map_page, self.get_repo())
 
 
+class TestWbTabularDataNonDry(WikidataTestCase):
+
+    """
+    Test Wikibase WbTabularData data type (non-dry).
+
+    These require non dry tests due to the page.exists() call.
+    """
+
+    def setUp(self):
+        """Setup tests."""
+        self.commons = pywikibot.Site('commons', 'commons')
+        self.page = Page(self.commons, 'Data:Bea.gov/GDP by state.tab')
+        super(TestWbTabularDataNonDry, self).setUp()
+
+    def test_WbTabularData_page(self):
+        """Test WbTabularData page."""
+        q = pywikibot.WbTabularData(self.page)
+        q_val = u'Data:Bea.gov/GDP by state.tab'
+        self.assertEqual(q.toWikibase(), q_val)
+
+    def test_WbTabularData_page_and_site(self):
+        """Test WbTabularData from page and site."""
+        q = pywikibot.WbTabularData(self.page, self.get_repo())
+        q_val = u'Data:Bea.gov/GDP by state.tab'
+        self.assertEqual(q.toWikibase(), q_val)
+
+    def test_WbTabularData_equality(self):
+        """Test WbTabularData equality."""
+        q = pywikibot.WbTabularData(self.page, self.get_repo())
+        self.assertEqual(q, q)
+
+    def test_WbTabularData_fromWikibase(self):
+        """Test WbTabularData.fromWikibase() instantiating."""
+        repo = self.get_repo()
+        q = pywikibot.WbTabularData.fromWikibase(
+            'Data:Bea.gov/GDP by state.tab', repo)
+        self.assertEqual(q.toWikibase(), 'Data:Bea.gov/GDP by state.tab')
+
+    def test_WbTabularData_error_on_non_page(self):
+        """Test WbTabularData error handling when given a non-page."""
+        self.assertRaises(ValueError, pywikibot.WbTabularData,
+                          'A string', self.get_repo())
+
+    def test_WbTabularData_error_on_non_exitant_page(self):
+        """Test WbTabularData error handling of a non-existant page."""
+        page = Page(self.commons, 'Non-existant page... really')
+        self.assertRaises(ValueError, pywikibot.WbTabularData,
+                          page, self.get_repo())
+
+    def test_WbTabularData_error_on_wrong_site(self):
+        """Test WbTabularData error handling of a page on non-filerepo site."""
+        repo = self.get_repo()
+        page = Page(repo, 'Q123')
+        self.assertRaises(ValueError, pywikibot.WbTabularData,
+                          page, self.get_repo())
+
+    def test_WbTabularData_error_on_wrong_page_type(self):
+        """Test WbTabularData error handling of a non-map page."""
+        non_data_page = Page(self.commons, 'File:Foo.jpg')
+        non_map_page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
+        self.assertRaises(ValueError, pywikibot.WbTabularData,
+                          non_data_page, self.get_repo())
+        self.assertRaises(ValueError, pywikibot.WbTabularData,
+                          non_map_page, self.get_repo())
+
+
 class TestItemPageExtensibility(TestCase):
 
     """Test ItemPage extensibility."""

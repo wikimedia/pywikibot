@@ -915,7 +915,7 @@ class WbGeoShape(_WbRepresentation):
         if not geo_shape_site:
             raise ValueError('the provided site does not support geo-shapes.')
         if page.site != geo_shape_site:
-            raise ValueError('page must be on the image repository site.')
+            raise ValueError('page must be on the geo-shape repository site.')
 
         # validate page title fulfills hard-coded Wikibase requirement
         # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.map$/u'
@@ -944,10 +944,83 @@ class WbGeoShape(_WbRepresentation):
 
         @param page_name: page name from Wikibase value
         @type page_name: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         @rtype: pywikibot.WbGeoShape
         """
         geo_shape_site = site.geo_shape_repository()
         page = Page(geo_shape_site, page_name)
+        return cls(page, site)
+
+
+class WbTabularData(_WbRepresentation):
+    """
+    A Wikibase tabular-data representation.
+
+    A temporary implementation until T162336 has been resolved.
+    """
+
+    _items = ('page', )
+
+    def __init__(self, page, site=None):
+        """
+        Create a new WbTabularData object.
+
+        @param page: page containing the tabular data
+        @type text: pywikibot.Page
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        """
+        site = site or Site().data_repository()
+        if not isinstance(page, Page):
+            raise ValueError('page must be a pywikibot.Page object.')
+
+        # validate page exists
+        if not page.exists():
+            raise ValueError('page must exist.')
+
+        # validate page is on the right site, and site supports tabular-data
+        tabular_data_site = site.tabular_data_repository()
+        if not tabular_data_site:
+            raise ValueError(
+                'the provided site does not support tabular-data.')
+        if page.site != tabular_data_site:
+            raise ValueError(
+                'page must be on the tabular-data repository site.')
+
+        # validate page title fulfills hard-coded Wikibase requirement
+        # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.tab$/u'
+        # As we have already checked for existence the following simplified
+        # check should be enough.
+        if not page.title().startswith('Data:') or \
+                not page.title().endswith('.tab'):
+            raise ValueError(
+                "page must be a '.tab' page in the 'Data:' namespace.")
+
+        self.page = page
+
+    def toWikibase(self):
+        """
+        Convert the data to the value required by the Wikibase API.
+
+        @return: title of the tabular-data page incl. namespace
+        @rtype: str
+        """
+        return self.page.title()
+
+    @classmethod
+    def fromWikibase(cls, page_name, site):
+        """
+        Create a WbTabularData from the JSON data given by the Wikibase API.
+
+        @param page_name: page name from Wikibase value
+        @type page_name: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.WbTabularData
+        """
+        tabular_data_site = site.tabular_data_repository()
+        page = Page(tabular_data_site, page_name)
         return cls(page, site)
 
 

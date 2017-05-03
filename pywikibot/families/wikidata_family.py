@@ -55,6 +55,11 @@ class Family(family.WikimediaFamily):
         # Per geoShapeStorageFrontendUrl settings in Wikibase
         return ('commons', 'commons')
 
+    def shared_tabular_data_repository(self, code):
+        """Return Wikimedia Commons as the repository for tabular-datas."""
+        # Per tabularDataStorageFrontendUrl settings in Wikibase
+        return ('commons', 'commons')
+
     def globes(self, code):
         """Supported globes for Coordinate datatype."""
         return {
