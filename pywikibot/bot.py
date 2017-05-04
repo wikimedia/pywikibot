@@ -27,8 +27,8 @@ current page to the page treated. It is recommended to use this class and to
 use C{treat_page} instead of C{treat} and C{put_current} instead of C{userPut}.
 It by default subclasses the C{BaseBot} class.
 
-With L{CurrentPageBot} it's possible to subclass one of the following classes to
-filter the pages which are ultimately handled by C{treat_page}:
+With L{CurrentPageBot} it's possible to subclass one of the following classes
+to filter the pages which are ultimately handled by C{treat_page}:
 
 * L{ExistingPageBot}: Only handle pages which do exist.
 * L{CreatingPageBot}: Only handle pages which do not exist.
@@ -39,9 +39,9 @@ filter the pages which are ultimately handled by C{treat_page}:
 
 It is possible to combine filters by subclassing multiple of them. They are
 new-style classes so when a class is first subclassing L{ExistingPageBot} and
-then L{FollowRedirectPageBot} it will also work on pages which do not exist when
-a redirect pointed to that. If the order is inversed it'll first follow them and
-then check whether they exist.
+then L{FollowRedirectPageBot} it will also work on pages which do not exist
+when a redirect pointed to that. If the order is inversed it'll first follow
+them and then check whether they exist.
 
 Additionally there is the L{AutomaticTWSummaryBot} which subclasses
 L{CurrentPageBot} and automatically defines the summary when C{put_current} is
@@ -120,7 +120,8 @@ __all__ = (
     'Choice', 'AlwaysChoice',
     'QuitKeyboardInterrupt',
     'InteractiveReplace',
-    'calledModuleName', 'handle_args', 'handleArgs', 'showHelp', 'suggest_help',
+    'calledModuleName', 'handle_args', 'handleArgs',
+    'showHelp', 'suggest_help',
     'writeToCommandLogFile', 'open_webbrowser',
     'OptionHandler',
     'BaseBot', 'Bot', 'SingleSiteBot', 'MultipleSitesBot',
@@ -374,9 +375,10 @@ def writelogheader():
         ver = version.get_module_version(module)
         mtime = version.get_module_mtime(module)
         if filename and ver and mtime:
-            # it's explicitly using str() to bypass unicode_literals in Python 2
+            # it's explicitly using str() to bypass unicode_literals in py2
             # isoformat expects a char not a unicode in Python 2
-            log(u'  {0} {1} {2}'.format(filename, ver[:7], mtime.isoformat(str(' '))))
+            log(u'  {0} {1} {2}'.format(filename, ver[:7],
+                                        mtime.isoformat(str(' '))))
 
     if config.log_pywiki_repo_version:
         log(u'PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
@@ -495,8 +497,8 @@ def inputChoice(question, answers, hotkeys, default=None):
     @param answers: a list of strings that represent the options.
     @type answers: list of basestring
     @param hotkeys: a list of one-letter strings, one for each answer.
-    @param default: an element of hotkeys, or None. The default choice that will
-                 be returned when the user just presses Enter.
+    @param default: an element of hotkeys, or None. The default choice that
+        will be returned when the user just presses Enter.
     @return: a one-letter string in lowercase.
     @rtype: str
     """
@@ -598,7 +600,8 @@ class LinkChoice(Choice):
             if self.replacer.current_link.anchor is None:
                 kwargs['label'] = self.replacer.current_groups['title']
                 if self.replacer.current_groups['section']:
-                    kwargs['label'] += '#' + self.replacer.current_groups['section']
+                    kwargs['label'] += '#' + \
+                                       self.replacer.current_groups['section']
             else:
                 kwargs['label'] = self.replacer.current_link.anchor
         return pywikibot.Link.create_separated(
@@ -650,9 +653,9 @@ class InteractiveReplace(object):
     option to increase C{context} by the given amount each time the option is
     selected.
 
-    Additional choices can be defined using the 'additional_choices' and will be
-    amended to the choices defined by this class. This list is mutable and the
-    Choice instance returned and created by this class are too.
+    Additional choices can be defined using the 'additional_choices' and will
+    be amended to the choices defined by this class. This list is mutable and
+    the Choice instance returned and created by this class are too.
     """
 
     def __init__(self, old_link, new_link, default=None, automatic_quit=True):
@@ -664,8 +667,8 @@ class InteractiveReplace(object):
         @type old_link: Link or Page
         @param new_link: The new link with which it should be replaced.
             Depending on the replacement mode it'll use this link's label and
-            section. If False it'll unlink all and the attributes beginning with
-            allow_replace are ignored.
+            section. If False it'll unlink all and the attributes beginning
+            with allow_replace are ignored.
         @type new_link: Link or Page or False
         @param default: The default answer as the shortcut
         @type default: None or str
@@ -701,8 +704,8 @@ class InteractiveReplace(object):
             self._own_choices += [
                 ('replace', LinkChoice('Change link target', 't', self,
                                        False, False)),
-                ('replace_section', LinkChoice('Change link target and section',
-                                               's', self, True, False)),
+                ('replace_section', LinkChoice(
+                    'Change link target and section', 's', self, True, False)),
                 ('replace_label', LinkChoice('Change link target and label',
                                              'l', self, False, True)),
                 ('replace_all', LinkChoice('Change complete link', 'c', self,
@@ -858,8 +861,8 @@ def handle_args(args=None, do_help=True):
         # not the one in pywikibot.bot.
         args = pywikibot.argvu[1:]
     # get the name of the module calling this function. This is
-    # required because the -help option loads the module's docstring and because
-    # the module name will be used for the filename of the log.
+    # required because the -help option loads the module's docstring and
+    # because the module name will be used for the filename of the log.
     moduleName = calledModuleName()
     if not moduleName:
         moduleName = "terminal-interface"
@@ -1104,7 +1107,7 @@ def suggest_help(missing_parameters=[], missing_generator=False,
 
 def writeToCommandLogFile():
     """
-    Save name of the called module along with all parameters to logs/commands.log.
+    Save name of the called module along with all params to logs/commands.log.
 
     This can be used by user later to track errors or report bugs.
     """
@@ -1563,8 +1566,8 @@ class SingleSiteBot(BaseBot):
     """
     A bot only working on one site and ignoring the others.
 
-    If no site is given from the start it'll use the first page's site. Any page
-    after the site has been defined and is not on the defined site will be
+    If no site is given from the start it'll use the first page's site. Any
+    page after the site has been defined and is not on the defined site will be
     ignored.
     """
 
@@ -1727,9 +1730,11 @@ class AutomaticTWSummaryBot(CurrentPageBot):
         if not kwargs.get('summary'):
             if self.summary_key is None:
                 raise ValueError('The summary_key must be set.')
-            summary = i18n.twtranslate(self.current_page.site, self.summary_key,
+            summary = i18n.twtranslate(self.current_page.site,
+                                       self.summary_key,
                                        self.summary_parameters)
-            pywikibot.log('Use automatic summary message "{0}"'.format(summary))
+            pywikibot.log(
+                'Use automatic summary message "{0}"'.format(summary))
             kwargs['summary'] = summary
         super(AutomaticTWSummaryBot, self).put_current(*args, **kwargs)
 
@@ -1855,8 +1860,9 @@ class WikidataBot(Bot):
         self.source_values = json.loads(page.get())
         for family_code, family in self.source_values.items():
             for source_lang in family:
-                self.source_values[family_code][source_lang] = pywikibot.ItemPage(
-                    self.repo, family[source_lang])
+                self.source_values[
+                    family_code][source_lang] = pywikibot.ItemPage(
+                        self.repo, family[source_lang])
 
     def get_property_by_name(self, property_name):
         """
