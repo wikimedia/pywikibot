@@ -4405,6 +4405,7 @@ class Property(object):
              'math': basestring,
              'external-id': basestring,
              'geo-shape': pywikibot.WbGeoShape,
+             'tabular-data': pywikibot.WbTabularData,
              }
 
     value_types = {'wikibase-item': 'wikibase-entityid',
@@ -4415,6 +4416,7 @@ class Property(object):
                    'math': 'string',
                    'external-id': 'string',
                    'geo-shape': 'string',
+                   'tabular-data': 'string',
                    }
 
     def __init__(self, site, id, datatype=None):
@@ -4550,6 +4552,7 @@ class Claim(Property):
             FilePage(pywikibot.Site('commons', 'commons'), value),  # T90492
         'globe-coordinate': pywikibot.Coordinate.fromWikibase,
         'geo-shape': pywikibot.WbGeoShape.fromWikibase,
+        'tabular-data': pywikibot.WbTabularData.fromWikibase,
         'time': pywikibot.WbTime.fromWikibase,
         'quantity': pywikibot.WbQuantity.fromWikibase,
         'monolingualtext': lambda value, site:
@@ -4976,7 +4979,7 @@ class Claim(Property):
             value = self.getTarget().title(withNamespace=False)
         elif self.type in ('globe-coordinate', 'time',
                            'quantity', 'monolingualtext',
-                           'geo-shape'):
+                           'geo-shape', 'tabular-data'):
             value = self.getTarget().toWikibase()
         else:
             raise NotImplementedError('%s datatype is not supported yet.'

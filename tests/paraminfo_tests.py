@@ -229,7 +229,7 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     def test_datatypes(self):
         """Test that all encountered datatypes are known."""
-        unsupported = set(['tabular-data'])
+        unsupported = set()
         known = set(Property.types) | unsupported
         self._check_param_superset(
             self.repo, 'wbformatvalue', 'datatype', known)

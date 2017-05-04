@@ -341,6 +341,26 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         claim = item.claims['P27199'][0]
         self.assertEqual(claim.getTarget(), target)
 
+    def test_WbTabularData_edit(self):
+        """Attempt adding a tabular-data with valid input."""
+        # Clean the slate in preparation for test.
+        testsite = self.get_repo()
+        item = self._clean_item(testsite, 'P30175')
+
+        # set new claim
+        claim = pywikibot.page.Claim(
+            testsite, 'P30175', datatype='tabular-data')
+        commons_site = pywikibot.Site('commons', 'commons')
+        page = pywikibot.Page(commons_site, 'Data:Bea.gov/GDP by state.tab')
+        target = pywikibot.WbGeoShape(page)
+        claim.setTarget(target)
+        item.addClaim(claim)
+
+        # confirm new claim
+        item.get(force=True)
+        claim = item.claims['P30175'][0]
+        self.assertEqual(claim.getTarget(), target)
+
 
 class TestWikibaseRemoveQualifier(WikibaseTestCase):
 

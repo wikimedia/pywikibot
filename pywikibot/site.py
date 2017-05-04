@@ -7269,8 +7269,15 @@ class DataSite(APISite):
 
     def geo_shape_repository(self):
         """Return Site object for the geo-shapes repository e.g. commons."""
-        # Do this via API instead if T162561 is implemented.
+        # Do this via API instead when T162561 is implemented.
         code, fam = self.shared_geo_shape_repository()
+        if bool(code or fam):
+            return pywikibot.Site(code, fam, self.username())
+
+    def tabular_data_repository(self):
+        """Return Site object for the tabular-datas repository e.g. commons."""
+        # Do this via API instead when T164413 is implemented.
+        code, fam = self.shared_tabular_data_repository()
         if bool(code or fam):
             return pywikibot.Site(code, fam, self.username())
 
