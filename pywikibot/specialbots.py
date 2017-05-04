@@ -22,7 +22,7 @@ import pywikibot.data.api
 from pywikibot import config
 
 from pywikibot.bot import BaseBot, QuitKeyboardInterrupt
-from pywikibot.tools import PY2, deprecated
+from pywikibot.tools import PY2, deprecated, deprecated_args
 from pywikibot.tools.formatter import color_format
 
 if not PY2:
@@ -39,10 +39,11 @@ class UploadRobot(BaseBot):
 
     """Upload bot."""
 
+    @deprecated_args(uploadByUrl=None)
     def __init__(self, url, urlEncoding=None, description=u'',
                  useFilename=None, keepFilename=False,
                  verifyDescription=True, ignoreWarning=False,
-                 targetSite=None, uploadByUrl=False, aborts=[], chunk_size=0,
+                 targetSite=None, aborts=[], chunk_size=0,
                  summary=None, **kwargs):
         """
         Constructor.
@@ -114,7 +115,6 @@ class UploadRobot(BaseBot):
         else:
             self.targetSite = targetSite or pywikibot.Site()
         self.targetSite.login()
-        self.uploadByUrl = uploadByUrl
 
     @deprecated()
     def urlOK(self):
@@ -385,17 +385,18 @@ class UploadRobot(BaseBot):
             return warn_code in self.ignoreWarning
 
     @deprecated('UploadRobot.upload_file()')
-    def upload_image(self, debug=False):
+    @deprecated_args(debug=None)
+    def upload_image(self):
         """Upload image."""
-        self.upload_file(self.url, debug)
+        return self.upload_file(self.url)
 
-    def upload_file(self, file_url, debug=False, _file_key=None, _offset=0):
+    @deprecated_args(debug=None)
+    def upload_file(self, file_url, _file_key=None, _offset=0):
         """Upload the image at file_url to the target wiki.
 
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.
-        If the user chooses not to retry, return null.
-
+        If the user chooses not to retry, return None.
         """
         filename = self.process_filename(file_url)
         if not filename:
@@ -405,30 +406,20 @@ class UploadRobot(BaseBot):
         imagepage = pywikibot.FilePage(site, filename)  # normalizes filename
         imagepage.text = self.description
 
-        pywikibot.output(u'Uploading file to %s via API...' % site)
+        pywikibot.output('Uploading file to {0}...'.format(site))
 
         success = False
-        try:
-            if self.ignoreWarning is True:
-                apiIgnoreWarnings = True
-            else:
-                apiIgnoreWarnings = self._handle_warnings
-            if self.uploadByUrl:
-                success = site.upload(imagepage, source_url=file_url,
-                                      ignore_warnings=apiIgnoreWarnings,
-                                      _file_key=_file_key, _offset=_offset,
-                                      comment=self.summary)
-            else:
-                if "://" in file_url:
-                    temp = self.read_file_content(file_url)
-                else:
-                    temp = file_url
-                success = site.upload(imagepage, source_filename=temp,
-                                      ignore_warnings=apiIgnoreWarnings,
-                                      chunk_size=self.chunk_size,
-                                      _file_key=_file_key, _offset=_offset,
-                                      comment=self.summary)
+        ignore_warnings = self.ignoreWarning is True or self._handle_warnings
+        if ('://' in file_url and
+                'upload_by_url' not in site.userinfo['rights']):
+            file_url = self.read_file_content(file_url)
 
+        try:
+            success = imagepage.upload(file_url,
+                                       ignore_warnings=ignore_warnings,
+                                       chunk_size=self.chunk_size,
+                                       _file_key=_file_key, _offset=_offset,
+                                       comment=self.summary)
         except pywikibot.data.api.APIError as error:
             if error.code == u'uploaddisabled':
                 pywikibot.error("Upload error: Local file uploads are disabled on %s."
