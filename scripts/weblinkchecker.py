@@ -113,6 +113,7 @@ import threading
 import time
 
 from functools import partial
+from time import sleep
 from warnings import warn
 
 try:
@@ -122,7 +123,9 @@ except ImportError as e:
 
 import pywikibot
 
-from pywikibot import comms, i18n, config, pagegenerators, textlib, weblib
+from pywikibot import (
+    comms, i18n, config, pagegenerators, textlib, weblib, config2,
+)
 
 from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.pagegenerators import (
@@ -188,7 +191,18 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
     if timegate_uri:
         mc.timegate_uri = timegate_uri
 
-    memento_info = mc.get_memento_info(url, when)
+    retry_count = 0
+    while retry_count <= config2.max_retries:
+        try:
+            memento_info = mc.get_memento_info(url, when)
+            break
+        except requests.ConnectionError as e:
+            error = e
+            retry_count += 1
+            sleep(config2.retry_wait)
+    else:
+        raise error
+
     mementos = memento_info.get('mementos')
     if not mementos:
         raise Exception(

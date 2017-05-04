@@ -9,6 +9,8 @@ from __future__ import absolute_import, unicode_literals
 
 import datetime
 
+from requests import ConnectionError as RequestsConnectionError
+
 from pywikibot.tools import PY2
 if not PY2:
     from urllib.parse import urlparse
@@ -31,10 +33,11 @@ class MementoTestCase(TestCase):
             when = datetime.datetime.now()
         else:
             when = datetime.datetime.strptime(date_string, '%Y%m%d')
-        return weblinkchecker._get_closest_memento_url(
-            url,
-            when,
-            self.timegate_uri)
+        try:
+            return weblinkchecker._get_closest_memento_url(
+                url, when, self.timegate_uri)
+        except RequestsConnectionError as e:
+            self.skipTest(e)
 
 
 class WeblibTestMementoInternetArchive(MementoTestCase, weblib_tests.TestInternetArchive):
