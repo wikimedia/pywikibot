@@ -63,7 +63,7 @@ class UploadRobot(BaseBot):
         @type keepFilename: bool
         @param summary: Summary of the upload
         @type summary: string
-        @param verifyDescription: Set to False to not proofread the description.
+        @param verifyDescription: Set to True to proofread the description.
         @type verifyDescription: bool
         @param ignoreWarning: Set this to True to upload even if another file
             would be overwritten or another mistake would be risked. Set it to
@@ -72,16 +72,16 @@ class UploadRobot(BaseBot):
         @param targetSite: Set the site to upload to. If target site is not
             given it's taken from user-config.py.
         @type targetSite: object
-        @param aborts: List of the warning types to abort upload on. Set to True
-            to abort on any warning.
+        @param aborts: List of the warning types to abort upload on. Set to
+            True to abort on any warning.
         @type aborts: bool or list
         @param chunk_size: Upload the file in chunks (more overhead, but
             restartable) specified in bytes. If no value is specified the file
             will be uploaded as whole.
         @type chunk_size: integer
-        @param always: Disables any input, requires that either ignoreWarning or
-            aborts are set to True and that the description is also set. It will
-            overwrite verifyDescription to False and keepFilename to True.
+        @param always: Disables any input, requires that either ignoreWarning
+            or aborts are set to True and that the description is also set. It
+            overwrites verifyDescription to False and keepFilename to True.
         @type always: bool
 
         @deprecated: Using upload_image() is deprecated, use upload_file() with
@@ -91,11 +91,11 @@ class UploadRobot(BaseBot):
         super(UploadRobot, self).__init__(**kwargs)
         always = self.getOption('always')
         if (always and ignoreWarning is not True and aborts is not True):
-            raise ValueError('When always is set to True, either ignoreWarning '
-                             'or aborts must be set to True.')
+            raise ValueError('When always is set to True, either '
+                             'ignoreWarning or aborts must be set to True.')
         if always and not description:
-            raise ValueError('When always is set to True, the description must '
-                             'be set.')
+            raise ValueError('When always is set to True, the description '
+                             'must be set.')
         self.url = url
         if isinstance(self.url, basestring):
             pywikibot.warning("url as string is deprecated. "
@@ -300,7 +300,8 @@ class UploadRobot(BaseBot):
             if potential_file_page.exists():
                 overwrite = self._handle_warning('exists')
                 if overwrite is False:
-                    pywikibot.output("File exists and you asked to abort. Skipping.")
+                    pywikibot.output(
+                        'File exists and you asked to abort. Skipping.')
                     return None
                 if potential_file_page.canBeEdited():
                     if overwrite is None:
@@ -321,9 +322,9 @@ class UploadRobot(BaseBot):
             else:
                 try:
                     if potential_file_page.fileIsShared():
-                        pywikibot.output(u"File with name %s already exists in shared "
-                                         "repository and cannot be overwritten."
-                                         % filename)
+                        pywikibot.output(
+                            'File with name %s already exists in shared '
+                            'repository and cannot be overwritten.' % filename)
                         continue
                     else:
                         break
@@ -422,8 +423,9 @@ class UploadRobot(BaseBot):
                                        comment=self.summary)
         except pywikibot.data.api.APIError as error:
             if error.code == u'uploaddisabled':
-                pywikibot.error("Upload error: Local file uploads are disabled on %s."
-                                % site)
+                pywikibot.error(
+                    'Upload error: Local file uploads are disabled on %s.'
+                    % site)
             else:
                 pywikibot.error("Upload error: ", exc_info=True)
             return None
