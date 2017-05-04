@@ -5465,7 +5465,9 @@ class APISite(BaseSite):
         "noapiwrite": "API editing not enabled on %(site)s wiki",
         "writeapidenied": "User %(user)s not allowed to edit through the API",
         "permissiondenied": "User %(user)s not authorized to protect pages on %(site)s wiki.",
-        "cantedit": "User %(user) can't protect this page because user %(user) can't edit it.",
+        "cantedit":
+            "User %(user)s can't protect this page because user %(user)s "
+            "can't edit it.",
         "protect-invalidlevel": "Invalid protection level"
     }
 
