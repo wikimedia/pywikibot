@@ -17,7 +17,8 @@ from pywikibot.tools import (
 )
 
 from tests import join_root_path
-from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
+from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
+                           PwbTestCase)
 from tests.utils import allowed_failure, execute_pwb, add_metaclass
 
 scripts_path = join_root_path('scripts')
@@ -101,7 +102,9 @@ script_input = {
     'catall': 'q\n',  # q for quit
     'editarticle': 'Test page\n',
     'imageuncat': 'q\n',
-    'imageharvest': 'https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg\n\n',
+    'imageharvest':
+        'https://upload.wikimedia.org/wikipedia/commons/'
+        '8/80/Wikipedia-logo-v2.svg\n\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
@@ -109,7 +112,9 @@ script_input = {
                                   # Enter to begin, Enter for default summary.
     'shell': '\n',  # exits on end of stdin
     'solve_disambiguation': 'Test page\nq\n',
-    'upload': 'https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg\n\n\n',
+    'upload':
+        'https://upload.wikimedia.org/wikipedia/commons/'
+        '8/80/Wikipedia-logo-v2.svg\n\n\n',
 }
 
 auto_run_script_list = [
@@ -149,7 +154,8 @@ no_args_expected_results = {
     'featured': '0 pages written.',
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
-    'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
+    'imageuncat':
+        'WARNING: This script is primarily written for Wikimedia Commons',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
     'imageharvest': 'From what URL should I get the images',
@@ -237,14 +243,18 @@ class TestScriptMeta(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create the new class."""
         def test_execution(script_name, args=[]):
-            is_autorun = '-help' not in args and script_name in auto_run_script_list
+            is_autorun = ('-help' not in args and
+                          script_name in auto_run_script_list)
 
             def test_skip_script(self):
                 raise unittest.SkipTest(
                     'Skipping execution of auto-run scripts (set '
-                    'PYWIKIBOT2_TEST_AUTORUN=1 to enable) "{0}"'.format(script_name))
+                    'PYWIKIBOT2_TEST_AUTORUN=1 to enable) "{0}"'
+                    .format(script_name))
 
             def testScript(self):
+                GLOBAL_ARGS = 'Global arguments available for all'
+
                 cmd = [script_name]
 
                 if args:
@@ -270,8 +280,8 @@ class TestScriptMeta(MetaTestCaseClass):
                 if not hasattr(self, 'net') or not self.net:
                     test_overrides['pywikibot.Site'] = 'None'
 
-                result = execute_pwb(cmd, data_in, timeout=timeout, error=error,
-                                     overrides=test_overrides)
+                result = execute_pwb(cmd, data_in, timeout=timeout,
+                                     error=error, overrides=test_overrides)
 
                 stderr = result['stderr'].splitlines()
                 stderr_sleep = [l for l in stderr
@@ -296,8 +306,7 @@ class TestScriptMeta(MetaTestCaseClass):
                                       stderr_other)
                         self.assertNotIn('-help', args)
                     else:
-                        self.assertIn('Global arguments available for all',
-                                      result['stdout'])
+                        self.assertIn(GLOBAL_ARGS, result['stdout'])
 
                     exit_codes = [0]
                 else:
@@ -319,7 +328,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 self.assertNotIn('deprecated', result['stderr'].lower())
 
                 # If stdout doesnt include global help..
-                if 'Global arguments available for all' not in result['stdout']:
+                if GLOBAL_ARGS not in result['stdout']:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', result['stdout'].lower())
                     if result['stdout'] == '':
