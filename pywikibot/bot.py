@@ -461,7 +461,7 @@ def input_yn(question, default=None, automatic_quit=True, force=False):
         'y' or 'n' and can be disabled by setting it to None.
     @type default: basestring or bool
     @param automatic_quit: Adds the option 'Quit' ('q') and throw a
-            L{QuitKeyboardInterrupt} if selected.
+        L{QuitKeyboardInterrupt} if selected.
     @type automatic_quit: bool
     @param force: Automatically use the default
     @type force: bool
