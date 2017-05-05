@@ -22,7 +22,7 @@ Command line options:
                wikipedia, user, etc. namespaces.
 """
 # (C) Daniel Herding, 2007
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -83,9 +83,9 @@ class MisspellingRobot(DisambiguationRobot):
 
         @rtype: generator
         """
-        mylang = self.site.code
-        if mylang in self.misspellingCategory:
-            categories = self.misspellingCategory[mylang]
+        mycode = self.site.code
+        if mycode in self.misspellingCategory:
+            categories = self.misspellingCategory[mycode]
             if isinstance(categories, basestring):
                 categories = (categories, )
             generators = (
@@ -93,8 +93,8 @@ class MisspellingRobot(DisambiguationRobot):
                     pywikibot.Category(self.site, misspellingCategoryTitle),
                     recurse=True, start=firstPageTitle)
                 for misspellingCategoryTitle in categories)
-        elif mylang in self.misspellingTemplate:
-            templates = self.misspellingTemplate[mylang]
+        elif mycode in self.misspellingTemplate:
+            templates = self.misspellingTemplate[mycode]
             if isinstance(templates, basestring):
                 templates = (templates, )
             generators = (
