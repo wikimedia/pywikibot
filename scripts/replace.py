@@ -524,7 +524,8 @@ class ReplaceRobot(Bot):
             regular expressions.
         inside-tags
             A list of strings. These strings must be keys from the
-            exceptionRegexes dictionary in textlib.replaceExcept().
+            dictionary in textlib._create_default_regexes() or must be
+            accepted by textlib._get_regexes().
 
     @type exceptions: dict
     @param allowoverlap: when matches overlap, all of them are replaced.
