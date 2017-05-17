@@ -39,7 +39,7 @@ build paths relative to base_dir:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
+__version__ = '$Id: 85ad1a71d7bc127cfeeb9b8b3f75cca5ceaf56de $'
 #
 
 import collections
@@ -786,6 +786,10 @@ persistent_http = False
 # You may assign either a tuple of two int or float values for connection and
 # read timeout, or a single value for both in a tuple (since requests 2.4.0).
 socket_timeout = 75
+
+# Use http2 for connection where available through use of hyper HTTP20Adapter for requests
+# Blocked by bugs in HTTP20Adapter for now
+usehttp2 = False
 
 
 # ############# COSMETIC CHANGES SETTINGS ##############
