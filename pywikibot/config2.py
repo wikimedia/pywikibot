@@ -661,9 +661,6 @@ splitLongParagraphs = False
 # sometimes HTML-tables are indented for better reading.
 # That can do very ugly results.
 deIndentTables = True
-# table2wiki.py works quite stable, so you might switch to True
-table2wikiAskOnlyWarnings = True
-table2wikiSkipWarnings = False
 
 # ############# WEBLINK CHECKER SETTINGS ##############
 
