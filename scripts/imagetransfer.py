@@ -154,8 +154,8 @@ class ImageTransferBot(object):
 
             description = i18n.twtranslate(self.targetSite,
                                            'imagetransfer-file_page_message',
-                                           dict(site=sourceSite,
-                                                description=description))
+                                           {'site': sourceSite,
+                                            'description': description})
             description += '\n\n'
             description += sourceImagePage.getFileVersionHistoryTable()
             # add interwiki link

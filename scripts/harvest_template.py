@@ -226,7 +226,7 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    commandline_arguments = list()
+    commandline_arguments = []
     template_title = u''
 
     # Process global args and prepare generator args parser
@@ -253,7 +253,7 @@ def main(*args):
 
     if len(commandline_arguments) % 2:
         raise ValueError  # or something.
-    fields = dict()
+    fields = {}
 
     for i in range(0, len(commandline_arguments), 2):
         fields[commandline_arguments[i]] = commandline_arguments[i + 1]

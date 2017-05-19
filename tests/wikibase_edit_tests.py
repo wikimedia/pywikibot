@@ -155,7 +155,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
 
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo)
-        self.assertEqual(item._defined_by(), dict())
+        self.assertEqual(item._defined_by(), {})
         item.editEntity(data)
 
     def test_set_redirect_target(self):

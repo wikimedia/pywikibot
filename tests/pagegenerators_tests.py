@@ -583,7 +583,7 @@ class TestDequePreloadingGenerator(DefaultSiteTestCase):
 
         pages = pywikibot.tools.DequeGenerator([mainpage])
         gen = pagegenerators.DequePreloadingGenerator(pages)
-        pages_out = list()
+        pages_out = []
         for page in gen:
             pages_out.append(page)
             # Add a page to the generator

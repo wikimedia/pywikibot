@@ -232,14 +232,14 @@ class FeaturedBot(pywikibot.Bot):
             'fromlang': None,
             'good': False,
             'lists': False,
-            'nocache': list(),
+            'nocache': [],
             'side': False,    # not template_on_top
             'quiet': False,
             'interactive': False,
         })
 
         super(FeaturedBot, self).__init__(**kwargs)
-        self.cache = dict()
+        self.cache = {}
         self.filename = None
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
@@ -335,7 +335,7 @@ class FeaturedBot(pywikibot.Bot):
                              % (len(self.cache), self.filename))
             with open(self.filename, "wb") as f:
                 pickle.dump(self.cache, f, protocol=config.pickle_protocol)
-        self.cache = dict()
+        self.cache = {}
 
     def run(self):
         for task in self.tasks:

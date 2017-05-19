@@ -126,7 +126,7 @@ def getversiondict():
         warn('Unable to detect package date', UserWarning)
         datestring = '-2 (unknown)'
 
-    cache = dict(tag=tag, rev=rev, date=datestring, hsh=hsh)
+    cache = {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
     return cache
 
 

@@ -273,7 +273,7 @@ def main(*args):
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
-        generator = list()
+        generator = []
         pywikibot.output(u'Loading categories...')
         # Define the category if no other generator has been setted
         for CAT in categories:

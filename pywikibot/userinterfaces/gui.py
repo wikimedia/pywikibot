@@ -55,23 +55,23 @@ class TextEditor(ScrolledText):
         Get default settings from user's IDLE configuration.
         """
         currentTheme = idleConf.CurrentTheme()
-        textcf = dict(padx=5, wrap='word', undo='True',
-                      foreground=idleConf.GetHighlight(currentTheme,
-                                                       'normal', fgBg='fg'),
-                      background=idleConf.GetHighlight(currentTheme,
-                                                       'normal', fgBg='bg'),
-                      highlightcolor=idleConf.GetHighlight(currentTheme,
-                                                           'hilite', fgBg='fg'),
-                      highlightbackground=idleConf.GetHighlight(currentTheme,
-                                                                'hilite',
-                                                                fgBg='bg'),
-                      insertbackground=idleConf.GetHighlight(currentTheme,
-                                                             'cursor',
-                                                             fgBg='fg'),
-                      width=idleConf.GetOption('main', 'EditorWindow', 'width'),
-                      height=idleConf.GetOption('main', 'EditorWindow',
-                                                'height')
-                      )
+        textcf = {
+            'padx': 5,
+            'wrap': 'word',
+            'undo': 'True',
+            'foreground': idleConf.GetHighlight(
+                currentTheme, 'normal', fgBg='fg'),
+            'background': idleConf.GetHighlight(
+                currentTheme, 'normal', fgBg='bg'),
+            'highlightcolor': idleConf.GetHighlight(
+                currentTheme, 'hilite', fgBg='fg'),
+            'highlightbackground': idleConf.GetHighlight(
+                currentTheme, 'hilite', fgBg='bg'),
+            'insertbackground': idleConf.GetHighlight(
+                currentTheme, 'cursor', fgBg='fg'),
+            'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
+            'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
+        }
         fontWeight = 'normal'
         if idleConf.GetOption('main', 'EditorWindow', 'font-bold', type='bool'):
             fontWeight = 'bold'

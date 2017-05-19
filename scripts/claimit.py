@@ -162,7 +162,7 @@ def main(*args):
     @rtype: bool
     """
     exists_arg = ''
-    commandline_claims = list()
+    commandline_claims = []
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -181,7 +181,7 @@ def main(*args):
         pywikibot.error('Incomplete command line property-value pair.')
         return False
 
-    claims = list()
+    claims = []
     repo = pywikibot.Site().data_repository()
     for i in range(0, len(commandline_claims), 2):
         claim = pywikibot.Claim(repo, commandline_claims[i])

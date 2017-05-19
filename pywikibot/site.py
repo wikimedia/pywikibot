@@ -226,7 +226,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         self.id = id
 
         if aliases is None:
-            self.aliases = list()
+            self.aliases = []
         else:
             self.aliases = aliases
 
@@ -258,7 +258,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
                     alias += u' talk'
                 self.aliases = [alias]
             else:
-                self.aliases = list()
+                self.aliases = []
         else:
             self.aliases = aliases
 
@@ -1540,11 +1540,9 @@ class Siteinfo(Container):
             request = self._site._request(
                 expiry=pywikibot.config.API_config_expiry
                 if expiry is False else expiry,
-                parameters=dict(
-                    action='query',
-                    meta='siteinfo',
-                    siprop=props
-                )
+                parameters={
+                    'action': 'query', 'meta': 'siteinfo', 'siprop': props,
+                }
             )
             # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
             # continue anyway we just always use continue.
@@ -2312,9 +2310,12 @@ class APISite(BaseSite):
     @need_extension('Echo')
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension."""
-        params = dict(action='query',
-                      meta='notifications',
-                      notprop='list', notformat='text')
+        params = {
+            'action': 'query',
+            'meta': 'notifications',
+            'notprop': 'list',
+            'notformat': 'text',
+        }
 
         for key in kwargs:
             params['not' + key] = kwargs[key]
@@ -2869,11 +2870,8 @@ class APISite(BaseSite):
             pirequest = self._request(
                 expiry=pywikibot.config.API_config_expiry
                 if expiry is False else expiry,
-                parameters=dict(
-                    action='query',
-                    meta='proofreadinfo',
-                    piprop='namespaces|qualitylevels'
-                )
+                parameters={'action': 'query', 'meta': 'proofreadinfo',
+                            'piprop': 'namespaces|qualitylevels'}
             )
 
             pidata = pirequest.submit()
@@ -3776,9 +3774,8 @@ class APISite(BaseSite):
                 u"categorymembers: non-Category page '%s' specified"
                 % category.title())
         cmtitle = category.title(withSection=False).encode(self.encoding())
-        cmargs = dict(type_arg="categorymembers",
-                      gcmtitle=cmtitle,
-                      gcmprop="ids|title|sortkey")
+        cmargs = {'type_arg': "categorymembers", 'gcmtitle': cmtitle,
+                  'gcmprop': "ids|title|sortkey"}
         if sortby in ["sortkey", "timestamp"]:
             cmargs["gcmsort"] = sortby
         elif sortby:
@@ -4416,7 +4413,7 @@ class APISite(BaseSite):
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        iuargs = dict(giutitle=image.title(withSection=False))
+        iuargs = {'giutitle': image.title(withSection=False)}
         if filterredir is not None:
             iuargs['giufilterredir'] = ('redirects' if filterredir else
                                         'nonredirects')
@@ -7400,11 +7397,8 @@ class DataSite(APISite):
         This is used specifically because we can cache
         the value for a much longer time (near infinite).
         """
-        params = dict(
-            action='wbgetentities',
-            ids=prop.getID(),
-            props='datatype',
-        )
+        params = {'action': 'wbgetentities', 'ids': prop.getID(),
+                  'props': 'datatype'}
         expiry = datetime.timedelta(days=365 * 100)
         # Store it for 100 years
         req = self._request(expiry=expiry, parameters=params)
@@ -7471,14 +7465,10 @@ class DataSite(APISite):
         @param summary: Edit summary
         @type summary: str
         """
-        params = dict(action='wbcreateclaim',
-                      entity=item.getID(),
-                      baserevid=item.latest_revision_id,
-                      snaktype=claim.getSnakType(),
-                      property=claim.getID(),
-                      summary=summary,
-                      bot=bot,
-                      )
+        params = {'action': 'wbcreateclaim', 'entity': item.getID(),
+                  'baserevid': item.latest_revision_id,
+                  'snaktype': claim.getSnakType(), 'property': claim.getID(),
+                  'summary': summary, 'bot': bot}
 
         if claim.getSnakType() == 'value':
             params['value'] = json.dumps(claim._formatValue())
@@ -7514,14 +7504,10 @@ class DataSite(APISite):
         if not claim.snak:
             # We need to already have the snak value
             raise NoPage(claim)
-        params = dict(action='wbsetclaimvalue',
-                      claim=claim.snak,
-                      snaktype=snaktype,
-                      summary=summary,
-                      bot=bot,
-                      )
+        params = {'action': 'wbsetclaimvalue', 'claim': claim.snak,
+                  'snaktype': snaktype, 'summary': summary, 'bot': bot,
+                  'token': self.tokens['edit']}
 
-        params['token'] = self.tokens['edit']
         if snaktype == 'value':
             params['value'] = json.dumps(claim._formatValue())
 
@@ -7582,14 +7568,10 @@ class DataSite(APISite):
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a source.")
-        params = dict(action='wbsetreference',
-                      statement=claim.snak,
-                      baserevid=self._get_baserevid(claim, baserevid),
-                      summary=summary,
-                      bot=bot,
-                      )
+        params = {'action': 'wbsetreference', 'statement': claim.snak,
+                  'baserevid': self._get_baserevid(claim, baserevid),
+                  'summary': summary, 'bot': bot, 'token': self.tokens['edit']}
 
-        params['token'] = self.tokens['edit']
         # build up the snak
         if isinstance(source, list):
             sources = source
@@ -7639,12 +7621,9 @@ class DataSite(APISite):
         """
         if claim.isReference or claim.isQualifier:
             raise ValueError("The claim cannot have a qualifier.")
-        params = dict(action='wbsetqualifier',
-                      claim=claim.snak,
-                      baserevid=self._get_baserevid(claim, baserevid),
-                      summary=summary,
-                      bot=bot,
-                      )
+        params = {'action': 'wbsetqualifier', 'claim': claim.snak,
+                  'baserevid': self._get_baserevid(claim, baserevid),
+                  'summary': summary, 'bot': bot}
 
         if (not new and
                 hasattr(qualifier, 'hash') and
@@ -7683,14 +7662,13 @@ class DataSite(APISite):
         items = set(claim.on_item for claim in claims if claim.on_item)
         assert len(items) == 1
 
-        params = dict(action='wbremoveclaims',
-                      baserevid=baserevid,
-                      summary=summary,
-                      bot=bot,
-                      )
-
-        params['claim'] = '|'.join(claim.snak for claim in claims)
-        params['token'] = self.tokens['edit']
+        params = {
+            'action': 'wbremoveclaims', 'baserevid': baserevid,
+            'summary': summary,
+            'bot': bot,
+            'claim': '|'.join(claim.snak for claim in claims),
+            'token': self.tokens['edit'],
+        }
 
         req = self._simple_request(**params)
         data = req.submit()
@@ -7714,15 +7692,14 @@ class DataSite(APISite):
             When omitted, revision of claim.on_item is used. DEPRECATED.
         @type baserevid: long
         """
-        params = dict(action='wbremovereferences',
-                      baserevid=self._get_baserevid(claim, baserevid),
-                      summary=summary,
-                      bot=bot,
-                      )
-
-        params['statement'] = claim.snak
-        params['references'] = '|'.join(source.hash for source in sources)
-        params['token'] = self.tokens['edit']
+        params = {
+            'action': 'wbremovereferences',
+            'baserevid': self._get_baserevid(claim, baserevid),
+            'summary': summary, 'bot': bot,
+            'statement': claim.snak,
+            'references': '|'.join(source.hash for source in sources),
+            'token': self.tokens['edit'],
+        }
 
         req = self._simple_request(**params)
         data = req.submit()
@@ -7746,15 +7723,15 @@ class DataSite(APISite):
             When omitted, revision of claim.on_item is used. DEPRECATED.
         @type baserevid: long
         """
-        params = dict(action='wbremovequalifiers',
-                      claim=claim.snak,
-                      baserevid=self._get_baserevid(claim, baserevid),
-                      summary=summary,
-                      bot=bot,
-                      )
-
-        params['qualifiers'] = [qualifier.hash for qualifier in qualifiers]
-        params['token'] = self.tokens['edit']
+        params = {
+            'action': 'wbremovequalifiers',
+            'claim': claim.snak,
+            'baserevid': self._get_baserevid(claim, baserevid),
+            'summary': summary,
+            'bot': bot,
+            'qualifiers': [qualifier.hash for qualifier in qualifiers],
+            'token': self.tokens['edit']
+        }
 
         req = self._simple_request(**params)
         data = req.submit()

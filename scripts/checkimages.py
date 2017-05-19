@@ -1126,7 +1126,7 @@ class checkImagesBot(object):
                 self.settingsData = None
             else:
                 wikiPage = pywikibot.Page(self.site, settingsPage)
-                self.settingsData = list()
+                self.settingsData = []
                 try:
                     testo = wikiPage.get()
                     number = 1

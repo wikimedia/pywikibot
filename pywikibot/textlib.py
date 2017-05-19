@@ -2042,7 +2042,7 @@ class TimeStripper(object):
             return '_' * (match.end() - match.start())
 
         # match date fields
-        dateDict = dict()
+        dateDict = {}
 
         # Analyze comments separately from rest of each line to avoid to skip
         # dates in comments, as the date matched by timestripper is the

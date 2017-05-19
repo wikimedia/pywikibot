@@ -426,7 +426,7 @@ class LinkedPagesRule(PatrolRule):
             if pywikibot.config.verbose_output:
                 pywikibot.output(u'loading page links on %s' % self.page_title)
             p = pywikibot.Page(self.site, self.page_title)
-            linkedpages = list()
+            linkedpages = []
             for linkedpage in p.linkedPages():
                 linkedpages.append(linkedpage.title())
 

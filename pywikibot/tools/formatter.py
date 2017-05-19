@@ -130,7 +130,7 @@ class _ColorFormatter(Formatter):
             additional_params = result[1:]
             result = result[0]
         else:
-            additional_params = tuple()
+            additional_params = ()
         result = self._convert_bytes(result)
         if additional_params:
             result = (result, ) + additional_params

@@ -3686,7 +3686,7 @@ class WikibasePage(BasePage):
         self.aliases = {}
         if 'aliases' in self._content:
             for lang in self._content['aliases']:
-                self.aliases[lang] = list()
+                self.aliases[lang] = []
                 for value in self._content['aliases'][lang]:
                     self.aliases[lang].append(value['value'])
 
@@ -4267,7 +4267,7 @@ class ItemPage(WikibasePage):
         Sites should be a list, with values either
         being Site objects, or dbNames.
         """
-        data = list()
+        data = []
         for site in sites:
             site = self.getdbName(site)
             data.append({'site': site, 'title': ''})

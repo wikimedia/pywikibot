@@ -175,7 +175,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
     @PatchingTestCase.patched(pywikibot, 'Site')
     def Site(self, code, fam, *args, **kwargs):
         """Own DrySite creator."""
-        self.assertEqual(args, tuple())
+        self.assertEqual(args, ())
         self.assertEqual(kwargs, {})
         self.assertEqual(code, self.current_code)
         self.assertEqual(fam, self.current_family)

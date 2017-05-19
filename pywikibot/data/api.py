@@ -3030,9 +3030,11 @@ class LoginManager(login.LoginManager):
         # base login request
         login_request = self.site._request(
             use_get=False,
-            parameters=dict(action='login',
-                            lgname=self.login_name,
-                            lgpassword=self.password))
+            parameters={
+                'action': 'login',
+                'lgname': self.login_name,
+                'lgpassword': self.password,
+            })
 
         if self.site.family.ldapDomain:
             login_request['lgdomain'] = self.site.family.ldapDomain
@@ -3078,9 +3080,8 @@ class LoginManager(login.LoginManager):
                                       'at least MediaWiki version 1.27.')
         login_token_request = self.site._request(
             use_get=False,
-            parameters=dict(action='query',
-                            meta='tokens',
-                            type='login'))
+            parameters={'action': 'query', 'meta': 'tokens', 'type': 'login'},
+        )
         login_token_result = login_token_request.submit()
         return login_token_result['query']['tokens'].get('logintoken')
 

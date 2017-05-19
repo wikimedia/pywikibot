@@ -42,9 +42,9 @@ comment = {
 
 
 # Some parameters
-options = list()
-start = list()
-filelist = list()
+options = []
+start = []
+filelist = []
 hints = {}
 debug = 0
 start = '!'

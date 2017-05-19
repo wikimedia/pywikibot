@@ -1287,8 +1287,10 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
     retrieved page will be downloaded.
 
     """
-    kwargs = dict(recurse=recurse, total=total,
-                  content=content, namespaces=namespaces)
+    kwargs = {
+        'recurse': recurse, 'total': total,
+        'content': content, 'namespaces': namespaces,
+    }
     if start:
         kwargs['sortby'] = 'sortkey'
         kwargs['startsort'] = start
@@ -2778,7 +2780,7 @@ def WikidataSPARQLPageGenerator(query, site=None,
     if site is None:
         site = pywikibot.Site()
     repo = site.data_repository()
-    dependencies = dict(endpoint=endpoint, entity_url=entity_url)
+    dependencies = {'endpoint': endpoint, 'entity_url': entity_url}
     if not endpoint or not entity_url:
         dependencies['repo'] = repo
     query_object = sparql.SparqlQuery(**dependencies)

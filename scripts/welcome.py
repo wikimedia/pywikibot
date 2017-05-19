@@ -428,10 +428,10 @@ class WelcomeBot(object):
         """Constructor."""
         self.site = pywikibot.Site()
         self.check_managed_sites()
-        self.bname = dict()
+        self.bname = {}
 
         self._totallyCount = 0
-        self.welcomed_users = list()
+        self.welcomed_users = []
 
         if globalvar.randomSign:
             self.defineSign(True)
@@ -495,7 +495,7 @@ class WelcomeBot(object):
             badword_page = pywikibot.Page(self.site,
                                           i18n.translate(self.site,
                                                          bad_pag))
-            list_loaded = list()
+            list_loaded = []
             if badword_page.exists():
                 pywikibot.output(u'\nLoading the bad words list from %s...'
                                  % self.site)
@@ -510,7 +510,7 @@ class WelcomeBot(object):
             # initialize whitelist
             whitelist_default = ['emiliano']
             wtlpg = i18n.translate(self.site, whitelist_pg)
-            list_white = list()
+            list_white = []
             if wtlpg:
                 whitelist_page = pywikibot.Page(self.site, wtlpg)
                 if whitelist_page.exists():
@@ -607,7 +607,7 @@ class WelcomeBot(object):
                              minorEdit=True)
                 showStatus(5)
                 pywikibot.output(u'Reported')
-            self.BAQueue = list()
+            self.BAQueue = []
         else:
             return True
 
@@ -790,7 +790,7 @@ class WelcomeBot(object):
                                              % welcomed_count)
                         if welcomed_count >= globalvar.dumpToLog:
                             if self.makelogpage(self.welcomed_users):
-                                self.welcomed_users = list()
+                                self.welcomed_users = []
                                 welcomed_count = 0
                             else:
                                 continue
@@ -817,10 +817,10 @@ class WelcomeBot(object):
                         u'Putting the log of the latest %d users...'
                         % welcomed_count)
                 if self.makelogpage(self.welcomed_users):
-                    self.welcomed_users = list()
+                    self.welcomed_users = []
                 else:
                     continue
-                self.welcomed_users = list()
+                self.welcomed_users = []
             if hasattr(self, '_BAQueue'):
                 showStatus()
                 pywikibot.output("Putting bad name to report page....")

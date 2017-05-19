@@ -732,7 +732,7 @@ class FakeUITest(TestCase):
 
     def test_no_color(self):
         """Test a string without any colors."""
-        self._colors = tuple()
+        self._colors = ()
         self.ui_obj._print('Hello world you!', self.stream)
         self.assertEqual(self._getvalue(), 'Hello world you!')
 

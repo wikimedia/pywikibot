@@ -514,7 +514,7 @@ class TestFilterUnique(TestCase):
 
     def test_dict(self):
         """Test filter_unique with a dict."""
-        deduped = dict()
+        deduped = {}
         deduper = tools.filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 
