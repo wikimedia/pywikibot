@@ -265,9 +265,6 @@ parameterHelp = """\
                   "SELECT page_namespace, page_title, FROM page
                   WHERE page_namespace = 0" and works on the resulting pages.
 
--wikidataquery    Takes a WikidataQuery query string like claim[31:12280]
-                  and works on the resulting pages.
-
 -sparql           Takes a SPARQL SELECT query string including ?item
                   and works on the resulting pages.
 
@@ -922,9 +919,7 @@ class GeneratorFactory(object):
         elif arg == '-untagged':
             issue_deprecation_warning(arg, None, 2)
         elif arg == '-wikidataquery':
-            if not value:
-                value = pywikibot.input('WikidataQuery string:')
-            gen = WikidataQueryPageGenerator(value, site=self.site)
+            issue_deprecation_warning(arg, None, 2)
         elif arg == '-sparqlendpoint':
             if not value:
                 value = pywikibot.input('SPARQL endpoint:')
@@ -2723,39 +2718,6 @@ def WikidataPageFromItemGenerator(gen, site):
                      for item in entities)
         for sitelink in sitelinks:
             yield pywikibot.Page(site, sitelink)
-
-
-def WikidataQueryPageGenerator(query, site=None):
-    """Generate pages that result from the given WikidataQuery.
-
-    @param query: the WikidataQuery query string.
-    @param site: Site for generator results.
-    @type site: L{pywikibot.site.BaseSite}
-
-    """
-    from pywikibot.data import wikidataquery as wdquery
-
-    if site is None:
-        site = pywikibot.Site()
-    repo = site.data_repository()
-    is_repo = isinstance(site, pywikibot.site.DataSite)
-
-    if not is_repo:
-        # limit the results to those with sitelinks to target site
-        query += ' link[%s]' % site.dbName()
-    wd_queryset = wdquery.QuerySet(query)
-
-    wd_query = wdquery.WikidataQuery(cacheMaxAge=0)
-    data = wd_query.query(wd_queryset)
-    # This item count should not be copied by other generators,
-    # and should be removed when wdq becomes a real generator (T135592)
-    pywikibot.output(u'retrieved %d items' % data[u'status'][u'items'])
-    items_pages = (pywikibot.ItemPage(repo, 'Q{0}'.format(item))
-                   for item in data[u'items'])
-    if is_repo:
-        return items_pages
-
-    return WikidataPageFromItemGenerator(items_pages, site)
 
 
 def WikidataSPARQLPageGenerator(query, site=None,

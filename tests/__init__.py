@@ -110,7 +110,6 @@ library_test_modules = [
     'timestripper',
     'pagegenerators',
     'cosmetic_changes',
-    'wikidataquery',
     'wikistats',
     'weblib',
     'i18n',

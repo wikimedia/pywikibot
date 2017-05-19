@@ -136,9 +136,6 @@ The contents of the package
     +---------------------------+-------------------------------------------------------+
     | sparql.py                 | Objects representing SPARQL query API                 |
     +---------------------------+-------------------------------------------------------+
-    | wikidataquery.py          | Objects representing WikidataQuery query syntax       |
-    |                           | and API                                               |
-    +---------------------------+-------------------------------------------------------+
     | wikistats.py              | Objects representing WikiStats API                    |
     +---------------------------+-------------------------------------------------------+
 

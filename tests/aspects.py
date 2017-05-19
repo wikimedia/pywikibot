@@ -18,9 +18,7 @@ from __future__ import absolute_import, print_function, unicode_literals
         skip if the user is blocked.
         sysop flag, implement in site & page, and
             possibly some of the script tests.
-        labs flag, for wikidataquery
         slow flag
-            wikiquerydata - quite slow
             weblib - also slow
             (this class, and a FastTest, could error/pass based
              it consumed more than a specified amount of time allowed.)
