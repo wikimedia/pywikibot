@@ -148,13 +148,14 @@ docuReplacements = {
 
 cfd_templates = {
     'wikipedia': {
+        'cs': ['přesunout', 'přejmenovat', 'přejmenovat kategorii',
+               'přesunout kategorii', 'přejmenování kategorie'],
         'en': [u'cfd', u'cfr', u'cfru', u'cfr-speedy', u'cfm', u'cfdu'],
         'fi': [u'roskaa', u'poistettava', u'korjattava/nimi',
                u'yhdistettäväLuokka'],
         'fr': ['renommage de catégorie demandé'],
         'he': [u'הצבעת מחיקה', u'למחוק'],
         'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2'],
-        'cs': ['přejmenovat kategorii', 'přesunout kategorii', 'přejmenování kategorie'],
         # For testing purposes
         'test': [u'delete']
     },
