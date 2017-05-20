@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -150,6 +150,7 @@ auto_run_script_list = [
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user_config.py
+    'checkimages': 'Execution time: 0 seconds',
     'editarticle': 'Nothing changed',
     'featured': '0 pages written.',
     'freebasemappingupload': 'Cannot find ',
@@ -419,7 +420,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
     ] + failed_dep_script_list
 
     _allowed_failures = [
-        'checkimages',
         'disambredir',
         # T94681
         'misspelling',
