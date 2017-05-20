@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cases for the WikiStats dataset."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,6 +15,8 @@ from pywikibot.tools import UnicodeType
 from tests.aspects import unittest, TestCase
 
 
+@unittest.skip('Wikistats at https://wikistats.wmflabs.org/ '
+               'appears to be broken. See T165830.')
 class WikiStatsTestCase(TestCase):
 
     """Test WikiStats dump."""

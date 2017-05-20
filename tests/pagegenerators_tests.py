@@ -238,7 +238,7 @@ class TestCategoryFilterPageGenerator(TestCase):
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.CategoryFilterPageGenerator(gen, self.catfilter_list, site)
-        self.assertEqual(len(tuple(gen)), 9)
+        self.assertEqual(len(tuple(gen)), 10)
 
 
 class TestQualityFilterPageGenerator(TestCase):
@@ -314,12 +314,12 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
             gen, last_edit_end=two_days_ago)
         self.assertEqual(len(list(gen)), 0)
 
-        gen = PagesFromTitlesGenerator(['Template:Sidebox'], self.site)
+        gen = PagesFromTitlesGenerator(['Template:Side box'], self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_end=nine_days_ago)
         self.assertEqual(len(list(gen)), 1)
 
-        gen = PagesFromTitlesGenerator(['Template:Sidebox'], self.site)
+        gen = PagesFromTitlesGenerator(['Template:Side box'], self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_start=nine_days_ago)
         self.assertEqual(len(list(gen)), 0)
