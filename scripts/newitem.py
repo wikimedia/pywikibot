@@ -94,6 +94,9 @@ class NewItemRobot(WikidataBot):
 
         self.current_page = page
 
+        if not page.exists():
+            pywikibot.output('%s does not exist. Skipping.' % page)
+            return
         if page.isRedirectPage():
             pywikibot.output(u'%s is a redirect page. Skipping.' % page)
             return
