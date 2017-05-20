@@ -154,7 +154,7 @@ cfd_templates = {
         'fr': ['renommage de catégorie demandé'],
         'he': [u'הצבעת מחיקה', u'למחוק'],
         'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2'],
-        'cs': ['přejmenovat kategorii', 'přesunout kategorii', 'přejmenování kategorie'],
+        'cs': [u'přejmenovat', u'přesunout kategorii', u'přejmenování kategorie', u'přejmenovat kategorii', u'přesunout'],
         # For testing purposes
         'test': [u'delete']
     },
