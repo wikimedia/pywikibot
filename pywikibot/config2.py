@@ -649,7 +649,7 @@ special_page_limit = 500
 step = -1
 
 # Maximum number of times to retry an API request before quitting.
-max_retries = 25
+max_retries = 15
 # Minimum time to wait before resubmitting a failed API request.
 retry_wait = 5
 
