@@ -1024,6 +1024,48 @@ class WbTabularData(_WbRepresentation):
         return cls(page, site)
 
 
+class WbUnknown(_WbRepresentation):
+    """
+    A Wikibase representation for unknown data type.
+
+    This will prevent the bot from breaking completely when a new type
+    is introduced.
+
+    This data type is just a json container
+    """
+
+    _items = ('json',)
+
+    def __init__(self, json):
+        """
+        Create a new WbUnknown object.
+
+        @param json: Wikibase JSON
+        @type: dict
+        """
+        self.json = json
+
+    def toWikibase(self):
+        """
+        Return the JSON object for the Wikibase API.
+
+        @return: Wikibase JSON
+        @rtype: dict
+        """
+        return self.json
+
+    @classmethod
+    def fromWikibase(cls, json):
+        """
+        Create a WbUnknown from the JSON data given by the Wikibase API.
+
+        @param json: Wikibase JSON
+        @type json: dict
+        @rtype: pywikibot.WbUnknown
+        """
+        return cls(json)
+
+
 _sites = {}
 _url_cache = {}  # The code/fam pair for each URL
 

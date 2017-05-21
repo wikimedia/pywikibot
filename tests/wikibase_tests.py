@@ -746,6 +746,32 @@ class TestWbTabularDataNonDry(WikidataTestCase):
                           non_map_page, self.get_repo())
 
 
+class TestWbUnknown(WikidataTestCase):
+
+    """Test Wikibase WbUnknown data type."""
+
+    dry = True
+
+    def test_WbUnknown_string(self):
+        """Test WbUnknown string."""
+        q_dict = {'text': 'Test that basics work', 'language': 'en'}
+        q = pywikibot.WbUnknown(q_dict)
+        self.assertEqual(q.toWikibase(), q_dict)
+
+    def test_WbUnknown_equality(self):
+        """Test WbUnknown equality."""
+        q_dict = {'text': 'Thou shall test this!', 'language': 'unknown'}
+        q = pywikibot.WbUnknown(q_dict)
+        self.assertEqual(q, q)
+
+    def test_WbUnknown_fromWikibase(self):
+        """Test WbUnknown.fromWikibase() instantiating."""
+        q = pywikibot.WbUnknown.fromWikibase({'text': 'Test this!',
+                                              'language': 'en'})
+        self.assertEqual(q.toWikibase(),
+                         {'text': 'Test this!', 'language': 'en'})
+
+
 class TestItemPageExtensibility(TestCase):
 
     """Test ItemPage extensibility."""
