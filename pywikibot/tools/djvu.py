@@ -20,6 +20,7 @@ from pywikibot.tools import (
     Counter,
     deprecated, deprecated_args,
     StringTypes,
+    UnicodeType,
 )
 
 
@@ -80,17 +81,41 @@ class DjVuFile(object):
         @param file: filename (including path) to djvu file
         @type file: string/unicode
         """
-        file = os.path.expanduser(file)
-        file = os.path.abspath(file)
+        self._filename = file
+        filename = os.path.expanduser(file)
+        filename = os.path.abspath(file)
         # Check file exists and has read permissions.
-        with open(file):
-            self.file = file
-        self.dirname = os.path.dirname(file)
+        with open(filename):
+            self.file = filename
+        self.dirname = os.path.dirname(filename)
 
         # pattern for parsing of djvudump output.
         self._pat_form = re.compile(
             r' *?FORM:DJVU *?\[\d+\] *?(?P<id>{[^\}]*?})? *?\[P(?P<n>\d+)\]')
         self._pat_info = re.compile(r'DjVu.*?(?P<size>\d+x\d+).*?(?P<dpi>\d+) dpi')
+
+    def __repr__(self):
+        """Return a more complete string representation."""
+        filename = self._filename
+        if not isinstance(filename, str):
+            filename = self._filename.encode('utf-8')
+        return str("{0}.{1}('{2}')").format(self.__module__,
+                                            self.__class__.__name__,
+                                            filename)
+
+    def __str__(self):
+        """Return a string representation."""
+        filename = self._filename
+        if not isinstance(filename, str):
+            filename = self._filename.encode('utf-8')
+        return str("{0}('{1}')").format(self.__class__.__name__, filename)
+
+    def __unicode__(self):
+        """Return a unicode representation."""
+        _str = self.__str__()
+        if not isinstance(_str, UnicodeType):
+            _str = _str.decode('utf-8')
+        return _str
 
     @property
     @deprecated('DjVuFile.file')
@@ -149,7 +174,7 @@ class DjVuFile(object):
         @param force: if True, refresh the cached data
         @type force: bool
         """
-        if not hasattr(self, '_page_info'):
+        if not hasattr(self, '_page_info') or force:
             self._get_page_info(force=force)
         return self._page_info[n]
 
@@ -242,6 +267,77 @@ class DjVuFile(object):
         if not res:
             return False
         return self._remove_control_chars(stdoutdata)
+
+    @check_page_number
+    def whiten_page(self, n):
+        """Replace page 'n' of djvu file with a blank page."""
+        # tmp files for creation/insertion of a white page.
+        white_ppm = os.path.join(self.dirname, 'white_page.ppm')
+        white_djvu = os.path.join(self.dirname, 'white_page.djvu')
+
+        n_tot = self.number_of_images()
+
+        # Check n is in valid range and set ref_page number for final checks.
+        ref_page = 2 if n == 1 else n - 1
+
+        size, dpi = self.get_most_common_info()
+
+        # Generate white_page.
+        res, data = _call_cmd(['convert', '-size', size, 'xc:white', white_ppm],
+                              lib='ImageMagik')
+        if not res:
+            return False
+
+        # Convert white_page to djvu.
+        res, data = _call_cmd(['c44', white_ppm, '-dpi', dpi])
+        os.unlink(white_ppm)  # rm white_page.ppm before retuning.
+        if not res:
+            return False
+
+        # Delete page n.
+        # Get ref page info for later checks.
+        info_ref_page = self.page_info(ref_page)
+        res, data = _call_cmd(['djvm', '-d', self.file, n])
+        if not res:
+            return False
+
+        # Insert new page
+        res, data = _call_cmd(['djvm', '-i', self.file, white_djvu, n])
+        os.unlink(white_djvu)  # rm white_page.djvu before returning.
+        if not res:
+            return False
+
+        # Check if page processing is as expected.
+        expected_id = '{%s}' % os.path.basename(white_djvu)
+        assert self.number_of_images(force=True) == n_tot
+        assert self.page_info(n) == (expected_id, (size, dpi))  # white page id.
+        assert self.page_info(ref_page) == info_ref_page  # ref page info.
+
+        return True
+
+    @check_page_number
+    def delete_page(self, n):
+        """Delete page 'n' of djvu file ."""
+        n_tot = self.number_of_images()
+
+        # Check n is in valid range and set ref_page number for final checks.
+        ref_page = n - 1 if n == n_tot else n + 1
+        new_ref_page = n - 1 if n == n_tot else n
+
+        # Delete page n.
+        # Get ref page info for later checks.
+        info_ref_page = self.page_info(ref_page)
+        res, data = _call_cmd(['djvm', '-d', self.file, n])
+        if not res:
+            return False
+
+        # Check if page processing is as expected.
+        # ref page info.
+        assert self.page_info(new_ref_page, force=True) == info_ref_page
+        if n_tot > 1:
+            assert self.number_of_images() == n_tot - 1
+
+        return True
 
     # This is to be used only if this class is subclassed and the decorators
     # needs to be used by the child.
