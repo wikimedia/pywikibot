@@ -33,6 +33,7 @@ import os
 import subprocess
 import sys
 import time
+import warnings
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
@@ -285,11 +286,15 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstderr.getvalue(), 'output\n')
 
     def test_output_stdout(self):
-        pywikibot.output('output', toStdout=True)
-        self.assertEqual(newstdout.getvalue(), 'output\n')
-        self.assertIn('DeprecationWarning: "toStdout" parameter is '
-                      'deprecated; use pywikibot.stdout() instead.\n',
-                      newstderr.getvalue(),)
+        with warnings.catch_warnings(record=True) as w:
+            pywikibot.output('output', toStdout=True)
+            self.assertEqual(newstdout.getvalue(), 'output\n')
+            self.assertEqual(len(w), 1)
+            self.assertEqual(w[0].category, DeprecationWarning)
+            self.assertEqual(
+                str(w[0].message),
+                '"toStdout" parameter is deprecated; use pywikibot.stdout() instead.'
+            )
 
     def test_stdout(self):
         pywikibot.stdout('output')
