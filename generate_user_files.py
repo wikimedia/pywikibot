@@ -142,22 +142,22 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
                 default_lang = None
     message = "The language code of the site we're working on"
 
-    mylang = None
-    while not mylang:
-        mylang = pywikibot.input(message, default=default_lang, force=force)
-        if known_langs and mylang and mylang not in known_langs:
+    mycode = None
+    while not mycode:
+        mycode = pywikibot.input(message, default=default_lang, force=force)
+        if known_langs and mycode and mycode not in known_langs:
             if not pywikibot.input_yn("The language code {0} is not in the "
                                       "list of known languages. Do you want "
-                                      "to continue?".format(mylang),
+                                      "to continue?".format(mycode),
                                       default=False, automatic_quit=False):
-                mylang = None
+                mycode = None
 
-    message = u"Username on {0}:{1}".format(mylang, fam.name)
+    message = 'Username on {0}:{1}'.format(mycode, fam.name)
     username = pywikibot.input(message, default=default_username, force=force)
     # Escape ''s
     if username:
         username = username.replace("'", "\\'")
-    return fam.name, mylang, username
+    return fam.name, mycode, username
 
 
 EXTENDED_CONFIG = """# -*- coding: utf-8 -*-
@@ -197,7 +197,7 @@ from __future__ import absolute_import, unicode_literals
 family = '{main_family}'
 
 # The language code of the site we're working on.
-mylang = '{main_lang}'
+mylang = '{main_code}'
 
 # The dictionary usernames should contain a username for each site where you
 # have a bot account. If you have a unique username for all languages of a
@@ -210,7 +210,7 @@ mylang = '{main_lang}'
 SMALL_CONFIG = ('# -*- coding: utf-8 -*-\n'
                 u"from __future__ import absolute_import, unicode_literals\n"
                 u"family = '{main_family}'\n"
-                u"mylang = '{main_lang}'\n"
+                "mylang = '{main_code}'\n"
                 u"{usernames}\n")
 
 
@@ -222,22 +222,22 @@ def create_user_config(args=None, force=False):
 
     if args and force and not config.verbose_output:
         # main_username may be None, which is used in the next block
-        main_family, main_lang, main_username = args
+        main_family, main_code, main_username = args
         usernames = [args]
     else:
-        main_family, main_lang, main_username = get_site_and_lang(*args,
+        main_family, main_code, main_username = get_site_and_lang(*args,
                                                                   force=force)
-        usernames = [(main_family, main_lang, main_username)]
+        usernames = [(main_family, main_code, main_username)]
 
         while pywikibot.input_yn("Do you want to add any other projects?",
                                  force=force,
                                  default=False, automatic_quit=False):
-            usernames += [get_site_and_lang(main_family, main_lang,
+            usernames += [get_site_and_lang(main_family, main_code,
                                             main_username)]
 
     if not main_username:
         usernames = "# usernames['{0}']['{1}'] = u'MyUsername'".format(
-            main_family, main_lang)
+            main_family, main_code)
     else:
         usernames = '\n'.join(
             u"usernames['{0}']['{1}'] = u'{2}'".format(*username)
@@ -290,7 +290,7 @@ def create_user_config(args=None, force=False):
     try:
         with codecs.open(_fnc, "w", "utf-8") as f:
             f.write(config_content.format(main_family=main_family,
-                                          main_lang=main_lang,
+                                          main_code=main_code,
                                           usernames=usernames,
                                           config_text=config_text))
 
