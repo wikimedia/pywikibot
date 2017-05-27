@@ -95,7 +95,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | flickrripper.py        | Upload images from Flickr easily.                       |
     +------------------------+---------------------------------------------------------+
-    | #followlive.py         | follow new articles on a wikipedia and flag them        |
+    | followlive.py          | follow new articles on a wikipedia and flag them        |
     |                        | with a template.                                        |
     +------------------------++--------------------------------------------------------+
     | freebasemappingupload.py| Docstring fixes in scripts                             |
