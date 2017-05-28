@@ -34,18 +34,18 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'sh', 'es', 'zh', 'ru', 'lt', 'de', 'nl', 'pl',
-            'sv', 'ku', 'el', 'it', 'ta', 'tr', 'fi', 'hu', 'ko', 'io', 'kn',
-            'ca', 'vi', 'pt', 'chr', 'hy', 'sr', 'hi', 'ja', 'ro', 'no', 'th',
+            'en', 'mg', 'fr', 'sh', 'es', 'ru', 'zh', 'de', 'lt', 'nl', 'sv',
+            'pl', 'ku', 'el', 'it', 'ta', 'fi', 'tr', 'hu', 'ko', 'io', 'ca',
+            'kn', 'pt', 'vi', 'hy', 'chr', 'sr', 'hi', 'ja', 'ro', 'no', 'th',
             'ml', 'id', 'et', 'uz', 'li', 'my', 'or', 'te', 'fa', 'eo', 'cs',
-            'ar', 'jv', 'eu', 'az', 'gl', 'lo', 'da', 'br', 'uk', 'oc', 'hr',
+            'ar', 'jv', 'eu', 'az', 'gl', 'da', 'lo', 'br', 'uk', 'oc', 'hr',
             'fj', 'tg', 'bg', 'ps', 'simple', 'cy', 'vo', 'is', 'wa',
-            'zh-min-nan', 'sk', 'scn', 'ast', 'he', 'la', 'af', 'tl', 'sw',
-            'fy', 'ky', 'nn', 'co', 'pnb', 'lv', 'mn', 'ka', 'sl', 'sq', 'nds',
+            'zh-min-nan', 'sk', 'scn', 'la', 'ast', 'he', 'af', 'tl', 'sw',
+            'fy', 'ky', 'nn', 'co', 'lv', 'pnb', 'mn', 'ka', 'sl', 'sq', 'nds',
             'nah', 'lb', 'bs', 'sa', 'kk', 'tk', 'km', 'sm', 'mk', 'hsb', 'bn',
             'be', 'pa', 'ms', 'ga', 'ur', 'an', 'wo', 'vec', 'ang', 'tt', 'sd',
             'gn', 'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si',
-            'ia', 'ie', 'ay', 'mi', 'kl', 'jbo', 'fo', 'ln', 'zu', 'na', 'gu',
+            'ia', 'ie', 'ay', 'mi', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu',
             'gv', 'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu',
             'am', 'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
         ]
