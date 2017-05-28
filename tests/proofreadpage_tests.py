@@ -268,13 +268,15 @@ class TestProofreadPageIndexProperty(TestCase):
         page = ProofreadPage(self.site, self.valid['title'])
         index_page = IndexPage(self.site, self.valid['index'])
 
-        # Test propery.
+        # Test property.
         self.assertEqual(page.index, index_page)
 
         # Test deleter
         del page.index
         self.assertFalse(hasattr(page, '_index'))
-        # Test setter
+        # Test setter with wrong type.
+        self.assertRaises(TypeError, setattr, page, 'index', 'invalid index')
+        # Test setter with correct type.
         page.index = index_page
         self.assertEqual(page.index, index_page)
 

@@ -173,8 +173,8 @@ class ProofreadPage(pywikibot.Page):
     @index.setter
     def index(self, value):
         if not isinstance(value, IndexPage):
-            raise ValueError('value %s must be a IndexPage object.'
-                             % value)
+            raise TypeError('value %s must be a IndexPage object.'
+                            % value)
         self._index = (value, None)
 
     @index.deleter
