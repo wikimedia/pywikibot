@@ -994,7 +994,7 @@ class _WbDataPage(_WbRepresentation):
         return self.page.title()
 
     @classmethod
-    def fromWikibase(cls, page_name, site=None, data_site=None):
+    def fromWikibase(cls, page_name, site):
         """
         Create a _WbDataPage from the JSON data given by the Wikibase API.
 
@@ -1004,8 +1004,7 @@ class _WbDataPage(_WbRepresentation):
         @type site: pywikibot.site.DataSite
         @rtype: pywikibot._WbDataPage
         """
-        site = site or Site().data_repository()
-        data_site = data_site or cls._get_data_site(site)
+        data_site = cls._get_data_site(site)
         page = Page(data_site, page_name)
         return cls(page, site)
 
