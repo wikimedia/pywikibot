@@ -89,9 +89,8 @@ def update_family(families):
             old = re.findall(r'(?msu)^ {8}self.languages_by_size.+?\]',
                              family_text)[0]
             family_text = family_text.replace(old, text)
-            family_file = codecs.open(family_file_name, 'w', 'utf8')
-            family_file.write(family_text)
-            family_file.close()
+            with codecs.open(family_file_name, 'w', 'utf8') as family_file:
+                family_file.write(family_text)
 
 
 if __name__ == '__main__':
