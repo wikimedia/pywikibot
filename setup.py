@@ -208,6 +208,8 @@ setup(
     version=version,
     description='Python MediaWiki Bot Framework',
     long_description=open('README.rst').read(),
+    keywords=('pywikibot python mediawiki bot wiki framework '
+              'wikimedia wikipedia pwb pywikipedia API'),
     maintainer='The Pywikibot team',
     maintainer_email='pywikibot@lists.wikimedia.org',
     license='MIT License',
