@@ -20,7 +20,7 @@ from tests.aspects import unittest, TestCase, DeprecationTestCase
 
 class TestShareFiles(TestCase):
 
-    """Test methods fileIsShared, exists and fileUrl with shared files."""
+    """Test fileIsShared, exists and fileUrl/get_file_url with shared files."""
 
     sites = {
         'enwiki': {
@@ -43,6 +43,16 @@ class TestShareFiles(TestCase):
 
     cached = True
 
+    def test_fileUrl_versus_get_file_url(self):
+        """Test fileUrl() is equivalent to get_file_url()."""
+        title = 'File:Sepp Maier 1.JPG'
+        commons = self.get_site('commons')
+        commons_file = pywikibot.FilePage(commons, title)
+        self.assertEqual(commons_file.fileUrl(), commons_file.get_file_url())
+        itwp = self.get_site('itwiki')
+        itwp_file = pywikibot.FilePage(itwp, title)
+        self.assertEqual(itwp_file.fileUrl(), itwp_file.get_file_url())
+
     def testSharedOnly(self):
         """Test fileIsShared() on file page with shared file only."""
         title = 'File:Sepp Maier 1.JPG'
@@ -60,9 +70,9 @@ class TestShareFiles(TestCase):
 
         self.assertTrue(itwp_file.fileIsShared())
         self.assertTrue(commons_file.fileIsShared())
-        self.assertTrue(commons_file.fileUrl())
+        self.assertTrue(commons_file.get_file_url())
 
-        self.assertIn('/wikipedia/commons/', itwp_file.fileUrl())
+        self.assertIn('/wikipedia/commons/', itwp_file.get_file_url())
         self.assertRaises(pywikibot.NoPage, itwp_file.get)
 
     def testLocalOnly(self):
@@ -78,14 +88,14 @@ class TestShareFiles(TestCase):
 
         commons_file = pywikibot.FilePage(commons, title)
 
-        self.assertTrue(enwp_file.fileUrl())
+        self.assertTrue(enwp_file.latest_file_info.url)
         self.assertTrue(enwp_file.exists())
         self.assertFalse(commons_file.exists())
 
         self.assertFalse(enwp_file.fileIsShared())
         self.assertRaises(pywikibot.NoPage, commons_file.fileIsShared)
 
-        self.assertRaises(pywikibot.NoPage, commons_file.fileUrl)
+        self.assertRaises(pywikibot.NoPage, commons_file.get_file_url)
         self.assertRaises(pywikibot.NoPage, commons_file.get)
 
     def testOnBoth(self):
@@ -100,7 +110,7 @@ class TestShareFiles(TestCase):
 
         commons_file = pywikibot.FilePage(commons, title)
 
-        self.assertTrue(itwp_file.fileUrl())
+        self.assertTrue(itwp_file.get_file_url())
         self.assertTrue(itwp_file.exists())
         self.assertTrue(commons_file.exists())
 
@@ -115,13 +125,13 @@ class TestShareFiles(TestCase):
         testwp = self.get_site('testwiki')
         testwp_file = pywikibot.FilePage(testwp, title)
 
-        self.assertTrue(testwp_file.fileUrl())
+        self.assertTrue(testwp_file.latest_file_info.url)
         self.assertTrue(testwp_file.exists())
         self.assertTrue(testwp_file.fileIsShared())
 
         commons_file = pywikibot.FilePage(commons, title)
-        self.assertEqual(testwp_file.fileUrl(),
-                         commons_file.fileUrl())
+        self.assertEqual(testwp_file.get_file_url(),
+                         commons_file.get_file_url())
 
 
 class TestFilePage(TestCase):

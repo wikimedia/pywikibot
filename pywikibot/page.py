@@ -2495,10 +2495,10 @@ class FilePage(Page):
         if not self.site.has_image_repository:
             return False
         elif 'wikitravel_shared' in self.site.shared_image_repository():
-            return self.fileUrl().startswith(
+            return self.latest_file_info.url.startswith(
                 u'http://wikitravel.org/upload/shared/')
         else:
-            return self.fileUrl().startswith(
+            return self.latest_file_info.url.startswith(
                 'https://upload.wikimedia.org/wikipedia/commons/')
 
     @deprecated("FilePage.latest_file_info.sha1")
