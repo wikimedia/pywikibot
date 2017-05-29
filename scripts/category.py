@@ -906,9 +906,9 @@ class CategoryTidyRobot(pywikibot.Bot):
         # Show the title of the page where the link was found.
         # Highlight the title in purple.
         pywikibot.output(color_format(
-            'Treating page {lightpurple}{0}{default}, '
+            'Treating page {0}, '
             'currently in {lightpurple}{1}{default}',
-            article.title(), current_cat.title()))
+            article.title(asLink=True), current_cat.title()))
 
         # Determine a reasonable amount of context to print
         try:
@@ -951,7 +951,9 @@ class CategoryTidyRobot(pywikibot.Bot):
                    StandardOption('remove this category tag', 'r'),
                    context_option,
                    StandardOption('save category as "{0}"'.format(current_cat.title()), 'c'))
-        choice = pywikibot.input_choice('Choice:', options, default='c')
+        choice = pywikibot.input_choice(color_format(
+            'Choice for page {lightpurple}{0}{default}:\n',
+            article.title()), options, default='c')
 
         if choice == 'c':
             pywikibot.output(u'Saving category as %s' % current_cat.title())
