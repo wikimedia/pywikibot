@@ -64,7 +64,7 @@ da9021c use OptionHandler for redirect.RedirectGenerator
 bc59339 Enable a new option sdtemplate for customized sd template (T140624)
 cfaf7c0 Rewrite claimit.py (T69284)
 2487c75 Replace private mylang variables with mycode in misspelling.py
-37a4846 se input_yn in states_redirect.py
+37a4846 Use input_yn in states_redirect.py
 0809a60 Use bot classes for table2wiki.py
 
 Updates (scripts)
