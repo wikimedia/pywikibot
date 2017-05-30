@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
-import inspect
 import math
 
 from string import Formatter
@@ -71,11 +70,6 @@ class _ColorFormatter(Formatter):
     # Dot.product of colors to create all possible combinations of foreground
     # and background colors.
     colors |= set('%s;%s' % (c1, c2) for c1 in colors for c2 in colors)
-
-    def __init__(self):
-        """Create new instance and store the stack depth."""
-        super(_ColorFormatter, self).__init__()
-        self._depth = len(inspect.stack())
 
     def get_value(self, key, args, kwargs):
         """Get value, filling in 'color' when it is a valid color."""
