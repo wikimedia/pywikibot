@@ -14,7 +14,7 @@ This module is responsible for
 from __future__ import absolute_import, print_function, unicode_literals
 
 #
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,7 +25,6 @@ __docformat__ = 'epytext'
 import atexit
 import sys
 
-from distutils.version import StrictVersion
 from string import Formatter
 from warnings import warn
 
@@ -69,13 +68,6 @@ import pywikibot.version
 SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
 _logger = "comm.http"
-
-if (isinstance(config.socket_timeout, tuple) and
-        StrictVersion(requests.__version__) < StrictVersion('2.4.0')):
-    warning('The configured timeout is a tuple but requests does not '
-            'support a tuple as a timeout. It uses the lower of the '
-            'two.')
-    config.socket_timeout = min(config.socket_timeout)
 
 
 def mode_check_decorator(func):
