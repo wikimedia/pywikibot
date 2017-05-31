@@ -13,6 +13,8 @@ __version__ = '$Id$'
 import json
 import re
 
+from requests import RequestException
+
 import pywikibot
 
 from pywikibot.comms.http import fetch
@@ -82,7 +84,7 @@ class MWSite(object):
         if self.api:
             try:
                 self._parse_post_117()
-            except ServerError:
+            except (ServerError, RequestException):
                 raise
             except Exception as e:
                 pywikibot.log('MW 1.17+ detection failed: {0!r}'.format(e))
