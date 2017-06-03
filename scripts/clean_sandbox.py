@@ -73,7 +73,7 @@ content = {
     'fa': u'{{subst:Wikipedia:ربات/sandbox}}',
     'fi': u'{{subst:Hiekka}}',
     'he': u'{{ארגז חול}}\n<!-- נא לערוך מתחת לשורה זו בלבד, תודה. -->',
-    'id': u'{{Bakpasir}}\n<!-- Uji coba dilakukan di baris di bawah ini -->',
+    'id': u' <!-- Uji coba dilakukan di baris di bawah ini -->',
     'it': '{{sandbox}}'
           '<!-- Scrivi SOTTO questa riga senza cancellarla. Grazie. -->',
     'ja': u'{{subst:サンドボックス}}',
