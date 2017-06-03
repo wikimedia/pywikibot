@@ -956,9 +956,7 @@ def handle_args(args=None, do_help=True):
     if config.verbose_output:
         # Please don't change the regular expression here unless you really
         # have to - some git versions (like 1.7.0.4) seem to treat lines
-        # containing just `$Id:` as if they were ident lines (see
-        # gitattributes(5)) leading to unwanted behaviour like automatic
-        # replacement with `$Id$`
+        # containing just `$Id$Id$`
         # or `$Id$`.
         m = re.search(r"\$Id"
                       r": (\w+) \$", pywikibot.__version__)
