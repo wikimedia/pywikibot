@@ -67,7 +67,7 @@ and arguments can be:
                This enables overriding the default template via i18n or
                to enable speedy deletion for projects other than wikipedias.
 
--always        Don't prompt you for each replacement.
+-always        Don't prompt you for each replacement/deletion.
 
 """
 #
