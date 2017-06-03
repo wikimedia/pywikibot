@@ -2634,7 +2634,7 @@ class FilePage(Page):
         return self.site.upload(self, source_filename=filename, source_url=url,
                                 **kwargs)
 
-    def download(self, filename=None, chunk_size=100 * 1024):
+    def download(self, filename=None, chunk_size=100 * 1024, revision=None):
         """
         Download to filename file of FilePage.
 
@@ -2642,7 +2642,14 @@ class FilePage(Page):
             None: self.title(as_filename=True, withNamespace=False)
             will be used
             str: provided filename will be used.
-        @type None or str
+        @type filename: None or str
+        @param chunk_size: the size of each chunk to be received and
+            written to file.
+        @type chunk_size: int
+        @param revision: file revision to download:
+            None: self.latest_file_info will be used
+            FileInfo: provided revision will be used.
+        @type revision: None or FileInfo
         @return: True if download is successful, False otherwise.
         @raise: IOError if filename cannot be written for any reason.
         """
@@ -2651,7 +2658,10 @@ class FilePage(Page):
 
         filename = os.path.expanduser(filename)
 
-        req = http.fetch(self.latest_file_info.url, stream=True)
+        if revision is None:
+            revision = self.latest_file_info
+
+        req = http.fetch(revision.url, stream=True)
         if req.status == 200:
             try:
                 with open(filename, 'wb') as f:
@@ -2661,7 +2671,7 @@ class FilePage(Page):
                 raise e
 
             sha1 = compute_file_hash(filename)
-            return sha1 == self.latest_file_info.sha1
+            return sha1 == revision.sha1
         else:
             pywikibot.warning('Unsuccesfull request (%s): %s' % (req.status, req.uri))
             return False
