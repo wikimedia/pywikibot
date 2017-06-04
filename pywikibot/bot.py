@@ -1180,11 +1180,13 @@ class OptionHandler(object):
         Get the current value of an option.
 
         @param option: key defined in OptionHandler.availableOptions
+        @raise Error: No valid option is given with option parameter
         """
         try:
             return self.options.get(option, self.availableOptions[option])
         except KeyError:
-            raise pywikibot.Error(u'%s is not a valid bot option.' % option)
+            raise pywikibot.Error("'{0}' is not a valid option for {1}."
+                                  .format(option, self.__class__.__name__))
 
 
 class BaseBot(OptionHandler):
