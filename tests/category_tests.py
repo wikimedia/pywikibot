@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Category class."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,7 +39,7 @@ class TestCategoryObject(TestCase):
         """Test isHiddenCategory."""
         site = self.get_site()
         cat_hidden = pywikibot.Category(site, 'Category:Hidden categories')
-        cat_not_hidden = pywikibot.Category(site, 'Category:Wikipedia categories')
+        cat_not_hidden = pywikibot.Category(site, 'Category:Wikipedia')
         self.assertTrue(cat_hidden.isHiddenCategory())
         self.assertFalse(cat_not_hidden.isHiddenCategory())
 
