@@ -519,7 +519,7 @@ def main(*args):
         skip = False
         if page.exists() and (page.namespace() == 6) and (
                 not page.isRedirectPage()):
-            imagepage = pywikibot.FilePage(page.site(), page.title())
+            imagepage = pywikibot.FilePage(page.site, page.title())
 
             # First do autoskip.
             if doiskip(imagepage.get()):
