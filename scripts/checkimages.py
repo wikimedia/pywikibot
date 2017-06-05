@@ -553,8 +553,8 @@ class checkImagesBot(object):
         self.logFullError = logFullError
         self.logFulNumber = logFulNumber
         self.rep_page = i18n.translate(self.site, report_page)
-        self.rep_text = '\n* [[:{0}:%s]] ~~~~~'.format(
-            self.site.namespaces.FILE.custom_name)
+        self.image_namespace = site.namespaces.FILE.custom_name + ':'
+        self.list_entry = '\n* [[:{0}%s]] '.format(self.image_namespace)
         self.com = i18n.translate(self.site, msg_comm10, fallback=True)
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         self.hiddentemplates = set(
@@ -580,33 +580,8 @@ class checkImagesBot(object):
         else:
             self.num_notify = None
 
-        self.image_namespace = u"File:"
         # Load the licenses only once, so do it once
         self.list_licenses = self.load_licenses()
-
-    @property
-    @deprecated
-    def project(self):
-        """Return family name."""
-        return self.site.family.name
-
-    @property
-    @deprecated
-    def botolist(self):
-        """Return bots."""
-        return self.bots
-
-    @botolist.setter
-    @deprecated
-    def botolist(self, value):
-        """Set bots."""
-        self.bots = value
-
-    @property
-    @deprecated
-    def botnick(self):
-        """Return username."""
-        return self.site.username()
 
     def setParameters(self, image):
         """Set parameters."""
@@ -706,7 +681,7 @@ class checkImagesBot(object):
             pywikibot.output(
                 u"Seems that %s has only the description and not the file..."
                 % self.image_to_report)
-            repme = "\n* [[:File:%s]] problems '''with the APIs'''"
+            repme = self.list_entry + "problems '''with the APIs'''"
             self.report_image(self.image_to_report, self.rep_page, self.com,
                               repme)
             return
@@ -905,8 +880,8 @@ class checkImagesBot(object):
             # It's not only on commons but the image needs a check
             # the second usually is a url or something like that.
             # Compare the two in equal way, both url.
-            repme = ("\n* [[:File:%s]] is also on '''Commons''': "
-                     "[[commons:File:%s]]"
+            repme = (self.list_entry +
+                     "is also on '''Commons''': [[commons:File:%s]]"
                      % (self.imageName,
                         commons_image_with_this_hash.title(
                             withNamespace=False)))
@@ -1023,8 +998,9 @@ class checkImagesBot(object):
                 if len(images_to_tag_list) != 0 and not only_report:
                     fp = pywikibot.FilePage(self.site, images_to_tag_list[-1])
                     already_reported_in_past = fp.revision_count(self.bots)
-                    from_regex = (r'\n\*\[\[:File:%s\]\]'
-                                  % re.escape(self.image.title(asUrl=True)))
+                    from_regex = (r'\n\*\[\[:%s%s\]\]'
+                                  % (self.image_namespace,
+                                     re.escape(self.image.title(asUrl=True))))
                     # Delete the image in the list where we're write on
                     text_for_the_report = re.sub(from_regex, '',
                                                  text_for_the_report)
@@ -1044,18 +1020,19 @@ class checkImagesBot(object):
 
             if self.duplicatesReport or only_report:
                 if only_report:
-                    repme = ('\n* [[:File:%s]] has the following duplicates '
+                    repme = (self.list_entry + 'has the following duplicates '
                              "('''forced mode'''):"
                              % self.image.title(asUrl=True))
                 else:
-                    repme = ('\n* [[:File:%s]] has the following duplicates:'
+                    repme = (self.list_entry + 'has the following duplicates:'
                              % self.image.title(asUrl=True))
 
                 for dup_page in duplicates:
                     if dup_page.title(asUrl=True) == self.image.title(asUrl=True):
                         # the image itself, not report also this as duplicate
                         continue
-                    repme += '\n** [[:File:%s]]' % dup_page.title(asUrl=True)
+                    repme += '\n** [[:%s%s]]' % (self.image_namespace,
+                                                 dup_page.title(asUrl=True))
 
                 result = self.report_image(self.imageName, self.rep_page,
                                            self.com, repme, addings=False)
@@ -1073,7 +1050,7 @@ class checkImagesBot(object):
         """Report the files to the report page when needed."""
         rep_page = rep_page or self.rep_page
         com = com or self.com
-        rep_text = rep_text or self.rep_text
+        rep_text = rep_text or self.list_entry + '~~~~~'
 
         if addings:
             # Adding the name of the image in the report if not done already
@@ -1330,10 +1307,11 @@ class checkImagesBot(object):
                 self.some_problem = False
         else:
             if not self.seems_ok and self.license_found:
-                rep_text_license_fake = u"\n* [[:File:%s]] seems to have " \
-                                        % self.imageName + \
-                    "a ''fake license'', license detected: <nowiki>%s</nowiki>" \
-                                        % self.license_found
+                rep_text_license_fake = (self.list_entry +
+                                         "seems to have a ''fake license'', "
+                                         'license detected: '
+                                         '<nowiki>%s</nowiki>' %
+                                         (self.imageName, self.license_found))
                 printWithTimeZone(
                     u"%s seems to have a fake license: %s, reporting..."
                     % (self.imageName, self.license_found))
