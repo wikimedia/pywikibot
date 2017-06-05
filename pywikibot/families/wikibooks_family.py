@@ -37,12 +37,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'hu', 'de', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'vi',
-            'he', 'ca', 'th', 'fi', 'id', 'sq', 'fa', 'ru', 'zh', 'cs', 'az',
+            'en', 'hu', 'de', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'he',
+            'vi', 'ca', 'th', 'fi', 'id', 'sq', 'fa', 'ru', 'zh', 'cs', 'az',
             'sv', 'da', 'hr', 'sr', 'tr', 'ko', 'ar', 'no', 'gl', 'ro', 'ta',
             'tl', 'mk', 'is', 'sa', 'ka', 'uk', 'lt', 'tt', 'eo', 'sk', 'el',
-            'bg', 'hi', 'bn', 'hy', 'si', 'ms', 'li', 'sl', 'ur', 'la', 'ml',
-            'km', 'ang', 'ia', 'et', 'cv', 'mr', 'eu', 'kk', 'oc', 'be', 'pa',
+            'hi', 'bg', 'bn', 'hy', 'si', 'ms', 'li', 'sl', 'ur', 'la', 'ml',
+            'km', 'ang', 'ia', 'et', 'cv', 'mr', 'eu', 'oc', 'kk', 'be', 'pa',
             'ne', 'ie', 'fy', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'cy',
             'zh-min-nan', 'uz',
         ]
