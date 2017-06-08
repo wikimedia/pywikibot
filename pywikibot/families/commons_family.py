@@ -13,7 +13,7 @@ from pywikibot import family
 
 
 # The Wikimedia Commons family
-class Family(family.WikimediaOrgFamily):
+class Family(family.WikimediaFamily):
 
     """Family class for Wikimedia Commons."""
 
@@ -23,12 +23,17 @@ class Family(family.WikimediaOrgFamily):
         """Constructor."""
         super(Family, self).__init__()
 
+        self.langs = {
+            'commons': 'commons.wikimedia.org',
+            'beta': 'commons.wikimedia.beta.wmflabs.org'
+        }
+
         self.interwiki_forward = 'wikipedia'
 
         # Templates that indicate a category redirect
         # Redirects to these templates are automatically included
         self.category_redirect_templates = {
-            'commons': (
+            '_default': (
                 u'Category redirect',
                 u'Synonym taxon category redirect',
                 u'Invalid taxon category redirect',
