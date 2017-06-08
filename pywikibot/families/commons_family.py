@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikimedia Commons."""
 #
-# (C) Pywikibot team, 2005-2015
+# (C) Pywikibot team, 2005-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,20 +25,11 @@ class Family(family.WikimediaOrgFamily):
 
         self.interwiki_forward = 'wikipedia'
 
+        # Templates that indicate a category redirect
+        # Redirects to these templates are automatically included
         self.category_redirect_templates = {
             'commons': (
                 u'Category redirect',
-                u'Categoryredirect',
-                u'Catredirect',
-                u'Cat redirect',
-                u'Catredir',
-                u'Cat-red',
-                u'See cat',
-                u'Seecat',
-                u'See category',
-                u'Redirect category',
-                u'Redirect cat',
-                u'Redir cat',
                 u'Synonym taxon category redirect',
                 u'Invalid taxon category redirect',
                 u'Monotypic taxon category redirect',

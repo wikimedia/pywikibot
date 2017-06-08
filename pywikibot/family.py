@@ -998,11 +998,11 @@ class Family(object):
                 "ERROR: linktrail in language %(language_code)s unknown"
                 % {'language_code': code})
 
-    def _category_redirects(self, code, fallback='_default'):
+    def category_redirects(self, code, fallback='_default'):
         """Return list of category redirect templates."""
         if not hasattr(self, "_catredirtemplates") or \
            code not in self._catredirtemplates:
-            self.get_cr_templates(code, fallback)
+            self._get_cr_templates(code, fallback)
         if code in self._catredirtemplates:
             return self._catredirtemplates[code]
         else:
@@ -1032,15 +1032,10 @@ class Family(object):
                     cr_list.append(newtitle)
         self._catredirtemplates[code] = cr_list
 
-    @deprecated('Page.isCategoryRedirect')
-    def category_redirects(self, code, fallback="_default"):
-        """DEPRECATED: Return list of category redirect templates."""
-        return self._category_redirects(code, fallback)
-
-    @deprecated('Page.isCategoryRedirect')
+    @deprecated('site.category_redirects()')
     def get_cr_templates(self, code, fallback):
         """DEPRECATED: Build list of category redirect templates."""
-        return self._get_cr_templates(code, fallback)
+        self._get_cr_templates(code, fallback)
 
     def disambig(self, code, fallback='_default'):
         """Return list of disambiguation templates."""

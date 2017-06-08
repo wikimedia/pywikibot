@@ -264,10 +264,8 @@ class CategoryRedirectBot(pywikibot.Bot):
     def run(self):
         """Run the bot."""
         # validate L10N
-        try:
-            self.template_list = self.site.family.category_redirect_templates[
-                self.site.code]
-        except KeyError:
+        self.template_list = self.site.category_redirects()
+        if not self.template_list:
             pywikibot.warning(u"No redirect templates defined for %s"
                               % self.site)
             return
