@@ -3462,6 +3462,23 @@ class User(Page):
                    item.pageid() > 0
                    )
 
+    @property
+    def is_thankable(self):
+        """
+        Determine if the user has thanks notifications enabled.
+
+        NOTE: This doesn't accurately determine if thanks is enabled for user.
+              Privacy of thanks preferences is under discussion, please see
+              https://phabricator.wikimedia.org/T57401#2216861, and
+              https://phabricator.wikimedia.org/T120753#1863894
+
+        @rtype: bool
+        """
+        if self.isAnonymous():
+            return False
+
+        return True
+
 
 class WikibasePage(BasePage):
 
@@ -5166,6 +5183,17 @@ class Revision(DotReadableDict):
         """Return a namedtuple with a Page full history record."""
         return Revision.FullHistEntry(self.revid, self.timestamp, self.user,
                                       self.text, self.rollbacktoken)
+
+    @staticmethod
+    def _thank(revid, site, source='pywikibot'):
+        """Thank a user for this revision.
+
+        @param site: The Site object for this revision.
+        @type site: Site
+        @param source: An optional source to pass to the API.
+        @type source: str
+        """
+        site.thank_revision(revid, source)
 
 
 class FileInfo(DotReadableDict):
