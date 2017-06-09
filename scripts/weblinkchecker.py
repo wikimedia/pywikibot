@@ -793,7 +793,7 @@ class DeadLinkReportThread(threading.Thread):
                     '{lightaqua}** Reporting dead link on {0}...{default}',
                     talkPage.title(asLink=True)))
                 try:
-                    content = talkPage.get() + "\n\n"
+                    content = talkPage.get() + "\n\n\n"
                     if url in content:
                         pywikibot.output(color_format(
                             '{lightaqua}** Dead link seems to have already '
@@ -824,7 +824,7 @@ class DeadLinkReportThread(threading.Thread):
                     i += 1
                     count = u' ' + str(i)
                 caption += count
-                content += '\n\n== %s ==\n\n%s\n\n%s%s--~~~~' % \
+                content += '== %s ==\n\n%s\n\n%s%s\n--~~~~' % \
                            (caption,
                             i18n.twtranslate(containingPage.site,
                                              'weblinkchecker-report'),
