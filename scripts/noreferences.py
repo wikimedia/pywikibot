@@ -34,7 +34,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -287,7 +287,8 @@ referencesSections = {
         u'Notes et références',
         u'Références',
         u'References',
-        u'Notes'
+        'Notes',
+        'Sources',
     ],
     'he': [
         u'הערות שוליים',
@@ -644,23 +645,23 @@ class NoReferencesBot(Bot):
             try:
                 text = page.text
             except pywikibot.NoPage:
-                pywikibot.output(u"Page %s does not exist?!"
-                                 % page.title(asLink=True))
+                pywikibot.warning('Page %s does not exist?!'
+                                  % page.title(asLink=True))
                 continue
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Page %s is a redirect; skipping."
                                  % page.title(asLink=True))
                 continue
             except pywikibot.LockedPage:
-                pywikibot.output(u"Page %s is locked?!"
-                                 % page.title(asLink=True))
+                pywikibot.warning('Page %s is locked?!'
+                                  % page.title(asLink=True))
                 continue
             if page.isDisambig():
                 pywikibot.output(u"Page %s is a disambig; skipping."
                                  % page.title(asLink=True))
                 continue
             if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
-                pywikibot.output(
+                pywikibot.warning(
                     u"Page %s is edited by IP. Possible vandalized"
                     % page.title(asLink=True))
                 continue
@@ -669,14 +670,15 @@ class NoReferencesBot(Bot):
                 try:
                     self.userPut(page, page.text, newText, summary=self.comment)
                 except pywikibot.EditConflict:
-                    pywikibot.output(u'Skipping %s because of edit conflict'
-                                     % page.title())
+                    pywikibot.warning('Skipping %s because of edit conflict'
+                                      % page.title(asLink=True))
                 except pywikibot.SpamfilterError as e:
-                    pywikibot.output(
+                    pywikibot.warning(
                         u'Cannot change %s because of blacklist entry %s'
-                        % (page.title(), e.url))
+                        % (page.title(asLink=True), e.url))
                 except pywikibot.LockedPage:
-                    pywikibot.output(u'Skipping %s (locked page)' % page.title())
+                    pywikibot.warning('Skipping %s (locked page)' %
+                                      page.title(asLink=True))
 
 
 def main(*args):
