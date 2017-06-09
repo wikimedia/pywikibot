@@ -102,7 +102,7 @@ from pywikibot import pagegenerators as pg
 
 from pywikibot.exceptions import ArgumentDeprecationWarning, NotEmailableError
 from pywikibot.family import Family
-from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
+from pywikibot.tools import issue_deprecation_warning
 
 ###############################################################################
 # <--------------------------- Change only below! --------------------------->#
@@ -828,14 +828,6 @@ class checkImagesBot(object):
         # find the oldest image
         sec, image = max(listGiven, key=lambda element: element[0])
         return image
-
-    @deprecated('Page.revision_count()')
-    def countEdits(self, pagename, userlist):
-        """Function to count the edit of a user or a list of users in a page."""
-        if isinstance(userlist, StringTypes):
-            userlist = [userlist]
-        page = pywikibot.Page(self.site, pagename)
-        return page.revision_count(userlist)
 
     def checkImageOnCommons(self):
         """Checking if the file is on commons."""
