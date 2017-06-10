@@ -221,13 +221,18 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
 def get_archive_url(url):
     """Get archive URL."""
     try:
-        return _get_closest_memento_url(
+        archive = _get_closest_memento_url(
             url,
             timegate_uri='http://web.archive.org/web/')
     except Exception:
-        return _get_closest_memento_url(
+        archive = _get_closest_memento_url(
             url,
             timegate_uri='http://timetravel.mementoweb.org/webcite/timegate/')
+
+    # FIXME: Hack for T167463: Use https instead of http for archive.org links
+    if archive.startswith('http://web.archive.org'):
+        archive = archive.replace('http://', 'https://', 1)
+    return archive
 
 
 def weblinksIn(text, withoutBracketed=False, onlyBracketed=False):
