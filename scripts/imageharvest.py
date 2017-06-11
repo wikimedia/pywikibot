@@ -45,6 +45,8 @@ if not PY2:
 else:
     from urllib import URLopener
 
+fileformats = ('jpg', 'jpeg', 'png', 'gif', 'svg', 'ogg')
+
 
 def get_imagelinks(url):
     """Given a URL, get all images linked to by the page at that URL."""
@@ -73,7 +75,7 @@ def get_imagelinks(url):
     return links
 
 
-def main(give_url, image_url, desc):
+def run_bot(give_url, image_url, desc):
     """Run the bot."""
     url = give_url
     image_url = ''
@@ -135,7 +137,10 @@ def main(give_url, image_url, desc):
             break
 
 
-try:
+def main(*args):
+    """Process command line arguments and invoke bot."""
+    global shown
+    global mysite
     url = u''
     image_url = False
     shown = False
@@ -154,8 +159,9 @@ try:
             desc += [arg]
     desc = ' '.join(desc)
 
-    fileformats = ('jpg', 'jpeg', 'png', 'gif', 'svg', 'ogg')
     mysite = pywikibot.Site()
-    main(url, image_url, desc)
-finally:
-    pywikibot.stopme()
+    run_bot(url, image_url, desc)
+
+
+if __name__ == '__main__':
+    main()

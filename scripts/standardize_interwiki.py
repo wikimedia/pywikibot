@@ -9,7 +9,7 @@ Parameters:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,27 +41,19 @@ comment = {
 }
 
 
-# Some parameters
-options = []
-start = []
-filelist = []
-hints = {}
-debug = 0
-start = '!'
-nothing = False
+def main(*args):
+    """Process command line arguments and run the script."""
+    start = '!'
 
-# Load the default parameters and start
-for arg in pywikibot.handle_args():
-    if arg.startswith('-start'):
-        if len(arg) == 6:
-            start = pywikibot.input(u'From what page do you want to start?')
-        else:
-            start = arg[7:]
-site = pywikibot.Site()
-comm = pywikibot.translate(site, comment)
-
-# What follows is the main part of the code.
-try:
+    # Load the default parameters and start
+    for arg in pywikibot.handle_args():
+        if arg.startswith('-start'):
+            if len(arg) == 6:
+                start = pywikibot.input(u'From what page do you want to start?')
+            else:
+                start = arg[7:]
+    site = pywikibot.Site()
+    comm = pywikibot.translate(site, comment)
     for pl in site.allpages(start):
         plname = pl.title()
         pywikibot.output(u'\nLoading %s...' % plname)
@@ -90,5 +82,7 @@ try:
         else:
             pywikibot.output(u'No interwiki found.')
             continue
-finally:
-    pywikibot.stopme()
+
+
+if __name__ == '__main__':
+    main()
