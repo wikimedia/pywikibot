@@ -714,13 +714,6 @@ flickr = {
     'reviewer': u'',  # If so, under what reviewer name?
 }
 
-# Using the Panoramio api
-panoramio = {
-    'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': u'',  # If so, under what reviewer name?
-}
-
-
 # ############# COPYRIGHT SETTINGS ##############
 
 # Enable/disable search engine in copyright.py script
@@ -887,6 +880,15 @@ pickle_protocol = 2
 
 # End of configuration section
 # ============================
+
+# ############# OBSOLETE SETTINGS #############
+# This section contains configuration options that are no longer in use.
+# They are kept here to prevent warnings about undefined parameters.
+
+panoramio = {
+    'review': False,  # Do we use automatically make our uploads reviewed?
+    'reviewer': u'',  # If so, under what reviewer name?
+}
 
 
 def makepath(path):
