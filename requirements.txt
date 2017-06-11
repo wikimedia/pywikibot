@@ -55,7 +55,7 @@ Pillow ; python_version >= '2.7'
 
 # core pagegenerators
 google >= 1.7
-socketIO-client<0.6.1
+sseclient
 
 # scripts/script_wui.py:
 crontab

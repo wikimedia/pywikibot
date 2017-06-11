@@ -26,6 +26,8 @@ from pywikibot.pagegenerators import (
     CategorizedPageGenerator
 )
 
+from pywikibot.tools import has_module
+
 from tests import join_data_path
 from tests.aspects import (
     unittest,
@@ -1299,27 +1301,31 @@ class EnWikipediaPageGeneratorIntersectTestCase(GeneratorIntersectTestCase,
         )
 
 
-class LiveRCPageGeneratorTestCase(RecentChangesTestCase):
+class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
 
     """Test case for Live Recent Changes pagegenerator."""
 
     @classmethod
     def setUpClass(cls):
         """Setup test class."""
-        super(LiveRCPageGeneratorTestCase, cls).setUpClass()
-        try:
-            import socketIO_client
-        except ImportError:
-            raise unittest.SkipTest('socketIO_client not available')
-
-        if LooseVersion(socketIO_client.__version__) >= LooseVersion('0.6.1'):
-            raise unittest.SkipTest(
-                'socketIO_client %s not supported by Wikimedia-Stream'
-                % socketIO_client.__version__)
+        super(EventStreamsPageGeneratorTestCase, cls).setUpClass()
+        cls.client = 'sseclient'
+        if not has_module(cls.client):
+            cls.client = 'socketIO_client'
+            try:
+                import socketIO_client
+            except ImportError:
+                raise unittest.SkipTest(
+                    'Neither sseclient nor socketIO_client is available')
+            if LooseVersion(
+                    socketIO_client.__version__) >= LooseVersion('0.6.1'):
+                raise unittest.SkipTest(
+                    'socketIO_client %s not supported by Wikimedia-Stream'
+                    % socketIO_client.__version__)
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""
-        lgr = logging.getLogger('socketIO_client')
+        lgr = logging.getLogger(self.client)
         lgr.setLevel(logging.DEBUG)
         ch = logging.StreamHandler()
         ch.setLevel(logging.DEBUG)
