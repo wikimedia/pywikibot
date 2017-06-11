@@ -40,9 +40,8 @@ script_deps = {
     'imagecopy_self': [TK_IMPORT],
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
-
     'flickrripper': ['flickrapi'],
-    'imageharvest': ['BeautifulSoup'],
+    'imageharvest': ['beautifulsoup4'],
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwparserfromhell'],
@@ -391,6 +390,11 @@ class TestScriptHelp(PwbTestCase):
     net = False
 
     _expected_failures = failed_dep_script_list
+    # -help supported not explicitly
+    try:
+        _expected_failures.remove('imageharvest')
+    except ValueError:
+        pass
     _allowed_failures = []
 
     _argument = 'help'
