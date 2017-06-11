@@ -735,11 +735,11 @@ class RedirectRobot(SingleSiteBot):
 
     def treat(self, page):
         """Treat a single page."""
-        self.action_treat(page)
         if self._treat_counter >= self.getOption('total'):
             pywikibot.output('\nNumber of pages reached the total limit. '
                              'Script terminated.')
             self.quit()
+        self.action_treat(page)
 
 
 def main(*args):
