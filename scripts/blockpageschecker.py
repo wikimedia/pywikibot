@@ -86,6 +86,7 @@ templateSemiProtection = {
            r'\{\{(?:[Tt]emplate:|)[Aa]bp(?:|[ _]scad\|(?:.*?))\}\}'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)半保護'
            r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
+    'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано-анон)\}\}'],
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
@@ -99,6 +100,7 @@ templateTotalProtection = {
            r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">\s*?[Qq]uesta pagina'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)保護(?:性急|)'
            r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
+    'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано)\}\}']
 }
 
 # Regex to get the semi-protection move template
@@ -130,11 +132,11 @@ templateNoRegex = {
     'it': ['{{Avvisobloccoparziale}}', '{{Avvisoblocco}}', None, None,
            '{{Protetta}}'],
     'ja': [u'{{半保護}}', u'{{保護}}', u'{{移動半保護}}', u'{{移動保護}}', None],
+    'sr': ['{{Закључано-анон}}', '{{Закључано}}', None, None, None],
 }
 
 # Category where the bot will check
 categoryToCheck = {
-    'en': [u'Category:Wikipedia protected pages'],
     'ar': [u'تصنيف:محتويات محمية'],
     'cs': ['Kategorie:Wikipedie:Zamčené stránky',
            'Kategorie:Wikipedie:Polozamčené stránky',
@@ -142,6 +144,7 @@ categoryToCheck = {
            'Kategorie:Wikipedie:Dlouhodobě polozamčené stránky'],
     'fr': [u'Category:Page semi-protégée', u'Category:Page protégée',
            u'Catégorie:Article protégé'],
+    'en': [u'Category:Wikipedia protected pages'],
     'he': [u'קטגוריה:ויקיפדיה: דפים מוגנים',
            u'קטגוריה:ויקיפדיה: דפים מוגנים חלקית'],
     'it': [u'Categoria:Pagine protette - scadute',
@@ -150,12 +153,13 @@ categoryToCheck = {
            u'Category:移動保護中の記事'],
     'pt': [u'Category:!Páginas protegidas',
            u'Category:!Páginas semiprotegidas'],
+    'sr': [u'Category:Странице закључане за анонимне кориснике', u'Category:Закључане странице'],
     'zh': [u'Category:被保护的页面', u'Category:被保護的模板',
            u'Category:暂时不能移动的页面', u'Category:被半保护的页面'],
 }
 
 # Check list to block the users that haven't set their preferences
-project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'zh']
+project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'sr', 'zh']
 
 # END PREFERENCES
 
