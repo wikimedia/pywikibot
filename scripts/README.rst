@@ -166,8 +166,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | #pageimport.py         | Import pages from a certain wiki to another.            |
     +------------------------+---------------------------------------------------------+
-    | panoramiopicker.py     | Upload images from Panoramio easily.                    |
-    +------------------------+---------------------------------------------------------+
     | patrol.py              | Obtains a list pages and marks the edits as patrolled   |
     |                        | based on a whitelist.                                   |
     +------------------------+---------------------------------------------------------+

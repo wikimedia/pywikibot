@@ -44,7 +44,6 @@ script_deps = {
     'flickrripper': ['flickrapi'],
     'imageharvest': ['BeautifulSoup'],
     'match_images': ['PIL.ImageTk'],
-    'panoramiopicker': ['BeautifulSoup'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwparserfromhell'],
 }
@@ -163,7 +162,6 @@ no_args_expected_results = {
     'imageharvest': 'From what URL should I get the images',
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
-    'panoramiopicker': 'Panoramiopicker is a tool to transfer Panaramio ',
     'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
     'shell': ('>>> ', 'Welcome to the'),
