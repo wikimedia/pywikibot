@@ -658,6 +658,60 @@ class DryFactoryGeneratorTest(TestCase):
         gf = pagegenerators.GeneratorFactory(site=self.get_site())
         self.assertRaises(UnknownExtension, gf.handleArg, '-ql:2')
 
+    def test_one_excluded_namespaces(self):
+        """Test one excluded namespaces."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:not:2')
+        ns = set(range(16))
+        ns.remove(2)
+        self.assertTrue(ns.issubset(gf.namespaces))
+
+    def test_two_excluded_namespaces(self):
+        """Test two excluded namespaces."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:not:2')
+        gf.handleArg('-ns:not:Talk')
+        ns = set(range(16))
+        ns.remove(2)
+        ns.remove(1)
+        self.assertTrue(ns.issubset(gf.namespaces))
+
+    def test_two_excluded_named_namespaces(self):
+        """Test two excluded named namespaces."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:not:Talk,File')
+        ns = set(range(16))
+        ns.remove(1)
+        ns.remove(6)
+        self.assertTrue(ns.issubset(gf.namespaces))
+
+    def test_two_excluded_numeric_namespaces(self):
+        """Test two excluded namespaces delimited by colon."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:not:1,6')
+        ns = set(range(16))
+        ns.remove(1)
+        ns.remove(6)
+        self.assertTrue(ns.issubset(gf.namespaces))
+
+    def test_mixed_namespaces_with_exclusion(self):
+        """Test mixed namespaces with exclusion."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:not:2,File')
+        gf.handleArg('-ns:not:3,4,5')
+        gf.handleArg('-ns:6,7')
+        ns = set(range(16))
+        for i in range(2, 6):
+            ns.remove(i)
+        self.assertTrue(ns.issubset(gf.namespaces))
+
+    def test_given_namespaces_with_exclusion(self):
+        """Test mixed namespaces with exclusion."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        gf.handleArg('-ns:1,2,3,4,5')
+        gf.handleArg('-ns:not:User')
+        self.assertEqual(gf.namespaces, set([1, 3, 4, 5]))
+
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):
 
