@@ -41,7 +41,7 @@ script_deps = {
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
     'flickrripper': ['flickrapi'],
-    'imageharvest': ['beautifulsoup4'],
+    'imageharvest': ['bs4'],
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwparserfromhell'],
