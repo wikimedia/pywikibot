@@ -44,6 +44,20 @@ def _get_test_unconnected_page(site):
             return page
 
 
+class WbRepresentationTestCase(WikidataTestCase):
+
+    """Test methods inherited or extended from _WbRepresentation."""
+
+    def setUp(self):
+        """Setup tests."""
+        super(WbRepresentationTestCase, self).setUp()
+
+    def _test_hashable(self, representation):
+        """Test that the representation is hashable."""
+        list_of_dupes = [representation, representation]
+        self.assertEqual(len(set(list_of_dupes)), 1)
+
+
 class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
                                WikidataTestCase):
 
@@ -136,11 +150,19 @@ class TestGeneral(WikidataTestCase):
                          ItemPage(self.get_repo(), 'q5296'))
 
 
-class TestWikibaseCoordinate(WikidataTestCase):
+class TestWikibaseCoordinate(WbRepresentationTestCase):
 
     """Test Wikibase Coordinate data type."""
 
     dry = True
+
+    def test_Coordinate_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        repo = self.get_repo()
+        coord = pywikibot.Coordinate(
+            site=repo, lat=12.0, lon=13.0, precision=0,
+            globe='moon')
+        self._test_hashable(coord)
 
     def test_Coordinate_dim(self):
         """Test Coordinate dimension."""
@@ -178,7 +200,7 @@ class TestWikibaseCoordinate(WikidataTestCase):
                           'globe': 'http://www.wikidata.org/entity/Q123'})
 
 
-class TestWikibaseCoordinateNonDry(WikidataTestCase):
+class TestWikibaseCoordinateNonDry(WbRepresentationTestCase):
 
     """
     Test Wikibase Coordinate data type (non-dry).
@@ -262,11 +284,18 @@ class TestWikibaseCoordinateNonDry(WikidataTestCase):
         self.assertNotEqual(c, d)
 
 
-class TestWbTime(WikidataTestCase):
+class TestWbTime(WbRepresentationTestCase):
 
     """Test Wikibase WbTime data type."""
 
     dry = True
+
+    def test_WbTime_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        repo = self.get_repo()
+        t = pywikibot.WbTime(site=repo, year=2010, month=0, day=0, hour=12,
+                             minute=43)
+        self._test_hashable(t)
 
     def test_WbTime_timestr(self):
         """Test timestr functions of WbTime."""
@@ -335,11 +364,17 @@ class TestWbTime(WikidataTestCase):
                           precision='invalid_precision')
 
 
-class TestWbQuantity(WikidataTestCase):
+class TestWbQuantity(WbRepresentationTestCase):
 
     """Test Wikibase WbQuantity data type."""
 
     dry = True
+
+    def test_WbQuantity_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        repo = self.get_repo()
+        q = pywikibot.WbQuantity(amount=1234, error=1, site=repo)
+        self._test_hashable(q)
 
     def test_WbQuantity_integer(self):
         """Test WbQuantity for integer value."""
@@ -457,7 +492,7 @@ class TestWbQuantity(WikidataTestCase):
                           'unit': 'http://www.wikidata.org/entity/Q712226', })
 
 
-class TestWbQuantityNonDry(WikidataTestCase):
+class TestWbQuantityNonDry(WbRepresentationTestCase):
 
     """
     Test Wikibase WbQuantity data type (non-dry).
@@ -574,11 +609,17 @@ class TestWbQuantityNonDry(WikidataTestCase):
                          ItemPage(test_repo, 'Q123'))
 
 
-class TestWbMonolingualText(WikidataTestCase):
+class TestWbMonolingualText(WbRepresentationTestCase):
 
     """Test Wikibase WbMonolingualText data type."""
 
     dry = True
+
+    def test_WbMonolingualText_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        q = pywikibot.WbMonolingualText(
+            text='Test that basics work', language='en')
+        self._test_hashable(q)
 
     def test_WbMonolingualText_string(self):
         """Test WbMonolingualText string."""
@@ -614,7 +655,7 @@ class TestWbMonolingualText(WikidataTestCase):
                           text=None, language='sv')
 
 
-class TestWbGeoShapeNonDry(WikidataTestCase):
+class TestWbGeoShapeNonDry(WbRepresentationTestCase):
 
     """
     Test Wikibase WbGeoShape data type (non-dry).
@@ -627,6 +668,11 @@ class TestWbGeoShapeNonDry(WikidataTestCase):
         self.commons = pywikibot.Site('commons', 'commons')
         self.page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
         super(TestWbGeoShapeNonDry, self).setUp()
+
+    def test_WbGeoShape_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        q = pywikibot.WbGeoShape(self.page)
+        self._test_hashable(q)
 
     def test_WbGeoShape_page(self):
         """Test WbGeoShape page."""
@@ -680,7 +726,7 @@ class TestWbGeoShapeNonDry(WikidataTestCase):
                           non_map_page, self.get_repo())
 
 
-class TestWbTabularDataNonDry(WikidataTestCase):
+class TestWbTabularDataNonDry(WbRepresentationTestCase):
 
     """
     Test Wikibase WbTabularData data type (non-dry).
@@ -693,6 +739,11 @@ class TestWbTabularDataNonDry(WikidataTestCase):
         self.commons = pywikibot.Site('commons', 'commons')
         self.page = Page(self.commons, 'Data:Bea.gov/GDP by state.tab')
         super(TestWbTabularDataNonDry, self).setUp()
+
+    def test_WbTabularData_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        q = pywikibot.WbTabularData(self.page)
+        self._test_hashable(q)
 
     def test_WbTabularData_page(self):
         """Test WbTabularData page."""
@@ -746,11 +797,17 @@ class TestWbTabularDataNonDry(WikidataTestCase):
                           non_map_page, self.get_repo())
 
 
-class TestWbUnknown(WikidataTestCase):
+class TestWbUnknown(WbRepresentationTestCase):
 
     """Test Wikibase WbUnknown data type."""
 
     dry = True
+
+    def test_WbUnknown_WbRepresentation_methods(self):
+        """Test inherited or extended methods from _WbRepresentation."""
+        q_dict = {'text': 'Test that basics work', 'language': 'en'}
+        q = pywikibot.WbUnknown(q_dict)
+        self._test_hashable(q)
 
     def test_WbUnknown_string(self):
         """Test WbUnknown string."""
@@ -1344,6 +1401,11 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
         """Test ItemPage methods inherited from superclass BasePage."""
         self._test_invoke()
         self._test_no_wikitext()
+
+    def test_item_is_hashable(self):
+        """Ensure that ItemPages are hashable."""
+        list_of_dupes = [self._page, self._page]
+        self.assertEqual(len(set(list_of_dupes)), 1)
 
 
 class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):

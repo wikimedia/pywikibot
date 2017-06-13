@@ -984,6 +984,10 @@ class _WbDataPage(_WbRepresentation):
                               specifics['ending'], specifics['label'])
         self.page = page
 
+    def __hash__(self):
+        """Override super.hash() as toWikibase is a string for _WbDataPage."""
+        return hash(self.toWikibase())
+
     def toWikibase(self):
         """
         Convert the data to the value required by the Wikibase API.
