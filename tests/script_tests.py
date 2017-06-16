@@ -74,7 +74,7 @@ failed_dep_script_list = [name
 
 unrunnable_script_list = [
     'version',  # does not use global args
-    'script_wui',   # depends on lua compiling
+    'script_wui',  # depends on lua compiling
 ]
 
 
