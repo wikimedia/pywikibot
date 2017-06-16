@@ -360,6 +360,23 @@ class NewUsersEntry(LogEntry):
 
     _expectedType = 'newusers'
 
+
+class ThanksEntry(LogEntry):
+
+    """Thanks log entry."""
+
+    _expectedType = 'thanks'
+
+    def page(self):
+        """Return the target user.
+
+        This returns a User object instead of the Page object returned by the
+        superclass method.
+        """
+        if not hasattr(self, '_page'):
+            self._page = pywikibot.User(super(ThanksEntry, self).page())
+        return self._page
+
 # TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
 
 
@@ -380,7 +397,8 @@ class LogEntryFactory(object):
         'move': MoveEntry,
         'import': ImportEntry,
         'patrol': PatrolEntry,
-        'newusers': NewUsersEntry
+        'newusers': NewUsersEntry,
+        'thanks': ThanksEntry,
     }
 
     def __init__(self, site, logtype=None):
