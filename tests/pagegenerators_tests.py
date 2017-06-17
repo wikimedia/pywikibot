@@ -857,8 +857,15 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
-        self.assertGreater(len(pages), 0)
         self.assertLessEqual(len(pages), 60)
+
+        newpages_url = self.site.base_url(self.site.path() + '?title=Special:NewPages&uselang=en')
+        failure_message = 'No new pages returned by -newpages. ' \
+            'If this is the only failure, check whether {url} contains any pages. ' \
+            'If not, create a new page on the site to make the test pass again.' \
+            .format(url=newpages_url)
+
+        self.assertGreater(len(pages), 0, failure_message)
 
     def test_newpages_ns_default(self):
         """Test newpages generator with limit argument."""
