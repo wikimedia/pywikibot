@@ -452,10 +452,15 @@ class TestSiteObject(DefaultSiteTestCase):
 
 
 class TestSiteGenerators(DefaultSiteTestCase):
-
     """Test cases for Site methods."""
 
     cached = True
+
+    def setUp(self):
+        """Initialize self.site and self.mainpage."""
+        super(TestSiteGenerators, self).setUp()
+        self.site = self.get_site()
+        self.mainpage = self.get_mainpage()
 
     def test_generator_namespace(self):
         """Test site._generator with namespaces."""
@@ -469,62 +474,111 @@ class TestSiteGenerators(DefaultSiteTestCase):
                               namespaces=1)
         self.assertEqual(gen.request['gblnamespace'], [1])
 
-    def testLinkMethods(self):
-        """Test site methods for getting links to and from a page."""
-        if self.site.family.name == 'wpbeta':
-            raise unittest.SkipTest('Test fails on betawiki; T69931')
-        mysite = self.get_site()
-        mainpage = self.get_mainpage()
-        backlinks = set(mysite.pagebacklinks(mainpage, namespaces=[0]))
+    def test_pagereferences(self):
+        """Test Site.pagereferences."""
+        # pagereferences includes both backlinks and embeddedin
+        backlinks = set(self.site.pagebacklinks(self.mainpage, namespaces=[0]))
+        embedded = set(self.site.page_embeddedin(self.mainpage, namespaces=[0]))
+        refs = set(self.site.pagereferences(self.mainpage, namespaces=[0]))
+
+        self.assertLessEqual(backlinks, refs)
+        self.assertLessEqual(embedded, refs)
+        self.assertEqual(refs, backlinks | embedded)
+
+    def test_backlinks(self):
+        """Test Site.pagebacklinks."""
+        backlinks_ns_0 = set(self.site.pagebacklinks(
+            self.mainpage, namespaces=[0]))
+        backlinks_ns_0_2 = set(self.site.pagebacklinks(
+            self.mainpage, namespaces=[0, 2]))
+
         # only non-redirects:
-        filtered = set(mysite.pagebacklinks(mainpage, namespaces=0,
-                                            filterRedirects=False))
+        filtered = set(self.site.pagebacklinks(
+            self.mainpage, namespaces=0, filterRedirects=False))
         # only redirects:
-        redirs = set(mysite.pagebacklinks(mainpage, namespaces=0,
-                                          filterRedirects=True))
+        redirs = set(self.site.pagebacklinks(
+            self.mainpage, namespaces=0, filterRedirects=True))
         # including links to redirect pages (but not the redirects):
-        indirect = set(mysite.pagebacklinks(mainpage, namespaces=[0],
-                                            followRedirects=True,
-                                            filterRedirects=False))
+        indirect = set(self.site.pagebacklinks(
+            self.mainpage, namespaces=[0], followRedirects=True, filterRedirects=False))
+
+        for bl in backlinks_ns_0:
+            self.assertIsInstance(bl, pywikibot.Page)
+
         self.assertEqual(filtered & redirs, set([]))
         self.assertEqual(indirect & redirs, set([]))
         self.assertLessEqual(filtered, indirect)
-        self.assertLessEqual(filtered, backlinks)
-        self.assertLessEqual(redirs, backlinks)
-        self.assertLessEqual(
-            backlinks,
-            set(self.site.pagebacklinks(mainpage, namespaces=[0, 2])))
+        self.assertLessEqual(filtered, backlinks_ns_0)
+        self.assertLessEqual(redirs, backlinks_ns_0)
+        self.assertLessEqual(backlinks_ns_0, backlinks_ns_0_2)
 
-        # pagereferences includes both backlinks and embeddedin
-        embedded = set(mysite.page_embeddedin(mainpage, namespaces=[0]))
-        refs = set(mysite.pagereferences(mainpage, namespaces=[0]))
-        self.assertTrue(backlinks.issubset(refs))
-        self.assertTrue(embedded.issubset(refs))
-        for bl in backlinks:
-            self.assertIsInstance(bl, pywikibot.Page)
-            self.assertIn(bl, refs)
-        for ei in embedded:
+    def test_embeddedin(self):
+        """Test Site.page_embeddedin."""
+        embedded_ns_0 = set(self.site.page_embeddedin(
+            self.mainpage, namespaces=[0]))
+        embedded_ns_0_2 = set(self.site.page_embeddedin(
+            self.mainpage, namespaces=[0, 2]))
+        redirs = set(self.site.page_embeddedin(
+            self.mainpage, filterRedirects=True, namespaces=[0]))
+        no_redirs = set(self.site.page_embeddedin(
+            self.mainpage, filterRedirects=False, namespaces=[0]))
+
+        for ei in embedded_ns_0:
             self.assertIsInstance(ei, pywikibot.Page)
-            self.assertIn(ei, refs)
-        for ref in refs:
-            self.assertIn(ref, backlinks | embedded)
-        # test embeddedin arguments
-        self.assertTrue(embedded.issuperset(
-            set(mysite.page_embeddedin(mainpage, filterRedirects=True,
-                                       namespaces=[0]))))
-        self.assertTrue(embedded.issuperset(
-            set(mysite.page_embeddedin(mainpage, filterRedirects=False,
-                                       namespaces=[0]))))
-        self.assertTrue(embedded.issubset(
-            set(mysite.page_embeddedin(mainpage, namespaces=[0, 2]))))
-        links = set(mysite.pagelinks(mainpage))
+
+        self.assertLessEqual(redirs, embedded_ns_0)
+        self.assertLessEqual(no_redirs, embedded_ns_0)
+        self.assertLessEqual(embedded_ns_0, embedded_ns_0_2)
+
+    def test_pagecategories(self):
+        """Test Site.pagecategories."""
+        for cat in self.site.pagecategories(self.mainpage):
+            self.assertIsInstance(cat, pywikibot.Category)
+
+    def test_categorymembers(self):
+        """Test Site.categorymembers."""
+        cats = list(self.site.pagecategories(self.mainpage))
+        if len(cats) == 0:
+            self.skipTest("Main page is not in any categories.")
+        else:
+            for cm in self.site.categorymembers(cats[0]):
+                self.assertIsInstance(cm, pywikibot.Page)
+
+    def test_pageimages(self):
+        """Test Site.pageimages."""
+        for im in self.site.pageimages(self.mainpage):
+            self.assertIsInstance(im, pywikibot.FilePage)
+
+    def test_pagetemplates(self):
+        """Test Site.pagetemplates."""
+        pagetemplates_all = set(self.site.pagetemplates(self.mainpage))
+        pagetemplates_ns_10 = set(self.site.pagetemplates(self.mainpage, namespaces=[10]))
+
+        for te in pagetemplates_all:
+            self.assertIsInstance(te, pywikibot.Page)
+
+        self.assertLessEqual(pagetemplates_ns_10, pagetemplates_all)
+
+    def test_pagelanglinks(self):
+        """Test Site.pagelanglinks."""
+        for ll in self.site.pagelanglinks(self.mainpage):
+            self.assertIsInstance(ll, pywikibot.Link)
+
+    def test_page_extlinks(self):
+        """Test Site.extlinks."""
+        for el in self.site.page_extlinks(self.mainpage):
+            self.assertIsInstance(el, basestring)
+
+    def test_pagelinks(self):
+        """Test Site.pagelinks."""
+        links = set(self.site.pagelinks(self.mainpage))
         for pl in links:
             self.assertIsInstance(pl, pywikibot.Page)
         # test links arguments
         # TODO: There have been build failures because the following assertion
         # wasn't true. Bug: T92856
         # Example: https://travis-ci.org/wikimedia/pywikibot-core/jobs/54552081#L505
-        namespace_links = set(mysite.pagelinks(mainpage, namespaces=[0, 1]))
+        namespace_links = set(self.site.pagelinks(self.mainpage, namespaces=[0, 1]))
         if namespace_links - links:
             unittest_print(
                 'FAILURE wrt T92856:\nSym. difference: "{0}"'.format(
@@ -533,31 +587,11 @@ class TestSiteGenerators(DefaultSiteTestCase):
                                          link.title(withNamespace=False))
                         for link in namespace_links ^ links)))
         self.assertCountEqual(
-            set(mysite.pagelinks(mainpage, namespaces=[0, 1])) - links, [])
-        for target in mysite.preloadpages(mysite.pagelinks(mainpage,
-                                                           follow_redirects=True,
-                                                           total=5)):
+            set(self.site.pagelinks(self.mainpage, namespaces=[0, 1])) - links, [])
+        for target in self.site.preloadpages(
+                self.site.pagelinks(self.mainpage, follow_redirects=True, total=5)):
             self.assertIsInstance(target, pywikibot.Page)
             self.assertFalse(target.isRedirectPage())
-        # test pagecategories
-        for cat in mysite.pagecategories(mainpage):
-            self.assertIsInstance(cat, pywikibot.Category)
-            for cm in mysite.categorymembers(cat):
-                self.assertIsInstance(cat, pywikibot.Page)
-        # test pageimages
-        self.assertTrue(all(isinstance(im, pywikibot.FilePage)
-                            for im in mysite.pageimages(mainpage)))
-        # test pagetemplates
-        self.assertTrue(all(isinstance(te, pywikibot.Page)
-                            for te in mysite.pagetemplates(mainpage)))
-        self.assertTrue(set(mysite.pagetemplates(mainpage)).issuperset(
-                        set(mysite.pagetemplates(mainpage, namespaces=[10]))))
-        # test pagelanglinks
-        for ll in mysite.pagelanglinks(mainpage):
-            self.assertIsInstance(ll, pywikibot.Link)
-        # test page_extlinks
-        self.assertTrue(all(isinstance(el, basestring)
-                            for el in mysite.page_extlinks(mainpage)))
 
     def test_allpages(self):
         """Test the site.allpages() method."""
