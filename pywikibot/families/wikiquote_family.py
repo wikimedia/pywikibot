@@ -40,7 +40,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'ko', 'ja', 'ar', 'gu', 'sv', 'gl', 'ur', 'te', 'ta', 'cy', 'la',
             'no', 'vi', 'ml', 'et', 'kn', 'ku', 'sr', 'ro', 'eu', 'be', 'hi',
             'ka', 'da', 'sa', 'is', 'sq', 'mr', 'br', 'uz', 'af', 'zh-min-nan',
-            'am', 'wo', 'ky',
+            'wo', 'ky',
         ]
 
         super(Family, self).__init__()
