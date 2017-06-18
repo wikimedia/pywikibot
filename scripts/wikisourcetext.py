@@ -87,8 +87,7 @@ class UploadTextBot(SingleSiteBot):
         if page.exists():
             pywikibot.output('Page %s already exists, not adding!' % page)
         else:
-            self.userPut(page, old_text, new_text,
-                         summary=summary, minor=True, botflag=True,
+            self.userPut(page, old_text, new_text, summary=summary,
                          show_diff=self.getOption('showdiff'))
 
 

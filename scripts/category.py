@@ -386,8 +386,7 @@ class CategoryAddBot(MultipleSitesBot):
                                            'category-adding',
                                            {'newcat': catpl.title(withNamespace=False)})
             try:
-                self.userPut(self.current_page, old_text, text,
-                             summary=comment, minor=True, botflag=True)
+                self.userPut(self.current_page, old_text, text, summary=comment)
             except pywikibot.PageSaveRelatedError as error:
                 pywikibot.output(u'Page %s not saved: %s'
                                  % (self.current_page.title(asLink=True),
