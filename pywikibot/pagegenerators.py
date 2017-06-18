@@ -149,6 +149,11 @@ parameterHelp = """\
                   -ns:0,2,4
                   -ns:Help,MediaWiki
 
+                  You may use a preleading "not" to exclude the namespace.
+                  Examples:
+                  -ns:not:2,3
+                  -ns:not:Help,File
+
                   If used with -newpages/-random/-randomredirect,
                   -namespace/ns must be provided before
                   -newpages/-random/-randomredirect.
@@ -776,7 +781,19 @@ class GeneratorFactory(object):
             if not value:
                 value = pywikibot.input(
                     u'What namespace are you filtering on?')
-            self._namespaces += value.split(",")
+            NOT_KEY = 'not:'
+            if value.startswith(NOT_KEY):
+                value = value[len(NOT_KEY):]
+                resolve = self.site.namespaces.resolve
+                not_ns = set(resolve(value.split(',')))
+                if not self._namespaces:
+                    self._namespaces = list(
+                        set(self.site.namespaces.values()) - not_ns)
+                else:
+                    self._namespaces = list(
+                        set(resolve(self._namespaces)) - not_ns)
+            else:
+                self._namespaces += value.split(",")
             return True
         elif arg == '-limit':
             if not value:
