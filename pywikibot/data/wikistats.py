@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -104,7 +104,11 @@ class WikiStats(object):
         @type format: 'xml' or 'csv'.
         @rtype: bytes
         """
-        URL = self.url + '/api.php?action=dump&table=%s&format=%s'
+        if format == 'xml':
+            path = '/{format}/{table}.{format}'
+        else:
+            path = '/api.php?action=dump&table={table}&format={format}'
+        URL = self.url + path
 
         if table not in self.ALL_KEYS:
             pywikibot.warning('WikiStats unknown table %s' % table)
@@ -112,7 +116,7 @@ class WikiStats(object):
         if table in self.FAMILY_MAPPING:
             table = self.FAMILY_MAPPING[table]
 
-        r = http.fetch(URL % (table, format))
+        r = http.fetch(URL.format(table=table, format=format))
         return r.raw
 
     def raw_cached(self, table, format):
@@ -185,7 +189,8 @@ class WikiStats(object):
             site = {}
 
             for field in row.findall('field'):
-                site[field.get('name')] = unicode(field.text)
+                name = unicode(field.get('name'))
+                site[name] = unicode(field.text)
 
             data.append(site)
 
