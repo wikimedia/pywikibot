@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikidata."""
 #
-# (C) Pywikibot team, 2012-2016
+# (C) Pywikibot team, 2012-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,6 +59,10 @@ class Family(family.WikimediaFamily):
         """Return Wikimedia Commons as the repository for tabular-datas."""
         # Per tabularDataStorageFrontendUrl settings in Wikibase
         return ('commons', 'commons')
+
+    def default_globe(self, code):
+        """Default globe for Coordinate datatype."""
+        return 'earth'
 
     def globes(self, code):
         """Supported globes for Coordinate datatype."""
