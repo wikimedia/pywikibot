@@ -21,8 +21,7 @@ import pywikibot
 
 from pywikibot.bot import Choice, MultipleSitesBot
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
-
-from scripts.unlink import BaseUnlinkBot
+from pywikibot.specialbots import BaseUnlinkBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
