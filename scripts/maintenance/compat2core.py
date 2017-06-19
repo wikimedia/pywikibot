@@ -79,7 +79,8 @@ replacements = (
     (r'\.aslink\s*\(\s*\)', '.title(asLink=True)'),
     # other deprecated methods
     (r'(?<!site)\.encoding\s*\(\s*\)', '.site.encoding()'),
-    (r'\.newimages\s*\(', '.newfiles('),
+    (r'\.newimages\s*\(\)', ".logevents(logtype='upload')"),
+    (r'\.newimages\s*\(([^)])', r".logevents(logtype='upload', \1"),
     (r'\.getRestrictions\s*\(', '.protection('),
     # new core methods and properties
     (r'\.get\s*\(\s*get_redirect\s*=\s*True\s*\)', '.text'),

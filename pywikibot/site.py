@@ -6383,19 +6383,20 @@ class APISite(BaseSite):
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
                        u'', pageitem['user'], pageitem['comment'])
 
+    @deprecated('APISite.logevents(logtype="upload")')
     @deprecated_args(lestart='start', leend='end', leuser='user', letitle=None,
                      repeat=None, number='total', step=None)
     def newfiles(self, user=None, start=None, end=None, reverse=False,
                  total=None):
         """Yield information about newly uploaded files.
 
+        DEPRECATED: Use logevents(logtype='upload') instead.
+
         Yields a tuple of FilePage, Timestamp, user(unicode), comment(unicode).
 
         N.B. the API does not provide direct access to Special:Newimages, so
         this is derived from the "upload" log events instead.
-
         """
-        # TODO: update docstring
         for event in self.logevents(logtype="upload", user=user,
                                     start=start, end=end, reverse=reverse,
                                     total=total):
@@ -6405,13 +6406,13 @@ class APISite(BaseSite):
             comment = event.comment() or u''
             yield (filepage, date, user, comment)
 
-    @deprecated("Site().newfiles()")
+    @deprecated('APISite.logevents(logtype="upload")')
     @deprecated_args(number='total', repeat=None)
     def newimages(self, *args, **kwargs):
         """
         Yield information about newly uploaded files.
 
-        DEPRECATED: Use newfiles() instead.
+        DEPRECATED: Use logevents(logtype='upload') instead.
         """
         return self.newfiles(*args, **kwargs)
 
