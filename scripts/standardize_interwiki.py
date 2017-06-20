@@ -30,13 +30,15 @@ comment = {
     'fa': u'ربات: تصحیح جایگذاری میان‌ویکی‌ها',
     'fr': u'Robot : Standardisation des interwikis',
     'he': u'בוט: מסדר את האינטרוויקי',
+    'hi': 'बॉट: अंतरविकि मानकीकरण',
     'it': u'Bot: Standardizzo interwiki',
     'ja': u'ロボットによる: 言語間リンクを標準化',
+    'ksh': 'Bot: Engerwiki Lengks opprüühme',
     'ml': u'യന്ത്രം: അന്തർവിക്കി ക്രമവൽക്കരണം',
+    'nds': 'Bot: Links twüschen Wikis standardisseern',
     'nl': u'Bot: standaardisatie interwikiverwijzingen',
     'no': u'bot: Språklenkestandardisering',
-    'ksh': u'Bot: Engerwiki Lengks opprüühme',
-    'nds': u'Bot: Links twüschen Wikis standardisseern',
+    'ro': 'Robot: Standardizare interwiki',
     'zh': u'機器人: 跨語連結標準化',
 }
 
