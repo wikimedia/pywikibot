@@ -19,6 +19,7 @@ import json
 import socket
 
 from requests.packages.urllib3.exceptions import ProtocolError
+from requests.packages.urllib3.response import httplib
 
 try:
     from sseclient import SSEClient as EventSource
@@ -207,7 +208,7 @@ class EventStreams(object):
                 self.source = EventSource(**self.sse_kwargs)
             try:
                 event = next(self.source)
-            except (ProtocolError, socket.error) as e:
+            except (ProtocolError, socket.error, httplib.IncompleteRead) as e:
                 warning('Connection error: {0}.\n'
                         'Try to re-establish connection.'.format(e))
                 del self.source
