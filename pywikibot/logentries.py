@@ -129,6 +129,21 @@ class LogEntry(object):
         return self.data['comment']
 
 
+class UserTargetLogEntry(LogEntry):
+
+    """A log entry whose target is a user page."""
+
+    def page(self):
+        """Return the target user.
+
+        This returns a User object instead of the Page object returned by the
+        superclass method.
+        """
+        if not hasattr(self, '_page'):
+            self._page = pywikibot.User(super(UserTargetLogEntry, self).page())
+        return self._page
+
+
 class BlockEntry(LogEntry):
 
     """
@@ -361,21 +376,11 @@ class NewUsersEntry(LogEntry):
     _expectedType = 'newusers'
 
 
-class ThanksEntry(LogEntry):
+class ThanksEntry(UserTargetLogEntry):
 
     """Thanks log entry."""
 
     _expectedType = 'thanks'
-
-    def page(self):
-        """Return the target user.
-
-        This returns a User object instead of the Page object returned by the
-        superclass method.
-        """
-        if not hasattr(self, '_page'):
-            self._page = pywikibot.User(super(ThanksEntry, self).page())
-        return self._page
 
 # TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
 
