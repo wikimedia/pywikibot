@@ -1088,6 +1088,7 @@ def main(*args):
 
         if replacement_set:
             replacements.extend(replacement_set)
+            exceptions = replacement_set._exceptions
 
         if len(fix['replacements']) == len(missing_fix_summaries):
             missing_fixes_summaries.append(
