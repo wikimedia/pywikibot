@@ -24,7 +24,7 @@ from pywikibot import textlib
 # The summary that the Bot will use.
 comment = {
     'ar': u'روبوت: توحيد قياسي للإنترويكي',
-    'cs': u'Standadizace interwiki',
+    'cs': 'Robot: standardizace interwiki',
     'de': u'Bot: Interwikilinks standardisieren',
     'en': u'Robot: Interwiki standardization',
     'fa': u'ربات: تصحیح جایگذاری میان‌ویکی‌ها',
