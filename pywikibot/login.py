@@ -251,7 +251,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         line_nr = len(lines) + 1
         for line in reversed(lines):
             line_nr -= 1
-            if not line.strip():
+            if not line.strip() or line.startswith('#'):
                 continue
             try:
                 entry = eval(line)
