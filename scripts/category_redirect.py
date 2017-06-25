@@ -77,7 +77,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'commons': "Category:Category redirects",
             'meta': 'Category:Maintenance of categories/Soft redirected categories',
             'ar': u"تصنيف:تحويلات تصنيفات ويكيبيديا",
-            'cs': u"Kategorie:Zastaralé kategorie",
+            'cs': 'Kategorie:Údržba:Zastaralé kategorie',
             'da': "Kategori:Omdirigeringskategorier",
             'en': "Category:Wikipedia soft redirected categories",
             'es': "Categoría:Wikipedia:Categorías redirigidas",
