@@ -103,6 +103,8 @@ class TestLogentriesMeta(MetaTestCaseClass):
         def test_method(logtype):
             def test_logevent(self, key):
                 """Test a single logtype entry."""
+                if key == 'old' and logtype == 'thanks':
+                    self.skipTest('Thanks extension not on old.')
                 self._test_logevent(logtype)
 
             return test_logevent
@@ -214,6 +216,13 @@ class TestLogentryParams(TestLogentriesBase):
         page = pywikibot.Page(self.get_site('dewp'), 'Main Page')
         with self.assertRaises(pywikibot.NoMoveTarget):
             page.moved_target()
+
+    def test_thanks_page(self, key):
+        """Test Thanks page method return type."""
+        if not self.site.has_extension('Thanks'):
+            self.skipTest('Thanks extension not available.')
+        logentry = self._get_logentry('thanks')
+        self.assertIsInstance(logentry.page(), pywikibot.User)
 
 
 class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
