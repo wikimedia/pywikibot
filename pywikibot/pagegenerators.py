@@ -120,9 +120,12 @@ parameterHelp = """\
                   You have options for every type of logs given by the
                   log event parameter which could be one of the following:
 
-                      block, protect, rights, delete, upload, move, import,
-                      patrol, merge, suppress, review, stable, gblblock,
-                      renameuser, globalauth, gblrights, abusefilter, newusers
+                      spamblacklist, titleblacklist, gblblock, renameuser,
+                      globalauth, gblrights, gblrename, abusefilter,
+                      massmessage, thanks, usermerge, block, protect, rights,
+                      delete, upload, move, import, patrol, merge, suppress,
+                      tag, managetags, contentmodel, review, stable,
+                      timedmediahandler, newusers
 
                   It uses the default number of pages 10.
 
