@@ -1086,9 +1086,15 @@ def main(*args):
                 edit_summary=summary,
             ))
 
+        # Exceptions specified via 'fix' shall be merged to those via CLI.
         if replacement_set:
             replacements.extend(replacement_set)
-            exceptions = replacement_set._exceptions
+            if replacement_set._exceptions is not None:
+                for k, v in replacement_set._exceptions.items():
+                    if k in exceptions:
+                        exceptions[k] = list(set(exceptions[k]) | set(v))
+                    else:
+                        exceptions[k] = v
 
         if len(fix['replacements']) == len(missing_fix_summaries):
             missing_fixes_summaries.append(
