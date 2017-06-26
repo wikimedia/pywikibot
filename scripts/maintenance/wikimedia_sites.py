@@ -22,7 +22,6 @@ from pywikibot.family import Family
 
 # supported families by this script
 families_list = [
-    'anarchopedia',
     'wikibooks',
     'wikinews',
     'wikipedia',
