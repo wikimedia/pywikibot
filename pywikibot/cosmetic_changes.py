@@ -688,7 +688,12 @@ class CosmeticChangesToolkit(object):
         """Convert weblinks to wikilink, fix link syntax."""
         def replace_link(match):
             """Create a string to replace a single link."""
-            replacement = '[[' + match.group('link')
+            replacement = '[['
+            if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6]) +
+                        list(self.site.namespaces[14])) + '):',
+                        match.group('link')):
+                replacement += ':'
+            replacement += match.group('link')
             if match.group('title'):
                 replacement += '|' + match.group('title')
             return replacement + ']]'
