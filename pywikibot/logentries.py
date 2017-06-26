@@ -97,8 +97,11 @@ class LogEntry(object):
         """
         Page on which action was performed.
 
-        Note: title may be missing in data dict e.g. by oversight action to
-              hide the title. In that case a KeyError exception will raise
+        @note: title may be missing in data dict e.g. by oversight action to
+               hide the title. In that case a KeyError exception will raise
+
+        @rtype: pywikibot.Page
+        @raise: KeyError: title was missing from log entry
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.Page(self.site, self.data['title'])
@@ -138,6 +141,9 @@ class UserTargetLogEntry(LogEntry):
 
         This returns a User object instead of the Page object returned by the
         superclass method.
+
+        @return: target user
+        @rtype: pywikibot.User
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.User(super(UserTargetLogEntry, self).page())
@@ -172,7 +178,7 @@ class BlockEntry(LogEntry):
         @return: the Page object of username or IP if this block action
             targets a username or IP, or the blockid if this log reflects
             the removal of an autoblock
-        @rtype: Page or int
+        @rtype: pywikibot.Page or int
         """
         # TODO what for IP ranges ?
         if self.isAutoblockRemoval:
@@ -277,7 +283,7 @@ class UploadEntry(LogEntry):
         Note: title may be missing in data dict e.g. by oversight action to
               hide the title. In that case a KeyError exception will raise
 
-        @rtype: FilePage
+        @rtype: pywikibot.FilePage
         @raise: KeyError: title was missing from log entry
         """
         if not hasattr(self, '_page'):
