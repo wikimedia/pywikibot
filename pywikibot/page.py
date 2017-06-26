@@ -4672,7 +4672,7 @@ class Claim(Property):
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
             # The default covers string, url types
-            claim.target = Claim.TARGET_CONVERTER.get(
+            claim.target = cls.TARGET_CONVERTER.get(
                 claim.type, lambda value, site: value)(value, site)
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
