@@ -120,6 +120,10 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         # necessary as the fixer needs the article path to fix it
         self.cct.site._siteinfo._cache['general'] = (
             {'articlepath': '/wiki/$1'}, True)
+        self.cct.site._namespaces = {
+            6: ['Datei', 'File'],
+            14: ['Kategorie', 'Category'],
+        }
         self.assertEqual(
             '[[Example|Page]]\n[[Example|Page]]\n[[Example|Page]]\n'
             '[[Example]]\n[[Example]]\n[[Example]]\n'
@@ -180,6 +184,26 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '[https://de.wikipedia.org/w/api.php API]',
             self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
+        self.assertEqual(
+            '[[:Kategorie:Example]]\n'
+            '[[:Category:Example|Description]]\n'
+            '[[:Datei:Example.svg]]\n'
+            '[[:File:Example.svg|Description]]\n'
+            '[[:Category:Example]]\n'
+            '[[:Kategorie:Example|Description]]\n'
+            '[[:File:Example.svg]]\n'
+            '[[:Datei:Example.svg|Description]]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/wiki/Kategorie:Example]\n'
+                '[https://de.wikipedia.org/wiki/Category:Example Description]\n'
+                '[https://de.wikipedia.org/wiki/Datei:Example.svg]\n'
+                '[https://de.wikipedia.org/wiki/File:Example.svg Description]\n'
+                '[[https://de.wikipedia.org/wiki/Category:Example]]\n'
+                '[[https://de.wikipedia.org/wiki/Kategorie:Example Description]]\n'
+                '[[https://de.wikipedia.org/wiki/File:Example.svg]]\n'
+                '[[https://de.wikipedia.org/wiki/Datei:Example.svg Description]]\n'
+            ))
+        del self.cct.site._namespaces
 
     def test_fixHtml(self):
         """Test fixHtml method."""
