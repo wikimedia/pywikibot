@@ -111,7 +111,14 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                   'value': self.current_page.title()}
                  }
                 }
-        summary = (u'Bot: New item with sitelink from %s'
+        for site, page in self.iwlangs.values():
+            if not page.exists():
+                continue
+            dbname = site.dbName()
+            title = page.title()
+            data['sitelinks'][dbname] = {'site': dbname, 'title': title}
+            data['labels'][site.lang] = {'language': site.lang, 'value': title}
+        summary = ('Bot: New item with sitelink(s) from %s'
                    % self.current_page.title(asLink=True, insite=self.repo))
 
         item = pywikibot.ItemPage(self.repo)
@@ -155,11 +162,10 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                 warning('Interwiki %s does not exist, skipping...' %
                         iw_page.title(asLink=True))
                 continue
-            except pywikibot.InvalidTitle:
-                warning('Invalid title %s, skipping...' %
-                        iw_page.title(asLink=True))
-                continue
-        if len(wd_data) != 1:
+        if not wd_data:
+            # will create a new item with interwiki
+            return None
+        if len(wd_data) > 1:
             warning('Interwiki conflict in %s, skipping...' %
                     self.current_page.title(asLink=True))
             return False
