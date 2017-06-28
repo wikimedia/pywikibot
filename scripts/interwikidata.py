@@ -111,7 +111,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                   'value': self.current_page.title()}
                  }
                 }
-        for site, page in self.iwlangs.values():
+        for site, page in self.iwlangs.items():
             if not page.exists():
                 continue
             dbname = site.dbName()
