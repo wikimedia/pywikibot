@@ -71,7 +71,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2016
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -837,7 +837,7 @@ class DisambiguationRobot(Bot):
                 # TODO: Output context on each question
                 answer = pywikibot.input_choice('Option', options,
                                                 default=self.always,
-                                                force=True)
+                                                force=bool(self.always))
                 if answer == 'x':
                     assert edited, 'invalid option before editing'
                     break
