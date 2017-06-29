@@ -175,7 +175,7 @@ def _altlang(code):
     if code == 'fit':
         return ['fi', 'sv']
     # French
-    if code in ['atj', 'bm', 'br', 'ht', 'kg', 'ln', 'mg', 'nrm', 'pcd',
+    if code in ['atj', 'bm', 'br', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm', 'pcd',
                 'rw', 'sg', 'ty', 'wa']:
         return ['fr']
     if code == 'oc':
