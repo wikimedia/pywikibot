@@ -1688,12 +1688,13 @@ class Request(MutableMapping):
             # Work around this by requiring userinfo only if 'tokens' and 'login'
             # are not both set.
             typep = self._params.get('type', [])
-            if 'userinfo' not in meta and not ('tokens' in meta and 'login' in typep):
-                meta = set(meta + ['userinfo'])
-                self._params['meta'] = sorted(meta)
-            uiprop = self._params.get("uiprop", [])
-            uiprop = set(uiprop + ["blockinfo", "hasmsg"])
-            self._params['uiprop'] = sorted(uiprop)
+            if not ('tokens' in meta and 'login' in typep):
+                if 'userinfo' not in meta:
+                    meta = set(meta + ['userinfo'])
+                    self._params['meta'] = sorted(meta)
+                uiprop = self._params.get("uiprop", [])
+                uiprop = set(uiprop + ["blockinfo", "hasmsg"])
+                self._params['uiprop'] = sorted(uiprop)
             if 'prop' in self._params:
                 if self.site.has_extension('ProofreadPage'):
                     prop = set(self._params['prop'] + ['proofread'])
