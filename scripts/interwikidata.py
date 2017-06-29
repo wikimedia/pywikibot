@@ -142,7 +142,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         if not self.iwlangs:
             return
         dbnames = [iw_site.dbName() for iw_site in self.iwlangs]
-        if set(dbnames) < set(self.current_item.sitelinks.keys()):
+        if set(dbnames) - set(self.current_item.sitelinks.keys()):
             if not self.handle_complicated():
                 warning('Interwiki conflict in %s, skipping...' %
                         self.current_page.title(asLink=True))
