@@ -156,12 +156,15 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         """Add current page in repo."""
         wd_data = set()
         for iw_page in self.iwlangs.values():
-            try:
-                wd_data.add(pywikibot.ItemPage.fromPage(iw_page))
-            except pywikibot.NoPage:
+            if not iw_page.exists():
                 warning('Interwiki %s does not exist, skipping...' %
                         iw_page.title(asLink=True))
                 continue
+            try:
+                wd_data.add(pywikibot.ItemPage.fromPage(iw_page))
+            except pywikibot.NoPage:
+                output('Interwiki %s does not have an item' %
+                       iw_page.title(asLink=True))
         if not wd_data:
             # will create a new item with interwiki
             return None
