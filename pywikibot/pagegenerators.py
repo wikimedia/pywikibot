@@ -66,9 +66,8 @@ _logger = "pagegenerators"
 # a generator
 
 parameterHelp = """\
-
--catfilter        Filter the page generator to only yield pages in the
-                  specified category. See -cat for argument format.
+GENERATOR OPTIONS
+=================
 
 -cat              Work on all pages which are in a specific category.
                   Argument can also be given as "-cat:categoryname" or
@@ -144,37 +143,12 @@ parameterHelp = """\
 
                   In some cases it must be written as -logevents:"move,Usr,20"
 
--namespaces       Filter the page generator to only yield pages in the
--namespace        specified namespaces. Separate multiple namespace
--ns               numbers or names with commas.
-                  Examples:
-
-                  -ns:0,2,4
-                  -ns:Help,MediaWiki
-
-                  You may use a preleading "not" to exclude the namespace.
-                  Examples:
-                  -ns:not:2,3
-                  -ns:not:Help,File
-
-                  If used with -newpages/-random/-randomredirect,
-                  -namespace/ns must be provided before
-                  -newpages/-random/-randomredirect.
-                  If used with -recentchanges, efficiency is improved if
-                  -namespace/ns is provided before -recentchanges.
-
-                  If used with -start, -namespace/ns shall contain only one
-                  value.
-
 -interwiki        Work on the given page and all equivalent pages in other
                   languages. This can, for example, be used to fight
                   multi-site spamming.
                   Attention: this will cause the bot to modify
                   pages on several wiki sites, this is not well tested,
                   so check your edits!
-
--limit:n          When used with any other argument that specifies a set
-                  of pages, work on no more than n pages in total.
 
 -links            Work on all pages that are linked from a certain page.
                   Argument can also be given as "-links:linkingpagetitle".
@@ -225,22 +199,6 @@ parameterHelp = """\
                   default value is start:!
 
 -prefixindex      Work on pages commencing with a common prefix.
-
--subpage:n        Filters pages to only those that have depth n
-                  i.e. a depth of 0 filters out all pages that are subpages,
-                  and a depth of 1 filters out all pages that are subpages of
-                  subpages.
-
--titleregex       A regular expression that needs to match the article title
-                  otherwise the page won't be returned.
-                  Multiple -titleregex:regexpr can be provided and the page
-                  will be returned if title is matched by any of the regexpr
-                  provided.
-                  Case insensitive regular expressions will be used and
-                  dot matches any character.
-
--titleregexnot    Like -titleregex, but return the page only if the regular
-                  expression does not match.
 
 -transcludes      Work on all pages that use a certain template.
                   Argument can also be given as "-transcludes:Title".
@@ -315,6 +273,13 @@ parameterHelp = """\
                   "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
                   and supplied multiple times for multiple pages.
 
+
+FILTER OPTIONS
+==============
+
+-catfilter        Filter the page generator to only yield pages in the
+                  specified category. See -cat generator for argument format.
+
 -grep             A regular expression that needs to match the article
                   otherwise the page won't be returned.
                   Multiple -grep:regexpr can be provided and the page will
@@ -323,11 +288,32 @@ parameterHelp = """\
                   Case insensitive regular expressions will be used and
                   dot matches any character, including a newline.
 
--ql               Filter pages based on page quality.
-                  This is only applicable if contentmodel equals
-                  'proofread-page', otherwise has no effects.
-                  Valid values are in range 0-4.
-                  Multiple values can be comma-separated.
+-intersect        Work on the intersection of all the provided generators.
+
+-limit:n          When used with any other argument that specifies a set
+                  of pages, work on no more than n pages in total.
+
+-namespaces       Filter the page generator to only yield pages in the
+-namespace        specified namespaces. Separate multiple namespace
+-ns               numbers or names with commas.
+                  Examples:
+
+                  -ns:0,2,4
+                  -ns:Help,MediaWiki
+
+                  You may use a preleading "not" to exclude the namespace.
+                  Examples:
+                  -ns:not:2,3
+                  -ns:not:Help,File
+
+                  If used with -newpages/-random/-randomredirect generators,
+                  -namespace/ns must be provided before
+                  -newpages/-random/-randomredirect.
+                  If used with -recentchanges generator, efficiency is
+                  improved if -namespace/ns is provided before -recentchanges.
+
+                  If used with -start generator, -namespace/ns shall contain
+                  only one value.
 
 -onlyif           A claim the page needs to contain, otherwise the item won't
                   be returned.
@@ -347,7 +333,27 @@ parameterHelp = """\
                   be returned.
                   For usage and examples, see -onlyif above.
 
--intersect        Work on the intersection of all the provided generators.
+-ql               Filter pages based on page quality.
+                  This is only applicable if contentmodel equals
+                  'proofread-page', otherwise has no effects.
+                  Valid values are in range 0-4.
+                  Multiple values can be comma-separated.
+
+-subpage:n        Filters pages to only those that have depth n
+                  i.e. a depth of 0 filters out all pages that are subpages,
+                  and a depth of 1 filters out all pages that are subpages of
+                  subpages.
+
+-titleregex       A regular expression that needs to match the article title
+                  otherwise the page won't be returned.
+                  Multiple -titleregex:regexpr can be provided and the page
+                  will be returned if title is matched by any of the regexpr
+                  provided.
+                  Case insensitive regular expressions will be used and
+                  dot matches any character.
+
+-titleregexnot    Like -titleregex, but return the page only if the regular
+                  expression does not match.
 """
 
 docuReplacements = {'&params;': parameterHelp}

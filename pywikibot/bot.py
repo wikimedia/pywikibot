@@ -995,7 +995,9 @@ def showHelp(module_name=None):
             module_name = "no_module"
 
     globalHelp = u'''
-Global arguments available for all bots:
+GLOBAL OPTIONS
+==============
+(Global arguments available for all bots)
 
 -dir:PATH         Read the bot's configuration data from directory given by
                   PATH, instead of from the default directory.
