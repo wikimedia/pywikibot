@@ -73,6 +73,62 @@ class TestLoadRevisionsCachingProofreadPage(BasePageLoadRevisionsCachingTestBase
         self._test_page_text()
 
 
+class TestProofreadPageParseTitle(TestCase):
+
+    """Test ProofreadPage._parse_title() function."""
+
+    cached = True
+
+    # Use sites to run  parametrized tests.
+    sites = {
+        '1': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test.djvu/12',
+            'tuple': ('Test.djvu', 'djvu', 12),
+        },
+        '2': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test djvu/12',
+            'tuple': ('Test djvu', '', 12),
+        },
+        '3': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test.jpg/12',
+            'tuple': ('Test.jpg', 'jpg', 12),
+        },
+        '4': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test jpg/12',
+            'tuple': ('Test jpg', '', 12),
+        },
+        '5': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test.jpg',
+            'tuple': ('Test.jpg', 'jpg', None),
+        },
+        '6': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test jpg',
+            'tuple': ('Test jpg', '', None),
+        },
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        """Prepare get_page dataset for tests."""
+        super(TestProofreadPageParseTitle, cls).setUpClass()
+
+    def test_parse_title(self, key):
+        """Test ProofreadPage_parse_title() function."""
+        data = self.sites[key]
+        title = data['title']
+        base, base_ext, num = data['tuple']
+        page = ProofreadPage(self.site, title)
+        self.assertEqual(page._base, base)
+        self.assertEqual(page._base_ext, base_ext)
+        self.assertEqual(page._num, num)
+
+
 class TestProofreadPageValidSite(TestCase):
 
     """Test ProofreadPage class."""
@@ -89,6 +145,15 @@ class TestProofreadPageValidSite(TestCase):
         'user': 'T. Mazzei',
         'header': u"{{rh|2|''THE POPULAR SCIENCE MONTHLY.''}}",
         'footer': u'\n{{smallrefs}}',
+        'url_image': ('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/'
+                      'Popular_Science_Monthly_Volume_1.djvu/'
+                      'page12-1024px-Popular_Science_Monthly_Volume_1.djvu.jpg'),
+    }
+
+    valid_redlink = {
+        'title': 'Page:Pywikibot test page 3.jpg',
+        'url_image': ('https://upload.wikimedia.org/wikisource/en/3/37/'
+                      'Pywikibot_test_page_3.jpg'),
     }
 
     existing_invalid = {
@@ -217,6 +282,18 @@ class TestProofreadPageValidSite(TestCase):
 
         page_text = page._page_to_json()
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
+
+    def test_url_image(self):
+        """Test fetching of url image of the scan of ProofreadPage."""
+        page = ProofreadPage(self.site, self.valid['title'])
+        self.assertEqual(page.url_image, self.valid['url_image'])
+
+        page = ProofreadPage(self.site, self.valid_redlink['title'])
+        self.assertEqual(page.url_image, self.valid_redlink['url_image'])
+
+        page = ProofreadPage(self.site, self.existing_unlinked['title'])
+        # test Exception in property.
+        self.assertRaises(ValueError, getattr, page, 'url_image')
 
 
 class TestPageQuality(TestCase):
