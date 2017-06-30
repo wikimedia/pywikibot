@@ -1442,7 +1442,7 @@ class Request(MutableMapping):
             "wbcreateclaim", "wbremoveclaims", "wbsetclaimvalue",
             "wbsetreference", "wbremovereferences", "wbsetclaim",
             'wbcreateredirect',
-            'thank',
+            'thank', 'flowthank'
         )
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
