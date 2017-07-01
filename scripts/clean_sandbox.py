@@ -72,6 +72,7 @@ content = {
     'eo': '{{Bonvolu ne forigi tiun ĉi linion (Provejo)}}',
     'fa': u'{{subst:Wikipedia:ربات/sandbox}}',
     'fi': u'{{subst:Hiekka}}',
+    'fr': '{{subst:Préchargement pour Bac à sable}}',
     'he': u'{{ארגז חול}}\n<!-- נא לערוך מתחת לשורה זו בלבד, תודה. -->',
     'id': u'{{Bakpasir}}\n<!-- Uji coba dilakukan di baris di bawah ini -->',
     'it': '{{sandbox}}'
