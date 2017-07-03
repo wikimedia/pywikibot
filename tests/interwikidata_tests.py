@@ -47,7 +47,7 @@ class TestInterwikidataBot(SiteAttributeTestCase):
             'code': 'fa',
         },
         'wt': {
-            'family': 'wiktionary',
+            'family': 'wikitech',
             'code': 'en',
         },
     }
@@ -89,16 +89,16 @@ class TestInterwikidataBot(SiteAttributeTestCase):
     def test_without_repo(self):
         """Test throwing error when site does not have a data repo."""
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
-        self.assertRaises(ValueError, DummyBot, generator=[wt_page], site=self.wt)
+        self.assertRaises(ValueError, DummyBot, generator=[wt_page],
+                          site=self.wt)
 
-        fa_wiktionary = pywikibot.Site('fa', 'wiktionary')
         self.assertRaisesRegex(
             ValueError,
-            r'wiktionary:fa does not have a data repository, '
+            r'wikitech:en does not have a data repository, '
             r'use interwiki\.py instead.',
             interwikidata.IWBot,
-            generator=[pywikibot.Page(fa_wiktionary, 'User:Dalba')],
-            site=fa_wiktionary,
+            generator=[pywikibot.Page(self.wt, 'User:Dalba')],
+            site=self.wt,
         )
 
 
