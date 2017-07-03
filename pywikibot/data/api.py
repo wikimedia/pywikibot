@@ -3076,7 +3076,8 @@ class LoginManager(login.LoginManager):
                 break
             else:
                 break
-        raise APIError(code=login_result["login"]["result"], info="")
+        info = login_result['login'].get('reason', '')
+        raise APIError(code=login_result['login']['result'], info=info)
 
     def storecookiedata(self, data):
         """Ignore data; cookies are set by threadedhttp module."""

@@ -3,7 +3,7 @@
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2016
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -320,6 +320,10 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                 raise NoUsername(
                     'Username "{0}" does not have read permissions on '
                     '{1}'.format(self.login_name, self.site))
+            elif e.code == 'Failed':
+                raise NoUsername(
+                    'Username "{0}" does not have read permissions on '
+                    '{1}\n.{2}'.format(self.login_name, self.site, e.info))
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
