@@ -77,7 +77,7 @@ UserWarning: warnings targetted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -480,13 +480,12 @@ class BadTitle(Error):
 
     """Server responded with BadTitle."""
 
-# UserBlocked exceptions should in general not be caught. If the bot has
-# been blocked, the bot operator should address the reason for the block
-# before continuing.
-
     pass
 
 
+# UserBlocked exceptions should in general not be caught. If the bot has
+# been blocked, the bot operator should address the reason for the block
+# before continuing.
 class UserBlocked(Error):  # noqa
 
     """Your username or IP has been blocked"""
