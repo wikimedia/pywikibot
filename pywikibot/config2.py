@@ -936,7 +936,7 @@ def _win32_extension_command(extension):
         key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
         _progID = winreg.EnumValue(key1, 0)[0]
         _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                                '%s\shell\open\command' % _progID)
+                                r'%s\shell\open\command' % _progID)
         _cmd = _winreg.QueryValueEx(_key2, None)[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd
