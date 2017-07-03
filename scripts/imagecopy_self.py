@@ -580,8 +580,8 @@ class imageFetcher(threading.Thread):
         lang = sourceSite.code
         family = sourceSite.family.name
         conversions = [
-            (u'\[\[([^\[\]\|]+)\|([^\[\]\|]+)\]\]', u'[[:%(lang)s:\\1|\\2]]'),
-            (u'\[\[([^\[\]\|]+)\]\]', u'[[:%(lang)s:\\1|\\1]]'),
+            (r'\[\[([^\[\]\|]+)\|([^\[\]\|]+)\]\]', r'[[:%(lang)s:\1|\2]]'),
+            (r'\[\[([^\[\]\|]+)\]\]', r'[[:%(lang)s:\1|\1]]'),
         ]
         for (regex, replacement) in conversions:
             text = re.sub(regex, replacement % {u'lang': lang,
@@ -992,8 +992,8 @@ class uploader(threading.Thread):
             if imagepage.site.lang in moveToCommonsTemplate:
                 for moveTemplate in moveToCommonsTemplate[
                         imagepage.site.lang]:
-                    imtxt = re.sub(u'(?i)\{\{' + moveTemplate +
-                                   u'[^\}]*\}\}', u'', imtxt)
+                    imtxt = re.sub(r'(?i){{' + moveTemplate +
+                                   r'[^}]*}}', r'', imtxt)
 
             # add {{NowCommons}}
             if imagepage.site.lang in nowCommonsTemplate:

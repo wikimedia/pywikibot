@@ -352,11 +352,11 @@ class imageTransfer(threading.Thread):
     def fixAuthor(self, pageText):
         """Fix the author field in the information template."""
         informationRegex = re.compile(
-            '\|Author\=Original uploader was '
-            '(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])')
+            r'\|Author=Original uploader was '
+            r'(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])')
         selfRegex = re.compile(
-            '\{\{self\|author\='
-            '(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])\|')
+            r'{{self\|author='
+            r'(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])\|')
 
         # Find the |Author=Original uploader was ....
         informationMatch = informationRegex.search(pageText)
@@ -485,8 +485,8 @@ def doiskip(pagetext):
     saltos = getautoskip()
     # print saltos
     for salto in saltos:
-        rex = u'\{\{\s*[' + salto[0].upper() + salto[0].lower() + ']' + \
-              salto[1:] + '(\}\}|\|)'
+        rex = r'\{\{\s*[' + salto[0].upper() + salto[0].lower() + r']' + \
+              salto[1:] + r'(\}\}|\|)'
         # print rex
         if re.search(rex, pagetext):
             return True

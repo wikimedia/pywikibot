@@ -226,8 +226,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         #     warnings += n
 
         # what is this for?
-        newTable, n = re.subn("[\r\n]+<(td|TD)([^>]+?)>([^\r\n]*?)<\/(td|TD)>",
-                              r"\r\n|\2 | \3\r\n", newTable)
+        newTable, n = re.subn(
+            r'[\r\n]+<(td|TD)([^>]+?)>([^\r\n]*?)</(td|TD)>',
+            r'\r\n|\2 | \3\r\n', newTable)
         if n > 0:
             warning_messages.append(
                 u"WARNING: (sorry, bot code unreadable (1). I don't know why "
