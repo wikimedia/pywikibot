@@ -26,16 +26,23 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+from functools import partial
 import json
 import re
 
 try:
-    from bs4 import BeautifulSoup
+    from bs4 import BeautifulSoup, FeatureNotFound
 except ImportError as e:
     BeautifulSoup = e
+else:
+    try:
+        BeautifulSoup('', 'lxml')
+    except FeatureNotFound:
+        Soup = partial(BeautifulSoup, features='html.parser')
+    else:
+        Soup = partial(BeautifulSoup, features='lxml')
 
 import pywikibot
-
 from pywikibot.comms import http
 from pywikibot.data.api import Request
 
@@ -522,7 +529,7 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.error('Error fetching HTML for %s.' % self)
                 raise
 
-            soup = BeautifulSoup(response.content, 'lxml')
+            soup = Soup(response.content)
 
             try:
                 # None if nothing is found by .find()
@@ -577,7 +584,7 @@ class ProofreadPage(pywikibot.Page):
         """Do hocr using //tools.wmflabs.org/phetools/hocr_cgi.py?cmd=hocr."""
         def parse_hocr_text(txt):
             """Parse hocr text."""
-            soup = BeautifulSoup(txt, 'lxml')
+            soup = Soup(txt)
 
             res = []
             for ocr_page in soup.find_all(class_='ocr_page'):
@@ -743,7 +750,7 @@ class IndexPage(pywikibot.Page):
             del self._parsed_text
 
         self._parsed_text = self._get_parsed_page()
-        self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
+        self._soup = Soup(self._parsed_text)
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
         attrs = {'class': re.compile('prp-pagequality')}
@@ -765,7 +772,7 @@ class IndexPage(pywikibot.Page):
             self.purge()
             del self._parsed_text
             self._parsed_text = self._get_parsed_page()
-            self._soup = BeautifulSoup(self._parsed_text, 'html.parser')
+            self._soup = Soup(self._parsed_text)
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '
