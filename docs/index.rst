@@ -6,7 +6,7 @@ Welcome to pywikibot!
     **This documentation is incomplete**, and needs quite some work.
     
     If you are not familiar with pywikibot, please start at the
-    old documentation:
+    documentation:
     `Manual:Pywikibot on mediawiki.org <https://www.mediawiki.org/wiki/Manual:Pywikibot>`_
     
 
