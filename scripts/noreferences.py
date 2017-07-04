@@ -40,9 +40,6 @@ a list of affected articles
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 from functools import partial

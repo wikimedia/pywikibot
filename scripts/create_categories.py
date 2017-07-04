@@ -30,16 +30,15 @@ page links like [[Category:Hensies]], causing this script
 to create [[Category:Cultural heritage monuments in Hensies]].
 
 """
-from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 #
 # (C) Multichill, 2011
 # (C) xqt, 2011-2016
-# (c) Pywikibot team, 2016
+# (c) Pywikibot team, 2017
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import absolute_import, unicode_literals
+
 import pywikibot
 from pywikibot import pagegenerators, Bot
 

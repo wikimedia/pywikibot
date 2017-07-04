@@ -88,14 +88,11 @@ Custom format can be applied to the following items extrapolated from a
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import os
 import re

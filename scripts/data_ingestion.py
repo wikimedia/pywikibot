@@ -8,14 +8,11 @@ usage:
     python pwb.py data_ingestion -csvdir:local_dir/ -page:config_page
 """
 #
-# (C) Pywikibot team, 2013-2016
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import base64
 import codecs

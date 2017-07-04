@@ -32,9 +32,6 @@ to show warnings about deprecated methods:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import os
 import re
@@ -45,8 +42,8 @@ import pywikibot
 replacements = (
     # doc strings
     ('#\r?\n__version__',
-     '#\n# Automatically ported from compat branch by compat2core.py script\n'
-     '#\n__version__'),
+     '#\n'
+     '# Automatically ported from compat branch by compat2core.py script\n'),
     ('Pywikipedia bot team', 'Pywikibot team'),
     # importing changes
     ('import wikipedia(?: as pywikibot)?', 'import pywikibot'),

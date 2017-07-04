@@ -46,9 +46,6 @@ Please check every article you change.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 import pywikibot

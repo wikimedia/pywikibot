@@ -26,12 +26,11 @@ Expect the code to change a lot!
 """
 #
 # (c) Multichill, 2009
-# (c) Pywikibot team, 2009-2015
+# (c) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
-__version__ = '$Id$'
 
 import io
 

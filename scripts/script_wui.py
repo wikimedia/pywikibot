@@ -24,7 +24,7 @@ Syntax example:
 """
 #
 # (C) Dr. Trigon, 2012-2014
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,9 +66,6 @@ Syntax example:
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import datetime
 import gc

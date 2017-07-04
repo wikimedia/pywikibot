@@ -134,9 +134,6 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import collections
 import re

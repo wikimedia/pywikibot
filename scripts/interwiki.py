@@ -343,9 +343,6 @@ that you have to break it off, use "-continue" next time.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import os
 import pickle

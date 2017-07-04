@@ -40,9 +40,6 @@ Furthermore, the following command line parameters are supported:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 import pywikibot

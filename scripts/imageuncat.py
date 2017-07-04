@@ -18,9 +18,6 @@ the site commons should be given and not a Wikipedia or similar.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 from datetime import timedelta
 
 import pywikibot

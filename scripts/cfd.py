@@ -13,14 +13,11 @@ Syntax:
 """
 #
 # (C) Ben McIlwain, 2008
-# (C) Pywikibot team, 2009-2016
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import re
 import sys

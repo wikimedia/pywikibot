@@ -89,14 +89,12 @@ Options (may be omitted):
 #
 # (C) Misza13, 2006-2010
 # (C) xqt, 2009-2016
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import datetime
 import locale
 import math

@@ -33,9 +33,6 @@ For further information see pywikibot/cosmetic_changes.py
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 
 from pywikibot import config, cosmetic_changes, i18n, pagegenerators

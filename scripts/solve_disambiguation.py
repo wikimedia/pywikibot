@@ -77,9 +77,6 @@ To complete a move of a page, one can use:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import os
 import re
