@@ -61,7 +61,7 @@ Variables below can be used in the value for "archive" in the template above:
 %(isoweek)d          ISO week number of the thread being archived
 %(quarter)d          quarter of the year of the thread being archived
 %(month)d            month (as a number 1-12) of the thread being archived
-%(monthname)s        English name of the month above
+%(monthname)s        localized name of the month above
 %(monthnameshort)s   first three letters of the name above
 %(week)d             week number of the thread being archived
 
