@@ -573,7 +573,7 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     """
     FORMAT = '{2}{lightpurple}{0:{1}^50}{default}{2}'
 
-    patch = PatchManager(oldtext, newtext, n=n, by_letter=by_letter)
+    patch = PatchManager(oldtext, newtext, context=n, by_letter=by_letter)
     pywikibot.output(color_format(FORMAT, '  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
