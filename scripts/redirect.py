@@ -557,7 +557,7 @@ class RedirectRobot(SingleSiteBot):
                             except pywikibot.LockedPage:
                                 pywikibot.output(u'%s is locked.'
                                                  % redir_page.title())
-                            except pywikibot.OtherPageSaveError:
+                            except pywikibot.PageSaveRelatedError:
                                 pywikibot.exception()
                             else:
                                 done = True
