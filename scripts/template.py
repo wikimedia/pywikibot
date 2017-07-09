@@ -97,9 +97,9 @@ from five category pages as given:
 
 
 This next example substitutes templates test1, test2, and space test on all
-pages:
+user talk pages (namespace #3):
 
-    python pwb.py template test1 test2 "space test" -subst -always
+    python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 
 """
 #
