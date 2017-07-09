@@ -1837,7 +1837,7 @@ class TestDeprecatedDataSiteMethods(WikidataTestCase, DeprecationTestCase):
         data = self.repo.get_aliases(60)
         self.assertOneDeprecation()
         self.assertIsInstance(data, dict)
-        self.assertIn('en', data)
+        self.assertIn('fr', data)  # T170073
 
     def test_get_descriptions(self):
         """Test get_descriptions."""
