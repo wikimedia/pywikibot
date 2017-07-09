@@ -101,8 +101,6 @@ class HarvestRobot(WikidataBot):
         return titles
 
     def _template_link_target(self, item, link_text):
-        linked_page = None
-
         link = pywikibot.Link(link_text)
         linked_page = pywikibot.Page(link)
 
@@ -175,14 +173,11 @@ class HarvestRobot(WikidataBot):
                             if claim.type == 'wikibase-item':
                                 # Try to extract a valid page
                                 match = re.search(pywikibot.link_regex, value)
-                                if not match:
-                                    pywikibot.output(
-                                        '%s field %s value %s is not a '
-                                        'wikilink. Skipping.'
-                                        % (claim.getID(), field, value))
-                                    continue
+                                if match:
+                                    link_text = match.group(1)
+                                else:
+                                    link_text = value
 
-                                link_text = match.group(1)
                                 linked_item = self._template_link_target(
                                     item, link_text)
                                 if not linked_item:
