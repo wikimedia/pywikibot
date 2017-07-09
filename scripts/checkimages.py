@@ -872,8 +872,8 @@ class checkImagesBot(object):
             # It's not only on commons but the image needs a check
             # the second usually is a url or something like that.
             # Compare the two in equal way, both url.
-            repme = (self.list_entry +
-                     "is also on '''Commons''': [[commons:File:%s]]"
+            repme = ((self.list_entry +
+                      "is also on '''Commons''': [[commons:File:%s]]")
                      % (self.imageName,
                         commons_image_with_this_hash.title(
                             withNamespace=False)))
@@ -1012,11 +1012,11 @@ class checkImagesBot(object):
 
             if self.duplicatesReport or only_report:
                 if only_report:
-                    repme = (self.list_entry + 'has the following duplicates '
-                             "('''forced mode'''):"
+                    repme = ((self.list_entry + 'has the following duplicates '
+                              "('''forced mode'''):")
                              % self.image.title(asUrl=True))
                 else:
-                    repme = (self.list_entry + 'has the following duplicates:'
+                    repme = ((self.list_entry + 'has the following duplicates:')
                              % self.image.title(asUrl=True))
 
                 for dup_page in duplicates:
@@ -1299,10 +1299,10 @@ class checkImagesBot(object):
                 self.some_problem = False
         else:
             if not self.seems_ok and self.license_found:
-                rep_text_license_fake = (self.list_entry +
-                                         "seems to have a ''fake license'', "
-                                         'license detected: '
-                                         '<nowiki>%s</nowiki>' %
+                rep_text_license_fake = ((self.list_entry +
+                                          "seems to have a ''fake license'', "
+                                          'license detected: '
+                                          '<nowiki>%s</nowiki>') %
                                          (self.imageName, self.license_found))
                 printWithTimeZone(
                     u"%s seems to have a fake license: %s, reporting..."
