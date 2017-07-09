@@ -59,7 +59,7 @@ class IllustrateRobot(WikidataBot):
         self.current_page = page
 
         pywikibot.output(u'Found %s' % item.title())
-        imagename = page.properties().get('page_image')
+        imagename = page.properties().get('page_image_free')
 
         if not imagename:
             return
@@ -79,8 +79,8 @@ class IllustrateRobot(WikidataBot):
             image = pywikibot.FilePage(image.getRedirectTarget())
 
         if not image.exists():
-            pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it'
-                             % (image.title(),))
+            pywikibot.output("%s doesn't exist so I can't link to it"
+                             % image.title(asLink=True))
             return
 
         newclaim.setTarget(image)
