@@ -34,8 +34,6 @@ This script understands the following command-line arguments:
 
 -sleep[:#]          Time in seconds between repeat runs (default: 30)
 
--time[:#]           The -time option is deprecated. Use -sleep instead.
-
 -wait[:#]           Wait x second before check the images (default: 0)
 
 -skip[:#]           The bot skip the first [:#] images (default: 0)
