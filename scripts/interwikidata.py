@@ -16,7 +16,9 @@ Furthermore, the following command line parameters are supported:
 
 -clean            Clean pages.
 
--create           Create items only.
+-create           Create items.
+
+-merge            Merge items.
 
 -summary:         Use your own edit summary for cleaning the page.
 """
@@ -57,6 +59,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         self.availableOptions.update({
             'clean': False,
             'create': False,
+            'merge': False,
             'summary': None,
             'ignore_ns': False,  # used by interwikidata_tests only
         })
@@ -93,9 +96,12 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             item = self.try_to_add()
             if self.getOption('create') and item is None:
                 item = self.create_item()
+        else:
+            if self.getOption('merge'):
+                item = self.try_to_merge(item)
 
-        self.current_item = item
         if item and self.getOption('clean'):
+            self.current_item = item
             self.clean_page()
 
     def create_item(self):
@@ -152,8 +158,8 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             self.current_page.text, site=self.current_page.site)
         self.put_current(new_text, summary=self.getOption('summary'))
 
-    def try_to_add(self):
-        """Add current page in repo."""
+    def get_items(self):
+        """Return all items of pages linked through the interwiki."""
         wd_data = set()
         for iw_page in self.iwlangs.values():
             if not iw_page.exists():
@@ -165,6 +171,11 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             except pywikibot.NoPage:
                 output('Interwiki %s does not have an item' %
                        iw_page.title(asLink=True))
+        return wd_data
+
+    def try_to_add(self):
+        """Add current page in repo."""
+        wd_data = self.get_items()
         if not wd_data:
             # will create a new item with interwiki
             return None
@@ -180,6 +191,26 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         output('Adding link to %s' % item.title())
         item.setSitelink(self.current_page)
         return item
+
+    def try_to_merge(self, item):
+        """Merge two items."""
+        wd_data = self.get_items()
+        if not wd_data:
+            # todo: add links to item
+            return None
+        if len(wd_data) > 1:
+            warning('Interwiki conflict in %s, skipping...' %
+                    self.current_page.title(asLink=True))
+            return False
+        target_item = list(wd_data).pop()
+        try:
+            item.mergeInto(target_item)
+        except pywikibot.data.api.APIError:
+            # warning already printed by the API
+            return False
+        else:
+            target_item.get(force=True)
+            return target_item
 
 
 def main(*args):
