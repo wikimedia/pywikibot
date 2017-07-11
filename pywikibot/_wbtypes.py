@@ -50,5 +50,8 @@ class WbRepresentation(object):
             return self.toWikibase() == other.toWikibase()
         return NotImplemented
 
+    def __hash__(self):
+        return hash(frozenset(self.toWikibase().items()))
+
     def __ne__(self, other):
         return not self.__eq__(other)
