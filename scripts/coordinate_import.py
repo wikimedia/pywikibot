@@ -67,10 +67,8 @@ class CoordImportRobot(WikidataBot):
                 if self.prop in claim.qualifiers:
                     return prop
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Treat page/item."""
-        self.current_page = page
-
         coordinate = page.coordinates(primary_only=True)
 
         if not coordinate:

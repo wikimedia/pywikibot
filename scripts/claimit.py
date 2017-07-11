@@ -90,9 +90,8 @@ class ClaimRobot(WikidataBot):
         if self.exists_arg:
             pywikibot.output("'exists' argument set to '%s'" % self.exists_arg)
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Treat each page."""
-        self.current_page = page
         # The generator might yield pages from multiple sites
         source = self.getSource(page.site)
 

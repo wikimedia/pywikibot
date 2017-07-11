@@ -1825,26 +1825,35 @@ class NoRedirectPageBot(CurrentPageBot):
                 'exception was raised.'.format(page.title(), page.site))
 
 
-class WikidataBot(Bot):
+class WikidataBot(Bot, ExistingPageBot):
 
     """
     Generic Wikidata Bot to be subclassed.
 
-    Source claims (P143) can be created for specific sites.
+    Source claims (P143) can be created for specific sites
+
+    @cvar use_from_page: If True (default) it will apply ItemPage.fromPage
+        for every item. If False it assumes that the pages are actually
+        already ItemPage (page in treat_page_and_item will be None).
+        If None it'll use ItemPage.fromPage when the page is not in the site's
+        item namespace.
+    @type use_from_page: bool, None
+    @cvar treat_missing_item: Whether pages without items should be treated.
+        Note that this is checked after create_missing_item.
+    @type treat_missing_item: bool
+    @ivar create_missing_item: If True, new items will be created if the current
+        page doesn't have one. Subclasses should override this in the
+        constructor with a bool value or using self.getOption.
+    @type create_missing_item: bool
     """
 
-    def __init__(self, **kwargs):
-        """
-        Constructor of the WikidataBot.
+    use_from_page = True
+    treat_missing_item = False
 
-        @kwarg use_from_page: If True (default) it will apply ItemPage.fromPage
-            for every item. If False it assumes that the pages are actually
-            already ItemPage (page in treat will be None). If None it'll use
-            ItemPage.fromPage when the page is not in the site's item
-            namespace.
-        @kwtype use_from_page: bool, None
-        """
-        self.use_from_page = kwargs.pop('use_from_page', True)
+    @deprecated_args(use_from_page=None)
+    def __init__(self, **kwargs):
+        """Constructor of the WikidataBot."""
+        self.create_missing_item = False
         super(WikidataBot, self).__init__(**kwargs)
         self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
@@ -1989,18 +1998,61 @@ class WikidataBot(Bot):
             source.setTarget(item)
         return source
 
-    def run(self):
-        """Process all pages in generator."""
-        if not hasattr(self, 'generator'):
-            raise NotImplementedError('Variable %s.generator not set.'
-                                      % self.__class__.__name__)
+    def create_item_for_page(self, page, data=None, summary=None, **kwargs):
+        """
+        Create an ItemPage with the provided page as the sitelink.
 
-        treat_missing_item = hasattr(self, 'treat_missing_item')
+        @param page: the page for which the item will be created
+        @type page: pywikibot.Page
+        @param data: additional data to be included in the new item (optional).
+            Note that data created from the page have higher priority.
+        @type data: dict
+        @param summary: optional edit summary to replace the default one
+        @type summary: str
 
-        try:
-            for page in self.generator:
-                if not page.exists():
-                    pywikibot.output('%s doesn\'t exist.' % page)
+        @return: pywikibot.ItemPage or None
+        """
+        if not summary:
+            # FIXME: i18n
+            summary = ('Bot: New item with sitelink from %s'
+                       % page.title(asLink=True, insite=self.repo))
+
+        if data is None:
+            data = {}
+        data.setdefault('sitelinks', {}).update({
+            page.site.dbName(): {
+                'site': page.site.dbName(),
+                'title': page.title()
+            }
+        })
+        data.setdefault('labels', {}).update({
+            page.site.lang: {
+                'language': page.site.lang,
+                'value': page.title()
+            }
+        })
+        pywikibot.output('Creating item for %s...' % page)
+        item = pywikibot.ItemPage(page.site.data_repository())
+        kwargs.setdefault('show_diff', False)
+        result = self.user_edit_entity(item, data, summary=summary, **kwargs)
+        if result:
+            return item
+        else:
+            return None
+
+    def treat_page(self):
+        """Treat a page."""
+        page = self.current_page
+        if self.use_from_page is True:
+            try:
+                item = pywikibot.ItemPage.fromPage(page)
+            except pywikibot.NoPage:
+                item = None
+        else:
+            if isinstance(page, pywikibot.ItemPage):
+                item = page
+                page = None
+            else:
                 # FIXME: Hack because 'is_data_repository' doesn't work if
                 #        site is the APISite. See T85483
                 data_site = page.site.data_repository()
@@ -2009,33 +2061,30 @@ class WikidataBot(Bot):
                     is_item = page.namespace() == data_site.item_namespace.id
                 else:
                     is_item = False
-                if self.use_from_page is not True and is_item:
+                if is_item:
                     item = pywikibot.ItemPage(data_site, page.title())
-                    item.get()
-                elif self.use_from_page is False:
-                    pywikibot.error('{0} is not in the item namespace but '
-                                    'must be an item.'.format(page))
-                    continue
+                    page = None
                 else:
-                    try:
-                        item = pywikibot.ItemPage.fromPage(page)
-                    except pywikibot.NoPage:
-                        item = None
-                if not item:
-                    if not treat_missing_item:
-                        pywikibot.output(
-                            '%s doesn\'t have a wikidata item.' % page)
-                        # TODO: Add an option to create the item
-                        continue
-                self.treat(page, item)
-        except QuitKeyboardInterrupt:
-            pywikibot.output('\nUser quit %s bot run...' %
-                             self.__class__.__name__)
-        except KeyboardInterrupt:
-            if config.verbose_output:
-                raise
-            else:
-                pywikibot.output('\nKeyboardInterrupt during %s bot run...' %
-                                 self.__class__.__name__)
-        except Exception as e:
-            pywikibot.exception(msg=e, tb=True)
+                    item = None
+                    if self.use_from_page is False:
+                        pywikibot.error('{0} is not in the item namespace but '
+                                        'must be an item.'.format(page))
+                        return
+
+        if not item and self.create_missing_item:
+            item = self.create_item_for_page(page, asynchronous=False)
+
+        if not item and not self.treat_missing_item:
+            pywikibot.output('%s doesn\'t have a Wikidata item.' % page)
+            return
+
+        self.treat_page_and_item(page, item)
+
+    def treat_page_and_item(self, page, item):
+        """
+        Treat page together with its item (if it exists).
+
+        Must be implemented in subclasses.
+        """
+        raise NotImplementedError('Method %s.treat_page_and_item() not '
+                                  'implemented.' % self.__class__.__name__)
