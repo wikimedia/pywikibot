@@ -4470,6 +4470,7 @@ class Property(object):
              'tabular-data': pywikibot.WbTabularData,
              }
 
+    # the value type where different from the type
     value_types = {'wikibase-item': 'wikibase-entityid',
                    'wikibase-property': 'wikibase-entityid',
                    'commonsMedia': 'string',
@@ -4672,8 +4673,13 @@ class Claim(Property):
         if claim.getSnakType() == 'value':
             value = data['mainsnak']['datavalue']['value']
             # The default covers string, url types
-            claim.target = cls.TARGET_CONVERTER.get(
-                claim.type, lambda value, site: value)(value, site)
+            if claim.type in cls.types or claim.type == 'wikibase-property':
+                claim.target = cls.TARGET_CONVERTER.get(
+                    claim.type, lambda value, site: value)(value, site)
+            else:
+                pywikibot.warning(
+                    '{0} datatype is not supported yet.'.format(claim.type))
+                claim.target = pywikibot.WbUnknown.fromWikibase(value)
         if 'rank' in data:  # References/Qualifiers don't have ranks
             claim.rank = data['rank']
         if 'references' in data:
@@ -5043,9 +5049,10 @@ class Claim(Property):
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
             value = self.getTarget().toWikibase()
-        else:
-            raise NotImplementedError('%s datatype is not supported yet.'
-                                      % self.type)
+        else:  # WbUnknown
+            pywikibot.warning(
+                '{0} datatype is not supported yet.'.format(self.type))
+            value = self.getTarget().toWikibase()
         return value
 
     def _formatDataValue(self):

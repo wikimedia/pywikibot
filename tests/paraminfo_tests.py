@@ -227,6 +227,7 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
         known = ['item', 'property']
         self._check_param_values(self.repo, 'wbsearchentities', 'type', known)
 
+    # Missing datatypes won't crash pywikibot but should be noted
     def test_datatypes(self):
         """Test that all encountered datatypes are known."""
         unsupported = set()
