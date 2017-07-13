@@ -83,8 +83,8 @@ def update_family(families):
             text += u'        ]'
             pywikibot.output(text)
             family_file_name = 'pywikibot/families/%s_family.py' % family
-            family_file = codecs.open(family_file_name, 'r', 'utf8')
-            family_text = family_file.read()
+            with codecs.open(family_file_name, 'r', 'utf8') as family_file:
+                family_text = family_file.read()
             family_text = re.sub(r'(?msu)^ {8}self.languages_by_size.+?\]',
                                  text, family_text)
             with codecs.open(family_file_name, 'w', 'utf8') as family_file:
