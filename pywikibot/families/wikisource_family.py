@@ -32,10 +32,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'pl', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'cs',
-            'pt', 'fa', 'hu', 'www', 'ml', 'ko', 'sv', 'gu', 'bn', 'sl', 'te',
-            'sa', 'sr', 'ro', 'fi', 'el', 'uk', 'vi', 'ja', 'th', 'hy', 'ca',
-            'az', 'hr', 'ta', 'br', 'nl', 'is', 'la', 'no', 'vec', 'eo', 'tr',
-            'be', 'et', 'mk', 'yi', 'id', 'da', 'as', 'bg', 'li', 'mr', 'kn',
+            'pt', 'fa', 'hu', 'www', 'ml', 'ko', 'sv', 'gu', 'sl', 'bn', 'te',
+            'sa', 'sr', 'ro', 'el', 'fi', 'uk', 'vi', 'ja', 'th', 'hy', 'az',
+            'ca', 'hr', 'br', 'ta', 'nl', 'is', 'la', 'no', 'vec', 'eo', 'tr',
+            'be', 'et', 'mk', 'yi', 'id', 'da', 'bg', 'li', 'mr', 'as', 'kn',
             'or', 'bs', 'sah', 'lt', 'gl', 'cy', 'sk', 'zh-min-nan', 'fo',
             'pa',
         ]
