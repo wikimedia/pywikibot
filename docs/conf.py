@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,7 +36,9 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx_epytext',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              'sphinx.ext.autosummary',
+              'numpydoc']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

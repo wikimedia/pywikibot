@@ -2403,10 +2403,12 @@ def LiveRCPageGenerator(site=None, total=None):
     """
     Yield pages from a socket.io RC stream.
 
-    Generates pages based on the socket.io recent changes stream.
+    Generates pages based on the EventStreams Server-Sent-Event (SSE) recent
+    changes stream.
     The Page objects will have an extra property ._rcinfo containing the
     literal rc data. This can be used to e.g. filter only new pages. See
-    `pywikibot.comms.rcstream.rc_listener` for details on the .rcinfo format.
+    `pywikibot.comms.eventstreams.rc_listener` for details on the .rcinfo
+    format.
 
     @param site: site to return recent changes for
     @type site: pywikibot.BaseSite

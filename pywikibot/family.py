@@ -1144,12 +1144,19 @@ class Family(object):
 
     def rcstream_host(self, code):
         """Hostname for RCStream."""
-        raise NotImplementedError(
-            'This family does support neither RCStream nor EventStreams')
+        raise NotImplementedError('This family does not support RCStream')
 
     def rcstream_path(self, code):
         """Return path for RCStream."""
         raise NotImplementedError("This family does not support RCStream")
+
+    def rcstream_port(self, code):
+        """Return port for RCStream."""
+        raise NotImplementedError('This family does not support RCStream')
+
+    def eventstreams_host(self, code):
+        """Hostname for EventStreams."""
+        raise NotImplementedError('This family does not support EventStreams')
 
     def eventstreams_path(self, code):
         """Return path for EventStreams."""
@@ -1639,17 +1646,14 @@ class WikimediaFamily(Family):
         """Return 'https' as the protocol."""
         return 'https'
 
+    @deprecated('eventstreams_host')
     def rcstream_host(self, code):
-        """Return 'https://stream.wikimedia.org' as the RCStream hostname."""
+        """DEPRECATED: use eventstreams_host instead."""
+        return self.eventstreams_host(code)
+
+    def eventstreams_host(self, code):
+        """Return 'https://stream.wikimedia.org' as the stream hostname."""
         return 'https://stream.wikimedia.org'
-
-    def rcstream_port(self, code):
-        """Return 443 as the RCStream port number."""
-        return 443
-
-    def rcstream_path(self, code):
-        """Return path for RCStream."""
-        return '/rc'
 
     def eventstreams_path(self, code):
         """Return path for EventStreams."""
