@@ -1,3 +1,108 @@
+Release 3.0.20170713 (13 July 2017)
+====================================
+
+Bugfixes (core)
+---------------
+d9d1d02 Manage temporary readonly error (T154011)
+e533425 Unbreak wbGeoShape and WbTabularData (T166362)
+3834b6c Clean up issue with _WbDataPage (T166362)
+b8a9c2f Re-enable xml for WikiStats with py2 (T165830)
+461ffb0 Solve httplib.IncompleteRead exception in eventstreams (T168535)
+c697bfe Only force input_choise if self.always is given (T161483)
+5ed60e0 Add colon when replacing category and file weblink (T127745)
+df097a6 API Request: set uiprop only when ensuring 'userinfo' in meta (T169202)
+39843e8 Fix TestLazyLoginNotExistUsername test for Stewardwiki (T169458)
+
+Improvements (core)
+-------------------
+8b74d51 Introduce the new WbUnknown data type for Wikibase (T165961)
+461f747 djvu.py: add replace_page() and delete_page()
+ee30a68 Build GeoShape and TabularData from shared base class
+9aee0e0 Remove non-breaking spaces when tidying up a link (T130818)
+aef1b24 Replace private mylang variables with mycode in generate_user_files.py
+a5e5a3f FilePage: remove deprecated use of fileUrl
+e236757 Make socket_timeout recalculation reusable (T166539)
+b022690 FilePage.download(): add revision parameter to download arbitrary revision (T166939)
+737b037 Make pywikibot.Error more precise (T166982)
+a0a6d16 Implement pywikibot support for adding thanks to normal revisions (T135409)
+ed61b0f Implement EventStreams (T158943)
+f5f4a60 Add -titleregexnot page filter
+eddcc95 Add exception for -namepace option (T167580)
+4ea8d38 InteractiveReplace: Allow no replacements by default
+633e69a Encode default globe in family file
+3321a40 Add on to pywikibot support for thanking normal revisions (T135409)
+98783dc Add log entry code for thanks log (T135413)
+4be9336 Create superclass for log entries with user targets
+f6b0c7b Use relative reference to class attribute
+d12f60b Allow pywikibot to authenticate against a private wiki (T153903)
+42443c5 Make WbRepresentations hashable (T167827)
+
+Updates (core)
+--------------
+a6337f7 Update linktails
+173becb Update languages_by_size
+be75fb9 Update cross_allowed (global bot wikis group)
+1fbcccb Add atjwiki to wikipedia family file (T168049)
+beacf44 remove closed sites from languages_by_size list
+447b045 Update category_redirect_templates for wikipedia and commons Family
+7945c4a Update logevent type parameter list
+bc01242 Disable cleanUpSectionHeaders on jbo.wiktionary (T168399)
+54b4f90 Add kbpwiki to wikipedia family file (T169216)
+0679efa Remove anarchopedia family out of the framework (T167534)
+
+Bugfixes (scripts)
+------------------
+1d8c1bd Fix ResourceWarning in wikimedia_sites.py (T166459)
+02dbe77 imagecopy.py: page.site is not callable (T167062)
+38d645d weblinkchecker.py: Use https for web.archive.org (T167463)
+ea80e13 redirect.py: Adjust _treat_counter (T167254)
+f24c082 misspelling.py: Fix comparing template name (T125328)
+74f6c36 piper.py: fix bytes/str handling in python3 (T157215)
+fa830d6 Enable exceptions from fixes file (T142324)
+e229a13 revertbot.py: Don't loop over user contribs (T168666)
+e8bdc42 Use correct iterator method in interwikidata.py (T168575)
+86f623f Don't fail TestProofreadPageValidSite.test_url_image (T169542)
+54d24f7 Fix some of the invalid escape sequences (T164575)
+f577676 redirect.py: Handle PageSaveRelatedError exception (T169859)
+48431e7 illustratewikidata: rename page_image key in page_image_free (T169447)
+2684ffc checkimages: format string must be concatenated first (T170087)
+7f2b925 interwikidata:  Fix interwiki conflict detection (T168575)
+f645523 Fix ResourceWarning in wikimedia_sites.py with python3 (T166459)
+
+Improvements (scripts)
+----------------------
+3343a7f Port followlive.py to core (T66854)
+92f66ff replace.py: allow to edit modified text
+4ee7fda Catch KeyboardInterrupt and finally print execution time in checkimages.py
+e79af64 proofreadpage.py: raise TypeError, not ValueError
+7c5a078 category.py/tidy: Show page title at the bottom of the output (T166468)
+8355c22 checkimages: Use site.namespaces.FILE.custom_name instead of "File:"
+e2c92e2 weblinkchecker.py: Sorting of carriage returns (T166934)
+a78df27 Stopme is done at exit time by default
+a360417 standardize spamremove.py
+cd5665a replace.py: do not overwrite exceptions given via CLI (T142324)
+280f0a9 Create items with interwiki using interwikidata.py (T168575)
+c0a879b proofreadpage.py: add support for OCR feature (T159655)
+b11c819 Improve maintenance/wikimedia_sites.py
+152d798 proofreadpage.py: Fallback to "html.parser" if "lxml" is not available (T169515)
+09f56d4 Add support for item without link to harvest_template (T64014)
+c586403 Port ndashredir to core (T66875)
+5435fd7 Show different message if the page doesn't have an item (T168575)
+847cbb3 Merge items in interwikidata.py
+
+Updates (scripts)
+-----------------
+b4ab2e1 noreferences.py: update frwiki dict
+c8d1e66 Remove panoramiopicker.py (Panoramio is no longer available)
+b0f0d92 Use bs4 for imageharvest, not BeautifulSoup v3 (T115428)
+4c10c17 blockpageschecker: Add serbian localisation (T167599)
+b398a93 Update Czech (cs) summary in standardize_interwiki.py (T168798)
+2b882ed Update Czech category name in category_redirect.py
+f088a04 Remove anarchopedia from wikimedia_sites.py maintenance script (T167534)
+9b3a556 Add a French localisation for clean_sandbox
+77f42c0 Add Hindi (hi) summary in standardize_interwiki.py
+
+
 Release 3.0.20170521 (21 Mai 2017)
 ====================================
 
