@@ -225,7 +225,9 @@ try:
                                     % (mysite.namespaces.CATEGORY,
                                        workingcatname))
     filename = pywikibot.config.datafilepath(
-        'category', workingcatname.encode('ascii', 'xmlcharrefreplace') + '_exclude.txt')
+        'category',
+        workingcatname.encode('ascii', 'xmlcharrefreplace').decode('ascii') +
+        '_exclude.txt')
     try:
         f = codecs.open(filename, 'r', encoding=mysite.encoding())
         for line in f.readlines():
