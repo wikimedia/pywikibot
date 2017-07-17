@@ -222,6 +222,7 @@ netext = {
     'wikipedia': {
         'am': u'{{subst:Welcome}} %s',
         'ar': u'{{subst:ترحيب}} %s',
+        'ba': u'{{Hello}} %s',
         'bn': u'{{subst:স্বাগতম/বট}} %s',
         'da': u'{{velkommen|%s}}',
         'en': u'{{subst:welcome}} %s',
@@ -344,6 +345,7 @@ report_text = {
 random_sign = {
     'am': u'User:Beria/Signatures',
     'ar': u'Project:سجل الترحيب/توقيعات',
+    'ba': u'Ҡалып:Salamat_bot/Яңы',
     'da': u'Wikipedia:Velkommen/Signaturer',
     'en': u'Project:Welcome log/Sign',
     'fa': u'Project:سیاهه خوشامد/امضاها',
