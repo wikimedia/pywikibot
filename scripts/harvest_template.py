@@ -21,6 +21,10 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
+You can also use additional parameters:
+
+-create             Create missing items before importing.
+
 The following command line parameters can be used to change the bot's behavior.
 If you specify them before all parameters, they are global and are applied to
 all param-property pairs. If you specify them after a param-property pair,
@@ -115,9 +119,12 @@ class HarvestRobot(WikidataBot):
         @type fields: dict
         @keyword islink: Whether non-linked values should be treated as links
         @type islink: bool
+        @keyword create: Whether to create a new item if it's missing
+        @type create: bool
         """
         self.availableOptions.update({
             'always': True,
+            'create': False,
             'islink': False,
         })
         super(HarvestRobot, self).__init__(**kwargs)
@@ -133,6 +140,7 @@ class HarvestRobot(WikidataBot):
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
         self.linkR = textlib.compileLinkR()
+        self.create_missing_item = self.getOption('create')
 
     def getTemplateSynonyms(self, title):
         """Fetch redirects of the title, so we can check against them."""
@@ -321,6 +329,8 @@ def main(*args):
                     u'Please enter the template to work on:')
             else:
                 template_title = arg[10:]
+        elif arg.startswith('-create'):
+            options['create'] = True
         elif gen.handleArg(arg):
             if arg.startswith(u'-transcludes:'):
                 template_title = arg[13:]
