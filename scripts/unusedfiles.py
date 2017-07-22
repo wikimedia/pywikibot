@@ -35,7 +35,7 @@ template_to_the_image = {
 
 # This template message should use subst:
 template_to_the_user = {
-    'fa': u'\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
+    'fa': '\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
 }
 
 

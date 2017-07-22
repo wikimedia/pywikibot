@@ -90,14 +90,15 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
             else:
                 pywikibot.output('%s doesn\'t exist'
                                  % new_page.title(asLink=True))
-                choice = pywikibot.input_yn('Do you want to create a redirect?')
+                choice = pywikibot.input_yn(
+                    'Do you want to create a redirect?')
                 if choice:
                     comment = i18n.twtranslate(
                         site,
                         'capitalize_redirects-create-redirect',
                         {'to': page_t})
-                    new_page.set_redirect_target(self.current_page, create=True,
-                                                 summary=comment)
+                    new_page.set_redirect_target(self.current_page,
+                                                 create=True, summary=comment)
 
 
 def main(*args):

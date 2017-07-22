@@ -239,7 +239,8 @@ class TemplateRobot(ReplaceBot):
                 if not template.exists():
                     pywikibot.warning(u'Template "%s" does not exist.' % new)
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
-                                              default=False, automatic_quit=False):
+                                              default=False,
+                                              automatic_quit=False):
                         continue
                 replacements.append((templateRegex,
                                      r'{{%s\g<parameters>}}' % new))
@@ -343,13 +344,15 @@ def main(*args):
 
     if not gen:
         gens = [
-            pagegenerators.ReferringPageGenerator(t, onlyTemplateInclusion=True)
+            pagegenerators.ReferringPageGenerator(t,
+                                                  onlyTemplateInclusion=True)
             for t in oldTemplates
         ]
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
-        gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp, skip,
+        gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp,
+                                                     skip,
                                                      max_revision_depth=100,
                                                      show_filtered=True)
 

@@ -246,7 +246,8 @@ ignore_title = {
             u'Wikipédia:Liens aux pages d’homonymie',
             u'Wikipédia:Homonymie',
             u'Wikipédia:Homonymie/Homonymes dynastiques',
-            u'Wikipédia:Prise de décision, noms des membres de dynasties/liste des dynastiens',
+            'Wikipédia:Prise de décision, noms des membres '
+            'de dynasties/liste des dynastiens',
             u'Liste de toutes les combinaisons de deux lettres',
             u'Wikipédia:Log d’upload/.*',
             u'Sigles de trois lettres de [A-Z]AA à [A-Z]ZZ',
@@ -405,7 +406,8 @@ class ReferringPageGeneratorWithIgnore(object):
         pywikibot.output(u"Found %d references." % len(refs))
         # Remove ignorables
         if self.disambPage.site.family.name in ignore_title and \
-           self.disambPage.site.lang in ignore_title[self.disambPage.site.family.name]:
+           self.disambPage.site.lang in ignore_title[
+               self.disambPage.site.family.name]:
             for ig in ignore_title[self.disambPage.site.family.name
                                    ][self.disambPage.site.lang]:
                 for i in range(len(refs) - 1, -1, -1):
@@ -497,7 +499,7 @@ class PrimaryIgnoreManager(object):
                 'disambiguations',
                 self.disambPage.title(asUrl=True) + '.txt')
             try:
-                # Open file for appending. If none exists yet, create a new one.
+                # Open file for appending. If none exists, create a new one.
                 f = codecs.open(filename, 'a', 'utf-8')
                 f.write(refPage.title(asUrl=True) + '\n')
                 f.close()
@@ -584,7 +586,8 @@ class AliasOption(StandardOption):
 
     def test(self, value):
         """Test aliases and combine it with the original test."""
-        return value.lower() in self._aliases or super(AliasOption, self).test(value)
+        return value.lower() in self._aliases or super(AliasOption,
+                                                       self).test(value)
 
 
 class DisambiguationRobot(Bot):
@@ -613,8 +616,8 @@ class DisambiguationRobot(Bot):
         'hu': u'Egyért-redir',
     }
 
-    def __init__(self, always, alternatives, getAlternatives, dnSkip, generator,
-                 primary, main_only, minimum=0):
+    def __init__(self, always, alternatives, getAlternatives, dnSkip,
+                 generator, primary, main_only, minimum=0):
         """Constructor."""
         super(DisambiguationRobot, self).__init__()
         self.always = always
@@ -688,7 +691,7 @@ class DisambiguationRobot(Bot):
         # between | and ].
         # group linktrail is the link trail, that's letters after ]] which
         # are part of the word.
-        # note that the definition of 'letter' varies from language to language.
+        # note: the definition of 'letter' varies from language to language.
         self.linkR = re.compile(r'''
             \[\[  (?P<title>     [^\[\]\|#]*)
                   (?P<section> \#[^\]\|]*)?
@@ -761,7 +764,7 @@ class DisambiguationRobot(Bot):
                 % refPage.title())
             include = False
         if include in (True, "redirect"):
-            # make a backup of the original text so we can show the changes later
+            # save the original text so we can show the changes later
             original_text = text
             n = 0
             curpos = 0
@@ -778,7 +781,7 @@ class DisambiguationRobot(Bot):
                     else:
                         # stop loop and save page
                         break
-                # Make sure that next time around we will not find this same hit.
+                # Ensure that next time around we will not find this same hit.
                 curpos = m.start() + 1
                 try:
                     foundlink = pywikibot.Link(m.group('title'),
@@ -803,13 +806,15 @@ class DisambiguationRobot(Bot):
                 context = 60
                 # check if there's a dn-template here already
                 if (self.dnSkip and self.dn_template_str and
-                        self.dn_template_str[:-2] in text[m.end():m.end() +
-                                                          len(self.dn_template_str) + 8]):
+                        self.dn_template_str[:-2] in text[
+                            m.end():m.end() + len(self.dn_template_str) + 8]):
                     continue
 
-                edit = EditOption('edit page', 'e', text, m.start(), disambPage.title())
+                edit = EditOption('edit page', 'e', text, m.start(),
+                                  disambPage.title())
                 context_option = HighlightContextOption(
-                    'more context', 'm', text, 60, start=m.start(), end=m.end())
+                    'more context', 'm', text, 60, start=m.start(),
+                    end=m.end())
                 context_option.before_question = True
 
                 options = [ListOption(self.alternatives, ''),
@@ -820,7 +825,8 @@ class DisambiguationRobot(Bot):
                            StandardOption('unlink', 'u')]
                 if self.dn_template_str:
                     # '?', '/' for old choice
-                    options += [AliasOption('tag template %s' % self.dn_template_str,
+                    options += [AliasOption('tag template %s' %
+                                            self.dn_template_str,
                                             ['t', '?', '/'])]
                 options += [context_option]
                 if not edited:
@@ -928,8 +934,10 @@ class DisambiguationRobot(Bot):
                     # instead of a pipelink
                     elif (
                         (len(new_page_title) <= len(link_text)) and
-                        (firstcap(link_text[:len(new_page_title)]) == firstcap(new_page_title)) and
-                        (re.sub(self.trailR, '', link_text[len(new_page_title):]) == '') and
+                        (firstcap(link_text[:len(new_page_title)]) ==
+                         firstcap(new_page_title)) and
+                        (re.sub(self.trailR, '',
+                                link_text[len(new_page_title):]) == '') and
                         (not section)
                     ):
                         newlink = "[[%s]]%s" \
@@ -1057,7 +1065,8 @@ or press enter to quit:""")
 
         # first check whether user has customized the edit comment
         if (self.mysite.family.name in config.disambiguation_comment and
-                self.mylang in config.disambiguation_comment[self.mysite.family.name]):
+                self.mylang in config.disambiguation_comment[
+                    self.mysite.family.name]):
             try:
                 self.comment = i18n.translate(
                     self.mysite,
@@ -1208,7 +1217,8 @@ def main(*args):
                     pywikibot.Site().disambcategory(),
                     start=arg[7:], namespaces=[0])
             except pywikibot.NoPage:
-                pywikibot.output("Disambiguation category for your wiki is not known.")
+                pywikibot.output(
+                    'Disambiguation category for your wiki is not known.')
                 raise
         else:
             generator_factory.handleArg(arg)

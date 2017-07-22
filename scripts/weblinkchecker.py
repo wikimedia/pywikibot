@@ -171,7 +171,8 @@ ignorelist = [
 
     # Other special cases
     re.compile(r'.*[\./@]berlinonline\.de(/.*)?'),
-    # above entry to be manually fixed per request at [[de:Benutzer:BLueFiSH.as/BZ]]
+    # above entry to be manually fixed per request at
+    # [[de:Benutzer:BLueFiSH.as/BZ]]
     # bot can't handle their redirects:
 
     # bot rejected on the site, already archived
@@ -299,8 +300,8 @@ class LinkChecker(object):
     Given a HTTP URL, tries to load the page from the Internet and checks if it
     is still online.
 
-    Returns a (boolean, string) tuple saying if the page is online and including
-    a status reason.
+    Returns a (boolean, string) tuple saying if the page is online and
+    including a status reason.
 
     Per-domain user-agent faking is not supported in this deprecated class.
 
@@ -366,8 +367,8 @@ class LinkChecker(object):
             if not self.serverEncoding:
                 # TODO: We might also load a page, then check for an encoding
                 # definition in a HTML meta tag.
-                pywikibot.output(u'Error retrieving server\'s default charset. '
-                                 u'Using ISO 8859-1.')
+                pywikibot.output('Error retrieving server\'s default charset. '
+                                 'Using ISO 8859-1.')
                 # most browsers use ISO 8859-1 (Latin-1) as the default.
                 self.serverEncoding = 'iso8859-1'
         return self.serverEncoding
@@ -402,7 +403,8 @@ class LinkChecker(object):
         except UnicodeEncodeError:
             encoding = self.getEncodingUsedByServer()
             self.path = unicode(urllib.quote(self.path.encode(encoding)))
-            self.query = unicode(urllib.quote(self.query.encode(encoding), '=&'))
+            self.query = unicode(urllib.quote(self.query.encode(encoding),
+                                              '=&'))
 
     def resolveRedirect(self, useHEAD=False):
         """
@@ -560,7 +562,8 @@ class LinkChecker(object):
             alive = self.response.status not in range(400, 500)
             if self.response.status in self.HTTPignore:
                 alive = False
-            return alive, '%s %s' % (self.response.status, self.response.reason)
+            return alive, '%s %s' % (self.response.status,
+                                     self.response.reason)
 
 
 class LinkCheckThread(threading.Thread):
@@ -598,7 +601,8 @@ class LinkCheckThread(threading.Thread):
         try:
             header = self.header
             r = comms.http.fetch(
-                self.url, headers=header, use_fake_user_agent=self._use_fake_user_agent)
+                self.url, headers=header,
+                use_fake_user_agent=self._use_fake_user_agent)
         except requests.exceptions.InvalidURL:
             message = i18n.twtranslate(self.page.site,
                                        'weblinkchecker-badurl_msg',
@@ -631,8 +635,8 @@ class History(object):
     The URLs are dictionary keys, and
     values are lists of tuples where each tuple represents one time the URL was
     found dead. Tuples have the form (title, date, error) where title is the
-    wiki page where the URL was found, date is an instance of time, and error is
-    a string with error code and message.
+    wiki page where the URL was found, date is an instance of time, and error
+    is a string with error code and message.
 
     We assume that the first element in the list represents the first time we
     found this dead link, and the last element represents the last time.
@@ -656,7 +660,8 @@ class History(object):
             self.site = site
         self.semaphore = threading.Semaphore()
         self.datfilename = pywikibot.config.datafilepath(
-            'deadlinks', 'deadlinks-%s-%s.dat' % (self.site.family.name, self.site.code))
+            'deadlinks', 'deadlinks-%s-%s.dat' % (self.site.family.name,
+                                                  self.site.code))
         # Count the number of logged links, so that we can insert captions
         # from time to time
         self.logCount = 0
@@ -994,7 +999,8 @@ def main(*args):
             xmlStart
         except NameError:
             xmlStart = None
-        gen = XmlDumpPageGenerator(xmlFilename, xmlStart, genFactory.namespaces)
+        gen = XmlDumpPageGenerator(xmlFilename, xmlStart,
+                                   genFactory.namespaces)
 
     if not gen:
         gen = genFactory.getCombinedGenerator()

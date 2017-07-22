@@ -57,7 +57,8 @@ class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
     def _create_callback(self):
         """Create callback and add a choice to make the link bold."""
         callback = super(SelflinkBot, self)._create_callback()
-        callback.additional_choices += [_BoldChoice(self.current_page, callback)]
+        callback.additional_choices += [_BoldChoice(self.current_page,
+                                                    callback)]
         return callback
 
     def treat_page(self):

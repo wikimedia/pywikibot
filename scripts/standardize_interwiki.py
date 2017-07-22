@@ -51,7 +51,7 @@ def main(*args):
     for arg in pywikibot.handle_args():
         if arg.startswith('-start'):
             if len(arg) == 6:
-                start = pywikibot.input(u'From what page do you want to start?')
+                start = pywikibot.input('From what page do you want to start?')
             else:
                 start = arg[7:]
     site = pywikibot.Site()

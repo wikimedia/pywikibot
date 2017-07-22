@@ -409,7 +409,7 @@ class Global(object):
     offset = None           # skip users newer than that timestamp
     timeoffset = 0          # skip users newer than # minutes
     recursive = True        # define if the Bot is recursive or not
-    timeRecur = 3600        # how much time (sec.) the bot sleeps before restart
+    timeRecur = 3600        # how much time (sec.) the bot waits before restart
     makeWelcomeLog = True   # create the welcome log or not
     confirm = False         # should bot ask to add user to bad-username list
     welcomeAuto = False     # should bot welcome auto-created users
@@ -419,7 +419,7 @@ class Global(object):
     signFileName = None     # File name, default: None
     defaultSign = '--~~~~'  # default signature
     queryLimit = 50         # number of users that the bot load to check
-    quiet = False           # Prevents users without contributions are displayed
+    quiet = False           # Users without contributions aren't displayed
 
 
 class WelcomeBot(object):
@@ -567,7 +567,7 @@ class WelcomeBot(object):
             if answer.lower() in ['yes', 'y'] or not globalvar.confirm:
                 showStatus()
                 pywikibot.output(
-                    u'%s is possibly an unwanted username. It will be reported.'
+                    '%s is possibly an unwanted username. It will be reported.'
                     % name)
                 if hasattr(self, '_BAQueue'):
                     self._BAQueue.append(name)
@@ -696,8 +696,8 @@ class WelcomeBot(object):
                 pywikibot.output('Loading signature list...')
                 signText = signPage.get()
             else:
-                pywikibot.output('The Signature list page is not exist, random '
-                                 'signature will disable.')
+                pywikibot.output('The signature list page does not exist, '
+                                 'random signature will be disabled.')
                 globalvar.randomSign = False
         else:
             try:
@@ -913,7 +913,7 @@ def main(*args):
             try:
                 globalvar.offset = pywikibot.Timestamp.fromtimestampformat(val)
             except ValueError:
-                # upon request, we might want to check for software version here
+                # upon request, we could check for software version here
                 raise ValueError(
                     "Mediawiki has changed, -offset:# is not supported "
                     "anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP "
