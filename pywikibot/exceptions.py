@@ -24,6 +24,7 @@ SiteDefinitionError: Site loading problem
 PageRelatedError: any exception which is caused by an operation on a Page.
 
   - NoPage: Page does not exist
+  - UnsupportedPage: Page is not supported due to a namespace restriction
   - IsRedirectPage: Page is a redirect page
   - IsNotRedirectPage: Page is not a redirect page
   - CircularRedirect: Page is a circular redirect
@@ -223,6 +224,16 @@ class NoPage(PageRelatedError):  # noqa
     """Page does not exist"""
 
     message = u"Page %s doesn't exist."
+
+    pass
+
+
+class UnsupportedPage(PageRelatedError):
+
+    """Unsupported page due to namespace restriction."""
+
+    # namespaces < 0 aren't supported (T169213)
+    message = 'Page %s is not supported due to namespace restriction.'
 
     pass
 
