@@ -180,10 +180,7 @@ import pywikibot
 
 from pywikibot import config, i18n
 from pywikibot.tools.formatter import color_format
-from pywikibot.tools import issue_deprecation_warning
-
-if sys.version_info[0] > 2:
-    unicode = str
+from pywikibot.tools import issue_deprecation_warning, UnicodeType
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -831,10 +828,10 @@ class WelcomeBot(object):
                 if globalvar.recursive:
                     showStatus()
                     if locale.getlocale()[1]:
-                        strfstr = unicode(
-                            time.strftime(u"%d %b %Y %H:%M:%S (UTC)",
-                                          time.gmtime()),
-                            locale.getlocale()[1])
+                        strfstr = time.strftime(
+                            '%d %b %Y %H:%M:%S (UTC)', time.gmtime())
+                        if not isinstance(strfstr, UnicodeType):  # py2-py3 compatibility
+                            strfstr = strfstr.decode(locale.getlocale()[1])
                     else:
                         strfstr = time.strftime(
                             u"%d %b %Y %H:%M:%S (UTC)", time.gmtime())
