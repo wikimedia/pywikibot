@@ -27,7 +27,3 @@ class Family(family.SubdomainFamily):
     def protocol(self, code):
         """Return https as the protocol for this family."""
         return "https"
-
-    def ignore_certificate_error(self, code):
-        """Ignore certificate errors."""
-        return True  # has self-signed certificate for a different domain.
