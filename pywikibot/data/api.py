@@ -2188,6 +2188,9 @@ class Request(MutableMapping):
                     continue
                 raise NoUsername('Failed OAuth authentication for %s: %s'
                                  % (self.site, info))
+            if code == 'cirrussearch-too-busy-error':  # T170647
+                self.wait()
+                continue
             # raise error
             try:
                 # Due to bug T66958, Page's repr may return non ASCII bytes
