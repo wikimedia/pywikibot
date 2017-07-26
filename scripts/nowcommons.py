@@ -52,9 +52,6 @@ Please fix these if you are capable and motivated:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import sys
 
 import pywikibot

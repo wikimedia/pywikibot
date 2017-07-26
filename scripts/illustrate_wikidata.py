@@ -21,9 +21,6 @@ Usage:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 
 from pywikibot import pagegenerators, WikidataBot

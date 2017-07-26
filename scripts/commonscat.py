@@ -59,9 +59,6 @@ For example to go through all categories:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 import pywikibot

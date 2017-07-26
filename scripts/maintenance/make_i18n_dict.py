@@ -38,9 +38,6 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 #
 from __future__ import absolute_import, print_function, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import json
 import os

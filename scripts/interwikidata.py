@@ -29,9 +29,6 @@ Furthermore, the following command line parameters are supported:
 #
 from __future__ import unicode_literals, absolute_import
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 
 from pywikibot import pagegenerators, output, warning

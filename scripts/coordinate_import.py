@@ -31,8 +31,6 @@ You can use any typical pagegenerator to provide with a list of pages:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownException

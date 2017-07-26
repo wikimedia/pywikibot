@@ -18,8 +18,6 @@ If no starting name is provided, the bot starts at '!'.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import pywikibot
 
 from pywikibot import textlib, pagegenerators

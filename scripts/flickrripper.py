@@ -25,14 +25,11 @@ Todo:
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikibot team, 2009-2016
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import base64
 import hashlib

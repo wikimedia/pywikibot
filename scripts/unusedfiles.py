@@ -15,14 +15,11 @@ Parameters:
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
 # (c) xqt, 2011-2016
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 from pywikibot import i18n, pagegenerators, Bot

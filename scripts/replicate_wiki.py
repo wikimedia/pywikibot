@@ -42,14 +42,11 @@ destination_wiki  destination wiki(s)
 """
 #
 # (C) Kasper Souren, 2012-2013
-# (C) Pywikibot team, 2013-2016
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import sys
 

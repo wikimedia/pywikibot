@@ -164,9 +164,6 @@ badwords at all but can be used for some bad-nickname.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 from datetime import timedelta
 import locale

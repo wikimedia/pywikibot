@@ -112,9 +112,6 @@ user talk pages (namespace #3):
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 from warnings import warn

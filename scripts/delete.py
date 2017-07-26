@@ -49,14 +49,11 @@ Delete everything in the category "To delete" without prompting.
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2016
+# (C) Pywikibot team, 2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import collections
 

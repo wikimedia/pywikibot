@@ -33,9 +33,6 @@ Example:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import (

@@ -32,8 +32,6 @@ import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 from pywikibot.exceptions import LockedPage, NoPage, PageNotSaved
 
-__version__ = '$Id$'
-
 
 class NewItemRobot(WikidataBot):
 
