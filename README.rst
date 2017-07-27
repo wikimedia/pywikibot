@@ -102,9 +102,9 @@ It may require the following programs to function properly:
 Contributing
 ------------
 
-Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikimedia.org/>`_,
-`learn <https://www.mediawiki.org/wiki/Special:MyLanguage/Developer_access>`_ how to get
-started.
+Our code is maintained on Wikimedia's
+`Gerrit installation <https://gerrit.wikimedia.org/r/#/admin/projects/?filter=pywikibot>`_.
+Learn about `how to contribute <https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Development>`_.
 
 .. image:: https://secure.travis-ci.org/wikimedia/pywikibot-core.png?branch=master
    :alt: Build Status
