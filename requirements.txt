@@ -95,7 +95,7 @@ beautifulsoup4
 pycountry
 
 # scripts/weblinkchecker.py
-memento_client>=0.5.1
+memento_client>=0.5.1,!=0.6.0
 
 # tools/__init__.py
 # pywikibot prefers using the inbuilt bz2 module if python was compiled with

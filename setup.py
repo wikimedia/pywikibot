@@ -79,7 +79,7 @@ if PY2:
 script_deps = {
     'flickrripper.py': ['Pillow<3.5.0' if PY26 else 'Pillow'],
     'states_redirect.py': ['pycountry'],
-    'weblinkchecker.py': ['memento_client>=0.5.1'],
+    'weblinkchecker.py': ['memento_client>=0.5.1,!=0.6.0'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],
 }
 # flickrapi 1.4.4 installs a root logger in verbose mode; 1.4.5 fixes this.
