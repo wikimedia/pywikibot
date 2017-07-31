@@ -83,7 +83,7 @@ def update_family(families):
             with codecs.open(family_file_name, 'r', 'utf8') as family_file:
                 family_text = family_file.read()
             family_text = re.sub(r'(?msu)^ {8}self.languages_by_size.+?\]',
-                                 text, family_text)
+                                 text, family_text, 1)
             with codecs.open(family_file_name, 'w', 'utf8') as family_file:
                 family_file.write(family_text)
 
