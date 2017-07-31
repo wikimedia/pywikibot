@@ -46,7 +46,7 @@ if not python_is_supported():
 
 test_deps = ['bz2file', 'mock']
 
-dependencies = ['requests']
+dependencies = ['requests!=2.18.2']
 
 # the irc module has no Python 2.6 support since 10.0
 irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'

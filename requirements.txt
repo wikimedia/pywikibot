@@ -19,7 +19,7 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory; see README.conversion.txt
-requests>=2.4.1
+requests>=2.4.1,!=2.18.2
 
 # requests security extra
 pyOpenSSL>=0.14 ; python_full_version < '2.7.9'
