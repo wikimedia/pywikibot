@@ -9,8 +9,8 @@ Text to be stored, if the page is not-existing, is preloaded from the file used
 to create the Index page, making the upload feature independent from the format
 of the file, as long as it is supported by the MW ProofreadPage extension.
 
-As alternative, if '-ocr' option is selected, https://tools.wmflabs.org/phetools
-OCR tool will be used to get text.
+As alternative, if '-ocr' option is selected,
+https://tools.wmflabs.org/phetools OCR tool will be used to get text.
 In this case, also already existing pages with quality value 'Not Proofread'
 can be treated. '-force' will override existing page in this case.
 
@@ -34,8 +34,8 @@ The following parameters are supported:
                    saving the page
 
     -ocr:          use https://tools.wmflabs.org/phetools OCR tool to get text;
-                   default is False, i.e. only not-(yet)-existing pages
-                   in Page ns will be treated and text will be fetched via preload.
+                   default is False, i.e. only not-(yet)-existing pages in Page
+                   ns will be treated and text will be fetched via preload.
 
     -force:        overwrite existing pages;
                    default is False; valid only if '-ocr' is selected.

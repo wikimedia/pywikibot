@@ -34,7 +34,9 @@ WMF_CACERT = 'MIIDxTCCAq2gAwIBAgIQAqxcJmoLQJuPC3nyrkYldzANBgkqhkiG9w0BAQUFADBs'
 
 def check_environ(environ_name):
     """Print environment variable."""
-    pywikibot.output('{0}: {1}'.format(environ_name, os.environ.get(environ_name, 'Not set')))
+    pywikibot.output('{0}: {1}'.format(environ_name,
+                                       os.environ.get(environ_name,
+                                                      'Not set')))
 
 
 def main(*args):
@@ -73,12 +75,14 @@ def main(*args):
         if usernames:
             pywikibot.output('Usernames for family "{0}":'.format(family))
             for lang, username in usernames.items():
-                sysop_name = pywikibot.config2.sysopnames.get(family, {}).get(lang)
+                sysop_name = pywikibot.config2.sysopnames.get(family,
+                                                              {}).get(lang)
                 if not sysop_name:
                     sysop_name = 'no sysop configured'
                 elif sysop_name == username:
                     sysop_name = 'also sysop'
-                pywikibot.output('\t{0}: {1} ({2})'.format(lang, username, sysop_name))
+                pywikibot.output('\t{0}: {1} ({2})'.format(lang, username,
+                                                           sysop_name))
 
 
 if __name__ == '__main__':

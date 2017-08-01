@@ -54,8 +54,8 @@ class WikiTransferException(Exception):
 
     """Base class for exceptions from this script.
 
-    Makes it easier for clients to catch all expected exceptions that the script might
-    throw
+    Makes it easier for clients to catch all expected exceptions that the
+    script might throw
     """
 
     pass
@@ -65,8 +65,8 @@ class TargetSiteMissing(WikiTransferException):
 
     """Thrown when the target site is the same as the source site.
 
-    Based on the way each are initialized, this is likely to happen when the target site
-    simply hasn't been specified.
+    Based on the way each are initialized, this is likely to happen when the
+    target site simply hasn't been specified.
     """
 
     pass
@@ -74,7 +74,7 @@ class TargetSiteMissing(WikiTransferException):
 
 class TargetPagesMissing(WikiTransferException):
 
-    """Thrown if no page range has been specified for the script to operate on."""
+    """Thrown if no page range has been specified to operate on."""
 
     pass
 
@@ -136,7 +136,8 @@ def main(*args):
     for page in gen:
         summary = "Moved page from %s" % page.title(asLink=True)
         targetpage = pywikibot.Page(tosite, prefix + page.title())
-        edithistpage = pywikibot.Page(tosite, prefix + page.title() + '/edithistory')
+        edithistpage = pywikibot.Page(tosite, prefix + page.title() +
+                                      '/edithistory')
 
         if targetpage.exists() and not overwrite:
             pywikibot.output(

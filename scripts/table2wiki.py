@@ -67,7 +67,7 @@ docuReplacements = {
 
 
 class TableXmlDumpPageGenerator(object):
-    """A page generator that will yield all pages that seem to contain an HTML table."""
+    """Generator to yield all pages that seem to contain an HTML table."""
 
     def __init__(self, xmlfilename):
         """Constructor."""
@@ -111,8 +111,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         beautify all wiki tables already contained in the text.
         """
         warnings = 0
-        # this array will contain strings that will be shown in case of possible
-        # errors, before the user is asked if he wants to accept the changes.
+        # this array will contain strings that will be shown in case of
+        # possible errors, before the user is asked if he wants to accept the
+        # changes.
         warning_messages = []
         newTable = table
         ##################
@@ -135,8 +136,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         newTable = re.sub(r'(?i)[\r\n]*?<##table##>(?P<more>[\w\W]*?)[\r\n ]*',
                           r'\r\n{|\n\g<more>\r\n', newTable)
         # <table> tag with attributes, without more text on the same line
-        newTable = re.sub(r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>[\r\n ]*',
-                          r'\r\n{| \g<attr>\r\n', newTable)
+        newTable = re.sub(
+            r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>[\r\n ]*',
+            r'\r\n{| \g<attr>\r\n', newTable)
         # <table> tag without attributes, without more text on the same line
         newTable = re.sub(r'(?i)[\r\n]*?<##table##>[\r\n ]*',
                           '\r\n{|\r\n', newTable)
@@ -147,7 +149,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         ##################
         # caption with attributes
         newTable = re.sub(
-            r'(?i)<caption (?P<attr>[\w\W]*?)>(?P<caption>[\w\W]*?)<\/caption>',
+            r'(?i)<caption (?P<attr>[\w\W]*?)>'
+            r'(?P<caption>[\w\W]*?)<\/caption>',
             r'\r\n|+\g<attr> | \g<caption>', newTable)
         # caption without attributes
         newTable = re.sub(r'(?i)<caption>(?P<caption>[\w\W]*?)<\/caption>',
@@ -179,7 +182,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\n!\g<attr> | \g<header>\r\n', newTable)
         if n > 0:
             warning_messages.append(
-                u'WARNING: found <th ...> without </th>. (%d occurences\n)' % n)
+                'WARNING: found <th ...> without </th>. (%d occurences\n)' % n)
             warnings += n
 
         ##################
@@ -211,16 +214,6 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             warning_messages.append(
                 u'<td> used where </td> was expected. (%d occurences)\n' % n)
             warnings += n
-
-        # fail save, sometimes it's a <td><td></tr>
-        #        newTable, n = re.subn("[\r\n]+<(td|TD)>([^<]*?)<(td|TD)><\/(tr|TR)>",
-        #                             "\r\n| \\2\r\n", newTable)
-        #        newTable, n = re.subn("[\r\n]+<(td|TD)([^>]*?)>([^<]*?)<(td|TD)><\/(tr|TR)>",
-        #                             "\r\n|\\2| \\3\r\n", newTable)
-        # if n > 0:
-        #     warning_messages.append("WARNING: found <td><td></tr>, but no </td>."
-        #                             " (%d occurences)\n" % n)
-        #     warnings += n
 
         # what is this for?
         newTable, n = re.subn(
@@ -277,8 +270,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         if config.deIndentTables:
             num = 1
             while num != 0:
-                newTable, num = re.subn(r'(\{\|[\w\W]*?)\n[ \t]+([\w\W]*?\|\})',
-                                        r'\1\r\n\2', newTable)
+                newTable, num = re.subn(
+                    r'(\{\|[\w\W]*?)\n[ \t]+([\w\W]*?\|\})',
+                    r'\1\r\n\2', newTable)
 
         ##################
         # kills additional spaces after | or ! or {|
@@ -372,15 +366,17 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 # TODO: how does this work? docu please.
                 # why are only äöüß used, but not other special characters?
                 newTable, num = re.subn(
-                    r'(\r\n[A-Z]{1}[^\n\r]{200,}?[a-zäöüß]\.)\ ([A-ZÄÖÜ]{1}[^\n\r]{200,})',
+                    r'(\r\n[A-Z]{1}[^\n\r]{200,}?[a-zäöüß]\.)'
+                    r'\ ([A-ZÄÖÜ]{1}[^\n\r]{200,})',
                     r'\1\r\n\2', newTable)
         return newTable, warnings, warning_messages
 
     def markActiveTables(self, text):
         """
-        Mark all table start and end tags that are not disabled by nowiki tags, comments etc.
+        Mark all hidden table start and end tags.
 
-        We will then later only work on these marked tags.
+        Mark all table start and end tags that are not disabled by nowiki tags,
+        comments etc. We will then later only work on these marked tags.
         """
         tableStartTagR = re.compile("<table", re.IGNORECASE)
         tableEndTagR = re.compile("</table>", re.IGNORECASE)
@@ -395,7 +391,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
     def findTable(self, text):
         """
-        Find the first HTML table (which can contain nested tables) inside a text.
+        Find the first HTML table (which can contain nested tables).
 
         Returns the table and the start and end position inside the text.
         """
@@ -417,10 +413,12 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 nextStarting = markedTableStartTagR.search(text)
                 nextEnding = markedTableEndTagR.search(text)
                 if not nextEnding:
-                    pywikibot.output("More opening than closing table tags. Skipping.")
+                    pywikibot.output(
+                        'More opening than closing table tags. Skipping.')
                     return None, 0, 0
                 # if another table tag is opened before one is closed
-                elif nextStarting and nextStarting.start() < nextEnding.start():
+                elif (nextStarting and
+                      nextStarting.start() < nextEnding.start()):
                     offset += nextStarting.end()
                     text = text[nextStarting.end():]
                     depth += 1
