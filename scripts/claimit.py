@@ -107,12 +107,13 @@ class ClaimRobot(WikidataBot):
                     pywikibot.log(
                         'Use -exists:p option to override this behavior')
                     break
+                if not existing.target_equals(claim.getTarget()):
+                    continue
                 # If some attribute of the claim being added
                 # matches some attribute in an existing claim of
                 # the same property, skip the claim, unless the
                 # 'exists' argument overrides it.
-                if (existing.target_equals(claim.getTarget()) and
-                        't' not in self.exists_arg):
+                if 't' not in self.exists_arg:
                     pywikibot.log(
                         'Skipping %s because claim with same target already exists'
                         % (claim.getID(),))
