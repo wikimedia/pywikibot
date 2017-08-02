@@ -185,7 +185,7 @@ class PatrolBot(SingleSiteBot):
             if pywikibot.config.verbose_output:
                 pywikibot.output(u'checking against whitelist item = %s' % item)
 
-            if isinstance(item, PatrolRule):
+            if isinstance(item, LinkedPagesRule):
                 if pywikibot.config.verbose_output:
                     pywikibot.output(u'invoking programmed rule')
                 if item.match(title):
@@ -377,29 +377,7 @@ def title_match(prefix, title):
     return
 
 
-class PatrolRule(object):
-
-    """Bot marks the edit.startswith("-s as patrolled based on info obtained by whitelist."""
-
-    def __init__(self, page_title):
-        """
-        Constructor.
-
-        @param page_title: The page title for this rule
-        @type page_title: pywikibot.Page
-        """
-        self.page_title = page_title
-
-    def title(self):
-        """Obtain page title."""
-        return self.page_title
-
-    def match(self, page):
-        """Added for future use."""
-        pass
-
-
-class LinkedPagesRule(PatrolRule):
+class LinkedPagesRule(object):
 
     """Matches of page site title and linked pages title."""
 
@@ -412,6 +390,10 @@ class LinkedPagesRule(PatrolRule):
         self.site = pywikibot.Site()
         self.page_title = page_title
         self.linkedpages = None
+
+    def title(self):
+        """Obtain page title."""
+        return self.page_title
 
     def match(self, page_title):
         """Match page_title to linkedpages elements."""
