@@ -95,7 +95,8 @@ class SyncSites(object):
 
         if options.namespace and 'help' in options.namespace:
             for namespace in self.original.namespaces.values():
-                pywikibot.output('%s %s' % (namespace.id, namespace.custom_name))
+                pywikibot.output(
+                    '{0} {1}'.format(namespace.id, namespace.custom_name))
             sys.exit()
 
         self.sites = [pywikibot.Site(s, family) for s in sites]
@@ -174,12 +175,14 @@ class SyncSites(object):
             else:
                 output += "All important pages are the same"
 
-            output += "\n\n== Admins from original that are missing here ==\n\n"
+            output += (
+                '\n\n== Admins from original that are missing here ==\n\n')
             if self.user_diff[site]:
                 output += "".join('* %s\n' % l.replace('_', ' ') for l in
                                   self.user_diff[site])
             else:
-                output += "All users from original are also present on this wiki"
+                output += (
+                    'All users from original are also present on this wiki')
 
             pywikibot.output(output)
             sync_overview_page.text = output

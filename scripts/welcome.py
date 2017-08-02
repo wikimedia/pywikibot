@@ -827,7 +827,8 @@ class WelcomeBot(object):
                     if locale.getlocale()[1]:
                         strfstr = time.strftime(
                             '%d %b %Y %H:%M:%S (UTC)', time.gmtime())
-                        if not isinstance(strfstr, UnicodeType):  # py2-py3 compatibility
+                        # py2-py3 compatibility
+                        if not isinstance(strfstr, UnicodeType):
                             strfstr = strfstr.decode(locale.getlocale()[1])
                     else:
                         strfstr = time.strftime(

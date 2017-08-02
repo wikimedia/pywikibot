@@ -165,15 +165,15 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
                 else:
                     above, below = pagecontents, contents
                     comment = comment_bottom
-                pywikibot.output('Page {0} already exists, appending on {1}!'.format(
-                                 title, self.getOption('append')[0]))
+                pywikibot.output('Page {0} already exists, appending on {1}!'
+                                 .format(title, self.getOption('append')[0]))
                 contents = above + separator + below
             elif self.getOption('force'):
                 pywikibot.output(u"Page %s already exists, ***overwriting!"
                                  % title)
                 comment = comment_force
             else:
-                pywikibot.output(u"Page %s already exists, not adding!" % title)
+                pywikibot.output('Page %s already exists, not adding!' % title)
                 return
         else:
             if self.getOption('autosummary'):

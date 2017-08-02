@@ -630,15 +630,15 @@ class ReplaceRobot(Bot):
                     page.title(), replacement.exceptions):
                 if replacement.container:
                     pywikibot.output(
-                        'Skipping fix "{0}" on {1} because the title is on the '
-                        'exceptions list.'.format(
+                        'Skipping fix "{0}" on {1} because the title is on '
+                        'the exceptions list.'.format(
                             replacement.container.name,
                             page.title(asLink=True)))
                     skipped_containers.add(replacement.container.name)
                 else:
                     pywikibot.output(
-                        'Skipping unnamed replacement ({0}) on {1} because the '
-                        'title is on the exceptions list.'.format(
+                        'Skipping unnamed replacement ({0}) on {1} because '
+                        'the title is on the exceptions list.'.format(
                             replacement.description, page.title(asLink=True)))
                 continue
             old_text = new_text
@@ -670,7 +670,8 @@ class ReplaceRobot(Bot):
             self.changed_pages += 1
             self._pending_processed_titles.put((page.title(asLink=True), True))
         else:  # unsuccessful pages
-            self._pending_processed_titles.put((page.title(asLink=True), False))
+            self._pending_processed_titles.put((page.title(asLink=True),
+                                                False))
 
     def _replace_async_callback(self, page, err):
         """Callback for asynchronous page edit."""
@@ -727,7 +728,7 @@ class ReplaceRobot(Bot):
                                      % page.title(asLink=True))
                     continue
             except pywikibot.NoPage:
-                pywikibot.output(u'Page %s not found' % page.title(asLink=True))
+                pywikibot.output('Page %s not found' % page.title(asLink=True))
                 continue
             applied = set()
             new_text = original_text
@@ -749,8 +750,8 @@ class ReplaceRobot(Bot):
                                      % page.title(asLink=True))
                     break
                 if hasattr(self, 'addedCat'):
-                    # Fetch only categories in wikitext, otherwise the others will
-                    # be explicitly added.
+                    # Fetch only categories in wikitext, otherwise the others
+                    # will be explicitly added.
                     cats = textlib.getCategoryLinks(new_text, site=page.site)
                     if self.addedCat not in cats:
                         cats.append(self.addedCat)
@@ -766,7 +767,8 @@ class ReplaceRobot(Bot):
                     break
                 choice = pywikibot.input_choice(
                     u'Do you want to accept these changes?',
-                    [('Yes', 'y'), ('No', 'n'), ('Edit original', 'e'), ('edit Latest', 'l'),
+                    [('Yes', 'y'), ('No', 'n'), ('Edit original', 'e'),
+                     ('edit Latest', 'l'),
                      ('open in Browser', 'b'), ('all', 'a')],
                     default='N')
                 if choice == 'e':
@@ -782,7 +784,8 @@ class ReplaceRobot(Bot):
                     # if user didn't press Cancel
                     if as_edited and as_edited != new_text:
                         new_text = as_edited
-                        last_text = new_text  # prevent changes from being applied again
+                        # prevent changes from being applied again
+                        last_text = new_text
                     continue
                 if choice == 'b':
                     pywikibot.bot.open_webbrowser(page)
@@ -801,7 +804,8 @@ class ReplaceRobot(Bot):
                     page.text = new_text
                     page.save(summary=self.generate_summary(applied),
                               asynchronous=True,
-                              callback=self._replace_async_callback, quiet=True)
+                              callback=self._replace_async_callback,
+                              quiet=True)
                 while not self._pending_processed_titles.empty():
                     proc_title, res = self._pending_processed_titles.get()
                     pywikibot.output('Page %s%s saved'
@@ -1010,7 +1014,7 @@ def main(*args):
         commandline_replacements.extend(file_replacements)
 
     if not(commandline_replacements or fixes_set) or manual_input:
-        old = pywikibot.input(u'Please enter the text that should be replaced:')
+        old = pywikibot.input('Please enter the text that should be replaced:')
         while old:
             new = pywikibot.input(u'Please enter the new text:')
             commandline_replacements += [old, new]
@@ -1107,8 +1111,8 @@ def main(*args):
                              % single_summary)
         if missing_fixes_summaries:
             pywikibot.output('The summary will not be used when the fix has '
-                             'one defined but the following fix(es) do(es) not '
-                             'have a summary defined: '
+                             'one defined but the following fix(es) do(es) '
+                             'not have a summary defined: '
                              '{0}'.format(', '.join(missing_fixes_summaries)))
         if edit_summary is not True:
             edit_summary = pywikibot.input(
@@ -1170,8 +1174,8 @@ LIMIT 200""" % (whereClause, exceptClause)
     site.login()
     bot.run()
 
-    # Explicitly call pywikibot.stopme().
-    # It will make sure the callback is triggered before replace.py is unloaded.
+    # Explicitly call pywikibot.stopme(). It will make sure the callback is
+    # triggered before replace.py is unloaded.
     pywikibot.stopme()
     pywikibot.output(u'\n%s pages changed.' % bot.changed_pages)
 
