@@ -1,7 +1,7 @@
 This is a guide to converting bot scripts from version 1 of the
-Pywikibot framework to version 2.
+Pywikibot framework to version 3.
 
-Most importantly, note that the version 2 framework *only* supports wikis
+Most importantly, note that the version 3 framework *only* supports wikis
 using MediaWiki v.1.14 or higher software.  If you need to access a wiki that
 uses older software, you should continue using version 1 for this purpose.
 
@@ -150,5 +150,3 @@ while unlink.py and other scripts that required page titles as main arguments
 now need only that the titles be wrapped in quotes, as:
 
     python unlink.py "A title"
-
-# MORE TO COME #

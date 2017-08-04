@@ -6,8 +6,8 @@ Helper functions for both the internal translation system
 and for TranslateWiki-based translations.
 
 By default messages are assumed to reside in a package called
-'scripts.i18n'. In pywikibot 2.0, that package is not packaged
-with pywikibot, and pywikibot 2.0 does not have a hard dependency
+'scripts.i18n'. In pywikibot 3.0, that package is not packaged
+with pywikibot, and pywikibot 3.0 does not have a hard dependency
 on any i18n messages. However, there are three user input questions
 in pagegenerators which will use i18 messages if they can be loaded.
 

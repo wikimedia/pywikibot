@@ -70,13 +70,13 @@ The contents of the package
     |    pwb.py                 | Wrapper script to use Pywikibot in 'directory' mode  |
     +---------------------------+------------------------------------------------------+
     |    README-conversion.txt  | Guide to converting bot scripts from version 1       |
-    |                           | of the Pywikibot framework to version 2              |
+    |                           | of the Pywikibot framework to version 3              |
     +---------------------------+------------------------------------------------------+
     |    README.rst             | Short info string used by Pywikibot Nightlies        |
     +---------------------------+------------------------------------------------------+
     |    requirements.txt       | PIP requirements file                                |
     +---------------------------+------------------------------------------------------+
-    |    setup.py               | Installer script for Pywikibot 2.0 framework         |
+    |    setup.py               | Installer script for Pywikibot 3.0 framework         |
     +---------------------------+------------------------------------------------------+
     |    user-config.py.sample  | Example user-config.py file for reference            |
     +---------------------------+------------------------------------------------------+

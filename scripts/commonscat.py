@@ -378,7 +378,7 @@ class CommonscatBot(Bot):
     def findCommonscatLink(self, page=None):
         """Find CommonsCat template on interwiki pages.
 
-        In Pywikibot 2.0, page.interwiki() now returns Link objects,
+        In Pywikibot >=2.0, page.interwiki() now returns Link objects,
         not Page objects
 
         @rtype: unicode, name of a valid commons category
