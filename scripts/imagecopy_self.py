@@ -10,12 +10,17 @@ only environment.
 
 Examples
 
-Work on a single file
- python pwb.py imagecopy.py -page:file:<filename>
-Work on all images in a category:<cat>
- python pwb.py imagecopy.py -cat:<cat>
-Work on all images which transclude a template
- python pwb.py imagecopy.py -transcludes:<template>
+Work on a single file:
+
+    python pwb.py imagecopy.py -page:file:<filename>
+
+Work on all images in a category:<cat>:
+
+    python pwb.py imagecopy.py -cat:<cat>
+
+Work on all images which transclude a template:
+
+    python pwb.py imagecopy.py -transcludes:<template>
 
 See pagegenerators.py for more ways to get a list of images.
 By default the bot works on your home wiki (set in user-config)
@@ -24,12 +29,6 @@ This is a first test version and should be used with care.
 
 Use -nochecktemplate if you don't want to add the check template. Be sure to
 check it yourself.
-
-Todo:
-*Queues with threads have to be implemented for the information collecting part
- and for the upload part.
-*Categories are now on a single line. Something like hotcat would be nice.
-
 """
 #
 # Based on upload.py by:
