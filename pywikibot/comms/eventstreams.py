@@ -171,11 +171,11 @@ class EventStreams(object):
         # register pairs of keys and items as a filter function
         for key, value in kwargs.items():
             # append function for singletons
-            if value in (True, False, None):
+            if isinstance(value, (bool, type(None))):
                 self.filter[ftype].append(lambda e: key in e and
                                           e[key] is value)
             # append function for a single value
-            elif isinstance(value, StringTypes):
+            elif isinstance(value, (StringTypes, int)):
                 self.filter[ftype].append(lambda e: key in e and
                                           e[key] == value)
             # append function for an iterable as value

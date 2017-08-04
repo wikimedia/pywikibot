@@ -179,6 +179,21 @@ class TestEventStreamsFilterTests(TestCase):
         self.es.register_filter(lambda x: True, ftype='none')
         self.assertFalse(self.es.streamfilter(self.data))
 
+    def test_filter_false(self):
+        """Test EventStreams filter with assignment of True."""
+        self.es.register_filter(foo=False)
+        self.assertFalse(self.es.streamfilter(self.data))
+
+    def test_filter_true(self):
+        """Test EventStreams filter with assignment of False."""
+        self.es.register_filter(foo=True)
+        self.assertTrue(self.es.streamfilter(self.data))
+
+    def test_filter_value(self):
+        """Test EventStreams filter with assignment of a int value."""
+        self.es.register_filter(foo=10)
+        self.assertFalse(self.es.streamfilter(self.data))
+
     def _test_filter(self, none_type, all_type, any_type, result):
         """Test a single fixed filter."""
         self.es.filter = {'all': [], 'any': [], 'none': []}
