@@ -431,8 +431,6 @@ class WelcomeBot(object):
 
         if globalvar.randomSign:
             self.defineSign(True)
-        if __name__ != '__main__':  # use only in module call
-            self._checkQueue = []
 
     def check_managed_sites(self):
         """Check that site is managed by welcome.py."""
@@ -812,9 +810,7 @@ class WelcomeBot(object):
                     pywikibot.output(
                         u'Putting the log of the latest %d users...'
                         % welcomed_count)
-                if self.makelogpage(self.welcomed_users):
-                    self.welcomed_users = []
-                else:
+                if not self.makelogpage(self.welcomed_users):
                     continue
                 self.welcomed_users = []
             if hasattr(self, '_BAQueue'):
