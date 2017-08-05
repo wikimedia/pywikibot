@@ -3242,6 +3242,9 @@ def update_page(page, pagedict, props=[]):
             coords.append(coord)
         page._coords = coords
 
+    if 'pageimage' in pagedict:
+        page._pageimage = pywikibot.FilePage(page.site, pagedict['pageimage'])
+
     if "pageprops" in pagedict:
         page._pageprops = pagedict['pageprops']
 
