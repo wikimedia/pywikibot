@@ -228,6 +228,7 @@ netext = {
         'it': u'<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s',
         'ja': u'{{subst:Welcome/intro}}\n{{subst:welcome|%s}}',
         'ka': u'{{ახალი მომხმარებელი}}--%s',
+        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'ml': u'{{ബദൽ:സ്വാഗതം/bot}} %s',
         'nap': u'{{Bemmenuto}}%s',
         'nl': u'{{hola|bot|%s}}',
