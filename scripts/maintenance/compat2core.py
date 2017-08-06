@@ -1,15 +1,16 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-A helper script to convert compat 1.0 scripts to the new core 2.0 framework.
+A helper script to convert compat 1.0 scripts to the new core 3.0 framework.
 
 NOTE: Please be aware that this script is not able to convert your codes
 completely. It may support you with some automatic replacements and it gives
 some warnings and hints for converting. Please refer to the converting guide
-README-conversion.txt in the core framework folder and check your codes finally.
+README-conversion.txt in the core framework folder and check your codes
+finally.
 
 The scripts asks for the .py file and converts it to
-<scriptname>-core.py in the same directory. The following options are supported:
+<scriptname>-core.py in the same directory. The following option is supported:
 
 - warnonly: Do not convert the source but show warning messages. This is good
             to check already merged scripts.
