@@ -208,7 +208,7 @@ setup(
     name=name,
     version=version,
     description='Python MediaWiki Bot Framework',
-    long_description=open('README.rst').read(),
+    long_description=open('pypi_description.rst').read(),
     keywords=('pywikibot', 'python', 'mediawiki', 'bot', 'wiki', 'framework',
               'wikimedia', 'wikipedia', 'pwb', 'pywikipedia', 'API'),
     maintainer='The Pywikibot team',
