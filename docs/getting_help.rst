@@ -6,4 +6,4 @@ Getting help
 
 .. tip::
    Please report bugs at `Phabricator <https://phabricator.wikimedia.org/>`_.
-   You may use `this report from <https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projectPHIDs=pywikibot-core>`_.
+   You may use `this report form <https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?projectPHIDs=pywikibot-core>`_.
