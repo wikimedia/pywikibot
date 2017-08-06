@@ -3,12 +3,16 @@
 r"""
 Template harvesting script.
 
-Usage:
+Usage (see below for explanations and examples):
 
 * python pwb.py harvest_template -transcludes:"..." \
-    template_parameter PID [template_parameter PID]
+    [default optional arguments] \
+    template_parameter PID [local optional arguments] \
+    [template_parameter PID [local optional arguments]]
 * python pwb.py harvest_template [generators] -template:"..." \
-    template_parameter PID [template_parameter PID]
+    [default optional arguments] \
+    template_parameter PID [local optional arguments] \
+    [template_parameter PID [local optional arguments]]
 
 This will work on all pages that transclude the template in the article
 namespace
@@ -17,10 +21,41 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
+The following command line parameters can be used to change the bot's behavior.
+If you specify them before all parameters, they are global and are applied to
+all param-property pairs. If you specify them after a param-property pair,
+they are local and are only applied to this pair. If you specify the same
+argument as both local and global, the local argument overrides the global one
+(see also examples).
+
+-islink           Treat plain text values as links ("text" -> "[[text]]").
+
 Examples:
 
-    python pwb.py harvest_template -lang:nl -cat:Sisoridae -namespace:0 \
-        -template:"Taxobox straalvinnige" orde P70 familie P71 geslacht P74
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
+        -template:"Infobox person" image P18
+
+    will try to import existing images from "image" parameter of "Infobox
+    person" on English Wikipedia as Wikidata property "P18" (image).
+
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
+        -template:"Infobox person" image P18 birth_place P19
+
+    will behave the same as the previous example and also try to import
+    [[links]] from "birth_place" parameter of the same template as Wikidata
+    property "P19" (place of birth).
+
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
+        -template:"Infobox person" -islink birth_place P19 death_place P20
+
+    will import both "birth_place" and "death_place" params with -islink
+    modifier, ie. the bot will try to import values, even if it doesn't find
+    a [[link]].
+
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
+        -template:"Infobox person" birth_place P19 -islink death_place P20
+
+    will do the same but only "birth_place" can be imported without a link.
 
 """
 #
@@ -49,16 +84,26 @@ def _signal_handler(signal, frame):
 signal.signal(signal.SIGINT, _signal_handler)
 
 import pywikibot
-from pywikibot import pagegenerators as pg, WikidataBot, textlib
+from pywikibot import pagegenerators as pg, textlib
+from pywikibot.bot import WikidataBot, OptionHandler
 
 docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
+
+
+class PropertyOptionHandler(OptionHandler):
+
+    """Class holding options for a param-property pair."""
+
+    availableOptions = {
+        'islink': False,
+    }
 
 
 class HarvestRobot(WikidataBot):
 
     """A bot to add Wikidata claims."""
 
-    def __init__(self, generator, templateTitle, fields):
+    def __init__(self, generator, templateTitle, fields, **kwargs):
         """
         Constructor.
 
@@ -68,13 +113,23 @@ class HarvestRobot(WikidataBot):
         @type templateTitle: str
         @param fields: A dictionary of fields that are of use to us
         @type fields: dict
+        @keyword islink: Whether non-linked values should be treated as links
+        @type islink: bool
         """
-        self.availableOptions['always'] = True
-        super(HarvestRobot, self).__init__()
+        self.availableOptions.update({
+            'always': True,
+            'islink': False,
+        })
+        super(HarvestRobot, self).__init__(**kwargs)
         self.generator = generator
         self.templateTitle = templateTitle.replace(u'_', u' ')
         # TODO: Make it a list which also includes the redirects to the template
-        self.fields = fields
+        self.fields = {}
+        for key, value in fields.items():
+            if isinstance(value, tuple):
+                self.fields[key] = value
+            else:  # backwards compatibility
+                self.fields[key] = (value, PropertyOptionHandler())
         self.cacheSources()
         self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
         self.linkR = textlib.compileLinkR()
@@ -130,13 +185,27 @@ class HarvestRobot(WikidataBot):
 
         return linked_item
 
+    def _get_option_with_fallback(self, handler, option):
+        """
+        Compare bot's (global) and provided (local) options.
+
+        @see: L{pywikibot.bot.OptionHandler.getOption}
+
+        @rtype: bool
+        """
+        # TODO: only works with booleans
+        default = self.getOption(option)
+        local = handler.getOption(option)
+        return default is not local
+
     def treat(self, page, item):
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
         self.current_page = page
         item.get()
-        if set(self.fields.values()) <= set(item.claims.keys()):
+        if set(val[0] for val in self.fields.values()) <= set(
+                item.claims.keys()):
             pywikibot.output('%s item %s has claims for all properties. '
                              'Skipping.' % (page, item.title()))
             return
@@ -162,8 +231,9 @@ class HarvestRobot(WikidataBot):
 
                     # This field contains something useful for us
                     if field in self.fields:
+                        prop, options = self.fields[field]
                         # Check if the property isn't already set
-                        claim = pywikibot.Claim(self.repo, self.fields[field])
+                        claim = pywikibot.Claim(self.repo, prop)
                         if claim.getID() in item.get().get('claims'):
                             pywikibot.output(
                                 'A claim for %s already exists. Skipping.'
@@ -178,7 +248,15 @@ class HarvestRobot(WikidataBot):
                                 if match:
                                     link_text = match.group(1)
                                 else:
-                                    link_text = value
+                                    if self._get_option_with_fallback(
+                                            options, 'islink'):
+                                        link_text = value
+                                    else:
+                                        pywikibot.output(
+                                            '%s field %s value %s is not a '
+                                            'wikilink. Skipping.'
+                                            % (claim.getID(), field, value))
+                                        continue
 
                                 linked_item = self._template_link_target(
                                     item, link_text)
@@ -228,13 +306,15 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    commandline_arguments = []
-    template_title = u''
+    template_title = None
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
     gen = pg.GeneratorFactory()
 
+    current_args = []
+    fields = {}
+    options = {}
     for arg in local_args:
         if arg.startswith('-template'):
             if len(arg) == 9:
@@ -246,26 +326,49 @@ def main(*args):
             if arg.startswith(u'-transcludes:'):
                 template_title = arg[13:]
         else:
-            commandline_arguments.append(arg)
+            optional = arg.startswith('-')
+            complete = len(current_args) == 3
+            if optional:
+                needs_second = len(current_args) == 1
+                if needs_second:
+                    break  # will stop below
+
+                arg, sep, value = arg[1:].partition(':')
+                if len(current_args) == 0:
+                    assert not fields
+                    options[arg] = value or True
+                else:
+                    assert complete
+                    current_args[2][arg] = value or True
+            else:
+                if complete:
+                    handler = PropertyOptionHandler(**current_args[2])
+                    fields[current_args[0]] = (current_args[1], handler)
+                    current_args.clear()
+                else:
+                    current_args.append(arg)
+                    if len(current_args) == 2:
+                        current_args.append({})
+
+    # handle leftover
+    if len(current_args) == 3:
+        handler = PropertyOptionHandler(**current_args[2])
+        fields[current_args[0]] = (current_args[1], handler)
+    elif len(current_args) == 1:
+        pywikibot.error('Incomplete command line param-property pair.')
+        return False
 
     if not template_title:
         pywikibot.error(
             'Please specify either -template or -transcludes argument')
         return
 
-    if len(commandline_arguments) % 2:
-        raise ValueError  # or something.
-    fields = {}
-
-    for i in range(0, len(commandline_arguments), 2):
-        fields[commandline_arguments[i]] = commandline_arguments[i + 1]
-
     generator = gen.getCombinedGenerator(preload=True)
     if not generator:
         gen.handleArg(u'-transcludes:' + template_title)
         generator = gen.getCombinedGenerator(preload=True)
 
-    bot = HarvestRobot(generator, template_title, fields)
+    bot = HarvestRobot(generator, template_title, fields, **options)
     bot.run()
 
 
