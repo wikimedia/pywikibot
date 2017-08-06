@@ -21,15 +21,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
-        'hu', 'nl', 'sd', 'th',
+        'hu', 'sd', 'th',
     ]
 
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
             'sr', 'en', 'fr', 'ru', 'de', 'pl', 'pt', 'es', 'it', 'zh', 'cs',
-            'ca', 'ar', 'ta', 'el', 'sv', 'fa', 'uk', 'ro', 'tr', 'ja', 'sq',
-            'no', 'eo', 'fi', 'bs', 'he', 'ko', 'bg',
+            'ar', 'ca', 'ta', 'el', 'nl', 'sv', 'fa', 'uk', 'ro', 'tr', 'ja',
+            'sq', 'no', 'eo', 'fi', 'bs', 'he', 'ko', 'bg',
         ]
 
         super(Family, self).__init__()
@@ -39,8 +39,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
         self.cross_allowed = [
             'ar', 'bg', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he',
-            'ja', 'ko', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr', 'uk',
-            'zh',
+            'ja', 'ko', 'nl', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr',
+            'uk', 'zh',
         ]
 
         # TODO:
