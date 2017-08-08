@@ -559,9 +559,18 @@ class TestPageObject(DefaultSiteTestCase):
         site = self.get_site()
         mainpage = self.get_mainpage()
         image = pywikibot.FilePage(site, 'File:Jean-Léon Gérôme 003.jpg')
-        self.assertIsInstance(mainpage.page_image(), pywikibot.FilePage)
-        # for file pages, the API should return the file itself
-        self.assertEqual(image.page_image(), image)
+
+        if MediaWikiVersion(site.version()) < MediaWikiVersion('1.20'):
+            self.assertRaises(NotImplementedError, mainpage.page_image)
+        elif site.has_extension('PageImages'):
+            self.assertIsInstance(mainpage.page_image(), pywikibot.FilePage)
+            # for file pages, the API should return the file itself
+            self.assertEqual(image.page_image(), image)
+        else:
+            self.assertRaises(pywikibot.UnknownExtension,
+                              'Method "loadpageimage" is not implemented '
+                              'without the extension PageImages',
+                              mainpage.page_image)
 
 
 class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
