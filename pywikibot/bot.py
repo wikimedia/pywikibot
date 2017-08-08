@@ -2000,6 +2000,69 @@ class WikidataBot(Bot, ExistingPageBot):
             source.setTarget(item)
         return source
 
+    def user_add_claim_unless_exists(
+            self, item, claim, exists_arg='', source=None,
+            logger_callback=log, **kwargs):
+        """
+        Decorator of L{user_add_claim}.
+
+        Before adding a new claim, it checks if we can add it, using provided
+        filters.
+
+        @see: documentation of L{claimit.py<scripts.claimit>}
+        @param exists_arg: pattern for merging existing claims with new ones
+        @type exists_arg: str
+        @param logger_callback: function logging the output of the method
+        @type logger_callback: callable
+        @return: whether the claim could be added
+        @rtype: bool
+        """
+        # Existing claims on page of same property
+        for existing in item.get().get('claims').get(claim.getID(), []):
+            # If claim with same property already exists...
+            if 'p' not in exists_arg:
+                logger_callback(
+                    'Skipping %s because claim with same property already exists'
+                    % (claim.getID(),))
+                log('Use -exists:p option to override this behavior')
+                return False
+            if not existing.target_equals(claim.getTarget()):
+                continue
+            # If some attribute of the claim being added
+            # matches some attribute in an existing claim of
+            # the same property, skip the claim, unless the
+            # 'exists' argument overrides it.
+            if 't' not in exists_arg:
+                logger_callback(
+                    'Skipping %s because claim with same target already exists'
+                    % (claim.getID(),))
+                log("Append 't' to -exists argument to override this behavior")
+                return False
+            if 'q' not in exists_arg and not existing.qualifiers:
+                logger_callback(
+                    'Skipping %s because claim without qualifiers already exists'
+                    % (claim.getID(),))
+                log("Append 'q' to -exists argument to override this behavior")
+                return False
+            if ('s' not in exists_arg or not source) and not existing.sources:
+                logger_callback(
+                    'Skipping %s because claim without source already exists'
+                    % (claim.getID(),))
+                log("Append 's' to -exists argument to override this behavior")
+                return False
+            if ('s' not in exists_arg and source and
+                    any(source.getID() in ref and
+                        all(snak.target_equals(source.getTarget())
+                            for snak in ref[source.getID()])
+                        for ref in existing.sources)):
+                logger_callback(
+                    'Skipping %s because claim with the same source already exists'
+                    % (claim.getID(),))
+                log("Append 's' to -exists argument to override this behavior")
+                return False
+
+        return self.user_add_claim(item, claim, source, **kwargs)
+
     def create_item_for_page(self, page, data=None, summary=None, **kwargs):
         """
         Create an ItemPage with the provided page as the sitelink.
