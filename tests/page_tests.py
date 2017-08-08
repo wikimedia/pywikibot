@@ -567,10 +567,10 @@ class TestPageObject(DefaultSiteTestCase):
             # for file pages, the API should return the file itself
             self.assertEqual(image.page_image(), image)
         else:
-            self.assertRaises(pywikibot.UnknownExtension,
-                              'Method "loadpageimage" is not implemented '
-                              'without the extension PageImages',
-                              mainpage.page_image)
+            self.assertRaisesRegex(pywikibot.UnknownExtension,
+                                   'Method "loadpageimage" is not implemented '
+                                   'without the extension PageImages',
+                                   mainpage.page_image)
 
 
 class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
