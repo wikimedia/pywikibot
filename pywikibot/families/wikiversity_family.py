@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikiversity."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,6 +27,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         ]
 
         super(Family, self).__init__()
+
+        self.category_redirect_templates = {
+            '_default': (),
+            'ar': ('قالب:تحويل تصنيف',),
+            'en': ('Category redirect',),
+        }
 
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/BPI#Current_implementation

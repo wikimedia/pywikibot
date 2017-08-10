@@ -48,6 +48,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
         super(Family, self).__init__()
 
+        self.category_redirect_templates = {
+            '_default': (),
+            'en': ('Category redirect',),
+            'es': ('Categoría redirigida',),
+            'ro': ('Redirect categorie',),
+            'vi': ('Đổi hướng thể loại',),
+        }
+
         # Global bot allowed languages on
         # https://meta.wikimedia.org/wiki/BPI#Current_implementation
         self.cross_allowed = [

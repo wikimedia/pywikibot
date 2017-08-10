@@ -32,6 +32,12 @@ class Family(family.WikimediaFamily):
 
         self.interwiki_forward = 'wikipedia'
 
+        self.category_redirect_templates = {
+            'wikidata': (
+                'Category redirect',
+            ),
+        }
+
         # Subpages for documentation.
         self.doc_subpages = {
             '_default': ((u'/doc', ), ['wikidata']),

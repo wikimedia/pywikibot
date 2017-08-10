@@ -42,6 +42,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
         super(Family, self).__init__()
 
+        self.category_redirect_templates = {
+            '_default': (),
+            'ar': ('قالب:تحويل تصنيف',),
+            'en': ('Category redirect',),
+            'ro': ('Redirect categorie',),
+            'zh': ('分類重定向',),
+        }
+
         # All requests to 'mul.wikisource.org/*' are redirected to
         # the main page, so using 'wikisource.org'
         self.langs['mul'] = self.domain
