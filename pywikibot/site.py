@@ -3004,6 +3004,45 @@ class APISite(BaseSite):
                                 )
         self._update_page(page, query)
 
+    @need_extension('Global Usage')
+    def globalusage(self, page, total=None):
+        """Iterate global image usage for a given FilePage.
+
+        @param page: the page to return global image usage for.
+        @type image: FilePage
+        @param total: iterate no more than this number of pages in total.
+        @raises TypeError: input page is not a FilePage.
+        @raises SiteDefinitionError: Site could not be defined for a returned
+            entry in API response.
+        """
+        if not isinstance(page, pywikibot.FilePage):
+            raise TypeError('Page %s must be a FilePage.' % page)
+
+        title = page.title(withSection=False)
+        args = {'titles': title,
+                'gufilterlocal': False,
+                }
+        query = self._generator(api.PropertyGenerator,
+                                type_arg='globalusage',
+                                guprop=['url', 'pageid', 'namespace'],
+                                total=total,  # will set gulimit=total in api,
+                                **args)
+
+        self._update_page(page, query)
+
+        for pageitem in query:
+            assert 'globalusage' in pageitem, \
+                   "API globalusage response lacks 'globalusage' key"
+            for entry in pageitem['globalusage']:
+                try:
+                    gu_site = pywikibot.Site(url=entry['url'])
+                except SiteDefinitionError:
+                    pywikibot.warning('Site could not be defined for global'
+                                      ' usage for {0}: {1}.'.format(page, entry))
+                    continue
+                gu_page = pywikibot.Page(gu_site, entry['title'])
+                yield gu_page
+
     def loadimageinfo(self, page, history=False,
                       url_width=None, url_height=None, url_param=None):
         """Load image info from api and save in page attributes.
