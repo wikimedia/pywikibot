@@ -1242,8 +1242,10 @@ class Family(object):
                     site = pywikibot.Site(code, self.name)
                     pywikibot.log('Found candidate {0}'.format(site))
 
-                    if path in site._interwiki_urls():
-                        matched_sites += [site]
+                    for iw_url in site._interwiki_urls():
+                        if iw_url in path:
+                            matched_sites += [site]
+                            break
 
         if len(matched_sites) == 1:
             return matched_sites[0].code

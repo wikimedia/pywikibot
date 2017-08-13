@@ -207,6 +207,9 @@ class TestFamilyUrlRegex(PatchingTestCase):
         self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1'), 'vo')
         self.assertEqual(f.from_url(prefix + '/w/index.php/$1'), 'vo')
         self.assertEqual(f.from_url('//vo.wikipedia.org/wiki/$1'), 'vo')
+        # including title
+        self.assertEqual(f.from_url(prefix + '/wiki/Main_page'), 'vo')
+        self.assertEqual(f.from_url(prefix + '/w/index.php?title=Foo'), 'vo')
 
         # Text after $1 is not allowed
         self.assertRaisesRegex(
