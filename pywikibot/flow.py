@@ -12,7 +12,7 @@ __version__ = '$Id$'
 import logging
 
 from pywikibot.exceptions import NoPage, UnknownExtension, LockedPage
-from pywikibot.page import BasePage
+from pywikibot.page import BasePage, User
 from pywikibot.tools import PY2
 
 if not PY2:
@@ -428,6 +428,16 @@ class Post(object):
             self._load()
         return self._current_revision['isModerated']
 
+    @property
+    def creator(self):
+        """The creator of this post."""
+        if not hasattr(self, '_current_revision'):
+            self._load()
+        if not hasattr(self, '_creator'):
+            self._creator = User(self.site,
+                                 self._current_revision['creator']['name'])
+        return self._creator
+
     def get(self, format='wikitext', force=False, sysop=False):
         """Return the contents of the post in the given format.
 
@@ -535,3 +545,7 @@ class Post(object):
         """
         self.site.restore_post(self, reason)
         self._load()
+
+    def thank(self):
+        """Thank the user who made this post."""
+        self.site.thank_post(self)
