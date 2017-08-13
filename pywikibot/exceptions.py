@@ -58,6 +58,8 @@ WikiBaseError: any issue specific to Wikibase.
   - CoordinateGlobeUnknownException: globe is not implemented yet.
   - EntityTypeUnknownException: entity type is not available on the site.
 
+TimeoutError: request failed with a timeout
+
 DeprecationWarning: old functionality replaced by new functionality
 
 PendingDeprecationWarning: problematic code which has not yet been
@@ -545,6 +547,13 @@ class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
 class EntityTypeUnknownException(WikiBaseError):
 
     """The requested entity type is not recognised on this site."""
+
+    pass
+
+
+class TimeoutError(Error):
+
+    """Request failed with a timeout error."""
 
     pass
 

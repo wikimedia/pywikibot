@@ -9,14 +9,18 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 import sys
+import time
 if sys.version_info[0] > 2:
     from urllib.parse import quote
 else:
     from urllib2 import quote
 
-from pywikibot import Site, Error
+from requests.exceptions import Timeout
+
+from pywikibot import config, warning, Site
 from pywikibot.comms import http
 from pywikibot.tools import UnicodeMixin, py2_encode_utf_8
+from pywikibot.exceptions import Error, TimeoutError
 
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}
@@ -29,7 +33,8 @@ class SparqlQuery(object):
     This class allows to run SPARQL queries against any SPARQL endpoint.
     """
 
-    def __init__(self, endpoint=None, entity_url=None, repo=None):
+    def __init__(self, endpoint=None, entity_url=None, repo=None,
+                 max_retries=None, retry_wait=None):
         """
         Create endpoint.
 
@@ -38,9 +43,16 @@ class SparqlQuery(object):
         @param entity_url: URL prefix for any entities returned in a query.
         @type entity_url: string
         @param repo: The Wikibase site which we want to run queries on. If
-                     provided this overrides any value in endpoint and entity_url.
-                     Defaults to Wikidata.
+            provided this overrides any value in endpoint and entity_url.
+            Defaults to Wikidata.
         @type repo: pywikibot.site.DataSite
+        @param max_retries: (optional) Maximum number of times to retry after
+               errors, defaults to config.max_retries.
+        @type max_retries: int
+        @param retry_wait: (optional) Minimum time in seconds to wait after an
+               error, defaults to config.retry_wait seconds (doubles each retry
+               until max of 120 seconds is reached).
+        @type retry_wait: float
         """
         # default to Wikidata
         if not repo and not endpoint:
@@ -67,6 +79,15 @@ class SparqlQuery(object):
             self.entity_url = entity_url
 
         self.last_response = None
+
+        if max_retries is None:
+            self.max_retries = config.max_retries
+        else:
+            self.max_retries = max_retries
+        if retry_wait is None:
+            self.retry_wait = config.retry_wait
+        else:
+            self.retry_wait = retry_wait
 
     def get_last_response(self):
         """
@@ -120,13 +141,28 @@ class SparqlQuery(object):
         @type query: string
         """
         url = '%s?query=%s' % (self.endpoint, quote(query))
-        self.last_response = http.fetch(url, headers=headers)
-        if not self.last_response.content:
-            return None
-        try:
-            return json.loads(self.last_response.content)
-        except ValueError:
-            return None
+        while True:
+            try:
+                self.last_response = http.fetch(url, headers=headers)
+                if not self.last_response.content:
+                    return None
+                try:
+                    return json.loads(self.last_response.content)
+                except ValueError:
+                    return None
+            except Timeout:
+                self.wait()
+                continue
+
+    def wait(self):
+        """Determine how long to wait after a failed request."""
+        self.max_retries -= 1
+        if self.max_retries < 0:
+            raise TimeoutError('Maximum retries attempted without success.')
+        warning('Waiting {0} seconds before retrying.'.format(self.retry_wait))
+        time.sleep(self.retry_wait)
+        # double the next wait, but do not exceed 120 seconds
+        self.retry_wait = min(120, self.retry_wait * 2)
 
     def ask(self, query, headers=DEFAULT_HEADERS):
         """

@@ -35,8 +35,7 @@ from pywikibot import config, login
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     Server504Error, Server414Error, FatalServerError, NoUsername,
-    Error,
-    InvalidTitle
+    Error, TimeoutError, InvalidTitle
 )
 from pywikibot.tools import (
     MediaWikiVersion, deprecated, itergroup, ip, PY2, getargspec,
@@ -1241,11 +1240,6 @@ class OptionSet(MutableMapping):
     def __len__(self):
         """Return the number of enabled and disabled options."""
         return len(self._enabled) + len(self._disabled)
-
-
-class TimeoutError(Error):
-
-    """API request failed with a timeout error."""
 
 
 class EnableSSLSiteWrapper(object):
