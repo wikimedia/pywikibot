@@ -1339,16 +1339,16 @@ class Request(MutableMapping):
         """
         Create a new Request instance with the given parameters.
 
-        The parameters for the request can be defined via eiter the 'parameters'
-        parameter or the keyword arguments. The keyword arguments were the
-        previous implementation but could cause problems when there are
-        arguments to the API named the same as normal arguments to this class.
-        So the second parameter 'parameters' was added which just contains all
-        parameters. When a Request instance is created it must use either one
-        of them and not both at the same time. To have backwards compatibility
-        it adds a parameter named 'parameters' to kwargs when both parameters
-        are set as that indicates an old call and 'parameters' was originally
-        supplied as a keyword parameter.
+        The parameters for the request can be defined via either the
+        'parameters' parameter or the keyword arguments. The keyword arguments
+        were the previous implementation but could cause problems when there
+        are arguments to the API named the same as normal arguments to this
+        class. So the second parameter 'parameters' was added which just
+        contains all parameters. When a Request instance is created it must use
+        either one of them and not both at the same time. To have backwards
+        compatibility it adds a parameter named 'parameters' to kwargs when
+        both parameters are set as that indicates an old call and 'parameters'
+        was originally supplied as a keyword parameter.
 
         If undefined keyword arguments were given AND the 'parameters'
         parameter was supplied as a positional parameter it still assumes
@@ -1365,17 +1365,18 @@ class Request(MutableMapping):
         @param site: The Site to which the request will be submitted. If not
                supplied, uses the user's configured default Site.
         @param mime: If true, send in "multipart/form-data" format (default
-               False). Parameters which should only be transferred via mime mode
-               can be defined via that parameter too (an empty dict acts like
-               'True' not like 'False'!).
+               False). Parameters which should only be transferred via mime
+               mode can be defined via that parameter too (an empty dict acts
+               like 'True' not like 'False'!).
         @type mime: bool or dict
         @param mime_params: DEPRECATED! A dictionary of parameter which should
-               only be transferred via mime mode. If not None sets mime to True.
+               only be transferred via mime mode. If not None sets mime to
+               True.
         @param max_retries: (optional) Maximum number of times to retry after
-               errors, defaults to 25
-        @param retry_wait: (optional) Minimum time to wait after an error,
-               defaults to 5 seconds (doubles each retry until max of 120 is
-               reached)
+               errors, defaults to config.max_retries.
+        @param retry_wait: (optional) Minimum time in seconds to wait after an
+               error, defaults to config.retry_wait seconds (doubles each retry
+               until max of 120 seconds is reached).
         @param use_get: (optional) Use HTTP GET request if possible. If False
                it uses a POST request. If None, it'll try to determine via
                action=paraminfo if the action requires a POST.
