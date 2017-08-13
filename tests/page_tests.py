@@ -563,10 +563,9 @@ class TestPageObject(DefaultSiteTestCase):
         if MediaWikiVersion(site.version()) < MediaWikiVersion('1.20'):
             self.assertRaises(NotImplementedError, mainpage.page_image)
         elif site.has_extension('PageImages'):
-            image = mainpage.page_image()
-            if image is not None:
-                self.assertIsInstance(mainpage.page_image(),
-                                      pywikibot.FilePage)
+            mainpage_image = mainpage.page_image()
+            if mainpage_image is not None:
+                self.assertIsInstance(mainpage_image, pywikibot.FilePage)
             # for file pages, the API should return the file itself
             self.assertEqual(image.page_image(), image)
         else:
