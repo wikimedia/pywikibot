@@ -106,11 +106,9 @@ The contents of the package
     +---------------------------+-------------------------------------------------------+
     |  comms                    | Communication layer.                                  |
     +===========================+=======================================================+
-    | eventstreams.py           | rcstream client for server sent events                |
+    | eventstreams.py           | stream client for server sent events                  |
     +---------------------------+-------------------------------------------------------+
     | http.py                   | Basic HTTP access interface                           |
-    +---------------------------+-------------------------------------------------------+
-    | rcstream.py               | SocketIO-based rcstream client (deprecated)           |
     +---------------------------+-------------------------------------------------------+
     | threadedhttp.py           | Httplib2 threaded cookie layer extending httplib2     |
     +---------------------------+-------------------------------------------------------+
