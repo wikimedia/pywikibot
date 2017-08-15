@@ -464,14 +464,14 @@ class FatalServerError(ServerError):
     pass
 
 
-class Server504Error(Error):  # noqa
+class Server504Error(ServerError):  # noqa
 
     """Server timed out with HTTP 504 code"""
 
     pass
 
 
-class Server414Error(Error):
+class Server414Error(ServerError):
 
     """Server returned with HTTP 414 code."""
 
