@@ -183,7 +183,7 @@ class PatrolBot(SingleSiteBot):
 
         for item in pagelist:
             if pywikibot.config.verbose_output:
-                pywikibot.output(u'checking against whitelist item = %s' % item)
+                pywikibot.output('checking against whitelist item = %s' % item)
 
             if isinstance(item, LinkedPagesRule):
                 if pywikibot.config.verbose_output:
@@ -252,13 +252,14 @@ class PatrolBot(SingleSiteBot):
                     if not user or current_user == user:
                         if self.is_wikisource_author_page(page):
                             if pywikibot.config.verbose_output:
-                                pywikibot.output(u'Whitelist author: %s' % page)
+                                pywikibot.output('Whitelist author: %s' % page)
                             page = LinkedPagesRule(page)
                         else:
                             if pywikibot.config.verbose_output:
                                 pywikibot.output(u'Whitelist page: %s' % page)
                         if pywikibot.config.verbose_output:
-                            pywikibot.output('Adding {0}:{1}'.format(current_user, page))
+                            pywikibot.output('Adding {0}:{1}'
+                                             .format(current_user, page))
                         whitelist[current_user].append(page)
                     elif pywikibot.config.verbose_output:
                         pywikibot.output(u'Discarding whitelist page for '
@@ -340,7 +341,8 @@ class PatrolBot(SingleSiteBot):
 
             if self.getOption('ask'):
                 choice = pywikibot.input_yn(
-                    u'Do you want to mark page as patrolled?', automatic_quit=False)
+                    'Do you want to mark page as patrolled?',
+                    automatic_quit=False)
 
             # Patrol the page
             if choice:

@@ -168,7 +168,8 @@ class RedirectGenerator(OptionHandler):
                         not in self.namespaces:
                     continue
             if alsoGetPageTitles:
-                pageTitles.add(space_to_underscore(pywikibot.Link(entry.title, self.site)))
+                pageTitles.add(space_to_underscore(pywikibot.Link(entry.title,
+                                                                  self.site)))
 
             m = redirR.match(entry.text)
             if m:
@@ -186,8 +187,9 @@ class RedirectGenerator(OptionHandler):
                 else:
                     if target_link.site != self.site:
                         pywikibot.output(
-                            u'NOTE: Ignoring {0} which is a redirect to '
-                            u'another site {1}.'.format(entry.title, target_link.site))
+                            'NOTE: Ignoring {0} which is a redirect to '
+                            'another site {1}.'
+                            .format(entry.title, target_link.site))
                         target_link = None
                 # if the redirect does not link to another wiki
                 if target_link and target_link.title:
@@ -497,7 +499,7 @@ class RedirectRobot(SingleSiteBot):
         except pywikibot.IsNotRedirectPage:
             pywikibot.output(u'%s is not a redirect.' % redir_page.title())
         except pywikibot.CircularRedirect:
-            pywikibot.output(u'%s is a circular redirect.' % redir_page.title())
+            pywikibot.output('%s is a circular redirect.' % redir_page.title())
         except pywikibot.NoPage:
             pywikibot.output(u'%s doesn\'t exist.' % redir_page.title())
         except pywikibot.InvalidTitle:
@@ -565,7 +567,8 @@ class RedirectRobot(SingleSiteBot):
                            redir_page.title(asLink=True))):
                     self.delete_redirect(redir_page, 'redirect-remove-broken')
                 elif not (self.getOption('delete') or movedTarget):
-                    pywikibot.output(u'Cannot fix or delete the broken redirect')
+                    pywikibot.output(
+                        'Cannot fix or delete the broken redirect')
             except pywikibot.IsRedirectPage:
                 pywikibot.output(
                     "Redirect target {0} is also a redirect! {1}".format(
@@ -671,7 +674,8 @@ class RedirectRobot(SingleSiteBot):
                         # Delete the two redirects
                         # TODO: Check whether pages aren't vandalized
                         # and (maybe) do not have a version history
-                        self.delete_redirect(targetPage, 'redirect-remove-loop')
+                        self.delete_redirect(targetPage,
+                                             'redirect-remove-loop')
                         self.delete_redirect(redir, 'redirect-remove-loop')
                     break
                 else:  # redirect target found
@@ -693,7 +697,8 @@ class RedirectRobot(SingleSiteBot):
                 pywikibot.output('Fixing double item redirect')
                 redir.set_redirect_target(targetPage)
                 break
-            redir.set_redirect_target(targetPage, keep_section=True, save=False)
+            redir.set_redirect_target(targetPage, keep_section=True,
+                                      save=False)
             summary = i18n.twtranslate(self.site, 'redirect-fix-double',
                                        {'to': targetPage.title(asLink=True)}
                                        )

@@ -130,7 +130,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # Note that we added the ## characters in markActiveTables().
         # <table> tag with attributes, with more text on the same line
         newTable = re.sub(
-            r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>(?P<more>[\w\W]*?)[\r\n ]*',
+            r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>'
+            r'(?P<more>[\w\W]*?)[\r\n ]*',
             r'\r\n{| \g<attr>\r\n\g<more>', newTable)
         # <table> tag without attributes, with more text on the same line
         newTable = re.sub(r'(?i)[\r\n]*?<##table##>(?P<more>[\w\W]*?)[\r\n ]*',
