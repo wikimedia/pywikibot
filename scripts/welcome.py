@@ -440,7 +440,9 @@ class WelcomeBot(object):
         if site_netext is None:
             raise KeyError(
                 'welcome.py is not localized for site {0} in netext dict.'
-                ''.format(self.site))
+                .format(self.site))
+        else:
+            self.welcome_text = site_netext
 
     def badNameFilter(self, name, force=False):
         """Check for bad names."""
@@ -741,7 +743,7 @@ class WelcomeBot(object):
                         if self.badNameFilter(users.username):
                             self.reportBadAccount(users.username)
                             continue
-                        welcome_text = i18n.translate(self.site, netext)
+                        welcome_text = self.welcome_text
                         if globalvar.randomSign:
                             if self.site.family.name != 'wikinews':
                                 welcome_text = (welcome_text
