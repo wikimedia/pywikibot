@@ -1243,7 +1243,7 @@ class Family(object):
                     pywikibot.log('Found candidate {0}'.format(site))
 
                     for iw_url in site._interwiki_urls():
-                        if iw_url in path:
+                        if path.startswith(iw_url):
                             matched_sites += [site]
                             break
 
