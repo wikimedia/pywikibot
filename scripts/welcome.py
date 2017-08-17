@@ -441,8 +441,7 @@ class WelcomeBot(object):
             raise KeyError(
                 'welcome.py is not localized for site {0} in netext dict.'
                 .format(self.site))
-        else:
-            self.welcome_text = site_netext
+        self.welcome_text = site_netext
 
     def badNameFilter(self, name, force=False):
         """Check for bad names."""
