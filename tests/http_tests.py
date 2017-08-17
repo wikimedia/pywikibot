@@ -439,6 +439,18 @@ class CharsetTestCase(TestCase):
         req._data = resp
         return req
 
+    def test_no_content_type(self):
+        """Test decoding without content-type (and then no charset)."""
+        req = threadedhttp.HttpRequest('')
+        resp = requests.Response()
+        resp.headers = {}
+        resp._content = CharsetTestCase.LATIN1_BYTES[:]
+        req._data = resp
+        self.assertIsNone(req.charset)
+        self.assertEqual('latin1', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
     def test_no_charset(self):
         """Test decoding without explicit charset."""
         req = threadedhttp.HttpRequest('')
