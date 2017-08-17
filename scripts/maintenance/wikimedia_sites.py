@@ -1,6 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""Script that updates the language lists in Wikimedia family files."""
+"""Script that updates the language lists in Wikimedia family files.
+
+Usage:
+
+    python pwb.py wikimedia_sites [ {<family>} ]
+
+"""
 #
 # (C) xqt, 2009-2017
 # (C) Pywikibot team, 2008-2017
