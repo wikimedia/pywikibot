@@ -21,7 +21,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
-        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay', 'ba',
+        'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay',
         'bi', 'bm', 'bo', 'ch', 'co', 'ga', 'got', 'gn',
         'gu', 'kn', 'ie', 'ks', 'lb', 'ln', 'lv', 'mi',
         'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm',
@@ -43,7 +43,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'tl', 'mk', 'is', 'uk', 'sa', 'hi', 'ka', 'lt', 'tt', 'eo', 'sk',
             'el', 'bg', 'bn', 'li', 'hy', 'si', 'ms', 'sl', 'ur', 'la', 'ml',
             'km', 'ia', 'et', 'cv', 'mr', 'oc', 'eu', 'kk', 'be', 'pa', 'ne',
-            'fy', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'cy',
+            'fy', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'cy', 'ba',
         ]
 
         super(Family, self).__init__()
