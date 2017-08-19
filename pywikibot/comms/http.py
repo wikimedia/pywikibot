@@ -340,9 +340,11 @@ def get_authentication(uri):
         if path in config.authenticate:
             if len(config.authenticate[path]) in [2, 4]:
                 return config.authenticate[path]
-            else:
-                warn('Invalid authentication tokens for %s '
-                     'set in `config.authenticate`' % path)
+            warn('config.authenticate["{path}"] has invalid value.\n'
+                 'It should contain 2 or 4 items, not {length}.\n'
+                 'See https://www.mediawiki.org/wiki/Manual:Pywikibot/OAuth '
+                 'for more info.'
+                 .format(path=path, length=len(config.authenticate[path])))
     return None
 
 
