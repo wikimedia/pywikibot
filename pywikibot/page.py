@@ -2693,6 +2693,16 @@ class FilePage(Page):
             pywikibot.warning('Unsuccesfull request (%s): %s' % (req.status, req.uri))
             return False
 
+    def globalusage(self, total=None):
+        """
+        Iterate all global usage for this page.
+
+        @param total: iterate no more than this number of pages in total
+        @return: a generator that yields Pages also on sites different from
+            self.site.
+        @rtype: generator
+        """
+        return self.site.globalusage(self, total=total)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
