@@ -200,6 +200,12 @@ placeBeforeSections = {
     'sk': [
         u'Pozri aj',
     ],
+    'sr': [
+        'Даље читање',
+        'Спољашње везе',
+        'Види још',
+        'Напомене',
+    ],
     'szl': [
         u'Przipisy',
         u'Připisy',
@@ -347,6 +353,9 @@ referencesSections = {
     'sk': [
         u'Referencie',
     ],
+    'sr': [
+        'Референце',
+    ],
     'szl': [
         u'Przipisy',
         u'Připisy',
@@ -408,6 +417,7 @@ referencesTemplates = {
         'ru': [u'Reflist', u'Ref-list', u'Refs', u'Sources',
                u'Примечания', u'Список примечаний',
                u'Сноска', u'Сноски'],
+        'sr': ['Reflist'],
         'szl': [u'Przipisy', u'Připisy'],
         'th': [u'รายการอ้างอิง'],
         'zh': [u'Reflist', u'RefFoot', u'NoteFoot'],
@@ -430,6 +440,7 @@ referencesSubstitute = {
         'hu': u'{{Források}}',
         'pl': u'{{Przypisy}}',
         'ru': u'{{примечания}}',
+        'sr': '{{reflist}}',
         'szl': u'{{Przipisy}}',
         'th': u'{{รายการอ้างอิง}}',
         'zh': u'{{reflist}}',
