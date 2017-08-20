@@ -59,6 +59,19 @@ class LogEntry(object):
         """Return the id as the hash."""
         return self.logid()
 
+    def __eq__(self, other):
+        """Compare if self is equal to other."""
+        if not isinstance(other, LogEntry):
+            pywikibot.debug("'{0}' cannot be compared with '{1}'"
+                            .format(type(self).__name__, type(other).__name__),
+                            _logger)
+            return False
+        return self.logid() == other.logid() and self.site == other.site
+
+    def __ne__(self, other):
+        """Compare if self is not equal to other."""
+        return not self == other
+
     @property
     def _params(self):
         """

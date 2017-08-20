@@ -224,6 +224,18 @@ class TestLogentryParams(TestLogentriesBase):
         logentry = self._get_logentry('thanks')
         self.assertIsInstance(logentry.page(), pywikibot.User)
 
+    def test_equality(self):
+        """Test equality of LogEntry instances."""
+        site = self.get_site('dewp')
+        other_site = self.get_site('tewp')
+        le1 = next(iter(site.logevents(reverse=True, total=1)))
+        le2 = next(iter(site.logevents(reverse=True, total=1)))
+        le3 = next(iter(other_site.logevents(reverse=True, total=1)))
+        self.assertEqual(le1, le2)
+        self.assertFalse(le1 != le2)  # __ne__ test
+        self.assertNotEqual(le1, le3)
+        self.assertNotEqual(le1, site)
+
 
 class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
