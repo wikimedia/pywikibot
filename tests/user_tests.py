@@ -9,11 +9,11 @@ from __future__ import absolute_import, unicode_literals
 
 import pywikibot
 
+from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUser
-from pywikibot.tools import suppress_warnings
-from pywikibot import User
+from pywikibot.tools import StringTypes, suppress_warnings
 
-from tests.aspects import TestCase, unittest
+from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
 
 class TestUserClass(TestCase):
@@ -162,6 +162,46 @@ class TestUserClass(TestCase):
                                user.getUserPage)
         self.assertRaisesRegex(AutoblockUser, 'This is an autoblock ID',
                                user.getUserTalkPage)
+
+
+class TestUserMethods(DefaultSiteTestCase):
+
+    """Test User methods with bot user."""
+
+    user = True
+
+    def test_contribution(self):
+        """Test the User.usercontribs() method."""
+        mysite = self.get_site()
+        user = User(mysite, mysite.user())
+        uc = list(user.contributions(total=10))
+        if not uc:
+            self.skipTest('User {0} has no contributions on site {1}.'
+                          .format(mysite.user(), mysite))
+        self.assertLessEqual(len(uc), 10)
+        last = uc[0]
+        for contrib in uc:
+            self.assertIsInstance(contrib, tuple)
+            self.assertEqual(len(contrib), 4)
+            p, i, t, c = contrib
+            self.assertIsInstance(p, Page)
+            self.assertIsInstance(i, int)
+            self.assertIsInstance(t, Timestamp)
+            self.assertIsInstance(c, StringTypes)
+        self.assertEqual(last, user.last_edit)
+
+    def test_logevents(self):
+        """Test the User.logevents() method."""
+        mysite = self.get_site()
+        user = User(mysite, mysite.user())
+        le = list(user.logevents(total=10))
+        if not le:
+            self.skipTest('User {0} has no logevents on site {1}.'
+                          .format(mysite.user(), mysite))
+        self.assertLessEqual(len(le), 10)
+        last = le[0]
+        self.assertTrue(all(event.user() == user.username for event in le))
+        self.assertEqual(last, user.last_event)
 
 
 if __name__ == '__main__':  # pragma: no cover
