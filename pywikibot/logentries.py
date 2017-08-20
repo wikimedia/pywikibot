@@ -55,6 +55,11 @@ class LogEntry(object):
                         % (self._expectedType, self.type()))
         self.data._type = self.type()
 
+    def __repr__(self):
+        """Return a string representation of LogEntry object."""
+        return '<{0}({1}, logid={2})>'.format(type(self).__name__,
+                                              self.site.sitename, self.logid())
+
     def __hash__(self):
         """Return the id as the hash."""
         return self.logid()
