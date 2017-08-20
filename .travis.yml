@@ -90,6 +90,7 @@ script:
       fi ;
     fi
   - echo "authenticate['wiki.musicbrainz.org'] = ('NOTSPAM', 'NOTSPAM')" >> ~/.pywikibot/user-config.py ;
+  - python -c "from __future__ import print_function;from pywikibot import config as c; a=c.authenticate; [(print('authenticate_key:', i), print('authenticate_value_type:', type(a[i])), print('authenticate_value_length:', len(a[i]))) for i in a]"  # T173498
 
   - echo "max_retries = 2" >> ~/.pywikibot/user-config.py
   - echo "maximum_GET_length = 5000" >> ~/.pywikibot/user-config.py
