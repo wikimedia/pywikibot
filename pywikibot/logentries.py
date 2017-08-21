@@ -56,8 +56,8 @@ class LogEntry(object):
         self.data._type = self.type()
 
     def __hash__(self):
-        """Return the id as the hash."""
-        return self.logid()
+        """Combine site and logid as the hash."""
+        return self.logid() ^ hash(self.site)
 
     @property
     def _params(self):
