@@ -5315,13 +5315,13 @@ class Link(ComparableMixin):
         """
         source_is_page = isinstance(source, BasePage)
 
-        assert source is None or source_is_page or isinstance(source, pywikibot.site.BaseSite), \
-            "source parameter should be either a Site or Page object"
-
         if source_is_page:
             self._source = source.site
         else:
             self._source = source or pywikibot.Site()
+
+        assert isinstance(self._source, pywikibot.site.BaseSite), \
+            "source parameter should be either a Site or Page object"
 
         self._text = text
         # See bug T104864, defaultNamespace might have been deleted.
