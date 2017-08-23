@@ -37,6 +37,8 @@ class NewItemRobot(WikidataBot):
 
     """A bot to create new items."""
 
+    treat_missing_item = True
+
     def __init__(self, generator, **kwargs):
         """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
@@ -54,7 +56,6 @@ class NewItemRobot(WikidataBot):
             days=self.pageAge)
         self.lastEditBefore = self.repo.getcurrenttime() - timedelta(
             days=self.lastEdit)
-        self.treat_missing_item = True
         pywikibot.output('Page age is set to %s days so only pages created'
                          '\nbefore %s will be considered.'
                          % (self.pageAge, self.pageAgeBefore.isoformat()))
@@ -81,7 +82,7 @@ class NewItemRobot(WikidataBot):
         if exc is None:
             self._touch_page(page)
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Treat page/item."""
         if item and item.exists():
             pywikibot.output(u'%s already has an item: %s.' % (page, item))
@@ -90,11 +91,6 @@ class NewItemRobot(WikidataBot):
                 self._touch_page(page)
             return
 
-        self.current_page = page
-
-        if not page.exists():
-            pywikibot.output('%s does not exist. Skipping.' % page)
-            return
         if page.isRedirectPage():
             pywikibot.output(u'%s is a redirect page. Skipping.' % page)
             return
@@ -120,25 +116,7 @@ class NewItemRobot(WikidataBot):
                 "Haven't implemented that yet so skipping.")
             return
 
-        # FIXME: i18n
-        summary = (u'Bot: New item with sitelink from %s'
-                   % page.title(asLink=True, insite=self.repo))
-
-        data = {'sitelinks':
-                {page.site.dbName():
-                 {'site': page.site.dbName(),
-                  'title': page.title()}
-                 },
-                'labels':
-                {page.site.lang:
-                 {'language': page.site.lang,
-                  'value': page.title()}
-                 }
-                }
-
-        item = pywikibot.ItemPage(page.site.data_repository())
-        self.user_edit_entity(item, data, summary=summary,
-                              callback=self._callback)
+        self.create_item_for_page(page, callback=self._callback)
 
 
 def main(*args):

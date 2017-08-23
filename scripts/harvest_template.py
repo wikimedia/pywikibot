@@ -198,11 +198,10 @@ class HarvestRobot(WikidataBot):
         local = handler.getOption(option)
         return default is not local
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
-        self.current_page = page
         item.get()
         if set(val[0] for val in self.fields.values()) <= set(
                 item.claims.keys()):

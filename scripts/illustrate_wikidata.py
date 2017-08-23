@@ -51,10 +51,8 @@ class IllustrateRobot(WikidataBot):
             raise ValueError(u'%s is of type %s, should be commonsMedia'
                              % (self.wdproperty, claim.type))
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Treat a page / item."""
-        self.current_page = page
-
         pywikibot.output(u'Found %s' % item.title())
         imagename = page.properties().get('page_image_free')
 
