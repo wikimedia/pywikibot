@@ -5433,40 +5433,38 @@ class Link(ComparableMixin):
         self._site = self._source
         self._namespace = self._defaultns
         self._is_interwiki = False
-        t = self._text
         ns_prefix = False
 
-        # This code was adapted from Title.php : secureAndSplit()
-        #
+        old_position = 0 if self._text.find(':') != 0 else 1
+        colon_position = self._text.find(':', old_position)
         first_other_site = None
-        while u":" in t:
-            # Initial colon indicates main namespace rather than default
-            if t.startswith(u":"):
-                self._namespace = self._site.namespaces[0]
-                # remove the colon but continue processing
-                # remove any subsequent whitespace
-                t = t.lstrip(u":").lstrip(u" ")
-                continue
-
-            prefix = t[:t.index(u":")].lower()
+        while colon_position >= 0:
+            prefix = self._text[old_position:colon_position].lower()
+            # All spaces after a prefix are discarded
+            colon_position += 1
+            while (len(self._text) > colon_position and
+                    self._text[colon_position] == ' '):
+                colon_position += 1
             ns = self._site.namespaces.lookup_name(prefix)
             if ns:
-                # Ordinary namespace
-                t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
+                if len(self._text) <= colon_position:
+                    raise pywikibot.InvalidTitle(
+                        "'{0}' has no title.".format(self._text))
                 self._namespace = ns
                 ns_prefix = True
+                old_position = colon_position
                 break
+
             try:
                 newsite = self._site.interwiki(prefix)
             except KeyError:
                 break  # text before : doesn't match any known prefix
             except SiteDefinitionError as e:
                 raise SiteDefinitionError(
-                    u'{0} is not a local page on {1}, and the interwiki prefix '
-                    '{2} is not supported by Pywikibot!:\n{3}'.format(
-                        self._text, self._site, prefix, e))
+                    '{0} is not a local page on {1}, and the interwiki '
+                    'prefix {2} is not supported by Pywikibot!\n{3}'
+                    .format(self._text, self._site, prefix, e))
             else:
-                t = t[t.index(u":"):].lstrip(u":").lstrip(u" ")
                 if first_other_site:
                     if not self._site.local_interwiki(prefix):
                         raise pywikibot.InvalidTitle(
@@ -5477,6 +5475,11 @@ class Link(ComparableMixin):
                     first_other_site = newsite
                 self._site = newsite
                 self._is_interwiki = True
+            old_position = colon_position
+            colon_position = self._text.find(':', old_position)
+
+        # Remove any namespaces/interwiki prefixes
+        t = self._text[old_position:]
 
         if u"#" in t:
             t, sec = t.split(u'#', 1)
