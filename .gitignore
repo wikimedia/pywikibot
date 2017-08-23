@@ -8,6 +8,7 @@ user-*.py
 /.tox
 /*.egg
 /data*
+/category*
 logs*
 *apicache*
 *pycache*
