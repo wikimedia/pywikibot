@@ -248,8 +248,11 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         # We fix password file permission first.
         file_mode_checker(password_file, mode=config.private_files_permission)
 
-        password_f = codecs.open(password_file, encoding='utf-8')
-        for line_nr, line in enumerate(password_f):
+        with codecs.open(password_file, encoding='utf-8') as f:
+            lines = f.readlines()
+        line_nr = len(lines) + 1
+        for line in reversed(lines):
+            line_nr -= 1
             if not line.strip():
                 continue
             try:
@@ -265,23 +268,20 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                      'given)'.format(line_nr, entry), _PasswordFileWarning)
                 continue
 
-            # When the tuple is inverted the default family and code can be
-            # easily appended which makes the next condition easier as it does
-            # not need to know if it's using the default value or not.
-            entry = list(entry[::-1]) + [self.site.family.name,
-                                         self.site.code][len(entry) - 2:]
-
-            if (normalize_username(entry[1]) == self.username and
-                    entry[2] == self.site.family.name and
-                    entry[3] == self.site.code):
-                if isinstance(entry[0], basestring):
-                    self.password = entry[0]
-                elif isinstance(entry[0], BotPassword):
-                    self.password = entry[0].password
-                    self.login_name = entry[0].login_name(self.username)
+            code, family, username, password = (
+                self.site.code, self.site.family.name)[:4 - len(entry)] + entry
+            if (normalize_username(username) == self.username and
+                    family == self.site.family.name and
+                    code == self.site.code):
+                if isinstance(password, basestring):
+                    self.password = password
+                    break
+                elif isinstance(password, BotPassword):
+                    self.password = password.password
+                    self.login_name = password.login_name(self.username)
+                    break
                 else:
                     warn('Invalid password format', _PasswordFileWarning)
-        password_f.close()
 
     def login(self, retry=False):
         """

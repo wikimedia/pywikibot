@@ -16,6 +16,7 @@ try:
     import unittest.mock as mock
 except ImportError:
     import mock
+from io import StringIO
 
 from pywikibot.exceptions import NoUsername
 from pywikibot.login import LoginManager
@@ -93,10 +94,6 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         self.addCleanup(patcher.stop)
         return patcher.start()
 
-    def _file_lines(self, lines=[]):
-        for line in lines:
-            yield line
-
     def setUp(self):
         """Patch a variety of dependencies."""
         super(TestPasswordFile, self).setUp()
@@ -112,7 +109,7 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         self.chmod = self.patch("os.chmod")
 
         self.open = self.patch("codecs.open")
-        self.open.return_value = self._file_lines()
+        self.open.return_value = StringIO()
 
     def test_auto_chmod_OK(self):
         """Do not chmod files that have mode private_files_permission."""
@@ -132,7 +129,7 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         )
 
     def _test_pwfile(self, contents, password):
-        self.open.return_value = self._file_lines(contents.split("\n"))
+        self.open.return_value = StringIO(contents)
         obj = LoginManager()
         self.assertEqual(obj.password, password)
         return obj
