@@ -1016,23 +1016,25 @@ class Family(object):
         if not hasattr(self, "_catredirtemplates"):
             self._catredirtemplates = {}
         if code in self.category_redirect_templates:
-            cr_template_list = self.category_redirect_templates[code]
-            cr_list = list(self.category_redirect_templates[code])
+            cr_template_tuple = self.category_redirect_templates[code]
+        elif fallback and fallback in self.category_redirect_templates:
+            cr_template_tuple = self.category_redirect_templates[fallback]
         else:
-            cr_template_list = self.category_redirect_templates[fallback]
-            cr_list = []
-        if cr_template_list:
-            cr_template = cr_template_list[0]
-            # start with list of category redirect templates from family file
-            cr_page = pywikibot.Page(pywikibot.Site(code, self),
-                                     "Template:" + cr_template)
+            self._catredirtemplates[code] = []
+            return
+        cr_set = set()
+        site = pywikibot.Site(code, self)
+        tpl_ns = site.namespaces.TEMPLATE
+        for cr_template in cr_template_tuple:
+            cr_page = pywikibot.Page(site, cr_template, ns=tpl_ns)
             # retrieve all redirects to primary template from API,
             # add any that are not already on the list
-            for t in cr_page.backlinks(filterRedirects=True, namespaces=10):
+            for t in cr_page.backlinks(filterRedirects=True,
+                                       namespaces=tpl_ns):
                 newtitle = t.title(withNamespace=False)
-                if newtitle not in cr_list:
-                    cr_list.append(newtitle)
-        self._catredirtemplates[code] = cr_list
+                if newtitle not in cr_template_tuple:
+                    cr_set.add(newtitle)
+        self._catredirtemplates[code] = list(cr_template_tuple) + list(cr_set)
 
     @deprecated('site.category_redirects()')
     def get_cr_templates(self, code, fallback):
