@@ -1540,6 +1540,8 @@ class IsbnWikibaseBot(WikidataBot):
 
     """ISBN bot to be run on Wikibase sites."""
 
+    use_from_page = None
+
     def __init__(self, generator, **kwargs):
         """Constructor."""
         self.availableOptions.update({
@@ -1549,7 +1551,7 @@ class IsbnWikibaseBot(WikidataBot):
         self.isbn_10_prop_id = kwargs.pop('prop-isbn-10', None)
         self.isbn_13_prop_id = kwargs.pop('prop-isbn-13', None)
 
-        super(IsbnWikibaseBot, self).__init__(use_from_page=None, **kwargs)
+        super(IsbnWikibaseBot, self).__init__(**kwargs)
 
         self.generator = generator
         if self.isbn_10_prop_id is None:
@@ -1558,7 +1560,7 @@ class IsbnWikibaseBot(WikidataBot):
             self.isbn_13_prop_id = self.get_property_by_name('ISBN-13')
         self.comment = i18n.twtranslate(pywikibot.Site(), 'isbn-formatting')
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Treat a page."""
         change_messages = []
 
