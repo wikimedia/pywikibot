@@ -42,7 +42,7 @@ class EventStreams(object):
     Usage:
 
     >>> stream = EventStreams(stream='recentchange')
-    >>> change = iter(stream).next()
+    >>> change = next(iter(stream))
     >>> change
     {'comment': '/* wbcreateclaim-create:1| */ [[Property:P31]]: [[Q4167836]]',
      'wiki': 'wikidatawiki', 'type': 'edit', 'server_name': 'www.wikidata.org',
