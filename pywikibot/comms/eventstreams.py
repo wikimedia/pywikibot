@@ -91,6 +91,19 @@ class EventStreams(object):
         kwargs.setdefault('timeout', config.socket_timeout)
         self.sse_kwargs = kwargs
 
+    def __repr__(self):
+        """Return representation string."""
+        kwargs = self.sse_kwargs.copy()
+        if self._site != Site():
+            kwargs['site'] = self._site
+        if self._stream:
+            kwargs['stream'] = self._stream
+            kwargs.pop('url')
+        if kwargs['timeout'] == config.socket_timeout:
+            kwargs.pop('timeout')
+        return '{0}({1})'.format(self.__class__.__name__, ', '.join(
+            '%s=%r' % x for x in kwargs.items()))
+
     @property
     def url(self):
         """Get the EventStream's url.
