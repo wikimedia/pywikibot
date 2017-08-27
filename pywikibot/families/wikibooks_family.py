@@ -38,12 +38,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'hu', 'de', 'fr', 'ja', 'it', 'es', 'pt', 'nl', 'pl', 'he',
-            'vi', 'ca', 'th', 'fi', 'id', 'sq', 'fa', 'zh', 'ru', 'az', 'cs',
+            'vi', 'th', 'ca', 'fi', 'id', 'sq', 'fa', 'zh', 'ru', 'az', 'cs',
             'sv', 'da', 'hr', 'sr', 'tr', 'ko', 'ar', 'no', 'gl', 'ro', 'ta',
-            'tl', 'mk', 'is', 'uk', 'sa', 'hi', 'ka', 'lt', 'tt', 'eo', 'sk',
-            'el', 'bg', 'bn', 'li', 'hy', 'si', 'ms', 'sl', 'ur', 'la', 'ml',
-            'km', 'ia', 'et', 'cv', 'mr', 'oc', 'eu', 'kk', 'be', 'pa', 'ne',
-            'fy', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'cy', 'ba',
+            'ba', 'tl', 'mk', 'is', 'uk', 'sa', 'hi', 'ka', 'lt', 'tt', 'eo',
+            'sk', 'el', 'bg', 'li', 'bn', 'hy', 'si', 'ms', 'sl', 'ur', 'la',
+            'ml', 'km', 'ia', 'et', 'cv', 'mr', 'oc', 'eu', 'kk', 'be', 'pa',
+            'ne', 'fy', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'cy',
         ]
 
         super(Family, self).__init__()
