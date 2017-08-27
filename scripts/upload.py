@@ -33,6 +33,7 @@ Arguments:
   -recursive    When the filename is a directory it also uploads the files from
                 the subdirectories.
   -summary:     Pick a custom edit summary for the bot.
+  -descfile:    Specify a filename where the description is stored
 
 It is possible to combine -abortonwarn and -ignorewarn so that if the specific
 warning is given it won't apply the general one but more specific one. So if it
@@ -57,6 +58,7 @@ parameter, and for a description.
 #
 from __future__ import absolute_import, unicode_literals
 
+import codecs
 import math
 import os
 import re
@@ -114,6 +116,7 @@ def main(*args):
     chunk_size_regex = re.compile(
         r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
     recursive = False
+    description_file = None
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
@@ -149,13 +152,25 @@ def main(*args):
         elif arg == '-chunked':
             match = chunk_size_regex.match(option)
             chunk_size = get_chunk_size(match)
+        elif arg == '-descfile':
+            description_file = value
         elif arg and not value:
             if not url:
                 url = arg
             else:
                 description.append(arg)
 
-    description = u' '.join(description)
+    description = ' '.join(description)
+
+    if description_file:
+        if description:
+            pywikibot.error('Both a description and a -descfile were '
+                            'provided. Please specify only one of those.')
+            return False
+        with codecs.open(description_file,
+                         encoding=pywikibot.config.textfile_encoding) as f:
+            description = f.read().replace('\r\n', '\n')
+
     while not ("://" in url or os.path.exists(url)):
         if not url:
             error = 'No input filename given.'
