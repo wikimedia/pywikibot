@@ -80,6 +80,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'en': "Category:Wikipedia soft redirected categories",
             'es': "Categoría:Wikipedia:Categorías redirigidas",
             'fa': u"رده:رده‌های منتقل‌شده",
+            'hi': 'श्रेणी:विकिपीडिया श्रेणी अनुप्रेषित',
             'hu': "Kategória:Kategóriaátirányítások",
             'ja': "Category:移行中のカテゴリ",
             'no': "Kategori:Wikipedia omdirigertekategorier",
