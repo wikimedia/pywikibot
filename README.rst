@@ -47,50 +47,7 @@ If you wish to write your own script it's very easy to get started:
 
 For more documentation on pywikibot see our `docs <https://doc.wikimedia.org/pywikibot/>`_.
 
-
-The contents of the package
-----------------------------
-
-    +----------------------------------------------------------------------------------+
-    |    README and config files:                                                      |
-    +===========================+======================================================+
-    |    ChangeLog              | Log file to keep track of major changes versionwise  |
-    +---------------------------+------------------------------------------------------+
-    |    CREDITS                | List of major contributors to this module            |
-    +---------------------------+------------------------------------------------------+
-    |    ez_setup.py            | Bootstrap distribute installation file, can also be  |
-    |                           | run to install or upgrade setuptools.                |
-    +---------------------------+------------------------------------------------------+
-    |    generate_family_file.py| Creates a new family file.                           |
-    +---------------------------+------------------------------------------------------+
-    |    generate_user_files.py | Creates user-config.py or user-fixes.py              |
-    +---------------------------+------------------------------------------------------+
-    |    LICENSE                | a reference to the MIT license                       |
-    +---------------------------+------------------------------------------------------+
-    |    pwb.py                 | Wrapper script to use Pywikibot in 'directory' mode  |
-    +---------------------------+------------------------------------------------------+
-    |    README-conversion.txt  | Guide to converting bot scripts from version 1       |
-    |                           | of the Pywikibot framework to version 3              |
-    +---------------------------+------------------------------------------------------+
-    |    README.rst             | Short info string used by Pywikibot Nightlies        |
-    +---------------------------+------------------------------------------------------+
-    |    requirements.txt       | PIP requirements file                                |
-    +---------------------------+------------------------------------------------------+
-    |    setup.py               | Installer script for Pywikibot 3.0 framework         |
-    +---------------------------+------------------------------------------------------+
-    |    user-config.py.sample  | Example user-config.py file for reference            |
-    +---------------------------+------------------------------------------------------+
-
-    +----------------------------------------------------------------------------------+
-    |    Directories                                                                   |
-    +===========================+======================================================+
-    |    pywikibot              | Contains some libraries and control files            |
-    +---------------------------+------------------------------------------------------+
-    |    scripts                | Contains all bots and utility scripts                |
-    +---------------------------+------------------------------------------------------+
-    |    tests                  | Some test stuff for the developing team              |
-    +---------------------------+------------------------------------------------------+
-
+.. include:: pywikibot/DIRECTORIES.rst
 
 Required external programs
 ---------------------------
@@ -99,13 +56,18 @@ It may require the following programs to function properly:
 
 * `7za`: To extract 7z files
 
+.. include:: HISTORY.rst
+
 Contributing
 ------------
 
-Our code is maintained on Wikimedia's
-`Gerrit installation <https://gerrit.wikimedia.org/r/#/admin/projects/?filter=pywikibot>`_.
-Learn about `how to contribute <https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Development>`_.
+Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikimedia.org/>`_,
+`learn <https://www.mediawiki.org/wiki/Special:MyLanguage/Developer_access>`_ how to get
+started.
 
 .. image:: https://secure.travis-ci.org/wikimedia/pywikibot-core.png?branch=master
    :alt: Build Status
    :target: https://travis-ci.org/wikimedia/pywikibot-core
+.. image:: https://img.shields.io/pypi/v/pywikibot.svg
+   :alt: Pywikibot release
+   :target: https://pypi.python.org/pypi/pywikibot
