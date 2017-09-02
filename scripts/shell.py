@@ -8,11 +8,6 @@ Usage:
     python pwb.py shell [args]
 
 If no arguments are given, the pywikibot library will not be loaded.
-
-The following parameters are supported:
-
-&params;
-
 """
 # (C) Pywikibot team, 2014-2017
 #
