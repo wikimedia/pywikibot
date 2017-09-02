@@ -70,6 +70,8 @@ class ClaimRobot(WikidataBot):
 
     """A bot to add Wikidata claims."""
 
+    use_from_page = None
+
     def __init__(self, generator, claims, exists_arg=''):
         """
         Constructor.
@@ -82,7 +84,7 @@ class ClaimRobot(WikidataBot):
         @type exists_arg: str
         """
         self.availableOptions['always'] = True
-        super(ClaimRobot, self).__init__(use_from_page=None)
+        super(ClaimRobot, self).__init__()
         self.generator = generator
         self.claims = claims
         self.exists_arg = ''.join(x for x in exists_arg.lower() if x in 'pqst')
