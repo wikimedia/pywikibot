@@ -7352,8 +7352,26 @@ class DataSite(APISite):
             props = attr.replace("get_", "")
             if props in ['info', 'sitelinks', 'aliases', 'labels',
                          'descriptions', 'urls']:
+                if props == 'info':
+                    instead = (
+                        '\n'
+                        "{'lastrevid': WikibasePage.latest_revision_id,\n"
+                        " 'pageid': WikibasePage.pageid,\n"
+                        " 'title': WikibasePage.title(),\n"
+                        " 'modified': WikibasePage._timestamp,\n"
+                        " 'ns': WikibasePage.namespace(),\n"
+                        " 'type': WikibasePage.entity_type, # for subclasses\n"
+                        " 'id': WikibasePage.id"
+                        '}\n')
+                elif props == 'sitelinks':
+                    instead = 'ItemPage.sitelinks'
+                elif props in ('aliases', 'labels', 'descriptions'):
+                    instead = ('WikibasePage.{0} after WikibasePage.get()'
+                               .format(attr))
+                else:  # urls
+                    instead = None
                 issue_deprecation_warning('DataSite.{0}()'.format(attr),
-                                          'WikibasePage', 2)
+                                          instead, 2)
                 if props == 'urls':
                     props = 'sitelinks/urls'
                 method = self._get_propertyitem
