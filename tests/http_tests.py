@@ -212,7 +212,7 @@ class TestHttpStatus(HttpbinTestCase):
         r = http.fetch(uri='http://www.gandi.eu')
         self.assertEqual(r.status, 200)
         self.assertEqual(r.data.url,
-                         'https://www.gandi.net/')
+                         'https://www.gandi.net/en')
 
 
 class UserAgentTestCase(TestCase):
