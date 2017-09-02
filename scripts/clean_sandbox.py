@@ -72,6 +72,7 @@ content = {
     'fi': u'{{subst:Hiekka}}',
     'fr': '{{subst:Préchargement pour Bac à sable}}',
     'he': u'{{ארגז חול}}\n<!-- נא לערוך מתחת לשורה זו בלבד, תודה. -->',
+    'hi': '{{User sandbox}}\n<!-- कृप्या इस लाइन के नीचे सम्पादन करे। -->',
     'id': u'{{Bakpasir}}\n<!-- Uji coba dilakukan di baris di bawah ini -->',
     'it': '{{sandbox}}'
           '<!-- Scrivi SOTTO questa riga senza cancellarla. Grazie. -->',
