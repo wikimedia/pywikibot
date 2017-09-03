@@ -4680,6 +4680,11 @@ class Claim(Property):
         self.rank = 'normal'
         self.on_item = None  # The item it's on
 
+    def __repr__(self):
+        """Return the representation string."""
+        return '{cls_name}.fromJSON({0}, {1})'.format(
+            repr(self.repo), self.toJSON(), cls_name=type(self).__name__)
+
     @classmethod
     def fromJSON(cls, site, data):
         """
