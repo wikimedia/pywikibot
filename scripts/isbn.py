@@ -1563,7 +1563,7 @@ class IsbnWikibaseBot(WikidataBot):
     def treat_page_and_item(self, page, item):
         """Treat a page."""
         change_messages = []
-
+        item.get()
         if self.isbn_10_prop_id in item.claims:
             for claim in item.claims[self.isbn_10_prop_id]:
                 isbn = claim.getTarget()
