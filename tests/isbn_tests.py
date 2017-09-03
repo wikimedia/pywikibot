@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -238,10 +238,14 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase, TWNBotTestCase):
         ItemPage.editEntity = TestIsbnWikibaseBot._original_editEntity
         super(TestIsbnWikibaseBot, self).tearDown()
 
-    def test_isbn(self):
-        """Test using the bot and wikibase."""
+    def test_isbn_format(self):
+        """Test format using the bot and wikibase."""
         main('-page:' + self.test_page_qid, '-always', '-format')
         self.assertEqual(self.setTarget_value, '0-9752298-0-X')
+
+    @unittest.expectedFailure  # See T174870
+    def test_isbn_to13(self):
+        """Test to13 using the bot and wikibase."""
         main('-page:' + self.test_page_qid, '-always', '-to13')
         self.assertTrue(self.setTarget_value, '978-0975229804')
 
