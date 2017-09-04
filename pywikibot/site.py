@@ -4544,7 +4544,7 @@ class APISite(BaseSite):
             legen.request["leend"] = end
         if reverse:
             legen.request["ledir"] = "newer"
-        if namespace is not None:
+        if namespace or namespace == 0:
             legen.request["lenamespace"] = namespace
         if tag:
             # Supported in version 1.16+; earlier sites will cause APIError
