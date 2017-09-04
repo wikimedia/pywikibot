@@ -37,7 +37,6 @@ class WikiStats(object):
     """
 
     FAMILY_MAPPING = {
-        'anarchopedia': 'anarchopedias',
         'wikipedia': 'wikipedias',
         'wikiquote': 'wikiquotes',
         'wikisource': 'wikisources',
@@ -53,7 +52,6 @@ class WikiStats(object):
 
     OTHER_MULTILANG_TABLES = set([
         'uncyclomedia',
-        'anarchopedias',
         'rodovid',
         'wikifur',
         'wikitravel',
