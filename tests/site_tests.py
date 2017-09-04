@@ -1234,6 +1234,12 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
                 entry[2], long if PY2 and entry[2] > sys.maxint else int)
             self.assertIsInstance(entry[3], basestring)
 
+    def test_list_namespace(self):
+        """Test the deprecated site.logpages() when namespace is a list."""
+        le = list(self.site.logpages(namespace=[2, 3], number=10))
+        for entry in le:
+            self.assertIn(entry[0].namespace(), [2, 3])
+
     def test_logpages_dump(self):
         """Test the deprecated site.logpages() method using dump mode."""
         le = list(self.site.logpages(number=10, dump=True))
