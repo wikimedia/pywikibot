@@ -528,19 +528,19 @@ class GeneratorFactory(object):
             dupfiltergen = RegexFilterPageGenerator(
                 dupfiltergen, self.titlenotfilter_list, 'none')
 
-        if self.articlefilter_list:
-            dupfiltergen = RegexBodyFilterPageGenerator(
-                PreloadingGenerator(dupfiltergen), self.articlefilter_list)
-
         if self.catfilter_list:
             dupfiltergen = CategoryFilterPageGenerator(
                 dupfiltergen, self.catfilter_list, self.site)
 
-        if preload and not self.nopreload:
+        if (preload or self.articlefilter_list) and not self.nopreload:
             if isinstance(dupfiltergen, DequeGenerator):
                 dupfiltergen = DequePreloadingGenerator(dupfiltergen)
             else:
                 dupfiltergen = PreloadingGenerator(dupfiltergen)
+
+        if self.articlefilter_list:
+            dupfiltergen = RegexBodyFilterPageGenerator(
+                dupfiltergen, self.articlefilter_list)
 
         return dupfiltergen
 
