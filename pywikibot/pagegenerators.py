@@ -511,7 +511,6 @@ class GeneratorFactory(object):
                 dupfiltergen, self.subpage_max_depth)
 
         if self.claimfilter_list:
-            dupfiltergen = PreloadingItemGenerator(dupfiltergen)
             for claim in self.claimfilter_list:
                 dupfiltergen = ItemClaimFilterPageGenerator(dupfiltergen,
                                                             claim[0], claim[1],
@@ -1577,9 +1576,11 @@ class ItemClaimFilter(object):
         @return: true if page contains the claim, false otherwise
         @rtype: bool
         """
-        if not isinstance(page, pywikibot.ItemPage):
-            pywikibot.output(u'%s is not an ItemPage. Skipping.' % page)
-            return False
+        if not isinstance(page, pywikibot.WikibasePage):
+            try:
+                page = pywikibot.ItemPage.fromPage(page)
+            except pywikibot.NoPage:
+                return False
         for page_claim in page.get()['claims'].get(prop, []):
             if page_claim.target_equals(claim):
                 if not qualifiers:
