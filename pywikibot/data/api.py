@@ -2507,6 +2507,16 @@ class QueryGenerator(_RequestWrapper):
 
     """
 
+    # Should results be filtered during iteration according to set_namespace?
+    # Used if the API module does not support multiple namespaces.
+    # Override in subclasses by defining a function that returns True if
+    # the result's namespace is in self._namespaces.
+    _check_result_namespace = NotImplemented
+
+    # Set of allowed namespaces will be assigned to _namespaces during
+    # set_namespace call. Only to be used by _check_result_namespace.
+    _namespaces = None
+
     def __init__(self, **kwargs):
         """
         Construct a QueryGenerator object.
@@ -2683,8 +2693,12 @@ class QueryGenerator(_RequestWrapper):
                       self.site.namespaces.resolve(namespaces)]
 
         if 'multi' not in param and len(namespaces) != 1:
-            raise TypeError(u'{0} module does not support multiple namespaces'
-                            .format(self.limited_module))
+            if self._check_result_namespace is NotImplemented:
+                raise TypeError('{0} module does not support multiple '
+                                'namespaces'.format(self.limited_module))
+            else:
+                self._namespaces = set(namespaces)
+                namespaces = None
 
         if namespaces:
             self.request[self.prefix + 'namespace'] = namespaces
@@ -2801,7 +2815,11 @@ class QueryGenerator(_RequestWrapper):
                 else:
                     self.normalized = {}
                 for item in resultdata:
-                    yield self.result(item)
+                    result = self.result(item)
+                    if self._check_result_namespace is not NotImplemented:
+                        if not self._check_result_namespace(result):
+                            continue
+                    yield result
                     if isinstance(item, dict) and set(self.continuekey) & set(item.keys()):
                         # if we need to count elements contained in items in
                         # self.data["query"]["pages"], we want to count
@@ -3014,6 +3032,10 @@ class LogEntryListGenerator(ListGenerator):
     def result(self, pagedata):
         """Instatiate LogEntry from data from api."""
         return self.entryFactory.create(pagedata)
+
+    def _check_result_namespace(self, result):
+        """Return True if result.ns() is in self._namespaces."""
+        return result.ns() in self._namespaces
 
 
 class LoginManager(login.LoginManager):

@@ -4509,8 +4509,11 @@ class APISite(BaseSite):
         @type user: basestring
         @param page: only iterate entries affecting this page
         @type page: Page or basestring
-        @param namespace: namespace to retrieve logevents from
-        @type namespace: int or Namespace
+        @param namespace: namespace(s) to retrieve logevents from
+        @type namespace: int or Namespace or an iterable of them
+        @note: due to an API limitation, if namespace param contains multiple
+            namespaces, log entries from all namespaces will be fetched from
+            the API and will be filtered later during iteration.
         @param start: only iterate entries from and after this Timestamp
         @type start: Timestamp or ISO date string
         @param end: only iterate entries up to and through this Timestamp
@@ -4544,8 +4547,8 @@ class APISite(BaseSite):
             legen.request["leend"] = end
         if reverse:
             legen.request["ledir"] = "newer"
-        if namespace or namespace == 0:
-            legen.request["lenamespace"] = namespace
+        if namespace is not None:
+            legen.set_namespace(namespace)
         if tag:
             # Supported in version 1.16+; earlier sites will cause APIError
             legen.request['letag'] = tag
