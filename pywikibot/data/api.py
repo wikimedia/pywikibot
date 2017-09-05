@@ -2816,7 +2816,7 @@ class QueryGenerator(_RequestWrapper):
                     self.normalized = {}
                 for item in resultdata:
                     result = self.result(item)
-                    if self._check_result_namespace is not NotImplemented:
+                    if self._namespaces:
                         if not self._check_result_namespace(result):
                             continue
                     yield result
