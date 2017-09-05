@@ -92,19 +92,17 @@ def translate(page=None, hints=None, auto=True, removebrackets=False,
         sitelang = page.site.code
         dictName, value = date.getAutoFormat(sitelang, page.title())
         if dictName:
-            if True:
-                pywikibot.output(
-                    u'TitleTranslate: %s was recognized as %s with value %d'
-                    % (page.title(), dictName, value))
-                for entryLang, entry in date.formats[dictName].items():
-                    if entryLang not in site.languages():
-                        continue
-                    if entryLang != sitelang:
-                        if True:
-                            newname = entry(value)
-                            x = pywikibot.Link(
-                                newname,
-                                pywikibot.Site(code=entryLang,
-                                               fam=site.family))
-                            result.add(x)
+            pywikibot.output(
+                u'TitleTranslate: %s was recognized as %s with value %d'
+                % (page.title(), dictName, value))
+            for entryLang, entry in date.formats[dictName].items():
+                if entryLang not in site.languages():
+                    continue
+                if entryLang != sitelang:
+                    newname = entry(value)
+                    x = pywikibot.Link(
+                        newname,
+                        pywikibot.Site(code=entryLang,
+                                       fam=site.family))
+                    result.add(x)
     return list(result)
