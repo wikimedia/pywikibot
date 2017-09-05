@@ -1095,7 +1095,7 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
 
 
 @deprecated_args(number="total", mode="logtype", repeat=None)
-def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=0,
+def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
                            total=None, start=None, end=None, reverse=False):
     """
     Generate Pages for specified modes of logevents.
@@ -1121,7 +1121,7 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=0,
         site = pywikibot.Site()
     for entry in site.logevents(total=total, logtype=logtype, user=user,
                                 namespace=namespace, start=start, end=end,
-                                reverse=False):
+                                reverse=reverse):
         try:
             yield entry.page()
         except KeyError as e:
