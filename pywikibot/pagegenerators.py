@@ -1576,7 +1576,7 @@ class ItemClaimFilter(object):
         @return: true if page contains the claim, false otherwise
         @rtype: bool
         """
-        if not isinstance(page, pywikibot.WikibasePage):
+        if not isinstance(page, pywikibot.page.WikibasePage):
             try:
                 page = pywikibot.ItemPage.fromPage(page)
             except pywikibot.NoPage:

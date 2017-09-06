@@ -7358,18 +7358,18 @@ class DataSite(APISite):
                 if props == 'info':
                     instead = (
                         '\n'
-                        "{'lastrevid': WikibasePage.latest_revision_id,\n"
-                        " 'pageid': WikibasePage.pageid,\n"
-                        " 'title': WikibasePage.title(),\n"
-                        " 'modified': WikibasePage._timestamp,\n"
-                        " 'ns': WikibasePage.namespace(),\n"
-                        " 'type': WikibasePage.entity_type, # for subclasses\n"
-                        " 'id': WikibasePage.id"
+                        "{'lastrevid': ItemPage.latest_revision_id,\n"
+                        " 'pageid': ItemPage.pageid,\n"
+                        " 'title': ItemPage.title(),\n"
+                        " 'modified': ItemPage._timestamp,\n"
+                        " 'ns': ItemPage.namespace(),\n"
+                        " 'type': ItemPage.entity_type, # for subclasses\n"
+                        " 'id': ItemPage.id"
                         '}\n')
                 elif props == 'sitelinks':
                     instead = 'ItemPage.sitelinks'
                 elif props in ('aliases', 'labels', 'descriptions'):
-                    instead = ('WikibasePage.{0} after WikibasePage.get()'
+                    instead = ('ItemPage.{0} after ItemPage.get()'
                                .format(attr))
                 else:  # urls
                     instead = None
@@ -7398,7 +7398,7 @@ class DataSite(APISite):
             "API wbgetentities response lacks %s key" % props
         return wbdata[props]
 
-    @deprecated("pywikibot.WikibasePage")
+    @deprecated('pywikibot.ItemPage')
     def get_item(self, source, **params):
         """Get the data for multiple Wikibase items."""
         return self._get_item(source, **params)
