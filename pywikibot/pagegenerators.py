@@ -1577,10 +1577,23 @@ class ItemClaimFilter(object):
         @rtype: bool
         """
         if not isinstance(page, pywikibot.page.WikibasePage):
-            try:
-                page = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
-                return False
+            if isinstance(page.site, pywikibot.site.DataSite):  # T175151
+                on_repo = page.namespace() in (
+                    page.site.item_namespace, page.site.property_namespace)
+            else:
+                on_repo = False
+            if on_repo:
+                if page.namespace() == page.site.property_namespace:
+                    cls = pywikibot.PropertyPage
+                else:
+                    cls = pywikibot.ItemPage
+                page = cls(page.site, page.title(withNamespace=False))
+            else:
+                try:
+                    page = pywikibot.ItemPage.fromPage(page)
+                except pywikibot.NoPage:
+                    return False
+
         for page_claim in page.get()['claims'].get(prop, []):
             if page_claim.target_equals(claim):
                 if not qualifiers:
