@@ -27,6 +27,8 @@ An example can be found at:
 
 https://en.wikisource.org/wiki/User:Wikisource-bot/patrol_whitelist
 
+&params;
+
 Commandline parameters
 ======================
 

@@ -21,6 +21,8 @@ You can use any typical pagegenerator to provide with a list of pages:
     python pwb.py coordinate_import -lang:it -family:wikipedia \
         -namespace:0 -transcludes:Infobox_stazione_ferroviaria
 
+These command line parameters can be used to specify which pages to work on:
+
 &params;
 """
 #
@@ -34,6 +36,8 @@ from __future__ import absolute_import, unicode_literals
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownException
+
+docuReplacements = {'&params;': pagegenerators.parameterHelp}
 
 
 class CoordImportRobot(WikidataBot):

@@ -28,6 +28,8 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import FollowRedirectPageBot, ExistingPageBot
 
+docuReplacements = {'&params;': pagegenerators.parameterHelp}
+
 
 class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
 

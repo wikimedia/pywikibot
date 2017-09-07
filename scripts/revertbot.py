@@ -5,8 +5,6 @@ This script can be used for reverting certain edits.
 
 The following command line parameters are supported:
 
-&params;
-
 -username         Edits of which user need to be reverted.
 
 -rollback         Rollback edits instead of reverting them.

@@ -9,8 +9,6 @@ Usage:
 
 It is essential to provide two images to work on.
 
-&params;
-
 Furthermore, the following command line parameters are supported:
 
 -otherfamily        Mentioned family with this parameter will be preferred for

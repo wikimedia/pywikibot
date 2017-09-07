@@ -11,12 +11,6 @@ in order to run properly. Most of them can be checked-out at:
 (some code might get compiled on-the-fly, so a GNU compiler along
 with library header files is needed too)
 
-The following parameters are supported:
-
-&params;
-
-All other parameters will be ignored.
-
 Syntax example:
 
     python pwb.py script_wui -dir:.

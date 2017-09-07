@@ -3,6 +3,10 @@
 """
 A script that adds claims to Wikidata items based on a list of pages.
 
+These command line parameters can be used to specify which pages to work on:
+
+&params;
+
 ------------------------------------------------------------------------------
 
 Usage:
