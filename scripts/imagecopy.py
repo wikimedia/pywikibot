@@ -31,43 +31,7 @@ Work on all images which transclude a template
 See pagegenerators.py for more ways to get a list of images.
 By default the bot works on your home wiki (set in user-config)
 
-Known issues/FIXMEs (no critical issues known):
-* make it use pagegenerators.py
-** Implemented in rewrite
-* Some variable names are in Spanish, which makes the code harder to read.
-** Almost all variables are now in English
-* Depending on sorting within a file category, the "next batch" is sometimes
-  not working, leading to an endless loop
-** Using pagegenerators now
-* Different wikis can have different exclusion lists. A parameter for the
-  exclusion list Uploadbot.localskips.txt would probably be nice.
-* Bot should probably use API instead of query.php
-** Api? Query? Wikipedia.py!
-* Should request alternative name if file name already exists on Commons
-** Implemented in rewrite
-* Exits after last file in category was processed, aborting all pending
-  threads.
-** Implemented proper threading in rewrite
-* Should take user-config.py as input for project and lang variables
-** Implemented in rewrite
-* Should require a Commons user to be present in user-config.py before
-  working
-* Should probably have an input field for additional categories
-* Should probably have an option to change uploadtext with file
-* required i18n options for NowCommons template (f.e. {{subst:ncd}} on
-  en.wp. Currently needs customisation to work properly. Bot was tested
-  succesfully on nl.wp (12k+ files copied and deleted locally) and en.wp
-  (about 100 files copied and SieBot has bot approval for tagging {{ncd}}
-  with this bot)
-** Implemented
-* {{NowCommons|xxx}} requires the namespace prefix Image: on most wikis
-  and can be left out on others. This needs to be taken care of when
-  implementing i18n
-** Implemented
-* This bot should probably get a small tutorial at meta with a few
-  screenshots.
 """
-#
 # Based on upload.py by:
 # (C) Rob W.W. Hooft, Andre Engels 2003-2007
 # (C) Wikipedian, Keichwa, Leogregianin, Rikwade, Misza13 2003-2007

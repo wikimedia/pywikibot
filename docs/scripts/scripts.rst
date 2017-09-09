@@ -20,7 +20,7 @@ Submodules
 scripts.add_text script
 -----------------------
 
-.. automodule:: script.add_text
+.. automodule:: scripts.add_text
     :members:
     :undoc-members:
     :show-inheritance:
@@ -29,16 +29,11 @@ scripts.add_text script
 scripts.archivebot script
 -------------------------
 
-.. automodule:: script.archivebot
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 scripts.basic script
 --------------------
 
-.. automodule:: script.basic
+.. automodule:: scripts.basic
     :members:
     :undoc-members:
     :show-inheritance:
@@ -47,7 +42,7 @@ scripts.basic script
 scripts.blockpagechecker script
 -------------------------------
 
-.. automodule:: script.blockpagechecker
+.. automodule:: scripts.blockpagechecker
     :members:
     :undoc-members:
     :show-inheritance:
@@ -56,7 +51,7 @@ scripts.blockpagechecker script
 scripts.capitalize_redirects script
 -----------------------------------
 
-.. automodule:: script.capitalize_redirects
+.. automodule:: scripts.capitalize_redirects
     :members:
     :undoc-members:
     :show-inheritance:
@@ -65,7 +60,7 @@ scripts.capitalize_redirects script
 scripts.catall script
 ---------------------
 
-.. automodule:: script.catall
+.. automodule:: scripts.catall
     :members:
     :undoc-members:
     :show-inheritance:
@@ -74,7 +69,7 @@ scripts.catall script
 scripts.category script
 -----------------------
 
-.. automodule:: script.category
+.. automodule:: scripts.category
     :members:
     :undoc-members:
     :show-inheritance:
@@ -83,7 +78,7 @@ scripts.category script
 scripts.cfd script
 ------------------
 
-.. automodule:: script.cfd
+.. automodule:: scripts.cfd
     :members:
     :undoc-members:
     :show-inheritance:
@@ -92,7 +87,7 @@ scripts.cfd script
 scripts.checkimages script
 --------------------------
 
-.. automodule:: script.checkimages
+.. automodule:: scripts.checkimages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -101,7 +96,7 @@ scripts.checkimages script
 scripts.claimit script
 ----------------------
 
-.. automodule:: script.claimit
+.. automodule:: scripts.claimit
     :members:
     :undoc-members:
     :show-inheritance:
@@ -110,7 +105,7 @@ scripts.claimit script
 scripts.clean_sandbox script
 ----------------------------
 
-.. automodule:: script.clean_sandboy
+.. automodule:: scripts.clean_sandboy
     :members:
     :undoc-members:
     :show-inheritance:
@@ -119,7 +114,7 @@ scripts.clean_sandbox script
 scripts.commons_link script
 ---------------------------
 
-.. automodule:: script.commons_link
+.. automodule:: scripts.commons_link
     :members:
     :undoc-members:
     :show-inheritance:
@@ -128,7 +123,7 @@ scripts.commons_link script
 scripts.commonscat script
 -------------------------
 
-.. automodule:: script.commonscat
+.. automodule:: scripts.commonscat
     :members:
     :undoc-members:
     :show-inheritance:
@@ -137,7 +132,7 @@ scripts.commonscat script
 scripts.coodinate_import script
 -------------------------------
 
-.. automodule:: script.coodinate_import
+.. automodule:: scripts.coodinate_import
     :members:
     :undoc-members:
     :show-inheritance:
@@ -146,7 +141,7 @@ scripts.coodinate_import script
 scripts.cosmetic_changes script
 -------------------------------
 
-.. automodule:: script.cosmetic_changes
+.. automodule:: scripts.cosmetic_changes
     :members:
     :undoc-members:
     :show-inheritance:
@@ -155,7 +150,7 @@ scripts.cosmetic_changes script
 scripts.create_categories script
 --------------------------------
 
-.. automodule:: script.create_categories
+.. automodule:: scripts.create_categories
     :members:
     :undoc-members:
     :show-inheritance:
@@ -164,7 +159,7 @@ scripts.create_categories script
 scripts.data_ingestion script
 -----------------------------
 
-.. automodule:: script.data_ingestion
+.. automodule:: scripts.data_ingestion
     :members:
     :undoc-members:
     :show-inheritance:
@@ -173,7 +168,7 @@ scripts.data_ingestion script
 scripts.delete script
 ---------------------
 
-.. automodule:: script.delete
+.. automodule:: scripts.delete
     :members:
     :undoc-members:
     :show-inheritance:
@@ -182,7 +177,7 @@ scripts.delete script
 scripts.disambredir script
 --------------------------
 
-.. automodule:: script.disambredir
+.. automodule:: scripts.disambredir
     :members:
     :undoc-members:
     :show-inheritance:
@@ -191,7 +186,7 @@ scripts.disambredir script
 scripts.djvutext script
 -----------------------
 
-.. automodule:: script.djvutext
+.. automodule:: scripts.djvutext
     :members:
     :undoc-members:
     :show-inheritance:
@@ -200,7 +195,7 @@ scripts.djvutext script
 scripts.editarticle script
 --------------------------
 
-.. automodule:: script.editarticle
+.. automodule:: scripts.editarticle
     :members:
     :undoc-members:
     :show-inheritance:
@@ -209,7 +204,7 @@ scripts.editarticle script
 scripts.fixing_redirects script
 -------------------------------
 
-.. automodule:: script.fixing_redirects
+.. automodule:: scripts.fixing_redirects
     :members:
     :undoc-members:
     :show-inheritance:
@@ -218,7 +213,7 @@ scripts.fixing_redirects script
 scripts.flickrripper script
 ---------------------------
 
-.. automodule:: script.flickrripper
+.. automodule:: scripts.flickrripper
     :members:
     :undoc-members:
     :show-inheritance:
@@ -227,7 +222,7 @@ scripts.flickrripper script
 scripts.followlive script
 -------------------------
 
-.. automodule:: script.followlive
+.. automodule:: scripts.followlive
     :members:
     :undoc-members:
     :show-inheritance:
@@ -236,7 +231,7 @@ scripts.followlive script
 scripts.freebasemappingupload script
 ------------------------------------
 
-.. automodule:: script.freebasemappingupload
+.. automodule:: scripts.freebasemappingupload
     :members:
     :undoc-members:
     :show-inheritance:
@@ -245,16 +240,11 @@ scripts.freebasemappingupload script
 scripts.harvest_template script
 -------------------------------
 
-.. automodule:: script.harvest_template
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 scripts.illustrate_wikidata script
 ----------------------------------
 
-.. automodule:: script.illustrate_wikidata
+.. automodule:: scripts.illustrate_wikidata
     :members:
     :undoc-members:
     :show-inheritance:
@@ -263,7 +253,7 @@ scripts.illustrate_wikidata script
 scripts.image script
 --------------------
 
-.. automodule:: script.image
+.. automodule:: scripts.image
     :members:
     :undoc-members:
     :show-inheritance:
@@ -272,7 +262,7 @@ scripts.image script
 scripts.imagecopy script
 ------------------------
 
-.. automodule:: script.imagecopy
+.. automodule:: scripts.imagecopy
     :members:
     :undoc-members:
     :show-inheritance:
@@ -281,7 +271,7 @@ scripts.imagecopy script
 scripts.imagecopy_self script
 -----------------------------
 
-.. automodule:: script.imagecopy_self
+.. automodule:: scripts.imagecopy_self
     :members:
     :undoc-members:
     :show-inheritance:
@@ -290,7 +280,7 @@ scripts.imagecopy_self script
 scripts.imageharvest script
 ---------------------------
 
-.. automodule:: script.imageharvest
+.. automodule:: scripts.imageharvest
     :members:
     :undoc-members:
     :show-inheritance:
@@ -299,7 +289,7 @@ scripts.imageharvest script
 scripts.imagerecat script
 -------------------------
 
-.. automodule:: script.imagerecat
+.. automodule:: scripts.imagerecat
     :members:
     :undoc-members:
     :show-inheritance:
@@ -308,7 +298,7 @@ scripts.imagerecat script
 scripts.imagetransfer script
 ----------------------------
 
-.. automodule:: script.imagetransfer
+.. automodule:: scripts.imagetransfer
     :members:
     :undoc-members:
     :show-inheritance:
@@ -317,7 +307,7 @@ scripts.imagetransfer script
 scripts.imageuncat script
 -------------------------
 
-.. automodule:: script.imageuncat
+.. automodule:: scripts.imageuncat
     :members:
     :undoc-members:
     :show-inheritance:
@@ -326,16 +316,11 @@ scripts.imageuncat script
 scripts.interwiki script
 ------------------------
 
-.. automodule:: script.interwiki
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 scripts.interwikidata script
 ----------------------------
 
-.. automodule:: script.interwikidata
+.. automodule:: scripts.interwikidata
     :members:
     :undoc-members:
     :show-inheritance:
@@ -344,7 +329,7 @@ scripts.interwikidata script
 scripts.isbn script
 -------------------
 
-.. automodule:: script.isbn
+.. automodule:: scripts.isbn
     :members:
     :undoc-members:
     :show-inheritance:
@@ -353,7 +338,7 @@ scripts.isbn script
 scripts.listpages script
 ------------------------
 
-.. automodule:: script.listpages
+.. automodule:: scripts.listpages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -362,7 +347,7 @@ scripts.listpages script
 scripts.login script
 --------------------
 
-.. automodule:: script.login
+.. automodule:: scripts.login
     :members:
     :undoc-members:
     :show-inheritance:
@@ -371,7 +356,7 @@ scripts.login script
 scripts.lonelypages script
 --------------------------
 
-.. automodule:: script.lonelypages
+.. automodule:: scripts.lonelypages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -380,7 +365,7 @@ scripts.lonelypages script
 scripts.makecat script
 ----------------------
 
-.. automodule:: script.makecat
+.. automodule:: scripts.makecat
     :members:
     :undoc-members:
     :show-inheritance:
@@ -389,7 +374,7 @@ scripts.makecat script
 scripts.match_images script
 ---------------------------
 
-.. automodule:: script.match_images
+.. automodule:: scripts.match_images
     :members:
     :undoc-members:
     :show-inheritance:
@@ -398,7 +383,7 @@ scripts.match_images script
 scripts.misspelling script
 --------------------------
 
-.. automodule:: script.misspelling
+.. automodule:: scripts.misspelling
     :members:
     :undoc-members:
     :show-inheritance:
@@ -407,7 +392,7 @@ scripts.misspelling script
 scripts.movepages script
 ------------------------
 
-.. automodule:: script.movepages
+.. automodule:: scripts.movepages
     :members:
     :undoc-members:
     :show-inheritance:
@@ -416,7 +401,7 @@ scripts.movepages script
 scripts.ndashredir script
 -------------------------
 
-.. automodule:: script.ndashredir
+.. automodule:: scripts.ndashredir
     :members:
     :undoc-members:
     :show-inheritance:
@@ -425,7 +410,7 @@ scripts.ndashredir script
 scripts.newitem script
 ----------------------
 
-.. automodule:: script.newitem
+.. automodule:: scripts.newitem
     :members:
     :undoc-members:
     :show-inheritance:
@@ -434,7 +419,7 @@ scripts.newitem script
 scripts.noreferences script
 ---------------------------
 
-.. automodule:: script.noreferences
+.. automodule:: scripts.noreferences
     :members:
     :undoc-members:
     :show-inheritance:
@@ -443,7 +428,7 @@ scripts.noreferences script
 scripts.nowcommons script
 -------------------------
 
-.. automodule:: script.nowcommons
+.. automodule:: scripts.nowcommons
     :members:
     :undoc-members:
     :show-inheritance:
@@ -452,7 +437,7 @@ scripts.nowcommons script
 scripts.pagefromfile script
 ---------------------------
 
-.. automodule:: script.pagefromfile
+.. automodule:: scripts.pagefromfile
     :members:
     :undoc-members:
     :show-inheritance:
@@ -461,7 +446,7 @@ scripts.pagefromfile script
 scripts.patrol script
 ---------------------
 
-.. automodule:: script.patrol
+.. automodule:: scripts.patrol
     :members:
     :undoc-members:
     :show-inheritance:
@@ -470,7 +455,7 @@ scripts.patrol script
 scripts.piper script
 --------------------
 
-.. automodule:: script.piper
+.. automodule:: scripts.piper
     :members:
     :undoc-members:
     :show-inheritance:
@@ -479,25 +464,15 @@ scripts.piper script
 scripts.protect script
 ----------------------
 
-.. automodule:: script.protect
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 scripts.redirect script
 -----------------------
-
-.. automodule:: script.redirect
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 
 scripts.reflinks script
 -----------------------
 
-.. automodule:: script.reflinks
+.. automodule:: scripts.reflinks
     :members:
     :undoc-members:
     :show-inheritance:
@@ -506,7 +481,7 @@ scripts.reflinks script
 scripts.replace script
 ----------------------
 
-.. automodule:: script.replace
+.. automodule:: scripts.replace
     :members:
     :undoc-members:
     :show-inheritance:
@@ -515,7 +490,7 @@ scripts.replace script
 scripts.replicate_wiki script
 -----------------------------
 
-.. automodule:: script.replicate_wiki
+.. automodule:: scripts.replicate_wiki
     :members:
     :undoc-members:
     :show-inheritance:
@@ -524,7 +499,7 @@ scripts.replicate_wiki script
 scripts.revertbot script
 ------------------------
 
-.. automodule:: script.revertbot
+.. automodule:: scripts.revertbot
     :members:
     :undoc-members:
     :show-inheritance:
@@ -533,7 +508,7 @@ scripts.revertbot script
 scripts.script_wui script
 -------------------------
 
-.. automodule:: script.script_wui
+.. automodule:: scripts.script_wui
     :members:
     :undoc-members:
     :show-inheritance:
@@ -542,7 +517,7 @@ scripts.script_wui script
 scripts.selflink script
 -----------------------
 
-.. automodule:: script.selflink
+.. automodule:: scripts.selflink
     :members:
     :undoc-members:
     :show-inheritance:
@@ -551,7 +526,7 @@ scripts.selflink script
 scripts.shell script
 --------------------
 
-.. automodule:: script.shell
+.. automodule:: scripts.shell
     :members:
     :undoc-members:
     :show-inheritance:
@@ -560,7 +535,7 @@ scripts.shell script
 scripts.solve_disambiguation script
 -----------------------------------
 
-.. automodule:: script.solve_disambiguation
+.. automodule:: scripts.solve_disambiguation
     :members:
     :undoc-members:
     :show-inheritance:
@@ -569,7 +544,7 @@ scripts.solve_disambiguation script
 scripts.spamremove script
 -------------------------
 
-.. automodule:: script.spamremove
+.. automodule:: scripts.spamremove
     :members:
     :undoc-members:
     :show-inheritance:
@@ -578,7 +553,7 @@ scripts.spamremove script
 scripts.standardize_interwiki script
 ------------------------------------
 
-.. automodule:: script.standardize_interwiki
+.. automodule:: scripts.standardize_interwiki
     :members:
     :undoc-members:
     :show-inheritance:
@@ -587,7 +562,7 @@ scripts.standardize_interwiki script
 scripts.states_redirect script
 ------------------------------
 
-.. automodule:: script.states_redirect
+.. automodule:: scripts.states_redirect
     :members:
     :undoc-members:
     :show-inheritance:
@@ -596,7 +571,7 @@ scripts.states_redirect script
 scripts.surnames_redirect script
 --------------------------------
 
-.. automodule:: script.surnames_redirect
+.. automodule:: scripts.surnames_redirect
     :members:
     :undoc-members:
     :show-inheritance:
@@ -605,7 +580,7 @@ scripts.surnames_redirect script
 scripts.table2wiki script
 -------------------------
 
-.. automodule:: script.table2wiki
+.. automodule:: scripts.table2wiki
     :members:
     :undoc-members:
     :show-inheritance:
@@ -614,7 +589,7 @@ scripts.table2wiki script
 scripts.template script
 -----------------------
 
-.. automodule:: script.template
+.. automodule:: scripts.template
     :members:
     :undoc-members:
     :show-inheritance:
@@ -623,7 +598,7 @@ scripts.template script
 scripts.templatecount script
 ----------------------------
 
-.. automodule:: script.templatecount
+.. automodule:: scripts.templatecount
     :members:
     :undoc-members:
     :show-inheritance:
@@ -632,7 +607,7 @@ scripts.templatecount script
 scripts.touch script
 --------------------
 
-.. automodule:: script.touch
+.. automodule:: scripts.touch
     :members:
     :undoc-members:
     :show-inheritance:
@@ -641,7 +616,7 @@ scripts.touch script
 scripts.transferbot script
 --------------------------
 
-.. automodule:: script.transferbot
+.. automodule:: scripts.transferbot
     :members:
     :undoc-members:
     :show-inheritance:
@@ -650,7 +625,7 @@ scripts.transferbot script
 scripts.unlink script
 ---------------------
 
-.. automodule:: script.unlink
+.. automodule:: scripts.unlink
     :members:
     :undoc-members:
     :show-inheritance:
@@ -659,7 +634,7 @@ scripts.unlink script
 scripts.unusedfiles script
 --------------------------
 
-.. automodule:: script.unusedfiles
+.. automodule:: scripts.unusedfiles
     :members:
     :undoc-members:
     :show-inheritance:
@@ -668,7 +643,7 @@ scripts.unusedfiles script
 scripts.upload script
 ---------------------
 
-.. automodule:: script.upload
+.. automodule:: scripts.upload
     :members:
     :undoc-members:
     :show-inheritance:
@@ -677,7 +652,7 @@ scripts.upload script
 scripts.version script
 ----------------------
 
-.. automodule:: script.version
+.. automodule:: scripts.version
     :members:
     :undoc-members:
     :show-inheritance:
@@ -686,7 +661,7 @@ scripts.version script
 scripts.watchlist script
 ------------------------
 
-.. automodule:: script.watchlist
+.. automodule:: scripts.watchlist
     :members:
     :undoc-members:
     :show-inheritance:
@@ -695,7 +670,7 @@ scripts.watchlist script
 scripts.weblinkchecker script
 -----------------------------
 
-.. automodule:: script.weblinkchecker
+.. automodule:: scripts.weblinkchecker
     :members:
     :undoc-members:
     :show-inheritance:
@@ -704,16 +679,11 @@ scripts.weblinkchecker script
 scripts.welcome script
 ----------------------
 
-.. automodule:: script.welcome
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 scripts.wikisourcetext script
 -----------------------------
 
-.. automodule:: script.wikisourcetext
+.. automodule:: scripts.wikisourcetext
     :members:
     :undoc-members:
     :show-inheritance:

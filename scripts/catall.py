@@ -4,9 +4,10 @@
 This script shows the categories on each page and lets you change them.
 
 For each page in the target wiki:
-* If the page contains no categories, you can specify a list of categories to
+
+- If the page contains no categories, you can specify a list of categories to
   add to the page.
-* If the page already contains one or more categories, you can specify a new
+- If the page already contains one or more categories, you can specify a new
   list of categories to replace the current list of categories of the page.
 
 Usage:
