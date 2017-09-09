@@ -89,6 +89,7 @@ class OrphanTemplate(object):
 
 # The orphan template names in the different languages.
 _templates = {
+    'af': ('Weesbladsy', 'datum={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}', ['wi']),
     'ar': ('يتيمة', 'تاريخ={{نسخ:اسم_شهر}} {{نسخ:عام}}'),
     'ca': ('Orfe', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}'),
     'en': ('Orphan', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}', ['wi']),
