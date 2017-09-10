@@ -884,7 +884,12 @@ class TestItemLoad(WikidataTestCase):
         """Setup test class."""
         super(TestItemLoad, cls).setUpClass()
         cls.site = cls.get_site('enwiki')
-        cls.nyc = pywikibot.Page(pywikibot.page.Link("New York City", cls.site))
+
+    def setUp(self):
+        """Setup test."""
+        super(TestItemLoad, self).setUp()
+        self.nyc = pywikibot.Page(pywikibot.page.Link('New York City',
+                                                      self.site))
 
     def test_item_normal(self):
         """Test normal wikibase item."""
@@ -1012,7 +1017,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertRaises(pywikibot.NoPage, item.get)
 
     def test_fromPage_noprops(self):
-        """Test item from page with properties."""
+        """Test item from page without properties."""
         page = self.nyc
         item = ItemPage.fromPage(page)
         self.assertEqual(item._link._title, '-1')
@@ -1042,7 +1047,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertTrue(item.exists())
 
     def test_fromPage_props(self):
-        """Test item from page without properties."""
+        """Test item from page with properties."""
         page = self.nyc
         # fetch page properties
         page.properties()
