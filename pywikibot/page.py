@@ -163,7 +163,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         '_contentmodel', '_langlinks', '_isredir', '_coords',
         '_preloadedtext', '_timestamp', '_applicable_protections',
         '_flowinfo', '_quality', '_pageprops', '_revid', '_quality_text',
-        '_pageimage'
+        '_pageimage', '_item'
     )
 
     def __init__(self, source, title=u"", ns=0):
@@ -4178,6 +4178,8 @@ class ItemPage(WikibasePage):
         @raise NoPage: There is no corresponding ItemPage for the page
         @raise WikiBaseError: The site of the page has no data repository.
         """
+        if hasattr(page, '_item'):
+            return page._item
         if not page.site.has_data_repository:
             raise pywikibot.WikiBaseError('{0} has no data repository'
                                           ''.format(page.site))
@@ -4189,7 +4191,8 @@ class ItemPage(WikibasePage):
                    '_pageprops') and page.properties().get('wikibase_item'):
             # If we have already fetched the pageprops for something else,
             # we already have the id, so use it
-            return cls(repo, page.properties().get('wikibase_item'))
+            page._item = cls(repo, page.properties().get('wikibase_item'))
+            return page._item
         i = cls(repo)
         # clear id, and temporarily store data needed to lazy loading the item
         del i.id
@@ -4197,7 +4200,8 @@ class ItemPage(WikibasePage):
         i._title = page.title(withSection=False)
         if not lazy_load and not i.exists():
             raise pywikibot.NoPage(i)
-        return i
+        page._item = i
+        return page._item
 
     @classmethod
     def from_entity_uri(cls, site, uri, lazy_load=False):
@@ -4309,6 +4313,7 @@ class ItemPage(WikibasePage):
         for dbname in self.sitelinks:
             pg = Page(pywikibot.site.APISite.fromDBName(dbname),
                       self.sitelinks[dbname])
+            pg._item = self
             if family is None or family == pg.site.family:
                 yield pg
 
