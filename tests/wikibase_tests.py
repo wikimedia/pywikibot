@@ -1064,6 +1064,8 @@ class TestItemLoad(WikidataTestCase):
         item.get()
         self.assertTrue(hasattr(item, '_content'))
         self.assertTrue(item.exists())
+        item2 = ItemPage.fromPage(page)
+        self.assertTrue(item is item2)
 
     def test_fromPage_lazy(self):
         """Test item from page with lazy_load."""
