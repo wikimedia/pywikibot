@@ -75,7 +75,10 @@ class TestLogentriesBase(TestCase):
         else:
             self.assertNotIn(logentry.type(), logentry.data)
         self.assertIsInstance(logentry.action(), unicode)
-        self.assertIsInstance(logentry.comment(), unicode)
+        if hasattr(logentry, 'comment'):
+            self.assertIsInstance(logentry.comment(), unicode)
+        else:
+            self.assertRaises(KeyError, logentry.comment)
         self.assertIsInstance(logentry.logid(), int)
         self.assertIsInstance(logentry.ns(), int)
         self.assertIsInstance(logentry.pageid(), int)
