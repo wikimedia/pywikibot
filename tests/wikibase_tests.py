@@ -12,6 +12,11 @@ import json
 
 from decimal import Decimal
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 import pywikibot
 
 from pywikibot import pagegenerators
@@ -827,6 +832,31 @@ class TestWbUnknown(WbRepresentationTestCase):
                                               'language': 'en'})
         self.assertEqual(q.toWikibase(),
                          {'text': 'Test this!', 'language': 'en'})
+
+
+class TestLoadUnknownType(WikidataTestCase):
+
+    """Test unknown datatypes being loaded as WbUnknown."""
+
+    dry = True
+
+    def setUp(self):
+        """Setup test."""
+        super(TestLoadUnknownType, self).setUp()
+        wikidata = self.get_repo()
+        self.wdp = ItemPage(wikidata, 'Q60')
+        self.wdp.id = 'Q60'
+        with open(join_pages_path('Q60_unknown_datatype.wd')) as f:
+            self.wdp._content = json.load(f)
+
+    def test_load_unknown(self):
+        """Ensure unknown value is loaded but raises a warning."""
+        with mock.patch.object(pywikibot, 'warning', autospec=True) as warn:
+            self.wdp.get()
+            unknown_value = self.wdp.claims['P99999'][0].getTarget()
+            self.assertIsInstance(unknown_value, pywikibot.WbUnknown)
+            warn.assert_called_once_with(
+                'foo-unknown-bar datatype is not supported yet.')
 
 
 class TestItemPageExtensibility(TestCase):
