@@ -28,7 +28,7 @@ idna>=2.0.0 ; python_full_version < '2.7.9'
 # https://github.com/eliben/pycparser/issues/147
 pycparser != 2.14
 
-future>=0.15.0 ; python_version < '2.7'
+future>=0.15.0 ; python_full_version < '2.7.3'
 
 ipaddr>=2.1.10 ; python_version < '3'
 

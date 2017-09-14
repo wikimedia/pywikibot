@@ -133,6 +133,9 @@ if sys.version_info[0] == 2:
     # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
 
+    if sys.version_info < (2, 7, 3):
+        dependencies.append('future>=0.15.0')  # Bug fixes for HTMLParser
+
     if sys.version_info < (2, 7, 9):
         # Python versions before 2.7.9 will cause urllib3 to trigger
         # InsecurePlatformWarning warnings for all HTTPS requests. By
