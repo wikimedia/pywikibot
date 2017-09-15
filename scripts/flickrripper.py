@@ -431,12 +431,6 @@ def main(*args):
 
     if 'api_secret' in config.flickr and config.flickr['api_secret']:
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'], config.flickr['api_secret'])
-        (token, frob) = flickr.get_token_part_one(perms='read')
-        if not token:
-            # The user still hasn't authorised this app yet, get_token_part_one()
-            # will have spawn a browser window
-            pywikibot.input("Press ENTER after you authorized this program")
-        flickr.get_token_part_two((token, frob))
     else:
         pywikibot.output('Accessing public content only')
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
