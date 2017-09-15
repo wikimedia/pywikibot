@@ -1505,7 +1505,7 @@ class SearchTestCase(DefaultSiteTestCase):
                                         get_redirects=True, where='title'):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 0)
-                self.assertTrue('wiki' in hit.title().lower())
+                self.assertIn('wiki', hit.title().lower())
         except pywikibot.data.api.APIError as e:
             if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
                 raise unittest.SkipTest(
