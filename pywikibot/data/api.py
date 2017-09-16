@@ -1771,6 +1771,10 @@ class Request(MutableMapping):
         Return the parameters as a HTTP URL query fragment.
 
         URL encodes the parameters provided by _encoded_items()
+
+        @note: Not all parameters are sorted, therefore for two given
+            CachedRequest objects with equal _params, the result of
+            _http_param_string() is not necessarily equal.
         """
         return encode_url(self._encoded_items())
 
