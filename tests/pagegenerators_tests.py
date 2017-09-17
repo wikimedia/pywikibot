@@ -9,11 +9,15 @@ from __future__ import absolute_import, unicode_literals
 
 import calendar
 import datetime
-import json
 import logging
 import sys
 
 from distutils.version import LooseVersion
+
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 import pywikibot
 from pywikibot import pagegenerators, date
@@ -1455,34 +1459,21 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
 
     """Test UnconnectedPageGenerator."""
 
+    cached = True
+
     def test_unconnected_with_repo(self):
-        """Test that the ItemPage returned raises NoPage."""
+        """Test UnconnectedPageGenerator."""
         if not self.site.data_repository():
             raise unittest.SkipTest('Site is not using a Wikibase repository')
-        if self.site.hostname() == 'test.wikipedia.org':
-            raise unittest.SkipTest('test.wikipedia is misconfigured; T85358')
-        cnt = 0
-        # Pages which have been connected recently may still be reported as
-        # unconnected. So try on a version that is a few minutes older if the
-        # tested site appears as a sitelink.
-        start_time = \
-            datetime.datetime.utcnow() - datetime.timedelta(minutes=30)
-        for page in pagegenerators.UnconnectedPageGenerator(self.site, 3):
-            try:
-                item = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
-                pass
-            else:
-                revisions = list(item.revisions(total=1, starttime=start_time,
-                                                content=True))
-                if revisions:
-                    sitelinks = json.loads(revisions[0].text)['sitelinks']
-                    self.assertNotIn(
-                        self.site.dbName(), sitelinks,
-                        'Page "{0}" is connected to {1} on Wikibase '
-                        'repository'.format(page.title(), item))
-            cnt += 1
-        self.assertLessEqual(cnt, 3)
+        upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
+
+        def unconnected_pages(total=None):
+            """Assert unconnected_pages is called correctly."""
+            self.assertEqual(total, 3)
+            yield
+
+        with patch.object(self.site, 'unconnected_pages', unconnected_pages):
+            self.assertEqual(tuple(upgen), (None,))
 
     def test_unconnected_without_repo(self):
         """Test that it raises a ValueError on sites without repository."""

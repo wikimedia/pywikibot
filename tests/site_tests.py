@@ -7,14 +7,13 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-import json
 import os
 import pickle
 import re
 import sys
 
 from collections import Iterable, Mapping
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import pywikibot
 
@@ -1034,38 +1033,21 @@ class TestSiteGenerators(DefaultSiteTestCase):
                     self.fail(
                         'NotImplementedError not raised for {0}'.format(item))
 
-
-class TestSiteGeneratorsUncached(DefaultSiteTestCase):
-
-    """Test cases for Site methods."""
-
     def test_unconnected(self):
-        """Test that the ItemPage returned raises NoPage."""
+        """Test site.unconnected_pages method."""
         if not self.site.data_repository():
             raise unittest.SkipTest('Site is not using a Wikibase repository')
-        if self.site.hostname() == 'test.wikipedia.org':
-            raise unittest.SkipTest('test.wikipedia is misconfigured; T85358')
-        cnt = 0
-        # Pages which have been connected recently may still be reported as
-        # unconnected. So try on a version that is a few minutes older if the
-        # tested site appears as a sitelink.
-        start_time = datetime.utcnow() - timedelta(minutes=30)
-        for page in self.site.unconnected_pages(total=3):
-            try:
-                item = pywikibot.ItemPage.fromPage(page)
-            except pywikibot.NoPage:
-                pass
-            else:
-                revisions = list(item.revisions(total=1, starttime=start_time,
-                                                content=True))
-                if revisions:
-                    sitelinks = json.loads(revisions[0].text)['sitelinks']
-                    self.assertNotIn(
-                        self.site.dbName(), sitelinks,
-                        'Page "{0}" is connected to {1} on Wikibase '
-                        'repository'.format(page.title(), item))
-            cnt += 1
-        self.assertLessEqual(cnt, 3)
+        upgen = self.site.unconnected_pages(total=3)
+        self.assertDictEqual(
+            upgen.request._params, {
+                'gqppage': ['UnconnectedPages'],
+                'prop': ['info', 'imageinfo', 'categoryinfo'],
+                'inprop': ['protection'],
+                'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
+                           'sha1', 'metadata'],
+                'generator': ['querypage'], 'action': ['query'],
+                'indexpageids': [True], 'continue': [True]})
+        self.assertLessEqual(len(tuple(upgen)), 3)
 
 
 class TestImageUsage(DefaultSiteTestCase):
