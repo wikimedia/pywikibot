@@ -34,6 +34,12 @@ argument as both local and global, the local argument overrides the global one
 
 -islink           Treat plain text values as links ("text" -> "[[text]]").
 
+-exists           If set to 'p', add a new value, even if the item already
+                  has the imported property but not the imported value.
+                  If set to 'pt', add a new value, even if the item already
+                  has the imported property with the imported value and
+                  some qualifiers.
+
 Examples:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
@@ -60,6 +66,14 @@ Examples:
         -template:"Infobox person" birth_place P19 -islink death_place P20
 
     will do the same but only "birth_place" can be imported without a link.
+
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
+        -template:"Infobox person" occupation P106 -exists:p
+
+    will import an occupation from "occupation" parameter of "Infobox
+    person" on English Wikipedia as Wikidata property "P106" (occupation). The
+    page won't be skipped if the item already has that property but there is
+    not the new value.
 
 """
 #
@@ -100,6 +114,7 @@ class PropertyOptionHandler(OptionHandler):
 
     availableOptions = {
         'islink': False,
+        'exists': '',
     }
 
 
@@ -121,10 +136,14 @@ class HarvestRobot(WikidataBot):
         @type islink: bool
         @keyword create: Whether to create a new item if it's missing
         @type create: bool
+        @keyword exists: pattern for merging existing claims with harvested
+            values
+        @type exists: str
         """
         self.availableOptions.update({
             'always': True,
             'create': False,
+            'exists': '',
             'islink': False,
         })
         super(HarvestRobot, self).__init__(**kwargs)
@@ -197,25 +216,19 @@ class HarvestRobot(WikidataBot):
         """
         Compare bot's (global) and provided (local) options.
 
-        @see: L{pywikibot.bot.OptionHandler.getOption}
-
-        @rtype: bool
+        @see: L{OptionHandler.getOption}
         """
-        # TODO: only works with booleans
         default = self.getOption(option)
         local = handler.getOption(option)
-        return default is not local
+        if isinstance(default, bool) and isinstance(local, bool):
+            return default is not local
+        else:
+            return local or default
 
     def treat_page_and_item(self, page, item):
         """Process a single page/item."""
         if willstop:
             raise KeyboardInterrupt
-        item.get()
-        if set(val[0] for val in self.fields.values()) <= set(
-                item.claims.keys()):
-            pywikibot.output('%s item %s has claims for all properties. '
-                             'Skipping.' % (page, item.title()))
-            return
 
         templates = page.raw_extracted_templates
         for (template, fielddict) in templates:
@@ -228,80 +241,71 @@ class HarvestRobot(WikidataBot):
                     "Failed parsing template; '%s' should be the template name."
                     % template)
                 continue
+
+            if template not in self.templateTitles:
+                continue
             # We found the template we were looking for
-            if template in self.templateTitles:
-                for field, value in fielddict.items():
-                    field = field.strip()
-                    value = value.strip()
-                    if not field or not value:
+            for field, value in fielddict.items():
+                field = field.strip()
+                value = value.strip()
+                if not field or not value:
+                    continue
+
+                if field not in self.fields:
+                    continue
+
+                # This field contains something useful for us
+                prop, options = self.fields[field]
+                claim = pywikibot.Claim(self.repo, prop)
+                if claim.type == 'wikibase-item':
+                    # Try to extract a valid page
+                    match = pywikibot.link_regex.search(value)
+                    if match:
+                        link_text = match.group(1)
+                    else:
+                        if self._get_option_with_fallback(options, 'islink'):
+                            link_text = value
+                        else:
+                            pywikibot.output(
+                                '%s field %s value %s is not a wikilink. '
+                                'Skipping.' % (claim.getID(), field, value))
+                            continue
+
+                    linked_item = self._template_link_target(item, link_text)
+                    if not linked_item:
                         continue
 
-                    # This field contains something useful for us
-                    if field in self.fields:
-                        prop, options = self.fields[field]
-                        # Check if the property isn't already set
-                        claim = pywikibot.Claim(self.repo, prop)
-                        if claim.getID() in item.get().get('claims'):
-                            pywikibot.output(
-                                'A claim for %s already exists. Skipping.'
-                                % claim.getID())
-                            # TODO: Implement smarter approach to merging
-                            # harvested values with existing claims esp.
-                            # without overwriting humans unintentionally.
-                        else:
-                            if claim.type == 'wikibase-item':
-                                # Try to extract a valid page
-                                match = pywikibot.link_regex.search(value)
-                                if match:
-                                    link_text = match.group(1)
-                                else:
-                                    if self._get_option_with_fallback(
-                                            options, 'islink'):
-                                        link_text = value
-                                    else:
-                                        pywikibot.output(
-                                            '%s field %s value %s is not a '
-                                            'wikilink. Skipping.'
-                                            % (claim.getID(), field, value))
-                                        continue
+                    claim.setTarget(linked_item)
+                elif claim.type in ('string', 'external-id'):
+                    claim.setTarget(value.strip())
+                elif claim.type == 'url':
+                    match = self.linkR.search(value)
+                    if not match:
+                        continue
+                    claim.setTarget(match.group('url'))
+                elif claim.type == 'commonsMedia':
+                    commonssite = pywikibot.Site('commons', 'commons')
+                    imagelink = pywikibot.Link(
+                        value, source=commonssite, defaultNamespace=6)
+                    image = pywikibot.FilePage(imagelink)
+                    if image.isRedirectPage():
+                        image = pywikibot.FilePage(image.getRedirectTarget())
+                    if not image.exists():
+                        pywikibot.output(
+                            "{0} doesn't exist. I can't link to it"
+                            ''.format(image.title(asLink=True)))
+                        continue
+                    claim.setTarget(image)
+                else:
+                    pywikibot.output('%s is not a supported datatype.'
+                                     % claim.type)
+                    continue
 
-                                linked_item = self._template_link_target(
-                                    item, link_text)
-                                if not linked_item:
-                                    continue
-
-                                claim.setTarget(linked_item)
-                            elif claim.type in ('string', 'external-id'):
-                                claim.setTarget(value.strip())
-                            elif claim.type == 'url':
-                                match = self.linkR.search(value)
-                                if not match:
-                                    continue
-                                claim.setTarget(match.group('url'))
-                            elif claim.type == 'commonsMedia':
-                                commonssite = pywikibot.Site('commons',
-                                                             'commons')
-                                imagelink = pywikibot.Link(value,
-                                                           source=commonssite,
-                                                           defaultNamespace=6)
-                                image = pywikibot.FilePage(imagelink)
-                                if image.isRedirectPage():
-                                    image = pywikibot.FilePage(
-                                        image.getRedirectTarget())
-                                if not image.exists():
-                                    pywikibot.output(
-                                        "{0} doesn't exist. I can't link to it"
-                                        ''.format(image.title(asLink=True)))
-                                    continue
-                                claim.setTarget(image)
-                            else:
-                                pywikibot.output(
-                                    '%s is not a supported datatype.'
-                                    % claim.type)
-                                continue
-
-                            # A generator might yield pages from multiple sites
-                            self.user_add_claim(item, claim, page.site)
+                # A generator might yield pages from multiple sites
+                self.user_add_claim_unless_exists(
+                    item, claim, self._get_option_with_fallback(
+                        options, 'exists'),
+                    page.site, pywikibot.output)
 
 
 def main(*args):

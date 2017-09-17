@@ -92,60 +92,10 @@ class ClaimRobot(WikidataBot):
 
     def treat_page_and_item(self, page, item):
         """Treat each page."""
-        # The generator might yield pages from multiple sites
-        source = self.getSource(page.site)
-
         for claim in self.claims:
-            # Existing claims on page of same property
-            for existing in item.claims.get(claim.getID(), []):
-                # If claim with same property already exists...
-                if 'p' not in self.exists_arg:
-                    pywikibot.log(
-                        'Skipping %s because claim with same property already exists'
-                        % (claim.getID(),))
-                    pywikibot.log(
-                        'Use -exists:p option to override this behavior')
-                    break
-                if not existing.target_equals(claim.getTarget()):
-                    continue
-                # If some attribute of the claim being added
-                # matches some attribute in an existing claim of
-                # the same property, skip the claim, unless the
-                # 'exists' argument overrides it.
-                if 't' not in self.exists_arg:
-                    pywikibot.log(
-                        'Skipping %s because claim with same target already exists'
-                        % (claim.getID(),))
-                    pywikibot.log(
-                        "Append 't' to -exists argument to override this behavior")
-                    break
-                if 'q' not in self.exists_arg and not existing.qualifiers:
-                    pywikibot.log(
-                        'Skipping %s because claim without qualifiers already exists'
-                        % (claim.getID(),))
-                    pywikibot.log(
-                        "Append 'q' to -exists argument to override this behavior")
-                    break
-                if ('s' not in self.exists_arg or not source) and not existing.sources:
-                    pywikibot.log(
-                        'Skipping %s because claim without source already exists'
-                        % (claim.getID(),))
-                    pywikibot.log(
-                        "Append 's' to -exists argument to override this behavior")
-                    break
-                if ('s' not in self.exists_arg and source and
-                        any(source.getID() in ref and
-                            all(snak.target_equals(source.getTarget())
-                                for snak in ref[source.getID()])
-                            for ref in existing.sources)):
-                    pywikibot.log(
-                        'Skipping %s because claim with the same source already exists'
-                        % (claim.getID(),))
-                    pywikibot.log(
-                        "Append 's' to -exists argument to override this behavior")
-                    break
-            else:
-                self.user_add_claim(item, claim, page.site)
+            # The generator might yield pages from multiple sites
+            self.user_add_claim_unless_exists(
+                item, claim, self.exists_arg, page.site)
 
 
 def main(*args):
