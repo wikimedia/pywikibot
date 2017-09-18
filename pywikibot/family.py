@@ -1005,11 +1005,7 @@ class Family(object):
         if not hasattr(self, "_catredirtemplates") or \
            code not in self._catredirtemplates:
             self._get_cr_templates(code, fallback)
-        if code in self._catredirtemplates:
-            return self._catredirtemplates[code]
-        else:
-            raise KeyError("ERROR: title for category redirect template in "
-                           "language '%s' unknown" % code)
+        return self._catredirtemplates[code]
 
     def _get_cr_templates(self, code, fallback):
         """Build list of category redirect templates."""
