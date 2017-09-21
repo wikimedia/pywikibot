@@ -618,7 +618,8 @@ class RedirectRobot(SingleSiteBot):
                     u"Redirect target section %s doesn't exist."
                     % newRedir.title(asLink=True))
             except (pywikibot.CircularRedirect,
-                    pywikibot.InterwikiRedirectPage) as e:
+                    pywikibot.InterwikiRedirectPage,
+                    pywikibot.UnsupportedPage) as e:
                 pywikibot.exception(e)
                 pywikibot.output(u"Skipping %s." % newRedir)
                 break
