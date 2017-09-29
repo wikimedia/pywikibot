@@ -209,7 +209,8 @@ def main():
         if not os.path.exists(filename):
             script_paths = ['scripts',
                             'scripts.maintenance',
-                            'scripts.archive']
+                            'scripts.archive',
+                            'scripts.userscripts']
             from pywikibot import config  # flake8: disable=E402
             if config.user_script_paths:
                 if isinstance(config.user_script_paths, (tuple, list)):
