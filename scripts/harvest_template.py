@@ -358,10 +358,9 @@ def main(*args):
                     handler = PropertyOptionHandler(**current_args[2])
                     fields[current_args[0]] = (current_args[1], handler)
                     del current_args[:]
-                else:
-                    current_args.append(arg)
-                    if len(current_args) == 2:
-                        current_args.append({})
+                current_args.append(arg)
+                if len(current_args) == 2:
+                    current_args.append({})
 
     # handle leftover
     if len(current_args) == 3:
