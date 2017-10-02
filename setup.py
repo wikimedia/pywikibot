@@ -214,17 +214,36 @@ except Exception as e:
     print(e)
     version = version + "-dev"
 
-github_url = 'https://github.com/wikimedia/pywikibot-core'
-with open('README.rst') as f:
-    long_description = f.read()
+
+def read_desc(filename):
+    """Read long description.
+
+    Combine included restructured text files which must be done before
+    uploading because the source isn't available after creating the package.
+    """
+    desc = []
+    with open(filename) as f:
+        for line in f:
+            if line.strip().startswith('.. include::'):
+                include = os.path.relpath(line.rsplit('::')[1].strip())
+                if os.path.exists(include):
+                    with open(include) as g:
+                        desc.append(g.read())
+                else:
+                    print('Cannot include {0}; file not found'.format(include))
+            else:
+                desc.append(line)
+    return ''.join(desc)
+
 
 setup(
     name=name,
     version=version,
     description='Python MediaWiki Bot Framework',
-    long_description=long_description,
-    keywords=('pywikibot', 'python', 'mediawiki', 'bot', 'wiki', 'framework',
-              'wikimedia', 'wikipedia', 'pwb', 'pywikipedia', 'API'),
+    long_description=read_desc('README.rst'),
+    keywords=('API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
+              'pywikibot', 'pywikipedia', 'pywikipediabot', 'wiki',
+              'wikimedia', 'wikipedia'),
     maintainer='The Pywikibot team',
     maintainer_email='pywikibot@lists.wikimedia.org',
     license='MIT License',
@@ -235,19 +254,25 @@ setup(
     dependency_links=dependency_links,
     extras_require=extra_deps,
     url='https://www.mediawiki.org/wiki/Pywikibot',
+    download_url='https://tools.wmflabs.org/pywikibot/',
     test_suite="tests.collector",
     tests_require=test_deps,
     classifiers=[
-        'License :: OSI Approved :: MIT License',
         'Development Status :: 4 - Beta',
-        'Operating System :: OS Independent',
-        'Intended Audience :: Developers',
         'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Utilities',
     ],
     use_2to3=False
 )

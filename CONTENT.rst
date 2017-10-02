@@ -1,46 +1,58 @@
 The contents of the package
-----------------------------
+---------------------------
 
     +----------------------------------------------------------------------------------+
-    |    README and config files:                                                      |
+    | README and config files:                                                         |
     +===========================+======================================================+
-    |    ChangeLog              | Log file to keep track of major changes versionwise  |
+    | ChangeLog                 | Log file to keep track of major changes versionwise  |
     +---------------------------+------------------------------------------------------+
-    |    CODE_OF_CONDUCT.md     | Code of conduct reference                            |
+    | CODE_OF_CONDUCT.md        | Code of conduct reference                            |
     +---------------------------+------------------------------------------------------+
-    |    CONTENT.rst            | Content description file                             |
+    | CONTENT.rst               | This Content description file                        |
     +---------------------------+------------------------------------------------------+
-    |    CREDITS                | List of major contributors to this module            |
+    | CREDITS                   | List of major contributors to this module            |
     +---------------------------+------------------------------------------------------+
-    |    ez_setup.py            | Bootstrap distribute installation file, can also be  |
+    | dev-requirements.txt      | PIP requirements file for development dependencies   |
+    +---------------------------+------------------------------------------------------+
+    | Dockerfile                | assemble an image, install all dependencies via pip  |
+    +---------------------------+------------------------------------------------------+
+    | ez_setup.py               | Bootstrap distribute installation file, can also be  |
     |                           | run to install or upgrade setuptools.                |
     +---------------------------+------------------------------------------------------+
-    |    generate_family_file.py| Creates a new family file.                           |
+    | generate_family_file.py   | Creates a new family file.                           |
     +---------------------------+------------------------------------------------------+
-    |    generate_user_files.py | Creates user-config.py or user-fixes.py              |
+    | generate_user_files.py    | Creates user-config.py or user-fixes.py              |
     +---------------------------+------------------------------------------------------+
-    |    LICENSE                | a reference to the MIT license                       |
+    | HISTORY.rst               | pypi version history file                            |
     +---------------------------+------------------------------------------------------+
-    |    pwb.py                 | Wrapper script to use Pywikibot in 'directory' mode  |
+    | LICENSE                   | a reference to the MIT license                       |
     +---------------------------+------------------------------------------------------+
-    |    README-conversion.txt  | Guide to converting bot scripts from version 1       |
+    | pwb.py                    | Wrapper script to use Pywikibot in 'directory' mode  |
+    +---------------------------+------------------------------------------------------+
+    | README.rst                | Short info string used by Pywikibot Nightlies        |
+    +---------------------------+------------------------------------------------------+
+    | README-conversion.txt     | Guide to converting bot scripts from version 1       |
     |                           | of the Pywikibot framework to version 3              |
     +---------------------------+------------------------------------------------------+
-    |    README.rst             | Short info string used by Pywikibot Nightlies        |
+    | requests-requirements.txt | PIP requirements file for Appveyor builds            |
     +---------------------------+------------------------------------------------------+
-    |    requirements.txt       | PIP requirements file                                |
+    | requirements.txt          | General PIP requirements file                        |
     +---------------------------+------------------------------------------------------+
-    |    setup.py               | Installer script for Pywikibot 3.0 framework         |
+    | setup.py                  | Installer script for Pywikibot 3.0 framework         |
     +---------------------------+------------------------------------------------------+
-    |    user-config.py.sample  | Example user-config.py file for reference            |
+    | tox.ini                   | Tests config file                                    |
+    +---------------------------+------------------------------------------------------+
+    | user-config.py.sample     | Example user-config.py file for reference            |
+    +---------------------------+------------------------------------------------------+
+    | user-fixes.py.sample      | Example user-fixes.py file for reference             |
     +---------------------------+------------------------------------------------------+
 
     +----------------------------------------------------------------------------------+
-    |    Directories                                                                   |
+    | Directories                                                                      |
     +===========================+======================================================+
-    |    pywikibot              | Contains some libraries and control files            |
+    | pywikibot                 | Contains some libraries and control files            |
     +---------------------------+------------------------------------------------------+
-    |    scripts                | Contains all bots and utility scripts                |
+    | scripts                   | Contains all bots and utility scripts                |
     +---------------------------+------------------------------------------------------+
-    |    tests                  | Some test stuff for the developing team              |
+    | tests                     | Some test stuff for the developing team              |
     +---------------------------+------------------------------------------------------+

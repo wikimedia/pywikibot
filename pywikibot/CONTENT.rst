@@ -33,8 +33,6 @@ The contents of the package
     +---------------------------+-------------------------------------------------------+
     | editor.py                 | Text editor class for your favourite editor           |
     +---------------------------+-------------------------------------------------------+
-    | epydoc.cfg                | The list of objects to document                       |
-    +---------------------------+-------------------------------------------------------+
     | exceptions.py             | Exception classes used throughout the framework       |
     +---------------------------+-------------------------------------------------------+
     | family.py                 | Abstract superclass for wiki families. Subclassed by  |
@@ -171,6 +169,8 @@ The contents of the package
     |                            | languages, encodings etc.                            |
     +----------------------------+------------------------------------------------------+
     | CONTENT.rst                | This file ( Short info on all modules )              |
+    +----------------------------+------------------------------------------------------+
+    | epydoc.cfg                 | The list of objects to document                      |
     +----------------------------+------------------------------------------------------+
     | READMY.rst                 | Package description file                             |
     +----------------------------+------------------------------------------------------+
