@@ -105,6 +105,7 @@ deadLinkTag = {
     'de': u'',
     'fa': u'[%s] {{پیوند مرده}}',
     'he': u'{{קישור שבור}}',
+    'hi': '[%s] {{Dead link}}',
     'hu': u'[%s] {{halott link}}',
     'ko': u'[%s] {{죽은 바깥 고리}}',
     'es': u'{{enlace roto2|%s}}',
