@@ -42,7 +42,7 @@ import pywikibot
 # be careful with replacement order!
 replacements = (
     # doc strings
-    ('#\r?\n__version__',
+    ('#\r?\n__version__.*\r?\n',
      '#\n'
      '# Automatically ported from compat branch by compat2core.py script\n'),
     ('Pywikipedia bot team', 'Pywikibot team'),
@@ -60,7 +60,7 @@ replacements = (
     # site instance call
     (r'pywikibot\.getSite\s*\(\s*', 'pywikibot.Site('),
     # lang is different from code. We should use code in core
-    (r'([Ss])ite.lang(?:uage\(\))?', r'\1ite.code'),
+    (r'([Ss])ite\.lang(?:uage\(\))?', r'\1ite.code'),
     # change compat library classes to pywikibot intrinsic classes
     (r'catlib\.Category\s*\(\s*', 'pywikibot.Category('),
     (r'catlib\.change_category\s*\((\s*)(?P<article>.+?),\s*(?P<oldcat>.+?),',
