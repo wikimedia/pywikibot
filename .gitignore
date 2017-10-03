@@ -12,6 +12,7 @@ user-*.py
 logs*
 *apicache*
 *pycache*
+/cache
 /cache/*
 .cache
 .idea
