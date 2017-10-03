@@ -2130,7 +2130,10 @@ class WikidataBot(Bot, ExistingPageBot):
                     item = pywikibot.ItemPage(data_site, page.title())
                     page = None
                 else:
-                    item = None
+                    try:
+                        item = pywikibot.ItemPage.fromPage(page)
+                    except pywikibot.NoPage:
+                        item = None
                     if self.use_from_page is False:
                         pywikibot.error('{0} is not in the item namespace but '
                                         'must be an item.'.format(page))
