@@ -3028,9 +3028,13 @@ class APISite(BaseSite):
                                 total=total,  # will set gulimit=total in api,
                                 **args)
 
-        self._update_page(page, query)
-
         for pageitem in query:
+            if not self.sametitle(pageitem['title'],
+                                  page.title(withSection=False)):
+                    raise InconsistentTitleReceived(page, pageitem['title'])
+
+            api.update_page(page, pageitem, query.props)
+
             assert 'globalusage' in pageitem, \
                    "API globalusage response lacks 'globalusage' key"
             for entry in pageitem['globalusage']:
