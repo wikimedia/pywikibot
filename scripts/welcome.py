@@ -664,8 +664,8 @@ class WelcomeBot(object):
             start = globalvar.offset
         for ue in self.site.logevents('newusers', total=globalvar.queryLimit,
                                       start=start):
-            if ue.action == 'create' or (
-                    ue.action == 'autocreate' and globalvar.welcomeAuto):
+            if ue.action() == 'create' or (
+                    ue.action() == 'autocreate' and globalvar.welcomeAuto):
                 yield pywikibot.User(ue.page())
 
     def defineSign(self, force=False):
