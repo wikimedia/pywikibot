@@ -285,7 +285,7 @@ report_page = {
         'pdc': u'Benutzer:Xqt/Report',
         'ru': u'Участник:LatitudeBot/Рапорт',
         'sq': u'User:EagleBot/Report',
-        'sr': u'User:SashatoBot/Записи',
+        'sr': 'User:ZoranBot/Записи',
         'zh': u'User:Welcomebot/report',
         'zh-yue': u'User:Alexbot/report',
     }
@@ -305,7 +305,7 @@ bad_pag = {
         'no': u'Bruker:JhsBot/Daarlige ord',
         'ru': u'Участник:LatitudeBot/Чёрный список',
         'sq': u'User:Eagleal/Bad_names',
-        'sr': u'Додавање корисника за проверу',
+        'sr': 'User:ZoranBot/лоша корисничка имена',
         'zh': u'User:Welcomebot/badname',
         'zh-yue': u'User:Welcomebot/badname',
     }
@@ -332,6 +332,7 @@ report_text = {
         'no': u'\n*{{bruker|%s}} ' + timeselected,
         'pdc': u'\n*[[Benutzer Diskussion:%s]] ' + timeselected,
         'sq': u'\n*[[User:%s]] ' + timeselected,
+        'sr': '\n*{{Корисник|%s}}' + timeselected,
         'zh': u"\n*{{User|%s}}" + timeselected
     }
 }
