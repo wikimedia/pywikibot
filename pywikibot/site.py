@@ -4914,12 +4914,14 @@ class APISite(BaseSite):
         @param usernames: a list of user names
         @type usernames: list, or other iterable, of unicodes
         """
-        if not isinstance(usernames, basestring):
-            usernames = u"|".join(usernames)
+        usprop = ['blockinfo', 'groups', 'editcount', 'registration',
+                  'emailable']
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.16'):
+            usprop.append('gender')
+        if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.17'):
+            usprop.append('rights')
         usgen = api.ListGenerator(
-            "users", ususers=usernames, site=self,
-            usprop="blockinfo|groups|editcount|registration|emailable"
-        )
+            'users', ususers=usernames, site=self, usprop=usprop)
         return usgen
 
     @deprecated("Site.randompages()")

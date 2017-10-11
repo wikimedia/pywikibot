@@ -3289,6 +3289,26 @@ class User(Page):
         """
         return self.getprops(force).get('groups', [])
 
+    def gender(self, force=False):
+        """Return the gender of the user.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        @return: return 'male', 'female', or 'unknown'
+        @rtype: str
+        """
+        return self.getprops(force).get('gender', 'unknown')
+
+    def rights(self, force=False):
+        """Return the gender of the user.
+
+        @param force: if True, forces reloading the data from API
+        @type force: bool
+        @return: return user rights
+        @rtype: list
+        """
+        return self.getprops(force).get('rights', [])
+
     def getUserPage(self, subpage=u''):
         """
         Return a Page object relative to this user's main page.

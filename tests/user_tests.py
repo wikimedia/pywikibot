@@ -32,6 +32,7 @@ class TestUserClass(TestCase):
         self.assertGreater(user.editCount(), 0)
         self.assertFalse(user.isBlocked())
         self.assertTrue(user.isEmailable())
+        self.assertEqual(user.gender(), 'unknown')
         self.assertIn('userid', user.getprops())
 
     def test_registered_user_without_timestamp(self):
@@ -42,6 +43,16 @@ class TestUserClass(TestCase):
         self.assertIsNone(user.registration())
         self.assertIsNone(user.getprops()['registration'])
         self.assertGreater(user.editCount(), 0)
+        self.assertEqual(user.gender(), 'male')
+        self.assertIn('userid', user.getprops())
+
+    def test_female_user(self):
+        """Test female user."""
+        user = User(self.site, 'Alraunenstern')
+        self.assertTrue(user.isRegistered())
+        self.assertFalse(user.isAnonymous())
+        self.assertGreater(user.editCount(), 0)
+        self.assertEqual(user.gender(), 'female')
         self.assertIn('userid', user.getprops())
 
     def test_anonymous_user(self):
@@ -53,6 +64,7 @@ class TestUserClass(TestCase):
         self.assertTrue(user.isAnonymous())
         self.assertIsNone(user.registration())
         self.assertFalse(user.isEmailable())
+        self.assertEqual(user.gender(), 'unknown')
         self.assertIn('invalid', user.getprops())
 
     def test_unregistered_user(self):
@@ -64,6 +76,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isAnonymous())
         self.assertIsNone(user.registration())
         self.assertFalse(user.isEmailable())
+        self.assertEqual(user.gender(), 'unknown')
         self.assertIn('missing', user.getprops())
 
     def test_invalid_user(self):
@@ -75,6 +88,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isAnonymous())
         self.assertIsNone(user.registration())
         self.assertFalse(user.isEmailable())
+        self.assertEqual(user.gender(), 'unknown')
         self.assertIn('invalid', user.getprops())
 
 
