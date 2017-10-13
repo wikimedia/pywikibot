@@ -3300,7 +3300,7 @@ class User(Page):
         return self.getprops(force).get('gender', 'unknown')
 
     def rights(self, force=False):
-        """Return the gender of the user.
+        """Return user rights.
 
         @param force: if True, forces reloading the data from API
         @type force: bool
