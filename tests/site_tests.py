@@ -1487,11 +1487,12 @@ class SearchTestCase(DefaultSiteTestCase):
                                         get_redirects=True, where='title'):
                 self.assertIsInstance(hit, pywikibot.Page)
                 self.assertEqual(hit.namespace(), 0)
-                try:
-                    self.assertIn('wiki', hit.title().lower())
-                except AssertionError:
-                    self.assertTrue(any('wiki' in r.title().lower() for r in
-                                        hit.getReferences(redirectsOnly=True)))
+                if 'wiki' not in hit.title().lower():
+                    self.assertTrue(
+                        any('wiki' in r.title().lower()
+                            for r in hit.getReferences(redirectsOnly=True)),
+                        "'wiki' neither found in '{0}'.lower() "
+                        'nor in its redirects'.format(hit.title()))
         except pywikibot.data.api.APIError as e:
             if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
                 raise unittest.SkipTest(
