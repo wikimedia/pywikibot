@@ -90,7 +90,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'sco': "Category:Wikipaedia soft redirectit categories",
             'simple': "Category:Category redirects",
             'sh': u"Kategorija:Preusmjerene kategorije Wikipedije",
-            'sr': 'Категорија:Wikipedia soft redirected categories',
+            'sr': 'Категорија:Википедијине меко преусмерене категорије',
             'vi': u"Thể loại:Thể loại đổi hướng",
             'zh': u"Category:已重定向的分类",
             'ro': 'Categorie:Categorii de redirecționare',
