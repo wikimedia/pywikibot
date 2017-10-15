@@ -1,14 +1,13 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
+import json
 import re
 import warnings
 
@@ -24,7 +23,13 @@ from pywikibot.tools import (
 )
 
 from tests import join_images_path
-from tests.aspects import unittest, TestCase, DeprecationTestCase
+from tests.aspects import (
+    unittest,
+    TestCase,
+    DeprecationTestCase,
+    HttpbinTestCase,
+    require_modules,
+)
 
 
 class HttpTestCase(TestCase):
@@ -94,6 +99,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     def setUp(self):
         """Set up test by configuring config.authenticate."""
+        super(TestGetAuthenticationConfig, self).setUp()
         self._authenticate = config.authenticate
         config.authenticate = {
             'zh.wikipedia.beta.wmflabs.org': ('1', '2'),
@@ -104,6 +110,7 @@ class TestGetAuthenticationConfig(TestCase):
 
     def tearDown(self):
         """Tear down test by resetting config.authenticate."""
+        super(TestGetAuthenticationConfig, self).tearDown()
         config.authenticate = self._authenticate
 
     def test_url_based_authentication(self):
@@ -124,13 +131,15 @@ class HttpsCertificateTestCase(TestCase):
 
     """HTTPS certificate test."""
 
+    CERT_VERIFY_FAILED_RE = 'certificate verify failed'
     hostname = 'testssl-expire-r2i2.disig.sk'
 
     def test_https_cert_error(self):
         """Test if http.fetch respects disable_ssl_certificate_validation."""
-        self.assertRaises(pywikibot.FatalServerError,
-                          http.fetch,
-                          uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        self.assertRaisesRegex(pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE,
+                               http.fetch,
+                               uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        http.session.close()  # clear the connection
 
         with warnings.catch_warnings(record=True) as warning_log:
             response = http.fetch(
@@ -139,20 +148,20 @@ class HttpsCertificateTestCase(TestCase):
         r = response.content
         self.assertIsInstance(r, unicode)
         self.assertTrue(re.search(r'<title>.*</title>', r))
+        http.session.close()  # clear the connection
 
         # Verify that it now fails again
-        http.session.close()  # but first clear the connection
-        self.assertRaises(pywikibot.FatalServerError,
-                          http.fetch,
-                          uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        self.assertRaisesRegex(pywikibot.FatalServerError, self.CERT_VERIFY_FAILED_RE,
+                               http.fetch,
+                               uri='https://testssl-expire-r2i2.disig.sk/index.en.html')
+        http.session.close()  # clear the connection
 
         # Verify that the warning occurred
-        self.assertEqual(len(warning_log), 1)
-        self.assertEqual(warning_log[0].category.__name__,
-                         'InsecureRequestWarning')
+        self.assertIn('InsecureRequestWarning',
+                      [w.category.__name__ for w in warning_log])
 
 
-class TestHttpStatus(TestCase):
+class TestHttpStatus(HttpbinTestCase):
 
     """Test HTTP status code handling and errors."""
 
@@ -170,23 +179,26 @@ class TestHttpStatus(TestCase):
 
     def test_http_504(self):
         """Test that a HTTP 504 raises the correct exception."""
-        self.assertRaises(pywikibot.Server504Error,
-                          http.fetch,
-                          uri='http://httpbin.org/status/504')
+        self.assertRaisesRegex(pywikibot.Server504Error,
+                               r'Server ([^\:]+|[^\:]+:[0-9]+) timed out',
+                               http.fetch,
+                               uri=self.get_httpbin_url('/status/504'))
 
     def test_server_not_found(self):
         """Test server not found exception."""
-        self.assertRaises(requests.exceptions.ConnectionError,
-                          http.fetch,
-                          uri='http://ru-sib.wikipedia.org/w/api.php',
-                          default_error_handling=True)
+        self.assertRaisesRegex(requests.exceptions.ConnectionError,
+                               'Max retries exceeded with url: /w/api.php',
+                               http.fetch,
+                               uri='http://ru-sib.wikipedia.org/w/api.php',
+                               default_error_handling=True)
 
     def test_invalid_scheme(self):
         """Test invalid scheme."""
         # A InvalidSchema is raised within requests
-        self.assertRaises(requests.exceptions.InvalidSchema,
-                          http.fetch,
-                          uri='invalid://url')
+        self.assertRaisesRegex(requests.exceptions.InvalidSchema,
+                               'No connection adapters were found for \'invalid://url\'',
+                               http.fetch,
+                               uri='invalid://url')
 
     def test_follow_redirects(self):
         """Test follow 301 redirects correctly."""
@@ -200,7 +212,7 @@ class TestHttpStatus(TestCase):
         r = http.fetch(uri='http://www.gandi.eu')
         self.assertEqual(r.status, 200)
         self.assertEqual(r.data.url,
-                         'http://www.gandi.net')
+                         'https://www.gandi.net/en')
 
 
 class UserAgentTestCase(TestCase):
@@ -262,12 +274,14 @@ class DefaultUserAgentTestCase(TestCase):
 
     def setUp(self):
         """Set up unit test."""
+        super(DefaultUserAgentTestCase, self).setUp()
         self.orig_format = config.user_agent_format
         config.user_agent_format = ('{script_product} ({script_comments}) {pwb} '
                                     '({revision}) {http_backend} {python}')
 
     def tearDown(self):
         """Tear down unit test."""
+        super(DefaultUserAgentTestCase, self).tearDown()
         config.user_agent_format = self.orig_format
 
     def test_default_user_agent(self):
@@ -283,10 +297,132 @@ class DefaultUserAgentTestCase(TestCase):
         self.assertIn('Python/' + str(PYTHON_VERSION[0]), http.user_agent())
 
 
+class DryFakeUserAgentTestCase(TestCase):
+
+    """Test the generation of fake user agents.
+
+    If the method cannot import either browseragents or fake_useragent, the
+    default user agent will be returned, causing tests to fail. Therefore tests
+    will skip if neither is present.
+    """
+
+    net = False
+
+    def _test_fake_user_agent_randomness(self):
+        """Test if user agent returns are randomized."""
+        self.assertNotEqual(http.fake_user_agent(), http.fake_user_agent())
+
+    @require_modules('browseragents')
+    def test_with_browseragents(self):
+        """Test fake user agent generation with browseragents module."""
+        self._test_fake_user_agent_randomness()
+
+    @require_modules('fake_useragent')
+    def test_with_fake_useragent(self):
+        """Test fake user agent generation with fake_useragent module."""
+        self._test_fake_user_agent_randomness()
+
+
+class LiveFakeUserAgentTestCase(HttpbinTestCase):
+
+    """Test the usage of fake user agent."""
+
+    def setUp(self):
+        """Set up the unit test."""
+        self.orig_fake_user_agent_exceptions = config.fake_user_agent_exceptions
+        super(LiveFakeUserAgentTestCase, self).setUp()
+
+    def tearDown(self):
+        """Tear down unit test."""
+        config.fake_user_agent_exceptions = self.orig_fake_user_agent_exceptions
+        super(LiveFakeUserAgentTestCase, self).tearDown()
+
+    def _test_fetch_use_fake_user_agent(self):
+        """Test `use_fake_user_agent` argument of http.fetch."""
+        # Existing headers
+        r = http.fetch(
+            self.get_httpbin_url('/status/200'), headers={'user-agent': 'EXISTING'})
+        self.assertEqual(r.headers['user-agent'], 'EXISTING')
+
+        # Argument value changes
+        r = http.fetch(self.get_httpbin_url('/status/200'), use_fake_user_agent=True)
+        self.assertNotEqual(r.headers['user-agent'], http.user_agent())
+        r = http.fetch(self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
+        self.assertEqual(r.headers['user-agent'], http.user_agent())
+        r = http.fetch(
+            self.get_httpbin_url('/status/200'), use_fake_user_agent='ARBITRARY')
+        self.assertEqual(r.headers['user-agent'], 'ARBITRARY')
+
+        # Manually overridden domains
+        config.fake_user_agent_exceptions = {self.get_httpbin_hostname(): 'OVERRIDDEN'}
+        r = http.fetch(
+            self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
+        self.assertEqual(r.headers['user-agent'], 'OVERRIDDEN')
+
+    @require_modules('browseragents')
+    def test_fetch_with_browseragents(self):
+        """Test method with browseragents module."""
+        self._test_fetch_use_fake_user_agent()
+
+    @require_modules('fake_useragent')
+    def test_fetch_with_fake_useragent(self):
+        """Test method with fake_useragent module."""
+        self._test_fetch_use_fake_user_agent()
+
+
+class GetFakeUserAgentTestCase(TestCase):
+
+    """Test the deprecated get_fake_user_agent()."""
+
+    net = False
+
+    def setUp(self):
+        """Set up unit test."""
+        self.orig_fake_user_agent = config.fake_user_agent
+        super(GetFakeUserAgentTestCase, self).setUp()
+
+    def tearDown(self):
+        """Tear down unit test."""
+        config.fake_user_agent = self.orig_fake_user_agent
+        super(GetFakeUserAgentTestCase, self).tearDown()
+
+    def _test_fake_user_agent_randomness(self):
+        """Test if user agent returns are randomized."""
+        config.fake_user_agent = True
+        self.assertNotEqual(http.get_fake_user_agent(), http.get_fake_user_agent())
+
+    def _test_config_settings(self):
+        """Test if method honours configuration toggle."""
+        # ON: True and None in config are considered turned on.
+        config.fake_user_agent = True
+        self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
+        config.fake_user_agent = None
+        self.assertNotEqual(http.get_fake_user_agent(), http.user_agent())
+
+        # OFF: All other values won't make it return random UA.
+        config.fake_user_agent = False
+        self.assertEqual(http.get_fake_user_agent(), http.user_agent())
+        config.fake_user_agent = 'ARBITRARY'
+        self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
+
+    @require_modules('browseragents')
+    def test_with_browseragents(self):
+        """Test method with browseragents module."""
+        self._test_fake_user_agent_randomness()
+        self._test_config_settings()
+
+    @require_modules('fake_useragent')
+    def test_with_fake_useragent(self):
+        """Test method with fake_useragent module."""
+        self._test_fake_user_agent_randomness()
+        self._test_config_settings()
+
+
 class CharsetTestCase(TestCase):
 
     """Test that HttpRequest correct handles the charsets given."""
 
+    CODEC_CANT_DECODE_RE = 'codec can\'t decode byte'
     net = False
 
     STR = u'äöü'
@@ -303,6 +439,18 @@ class CharsetTestCase(TestCase):
         req._data = resp
         return req
 
+    def test_no_content_type(self):
+        """Test decoding without content-type (and then no charset)."""
+        req = threadedhttp.HttpRequest('')
+        resp = requests.Response()
+        resp.headers = {}
+        resp._content = CharsetTestCase.LATIN1_BYTES[:]
+        req._data = resp
+        self.assertIsNone(req.charset)
+        self.assertEqual('latin1', req.encoding)
+        self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
+        self.assertEqual(req.content, CharsetTestCase.STR)
+
     def test_no_charset(self):
         """Test decoding without explicit charset."""
         req = threadedhttp.HttpRequest('')
@@ -314,6 +462,26 @@ class CharsetTestCase(TestCase):
         self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.content, CharsetTestCase.STR)
+
+    def test_content_type_application_json_without_charset(self):
+        """Test decoding without explicit charset but JSON content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = CharsetTestCase.UTF8_BYTES[:]
+        resp.headers = {'content-type': 'application/json'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
+
+    def test_content_type_sparql_json_without_charset(self):
+        """Test decoding without explicit charset but JSON content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = CharsetTestCase.UTF8_BYTES[:]
+        resp.headers = {'content-type': 'application/sparql-results+json'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
 
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
@@ -353,9 +521,9 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('utf16',
                                               CharsetTestCase.LATIN1_BYTES)
         self.assertEqual('utf16', req.charset)
-        self.assertRaises(UnicodeDecodeError, lambda: req.encoding)
+        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
-        self.assertRaises(UnicodeDecodeError, lambda: req.content)
+        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.content)
 
 
 class BinaryTestCase(TestCase):
@@ -407,7 +575,66 @@ class TestDeprecatedGlobalCookieJar(DeprecationTestCase):
         self.assertIs(main_module_cookie_jar, http.cookie_jar)
 
 
-if __name__ == '__main__':
+class QueryStringParamsTestCase(HttpbinTestCase):
+
+    """
+    Test the query string parameter of request methods.
+
+    The /get endpoint of httpbin returns JSON that can include an 'args' key with
+    urldecoded query string parameters.
+    """
+
+    def test_no_params(self):
+        """Test fetch method with no parameters."""
+        r = http.fetch(uri=self.get_httpbin_url('/get'), params={})
+        self.assertEqual(r.status, 200)
+
+        content = json.loads(r.content)
+        self.assertDictEqual(content['args'], {})
+
+    def test_unencoded_params(self):
+        """
+        Test fetch method with unencoded parameters, which should be encoded internally.
+
+        HTTPBin returns the args in their urldecoded form, so what we put in should be
+        the same as what we get out.
+        """
+        r = http.fetch(uri=self.get_httpbin_url('/get'), params={'fish&chips': 'delicious'})
+        self.assertEqual(r.status, 200)
+
+        content = json.loads(r.content)
+        self.assertDictEqual(content['args'], {'fish&chips': 'delicious'})
+
+    def test_encoded_params(self):
+        """
+        Test fetch method with encoded parameters, which should be re-encoded internally.
+
+        HTTPBin returns the args in their urldecoded form, so what we put in should be
+        the same as what we get out.
+        """
+        r = http.fetch(uri=self.get_httpbin_url('/get'),
+                       params={'fish%26chips': 'delicious'})
+        self.assertEqual(r.status, 200)
+
+        content = json.loads(r.content)
+        self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})
+
+
+class DataBodyParameterTestCase(HttpbinTestCase):
+    """Test that the data and body parameters of fetch/request methods are equivalent."""
+
+    def test_fetch(self):
+        """Test that using the data parameter and body parameter produce same results."""
+        r_data = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
+                            data={'fish&chips': 'delicious'})
+        r_body = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
+                            body={'fish&chips': 'delicious'})
+
+        self.assertDictEqual(json.loads(r_data.content),
+                             json.loads(r_body.content))
+
+
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

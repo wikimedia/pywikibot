@@ -28,13 +28,11 @@ The following parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import os.path
 
@@ -60,11 +58,11 @@ class DjVuTextBot(SingleSiteBot):
         Constructor.
 
         @param djvu: djvu from where to fetch the text layer
-        @type  djvu: DjVuFile object
+        @type djvu: DjVuFile object
         @param index: index page in the Index: namespace
-        @type  index: Page object
+        @type index: Page object
         @param pages: page interval to upload (start, end)
-        @type  pages: tuple
+        @type pages: tuple
         """
         self.availableOptions.update({
             'force': False,
@@ -74,6 +72,7 @@ class DjVuTextBot(SingleSiteBot):
         self._djvu = djvu
         self._index = index
         self._prefix = self._index.title(withNamespace=False)
+        self._page_ns = self.site._proofread_page_ns.custom_name
 
         if not pages:
             self._pages = (1, self._djvu.number_of_images())
@@ -99,8 +98,10 @@ class DjVuTextBot(SingleSiteBot):
     def gen(self):
         """Generate pages from specified page interval."""
         for page_number in self.page_number_gen():
-            title = '{prefix}/{number}'.format(prefix=self._prefix,
-                                               number=page_number)
+            title = '{page_ns}:{prefix}/{number}'.format(
+                page_ns=self._page_ns,
+                prefix=self._prefix,
+                number=page_number)
             page = ProofreadPage(self._index.site, title)
             page.page_number = page_number  # remember page number in djvu file
             yield page
@@ -117,8 +118,7 @@ class DjVuTextBot(SingleSiteBot):
         if page.exists() and not self.getOption('force'):
             pywikibot.output('Page %s already exists, not adding!' % page)
         else:
-            self.userPut(page, old_text, new_text,
-                         summary=summary, minor=True, botflag=True)
+            self.userPut(page, old_text, new_text, summary=summary)
 
 
 def main(*args):
@@ -200,6 +200,7 @@ def main(*args):
 
     bot = DjVuTextBot(djvu, index_page, pages, **options)
     bot.run()
+
 
 if __name__ == '__main__':
     try:

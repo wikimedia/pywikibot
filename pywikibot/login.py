@@ -1,9 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,8 +13,9 @@ __version__ = '$Id$'
 #
 import codecs
 import os
-import stat
 import webbrowser
+
+from pywikibot.tools import file_mode_checker
 
 from warnings import warn
 
@@ -27,7 +28,10 @@ import pywikibot
 
 from pywikibot import config
 from pywikibot.exceptions import NoUsername
-from pywikibot.tools import deprecated_args, normalize_username
+from pywikibot.tools import deprecated_args, normalize_username, PY2
+
+if not PY2:
+    unicode = basestring = str
 
 
 class OAuthImpossible(ImportError):
@@ -51,7 +55,6 @@ _logger = "wiki.login"
 # second parameter, otherwise it must be None
 botList = {
     'wikipedia': {
-        'en': [u'Wikipedia:Bots/Status/active bots', 'BotS'],
         'simple': [u'Wikipedia:Bots', '/links']
     },
 }
@@ -88,9 +91,12 @@ class LoginManager(object):
         if user:
             self.username = user
         elif sysop:
+            config_names = config.sysopnames
+            family_sysopnames = (
+                config_names[self.site.family.name] or config_names['*']
+            )
+            self.username = family_sysopnames.get(self.site.code, None)
             try:
-                family_sysopnames = config.sysopnames[self.site.family.name]
-                self.username = family_sysopnames.get(self.site.code, None)
                 self.username = self.username or family_sysopnames['*']
             except KeyError:
                 raise NoUsername(u"""\
@@ -101,11 +107,14 @@ sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                  % {'fam_name': self.site.family.name,
                                     'wiki_code': self.site.code})
         else:
+            config_names = config.usernames
+            family_usernames = (
+                config_names[self.site.family.name] or config_names['*']
+            )
+            self.username = family_usernames.get(self.site.code, None)
             try:
-                family_usernames = config.usernames[self.site.family.name]
-                self.username = family_usernames.get(self.site.code, None)
                 self.username = self.username or family_usernames['*']
-            except:
+            except KeyError:
                 raise NoUsername(u"""\
 ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have an account for that site, please add a line to user-config.py:
@@ -114,6 +123,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                                  % {'fam_name': self.site.family.name,
                                     'wiki_code': self.site.code})
         self.password = password
+        self.login_name = self.username
         if getattr(config, 'password_file', ''):
             self.readPassword()
 
@@ -123,21 +133,31 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         @raises NoUsername: Username doesnt exist in user list.
         """
+        # convert any Special:BotPassword usernames to main account equivalent
+        main_username = self.username
+        if '@' in self.username:
+            warn(
+                'When using BotPasswords it is recommended that you store your '
+                'login credentials in a password_file instead. '
+                'See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords '
+                'for instructions and more information.')
+            main_username = self.username.partition('@')[0]
+
         try:
-            data = self.site.allusers(start=self.username, total=1)
+            data = self.site.allusers(start=main_username, total=1)
             user = next(iter(data))
         except pywikibot.data.api.APIError as e:
             if e.code == 'readapidenied':
                 pywikibot.warning('Could not check user %s exists on %s'
-                                  % (self.username, self.site))
+                                  % (main_username, self.site))
                 return
             else:
                 raise
 
-        if user['name'] != self.username:
+        if user['name'] != main_username:
             # Report the same error as server error code NotExists
             raise NoUsername('Username \'%s\' does not exist on %s'
-                             % (self.username, self.site))
+                             % (main_username, self.site))
 
     def botAllowed(self):
         """
@@ -168,10 +188,12 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         Login to the site.
 
-        remember    Remember login (default: True)
-        captchaId   A dictionary containing the captcha id and answer, if any
+        @param remember: Remember login (default: True)
+        @type remember: bool
+        @param captchaId: A dictionary containing the captcha id and answer,
+            if any
 
-        Returns cookie data if successful, None otherwise.
+        @return: cookie data if successful, None otherwise.
         """
         # NOT IMPLEMENTED - see data/api.py for implementation
 
@@ -205,6 +227,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         to set a default password for an username. The last matching entry will
         be used, so default usernames should occur above specific usernames.
 
+        For BotPasswords the password should be given as a BotPassword object.
+
         The file must be either encoded in ASCII or UTF-8.
 
         Example:
@@ -213,16 +237,22 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         (u"my_sysop_user", u"my_sysop_password")
         (u"wikipedia", u"my_wikipedia_user", u"my_wikipedia_pass")
         (u"en", u"wikipedia", u"my_en_wikipedia_user", u"my_en_wikipedia_pass")
+        (u"my_username", BotPassword(u"my_BotPassword_suffix", u"my_BotPassword_password"))
         """
-        # We fix password file permission first,
-        # lift upper permission (regular file) from st_mode
-        # to compare it with private_files_permission.
-        if os.stat(config.password_file).st_mode - stat.S_IFREG \
-                != config.private_files_permission:
-            os.chmod(config.password_file, config.private_files_permission)
+        # Set path to password file relative to the user_config
+        # but fall back on absolute path for backwards compatibility
+        password_file = os.path.join(config.base_dir, config.password_file)
+        if not os.path.isfile(password_file):
+            password_file = config.password_file
 
-        password_f = codecs.open(config.password_file, encoding='utf-8')
-        for line_nr, line in enumerate(password_f):
+        # We fix password file permission first.
+        file_mode_checker(password_file, mode=config.private_files_permission)
+
+        with codecs.open(password_file, encoding='utf-8') as f:
+            lines = f.readlines()
+        line_nr = len(lines) + 1
+        for line in reversed(lines):
+            line_nr -= 1
             if not line.strip():
                 continue
             try:
@@ -238,17 +268,20 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                      'given)'.format(line_nr, entry), _PasswordFileWarning)
                 continue
 
-            # When the tuple is inverted the default family and code can be
-            # easily appended which makes the next condition easier as it does
-            # not need to know if it's using the default value or not.
-            entry = list(entry[::-1]) + [self.site.family.name,
-                                         self.site.code][len(entry) - 2:]
-
-            if (normalize_username(entry[1]) == self.username and
-                    entry[2] == self.site.family.name and
-                    entry[3] == self.site.code):
-                self.password = entry[0]
-        password_f.close()
+            code, family, username, password = (
+                self.site.code, self.site.family.name)[:4 - len(entry)] + entry
+            if (normalize_username(username) == self.username and
+                    family == self.site.family.name and
+                    code == self.site.code):
+                if isinstance(password, basestring):
+                    self.password = password
+                    break
+                elif isinstance(password, BotPassword):
+                    self.password = password.password
+                    self.login_name = password.login_name(self.username)
+                    break
+                else:
+                    warn('Invalid password format', _PasswordFileWarning)
 
     def login(self, retry=False):
         """
@@ -268,21 +301,29 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             # password = True
             self.password = pywikibot.input(
                 u'Password for user %(name)s on %(site)s (no characters will '
-                u'be shown):' % {'name': self.username, 'site': self.site},
+                u'be shown):' % {'name': self.login_name, 'site': self.site},
                 password=True)
 
         pywikibot.output(u"Logging in to %(site)s as %(name)s"
-                         % {'name': self.username, 'site': self.site})
+                         % {'name': self.login_name, 'site': self.site})
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError as e:
             pywikibot.error(u"Login failed (%s)." % e.code)
             if e.code == 'NotExists':
                 raise NoUsername(u"Username '%s' does not exist on %s"
-                                 % (self.username, self.site))
+                                 % (self.login_name, self.site))
             elif e.code == 'Illegal':
                 raise NoUsername(u"Username '%s' is invalid on %s"
-                                 % (self.username, self.site))
+                                 % (self.login_name, self.site))
+            elif e.code == 'readapidenied':
+                raise NoUsername(
+                    'Username "{0}" does not have read permissions on '
+                    '{1}'.format(self.login_name, self.site))
+            elif e.code == 'Failed':
+                raise NoUsername(
+                    'Username "{0}" does not have read permissions on '
+                    '{1}\n.{2}'.format(self.login_name, self.site, e.info))
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
@@ -307,6 +348,41 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
     def showCaptchaWindow(self, url):
         """Open a window to show the captcha for the given URL."""
         pass
+
+
+class BotPassword(object):
+
+    """BotPassword object for storage in password file."""
+
+    def __init__(self, suffix, password):
+        """
+        Constructor.
+
+        BotPassword function by using a separate password paired with a suffixed
+        username of the form <username>@<suffix>.
+
+        @param suffix: Suffix of the login name
+        @type suffix: basestring
+        @param password: bot password
+        @type password: basestring
+
+        @raises _PasswordFileWarning: suffix improperly specified
+        """
+        if '@' in suffix:
+            warn('The BotPassword entry should only include the suffix',
+                 _PasswordFileWarning)
+        self.suffix = suffix
+        self.password = password
+
+    def login_name(self, username):
+        """
+        Construct the login name from the username and suffix.
+
+        @param user: username (without suffix)
+        @type user: basestring
+        @rtype: basestring
+        """
+        return '{0}@{1}'.format(username, self.suffix)
 
 
 class OauthLoginManager(LoginManager):
@@ -387,7 +463,7 @@ class OauthLoginManager(LoginManager):
     @property
     def consumer_token(self):
         """
-        OAuth consumer key token and secret token.
+        Return OAuth consumer key token and secret token.
 
         @rtype: tuple of two str
         """
@@ -396,7 +472,7 @@ class OauthLoginManager(LoginManager):
     @property
     def access_token(self):
         """
-        OAuth access key token and secret token.
+        Return OAuth access key token and secret token.
 
         @rtype: tuple of two str
         """

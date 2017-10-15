@@ -1,7 +1,7 @@
 This is a guide to converting bot scripts from version 1 of the
-Pywikibot framework to version 2.
+Pywikibot framework to version 3.
 
-Most importantly, note that the version 2 framework *only* supports wikis
+Most importantly, note that the version 3 framework *only* supports wikis
 using MediaWiki v.1.14 or higher software.  If you need to access a wiki that
 uses older software, you should continue using version 1 for this purpose.
 
@@ -89,6 +89,9 @@ If you call them, they will print a warning and do nothing else:
 The following methods have had their outputs changed:
 
 - getVersionHistory(): Returns a pywikibot.Timestamp object instead of a MediaWiki one
+- templatesWithParams(): Returns a list of tuples with two items. The first item is
+    a Page object of the template, the second is a list of parameters. In compat we have
+    a list of tuples with two items. The first item is the template title.
 
 === FilePage objects ===
 
@@ -120,6 +123,22 @@ The following changes have occurred in the User object:
 
 - contributions(): returns a pywikibot.Timestamp object instead of a Mediawiki one
 
+== apispec library and Blocks objects ==
+
+Some apispec functionality could be replaced with other methods:
+
+    iso() -> Timestamp.isoformat()
+    uniso() -> Timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    dt() -> Timestamp.totimestampformat()
+    duration() -> BlockEntry.duration()
+
+    Blocks.empty() -> (* obsolete parameter cleanup *)
+    Blocks.query() -> site.blocks() or site.logevents('block')
+    Blocks.IPsortkey() -> (* sort key, not needed * )
+    Blocks.allblocks() ->  site.blocks() or site.logevents('block')
+    Blocks.user() -> site.blocks(user=user)
+    Blocks.IP() -> site.blocks(iprange=IP)
+
 === Command-line arguments ===
 
 Scripts that supported unnamed arguments as titles of pages on which to work,
@@ -131,5 +150,3 @@ while unlink.py and other scripts that required page titles as main arguments
 now need only that the titles be wrapped in quotes, as:
 
     python unlink.py "A title"
-
-# MORE TO COME #

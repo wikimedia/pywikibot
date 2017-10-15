@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Wikibase data type classes."""
 #
 # (C) Pywikibot team, 2013-2015
@@ -46,4 +46,12 @@ class WbRepresentation(object):
         return '{0}({1})'.format(self.__class__.__name__, attrs)
 
     def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+        if isinstance(other, self.__class__):
+            return self.toWikibase() == other.toWikibase()
+        return NotImplemented
+
+    def __hash__(self):
+        return hash(frozenset(self.toWikibase().items()))
+
+    def __ne__(self, other):
+        return not self.__eq__(other)

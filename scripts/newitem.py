@@ -20,58 +20,76 @@ This script understands various command-line arguments:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 from datetime import timedelta
 
 import pywikibot
-
 from pywikibot import pagegenerators, WikidataBot
+from pywikibot.exceptions import LockedPage, NoPage, PageNotSaved
 
 
 class NewItemRobot(WikidataBot):
 
     """A bot to create new items."""
 
+    treat_missing_item = True
+
     def __init__(self, generator, **kwargs):
         """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
+            'always': True,
             'lastedit': 7,
             'pageage': 21,
             'touch': False,
         })
 
         super(NewItemRobot, self).__init__(**kwargs)
-        self.generator = pagegenerators.PreloadingGenerator(generator)
+        self.generator = generator
         self.pageAge = self.getOption('pageage')
         self.lastEdit = self.getOption('lastedit')
-        self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(days=self.pageAge)
-        self.lastEditBefore = self.repo.getcurrenttime() - timedelta(days=self.lastEdit)
-        self.treat_missing_item = True
+        self.pageAgeBefore = self.repo.getcurrenttime() - timedelta(
+            days=self.pageAge)
+        self.lastEditBefore = self.repo.getcurrenttime() - timedelta(
+            days=self.lastEdit)
         pywikibot.output('Page age is set to %s days so only pages created'
                          '\nbefore %s will be considered.'
                          % (self.pageAge, self.pageAgeBefore.isoformat()))
-        pywikibot.output('Last edit is set to %s days so only pages last edited'
-                         '\nbefore %s will be considered.'
-                         % (self.lastEdit, self.lastEditBefore.isoformat()))
+        pywikibot.output(
+            'Last edit is set to {0} days so only pages last edited'
+            '\nbefore {1} will be considered.'.format(
+                self.lastEdit, self.lastEditBefore.isoformat()))
 
-    def treat(self, page, item):
+    @staticmethod
+    def _touch_page(page):
+        try:
+            page.touch()
+        except NoPage:
+            pywikibot.error('Page {0} does not exist.'.format(
+                page.title(asLink=True)))
+        except LockedPage:
+            pywikibot.error('Page {0} is locked.'.format(
+                page.title(asLink=True)))
+        except PageNotSaved:
+            pywikibot.error('Page {0} not saved.'.format(
+                page.title(asLink=True)))
+
+    def _callback(self, page, exc):
+        if exc is None:
+            self._touch_page(page)
+
+    def treat_page_and_item(self, page, item):
         """Treat page/item."""
         if item and item.exists():
             pywikibot.output(u'%s already has an item: %s.' % (page, item))
             if self.getOption('touch'):
                 pywikibot.output(u'Doing a null edit on the page.')
-                page.put(page.text)
+                self._touch_page(page)
             return
-
-        self.current_page = page
 
         if page.isRedirectPage():
             pywikibot.output(u'%s is a redirect page. Skipping.' % page)
@@ -87,6 +105,9 @@ class NewItemRobot(WikidataBot):
                 u'Page creation of %s on %s is too recent. Skipping.'
                 % (page, page.editTime().isoformat()))
             return
+        if page.isCategoryRedirect():
+            pywikibot.output('%s is a category redirect. Skipping.' % page)
+            return
 
         if page.langlinks():
             # FIXME: Implement this
@@ -95,28 +116,7 @@ class NewItemRobot(WikidataBot):
                 "Haven't implemented that yet so skipping.")
             return
 
-        # FIXME: i18n
-        summary = (u'Bot: New item with sitelink from %s'
-                   % page.title(asLink=True, insite=self.repo))
-
-        data = {'sitelinks':
-                {page.site.dbName():
-                 {'site': page.site.dbName(),
-                  'title': page.title()}
-                 },
-                'labels':
-                {page.site.lang:
-                 {'language': page.site.lang,
-                  'value': page.title()}
-                 }
-                }
-
-        pywikibot.output(summary)
-
-        item = pywikibot.ItemPage(page.site.data_repository())
-        item.editEntity(data, summary=summary)
-        # And do a null edit to force update
-        page.put(page.text)
+        self.create_item_for_page(page, callback=self._callback)
 
 
 def main(*args):
@@ -144,7 +144,7 @@ def main(*args):
         else:
             options[arg[1:].lower()] = True
 
-    generator = gen.getCombinedGenerator()
+    generator = gen.getCombinedGenerator(preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
@@ -152,6 +152,7 @@ def main(*args):
     bot = NewItemRobot(generator, **options)
     bot.run()
     return True
+
 
 if __name__ == "__main__":
     main()

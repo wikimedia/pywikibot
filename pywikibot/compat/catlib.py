@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE BACKWARDS-COMPATIBILITY.
 
@@ -24,6 +24,7 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None,
                     inPlace=True):
     """Change the category of the article."""
     return article.change_category(oldCat, newCat, comment, sortKey, inPlace)
+
 
 __all__ = ('Category', 'change_category',)
 

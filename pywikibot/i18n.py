@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Various i18n functions.
 
@@ -6,18 +6,18 @@ Helper functions for both the internal translation system
 and for TranslateWiki-based translations.
 
 By default messages are assumed to reside in a package called
-'scripts.i18n'.  In pywikibot 2.0, that package is not packaged
-with pywikibot, and pywikibot 2.0 does not have a hard dependency
-on any i18n messages.  However, there are three user input questions
+'scripts.i18n'. In pywikibot 3.0, that package is not packaged
+with pywikibot, and pywikibot 3.0 does not have a hard dependency
+on any i18n messages. However, there are three user input questions
 in pagegenerators which will use i18 messages if they can be loaded.
 
 The default message location may be changed by calling
-L{set_message_package} with a package name.  The package must contain
+L{set_message_package} with a package name. The package must contain
 an __init__.py, and a message bundle called 'pywikibot' containing
-messages.  See L{twntranslate} for more information on the messages.
+messages. See L{twntranslate} for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,7 +27,6 @@ __version__ = '$Id$'
 #
 
 import json
-import locale
 import os
 import pkgutil
 import re
@@ -41,12 +40,13 @@ from pywikibot import __url__
 from pywikibot import config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
-from pywikibot.tools import deprecated, issue_deprecation_warning, StringTypes
+from pywikibot.tools import (
+    deprecated, deprecated_args, issue_deprecation_warning, StringTypes)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
-# Package name for the translation messages.  The messages data must loaded
-# relative to that package name.  In the top of this package should be
+# Package name for the translation messages. The messages data must loaded
+# relative to that package name. In the top of this package should be
 # directories named after for each script/message bundle, and each directory
 # should contain JSON files called <lang>.json
 _messages_package_name = 'scripts.i18n'
@@ -175,7 +175,7 @@ def _altlang(code):
     if code == 'fit':
         return ['fi', 'sv']
     # French
-    if code in ['bm', 'br', 'ht', 'kg', 'ln', 'mg', 'nrm', 'pcd',
+    if code in ['atj', 'bm', 'br', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm', 'pcd',
                 'rw', 'sg', 'ty', 'wa']:
         return ['fr']
     if code == 'oc':
@@ -358,7 +358,9 @@ def _extract_plural(code, message, parameters):
 
         plural_entries = []
         specific_entries = {}
-        for number, plural in re.findall(r'\|?(?: *(\d+) *= *)?([^|]+)',
+        # A plural entry can not start at the end of the variants list,
+        # and must end with | or the end of the variants list.
+        for number, plural in re.findall(r'(?!$)(?: *(\d+) *= *)?(.*?)(?:\||$)',
                                          variants):
             if number:
                 specific_entries[int(number)] = plural
@@ -523,7 +525,8 @@ def translate(code, xdict, parameters=None, fallback=False):
     return trans
 
 
-def twtranslate(code, twtitle, parameters=None, fallback=True,
+@deprecated_args(code='source')
+def twtranslate(source, twtitle, parameters=None, fallback=True,
                 only_plural=False):
     """
     Translate a message using JSON files in messages_package_name.
@@ -568,9 +571,9 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
     ...     % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
 
-    @param code: When it's a site it's using the code attribute and otherwise it
-        is using the value directly.
-    @type code: BaseSite or str
+    @param source: When it's a site it's using the lang attribute and otherwise
+        it is using the value directly.
+    @type source: BaseSite or str
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: For passing parameters. It should be a mapping but for
         backwards compatibility can also be a list, tuple or a single value.
@@ -593,20 +596,20 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
             'Read %s/i18n'
             % (_messages_package_name, twtitle, __url__))
 
-    code_needed = False
-    # If a site is given instead of a code, use its language
-    if hasattr(code, 'code'):
-        lang = code.code
+    source_needed = False
+    # If a site is given instead of a lang, use its language
+    if hasattr(source, 'lang'):
+        lang = source.lang
     # check whether we need the language code back
-    elif isinstance(code, list):
+    elif isinstance(source, list):
         # For backwards compatibility still support lists, when twntranslate
         # was not deprecated and needed a way to get the used language code back
-        warn('The code argument should not be a list but either a BaseSite or '
-             'a str/unicode.', DeprecationWarning, 2)
-        lang = code.pop()
-        code_needed = True
+        warn('The source argument should not be a list but either a BaseSite '
+             'or a str/unicode.', DeprecationWarning, 2)
+        lang = source.pop()
+        source_needed = True
     else:
-        lang = code
+        lang = source
 
     # There are two possible failure modes: the translation dict might not have
     # the language altogether, or a specific key could be untranslated. Both
@@ -625,9 +628,9 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
             'Read https://mediawiki.org/wiki/PWB/i18n'
             % ('English' if 'en' in langs else "'%s'" % lang,
                twtitle))
-    # send the language code back via the given list
-    if code_needed:
-        code.append(alt)
+    # send the language code back via the given mutable list parameter
+    if source_needed:
+        source.append(alt)
 
     if '{{PLURAL:' in trans:
         # _extract_plural supports in theory non-mappings, but they are
@@ -658,14 +661,16 @@ def twtranslate(code, twtitle, parameters=None, fallback=True,
 
 
 @deprecated('twtranslate')
-def twntranslate(code, twtitle, parameters=None):
+@deprecated_args(code='source')
+def twntranslate(source, twtitle, parameters=None):
     """DEPRECATED: Get translated string for the key."""
     if parameters is not None:
         parameters = _PluralMappingAlias(parameters)
-    return twtranslate(code, twtitle, parameters)
+    return twtranslate(source, twtitle, parameters)
 
 
-def twhas_key(code, twtitle):
+@deprecated_args(code='source')
+def twhas_key(source, twtitle):
     """
     Check if a message has a translation in the specified language code.
 
@@ -674,16 +679,15 @@ def twhas_key(code, twtitle):
 
     No code fallback is made.
 
-    @param code: The language code
+    @param source: When it's a site it's using the lang attribute and otherwise
+        it is using the value directly.
+    @type source: BaseSite or str
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     """
     # If a site is given instead of a code, use its language
-    if hasattr(code, 'code'):
-        code = code.code
-    transdict = _get_translation(code, twtitle)
-    if transdict is None:
-        return False
-    return True
+    lang = getattr(source, 'lang', source)
+    transdict = _get_translation(lang, twtitle)
+    return transdict is not None
 
 
 def twget_keys(twtitle):
@@ -715,9 +719,8 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
     """
     Ask the user a question, return the user's answer.
 
-    The prompt message is retrieved via L{twtranslate} and either uses the
-    config variable 'userinterface_lang' or the default locale as the language
-    code.
+    The prompt message is retrieved via L{twtranslate} and uses the
+    config variable 'userinterface_lang'.
 
     @param twtitle: The TranslateWiki string title, in <package>-<key> format
     @param parameters: The values which will be applied to the translated text
@@ -733,8 +736,7 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
         else:
             prompt = fallback_prompt
     else:
-        code = config.userinterface_lang or \
-            locale.getdefaultlocale()[0].split('_')[0]
+        code = config.userinterface_lang
 
         prompt = twtranslate(code, twtitle, parameters)
     return pywikibot.input(prompt, password)

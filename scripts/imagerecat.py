@@ -9,8 +9,8 @@ some filters and adds the result.
 
 The following command line parameters are supported:
 
--onlyfilter     Don't use Commonsense to get categories, just filter the current
-                categories
+-onlyfilter     Don't use Commonsense to get categories, just filter the
+                current categories
 
 -onlyuncat      Only work on uncategorized images. Will prevent the bot from
                 working on an image multiple times.
@@ -27,14 +27,11 @@ The following command line parameters are supported:
 """
 #
 # (C) Multichill, 2008-2011
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2017
 #
-#   Distributed under the terms of the MIT license.
+# Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import re
 import socket
@@ -151,10 +148,10 @@ def getCommonshelperCats(imagepage):
         return [], [], []
 
     commonsenseRe = re.compile(
-        '^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s'
-        '#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)'
-        '#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s'
-        '#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$',
+        r'^#COMMONSENSE(.*)#USAGE(\s)+\((?P<usagenum>(\d)+)\)\s(?P<usage>(.*))\s'
+        r'#KEYWORDS(\s)+\((?P<keywords>(\d)+)\)(.*)'
+        r'#CATEGORIES(\s)+\((?P<catnum>(\d)+)\)\s(?P<cats>(.*))\s'
+        r'#GALLERIES(\s)+\((?P<galnum>(\d)+)\)\s(?P<gals>(.*))\s(.*)#EOF$',
         re.MULTILINE + re.DOTALL)
 
     gotInfo = False
@@ -492,6 +489,7 @@ def main(*args):
     initLists()
     categorizeImages(generator, onlyFilter, onlyUncat)
     pywikibot.output(u'All done')
+
 
 if __name__ == "__main__":
     main()

@@ -1,0 +1,45 @@
+{
+    "id": "Q60",
+    "type": "item",
+    "lastrevid": 122836617,
+    "pageid": 186,
+    "aliases": {
+        "en": [
+            {
+                "language": "en",
+                "value": "foo bar"
+            }
+        ]
+    },
+    "labels": {
+        "en": {
+            "language": "en",
+            "value": "Foobar"
+        }
+    },
+    "descriptions": {
+        "en": {
+            "language": "en",
+            "value": "An item with an unknown foobar datatype"
+        }
+    },
+    "claims": {
+        "P99999": [
+            {
+                "id": "Q60$efebe507-4e9f-4254-dc47-fake",
+                "mainsnak": {
+                    "snaktype": "value",
+                    "property": "P99999",
+                    "datatype": "foo-unknown-bar",
+                    "datavalue": {
+                        "value": "foobar",
+                        "type": "bar-unknown-foo"
+                    }
+                },
+                "type": "statement",
+                "rank": "normal"
+            }
+        ]
+    },
+    "sitelinks": {}
+}

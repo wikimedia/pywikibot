@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Unit tests for data_ingestion.py script."""
 #
 # (C) Pywikibot team, 2012-2015
@@ -7,8 +7,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 from scripts import data_ingestion
 
@@ -61,14 +59,14 @@ class TestPhoto(TestCase):
     def test_getDescription(self):
         """Test getDescription()."""
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
-"""{{CrystalTemplate
+                         str("""{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
 |description.en="Sounds" icon
 |license=LGPL
 |name=Sound icon
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
-}}""")  # noqa
+}}"""))
 
 
 class TestCSVReader(TestCase):
@@ -99,7 +97,7 @@ class TestCSVReader(TestCase):
     def test_getDescription(self):
         """Test getDescription()."""
         self.assertEqual(self.obj.getDescription('CrystalTemplate'),
-"""{{CrystalTemplate
+                         str("""{{CrystalTemplate
 |author=KDE artists {{!}} Silstor
 |description.en="Sounds" icon
 |license=LGPL
@@ -107,7 +105,7 @@ class TestCSVReader(TestCase):
 |set=Crystal SVG icon set
 |source=http://commons.wikimedia.org/wiki/File:Sound-icon.svg
 |url=http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png
-}}""")  # noqa
+}}"""))
 
 
 class TestDataIngestionBot(ScriptMainTestCase):
@@ -124,5 +122,5 @@ class TestDataIngestionBot(ScriptMainTestCase):
             '-page:User:John_Vandenberg/data_ingestion_test_template')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

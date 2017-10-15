@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the C{pywikibot.tools.formatter} module."""
 #
 # (C) Pywikibot team, 2015
@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 from pywikibot.tools import formatter
 from pywikibot.tools import UnicodeMixin
 
@@ -32,6 +30,7 @@ class TestListOutputter(TestCase):
         self.assertEqual(outputter.format_list(), '\nfoo\nbar\n')
 
 
+# TODO: add tests for background colors.
 class TestColorFormat(TestCase):
 
     """Test color_format function in bot module."""
@@ -108,7 +107,7 @@ class TestColorFormat(TestCase):
         self.assert_format('{color}', '42', color=42)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """weblinkchecker test module."""
 #
 # (C) Pywikibot team, 2015
@@ -7,9 +7,9 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import datetime
+
+from requests import ConnectionError as RequestsConnectionError
 
 from pywikibot.tools import PY2
 if not PY2:
@@ -33,10 +33,11 @@ class MementoTestCase(TestCase):
             when = datetime.datetime.now()
         else:
             when = datetime.datetime.strptime(date_string, '%Y%m%d')
-        return weblinkchecker._get_closest_memento_url(
-            url,
-            when,
-            self.timegate_uri)
+        try:
+            return weblinkchecker._get_closest_memento_url(
+                url, when, self.timegate_uri)
+        except RequestsConnectionError as e:
+            self.skipTest(e)
 
 
 class WeblibTestMementoInternetArchive(MementoTestCase, weblib_tests.TestInternetArchive):
@@ -52,7 +53,8 @@ class WeblibTestMementoWebCite(MementoTestCase, weblib_tests.TestWebCite):
     """Test WebCite Memento using old weblib tests."""
 
     timegate_uri = 'http://timetravel.mementoweb.org/webcite/timegate/'
-    hostname = timegate_uri
+    hostname = ('http://timetravel.mementoweb.org/webcite/'
+                'timemap/json/http://google.com')
 
 
 class TestMementoWebCite(MementoTestCase):
@@ -60,7 +62,8 @@ class TestMementoWebCite(MementoTestCase):
     """New WebCite Memento tests."""
 
     timegate_uri = 'http://timetravel.mementoweb.org/webcite/timegate/'
-    hostname = timegate_uri
+    hostname = ('http://timetravel.mementoweb.org/webcite/'
+                'timemap/json/http://google.com')
 
     def test_newest(self):
         """Test WebCite for newest https://google.com."""
@@ -85,12 +88,12 @@ class TestMementoDefault(MementoTestCase):
     def test_invalid(self):
         """Test getting memento for invalid URL."""
         # memento_client raises 'Exception', not a subclass.
-        self.assertRaisesRegexp(
+        self.assertRaisesRegex(
             Exception, 'Only HTTP URIs are supported',
             self._get_archive_url, 'invalid')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

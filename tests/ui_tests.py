@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,8 +26,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import inspect
 import io
 import logging
@@ -35,6 +33,7 @@ import os
 import subprocess
 import sys
 import time
+import warnings
 
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
@@ -218,6 +217,7 @@ class UITestCase(unittest.TestCase):
     net = False
 
     def setUp(self):
+        super(UITestCase, self).setUp()
         patch()
 
         pywikibot.config.colorized_output = True
@@ -226,6 +226,7 @@ class UITestCase(unittest.TestCase):
         pywikibot.ui.encoding = 'utf-8'
 
     def tearDown(self):
+        super(UITestCase, self).tearDown()
         unpatch()
 
     def _encode(self, string, encoding='utf-8'):
@@ -285,7 +286,18 @@ class TestTerminalOutput(UITestCase):
         self.assertEqual(newstderr.getvalue(), 'output\n')
 
     def test_output_stdout(self):
-        pywikibot.output('output', toStdout=True)
+        with warnings.catch_warnings(record=True) as w:
+            pywikibot.output('output', toStdout=True)
+            self.assertEqual(newstdout.getvalue(), 'output\n')
+            self.assertEqual(len(w), 1)
+            self.assertEqual(w[0].category, DeprecationWarning)
+            self.assertEqual(
+                str(w[0].message),
+                '"toStdout" parameter is deprecated; use pywikibot.stdout() instead.'
+            )
+
+    def test_stdout(self):
+        pywikibot.stdout('output')
         self.assertEqual(newstdout.getvalue(), 'output\n')
         self.assertEqual(newstderr.getvalue(), '')
 
@@ -682,6 +694,7 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
         self.assertEqual(lines, [u'Alpha', u'Bετα', u'Гамма', u'دلتا', u''])
 
 
+# TODO: add tests for background colors.
 class FakeUITest(TestCase):
 
     """Test case to allow doing uncolorized general UI tests."""
@@ -724,7 +737,7 @@ class FakeUITest(TestCase):
 
     def test_no_color(self):
         """Test a string without any colors."""
-        self._colors = tuple()
+        self._colors = ()
         self.ui_obj._print('Hello world you!', self.stream)
         self.assertEqual(self._getvalue(), 'Hello world you!')
 
@@ -857,7 +870,7 @@ class FakeWin32UncolorizedTest(FakeWin32Test):
         self.stream._hConsole = None
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     try:
         try:
             unittest.main()

@@ -17,14 +17,11 @@ Command line options:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2015
+# (C) Pywikibot team, 2005-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import os
 
@@ -53,7 +50,7 @@ def isWatched(pageName, site=None):
 
 def refresh(site, sysop=False):
     """Fetch the watchlist."""
-    pywikibot.output(u'Retrieving watchlist for %s via API.' % str(site))
+    pywikibot.output('Retrieving watchlist for {0}.'.format(str(site)))
     return list(site.watched_pages(sysop=sysop, force=True))
 
 
@@ -115,7 +112,11 @@ def main(*args):
         watchlist = refresh(site, sysop=sysop)
         pywikibot.output(u'%i pages in the watchlist.' % len(watchlist))
         for page in watchlist:
-            pywikibot.output(page.title(), toStdout=True)
+            try:
+                pywikibot.stdout(page.title())
+            except pywikibot.InvalidTitle:
+                pywikibot.exception()
+
 
 if __name__ == "__main__":
     main()

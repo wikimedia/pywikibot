@@ -1,5 +1,5 @@
 [submodule "i18n"]
 	path = scripts/i18n
-	url = https://gerrit.wikimedia.org/r/p/pywikibot/i18n.git
+	url = https://gerrit.wikimedia.org/r/pywikibot/i18n
 	branch = master
 	ignore = all

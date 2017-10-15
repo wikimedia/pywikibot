@@ -1,13 +1,13 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Date data and manipulation module."""
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Ævar Arnfjörð Bjarmason, 2004
 # (C) Andre Engels, 2004-2005
-# (C) Yuri Astrakhan, 2005-2006  (<Firstname><Lastname>@gmail.com)
-#       (years/decades/centuries/millenniums  str <=> int  conversions)
-# (C) Pywikibot team, 2004-2015
+# (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
+#       (years/decades/centuries/millenniums str <=> int conversions)
+# (C) Pywikibot team, 2004-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -263,28 +263,28 @@ def monthName(lang, ind):
 
 # Helper for KN: digits representation
 _knDigits = u'೦೧೨೩೪೫೬೭೮೯'
-_knDigitsToLocal = dict([(ord(unicode(i)), _knDigits[i]) for i in range(10)])
-_knLocalToDigits = dict([(ord(_knDigits[i]), unicode(i)) for i in range(10)])
+_knDigitsToLocal = dict((ord(unicode(i)), _knDigits[i]) for i in range(10))
+_knLocalToDigits = dict((ord(_knDigits[i]), unicode(i)) for i in range(10))
 
 # Helper for Urdu/Persian languages
 _faDigits = u'۰۱۲۳۴۵۶۷۸۹'
-_faDigitsToLocal = dict([(ord(unicode(i)), _faDigits[i]) for i in range(10)])
-_faLocalToDigits = dict([(ord(_faDigits[i]), unicode(i)) for i in range(10)])
+_faDigitsToLocal = dict((ord(unicode(i)), _faDigits[i]) for i in range(10))
+_faLocalToDigits = dict((ord(_faDigits[i]), unicode(i)) for i in range(10))
 
 # Helper for HI:, MR:
 _hiDigits = u'०१२३४५६७८९'
-_hiDigitsToLocal = dict([(ord(unicode(i)), _hiDigits[i]) for i in range(10)])
-_hiLocalToDigits = dict([(ord(_hiDigits[i]), unicode(i)) for i in range(10)])
+_hiDigitsToLocal = dict((ord(unicode(i)), _hiDigits[i]) for i in range(10))
+_hiLocalToDigits = dict((ord(_hiDigits[i]), unicode(i)) for i in range(10))
 
 # Helper for BN:
 _bnDigits = u'০১২৩৪৫৬৭৮৯'
-_bnDigitsToLocal = dict([(ord(unicode(i)), _bnDigits[i]) for i in range(10)])
-_bnLocalToDigits = dict([(ord(_bnDigits[i]), unicode(i)) for i in range(10)])
+_bnDigitsToLocal = dict((ord(unicode(i)), _bnDigits[i]) for i in range(10))
+_bnLocalToDigits = dict((ord(_bnDigits[i]), unicode(i)) for i in range(10))
 
 # Helper for GU:
 _guDigits = u'૦૧૨૩૪૫૬૭૮૯'
-_guDigitsToLocal = dict([(ord(unicode(i)), _guDigits[i]) for i in range(10)])
-_guLocalToDigits = dict([(ord(_guDigits[i]), unicode(i)) for i in range(10)])
+_guDigitsToLocal = dict((ord(unicode(i)), _guDigits[i]) for i in range(10))
+_guLocalToDigits = dict((ord(_guDigits[i]), unicode(i)) for i in range(10))
 
 
 def intToLocalDigitsStr(value, digitsToLocalDict):
@@ -300,6 +300,7 @@ def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
         return int(value.translate(localToDigitsDict))    # Convert
     else:
         raise ValueError("string contains regular digits")
+
 
 # Decimal digits used for various matchings
 _decimalDigits = '0123456789'
@@ -322,7 +323,8 @@ def romanNumToInt(v):
     """Convert roman numeral to integer."""
     return _romanNumbers.index(v)
 
-# Each tuple must 3 parts:  a list of all possible digits (symbols), encoder
+
+# Each tuple must 3 parts: a list of all possible digits (symbols), encoder
 # (from int to a u-string) and decoder (from u-string to an int)
 _digitDecoders = {
     # %% is a %
@@ -356,8 +358,7 @@ _digitDecoders = {
 _reParameters = re.compile(u'|'.join(u'(%%[1-9]?%s)' % s
                                      for s in _digitDecoders))
 
-# A map of   sitecode+pattern  to  (re matching object and corresponding
-# decoders)
+# A map of sitecode+pattern to (re matching object and corresponding decoders)
 _escPtrnCache2 = {}
 
 _listTypes = [list, tuple]
@@ -506,7 +507,7 @@ def MakeParameter(decoder, param):
     """DEPRECATED."""
     return _make_parameter(decoder, param)
 
-#
+
 # All years/decades/centuries/millenniums are designed in such a way
 # as to allow for easy date to string and string to date conversion.
 # For example, using any map with either an integer or a string will produce
@@ -519,7 +520,6 @@ def MakeParameter(decoder, param):
 # This is useful when trying to decide if a certain article is a localized date
 # or not, or generating dates.
 # See dh() for additional information.
-#
 formats = {
     'MonthName': {
         'af': lambda v: slh(v, [u"Januarie", u"Februarie", u"Maart", u"April",
@@ -586,10 +586,9 @@ formats = {
         'cy': lambda v: slh(v, [u"Ionawr", u"Chwefror", u"Mawrth", u"Ebrill",
                                 u"Mai", u"Mehefin", u"Gorffennaf", u"Awst",
                                 u"Medi", u"Hydref", u"Tachwedd", u"Rhagfyr"]),
-        'da': lambda v: slh(v, [u"januar", u"februar", u"marts",  u"april",
-                                u"maj", u"juni", u"juli", u"august",
-                                u"september", u"oktober", u"november",
-                                u"december"]),
+        'da': lambda v: slh(v, ['januar', 'februar', 'marts', 'april', 'maj',
+                                'juni', 'juli', 'august', 'september',
+                                'oktober', 'november', 'december']),
         'de': lambda v: slh(v, [u"Januar", u"Februar", u"März", u"April",
                                 u"Mai", u"Juni", u"Juli", u"August",
                                 u"September", u"Oktober", u"November",
@@ -611,9 +610,9 @@ formats = {
                                 u"mai", u"juuni", u"juuli", u"august",
                                 u"september", u"oktoober", u"november",
                                 u"detsember"]),
-        'eu': lambda v: slh(v, [u"Urtarril", u"Otsail", u"Martxo", u"Apiril",
-                                u"Maiatz", u"Ekain", u"Uztail", u"Abuztu",
-                                u"Irail", u"Urri", u"Azaro", u"Abendu"]),
+        'eu': lambda v: slh(v, ['urtarrila', 'otsaila', 'martxoa', 'apirila',
+                                'maiatza', 'ekaina', 'uztaila', 'abuztua',
+                                'iraila', 'urria', 'azaroa', 'abendua']),
         'fa': lambda v: slh(v, [u"ژانویه", u"فوریه", u"مارس", u"آوریل", u"مه",
                                 u"ژوئن", u"ژوئیه", u"اوت", u"سپتامبر", u"اکتبر",
                                 u"نوامبر", u"دسامبر"]),
@@ -1016,7 +1015,7 @@ formats = {
         'scn': dh_simpleYearAD,
         'se': dh_simpleYearAD,
         'sh': dh_simpleYearAD,
-        'simple':  dh_simpleYearAD,
+        'simple': dh_simpleYearAD,
         'sk': dh_simpleYearAD,
         'sl': dh_simpleYearAD,
         'sm': dh_simpleYearAD,
@@ -1112,7 +1111,6 @@ formats = {
     'DecadeAD': {
         'als': lambda v: dh_decAD(v, u'%der'),
         'ar': lambda v: dh_decAD(v, u'%d عقد'),
-        'ast': lambda v: dh_decAD(v, u'Años %d'),
         'ang': lambda v: dh_decAD(v, u'%de'),
         'ast': lambda v: dh_decAD(v, u'Años %d'),
         'bg': lambda v: dh_decAD(v, u'%d-те'),
@@ -1223,7 +1221,6 @@ formats = {
                           lambda ii: (ii[1] - 1) * 100 + ii[0]),
              alwaysTrue)]),
         'pt': lambda v: dh_decAD(v, u'Década de %d'),
-        'ro': lambda v: dh_decAD(v, u'Anii %d'),
         'ro': lambda m: multi(m, [
             (lambda v: dh_constVal(v, 0, u'Primul deceniu d.Hr.'),
              lambda p: p == 0),
@@ -1922,9 +1919,8 @@ formats = {
         'ko': lambda v: dh_singVal(v, u'요즘 화제'),
         'ksh': lambda v: dh_singVal(v, u'Et Neuste'),
         'ku': lambda v: dh_singVal(v, u'Bûyerên rojane'),
-        'la': lambda v: dh_singVal(v, u'Novissima'),
-        'lb': lambda v: dh_singVal(v, u'Aktualitéit'),
         'la': lambda v: dh_singVal(v, u"Nuntii"),
+        'lb': lambda v: dh_singVal(v, u'Aktualitéit'),
         'li': lambda v: dh_singVal(v, u"In 't nuujs"),
         'mn': lambda v: dh_singVal(v, u'Мэдээ'),
         'nl': lambda v: dh_singVal(v, u'In het nieuws'),
@@ -2013,9 +2009,8 @@ def makeMonthNamedList(lang, pattern, makeUpperCase=None):
         f = first_lower
     return [pattern % f(monthName(lang, m)) for m in range(1, 13)]
 
-#
-# Add day of the month formats to the formatting table:   "en:May 15"
-#
+
+# Add day of the month formats to the formatting table: "en:May 15"
 addFmt2('af', False, u"%%d %s", True)
 addFmt2('als', False, u"%%d. %s", True)
 addFmt1('an', False, [u"%d de chinero", u"%d de frebero", u"%d de marzo",

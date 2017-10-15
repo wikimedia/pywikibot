@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Functions for manipulating wiki-text.
 
@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,6 +39,7 @@ from pywikibot import config2 as config
 from pywikibot.exceptions import InvalidTitle
 from pywikibot.family import Family
 from pywikibot.tools import (
+    deprecate_arg,
     deprecated,
     DeprecatedRegex,
     OrderedDict,
@@ -99,7 +100,7 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 }}
 |
 (?P<unhandled_depth>{{\s*[^{\|#0-9][^{\|#]*?\s* [^{]* {{ .* }})
-""", re.VERBOSE)
+""", re.VERBOSE | re.DOTALL)
 
 # The following regex supports wikilinks anywhere after the first pipe
 # and correctly matches the end of the file link if the wikilink contains
@@ -109,8 +110,7 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 FILE_LINK_REGEX = r"""
 \[\[\s*(?:%s)\s*:[^|]*?\s*
   (\|
-    ( \[\[ [^[]*? \[\[ [^]]*? \]\] [^]]*? \]\]  # capture invalid syntax
-     | ( \[\[ .*? \]\] )? [^[]*?
+    ( ( \[\[ .*? \]\] )? [^[]*?
      | \[ [^]]*? \]
     )*
   )?
@@ -127,13 +127,19 @@ NON_LATIN_DIGITS = {
     'or': u'୦୧୨୩୪୫୬୭୮୯',
 }
 
+# Used in TimeStripper. When a timestamp-like line has longer gaps
+# than this between year, month, etc in it, then the line will not be
+# considered to contain a timestamp.
+TIMESTAMP_GAP_LIMIT = 10
+
 
 def to_local_digits(phrase, lang):
     """
     Change Latin digits based on language to localized version.
 
-    Be aware that this function only returns for several language
-    And doesn't touch the input if other languages are asked.
+    Be aware that this function only works for several languages,
+    and that it returns an unchanged string if an unsupported language is given.
+
     @param phrase: The phrase to convert to localized numerical
     @param lang: language code
     @return: The localized version
@@ -193,8 +199,12 @@ class _MultiTemplateMatchBuilder(object):
                       ']' + re.escape(old[1:])
         else:
             pattern = re.escape(old)
+        # namespaces may be any mixed case
+        namespaces = [''.join('[{0}{1}]'.format(char.upper(), char.lower())
+                              for char in ns)
+                      for ns in namespace]
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespace) +
+        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) +
                                    r':|[mM][sS][gG]:)?' + pattern +
                                    r'(?P<parameters>\s*\|.+?|) *}}',
                                    flags)
@@ -211,12 +221,13 @@ def _create_default_regexes():
     _regex_cache.update({
         'comment':      re.compile(r'(?s)<!--.*?-->'),
         # section headers
-        'header':       re.compile(r'\r?\n=+.+=+ *\r?\n'),
+        'header':       re.compile(r'(?m)^=+.+=+ *$'),
         # preformatted text
-        'pre':          re.compile(r'(?ism)<pre>.*?</pre>'),
+        'pre':          re.compile(r'(?is)<pre[ >].*?</pre>'),
         'source':       re.compile(r'(?is)<source .*?</source>'),
+        'score':        re.compile(r'(?is)<score[ >].*?</score>'),
         # inline references
-        'ref':          re.compile(r'(?ism)<ref[ >].*?</ref>'),
+        'ref':          re.compile(r'(?is)<ref[ >].*?</ref>'),
         'template':     NESTED_TEMPLATE_REGEX,
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
@@ -224,7 +235,7 @@ def _create_default_regexes():
         # tables often have whitespace that is used to improve wiki
         # source code readability.
         # TODO: handle nested tables.
-        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table>.*?</table>'),
+        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table[ >].*?</table>'),
         'hyperlink':    compileLinkR(),
         'gallery':      re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
         # this matches internal wikilinks, but also interwiki, categories, and
@@ -236,15 +247,19 @@ def _create_default_regexes():
                              site.validLanguageLinks() +
                              list(site.family.obsolete.keys()))),
         # Wikibase property inclusions
-        'property':     re.compile(r'(?i)\{\{\s*#property:\s*p\d+\s*\}\}'),
+        'property':     (r'(?i)\{\{\s*\#(?:%s):\s*p\d+.*?\}\}',
+                         lambda site: '|'.join(site.getmagicwords('property'))),
         # Module invocations (currently only Lua)
-        'invoke':       re.compile(r'(?i)\{\{\s*#invoke:.*?}\}'),
+        'invoke':       (r'(?is)\{\{\s*\#(?:%s):.*?\}\}',
+                         lambda site: '|'.join(site.getmagicwords('invoke'))),
         # categories
-        'category':     ('\[\[ *(?:%s)\s*:.*?\]\]',
+        'category':     (r'\[\[ *(?:%s)\s*:.*?\]\]',
                          lambda site: '|'.join(site.namespaces[14])),
         # files
         'file':         (FILE_LINK_REGEX,
                          lambda site: '|'.join(site.namespaces[6])),
+        # pagelist tag (used in Proofread extension).
+        'pagelist':      re.compile(r'(?is)<pagelist.*?/>'),
     })
 
 
@@ -277,11 +292,10 @@ def _get_regexes(keys, site):
                 else:
                     result.append(_regex_cache[exc])
             else:
-                # nowiki, noinclude, includeonly, timeline, math ond other
+                # nowiki, noinclude, includeonly, timeline, math and other
                 # extensions
-                if exc not in _regex_cache:
-                    _regex_cache[exc] = re.compile(r'(?is)<%s>.*?</%s>'
-                                                   % (exc, exc))
+                _regex_cache[exc] = re.compile(
+                    r'(?is)<{0}>.*?</{0}>'.format(exc))
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
@@ -295,7 +309,7 @@ def _get_regexes(keys, site):
 
 
 def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
-                  allowoverlap=False, marker='', site=None):
+                  allowoverlap=False, marker='', site=None, count=0):
     """
     Return text with 'old' replaced by 'new', ignoring specified types of text.
 
@@ -315,7 +329,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     @type caseInsensitive: bool
     @param marker: a string that will be added to the last replacement;
         if nothing is changed, it is added at the end
-
+    @param count: how many replacements to do at most. See parameter
+        count of re.sub().
+    @type count: int
     """
     # if we got a string, compile it as a regular expression
     if isinstance(old, basestring):
@@ -331,8 +347,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     dontTouchRegexes = _get_regexes(exceptions, site)
 
     index = 0
+    replaced = 0
     markerpos = len(text)
-    while True:
+    while not count or replaced < count:
         if index > len(text):
             break
         match = old.search(text, index)
@@ -390,9 +407,9 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                         replacement += new[last:group_match.start()]
                         replacement += match.group(group_id) or ''
                     except IndexError:
-                        pywikibot.output('\nInvalid group reference: %s' % group_id)
-                        pywikibot.output('Groups found:\n%s' % match.groups())
-                        raise IndexError
+                        raise IndexError(
+                            'Invalid group reference: {0}\nGroups found: {1}'
+                            ''.format(group_id, match.groups()))
                     last = group_match.end()
                 replacement += new[last:]
 
@@ -407,6 +424,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 # When the regex allows to match nothing, shift by one character
                 index += 1
             markerpos = match.start() + len(replacement)
+            replaced += 1
     text = text[:markerpos] + marker + text[markerpos:]
     return text
 
@@ -568,7 +586,7 @@ def replace_links(text, replace, site=None):
     remaining.
 
     @param text: the text in which to replace links
-    @type  text: basestring
+    @type text: basestring
     @param replace: either a callable which reacts like described above.
         The callable must accept four parameters link, text, groups, rng and
         allows for user interaction. The groups are a dict containing 'title',
@@ -581,11 +599,11 @@ def replace_links(text, replace, site=None):
         result by the callable. It'll convert that into a callable where the
         first item (the Link or Page) has to be equal to the found link and in
         that case it will apply the second value from the sequence.
-    @type  replace: sequence of pywikibot.Page/pywikibot.Link/str or
+    @type replace: sequence of pywikibot.Page/pywikibot.Link/str or
         callable
     @param site: a Site object to use if replace is not a sequence or the link
         to be replaced is not a Link or Page instance.
-    @type  site: pywikibot.APISite
+    @type site: pywikibot.APISite
     """
     def to_link(source):
         """Return the link from source when it's a Page otherwise itself."""
@@ -791,12 +809,12 @@ def replace_links(text, replace, site=None):
 #            Families having those have one member only, and do not have
 #            language-specific sites. The name of the target family of their
 #            inter-language links is kept in their interwiki_forward attribute.
-#        These functions only deal with links of these two kinds only.  They
+#        These functions only deal with links of these two kinds only. They
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Articulo]]".
 
-def getLanguageLinks(text, insite=None, pageLink="[[]]",
-                     template_subpage=False):
+@deprecate_arg("pageLink", None)
+def getLanguageLinks(text, insite=None, template_subpage=False):
     """
     Return a dict of inter-language links found in text.
 
@@ -852,7 +870,7 @@ def getLanguageLinks(text, insite=None, pageLink="[[]]",
                 if previous_key_count == len(result):
                     pywikibot.warning('[getLanguageLinks] 2 or more interwiki '
                                       'links point to site %s.' % site)
-            except pywikibot.InvalidTitle:
+            except InvalidTitle:
                 pywikibot.output(u'[getLanguageLinks] Text contains invalid '
                                  u'interwiki link [[%s:%s]].'
                                  % (lang, pagetitle))
@@ -1087,11 +1105,18 @@ def getCategoryLinks(text, site=None, include=[], expand_text=False):
             title, sortKey = rest.split('|', 1)
         else:
             title, sortKey = rest, None
-        cat = pywikibot.Category(pywikibot.Link(
-                                 '%s:%s' % (match.group('namespace'), title),
-                                 site),
-                                 sortKey=sortKey)
-        result.append(cat)
+        try:
+            cat = pywikibot.Category(pywikibot.Link(
+                                     '%s:%s' % (match.group('namespace'), title),
+                                     site),
+                                     sortKey=sortKey)
+        except InvalidTitle:
+            # Category title extracted contains invalid characters
+            # Likely due to on-the-fly category name creation, see T154309
+            pywikibot.warning('Invalid category title extracted: %s' % title)
+        else:
+            result.append(cat)
+
     return result
 
 
@@ -1334,7 +1359,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
 
     Return value is a list of tuples. There is one tuple for each use of a
     template in the page, with the template title as the first entry and a
-    dict of parameters as the second entry.  Parameters are indexed by
+    dict of parameters as the second entry. Parameters are indexed by
     strings; as in MediaWiki, an unnamed parameter is given a parameter name
     with an integer value corresponding to its position among the unnamed
     parameters, and if this results multiple parameters with the same name
@@ -1349,7 +1374,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     The two implementations return nested templates in a different order.
     i.e. for {{a|b={{c}}}}, mwpfh returns [a, c], whereas regex returns [c, a].
 
-    mwpfh preserves whitespace in parameter names and values.  regex excludes
+    mwpfh preserves whitespace in parameter names and values. regex excludes
     anything between <!-- --> before parsing the text.
 
     If there are multiple numbered parameters in the wikitext for the same
@@ -1360,7 +1385,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     @param text: The wikitext from which templates are extracted
     @type text: unicode or string
     @param remove_disabled_parts: Remove disabled wikitext such as comments
-        and pre.  If None (default), this is enabled when mwparserfromhell
+        and pre. If None (default), this is enabled when mwparserfromhell
         is not available or is disabled in the config, and disabled if
         mwparserfromhell is present and enabled in the config.
     @type remove_disabled_parts: bool or None
@@ -1665,6 +1690,108 @@ def glue_template_and_params(template_and_params):
     return u'{{%s\n%s}}' % (template, text)
 
 
+# ---------------------------------
+# functions dealing with stars list
+# ---------------------------------
+
+starsList = [
+    'bueno',
+    'bom interwiki',
+    'cyswllt[ _]erthygl[ _]ddethol', 'dolen[ _]ed',
+    'destacado', 'destaca[tu]',
+    'enllaç[ _]ad',
+    'enllaz[ _]ad',
+    'leam[ _]vdc',
+    'legătură[ _]a[bcf]',
+    'liamm[ _]pub',
+    'lien[ _]adq',
+    'lien[ _]ba',
+    'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
+    'liên[ _]kết[ _]chọn[ _]lọc',
+    'ligam[ _]adq',
+    'ligazón[ _]a[bd]',
+    'ligoelstara',
+    'ligoleginda',
+    'link[ _][afgu]a', 'link[ _]adq', 'link[ _]f[lm]', 'link[ _]km',
+    'link[ _]sm', 'linkfa',
+    'na[ _]lotura',
+    'nasc[ _]ar',
+    'tengill[ _][úg]g',
+    'ua',
+    'yüm yg',
+    'רא',
+    'وصلة مقالة جيدة',
+    'وصلة مقالة مختارة',
+]
+
+
+def get_stars(text):
+    """
+    Extract stars templates from wikitext.
+
+    @param text: a wiki text
+    @type text: str
+    @return: list of stars templates
+    @rtype: list
+    """
+    allstars = []
+    starstext = removeDisabledParts(text)
+    for star in starsList:
+        regex = re.compile(r'(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
+                           % star, re.I)
+        found = regex.findall(starstext)
+        if found:
+            allstars += found
+    return allstars
+
+
+def remove_stars(text, stars_list):
+    """
+    Remove stars templates from text.
+
+    @param text: a wiki text
+    @type text: str
+    @param start_list: list of stars templates previously found in text
+    @return: modified text
+    @rtype: str
+    """
+    for star in stars_list:
+        text = text.replace(star, '')
+    return text
+
+
+def append_stars(text, stars_list, site=None):
+    """
+    Remove stars templates from text.
+
+    @param text: a wiki text
+    @type text: str
+    @param stars_list: list of stars templates previously found in text
+    @type stars_list: list
+    @param site: a site where the given text is used.
+        interwiki_text_separator is used when a site object is given.
+        Otherwise line_separator is used twice to separate stars list.
+    @type site: BaseSite
+    @return: modified text
+    @rtype: str
+    """
+    LS = (config.line_separator * 2
+          if not site else site.family.interwiki_text_separator)
+    text = text.strip() + LS
+    stars = stars_list[:]
+    stars.sort()
+    for element in stars:
+        text += element.strip() + config.line_separator
+    return text
+
+
+def standardize_stars(text):
+    """Make sure that star templates are in the right order."""
+    allstars = get_stars(text)
+    text = remove_stars(text, allstars)
+    return append_stars(text, allstars)
+
+
 # --------------------------
 # Page parsing functionality
 # --------------------------
@@ -1768,7 +1895,8 @@ class TimeStripper(object):
             if _short.endswith('.'):
                 self.origNames2monthNum[_short[:-1]] = n
 
-        self.groups = [u'year', u'month',  u'hour',  u'time', u'day', u'minute', u'tzinfo']
+        self.groups = ['year', 'month', 'hour', 'time', 'day', 'minute',
+                       'tzinfo']
 
         timeR = r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h](?P<minute>[0-5]\d))'
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
@@ -1808,11 +1936,25 @@ class TimeStripper(object):
             self.pdayR,
         ]
 
-        self.linkP = compileLinkR()
-        self.comment_pattern = re.compile(r'<!--(.*?)-->')
+        self._hyperlink_pat = re.compile(r'\[\s*?http[s]?://[^\]]*?\]')
+        self._comment_pat = re.compile(r'<!--(.*?)-->')
+        self._wikilink_pat = re.compile(
+            r'\[\[(?P<link>[^\]\|]*?)(?P<anchor>\|[^\]]*)?\]\]')
 
         self.tzinfo = tzoneFixedOffset(self.site.siteinfo['timeoffset'],
                                        self.site.siteinfo['timezone'])
+
+    @property
+    @deprecated('_hyperlink_pat')
+    def linkP(self):
+        """Deprecated linkP instance variable."""
+        return self._hyperlink_pat
+
+    @property
+    @deprecated('_comment_pat')
+    def comment_pattern(self):
+        """Deprecated comment_pattern instance variable."""
+        return self._comment_pat
 
     @deprecated('module function')
     def findmarker(self, text, base=u'@@', delta='@'):
@@ -1826,7 +1968,7 @@ class TimeStripper(object):
                 line = line.replace(system[i], str(i))
         return line
 
-    def last_match_and_replace(self, txt, pat):
+    def _last_match_and_replace(self, txt, pat):
         """
         Take the rightmost match and replace with marker.
 
@@ -1837,8 +1979,17 @@ class TimeStripper(object):
         for m in pat.finditer(txt):
             cnt += 1
 
+        def marker(m):
+            """
+            Replace exactly the same number of matched characters.
+
+            Same number of chars shall be replaced, in order to be able to
+            compare pos for matches reliably (absolute pos of a match
+            is not altered by replacement).
+            """
+            return '@' * (m.end() - m.start())
+
         if m:
-            marker = findmarker(txt)
             # month and day format might be identical (e.g. see bug T71315),
             # avoid to wipe out day, after month is matched.
             # replace all matches but the last two
@@ -1851,9 +2002,31 @@ class TimeStripper(object):
                     txt = pat.sub(marker, txt)
             else:
                 txt = pat.sub(marker, txt)
-            return (txt, m.groupdict())
+            return (txt, m)
         else:
             return (txt, None)
+
+    @staticmethod
+    def _valid_date_dict_positions(dateDict):
+        """Check consistency of reasonable positions for groups."""
+        time_pos = dateDict['time']['start']
+        tzinfo_pos = dateDict['tzinfo']['start']
+        date_pos = sorted(
+            (dateDict['day'], dateDict['month'], dateDict['year']),
+            key=lambda x: x['start'])
+        min_pos, max_pos = date_pos[0]['start'], date_pos[-1]['start']
+        max_gap = max(x[1]['start'] - x[0]['end']
+                      for x in zip(date_pos, date_pos[1:]))
+
+        if max_gap > TIMESTAMP_GAP_LIMIT:
+            return False
+        if tzinfo_pos < min_pos or tzinfo_pos < time_pos:
+            return False
+        if min_pos < tzinfo_pos < max_pos:
+            return False
+        if min_pos < time_pos < max_pos:
+            return False
+        return True
 
     def timestripper(self, line):
         """
@@ -1864,52 +2037,86 @@ class TimeStripper(object):
         @return: A timestamp found on the given line
         @rtype: pywikibot.Timestamp
         """
+        # Try to maintain gaps that are used in _valid_date_dict_positions()
+        def censor_match(match):
+            return '_' * (match.end() - match.start())
+
         # match date fields
-        dateDict = dict()
+        dateDict = {}
+
         # Analyze comments separately from rest of each line to avoid to skip
         # dates in comments, as the date matched by timestripper is the
         # rightmost one.
         most_recent = []
-        for comment in self.comment_pattern.finditer(line):
+        for comment in self._comment_pat.finditer(line):
             # Recursion levels can be maximum two. If a comment is found, it will
             # not for sure be found in the next level.
-            # Nested cmments are excluded by design.
+            # Nested comments are excluded by design.
             timestamp = self.timestripper(comment.group(1))
             most_recent.append(timestamp)
+
+        # Censor comments.
+        line = self._comment_pat.sub(censor_match, line)
+
+        # Censor external links.
+        line = self._hyperlink_pat.sub(censor_match, line)
+
+        for wikilink in self._wikilink_pat.finditer(line):
+            # Recursion levels can be maximum two. If a link is found, it will
+            # not for sure be found in the next level.
+            # Nested links are excluded by design.
+            link, anchor = wikilink.group('link'), wikilink.group('anchor')
+            timestamp = self.timestripper(link)
+            most_recent.append(timestamp)
+            if anchor:
+                timestamp = self.timestripper(anchor)
+                most_recent.append(timestamp)
+
+        # Censor wikilinks.
+        line = self._wikilink_pat.sub(censor_match, line)
 
         # Remove parts that are not supposed to contain the timestamp, in order
         # to reduce false positives.
         line = removeDisabledParts(line)
-        line = self.linkP.sub('', line)  # remove external links
 
         line = self.fix_digits(line)
         for pat in self.patterns:
-            line, matchDict = self.last_match_and_replace(line, pat)
-            if matchDict:
-                dateDict.update(matchDict)
+            line, match_obj = self._last_match_and_replace(line, pat)
+            if match_obj:
+                for group, value in match_obj.groupdict().items():
+                    start, end = (match_obj.start(group), match_obj.end(group))
+                    # The positions are stored for later validation
+                    dateDict[group] = {
+                        'value': value, 'start': start, 'end': end
+                    }
 
         # all fields matched -> date valid
-        if all(g in dateDict for g in self.groups):
-            # remove 'time' key, now split in hour/minute and not needed by datetime
+        # groups are in a reasonable order.
+        if (all(g in dateDict for g in self.groups) and
+                self._valid_date_dict_positions(dateDict)):
+            # remove 'time' key, now split in hour/minute and not needed
+            # by datetime.
             del dateDict['time']
 
             # replace month name in original language with month number
             try:
-                dateDict['month'] = self.origNames2monthNum[dateDict['month']]
+                value = self.origNames2monthNum[dateDict['month']['value']]
             except KeyError:
                 pywikibot.output(u'incorrect month name "%s" in page in site %s'
-                                 % (dateDict['month'], self.site))
+                                 % (dateDict['month']['value'], self.site))
                 raise KeyError
+            else:
+                dateDict['month']['value'] = value
 
-            # convert to integers
+            # convert to integers and remove the inner dict
             for k, v in dateDict.items():
                 if k == 'tzinfo':
                     continue
                 try:
-                    dateDict[k] = int(v)
+                    dateDict[k] = int(v['value'])
                 except ValueError:
                     raise ValueError('Value: %s could not be converted for key: %s.'
-                                     % (v, k))
+                                     % (v['value'], k))
 
             # find timezone
             dateDict['tzinfo'] = self.tzinfo

@@ -1,5 +1,10 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikisource."""
+#
+# (C) Pywikibot team, 2004-2017
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
@@ -15,32 +20,43 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikisource'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikisource
-        'ang',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Haitian_Creole_Wikisource
-        'ht',
+        # https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'ang', 'ht',
+    ]
+    removed_wikis = [
+        # https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
+        'tokipona',
     ]
 
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'de', 'ru', 'fr', 'he', 'zh', 'pl', 'es', 'it', 'ar', 'cs',
-            'pt', 'fa', 'hu', 'ml', 'ko', 'sv', 'sl', 'te', 'ro', 'gu', 'fi',
-            'sr', 'sa', 'vi', 'el', 'bn', 'ca', 'hy', 'th', 'hr', 'ja', 'nl',
-            'is', 'br', 'az', 'no', 'la', 'uk', 'vec', 'eo', 'tr', 'ta', 'be',
-            'mk', 'yi', 'id', 'da', 'et', 'li', 'as', 'bg', 'mr', 'kn', 'bs',
-            'sah', 'lt', 'gl', 'or', 'cy', 'sk', 'zh-min-nan', 'fo',
+            'en', 'pl', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'cs',
+            'pt', 'fa', 'www', 'hu', 'ml', 'ko', 'sv', 'sr', 'gu', 'bn', 'sl',
+            'te', 'sa', 'el', 'ro', 'fi', 'uk', 'vi', 'ja', 'az', 'th', 'hy',
+            'ca', 'br', 'hr', 'ta', 'nl', 'is', 'la', 'no', 'vec', 'eo', 'tr',
+            'be', 'et', 'mk', 'yi', 'kn', 'id', 'da', 'bg', 'li', 'mr', 'as',
+            'or', 'bs', 'sah', 'lt', 'gl', 'sk', 'cy', 'pa', 'zh-min-nan',
+            'fo',
         ]
 
         super(Family, self).__init__()
 
-        # FIXME: '-' is invalid at the beginning of a hostname, and
-        # '-' is not a valid subdomain.
-        self.langs['-'] = self.domain
-        self.languages_by_size.append('-')
+        self.category_redirect_templates = {
+            '_default': (),
+            'ar': ('قالب:تحويل تصنيف',),
+            'en': ('Category redirect',),
+            'ro': ('Redirect categorie',),
+            'zh': ('分類重定向',),
+        }
+
+        # All requests to 'mul.wikisource.org/*' are redirected to
+        # the main page, so using 'wikisource.org'
+        self.langs['mul'] = self.domain
+        self.languages_by_size.append('mul')
 
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
         self.cross_allowed = [
             'ca', 'el', 'fa', 'it', 'ko', 'no', 'pl', 'vi', 'zh',
         ]

@@ -29,7 +29,6 @@ Library tests
     edit_failure<./edit_failure_tests>
     timestripper<./timestripper_tests>
     pagegenerators<./pagegenerators_tests>
-    wikidataquery<./wikidataquery_tests>
     weblib<./weblib_tests>
     i18n<./i18n_tests>
     wikistats<./wikistats_tests>

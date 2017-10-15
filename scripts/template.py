@@ -17,7 +17,10 @@ Command line options:
 
 -subst       Resolves the template by putting its text directly into the
              article. This is done by changing {{...}} or {{msg:...}} into
-             {{subst:...}}
+             {{subst:...}}.
+             Substitution is not available inside <ref>...</ref>,
+             <gallery>...</gallery>, <poem>...</poem> and <pagelist ... />
+             tags.
 
 -assubst     Replaces the first argument as old template with the second
              argument as new template but substitutes it like -subst does.
@@ -39,15 +42,15 @@ Command line options:
              If this parameter is missed, all edits are checked but this is
              restricted to the last 100 edits.
 
--summary:    Lets you pick a custom edit summary.  Use quotes if edit summary
+-summary:    Lets you pick a custom edit summary. Use quotes if edit summary
              contains spaces.
 
 -always      Don't bother asking to confirm any of the changes, Just Do It.
 
--addcat:     Appends the given category to every page that is edited.  This is
+-addcat:     Appends the given category to every page that is edited. This is
              useful when a category is being broken out from a template
-             parameter or when templates are being upmerged but more information
-             must be preserved.
+             parameter or when templates are being upmerged but more
+             information must be preserved.
 
 other:       First argument is the old template name, second one is the new
              name.
@@ -94,23 +97,20 @@ from five category pages as given:
 
 
 This next example substitutes templates test1, test2, and space test on all
-pages:
+user talk pages (namespace #3):
 
-    python pwb.py template test1 test2 "space test" -subst -always
+    python pwb.py template test1 test2 "space test" -subst -ns:3 -always
 
 """
 #
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2004-2016
+# (C) xqt, 2009-2017
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import re
 
@@ -141,10 +141,11 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
         """
         Constructor.
 
-        Arguments:
-            * templateNames - A list of Page object representing the searched
-                              templates
-            * xmlfilename   - The dump's path, either absolute or relative
+        @param templateNames: A list of Page objects representing the searched
+            templates
+        @type templateNames: list
+        @param xmlfilename: The dump's path, either absolute or relative
+        @type xmlfilename: str
 
         """
         self.templates = templates
@@ -179,11 +180,11 @@ class TemplateRobot(ReplaceBot):
         Constructor.
 
         @param generator: the pages to work on
-        @type  generator: iterable
+        @type generator: iterable
         @param templates: a dictionary which maps old template names to
             their replacements. If remove or subst is True, it maps the
             names of the templates that should be removed/resolved to None.
-        @type  templates: dict
+        @type templates: dict
         """
         self.availableOptions.update({
             'subst': False,
@@ -202,46 +203,51 @@ class TemplateRobot(ReplaceBot):
             params = {'list': comma.join(self.templates.keys()),
                       'num': len(self.templates)}
 
-            site = self.site
-
             if self.getOption('remove'):
                 self.options['summary'] = i18n.twtranslate(
-                    site, 'template-removing', params)
+                    self.site, 'template-removing', params)
             elif self.getOption('subst'):
                 self.options['summary'] = i18n.twtranslate(
-                    site, 'template-substituting', params)
+                    self.site, 'template-substituting', params)
             else:
                 self.options['summary'] = i18n.twtranslate(
-                    site, 'template-changing', params)
-
-        # regular expression to find the original template.
-        # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
-        # The old syntax, {{msg:vfd}}, will also be found.
-        # The group 'parameters' will either match the parameters, or an
-        # empty string if there are none.
+                    self.site, 'template-changing', params)
 
         replacements = []
         exceptions = {}
-        builder = textlib._MultiTemplateMatchBuilder(site)
+        builder = textlib._MultiTemplateMatchBuilder(self.site)
         for old, new in self.templates.items():
             templateRegex = builder.pattern(old)
 
             if self.getOption('subst') and self.getOption('remove'):
                 replacements.append((templateRegex,
                                      r'{{subst:%s\g<parameters>}}' % new))
-                exceptions['inside-tags'] = ['ref', 'gallery']
+                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
+                                             'pagelist', ]
             elif self.getOption('subst'):
                 replacements.append((templateRegex,
                                      r'{{subst:%s\g<parameters>}}' % old))
-                exceptions['inside-tags'] = ['ref', 'gallery']
+                exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
+                                             'pagelist', ]
             elif self.getOption('remove'):
+                separate_line_regex = re.compile(
+                    r'^[*#:]* *{0} *\n'.format(templateRegex.pattern),
+                    re.DOTALL | re.MULTILINE)
+                replacements.append((separate_line_regex, ''))
+
+                spaced_regex = re.compile(
+                    r' +{0} +'.format(templateRegex.pattern),
+                    re.DOTALL)
+                replacements.append((spaced_regex, ' '))
+
                 replacements.append((templateRegex, ''))
             else:
                 template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
                     pywikibot.warning(u'Template "%s" does not exist.' % new)
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
-                                              default=False, automatic_quit=False):
+                                              default=False,
+                                              automatic_quit=False):
                         continue
                 replacements.append((templateRegex,
                                      r'{{%s\g<parameters>}}' % new))
@@ -338,20 +344,22 @@ def main(*args):
         builder = textlib._MultiTemplateMatchBuilder(site)
         predicate = builder.search_any_predicate(oldTemplates)
 
-        gen = XmlDumpTemplatePageGenerator(
+        gen = XMLDumpPageGenerator(
             xmlfilename, site=site, text_predicate=predicate)
     else:
         gen = genFactory.getCombinedGenerator()
 
     if not gen:
         gens = [
-            pagegenerators.ReferringPageGenerator(t, onlyTemplateInclusion=True)
+            pagegenerators.ReferringPageGenerator(t,
+                                                  onlyTemplateInclusion=True)
             for t in oldTemplates
         ]
         gen = pagegenerators.CombinedPageGenerator(gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
-        gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp, skip,
+        gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp,
+                                                     skip,
                                                      max_revision_depth=100,
                                                      show_filtered=True)
 
@@ -359,10 +367,12 @@ def main(*args):
         # make sure that proper namespace filtering etc. is handled
         gen = genFactory.getCombinedGenerator(gen)
 
-    preloadingGen = pagegenerators.PreloadingGenerator(gen)
+    if not genFactory.nopreload:
+        gen = pagegenerators.PreloadingGenerator(gen)
 
-    bot = TemplateRobot(preloadingGen, templates, **options)
+    bot = TemplateRobot(gen, templates, site=site, **options)
     bot.run()
+
 
 if __name__ == "__main__":
     try:

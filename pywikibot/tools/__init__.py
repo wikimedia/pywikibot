@@ -1,18 +1,21 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import absolute_import, unicode_literals
 __version__ = '$Id$'
 
-import bz2
 import collections
 import gzip
+import hashlib
 import inspect
+import itertools
+import os
 import re
+import stat
 import subprocess
 import sys
 import threading
@@ -38,6 +41,15 @@ else:
 
 from pywikibot.logging import debug
 
+try:
+    import bz2
+except ImportError as bz2_import_error:
+    try:
+        import bz2file as bz2
+        warn('package bz2 was not found; using bz2file', ImportWarning)
+    except ImportError:
+        warn('package bz2 and bz2file were not found', ImportWarning)
+        bz2 = bz2_import_error
 
 if PYTHON_VERSION < (3, 5):
     # although deprecated in 3 completely no message was emitted until 3.5
@@ -138,9 +150,19 @@ Please upgrade to Python 2.7+ or Python 3.3+, or run:
 
 
 else:
-    from collections import Counter  # noqa ; unused
-    from collections import OrderedDict
-    from itertools import count  # noqa ; unused
+    Counter = collections.Counter
+    OrderedDict = collections.OrderedDict
+    count = itertools.count
+
+
+def has_module(module):
+    """Check whether a module can be imported."""
+    try:
+        __import__(module)
+    except ImportError:
+        return False
+    else:
+        return True
 
 
 def empty_iterator():
@@ -150,18 +172,49 @@ def empty_iterator():
     yield
 
 
+def py2_encode_utf_8(func):
+    """Decorator to optionally encode the string result of a function on Python 2.x."""
+    if PY2:
+        return lambda s: func(s).encode('utf-8')
+    else:
+        return func
+
+
+class classproperty(object):  # flake8: disable=N801
+
+    """
+    Metaclass to accesss a class method as a property.
+
+    This class may be used as a decorator::
+
+        class Foo(object):
+
+            _bar = 'baz'  # a class property
+
+            @classproperty
+            def bar(cls):  # a class property method
+                return cls._bar
+
+    Foo.bar gives 'baz'.
+    """
+
+    def __init__(self, cls_method):
+        """Hold the class method."""
+        self.method = cls_method
+
+    def __get__(self, instance, owner):
+        """Get the attribute of the owner class by its method."""
+        return self.method(owner)
+
+
 class UnicodeMixin(object):
 
     """Mixin class to add __str__ method in Python 2 or 3."""
 
-    if not PY2:
-        def __str__(self):
-            """Return the unicode representation as the str representation."""
-            return self.__unicode__()
-    else:
-        def __str__(self):
-            """Return the str representation of the UTF-8 encoded Unicode."""
-            return self.__unicode__().encode('utf8')
+    @py2_encode_utf_8
+    def __str__(self):
+        """Return the unicode representation as the str representation."""
+        return self.__unicode__()
 
 
 # From http://python3porting.com/preparing.html
@@ -447,7 +500,7 @@ class MediaWikiVersion(Version):
             self._dev_version = (2, int(version_match.group(4)))
         elif version_match.group(5):
             self._dev_version = (3, int(version_match.group(5)))
-        elif version_match.group(2) in {'alpha', '-alpha'}:
+        elif version_match.group(2) in ('alpha', '-alpha'):
             self._dev_version = (1, )
         else:
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
@@ -496,7 +549,7 @@ class ThreadedGenerator(threading.Thread):
     Important: the generator thread will stop itself if the generator's
     internal queue is exhausted; but, if the calling program does not use
     all the generated values, it must call the generator's stop() method to
-    stop the background thread.  Example usage:
+    stop the background thread. Example usage:
 
     >>> gen = ThreadedGenerator(target=range, args=(20,))
     >>> try:
@@ -510,7 +563,7 @@ class ThreadedGenerator(threading.Thread):
 
     def __init__(self, group=None, target=None, name="GeneratorThread",
                  args=(), kwargs=None, qsize=65536):
-        """Constructor.  Takes same keyword arguments as threading.Thread.
+        """Constructor. Takes same keyword arguments as threading.Thread.
 
         target must be a generator function (or other callable that returns
         an iterable object).
@@ -551,8 +604,8 @@ class ThreadedGenerator(threading.Thread):
 
     def run(self):
         """Run the generator and store the results on the queue."""
-        iterable = any([hasattr(self.generator, key)
-                        for key in ['__iter__', '__getitem__']])
+        iterable = any(hasattr(self.generator, key)
+                       for key in ('__iter__', '__getitem__'))
         if iterable and not self.args and not self.kwargs:
             self.__gen = self.generator
         else:
@@ -601,12 +654,55 @@ def itergroup(iterable, size):
         yield group
 
 
+def islice_with_ellipsis(iterable, *args, **kwargs):
+    u"""
+    Generator which yields the first n elements of the iterable.
+
+    If more elements are available and marker is True, it returns an extra
+    string marker as continuation mark.
+
+    Function takes the
+    and the additional keyword marker.
+
+    @param iterable: the iterable to work on
+    @type iterable: iterable
+    @param args: same args as:
+        - C{itertools.islice(iterable, stop)}
+        - C{itertools.islice(iterable, start, stop[, step])}
+    @keyword marker: element to yield if iterable still contains elements
+        after showing the required number.
+        Default value: '…'
+        No other kwargs are considered.
+    @type marker: str
+    """
+    s = slice(*args)
+    marker = kwargs.pop('marker', '…')
+    try:
+        k, v = kwargs.popitem()
+        raise TypeError(
+            "islice_with_ellipsis() take only 'marker' as keyword arg, not %s"
+            % k)
+    except KeyError:
+        pass
+
+    _iterable = iter(iterable)
+    for el in itertools.islice(_iterable, *args):
+        yield el
+    if marker and s.stop is not None:
+        try:
+            next(_iterable)
+        except StopIteration:
+            pass
+        else:
+            yield marker
+
+
 class ThreadList(list):
 
     """A simple threadpool class to limit the number of simultaneous threads.
 
     Any threading.Thread object can be added to the pool using the append()
-    method.  If the maximum number of simultaneous threads has not been reached,
+    method. If the maximum number of simultaneous threads has not been reached,
     the Thread object will be started immediately; if not, the append() call
     will block until the thread is able to start.
 
@@ -695,6 +791,7 @@ def intersect_generators(genlist):
 
     for source in genlist:
         threaded_gen = ThreadedGenerator(name=repr(source), target=source)
+        threaded_gen.daemon = True
         thrlist.append(threaded_gen)
 
     while True:
@@ -755,8 +852,10 @@ def filter_unique(iterable, container=None, key=None, add=None):
 
     The container can be any object that supports __contains__.
     If the container is a set or dict, the method add or __setitem__ will be
-    used automatically.  Any other method may be provided explicitly using the
+    used automatically. Any other method may be provided explicitly using the
     add parameter.
+
+    Beware that key=id is only useful for cases where id() is not unique.
 
     Note: This is not thread safe.
 
@@ -987,6 +1086,8 @@ def open_archive(filename, mode='rb', use_extension=True):
             extension = ''
 
     if extension == 'bz2':
+        if isinstance(bz2, ImportError):
+            raise bz2
         return wrap(bz2.BZ2File(filename, mode), 1)
     elif extension == 'gz':
         return wrap(gzip.open(filename, mode), 0)
@@ -1000,15 +1101,15 @@ def open_archive(filename, mode='rb', use_extension=True):
                                        stderr=subprocess.PIPE,
                                        bufsize=65535)
         except OSError:
-            raise ValueError('7za is not installed and can not '
+            raise ValueError('7za is not installed or cannot '
                              'uncompress "{0}"'.format(filename))
         else:
             stderr = process.stderr.read()
             process.stderr.close()
-            if b'Everything is Ok' not in stderr:
+            if stderr != b'':
                 process.stdout.close()
-                # OSError is also raised when bz2 is invalid
-                raise OSError('Invalid 7z archive.')
+                raise OSError(
+                    'Unexpected STDERR output from 7za {0}'.format(stderr))
             else:
                 return process.stdout
     else:
@@ -1038,7 +1139,7 @@ def merge_unique_dicts(*args, **kwargs):
 # Decorators
 #
 # Decorator functions without parameters are _invoked_ differently from
-# decorator functions with function syntax.  For example, @deprecated causes
+# decorator functions with function syntax. For example, @deprecated causes
 # a different invocation to @deprecated().
 
 # The former is invoked with the decorated function as args[0].
@@ -1047,8 +1148,8 @@ def merge_unique_dicts(*args, **kwargs):
 # function as args[0].
 
 # The follow deprecators may support both syntax, e.g. @deprecated and
-# @deprecated() both work.  In order to achieve that, the code inspects
-# args[0] to see if it callable.  Therefore, a decorator must not accept
+# @deprecated() both work. In order to achieve that, the code inspects
+# args[0] to see if it callable. Therefore, a decorator must not accept
 # only one arg, and that arg be a callable, as it will be detected as
 # a deprecator without any arguments.
 
@@ -1059,7 +1160,7 @@ def signature(obj):
 
     inspect.signature was introduced in 3.3, however backports are available.
     In Python 3.3, it does not support all types of callables, and should
-    not be relied upon.  Python 3.4 works correctly.
+    not be relied upon. Python 3.4 works correctly.
 
     Any exception calling inspect.signature is ignored and None is returned.
 
@@ -1606,3 +1707,59 @@ class ModuleDeprecationWrapper(types.ModuleType):
 def open_compressed(filename, use_extension=False):
     """DEPRECATED: Open a file and uncompress it if needed."""
     return open_archive(filename, use_extension=use_extension)
+
+
+def file_mode_checker(filename, mode=0o600):
+    """Check file mode and update it, if needed.
+
+    @param filename: filename path
+    @type filename: basestring
+    @param mode: requested file mode
+    @type mode: int
+
+    """
+    warn_str = 'File {0} had {1:o} mode; converted to {2:o} mode.'
+    st_mode = os.stat(filename).st_mode
+    if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode):
+        os.chmod(filename, mode)
+        # re-read and check changes
+        if os.stat(filename).st_mode != st_mode:
+            warn(warn_str.format(filename, st_mode - stat.S_IFREG, mode))
+
+
+def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
+    """Compute file hash.
+
+    Result is expressed as hexdigest().
+
+    @param filename: filename path
+    @type filename: basestring
+
+    @param func: hashing function among the following in hashlib:
+        md5(), sha1(), sha224(), sha256(), sha384(), and sha512()
+        function name shall be passed as string, e.g. 'sha1'.
+    @type filename: basestring
+
+    @param bytes_to_read: only the first bytes_to_read will be considered;
+        if file size is smaller, the whole file will be considered.
+    @type bytes_to_read: None or int
+
+    """
+    size = os.path.getsize(filename)
+    if bytes_to_read is None:
+        bytes_to_read = size
+    else:
+        bytes_to_read = min(bytes_to_read, size)
+    step = 1 << 20
+
+    shas = ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512']
+    assert sha in shas
+    sha = getattr(hashlib, sha)()  # sha instance
+
+    with open(filename, 'rb') as f:
+        while bytes_to_read > 0:
+            read_bytes = f.read(min(bytes_to_read, step))
+            assert read_bytes  # make sure we actually read bytes
+            bytes_to_read -= len(read_bytes)
+            sha.update(read_bytes)
+    return sha.hexdigest()

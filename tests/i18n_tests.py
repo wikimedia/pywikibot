@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test i18n module."""
 #
 # (C) Pywikibot team, 2007-2014
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -300,9 +298,13 @@ class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
 
     def testMultipleNonNumbers(self):
         """Test error handling for multiple non-numbers."""
-        with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'drei'"):
+        with self.assertRaisesRegex(
+            ValueError, r"invalid literal for int\(\) with base 10: 'drei'"
+        ):
             i18n.twntranslate('de', 'test-multiple-plurals', ["drei", "1", 1])
-        with self.assertRaisesRegex(ValueError, "invalid literal for int\(\) with base 10: 'elf'"):
+        with self.assertRaisesRegex(
+            ValueError, r"invalid literal for int\(\) with base 10: 'elf'"
+        ):
             i18n.twntranslate('de', 'test-multiple-plurals',
                               {'action': u'Ändere', 'line': "elf", 'page': 2})
 
@@ -357,27 +359,35 @@ class InputTestCase(TWNTestCaseBase, UserInterfaceLangTestCase, PwbTestCase):
     """Test i18n.input."""
 
     family = 'wikipedia'
-    code = 'arz'
+    code = 'nn'
+    alt_code = 'nb'
 
     message_package = 'scripts.i18n'
+    message = 'pywikibot-enter-category-name'
 
     @classmethod
     def setUpClass(cls):
         """Verify that a translation does not yet exist."""
+        if 'userinterface_lang' in pywikibot.config.__modified__:
+            raise unittest.SkipTest(
+                'user-config has a modified userinterface_lang')
+
         super(InputTestCase, cls).setUpClass()
 
-        if cls.code in i18n.twget_keys('pywikibot-enter-category-name'):
+        if cls.code in i18n.twget_keys(cls.message):
             raise unittest.SkipTest(
                 '%s has a translation for %s'
-                % (cls.code, 'pywikibot-enter-category-name'))
+                % (cls.code, cls.message))
 
     def test_pagegen_i18n_input(self):
-        """Test i18n.input via ."""
-        result = self._execute(args=['listpages', '-cat'],
-                               data_in='non-existant-category\n',
-                               timeout=5)
+        """Test i18n.input fallback via pwb and LC_ALL."""
+        expect = i18n.twtranslate(self.alt_code, self.message, fallback=False)
 
-        self.assertIn('Please enter the category name:', result['stderr'])
+        result = self._execute(args=['listpages', '-cat'],
+                               data_in='non-existant-category\r\n',
+                               timeout=20)
+
+        self.assertIn(expect, result['stderr'])
 
 
 class MissingPackageTestCase(TWNSetMessagePackageBase,
@@ -432,6 +442,20 @@ class TestExtractPlural(TestCase):
             i18n._extract_plural('en', '{{PLURAL:foo|one|other}}', {'foo': 0}),
             'other')
 
+    def test_empty_fields(self):
+        """Test default usage using a dict and no specific plurals."""
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo||other}}', {'foo': 42}),
+            'other')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo||other}}', {'foo': 1}),
+            '')
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one|}}', {'foo': 1}),
+            'one')
+        with self.assertRaises(IndexError):
+            i18n._extract_plural('en', '{{PLURAL:foo|one}}', {'foo': 0})
+
     def test_specific(self):
         """Test using a specific plural."""
         self.assertEqual(
@@ -444,7 +468,7 @@ class TestExtractPlural(TestCase):
             'dozen')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

@@ -27,13 +27,11 @@ used on a page reachable via interwiki links.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import re
 import sys
@@ -41,8 +39,8 @@ import sys
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.specialbots import UploadRobot
 
-from scripts import upload
 
 nowCommonsTemplate = {
     'ar': u'{{الآن كومنز|%s}}',
@@ -121,6 +119,7 @@ class ImageTransferBot(object):
 
     def __init__(self, generator, targetSite=None, interwiki=False,
                  keep_name=False, ignore_warning=False):
+        """Constructor."""
         self.generator = generator
         self.interwiki = interwiki
         self.targetSite = targetSite
@@ -153,8 +152,8 @@ class ImageTransferBot(object):
 
             description = i18n.twtranslate(self.targetSite,
                                            'imagetransfer-file_page_message',
-                                           dict(site=sourceSite,
-                                                description=description))
+                                           {'site': sourceSite,
+                                            'description': description})
             description += '\n\n'
             description += sourceImagePage.getFileVersionHistoryTable()
             # add interwiki link
@@ -162,17 +161,18 @@ class ImageTransferBot(object):
                 description += u'\r\n\r\n{0}'.format(sourceImagePage)
         except pywikibot.NoPage:
             description = ''
-            print("Image does not exist or description page is empty.")
+            pywikibot.output(
+                'Image does not exist or description page is empty.')
         except pywikibot.IsRedirectPage:
             description = ''
-            print("Image description page is redirect.")
+            pywikibot.output('Image description page is redirect.')
         else:
-            bot = upload.UploadRobot(url=url, description=description,
-                                     targetSite=self.targetSite,
-                                     urlEncoding=sourceSite.encoding(),
-                                     keepFilename=self.keep_name,
-                                     verifyDescription=not self.keep_name,
-                                     ignoreWarning=self.ignore_warning)
+            bot = UploadRobot(url=url, description=description,
+                              targetSite=self.targetSite,
+                              urlEncoding=sourceSite.encoding(),
+                              keepFilename=self.keep_name,
+                              verifyDescription=not self.keep_name,
+                              ignoreWarning=self.ignore_warning)
             # try to upload
             targetFilename = bot.run()
             if targetFilename and self.targetSite.family.name == 'commons' and \
@@ -197,9 +197,10 @@ class ImageTransferBot(object):
                                         summary=reason)
 
     def showImageList(self, imagelist):
+        """Print image list."""
         for i in range(len(imagelist)):
             image = imagelist[i]
-            print("-" * 60)
+            pywikibot.output('-' * 60)
             pywikibot.output(u"%s. Found image: %s"
                              % (i, image.title(asLink=True)))
             try:
@@ -217,7 +218,7 @@ class ImageTransferBot(object):
                     targetImage.get()
                     pywikibot.output(u"Image with this name is already on %s."
                                      % self.targetSite)
-                    print("-" * 60)
+                    pywikibot.output('-' * 60)
                     pywikibot.output(targetImage.get())
                     sys.exit()
                 except pywikibot.NoPage:
@@ -229,9 +230,10 @@ class ImageTransferBot(object):
 
             except pywikibot.NoPage:
                 break
-        print("=" * 60)
+        pywikibot.output('=' * 60)
 
     def run(self):
+        """Run the bot."""
         for page in self.generator:
             if self.interwiki:
                 imagelist = []
@@ -240,7 +242,7 @@ class ImageTransferBot(object):
                     imagelist.extend(
                         linkedPage.imagelinks(
                             followRedirects=True))
-            elif page.isImage():
+            elif page.is_filepage():
                 imagePage = pywikibot.FilePage(page.site, page.title())
                 imagelist = [imagePage]
             else:
@@ -321,6 +323,7 @@ def main(*args):
     bot = ImageTransferBot(gen, interwiki=interwiki, targetSite=targetSite,
                            keep_name=keep_name)
     bot.run()
+
 
 if __name__ == "__main__":
     main()

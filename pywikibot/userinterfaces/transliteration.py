@@ -1,5 +1,10 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module to transliterate text."""
+#
+# (C) Pywikibot team, 2006-2015
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
@@ -291,18 +296,18 @@ class transliterator(object):
                            u"І": u"I", u"і": u"i", u"Ї": u"Ji", u"ї": u"ji",
                            u"Є": u"Je", u"є": u"je", u"Ґ": u"G", u"Ҝ": u"G",
                            u"ґ": u"g", u"ҝ": u"g", u"Ђ": u"Dj", u"ђ": u"dj",
-                           u"Ӣ": u"Y", u"ӣ": u"y", u"Љ": u"Lj", u"љ": u"lj",
+                           "Љ": "Lj", "љ": "lj",
                            u"Њ": u"Nj", u"њ": u"nj", u"Ћ": u"Cj", u"ћ": u"cj",
                            u"Җ": u"Zhj", u"җ": u"zhj", u"Ѓ": u"Gj", u"ѓ": u"gj",
                            u"Ќ": u"Kj", u"ќ": u"kj", u"Ӣ": u"Ii", u"ӣ": u"ii",
-                           u"Ӯ": u"U", u"ӯ": u"u", u"Ҳ": u"H", u"ҳ": u"h",
+                           "Ҳ": "H", "ҳ": "h",
                            u"Ҷ": u"Dz", u"ҷ": u"dz", u"Ө": u"Ô", u"Ӫ": u"Ô",
                            u"ө": u"ô", u"ӫ": u"ô", u"Ү": u"Y", u"ү": u"y", u"Һ": u"H",
                            u"һ": u"h", u"Ә": u"AE", u"Ӕ": u"AE", u"ә": u"ae",
                            u"Ӛ": u"Ë", u"Ӭ": u"Ë", u"ӛ": u"ë", u"ӭ": u"ë", u"Җ": u"Zhj",
                            u"җ": u"zhj", u"Ұ": u"U", u"ұ": u"u", u"ў": u"ù", u"Ў": u"Ù",
                            u"ѝ": u"ì", u"Ѝ": u"Ì", u"Ӑ": u"A", u"ă": u"a", u"Ӓ": u"Ä",
-                           u"ҿ": u"ä", u"Ҽ": u"Ts", u"Ҿ": u"Ts", u"ҽ": u"ts", u"ҿ": u"ts",
+                           "Ҽ": "Ts", "Ҿ": "Ts", "ҽ": "ts", "ҿ": "ts",
                            u"Ҙ": u"Dh", u"ҙ": u"dh", u"Ӏ": u"", u"ӏ": u"", u"Ӆ": u"L",
                            u"ӆ": u"l", u"Ӎ": u"M", u"ӎ": u"m", u"Ӧ": u"Ö", u"ӧ": u"ö",
                            u"Ҩ": u"u", u"ҩ": u"u", u"Ҧ": u"Ph", u"ҧ": u"ph", u"Ҏ": u"R",

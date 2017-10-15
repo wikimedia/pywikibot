@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Package tests."""
 #
 # (C) Pywikibot team, 2007-2015
@@ -7,13 +7,11 @@
 #
 from __future__ import absolute_import, print_function, unicode_literals
 
-__version__ = '$Id$'
-
 import functools
 import os
 import warnings
 
-__all__ = ('requests', 'TestRequest',
+__all__ = ('requests', 'unittest', 'TestRequest',
            'patch_request', 'unpatch_request')
 
 # Verify that the unit tests have a base working environment:
@@ -22,7 +20,7 @@ __all__ = ('requests', 'TestRequest',
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - unittest2; see below
 # - mwparserfromhell is optional, so is only imported in textlib_tests
-import requests  # noqa
+import requests
 
 from pywikibot.tools import PYTHON_VERSION
 
@@ -66,6 +64,7 @@ join_pages_path = create_path_func(join_tests_path, 'pages')
 
 join_images_path = create_path_func(join_data_path, 'images')
 join_xml_data_path = create_path_func(join_data_path, 'xml')
+join_html_data_path = create_path_func(join_data_path, 'html')
 
 # Find the root directory of the checkout
 _pwb_py = join_root_path('pwb.py')
@@ -86,6 +85,7 @@ library_test_modules = [
     'tools_ip',
     'xmlreader',
     'textlib',
+    'diff',
     'http',
     'namespace',
     'dry_api',
@@ -110,7 +110,6 @@ library_test_modules = [
     'timestripper',
     'pagegenerators',
     'cosmetic_changes',
-    'wikidataquery',
     'wikistats',
     'weblib',
     'i18n',
@@ -155,9 +154,6 @@ if not i18n.messages_available():
 disabled_tests = {
     'textlib': [
         'test_interwiki_format',  # example; very slow test
-    ],
-    'site_detect': [
-        'test_IWM',  # very slow and tests include unnecessary sites
     ],
     'weblib': [
         'testWebCiteOlder',  # fails. T110640

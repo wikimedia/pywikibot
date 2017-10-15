@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test tools.chars package."""
 #
 # (C) Pywikibot team, 2015
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import unicodedata
 
@@ -48,7 +46,7 @@ class CharsTestCase(TestCase):
         self.assertCountEqual(invalid.items(), [])
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

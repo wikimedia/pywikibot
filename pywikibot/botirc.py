@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 User-interface related functions for building bots.
 
@@ -25,13 +25,15 @@ import re
 try:
     from ircbot import SingleServerIRCBot
 except ImportError as e:
+    ircbot_import_error = e
+
     class SingleServerIRCBot(object):
 
         """Fake SingleServerIRCBot."""
 
         def __init__(*args, **kwargs):
             """Report import exception."""
-            raise e
+            raise ircbot_import_error
 
 
 _logger = "botirc"

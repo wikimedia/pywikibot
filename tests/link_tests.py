@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
 # (C) Pywikibot team, 2014-2015
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -92,6 +90,8 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(Link('A &eacute; B', self.get_site()).title, u'A é B')
         self.assertEqual(Link('A &#233; B', self.get_site()).title, u'A é B')
         self.assertEqual(Link('A &#x00E9; B', self.get_site()).title, u'A é B')
+        self.assertEqual(Link('A &nbsp; B', self.get_site()).title, 'A B')
+        self.assertEqual(Link('A &#160; B', self.get_site()).title, 'A B')
 
         l = Link('A | B', self.get_site())
         self.assertEqual(l.title, 'A')
@@ -614,7 +614,7 @@ class TestPartiallyQualifiedImplicitLinkDifferentCodeParser(LinkTestCase):
     cached = True
 
     def test_partially_qualified_NS0_family(self):
-        """Test 'en:Main Page' on dewp  is namespace 0."""
+        """Test 'en:Main Page' on dewp is namespace 0."""
         config.mylang = 'de'
         config.family = 'wikipedia'
         link = Link('en:Main Page')
@@ -972,7 +972,7 @@ class TestInvalidInterwikiLinks(WikimediaDefaultSiteTestCase):
             link.parse)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

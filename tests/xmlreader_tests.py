@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for xmlreader module."""
 #
 # (C) Pywikibot team, 2009-2014
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 from pywikibot import xmlreader
 
@@ -127,7 +125,7 @@ class ExportDotTenTestCase(XmlReaderTestCase):
                          u'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]:&#32;dab')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -78,11 +78,10 @@ class Throttle(object):
     def checkMultiplicity(self):
         """Count running processes for site and set process_multiplicity."""
         global pid
-        self.lock.acquire()
         mysite = self.mysite
         pywikibot.debug(u"Checking multiplicity: pid = %(pid)s" % globals(),
                         _logger)
-        try:
+        with self.lock:
             processes = []
             my_pid = pid or 1  # start at 1 if global pid not yet set
             count = 1
@@ -139,13 +138,10 @@ class Throttle(object):
             pywikibot.log(
                 'Found {0} {1} processes running, including this one.'.format(
                     count, mysite))
-        finally:
-            self.lock.release()
 
     def setDelays(self, delay=None, writedelay=None, absolute=False):
         """Set the nominal delays in seconds. Defaults to config values."""
-        self.lock.acquire()
-        try:
+        with self.lock:
             if delay is None:
                 delay = self.mindelay
             if writedelay is None:
@@ -158,8 +154,6 @@ class Throttle(object):
                                   self.maxdelay)
             # Start the delay count now, not at the next check
             self.last_read = self.last_write = time.time()
-        finally:
-            self.lock.release()
 
     def getDelay(self, write=False):
         """Return the actual delay, accounting for multiple processes.
@@ -204,12 +198,13 @@ class Throttle(object):
         self.checktime = 0
         processes = []
         try:
-            f = open(self.ctrlfilename, 'r')
+            with open(self.ctrlfilename, 'r') as f:
+                lines = f.readlines()
         except IOError:
             return
         else:
             now = time.time()
-            for line in f.readlines():
+            for line in lines:
                 try:
                     line = line.split(' ')
                     this_pid = int(line[0])
@@ -225,12 +220,11 @@ class Throttle(object):
                                       'site': this_site})
         processes.sort(key=lambda p: p['pid'])
         try:
-            f = open(self.ctrlfilename, 'w')
-            for p in processes:
-                f.write("%(pid)s %(time)s %(site)s\n" % p)
+            with open(self.ctrlfilename, 'w') as f:
+                for p in processes:
+                    f.write("%(pid)s %(time)s %(site)s\n" % p)
         except IOError:
             return
-        f.close()
 
     def wait(self, seconds):
         """Wait for seconds seconds.
@@ -263,8 +257,7 @@ class Throttle(object):
         thread from writing to the same site until the wait expires.
 
         """
-        self.lock.acquire()
-        try:
+        with self.lock:
             wait = self.waittime(write=write)
             # Calculate the multiplicity of the next delay based on how
             # big the request is that is being posted now.
@@ -279,8 +272,6 @@ class Throttle(object):
                 self.last_write = time.time()
             else:
                 self.last_read = time.time()
-        finally:
-            self.lock.release()
 
     def lag(self, lagtime):
         """Seize the throttle lock due to server lag.
@@ -289,8 +280,7 @@ class Throttle(object):
 
         """
         started = time.time()
-        self.lock.acquire()
-        try:
+        with self.lock:
             # start at 1/2 the current server lag time
             # wait at least 5 seconds but not more than 120 seconds
             delay = min(max(5, lagtime // 2), 120)
@@ -298,6 +288,3 @@ class Throttle(object):
             wait = delay - (time.time() - started)
 
             self.wait(wait)
-
-        finally:
-            self.lock.release()

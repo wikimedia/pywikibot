@@ -1,16 +1,17 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 
 #
 # This is only an example. Don't use it.
 #
+from __future__ import unicode_literals
 
 fixes['example'] = {
     'regex': True,
     'msg': {
-        '_default': u'no summary specified',
+        '_default': 'no summary specified',
     },
     'replacements': [
-        (r'\bword\b', u'two words'),
+        (r'\bword\b', 'two words'),
     ]
 }
 

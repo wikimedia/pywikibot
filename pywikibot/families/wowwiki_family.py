@@ -1,5 +1,10 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for WOW Wiki."""
+#
+# (C) Pywikibot team, 2009-2015
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
@@ -26,7 +31,7 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
     def __init__(self):
         """Constructor."""
         super(Family, self).__init__()
-        # Override 'sv'.  http://sv.wow.wikia.com is an empty wiki.
+        # Override 'sv'. http://sv.wow.wikia.com is an empty wiki.
         # The interwikimap in this family map 'sv' to this empty wiki.
         self.langs['sv'] = 'sv.warcraft.wikia.com'
 

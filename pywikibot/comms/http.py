@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Basic HTTP access interface.
 
@@ -14,7 +14,7 @@ This module is responsible for
 from __future__ import absolute_import, print_function, unicode_literals
 
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,7 +25,6 @@ __docformat__ = 'epytext'
 import atexit
 import sys
 
-from distutils.version import StrictVersion
 from string import Formatter
 from warnings import warn
 
@@ -38,10 +37,11 @@ except ImportError as e:
 
 if sys.version_info[0] > 2:
     from http import cookiejar as cookielib
-    from urllib.parse import quote
+    from urllib.parse import quote, urlparse
 else:
     import cookielib
     from urllib2 import quote
+    from urlparse import urlparse
 
 from pywikibot import config
 
@@ -53,7 +53,9 @@ from pywikibot.exceptions import (
 )
 from pywikibot.logging import critical, debug, error, log, warning
 from pywikibot.tools import (
+    deprecated,
     deprecate_arg,
+    file_mode_checker,
     issue_deprecation_warning,
     PY2,
     StringTypes,
@@ -67,15 +69,37 @@ SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
 _logger = "comm.http"
 
-if (isinstance(config.socket_timeout, tuple) and
-        StrictVersion(requests.__version__) < StrictVersion('2.4.0')):
-    warning('The configured timeout is a tuple but requests does not '
-            'support a tuple as a timeout. It uses the lower of the '
-            'two.')
-    config.socket_timeout = min(config.socket_timeout)
 
-cookie_jar = cookielib.LWPCookieJar(
-    config.datafilepath('pywikibot.lwp'))
+def mode_check_decorator(func):
+    """Decorate load()/save() CookieJar methods."""
+    def wrapper(cls, **kwargs):
+        try:
+            filename = kwargs['filename']
+        except KeyError:
+            filename = cls.filename
+        res = func(cls, **kwargs)
+        file_mode_checker(filename, mode=0o600)
+        return res
+    return wrapper
+
+
+# in PY2 cookielib.LWPCookieJar is not a new-style class.
+class PywikibotCookieJar(cookielib.LWPCookieJar, object):
+
+    """CookieJar which checks file permissions."""
+
+    @mode_check_decorator
+    def load(self, **kwargs):
+        """Load cookies from file."""
+        super(PywikibotCookieJar, self).load()
+
+    @mode_check_decorator
+    def save(self, **kwargs):
+        """Save cookies to file."""
+        super(PywikibotCookieJar, self).save()
+
+
+cookie_jar = PywikibotCookieJar(config.datafilepath('pywikibot.lwp'))
 try:
     cookie_jar.load()
 except (IOError, cookielib.LoadError):
@@ -93,12 +117,14 @@ def _flush():
     message = 'Closing network session.'
     if hasattr(sys, 'last_type'):
         # we quit because of an exception
-        print(sys.last_type)  # noqa: print
+        print(sys.last_type)  # flake8: disable=T003 (print)
         critical(message)
     else:
         log(message)
 
     log('Network session closed.')
+
+
 atexit.register(_flush)
 
 USER_AGENT_PRODUCTS = {
@@ -204,36 +230,48 @@ def user_agent(site=None, format_string=None):
     return formatted
 
 
+@deprecated('pywikibot.comms.http.fake_user_agent')
 def get_fake_user_agent():
     """
-    Return a user agent to be used when faking a web browser.
+    Return a fake user agent depending on `fake_user_agent` option in config.
+
+    Deprecated, use fake_user_agent() instead.
 
     @rtype: str
     """
-    # Check fake_user_agent configuration variable
     if isinstance(config.fake_user_agent, StringTypes):
-        return pywikibot.config2.fake_user_agent
+        return config.fake_user_agent
+    elif config.fake_user_agent or config.fake_user_agent is None:
+        return fake_user_agent()
+    else:
+        return user_agent()
 
-    if config.fake_user_agent is None or config.fake_user_agent is True:
-        try:
-            import browseragents
-            return browseragents.core.random()
-        except ImportError:
-            pass
 
-        try:
-            import fake_useragent
-            return fake_useragent.fake.UserAgent().random
-        except ImportError:
-            pass
+def fake_user_agent():
+    """
+    Return a fake user agent.
 
-    # Use the default real user agent
-    return user_agent()
+    @rtype: str
+    """
+    try:
+        import browseragents
+        return browseragents.core.random()
+    except ImportError:
+        pass
+
+    try:
+        import fake_useragent
+        return fake_useragent.fake.UserAgent().random
+    except ImportError:
+        pass
+
+    raise ImportError(  # Actually complain when neither is installed.
+        'Either browseragents or fake_useragent must be installed to get fake UAs.')
 
 
 @deprecate_arg('ssl', None)
-def request(site=None, uri=None, method='GET', body=None, headers=None,
-            **kwargs):
+def request(site=None, uri=None, method='GET', params=None, body=None,
+            headers=None, data=None, **kwargs):
     """
     Request to Site with default error handling and response decoding.
 
@@ -255,12 +293,17 @@ def request(site=None, uri=None, method='GET', body=None, headers=None,
     @return: The received data
     @rtype: a unicode string
     """
+    # body and data parameters both map to the data parameter of
+    # requests.Session.request.
+    if data:
+        body = data
+
     assert(site or uri)
     if not site:
         # +1 because of @deprecate_arg
         issue_deprecation_warning(
             'Invoking http.request without argument site', 'http.fetch()', 3)
-        r = fetch(uri, method, body, headers, **kwargs)
+        r = fetch(uri, method, params, body, headers, **kwargs)
         return r.content
 
     baseuri = site.base_url(uri)
@@ -276,7 +319,7 @@ def request(site=None, uri=None, method='GET', body=None, headers=None,
 
     headers['user-agent'] = user_agent(site, format_string)
 
-    r = fetch(baseuri, method, body, headers, **kwargs)
+    r = fetch(baseuri, method, params, body, headers, **kwargs)
     return r.content
 
 
@@ -297,15 +340,18 @@ def get_authentication(uri):
         if path in config.authenticate:
             if len(config.authenticate[path]) in [2, 4]:
                 return config.authenticate[path]
-            else:
-                warn('Invalid authentication tokens for %s '
-                     'set in `config.authenticate`' % path)
+            warn('config.authenticate["{path}"] has invalid value.\n'
+                 'It should contain 2 or 4 items, not {length}.\n'
+                 'See https://www.mediawiki.org/wiki/Manual:Pywikibot/OAuth '
+                 'for more info.'
+                 .format(path=path, length=len(config.authenticate[path])))
     return None
 
 
 def _http_process(session, http_request):
     method = http_request.method
     uri = http_request.uri
+    params = http_request.params
     body = http_request.body
     headers = http_request.headers
     if PY2 and headers:
@@ -326,8 +372,8 @@ def _http_process(session, http_request):
         # Note that the connections are pooled which mean that a future
         # HTTPS request can succeed even if the certificate is invalid and
         # verify=True, when a request with verify=False happened before
-        response = session.request(method, uri, data=body, headers=headers,
-                                   auth=auth, timeout=timeout,
+        response = session.request(method, uri, params=params, data=body,
+                                   headers=headers, auth=auth, timeout=timeout,
                                    verify=not ignore_validation)
     except Exception as e:
         http_request.data = e
@@ -363,14 +409,15 @@ def error_handling_callback(request):
         warning('Http response status {0}'.format(request.data.status_code))
 
 
-def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
+def _enqueue(uri, method="GET", params=None, body=None, headers=None, data=None,
+             **kwargs):
     """
     Enqueue non-blocking threaded HTTP request with callback.
 
     Callbacks, including the default error handler if enabled, are run in the
     HTTP thread, where exceptions are logged but are not able to be caught.
     The default error handler is called first, then 'callback' (singular),
-    followed by each callback in 'callbacks' (plural).  All callbacks are
+    followed by each callback in 'callbacks' (plural). All callbacks are
     invoked, even if the default error handler detects a problem, so they
     must check request.exception before using the response data.
 
@@ -388,6 +435,11 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
     @type callbacks: list of callable
     @rtype: L{threadedhttp.HttpRequest}
     """
+    # body and data parameters both map to the data parameter of
+    # requests.Session.request.
+    if data:
+        body = data
+
     default_error_handling = kwargs.pop('default_error_handling', None)
     callback = kwargs.pop('callback', None)
 
@@ -399,21 +451,22 @@ def _enqueue(uri, method="GET", body=None, headers=None, **kwargs):
 
     callbacks += kwargs.pop('callbacks', [])
 
-    if not headers:
-        headers = {}
+    all_headers = config.extra_headers.copy()
+    all_headers.update(headers or {})
 
-    user_agent_format_string = headers.get("user-agent", None)
+    user_agent_format_string = all_headers.get('user-agent')
     if not user_agent_format_string or '{' in user_agent_format_string:
-        headers["user-agent"] = user_agent(None, user_agent_format_string)
+        all_headers['user-agent'] = user_agent(None, user_agent_format_string)
 
     request = threadedhttp.HttpRequest(
-        uri, method, body, headers, callbacks, **kwargs)
+        uri, method, params, body, all_headers, callbacks, **kwargs)
     _http_process(session, request)
     return request
 
 
-def fetch(uri, method="GET", body=None, headers=None,
-          default_error_handling=True, **kwargs):
+def fetch(uri, method="GET", params=None, body=None, headers=None,
+          default_error_handling=True, use_fake_user_agent=False, data=None,
+          **kwargs):
     """
     Blocking HTTP request.
 
@@ -424,9 +477,33 @@ def fetch(uri, method="GET", body=None, headers=None,
 
     @param default_error_handling: Use default error handling
     @type default_error_handling: bool
+    @type use_fake_user_agent: bool, str
+    @param use_fake_user_agent: Set to True to use fake UA, False to use
+        pywikibot's UA, str to specify own UA. This behaviour might be
+        overridden by domain in config.
     @rtype: L{threadedhttp.HttpRequest}
     """
-    request = _enqueue(uri, method, body, headers, **kwargs)
+    # body and data parameters both map to the data parameter of
+    # requests.Session.request.
+    if data:
+        body = data
+
+    # Change user agent depending on fake UA settings.
+    # Set header to new UA if needed.
+    headers = headers or {}
+    if not headers.get('user-agent', None):  # Skip if already specified in request.
+        # Get fake UA exceptions from `fake_user_agent_exceptions` config.
+        uri_domain = urlparse(uri).netloc
+        use_fake_user_agent = config.fake_user_agent_exceptions.get(
+            uri_domain, use_fake_user_agent)
+
+        if use_fake_user_agent and isinstance(
+                use_fake_user_agent, StringTypes):  # Custom UA.
+            headers['user-agent'] = use_fake_user_agent
+        elif use_fake_user_agent is True:
+            headers['user-agent'] = fake_user_agent()
+
+    request = _enqueue(uri, method, params, body, headers, **kwargs)
     assert(request._data is not None)  # if there's no data in the answer we're in trouble
     # Run the error handling callback in the callers thread so exceptions
     # may be caught.

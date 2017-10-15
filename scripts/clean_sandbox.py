@@ -29,15 +29,13 @@ Furthermore, the following command line parameters are supported:
 # (C) Wikipedian, 2006-2007
 # (C) Andre Engels, 2007
 # (C) Siebrand Mazeland, 2007
-# (C) xqt, 2009-2014
+# (C) xqt, 2009-2017
 # (C) Dr. Trigon, 2012
-# (C) Pywikibot team, 2012-2014
+# (C) Pywikibot team, 2012-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
-__version__ = '$Id$'
-#
 
 import datetime
 import time
@@ -48,6 +46,7 @@ from pywikibot import i18n, Bot, pagegenerators
 
 content = {
     'commons': u'{{Sandbox}}\n<!-- Please edit only below this line. -->',
+    'wikidata': '{{Please leave this line alone (sandbox heading)}}',
     'als': u'{{subst:/Vorlage}}',
     'ar': u'{{عنوان الملعب}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق '
           u'والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ '
@@ -57,8 +56,11 @@ content = {
            u'حيتم تنضيفها\nاوتوماتيكيا كل 12 ساعه. -->',
     'az': u'<!--- LÜTFƏN, BU SƏTRƏ TOXUNMAYIN --->\n{{Qaralama dəftəri}}\n'
           u'<!-- AŞAĞIDAKI XƏTTİN ALTINDAN YAZA BİLƏRSİNİZ --->',
-    'bar': u'{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\r\n',
-    'cs': u'{{subst:/uhrabat}}',
+    'bar': '{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\n',
+    'cs': '{{Tento řádek neměňte}}\n<!-- ************  Prosíme, '
+          'NEMĚŇTE nic nad tímto řádkem.  Díky.  ************ -->\n\n'
+          "== Bábovičky ==\n#'''první'''\n#''druhá''\n*třetí\n"
+          "*'''''čtvrtá'''''\n pátá\n;šestá\n:sedmá",
     'da': u'{{subst:Sandkasse tekst}}',
     'de': u'{{subst:Wikipedia:Spielwiese/Vorlage}}',
     'en': u'{{Sandbox heading}}\n<!-- Hello! Feel free to try your formatting '
@@ -68,9 +70,12 @@ content = {
     'eo': '{{Bonvolu ne forigi tiun ĉi linion (Provejo)}}',
     'fa': u'{{subst:Wikipedia:ربات/sandbox}}',
     'fi': u'{{subst:Hiekka}}',
+    'fr': '{{subst:Préchargement pour Bac à sable}}',
     'he': u'{{ארגז חול}}\n<!-- נא לערוך מתחת לשורה זו בלבד, תודה. -->',
+    'hi': '{{User sandbox}}\n<!-- कृप्या इस लाइन के नीचे सम्पादन करे। -->',
     'id': u'{{Bakpasir}}\n<!-- Uji coba dilakukan di baris di bawah ini -->',
-    'it': u'{{sandbox}}<!-- Scrivi SOTTO questa riga senza cancellarla. Grazie. -->',
+    'it': '{{sandbox}}'
+          '<!-- Scrivi SOTTO questa riga senza cancellarla. Grazie. -->',
     'ja': u'{{subst:サンドボックス}}',
     'ko': u'{{연습장 안내문}}',
     'ksh': u'{{subst:/Schablon}}',
@@ -86,9 +91,12 @@ content = {
     'no': u'{{Sandkasse}}\n<!-- VENNLIGST EKSPERIMENTER NEDENFOR DENNE '
           u'SKJULTE TEKSTLINJEN! SANDKASSEMALEN {{Sandkasse}} SKAL IKKE '
           u'FJERNES! -->}}',
-    'pl': u'{{Prosimy - NIE ZMIENIAJ, NIE KASUJ, NIE PRZENOŚ tej linijki - pisz niżej}}',
-    'pt': u'<!--não apague esta linha-->{{página de testes}}<!--não apagar-->\r\n',
-    'ru': u'{{/Пишите ниже}}\n<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
+    'pl': '{{Prosimy - NIE ZMIENIAJ, NIE KASUJ, NIE PRZENOŚ tej linijki '
+          '- pisz niżej}}',
+    'pt': '<!--não apague esta linha-->'
+          '{{página de testes}}<!--não apagar-->\n',
+    'ru': '{{/Пишите ниже}}\n'
+          '<!-- Не удаляйте, пожалуйста, эту строку, тестируйте ниже -->',
     'simple': u'{{subst:/Text}}',
     'sco': u'{{subst:Saundbox}}',
     'sr': u'{{песак}}\n<!-- Молимо, испробавајте испод ове линије. Хвала. -->',
@@ -96,50 +104,15 @@ content = {
     'th': u'{{กระบะทราย}}\n<!-- กรุณาอย่าแก้ไขบรรทัดนี้ ขอบคุณครับ/ค่ะ -- '
           u'Please leave this line as they are. Thank you! -->',
     'tr': u'{{/Bu satırı değiştirmeden bırakın}}',
-    'zh': u'{{subst:User:Sz-iwbot/sandbox}}\r\n',
+    'zh': '{{subst:User:Sz-iwbot/sandbox}}\n',
 }
 
-sandboxTitle = {
-    'commons': u'Project:Sandbox',
-    'als': u'Project:Sandchaschte',
-    'ar': u'Project:ملعب',
-    'arz': u'Project:السبوره',
-    'az': u'Vikipediya:Qaralama dəftəri',
-    'bar': u'Project:Spuiwiesn',
-    'cs': u'Project:Pískoviště',
-    'da': u'Project:Sandkassen',
-    'de': u'Project:Spielwiese',
-    'en': u'Project:Sandbox',
-    'eo': 'Project:Provejo',
-    'fa': [u'Project:صفحه تمرین', u'Project:آشنایی با ویرایش'],
-    'fi': u'Project:Hiekkalaatikko',
-    'fr': u'Project:Bac à sable',
-    'he': u'Project:ארגז חול',
-    'id': u'Project:Bak pasir',
-    'it': u'Project:Pagina delle prove',
-    'ja': u'Project:サンドボックス',
-    'ko': u'Project:연습장',
-    'ksh': u'Project:Shpillplaz',
-    'mzn': u'Project:چنگ‌مویی صفحه',
-    'nds': u'Project:Speelwisch',
-    'nl': u'Project:Zandbak',
-    'no': u'Project:Sandkasse',
-    'pl': u'Project:Brudnopis',
-    'pt': u'Project:Página de testes',
-    'ru': u'Project:Песочница',
-    'simple': u'Project:Sandbox',
-    'sco': u'Project:Saundbox',
-    'sr': u'Project:Песак',
-    'sv': u'Project:Sandlådan',
-    'th': u'Project:ทดลองเขียน',
-    'tr': u'Vikipedi:Deneme tahtası',
-    'zh': u'Project:沙盒',
-}
+sandbox_titles = ('Q3938', 'Q28939665')
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 
@@ -171,14 +144,15 @@ class SandboxBot(Bot):
             pywikibot.error(u'No content is given for pages, exiting.')
             raise RuntimeError
         if not self.generator:
-            if self.site.code not in sandboxTitle:
+            pages = []
+            for item in sandbox_titles:
+                p = self.site.page_from_repository(item)
+                if p is not None:
+                    pages.append(p)
+            if not pages:
                 pywikibot.bot.suggest_help(missing_generator=True)
                 raise RuntimeError
-            local_sandbox_title = sandboxTitle[self.site.code]
-            if not isinstance(local_sandbox_title, list):
-                local_sandbox_title = [local_sandbox_title]
-            self.generator = [pywikibot.Page(self.site, page_name) for
-                              page_name in local_sandbox_title]
+            self.generator = pages
 
     def run(self):
         """Run bot."""

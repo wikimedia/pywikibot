@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for scripts/interwikidata.py."""
 #
 # (C) Pywikibot team, 2015
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import unicode_literals, absolute_import
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -21,10 +19,6 @@ from tests.aspects import unittest, SiteAttributeTestCase
 class DummyBot(interwikidata.IWBot):
 
     """A dummy bot to prevent editing in production wikis."""
-
-    def __init__(self, *args, **kwargs):
-        """Initiate the class."""
-        super(DummyBot, self).__init__(*args, **kwargs)
 
     def put_current(self):
         """Prevent editing."""
@@ -53,7 +47,7 @@ class TestInterwikidataBot(SiteAttributeTestCase):
             'code': 'fa',
         },
         'wt': {
-            'family': 'wiktionary',
+            'family': 'wikitech',
             'code': 'en',
         },
     }
@@ -95,14 +89,20 @@ class TestInterwikidataBot(SiteAttributeTestCase):
     def test_without_repo(self):
         """Test throwing error when site does not have a data repo."""
         wt_page = pywikibot.Page(self.wt, 'User:Ladsgroup')
-        self.assertRaises(ValueError, DummyBot, generator=[wt_page], site=self.wt)
+        self.assertRaises(ValueError, DummyBot, generator=[wt_page],
+                          site=self.wt)
 
-        self.assertRaises(ValueError, interwikidata.main,
-                          '-page:User:Ladsgroup', '-lang:fa',
-                          '-family:wiktionary')
+        self.assertRaisesRegex(
+            ValueError,
+            r'wikitech:en does not have a data repository, '
+            r'use interwiki\.py instead.',
+            interwikidata.IWBot,
+            generator=[pywikibot.Page(self.wt, 'User:Dalba')],
+            site=self.wt,
+        )
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

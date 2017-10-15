@@ -18,29 +18,104 @@ Command line options:
 -always           Do not ask, but remove the lines automatically. Be very
                   careful in using this option!
 
--namespace:       Filters the search to a given namespace. If this is specified
-                  multiple times it will search all given namespaces
 -protocol:        The protocol prefix (default: "http")
+
 -summary:         A string to be used instead of the default summary
 
+In addition, these arguments can be used to restrict changes to some pages:
+
+&params;
 """
 #
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
-#
-
 import pywikibot
 
-from pywikibot import i18n
-
+from pywikibot import pagegenerators
+from pywikibot.bot import (
+    SingleSiteBot, ExistingPageBot, NoRedirectPageBot, AutomaticTWSummaryBot)
 from pywikibot.editor import TextEditor
 from pywikibot.tools.formatter import color_format
+
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp
+}
+
+
+class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
+                    AutomaticTWSummaryBot):
+
+    """Bot to remove links that are being or have been spammed.
+
+    @param generator: page generator with preloaded pages.
+    @type generator: generator
+    @param spam_external_url: an external url
+    @type spam_external_url: str
+    @keyword summary: summary message when given. Otherwise the default
+        summary will be used
+    @type summary: str
+    @keyword always: Don't ask for text replacements
+    @type always: bool
+    """
+
+    summary_key = 'spamremove-remove'
+
+    def __init__(self, generator, spam_external_url, **kwargs):
+        """Constructor."""
+        self.availableOptions.update({
+            'summary': None,
+        })
+        super(SpamRemoveBot, self).__init__(**kwargs)
+        self.generator = generator
+        self.spam_external_url = spam_external_url
+        self.changed_pages = 0
+
+    @property
+    def summary_parameters(self):
+        """A dictionary of all parameters for i18n."""
+        return {'url': self.spam_external_url}
+
+    def treat_page(self):
+        """Process a single page."""
+        text = self.current_page.text
+        if self.spam_external_url not in text:
+            return
+        lines = text.split('\n')
+        newpage = []
+        lastok = ""
+        for line in lines:
+            if self.spam_external_url in line:
+                if lastok:
+                    pywikibot.output(lastok)
+                pywikibot.output(color_format('{lightred}{0}{default}', line))
+                lastok = None
+            else:
+                newpage.append(line)
+                if line.strip():
+                    if lastok is None:
+                        pywikibot.output(line)
+                    lastok = line
+        if self.getOption('always'):
+            answer = "y"
+        else:
+            answer = pywikibot.input_choice(
+                u'\nDelete the red lines?',
+                [('yes', 'y'), ('no', 'n'), ('edit', 'e')],
+                'n', automatic_quit=False)
+        if answer == "n":
+            return
+        elif answer == "e":
+            editor = TextEditor()
+            newtext = editor.edit(text, highlight=self.spam_external_url,
+                                  jumpIndex=text.find(self.spam_external_url))
+        else:
+            newtext = "\n".join(newpage)
+        if newtext != text:
+            self.put_current(newtext, summary=self.getOption('summary'))
 
 
 def main(*args):
@@ -52,89 +127,34 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    always = False
-    namespaces = []
-    spamSite = ''
+    spam_external_url = None
     protocol = 'http'
-    summary = None
-    for arg in pywikibot.handle_args(args):
-        if arg == "-always":
-            always = True
-        elif arg.startswith('-namespace:'):
-            try:
-                namespaces.append(int(arg[len('-namespace:'):]))
-            except ValueError:
-                namespaces.append(arg[len('-namespace:'):])
+    options = {}
+    local_args = pywikibot.handle_args(args)
+    genFactory = pagegenerators.GeneratorFactory()
+    for arg in local_args:
+        if arg == '-always':
+            options['always'] = True
         elif arg.startswith('-protocol:'):
             protocol = arg.partition(':')[2]
         elif arg.startswith('-summary:'):
-            summary = arg.partition(':')[2]
+            options['summary'] = arg.partition(':')[2]
+        elif genFactory.handleArg(arg):
+            continue
         else:
-            spamSite = arg
+            spam_external_url = arg
 
-    if not spamSite:
+    if not spam_external_url:
         pywikibot.bot.suggest_help(missing_parameters=['spam site'])
         return False
 
-    mysite = pywikibot.Site()
-    pages = mysite.exturlusage(
-        spamSite, protocol=protocol, namespaces=namespaces, content=True
-    )
+    link_search = pagegenerators.LinksearchPageGenerator(spam_external_url,
+                                                         protocol=protocol)
+    generator = genFactory.getCombinedGenerator(gen=link_search)
+    generator = pagegenerators.PreloadingGenerator(generator)
 
-    if not summary:
-        summary = i18n.twtranslate(
-            mysite,
-            'spamremove-remove',
-            {'url': spamSite}
-        )
-    for i, p in enumerate(pages, 1):
-        text = p.text
-        if spamSite not in text:
-            continue
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(color_format(
-            '\n\n>>> {lightpurple}{0}{default} <<<', p.title()))
-        lines = text.split('\n')
-        newpage = []
-        lastok = ""
-        for line in lines:
-            if spamSite in line:
-                if lastok:
-                    pywikibot.output(lastok)
-                pywikibot.output(color_format('{lightred}{0}{default}', line))
-                lastok = None
-            else:
-                newpage.append(line)
-                if line.strip():
-                    if lastok is None:
-                        pywikibot.output(line)
-                    lastok = line
-        if always:
-            answer = "y"
-        else:
-            answer = pywikibot.input_choice(
-                u'\nDelete the red lines?',
-                [('yes', 'y'), ('no', 'n'), ('edit', 'e')],
-                'n', automatic_quit=False)
-        if answer == "n":
-            continue
-        elif answer == "e":
-            editor = TextEditor()
-            newtext = editor.edit(text, highlight=spamSite,
-                                  jumpIndex=text.find(spamSite))
-        else:
-            newtext = "\n".join(newpage)
-        if newtext != text:
-            p.text = newtext
-            p.save(summary)
-    else:
-        if "i" not in locals():
-            pywikibot.output('No page found.')
-        elif i == 1:
-            pywikibot.output('1 pages done.')
-        else:
-            pywikibot.output('%d pages done.' % i)
+    bot = SpamRemoveBot(generator, spam_external_url, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

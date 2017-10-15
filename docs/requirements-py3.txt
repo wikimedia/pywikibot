@@ -4,4 +4,5 @@
 
 sphinx==1.3.1
 sphinx-epytext>=0.0.4
+numpydoc
 

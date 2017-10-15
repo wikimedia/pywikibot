@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the date module."""
 #
 # (C) Pywikibot team, 2012-2015
@@ -95,7 +95,7 @@ class TestMonthDelta(TestCase):
         self.assertEqual(date.get_month_delta(datetime(2014, 3, 31), datetime(2013, 3, 31)), -12)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

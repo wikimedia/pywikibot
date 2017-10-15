@@ -1,15 +1,13 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
 import pywikibot
-
-__version__ = '$Id$'
 
 try:
     from stdnum.exceptions import ValidationError as StdNumValidationError
@@ -138,6 +136,11 @@ class TestIsbn(TestCase):
                          'ISBN 978-0-9752298-0-4')
         self.assertEqual(convertIsbn10toIsbn13('ISBN 0-9752298-0-1'),
                          'ISBN 0-9752298-0-1')  # Invalid ISBN - no changes
+        # Should not fail for ISBN13
+        self.assertEqual(
+            convertIsbn10toIsbn13('ISBN 978-0-7869-3669-4'),
+            'ISBN 978-0-7869-3669-4'
+        )
 
         # Errors
         isbn = ISBN10('9492098059')
@@ -202,7 +205,7 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase, TWNBotTestCase):
 
         # Check if the unit test item page and the property both exist
         item_ns = cls.get_repo().item_namespace
-        for page in cls.get_site().search('IsbnWikibaseBotUnitTest', step=1,
+        for page in cls.get_site().search('IsbnWikibaseBotUnitTest',
                                           total=1, namespaces=item_ns):
             cls.test_page_qid = page.title()
             item_page = ItemPage(cls.get_repo(), page.title())
@@ -235,10 +238,14 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase, TWNBotTestCase):
         ItemPage.editEntity = TestIsbnWikibaseBot._original_editEntity
         super(TestIsbnWikibaseBot, self).tearDown()
 
-    def test_isbn(self):
-        """Test using the bot and wikibase."""
+    def test_isbn_format(self):
+        """Test format using the bot and wikibase."""
         main('-page:' + self.test_page_qid, '-always', '-format')
         self.assertEqual(self.setTarget_value, '0-9752298-0-X')
+
+    @unittest.expectedFailure  # See T174870
+    def test_isbn_to13(self):
+        """Test to13 using the bot and wikibase."""
         main('-page:' + self.test_page_qid, '-always', '-to13')
         self.assertTrue(self.setTarget_value, '978-0975229804')
 
@@ -253,5 +260,6 @@ def editEntity_dummy(self, data=None, **kwargs):
     """Avoid that editEntity writes."""
     pass
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

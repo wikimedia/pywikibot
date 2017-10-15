@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 A bot to remove stale protection templates from pages that are not protected.
 
@@ -26,8 +26,8 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--always         Doesn't ask every time if the bot should make the change or not,
-                do it always.
+-always         Doesn't ask every time whether the bot should make the change.
+                Do it always.
 
 -show           When the bot can't delete the template from the page (wrong
                 regex or something like that) it will ask you if it should show
@@ -50,14 +50,11 @@ Furthermore, the following command line parameters are supported:
 # (C) Monobi a.k.a. Wikihermit, 2007
 # (C) Filnik, 2007-2011
 # (C) Nicolas Dumazet (NicDumZ), 2008-2009
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import re
 import time
@@ -73,44 +70,48 @@ from pywikibot.tools.formatter import color_format
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 # PREFERENCES
 
 templateSemiProtection = {
+    'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]p|[Pp])'
+           r'olozamčeno(|[^\}]*)\}\}\s*'],
+    'fr': [r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccoparziale(?:|[ _]scad\|.*?|\|.*?)\}\}',
            r'\{\{(?:[Tt]emplate:|)[Aa]bp(?:|[ _]scad\|(?:.*?))\}\}'],
-    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
-           r'|)[Ss]emi[- ]?protection(|[^\}]*)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' +
-           u'半保護' + r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)半保護'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
+    'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано-анон)\}\}'],
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
+    'cs': [r'\{\{(?:[Tt]emplate:|[Šš]ablona:|)([Dd]louhodobě[ _]z|[Zz])'
+           r'amčeno(|[^\}]*)\}\}\s*'],
+    'fr': [r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)[Pp]rotection(|[^\}]*)\}\}',
+           r'\{\{(?:[Tt]emplate:|[Mm]odèle:|)(?:[Pp]age|[Aa]rchive|'
+           r'[Mm]odèle) protégée?(|[^\}]*)\}\}'],
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisoblocco(?:|[ _]scad\|(?:.*?)|minaccia|cancellata)\}\}',
            r'\{\{(?:[Tt]emplate:|)(?:[Cc][Tt]|[Cc]anc fatte|[Cc][Ee])\}\}',
-           r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">(?:\s|\n)*?[Qq]uesta pagina'],
-    'fr': [r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' +
-           r'|)[Pp]rotection(|[^\}]*)\}\}',
-           r'\{\{(?:[Tt]emplate:|' + u'[Mm]odèle:' + r'|)(?:[Pp]age|[Aa]rchive|' +
-           u'[Mm]odèle) protégée' + r'?(|[^\}]*)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'保護(?:性急|)' +
-           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+           r'<div class="toccolours[ _]itwiki[ _]template[ _]avviso">\s*?[Qq]uesta pagina'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)保護(?:性急|)'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
+    'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано)\}\}']
 }
 
 # Regex to get the semi-protection move template
 templateSemiMoveProtection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動半保護' +
-           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動半保護'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
 }
 
 # Regex to get the total-protection move template
 templateTotalMoveProtection = {
     'it': [r'\{\{(?:[Tt]emplate:|)[Aa]vvisobloccospostamento(?:|[ _]scad\|.*?|\|.*?)\}\}'],
-    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)' + u'移動保護' +
-           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*(?:\r\n|)*'],
+    'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)移動保護'
+           r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
 }
 
 # If you use only one template for all the type of protection, put it here.
@@ -123,18 +124,24 @@ templateUnique = {
 # Array: 0 => Semi-block, 1 => Total Block, 2 => Semi-Move, 3 => Total-Move,
 #        4 => template-unique
 templateNoRegex = {
+    'cs': ['{{Polozamčeno}}', '{{Zamčeno}}', None, None, None],
+    'fr': ['{{Semi-protection}}', '{{Protection}}', None, None, None],
     'it': ['{{Avvisobloccoparziale}}', '{{Avvisoblocco}}', None, None,
            '{{Protetta}}'],
-    'fr': ['{{Semi-protection}}', '{{Protection}}', None, None, None],
     'ja': [u'{{半保護}}', u'{{保護}}', u'{{移動半保護}}', u'{{移動保護}}', None],
+    'sr': ['{{Закључано-анон}}', '{{Закључано}}', None, None, None],
 }
 
 # Category where the bot will check
 categoryToCheck = {
-    'en': [u'Category:Wikipedia protected pages'],
     'ar': [u'تصنيف:محتويات محمية'],
+    'cs': ['Kategorie:Wikipedie:Zamčené stránky',
+           'Kategorie:Wikipedie:Polozamčené stránky',
+           'Kategorie:Wikipedie:Dlouhodobě zamčené stránky',
+           'Kategorie:Wikipedie:Dlouhodobě polozamčené stránky'],
     'fr': [u'Category:Page semi-protégée', u'Category:Page protégée',
            u'Catégorie:Article protégé'],
+    'en': [u'Category:Wikipedia protected pages'],
     'he': [u'קטגוריה:ויקיפדיה: דפים מוגנים',
            u'קטגוריה:ויקיפדיה: דפים מוגנים חלקית'],
     'it': [u'Categoria:Pagine protette - scadute',
@@ -143,12 +150,13 @@ categoryToCheck = {
            u'Category:移動保護中の記事'],
     'pt': [u'Category:!Páginas protegidas',
            u'Category:!Páginas semiprotegidas'],
+    'sr': [u'Category:Странице закључане за анонимне кориснике', u'Category:Закључане странице'],
     'zh': [u'Category:被保护的页面', u'Category:被保護的模板',
            u'Category:暂时不能移动的页面', u'Category:被半保护的页面'],
 }
 
 # Check list to block the users that haven't set their preferences
-project_inserted = ['fr', 'it', 'ja', 'pt', 'zh']
+project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'sr', 'zh']
 
 # END PREFERENCES
 
@@ -266,7 +274,7 @@ def main(*args):
     if not generator:
         generator = genFactory.getCombinedGenerator()
     if not generator:
-        generator = list()
+        generator = []
         pywikibot.output(u'Loading categories...')
         # Define the category if no other generator has been setted
         for CAT in categories:
@@ -277,8 +285,10 @@ def main(*args):
                 generator.append(pageCat)
         pywikibot.output(u'Categories loaded, start!')
     # Main Loop
-    preloadingGen = pagegenerators.PreloadingGenerator(generator, step=60)
-    for page in preloadingGen:
+    if not genFactory.nopreload:
+        generator = pagegenerators.PreloadingGenerator(generator,
+                                                       groupsize=60)
+    for page in generator:
         pagename = page.title(asLink=True)
         pywikibot.output('Loading %s...' % pagename)
         try:

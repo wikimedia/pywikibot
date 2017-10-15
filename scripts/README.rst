@@ -28,8 +28,6 @@ The contents of the package
     | blockpagechecker.py    | Deletes any protection templates that are on pages      |
     |                        | which aren't actually protected.                        |
     +------------------------+---------------------------------------------------------+
-    | blockreview.py         | Bot implements blocking review process for de-wiki first|
-    +------------------------+---------------------------------------------------------+
     | capitalize_redirects.py| Script to create a redirect of capitalize articles.     |
     +------------------------+---------------------------------------------------------+
     | casechecker.py         | Script to enumerate all pages in the wikipedia and      |
@@ -97,7 +95,7 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | flickrripper.py        | Upload images from Flickr easily.                       |
     +------------------------+---------------------------------------------------------+
-    | #followlive.py         | follow new articles on a wikipedia and flag them        |
+    | followlive.py          | follow new articles on a wikipedia and flag them        |
     |                        | with a template.                                        |
     +------------------------++--------------------------------------------------------+
     | freebasemappingupload.py| Docstring fixes in scripts                             |
@@ -168,8 +166,6 @@ The contents of the package
     +------------------------+---------------------------------------------------------+
     | #pageimport.py         | Import pages from a certain wiki to another.            |
     +------------------------+---------------------------------------------------------+
-    | panoramiopicker.py     | Upload images from Panoramio easily.                    |
-    +------------------------+---------------------------------------------------------+
     | patrol.py              | Obtains a list pages and marks the edits as patrolled   |
     |                        | based on a whitelist.                                   |
     +------------------------+---------------------------------------------------------+
@@ -228,9 +224,9 @@ The contents of the package
     | #statistics_in_wikitable.py| This bot renders statistics provided by             |
     |                            | [[Special:Statistics]] in a table on a wiki page.   |
     |                            | Thus it creates and updates a statistics wikitable. |
-    +----------------------------+-----------------------------------------------------+
-    | #table2wiki.py             | Semi-automatic converting HTML-tables to wiki-tables|
     +------------------------+---+-----------------------------------------------------+
+    | table2wiki.py          | Semi-automatic converting HTML-tables to wiki-tables    |
+    +------------------------+---------------------------------------------------------+
     | template.py            | change one template (that is {{...}}) into another.     |
     +------------------------+---------------------------------------------------------+
     | templatecount.py       | Display the list of pages transcluding a given list     |

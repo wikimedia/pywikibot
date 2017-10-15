@@ -1,5 +1,10 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Classes and functions for working with the Echo extension."""
+#
+# (C) Pywikibot team, 2014-2016
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 import pywikibot
@@ -27,8 +32,10 @@ class Notification(object):
         notif.category = data['category']
         notif.timestamp = pywikibot.Timestamp.fromtimestampformat(data['timestamp']['mw'])
 
-        # TODO: use 'namespace-key' + 'text' ?
-        notif.page = pywikibot.Page(site, data['title']['full'])
+        if 'title' in data and 'full' in data['title']:
+            notif.page = pywikibot.Page(site, data['title']['full'])
+        else:
+            notif.page = None
 
         if 'agent' in data and 'name' in data['agent']:
             notif.agent = pywikibot.User(site, data['agent']['name'])
@@ -41,6 +48,7 @@ class Notification(object):
             notif.read = False
 
         notif.content = data.get('*', None)
+        notif.revid = data.get('revid', None)
 
         return notif
 

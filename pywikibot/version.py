@@ -1,9 +1,9 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
-# (C) xqt, 2010-2015
-# (C) Pywikibot team, 2007-2015
+# (C) xqt, 2010-2016
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,6 +20,7 @@ import sys
 import time
 import xml.dom.minidom
 
+from distutils import log
 from distutils.sysconfig import get_python_lib
 from io import BytesIO
 from warnings import warn
@@ -93,8 +94,8 @@ def getversiondict():
 
     for vcs_func in (getversion_git,
                      getversion_svn_setuptools,
-                     getversion_nightly,
                      getversion_svn,
+                     getversion_nightly,
                      getversion_package):
         try:
             (tag, rev, date, hsh) = vcs_func(_program_dir)
@@ -125,7 +126,7 @@ def getversiondict():
         warn('Unable to detect package date', UserWarning)
         datestring = '-2 (unknown)'
 
-    cache = dict(tag=tag, rev=rev, date=datestring, hsh=hsh)
+    cache = {'tag': tag, 'rev': rev, 'date': datestring, 'hsh': hsh}
     return cache
 
 
@@ -220,7 +221,10 @@ def getversion_svn_setuptools(path=None):
     tag = 'pywikibot-core'
     _program_dir = path or _get_program_dir()
     svninfo = svn_utils.SvnInfo(_program_dir)
+    # suppress warning
+    old_level = log.set_threshold(log.ERROR)
     rev = svninfo.get_revision()
+    log.set_threshold(old_level)
     if not isinstance(rev, int):
         raise TypeError('SvnInfo.get_revision() returned type %s' % type(rev))
     if rev < 0:
@@ -294,21 +298,21 @@ def getversion_git(path=None):
         tag = tag[(s + 6):e]
         t = tag.strip().split('/')
         tag = '[%s] %s' % (t[0][:-1], '-'.join(t[3:]))
-    with subprocess.Popen([cmd, '--no-pager',
+    dp = subprocess.Popen([cmd, '--no-pager',
                            'log', '-1',
                            '--pretty=format:"%ad|%an|%h|%H|%d"'
                            '--abbrev-commit',
                            '--date=iso'],
                           cwd=_program_dir,
-                          stdout=subprocess.PIPE).stdout as stdout:
-        info = stdout.read()
+                          stdout=subprocess.PIPE)
+    info, stderr = dp.communicate()
     info = info.decode(config.console_encoding).split('|')
     date = info[0][:-6]
     date = time.strptime(date.strip('"'), '%Y-%m-%d %H:%M:%S')
-    with subprocess.Popen([cmd, 'rev-list', 'HEAD'],
+    dp = subprocess.Popen([cmd, 'rev-list', 'HEAD'],
                           cwd=_program_dir,
-                          stdout=subprocess.PIPE).stdout as stdout:
-        rev = stdout.read()
+                          stdout=subprocess.PIPE)
+    rev, stderr = dp.communicate()
     rev = 'g%s' % len(rev.splitlines())
     hsh = info[3]  # also stored in '.git/refs/heads/master'
     if (not date or not tag or not rev) and not path:
@@ -479,12 +483,11 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 
     std_lib_dir = get_python_lib(standard_lib=True)
 
-    root_packages = set([key.split('.')[0]
-                         for key in modules])
+    root_packages = set(key.split('.')[0] for key in modules)
 
-    builtin_packages = set([name.split('.')[0] for name in root_packages
-                            if name in sys.builtin_module_names or
-                            '_' + name in sys.builtin_module_names])
+    builtin_packages = set(name.split('.')[0] for name in root_packages
+                           if name in sys.builtin_module_names or
+                           '_' + name in sys.builtin_module_names)
 
     # Improve performance by removing builtins from the list if possible.
     if builtins is False:

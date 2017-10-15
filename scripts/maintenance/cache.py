@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 This script runs commands on each entry in the API caches.
 
@@ -15,7 +15,7 @@ If only -delete is specified, it will delete all entries.
 -delete           Delete each command filtered. If that option is set the
                   default output will be nothing.
 
--c                Filter command in python syntax. It must evaulate to True to
+-c                Filter command in python syntax. It must evaluate to True to
                   output anything.
 
 -o                Output command which is output when the filter evaluated to
@@ -59,13 +59,11 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, print_function, unicode_literals
-__version__ = '$Id$'
-#
+from __future__ import absolute_import, unicode_literals
 
 import datetime
 import hashlib
@@ -76,8 +74,18 @@ import pywikibot
 
 from pywikibot.data import api
 
-from pywikibot.page import User  # noqa
-from pywikibot.site import APISite, DataSite, LoginStatus  # noqa
+# The follow attributes are used by eval()
+from pywikibot.page import User
+from pywikibot.site import APISite, DataSite, LoginStatus
+
+__all__ = (
+    'User', 'APISite', 'DataSite', 'LoginStatus',
+    'ParseError', 'CacheEntry', 'process_entries', 'main',
+    'has_password', 'is_logout', 'empty_response', 'not_accessed',
+    'incorrect_hash',
+    'older_than', 'newer_than', 'older_than_one_day', 'recent',
+    'uniquedesc', 'parameters',
+)
 
 
 class ParseError(Exception):
@@ -95,9 +103,11 @@ class CacheEntry(api.CachedRequest):
         self.filename = filename
 
     def __str__(self):
+        """Return string equivalent of object."""
         return self.filename
 
     def __repr__(self):
+        """Representation of object."""
         return self._cachefile_path()
 
     def _create_file_name(self):
@@ -109,6 +119,7 @@ class CacheEntry(api.CachedRequest):
         return self.directory
 
     def _cachefile_path(self):
+        """Return cache file path."""
         return os.path.join(self._get_cache_dir(),
                             self._create_file_name())
 
@@ -211,7 +222,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
     whether cache files are being used.
     However file access times are not always usable.
     On many modern filesystems, they have been disabled.
-    On unix, check the filesystem mount options.  You may
+    On unix, check the filesystem mount options. You may
     need to remount with 'strictatime'.
 
     @param use_accesstime: Whether access times should be used.
@@ -286,6 +297,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
 
 
 def _parse_command(command, name):
+    """Parse command."""
     obj = globals().get(command)
     if callable(obj):
         return obj
@@ -329,26 +341,31 @@ def not_accessed(entry):
 
 
 def incorrect_hash(entry):
+    """Incorrect hash."""
     if hashlib.sha256(entry.key.encode('utf-8')).hexdigest() != entry.filename:
         return entry
 
 
 def older_than(entry, interval):
+    """Find older entries."""
     if entry._cachetime + interval < datetime.datetime.now():
         return entry
 
 
 def newer_than(entry, interval):
+    """Find newer entries."""
     if entry._cachetime + interval >= datetime.datetime.now():
         return entry
 
 
 def older_than_one_day(entry):
+    """Find more than one day old entries."""
     if older_than(entry, datetime.timedelta(days=1)):
         return entry
 
 
 def recent(entry):
+    """Find entries newer than on hour."""
     if newer_than(entry, datetime.timedelta(hours=1)):
         return entry
 
@@ -369,6 +386,7 @@ def parameters(entry):
 
 
 def main():
+    """Process command line arguments and invoke bot."""
     local_args = pywikibot.handleArgs()
     cache_paths = None
     delete = False

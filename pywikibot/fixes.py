@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """File containing all standard fixes."""
 #
-# (C) Pywikibot team, 2008-2010
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -380,14 +380,16 @@ fixes = {
     },
 
     'isbn': {
+        'generator': ['-search:insource:/nowiki\>ISBN:?(?:&nbsp;| *)[0-9]/',
+                      '-namespace:0'],
         'regex': True,
         'msg': 'isbn-formatting',  # use i18n translations
         'replacements': [
             # Remove colon between the word ISBN and the number
             (r'ISBN: (\d+)', r'ISBN \1'),
             # superfluous word "number"
-            (r'ISBN( number| no\.?| No\.?|-Nummer|-Nr\.):? (\d+)', r'ISBN \2'),
-            # Space, minus, dot,  hypen, en dash, em dash, etc. instead of
+            (r'ISBN(?: [Nn]umber| [Nn]o\.?|-Nummer|-Nr\.):? (\d+)', r'ISBN \1'),
+            # Space, minus, dot, hypen, en dash, em dash, etc. instead of
             # hyphen-minus as separator, or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
             # these won't be changed.
@@ -402,8 +404,11 @@ fixes = {
             (r'ISBN (\d+) *[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d|X|x)(?!\d)',
              r'ISBN \1-\2-\3-\4'),  # ISBN-10
             # missing space before ISBN-10 or before ISBN-13,
-            # or non-breaking space.
-            (r'ISBN(|&nbsp;| )((\d(-?)){12}\d|(\d(-?)){9}[\dXx])', r'ISBN \2'),
+            # or multiple spaces or non-breaking space.
+            (r'ISBN(?: *|&nbsp;)((\d(-?)){12}\d|(\d(-?)){9}[\dXx])',
+             r'ISBN \1'),
+            # remove <nowiki /> tags
+            (r'<nowiki>ISBN ([0-9\-xX]+)</nowiki>', r'ISBN \1'),
         ],
         'exceptions': {
             'inside-tags': [
@@ -411,8 +416,8 @@ fixes = {
                 'hyperlink',
             ],
             'inside': [
-                r'ISBN (\d(-?)){12}\d',     # matches valid ISBN-13s
-                r'ISBN (\d(-?)){9}[\dXx]',  # matches valid ISBN-10s
+                r'ISBN (97[89]-?)(\d-?){9}\d',  # matches valid ISBN-13s
+                r'ISBN (\d-?){9}[\dXx]',  # matches valid ISBN-10s
             ],
         }
     },
@@ -648,7 +653,7 @@ def _load_file(filename):
     else:
         return False
 
-#
+
 # Load the user fixes file.
 filename = config.datafilepath('user-fixes.py')
 if _load_file(filename):

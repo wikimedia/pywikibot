@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test OAuth functionality."""
 #
 # (C) Pywikibot team, 2015
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import os
 
@@ -83,7 +81,7 @@ class TestOauthLoginManger(DefaultOAuthSiteTestCase):
                          self.site.username(sysop=False))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

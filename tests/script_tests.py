@@ -1,12 +1,11 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, print_function, unicode_literals
-__version__ = '$Id$'
 
 import os
 import sys
@@ -18,7 +17,8 @@ from pywikibot.tools import (
 )
 
 from tests import join_root_path
-from tests.aspects import unittest, DefaultSiteTestCase, MetaTestCaseClass, PwbTestCase
+from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
+                           PwbTestCase)
 from tests.utils import allowed_failure, execute_pwb, add_metaclass
 
 scripts_path = join_root_path('scripts')
@@ -40,11 +40,9 @@ script_deps = {
     'imagecopy_self': [TK_IMPORT],
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
-
     'flickrripper': ['flickrapi'],
-    'imageharvest': ['BeautifulSoup'],
+    'imageharvest': ['bs4'],
     'match_images': ['PIL.ImageTk'],
-    'panoramiopicker': ['BeautifulSoup'],
     'states_redirect': ['pycountry'],
     'patrol': ['mwparserfromhell'],
 }
@@ -76,7 +74,8 @@ failed_dep_script_list = [name
 
 unrunnable_script_list = [
     'version',  # does not use global args
-    'script_wui',   # depends on lua compiling
+    'script_wui',  # depends on lua compiling
+    'imageharvest',  # T167726
 ]
 
 
@@ -87,6 +86,7 @@ def list_scripts(path, exclude=None):
                not name.startswith('_') and  # skip __init__.py and _*
                name != exclude]
     return scripts
+
 
 script_list = (['login'] +
                list_scripts(scripts_path, 'login.py') +
@@ -101,7 +101,9 @@ script_input = {
     'catall': 'q\n',  # q for quit
     'editarticle': 'Test page\n',
     'imageuncat': 'q\n',
-    'imageharvest': 'https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg\n\n',
+    'imageharvest':
+        'https://upload.wikimedia.org/wikipedia/commons/'
+        '8/80/Wikipedia-logo-v2.svg\n\n',
     'interwiki': 'Test page that should not exist\n',
     'misspelling': 'q\n',
     'pagefromfile': 'q\n',
@@ -109,12 +111,13 @@ script_input = {
                                   # Enter to begin, Enter for default summary.
     'shell': '\n',  # exits on end of stdin
     'solve_disambiguation': 'Test page\nq\n',
-    'upload': 'https://upload.wikimedia.org/wikipedia/commons/8/80/Wikipedia-logo-v2.svg\n\n\n',
+    'upload':
+        'https://upload.wikimedia.org/wikipedia/commons/'
+        '8/80/Wikipedia-logo-v2.svg\n\n\n',
 }
 
 auto_run_script_list = [
     'blockpageschecker',
-    'blockreview',
     'casechecker',
     'catall',
     'category_redirect',
@@ -122,6 +125,8 @@ auto_run_script_list = [
     'checkimages',
     'clean_sandbox',
     'disambredir',
+    'featured',
+    'followlive',
     'imagerecat',
     'login',
     'lonelypages',
@@ -145,16 +150,18 @@ auto_run_script_list = [
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user_config.py
+    'checkimages': 'Execution time: 0 seconds',
     'editarticle': 'Nothing changed',
+    'featured': '0 pages written.',
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
-    'imageuncat': 'WARNING: This script is primarily written for Wikimedia Commons',
+    'imageuncat':
+        'WARNING: This script is primarily written for Wikimedia Commons',
     # script_input['interwiki'] above lists a title that should not exist
     'interwiki': 'does not exist. Skipping.',
     'imageharvest': 'From what URL should I get the images',
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
-    'panoramiopicker': 'Panoramiopicker is a tool to transfer Panaramio ',
     'replace': 'Press Enter to use this automatic message',
     'script_wui': 'Pre-loading all relevant page contents',
     'shell': ('>>> ', 'Welcome to the'),
@@ -236,14 +243,18 @@ class TestScriptMeta(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create the new class."""
         def test_execution(script_name, args=[]):
-            is_autorun = '-help' not in args and script_name in auto_run_script_list
+            is_autorun = ('-help' not in args and
+                          script_name in auto_run_script_list)
 
             def test_skip_script(self):
                 raise unittest.SkipTest(
                     'Skipping execution of auto-run scripts (set '
-                    'PYWIKIBOT2_TEST_AUTORUN=1 to enable) "{0}"'.format(script_name))
+                    'PYWIKIBOT2_TEST_AUTORUN=1 to enable) "{0}"'
+                    .format(script_name))
 
             def testScript(self):
+                GLOBAL_ARGS = 'Global arguments available for all'
+
                 cmd = [script_name]
 
                 if args:
@@ -269,10 +280,10 @@ class TestScriptMeta(MetaTestCaseClass):
                 if not hasattr(self, 'net') or not self.net:
                     test_overrides['pywikibot.Site'] = 'None'
 
-                result = execute_pwb(cmd, data_in, timeout=timeout, error=error,
-                                     overrides=test_overrides)
+                result = execute_pwb(cmd, data_in, timeout=timeout,
+                                     error=error, overrides=test_overrides)
 
-                stderr = result['stderr'].split('\n')
+                stderr = result['stderr'].splitlines()
                 stderr_sleep = [l for l in stderr
                                 if l.startswith('Sleeping for ')]
                 stderr_other = [l for l in stderr
@@ -288,15 +299,14 @@ class TestScriptMeta(MetaTestCaseClass):
 
                     exit_codes = [0, 1, 2, -9]
                 elif not is_autorun:
-                    if stderr_other == ['']:
+                    if stderr_other == []:
                         stderr_other = None
                     if stderr_other is not None:
                         self.assertIn('Use -help for further information.',
                                       stderr_other)
                         self.assertNotIn('-help', args)
                     else:
-                        self.assertIn('Global arguments available for all',
-                                      result['stdout'])
+                        self.assertIn(GLOBAL_ARGS, result['stdout'])
 
                     exit_codes = [0]
                 else:
@@ -318,7 +328,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 self.assertNotIn('deprecated', result['stderr'].lower())
 
                 # If stdout doesnt include global help..
-                if 'Global arguments available for all' not in result['stdout']:
+                if GLOBAL_ARGS not in result['stdout']:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', result['stdout'].lower())
                     if result['stdout'] == '':
@@ -361,6 +371,8 @@ class TestScriptMeta(MetaTestCaseClass):
 
             # Disable test by default in nosetests
             if script_name in unrunnable_script_list:
+                # flag them as an expectedFailure due to py.test (T135594)
+                dct[test_name] = unittest.expectedFailure(dct[test_name])
                 dct[test_name].__test__ = False
 
         return super(TestScriptMeta, cls).__new__(cls, name, bases, dct)
@@ -379,6 +391,11 @@ class TestScriptHelp(PwbTestCase):
     net = False
 
     _expected_failures = failed_dep_script_list
+    # -help supported not explicitly
+    try:
+        _expected_failures.remove('imageharvest')
+    except ValueError:
+        pass
     _allowed_failures = []
 
     _argument = 'help'
@@ -407,7 +424,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
     ] + failed_dep_script_list
 
     _allowed_failures = [
-        'checkimages',
         'disambredir',
         # T94681
         'misspelling',
@@ -421,7 +437,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
     _results = no_args_expected_results
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

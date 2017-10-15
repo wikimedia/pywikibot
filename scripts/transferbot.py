@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 This script transfers pages from a source wiki to a target wiki.
 
@@ -22,8 +22,8 @@ Pages to work on can be specified using any of:
 
 Example commands:
 
-Transfer all pages in category "Query service" from the English Wikipedia to the
-Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
+Transfer all pages in category "Query service" from the English Wikipedia to
+the Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
 
     python pwb.py transferbot -family:wikipedia -lang:en -cat:"Query service" \
         -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
@@ -36,14 +36,11 @@ Copy the template "Query service" from the Toolserver wiki to wikitech:
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 from pywikibot import pagegenerators
@@ -57,8 +54,8 @@ class WikiTransferException(Exception):
 
     """Base class for exceptions from this script.
 
-    Makes it easier for clients to catch all expected exceptions that the script might
-    throw
+    Makes it easier for clients to catch all expected exceptions that the
+    script might throw
     """
 
     pass
@@ -68,8 +65,8 @@ class TargetSiteMissing(WikiTransferException):
 
     """Thrown when the target site is the same as the source site.
 
-    Based on the way each are initialized, this is likely to happen when the target site
-    simply hasn't been specified.
+    Based on the way each are initialized, this is likely to happen when the
+    target site simply hasn't been specified.
     """
 
     pass
@@ -77,7 +74,7 @@ class TargetSiteMissing(WikiTransferException):
 
 class TargetPagesMissing(WikiTransferException):
 
-    """Thrown if no page range has been specified for the script to operate on."""
+    """Thrown if no page range has been specified to operate on."""
 
     pass
 
@@ -139,7 +136,8 @@ def main(*args):
     for page in gen:
         summary = "Moved page from %s" % page.title(asLink=True)
         targetpage = pywikibot.Page(tosite, prefix + page.title())
-        edithistpage = pywikibot.Page(tosite, prefix + page.title() + '/edithistory')
+        edithistpage = pywikibot.Page(tosite, prefix + page.title() +
+                                      '/edithistory')
 
         if targetpage.exists() and not overwrite:
             pywikibot.output(

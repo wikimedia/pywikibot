@@ -35,7 +35,7 @@ Options for "listify" action:
 
 Options for "remove" action:
  * -nodelsum    - This specifies not to use the custom edit summary as the
-                  deletion reason.  Instead, it uses the default deletion reason
+                  deletion reason. Instead, it uses the default deletion reason
                   for the language, which is "Category was disbanded" in
                   English.
 
@@ -69,7 +69,7 @@ Options for several actions:
                 - Also, the name of the list to make in the listify option
          NOTE: If the category names have spaces in them you may need to use
          a special syntax in your shell so that the names aren't treated as
-         separate parameters.  For instance, in BASH, use single quotes,
+         separate parameters. For instance, in BASH, use single quotes,
          e.g. -from:'Polar bears'
  * -batch       - Don't prompt to delete emptied categories (do it
                   automatically).
@@ -109,15 +109,12 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2015
-# (C) Pywikibot team, 2008-2015
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import codecs
 import os
@@ -148,9 +145,12 @@ docuReplacements = {
 
 cfd_templates = {
     'wikipedia': {
+        'cs': ['přesunout', 'přejmenovat', 'přejmenovat kategorii',
+               'přesunout kategorii', 'přejmenování kategorie'],
         'en': [u'cfd', u'cfr', u'cfru', u'cfr-speedy', u'cfm', u'cfdu'],
         'fi': [u'roskaa', u'poistettava', u'korjattava/nimi',
                u'yhdistettäväLuokka'],
+        'fr': ['renommage de catégorie demandé'],
         'he': [u'הצבעת מחיקה', u'למחוק'],
         'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2'],
         # For testing purposes
@@ -383,8 +383,7 @@ class CategoryAddBot(MultipleSitesBot):
                                            'category-adding',
                                            {'newcat': catpl.title(withNamespace=False)})
             try:
-                self.userPut(self.current_page, old_text, text,
-                             summary=comment, minor=True, botflag=True)
+                self.userPut(self.current_page, old_text, text, summary=comment)
             except pywikibot.PageSaveRelatedError as error:
                 pywikibot.output(u'Page %s not saved: %s'
                                  % (self.current_page.title(asLink=True),
@@ -414,6 +413,7 @@ class CategoryMoveRobot(object):
                  inplace=False, move_oldcat=True, delete_oldcat=True,
                  title_regex=None, history=False, pagesonly=False,
                  deletion_comment=DELETION_COMMENT_AUTOMATIC,
+                 move_comment=None,
                  wikibase=True, allow_split=False, move_together=False,
                  keep_sortkey=None):
         """Store all given parameters in the objects attributes.
@@ -421,8 +421,8 @@ class CategoryMoveRobot(object):
         @param oldcat: The move source.
         @param newcat: The move target.
         @param batch: If True the user has not to confirm the deletion.
-        @param comment: The edit summary for all pages where the
-            category is changed.
+        @param comment: The edit summary for all pages where the category is
+            changed, and also for moves and deletions if not overridden.
         @param inplace: If True the categories are not reordered.
         @param move_oldcat: If True the category page (and talkpage) is
             copied to the new category.
@@ -436,9 +436,12 @@ class CategoryMoveRobot(object):
         @param deletion_comment: Either string or special value:
             DELETION_COMMENT_AUTOMATIC: use a generated message,
             DELETION_COMMENT_SAME_AS_EDIT_COMMENT: use the same message for
-            delete that is also used for move.
-            If the value is not recognized, it's interpreted as
-            DELETION_COMMENT_AUTOMATIC.
+            delete that is used for the edit summary of the pages whose
+            category was changed (see the comment param above). If the value
+            is not recognized, it's interpreted as DELETION_COMMENT_AUTOMATIC.
+        @param move_comment: If set, uses this as the edit summary on the
+            actual move of the category page. Otherwise, defaults to the value
+            of the comment parameter.
         @param wikibase: If True, update the Wikibase item of the
             old category.
         @param allow_split: If False only moves page and talk page together.
@@ -482,7 +485,7 @@ class CategoryMoveRobot(object):
         template_vars = {'oldcat': self.oldcat.title(withNamespace=False)}
         if self.newcat:
             template_vars.update({
-                'newcat': self.newcat.title(withNamespace=False),
+                'newcat': self.newcat.title(withNamespace=False, asLink=True),
                 'title': self.newcat.title(withNamespace=False)})
         # Set edit summary for changed pages.
         if comment:
@@ -513,6 +516,7 @@ class CategoryMoveRobot(object):
                 # Category is deleted.
                 self.deletion_comment = i18n.twtranslate(self.site,
                                                          'category-was-disbanded')
+        self.move_comment = move_comment if move_comment else self.comment
 
     def run(self):
         """The main bot function that does all the work.
@@ -545,7 +549,7 @@ class CategoryMoveRobot(object):
                     old_cat_title = self.oldcat.title()
                     old_cat_text = self.oldcat.text
                     self.newcat = self.oldcat.move(self.newcat.title(),
-                                                   reason=self.comment,
+                                                   reason=self.move_comment,
                                                    movetalkpage=can_move_talk)
                     # Copy over the article text so it can be stripped of
                     # CFD templates and re-saved. This is faster than
@@ -604,7 +608,7 @@ class CategoryMoveRobot(object):
                                                  page.title()):
 
                 page.change_category(self.oldcat, self.newcat,
-                                     comment=self.comment,
+                                     summary=self.comment,
                                      inPlace=self.inplace,
                                      sortKey=self.keep_sortkey)
 
@@ -624,7 +628,7 @@ class CategoryMoveRobot(object):
                 (not self.title_regex or
                  re.search(self.title_regex, doc_page.title()))):
                     doc_page.change_category(self.oldcat, self.newcat,
-                                             comment=self.comment,
+                                             summary=self.comment,
                                              inPlace=self.inplace,
                                              include=['includeonly'],
                                              sortKey=self.keep_sortkey)
@@ -807,8 +811,8 @@ class CategoryListifyRobot(object):
 
         listString = ""
         for article in setOfArticles:
-            if (not article.isImage() or
-                    self.showImages) and not article.isCategory():
+            if (not article.is_filepage() or
+                    self.showImages) and not article.is_categorypage():
                 if self.talkPages and not article.isTalkPage():
                     listString += "*[[%s]] -- [[%s|talk]]\n" \
                                   % (article.title(),
@@ -847,10 +851,6 @@ class CategoryTidyRobot(pywikibot.Bot):
     Typing '?' will show you the first few bytes of the current page, helping
     you to find out what the article is about and in which other categories it
     currently is.
-
-    Important:
-     * this bot is written to work with the MonoBook skin, so make sure your bot
-       account uses this skin
 
     """
 
@@ -902,9 +902,9 @@ class CategoryTidyRobot(pywikibot.Bot):
         # Show the title of the page where the link was found.
         # Highlight the title in purple.
         pywikibot.output(color_format(
-            'Treating page {lightpurple}{0}{default}, '
+            'Treating page {0}, '
             'currently in {lightpurple}{1}{default}',
-            article.title(), current_cat.title()))
+            article.title(asLink=True), current_cat.title()))
 
         # Determine a reasonable amount of context to print
         try:
@@ -947,7 +947,9 @@ class CategoryTidyRobot(pywikibot.Bot):
                    StandardOption('remove this category tag', 'r'),
                    context_option,
                    StandardOption('save category as "{0}"'.format(current_cat.title()), 'c'))
-        choice = pywikibot.input_choice('Choice:', options, default='c')
+        choice = pywikibot.input_choice(color_format(
+            'Choice for page {lightpurple}{0}{default}:\n',
+            article.title()), options, default='c')
 
         if choice == 'c':
             pywikibot.output(u'Saving category as %s' % current_cat.title())
@@ -955,7 +957,7 @@ class CategoryTidyRobot(pywikibot.Bot):
                 pywikibot.output('No changes necessary.')
             else:
                 article.change_category(original_cat, current_cat,
-                                        comment=self.editSummary)
+                                        summary=self.editSummary)
         elif choice == 'j':
             newCatTitle = pywikibot.input(u'Please enter the category the '
                                           u'article should be moved to:',
@@ -967,7 +969,7 @@ class CategoryTidyRobot(pywikibot.Bot):
         elif choice == 'r':
             # remove the category tag
             article.change_category(original_cat, None,
-                                    comment=self.editSummary)
+                                    summary=self.editSummary)
         elif choice != 's':
             if choice[0] == 'u':
                 # recurse into supercategory
@@ -1082,7 +1084,7 @@ class CategoryTreeRobot(object):
             f.write(tree)
             f.close()
         else:
-            pywikibot.output(tree, toStdout=True)
+            pywikibot.stdout(tree)
 
 
 def main(*args):

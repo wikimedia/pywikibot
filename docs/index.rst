@@ -6,13 +6,13 @@ Welcome to pywikibot!
     **This documentation is incomplete**, and needs quite some work.
     
     If you are not familiar with pywikibot, please start at the
-    old documentation:
+    documentation:
     `Manual:Pywikibot on mediawiki.org <https://www.mediawiki.org/wiki/Manual:Pywikibot>`_
     
 
 Pywikibot is a full-stack framework for editing `MediaWiki <https://mediawiki.org>`_ wiki's. (more intro)
 
-Pywikibot supports Python 2.6.5, 2.7 and 3.2+.
+Pywikibot supports Python 2.6.5+, 2.7.2+ and 3.3+.
 
 Pywikibot and this documentation are licensed under the :ref:`MIT license <licenses-MIT>`;
 manual pages on mediawiki.org are licensed under the `CC-BY-SA 3.0`_ license.

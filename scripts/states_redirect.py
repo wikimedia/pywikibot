@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Create country sub-division redirect pages.
 
 Check if they are in the form Something, State, and if so, create a redirect
@@ -15,14 +15,11 @@ PRE-REQUISITE : Need to install python-pycountry library.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import re
 import sys
@@ -97,7 +94,6 @@ class StatesRedirectBot(pywikibot.Bot):
                         u"Please check page!"
                         % pl.title())
                 except pywikibot.NoPage:
-                    change = ''
                     if page.isRedirectPage():
                         p2 = page.getRedirectTarget()
                         pywikibot.output(
@@ -105,17 +101,12 @@ class StatesRedirectBot(pywikibot.Bot):
                             u'to "%s" to avoid double redirect.' % p2.title())
                     else:
                         p2 = page
-                    if self.force:
-                        change = 'y'
-                    else:
-                        change = pywikibot.input_choice(
-                            u'Create redirect %s?' % pl.title(),
-                            (('yes', 'y'), ('no', 'n')))
-                    if change == 'y':
+                    if self.force or pywikibot.input_yn('Create redirect {0}?'
+                                                        .format(pl.title())):
                         pl.set_redirect_target(
                             p2, create=True,
-                            summary=i18n.twtranslate(self.site,
-                                                     'states_redirect-comment'))
+                            summary=i18n.twtranslate(
+                                self.site, 'states_redirect-comment'))
 
 
 def main(*args):
@@ -143,6 +134,7 @@ def main(*args):
 
     bot = StatesRedirectBot(start, force)
     bot.run()
+
 
 if __name__ == "__main__":
     main()

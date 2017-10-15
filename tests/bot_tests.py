@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Bot tests."""
 #
 # (C) Pywikibot team, 2015
@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import sys
 
 import pywikibot
@@ -171,6 +169,7 @@ class TestBotTreatExit(object):
                 self.assertIs(exc, exception)
             else:
                 self.assertIsNone(exc)
+                # Cannot use assertRaisesRegex. Python 2.6 issue. See T158519.
                 self.assertRaises(StopIteration, next, self._page_iter)
         return exit
 
@@ -179,6 +178,8 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
 
     """Tests for the BaseBot subclasses."""
 
+    CANT_SET_ATTRIBUTE_RE = 'can\'t set attribute'
+    NOT_IN_TREAT_RE = 'Requesting the site not while in treat is not allowed.'
     dry = True
 
     sites = {
@@ -226,9 +227,9 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         # Assert no specific site
         self._treat_site = False
         self.bot = pywikibot.bot.MultipleSitesBot(generator=self._generator())
-        with self.assertRaises(AttributeError):
+        with self.assertRaisesRegex(AttributeError, self.CANT_SET_ATTRIBUTE_RE):
             self.bot.site = self.de
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, self.NOT_IN_TREAT_RE):
             self.bot.site
         if PY2:
             # The exc_info still contains the AttributeError :/
@@ -236,7 +237,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.treat = self._treat(self._generator())
         self.bot.exit = self._exit(4)
         self.bot.run()
-        with self.assertRaises(ValueError):
+        with self.assertRaisesRegex(ValueError, self.NOT_IN_TREAT_RE):
             self.bot.site
         if PY2:
             # The exc_info still contains the AttributeError :/
@@ -275,7 +276,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
                                       pywikibot.Page(self.de, 'Page 3')],
                                      post_treat)
         self.bot.exit = self._exit(2, exception=ValueError)
-        self.assertRaises(ValueError, self.bot.run)
+        self.assertRaisesRegex(ValueError, 'Whatever', self.bot.run)
 
     def test_Bot_KeyboardInterrupt(self):
         """Test normal Bot class with a KeyboardInterrupt in treat."""
@@ -362,7 +363,7 @@ class LiveBotTestCase(TestBotTreatExit, DefaultSiteTestCase):
         self.bot.run()
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

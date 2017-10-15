@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """IP address tools module."""
 #
 # (C) Pywikibot team, 2015
@@ -15,7 +15,7 @@ import sys
 from distutils.version import StrictVersion
 from warnings import warn
 
-from pywikibot.tools import DeprecatedRegex
+from pywikibot.tools import DeprecatedRegex, UnicodeType
 
 _ipaddress_e = _ipaddr_e = _ipaddr_version = None
 
@@ -33,7 +33,7 @@ if not ip_address or sys.version_info[0] < 3:
     else:
         _ipaddr_version = StrictVersion(_ipaddr_version)
         if _ipaddr_version >= StrictVersion('2.1.10'):
-            from ipaddr import IPAddress as ip_address
+            from ipaddr import IPAddress as ip_address  # flake8: disable=N813
         else:
             _ipaddr_e = ImportError('ipaddr %s is broken.' % _ipaddr_version)
 
@@ -61,7 +61,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
 
             def ip_address_patched(IP):
                 """Safe ip_address."""
-                return orig_ip_address(unicode(IP))  # noqa
+                return orig_ip_address(UnicodeType(IP))
 
             ip_address = ip_address_patched
         except ValueError:
@@ -97,7 +97,7 @@ def is_IP(IP):
     """
     Verify the IP address provided is valid.
 
-    No logging is performed.  Use ip_address instead to catch errors.
+    No logging is performed. Use ip_address instead to catch errors.
 
     @param IP: IP address
     @type IP: unicode

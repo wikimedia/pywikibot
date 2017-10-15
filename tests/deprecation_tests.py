@@ -1,13 +1,11 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, add_full_name, remove_last_args
@@ -62,6 +60,7 @@ class DecoratorFullNameTestCase(DeprecationTestCase):
     net = False
 
     def test_add_full_name_decorator(self):
+        """Test add_decorated_full_name() method."""
         self.assertRaisesRegex(
             Exception,
             __name__ + '.decorated_func',
@@ -171,28 +170,34 @@ class DeprecatedMethodClass(object):
     @classmethod
     @deprecated()
     def class_method(cls, foo=None):
+        """Deprecated class method."""
         return foo
 
     @staticmethod
     @deprecated()
     def static_method(foo=None):
+        """Deprecated static method."""
         return foo
 
     @deprecated()
     def instance_method(self, foo=None):
+        """Deprecated instance method."""
         self.foo = foo
         return foo
 
     @deprecated
     def instance_method2(self, foo=None):
+        """Another deprecated instance method."""
         self.foo = foo
         return foo
 
     def undecorated_method(self, foo=None):
+        """Not deprecated instance method."""
         return foo
 
     @deprecate_arg('bah', 'foo')
     def deprecated_instance_method_arg(self, foo=None):
+        """Instance method with deprecated parameters."""
         self.foo = foo
         return foo
 
@@ -208,6 +213,7 @@ class DeprecatedMethodClass(object):
 
     @deprecated_args(bah='foo', bah2='foo2')
     def deprecated_instance_method_args_multi(self, foo, foo2):
+        """Instance method with multiple deprecated parameters."""
         self.foo = foo
         self.foo2 = foo2
         return (foo, foo2)
@@ -215,21 +221,25 @@ class DeprecatedMethodClass(object):
     @deprecated()
     @deprecate_arg('bah', 'foo')
     def deprecated_instance_method_and_arg(self, foo):
+        """Deprecated instance method with deprecated parameters."""
         self.foo = foo
         return foo
 
     @deprecate_arg('bah', 'foo')
     @deprecated()
     def deprecated_instance_method_and_arg2(self, foo):
+        """Deprecating decorators in reverse order."""
         self.foo = foo
         return foo
 
     @remove_last_args(['foo', 'bar'])
     def deprecated_all(self):
+        """Deprecating positional parameters."""
         return None
 
     @remove_last_args(['bar'])
     def deprecated_all2(self, foo):
+        """Deprecating last positional parameter."""
         return foo
 
 
@@ -247,6 +257,7 @@ class DeprecatedClass(object):
     """Deprecated class."""
 
     def __init__(self, foo=None):
+        """Constructor."""
         self.foo = foo
 
 
@@ -310,6 +321,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             self.assertEqual(rv.__doc__, doc)
 
     def test_deprecated_function_bad_args(self):
+        """Test @deprecated function with bad arguments."""
         rv = deprecated_func_bad_args(None)
         self.assertEqual(rv, None)
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_bad_args')
@@ -328,6 +340,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(__name__ + '.deprecated_func_bad_args')
 
     def test_deprecated_instance_method(self):
+        """Test @deprecated instance method."""
         f = DeprecatedMethodClass()
 
         rv = f.instance_method()
@@ -349,6 +362,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             __name__ + '.DeprecatedMethodClass.instance_method')
 
     def test_deprecated_instance_method2(self):
+        """Test @deprecated instance method 2."""
         f = DeprecatedMethodClass()
 
         rv = f.instance_method2()
@@ -410,7 +424,9 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertOneDeprecationParts(__name__ + '.DeprecatedClass')
 
     def test_deprecate_function_arg(self):
+        """Test @deprecated function argument."""
         def tests(func):
+            """Test function."""
             rv = func()
             self.assertEqual(rv, None)
             self.assertNoDeprecation()
@@ -442,6 +458,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         tests(deprecated_func_arg2)
 
     def test_deprecate_and_remove_function_args(self):
+        """Test @deprecated and removed function argument."""
         rv = deprecated_func_arg3()
         self.assertEqual(rv, None)
         self.assertNoDeprecation()
@@ -585,10 +602,14 @@ class DeprecatorTestCase(DeprecationTestCase):
             "The value(s) provided for 'bar' have been dropped." % __name__)
 
     def test_remove_last_args_invalid(self):
+        """Test invalid @remove_last_args on functions."""
         self.assertRaisesRegex(
             TypeError,
-            r"(deprecated_all2\(\) missing 1 required positional argument: 'foo'|"  # Python 3
-            "deprecated_all2\(\) takes exactly 1 argument \(0 given\))",  # Python 2
+            # Python 3
+            r"(deprecated_all2\(\) missing 1 required positional argument: "
+            r"'foo'|"
+            # Python 2
+            r"deprecated_all2\(\) takes exactly 1 argument \(0 given\))",
             deprecated_all2)
 
         self.assertRaisesRegex(
@@ -600,7 +621,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertRaisesRegex(
             TypeError,
             r'deprecated_all2\(\) takes (exactly )?1 (positional )?argument'
-            ' (but 2 were given|\(2 given\))',
+            r' (but 2 were given|\(2 given\))',
             deprecated_all2,
             1, 2, 3)
 
@@ -608,8 +629,11 @@ class DeprecatorTestCase(DeprecationTestCase):
 
         self.assertRaisesRegex(
             TypeError,
-            r"(deprecated_all2\(\) missing 1 required positional argument: 'foo'|"  # Python 3
-            "deprecated_all2\(\) takes exactly 2 arguments \(1 given\))",  # Python 2
+            # Python 3
+            r"(deprecated_all2\(\) missing 1 required positional argument: "
+            r"'foo'|"
+            # Python 2
+            r"deprecated_all2\(\) takes exactly 2 arguments \(1 given\))",
             f.deprecated_all2)
 
         self.assertRaisesRegex(
@@ -621,7 +645,7 @@ class DeprecatorTestCase(DeprecationTestCase):
         self.assertRaisesRegex(
             TypeError,
             r'deprecated_all2\(\) takes (exactly )?2 (positional )?arguments '
-            '(but 3 were given|\(3 given\))',
+            r'(but 3 were given|\(3 given\))',
             f.deprecated_all2,
             1, 2, 3)
 
@@ -782,7 +806,7 @@ class DeprecatorTestCase(DeprecationTestCase):
             __name__ + '.DeprecatedMethodClass.deprecated_instance_method_and_arg2')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

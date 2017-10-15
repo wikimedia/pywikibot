@@ -1,17 +1,15 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test confirming paraminfo contains expected values."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
+from pywikibot.site import DataSite
 from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import (
@@ -40,14 +38,19 @@ class KnownTypesTestBase(TestCaseBase):
         return param['type']
 
     def _check_param_values(self, site, module, parameter, expected):
-        """Perform check that a parameter matches the expected list."""
+        """Check that a parameter matches the expected list exactly."""
         values = self._get_param_values(site, module, parameter)
         self.assertCountEqual(expected, values)
 
     def _check_param_subset(self, site, module, parameter, expected):
-        """Perform check that a parameter matches the expected list."""
+        """Check that a parameter contains all entries in expected list."""
         values = self._get_param_values(site, module, parameter)
         self.assertLessEqual(set(expected), set(values))
+
+    def _check_param_superset(self, site, module, parameter, expected):
+        """Check that a parameter only contains entries in expected list."""
+        values = self._get_param_values(site, module, parameter)
+        self.assertGreaterEqual(set(expected), set(values))
 
 
 class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
@@ -83,7 +86,7 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
 
         known = types + ['!%s' % item for item in types]
 
-        self._check_param_values(self.site, 'query+watchlist', 'show', known)
+        self._check_param_subset(self.site, 'query+watchlist', 'show', known)
 
     def test_watchlist_type(self):
         """Test watchlist type."""
@@ -123,6 +126,12 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         ]
         if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.24'):
             base.append('application/json')
+        if isinstance(self.site, DataSite):
+            # It is not clear when this format has been added, see T129281.
+            base.append('application/vnd.php.serialized')
+        extensions = set(e['name'] for e in self.site.siteinfo['extensions'])
+        if 'CollaborationKit' in extensions:
+            base.append('text/x-collabkit')
 
         self._check_param_values(self.site, 'edit', 'contentformat', base)
         self._check_param_values(self.site, 'parse', 'contentformat', base)
@@ -149,6 +158,9 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         self._check_param_subset(self.site, 'parse', 'contentmodel', base)
 
         if isinstance(self.site.family, WikimediaFamily):
+            # T151151 - en.wiki uninstalled Flow extension:
+            if self.site.family == 'wikipedia' and self.site.code == 'en':
+                wmf.remove('flow-board')
             self._check_param_subset(self.site, 'parse', 'contentmodel', wmf)
 
     def test_revision_deletion_type(self):
@@ -184,7 +196,7 @@ class SiteMatrixKnownTypesTestCase(KnownTypesTestBase,
 
     def test_site_matrix_state(self):
         """Test site matrix state."""
-        known = ['closed', 'private', 'fishbowl', 'all']
+        known = ['closed', 'private', 'fishbowl', 'all', 'nonglobal']
 
         self._check_param_values(self.site, 'sitematrix', 'state', known)
 
@@ -215,11 +227,13 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
         known = ['item', 'property']
         self._check_param_values(self.repo, 'wbsearchentities', 'type', known)
 
+    # Missing datatypes won't crash pywikibot but should be noted
     def test_datatypes(self):
-        """Test known datatypes."""
-        unsupported = set(['monolingualtext', 'wikibase-property'])
+        """Test that all encountered datatypes are known."""
+        unsupported = set()
         known = set(Property.types) | unsupported
-        self._check_param_values(self.repo, 'wbformatvalue', 'datatype', known)
+        self._check_param_superset(
+            self.repo, 'wbformatvalue', 'datatype', known)
 
     def test_snaktype(self):
         """Test known snak types."""
@@ -232,5 +246,5 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
         self._check_param_values(self.repo, 'wbgetclaims', 'rank', known)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

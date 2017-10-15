@@ -1,15 +1,16 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
-A helper script to convert compat 1.0 scripts to the new core 2.0 framework.
+A helper script to convert compat 1.0 scripts to the new core 3.0 framework.
 
 NOTE: Please be aware that this script is not able to convert your codes
 completely. It may support you with some automatic replacements and it gives
 some warnings and hints for converting. Please refer to the converting guide
-README-conversion.txt in the core framework folder and check your codes finally.
+README-conversion.txt in the core framework folder and check your codes
+finally.
 
 The scripts asks for the .py file and converts it to
-<scriptname>-core.py in the same directory. The following options are supported:
+<scriptname>-core.py in the same directory. The following option is supported:
 
 - warnonly: Do not convert the source but show warning messages. This is good
             to check already merged scripts.
@@ -18,22 +19,19 @@ usage
 
 to convert a script and show warnings about deprecated methods:
 
-    python  pwb.py maintenance/compat2core <scriptname>
+    python pwb.py compat2core <scriptname>
 
 to show warnings about deprecated methods:
 
-    python pwb.py maintenance/compat2core <scriptname> -warnonly
+    python pwb.py compat2core <scriptname> -warnonly
 """
 #
-# (C) xqt, 2014-2015
-# (C) Pywikibot team, 2014-2015
+# (C) xqt, 2014-2017
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import codecs
 import os
@@ -44,9 +42,9 @@ import pywikibot
 # be careful with replacement order!
 replacements = (
     # doc strings
-    ('#\r?\n__version__',
-     '#\n# Automatically ported from compat branch by compat2core.py script\n'
-     '#\n__version__'),
+    ('#\r?\n__version__.*\r?\n',
+     '#\n'
+     '# Automatically ported from compat branch by compat2core.py script\n'),
     ('Pywikipedia bot team', 'Pywikibot team'),
     # importing changes
     ('import wikipedia(?: as pywikibot)?', 'import pywikibot'),
@@ -62,7 +60,7 @@ replacements = (
     # site instance call
     (r'pywikibot\.getSite\s*\(\s*', 'pywikibot.Site('),
     # lang is different from code. We should use code in core
-    (r'([Ss])ite.lang(?:uage\(\))?', r'\1ite.code'),
+    (r'([Ss])ite\.lang(?:uage\(\))?', r'\1ite.code'),
     # change compat library classes to pywikibot intrinsic classes
     (r'catlib\.Category\s*\(\s*', 'pywikibot.Category('),
     (r'catlib\.change_category\s*\((\s*)(?P<article>.+?),\s*(?P<oldcat>.+?),',
@@ -79,7 +77,8 @@ replacements = (
     (r'\.aslink\s*\(\s*\)', '.title(asLink=True)'),
     # other deprecated methods
     (r'(?<!site)\.encoding\s*\(\s*\)', '.site.encoding()'),
-    (r'\.newimages\s*\(', '.newfiles('),
+    (r'\.newimages\s*\(\)', ".logevents(logtype='upload')"),
+    (r'\.newimages\s*\(([^)])', r".logevents(logtype='upload', \1"),
     (r'\.getRestrictions\s*\(', '.protection('),
     # new core methods and properties
     (r'\.get\s*\(\s*get_redirect\s*=\s*True\s*\)', '.text'),
@@ -117,7 +116,11 @@ warnings = (
      'query.GetData() should be replaced by pywikibot.data.api.Request or\n'
      'by a direct site request'),
     ('.verbose',
-     'verbose_output need "from pywikibot import config" first')
+     'verbose_output need "from pywikibot import config" first'),
+    ('templatesWithParams(',
+     'the first item of each template info is a Page object of the template,\n'
+     'not the title. '
+     'Please refer README-conversion.txt and the documentation.'),
 )
 
 
@@ -126,10 +129,12 @@ class ConvertBot(object):
     """Script conversion bot."""
 
     def __init__(self, filename=None, warnonly=False):
+        """Constructor."""
         self.source = filename
         self.warnonly = warnonly
 
     def run(self):
+        """Run the bot."""
         self.get_source()
         self.get_dest()
         if not self.warnonly:
@@ -137,6 +142,7 @@ class ConvertBot(object):
         self.warning()
 
     def get_source(self):
+        """Get source script."""
         while True:
             if self.source is None:
                 self.source = pywikibot.input(
@@ -155,6 +161,7 @@ class ConvertBot(object):
             self.source = None
 
     def get_dest(self):
+        """Ask for destination script name."""
         self.dest = u'%s-core.%s' % tuple(self.source.rsplit(u'.', 1))
         if not self.warnonly and not pywikibot.input_yn(
                 u'Destination file is %s.' % self.dest,
@@ -163,26 +170,28 @@ class ConvertBot(object):
             exit()
 
     def convert(self):
-        f = codecs.open(self.source, "r", "utf-8")
-        text = f.read()
-        f.close()
+        """Convert script."""
+        with codecs.open(self.source, 'r', 'utf-8') as f:
+            text = f.read()
         for r in replacements:
             text = re.sub(r[0], r[1], text)
-        g = codecs.open(self.dest, "w", "utf-8")
-        g.write(text)
-        g.close()
+        with codecs.open(self.dest, 'w', 'utf-8') as g:
+            g.write(text)
 
     def warning(self):
+        """Show warnings and hints."""
         filename = self.source if self.warnonly else self.dest
-        g = codecs.open(filename, "r", "utf-8")
-        for i, line in enumerate(g, start=1):
-            for w in warnings:
-                if w[0] in line:
-                    pywikibot.warning(u'line %d: %s>>> %s\n' % (i, line, w[1]))
-        g.close()
+        with codecs.open(filename, 'r', 'utf-8') as g:
+            lines = enumerate(g.readlines(), start=1)
+            for i, line in lines:
+                for w in warnings:
+                    if w[0] in line:
+                        pywikibot.warning(
+                            'line {0}: {1}>>> {2}\n'.format(i, line, w[1]))
 
 
 def main():
+    """Process command line arguments and invoke bot."""
     filename = None
     warnonly = False
 

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This script can move pages.
 
@@ -26,27 +26,26 @@ Furthermore, the following command line parameters are supported:
 -summary          Prompt for a custom summary, bypassing the predefined message
                   texts. Argument can also be given as "-summary:XYZ".
 
--pairs            Read pairs of file names from a file. The file must be in a
+-pairsfile        Read pairs of file names from a file. The file must be in a
                   format [[frompage]] [[topage]] [[frompage]] [[topage]] ...
-                  Argument can also be given as "-pairs:filename"
+                  Argument can also be given as "-pairsfile:filename"
 
 """
 #
 # (C) Leonardo Gregianin, 2006
 # (C) Andreas J. Schwab, 2007
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 import pywikibot
 
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import issue_deprecation_warning
 from pywikibot import i18n, pagegenerators
 
 from pywikibot.bot import MultipleSitesBot
@@ -54,7 +53,7 @@ from pywikibot.bot import MultipleSitesBot
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 
@@ -63,6 +62,7 @@ class MovePagesBot(MultipleSitesBot):
     """Page move bot."""
 
     def __init__(self, generator, **kwargs):
+        """Constructor."""
         self.availableOptions.update({
             'prefix': None,
             'noredirect': False,
@@ -78,6 +78,7 @@ class MovePagesBot(MultipleSitesBot):
         self.noNamespace = False
 
     def moveOne(self, page, newPageTitle):
+        """Move on page to newPageTitle."""
         try:
             msg = self.getOption('summary')
             if not msg:
@@ -91,6 +92,7 @@ class MovePagesBot(MultipleSitesBot):
             pywikibot.output(error)
 
     def treat(self, page):
+        """Treat a single page."""
         self.current_page = page
         if self.getOption('skipredirects') and page.isRedirectPage():
             pywikibot.output(u'Page %s is a redirect; skipping.' % page.title())
@@ -178,7 +180,6 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    gen = None
     oldName = None
     options = {}
     fromToPairs = []
@@ -188,12 +189,17 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-pairs'):
-            if len(arg) == len('-pairs'):
+        if arg == '-pairs' or arg.startswith('-pairs:'):
+            issue_deprecation_warning(
+                '-pairs',
+                '-pairsfile',
+                2, ArgumentDeprecationWarning)
+        elif arg.startswith('-pairsfile'):
+            if len(arg) == len('-pairsfile'):
                 filename = pywikibot.input(
                     u'Enter the name of the file containing pairs:')
             else:
-                filename = arg[len('-pairs:'):]
+                filename = arg[len('-pairsfile:'):]
             oldName1 = None
             for page in pagegenerators.TextfilePageGenerator(filename):
                 if oldName1:
@@ -243,11 +249,9 @@ def main(*args):
         bot = MovePagesBot(None, **options)
         bot.moveOne(page, pair[1])
 
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = MovePagesBot(preloadingGen, **options)
+        bot = MovePagesBot(gen, **options)
         bot.run()
         return True
 
@@ -256,6 +260,7 @@ def main(*args):
         return False
     else:
         return True
+
 
 if __name__ == '__main__':
     main()

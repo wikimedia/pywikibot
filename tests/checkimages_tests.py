@@ -1,6 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Unit tests for checkimages script."""
+#
+# (C) Pywikibot team, 2015-2016
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 from scripts import checkimages
@@ -26,5 +31,5 @@ class TestSettings(TestCase):
         self.assertEqual(item1[1], 'a deprecated template')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

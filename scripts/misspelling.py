@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This script fixes links that contain common spelling mistakes.
 
@@ -22,14 +22,11 @@ Command line options:
                wikipedia, user, etc. namespaces.
 """
 # (C) Daniel Herding, 2007
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 
@@ -63,7 +60,8 @@ class MisspellingRobot(DisambiguationRobot):
     # Optional: if there is a category, one can use the -start
     # parameter.
     misspellingCategory = {
-        'da': u'Omdirigeringer af fejlstavninger',  # only contains date redirects at the moment
+        # da: only contains date redirects at the moment
+        'da': 'Omdirigeringer af fejlstavninger',
         'de': ('Kategorie:Wikipedia:Falschschreibung',
                'Kategorie:Wikipedia:Obsolete Schreibung'),
         'en': u'Redirects from misspellings',
@@ -83,9 +81,9 @@ class MisspellingRobot(DisambiguationRobot):
 
         @rtype: generator
         """
-        mylang = self.site.code
-        if mylang in self.misspellingCategory:
-            categories = self.misspellingCategory[mylang]
+        mycode = self.site.code
+        if mycode in self.misspellingCategory:
+            categories = self.misspellingCategory[mycode]
             if isinstance(categories, basestring):
                 categories = (categories, )
             generators = (
@@ -93,8 +91,8 @@ class MisspellingRobot(DisambiguationRobot):
                     pywikibot.Category(self.site, misspellingCategoryTitle),
                     recurse=True, start=firstPageTitle)
                 for misspellingCategoryTitle in categories)
-        elif mylang in self.misspellingTemplate:
-            templates = self.misspellingTemplate[mylang]
+        elif mycode in self.misspellingTemplate:
+            templates = self.misspellingTemplate[mycode]
             if isinstance(templates, basestring):
                 templates = (templates, )
             generators = (
@@ -128,9 +126,11 @@ class MisspellingRobot(DisambiguationRobot):
             self.alternatives.append(disambPage.getRedirectTarget().title())
             return True
         if self.misspellingTemplate.get(disambPage.site.code) is not None:
+            templates = self.misspellingTemplate[disambPage.site.code]
+            if isinstance(templates, basestring):
+                templates = (templates, )
             for template, params in disambPage.templatesWithParams():
-                if (template.title(withNamespace=False) ==
-                        self.misspellingTemplate[disambPage.site.code]):
+                if template.title(withNamespace=False) in templates:
                     # The correct spelling is in the last paramter.
                     correctSpelling = params[-1]
                     # On de.wikipedia, there are some cases where the
@@ -173,14 +173,12 @@ def main(*args):
     firstPageTitle = None
 
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-always:'):
-            always = arg[8:]
-        elif arg.startswith('-start'):
-            if len(arg) == 6:
-                firstPageTitle = pywikibot.input(
-                    u'At which page do you want to start?')
-            else:
-                firstPageTitle = arg[7:]
+        arg, sep, value = arg.partition(':')
+        if arg == '-always':
+            always = value
+        elif arg == '-start':
+            firstPageTitle = value or pywikibot.input(
+                'At which page do you want to start?')
         elif arg == '-main':
             main_only = True
 

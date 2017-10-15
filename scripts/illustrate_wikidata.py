@@ -1,10 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Bot to add images to Wikidata items. The image is extracted from the page_props.
+Bot to add images to Wikidata items.
 
-For this to be available the PageImages extension
-(https://www.mediawiki.org/wiki/Extension:PageImages) needs to be installed
+The image is extracted from the page_props. For this to be available the
+PageImages extension (https://www.mediawiki.org/wiki/Extension:PageImages)
+needs to be installed
 
 Usage:
 
@@ -14,14 +15,11 @@ Usage:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of MIT License.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 
@@ -38,13 +36,13 @@ class IllustrateRobot(WikidataBot):
         """
         Constructor.
 
-        Arguments:
-            * generator     - A generator that yields Page objects.
-            * wdproperty    - The property to add. Should be of type commonsMedia
-
+        @param generator: A generator that yields Page objects
+        @type generator: generator
+        @param wdproperty: The property to add. Should be of type commonsMedia
+        @type wdproperty: str
         """
         super(IllustrateRobot, self).__init__()
-        self.generator = pagegenerators.PreloadingGenerator(generator)
+        self.generator = generator
         self.wdproperty = wdproperty
         self.cacheSources()
 
@@ -53,12 +51,10 @@ class IllustrateRobot(WikidataBot):
             raise ValueError(u'%s is of type %s, should be commonsMedia'
                              % (self.wdproperty, claim.type))
 
-    def treat(self, page, item):
+    def treat_page_and_item(self, page, item):
         """Treat a page / item."""
-        self.current_page = page
-
         pywikibot.output(u'Found %s' % item.title())
-        imagename = page.properties().get('page_image')
+        imagename = page.properties().get('page_image_free')
 
         if not imagename:
             return
@@ -71,23 +67,20 @@ class IllustrateRobot(WikidataBot):
 
         newclaim = pywikibot.Claim(self.repo, self.wdproperty)
         commonssite = pywikibot.Site("commons", "commons")
-        imagelink = pywikibot.Link(imagename, source=commonssite, defaultNamespace=6)
+        imagelink = pywikibot.Link(imagename, source=commonssite,
+                                   defaultNamespace=6)
         image = pywikibot.FilePage(imagelink)
         if image.isRedirectPage():
             image = pywikibot.FilePage(image.getRedirectTarget())
 
         if not image.exists():
-            pywikibot.output('[[%s]] doesn\'t exist so I can\'t link to it' % (image.title(),))
+            pywikibot.output("%s doesn't exist so I can't link to it"
+                             % image.title(asLink=True))
             return
 
         newclaim.setTarget(image)
-        pywikibot.output('Adding %s --> %s' % (newclaim.getID(), newclaim.getTarget()))
-        item.addClaim(newclaim)
-
         # A generator might yield pages from multiple sites
-        source = self.getSource(page.site)
-        if source:
-            newclaim.addSource(source, bot=True)
+        self.user_add_claim(item, newclaim, page.site)
 
 
 def main(*args):
@@ -115,7 +108,7 @@ def main(*args):
         else:
             generator_factory.handleArg(arg)
 
-    generator = generator_factory.getCombinedGenerator()
+    generator = generator_factory.getCombinedGenerator(preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
@@ -123,6 +116,7 @@ def main(*args):
     bot = IllustrateRobot(generator, wdproperty)
     bot.run()
     return True
+
 
 if __name__ == "__main__":
     main()

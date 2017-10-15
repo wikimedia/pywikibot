@@ -23,14 +23,12 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import re
 import sys
 import time
@@ -65,7 +63,7 @@ class CategoryRedirectBot(pywikibot.Bot):
         self.edit_requests = []
         self.problems = []
         self.template_list = []
-        self.cat_title = None
+        self.cat = None
         self.log_page = pywikibot.Page(self.site,
                                        u"User:%(user)s/category redirect log"
                                        % {'user': self.site.username()})
@@ -75,12 +73,14 @@ class CategoryRedirectBot(pywikibot.Bot):
         # Category that contains all redirected category pages
         self.cat_redirect_cat = {
             'commons': "Category:Category redirects",
+            'meta': 'Category:Maintenance of categories/Soft redirected categories',
             'ar': u"تصنيف:تحويلات تصنيفات ويكيبيديا",
-            'cs': u"Kategorie:Zastaralé kategorie",
+            'cs': 'Kategorie:Údržba:Zastaralé kategorie',
             'da': "Kategori:Omdirigeringskategorier",
             'en': "Category:Wikipedia soft redirected categories",
             'es': "Categoría:Wikipedia:Categorías redirigidas",
             'fa': u"رده:رده‌های منتقل‌شده",
+            'hi': 'श्रेणी:विकिपीडिया श्रेणी अनुप्रेषित',
             'hu': "Kategória:Kategóriaátirányítások",
             'ja': "Category:移行中のカテゴリ",
             'no': "Kategori:Wikipedia omdirigertekategorier",
@@ -90,8 +90,10 @@ class CategoryRedirectBot(pywikibot.Bot):
             'sco': "Category:Wikipaedia soft redirectit categories",
             'simple': "Category:Category redirects",
             'sh': u"Kategorija:Preusmjerene kategorije Wikipedije",
+            'sr': 'Категорија:Wikipedia soft redirected categories',
             'vi': u"Thể loại:Thể loại đổi hướng",
             'zh': u"Category:已重定向的分类",
+            'ro': 'Categorie:Categorii de redirecționare',
         }
 
         # Category that contains non-empty redirected category pages
@@ -106,20 +108,17 @@ class CategoryRedirectBot(pywikibot.Bot):
         self.edit_request_item = i18n.twtranslate(
             self.site, 'category_redirect-edit-request-item')
 
-    def get_cat_title(self):
-        """Specify the category title."""
+    def get_cat(self):
+        """Specify the category page."""
         if self.getOption('tiny'):
-            repo = self.site.data_repository()
-            dp = pywikibot.ItemPage(repo, self.tiny_cat_redirect_cat)
-            try:
-                self.cat_title = dp.getSitelink(self.site)
-            except pywikibot.NoPage:
-                self.cat_title = None
+            self.cat = self.site.page_from_repository(
+                self.tiny_cat_redirect_cat)
         else:
-            self.cat_title = pywikibot.translate(self.site,
-                                                 self.cat_redirect_cat,
-                                                 fallback=False)
-        return self.cat_title is not None
+            cat_title = pywikibot.translate(self.site, self.cat_redirect_cat)
+            if cat_title:
+                self.cat = pywikibot.Category(pywikibot.Link(cat_title,
+                                                             self.site))
+        return self.cat is not None
 
     def move_contents(self, oldCatTitle, newCatTitle, editSummary):
         """The worker function that moves pages out of oldCat into newCat."""
@@ -136,13 +135,13 @@ class CategoryRedirectBot(pywikibot.Bot):
                     'newCatLink': newCat.title(),
                     'newCatTitle': newCatTitle,
                 }
-                comment = editSummary % param
+                summary = editSummary % param
                 # Move articles
                 found, moved = 0, 0
                 for article in oldCat.members():
                     found += 1
                     changed = article.change_category(oldCat, newCat,
-                                                      comment=comment)
+                                                      summary=summary)
                     if changed:
                         moved += 1
 
@@ -158,7 +157,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                     except pywikibot.Error:
                         continue
                     changed = doc.change_category(oldCat, newCat,
-                                                  comment=comment)
+                                                  summary=summary)
                     if changed:
                         moved += 1
 
@@ -225,7 +224,8 @@ class CategoryRedirectBot(pywikibot.Bot):
 
         # generator yields all hard redirect pages in namespace 14
         for page in pagegenerators.PreloadingGenerator(
-                self.site.allpages(namespace=14, filterredir=True), step=250):
+                self.site.allpages(namespace=14, filterredir=True),
+                groupsize=250):
             if page.isCategoryRedirect():
                 # this is already a soft-redirect, so skip it (for now)
                 continue
@@ -239,7 +239,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # race condition: someone else removed the redirect while we
                 # were checking for it
                 continue
-            if target.isCategory():
+            if target.is_categorypage():
                 # this is a hard-redirect to a category page
                 newtext = (u"{{%(template)s|%(cat)s}}"
                            % {'cat': target.title(withNamespace=False),
@@ -264,14 +264,12 @@ class CategoryRedirectBot(pywikibot.Bot):
     def run(self):
         """Run the bot."""
         # validate L10N
-        try:
-            self.template_list = self.site.family.category_redirect_templates[
-                self.site.code]
-        except KeyError:
+        self.template_list = self.site.category_redirects()
+        if not self.template_list:
             pywikibot.warning(u"No redirect templates defined for %s"
                               % self.site)
             return
-        if not self.get_cat_title():
+        if not self.get_cat():
             pywikibot.warning(u"No redirect category found for %s" % self.site)
             return
 
@@ -313,7 +311,7 @@ class CategoryRedirectBot(pywikibot.Bot):
         comment = i18n.twtranslate(self.site, self.move_comment)
         counts = {}
         nonemptypages = []
-        redircat = pywikibot.Category(pywikibot.Link(self.cat_title, self.site))
+        redircat = self.cat
 
         pywikibot.output(u"\nChecking %d category redirect pages"
                          % redircat.categoryinfo['subcats'])
@@ -479,6 +477,7 @@ def main(*args):
             options[arg[1:]] = True
     bot = CategoryRedirectBot(**options)
     bot.run()
+
 
 if __name__ == "__main__":
     main()

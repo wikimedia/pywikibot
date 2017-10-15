@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 A window with a unicode textfield where the user can edit.
 
@@ -22,7 +22,7 @@ import sys
 if sys.version_info[0] > 2:
     import tkinter as Tkinter
     from tkinter.scrolledtext import ScrolledText
-    from tkinter import simpledialog as tkSimpleDialog
+    from tkinter import simpledialog as tkSimpleDialog  # flake8: disable=N812
 else:
     import Tkinter
     import tkSimpleDialog
@@ -36,6 +36,7 @@ from idlelib.MultiCall import MultiCallCreator
 import pywikibot
 
 from pywikibot import __url__
+from pywikibot.tools import PY2, UnicodeType
 
 
 class TextEditor(ScrolledText):
@@ -54,23 +55,23 @@ class TextEditor(ScrolledText):
         Get default settings from user's IDLE configuration.
         """
         currentTheme = idleConf.CurrentTheme()
-        textcf = dict(padx=5, wrap='word', undo='True',
-                      foreground=idleConf.GetHighlight(currentTheme,
-                                                       'normal', fgBg='fg'),
-                      background=idleConf.GetHighlight(currentTheme,
-                                                       'normal', fgBg='bg'),
-                      highlightcolor=idleConf.GetHighlight(currentTheme,
-                                                           'hilite', fgBg='fg'),
-                      highlightbackground=idleConf.GetHighlight(currentTheme,
-                                                                'hilite',
-                                                                fgBg='bg'),
-                      insertbackground=idleConf.GetHighlight(currentTheme,
-                                                             'cursor',
-                                                             fgBg='fg'),
-                      width=idleConf.GetOption('main', 'EditorWindow', 'width'),
-                      height=idleConf.GetOption('main', 'EditorWindow',
-                                                'height')
-                      )
+        textcf = {
+            'padx': 5,
+            'wrap': 'word',
+            'undo': 'True',
+            'foreground': idleConf.GetHighlight(
+                currentTheme, 'normal', fgBg='fg'),
+            'background': idleConf.GetHighlight(
+                currentTheme, 'normal', fgBg='bg'),
+            'highlightcolor': idleConf.GetHighlight(
+                currentTheme, 'hilite', fgBg='fg'),
+            'highlightbackground': idleConf.GetHighlight(
+                currentTheme, 'hilite', fgBg='bg'),
+            'insertbackground': idleConf.GetHighlight(
+                currentTheme, 'cursor', fgBg='fg'),
+            'width': idleConf.GetOption('main', 'EditorWindow', 'width'),
+            'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
+        }
         fontWeight = 'normal'
         if idleConf.GetOption('main', 'EditorWindow', 'font-bold', type='bool'):
             fontWeight = 'bold'
@@ -415,8 +416,8 @@ class EditBoxWindow(Tkinter.Frame):
         # if the editbox contains ASCII characters only, get() will
         # return string, otherwise unicode (very annoying). We only want
         # it to return unicode, so we work around this.
-        if sys.version[0] == 2 and isinstance(self.text, str):
-            self.text = unicode(self.text)  # noqa
+        if PY2 and isinstance(self.text, str):
+            self.text = UnicodeType(self.text)
         self.parent.destroy()
 
     def debug(self, event=None):

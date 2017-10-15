@@ -1,40 +1,42 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Generate a i18n file from a given script.
 
 usage:
 
-run IDLE at topmost level
+run IDLE at topmost level:
+
 >>> import pwb
 >>> from scripts.maintenance.make_i18n_dict import i18nBot
 >>> bot = i18nBot('<scriptname>', '<msg dict>')
 >>> bot.run()
 
 If you have more than one message dictionary, give all these names to the bot:
+
 >>> bot = i18nBot('<scriptname>', '<msg dict1>', '<msg dict2>', '<msg dict3>')
 
 If you want to rename the message index use keyword arguments. This may be
 mixed with preleading positonal argumens:
+
 >>> bot = i18nBot('<scriptname>', '<msg dict1>', the_other_msg='<msg dict2>')
 
 If you have the messages as instance constants you may call the bot as follows:
+
 >>> bot = i18nBot('<scriptname>.<class instance>', '<msg dict1>', '<msg dict2>')
 
 It's also possible to make json files too by using to_json method after
-instantiating the bot. It also calls bot.run() to create the dictionaries.
+instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
+
 >>> bot.to_json()
 """
 #
-# (C) xqt, 2013-2015
-# (C) Pywikibot team, 2013-2015
+# (C) xqt, 2013-2017
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
+from __future__ import absolute_import, print_function, unicode_literals
 
 import codecs
 import json
@@ -43,7 +45,7 @@ import os
 from pywikibot import config
 
 
-class i18nBot(object):
+class i18nBot(object):  # flake8: disable=N801
 
     """I18n bot."""
 
@@ -154,6 +156,7 @@ class i18nBot(object):
                                indent=IDENT, separators=(',', ': '))
                 s = s.replace(' ' * IDENT, '\t')
                 json_file.write(s)
+
 
 if __name__ == '__main__':
     print(__doc__)

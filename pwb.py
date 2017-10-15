@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Wrapper script to use Pywikibot in 'directory' mode.
 
 Run scripts using:
@@ -9,7 +9,7 @@ Run scripts using:
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
 """
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,13 +72,13 @@ def tryimport_pwb():
     """
     global pwb
     try:
-        import pywikibot  # noqa
+        import pywikibot
         pwb = pywikibot
     except RuntimeError:
         remove_modules()
 
         os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
-        import pywikibot  # noqa
+        import pywikibot  # flake8: disable=E402
         pwb = pywikibot
 
 
@@ -136,7 +136,6 @@ def abspath(path):
     path = os.path.abspath(path)
     if path[0] != '/':
         # normalise Windows drive letter
-        # TODO: use pywikibot.tools.first_upper
         path = path[0].upper() + path[1:]
     return path
 
@@ -161,9 +160,8 @@ except ImportError as e:
     requests = None
 
 if not requests:
-    print("Python module requests is required.")
-    print("Try running 'pip install requests'.")
-    sys.exit(1)
+    raise ImportError("Python module 'requests' is required.\n"
+                      "Try running 'pip install requests'.")
 
 del requests
 
@@ -184,7 +182,8 @@ try:
     if sys.platform == 'win32' and sys.version_info[0] < 3:
         _pwb_dir = str(_pwb_dir)
     os.environ[str('PYWIKIBOT2_DIR_PWB')] = _pwb_dir
-    import pywikibot  # noqa
+    import pywikibot
+    pwb = pywikibot
 except RuntimeError as err:
     # user-config.py to be created
     print("NOTE: 'user-config.py' was not found!")
@@ -208,17 +207,24 @@ def main():
         if not filename.endswith('.py'):
             filename += '.py'
         if not os.path.exists(filename):
-            testpath = os.path.join(os.path.split(__file__)[0],
-                                    'scripts',
-                                    filename)
-            file_package = 'scripts'
-            if not os.path.exists(testpath):
-                testpath = os.path.join(
-                    os.path.split(__file__)[0], 'scripts/archive', filename)
-                file_package = 'scripts.archive'
-
-            if os.path.exists(testpath):
-                filename = testpath
+            script_paths = ['scripts',
+                            'scripts.maintenance',
+                            'scripts.archive',
+                            'scripts.userscripts']
+            from pywikibot import config  # flake8: disable=E402
+            if config.user_script_paths:
+                if isinstance(config.user_script_paths, (tuple, list)):
+                    script_paths = config.user_script_paths + script_paths
+                else:
+                    warn("'user_script_paths' must be a list or tuple,\n"
+                         'found: {0}. Ignoring this setting.'
+                         ''.format(type(config.user_script_paths)))
+            for file_package in script_paths:
+                paths = file_package.split('.') + [filename]
+                testpath = os.path.join(_pwb_dir, *paths)
+                if os.path.exists(testpath):
+                    filename = testpath
+                    break
             else:
                 raise OSError("%s not found!" % filename)
 
@@ -251,6 +257,7 @@ def main():
         return True
     else:
         return False
+
 
 if __name__ == '__main__':
     if not main():

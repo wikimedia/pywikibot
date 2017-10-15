@@ -9,7 +9,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 #
 # (C) Merlijn van Deen, 2010-2013
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license
 #
@@ -30,8 +30,8 @@ else:
 
 # Disable user-config checks so the family can be created first,
 # and then used when generating the user-config
-_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')  # noqa
-os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'  # noqa
+_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
+os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
 
 from pywikibot.site_detect import MWSite as Wiki
 
@@ -47,6 +47,7 @@ class FamilyFileGenerator(object):
     """Family file creator."""
 
     def __init__(self, url=None, name=None, dointerwiki=None):
+        """Constructor."""
         if url is None:
             url = raw_input("Please insert URL to wiki: ")
         if name is None:
@@ -59,10 +60,11 @@ class FamilyFileGenerator(object):
         self.langs = []  # [Wiki('https://wiki/$1'), ...]
 
     def run(self):
+        """Main method, generate family file."""
         print("Generating family file from %s" % self.base_url)
 
         w = Wiki(self.base_url)
-        self.wikis[w.iwpath] = w
+        self.wikis[w.lang] = w
         print()
         print("==================================")
         print("api url: %s" % w.api)
@@ -75,15 +77,18 @@ class FamilyFileGenerator(object):
         self.writefile()
 
     def getlangs(self, w):
+        """Determine language of a site."""
         print("Determining other languages...", end="")
         try:
             self.langs = w.langs
-            print(u' '.join(sorted([wiki[u'prefix'] for wiki in self.langs])))
+            print(' '.join(sorted(wiki['prefix'] for wiki in self.langs)))
         except Exception as e:
             self.langs = []
             print(e, "; continuing...")
 
         if len([lang for lang in self.langs if lang['url'] == w.iwpath]) == 0:
+            if w.private_wiki:
+                w.lang = self.name
             self.langs.append({u'language': w.lang,
                                u'local': u'',
                                u'prefix': w.lang,
@@ -113,12 +118,13 @@ class FamilyFileGenerator(object):
                               if wiki[u'url'] == w.iwpath]
 
     def getapis(self):
+        """Load other language pages."""
         print("Loading wikis... ")
         for lang in self.langs:
             print("  * %s... " % (lang[u'prefix']), end="")
-            if lang[u'url'] not in self.wikis:
+            if lang['prefix'] not in self.wikis:
                 try:
-                    self.wikis[lang[u'url']] = Wiki(lang[u'url'])
+                    self.wikis[lang['prefix']] = Wiki(lang['url'])
                     print("downloaded")
                 except Exception as e:
                     print(e)
@@ -126,6 +132,7 @@ class FamilyFileGenerator(object):
                 print("in cache")
 
     def writefile(self):
+        """Write the family file."""
         fn = "pywikibot/families/%s_family.py" % self.name
         print("Writing %s... " % fn)
         try:
@@ -160,38 +167,37 @@ class Family(family.Family):
         self.langs = {
 """.lstrip() % {'url': self.base_url, 'name': self.name})
 
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             f.write("            '%(lang)s': '%(hostname)s',\n"
-                    % {'lang': w.lang, 'hostname': urlparse(w.server).netloc})
+                    % {'lang': k, 'hostname': urlparse(w.server).netloc})
 
         f.write("        }\n\n")
-
         f.write("    def scriptpath(self, code):\n")
         f.write("        return {\n")
 
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             f.write("            '%(lang)s': '%(path)s',\n"
-                    % {'lang': w.lang, 'path': w.scriptpath})
+                    % {'lang': k, 'path': w.scriptpath})
         f.write("        }[code]\n")
         f.write("\n")
 
         f.write("    @deprecated('APISite.version()')\n")
         f.write("    def version(self, code):\n")
         f.write("        return {\n")
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             if w.version is None:
-                f.write("            '%(lang)s': None,\n" % {'lang': w.lang})
+                f.write("            '%(lang)s': None,\n" % {'lang': k})
             else:
                 f.write("            '%(lang)s': u'%(ver)s',\n"
-                        % {'lang': w.lang, 'ver': w.version})
+                        % {'lang': k, 'ver': w.version})
         f.write("        }[code]\n")
 
         f.write("\n")
         f.write("    def protocol(self, code):\n")
         f.write("        return {\n")
-        for w in self.wikis.values():
+        for k, w in self.wikis.items():
             f.write("            '%(lang)s': u'%(protocol)s',\n"
-                    % {'lang': w.lang, 'protocol': urlparse(w.server).scheme})
+                    % {'lang': k, 'protocol': urlparse(w.server).scheme})
         f.write("        }[code]\n")
 
 

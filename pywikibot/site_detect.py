@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Classes for detecting a MediaWiki site."""
 #
 # (C) Pywikibot team, 2010-2015
@@ -12,6 +12,8 @@ __version__ = '$Id$'
 
 import json
 import re
+
+from requests import RequestException
 
 import pywikibot
 
@@ -28,6 +30,10 @@ else:
     except ImportError:
         from HTMLParser import HTMLParser
     from urlparse import urljoin, urlparse
+
+
+SERVER_DB_ERROR_MSG = \
+    '<h1>Sorry! This site is experiencing technical difficulties.</h1>'
 
 
 class MWSite(object):
@@ -52,8 +58,7 @@ class MWSite(object):
         if fromurl.endswith("$1"):
             fromurl = fromurl[:-2]
         r = fetch(fromurl)
-        if r.status == 503:
-            raise ServerError('Service Unavailable')
+        check_response(r)
 
         if fromurl != r.data.url:
             pywikibot.log('{0} redirected to {1}'.format(fromurl, r.data.url))
@@ -79,6 +84,8 @@ class MWSite(object):
         if self.api:
             try:
                 self._parse_post_117()
+            except (ServerError, RequestException):
+                raise
             except Exception as e:
                 pywikibot.log('MW 1.17+ detection failed: {0!r}'.format(e))
 
@@ -88,9 +95,25 @@ class MWSite(object):
         if not self.api:
             raise RuntimeError('Unsupported url: {0}'.format(self.fromurl))
 
+        if not self.articlepath:
+            if self.private_wiki:
+                if self.api != self.fromurl and self.private_wiki:
+                    self.articlepath = self.fromurl.rsplit('/', 1)[0] + '/$1'
+                else:
+                    raise RuntimeError(
+                        'Unable to determine articlepath because the wiki is '
+                        'private. Use the Main Page URL instead of the API.')
+            else:
+                raise RuntimeError('Unable to determine articlepath: '
+                                   '{0}'.format(self.fromurl))
+
         if (not self.version or
                 self.version < MediaWikiVersion('1.14')):
             raise RuntimeError('Unsupported version: {0}'.format(self.version))
+
+    def __repr__(self):
+        return '{0}("{1}")'.format(
+            self.__class__.__name__, self.fromurl)
 
     @property
     def langs(self):
@@ -145,7 +168,16 @@ class MWSite(object):
     def _parse_post_117(self):
         """Parse 1.17+ siteinfo data."""
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
-        info = json.loads(response.content)['query']['general']
+        check_response(response)
+        # remove preleading newlines and Byte Order Mark (BOM), see T128992
+        content = response.content.strip().lstrip('\uFEFF')
+        info = json.loads(content)
+        self.private_wiki = ('error' in info and
+                             info['error']['code'] == 'readapidenied')
+        if self.private_wiki:
+            return
+
+        info = info['query']['general']
         self.version = MediaWikiVersion.from_generator(info['generator'])
         if self.version < MediaWikiVersion('1.17'):
             return
@@ -267,3 +299,15 @@ class WikiHTMLPageParser(HTMLParser):
                 self.set_api_url(attrs['href'])
         elif tag == 'script' and 'src' in attrs:
             self.set_api_url(attrs['src'])
+
+
+def check_response(response):
+    """Raise ServerError if the response indicates a server error."""
+    if response.status == 503:
+        raise ServerError('Service Unavailable')
+    elif response.status == 502:
+        raise ServerError('Bad Gateway')
+    elif response.status == 500:
+        raise ServerError('Internal Server Error')
+    elif response.status == 200 and SERVER_DB_ERROR_MSG in response.content:
+        raise ServerError('Server cannot access the database')

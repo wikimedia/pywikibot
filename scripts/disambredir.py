@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 User assisted updating redirect links on disambiguation pages.
 
@@ -12,14 +12,12 @@ If no starting name is provided, the bot starts at '!'.
 """
 #
 # (C) André Engels, 2006-2009
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import pywikibot
 
 from pywikibot import textlib, pagegenerators
@@ -36,6 +34,7 @@ class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):
     def _create_callback(self, old, new):
         replace_callback = InteractiveReplace(
             old, new, default='n', automatic_quit=False)
+        replace_callback.allow_replace = True
         replace_callback.allow_replace_label = True
         replace_callback.allow_replace_section = True
         replace_callback.allow_replace_all = True

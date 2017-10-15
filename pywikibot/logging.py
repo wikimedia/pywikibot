@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Logging functions."""
 #
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -45,12 +45,12 @@ def _init():
 # User output/logging functions
 
 # Six output functions are defined. Each requires a unicode or string
-# argument.  All of these functions generate a message to the log file if
+# argument. All of these functions generate a message to the log file if
 # logging is enabled ("-log" or "-debug" command line arguments).
 
 # The functions output(), stdout(), warning(), and error() all display a
 # message to the user through the logger object; the only difference is the
-# priority level,  which can be used by the application layer to alter the
+# priority level, which can be used by the application layer to alter the
 # display. The stdout() function should be used only for data that is
 # the "result" of a script, as opposed to information messages to the
 # user.
@@ -131,9 +131,11 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     Other keyword arguments are passed unchanged to the logger; so far, the
     only argument that is useful is "exc_info=True", which causes the
     log message to include an exception traceback.
-
     """
     if toStdout:  # maintained for backwards-compatibity only
+        from pywikibot.tools import issue_deprecation_warning  # noqa
+        issue_deprecation_warning('"toStdout" parameter',
+                                  'pywikibot.stdout()', 2)
         logoutput(text, decoder, newline, STDOUT, **kwargs)
     else:
         logoutput(text, decoder, newline, INFO, **kwargs)

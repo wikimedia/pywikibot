@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Program to match two images based on histograms.
 
@@ -8,8 +8,6 @@ Usage:
     python pwb.py match_images ImageA ImageB
 
 It is essential to provide two images to work on.
-
-&params;
 
 Furthermore, the following command line parameters are supported:
 
@@ -26,12 +24,11 @@ Expect the code to change a lot!
 """
 #
 # (c) Multichill, 2009
-# (c) Pywikibot team, 2009-2015
+# (c) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
-__version__ = '$Id$'
 
 import io
 

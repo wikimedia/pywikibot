@@ -4,9 +4,10 @@
 This script shows the categories on each page and lets you change them.
 
 For each page in the target wiki:
-* If the page contains no categories, you can specify a list of categories to
+
+- If the page contains no categories, you can specify a list of categories to
   add to the page.
-* If the page already contains one or more categories, you can specify a new
+- If the page already contains one or more categories, you can specify a new
   list of categories to replace the current list of categories of the page.
 
 Usage:
@@ -26,15 +27,13 @@ Options:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 from pywikibot import i18n, textlib
 from pywikibot.bot import QuitKeyboardInterrupt
 
 
 def choosecats(pagetext):
+    """Coose categories."""
     chosen = []
     done = False
     length = 1000
@@ -71,6 +70,7 @@ q: quit.""")
 
 
 def make_categories(page, list, site=None):
+    """Make categories."""
     if site is None:
         site = pywikibot.Site()
     pllist = []
@@ -127,6 +127,7 @@ def main(*args):
                     make_categories(p, newcats, mysite)
         except pywikibot.IsRedirectPage:
             pywikibot.output(u'%s is a redirect' % p.title())
+
 
 if __name__ == "__main__":
     try:

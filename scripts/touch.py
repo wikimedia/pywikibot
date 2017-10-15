@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This bot goes over multiple pages of a wiki, and edits them without changes.
 
@@ -15,14 +15,11 @@ This script understands various command-line arguments:
 
 """
 #
-# (C) Pywikibot team, 2009-2015
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 
@@ -97,10 +94,9 @@ def main(*args):
             # -botflag
             options[arg[1:].lower()] = True
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = bot_class(generator=preloadingGen, **options)
+        bot = bot_class(generator=gen, **options)
         pywikibot.Site().login()
         bot.run()
         return True

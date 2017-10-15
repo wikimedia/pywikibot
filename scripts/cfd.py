@@ -13,25 +13,21 @@ Syntax:
 """
 #
 # (C) Ben McIlwain, 2008
-# (C) Pywikibot team, 2009-2013
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
+import sys
 
 import pywikibot
 
-from pywikibot import config2 as config
-
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
-# The location of the CFD working page.
-cfdPage = u'Wikipedia:Categories for discussion/Working'
+
+DEFAULT_CFD_PAGE = 'Wikipedia:Categories for discussion/Working'
 
 # A list of templates that are used on category pages as part of the CFD
 # process that contain information such as the link to the per-day discussion page.
@@ -39,8 +35,8 @@ cfdTemplates = ['Cfd full', 'Cfr full']
 
 # Regular expression declarations
 # See the en-wiki CFD working page at [[Wikipedia:Categories for discussion/Working]]
-# to see how these work in context.  To get this bot working on other wikis you will
-# need to adjust these regular expressions at the very least.
+# to see how these work in context. To get this bot working on other wikis you
+# will need to adjust these regular expressions at the very least.
 nobots = re.compile(r"NO\s*BOTS", re.IGNORECASE)
 example = re.compile(r"\[\[:Category:(.)\1\1\1\1\]\]", re.IGNORECASE)
 speedymode = re.compile(r"^===*\s*Speedy Moves\s*===*\s*$", re.IGNORECASE)
@@ -63,9 +59,11 @@ class ReCheck(object):
     """Helper class."""
 
     def __init__(self):
+        """Constructor."""
         self.result = None
 
     def check(self, pattern, text):
+        """Search pattern."""
         self.result = pattern.search(text)
         return self.result
 
@@ -79,18 +77,29 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    pywikibot.handle_args(args)
+    cfd_page = DEFAULT_CFD_PAGE
+    local_args = pywikibot.handle_args(args)
 
-    if config.family != 'wikipedia' or config.mylang != 'en':
-        pywikibot.warning('CFD does work only on the English Wikipedia.')
-        return
+    for arg in local_args:
+        if arg.startswith('-page'):
+            if len(arg) == len('-page'):
+                cfd_page = pywikibot.input('Enter the CFD working page to use:')
+            else:
+                cfd_page = arg[len('-page:'):]
 
-    page = pywikibot.Page(pywikibot.Site(), cfdPage)
+    page = pywikibot.Page(pywikibot.Site(), cfd_page)
+    try:
+        page.get()
+    except pywikibot.NoPage:
+        pywikibot.error(
+            'CFD working page "{0}" does not exist!'.format(cfd_page))
+        sys.exit(1)
 
     # Variable declarations
-    day = "None"
-    mode = "None"
-    summary = ""
+    day = 'None'
+    mode = 'None'
+    summary = ''
+    action_summary = ''
     robot = None
 
     m = ReCheck()
@@ -128,26 +137,30 @@ def main(*args):
                 summary = (
                     'Robot - Moving category ' + src + ' to [[:Category:' +
                     dest + ']] per [[WP:CFD|CFD]] at ' + thisDay + '.')
+                action_summary = 'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
             elif mode == "Speedy":
                 summary = (
                     'Robot - Speedily moving category ' + src +
                     ' to [[:Category:' + dest + ']] per [[WP:CFDS|CFDS]].')
+                action_summary = 'Robot - Speedily moved per [[WP:CFDS|CFDS]].'
             else:
                 continue
             # If the category is redirect, we do NOT want to move articles to
             # it. The safest thing to do here is abort and wait for human
             # intervention.
-            destpage = pywikibot.Page(
-                pywikibot.Site(), dest, ns=14)
+            destpage = pywikibot.Page(page.site, dest, ns=14)
             if destpage.isCategoryRedirect():
                 summary = 'CANCELED. Destination is redirect: ' + summary
-                pywikibot.output(summary, toStdout=True)
+                pywikibot.stdout(summary)
                 robot = None
             else:
+                deletion_comment_same = (
+                    CategoryMoveBot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT)
                 robot = CategoryMoveBot(oldcat=src, newcat=dest, batch=True,
                                         comment=summary, inplace=True,
                                         move_oldcat=True, delete_oldcat=True,
-                                        deletion_comment=True)
+                                        deletion_comment=deletion_comment_same,
+                                        move_comment=action_summary)
         elif m.check(deletecat, line):
             src = m.result.group(1)
             # I currently don't see any reason to handle these two cases
@@ -159,28 +172,34 @@ def main(*args):
                 summary = (
                     'Robot - Removing category {0} per [[WP:CFD|CFD]] '
                     'at {1}.'.format(src, thisDay))
+                action_summary = 'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
             else:
                 continue
             robot = CategoryMoveBot(oldcat=src, batch=True, comment=summary,
-                                    deletion_comment=True, inplace=True)
+                                    deletion_comment=action_summary,
+                                    inplace=True)
         else:
             # This line does not fit any of our regular expressions,
             # so ignore it.
             pass
         if summary != "" and robot is not None:
-            pywikibot.output(summary, toStdout=True)
+            pywikibot.stdout(summary)
             # Run, robot, run!
             robot.run()
         summary = ""
         robot = None
 
 
-# This function grabs the wiki source of a category page and attempts to
-# extract a link to the CFD per-day discussion page from the CFD template.
-# If the CFD template is not there, it will return the value of the second
-# parameter, which is essentially a fallback that is extracted from the
-# per-day subheadings on the working page.
 def findDay(pageTitle, oldDay):
+    """
+    Find day link from CFD template.
+
+    This function grabs the wiki source of a category page and attempts to
+    extract a link to the CFD per-day discussion page from the CFD template.
+    If the CFD template is not there, it will return the value of the second
+    parameter, which is essentially a fallback that is extracted from the
+    per-day subheadings on the working page.
+    """
     page = pywikibot.Page(pywikibot.Site(), u"Category:" + pageTitle)
     try:
         pageSrc = page.text
@@ -209,6 +228,7 @@ def findDay(pageTitle, oldDay):
                     return ('[[Wikipedia:Categories for discussion/Log/%s %s %s]]'
                             % (year, month, day))
         return oldDay
+
 
 if __name__ == "__main__":
     main()

@@ -9,14 +9,6 @@ pywikibot.families package
 Submodules
 ----------
 
-pywikibot.families.anarchopedia_family module
----------------------------------------------
-
-.. automodule:: pywikibot.families.anarchopedia_family
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 pywikibot.families.battlestarwiki_family module
 -----------------------------------------------
 

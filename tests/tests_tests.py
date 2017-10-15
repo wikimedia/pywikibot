@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the tests package."""
 #
 # (C) Pywikibot team, 2014
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -51,7 +49,7 @@ class TestPageAssert(TestCase):
                                    self.site)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

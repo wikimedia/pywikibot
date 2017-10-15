@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,24 +11,27 @@ __version__ = '$Id$'
 #
 
 import collections
-import imp
 import logging
 import re
 import string
 import sys
 import warnings
 
-if sys.version_info[0] > 2:
+PY3 = sys.version_info[0] > 2
+if PY3:
+    from os.path import basename, dirname, splitext
+    from importlib import import_module
     import urllib.parse as urlparse
 else:
+    import imp
     import urlparse
 
 from warnings import warn
 
+import requests
+
 import pywikibot
-
 from pywikibot import config
-
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     deprecated, deprecated_args, issue_deprecation_warning,
@@ -60,71 +63,73 @@ class Family(object):
         # The sorting order by language name from meta
         # MediaWiki:Interwiki_config-sorting_order-native-languagename
         self.alphabetic = [
-            'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
-            'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bm',
-            'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms', 'ba', 'be', 'be-tarask',
-            'bh', 'bcl', 'bi', 'bg', 'bar', 'bo', 'bs', 'br', 'bxr', 'ca', 'cv',
-            'ceb', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',
-            'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'dz', 'mh', 'et', 'el',
-            'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif',
-            'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'gag', 'gd', 'gl', 'gan',
-            'ki', 'glk', 'gu', 'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy',
-            'hi', 'ho', 'hsb', 'hr', 'io', 'ig', 'ilo', 'bpy', 'id', 'ia', 'ie',
-            'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it', 'he', 'jv', 'kl', 'kn',
-            'kr', 'pam', 'krc', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw',
-            'kv', 'kg', 'ht', 'ku', 'kj', 'ky', 'mrj', 'lad', 'lbe', 'lez',
-            'lo', 'ltg', 'la', 'lv', 'lb', 'lt', 'lij', 'li', 'ln', 'jbo', 'lg',
-            'lmo', 'hu', 'mk', 'mg', 'ml', 'mt', 'mi', 'mr', 'xmf', 'arz',
-            'mzn', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo', 'mn', 'mus', 'my',
-            'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap',
-            'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc',
-            'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag',
-            'pnb', 'pap', 'ps', 'koi', 'km', 'pcd', 'pms', 'tpi', 'nds', 'pl',
-            'tokipona', 'tp', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh',
-            'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'se', 'sm', 'sa', 'sg',
-            'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple',
-            'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh',
-            'su', 'fi', 'sv', 'tl', 'ta', 'shi', 'kab', 'roa-tara', 'tt', 'te',
-            'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tr', 'tk', 'tw',
-            'tyv', 'udm', 'bug', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vi',
-            'vo', 'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu',
-            'ts', 'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw',
-            'zh-cn',
+            'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar',
+            'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av',
+            'ay', 'az', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms',
+            'ba', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo',
+            'bs', 'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny',
+            'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv',
+            'nv', 'dsb', 'dty', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv',
+            'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff',
+            'fur', 'ga', 'gv', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu',
+            'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb',
+            'hr', 'io', 'ig', 'ilo', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os',
+            'xh', 'zu', 'is', 'it', 'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam',
+            'krc', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg',
+            'gom', 'ht', 'ku', 'kj', 'ky', 'mrj', 'lad', 'lbe', 'lez', 'lo',
+            'ltg', 'la', 'lv', 'lb', 'lt', 'lij', 'li', 'ln', 'olo', 'jbo',
+            'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi',
+            'mr', 'xmf', 'arz', 'mzn', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo',
+            'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
+            'new', 'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm',
+            'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
+            'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pms',
+            'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh',
+            'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'se', 'sm', 'sa',
+            'sg', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si',
+            'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn',
+            'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara', 'tt',
+            'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy',
+            'tr', 'azb', 'tk', 'tw', 'tyv', 'udm', 'bug', 'uk', 'ur', 'ug',
+            'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical',
+            'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq',
+            'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
         ]
 
         # The revised sorting order by first word from meta
         # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
         self.alphabetic_revised = [
-            'ace', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar', 'an',
-            'arc', 'roa-rup', 'frp', 'as', 'ast', 'gn', 'av', 'ay', 'az', 'bjn',
-            'id', 'ms', 'bm', 'bn', 'zh-min-nan', 'nan', 'map-bms', 'jv', 'su',
-            'ba', 'min', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bar', 'bo', 'bs',
-            'br', 'bug', 'bg', 'bxr', 'ca', 'ceb', 'cv', 'cs', 'ch', 'cbk-zam',
-            'ny', 'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv',
-            'nv', 'dsb', 'na', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv', 'es',
-            'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur',
-            'ga', 'gv', 'sm', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu',
-            'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb',
-            'hr', 'io', 'ig', 'ilo', 'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh',
-            'zu', 'is', 'it', 'he', 'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb',
-            'kk', 'kw', 'rw', 'ky', 'rn', 'mrj', 'sw', 'kv', 'kg', 'ht', 'ku',
-            'kj', 'lad', 'lbe', 'lez', 'lo', 'la', 'ltg', 'lv', 'to', 'lb',
-            'lt', 'lij', 'li', 'ln', 'jbo', 'lg', 'lmo', 'hu', 'mk', 'mg', 'ml',
-            'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn', 'cdo', 'mwl', 'koi',
-            'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj', 'nl', 'nds-nl', 'cr',
-            'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn',
-            'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa',
-            'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps', 'km', 'pcd', 'pms', 'nds',
-            'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh', 'ro', 'rmy',
-            'rm', 'qu', 'ru', 'rue', 'sah', 'se', 'sa', 'sg', 'sc', 'sco',
-            'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si', 'simple', 'sd', 'ss',
-            'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn', 'sr', 'sh', 'fi', 'sv',
-            'tl', 'ta', 'shi', 'kab', 'roa-tara', 'tt', 'te', 'tet', 'th', 'vi',
-            'ti', 'tg', 'tpi', 'tokipona', 'tp', 'chr', 'chy', 've', 'tr', 'tk',
-            'tw', 'tyv', 'udm', 'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo',
-            'fiu-vro', 'wa', 'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts',
-            'yi', 'yo', 'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw',
-            'zh-cn',
+            'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar',
+            'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av',
+            'ay', 'az', 'bjn', 'id', 'ms', 'bm', 'bn', 'zh-min-nan', 'nan',
+            'map-bms', 'jv', 'su', 'ba', 'min', 'be', 'be-tarask', 'bh', 'bcl',
+            'bi', 'bar', 'bo', 'bs', 'br', 'bug', 'bg', 'bxr', 'ca', 'ceb',
+            'cv', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',
+            'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz',
+            'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu',
+            'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'sm',
+            'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'got', 'hak', 'xal',
+            'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'io', 'ig',
+            'ilo', 'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it',
+            'he', 'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw',
+            'ky', 'rn', 'mrj', 'sw', 'kv', 'kg', 'gom', 'ht', 'ku', 'kj',
+            'lad', 'lbe', 'lez', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt',
+            'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai',
+            'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn',
+            'cdo', 'mwl', 'koi', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj',
+            'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih',
+            'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om',
+            'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps',
+            'jam', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa',
+            'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'rue', 'sah',
+            'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
+            'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+            'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab',
+            'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
+            'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'udm',
+            'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa',
+            'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
+            'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
         ]
 
         # Order for fy: alphabetical by code, but y counts as i
@@ -150,10 +155,13 @@ class Family(object):
             'av': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'ay': u'[a-záéíóúñ]*',
             'bar': u'[äöüßa-z]*',
+            'bat-smg': '[a-ząčęėįšųūž]*',
             'be': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
             'be-tarask': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
             'bg': u'[a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]*',
             'bm': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+            'bn': '[ঀ-৿]*',
+            'bpy': '[ঀ-৿]*',
             'bs': u'[a-zćčžšđž]*',
             'bxr': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'ca': u'[a-zàèéíòóúç·ïü]*',
@@ -173,6 +181,7 @@ class Family(object):
             'el': u'[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*',
             'eml': u'[a-zàéèíîìóòúù]*',
             'es': u'[a-záéíóúñ]*',
+            'eu': u'[a-záéíóúñ]*',
             'et': u'[äöõšüža-z]*',
             'ext': u'[a-záéíóúñ]*',
             'fa': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
@@ -205,6 +214,7 @@ class Family(object):
             'koi': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'krc': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'ksh': u'[a-zäöüėëĳßəğåůæœç]*',
+            'ku': '[a-zçêîşûẍḧÇÊÎŞÛẌḦ]*',
             'kv': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'lad': u'[a-záéíóúñ]*',
             'lb': u'[äöüßa-z]*',
@@ -215,8 +225,11 @@ class Family(object):
             'lmo': u'[a-zàéèíîìóòúù]*',
             'ln': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'lrc': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+            'lt': '[a-ząčęėįšųūž]*',
             'ltg': u'[a-zA-ZĀāČčĒēĢģĪīĶķĻļŅņŠšŪūŽž]*',
             'lv': u'[a-zA-ZĀāČčĒēĢģĪīĶķĻļŅņŠšŪūŽž]*',
+            'mai': '[a-zऀ-ॣ०-꣠-ꣿ]*',
+            'mdf': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'mg': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'mhr': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'mk': u'[a-zабвгдѓежзѕијклљмнњопрстќуфхцчџш]*',
@@ -234,7 +247,9 @@ class Family(object):
             'nl': u'[a-zäöüïëéèà]*',
             'nn': u'[æøåa-z]*',
             'no': u'[æøåa-z]*',
+            'nrm': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'oc': u'[a-zàâçéèêîôû]*',
+            'olo': '[a-zčČšŠžŽäÄöÖ]*',
             'or': u'[a-z଀-୿]*',
             'pa': u'[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*',
             'pcd': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
@@ -242,10 +257,14 @@ class Family(object):
             'pfl': u'[äöüßa-z]*',
             'pl': u'[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
             'pms': u'[a-zàéèíîìóòúù]*',
+            'pnt': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ'
+                    'άέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
             'pt': u'[a-záâãàéêẽçíòóôõq̃úüűũ]*',
             'qu': u'[a-záéíóúñ]*',
             'rmy': u'[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
             'ro': u'[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
+            'roa-rup': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
+            'roa-tara': '[a-zàéèíîìóòúù]*',
             'ru': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'rue': u'[a-zабвгґдеєжзиіїйклмнопрстуфхцчшщьєюяёъы“»]*',
             'sa': u'[a-zऀ-ॣ०-꣠-ꣿ]*',
@@ -710,7 +729,7 @@ class Family(object):
         # A list with the name in the cross-language flag permissions
         self.cross_allowed = []
 
-        # A list with the name of the category containing disambiguation
+        # A dict with the name of the category containing disambiguation
         # pages for the various languages. Only one category per language,
         # and without the namespace, so add things like:
         # 'en': "Disambiguation"
@@ -738,7 +757,7 @@ class Family(object):
         self.category_text_separator = config.line_separator * 2
         # When both at the bottom should categories come after interwikilinks?
         # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
-        # extension which puts categories last on all sites.  TO BE DEPRECATED!
+        # extension which puts categories last on all sites. TO BE DEPRECATED!
         self.categories_last = []
 
         # Which languages have a special order for putting interlanguage
@@ -914,6 +933,8 @@ class Family(object):
                 myfamily = AutoFamily(fam, family_file)
                 Family._families[fam] = myfamily
                 return Family._families[fam]
+        else:
+            raise UnknownFamily('Family %s does not exist' % fam)
 
         try:
             # Ignore warnings due to dots in family names.
@@ -921,8 +942,13 @@ class Family(object):
             #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
-                mod = imp.load_source(fam, config.family_files[fam])
-        except (ImportError, KeyError):
+                if PY3:
+                    sys.path.append(dirname(family_file))
+                    mod = import_module(splitext(basename(family_file))[0])
+                else:
+                    # Python 2.6 has no importlib.import_module
+                    mod = imp.load_source(fam, family_file)
+        except ImportError:
             raise UnknownFamily(u'Family %s does not exist' % fam)
         cls = mod.Family()
         if cls.name != fam:
@@ -934,11 +960,11 @@ class Family(object):
             warn(u'Family name %s contains non-ascii characters' % cls.name,
                  FamilyMaintenanceWarning)
         # FIXME: wikisource uses code '-' for www.wikisource.org
-        if not all(all(x in CODE_CHARACTERS for x in code) and
-                   (cls.name == 'wikisource' or code[0] != '-')
-                   for code in cls.langs.keys()):
-            warn(u'Family %s codes contains non-ascii characters',
-                 FamilyMaintenanceWarning)
+        for code in cls.langs.keys():
+            if not all(x in CODE_CHARACTERS for x in code) and \
+                    (cls.name == 'wikisource' or code[0] != '-'):
+                warn('Family %s code %s contains non-ascii characters' %
+                     (cls.name, code), FamilyMaintenanceWarning)
         Family._families[fam] = cls
         return cls
 
@@ -974,49 +1000,42 @@ class Family(object):
                 "ERROR: linktrail in language %(language_code)s unknown"
                 % {'language_code': code})
 
-    def _category_redirects(self, code, fallback='_default'):
+    def category_redirects(self, code, fallback='_default'):
         """Return list of category redirect templates."""
         if not hasattr(self, "_catredirtemplates") or \
            code not in self._catredirtemplates:
-            self.get_cr_templates(code, fallback)
-        if code in self._catredirtemplates:
-            return self._catredirtemplates[code]
-        else:
-            raise KeyError("ERROR: title for category redirect template in "
-                           "language '%s' unknown" % code)
+            self._get_cr_templates(code, fallback)
+        return self._catredirtemplates[code]
 
     def _get_cr_templates(self, code, fallback):
         """Build list of category redirect templates."""
         if not hasattr(self, "_catredirtemplates"):
             self._catredirtemplates = {}
         if code in self.category_redirect_templates:
-            cr_template_list = self.category_redirect_templates[code]
-            cr_list = list(self.category_redirect_templates[code])
+            cr_template_tuple = self.category_redirect_templates[code]
+        elif fallback and fallback in self.category_redirect_templates:
+            cr_template_tuple = self.category_redirect_templates[fallback]
         else:
-            cr_template_list = self.category_redirect_templates[fallback]
-            cr_list = []
-        if cr_template_list:
-            cr_template = cr_template_list[0]
-            # start with list of category redirect templates from family file
-            cr_page = pywikibot.Page(pywikibot.Site(code, self),
-                                     "Template:" + cr_template)
+            self._catredirtemplates[code] = []
+            return
+        cr_set = set()
+        site = pywikibot.Site(code, self)
+        tpl_ns = site.namespaces.TEMPLATE
+        for cr_template in cr_template_tuple:
+            cr_page = pywikibot.Page(site, cr_template, ns=tpl_ns)
             # retrieve all redirects to primary template from API,
             # add any that are not already on the list
-            for t in cr_page.backlinks(filterRedirects=True, namespaces=10):
+            for t in cr_page.backlinks(filterRedirects=True,
+                                       namespaces=tpl_ns):
                 newtitle = t.title(withNamespace=False)
-                if newtitle not in cr_list:
-                    cr_list.append(newtitle)
-        self._catredirtemplates[code] = cr_list
+                if newtitle not in cr_template_tuple:
+                    cr_set.add(newtitle)
+        self._catredirtemplates[code] = list(cr_template_tuple) + list(cr_set)
 
-    @deprecated('Page.isCategoryRedirect')
-    def category_redirects(self, code, fallback="_default"):
-        """DEPRECATED: Return list of category redirect templates."""
-        return self._category_redirects(code, fallback)
-
-    @deprecated('Page.isCategoryRedirect')
+    @deprecated('site.category_redirects()')
     def get_cr_templates(self, code, fallback):
         """DEPRECATED: Build list of category redirect templates."""
-        return self._get_cr_templates(code, fallback)
+        self._get_cr_templates(code, fallback)
 
     def disambig(self, code, fallback='_default'):
         """Return list of disambiguation templates."""
@@ -1125,7 +1144,23 @@ class Family(object):
 
     def rcstream_host(self, code):
         """Hostname for RCStream."""
+        raise NotImplementedError('This family does not support RCStream')
+
+    def rcstream_path(self, code):
+        """Return path for RCStream."""
         raise NotImplementedError("This family does not support RCStream")
+
+    def rcstream_port(self, code):
+        """Return port for RCStream."""
+        raise NotImplementedError('This family does not support RCStream')
+
+    def eventstreams_host(self, code):
+        """Hostname for EventStreams."""
+        raise NotImplementedError('This family does not support EventStreams')
+
+    def eventstreams_path(self, code):
+        """Return path for EventStreams."""
+        raise NotImplementedError('This family does not support EventStreams')
 
     @deprecated_args(name='title')
     def get_address(self, code, title):
@@ -1212,8 +1247,10 @@ class Family(object):
                     site = pywikibot.Site(code, self.name)
                     pywikibot.log('Found candidate {0}'.format(site))
 
-                    if path in site._interwiki_urls():
-                        matched_sites += [site]
+                    for iw_url in site._interwiki_urls():
+                        if path.startswith(iw_url):
+                            matched_sites += [site]
+                            break
 
         if len(matched_sites) == 1:
             return matched_sites[0].code
@@ -1240,7 +1277,12 @@ class Family(object):
         Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
         """
         # Here we return the latest mw release for downloading
-        return '1.26.2'
+        if not hasattr(self, '_version'):
+            self._version = requests.get(
+                'https://www.mediawiki.org/w/api.php?action=expandtemplates'
+                '&text={{MW_stable_release_number}}&prop=wikitext&format=json'
+            ).json()['expandtemplates']['wikitext']
+        return self._version
 
     def force_version(self, code):
         """
@@ -1555,6 +1597,8 @@ class WikimediaFamily(Family):
 
         # Renamed; see T11823
         'be-x-old': 'be-tarask',
+
+        '-': 'mul',  # T114574
     }
 
     # Not open for edits; stewards can still edit.
@@ -1569,6 +1613,14 @@ class WikimediaFamily(Family):
         # Romanian was to be the replacement.
         'mo': 'ro',
     }
+
+    def __init__(self):
+        """Constructor."""
+        super(WikimediaFamily, self).__init__()
+        # WikimediaFamily uses wikibase for the category name containing
+        # disambiguation pages for the various languages. We need the
+        # wikibase code and item number:
+        self.disambcatname = {'wikidata': 'Q1982926'}
 
     @property
     def domain(self):
@@ -1601,9 +1653,18 @@ class WikimediaFamily(Family):
         """Return 'https' as the protocol."""
         return 'https'
 
+    @deprecated('eventstreams_host')
     def rcstream_host(self, code):
-        """Return 'stream.wikimedia.org' as the RCStream hostname."""
-        return 'stream.wikimedia.org'
+        """DEPRECATED: use eventstreams_host instead."""
+        return self.eventstreams_host(code)
+
+    def eventstreams_host(self, code):
+        """Return 'https://stream.wikimedia.org' as the stream hostname."""
+        return 'https://stream.wikimedia.org'
+
+    def eventstreams_path(self, code):
+        """Return path for EventStreams."""
+        return '/v2/stream'
 
 
 class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):

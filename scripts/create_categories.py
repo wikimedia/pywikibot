@@ -30,16 +30,15 @@ page links like [[Category:Hensies]], causing this script
 to create [[Category:Cultural heritage monuments in Hensies]].
 
 """
-from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 #
 # (C) Multichill, 2011
-# (C) xqt, 2011-2014
-# (c) Pywikibot team, 2014
+# (C) xqt, 2011-2016
+# (c) Pywikibot team, 2017
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import absolute_import, unicode_literals
+
 import pywikibot
 from pywikibot import pagegenerators, Bot
 
@@ -68,14 +67,9 @@ class CreateCategoriesBot(Bot):
 
         if not newpage.exists():
             pywikibot.output(newpage.title())
-            try:
-                self.userPut(newpage, '', newtext, summary=self.comment)
-            except pywikibot.EditConflict:
-                pywikibot.output(u'Skipping %s due to edit conflict' % newpage.title())
-            except pywikibot.ServerError:
-                pywikibot.output(u'Skipping %s due to server error' % newpage.title())
-            except pywikibot.PageNotSaved as error:
-                pywikibot.output(u'Error putting page: %s' % error.args)
+            self.userPut(newpage, '', newtext, summary=self.comment,
+                         ignore_save_related_errors=True,
+                         ignore_server_errors=True)
         else:
             # FIXME: Add overwrite option
             pywikibot.output(u'%s already exists, skipping' % newpage.title())
@@ -124,6 +118,7 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=missing,
                                    missing_generator=not generator)
         return False
+
 
 if __name__ == "__main__":
     main()

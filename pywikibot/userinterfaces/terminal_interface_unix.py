@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User interface for unix terminals."""
 #
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
 
+import re
 import sys
 
 from pywikibot.userinterfaces import terminal_interface_base
@@ -42,9 +43,19 @@ class UnixUI(terminal_interface_base.UI):
         """Return that the target stream supports colors."""
         return True
 
+    def make_unix_bg_color(self, color):
+        """Obtain background color from foreground color."""
+        code = re.search(r'(?<=\[)\d+', color).group()
+        return chr(27) + '[' + str(int(code) + 10) + 'm'
+
     def encounter_color(self, color, target_stream):
         """Write the unix color directly to the stream."""
-        self._write(unixColors[color], target_stream)
+        fg, bg = self.divide_color(color)
+        fg = unixColors[fg]
+        self._write(fg, target_stream)
+        if bg is not None:
+            bg = unixColors[bg]
+            self._write(self.make_unix_bg_color(bg), target_stream)
 
     def _write(self, text, target_stream):
         """Optionally encode and write the text to the target stream."""

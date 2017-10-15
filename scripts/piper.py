@@ -27,17 +27,13 @@ The following parameters are supported:
     -filter:       Filter the article text through this program, can be
                    given multiple times to filter through multiple programs in
                    the order which they are given
-
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import os
 import pipes
@@ -45,8 +41,10 @@ import tempfile
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators
-from pywikibot.bot import MultipleSitesBot, ExistingPageBot, NoRedirectPageBot
+from pywikibot import pagegenerators
+from pywikibot.bot import (MultipleSitesBot, ExistingPageBot,
+                           NoRedirectPageBot, AutomaticTWSummaryBot)
+from pywikibot.tools import UnicodeType
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -55,23 +53,30 @@ docuReplacements = {
 }
 
 
-class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
+class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
+               AutomaticTWSummaryBot):
 
     """Bot for munging text using external filtering programs."""
+
+    summary_key = 'piper-edit-summary'
 
     def __init__(self, generator, **kwargs):
         """
         Constructor.
 
         @param generator: The page generator that determines on which pages
-                          to work on.
+            to work on.
+        @type generator: generator
         """
         self.availableOptions.update({
-            'always': False,
             'filters': [],
-            'comment': None,
         })
         super(PiperBot, self).__init__(generator=generator, **kwargs)
+
+    @property
+    def summary_parameters(self):
+        """Return the filter parameter."""
+        return {'filters': ', '.join(self.getOption('filters'))}
 
     def pipe(self, program, text):
         """Pipe a given text through a given program.
@@ -79,9 +84,10 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
         @return: processed text after piping
         @rtype: unicode
         """
-        text = text.encode('utf-8')
+        if not isinstance(text, str):  # py2-py3 compatibility
+            text = text.encode('utf-8')
         pipe = pipes.Template()
-        pipe.append(program.encode('ascii'), '--')
+        pipe.append(str(program), '--')  # py2-py3 compatibility
 
         # Create a temporary filename to save the piped stuff to
         tempFilename = '%s.%s' % (tempfile.mktemp(), 'txt')
@@ -89,15 +95,17 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
             file.write(text)
 
         # Now retrieve the munged text
-        with open(tempFilename, 'r') as mungedText:
-            unicode_text = mungedText.read().decode('utf-8')
+        with open(tempFilename, 'r') as file:
+            unicode_text = file.read()
+        if not isinstance(unicode_text, UnicodeType):  # py2-py3 compatibility
+            unicode_text = unicode_text.decode('utf-8')
 
         # clean up
         os.unlink(tempFilename)
         return unicode_text
 
     def treat_page(self):
-        """Load the given page, does some changes, and saves it."""
+        """Load the given page, do some changes, and save it."""
         # Load the page
         text = self.current_page.text
 
@@ -106,27 +114,27 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
             text = self.pipe(program, text)
 
         # only save if something was changed
-        self.put_current(text, summary=self.getOption('comment'))
+        self.put_current(text)
 
 
 def main(*args):
     """Create and run a PiperBot instance from the given command arguments."""
+    local_args = pywikibot.handle_args(args)
+
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
     genFactory = pagegenerators.GeneratorFactory()
-    # The generator gives the pages that should be worked upon.
-    gen = None
     # The program to pipe stuff through
     filters = []
     options = {}
 
     # Parse command line arguments
-    for arg in pywikibot.handle_args(args):
-        if arg.startswith("-filter:"):
-            prog = arg[8:]
-            filters.append(prog)
-        elif arg.startswith("-always"):
+    for arg in local_args:
+        option, sep, value = arg.partition(':')
+        if option == '-filter':
+            filters.append(value)
+        elif option == '-always':
             options['always'] = True
         else:
             # check if a standard argument like
@@ -134,17 +142,11 @@ def main(*args):
             genFactory.handleArg(arg)
 
     options['filters'] = filters
-    s = ', '.join(options['filters'])
-    options['comment'] = i18n.twtranslate(pywikibot.Site().lang,
-                                          'piper-edit-summary',
-                                          {'filters': s})
 
-    if not gen:
-        gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
-        gen = pagegenerators.PreloadingGenerator(gen)
         bot = PiperBot(gen, **options)
         bot.run()
         return True

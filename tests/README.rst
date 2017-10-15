@@ -34,6 +34,10 @@ setup.py
 
     python setup.py nosetests --tests tests
 
+::
+
+    pip install pytest-runner
+    python setup.py pytest
 
 Module unittest
 ~~~~~~~~~~~~~~~
@@ -48,6 +52,13 @@ nose
 ::
 
     nosetests -v
+
+pytest
+~~~~~~
+
+::
+
+    py.test
 
 tox
 ~~~
@@ -67,6 +78,7 @@ unittest
 ::
 
     python -m unittest -v tests.api_tests tests.site_tests
+    python -m unittest -v tests.api_tests.TestParamInfo.test_init
 
 nose
 ~~~~
@@ -74,6 +86,15 @@ nose
 ::
 
     nosetests -v tests.api_tests tests.site_tests
+    python -m unittest -v tests.api_tests:TestParamInfo.test_init
+
+pytest
+~~~~~~
+
+::
+
+    py.test -s -v tests/api_tests.py tests/site_tests.py
+    py.test -s -v tests/api_tests.py::TestParamInfo::test_init
 
 pwb
 ~~~
@@ -82,6 +103,7 @@ pwb
 
     python pwb.py tests/api_tests.py -v
     python pwb.py tests/site_tests.py -v
+    python pwb.py tests/api_tests.py -v TestParamInfo.test_init
 
 env
 ~~~
@@ -204,6 +226,68 @@ To enable 'write' tests, set PYWIKIBOT2_TEST_WRITE=1
 Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
 automatically.
 
+Decorators
+=====================
+
+pywikibot's test suite, including Python's unittest module, provides decorators
+to modify the behaviour of the test cases.
+
+@unittest.skipIf
+-----------------
+Skip a test if the condition is true. Refer to unittest's documentation.
+
+::
+
+  import unittest
+  [......]
+  @unittest.skipIf(check_if_fatal(), 'Something is not okay.')
+  def test_skipIf(self):
+
+@unittest.skipUnless
+---------------------
+Skip a test unless the condition is true. Refer to unittest's documentation.
+
+::
+
+  import unittest
+  [......]
+  @unittest.skipUnless(check_if_true(), 'Something must happen.')
+  def test_skipUnless(self):
+
+@tests.aspects.require_modules
+-------------------------------
+Require that the given list of modules can be imported.
+
+::
+
+  from tests.aspects import require_modules
+  [......]
+  @require_modules(['important1', 'musthave2'])
+  def test_require_modules(self):
+
+@(unittest.)mock.patch
+-----------------------
+Replaces `target` with object specified in `new`. Refer to mock's documentation.
+This is especially useful in tests, where requests to third-parties should be
+avoided.
+
+In Python 3, this is part of the built-in unittest module.
+
+::
+
+  if sys.version_info[0] > 2:
+    from unittest.mock import patch
+  else:
+    from mock import patch
+
+
+  def fake_ping(url):
+    return 'pong'
+  [......]
+  @patch('http_ping', side_effect=fake_ping)
+  def test_patch(self):
+    self.assertEqual('pong', http_ping())
+
 Contributing tests
 ==================
 
@@ -268,7 +352,8 @@ Other class attributes
 
 - ``net = False`` : test class does not use a site
 - ``dry = True`` : test class can use a fake site object
+- ``cached = True``:  test class may aggressively cache API responses
+- ``cacheinfo = True``:  report cache hits and misses on tearDown
 - ``user = True`` : test class needs to login to site
 - ``sysop = True`` : test class needs to login to site as a sysop
 - ``write = True`` : test class needs to write to a site
-

@@ -1,13 +1,11 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import datetime
 
@@ -68,7 +66,7 @@ class TestLogentriesBase(TestCase):
     def _test_logevent(self, logtype):
         """Test a single logtype entry."""
         logentry = self._get_logentry(logtype)
-        if logtype in LogEntryFactory._logtypes:
+        if logtype in LogEntryFactory.logtypes:
             self.assertEqual(logentry._expectedType, logtype)
         else:
             self.assertIsNone(logentry._expectedType)
@@ -77,7 +75,10 @@ class TestLogentriesBase(TestCase):
         else:
             self.assertNotIn(logentry.type(), logentry.data)
         self.assertIsInstance(logentry.action(), unicode)
-        self.assertIsInstance(logentry.comment(), unicode)
+        if hasattr(logentry, 'comment'):
+            self.assertIsInstance(logentry.comment(), unicode)
+        else:
+            self.assertRaises(KeyError, logentry.comment)
         self.assertIsInstance(logentry.logid(), int)
         self.assertIsInstance(logentry.ns(), int)
         self.assertIsInstance(logentry.pageid(), int)
@@ -105,12 +106,14 @@ class TestLogentriesMeta(MetaTestCaseClass):
         def test_method(logtype):
             def test_logevent(self, key):
                 """Test a single logtype entry."""
+                if key == 'old' and logtype == 'thanks':
+                    self.skipTest('Thanks extension not on old.')
                 self._test_logevent(logtype)
 
             return test_logevent
 
         # create test methods for the support logtype classes
-        for logtype in LogEntryFactory._logtypes:
+        for logtype in LogEntryFactory.logtypes:
             cls.add_method(dct, 'test_%sEntry' % logtype.title(),
                            test_method(logtype))
 
@@ -136,7 +139,7 @@ class TestSimpleLogentries(TestLogentriesBase):
         # initialized yet.
         available_types = set(self.site._paraminfo.parameter(
             'query+logevents', 'type')['type'])
-        for simple_type in available_types - set(LogEntryFactory._logtypes):
+        for simple_type in available_types - set(LogEntryFactory.logtypes):
             if not simple_type:
                 # paraminfo also reports an empty string as a type
                 continue
@@ -217,6 +220,25 @@ class TestLogentryParams(TestLogentriesBase):
         with self.assertRaises(pywikibot.NoMoveTarget):
             page.moved_target()
 
+    def test_thanks_page(self, key):
+        """Test Thanks page method return type."""
+        if not self.site.has_extension('Thanks'):
+            self.skipTest('Thanks extension not available.')
+        logentry = self._get_logentry('thanks')
+        self.assertIsInstance(logentry.page(), pywikibot.User)
+
+    def test_equality(self):
+        """Test equality of LogEntry instances."""
+        site = self.get_site('dewp')
+        other_site = self.get_site('tewp')
+        le1 = next(iter(site.logevents(reverse=True, total=1)))
+        le2 = next(iter(site.logevents(reverse=True, total=1)))
+        le3 = next(iter(other_site.logevents(reverse=True, total=1)))
+        self.assertEqual(le1, le2)
+        self.assertFalse(le1 != le2)  # __ne__ test
+        self.assertNotEqual(le1, le3)
+        self.assertNotEqual(le1, site)
+
 
 class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
 
@@ -281,7 +303,7 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
                                        'moved_target()')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

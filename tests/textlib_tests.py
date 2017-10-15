@@ -1,21 +1,24 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2015
+# (C) Pywikibot team, 2011-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import codecs
 import functools
 import os
 import re
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 import pywikibot
 import pywikibot.textlib as textlib
+from pywikibot.textlib import _MultiTemplateMatchBuilder
 
 from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
@@ -42,24 +45,30 @@ class TestSectionFunctions(TestCase):
     net = False
 
     def setUp(self):
+        """Setup tests."""
         self.catresult1 = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                            % {'LS': config.LS})
         super(TestSectionFunctions, self).setUp()
 
     def contains(self, fn, sn):
+        """Invoke does_text_contain_section()."""
         return textlib.does_text_contain_section(
             files[fn], sn)
 
     def assertContains(self, fn, sn, *args, **kwargs):
+        """Test that files[fn] contains sn."""
         self.assertEqual(self.contains(fn, sn), True, *args, **kwargs)
 
     def assertNotContains(self, fn, sn, *args, **kwargs):
+        """Test that files[fn] does not contain sn."""
         self.assertEqual(self.contains(fn, sn), False, *args, **kwargs)
 
     def testCurrentBehaviour(self):
+        """Test that 'Editing' is found."""
         self.assertContains("enwiki_help_editing", u"Editing")
 
     def testSpacesInSection(self):
+        """Test with spaces in section."""
         self.assertContains("enwiki_help_editing", u"Minor_edits")
         self.assertNotContains('enwiki_help_editing', '#Minor edits',
                                "Incorrect, '#Minor edits' does not work")
@@ -68,19 +77,25 @@ class TestSectionFunctions(TestCase):
         self.assertNotContains('enwiki_help_editing', 'Minor_Edits',
                                'section hashes are case-sensitive')
 
-    @unittest.expectedFailure
-    def testNonAlphabeticalCharactersInSection(self):
+    @unittest.expectedFailure  # TODO: T133276
+    def test_encoded_chars_in_section(self):
+        """Test encoded chars in section."""
         self.assertContains('enwiki_help_editing', 'Talk_.28discussion.29_pages',
                             'As used in the TOC')
+
+    def test_underline_characters_in_section(self):
+        """Test with underline chars in section."""
         self.assertContains('enwiki_help_editing', 'Talk_(discussion)_pages',
                             'Understood by mediawiki')
 
     def test_spaces_outside_section(self):
+        """Test with spaces around section."""
         self.assertContains("enwiki_help_editing", u"Naming and_moving")
         self.assertContains("enwiki_help_editing", u" Naming and_moving ")
         self.assertContains("enwiki_help_editing", u" Naming and_moving_")
 
     def test_link_in_section(self):
+        """Test with link inside section."""
         # section is ==[[Wiki markup]]==
         self.assertContains("enwiki_help_editing", u"[[Wiki markup]]", "Link as section header")
         self.assertContains('enwiki_help_editing', '[[:Wiki markup]]',
@@ -285,8 +300,10 @@ class TestTemplatesInCategory(TestCase):
         self.assertEqual(textlib.getCategoryLinks(
             '[[Category:Foo{{!}}and{{!}}bar]]', self.site, expand_text=True),
             [pywikibot.page.Category(self.site, 'Foo', sortKey='and|bar')])
-        self.assertRaises(pywikibot.InvalidTitle, textlib.getCategoryLinks,
-                          '[[Category:nasty{{{!}}]]', self.site)
+        with mock.patch.object(pywikibot, 'warning', autospec=True) as warn:
+            textlib.getCategoryLinks('[[Category:nasty{{{!}}]]', self.site)
+            warn.assert_called_once_with(
+                'Invalid category title extracted: nasty{{{!}}')
 
 
 class TestTemplateParams(TestCase):
@@ -615,6 +632,16 @@ class TestTemplateParams(TestCase):
 
         # All templates are captured when template depth is greater than 2
         m = func('{{a|{{c|{{d|}} }} | foo  = bar }} foo {{bar}} baz')
+        self.assertIsNotNone(m)
+        self.assertIsNotNone(m.group(0))
+        self.assertIsNone(m.group('name'))
+        self.assertIsNone(m.group(1))
+        self.assertIsNone(m.group('params'))
+        self.assertIsNone(m.group(2))
+        self.assertIsNotNone(m.group('unhandled_depth'))
+        self.assertTrue(m.group(0).endswith('foo {{bar}}'))
+
+        m = func('{{a|\n{{c|{{d|}} }}\n| foo  = bar }} foo {{bar}} baz')
         self.assertIsNotNone(m)
         self.assertIsNotNone(m.group(0))
         self.assertIsNone(m.group('name'))
@@ -1156,6 +1183,21 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                                                ['invoke'], site=self.site),
                          '{{#invoke:x}}')
 
+    def test_replace_with_count(self):
+        """Test replacing with count argument."""
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
+                                               site=self.site),
+                         'y [[y]] y y')
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
+                                               site=self.site, count=5),
+                         'y [[y]] y y')
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', [],
+                                               site=self.site, count=2),
+                         'y [[y]] x x')
+        self.assertEqual(textlib.replaceExcept('x [[x]] x x', 'x', 'y', ['link'],
+                                               site=self.site, count=2),
+                         'y [[x]] y x')
+
     def test_replace_tag_category(self):
         """Test replacing not inside category links."""
         for ns_name in self.site.namespaces[14]:
@@ -1262,13 +1304,6 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                 'x', 'y', ['file'], site=self.site),
             '[[File:a|[[foo]] [[bar [invalid ]].x]][[y]]')
 
-        # Even handle balanced [[ ]] inside the wikilink.
-        self.assertEqual(
-            textlib.replaceExcept(
-                '[[File:a|[[foo]] [[bar [[invalid]] ]].x]][[x]]',
-                'x', 'y', ['file'], site=self.site),
-            '[[File:a|[[foo]] [[bar [[invalid]] ]].x]][[y]]')
-
     @unittest.expectedFailure
     def test_replace_tag_file_failure(self):
         """Test showing limits of the file link regex."""
@@ -1334,6 +1369,68 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
                          r'X\g<bar>X')
 
 
+class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
+
+    """Test _MultiTemplateMatchBuilder."""
+
+    dry = True
+
+    @classmethod
+    def setUpClass(cls):
+        """Cache namespace 10 (Template) case sensitivity."""
+        super(TestMultiTemplateMatchBuilder, cls).setUpClass()
+        cls._template_not_case_sensitive = (
+            cls.get_site().namespaces.TEMPLATE.case != 'case-sensitive')
+
+    def test_no_match(self):
+        """Test text without any desired templates."""
+        string = 'The quick brown fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNone(re.search(builder.pattern('quick'), string))
+
+    def test_match(self):
+        """Test text with one match without parameters."""
+        string = 'The {{quick}} brown fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
+        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
+                         self._template_not_case_sensitive)
+
+    def test_match_with_params(self):
+        """Test text with one match with parameters."""
+        string = 'The {{quick|brown}} fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
+        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
+                         self._template_not_case_sensitive)
+
+    def test_match_msg(self):
+        """Test text with {{msg:..}}."""
+        string = 'The {{msg:quick}} brown fox'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        self.assertIsNotNone(re.search(builder.pattern('quick'), string))
+        self.assertEqual(bool(re.search(builder.pattern('Quick'), string)),
+                         self._template_not_case_sensitive)
+
+    def test_match_template_prefix(self):
+        """Test pages with {{template:..}}."""
+        string = 'The {{%s:%s}} brown fox'
+        template = 'template'
+        builder = _MultiTemplateMatchBuilder(self.site)
+        if self._template_not_case_sensitive:
+            quick_list = ('quick', 'Quick')
+        else:
+            quick_list = ('quick', )
+
+        for t in (template.upper(), template.lower(), template.title()):
+            for q in quick_list:
+                self.assertIsNotNone(re.search(builder.pattern('quick'),
+                                               string % (t, q)))
+                self.assertEqual(bool(re.search(builder.pattern('Quick'),
+                                                string % (t, q))),
+                                 self._template_not_case_sensitive)
+
+
 class TestGetLanguageLinks(SiteAttributeTestCase):
 
     """Test L{textlib.getLanguageLinks} function."""
@@ -1380,7 +1477,62 @@ class TestUnescape(TestCase):
         self.assertEqual(textlib.unescape('!23&lt;&gt;&apos;&quot;&amp;&'),
                          '!23<>\'"&&')
 
-if __name__ == '__main__':
+
+class TestStarList(TestCase):
+
+    """Test starlist."""
+
+    net = False
+
+    def test_basic(self):
+        """Test standardizing {{linkfa}} without parameters."""
+        self.assertEqual(
+            'foo\n{{linkfa}}\nbar\n\n',
+            textlib.standardize_stars('foo\n{{linkfa}}\nbar'))
+
+    def test_with_params(self):
+        """Test standardizing text with {{linkfa|...}}."""
+        self.assertEqual(
+            'foo\nbar\n\n{{linkfa|...}}\n',
+            textlib.standardize_stars('foo\n{{linkfa|...}}\nbar'))
+
+    def test_with_sorting_params(self):
+        """Test standardizing text with sorting parameters."""
+        self.assertEqual(
+            'foo\n\n{{linkfa|bar}}\n{{linkfa|de}}\n'
+            '{{linkfa|en}}\n{{linkfa|fr}}\n',
+            textlib.standardize_stars(
+                'foo\n{{linkfa|en}}\n{{linkfa|de}}\n'
+                '{{linkfa|fr}}\n{{linkfa|bar}}'))
+
+    def test_get_stars(self):
+        """Test get_starts method."""
+        self.assertEqual(
+            ['{{linkfa|en}}\n', '{{linkfa|de}}\n',
+             '{{linkfa|fr}}\n', '{{linkfa|bar}}'],
+            textlib.get_stars(
+                'foo\n{{linkfa|en}}\n{{linkfa|de}}\n'
+                '{{linkfa|fr}}\n{{linkfa|bar}}'))
+
+    def test_remove_stars(self):
+        """Test remove_stars method."""
+        self.assertEqual(
+            'foo\n{{linkfa|en}}\n{{linkfa|fr}}\n{{linkfa|bar}}',
+            textlib.remove_stars(
+                'foo\n{{linkfa|en}}\n{{linkfa|de}}\n'
+                '{{linkfa|fr}}\n{{linkfa|bar}}', ['{{linkfa|de}}\n']))
+
+    def test_append_stars(self):
+        """Test append_stars method."""
+        self.assertEqual(
+            'foo\n\n{{linkfa|bar}}\n{{linkfa|de}}\n'
+            '{{linkfa|en}}\n{{linkfa|fr}}\n',
+            textlib.append_stars(
+                'foo', ['{{linkfa|en}}\n', '{{linkfa|de}}\n',
+                        '{{linkfa|fr}}\n', '{{linkfa|bar}}']))
+
+
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

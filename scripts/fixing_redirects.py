@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Correct all redirect links in featured pages or only one page of each wiki.
 
@@ -13,14 +13,12 @@ options -file, -ref, -links, ...
 
 """
 #
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import re
 
 import pywikibot
@@ -34,7 +32,7 @@ from pywikibot.tools import first_lower, first_upper as firstcap
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
 docuReplacements = {
-    '&params;':     pagegenerators.parameterHelp,
+    '&params;': pagegenerators.parameterHelp,
 }
 
 # Featured articles categories
@@ -198,15 +196,9 @@ def main(*args):
         return
 
     if featured:
-        repo = mysite.data_repository()
-        if repo:
-            dp = pywikibot.ItemPage(repo, featured_articles)
-            try:
-                ref = pywikibot.Category(mysite, dp.getSitelink(mysite))
-            except pywikibot.NoPage:
-                pass
-            else:
-                gen = ref.articles(namespaces=0, content=True)
+        ref = mysite.page_from_repository(featured_articles)
+        if ref is not None:
+            gen = ref.articles(namespaces=0, content=True)
         if not gen:
             suggest_help(
                 unknown_parameters=['-featured'],
@@ -223,6 +215,7 @@ def main(*args):
     else:
         suggest_help(missing_generator=True)
         return False
+
 
 if __name__ == "__main__":
     main()

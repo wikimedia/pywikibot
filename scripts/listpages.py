@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 Print a list of pages, as defined by page generator parameters.
 
@@ -8,57 +8,62 @@ in the current directory.
 
 These parameters are supported to specify which pages titles to print:
 
--format  Defines the output format.
+-format     Defines the output format.
 
-         Can be a custom string according to python string.format() notation or
-         can be selected by a number from following list (1 is default format):
-         1 - u'{num:4d} {page.title}'
-             --> 10 PageTitle
+            Can be a custom string according to python string.format() notation
+            or can be selected by a number from following list
+            (1 is default format):
+            1 - u'{num:4d} {page.title}'
+                --> 10 PageTitle
 
-         2 - u'{num:4d} {[[page.title]]}'
-             --> 10 [[PageTitle]]
+            2 - u'{num:4d} [[{page.title}]]'
+                --> 10 [[PageTitle]]
 
-         3 - u'{page.title}'
-             --> PageTitle
+            3 - u'{page.title}'
+                --> PageTitle
 
-         4 - u'{[[page.title]]}'
-             --> [[PageTitle]]
+            4 - u'[[{page.title}]]'
+                --> [[PageTitle]]
 
-         5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
-             --> 10 PageTitle (colorised in lightred)
+            5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
+                --> 10 localised_Namespace:PageTitle (colorised in lightred)
 
-         6 - u'{num:4d} {page.loc_title:<40} {page.can_title:<40}'
-             --> 10 localised_Namespace:PageTitle canonical_Namespace:PageTitle
+            6 - u'{num:4d} {page.loc_title:<40} {page.can_title:<40}'
+                --> 10 localised_Namespace:PageTitle
+                       canonical_Namespace:PageTitle
 
-         7 - u'{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
-             --> 10 localised_Namespace:PageTitle outputlang_Namespace:PageTitle
-             (*) requires "outputlang:lang" set.
+            7 - u'{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
+                --> 10 localised_Namespace:PageTitle
+                       outputlang_Namespace:PageTitle
+                (*) requires "outputlang:lang" set.
 
-         num is the sequential number of the listed page.
+            num is the sequential number of the listed page.
 
--outputlang   Language for translation of namespaces.
+            An empty format is equal to -notitle and just shows the total
+            amount of pages.
 
--notitle Page title is not printed.
+-outputlang Language for translation of namespaces.
 
--get     Page content is printed.
+-notitle    Page title is not printed.
 
--save    Save Page content to a file named as page.title(as_filename=True).
-         Directory can be set with -save:dir_name
-         If no dir is specified, current direcory will be used.
+-get        Page content is printed.
 
--encode  File encoding can be specified with '-encode:name' (name must be a
-         valid python encoding: utf-8, etc.).
-         If not specified, it defaults to config.textfile_encoding.
+-save       Save Page content to a file named as page.title(as_filename=True).
+            Directory can be set with -save:dir_name
+            If no dir is specified, current direcory will be used.
 
--put:    Save the list to the defined page of the wiki. By default it does not
-         overwrite an exisiting page.
+-encode     File encoding can be specified with '-encode:name' (name must be
+            a valid python encoding: utf-8, etc.).
+            If not specified, it defaults to config.textfile_encoding.
 
--overwrite    Overwrite the page if it exists. Can only by applied with -put.
+-put:       Save the list to the defined page of the wiki. By default it does
+            not overwrite an exisiting page.
 
--summary:     The summary text when the page is written. If it's one word just
-              containing letters, dashes and underscores it uses that as a
-              translation key.
+-overwrite  Overwrite the page if it exists. Can only by applied with -put.
 
+-summary:   The summary text when the page is written. If it's one word just
+            containing letters, dashes and underscores it uses that as a
+            translation key.
 
 Custom format can be applied to the following items extrapolated from a
     page object:
@@ -83,14 +88,11 @@ Custom format can be applied to the following items extrapolated from a
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import os
 import re
@@ -191,25 +193,27 @@ def main(*args):
     genFactory = GeneratorFactory()
 
     for arg in local_args:
-        if arg == '-notitle':
+        option, sep, value = arg.partition(':')
+        if option == '-notitle':
             notitle = True
-        elif arg.startswith('-format:'):
-            fmt = arg[len('-format:'):]
-            fmt = fmt.replace(u'\\03{{', u'\03{{')
-        elif arg.startswith('-outputlang:'):
-            outputlang = arg[len('-outputlang:'):]
-        elif arg == '-get':
+        elif option == '-format':
+            fmt = value.replace('\\03{{', '\03{{')
+            if not fmt.strip():
+                notitle = True
+        elif option == '-outputlang:':
+            outputlang = value
+        elif option == '-get':
             page_get = True
-        elif arg.startswith('-save'):
-            base_dir = arg.partition(':')[2] or '.'
-        elif arg.startswith('-encode:'):
-            encoding = arg.partition(':')[2]
-        elif arg.startswith('-put:'):
-            page_target = arg.partition(':')[2]
-        elif arg.startswith('-overwrite'):
+        elif option == '-save':
+            base_dir = value or '.'
+        elif option == '-encode':
+            encoding = value
+        elif option == '-put':
+            page_target = value
+        elif option == '-overwrite':
             overwrite = True
-        elif arg.startswith('-summary:'):
-            summary = arg.partition(':')[2]
+        elif option == '-summary':
+            summary = value
         else:
             genFactory.handleArg(arg)
 
@@ -238,8 +242,10 @@ def main(*args):
         page_target = pywikibot.Page(site, page_target)
         if not overwrite and page_target.exists():
             pywikibot.bot.suggest_help(
-                additional_text='Page "{0}" already exists.'.format(
-                    page_target.title()))
+                additional_text='Page {0} already exists.\n'
+                                'You can use the -overwrite argument to '
+                                'replace the content of this page.'
+                                .format(page_target.title(asLink=True)))
             return False
         if re.match('^[a-z_-]+$', summary):
             summary = i18n.twtranslate(site, summary)
@@ -255,7 +261,7 @@ def main(*args):
                 pywikibot.stdout(output_list[-1])
             if page_get:
                 try:
-                    pywikibot.output(page.text, toStdout=True)
+                    pywikibot.stdout(page.text)
                 except pywikibot.Error as err:
                     pywikibot.output(err)
             if base_dir:

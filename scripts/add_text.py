@@ -1,10 +1,9 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 This is a Bot to add a text at the end of the content of the page.
 
-By default it adds the text above categories, interwiki and template
-for the stars of the interwiki.
+By default it adds the text above categories and interwiki.
 
 Alternatively it may also add a text at the top of the page.
 These command line parameters can be used to specify which pages to work on:
@@ -53,69 +52,30 @@ Furthermore, the following command line parameters are supported:
     python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare" \
         -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \
         -summary:"Bot: Aggiungo template Categorizzare"
-
---- Credits and Help ---
-This script has been written by Botwiki's staff, if you want to help us
-or you need some help regarding this script, you can find us here:
-
-* http://botwiki.sno.cc/wiki/Main_Page
-
 """
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import re
+import sys
 import time
 
 import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
+from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.tools.formatter import color_format
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp,
 }
-
-
-starsList = [
-    u'bueno',
-    u'bom interwiki',
-    u'cyswllt[ _]erthygl[ _]ddethol', u'dolen[ _]ed',
-    u'destacado', u'destaca[tu]',
-    u'enllaç[ _]ad',
-    u'enllaz[ _]ad',
-    u'leam[ _]vdc',
-    u'legătură[ _]a[bcf]',
-    u'liamm[ _]pub',
-    u'lien[ _]adq',
-    u'lien[ _]ba',
-    u'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
-    u'liên[ _]kết[ _]chọn[ _]lọc',
-    u'ligam[ _]adq',
-    u'ligazón[ _]a[bd]',
-    u'ligoelstara',
-    u'ligoleginda',
-    u'link[ _][afgu]a', u'link[ _]adq', u'link[ _]f[lm]', u'link[ _]km',
-    u'link[ _]sm', u'linkfa',
-    u'na[ _]lotura',
-    u'nasc[ _]ar',
-    u'tengill[ _][úg]g',
-    u'ua',
-    u'yüm yg',
-    u'רא',
-    u'وصلة مقالة جيدة',
-    u'وصلة مقالة مختارة',
-]
 
 
 def add_text(page, addText, summary=None, regexSkip=None,
@@ -130,10 +90,6 @@ def add_text(page, addText, summary=None, regexSkip=None,
     if not summary:
         summary = i18n.twtranslate(site, 'add_text-adding',
                                    {'adding': addText[:200]})
-
-    # When a page is tagged as "really well written" it has a star in the
-    # interwiki links. This is a list of all the templates used (in regex
-    # format) to make the stars appear.
 
     errorCount = 0
 
@@ -195,22 +151,6 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext = textlib.replaceCategoryLinks(newtext,
                                                    categoriesInside, site,
                                                    True)
-            # Dealing the stars' issue
-            # TODO: T123150
-            allstars = []
-            starstext = textlib.removeDisabledParts(text)
-            for star in starsList:
-                regex = re.compile('(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
-                                   % star, re.I)
-                found = regex.findall(starstext)
-                if found != []:
-                    newtext = regex.sub('', newtext)
-                    allstars += found
-            if allstars != []:
-                newtext = newtext.strip() + config.line_separator * 2
-                allstars.sort()
-                for element in allstars:
-                    newtext += '%s%s' % (element.strip(), config.LS)
             # Adding the interwiki
             newtext = textlib.replaceLanguageLinks(newtext, interwikiInside,
                                                    site)
@@ -228,10 +168,13 @@ def add_text(page, addText, summary=None, regexSkip=None,
         # text in the page
         if putText:
             if not always:
-                choice = pywikibot.input_choice(
-                    u'Do you want to accept these changes?',
-                    [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
-                     ('open in Browser', 'b')], 'n', automatic_quit=False)
+                try:
+                    choice = pywikibot.input_choice(
+                        'Do you want to accept these changes?',
+                        [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
+                         ('open in Browser', 'b')], 'n')
+                except QuitKeyboardInterrupt:
+                    sys.exit('User quit bot run.')
                 if choice == 'a':
                     always = True
                 elif choice == 'n':
@@ -305,42 +248,30 @@ def main(*args):
 
     # Loading the arguments
     for arg in local_args:
-        if arg.startswith('-textfile'):
-            if len(arg) == 9:
-                textfile = pywikibot.input(
-                    u'Which textfile do you want to add?')
-            else:
-                textfile = arg[10:]
-        elif arg.startswith('-text'):
-            if len(arg) == 5:
-                addText = pywikibot.input(u'What text do you want to add?')
-            else:
-                addText = arg[6:]
-        elif arg.startswith('-summary'):
-            if len(arg) == 8:
-                summary = pywikibot.input(u'What summary do you want to use?')
-            else:
-                summary = arg[9:]
-        elif arg.startswith('-excepturl'):
-            if len(arg) == 10:
-                regexSkipUrl = pywikibot.input(u'What text should I skip?')
-            else:
-                regexSkipUrl = arg[11:]
-        elif arg.startswith('-except'):
-            if len(arg) == 7:
-                regexSkip = pywikibot.input(u'What text should I skip?')
-            else:
-                regexSkip = arg[8:]
-        elif arg == '-up':
+        option, sep, value = arg.partition(':')
+        if option == '-textfile':
+            textfile = value or pywikibot.input(
+                'Which textfile do you want to add?')
+        elif option == '-text':
+            addText = value or pywikibot.input('What text do you want to add?')
+        elif option == '-summary':
+            summary = value or pywikibot.input(
+                'What summary do you want to use?')
+        elif option == '-excepturl':
+            regexSkipUrl = value or pywikibot.input('What text should I skip?')
+        elif option == '-except':
+            regexSkip = value or pywikibot.input('What text should I skip?')
+        elif option == '-up':
             up = True
-        elif arg == '-noreorder':
+        elif option == '-noreorder':
             reorderEnabled = False
-        elif arg == '-always':
+        elif option == '-always':
             always = True
-        elif arg == '-talk' or arg == '-talkpage':
+        elif option in ('-talk', '-talkpage'):
             talkPage = True
         else:
             genFactory.handleArg(arg)
+
     if textfile and not addText:
         with codecs.open(textfile, 'r', config.textfile_encoding) as f:
             addText = f.read()
@@ -358,6 +289,7 @@ def main(*args):
                                            regexSkipUrl, always, up, True,
                                            reorderEnabled=reorderEnabled,
                                            create=talkPage)
+
 
 if __name__ == "__main__":
     main()

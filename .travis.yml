@@ -5,23 +5,24 @@ language: python
 sudo: false
 
 python:
+  - '2.6'
   - '2.7'
   - '3.3'
   - '3.4'
   - '3.5'
-  - '2.6'
+  - '3.6'
 
 # OSX builds do not yet support Python
-os:
-  - linux
+os: linux
 
 addons:
   apt:
+    sources:
+      - lucid
     packages:
+      - libssl1.0.0
       - djvulibre-bin
-      - graphviz
       - liblua5.1-0-dev
-      - python-ipaddr
 
 before_install:
   # When PYSETUP_TEST_EXTRAS is not enabled, do not allow the
@@ -30,7 +31,16 @@ before_install:
   # Instead install requests in the before_script step below.
   - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then rm requirements.txt ; fi
 
-  - if [[ "$SITE_ONLY" == '1' ]]; then export USE_NOSE=1; fi
+  # When the env variable USE_NOSE or USE_PYTEST is set, the appropriate
+  # tool is used, else PYTEST is taken as the default
+  - if [[ "$PYSETUP_TEST_EXTRAS" != '1' && "$USE_NOSE" != '1' && "$USE_PYTEST" != '1' ]]; then
+      export USE_PYTEST=1 ;
+    fi
+
+  - if [[ "$SITE_ONLY" == '1' ]]; then
+      echo "Running site tests only code ${LANGUAGE} on family ${FAMILY}" ;
+    fi
+
   - export GITHUB_USER=`echo $TRAVIS_REPO_SLUG | cut -d '/' -f 1`
   - mkdir ~/.python-eggs
   - chmod 700 ~/.python-eggs
@@ -45,17 +55,17 @@ before_script:
 script:
   # Install security packages for requests to support HTTPS in site_detect
   - if [[ "$PYSETUP_TEST_EXTRAS" != '1' ]]; then
-      pip install mwoauth -r requests-requirements.txt ;
+      pip install mwoauth!=0.3.1 -r requests-requirements.txt ;
     fi
 
   - mkdir ~/.pywikibot
 
-  - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz
+  - python pwb.py generate_family_file 'https://wiki.musicbrainz.org/' musicbrainz 'n'
   - if [[ $FAMILY == 'wpbeta' ]]; then
-      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'n' ;
+      python -m generate_family_file 'http://'$LANGUAGE'.wikipedia.beta.wmflabs.org/' 'wpbeta' 'y' ;
     fi
   - if [[ $FAMILY == 'wsbeta' ]]; then
-      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'n' ;
+      python -m generate_family_file 'http://'$LANGUAGE'.wikisource.beta.wmflabs.org/' 'wsbeta' 'y' ;
     fi
 
   - python -W error::UserWarning -m generate_user_files -dir:~/.pywikibot/ -family:$FAMILY -lang:$LANGUAGE -v -user:"$PYWIKIBOT2_USERNAME"
@@ -80,6 +90,7 @@ script:
       fi ;
     fi
   - echo "authenticate['wiki.musicbrainz.org'] = ('NOTSPAM', 'NOTSPAM')" >> ~/.pywikibot/user-config.py ;
+  - python -c "from __future__ import print_function;from pywikibot import config as c; a=c.authenticate; [(print('authenticate_key:', i), print('authenticate_value_type:', type(a[i])), print('authenticate_value_length:', len(a[i]))) for i in a]"  # T173498
 
   - echo "max_retries = 2" >> ~/.pywikibot/user-config.py
   - echo "maximum_GET_length = 5000" >> ~/.pywikibot/user-config.py
@@ -90,11 +101,16 @@ script:
   - if [[ "$USE_NOSE" == "1" ]]; then
       nosetests --version ;
       if [[ "$SITE_ONLY" == "1" ]]; then
-        echo "Running site tests only code ${LANGUAGE} on family ${FAMILY}" ;
-        python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" --with-coverage --cover-package=. ;
+        python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" --with-trim --with-coverage --cover-package=. ;
       else
-        python setup.py nosetests --tests tests --verbosity=2 --with-coverage --cover-package=. ;
+        python setup.py nosetests --tests tests --verbosity=2 --with-trim --with-coverage --cover-package=. ;
       fi ;
+    elif [[ "$USE_PYTEST" == "1" ]]; then
+      if [[ "$SITE_ONLY" == "1" ]]; then
+        python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -a \"family=='$FAMILY' and code=='$LANGUAGE'\"" ;
+      else
+        python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=." ;
+      fi
     else
       coverage run setup.py test ;
     fi
@@ -102,13 +118,12 @@ script:
 after_success:
     codecov
 
+after_failure:
+    codecov
+
 env:
   global:
-    # This is the encrypted password for Wikimedia SUL user 'Pywikibot-test',
-    # and is only decrypted by Travis when running builds of code merged into
-    # the github repository 'wikimedia/pywikibot-core'.
-    # See http://docs.travis-ci.com/user/encryption-keys/ for more information.
-    - secure: kofInMlisiTBt9o/Ustc/vySlkKfxGzGCX2LwA1D2waym8sDTS0o5gMJ5LsrT/BUKwZbe1vLozPHqZrrkQvsdTml+DpZuotzdILs0m0f3BUoexEC6OON5IDljuxFyETrD1Ug44ih5Mc4lVFOdTcBzg501ZmswGwQrBvg/OyEFfE=
+    - TEST_TIMEOUT=300
 
   matrix:
     - LANGUAGE=en FAMILY=wikipedia PYWIKIBOT2_TEST_PROD_ONLY=1
@@ -117,19 +132,41 @@ env:
 matrix:
   include:
     - python: '2.7_with_system_site_packages'  # equivalent to virtualenv: system_site_packages: true
-      env: LANGUAGE=he FAMILY=wikivoyage SITE_ONLY=1
-    - python: '2.7'
-      env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
-    - python: '3.3'
-      env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
+      env: LANGUAGE=he FAMILY=wikivoyage DIST=precise-sudo PYWIKIBOT2_TEST_NO_RC=1
+      dist: precise
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - djvulibre-bin
+            - graphviz
+            - liblua5.1-0-dev
+            - python-ipaddr
+    - python: '2.7_with_system_site_packages'
+      env: LANGUAGE=nb FAMILY=wikipedia DIST=trusty PYSETUP_TEST_EXTRAS=1
+      dist: trusty
+      sudo: required
+      addons:
+        apt:
+          packages:
+            - djvulibre-bin
+            - graphviz
+            - liblua5.1-0-dev
+            - python-ipaddr
+    # Disabled due to T173498
+    #- python: '2.7'
+    #  env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
+    #- python: '3.3'
+    #  env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
     - python: '3.4'
       env: LANGUAGE=en FAMILY=wsbeta SITE_ONLY=1
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1
     - python: '3.3'
       env: LANGUAGE=en FAMILY=musicbrainz SITE_ONLY=1
-    - python: '3.4'
-      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
+    # Disabled due to T173498
+    #- python: '3.4'
+    #  env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
     - python: '3.4'
       env: LANGUAGE=test FAMILY=wikidata SITE_ONLY=1
     - python: '3.4'

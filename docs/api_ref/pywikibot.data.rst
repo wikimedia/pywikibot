@@ -17,13 +17,6 @@ pywikibot.data.api module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.data.wikidataquery module
------------------------------------
-
-.. automodule:: pywikibot.data.wikidataquery
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 pywikibot.data.wikistats module
 -------------------------------

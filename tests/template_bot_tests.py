@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test template bot module."""
 #
 # (C) Pywikibot team, 2015
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -109,7 +107,6 @@ class TestXMLPageGenerator(TestCase):
         self.assertPagelistTitles(pages, ['Fake page with msg'],
                                   site=self.site)
 
-    @unittest.expectedFailure
     def test_match_unnecessary_template_prefix(self):
         """Test pages with {{template:..}}."""
         template = pywikibot.Page(self.site, 'Template:Bar')
@@ -142,5 +139,5 @@ class TestXMLPageGenerator(TestCase):
             site=self.site)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

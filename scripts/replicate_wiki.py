@@ -1,11 +1,15 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This bot replicates pages in a wiki to a second wiki within one family.
 
 Example:
 
-    python pwb.py replicate_wiki [-r] -ns 10 -f wikipedia -o nl li fy
+    python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -o nl li fy
+
+or
+
+    python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -lang:nl li fy
 
 to copy all templates from an nlwiki to liwiki and fywiki. It will show which
 pages have to be changed if -r is not present, and will only actually write
@@ -26,7 +30,7 @@ The following parameters are supported:
 --replace         you will only get an overview page)
 
 -o                original wiki
---original
+--original        (you may use -lang:<code> option instead)
 
 destination_wiki  destination wiki(s)
 
@@ -38,14 +42,11 @@ destination_wiki  destination wiki(s)
 """
 #
 # (C) Kasper Souren, 2012-2013
-# (C) Pywikibot team, 2013-2014
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import sys
 
@@ -75,6 +76,7 @@ class SyncSites(object):
     """Work is done in here."""
 
     def __init__(self, options):
+        """Constructor."""
         self.options = options
 
         if options.original_wiki:
@@ -93,7 +95,8 @@ class SyncSites(object):
 
         if options.namespace and 'help' in options.namespace:
             for namespace in self.original.namespaces.values():
-                pywikibot.output('%s %s' % (namespace.id, namespace.custom_name))
+                pywikibot.output(
+                    '{0} {1}'.format(namespace.id, namespace.custom_name))
             sys.exit()
 
         self.sites = [pywikibot.Site(s, family) for s in sites]
@@ -172,18 +175,21 @@ class SyncSites(object):
             else:
                 output += "All important pages are the same"
 
-            output += "\n\n== Admins from original that are missing here ==\n\n"
+            output += (
+                '\n\n== Admins from original that are missing here ==\n\n')
             if self.user_diff[site]:
                 output += "".join('* %s\n' % l.replace('_', ' ') for l in
                                   self.user_diff[site])
             else:
-                output += "All users from original are also present on this wiki"
+                output += (
+                    'All users from original are also present on this wiki')
 
             pywikibot.output(output)
             sync_overview_page.text = output
             sync_overview_page.save(self.put_message(site))
 
     def put_message(self, site):
+        """Return synchonization message."""
         return ('%s replicate_wiki.py synchronization from %s'
                 % (site.user(), str(self.original)))
 
@@ -234,6 +240,14 @@ class SyncSites(object):
 
 
 def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
     my_args = pywikibot.handle_args(args)
 
     parser = ArgumentParser(add_help=False)
@@ -255,6 +269,7 @@ def main(*args):
     sync.check_sysops()
     sync.check_namespaces()
     sync.generate_overviews()
+
 
 if __name__ == '__main__':
     main()

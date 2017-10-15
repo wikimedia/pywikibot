@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Tests for edit failures.
 
@@ -13,8 +13,6 @@ These tests use special code 'write = -1' for edit failures.
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 from pywikibot import (
@@ -151,7 +149,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
         self.assertAPIError('invalid-snak',
-                            'Invalid snak (Can only construct a '
+                            'Invalid snak. (Can only construct a '
                             'MonolingualTextValue with a string value.)',
                             item.addClaim, claim)
 
@@ -174,7 +172,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                             item.addClaim, claim)
 
     def test_url_invalid_protocol(self):
-        """Attempt adding invalid latex to a math claim."""
+        """Attempt adding a URL with an invalid protocol to a url claim."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
@@ -183,7 +181,8 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                             'Unsupported URL scheme: wtf',
                             item.addClaim, claim)
 
-if __name__ == '__main__':
+
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

@@ -5,12 +5,12 @@ Module to define and load pywikibot configuration default and user preferences.
 User preferences are loaded from a python file called user-config.py, which
 may be located in directory specified by the environment variable
 PYWIKIBOT2_DIR, or the same directory as pwb.py, or in a directory within
-the users home.  See get_base_dir for more information.
+the users home. See get_base_dir for more information.
 
 If user-config.py can not be found in any of those locations, this module
 will fail to load unless the environment variable PYWIKIBOT2_NO_USER_CONFIG
-is set to a value other than '0'.  i.e. PYWIKIBOT2_NO_USER_CONFIG=1 will
-allow config to load without a user-config.py.  However, warnings will be
+is set to a value other than '0'. i.e. PYWIKIBOT2_NO_USER_CONFIG=1 will
+allow config to load without a user-config.py. However, warnings will be
 shown if user-config.py was not loaded.
 To prevent these warnings, set PYWIKIBOT2_NO_USER_CONFIG=2.
 
@@ -33,7 +33,7 @@ build paths relative to base_dir:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,6 +49,11 @@ import re
 import stat
 import sys
 import types
+
+from distutils.version import StrictVersion
+from locale import getdefaultlocale
+
+from requests import __version__ as requests_version
 
 from warnings import warn
 
@@ -80,19 +85,20 @@ class _ConfigurationDeprecationWarning(UserWarning):
 
     pass
 
+
 # IMPORTANT:
 # Do not change any of the variables in this file. Instead, make
 # a file user-config.py, and overwrite values in there.
 
 # Note: all variables defined in this module are made available to bots as
 # configuration settings, *except* variable names beginning with an
-# underscore (example: _variable).  Be sure to use an underscore on any
+# underscore (example: _variable). Be sure to use an underscore on any
 # variables that are intended only for internal use and not to be exported
 # to other modules.
 
 _private_values = ['authenticate', 'proxy', 'db_password']
 _deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
-                         'available_ssl_project']
+                         'available_ssl_project', 'fake_user_agent']
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -115,6 +121,7 @@ mylang = 'language'
 # If you have a unique username for all languages of a family,
 # you can use '*'
 # usernames['wikibooks']['*'] = 'mySingleUsername'
+# You may use '*' for family name in a similar manner.
 #
 # If you have a sysop account on some wikis, this will be used to delete pages
 # or to edit locked pages if you add such lines to your
@@ -136,16 +143,22 @@ disambiguation_comment = collections.defaultdict(dict)
 user_agent_format = ('{script_product} ({script_comments}) {pwb} ({revision}) '
                      '{http_backend} {python}')
 
-# Fake user agent
-# Used to retrieve pages in reflinks.py,
-# to work around user-agent sniffing webpages
-# When None or True,
-# Use random user agent if either browseragents or fake_useragent
-# packages are installed
-# Otherwise use pywikibot.comms.http.user_agent()
-# When set to False,
-# disables use of automatic user agents
-fake_user_agent = None
+# Fake user agent.
+# Some external websites reject bot-like user agents. It is possible to use
+# fake user agents in requests to these websites.
+# It is recommended to default this to False and use on an as-needed basis.
+#
+# Default behaviours in modules that can utilize fake UAs.
+# True for enabling fake UA, False for disabling / using pywikibot's own UA, str
+# to specify custom UA.
+fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
+# Website domains excepted to the default behaviour.
+# True for enabling, False for disabling, str to hardcode a UA.
+# Example: {'problematic.site.example': True,
+#           'prefers.specific.ua.example': 'snakeoil/4.2'}
+fake_user_agent_exceptions = {}
+# This following option is deprecated in favour of finer control options above.
+fake_user_agent = False
 
 # The default interface for communicating with the site
 # currently the only defined interface is 'APISite', so don't change this!
@@ -198,7 +211,7 @@ authenticate = {}
 #
 # Secure connection overrides
 #
-# These settings are deprecated.  They existed to support the Wikimedia
+# These settings are deprecated. They existed to support the Wikimedia
 # family which only served HTTPS on https://secure.wikimedia.org/<site>/<uri>
 # Use Family.protocol()
 use_SSL_onlogin = False  # if available, use SSL when logging in
@@ -207,7 +220,8 @@ use_SSL_always = False   # if available, use SSL for all API queries
 available_ssl_project = []
 
 # By default you are asked for a password on the terminal.
-# A password file may be used. e.g. password_file = ".passwd"
+# A password file may be used, e.g. password_file = ".passwd".
+# The path to the password file is relative to that of the user_config file.
 # The password file should consist of lines containing
 # Python tuples of any of the following formats:
 # (code, family, username, password)
@@ -218,7 +232,7 @@ password_file = None
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
-default_edit_summary = u'Pywikibot v.2'
+default_edit_summary = u'Pywikibot 3.0-dev'
 
 # What permissions to use to set private files to it
 # such as password file.
@@ -240,6 +254,16 @@ private_files_permission = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
 # Allow user to stop warnings about file security
 # by setting this to true.
 ignore_file_security_warnings = False
+
+# Custom headers to send on all requests.
+# This is mainly intended to support setting the
+# X-Wikimedia-Debug header, which is sometimes
+# needed to debug issues with Wikimedia sites:
+# https://wikitech.wikimedia.org/wiki/Debugging_in_production
+#
+# Note that these headers will be sent with all requests,
+# not just MediaWiki API calls.
+extra_headers = {}
 
 
 def user_home_path(path):
@@ -343,6 +367,7 @@ def get_base_dir(test_directory=None):
             raise RuntimeError(exc_text)
 
     return base_dir
+
 
 _get_base_dir = get_base_dir  # for backward compatibility
 _base_dir = get_base_dir()
@@ -505,6 +530,22 @@ log_pywiki_repo_version = False
 # (overrides log setting above)
 debug_log = []
 
+# ############# EXTERNAL SCRIPT PATH SETTING ##############
+# set your own script path to lookup for your script files.
+# your private script path must be located inside the
+# framework folder, subfolders must be delimited by '.'.
+# every folder must contain an (empty) __init__.py file.
+#
+# The search order is
+# 1. user_script_paths in the given order
+# 2. scripts
+# 3. scripts/maintenance
+# 4. scripts/archive
+#
+# sample:
+# user_script_paths = ['scripts.myscripts']
+user_script_paths = []
+
 # ############# INTERWIKI SETTINGS ##############
 
 # Should interwiki.py report warnings for missing links between foreign
@@ -579,7 +620,7 @@ upload_to_commons = False
 # but never more than 'maxthrottle' seconds. However - if you are running
 # more than one bot in parallel the times are lengthened.
 # By default, the get_throttle is turned off, and 'maxlag' is used to
-# control the rate of server access.  Set minthrottle to non-zero to use a
+# control the rate of server access. Set minthrottle to non-zero to use a
 # throttle on read access.
 minthrottle = 0
 maxthrottle = 60
@@ -592,7 +633,7 @@ put_throttle = 10
 # than 'noisysleep' seconds, it is logged on the screen.
 noisysleep = 3.0
 
-# Defer bot edits during periods of database server lag.  For details, see
+# Defer bot edits during periods of database server lag. For details, see
 # https://www.mediawiki.org/wiki/Maxlag_parameter
 # You can set this variable to a number of seconds, or to None (or 0) to
 # disable this behavior. Higher values are more aggressive in seeking
@@ -607,8 +648,12 @@ maxlag = 5
 # running solve_disambiguation.py with the -primary argument.
 special_page_limit = 500
 
+# Maximum of pages which can be retrieved at one time from wiki server.
+# -1 indicates limit by api restriction
+step = -1
+
 # Maximum number of times to retry an API request before quitting.
-max_retries = 25
+max_retries = 15
 # Minimum time to wait before resubmitting a failed API request.
 retry_wait = 5
 
@@ -620,9 +665,6 @@ splitLongParagraphs = False
 # sometimes HTML-tables are indented for better reading.
 # That can do very ugly results.
 deIndentTables = True
-# table2wiki.py works quite stable, so you might switch to True
-table2wikiAskOnlyWarnings = True
-table2wikiSkipWarnings = False
 
 # ############# WEBLINK CHECKER SETTINGS ##############
 
@@ -648,6 +690,9 @@ db_username = ''
 db_password = ''
 db_name_format = '{0}'
 db_connect_file = user_home_path('.my.cnf')
+# local port for mysql server
+# ssh -L 4711:enwiki.labsdb:3306 user@tools-login.wmflabs.org
+db_port = 3306
 
 # ############# SEARCH ENGINE SETTINGS ##############
 
@@ -668,13 +713,6 @@ flickr = {
     'review': False,  # Do we use automatically make our uploads reviewed?
     'reviewer': u'',  # If so, under what reviewer name?
 }
-
-# Using the Panoramio api
-panoramio = {
-    'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': u'',  # If so, under what reviewer name?
-}
-
 
 # ############# COPYRIGHT SETTINGS ##############
 
@@ -741,7 +779,7 @@ persistent_http = False
 # DO NOT set to None to disable timeouts. Otherwise this may freeze your script.
 # You may assign either a tuple of two int or float values for connection and
 # read timeout, or a single value for both in a tuple (since requests 2.4.0).
-socket_timeout = 30
+socket_timeout = (6.05, 45)
 
 
 # ############# COSMETIC CHANGES SETTINGS ##############
@@ -843,6 +881,15 @@ pickle_protocol = 2
 # End of configuration section
 # ============================
 
+# ############# OBSOLETE SETTINGS #############
+# This section contains configuration options that are no longer in use.
+# They are kept here to prevent warnings about undefined parameters.
+
+panoramio = {
+    'review': False,  # Do we use automatically make our uploads reviewed?
+    'reviewer': u'',  # If so, under what reviewer name?
+}
+
 
 def makepath(path):
     """Return a normalized absolute version of the path argument.
@@ -889,7 +936,7 @@ def _win32_extension_command(extension):
         key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
         _progID = winreg.EnumValue(key1, 0)[0]
         _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                                '%s\shell\open\command' % _progID)
+                                r'%s\shell\open\command' % _progID)
         _cmd = _winreg.QueryValueEx(_key2, None)[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd
@@ -900,7 +947,7 @@ def _win32_extension_command(extension):
             return cmd[:-1].strip()
     except WindowsError as e:
         # Catch any key lookup errors
-        output('Unable to detect program for file extension "{0}": {1}'.format(
+        output('Unable to detect program for file extension "{0}": {1!r}'.format(
             extension, e))
 
 
@@ -1022,6 +1069,7 @@ def _check_user_config_types(user_config, default_values, skipped):
             warn('Configuration variable {0} is defined but unknown. '
                  'Misspelled?'.format(name), UserWarning)
 
+
 _check_user_config_types(_uc, _glv, _imports)
 
 
@@ -1029,6 +1077,8 @@ _check_user_config_types(_uc, _glv, _imports)
 _modified = [_key for _key in _gl
              if _uc[_key] != globals()[_key] or
              _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
+# Retain the list of modified key names
+__modified__ = _modified
 
 if ('user_agent_format' in _modified):
     _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
@@ -1070,6 +1120,12 @@ if OSWIN32 and editor:
             'forward slashs as a path delimiter or to escape the normal '
             'path delimiter.')
 
+if userinterface_lang is None:
+    userinterface_lang = getdefaultlocale()[0]
+    if userinterface_lang in [None, 'C']:
+        userinterface_lang = 'en'
+    else:
+        userinterface_lang = userinterface_lang.split('_')[0]
 
 # Fix up default site
 if family == 'wikipedia' and mylang == 'language':
@@ -1077,6 +1133,13 @@ if family == 'wikipedia' and mylang == 'language':
         warning('family and mylang are not set.\n'
                 "Defaulting to family='test' and mylang='test'.")
     family = mylang = 'test'
+
+# Fix up socket_timeout
+# Older requests library expect a single value whereas newer versions also
+# accept a tuple (connect timeout, read timeout).
+if (isinstance(socket_timeout, tuple) and
+        StrictVersion(requests_version) < StrictVersion('2.4.0')):
+    socket_timeout = max(socket_timeout)
 
 # SECURITY WARNINGS
 if (not ignore_file_security_warnings and

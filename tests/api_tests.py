@@ -1,13 +1,11 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import datetime
 import types
@@ -18,6 +16,7 @@ import pywikibot.login
 import pywikibot.page
 import pywikibot.site
 
+from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
@@ -115,7 +114,8 @@ class TestApiFunctions(DefaultSiteTestCase):
 
     def testObjectCreation(self):
         """Test api.Request() constructor with implicit site creation."""
-        req = api.Request(action="test", foo="", bar="test")
+        req = api.Request(parameters={'action': 'test', 'foo': '',
+                                      'bar': 'test'})
         self.assertTrue(req)
         self.assertEqual(req.site, self.get_site())
 
@@ -127,7 +127,8 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
     def testObjectCreation(self):
         """Test api.Request() constructor."""
         mysite = self.get_site()
-        req = api.Request(site=mysite, action="test", foo="", bar="test")
+        req = api.Request(site=mysite, parameters={'action': 'test', 'foo': '',
+                                                   'bar': 'test'})
         self.assertTrue(req)
         self.assertEqual(req.site, mysite)
         self.assertIn("foo", req._params)
@@ -622,7 +623,7 @@ class TestDryPageGenerator(TestCase):
         """Test setting the limit to not a number."""
         with self.assertRaisesRegex(
                 ValueError,
-                "invalid literal for int\(\) with base 10: 'test'"):
+                r"invalid literal for int\(\) with base 10: 'test'"):
             self.gen.set_maximum_items('test')
 
     def test_limit_equal_total(self):
@@ -836,13 +837,13 @@ class TestCachedRequest(DefaultSiteTestCase):
                   'titles': mainpage.title(),
                   }
         req1 = api.CachedRequest(datetime.timedelta(minutes=10),
-                                 site=mysite, **params)
+                                 site=mysite, parameters=params)
         data1 = req1.submit()
         req2 = api.CachedRequest(datetime.timedelta(minutes=10),
-                                 site=mysite, **params)
+                                 site=mysite, parameters=params)
         data2 = req2.submit()
         req3 = api.CachedRequest(datetime.timedelta(minutes=10),
-                                 site=mysite, **params)
+                                 site=mysite, parameters=params)
         data3 = req3.submit()
         self.assertEqual(data1, data2)
         self.assertEqual(data2, data3)
@@ -861,7 +862,7 @@ class TestCachedRequest(DefaultSiteTestCase):
                   'titles': 'TestCachedRequest_test_internals ' + str(now),
                   }
         req = api.CachedRequest(datetime.timedelta(minutes=10),
-                                site=mysite, **params)
+                                site=mysite, parameters=params)
         rv = req._load_cache()
         self.assertFalse(rv)
         self.assertIsNone(req._data)
@@ -890,7 +891,7 @@ class TestLazyLoginBase(TestCase):
     BaseSite on it's own. It's testing against steward.wikimedia.org.
 
     These tests are split into two subclasses as only the first failed login
-    behaves as expected.  All subsequent logins will raise an APIError, making
+    behaves as expected. All subsequent logins will raise an APIError, making
     it impossible to test two scenarios with the same APISite object.
     """
 
@@ -927,7 +928,7 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
     def test_access_denied_notexist_username(self):
         """Test the query with a username which does not exist."""
         self.site._username = ['Not registered username', None]
-        req = api.Request(site=self.site, action='query')
+        req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
@@ -948,7 +949,7 @@ class TestLazyLoginNoUsername(TestLazyLoginBase):
         if 'steward' in pywikibot.config.usernames:
             del pywikibot.config.usernames['steward']
 
-        req = api.Request(site=self.site, action='query')
+        req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
@@ -1024,7 +1025,63 @@ class TestUrlEncoding(TestCase):
         self.assertEqual(result, expect)
         self.assertIsInstance(result, str)
 
-if __name__ == '__main__':
+
+class DummyThrottle(Throttle):
+
+    """Dummy Throttle class."""
+
+    def lag(self, lag):
+        """Override lag method, save the lag value and exit the api loop."""
+        self._lagvalue = lag  # save the lag value
+        raise SystemExit  # exit the api loop
+
+
+class TestLagpattern(DefaultSiteTestCase):
+
+    """Test the lag pattern."""
+
+    cached = False
+
+    def test_valid_lagpattern(self):
+        """Test whether api.lagpattern is valid."""
+        mysite = self.get_site()
+        if mysite.siteinfo['dbrepllag'][0]['lag'] == -1:
+            raise unittest.SkipTest(
+                '{0} is not running on a replicated database cluster.'
+                .format(mysite)
+            )
+        mythrottle = DummyThrottle(mysite)
+        mysite._throttle = mythrottle
+        params = {'action': 'query',
+                  'titles': self.get_mainpage().title(),
+                  'maxlag': -1}
+        req = api.Request(site=mysite, parameters=params)
+        try:
+            req.submit()
+        except SystemExit:
+            pass  # expected exception from DummyThrottle instance
+        except api.APIError as e:
+            pywikibot.warning(
+                'Wrong api.lagpattern regex, cannot retrieve lag value')
+            raise e
+        value = mysite.throttle._lagvalue
+        self.assertIsInstance(value, int)
+        self.assertGreaterEqual(value, 0)
+
+    def test_individual_patterns(self):
+        """Test api.lagpattern with example patterns."""
+        patterns = {
+            'Waiting for 10.64.32.115: 0.14024019241333 seconds lagged': 0,
+            'Waiting for hostname: 5 seconds lagged': 5,
+            'Waiting for 127.0.0.1: 1.7 seconds lagged': 1
+        }
+        for info, time in patterns.items():
+            lag = api.lagpattern.search(info)
+            self.assertIsNotNone(lag)
+            self.assertEqual(int(lag.group("lag")), time)
+
+
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

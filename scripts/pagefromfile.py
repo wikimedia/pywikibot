@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 r"""
 Bot to upload pages from a file.
 
@@ -18,7 +18,6 @@ the -include option.
 Specific arguments:
 
 -begin:xxx      Specify the text that marks the beginning of a page
--start:xxx      (deprecated)
 -end:xxx        Specify the text that marks the end of a page
 -file:xxx       Give the filename we are getting our material from
                 (default: dict.txt)
@@ -57,14 +56,11 @@ character.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2015
+# (C) Pywikibot team, 2005-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import codecs
 import os
@@ -74,7 +70,9 @@ from warnings import warn
 
 import pywikibot
 
-from pywikibot import config, Bot, i18n
+from pywikibot import config, i18n
+from pywikibot.bot import SingleSiteBot, CurrentPageBot
+from pywikibot.bot import OptionHandler
 from pywikibot.exceptions import ArgumentDeprecationWarning
 
 
@@ -87,7 +85,7 @@ class NoTitle(Exception):
         self.offset = offset
 
 
-class PageFromFileRobot(Bot):
+class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
 
     """
     Responsible for writing pages to the wiki.
@@ -96,7 +94,7 @@ class PageFromFileRobot(Bot):
 
     """
 
-    def __init__(self, reader, **kwargs):
+    def __init__(self, **kwargs):
         """Constructor."""
         self.availableOptions.update({
             'always': True,
@@ -113,40 +111,44 @@ class PageFromFileRobot(Bot):
         super(PageFromFileRobot, self).__init__(**kwargs)
         self.availableOptions.update(
             {'always': False if self.getOption('showdiff') else True})
-        self.reader = reader
 
-    def run(self):
-        """Start file processing and upload content."""
-        for title, contents in self.reader.run():
-            self.save(title, contents)
+    def init_page(self, page):
+        """Do not try to update site before calling treat."""
+        pass
 
-    def save(self, title, contents):
+    def treat(self, page_tuple):
+        """Process page tuple, set page to current page and treat it."""
+        title, content = page_tuple
+        page = pywikibot.Page(self.site, title)
+        page.text = content.strip()
+        super(PageFromFileRobot, self).treat(page)
+
+    def treat_page(self):
         """Upload page content."""
-        mysite = pywikibot.Site()
-
-        page = pywikibot.Page(mysite, title)
-        self.current_page = page
+        page = self.current_page
+        title = page.title()
+        # save the content retrieved from generator
+        contents = page.text
+        # delete page's text to get it from live wiki
+        del page.text
 
         if self.getOption('summary'):
             comment = self.getOption('summary')
         else:
-            comment = i18n.twtranslate(mysite, 'pagefromfile-msg')
+            comment = i18n.twtranslate(self.site, 'pagefromfile-msg')
 
         comment_top = comment + " - " + i18n.twtranslate(
-            mysite, 'pagefromfile-msg_top')
+            self.site, 'pagefromfile-msg_top')
         comment_bottom = comment + " - " + i18n.twtranslate(
-            mysite, 'pagefromfile-msg_bottom')
+            self.site, 'pagefromfile-msg_bottom')
         comment_force = "%s *** %s ***" % (
-            comment, i18n.twtranslate(mysite, 'pagefromfile-msg_force'))
-
-        # Remove trailing newlines (cause troubles when creating redirects)
-        contents = re.sub('^[\r\n]*', '', contents)
+            comment, i18n.twtranslate(self.site, 'pagefromfile-msg_force'))
 
         if page.exists():
             if not self.getOption('redirect') and page.isRedirectPage():
                 pywikibot.output(u"Page %s is redirect, skipping!" % title)
                 return
-            pagecontents = page.get(get_redirect=True)
+            pagecontents = page.text
             nocontent = self.getOption('nocontent')
             if nocontent and (
                     nocontent in pagecontents or
@@ -163,55 +165,61 @@ class PageFromFileRobot(Bot):
                 else:
                     above, below = pagecontents, contents
                     comment = comment_bottom
-                pywikibot.output('Page {0} already exists, appending on {1}!'.format(
-                                 title, self.getOption('append')[0]))
+                pywikibot.output('Page {0} already exists, appending on {1}!'
+                                 .format(title, self.getOption('append')[0]))
                 contents = above + separator + below
             elif self.getOption('force'):
                 pywikibot.output(u"Page %s already exists, ***overwriting!"
                                  % title)
                 comment = comment_force
             else:
-                pywikibot.output(u"Page %s already exists, not adding!" % title)
+                pywikibot.output('Page %s already exists, not adding!' % title)
                 return
         else:
             if self.getOption('autosummary'):
-                comment = ''
-                config.default_edit_summary = ''
+                comment = config.default_edit_summary = ''
 
-        self.userPut(page, page.text, contents,
-                     summary=comment,
-                     minor=self.getOption('minor'),
-                     show_diff=self.getOption('showdiff'),
-                     ignore_save_related_errors=True)
+        self.put_current(contents, summary=comment,
+                         minor=self.getOption('minor'),
+                         show_diff=self.getOption('showdiff'))
 
 
-class PageFromFileReader(object):
+class PageFromFileReader(OptionHandler):
 
-    """
-    Responsible for reading the file.
+    """Generator class, responsible for reading the file."""
 
-    The run() method yields a (title, contents) tuple for each found page.
+    # Adapt these to the file you are using. 'begin' and
+    # 'end' are the beginning and end of each entry. Take text that
+    # should be included and does not occur elsewhere in the text.
 
-    """
+    # TODO: make config variables for these.
+    availableOptions = {
+        'begin': '{{-start-}}',
+        'end': '{{-stop-}}',
+        'titlestart': "'''",
+        'titleend': "'''",
+        'include': False,
+        'notitle': False,
+    }
 
-    def __init__(self, filename, pageStartMarker, pageEndMarker,
-                 titleStartMarker, titleEndMarker, include, notitle):
+    def __init__(self, filename, **kwargs):
         """Constructor.
 
         Check if self.file name exists. If not, ask for a new filename.
         User can quit.
 
         """
+        super(PageFromFileReader, self).__init__(**kwargs)
         self.filename = filename
-        self.pageStartMarker = pageStartMarker
-        self.pageEndMarker = pageEndMarker
-        self.titleStartMarker = titleStartMarker
-        self.titleEndMarker = titleEndMarker
-        self.include = include
-        self.notitle = notitle
+        self.pageStartMarker = self.getOption('begin')
+        self.pageEndMarker = self.getOption('end')
+        self.titleStartMarker = self.getOption('titlestart')
+        self.titleEndMarker = self.getOption('titleend')
+        self.include = self.getOption('include')
+        self.notitle = self.getOption('notitle')
 
-    def run(self):
-        """Read file and yield page title and content."""
+    def __iter__(self):
+        """Read file and yield a tuple of page title and content."""
         pywikibot.output('\n\nReading \'%s\'...' % self.filename)
         try:
             with codecs.open(self.filename, 'r',
@@ -273,61 +281,39 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    # Adapt these to the file you are using. 'pageStartMarker' and
-    # 'pageEndMarker' are the beginning and end of each entry. Take text that
-    # should be included and does not occur elsewhere in the text.
-
-    # TODO: make config variables for these.
     filename = "dict.txt"
-    pageStartMarker = "{{-start-}}"
-    pageEndMarker = "{{-stop-}}"
-    titleStartMarker = u"'''"
-    titleEndMarker = u"'''"
     options = {}
-    include = False
-    notitle = False
+    r_options = {}
 
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-start:'):
-            pageStartMarker = arg[7:]
-            warn('-start param (text that marks the beginning) of a page has been '
-                 'deprecated in favor of begin; make sure to use the updated param.',
-                 ArgumentDeprecationWarning)
-        elif arg.startswith('-begin:'):
-            pageStartMarker = arg[len('-begin:'):]
-        elif arg.startswith("-end:"):
-            pageEndMarker = arg[5:]
-        elif arg.startswith("-file:"):
-            filename = arg[6:]
-        elif arg == "-include":
-            include = True
-        elif arg.startswith('-appendbottom'):
-            options['append'] = ('bottom', arg[len('-appendbottom:'):])
-        elif arg.startswith('-appendtop'):
-            options['append'] = ('top', arg[len('-appendtop:'):])
-        elif arg == "-force":
-            options['force'] = True
-        elif arg == "-safe":
+        arg, sep, value = arg.partition(':')
+        option = arg.partition('-')[2]
+        # reader options
+        if option == 'start':
+            r_options['begin'] = value
+            warn('-start param (text that marks the beginning) of a page has '
+                 'been deprecated in favor of begin; make sure to use the '
+                 'updated param.', ArgumentDeprecationWarning)
+        elif option in ('begin', 'end', 'titlestart', 'titleend'):
+            r_options[option] = value
+        elif option == 'file':
+            filename = value
+        elif option in ('include', 'notitle'):
+            r_options[option] = True
+        # bot options
+        elif option == 'appendbottom':
+            options['append'] = ('bottom', value)
+        elif option == 'appendtop':
+            options['append'] = ('top', value)
+        elif option in ('force', 'minor', 'autosummary', 'showdiff'):
+            options[option] = True
+        elif option == 'safe':
             options['force'] = False
             options['append'] = None
-        elif arg == "-noredirect":
+        elif option == 'noredirect':
             options['redirect'] = False
-        elif arg == '-notitle':
-            notitle = True
-        elif arg == '-minor':
-            options['minor'] = True
-        elif arg.startswith('-nocontent:'):
-            options['nocontent'] = arg[11:]
-        elif arg.startswith("-titlestart:"):
-            titleStartMarker = arg[12:]
-        elif arg.startswith("-titleend:"):
-            titleEndMarker = arg[10:]
-        elif arg.startswith("-summary:"):
-            options['summary'] = arg[9:]
-        elif arg == '-autosummary':
-            options['autosummary'] = True
-        elif arg == '-showdiff':
-            options['showdiff'] = True
+        elif option in ('nocontent', 'summary'):
+            options[option] = value
         else:
             pywikibot.output(u"Disregarding unknown argument %s." % arg)
 
@@ -348,11 +334,10 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['-file'])
         return False
     else:
-        reader = PageFromFileReader(filename, pageStartMarker, pageEndMarker,
-                                    titleStartMarker, titleEndMarker, include,
-                                    notitle)
-        bot = PageFromFileRobot(reader, **options)
+        reader = PageFromFileReader(filename, **r_options)
+        bot = PageFromFileRobot(generator=reader, **options)
         bot.run()
+
 
 if __name__ == "__main__":
     main()

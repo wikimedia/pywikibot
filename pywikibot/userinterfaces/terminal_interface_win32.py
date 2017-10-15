@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
 __version__ = '$Id$'
-
-import re
 
 from pywikibot.userinterfaces import (
     terminal_interface_base,
@@ -41,8 +39,6 @@ windowsColors = {
     'lightyellow': 14,
     'white':       15,
 }
-
-colorTagR = re.compile('\03{(?P<name>%s)}' % '|'.join(list(windowsColors.keys())))
 
 
 # Compat for python <= 2.5
@@ -76,8 +72,13 @@ class Win32CtypesUI(Win32BaseUI):
 
     def encounter_color(self, color, target_stream):
         """Set the new color."""
+        fg, bg = self.divide_color(color)
+        windows_color = windowsColors[fg]
+        # Merge foreground/backgroung color if needed.
+        if bg is not None:
+            windows_color = windowsColors[bg] << 4 | windows_color
         ctypes.windll.kernel32.SetConsoleTextAttribute(
-            target_stream._hConsole, windowsColors[color])
+            target_stream._hConsole, windows_color)
 
     def _raw_input(self):
         data = self.stdin.readline()
@@ -86,6 +87,7 @@ class Win32CtypesUI(Win32BaseUI):
         if str('\x1a') in data:
             raise EOFError()
         return data.strip()
+
 
 if ctypes_found:
     Win32UI = Win32CtypesUI

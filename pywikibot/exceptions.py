@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Exception and warning classes used throughout the framework.
 
@@ -24,6 +24,7 @@ SiteDefinitionError: Site loading problem
 PageRelatedError: any exception which is caused by an operation on a Page.
 
   - NoPage: Page does not exist
+  - UnsupportedPage: Page is not supported due to a namespace restriction
   - IsRedirectPage: Page is a redirect page
   - IsNotRedirectPage: Page is not a redirect page
   - CircularRedirect: Page is a circular redirect
@@ -31,6 +32,9 @@ PageRelatedError: any exception which is caused by an operation on a Page.
   - SectionError: The section specified by # does not exist
   - NotEmailableError: The target user has disabled email
   - NoMoveTarget: An expected move target page does not exist
+
+PageLoadRelatedError: any exception which happens while loading a Page.
+  - InconsistentTitleReceived: Page receives a title inconsistent with query
 
 PageSaveRelatedError: page exceptions within the save operation on a Page
 (alias: PageNotSaved).
@@ -55,6 +59,8 @@ WikiBaseError: any issue specific to Wikibase.
   - CoordinateGlobeUnknownException: globe is not implemented yet.
   - EntityTypeUnknownException: entity type is not available on the site.
 
+TimeoutError: request failed with a timeout
+
 DeprecationWarning: old functionality replaced by new functionality
 
 PendingDeprecationWarning: problematic code which has not yet been
@@ -74,7 +80,7 @@ UserWarning: warnings targetted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -160,7 +166,7 @@ class PageRelatedError(Error):
 
         if '%(' in self.message and ')s' in self.message:
             super(PageRelatedError, self).__init__(
-                self.message % self.__dict__)  # noqa: H501
+                self.message % self.__dict__)
         else:
             super(PageRelatedError, self).__init__(self.message % page)
 
@@ -222,6 +228,16 @@ class NoPage(PageRelatedError):  # noqa
     pass
 
 
+class UnsupportedPage(PageRelatedError):
+
+    """Unsupported page due to namespace restriction."""
+
+    # namespaces < 0 aren't supported (T169213)
+    message = 'Page %s is not supported due to namespace restriction.'
+
+    pass
+
+
 class NoMoveTarget(PageRelatedError):
 
     """Expected move target page not found."""
@@ -229,6 +245,30 @@ class NoMoveTarget(PageRelatedError):
     message = "Move target page of %s not found."
 
     pass
+
+
+class PageLoadRelatedError(PageRelatedError):
+
+    """Loading the contents of a Page object has failed."""
+
+    message = u"Page %s was not loaded."
+
+
+class InconsistentTitleReceived(PageLoadRelatedError):
+
+    """Page receives a title inconsistent with query."""
+
+    def __init__(self, page, actual):
+        """Constructor.
+
+        @param page: Page that caused the exception
+        @type page: Page object
+        @param actual: title obtained by query
+        @type reason: basestring
+
+        """
+        self.message = "Query on %s returned data on '{0}'".format(actual)
+        super(InconsistentTitleReceived, self).__init__(page)
 
 
 class SiteDefinitionError(Error):  # noqa
@@ -435,14 +475,14 @@ class FatalServerError(ServerError):
     pass
 
 
-class Server504Error(Error):  # noqa
+class Server504Error(ServerError):  # noqa
 
     """Server timed out with HTTP 504 code"""
 
     pass
 
 
-class Server414Error(Error):
+class Server414Error(ServerError):
 
     """Server returned with HTTP 414 code."""
 
@@ -453,13 +493,12 @@ class BadTitle(Error):
 
     """Server responded with BadTitle."""
 
-# UserBlocked exceptions should in general not be caught. If the bot has
-# been blocked, the bot operator should address the reason for the block
-# before continuing.
-
     pass
 
 
+# UserBlocked exceptions should in general not be caught. If the bot has
+# been blocked, the bot operator should address the reason for the block
+# before continuing.
 class UserBlocked(Error):  # noqa
 
     """Your username or IP has been blocked"""
@@ -519,6 +558,13 @@ class CoordinateGlobeUnknownException(WikiBaseError, NotImplementedError):
 class EntityTypeUnknownException(WikiBaseError):
 
     """The requested entity type is not recognised on this site."""
+
+    pass
+
+
+class TimeoutError(Error):
+
+    """Request failed with a timeout error."""
 
     pass
 

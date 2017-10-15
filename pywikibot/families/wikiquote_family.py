@@ -1,5 +1,10 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Family module for Wikiquote."""
+#
+# (C) Pywikibot team, 2005-2017
+#
+# Distributed under the terms of the MIT license.
+#
 from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
@@ -15,77 +20,51 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiquote'
 
     closed_wikis = [
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Alemannic_Wikiquote
-        'als',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Old_English_Wikiquote
-        'ang',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Asturianu_Wikiquote
-        'ast',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Bambara_Wikiquote
-        'bm',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Corsu_Wikiquote
-        'co',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nehiyaw_Wikiquote
-        'cr',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Gaeilge_Wikiquote
-        'ga',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kazakh_Wikiquote
-        'kk',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kanuri_Wikiquote
-        'kr',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kashmiri_Wikiquote
-        'ks',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Kernewek_Wikiquote
-        'kw',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Luxembourgish_Wikiquote
-        'lb',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Nauruan_Wikiquote
-        'na',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Low_Saxon_Wikiquote
-        'nds',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Quechua_Wikiquote
-        'qu',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Simple_English_Wikiquote_(3)
-        'simple',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Turkmen_Wikiquote
-        'tk',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Tatar_Wikiquote
-        'tt',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Oyghurque_Wikiquote
-        'ug',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Volapuk_Wikiquote
-        'vo',
-        # https://meta.wikimedia.org/wiki/Proposals_for_closing_projects/Closure_of_Zhuang_Wikiquote
-        'za',
+        # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
+        'als', 'am', 'ang', 'ast', 'bm', 'co', 'cr', 'ga', 'kk',
+        'kr', 'ks', 'kw', 'lb', 'na', 'nds', 'qu', 'simple',
+        'tk', 'tt', 'ug', 'vo', 'za', 'zh_min_nan',
     ]
 
     removed_wikis = [
+        # See https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
         'tokipona',
     ]
 
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'it', 'pl', 'ru', 'de', 'cs', 'pt', 'es', 'fr', 'sk', 'fa',
-            'bs', 'uk', 'tr', 'lt', 'bg', 'he', 'ca', 'sl', 'eo', 'el', 'nn',
-            'id', 'zh', 'hr', 'hy', 'th', 'hu', 'li', 'nl', 'su', 'ko', 'ja',
-            'sv', 'ur', 'te', 'ar', 'fi', 'cy', 'az', 'la', 'no', 'gl', 'ml',
-            'et', 'ku', 'kn', 'sr', 'eu', 'ro', 'ta', 'ka', 'da', 'sa', 'is',
-            'gu', 'vi', 'be', 'hi', 'sq', 'mr', 'br', 'uz', 'af', 'zh-min-nan',
-            'am', 'wo', 'ky',
+            'en', 'it', 'pl', 'ru', 'cs', 'de', 'fa', 'pt', 'es', 'uk', 'sk',
+            'fr', 'bs', 'tr', 'he', 'ca', 'fi', 'lt', 'th', 'bg', 'sl', 'eo',
+            'hy', 'el', 'nn', 'id', 'hr', 'zh', 'hu', 'su', 'li', 'az', 'nl',
+            'ko', 'ja', 'ar', 'gu', 'sv', 'sr', 'gl', 'ur', 'te', 'ta', 'cy',
+            'la', 'no', 'vi', 'ml', 'et', 'kn', 'ku', 'be', 'ro', 'eu', 'hi',
+            'ka', 'da', 'sa', 'is', 'sq', 'mr', 'br', 'af', 'uz', 'zh-min-nan',
+            'wo', 'ky',
         ]
 
         super(Family, self).__init__()
 
+        self.category_redirect_templates = {
+            '_default': (),
+            'ar': ('قالب:تحويل تصنيف',),
+            'en': ('Category redirect',),
+            'ro': ('Redirect categorie',),
+            'sq': ('Kategori e zhvendosur',),
+            'uk': ('Categoryredirect',),
+        }
+
         # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/Bot_policy/Implementation#Current_implementation
+        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
         self.cross_allowed = [
-            'af', 'am', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs', 'da',
-            'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi', 'fr', 'gl', 'he', 'hi',
-            'hu', 'hy', 'id', 'is', 'it', 'ja', 'ka', 'kn', 'ku', 'ky', 'la',
-            'li', 'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru', 'sk',
-            'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'tr', 'uk', 'uz', 'vi',
-            'wo', 'zh',
+            'af', 'ar', 'az', 'be', 'bg', 'br', 'bs', 'ca', 'cs',
+            'cy', 'da', 'el', 'eo', 'es', 'et', 'eu', 'fa', 'fi',
+            'fr', 'gl', 'gu', 'he', 'hi', 'hu', 'hy', 'id', 'is',
+            'it', 'ja', 'ka', 'kn', 'ko', 'ku', 'ky', 'la', 'li',
+            'lt', 'ml', 'mr', 'nl', 'nn', 'no', 'pt', 'ro', 'ru',
+            'sk', 'sl', 'sq', 'sr', 'su', 'sv', 'ta', 'te', 'tr',
+            'uk', 'ur', 'uz', 'vi', 'wo', 'zh',
         ]
 
         # Subpages for documentation.

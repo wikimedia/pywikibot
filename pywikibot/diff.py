@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Diff module."""
 #
 # (C) Pywikibot team, 2014-2015
@@ -19,11 +19,6 @@ if sys.version_info[0] > 2:
     from itertools import zip_longest
 else:
     from itertools import izip_longest as zip_longest
-
-try:
-    from bs4 import BeautifulSoup
-except ImportError as bserror:
-    BeautifulSoup = False
 
 import pywikibot
 from pywikibot.tools import chars
@@ -60,6 +55,10 @@ class Hunk(object):
         self.group = grouped_opcode
         self.header = u''
         self.colors = {
+            '+': 'lightgreen',
+            '-': 'lightred',
+        }
+        self.bg_colors = {
             '+': 'lightgreen',
             '-': 'lightred',
         }
@@ -118,20 +117,45 @@ class Hunk(object):
         """Color diff lines."""
         diff = iter(self.diff)
 
-        l1, l2 = '', next(diff)
+        fmt, line1, line2 = '', '', next(diff)
         for line in diff:
-            l1, l2 = l2, line
+            fmt, line1, line2 = line1, line2, line
             # do not show lines starting with '?'.
-            if l1.startswith('?'):
+            if line1.startswith('?'):
                 continue
-            if l2.startswith('?'):
-                yield self.color_line(l1, l2)
-            else:
-                yield self.color_line(l1)
+            if line2.startswith('?'):
+                yield self.color_line(line1, line2)
+                # do not try to reuse line2 as format at next iteration
+                # if already used for an added line.
+                if line1.startswith('+'):
+                    line2 = ''
+                continue
+            if line1.startswith('-'):
+                # Color whole line to be removed.
+                yield self.color_line(line1)
+            elif line1.startswith('+'):
+                # Reuse last available fmt as diff line, if possible,
+                # or color whole line to be added.
+                fmt = fmt if fmt.startswith('?') else ''
+                fmt = fmt[:min(len(fmt), len(line1))]
+                fmt = fmt if fmt else None
+                yield self.color_line(line1, fmt)
 
         # handle last line
-        if not l2.startswith('?'):
-            yield self.color_line(l2)
+        # If line line2 is removed, color the whole line.
+        # If line line2 is added, check if line1 is a '?-type' line, to prevent
+        # the entire line line2 to be colored (see T130572).
+        # The case where line2 start with '?' has been covered already.
+        if line2.startswith('-'):
+            # Color whole line to be removed.
+            yield self.color_line(line2)
+        elif line2.startswith('+'):
+            # Reuse last available line1 as diff line, if possible,
+            # or color whole line to be added.
+            fmt = line1 if line1.startswith('?') else ''
+            fmt = fmt[:min(len(fmt), len(line2))]
+            fmt = fmt if fmt else None
+            yield self.color_line(line2, fmt)
 
     def color_line(self, line, line_ref=None):
         """Color line characters.
@@ -160,8 +184,12 @@ class Hunk(object):
             char_tagged = char
             if color_closed:
                 if char_ref != ' ':
+                    if char != ' ':
+                        apply_color = self.colors[color]
+                    else:
+                        apply_color = 'default;' + self.bg_colors[color]
                     char_tagged = color_format('{color}{0}',
-                                               char, color=self.colors[color])
+                                               char, color=apply_color)
                     color_closed = False
             else:
                 if char_ref == ' ':
@@ -545,7 +573,7 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     """
     FORMAT = '{2}{lightpurple}{0:{1}^50}{default}{2}'
 
-    patch = PatchManager(oldtext, newtext, n=n, by_letter=by_letter)
+    patch = PatchManager(oldtext, newtext, context=n, by_letter=by_letter)
     pywikibot.output(color_format(FORMAT, '  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
@@ -579,9 +607,7 @@ def html_comparator(compare_string):
     @return: deleted and added list of contexts
     @rtype: dict
     """
-    # check if BeautifulSoup imported
-    if not BeautifulSoup:
-        raise bserror  # should have been raised and stored earlier.
+    from bs4 import BeautifulSoup
 
     comparands = {'deleted-context': [], 'added-context': []}
     soup = BeautifulSoup(compare_string)

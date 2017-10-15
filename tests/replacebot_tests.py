@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the replace script and ReplaceRobot class."""
 #
 # (C) Pywikibot team, 2015
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -45,14 +43,14 @@ class TestReplacementsMain(TWNBotTestCase):
 
             changed_pages = -42  # show that weird number to show this was used
 
-            def __init__(inner_self, *args, **kwargs):
+            def __init__(inner_self, *args, **kwargs):  # flake8: disable=N805
                 # Unpatch already here, as otherwise super calls will use
                 # this class' super which is the class itself
                 replace.ReplaceRobot = self._original_bot
                 super(FakeReplaceBot, inner_self).__init__(*args, **kwargs)
                 self.bots.append(inner_self)
 
-            def run(inner_self):
+            def run(inner_self):  # flake8: disable=N805
                 """Nothing to do here."""
                 inner_self.changed_pages = -47  # show that run was called
 
@@ -98,7 +96,7 @@ class TestReplacementsMain(TWNBotTestCase):
     def test_invalid_replacements(self):
         """Test invalid command line replacement configurations."""
         # old and new need to be together
-        self.assertFalse(self._run('foo', '-replacementfile:/dev/null', 'bar'))
+        self.assertFalse(self._run('foo', '-pairsfile:/dev/null', 'bar'))
         # only old provided
         self.assertFalse(self._run('foo'))
 
@@ -239,7 +237,7 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertTrue(callable(bot.replacements[0].new))
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

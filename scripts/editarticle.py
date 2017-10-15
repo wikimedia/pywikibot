@@ -23,14 +23,11 @@ The following parameters are supported:
 """
 #
 # (C) Gerrit Holl, 2004
-# (C) Pywikibot team, 2004-2015
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import argparse
 import os

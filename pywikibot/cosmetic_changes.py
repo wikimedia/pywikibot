@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This module can do slight modifications to tidy a wiki page's source code.
 
@@ -49,8 +49,8 @@ or by adding a list to the given one:
     cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 """
 #
-# (C) xqt, 2009-2015
-# (C) Pywikibot team, 2006-2016
+# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,8 +71,8 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config, textlib
-from pywikibot.textlib import _MultiTemplateMatchBuilder
-from pywikibot.tools import deprecate_arg, first_lower, first_upper
+from pywikibot.textlib import _MultiTemplateMatchBuilder, FILE_LINK_REGEX
+from pywikibot.tools import deprecated_args, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
 
@@ -151,7 +151,7 @@ def _format_isbn_match(match, strict=True):
             import scripts.isbn as scripts_isbn
         except ImportError:
             raise NotImplementedError(
-                'ISBN functionality not available.  Install stdnum package.')
+                'ISBN functionality not available. Install stdnum package.')
 
         warn('package stdnum.isbn not found; using scripts.isbn',
              ImportWarning)
@@ -199,14 +199,16 @@ class CosmeticChangesToolkit(object):
 
     """Cosmetic changes toolkit."""
 
-    @deprecate_arg('debug', 'diff')
-    def __init__(self, site, diff=False, redirect=False, namespace=None,
-                 pageTitle=None, ignore=CANCEL_ALL):
+    @deprecated_args(debug='diff', redirect=None)
+    def __init__(self, site, diff=False, namespace=None, pageTitle=None,
+                 ignore=CANCEL_ALL):
         """Constructor."""
         self.site = site
         self.diff = diff
-        self.redirect = redirect
-        self.namespace = namespace
+        try:
+            self.namespace = self.site.namespaces.resolve(namespace).pop(0)
+        except (KeyError, TypeError, IndexError):
+            raise ValueError('%s needs a valid namespace' % self.__class__.__name__)
         self.template = (self.namespace == 10)
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
         self.title = pageTitle
@@ -221,8 +223,7 @@ class CosmeticChangesToolkit(object):
             self.cleanUpSectionHeaders,
             self.putSpacesInLists,
             self.translateAndCapitalizeNamespaces,
-            # FIXME: fix bugs and re-enable
-            # self.translateMagicWords,
+            self.translateMagicWords,
             self.replaceDeprecatedTemplates,
             # FIXME: fix bugs and re-enable
             # self.resolveHtmlEntities,
@@ -235,7 +236,8 @@ class CosmeticChangesToolkit(object):
             self.fixTypo,
 
             self.fixArabicLetters,
-            self.fix_ISBN,
+            # FIXME: T144288
+            # self.fix_ISBN,
         )
 
     @classmethod
@@ -287,7 +289,7 @@ class CosmeticChangesToolkit(object):
         Remove their language code prefix.
         """
         if not self.talkpage and pywikibot.calledModuleName() != 'interwiki':
-            interwikiR = re.compile(r'\[\[%s\s?:([^\[\]\n]*)\]\]'
+            interwikiR = re.compile(r'\[\[(?: *:)? *%s *: *([^\[\]\n]*)\]\]'
                                     % self.site.code)
             text = interwikiR.sub(r'[[\1]]', text)
         return text
@@ -296,51 +298,18 @@ class CosmeticChangesToolkit(object):
         """
         Standardize page footer.
 
-        Makes sure that interwiki links, categories and star templates are
-        put to the correct position and into the right order. This combines the
-        old instances standardizeInterwiki and standardizeCategories
+        Makes sure that interwiki links and categories are put to the correct
+        position and into the right order. This combines the old instances
+        standardizeInterwiki and standardizeCategories.
         The page footer has the following section in that sequence:
         1. categories
         2. ## TODO: template beyond categories ##
         3. additional information depending on local site policy
-        4. stars templates for featured and good articles
-        5. interwiki links
+        4. interwiki links
 
         """
-        # TODO: T123150
-        starsList = [
-            u'bueno',
-            u'bom interwiki',
-            u'cyswllt[ _]erthygl[ _]ddethol', u'dolen[ _]ed',
-            u'destacado', u'destaca[tu]',
-            u'enllaç[ _]ad',
-            u'enllaz[ _]ad',
-            u'leam[ _]vdc',
-            u'legătură[ _]a[bcf]',
-            u'liamm[ _]pub',
-            u'lien[ _]adq',
-            u'lien[ _]ba',
-            u'liên[ _]kết[ _]bài[ _]chất[ _]lượng[ _]tốt',
-            u'liên[ _]kết[ _]chọn[ _]lọc',
-            u'ligam[ _]adq',
-            u'ligazón[ _]a[bd]',
-            u'ligoelstara',
-            u'ligoleginda',
-            u'link[ _][afgu]a', u'link[ _]adq', u'link[ _]f[lm]', u'link[ _]km',
-            u'link[ _]sm', u'linkfa',
-            u'na[ _]lotura',
-            u'nasc[ _]ar',
-            u'tengill[ _][úg]g',
-            u'ua',
-            u'yüm yg',
-            u'רא',
-            u'وصلة مقالة جيدة',
-            u'وصلة مقالة مختارة',
-        ]
-
         categories = None
         interwikiLinks = None
-        allstars = []
 
         # Pywikibot is no longer allowed to touch categories on the
         # German Wikipedia. See
@@ -367,15 +336,6 @@ class CosmeticChangesToolkit(object):
 
             # Removing the interwiki
             text = textlib.removeLanguageLinks(text, site=self.site)
-            # Removing the stars' issue
-            starstext = textlib.removeDisabledParts(text)
-            for star in starsList:
-                regex = re.compile(r'(\{\{(?:template:|)%s\|.*?\}\}[\s]*)'
-                                   % star, re.I)
-                found = regex.findall(starstext)
-                if found != []:
-                    text = regex.sub('', text)
-                    allstars += found
 
         # Adding categories
         if categories:
@@ -390,13 +350,6 @@ class CosmeticChangesToolkit(object):
             #            categories.insert(0, name)
             text = textlib.replaceCategoryLinks(text, categories,
                                                 site=self.site)
-        # Adding stars templates
-        if allstars:
-            text = text.strip() + self.site.family.interwiki_text_separator
-            allstars.sort()
-            for element in allstars:
-                text += '%s%s' % (element.strip(), config.line_separator)
-                pywikibot.log(u'%s' % element.strip())
         # Adding the interwiki
         if interwikiLinks:
             text = textlib.replaceLanguageLinks(text, interwikiLinks,
@@ -454,19 +407,31 @@ class CosmeticChangesToolkit(object):
         """Use localized magic words."""
         # not wanted at ru
         # arz uses english stylish codes
-        if self.site.code not in ['arz', 'ru']:
-            exceptions = ['nowiki', 'comment', 'math', 'pre']
-            for magicWord in ['img_thumbnail', 'img_left', 'img_center',
-                              'img_right', 'img_none', 'img_framed',
-                              'img_frameless', 'img_border', 'img_upright', ]:
-                aliases = self.site.getmagicwords(magicWord)
-                if not aliases:
-                    continue
-                text = textlib.replaceExcept(
-                    text,
-                    r'\[\[(?P<left>.+?:.+?\..+?\|) *(' + '|'.join(aliases) +
-                    r') *(?P<right>(\|.*?)?\]\])',
-                    r'[[\g<left>' + aliases[0] + r'\g<right>', exceptions)
+        # no need to run on English wikis
+        if self.site.code not in ['arz', 'en', 'ru']:
+            def replace_magicword(match):
+                split = match.group().split('|')
+                # push ']]' out and re-add below
+                split[-1] = split[-1][:-2]
+                for magicword in ['img_thumbnail', 'img_left', 'img_center',
+                                  'img_right', 'img_none', 'img_framed',
+                                  'img_frameless', 'img_border', 'img_upright',
+                                  ]:
+                    aliases = list(self.site.getmagicwords(magicword))
+                    preferred = aliases.pop(0)
+                    if not aliases:
+                        continue
+                    split[1:] = list(map(
+                        lambda x: preferred if x.strip() in aliases else x,
+                        split[1:]))
+                return '|'.join(split) + ']]'
+
+            exceptions = ['nowiki', 'comment', 'math', 'pre', 'source']
+            regex = re.compile(
+                FILE_LINK_REGEX % '|'.join(self.site.namespaces[6]),
+                flags=re.X)
+            text = textlib.replaceExcept(text, regex, replace_magicword,
+                                         exceptions)
         return text
 
     def cleanUpLinks(self, text):
@@ -498,7 +463,12 @@ class CosmeticChangesToolkit(object):
             trailingChars = match.group('linktrail')
             newline = match.group('newline')
 
-            if not self.site.isInterwikiLink(titleWithSection):
+            try:
+                is_interwiki = self.site.isInterwikiLink(titleWithSection)
+            except ValueError:  # T111513
+                is_interwiki = True
+
+            if not is_interwiki:
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
                 # We only work on namespace 0 because pipes and linktrails work
@@ -562,17 +532,23 @@ class CosmeticChangesToolkit(object):
                     if trailingChars:
                         label += trailingChars
 
-                    if titleWithSection == label or \
-                       first_lower(titleWithSection) == label:
-                        newLink = "[[%s]]" % label
+                    if self.site.siteinfo['case'] == 'first-letter':
+                        firstcase_title = first_lower(titleWithSection)
+                        firstcase_label = first_lower(label)
+                    else:
+                        firstcase_title = titleWithSection
+                        firstcase_label = label
+
+                    if firstcase_label == firstcase_title:
+                        newLink = '[[%s]]' % label
                     # Check if we can create a link with trailing characters
                     # instead of a pipelink
-                    elif (len(titleWithSection) <= len(label) and
-                          label[:len(titleWithSection)] == titleWithSection and
-                          re.sub(trailR, '',
-                                 label[len(titleWithSection):]) == ''):
-                        newLink = "[[%s]]%s" % (label[:len(titleWithSection)],
-                                                label[len(titleWithSection):])
+                    elif (firstcase_label.startswith(firstcase_title) and
+                          trailR.sub('', label[len(titleWithSection):]) == ''):
+                        newLink = '[[%s]]%s' % (
+                            label[:len(titleWithSection)],
+                            label[len(titleWithSection):])
+
                     else:
                         # Try to capitalize the first letter of the title.
                         # Not useful for languages that don't capitalize nouns.
@@ -617,6 +593,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def resolveHtmlEntities(self, text):
+        """Replace HTML entities with unicode."""
         ignore = [
             38,     # Ampersand (&amp;)
             39,     # Single quotation mark (&quot;) - bug T26093
@@ -655,8 +632,6 @@ class CosmeticChangesToolkit(object):
         Newer MediaWiki versions automatically place a non-breaking space in
         front of a percent sign, so it is no longer required to place it
         manually.
-
-        FIXME: which version should this be run on?
         """
         text = textlib.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
                                      ['timeline'])
@@ -669,9 +644,12 @@ class CosmeticChangesToolkit(object):
         Example: ==Section title== becomes == Section title ==
 
         NOTE: This space is recommended in the syntax help on the English and
-        German Wikipedia. It might be that it is not wanted on other wikis.
-        If there are any complaints, please file a bug report.
+        German Wikipedia. It is not wanted on Lojban Wiktionary (per T168399)
+        and it might be that it is not wanted on other wikis. If there are any
+        complaints, please file a bug report.
         """
+        if self.site.sitename == 'wiktionary:jbo':
+            return text
         return textlib.replaceExcept(
             text,
             r'(?m)^(={1,7}) *(?P<title>[^=]+?) *\1 *\r?\n',
@@ -697,6 +675,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def replaceDeprecatedTemplates(self, text):
+        """Replace deprecated templates."""
         exceptions = ['comment', 'math', 'nowiki', 'pre']
         builder = _MultiTemplateMatchBuilder(self.site)
 
@@ -720,8 +699,15 @@ class CosmeticChangesToolkit(object):
 
     # from fixes.py
     def fixSyntaxSave(self, text):
+        """Convert weblinks to wikilink, fix link syntax."""
         def replace_link(match):
-            replacement = '[[' + match.group('link')
+            """Create a string to replace a single link."""
+            replacement = '[['
+            if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6]) +
+                        list(self.site.namespaces[14])) + '):',
+                        match.group('link')):
+                replacement += ':'
+            replacement += match.group('link')
             if match.group('title'):
                 replacement += '|' + match.group('title')
             return replacement + ']]'
@@ -781,7 +767,9 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixHtml(self, text):
+        """Relace html markups with wikitext markups."""
         def replace_header(match):
+            """Create a header string for replacing."""
             depth = int(match.group(1))
             return r'{0} {1} {0}'.format('=' * depth, match.group(2))
 
@@ -811,6 +799,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixReferences(self, text):
+        """Fix references tags."""
         # See also https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
@@ -827,9 +816,9 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixStyle(self, text):
+        """Convert prettytable to wikitable class."""
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
-        # convert prettytable to wikitable class
         if self.site.code in ('de', 'en'):
             text = textlib.replaceExcept(text,
                                          r'(class="[^"]*)prettytable([^"]*")',
@@ -837,6 +826,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixTypo(self, text):
+        """Fix units."""
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace', 'gallery', 'hyperlink', 'interwiki', 'link']
         # change <number> ccm -> <number> cm³
@@ -855,6 +845,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def fixArabicLetters(self, text):
+        """Fix arabic and persian letters."""
         if self.site.code not in ['ckb', 'fa']:
             return text
         exceptions = [

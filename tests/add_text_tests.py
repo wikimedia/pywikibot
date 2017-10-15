@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import pywikibot
 
 from scripts.add_text import add_text
@@ -16,9 +14,9 @@ from scripts.add_text import add_text
 from tests.aspects import unittest, TestCase
 
 
-class TestStarList(TestCase):
+class TestAdding(TestCase):
 
-    """Test starlist."""
+    """Test adding text."""
 
     family = 'wikipedia'
     code = 'en'
@@ -26,7 +24,7 @@ class TestStarList(TestCase):
     dry = True
 
     def test_basic(self):
-        """Test adding text before {{linkfa}} without parameters."""
+        """Test adding text."""
         page = pywikibot.Page(self.site, 'foo')
         (text, newtext, always) = add_text(
             page, 'bar', putText=False,
@@ -35,16 +33,16 @@ class TestStarList(TestCase):
             'foo\n{{linkfa}}\nbar',
             newtext)
 
-    def test_with_params(self):
-        """Test adding text before {{linkfa|...}}."""
+    def test_with_category(self):
+        """Test adding text before categories."""
         page = pywikibot.Page(self.site, 'foo')
         (text, newtext, always) = add_text(
             page, 'bar', putText=False,
-            oldTextGiven='foo\n{{linkfa|...}}')
+            oldTextGiven='foo\n[[Category:Foo]]')
         self.assertEqual(
-            'foo\nbar\n\n{{linkfa|...}}\n',
+            'foo\nbar\n\n[[Category:Foo]]',
             newtext)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

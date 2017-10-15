@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Test pwb.py.
 
@@ -12,8 +12,6 @@ https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import sys
 
@@ -78,5 +76,5 @@ class TestPwb(PwbTestCase):
         self.assertEqual('Häuser', vpwb['stderr'].strip())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':  # pragma: no cover
     unittest.main(verbosity=10)

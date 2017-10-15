@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for exceptions."""
 #
 # (C) Pywikibot team, 2014-2015
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 
@@ -79,7 +77,7 @@ class TestDeprecatedExceptions(DeprecationTestCase):
             'pywikibot.exceptions.DeprecatedPageNotFoundError')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

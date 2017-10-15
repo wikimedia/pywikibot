@@ -1,13 +1,11 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import json
 
@@ -75,6 +73,62 @@ class TestLoadRevisionsCachingProofreadPage(BasePageLoadRevisionsCachingTestBase
         self._test_page_text()
 
 
+class TestProofreadPageParseTitle(TestCase):
+
+    """Test ProofreadPage._parse_title() function."""
+
+    cached = True
+
+    # Use sites to run  parametrized tests.
+    sites = {
+        '1': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test.djvu/12',
+            'tuple': ('Test.djvu', 'djvu', 12),
+        },
+        '2': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test djvu/12',
+            'tuple': ('Test djvu', '', 12),
+        },
+        '3': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test.jpg/12',
+            'tuple': ('Test.jpg', 'jpg', 12),
+        },
+        '4': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test jpg/12',
+            'tuple': ('Test jpg', '', 12),
+        },
+        '5': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test.jpg',
+            'tuple': ('Test.jpg', 'jpg', None),
+        },
+        '6': {
+            'family': 'wikisource', 'code': 'en',
+            'title': 'Page:Test jpg',
+            'tuple': ('Test jpg', '', None),
+        },
+    }
+
+    @classmethod
+    def setUpClass(cls):
+        """Prepare get_page dataset for tests."""
+        super(TestProofreadPageParseTitle, cls).setUpClass()
+
+    def test_parse_title(self, key):
+        """Test ProofreadPage_parse_title() function."""
+        data = self.sites[key]
+        title = data['title']
+        base, base_ext, num = data['tuple']
+        page = ProofreadPage(self.site, title)
+        self.assertEqual(page._base, base)
+        self.assertEqual(page._base_ext, base_ext)
+        self.assertEqual(page._num, num)
+
+
 class TestProofreadPageValidSite(TestCase):
 
     """Test ProofreadPage class."""
@@ -91,6 +145,15 @@ class TestProofreadPageValidSite(TestCase):
         'user': 'T. Mazzei',
         'header': u"{{rh|2|''THE POPULAR SCIENCE MONTHLY.''}}",
         'footer': u'\n{{smallrefs}}',
+        'url_image': ('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/'
+                      'Popular_Science_Monthly_Volume_1.djvu/'
+                      'page12-1024px-Popular_Science_Monthly_Volume_1.djvu.jpg'),
+    }
+
+    valid_redlink = {
+        'title': 'Page:Pywikibot test page 3.jpg',
+        'url_image': ('https://upload.wikimedia.org/wikisource/en/3/37/'
+                      'Pywikibot_test_page_3.jpg'),
     }
 
     existing_invalid = {
@@ -105,6 +168,15 @@ class TestProofreadPageValidSite(TestCase):
         'title': 'User:cannot_exists',
         'title1': 'User:Popular Science Monthly Volume 1.djvu/12'
     }
+
+    class_pagetext_fmt = {
+        True: ('<div class="pagetext">\n\n\n', '</div>'),
+        False: ('', ''),
+    }
+
+    fmt = ('<noinclude><pagequality level="1" user="{user}" />'
+           '{class_pagetext}</noinclude>'
+           '<noinclude>{references}{div_end}</noinclude>')
 
     def test_valid_site_source(self):
         """Test ProofreadPage from valid Site as source."""
@@ -167,21 +239,26 @@ class TestProofreadPageValidSite(TestCase):
     def test_preload_from_not_existing_page(self):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
+        # Fetch page text to instantiate page._full_header, in order to allow
+        # for proper test result preparation.
+        page.text
+        class_pagetext, div = self.class_pagetext_fmt[page._full_header._has_div]
         self.assertEqual(page.text,
-                         '<noinclude><pagequality level="1" user="%s" />'
-                         '<div class="pagetext">\n\n\n</noinclude>'
-                         '<noinclude><references/></div></noinclude>'
-                         % self.site.username())
+                         self.fmt.format(user=self.site.username(),
+                                         class_pagetext=class_pagetext,
+                                         references='<references/>',
+                                         div_end=div))
 
     def test_preload_from_empty_text(self):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
         page.text = ''
+        class_pagetext, div = self.class_pagetext_fmt[page._full_header._has_div]
         self.assertEqual(page.text,
-                         '<noinclude><pagequality level="1" user="%s" />'
-                         '<div class="pagetext">\n\n\n</noinclude>'
-                         '<noinclude></div></noinclude>'
-                         % self.site.username())
+                         self.fmt.format(user=self.site.username(),
+                                         class_pagetext=class_pagetext,
+                                         references='',
+                                         div_end=div))
 
     def test_json_format(self):
         """Test conversion to json format."""
@@ -205,6 +282,19 @@ class TestProofreadPageValidSite(TestCase):
 
         page_text = page._page_to_json()
         self.assertEqual(json.loads(page_text), json.loads(loaded_text))
+
+    @require_modules('bs4')
+    def test_url_image(self):
+        """Test fetching of url image of the scan of ProofreadPage."""
+        page = ProofreadPage(self.site, self.valid['title'])
+        self.assertEqual(page.url_image, self.valid['url_image'])
+
+        page = ProofreadPage(self.site, self.valid_redlink['title'])
+        self.assertEqual(page.url_image, self.valid_redlink['url_image'])
+
+        page = ProofreadPage(self.site, self.existing_unlinked['title'])
+        # test Exception in property.
+        self.assertRaises(ValueError, getattr, page, 'url_image')
 
 
 class TestPageQuality(TestCase):
@@ -256,13 +346,15 @@ class TestProofreadPageIndexProperty(TestCase):
         page = ProofreadPage(self.site, self.valid['title'])
         index_page = IndexPage(self.site, self.valid['index'])
 
-        # Test propery.
+        # Test property.
         self.assertEqual(page.index, index_page)
 
         # Test deleter
         del page.index
         self.assertFalse(hasattr(page, '_index'))
-        # Test setter
+        # Test setter with wrong type.
+        self.assertRaises(TypeError, setattr, page, 'index', 'invalid index')
+        # Test setter with correct type.
         page.index = index_page
         self.assertEqual(page.index, index_page)
 
@@ -594,7 +686,7 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
         self.assertEqual(list(gen), self.pages)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

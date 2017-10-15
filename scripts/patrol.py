@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 The bot is meant to mark the edits based on info obtained by whitelist.
 
@@ -17,8 +17,8 @@ edited a page on their white list it gets patrolled. It will also patrol pages
 which start with the mentioned link (e.g. [[foo]] will also patrol [[foobar]]).
 
 To avoid redlinks it's possible to use Special:PrefixIndex as a prefix so that
-it will list all pages which will be patrolled. The page after the slash will be
-used then.
+it will list all pages which will be patrolled. The page after the slash will
+be used then.
 
 On Wikisource, it'll also check if the page is on the author namespace in which
 case it'll also patrol pages which are linked from that page.
@@ -26,6 +26,8 @@ case it'll also patrol pages which are linked from that page.
 An example can be found at:
 
 https://en.wikisource.org/wiki/User:Wikisource-bot/patrol_whitelist
+
+&params;
 
 Commandline parameters
 ======================
@@ -39,13 +41,12 @@ Commandline parameters
 
 """
 #
-# (C) Pywikibot team, 2011-2015
+# (C) Pywikibot team, 2011-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
 import time
 
 from collections import defaultdict
@@ -80,12 +81,11 @@ class PatrolBot(SingleSiteBot):
         """
         Constructor.
 
-        @kwarg feed            - The changes feed to work on (Newpages
-                                  or Recentchanges)
-        @kwarg ask             - If True, confirm each patrol action
-        @kwarg whitelist       - page title for whitelist (optional)
-        @kwarg autopatroluserns - Takes user consent to automatically patrol
-        @kwarg versionchecktime - Check versionchecktime lapse in sec
+        @kwarg feed: The changes feed to work on (Newpages or Recentchanges)
+        @kwarg ask: If True, confirm each patrol action
+        @kwarg whitelist: page title for whitelist (optional)
+        @kwarg autopatroluserns: Takes user consent to automatically patrol
+        @kwarg versionchecktime: Check versionchecktime lapse in sec
         """
         self.availableOptions.update({
             'ask': False,
@@ -185,9 +185,9 @@ class PatrolBot(SingleSiteBot):
 
         for item in pagelist:
             if pywikibot.config.verbose_output:
-                pywikibot.output(u'checking against whitelist item = %s' % item)
+                pywikibot.output('checking against whitelist item = %s' % item)
 
-            if isinstance(item, PatrolRule):
+            if isinstance(item, LinkedPagesRule):
                 if pywikibot.config.verbose_output:
                     pywikibot.output(u'invoking programmed rule')
                 if item.match(title):
@@ -254,13 +254,14 @@ class PatrolBot(SingleSiteBot):
                     if not user or current_user == user:
                         if self.is_wikisource_author_page(page):
                             if pywikibot.config.verbose_output:
-                                pywikibot.output(u'Whitelist author: %s' % page)
+                                pywikibot.output('Whitelist author: %s' % page)
                             page = LinkedPagesRule(page)
                         else:
                             if pywikibot.config.verbose_output:
                                 pywikibot.output(u'Whitelist page: %s' % page)
                         if pywikibot.config.verbose_output:
-                            pywikibot.output('Adding {0}:{1}'.format(current_user, page))
+                            pywikibot.output('Adding {0}:{1}'
+                                             .format(current_user, page))
                         whitelist[current_user].append(page)
                     elif pywikibot.config.verbose_output:
                         pywikibot.output(u'Discarding whitelist page for '
@@ -342,7 +343,8 @@ class PatrolBot(SingleSiteBot):
 
             if self.getOption('ask'):
                 choice = pywikibot.input_yn(
-                    u'Do you want to mark page as patrolled?', automatic_quit=False)
+                    'Do you want to mark page as patrolled?',
+                    automatic_quit=False)
 
             # Patrol the page
             if choice:
@@ -379,29 +381,7 @@ def title_match(prefix, title):
     return
 
 
-class PatrolRule(object):
-
-    """Bot marks the edit.startswith("-s as patrolled based on info obtained by whitelist."""
-
-    def __init__(self, page_title):
-        """
-        Constructor.
-
-        @param page_title: The page title for this rule
-        @type  page_title: pywikibot.Page
-        """
-        self.page_title = page_title
-
-    def title(self):
-        """Obtain page title."""
-        return self.page_title
-
-    def match(self, page):
-        """Added for future use."""
-        pass
-
-
-class LinkedPagesRule(PatrolRule):
+class LinkedPagesRule(object):
 
     """Matches of page site title and linked pages title."""
 
@@ -409,11 +389,15 @@ class LinkedPagesRule(PatrolRule):
         """Constructor.
 
         @param page_title: The page title for this rule
-        @type  page_title: pywikibot.Page
+        @type page_title: pywikibot.Page
         """
         self.site = pywikibot.Site()
         self.page_title = page_title
         self.linkedpages = None
+
+    def title(self):
+        """Obtain page title."""
+        return self.page_title
 
     def match(self, page_title):
         """Match page_title to linkedpages elements."""
@@ -427,7 +411,7 @@ class LinkedPagesRule(PatrolRule):
             if pywikibot.config.verbose_output:
                 pywikibot.output(u'loading page links on %s' % self.page_title)
             p = pywikibot.Page(self.site, self.page_title)
-            linkedpages = list()
+            linkedpages = []
             for linkedpage in p.linkedPages():
                 linkedpages.append(linkedpage.title())
 
@@ -444,15 +428,15 @@ class LinkedPagesRule(PatrolRule):
                 return p
 
 
-def api_feed_repeater(gen, delay=0, repeat=False, number=1000, namespaces=None,
+def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
                       user=None, recent_new_gen=True):
     """Generator which loads pages details to be processed."""
     while True:
         if recent_new_gen:
-            generator = gen(step=number, namespaces=namespaces, user=user,
+            generator = gen(namespaces=namespaces, user=user,
                             showPatrolled=False)
         else:
-            generator = gen(step=number, namespaces=namespaces, user=user,
+            generator = gen(namespaces=namespaces, user=user,
                             returndict=True, showPatrolled=False)
         for page in generator:
             if recent_new_gen:
@@ -511,11 +495,9 @@ def main(*args):
     if usercontribs:
         pywikibot.output(u'Processing user: %s' % usercontribs)
 
-    newpage_count = 300
     if not newpages and not recentchanges and not usercontribs:
         if site.family.name == 'wikipedia':
             newpages = True
-            newpage_count = 5000
         else:
             recentchanges = True
 
@@ -525,7 +507,7 @@ def main(*args):
         pywikibot.output(u'Newpages:')
         gen = site.newpages
         feed = api_feed_repeater(gen, delay=60, repeat=repeat,
-                                 number=newpage_count, user=usercontribs,
+                                 user=usercontribs,
                                  namespaces=genFactory.namespaces,
                                  recent_new_gen=False)
         bot.run(feed)
@@ -533,13 +515,14 @@ def main(*args):
     if recentchanges or usercontribs:
         pywikibot.output(u'Recentchanges:')
         gen = site.recentchanges
-        feed = api_feed_repeater(gen, delay=60, repeat=repeat, number=1000,
+        feed = api_feed_repeater(gen, delay=60, repeat=repeat,
                                  namespaces=genFactory.namespaces,
                                  user=usercontribs)
         bot.run(feed)
 
     pywikibot.output(u'%d/%d patrolled'
                      % (bot.patrol_counter, bot.rc_item_counter))
+
 
 if __name__ == '__main__':
     main()

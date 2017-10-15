@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Bot which runs python framework scripts as (sub-)bot.
 
@@ -11,17 +11,17 @@ in order to run properly. Most of them can be checked-out at:
 (some code might get compiled on-the-fly, so a GNU compiler along
 with library header files is needed too)
 
-The following parameters are supported:
-
-&params;
-
-All other parameters will be ignored.
-
 Syntax example:
 
     python pwb.py script_wui -dir:.
         Default operating mode.
 """
+#
+# (C) Dr. Trigon, 2012-2014
+# (C) Pywikibot team, 2014-2017
+#
+# Distributed under the terms of the MIT license.
+#
 #  @package script_wui
 #  @brief   Script WikiUserInterface (WUI) Bot
 #
@@ -43,7 +43,7 @@ Syntax example:
 #        Id (rev-id) auf Ausgabeseite geschrieben, damit kann der Befehl
 #        (durch Angabe der Sim-Id) ausgeführt werden -> crontab (!)
 #        [ shell (rev-id) -> output mit shell rev-id ]
-#        [ shell rev-id (als eindeutige job/task-config bzw. script) -> crontab ]
+#        [ shell rev-id (eindeutige job/task-config bzw. script) -> crontab ]
 #  @todo Bei jeder Botbearbeitung wird der Name des Auftraggebers vermerkt
 # --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #  Writing code in Wikipedia:
@@ -53,7 +53,8 @@ Syntax example:
 #  # overwrite 'raw_input' to run bot non-blocking and simulation mode
 #  __builtin__.raw_input = lambda: 'n'
 #
-#  # backup sys.argv; depreciated: if possible manipulate pywikibot.config instead
+#  # backup sys.argv; depreciated: if possible manipulate pywikibot.config
+#    instead
 #  sys_argv = copy.deepcopy( sys.argv )
 #
 #  ...
@@ -61,15 +62,10 @@ Syntax example:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import datetime
 import gc
 import logging
-import os
 import re
-import resource
 import sys
 import threading
 import traceback
@@ -84,7 +80,7 @@ import lua
 
 # The crontab package is https://github.com/josiahcarlson/parse-crontab
 # version 0.20 installs a package called 'tests' which conflicts with our
-# test suite.  The patch to fix this has been merged, but is not released.
+# test suite. The patch to fix this has been merged, but is not released.
 # TODO: Use https://github.com/jayvdb/parse-crontab until it is fixed.
 import crontab
 
@@ -97,23 +93,25 @@ from pywikibot.tools.formatter import color_format
 if sys.version_info[0] > 2:
     import _thread as thread
 else:
-    import thread  # noqa: H237: module does not exist in Python 3
+    import thread  # flake8: disable=H237 (module does not exist in Python 3)
 
+try:
+    import resource
+except ImportError:
+    resource = None
 
 bot_config = {
-    'BotName': pywikibot.config.usernames[pywikibot.config.family][pywikibot.config.mylang],
+    'BotName': "{username}",
 
-    # protected !!! ('CSS' or other semi-protected page is essential here)
-    'ConfCSSshell': 'User:DrTrigon/DrTrigonBot/script_wui-shell.css',
-    'ConfCSScrontab': u'User:DrTrigon/DrTrigonBot/script_wui-crontab.css',
-
-    # (may be protected but not that important... 'CSS' is not needed here !!!)
-    'ConfCSSoutput': u'User:DrTrigonBot/Simulation',
+    'ConfCSSshell': u'User:{username}/script_wui-shell.css',
+    'ConfCSScrontab': u'User:{username}/script_wui-crontab.css',
+    'ConfCSSoutput': u'User:{username}/Simulation',
 
     'CRONMaxDelay': 5 * 60.0,       # check all ~5 minutes
 
     # forbidden parameters
-    # (at the moment none, but consider e.g. '-always' or allow it with '-simulate' only!)
+    # (at the moment none, but consider e.g. '-always' or allow it with
+    # '-simulate' only!)
 }
 
 __simulate = True
@@ -125,6 +123,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
     """WikiUserInterface bot."""
 
     def __init__(self, *arg):
+        """Constructor."""
         pywikibot.output(color_format(
             '{lightgreen}* Initialization of bot{default}'))
 
@@ -150,15 +149,20 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
                      }
         pywikibot.output(u'** Pre-loading all relevant page contents')
         for item in self.refs:
-            # security; first check if page is protected, reject any data if not
-            if os.path.splitext(self.refs[item].title().lower())[1] not in ['.css', '.js']:
-                raise ValueError(u'%s config %s = %s is not a secure page; '
-                                 u'it should be a css or js userpage which are '
-                                 u'automatically semi-protected.'
+            # First check if page is protected, reject any data if not
+            parts = self.refs[item].title().lower().rsplit('.')
+            if len(parts) == 1 or parts[1] not in ['.css', '.js']:
+                raise ValueError('%s config %s = %s is not a secure page; '
+                                 'it should be a css or js userpage which are '
+                                 'automatically semi-protected.'
                                  % (self.__class__.__name__, item,
                                     self.refs[item]))
-            self.refs[item].get(force=True)   # load all page contents
-
+            try:
+                self.refs[item].get(force=True)   # load all page contents
+            except pywikibot.NoPage:
+                pywikibot.error("The configuation page %s doesn't exists"
+                                % self.refs[item].title(asLink=True))
+                raise
         # init background timer
         pywikibot.output(u'** Starting crontab background timer thread')
         self.on_timer()
@@ -186,41 +190,52 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         self.do_check_CronJobs()
 
     def do_check_CronJobs(self):
-        # check cron/date (changes of self.refs are tracked (and reload) in on_pubmsg)
+        # check cron/date (changes of self.refs are tracked (and reload) in
+        # on_pubmsg)
         page = self.refs[self.templ]
         ctab = self.refs[self.cron].get()
         # extract 'rev' and 'timestmp' from 'crontab' page text ...
-        for line in ctab.splitlines():   # hacky/ugly/cheap; already better done in trunk dtbext
+
+        # hacky/ugly/cheap; already better done in trunk dtbext
+        for line in ctab.splitlines():
             (rev, timestmp) = [item.strip() for item in line[1:].split(',')]
 
             # [min] [hour] [day of month] [month] [day of week]
             # (date supported only, thus [min] and [hour] dropped)
             entry = crontab.CronTab(timestmp)
-            # find the delay from current minute (does not return 0.0 - but next)
+            # find the delay from current minute
+            # (does not return 0.0 - but next)
             now = datetime.datetime.now().replace(second=0, microsecond=0)
             delay = entry.next(
                 now - datetime.timedelta(microseconds=1))
 
             if (delay <= bot_config['CRONMaxDelay']):
-                pywikibot.output(u"CRONTAB: %s / %s / %s" % (page, rev, timestmp))
+                pywikibot.output('CRONTAB: %s / %s / %s' %
+                                 (page, rev, timestmp))
                 self.do_check(page.title(), int(rev))
 
     def do_check(self, page_title, rev=None, params=None):
         # Create two threads as follows
         # (simple 'thread' for more sophisticated code use 'threading')
         try:
-            thread.start_new_thread(main_script, (self.refs[page_title], rev, params))
+            thread.start_new_thread(main_script, (self.refs[page_title], rev,
+                                                  params))
         except:
-            # (done according to subster in trunk and submit in rewrite/.../data/api.py)
+            # (done according to subster in trunk and submit in
+            # rewrite/.../data/api.py)
             # TODO: is this error handling here needed at all??!?
-            pywikibot.exception(tb=True)  # secure traceback print (from api.py submit)
+
+            # secure traceback print (from api.py submit)
+            pywikibot.exception(tb=True)
             pywikibot.warning(u"Unable to start thread")
 
             wiki_logger(traceback.format_exc(), self.refs[page_title], rev)
 
 
 # Define a function for the thread
-def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unused-argument
+
+# pylint: disable=unused-argument
+def main_script(page, rev=None, params=NotImplemented):
     """Main thread."""
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/
 
@@ -233,7 +248,8 @@ def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unuse
     rootLogger = logging.getLogger()
 
     logHandler = logging.StreamHandler(buffer)
-    formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+    formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     logHandler.setFormatter(formatter)
     rootLogger.addHandler(logHandler)
 
@@ -248,8 +264,11 @@ def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unuse
     try:
         exec(code)
     except:
-        # (done according to subster in trunk and submit in rewrite/.../data/api.py)
-        pywikibot.exception(tb=True)  # secure traceback print (from api.py submit)
+        # (done according to subster in trunk and submit in
+        # rewrite/.../data/api.py)
+
+        # secure traceback print (from api.py submit)
+        pywikibot.exception(tb=True)
 
     sys.stdout = sys.__stdout__
     sys.stderr = sys.__stderr__
@@ -265,12 +284,17 @@ def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unuse
     # safety; restore settings
     pywikibot.config.simulate = __simulate
     sys.argv = __sys_argv
-
-    pywikibot.output(
-        u'environment: garbage; %s / memory; %s / members; %s' % (
-            gc.collect(),
-            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss * resource.getpagesize(),
-            len(dir())))
+    if resource:
+        pywikibot.output(
+            u'environment: garbage; %s / memory; %s / members; %s' % (
+                gc.collect(),
+                resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
+                resource.getpagesize(),
+                len(dir())))
+    else:
+        pywikibot.output(
+            u'environment: garbage; %s / members; %s' % (
+                gc.collect(), len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
     # append result to output page
@@ -281,7 +305,8 @@ def main_script(page, rev=None, params=NotImplemented):  # pylint: disable=unuse
 def wiki_logger(buffer, page, rev=None):
     """Log to wiki."""
     # FIXME: what is this??
-    # (might be a problem here for TS and SGE, output string has another encoding)
+    # (might be a problem here for TS and SGE, output string has another
+    # encoding)
     if False:
         buffer = buffer.decode(pywikibot.config.console_encoding)
     buffer = re.sub(r'\03\{(.*?)\}(.*?)\03\{default\}', r'\g<2>', buffer)
@@ -292,9 +317,10 @@ def wiki_logger(buffer, page, rev=None):
     outpage = pywikibot.Page(pywikibot.Site(), bot_config['ConfCSSoutput'])
     text = outpage.get()
     outpage.put(
-        text + u"\n== Simulation vom %s mit [%s code:%s] ==\n<pre>\n%s</pre>\n\n"
+        text + ('\n== Simulation vom %s mit [%s code:%s] =='
+                '\n<pre>\n%s</pre>\n\n')
         % (pywikibot.Timestamp.now().isoformat(' '), link, rev, buffer))
-#                comment = pywikibot.translate(self.site.lang, bot_config['msg']))
+#        summary=pywikibot.translate(self.site.lang, bot_config['msg']))
 
 
 def main(*args):
@@ -319,12 +345,20 @@ def main(*args):
     site = pywikibot.Site()
     site.login()
     chan = '#' + site.code + '.' + site.family.name
+
+    bot_user_name = pywikibot.config.usernames[pywikibot.config.family][
+        pywikibot.config.mylang]
+    for key, value in bot_config.items():
+        if hasattr(value, 'format'):
+            bot_config[key] = value.format(username=bot_user_name)
+
     bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
     try:
         bot.start()
     except:
         bot.t.cancel()
         raise
+
 
 if __name__ == "__main__":
     main()

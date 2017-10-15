@@ -19,14 +19,16 @@
 # $ awk -F '[#>=]' '{print $1}' requirements.txt | xargs apt-cache search
 
 # mandatory; see README.conversion.txt
-requests
+requests>=2.4.1,!=2.18.2
 
 # requests security extra
-pyOpenSSL ; python_full_version < '2.7.9'
-ndg-httpsclient ; python_full_version < '2.7.9'
-pyasn1 ; python_full_version < '2.7.9'
+pyOpenSSL>=0.14,!=17.2.0 ; python_full_version < '2.7.9'
+cryptography>=1.3.4 ; python_full_version < '2.7.9'
+idna>=2.0.0 ; python_full_version < '2.7.9'
+# https://github.com/eliben/pycparser/issues/147
+pycparser != 2.14
 
-future>=0.15.0 ; python_version < '2.7'
+future>=0.15.0 ; python_full_version < '2.7.3'
 
 ipaddr>=2.1.10 ; python_version < '3'
 
@@ -35,7 +37,7 @@ unicodedata2>=7.0.0-2 ; python_version < '3'
 # OAuth support
 # mwoauth 0.2.4 is needed because it supports getting identity information
 # about the user
-mwoauth>=0.2.4
+mwoauth>=0.2.4,!=0.3.1
 
 # core interwiki_graph.py:
 git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29
@@ -48,11 +50,12 @@ unicodecsv ; python_version < '3' and python_version >= '2.7'
 python-stdnum
 
 # GUI
-Pillow
+Pillow<3.5.0 ; python_version < '2.7'
+Pillow ; python_version >= '2.7'
 
 # core pagegenerators
 google >= 1.7
-socketIO-client<0.6.1
+sseclient
 
 # scripts/script_wui.py:
 crontab
@@ -82,6 +85,8 @@ oursql ; python_version < '3'
 
 # scripts/script_wui.py depends on Lua, which is not available using pip
 # but can be obtained from: https://github.com/bastibe/lunatic-python
+# However, a better fork is: https://github.com/AlereDevices/lunatic-python
+# Also script_wui.py is not currently functional, so it isnt installed here.
 
 # core HTML comparison parser in diff module
 beautifulsoup4
@@ -90,4 +95,9 @@ beautifulsoup4
 pycountry
 
 # scripts/weblinkchecker.py
-memento_client>=0.5.1
+memento_client>=0.5.1,!=0.6.0
+
+# tools/__init__.py
+# pywikibot prefers using the inbuilt bz2 module if python was compiled with
+# bz2 support. But if it wasn't, bz2file is used instead.
+# bz2file

@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This module can do slight modifications to tidy a wiki page's source code.
 
@@ -26,15 +26,12 @@ The following parameters are supported:
 For further information see pywikibot/cosmetic_changes.py
 """
 #
-# (C) xqt, 2009-2013
-# (C) Pywikibot team, 2006-2015
+# (C) xqt, 2009-2017
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 
@@ -71,20 +68,13 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     def treat_page(self):
         """Treat page with the cosmetic toolkit."""
-        try:
-            ccToolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
-                self.current_page, False, self.getOption('ignore'))
-            changedText = ccToolkit.change(self.current_page.get())
-            if changedText is not False:
-                self.put_current(new_text=changedText,
-                                 summary=self.getOption('summary'),
-                                 async=self.getOption('async'))
-        except pywikibot.LockedPage:
-            pywikibot.output("Page %s is locked?!"
-                             % self.current_page.title(asLink=True))
-        except pywikibot.EditConflict:
-            pywikibot.output("An edit conflict has occurred at %s."
-                             % self.current_page.title(asLink=True))
+        ccToolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
+            self.current_page, False, self.getOption('ignore'))
+        changedText = ccToolkit.change(self.current_page.get())
+        if changedText is not False:
+            self.put_current(new_text=changedText,
+                             summary=self.getOption('summary'),
+                             asynchronous=self.getOption('async'))
 
 
 def main(*args):
@@ -118,7 +108,8 @@ def main(*args):
             elif ignore_mode == 'match':
                 options['ignore'] = cosmetic_changes.CANCEL_MATCH
             else:
-                raise ValueError('Unknown ignore mode "{0}"!'.format(ignore_mode))
+                raise ValueError(
+                    'Unknown ignore mode "{0}"!'.format(ignore_mode))
         else:
             genFactory.handleArg(arg)
 
@@ -129,19 +120,19 @@ def main(*args):
         options['summary'] = i18n.twtranslate(site,
                                               'cosmetic_changes-standalone')
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
         if options.get('always') or config.simulate or pywikibot.input_yn(
                 warning + '\nDo you really want to continue?',
                 default=False, automatic_quit=False):
             site.login()
-            preloadingGen = pagegenerators.PreloadingGenerator(gen)
-            bot = CosmeticChangesBot(preloadingGen, **options)
+            bot = CosmeticChangesBot(gen, **options)
             bot.run()
         return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
+
 
 if __name__ == "__main__":
     main()

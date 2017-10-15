@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -14,7 +14,7 @@ import sys
 
 import pywikibot
 from pywikibot.exceptions import Error
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, classproperty
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -55,9 +55,27 @@ class LogEntry(object):
                         % (self._expectedType, self.type()))
         self.data._type = self.type()
 
+    def __repr__(self):
+        """Return a string representation of LogEntry object."""
+        return '<{0}({1}, logid={2})>'.format(type(self).__name__,
+                                              self.site.sitename, self.logid())
+
     def __hash__(self):
-        """Return the id as the hash."""
-        return self.logid()
+        """Combine site and logid as the hash."""
+        return self.logid() ^ hash(self.site)
+
+    def __eq__(self, other):
+        """Compare if self is equal to other."""
+        if not isinstance(other, LogEntry):
+            pywikibot.debug("'{0}' cannot be compared with '{1}'"
+                            .format(type(self).__name__, type(other).__name__),
+                            _logger)
+            return False
+        return self.logid() == other.logid() and self.site == other.site
+
+    def __ne__(self, other):
+        """Compare if self is not equal to other."""
+        return not self == other
 
     @property
     def _params(self):
@@ -97,8 +115,11 @@ class LogEntry(object):
         """
         Page on which action was performed.
 
-        Note: title may be missing in data dict e.g. by oversight action to
-              hide the title. In that case a KeyError exception will raise
+        @note: title may be missing in data dict e.g. by oversight action to
+               hide the title. In that case a KeyError exception will raise
+
+        @rtype: pywikibot.Page
+        @raise: KeyError: title was missing from log entry
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.Page(self.site, self.data['title'])
@@ -129,6 +150,24 @@ class LogEntry(object):
         return self.data['comment']
 
 
+class UserTargetLogEntry(LogEntry):
+
+    """A log entry whose target is a user page."""
+
+    def page(self):
+        """Return the target user.
+
+        This returns a User object instead of the Page object returned by the
+        superclass method.
+
+        @return: target user
+        @rtype: pywikibot.User
+        """
+        if not hasattr(self, '_page'):
+            self._page = pywikibot.User(super(UserTargetLogEntry, self).page())
+        return self._page
+
+
 class BlockEntry(LogEntry):
 
     """
@@ -157,7 +196,7 @@ class BlockEntry(LogEntry):
         @return: the Page object of username or IP if this block action
             targets a username or IP, or the blockid if this log reflects
             the removal of an autoblock
-        @rtype: Page or int
+        @rtype: pywikibot.Page or int
         """
         # TODO what for IP ranges ?
         if self.isAutoblockRemoval:
@@ -262,7 +301,7 @@ class UploadEntry(LogEntry):
         Note: title may be missing in data dict e.g. by oversight action to
               hide the title. In that case a KeyError exception will raise
 
-        @rtype: FilePage
+        @rtype: pywikibot.FilePage
         @raise: KeyError: title was missing from log entry
         """
         if not hasattr(self, '_page'):
@@ -360,6 +399,13 @@ class NewUsersEntry(LogEntry):
 
     _expectedType = 'newusers'
 
+
+class ThanksEntry(UserTargetLogEntry):
+
+    """Thanks log entry."""
+
+    _expectedType = 'thanks'
+
 # TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
 
 
@@ -371,7 +417,7 @@ class LogEntryFactory(object):
     Only available method is create()
     """
 
-    _logtypes = {
+    logtypes = {
         'block': BlockEntry,
         'protect': ProtectEntry,
         'rights': RightsEntry,
@@ -380,7 +426,8 @@ class LogEntryFactory(object):
         'move': MoveEntry,
         'import': ImportEntry,
         'patrol': PatrolEntry,
-        'newusers': NewUsersEntry
+        'newusers': NewUsersEntry,
+        'thanks': ThanksEntry,
     }
 
     def __init__(self, site, logtype=None):
@@ -403,6 +450,12 @@ class LogEntryFactory(object):
             logclass = LogEntryFactory._getEntryClass(logtype)
             self._creator = lambda data: logclass(data, self._site)
 
+    @classproperty
+    @deprecated('LogEntryFactory.logtypes')
+    def _logtypes(cls):  # flake8: disable=N805
+        """DEPRECATED LogEntryFactory class attribute of log types."""
+        return cls.logtypes
+
     def create(self, logdata):
         """
         Instantiate the LogEntry object representing logdata.
@@ -423,8 +476,10 @@ class LogEntryFactory(object):
         @rtype: class
         """
         try:
-            return cls._logtypes[logtype]
+            return cls.logtypes[logtype]
         except KeyError:
+            pywikibot.warning(
+                'Log entry key {0} is not known.'.format(logtype))
             return LogEntry
 
     def _createFromData(self, logdata):
@@ -437,8 +492,8 @@ class LogEntryFactory(object):
         """
         try:
             logtype = logdata['type']
-            return LogEntryFactory._getEntryClass(logtype)(logdata, self._site)
         except KeyError:
-            pywikibot.debug(u"API log entry received:\n" + logdata,
+            pywikibot.debug('API log entry received:\n{0}'.format(logdata),
                             _logger)
             raise Error("Log entry has no 'type' key")
+        return LogEntryFactory._getEntryClass(logtype)(logdata, self._site)

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Module with the Graphviz drawing calls."""
 #
 # (C) Pywikibot team, 2006-2016
@@ -103,7 +103,7 @@ class Subject(object):
     def originPage(self):
         """Deprecated property for the origin page.
 
-        DEPRECATED.  Use origin.
+        DEPRECATED. Use origin.
         """
         # TODO: deprecate this property
         return self.origin
@@ -112,7 +112,7 @@ class Subject(object):
     def originPage(self, value):
         """Deprecated property for the origin page.
 
-        DEPRECATED.  Use origin.
+        DEPRECATED. Use origin.
         """
         self.origin = value
 
@@ -120,7 +120,7 @@ class Subject(object):
     def foundIn(self):
         """Mapping of pages to others pages interwiki linked to it.
 
-        DEPRECATED.  Use found_in.
+        DEPRECATED. Use found_in.
         """
         # TODO: deprecate this property
         return self.found_in
@@ -169,7 +169,7 @@ class GraphDrawer(object):
         node = pydot.Node(self.getLabel(page), shape='rectangle')
         node.set_URL("\"http://%s%s\""
                      % (page.site.hostname(),
-                        page.site.get_address(page.urlname())))
+                        page.site.get_address(page.title(asUrl=True))))
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')
@@ -271,7 +271,7 @@ def getFilename(page, extension=None):
     """
     filename = '%s-%s-%s' % (page.site.family.name,
                              page.site.code,
-                             page.titleForFilename())
+                             page.title(as_filename=True))
     if extension:
         filename += '.%s' % extension
     return filename

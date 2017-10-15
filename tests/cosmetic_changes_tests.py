@@ -1,13 +1,11 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 from pywikibot.cosmetic_changes import CosmeticChangesToolkit
 
@@ -39,14 +37,18 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         """Test fixSelfInterwiki method."""
         self.assertEqual('[[Foo bar]]',
                          self.cct.fixSelfInterwiki('[[de:Foo bar]]'))
+        self.assertEqual('[[Foo bar]]',
+                         self.cct.fixSelfInterwiki('[[:de: Foo bar]]'))
+        self.assertEqual('[[Foo bar|Bar baz]]',
+                         self.cct.fixSelfInterwiki('[[ de: Foo bar|Bar baz]]'))
         self.assertEqual('[[en:Foo bar]]',
                          self.cct.fixSelfInterwiki('[[en:Foo bar]]'))
 
     def test_standardizePageFooter(self):
         """Test standardizePageFooter method."""
-        self.assertEqual('Foo\n{{link fa}}\n\n[[Category:Foo]]',
+        self.assertEqual('Foo\n{{any template}}\n\n[[Category:Foo]]',
                          self.cct.standardizePageFooter(
-                             'Foo [[category:foo]] {{link fa}}'))
+                             'Foo\n[[category:foo]]\n{{any template}}'))
 
     def test_resolveHtmlEntities(self):
         """Test resolveHtmlEntities method."""
@@ -118,6 +120,10 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         # necessary as the fixer needs the article path to fix it
         self.cct.site._siteinfo._cache['general'] = (
             {'articlepath': '/wiki/$1'}, True)
+        self.cct.site._namespaces = {
+            6: ['Datei', 'File'],
+            14: ['Kategorie', 'Category'],
+        }
         self.assertEqual(
             '[[Example|Page]]\n[[Example|Page]]\n[[Example|Page]]\n'
             '[[Example]]\n[[Example]]\n[[Example]]\n'
@@ -178,6 +184,26 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '[https://de.wikipedia.org/w/api.php API]',
             self.cct.fixSyntaxSave('[https://de.wikipedia.org/w/api.php|API]'))
+        self.assertEqual(
+            '[[:Kategorie:Example]]\n'
+            '[[:Category:Example|Description]]\n'
+            '[[:Datei:Example.svg]]\n'
+            '[[:File:Example.svg|Description]]\n'
+            '[[:Category:Example]]\n'
+            '[[:Kategorie:Example|Description]]\n'
+            '[[:File:Example.svg]]\n'
+            '[[:Datei:Example.svg|Description]]\n',
+            self.cct.fixSyntaxSave(
+                '[https://de.wikipedia.org/wiki/Kategorie:Example]\n'
+                '[https://de.wikipedia.org/wiki/Category:Example Description]\n'
+                '[https://de.wikipedia.org/wiki/Datei:Example.svg]\n'
+                '[https://de.wikipedia.org/wiki/File:Example.svg Description]\n'
+                '[[https://de.wikipedia.org/wiki/Category:Example]]\n'
+                '[[https://de.wikipedia.org/wiki/Kategorie:Example Description]]\n'
+                '[[https://de.wikipedia.org/wiki/File:Example.svg]]\n'
+                '[[https://de.wikipedia.org/wiki/Datei:Example.svg Description]]\n'
+            ))
+        del self.cct.site._namespaces
 
     def test_fixHtml(self):
         """Test fixHtml method."""
@@ -235,14 +261,48 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
     def test_translateMagicWords(self):
         """Test translateMagicWords method."""
         self.assertEqual(
-            '[[File:Foo.bar|mini]]',
+            '[[File:Foo.bar|miniatur]]',
             self.cct.translateMagicWords('[[File:Foo.bar|thumb]]'))
         self.assertEqual(
-            '[[File:Foo.bar|mini]]',
-            self.cct.translateMagicWords('[[File:Foo.bar|miniatur]]'))
+            '[[File:Foo.bar|miniatur]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|mini]]'))
+        # test local namespace
+        self.assertEqual(
+            '[[Datei:Foo.bar|miniatur]]',
+            self.cct.translateMagicWords('[[Datei:Foo.bar|thumb]]'))
+        # test multiple magic words
+        self.assertEqual(
+            '[[File:Foo.bar|links|miniatur]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|left|thumb]]'))
+        # test magic words at the end
+        self.assertEqual(
+            '[[File:Foo.bar|250px|links]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|250px|left]]'))
+        # test touching unstripped parts and stripping magic words
+        self.assertEqual(
+            '[[File:Foo.bar|links| 250px]]',
+            self.cct.translateMagicWords('[[File:Foo.bar| left | 250px]]'))
+        # test magic word with a caption
+        self.assertEqual(
+            '[[File:Foo.bar|250px|zentriert|Bar]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|250px|center|Bar]]'))
+
+    @unittest.expectedFailure
+    def test_translateMagicWords_fail(self):
+        """
+        Test translateMagicWords method.
+
+        The current implementation doesn't check whether the magic word is
+        inside a template.
+        """
+        self.assertEqual(
+            '[[File:Foo.bar|{{Baz|thumb|foo}}]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|{{Baz|thumb|foo}}]]'))
 
     def test_cleanUpLinks_pipes(self):
         """Test cleanUpLinks method."""
+        self.assertEqual('[[No|no change]]',
+                         self.cct.cleanUpLinks('[[no|no change]]'))
         self.assertEqual('[[title]]',
                          self.cct.cleanUpLinks('[[title|title]]'))
         self.assertEqual('[[title]]',
@@ -253,10 +313,6 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
                          self.cct.cleanUpLinks('[[sand|sand]]box'))
         self.assertEqual('[[Sand|demospace]]',
                          self.cct.cleanUpLinks('[[sand|demo]]space'))
-
-    @unittest.expectedFailure
-    def test_cleanUpLinks_pipes_fail(self):
-        """Test cleanUpLinks method."""
         self.assertEqual('[[Title]]',
                          self.cct.cleanUpLinks('[[title|Title]]'))
         self.assertEqual('[[Sand]]box',
@@ -300,15 +356,50 @@ class TestCosmeticChangesPersian(TestCosmeticChanges):
     family = 'wikipedia'
     code = 'fa'
 
-    def test_fixArabicLetters(self):
-        """Test fixArabicLetters."""
+    def test_fixArabicLetters_comma(self):
+        """Test fixArabicLetters comma replacements."""
+        self.assertEqual(self.cct.fixArabicLetters(','), '،')
         self.assertEqual(self.cct.fixArabicLetters('A,b,ا,۴,'),
                          'A,b،ا،۴،')
+
+    def test_fixArabicLetters_comma_skip(self):
+        """Test fixArabicLetters Latin comma not replaced."""
+        self.assertEqual(self.cct.fixArabicLetters('a", b'), 'a", b')
+        self.assertEqual(self.cct.fixArabicLetters('a, "b'), 'a, "b')
+        self.assertEqual(self.cct.fixArabicLetters('a", "b'), 'a", "b')
+        # spaces are not required
+        self.assertEqual(self.cct.fixArabicLetters('a",b'), 'a",b')
+        self.assertEqual(self.cct.fixArabicLetters('a,"b'), 'a,"b')
+        self.assertEqual(self.cct.fixArabicLetters('a","b'), 'a","b')
+        # quotes are a 'non-Farsi' character; additional non-Farsi not needed
+        self.assertEqual(self.cct.fixArabicLetters('",b'), '",b')
+        self.assertEqual(self.cct.fixArabicLetters('a,"'), 'a,"')
+        self.assertEqual(self.cct.fixArabicLetters('","'), '","')
+
+        # A single quotation is a 'non-Farsi' character
+        self.assertEqual(self.cct.fixArabicLetters("',b"), "',b")
+        self.assertEqual(self.cct.fixArabicLetters("a,'"), "a,'")
+        self.assertEqual(self.cct.fixArabicLetters("','"), "','")
+
+        # A space is a 'non-Farsi' character
+        self.assertEqual(self.cct.fixArabicLetters('a", ۴'), 'a", ۴')
+        self.assertEqual(self.cct.fixArabicLetters(' , '), ' , ')
+
+    def test_fixArabicLetters_letters(self):
+        """Test fixArabicLetters letter replacements."""
+        self.assertEqual(self.cct.fixArabicLetters('ك'),
+                         'ک')
+        self.assertEqual(self.cct.fixArabicLetters('ي'),
+                         'ی')
+        self.assertEqual(self.cct.fixArabicLetters('ى'),
+                         'ی')
         self.assertEqual(self.cct.fixArabicLetters('كي'),
                          'کی')
+
         # Once numbering fixes are enabled we can add tests.
 
-if __name__ == '__main__':
+
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

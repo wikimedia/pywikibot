@@ -1,16 +1,14 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the tools.MediaWikiVersion class."""
 #
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2016
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
 
-
-from pywikibot.tools import MediaWikiVersion as V
+from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, TestCase
 
@@ -19,11 +17,13 @@ class TestMediaWikiVersion(TestCase):
 
     """Test MediaWikiVersion class comparisons."""
 
+    GENERATOR_STRING_RE = 'Generator string'
+    INVALID_VERSION_RE = 'Invalid version number'
     net = False
 
     def _make(self, version):
         """Create a MediaWikiVersion instance and check that the str stays."""
-        v = V(version)
+        v = MediaWikiVersion(version)
         self.assertEqual(str(v), version)
         return v
 
@@ -74,20 +74,22 @@ class TestMediaWikiVersion(TestCase):
 
     def test_invalid_versions(self):
         """Verify that insufficient version fail creating."""
-        self.assertRaises(ValueError, V, 'invalid')
-        self.assertRaises(ValueError, V, '1number')
-        self.assertRaises(ValueError, V, '1.missing')
+        self.assertRaisesRegex(ValueError, self.INVALID_VERSION_RE, MediaWikiVersion, 'invalid')
+        self.assertRaisesRegex(ValueError, self.INVALID_VERSION_RE, MediaWikiVersion, '1number')
+        self.assertRaisesRegex(ValueError, self.INVALID_VERSION_RE, MediaWikiVersion, '1.missing')
 
-        self.assertRaises(AssertionError, V, '1.23wmf-1')
+        self.assertRaisesRegex(AssertionError, 'Found \"wmf\" in \"wmf-1\"',
+                               MediaWikiVersion, '1.23wmf-1')
 
     def test_generator(self):
         """Test from_generator classmethod."""
-        self.assertEqual(V.from_generator('MediaWiki 1.2.3'),
+        self.assertEqual(MediaWikiVersion.from_generator('MediaWiki 1.2.3'),
                          self._make('1.2.3'))
-        self.assertRaises(ValueError, V.from_generator, 'Invalid 1.2.3')
+        self.assertRaisesRegex(ValueError, self.GENERATOR_STRING_RE,
+                               MediaWikiVersion.from_generator, 'Invalid 1.2.3')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

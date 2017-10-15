@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Tool to copy a flickr stream to Commons.
 
@@ -25,14 +25,11 @@ Todo:
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikibot team, 2009-2014
+# (C) Pywikibot team, 2009-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import base64
 import hashlib
@@ -51,7 +48,7 @@ try:
 except ImportError as e:
     print('This script requires the python flickrapi module. \n'
           'See: http://stuvel.eu/projects/flickrapi')  # noqa: print
-    print(e)  # noqa: print
+    print(e)  # flake8: disable=T003 (print)
     sys.exit(1)
 
 import pywikibot
@@ -59,12 +56,12 @@ import pywikibot
 from pywikibot import config, textlib
 from pywikibot.comms.http import fetch
 
-from scripts import upload
+from pywikibot.specialbots import UploadRobot
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
 except ImportError as _tk_error:
-    Tkdialog = None
+    Tkdialog = _tk_error
 
 
 flickr_allowed_license = {
@@ -80,7 +77,7 @@ flickr_allowed_license = {
 }
 
 
-def getPhoto(flickr=None, photo_id=''):
+def getPhoto(flickr, photo_id):
     """
     Get the photo info and the photo sizes so we can use these later on.
 
@@ -99,7 +96,7 @@ def getPhoto(flickr=None, photo_id=''):
             time.sleep(30)
 
 
-def isAllowedLicense(photoInfo=None):
+def isAllowedLicense(photoInfo):
     """
     Check if the image contains the right license.
 
@@ -112,7 +109,7 @@ def isAllowedLicense(photoInfo=None):
         return False
 
 
-def getPhotoUrl(photoSizes=None):
+def getPhotoUrl(photoSizes):
     """Get the url of the jpg file with the highest resolution."""
     url = ''
     # The assumption is that the largest image is last
@@ -121,7 +118,7 @@ def getPhotoUrl(photoSizes=None):
     return url
 
 
-def downloadPhoto(photoUrl=''):
+def downloadPhoto(photoUrl):
     """
     Download the photo and store it in a io.BytesIO object.
 
@@ -153,7 +150,7 @@ def findDuplicateImages(photo, site=None):
     return site.getFilesFromAnHash(base64.b16encode(hashObject.digest()))
 
 
-def getTags(photoInfo=None):
+def getTags(photoInfo):
     """Get all the tags on a photo."""
     result = []
     for tag in photoInfo.find('photo').find('tags').findall('tag'):
@@ -162,7 +159,7 @@ def getTags(photoInfo=None):
     return result
 
 
-def getFlinfoDescription(photo_id=0):
+def getFlinfoDescription(photo_id):
     """
     Get the description from http://wikipedia.ramselehof.de/flinfo.php.
 
@@ -174,7 +171,7 @@ def getFlinfoDescription(photo_id=0):
         'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).content
 
 
-def getFilename(photoInfo=None, site=None, project=u'Flickr'):
+def getFilename(photoInfo, site=None, project=u'Flickr'):
     """Build a good filename for the upload based on the username and title.
 
     Prevents naming collisions.
@@ -224,23 +221,23 @@ def cleanUpTitle(title):
 
     """
     title = title.strip()
-    title = re.sub(u"[<{\\[]", u"(", title)
-    title = re.sub(u"[>}\\]]", u")", title)
-    title = re.sub(u"[ _]?\\(!\\)", u"", title)
-    title = re.sub(u",:[ _]", u", ", title)
-    title = re.sub(u"[;:][ _]", u", ", title)
-    title = re.sub(u"[\t\n ]+", u" ", title)
-    title = re.sub(u"[\r\n ]+", u" ", title)
-    title = re.sub(u"[\n]+", u"", title)
-    title = re.sub(u"[?!]([.\"]|$)", u"\\1", title)
-    title = re.sub(u"[&#%?!]", u"^", title)
-    title = re.sub(u"[;]", u",", title)
-    title = re.sub(u"[/+\\\\:]", u"-", title)
-    title = re.sub(u"--+", u"-", title)
-    title = re.sub(u",,+", u",", title)
-    title = re.sub(u"[-,^]([.]|$)", u"\\1", title)
-    title = title.replace(u" ", u"_")
-    title = title.strip(u"_")
+    title = re.sub(r'[<{\[]', '(', title)
+    title = re.sub(r'[>}\]]', ')', title)
+    title = re.sub(r'[ _]?\(!\)', '', title)
+    title = re.sub(',:[ _]', ', ', title)
+    title = re.sub('[;:][ _]', ', ', title)
+    title = re.sub(r'[\t\n ]+', ' ', title)
+    title = re.sub(r'[\r\n ]+', ' ', title)
+    title = re.sub('[\n]+', '', title)
+    title = re.sub('[?!]([.\"]|$)', r'\1', title)
+    title = re.sub('[&#%?!]', '^', title)
+    title = re.sub('[;]', ',', title)
+    title = re.sub(r'[/+\\:]', '-', title)
+    title = re.sub('--+', '-', title)
+    title = re.sub(',,+', ',', title)
+    title = re.sub('[-,^]([.]|$)', r'\1', title)
+    title = title.replace(' ', '_')
+    title = title.strip('_')
     return title
 
 
@@ -279,7 +276,7 @@ def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
     return description
 
 
-def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
+def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
                  override=u'', addCategory=u'', removeCategories=False,
                  autonomous=False):
     """Process a single Flickr photo."""
@@ -304,7 +301,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
                                                 override, addCategory,
                                                 removeCategories)
             # pywikibot.output(photoDescription)
-            if Tkdialog is not None and not autonomous:
+            if not isinstance(Tkdialog, ImportError) and not autonomous:
                 try:
                     (newPhotoDescription, newFilename, skip) = Tkdialog(
                         photoDescription, photo, filename).show_dialog()
@@ -315,7 +312,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
             elif not autonomous:
                 pywikibot.warning('Switching to autonomous mode because GUI '
                                   'interface cannot be used')
-                pywikibot.warning(_tk_error)
+                pywikibot.warning(Tkdialog)
                 autonomous = True
             if autonomous:
                 newPhotoDescription = photoDescription
@@ -330,11 +327,11 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
             # Would be nice to check before I upload if the file is already at Commons
             # Not that important for this program, but maybe for derived programs
             if not skip:
-                bot = upload.UploadRobot(photoUrl,
-                                         description=newPhotoDescription,
-                                         useFilename=newFilename,
-                                         keepFilename=True,
-                                         verifyDescription=False)
+                bot = UploadRobot(photoUrl,
+                                  description=newPhotoDescription,
+                                  useFilename=newFilename,
+                                  keepFilename=True,
+                                  verifyDescription=False)
                 bot.upload_image(debug=False)
                 return 1
     else:
@@ -342,7 +339,7 @@ def processPhoto(flickr=None, photo_id=u'', flickrreview=False, reviewer=u'',
     return 0
 
 
-def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
+def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
               start_id='', end_id='', tags=u''):
     """Loop over a set of Flickr photos."""
     found_start_id = not start_id
@@ -355,7 +352,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
                                                user_id=user_id, tags=tags,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-        gen = lambda i: flickr.groups_pools_getPhotos(  # noqa: E731
+        gen = lambda i: flickr.groups_pools_getPhotos(  # flake8: disable=E731
             group_id=group_id, user_id=user_id, tags=tags,
             per_page='100', page=i
         ).find('photos').getchildren()
@@ -365,7 +362,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
         photos = flickr.photosets_getPhotos(photoset_id=photoset_id,
                                             per_page='100', page='1')
         pages = photos.find('photoset').attrib['pages']
-        gen = lambda i: flickr.photosets_getPhotos(  # noqa: E731
+        gen = lambda i: flickr.photosets_getPhotos(  # flake8: disable=E731
             photoset_id=photoset_id, per_page='100', page=i
         ).find('photoset').getchildren()
     # https://www.flickr.com/services/api/flickr.people.getPublicPhotos.html
@@ -374,7 +371,7 @@ def getPhotos(flickr=None, user_id=u'', group_id=u'', photoset_id=u'',
         photos = flickr.people_getPublicPhotos(user_id=user_id,
                                                per_page='100', page='1')
         pages = photos.find('photos').attrib['pages']
-        gen = lambda i: flickr.people_getPublicPhotos(  # noqa: E731
+        gen = lambda i: flickr.people_getPublicPhotos(  # flake8: disable=E731
             user_id=user_id, per_page='100', page=i
         ).find('photos').getchildren()
     for i in range(1, int(pages) + 1):
@@ -434,12 +431,6 @@ def main(*args):
 
     if 'api_secret' in config.flickr and config.flickr['api_secret']:
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'], config.flickr['api_secret'])
-        (token, frob) = flickr.get_token_part_one(perms='read')
-        if not token:
-            # The user still hasn't authorised this app yet, get_token_part_one()
-            # will have spawn a browser window
-            pywikibot.input("Press ENTER after you authorized this program")
-        flickr.get_token_part_two((token, frob))
     else:
         pywikibot.output('Accessing public content only')
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
@@ -545,6 +536,7 @@ def main(*args):
     pywikibot.output(u'Finished running')
     pywikibot.output(u'Total photos: ' + str(totalPhotos))
     pywikibot.output(u'Uploaded photos: ' + str(uploadedPhotos))
+
 
 if __name__ == "__main__":
     main()

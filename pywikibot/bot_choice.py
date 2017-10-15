@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Choices for input_choice."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2016
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,7 @@ class Option(object):
     A basic option for input_choice.
 
     The following methods need to be implemented:
-    * format(default)
+    * format(default=None)
     * result(value)
     * test(value)
 
@@ -37,11 +37,11 @@ class Option(object):
         self._stop = stop
 
     @staticmethod
-    def formatted(text, options, default):
+    def formatted(text, options, default=None):
         """Create a text with the options formatted into it."""
         formatted_options = []
         for option in options:
-            formatted_options.append(option.format(default))
+            formatted_options.append(option.format(default=default))
         return '{0} ({1})'.format(text, ', '.join(formatted_options))
 
     @property
@@ -60,7 +60,7 @@ class Option(object):
         else:
             return None
 
-    def format(self, default):
+    def format(self, default=None):
         """Return a formatted string for that option."""
         raise NotImplementedError()
 
@@ -103,7 +103,7 @@ class StandardOption(Option):
         self.option = option
         self.shortcut = shortcut.lower()
 
-    def format(self, default):
+    def format(self, default=None):
         """Return a formatted string for that option."""
         index = self.option.lower().find(self.shortcut)
         shortcut = self.shortcut
@@ -154,10 +154,10 @@ class NestedOption(OutputOption, StandardOption):
         self.description = description
         self.options = options
 
-    def format(self, default):
+    def format(self, default=None):
         """Return a formatted string for that option."""
-        self._output = Option.formatted(self.description, self.options, default)
-        return super(NestedOption, self).format(default)
+        self._output = Option.formatted(self.description, self.options)
+        return super(NestedOption, self).format(default=default)
 
     def handled(self, value):
         """Return itself if it applies or the appling sub option."""
@@ -171,6 +171,35 @@ class NestedOption(OutputOption, StandardOption):
     def output(self):
         """Output the suboptions."""
         pywikibot.output(self._output)
+
+
+class ContextOption(OutputOption, StandardOption):
+
+    """An option to show more and more context."""
+
+    def __init__(self, option, shortcut, text, context, delta=100, start=0, end=0):
+        """Constructor."""
+        super(ContextOption, self).__init__(option, shortcut, False)
+        self.text = text
+        self.context = context
+        self.delta = delta
+        self.start = start
+        self.end = end
+
+    def result(self, value):
+        """Add the delta to the context and output it."""
+        self.context += self.delta
+        super(ContextOption, self).result(value)
+
+    def output(self):
+        """Output the context."""
+        start = max(0, self.start - self.context)
+        end = min(len(self.text), self.end + self.context)
+        self.output_range(start, end)
+
+    def output_range(self, start_context, end_context):
+        """Output a section from the text."""
+        pywikibot.output(self.text[start_context:end_context])
 
 
 class IntegerOption(Option):
@@ -210,7 +239,7 @@ class IntegerOption(Option):
         """Return the upper bound of the range of allowed values."""
         return self._max
 
-    def format(self, default):
+    def format(self, default=None):
         """Return a formatted string showing the range."""
         if default is not None and self.test(default):
             value = self.parse(default)
@@ -250,35 +279,6 @@ class IntegerOption(Option):
         return (self.prefix, self.parse(value))
 
 
-class ContextOption(OutputOption, StandardOption):
-
-    """An option to show more and more context."""
-
-    def __init__(self, option, shortcut, text, context, delta=100, start=0, end=0):
-        """Constructor."""
-        super(ContextOption, self).__init__(option, shortcut, False)
-        self.text = text
-        self.context = context
-        self.delta = delta
-        self.start = start
-        self.end = end
-
-    def result(self, value):
-        """Add the delta to the context and output it."""
-        self.context += self.delta
-        super(ContextOption, self).result(value)
-
-    def output(self):
-        """Output the context."""
-        start = max(0, self.start - self.context)
-        end = min(len(self.text), self.end + self.context)
-        self.output_range(start, end)
-
-    def output_range(self, start_context, end_context):
-        """Output a section from the text."""
-        pywikibot.output(self.text[start_context:end_context])
-
-
 class ListOption(IntegerOption):
 
     """An option to select something from a list."""
@@ -292,12 +292,12 @@ class ListOption(IntegerOption):
             raise ValueError('The sequence is empty.')
         del self._max
 
-    def format(self, default):
+    def format(self, default=None):
         """Return a string showing the range."""
         if not self._list:
             raise ValueError('The sequence is empty.')
         else:
-            return super(ListOption, self).format(default)
+            return super(ListOption, self).format(default=default)
 
     @property
     def maximum(self):

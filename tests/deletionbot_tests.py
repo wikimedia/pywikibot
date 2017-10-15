@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for scripts/delete.py."""
 #
 # (C) Pywikibot team, 2014
@@ -6,8 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import pywikibot
 import pywikibot.page
@@ -107,14 +105,16 @@ class TestDeletionBot(ScriptMainTestCase):
     def test_dry(self):
         """Test dry run of bot."""
         delete.main('-page:Main Page', '-always', '-summary:foo')
-        self.assertEqual(self.delete_args, ['[[Main Page]]', 'foo', False, True])
+        self.assertEqual(self.delete_args, ['[[Main Page]]', 'foo', False,
+                                            True, True])
         delete.main('-page:FoooOoOooO', '-always', '-summary:foo', '-undelete')
         self.assertEqual(self.undelete_args, ['[[FoooOoOooO]]', 'foo'])
 
 
-def delete_dummy(self, reason, prompt, mark):
+def delete_dummy(self, reason, prompt, mark, quit):
     """Dummy delete method."""
-    TestDeletionBot.delete_args = [self.title(asLink=True), reason, prompt, mark]
+    TestDeletionBot.delete_args = [self.title(asLink=True), reason, prompt,
+                                   mark, quit]
 
 
 def undelete_dummy(self, reason):
@@ -122,7 +122,7 @@ def undelete_dummy(self, reason):
     TestDeletionBot.undelete_args = [self.title(asLink=True), reason]
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

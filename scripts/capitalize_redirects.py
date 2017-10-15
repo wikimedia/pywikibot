@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 Bot to create capitalized redirects.
 
@@ -22,7 +22,7 @@ Example:
 """
 #
 # (C) Yrithinnd, 2006
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,9 +32,6 @@ Example:
 # Automatically converted from compat branch by compat2core.py script
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 from pywikibot import i18n, pagegenerators
@@ -111,15 +108,15 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if gen:
-        preloadingGen = pagegenerators.PreloadingGenerator(gen)
-        bot = CapitalizeBot(preloadingGen, **options)
+        bot = CapitalizeBot(gen, **options)
         bot.run()
         return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
+
 
 if __name__ == "__main__":
     main()

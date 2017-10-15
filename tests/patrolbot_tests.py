@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests for the patrol script."""
 #
 # (C) Pywikibot team, 2015
@@ -7,14 +7,14 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
+
 try:
     from scripts import patrol
 except ImportError:
     patrol = None  # if mwparserfromhell is not installed
 
 from tests.aspects import require_modules, unittest, DefaultDrySiteTestCase
+
 
 DUMMY_PAGE_TUPLES = """
 This is some text above the entries:
@@ -71,7 +71,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         self.assertEqual(self.bot.in_list(['', 'Foo'], 'Foo'), 'Foo')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

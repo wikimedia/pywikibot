@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 DisambigurationRedirectBot test.
 
@@ -10,9 +10,6 @@ These tests write to the wiki.
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 
@@ -155,7 +152,7 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
                          '[[Main Page|Label]]\n')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
     except SystemExit:

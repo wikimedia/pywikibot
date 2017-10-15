@@ -31,43 +31,7 @@ Work on all images which transclude a template
 See pagegenerators.py for more ways to get a list of images.
 By default the bot works on your home wiki (set in user-config)
 
-Known issues/FIXMEs (no critical issues known):
-* make it use pagegenerators.py
-** Implemented in rewrite
-* Some variable names are in Spanish, which makes the code harder to read.
-** Almost all variables are now in English
-* Depending on sorting within a file category, the "next batch" is sometimes
-  not working, leading to an endless loop
-** Using pagegenerators now
-* Different wikis can have different exclusion lists. A parameter for the
-  exclusion list Uploadbot.localskips.txt would probably be nice.
-* Bot should probably use API instead of query.php
-** Api? Query? Wikipedia.py!
-* Should request alternative name if file name already exists on Commons
-** Implemented in rewrite
-* Exits after last file in category was processed, aborting all pending
-  threads.
-** Implemented proper threading in rewrite
-* Should take user-config.py as input for project and lang variables
-** Implemented in rewrite
-* Should require a Commons user to be present in user-config.py before
-  working
-* Should probably have an input field for additional categories
-* Should probably have an option to change uploadtext with file
-* required i18n options for NowCommons template (f.e. {{subst:ncd}} on
-  en.wp. Currently needs customisation to work properly. Bot was tested
-  succesfully on nl.wp (12k+ files copied and deleted locally) and en.wp
-  (about 100 files copied and SieBot has bot approval for tagging {{ncd}}
-  with this bot)
-** Implemented
-* {{NowCommons|xxx}} requires the namespace prefix Image: on most wikis
-  and can be left out on others. This needs to be taken care of when
-  implementing i18n
-** Implemented
-* This bot should probably get a small tutorial at meta with a few
-  screenshots.
 """
-#
 # Based on upload.py by:
 # (C) Rob W.W. Hooft, Andre Engels 2003-2007
 # (C) Wikipedian, Keichwa, Leogregianin, Rikwade, Misza13 2003-2007
@@ -77,13 +41,11 @@ Known issues/FIXMEs (no critical issues known):
 #
 # Another rewrite by:
 # (C) Multichill 2008-2011
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import codecs
 import re
@@ -95,9 +57,10 @@ import pywikibot
 
 from pywikibot import pagegenerators, config, i18n
 
+from pywikibot.specialbots import UploadRobot
 from pywikibot.tools import PY2
 
-from scripts import image, upload
+from scripts import image
 
 if not PY2:
     import tkinter as Tkinter
@@ -112,7 +75,7 @@ else:
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
 except ImportError as _tk_error:
-    Tkdialog = None
+    Tkdialog = object
 
 NL = ''
 
@@ -228,6 +191,7 @@ moveToCommonsTemplate = {
 
 
 def pageTextPost(url, parameters):
+    """Get data from commons helper page."""
     gotInfo = False
     while not gotInfo:
         try:
@@ -247,13 +211,15 @@ class imageTransfer(threading.Thread):
     """Facilitate transfer of image/file to commons."""
 
     def __init__(self, imagePage, newname, category):
+        """Constructor."""
         self.imagePage = imagePage
         self.newname = newname
         self.category = category
         threading.Thread.__init__(self)
 
     def run(self):
-        tosend = {'language': self.imagePage.site.language().encode('utf-8'),
+        """Run the bot."""
+        tosend = {'language': self.imagePage.site.lang.encode('utf-8'),
                   'image': self.imagePage.title(
                       withNamespace=False).encode('utf-8'),
                   'newname': self.newname.encode('utf-8'),
@@ -279,7 +245,7 @@ class imageTransfer(threading.Thread):
 
         # I want every picture to be tagged with the bottemplate so i can check
         # my contributions later.
-        CH = ('\n\n{{BotMoveToCommons|' + self.imagePage.site.language() +
+        CH = ('\n\n{{BotMoveToCommons|' + self.imagePage.site.lang +
               '.' + self.imagePage.site.family.name +
               '|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}'
               '|day={{subst:CURRENTDAY}}}}' + CH)
@@ -289,11 +255,10 @@ class imageTransfer(threading.Thread):
                             'added categories -->', '')
             CH += u'[[Category:' + self.category + u']]'
 
-        bot = upload.UploadRobot(url=self.imagePage.fileUrl(), description=CH,
-                                 useFilename=self.newname, keepFilename=True,
-                                 verifyDescription=False, ignoreWarning=True,
-                                 targetSite=pywikibot.Site('commons',
-                                                           'commons'))
+        bot = UploadRobot(url=self.imagePage.fileUrl(), description=CH,
+                          useFilename=self.newname, keepFilename=True,
+                          verifyDescription=False, ignoreWarning=True,
+                          targetSite=pywikibot.Site('commons', 'commons'))
         bot.run()
 
         # Should check if the image actually was uploaded
@@ -304,16 +269,16 @@ class imageTransfer(threading.Thread):
             imtxt = self.imagePage.get(force=True)
 
             # Remove the move to commons templates
-            if self.imagePage.site.language() in moveToCommonsTemplate:
+            if self.imagePage.site.lang in moveToCommonsTemplate:
                 for moveTemplate in moveToCommonsTemplate[
-                        self.imagePage.site.language()]:
-                    imtxt = re.sub(u'(?i)\{\{' + moveTemplate + u'[^\}]*\}\}',
-                                   u'', imtxt)
+                        self.imagePage.site.lang]:
+                    imtxt = re.sub(r'(?i)\{\{' + moveTemplate + r'[^\}]*\}\}',
+                                   '', imtxt)
 
             # add {{NowCommons}}
-            if self.imagePage.site.language() in nowCommonsTemplate:
+            if self.imagePage.site.lang in nowCommonsTemplate:
                 addTemplate = nowCommonsTemplate[
-                    self.imagePage.site.language()] % self.newname
+                    self.imagePage.site.lang] % self.newname
             else:
                 addTemplate = nowCommonsTemplate['_default'] % self.newname
 
@@ -349,11 +314,11 @@ class imageTransfer(threading.Thread):
     def fixAuthor(self, pageText):
         """Fix the author field in the information template."""
         informationRegex = re.compile(
-            '\|Author\=Original uploader was '
-            '(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])')
+            r'\|Author=Original uploader was '
+            r'(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])')
         selfRegex = re.compile(
-            '\{\{self\|author\='
-            '(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])\|')
+            r'{{self\|author='
+            r'(?P<author>\[\[:\w+:\w+:\w+\|\w+\]\] at \[.+\])\|')
 
         # Find the |Author=Original uploader was ....
         informationMatch = informationRegex.search(pageText)
@@ -363,9 +328,10 @@ class imageTransfer(threading.Thread):
 
         # Check if both are found and are equal
         if (informationMatch and selfMatch):
-            if(informationMatch.group('author') == selfMatch.group('author')):
+            if informationMatch.group('author') == selfMatch.group('author'):
                 # Replace |Author=Original uploader was ... with |Author= ...
-                pageText = informationRegex.sub(r'|Author=\g<author>', pageText)
+                pageText = informationRegex.sub(r'|Author=\g<author>',
+                                                pageText)
         return pageText
 
 
@@ -395,6 +361,7 @@ class TkdialogIC(Tkdialog):
 
     def __init__(self, image_title, content, uploader, url, templates,
                  commonsconflict=0):
+        """Constructor."""
         super(TkdialogIC, self).__init__()
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
@@ -407,7 +374,7 @@ class TkdialogIC(Tkdialog):
         self.uploader = "Unknown"
         # uploader.decode('utf-8')
         scrollbar = Tkinter.Scrollbar(self.root, orient=Tkinter.VERTICAL)
-        label = Tkinter.Label(self.root, text=u"Enter new name or leave blank.")
+        label = Tkinter.Label(self.root, text='Enter new name or leave blank.')
         imageinfo = Tkinter.Label(self.root, text='Uploaded by %s.' % uploader)
         textarea = Tkinter.Text(self.root)
         textarea.insert(Tkinter.END, content.encode('utf-8'))
@@ -480,8 +447,8 @@ def doiskip(pagetext):
     saltos = getautoskip()
     # print saltos
     for salto in saltos:
-        rex = u'\{\{\s*[' + salto[0].upper() + salto[0].lower() + ']' + \
-              salto[1:] + '(\}\}|\|)'
+        rex = r'\{\{\s*[' + salto[0].upper() + salto[0].lower() + r']' + \
+              salto[1:] + r'(\}\}|\|)'
         # print rex
         if re.search(rex, pagetext):
             return True
@@ -490,7 +457,6 @@ def doiskip(pagetext):
 
 def main(*args):
     """Process command line arguments and invoke bot."""
-    generator = None
     imagepage = None
     always = False
     category = u''
@@ -506,18 +472,16 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    generator = genFactory.getCombinedGenerator()
-    if not generator:
+    pregenerator = genFactory.getCombinedGenerator(preload=True)
+    if not pregenerator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
-
-    pregenerator = pagegenerators.PreloadingGenerator(generator)
 
     for page in pregenerator:
         skip = False
         if page.exists() and (page.namespace() == 6) and (
                 not page.isRedirectPage()):
-            imagepage = pywikibot.FilePage(page.site(), page.title())
+            imagepage = pywikibot.FilePage(page.site, page.title())
 
             # First do autoskip.
             if doiskip(imagepage.get()):

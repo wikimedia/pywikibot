@@ -1,7 +1,7 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,6 +23,7 @@ from decimal import Decimal
 if sys.version_info[0] > 2:
     from queue import Queue
     long = int
+    basestring = str
 else:
     from Queue import Queue
 
@@ -52,7 +53,7 @@ from pywikibot.exceptions import (
     SiteDefinitionError, NoSuchSite, UnknownSite, UnknownFamily,
     UnknownExtension,
     NoUsername, UserBlocked,
-    PageRelatedError, IsRedirectPage, IsNotRedirectPage,
+    PageRelatedError, UnsupportedPage, IsRedirectPage, IsNotRedirectPage,
     PageSaveRelatedError, PageNotSaved, OtherPageSaveError,
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
     EditConflict, PageDeletedConflict, PageCreatedConflict,
@@ -68,8 +69,9 @@ from pywikibot.site import BaseSite
 from pywikibot.tools import (
     # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
     deprecated as __deprecated,
-    deprecate_arg as __deprecate_arg,
+    deprecate_arg as _deprecate_arg,
     normalize_username,
+    MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     PY2,
@@ -104,7 +106,8 @@ __all__ = (
     'SiteDefinitionError', 'NoSuchSite', 'UnknownSite', 'UnknownFamily',
     'UnknownExtension',
     'NoUsername', 'UserBlocked', 'UserActionRefuse',
-    'PageRelatedError', 'IsRedirectPage', 'IsNotRedirectPage',
+    'PageRelatedError', 'UnsupportedPage', 'IsRedirectPage',
+    'IsNotRedirectPage',
     'PageSaveRelatedError', 'PageNotSaved', 'OtherPageSaveError',
     'LockedPage', 'CascadeLockedPage', 'LockedNoPage', 'NoCreateError',
     'EditConflict', 'PageDeletedConflict', 'PageCreatedConflict',
@@ -128,7 +131,7 @@ for _name in textlib_methods:
 
 
 deprecated = redirect_func(__deprecated)
-deprecate_arg = redirect_func(__deprecate_arg)
+deprecate_arg = redirect_func(_deprecate_arg)
 
 
 class Timestamp(datetime.datetime):
@@ -136,7 +139,7 @@ class Timestamp(datetime.datetime):
     """Class for handling MediaWiki timestamps.
 
     This inherits from datetime.datetime, so it can use all of the methods
-    and operations of a datetime object.  To ensure that the results of any
+    and operations of a datetime object. To ensure that the results of any
     operation are also a Timestamp object, be sure to use only Timestamp
     objects (and datetime.timedeltas) in any operation.
 
@@ -154,6 +157,7 @@ class Timestamp(datetime.datetime):
 
     mediawikiTSFormat = "%Y%m%d%H%M%S"
     ISO8601Format = "%Y-%m-%dT%H:%M:%SZ"
+    _ISO8601Format_new = '{0:+05d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     def clone(self):
         """Clone this instance."""
@@ -231,10 +235,11 @@ class Coordinate(_WbRepresentation):
     in the future we can use it for the GeoData extension.
     """
 
-    _items = ('lat', 'lon', 'globe')
+    _items = ('lat', 'lon', 'entity')
 
-    def __init__(self, lat, lon, alt=None, precision=None, globe='earth',
-                 typ="", name="", dim=None, site=None, entity=''):
+    @_deprecate_arg('entity', 'globe_item')
+    def __init__(self, lat, lon, alt=None, precision=None, globe=None,
+                 typ='', name='', dim=None, site=None, globe_item=None):
         """
         Represent a geo coordinate.
 
@@ -255,30 +260,41 @@ class Coordinate(_WbRepresentation):
         @type dim: int
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
-        @param entity: The URL entity of a Wikibase item
-        @type entity: str
+        @param globe_item: The Wikibase item for the globe, or the entity URI
+                           of this Wikibase item. Takes precedence over 'globe'
+                           if present.
+        @type globe_item: pywikibot.ItemPage or str
         """
         self.lat = lat
         self.lon = lon
         self.alt = alt
         self._precision = precision
-        if globe:
-            globe = globe.lower()
-        self.globe = globe
-        self._entity = entity
+        self._entity = globe_item
         self.type = typ
         self.name = name
         self._dim = dim
-        if not site:
-            self.site = Site().data_repository()
-        else:
-            self.site = site
+        self.site = site or Site().data_repository()
+
+        if globe:
+            globe = globe.lower()
+        elif not globe_item:
+            globe = site.default_globe()
+        self.globe = globe
 
     @property
     def entity(self):
-        if self._entity:
-            return self._entity
-        return self.site.globes()[self.globe]
+        """Return the entity uri of the globe."""
+        if not self._entity:
+            if self.globe not in self.site.globes():
+                raise CoordinateGlobeUnknownException(
+                    u"%s is not supported in Wikibase yet."
+                    % self.globe)
+            return self.site.globes()[self.globe]
+
+        if isinstance(self._entity, ItemPage):
+            return self._entity.concept_uri()
+
+        return self._entity
 
     def toWikibase(self):
         """
@@ -289,10 +305,6 @@ class Coordinate(_WbRepresentation):
         @return: Wikibase JSON
         @rtype: dict
         """
-        if self.globe not in self.site.globes():
-            raise CoordinateGlobeUnknownException(
-                u"%s is not supported in Wikibase yet."
-                % self.globe)
         return {'latitude': self.lat,
                 'longitude': self.lon,
                 'altitude': self.alt,
@@ -311,20 +323,18 @@ class Coordinate(_WbRepresentation):
         @type site: pywikibot.site.DataSite
         @rtype: pywikibot.Coordinate
         """
-        globes = {}
-        for k in site.globes():
-            globes[site.globes()[k]] = k
+        globe = None
 
-        globekey = data['globe']
-        if globekey:
+        if data['globe']:
+            globes = {}
+            for name, entity in site.globes().items():
+                globes[entity] = name
+
             globe = globes.get(data['globe'])
-        else:
-            # Default to earth or should we use None here?
-            globe = 'earth'
 
         return cls(data['latitude'], data['longitude'],
                    data['altitude'], data['precision'],
-                   globe, site=site, entity=data['globe'])
+                   globe, site=site, globe_item=data['globe'])
 
     @property
     def precision(self):
@@ -354,6 +364,8 @@ class Coordinate(_WbRepresentation):
 
         @rtype: float or None
         """
+        if self._dim is None and self._precision is None:
+            return None
         if self._precision is None and self._dim is not None:
             radius = 6378137  # TODO: Support other globes
             self._precision = math.degrees(
@@ -365,8 +377,55 @@ class Coordinate(_WbRepresentation):
         self._precision = value
 
     def precisionToDim(self):
-        """Convert precision from Wikibase to GeoData's dim."""
-        raise NotImplementedError
+        """Convert precision from Wikibase to GeoData's dim and return the latter.
+
+        dim is calculated if the Coordinate doesn't have a dimension, and precision is set.
+        When neither dim nor precision are set, ValueError is thrown.
+
+        Carrying on from the earlier derivation of precision, since
+        precision = math.degrees(dim/(radius*math.cos(math.radians(self.lat)))), we get
+            dim = math.radians(precision)*radius*math.cos(math.radians(self.lat))
+        But this is not valid, since it returns a float value for dim which is an integer.
+        We must round it off to the nearest integer.
+
+        Therefore::
+            dim = int(round(math.radians(precision)*radius*math.cos(math.radians(self.lat))))
+
+        @rtype: int or None
+        """
+        if self._dim is None and self._precision is None:
+            raise ValueError('No values set for dim or precision')
+        if self._dim is None and self._precision is not None:
+            radius = 6378137
+            self._dim = int(
+                round(
+                    math.radians(self._precision) * radius * math.cos(math.radians(self.lat))
+                )
+            )
+        return self._dim
+
+    def get_globe_item(self, repo=None, lazy_load=False):
+        """
+        Return the ItemPage corresponding to the globe.
+
+        Note that the globe need not be in the same data repository as the
+        Coordinate itself.
+
+        A successful lookup is stored as an internal value to avoid the need
+        for repeated lookups.
+
+        @param repo: the Wikibase site for the globe, if different from that
+            provided with the Coordinate.
+        @type repo: pywikibot.site.DataSite
+        @param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        @type lazy_load: bool
+        @return: pywikibot.ItemPage
+        """
+        if isinstance(self._entity, ItemPage):
+            return self._entity
+
+        repo = repo or self.site
+        return ItemPage.from_entity_uri(repo, self.entity, lazy_load)
 
 
 class WbTime(_WbRepresentation):
@@ -469,6 +528,8 @@ class WbTime(_WbRepresentation):
         if calendarmodel is None:
             if site is None:
                 site = Site().data_repository()
+                if site is None:
+                    raise ValueError('Site %s has no data repository' % Site())
             calendarmodel = site.calendarmodel()
         self.calendarmodel = calendarmodel
 
@@ -521,15 +582,67 @@ class WbTime(_WbRepresentation):
                    int(t[3]), int(t[4]), int(t[5]),
                    precision, before, after, timezone, calendarmodel, site)
 
-    def toTimestr(self):
+    @classmethod
+    def fromTimestamp(cls, timestamp, precision=14, before=0, after=0,
+                      timezone=0, calendarmodel=None, site=None):
+        """
+        Create a new WbTime object from a pywikibot.Timestamp.
+
+        @param timestamp: Timestamp
+        @type timestamp: pywikibot.Timestamp
+        @param precision: The unit of the precision of the time.
+        @type precision: int or str
+        @param before: Number of units after the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type before: int
+        @param after: Number of units before the given time it could be, if uncertain.
+            The unit is given by the precision.
+        @type after: int
+        @param timezone: Timezone information in minutes.
+        @type timezone: int
+        @param calendarmodel: URI identifying the calendar model
+        @type calendarmodel: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.WbTime
+        """
+        return cls.fromTimestr(timestamp.isoformat(), precision=precision,
+                               before=before, after=after,
+                               timezone=timezone, calendarmodel=calendarmodel,
+                               site=site)
+
+    def toTimestr(self, force_iso=False):
         """
         Convert the data to a UTC date/time string.
 
+        See fromTimestr() for differences between output with and without
+        force_iso.
+
+        @param force_iso: whether the output should be forced to ISO 8601
+        @type force_iso: bool
         @return: Timestamp in a format resembling ISO 8601
         @rtype: str
         """
+        if force_iso:
+            return Timestamp._ISO8601Format_new.format(
+                self.year, max(1, self.month), max(1, self.day),
+                self.hour, self.minute, self.second)
         return self.FORMATSTR.format(self.year, self.month, self.day,
                                      self.hour, self.minute, self.second)
+
+    def toTimestamp(self):
+        """
+        Convert the data to a pywikibot.Timestamp.
+
+        @return: Timestamp
+        @rtype: pywikibot.Timestamp
+
+        @raises ValueError: instance value can not be represented using Timestamp
+        """
+        if self.year <= 0:
+            raise ValueError('You cannot turn BC dates into a Timestamp')
+        return Timestamp.fromISOformat(
+            self.toTimestr(force_iso=True).lstrip('+'))
 
     def toWikibase(self):
         """
@@ -548,17 +661,19 @@ class WbTime(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, ts):
+    def fromWikibase(cls, wb, site=None):
         """
         Create a WbTime from the JSON data given by the Wikibase API.
 
-        @param ts: Wikibase JSON
-        @type ts: dict
+        @param wb: Wikibase JSON
+        @type wb: dict
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         @rtype: pywikibot.WbTime
         """
-        return cls.fromTimestr(ts[u'time'], ts[u'precision'],
-                               ts[u'before'], ts[u'after'],
-                               ts[u'timezone'], ts[u'calendarmodel'])
+        return cls.fromTimestr(wb['time'], wb['precision'],
+                               wb['before'], wb['after'],
+                               wb['timezone'], wb['calendarmodel'], site)
 
 
 class WbQuantity(_WbRepresentation):
@@ -568,9 +683,29 @@ class WbQuantity(_WbRepresentation):
     _items = ('amount', 'upperBound', 'lowerBound', 'unit')
 
     @staticmethod
+    def _require_errors(site):
+        """
+        Check if the Wikibase site is so old it requires error bounds to be given.
+
+        If no site item is supplied it raises a warning and returns True.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: bool
+        """
+        if not site:
+            warning(
+                "WbQuantity now expects a 'site' parameter. This is needed to "
+                "ensure correct handling of error bounds.")
+            return False
+        return MediaWikiVersion(site.version()) < MediaWikiVersion('1.29.0-wmf.2')
+
+    @staticmethod
     def _todecimal(value):
         """
         Convert a string to a Decimal for use in WbQuantity.
+
+        None value is returned as is.
 
         @param value: decimal number to convert
         @type value: str
@@ -578,6 +713,8 @@ class WbQuantity(_WbRepresentation):
         """
         if isinstance(value, Decimal):
             return value
+        elif value is None:
+            return None
         return Decimal(str(value))
 
     @staticmethod
@@ -585,42 +722,88 @@ class WbQuantity(_WbRepresentation):
         """
         Convert a Decimal to a string representation suitable for WikiBase.
 
+        None value is returned as is.
+
         @param value: decimal number to convert
         @type value: Decimal
         @rtype: str
         """
+        if value is None:
+            return None
         return format(value, "+g")
 
-    def __init__(self, amount, unit=None, error=None):
+    def __init__(self, amount, unit=None, error=None, site=None):
         u"""
         Create a new WbQuantity object.
 
         @param amount: number representing this quantity
         @type amount: string or Decimal. Other types are accepted, and converted
                       via str to Decimal.
-        @param unit: not used (only unit-less quantities are supported)
+        @param unit: the Wikibase item for the unit or the entity URI of this
+                     Wikibase item.
+        @type unit: pywikibot.ItemPage, str or None
         @param error: the uncertainty of the amount (e.g. ±1)
         @type error: same as amount, or tuple of two values, where the first value is
                      the upper error and the second is the lower error value.
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
         """
         if amount is None:
             raise ValueError('no amount given')
-        if unit is None:
-            unit = '1'
 
         self.amount = self._todecimal(amount)
-        self.unit = unit
+        self._unit = unit
+        self.site = site or Site().data_repository()
 
-        if error is None:
-            upperError = lowerError = Decimal(0)
-        elif isinstance(error, tuple):
-            upperError = self._todecimal(error[0])
-            lowerError = self._todecimal(error[1])
+        # also allow entity URIs to be provided via unit parameter
+        if isinstance(unit, basestring) and \
+                unit.partition('://')[0] not in ('http', 'https'):
+            raise ValueError("'unit' must be an ItemPage or entity uri.")
+
+        if error is None and not self._require_errors(site):
+            self.upperBound = self.lowerBound = None
         else:
-            upperError = lowerError = self._todecimal(error)
+            if error is None:
+                self.upperBound = self.lowerBound = Decimal(0)
+            elif isinstance(error, tuple):
+                upperError = self._todecimal(error[0])
+                lowerError = self._todecimal(error[1])
+            else:
+                upperError = lowerError = self._todecimal(error)
 
-        self.upperBound = self.amount + upperError
-        self.lowerBound = self.amount - lowerError
+            self.upperBound = self.amount + upperError
+            self.lowerBound = self.amount - lowerError
+
+    @property
+    def unit(self):
+        """Return _unit's entity uri or '1' if _unit is None."""
+        if isinstance(self._unit, ItemPage):
+            return self._unit.concept_uri()
+        return self._unit or '1'
+
+    def get_unit_item(self, repo=None, lazy_load=False):
+        """
+        Return the ItemPage corresponding to the unit.
+
+        Note that the unit need not be in the same data repository as the
+        WbQuantity itself.
+
+        A successful lookup is stored as an internal value to avoid the need
+        for repeated lookups.
+
+        @param repo: the Wikibase site for the unit, if different from that
+            provided with the WbQuantity.
+        @type repo: pywikibot.site.DataSite
+        @param lazy_load: Do not raise NoPage if ItemPage does not exist.
+        @type lazy_load: bool
+        @return: pywikibot.ItemPage
+        """
+        if not isinstance(self._unit, basestring):
+            return self._unit
+
+        repo = repo or self.site
+        self._unit = ItemPage.from_entity_uri(repo, self._unit, lazy_load)
+        return self._unit
 
     def toWikibase(self):
         """
@@ -637,23 +820,34 @@ class WbQuantity(_WbRepresentation):
         return json
 
     @classmethod
-    def fromWikibase(cls, wb):
+    def fromWikibase(cls, wb, site=None):
         """
-        Create a WbQuanity from the JSON data given by the Wikibase API.
+        Create a WbQuantity from the JSON data given by the Wikibase API.
 
         @param wb: Wikibase JSON
         @type wb: dict
-        @rtype: pywikibot.WbQuanity
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.WbQuantity
         """
         amount = cls._todecimal(wb['amount'])
-        upperBound = cls._todecimal(wb['upperBound'])
-        lowerBound = cls._todecimal(wb['lowerBound'])
-        error = (upperBound - amount, amount - lowerBound)
-        return cls(amount, wb['unit'], error)
+        upperBound = cls._todecimal(wb.get('upperBound'))
+        lowerBound = cls._todecimal(wb.get('lowerBound'))
+        bounds_provided = (upperBound is not None and lowerBound is not None)
+        error = None
+        if bounds_provided or cls._require_errors(site):
+            error = (upperBound - amount, amount - lowerBound)
+        if wb['unit'] == '1':
+            unit = None
+        else:
+            unit = wb['unit']
+        return cls(amount, unit, error, site)
 
 
 class WbMonolingualText(_WbRepresentation):
     """A Wikibase monolingual text representation."""
+
+    _items = ('text', 'language')
 
     def __init__(self, text, language):
         """
@@ -692,6 +886,244 @@ class WbMonolingualText(_WbRepresentation):
         """
         return cls(wb['text'], wb['language'])
 
+
+class _WbDataPage(_WbRepresentation):
+    """
+    A Wikibase representation for data pages.
+
+    A temporary implementation until T162336 has been resolved.
+
+    Note that this class cannot be used directly
+    """
+
+    _items = ('page', )
+
+    @classmethod
+    def _get_data_site(cls, repo_site):
+        """
+        Return the site serving as a repository for a given data type.
+
+        Must be implemented in the extended class.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.APISite
+        @rtype: pywikibot.site.APISite
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _get_type_specifics(cls, site):
+        """
+        Return the specifics for a given data type.
+
+        Must be implemented in the extended class.
+
+        The dict should have three keys:
+        * ending: str, required filetype-like ending in page titles.
+        * label: str, describing the data type for use in error messages.
+        * data_site: pywikibot.site.APISite, site serving as a repository for
+            the given data type.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.APISite
+        @rtype: dict
+        """
+        raise NotImplementedError
+
+    @staticmethod
+    def _validate(page, data_site, ending, label):
+        """
+        Validate the provided page against general and type specific rules.
+
+        @param page: Page containing the data.
+        @type text: pywikibot.Page
+        @param data_site: The site serving as a repository for the given
+            data type.
+        @type data_site: pywikibot.site.APISite
+        @param ending: Required filetype-like ending in page titles.
+            E.g. '.map'
+        @type ending: str
+        @param label: Label describing the data type in error messages.
+        @type site: str
+        """
+        if not isinstance(page, Page):
+            raise ValueError('Page must be a pywikibot.Page object.')
+
+        # validate page exists
+        if not page.exists():
+            raise ValueError('Page must exist.')
+
+        # validate page is on the right site, and that site supports the type
+        if not data_site:
+            raise ValueError(
+                'The provided site does not support {0}.'.format(label))
+        if page.site != data_site:
+            raise ValueError(
+                'Page must be on the {0} repository site.'.format(label))
+
+        # validate page title fulfills hard-coded Wikibase requirement
+        # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.map$/u' for geo-shape
+        # pcre regexp: '/^Data:[^\\[\\]#\\\:{|}]+\.tab$/u' for tabular-data
+        # As we have already checked for existence the following simplified
+        # check should be enough.
+        if not page.title().startswith('Data:') or \
+                not page.title().endswith(ending):
+            raise ValueError(
+                "Page must be in 'Data:' namespace and end in '{0}' "
+                "for {1}.".format(ending, label))
+
+    def __init__(self, page, site=None):
+        """
+        Create a new _WbDataPage object.
+
+        @param page: page containing the data
+        @type text: pywikibot.Page
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        """
+        site = site or Site().data_repository()
+        specifics = type(self)._get_type_specifics(site)
+        _WbDataPage._validate(page, specifics['data_site'],
+                              specifics['ending'], specifics['label'])
+        self.page = page
+
+    def __hash__(self):
+        """Override super.hash() as toWikibase is a string for _WbDataPage."""
+        return hash(self.toWikibase())
+
+    def toWikibase(self):
+        """
+        Convert the data to the value required by the Wikibase API.
+
+        @return: title of the data page incl. namespace
+        @rtype: str
+        """
+        return self.page.title()
+
+    @classmethod
+    def fromWikibase(cls, page_name, site):
+        """
+        Create a _WbDataPage from the JSON data given by the Wikibase API.
+
+        @param page_name: page name from Wikibase value
+        @type page_name: str
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot._WbDataPage
+        """
+        data_site = cls._get_data_site(site)
+        page = Page(data_site, page_name)
+        return cls(page, site)
+
+
+class WbGeoShape(_WbDataPage):
+    """
+    A Wikibase geo-shape representation.
+    """
+
+    @classmethod
+    def _get_data_site(cls, site):
+        """
+        Return the site serving as a geo-shape repository.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.site.APISite
+        """
+        return site.geo_shape_repository()
+
+    @classmethod
+    def _get_type_specifics(cls, site):
+        """
+        Return the specifics for WbGeoShape.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: dict
+        """
+        specifics = {
+            'ending': '.map',
+            'label': 'geo-shape',
+            'data_site': cls._get_data_site(site)
+        }
+        return specifics
+
+
+class WbTabularData(_WbDataPage):
+    """
+    A Wikibase tabular-data representation.
+    """
+
+    @classmethod
+    def _get_data_site(cls, site):
+        """
+        Return the site serving as a tabular-data repository.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: pywikibot.site.APISite
+        """
+        return site.tabular_data_repository()
+
+    @classmethod
+    def _get_type_specifics(cls, site):
+        """
+        Return the specifics for WbTabularData.
+
+        @param site: The Wikibase site
+        @type site: pywikibot.site.DataSite
+        @rtype: dict
+        """
+        specifics = {
+            'ending': '.tab',
+            'label': 'tabular-data',
+            'data_site': cls._get_data_site(site)
+        }
+        return specifics
+
+
+class WbUnknown(_WbRepresentation):
+    """
+    A Wikibase representation for unknown data type.
+
+    This will prevent the bot from breaking completely when a new type
+    is introduced.
+
+    This data type is just a json container
+    """
+
+    _items = ('json',)
+
+    def __init__(self, json):
+        """
+        Create a new WbUnknown object.
+
+        @param json: Wikibase JSON
+        @type: dict
+        """
+        self.json = json
+
+    def toWikibase(self):
+        """
+        Return the JSON object for the Wikibase API.
+
+        @return: Wikibase JSON
+        @rtype: dict
+        """
+        return self.json
+
+    @classmethod
+    def fromWikibase(cls, json):
+        """
+        Create a WbUnknown from the JSON data given by the Wikibase API.
+
+        @param json: Wikibase JSON
+        @type json: dict
+        @rtype: pywikibot.WbUnknown
+        """
+        return cls(json)
+
+
 _sites = {}
 _url_cache = {}  # The code/fam pair for each URL
 
@@ -718,6 +1150,8 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @param url: Instead of code and fam, does try to get a Site based on the
         URL. Still requires that the family supporting that URL exists.
     @type url: string
+    @rtype: pywikibot.site.APISite
+
     """
     # Either code and fam or only url
     if url and (code or fam):
@@ -763,13 +1197,16 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
     interface = interface or fam.interface(code)
 
-    # config.usernames is initialised with a dict for each family name
+    # config.usernames is initialised with a defaultdict for each family name
     family_name = str(fam)
-    if family_name in config.usernames:
-        user = user or config.usernames[family_name].get(code) \
-            or config.usernames[family_name].get('*')
-        sysop = sysop or config.sysopnames[family_name].get(code) \
-            or config.sysopnames[family_name].get('*')
+
+    code_to_user = config.usernames['*'].copy()
+    code_to_user.update(config.usernames[family_name])
+    user = user or code_to_user.get(code) or code_to_user.get('*')
+
+    code_to_sysop = config.sysopnames['*'].copy()
+    code_to_sysop.update(config.sysopnames[family_name])
+    sysop = sysop or code_to_sysop.get(code) or code_to_sysop.get('*')
 
     if not isinstance(interface, type):
         # If it isnt a class, assume it is a string
@@ -835,47 +1272,59 @@ def showDiff(oldtext, newtext, context=0):
 
 # Throttle and thread handling
 
-stopped = False
-
 
 def stopme():
     """
     Drop this process from the throttle log, after pending threads finish.
 
-    Can be called manually if desired, but if not, will be called automatically
-    at Python exit.
+    Can be called manually if desired. Does not clean async_manager.
+    This should be run when a bot does not interact with the Wiki, or
+    when it has stopped doing so. After a bot has run stopme() it will
+    not slow down other bots any more.
     """
-    global stopped
+    _flush(False)
+
+
+def _flush(stop=True):
+    """
+    Drop this process from the throttle log, after pending threads finish.
+
+    Wait for the page-putter to flush its queue. Also drop this process from the
+    throttle log. Called automatically at Python exit.
+    """
     _logger = "wiki"
 
-    if not stopped:
-        debug(u"stopme() called", _logger)
+    debug('_flush() called', _logger)
 
-        def remaining():
-            remainingPages = page_put_queue.qsize() - 1
+    def remaining():
+        remainingPages = page_put_queue.qsize()
+        if stop:
             # -1 because we added a None element to stop the queue
+            remainingPages -= 1
 
-            remainingSeconds = datetime.timedelta(
-                seconds=(remainingPages * config.put_throttle))
-            return (remainingPages, remainingSeconds)
+        remainingSeconds = datetime.timedelta(
+            seconds=(remainingPages * config.put_throttle))
+        return (remainingPages, remainingSeconds)
 
+    if stop:
+        # None task element leaves async_manager
         page_put_queue.put((None, [], {}))
-        stopped = True
 
-        if page_put_queue.qsize() > 1:
-            num, sec = remaining()
-            output(color_format(
-                '{lightblue}Waiting for {num} pages to be put. '
-                'Estimated time remaining: {sec}{default}', num=num, sec=sec))
+    num, sec = remaining()
+    if num > 0 and sec.total_seconds() > config.noisysleep:
+        output(color_format(
+            '{lightblue}Waiting for {num} pages to be put. '
+            'Estimated time remaining: {sec}{default}', num=num, sec=sec))
 
-        while(_putthread.isAlive()):
-            try:
-                _putthread.join(1)
-            except KeyboardInterrupt:
-                if input_yn('There are %i pages remaining in the queue. '
-                            'Estimated time remaining: %s\nReally exit?'
-                            % remaining(), default=False, automatic_quit=False):
-                    return
+    while _putthread.isAlive() and page_put_queue.qsize() > 0:
+        try:
+            _putthread.join(1)
+        except KeyboardInterrupt:
+            if input_yn('There are {0} pages remaining in the queue. '
+                        'Estimated time remaining: {1}\nReally exit?'
+                        ''.format(*remaining()),
+                        default=False, automatic_quit=False):
+                return
 
     # only need one drop() call because all throttles use the same global pid
     try:
@@ -884,7 +1333,8 @@ def stopme():
     except IndexError:
         pass
 
-atexit.register(stopme)
+
+atexit.register(_flush)
 
 
 # Create a separate thread for asynchronous page saves (and other requests)
@@ -910,6 +1360,7 @@ def async_request(request, *args, **kwargs):
         finally:
             page_put_queue.mutex.release()
     page_put_queue.put((request, args, kwargs))
+
 
 # queue to hold pending requests
 page_put_queue = Queue(config.max_queue_size)

@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
 # (C) Pywikibot team, 2012-2014
@@ -6,9 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import pywikibot
 from pywikibot.tools import deprecated
@@ -290,5 +287,5 @@ class TestNeedVersion(DeprecationTestCase):
             __name__ + '.TestNeedVersion.deprecated_available_method2')
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()

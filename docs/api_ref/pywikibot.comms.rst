@@ -17,10 +17,10 @@ pywikibot.comms.http module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.comms.rcstream module
+pywikibot.comms.eventstreams module
 -------------------------------
 
-.. automodule:: pywikibot.comms.rcstream
+.. automodule:: pywikibot.comms.eventstreams
     :members:
     :undoc-members:
     :show-inheritance:

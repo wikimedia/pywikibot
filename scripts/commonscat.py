@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 With this tool you can add the template {{commonscat}} to categories.
 
@@ -52,15 +52,12 @@ For example to go through all categories:
 # November 2013
 #
 # (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2015
-# (C) Pywikibot team, 2008-2015
+# (C) Xqt, 2009-2017
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import re
 
@@ -143,6 +140,7 @@ commonscatTemplates = {
     'sl': (u'Kategorija v Zbirki',
            [u'Commonscat', u'Kategorija v zbirki', u'Commons cat',
             u'Katzbirke']),
+    'sq': (u'Commonscat', [u'Commonskat', u'Commonsart', u'CommonsCat']),
     'sv': (u'Commonscat',
            [u'Commonscat-rad', u'Commonskat', u'Commons cat', u'Commonscatbox',
             u'Commonscat-box']),
@@ -351,17 +349,17 @@ class CommonscatBot(Bot):
                               oldcat.lower() in page.title().lower()):
             linktitle = oldcat
         if linktitle and newcat != page.title(withNamespace=False):
-            newtext = re.sub(u'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s|%s|%s}}' % (newtemplate, newcat, linktitle),
                              page.get())
         elif newcat == page.title(withNamespace=False):
-            newtext = re.sub(u'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s}}' % newtemplate,
                              page.get())
         elif oldcat.strip() != newcat:  # strip trailing white space
-            newtext = re.sub(u'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
+            newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s|%s}}' % (newtemplate, newcat),
                              page.get())
@@ -380,7 +378,7 @@ class CommonscatBot(Bot):
     def findCommonscatLink(self, page=None):
         """Find CommonsCat template on interwiki pages.
 
-        In Pywikibot 2.0, page.interwiki() now returns Link objects,
+        In Pywikibot >=2.0, page.interwiki() now returns Link objects,
         not Page objects
 
         @rtype: unicode, name of a valid commons category
@@ -535,8 +533,9 @@ def main(*args):
         generator = genFactory.getCombinedGenerator()
 
     if generator:
-        pregenerator = pagegenerators.PreloadingGenerator(generator)
-        bot = CommonscatBot(pregenerator, **options)
+        if not genFactory.nopreload:
+            generator = pagegenerators.PreloadingGenerator(generator)
+        bot = CommonscatBot(generator, **options)
         bot.run()
         return True
     else:

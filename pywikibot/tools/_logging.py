@@ -1,4 +1,4 @@
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """Logging tools."""
 #
 # (C) Pywikibot team, 2009-2015
@@ -72,27 +72,15 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
         """Strip trailing newlines before outputting text to file."""
         # Warnings captured from the warnings system are not processed by
         # logoutput(), so the 'context' variables are missing.
-        # The same context details are provided by Python 3.X, but need to
-        # be extracted from the warning message for Python <= 2.7.
         if record.name == 'py.warnings' and 'caller_file' not in record.__dict__:
             assert len(record.args) == 1, \
                 'Arguments for record is not correctly set'
             msg = record.args[0]
 
-            if PY2:
-                record.pathname = msg.partition(':')[0]
-                record.lineno = msg.partition(':')[2].partition(':')[0]
-                record.module = msg.rpartition('/')[2].rpartition('.')[0]
-            else:
-                assert msg.startswith(record.pathname + ':'), \
-                    'Record argument should start with path'
-
             record.__dict__['caller_file'] = record.pathname
             record.__dict__['caller_name'] = record.module
             record.__dict__['caller_line'] = record.lineno
 
-            # Remove the path and the line number, and strip the extra space
-            msg = msg.partition(':')[2].partition(':')[2].lstrip()
             record.args = (msg,)
 
         text = logging.handlers.RotatingFileHandler.format(self, record)
@@ -121,7 +109,7 @@ class LoggingFormatter(logging.Formatter):
         Make sure that the exception trace is converted to unicode.
 
         L{exceptions.Error} traces are encoded in our console encoding, which
-        is needed for plainly printing them.  However, when logging them
+        is needed for plainly printing them. However, when logging them
         using logging.exception, the Python logging module will try to use
         these traces, and it will fail if they are console encoded strings.
 

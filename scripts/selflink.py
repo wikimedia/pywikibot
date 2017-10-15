@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# -*- coding: utf-8  -*-
+# -*- coding: utf-8 -*-
 """
 This bot searches for selflinks and allows removing them.
 
@@ -11,7 +11,7 @@ These command line parameters can be used to specify which pages to work on:
                   ATTENTION: Use this with care!
 """
 #
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,10 +20,8 @@ from __future__ import absolute_import, unicode_literals
 import pywikibot
 
 from pywikibot.bot import Choice, MultipleSitesBot
-from pywikibot.pagegenerators import GeneratorFactory, PreloadingGenerator, \
-    parameterHelp
-
-from scripts.unlink import BaseUnlinkBot
+from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
+from pywikibot.specialbots import BaseUnlinkBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -58,7 +56,8 @@ class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
     def _create_callback(self):
         """Create callback and add a choice to make the link bold."""
         callback = super(SelflinkBot, self)._create_callback()
-        callback.additional_choices += [_BoldChoice(self.current_page, callback)]
+        callback.additional_choices += [_BoldChoice(self.current_page,
+                                                    callback)]
         return callback
 
     def treat_page(self):
@@ -96,15 +95,15 @@ def main(*args):
         else:
             genFactory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = genFactory.getCombinedGenerator(preload=True)
     if not gen:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
 
-    preloadingGen = PreloadingGenerator(gen)
-    bot = SelflinkBot(preloadingGen, **botArgs)
+    bot = SelflinkBot(gen, **botArgs)
     bot.run()
     return True
+
 
 if __name__ == "__main__":
     main()
