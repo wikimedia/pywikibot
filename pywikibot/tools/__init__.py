@@ -23,7 +23,7 @@ import time
 import types
 
 from distutils.version import Version
-from warnings import warn
+from warnings import catch_warnings, simplefilter, warn
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
@@ -205,6 +205,16 @@ class classproperty(object):  # flake8: disable=N801
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""
         return self.method(owner)
+
+
+class suppress_warnings(catch_warnings):  # flake8: disable=N801
+
+    """A context manager that temporarily suppresses warnings."""
+
+    def __enter__(self):
+        """Catch the old filter settings and ignore all warnings."""
+        super(suppress_warnings, self).__enter__()
+        simplefilter('ignore')
 
 
 class UnicodeMixin(object):
