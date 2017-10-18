@@ -68,6 +68,7 @@ from pywikibot.i18n import translate
 from pywikibot.site import BaseSite
 from pywikibot.tools import (
     # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
+    classproperty,
     deprecated as __deprecated,
     deprecate_arg as _deprecate_arg,
     normalize_username,
@@ -156,21 +157,45 @@ class Timestamp(datetime.datetime):
     """
 
     mediawikiTSFormat = "%Y%m%d%H%M%S"
-    ISO8601Format = "%Y-%m-%dT%H:%M:%SZ"
     _ISO8601Format_new = '{0:+05d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     def clone(self):
         """Clone this instance."""
         return self.replace(microsecond=self.microsecond)
 
+    @classproperty
+    def ISO8601Format(cls):  # flake8: disable=N805
+        """ISO8601 format string class property for compatibility purpose."""
+        return cls._ISO8601Format()
+
     @classmethod
-    def fromISOformat(cls, ts):
-        """Convert an ISO 8601 timestamp to a Timestamp object."""
+    def _ISO8601Format(cls, sep='T'):
+        """ISO8601 format string.
+
+        @param sep: one-character separator, placed between the date and time
+        @type sep: str
+        @return: ISO8601 format string
+        @rtype: str
+        """
+        assert(len(sep) == 1)
+        return '%Y-%m-%d{0}%H:%M:%SZ'.format(sep)
+
+    @classmethod
+    def fromISOformat(cls, ts, sep='T'):
+        """Convert an ISO 8601 timestamp to a Timestamp object.
+
+        @param ts: ISO 8601 timestamp or a Timestamp object already
+        @type ts: str ot Timestamp
+        @param sep: one-character separator, placed between the date and time
+        @type sep: str
+        @return: Timestamp object
+        @rtype: Timestamp
+        """
         # If inadvertantly passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
             return ts.clone()
-        return cls.strptime(ts, cls.ISO8601Format)
+        return cls.strptime(ts, cls._ISO8601Format(sep))
 
     @classmethod
     def fromtimestampformat(cls, ts):
@@ -181,7 +206,7 @@ class Timestamp(datetime.datetime):
             return ts.clone()
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
-    def isoformat(self):
+    def isoformat(self, sep='T'):
         """
         Convert object to an ISO 8601 timestamp accepted by MediaWiki.
 
@@ -189,7 +214,7 @@ class Timestamp(datetime.datetime):
         with a 'Z' unless a timezone is included, which causes MediaWiki
         ~1.19 and earlier to fail.
         """
-        return self.strftime(self.ISO8601Format)
+        return self.strftime(self._ISO8601Format(sep))
 
     toISOformat = redirect_func(isoformat, old_name='toISOformat',
                                 class_name='Timestamp')

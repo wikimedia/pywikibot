@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Timestamp class."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,6 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 import calendar
 import datetime
+import re
 
 from pywikibot import Timestamp
 
@@ -40,6 +41,7 @@ class TestTimestamp(TestCase):
 
     def test_iso_format(self):
         """Test conversion from and to ISO format."""
+        SEP = 'T'
         t1 = Timestamp.utcnow()
         ts1 = t1.isoformat()
         t2 = Timestamp.fromISOformat(ts1)
@@ -49,6 +51,31 @@ class TestTimestamp(TestCase):
         t1 = t1.replace(microsecond=0)
         self.assertEqual(t1, t2)
         self.assertEqual(ts1, ts2)
+        date, sep, time = ts1.partition(SEP)
+        time = time.rstrip('Z')
+        self.assertEqual(date, str(t1.date()))
+        self.assertEqual(time, str(t1.time()))
+
+    def test_iso_format_with_sep(self):
+        """Test conversion from and to ISO format with separator."""
+        SEP = '*'
+        t1 = Timestamp.utcnow().replace(microsecond=0)
+        ts1 = t1.isoformat(sep=SEP)
+        t2 = Timestamp.fromISOformat(ts1, sep=SEP)
+        ts2 = t2.isoformat(sep=SEP)
+        self.assertEqual(t1, t2)
+        self.assertEqual(t1, t2)
+        self.assertEqual(ts1, ts2)
+        date, sep, time = ts1.partition(SEP)
+        time = time.rstrip('Z')
+        self.assertEqual(date, str(t1.date()))
+        self.assertEqual(time, str(t1.time()))
+
+    def test_iso_format_property(self):
+        """Test iso format properties."""
+        self.assertEqual(Timestamp.ISO8601Format, Timestamp._ISO8601Format())
+        self.assertEqual(re.sub('[\-\:TZ]', '', Timestamp.ISO8601Format),
+                         Timestamp.mediawikiTSFormat)
 
     def test_mediawiki_format(self):
         """Test conversion from and to timestamp format."""
