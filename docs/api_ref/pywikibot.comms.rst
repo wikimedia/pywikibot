@@ -9,18 +9,18 @@ pywikibot.comms package
 Submodules
 ----------
 
-pywikibot.comms.http module
----------------------------
+pywikibot.comms.eventstreams module
+-----------------------------------
 
-.. automodule:: pywikibot.comms.http
+.. automodule:: pywikibot.comms.eventstreams
     :members:
     :undoc-members:
     :show-inheritance:
 
-pywikibot.comms.eventstreams module
--------------------------------
+pywikibot.comms.http module
+---------------------------
 
-.. automodule:: pywikibot.comms.eventstreams
+.. automodule:: pywikibot.comms.http
     :members:
     :undoc-members:
     :show-inheritance:
