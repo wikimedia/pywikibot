@@ -4924,7 +4924,7 @@ class APISite(BaseSite):
             'users', ususers=usernames, site=self, usprop=usprop)
         return usgen
 
-    @deprecated("Site.randompages()")
+    @deprecated('Site.randompages(total=1)')
     def randompage(self, redirect=False):
         """
         DEPRECATED.
@@ -4934,7 +4934,7 @@ class APISite(BaseSite):
         """
         return self.randompages(total=1, redirects=redirect)
 
-    @deprecated("Site.randompages()")
+    @deprecated("Site.randompages(total=1, redirects=True)")
     def randomredirectpage(self):
         """
         DEPRECATED: Use Site.randompages() instead.
@@ -4956,17 +4956,34 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param redirects: if True, include only redirect pages in results
-            (default: include only non-redirects)
+        @param redirects: if True, include only redirect pages in results,
+            False does not include redirects and None (MW 1.26+) include both
+            types. (default: False)
+        @type redirects: bool or None
         @param content: if True, load the current content of each iterated page
             (default False)
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        @raises AssertError: unsupported redirects parameter
         """
+        mapping = {False: None, True: 'redirects', None: 'all'}
+        assert redirects in mapping
+        redirects = mapping[redirects]
+        params = {}
+        if redirects is not None:
+            if MediaWikiVersion(self.version()) < MediaWikiVersion('1.26'):
+                if redirects == 'all':
+                    warn("parameter redirects=None to retrieve 'all' random"
+                         'page types is not supported by mw version {0}. '
+                         'Using default.'.format(self.version()),
+                         UserWarning)
+                params['grnredirect'] = redirects == 'redirects'
+            else:
+                params['grnfilterredir'] = redirects
         rngen = self._generator(api.PageGenerator, type_arg="random",
                                 namespaces=namespaces, total=total,
-                                g_content=content, grnredirect=redirects)
+                                g_content=content, **params)
         return rngen
 
     # Catalog of editpage error codes, for use in generating messages.
