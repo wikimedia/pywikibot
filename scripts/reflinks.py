@@ -761,20 +761,26 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        arg, sep, value = arg.partition(':')
-        option = arg.partition('-')[2]
-        if option == 'summary':
-            options[option] = value
-        elif option in ('always', 'ignorepdf'):
-            options[option] = True
-        elif option == 'limit':
-            options[option] = int(value)
-        elif option == 'xmlstart':
-            xmlStart = value or pywikibot.input(
-                'Please enter the dumped article to start with:')
-        elif option == 'xml':
-            xmlFilename = value or pywikibot.input(
-                "Please enter the XML dump's filename:")
+        if arg.startswith('-summary:'):
+            options['summary'] = arg[9:]
+        elif arg == '-always':
+            options['always'] = True
+        elif arg == '-ignorepdf':
+            options['ignorepdf'] = True
+        elif arg.startswith('-limit:'):
+            options['limit'] = int(arg[7:])
+        elif arg.startswith('-xmlstart'):
+            if len(arg) == 9:
+                xmlStart = pywikibot.input(
+                    u'Please enter the dumped article to start with:')
+            else:
+                xmlStart = arg[10:]
+        elif arg.startswith('-xml'):
+            if len(arg) == 4:
+                xmlFilename = pywikibot.input(
+                    u'Please enter the XML dump\'s filename:')
+            else:
+                xmlFilename = arg[5:]
         else:
             genFactory.handleArg(arg)
 
