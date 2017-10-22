@@ -73,6 +73,10 @@ if PY2:
         'MySQL': ['oursql'],
         'unicode7': ['unicodedata2>=7.0.0-2'],
     })
+elif PYTHON_VERSION[:2] == (3, 3):
+    # requests[security] requires cryptography, but cryptography does not
+    # support Python 3.3; T178241
+    extra_deps['security'].append('cryptography<2.0')
 
 script_deps = {
     'flickrripper.py': ['Pillow<3.5.0' if PY26 else 'Pillow'],
