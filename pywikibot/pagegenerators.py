@@ -69,291 +69,300 @@ parameterHelp = """\
 GENERATOR OPTIONS
 =================
 
--cat              Work on all pages which are in a specific category.
-                  Argument can also be given as "-cat:categoryname" or
-                  as "-cat:categoryname|fromtitle" (using # instead of |
-                  is also allowed in this one and the following)
+-cat                Work on all pages which are in a specific category.
+                    Argument can also be given as "-cat:categoryname" or
+                    as "-cat:categoryname|fromtitle" (using # instead of |
+                    is also allowed in this one and the following)
 
--catr             Like -cat, but also recursively includes pages in
-                  subcategories, sub-subcategories etc. of the
-                  given category.
-                  Argument can also be given as "-catr:categoryname" or
-                  as "-catr:categoryname|fromtitle".
+-catr               Like -cat, but also recursively includes pages in
+                    subcategories, sub-subcategories etc. of the
+                    given category.
+                    Argument can also be given as "-catr:categoryname" or
+                    as "-catr:categoryname|fromtitle".
 
--subcats          Work on all subcategories of a specific category.
-                  Argument can also be given as "-subcats:categoryname" or
-                  as "-subcats:categoryname|fromtitle".
+-subcats            Work on all subcategories of a specific category.
+                    Argument can also be given as "-subcats:categoryname" or
+                    as "-subcats:categoryname|fromtitle".
 
--subcatsr         Like -subcats, but also includes sub-subcategories etc. of
-                  the given category.
-                  Argument can also be given as "-subcatsr:categoryname" or
-                  as "-subcatsr:categoryname|fromtitle".
+-subcatsr           Like -subcats, but also includes sub-subcategories etc. of
+                    the given category.
+                    Argument can also be given as "-subcatsr:categoryname" or
+                    as "-subcatsr:categoryname|fromtitle".
 
--uncat            Work on all pages which are not categorised.
+-uncat              Work on all pages which are not categorised.
 
--uncatcat         Work on all categories which are not categorised.
+-uncatcat           Work on all categories which are not categorised.
 
--uncatfiles       Work on all files which are not categorised.
+-uncatfiles         Work on all files which are not categorised.
 
--file             Read a list of pages to treat from the named text file.
-                  Page titles in the file may be either enclosed with
-                  [[brackets]], or be separated by new lines.
-                  Argument can also be given as "-file:filename".
+-file               Read a list of pages to treat from the named text file.
+                    Page titles in the file may be either enclosed with
+                    [[brackets]], or be separated by new lines.
+                    Argument can also be given as "-file:filename".
 
--filelinks        Work on all pages that use a certain image/media file.
-                  Argument can also be given as "-filelinks:filename".
+-filelinks          Work on all pages that use a certain image/media file.
+                    Argument can also be given as "-filelinks:filename".
 
--search           Work on all pages that are found in a MediaWiki search
-                  across all namespaces.
+-search             Work on all pages that are found in a MediaWiki search
+                    across all namespaces.
 
--logevents        Work on articles that were on a specified Special:Log.
-                  The value may be a comma separated list of these values:
+-logevents          Work on articles that were on a specified Special:Log.
+                    The value may be a comma separated list of these values:
 
-                      logevent,username,start,end
+                        logevent,username,start,end
 
-                  or for backward compatibility:
+                    or for backward compatibility:
 
-                      logevent,username,total
+                        logevent,username,total
 
-                  To use the default value, use an empty string.
-                  You have options for every type of logs given by the
-                  log event parameter which could be one of the following:
+                    To use the default value, use an empty string.
+                    You have options for every type of logs given by the
+                    log event parameter which could be one of the following:
 
-                      spamblacklist, titleblacklist, gblblock, renameuser,
-                      globalauth, gblrights, gblrename, abusefilter,
-                      massmessage, thanks, usermerge, block, protect, rights,
-                      delete, upload, move, import, patrol, merge, suppress,
-                      tag, managetags, contentmodel, review, stable,
-                      timedmediahandler, newusers
+                        spamblacklist, titleblacklist, gblblock, renameuser,
+                        globalauth, gblrights, gblrename, abusefilter,
+                        massmessage, thanks, usermerge, block, protect, rights,
+                        delete, upload, move, import, patrol, merge, suppress,
+                        tag, managetags, contentmodel, review, stable,
+                        timedmediahandler, newusers
 
-                  It uses the default number of pages 10.
+                    It uses the default number of pages 10.
 
-                  Examples:
+                    Examples:
 
-                  -logevents:move gives pages from move log (usually redirects)
-                  -logevents:delete,,20 gives 20 pages from deletion log
-                  -logevents:protect,Usr gives pages from protect by user Usr
-                  -logevents:patrol,Usr,20 gives 20 patroled pages by user Usr
-                  -logevents:upload,,20121231,20100101 gives upload pages
-                  in the 2010s, 2011s, and 2012s
-                  -logevents:review,,20121231 gives review pages since the
-                  beginning till the 31 Dec 2012
-                  -logevents:review,Usr,20121231 gives review pages by user
-                  Usr since the beginning till the 31 Dec 2012
+                    -logevents:move gives pages from move log (usually
+                    redirects)
+                    -logevents:delete,,20 gives 20 pages from deletion log
+                    -logevents:protect,Usr gives pages from protect by user Usr
+                    -logevents:patrol,Usr,20 gives 20 patroled pages by  Usr
+                    -logevents:upload,,20121231,20100101 gives upload pages
+                    in the 2010s, 2011s, and 2012s
+                    -logevents:review,,20121231 gives review pages since the
+                    beginning till the 31 Dec 2012
+                    -logevents:review,Usr,20121231 gives review pages by user
+                    Usr since the beginning till the 31 Dec 2012
 
-                  In some cases it must be written as -logevents:"move,Usr,20"
+                    In some cases it must be given as -logevents:"move,Usr,20"
 
--interwiki        Work on the given page and all equivalent pages in other
-                  languages. This can, for example, be used to fight
-                  multi-site spamming.
-                  Attention: this will cause the bot to modify
-                  pages on several wiki sites, this is not well tested,
-                  so check your edits!
+-interwiki          Work on the given page and all equivalent pages in other
+                    languages. This can, for example, be used to fight
+                    multi-site spamming.
+                    Attention: this will cause the bot to modify
+                    pages on several wiki sites, this is not well tested,
+                    so check your edits!
 
--links            Work on all pages that are linked from a certain page.
-                  Argument can also be given as "-links:linkingpagetitle".
+-links              Work on all pages that are linked from a certain page.
+                    Argument can also be given as "-links:linkingpagetitle".
 
--liverecentchanges Work on pages from the live recent changes feed. If used as
-                  -liverecentchanges:x, work on x recent changes.
+-liverecentchanges  Work on pages from the live recent changes feed. If used as
+                    -liverecentchanges:x, work on x recent changes.
 
--imagesused       Work on all images that contained on a certain page.
-                  Argument can also be given as "-imagesused:linkingpagetitle".
+-imagesused         Work on all images that contained on a certain page.
+                    Can also be given as "-imagesused:linkingpagetitle".
 
--newimages        Work on the most recent new images. If given as -newimages:x,
-                  will work on x newest images.
+-newimages          Work on the most recent new images. If given as
+                    -newimages:x, will work on x newest images.
 
--newpages         Work on the most recent new pages. If given as -newpages:x,
-                  will work on x newest pages.
+-newpages           Work on the most recent new pages. If given as -newpages:x,
+                    will work on x newest pages.
 
--recentchanges    Work on the pages with the most recent changes. If
-                  given as -recentchanges:x, will work on the x most recently
-                  changed pages. If given as -recentchanges:offset,duration it
-                  will work on pages changed from 'offset' minutes with
-                  'duration'  minutes of timespan. rctags are supported too.
-                  The rctag must be the very first parameter part.
+-recentchanges      Work on the pages with the most recent changes. If
+                    given as -recentchanges:x, will work on the x most recently
+                    changed pages. If given as -recentchanges:offset,duration
+                    it will work on pages changed from 'offset' minutes with
+                    'duration'  minutes of timespan. rctags are supported too.
+                    The rctag must be the very first parameter part.
 
-                  Examples:
-                  -recentchanges:20 gives the 20 most recently changed pages
-                  -recentchanges:120,70 will give pages with 120 offset
-                  minutes and 70 minutes of timespan
-                  -recentchanges:visualeditor,10 gives the 10 most recently
-                  changed pages marked with 'visualeditor'
-                  -recentchanges:"mobile edit,60,35" will retrieve pages marked
-                  with 'mobile edit' for the given offset and timespan
+                    Examples:
 
--unconnectedpages Work on the most recent unconnected pages to the Wikibase
-                  repository. Given as -unconnectedpages:x, will work on the
-                  x most recent unconnected pages.
+                    -recentchanges:20 gives the 20 most recently changed pages
+                    -recentchanges:120,70 will give pages with 120 offset
+                    minutes and 70 minutes of timespan
+                    -recentchanges:visualeditor,10 gives the 10 most recently
+                    changed pages marked with 'visualeditor'
+                    -recentchanges:"mobile edit,60,35" will retrieve pages
+                    marked with 'mobile edit' for the given offset and timespan
 
--ref              Work on all pages that link to a certain page.
-                  Argument can also be given as "-ref:referredpagetitle".
+-unconnectedpages   Work on the most recent unconnected pages to the Wikibase
+                    repository. Given as -unconnectedpages:x, will work on the
+                    x most recent unconnected pages.
 
--start            Specifies that the robot should go alphabetically through
-                  all pages on the home wiki, starting at the named page.
-                  Argument can also be given as "-start:pagetitle".
+-ref                Work on all pages that link to a certain page.
+                    Argument can also be given as "-ref:referredpagetitle".
 
-                  You can also include a namespace. For example,
-                  "-start:Template:!" will make the bot work on all pages
-                  in the template namespace.
+-start              Specifies that the robot should go alphabetically through
+                    all pages on the home wiki, starting at the named page.
+                    Argument can also be given as "-start:pagetitle".
 
-                  default value is start:!
+                    You can also include a namespace. For example,
+                    "-start:Template:!" will make the bot work on all pages
+                    in the template namespace.
 
--prefixindex      Work on pages commencing with a common prefix.
+                    default value is start:!
 
--transcludes      Work on all pages that use a certain template.
-                  Argument can also be given as "-transcludes:Title".
+-prefixindex        Work on pages commencing with a common prefix.
 
--unusedfiles      Work on all description pages of images/media files that are
-                  not used anywhere.
-                  Argument can be given as "-unusedfiles:n" where
-                  n is the maximum number of articles to work on.
+-transcludes        Work on all pages that use a certain template.
+                    Argument can also be given as "-transcludes:Title".
 
--lonelypages      Work on all articles that are not linked from any other
-                  article.
-                  Argument can be given as "-lonelypages:n" where
-                  n is the maximum number of articles to work on.
+-unusedfiles        Work on all description pages of images/media files that
+                    are not used anywhere.
+                    Argument can be given as "-unusedfiles:n" where
+                    n is the maximum number of articles to work on.
 
--unwatched        Work on all articles that are not watched by anyone.
-                  Argument can be given as "-unwatched:n" where
-                  n is the maximum number of articles to work on.
+-lonelypages        Work on all articles that are not linked from any other
+                    article.
+                    Argument can be given as "-lonelypages:n" where
+                    n is the maximum number of articles to work on.
 
--property:name    Work on all pages with a given propery name from
-                  Special:PagesWithProp.
+-unwatched          Work on all articles that are not watched by anyone.
+                    Argument can be given as "-unwatched:n" where
+                    n is the maximum number of articles to work on.
 
--usercontribs     Work on all articles that were edited by a certain user.
-                  (Example : -usercontribs:DumZiBoT)
+-property:name      Work on all pages with a given propery name from
+                    Special:PagesWithProp.
 
--weblink          Work on all articles that contain an external link to
-                  a given URL; may be given as "-weblink:url"
+-usercontribs       Work on all articles that were edited by a certain user.
+                    (Example : -usercontribs:DumZiBoT)
 
--withoutinterwiki Work on all pages that don't have interlanguage links.
-                  Argument can be given as "-withoutinterwiki:n" where
-                  n is the total to fetch.
+-weblink            Work on all articles that contain an external link to
+                    a given URL; may be given as "-weblink:url"
 
--mysqlquery       Takes a Mysql query string like
-                  "SELECT page_namespace, page_title, FROM page
-                  WHERE page_namespace = 0" and works on the resulting pages.
+-withoutinterwiki   Work on all pages that don't have interlanguage links.
+                    Argument can be given as "-withoutinterwiki:n" where
+                    n is the total to fetch.
 
--sparql           Takes a SPARQL SELECT query string including ?item
-                  and works on the resulting pages.
+-mysqlquery         Takes a Mysql query string like
+                    "SELECT page_namespace, page_title, FROM page
+                    WHERE page_namespace = 0" and works on the resulting pages.
 
--sparqlendpoint   Specify SPARQL endpoint URL (optional).
-                  (Example : -sparqlendpoint:http://myserver.com/sparql)
+-sparql             Takes a SPARQL SELECT query string including ?item
+                    and works on the resulting pages.
 
--searchitem       Takes a search string and works on Wikibase pages that
-                  contain it.
-                  Argument can be given as "-searchitem:text", where text
-                  is the string to look for, or "-searchitem:lang:text", where
-                  lang is the langauge to search items in.
+-sparqlendpoint     Specify SPARQL endpoint URL (optional).
+                    (Example : -sparqlendpoint:http://myserver.com/sparql)
 
--random           Work on random pages returned by [[Special:Random]].
-                  Can also be given as "-random:n" where n is the number
-                  of pages to be returned.
+-searchitem         Takes a search string and works on Wikibase pages that
+                    contain it.
+                    Argument can be given as "-searchitem:text", where text
+                    is the string to look for, or "-searchitem:lang:text",
+                    where lang is the langauge to search items in.
 
--randomredirect   Work on random redirect pages returned by
-                  [[Special:RandomRedirect]]. Can also be given as
-                  "-randomredirect:n" where n is the number of pages to be
-                  returned.
+-random             Work on random pages returned by [[Special:Random]].
+                    Can also be given as "-random:n" where n is the number
+                    of pages to be returned.
 
--google           Work on all pages that are found in a Google search.
-                  You need a Google Web API license key. Note that Google
-                  doesn't give out license keys anymore. See google_key in
-                  config.py for instructions.
-                  Argument can also be given as "-google:searchstring".
+-randomredirect     Work on random redirect pages returned by
+                    [[Special:RandomRedirect]]. Can also be given as
+                    "-randomredirect:n" where n is the number of pages to be
+                    returned.
 
--yahoo            Work on all pages that are found in a Yahoo search.
-                  Depends on python module pYsearch. See yahoo_appid in
-                  config.py for instructions.
+-google             Work on all pages that are found in a Google search.
+                    You need a Google Web API license key. Note that Google
+                    doesn't give out license keys anymore. See google_key in
+                    config.py for instructions.
+                    Argument can also be given as "-google:searchstring".
 
--page             Work on a single page. Argument can also be given as
-                  "-page:pagetitle", and supplied multiple times for
-                  multiple pages.
+-yahoo              Work on all pages that are found in a Yahoo search.
+                    Depends on python module pYsearch. See yahoo_appid in
+                    config.py for instructions.
 
--pageid           Work on a single pageid. Argument can also be given as
-                  "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
-                  and supplied multiple times for multiple pages.
+-page               Work on a single page. Argument can also be given as
+                    "-page:pagetitle", and supplied multiple times for
+                    multiple pages.
+
+-pageid             Work on a single pageid. Argument can also be given as
+                    "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
+                    and supplied multiple times for multiple pages.
 
 
 FILTER OPTIONS
 ==============
 
--catfilter        Filter the page generator to only yield pages in the
-                  specified category. See -cat generator for argument format.
+-catfilter          Filter the page generator to only yield pages in the
+                    specified category. See -cat generator for argument format.
 
--grep             A regular expression that needs to match the article
-                  otherwise the page won't be returned.
-                  Multiple -grep:regexpr can be provided and the page will
-                  be returned if content is matched by any of the regexpr
-                  provided.
-                  Case insensitive regular expressions will be used and
-                  dot matches any character, including a newline.
+-grep               A regular expression that needs to match the article
+                    otherwise the page won't be returned.
+                    Multiple -grep:regexpr can be provided and the page will
+                    be returned if content is matched by any of the regexpr
+                    provided.
+                    Case insensitive regular expressions will be used and
+                    dot matches any character, including a newline.
 
--intersect        Work on the intersection of all the provided generators.
+-intersect          Work on the intersection of all the provided generators.
 
--limit:n          When used with any other argument that specifies a set
-                  of pages, work on no more than n pages in total.
+-limit              When used with any other argument -limit:n specifies a set
+                    of pages, work on no more than n pages in total.
 
--namespaces       Filter the page generator to only yield pages in the
--namespace        specified namespaces. Separate multiple namespace
--ns               numbers or names with commas.
-                  Examples:
+-namespaces         Filter the page generator to only yield pages in the
+-namespace          specified namespaces. Separate multiple namespace
+-ns                 numbers or names with commas.
 
-                  -ns:0,2,4
-                  -ns:Help,MediaWiki
+                    Examples:
 
-                  You may use a preleading "not" to exclude the namespace.
-                  Examples:
-                  -ns:not:2,3
-                  -ns:not:Help,File
+                    -ns:0,2,4
+                    -ns:Help,MediaWiki
 
-                  If used with -newpages/-random/-randomredirect generators,
-                  -namespace/ns must be provided before
-                  -newpages/-random/-randomredirect.
-                  If used with -recentchanges generator, efficiency is
-                  improved if -namespace/ns is provided before -recentchanges.
+                    You may use a preleading "not" to exclude the namespace.
 
-                  If used with -start generator, -namespace/ns shall contain
-                  only one value.
+                    Examples:
 
--onlyif           A claim the page needs to contain, otherwise the item won't
-                  be returned.
-                  The format is property=value,qualifier=value. Multiple (or
-                  none) qualifiers can be passed, separated by commas.
-                  Examples: P1=Q2 (property P1 must contain value Q2),
-                  P3=Q4,P5=Q6,P6=Q7 (property P3 with value Q4 and
-                  qualifiers: P5 with value Q6 and P6 with value Q7).
-                  Value can be page ID, coordinate in format:
-                  latitude,longitude[,precision] (all values are in decimal
-                  degrees), year, or plain string.
-                  The argument can be provided multiple times and the item
-                  page will be returned only if all of the claims are present.
-                  Argument can be also given as "-onlyif:expression".
+                    -ns:not:2,3
+                    -ns:not:Help,File
 
--onlyifnot        A claim the page must not contain, otherwise the item won't
-                  be returned.
-                  For usage and examples, see -onlyif above.
+                    If used with -newpages/-random/-randomredirect generators,
+                    -namespace/ns must be provided before
+                    -newpages/-random/-randomredirect.
+                    If used with -recentchanges generator, efficiency is
+                    improved if -namespace is provided before -recentchanges.
 
--ql               Filter pages based on page quality.
-                  This is only applicable if contentmodel equals
-                  'proofread-page', otherwise has no effects.
-                  Valid values are in range 0-4.
-                  Multiple values can be comma-separated.
+                    If used with -start generator, -namespace/ns shall contain
+                    only one value.
 
--subpage:n        Filters pages to only those that have depth n
-                  i.e. a depth of 0 filters out all pages that are subpages,
-                  and a depth of 1 filters out all pages that are subpages of
-                  subpages.
+-onlyif             A claim the page needs to contain, otherwise the item won't
+                    be returned.
+                    The format is property=value,qualifier=value. Multiple (or
+                    none) qualifiers can be passed, separated by commas.
 
--titleregex       A regular expression that needs to match the article title
-                  otherwise the page won't be returned.
-                  Multiple -titleregex:regexpr can be provided and the page
-                  will be returned if title is matched by any of the regexpr
-                  provided.
-                  Case insensitive regular expressions will be used and
-                  dot matches any character.
+                    Examples:
 
--titleregexnot    Like -titleregex, but return the page only if the regular
-                  expression does not match.
+                    P1=Q2 (property P1 must contain value Q2),
+                    P3=Q4,P5=Q6,P6=Q7 (property P3 with value Q4 and
+                    qualifiers: P5 with value Q6 and P6 with value Q7).
+                    Value can be page ID, coordinate in format:
+                    latitude,longitude[,precision] (all values are in decimal
+                    degrees), year, or plain string.
+                    The argument can be provided multiple times and the item
+                    page will be returned only if all claims are present.
+                    Argument can be also given as "-onlyif:expression".
+
+-onlyifnot          A claim the page must not contain, otherwise the item won't
+                    be returned.
+                    For usage and examples, see -onlyif above.
+
+-ql                 Filter pages based on page quality.
+                    This is only applicable if contentmodel equals
+                    'proofread-page', otherwise has no effects.
+                    Valid values are in range 0-4.
+                    Multiple values can be comma-separated.
+
+-subpage            -subpage:n filters pages to only those that have depth n
+                    i.e. a depth of 0 filters out all pages that are subpages,
+                    and a depth of 1 filters out all pages that are subpages of
+                    subpages.
+
+
+-titleregex         A regular expression that needs to match the article title
+                    otherwise the page won't be returned.
+                    Multiple -titleregex:regexpr can be provided and the page
+                    will be returned if title is matched by any of the regexpr
+                    provided.
+                    Case insensitive regular expressions will be used and
+                    dot matches any character.
+
+-titleregexnot      Like -titleregex, but return the page only if the regular
+                    expression does not match.
 """
 
 docuReplacements = {'&params;': parameterHelp}
