@@ -131,17 +131,6 @@ env:
 
 matrix:
   include:
-    - python: '2.7_with_system_site_packages'  # equivalent to virtualenv: system_site_packages: true
-      env: LANGUAGE=he FAMILY=wikivoyage DIST=precise-sudo PYWIKIBOT2_TEST_NO_RC=1
-      dist: precise
-      sudo: required
-      addons:
-        apt:
-          packages:
-            - djvulibre-bin
-            - graphviz
-            - liblua5.1-0-dev
-            - python-ipaddr
     - python: '2.7_with_system_site_packages'
       env: LANGUAGE=nb FAMILY=wikipedia DIST=trusty PYSETUP_TEST_EXTRAS=1
       dist: trusty
