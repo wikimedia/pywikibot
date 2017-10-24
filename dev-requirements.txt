@@ -8,8 +8,7 @@ pytest-runner
 pytest-cov
 pytest-attrib
 pytest-httpbin
-httpbin<0.6.0 ; python_version < '2.7'
-httpbin!=0.6.0,!=0.6.1 ; os_name != 'posix' and python_version >= '2.7'
+httpbin<0.6.0 ; os_name != 'posix' or python_version < '2.7'
 
 six
 
