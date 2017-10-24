@@ -299,15 +299,6 @@ class ParamInfo(Container):
             self._fetch(set(['query']))
         assert 'query' in self._modules
 
-        _reused_module_names = self._action_modules & self._modules['query']
-
-        # The only name clash in core between actions and query submodules is
-        # action=tokens and actions=query&meta=tokens, and this will warn if
-        # any new ones appear.
-        if _reused_module_names > set(['tokens']):
-            warn('Unexpected overlap between action and query submodules: %s'
-                 % (_reused_module_names - set(['tokens'])), UserWarning)
-
     def _emulate_pageset(self):
         """Emulate the pageset module, which existed in MW 1.15-1.24."""
         # pageset isnt a module in the new system, so it is emulated, with
