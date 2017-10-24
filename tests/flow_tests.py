@@ -29,7 +29,8 @@ class TestMediaWikiFlowSandbox(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        self._page = Board(self.site, 'Project_talk:Sandbox/Flow test')
+        self._page = Board(self.site,
+                           'Project talk:Sandbox/Structured_Discussions_test')
         super(TestMediaWikiFlowSandbox, self).setUp()
 
 
@@ -43,7 +44,6 @@ class TestBoardBasePageMethods(BasePageMethodsTestBase,
         self._test_invoke()
         self._test_return_datatypes()
         self.assertFalse(self._page.isRedirectPage())
-        self.assertGreater(self._page.latest_revision.parent_id, 0)
 
     def test_content_model(self):
         """Test Flow page content model."""
