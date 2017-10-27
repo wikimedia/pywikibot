@@ -122,9 +122,10 @@ nowCommons = {
         u'NowCommons',
     ],
     'ko': [
-        u'NowCommons',
         u'공용중복',
         u'공용 중복',
+        u'NowCommons',
+        u'Now Commons',
         u'Nowcommons',
     ],
     'nds-nl': [
