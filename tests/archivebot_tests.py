@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2016
+# (C) Pywikibot team, 2016-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,7 @@ import pywikibot
 import pywikibot.page
 
 from pywikibot.textlib import TimeStripper
-from pywikibot.tools import StringTypes as basestring
+from pywikibot.tools import suppress_warnings, StringTypes as basestring
 
 from scripts import archivebot
 
@@ -98,7 +98,8 @@ class TestArchiveBotFunctions(TestCase):
     def test_checkstr(self):
         """Test for extracting key and duration from shorthand notation of durations."""
         self.assertEqual(archivebot.checkstr('400s'), ('s', '400'))
-        self.assertEqual(archivebot.checkstr('3000'), ('s', '3000'))
+        with suppress_warnings():
+            self.assertEqual(archivebot.checkstr('3000'), ('s', '3000'))
         self.assertEqual(archivebot.checkstr('7d'), ('d', '7'))
         self.assertEqual(archivebot.checkstr('3y'), ('y', '3'))
         # Should pass, because the key is verified in str2time
