@@ -2006,6 +2006,12 @@ class SiteRandomTestCase(DefaultSiteTestCase):
             self.assertIsInstance(rndpage, pywikibot.Page)
             self.assertTrue(rndpage.isRedirectPage())
 
+    def test_all(self):
+        """Test site.randompages() with both types."""
+        mysite = self.get_site()
+        for rndpage in mysite.randompages(total=5, redirects=None):
+            self.assertIsInstance(rndpage, pywikibot.Page)
+
     def test_namespaces(self):
         """Test site.randompages() with namespaces."""
         mysite = self.get_site()
