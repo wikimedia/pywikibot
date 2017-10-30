@@ -635,16 +635,26 @@ class NoReferencesBot(Bot):
         return self.createReferenceSection(oldText, index)
 
     def createReferenceSection(self, oldText, index, ident='=='):
-        """Create a reference section and insert it into the given text."""
+        """Create a reference section and insert it into the given text.
+
+        @param oldText: page text that is going to be be amended
+        @type oldText: str
+        @param index: the index of oldText where the reference section should
+            be inserted at
+        @type index: int
+        @param ident: symbols to be inserted before and after reference section
+            title
+        @type ident: str
+        @return: the amended page text with reference section added
+        @rtype: str
+        """
         if self.site.code in noTitleRequired:
-            newSection = u'\n%s\n' % (self.referencesText)
+            ref_section = '\n\n%s\n' % self.referencesText
         else:
-            newSection = u'\n%s %s %s\n%s\n' % (ident,
-                                                i18n.translate(
-                                                    self.site,
-                                                    referencesSections)[0],
-                                                ident, self.referencesText)
-        return oldText[:index] + newSection + oldText[index:]
+            ref_section = '\n\n{ident} {title} {ident}\n{text}\n'.format(
+                title=i18n.translate(self.site, referencesSections)[0],
+                ident=ident, text=self.referencesText)
+        return oldText[:index].rstrip() + ref_section + oldText[index:]
 
     def run(self):
         """Run the bot."""
