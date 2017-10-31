@@ -24,6 +24,7 @@ from pywikibot import (
     NoCreateError,
     PageCreatedConflict,
 )
+
 from tests.aspects import unittest, TestCase, WikibaseTestCase
 
 
