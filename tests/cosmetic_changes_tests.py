@@ -70,6 +70,9 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         # startspace
         self.assertEqual(' Foo  bar ',
                          self.cct.removeUselessSpaces(' Foo  bar '))
+        # tab
+        self.assertEqual('Fooooo bar',
+                         self.cct.removeUselessSpaces('Fooooo bar	'))
 
     def test_removeNonBreakingSpaceBeforePercent(self):
         """Test removeNonBreakingSpaceBeforePercent method."""

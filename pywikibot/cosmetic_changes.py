@@ -621,7 +621,7 @@ class CosmeticChangesToolkit(object):
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
-        text = textlib.replaceExcept(text, r'(?m) +( |$)', r'\1', exceptions,
+        text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1', exceptions,
                                      site=self.site)
         return text
 
