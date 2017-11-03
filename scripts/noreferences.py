@@ -227,6 +227,7 @@ placeBeforeSections = {
 # Titles of sections where a reference tag would fit into.
 # The first title should be the preferred one: It's the one that
 # will be used when a new section has to be created.
+# Except for the first, others are tested as regexes.
 referencesSections = {
     'ar': [             # not sure about which ones are preferred.
         u'مراجع',
@@ -287,11 +288,11 @@ referencesSections = {
         u'Viitteet',
     ],
     'fr': [             # [[fr:Aide:Note]]
-        u'Notes et références',
-        u'Références',
-        u'References',
-        'Notes',
-        'Sources',
+        'Notes et références',
+        'Notes? et r[ée]f[ée]rences?',
+        'R[ée]f[ée]rences?',
+        'Notes?',
+        'Sources?',
     ],
     'he': [
         u'הערות שוליים',
