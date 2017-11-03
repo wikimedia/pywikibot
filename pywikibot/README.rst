@@ -10,7 +10,7 @@ wiki-etiquette should be followed before running it on any wiki.
 
 To get started on proper usage of the bot framework, please refer to:
 
-    `Manual:Pywikibot <http://www.mediawiki.org/wiki/Manual:Pywikibot>`_
+    `Manual:Pywikibot <https://www.mediawiki.org/wiki/Manual:Pywikibot>`_
 
 .. include:: CONTENT.rst
 

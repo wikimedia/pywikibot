@@ -19,7 +19,7 @@ These command line parameters can be used to specify which pages to work on:
                   them on the live wiki.
 
 -xml              Retrieve information from a local XML dump
-                  (pages_current, see http://download.wikimedia.org).
+                  (pages_current, see https://download.wikimedia.org).
                   Argument can also be given as "-xml:filename".
                   Searches for pages with HTML tables, and tries to convert
                   them on the live wiki.

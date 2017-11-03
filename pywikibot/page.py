@@ -2513,7 +2513,7 @@ class FilePage(Page):
             return False
         elif 'wikitravel_shared' in self.site.shared_image_repository():
             return self.latest_file_info.url.startswith(
-                u'http://wikitravel.org/upload/shared/')
+                'https://wikitravel.org/upload/shared/')
         else:
             return self.latest_file_info.url.startswith(
                 'https://upload.wikimedia.org/wikipedia/commons/')
