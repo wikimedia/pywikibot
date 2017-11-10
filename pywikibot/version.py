@@ -14,6 +14,7 @@ __version__ = '$Id$'
 
 import codecs
 import datetime
+import json
 import os
 import subprocess
 import sys
@@ -364,19 +365,17 @@ def getversion_package(path=None):  # pylint: disable=unused-argument
     return (tag, rev, date, hsh)
 
 
-def getversion_onlinerepo(repo=None):
-    """Retrieve current framework revision number from online repository.
-
-    @param repo: (optional) Online repository location
-    @type repo: URL or string
-    """
+def getversion_onlinerepo():
+    """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
 
-    url = repo or 'https://git.wikimedia.org/feed/pywikibot/core'
+    url = 'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/branches/master'
+    # Gerrit API responses include )]}' at the beginning, make sure to strip it out
     buf = http.fetch(uri=url,
-                     headers={'user-agent': '{pwb}'}).content.splitlines()
+                     headers={'user-agent': '{pwb}'}).content[4:]
+
     try:
-        hsh = buf[13].split('/')[5][:-1]
+        hsh = json.loads(buf)['revision']
         return hsh
     except Exception as e:
         raise ParseError(repr(e) + ' while parsing ' + repr(buf))
