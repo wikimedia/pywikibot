@@ -1229,9 +1229,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-limit:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        # ABC disambiguation
+        # ABC
         page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q286874')
+        self.assertEqual(page1.title(), 'Q287078')
 
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:en:abc')
