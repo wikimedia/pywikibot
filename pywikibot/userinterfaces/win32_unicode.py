@@ -175,7 +175,7 @@ def old_fileno(std_name):
 # so that we can at least see them.
 def _complain(message):
     print(isinstance(message, str) and message or repr(message),
-          file=original_stderr)  # noqa: print
+          file=original_stderr)
 
 
 def register_cp65001():

@@ -47,8 +47,8 @@ try:
     import flickrapi                # see: http://stuvel.eu/projects/flickrapi
 except ImportError as e:
     print('This script requires the python flickrapi module. \n'
-          'See: http://stuvel.eu/projects/flickrapi')  # noqa: print
-    print(e)  # flake8: disable=T003 (print)
+          'See: http://stuvel.eu/projects/flickrapi')
+    print(e)
     sys.exit(1)
 
 import pywikibot

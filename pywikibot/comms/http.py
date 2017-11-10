@@ -117,7 +117,7 @@ def _flush():
     message = 'Closing network session.'
     if hasattr(sys, 'last_type'):
         # we quit because of an exception
-        print(sys.last_type)  # flake8: disable=T003 (print)
+        print(sys.last_type)
         critical(message)
     else:
         log(message)
