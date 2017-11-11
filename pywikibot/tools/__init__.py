@@ -450,8 +450,14 @@ def first_upper(string):
     Return a string with the first character capitalized.
 
     Empty strings are supported. The original string is not changed.
+
+    Warning: Python 2 and 3 capitalize "ß" differently. MediaWiki does
+    not capitalize ß at the beginning. See T179115.
     """
-    return string[:1].upper() + string[1:]
+    first = string[:1]
+    if first != 'ß':
+        first = first.upper()
+    return first + string[1:]
 
 
 def normalize_username(username):
