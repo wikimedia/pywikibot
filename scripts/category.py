@@ -362,7 +362,7 @@ class CategoryAddBot(MultipleSitesBot):
             return
         # store old text, so we don't have reload it every time
         old_text = text
-        cats = textlib.getCategoryLinks(text)
+        cats = textlib.getCategoryLinks(text, self.current_page.site)
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
