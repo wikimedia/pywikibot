@@ -316,6 +316,8 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
                          self.cct.cleanUpLinks('[[sand|sand]]box'))
         self.assertEqual('[[Sand|demospace]]',
                          self.cct.cleanUpLinks('[[sand|demo]]space'))
+        self.assertEqual('[[ß|Eszett]]',
+                         self.cct.cleanUpLinks('[[ß|Eszett]]'))
         self.assertEqual('[[Title]]',
                          self.cct.cleanUpLinks('[[title|Title]]'))
         self.assertEqual('[[Sand]]box',
