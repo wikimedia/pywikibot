@@ -32,7 +32,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     ]
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         self.languages_by_size = [
             'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'sv',
             'ku', 'pl', 'el', 'it', 'ta', 'fi', 'hu', 'tr', 'ko', 'ca', 'io',
@@ -47,7 +47,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si', 'ia',
             'ie', 'mi', 'ay', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu', 'gv',
             'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu', 'am',
-            'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
+            'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks', 'hif',
         ]
 
         super(Family, self).__init__()
