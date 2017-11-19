@@ -483,6 +483,49 @@ class CharsetTestCase(TestCase):
         self.assertIsNone(req.charset)
         self.assertEqual('utf-8', req.encoding)
 
+    def test_content_type_xml_without_charset(self):
+        """Test decoding without explicit charset but xml content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = CharsetTestCase.UTF8_BYTES[:]
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
+
+    def test_content_type_xml_with_charset(self):
+        """Test xml content with utf-8 encoding given in content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = '<?xml version="1.0" encoding="UTF-8"?>'.encode(
+            'utf-8')
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('UTF-8', req.encoding)
+
+    def test_content_type_xml_with_charset_and_more_data(self):
+        """Test xml content with utf-8 encoding given in content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = '<?xml version="1.0" encoding="UTF-8" someparam="ignored"?>'.encode(
+            'utf-8')
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('UTF-8', req.encoding)
+
+    def test_content_type_xml_with_variant_charset(self):
+        """Test xml content with latin1 encoding given in content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = "<?xml version='1.0' encoding='latin1'?>".encode(
+            'latin1')
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('latin1', req.encoding)
+
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
         req = CharsetTestCase._create_request()

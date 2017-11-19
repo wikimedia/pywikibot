@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 """Http backend layer, formerly providing a httplib2 wrapper."""
 from __future__ import absolute_import, unicode_literals
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2017
 
 __version__ = '$Id$'
 __docformat__ = 'epytext'
 
 # standard python libraries
 import codecs
+import re
 import sys
 
 if sys.version_info[0] > 2:
@@ -127,6 +128,14 @@ class HttpRequest(UnicodeMixin):
             elif 'json' in content_type:
                 # application/json | application/sparql-results+json
                 self._header_encoding = 'utf-8'
+            elif 'xml' in content_type:
+                header = self.raw[:100].splitlines()[0]  # bytestr in py3
+                m = re.search(br'encoding=("|'
+                              br"')(?P<encoding>.+?)\1", header)
+                if m:
+                    self._header_encoding = m.group('encoding').decode('utf-8')
+                else:
+                    self._header_encoding = 'utf-8'
             else:
                 self._header_encoding = None
         return self._header_encoding
