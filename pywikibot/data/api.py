@@ -93,7 +93,7 @@ else:
 _logger = "data.api"
 
 lagpattern = re.compile(
-    r'Waiting for [\w. ]+: (?P<lag>\d+)(?:\.\d+)? seconds? lagged')
+    r'Waiting for [\w.: ]+: (?P<lag>\d+)(?:\.\d+)? seconds? lagged')
 
 
 class APIError(Error):
