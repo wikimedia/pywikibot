@@ -34,20 +34,20 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Initializer."""
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'sv',
-            'ku', 'pl', 'el', 'it', 'ta', 'fi', 'hu', 'tr', 'ko', 'ca', 'io',
-            'kn', 'pt', 'vi', 'hy', 'sr', 'chr', 'ja', 'hi', 'ro', 'no', 'th',
+            'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'ku',
+            'sv', 'pl', 'el', 'it', 'ta', 'hu', 'fi', 'tr', 'ca', 'ko', 'io',
+            'kn', 'pt', 'hy', 'vi', 'sr', 'chr', 'ja', 'hi', 'ro', 'no', 'th',
             'ml', 'id', 'et', 'uz', 'li', 'my', 'or', 'te', 'fa', 'eo', 'cs',
-            'ar', 'jv', 'az', 'eu', 'gl', 'da', 'oc', 'lo', 'br', 'uk', 'hr',
-            'fj', 'tg', 'bg', 'ps', 'simple', 'cy', 'vo', 'wa', 'is', 'sk',
+            'ar', 'jv', 'az', 'eu', 'gl', 'oc', 'da', 'lo', 'br', 'uk', 'hr',
+            'fj', 'tg', 'bg', 'ps', 'simple', 'cy', 'vo', 'wa', 'sk', 'is',
             'zh-min-nan', 'la', 'scn', 'he', 'ast', 'af', 'tl', 'sw', 'ky',
-            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'ka', 'sl', 'nds', 'sq', 'lb',
-            'bs', 'pa', 'nah', 'sa', 'kk', 'tk', 'bn', 'km', 'sm', 'mk', 'hsb',
+            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'ka', 'nds', 'sl', 'pa', 'sq',
+            'lb', 'bs', 'nah', 'sa', 'kk', 'tk', 'bn', 'km', 'sm', 'mk', 'hsb',
             'be', 'ms', 'ga', 'ur', 'an', 'wo', 'vec', 'ang', 'tt', 'sd', 'gn',
-            'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si', 'ia',
-            'ie', 'mi', 'ay', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu', 'gv',
-            'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'ss', 'su', 'ha', 'iu', 'am',
-            'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks', 'hif',
+            'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si', 'hif',
+            'ia', 'ie', 'mi', 'ay', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu',
+            'gv', 'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'su', 'ss', 'ha', 'iu',
+            'am', 'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
         ]
 
         super(Family, self).__init__()
