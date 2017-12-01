@@ -651,11 +651,11 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
 
     cached = True
 
-    index_name = 'Index:Pywikibot test page 1'
-    page_names = ['Page:Pywikibot test page 1/1',
-                  'Page:Pywikibot test page 2/2',
+    index_name = 'Index:Pywikibot test page.djvu'
+    page_names = ['Page:Pywikibot test page.djvu/1',
+                  'Page:Pywikibot test page.djvu/2',
                   ]
-    missing_name = 'Page:Pywikibot test page 2/2'
+    missing_name = 'Page:Pywikibot test page.djvu/2'
 
     @classmethod
     def setUpClass(cls):
@@ -675,7 +675,6 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
             n = self.index.get_number(page)
             self.assertEqual(self.index.get_page(n), page)
 
-    @unittest.expectedFailure  # T181697
     def test_page_gen_redlink(self):
         """Test Index page generator with redlinks."""
         # Check start/end limits.
