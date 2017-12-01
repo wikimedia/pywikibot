@@ -74,7 +74,7 @@ class TestTimestamp(TestCase):
     def test_iso_format_property(self):
         """Test iso format properties."""
         self.assertEqual(Timestamp.ISO8601Format, Timestamp._ISO8601Format())
-        self.assertEqual(re.sub('[\-\:TZ]', '', Timestamp.ISO8601Format),
+        self.assertEqual(re.sub(r'[\-:TZ]', '', Timestamp.ISO8601Format),
                          Timestamp.mediawikiTSFormat)
 
     def test_mediawiki_format(self):
