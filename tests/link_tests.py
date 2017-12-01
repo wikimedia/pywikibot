@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
+
+import re
 
 import pywikibot
 
@@ -103,43 +105,104 @@ class TestLink(DefaultDrySiteTestCase):
 
     def test_invalid(self):
         """Test that invalid titles raise InvalidTitle exception."""
-        self.assertRaises(InvalidTitle, Link('', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link(':', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('__  __', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('  __  ', self.get_site()).parse)
+        exception_message_regex = (
+            r'^The link does not contain a page title$'
+        )
+
+        texts_to_test = ['', ':', '__  __', '  __  ']
+
+        for text in texts_to_test:
+            with self.assertRaisesRegex(
+                    InvalidTitle,
+                    exception_message_regex):
+                Link(text, self.get_site()).parse()
+
         # Bad characters forbidden regardless of wgLegalTitleChars
-        self.assertRaises(InvalidTitle, Link('A [ B', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A ] B', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A { B', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A } B', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A < B', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A > B', self.get_site()).parse)
+        def generate_contains_illegal_chars_exc_regex(text):
+            exc_regex = (
+                r'^(u|)\'%s\' contains illegal char\(s\) (u|)\'%s\'$' % (
+                    re.escape(text), re.escape(text[2])
+                ))
+            return exc_regex
+
+        texts_to_test = ['A [ B', 'A ] B', 'A { B', 'A } B', 'A < B', 'A > B']
+
+        for text in texts_to_test:
+            with self.assertRaisesRegex(
+                    InvalidTitle,
+                    generate_contains_illegal_chars_exc_regex(text)):
+                Link(text, self.get_site()).parse()
+
         # URL encoding
         # %XX is understood by wikimedia but not %XXXX
-        self.assertRaises(InvalidTitle, Link('A%2523B', self.get_site()).parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                r'^(u|)\'A%23B\' contains illegal char\(s\) (u|)\'%23\'$'):
+            Link('A%2523B', self.get_site()).parse()
+
         # A link is invalid if their (non-)talk page would be in another
         # namespace than the link's "other" namespace
-        self.assertRaises(InvalidTitle, Link('Talk:File:Example.svg', self.get_site()).parse)
+        with self.assertRaisesRegex(
+                InvalidTitle,
+                (r'The \(non-\)talk page of (u|)\'Talk:File:Example.svg\''
+                 r' is a valid title in another namespace.')):
+            Link('Talk:File:Example.svg', self.get_site()).parse()
+
         # Directory navigation
-        self.assertRaises(InvalidTitle, Link('.', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('..', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('./Sandbox', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('../Sandbox', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Foo/./Sandbox', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Foo/../Sandbox', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Sandbox/.', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Sandbox/..', self.get_site()).parse)
+        def generate_contains_dot_combinations_exc_regex(text):
+            exc_regex = (
+                r'^\(contains \. / combinations\): (u|)\'%s\'$' % re.escape(
+                    text)
+            )
+            return exc_regex
+
+        texts_to_test = ['.', '..', './Sandbox', '../Sandbox', 'Foo/./Sandbox',
+                         'Foo/../Sandbox', 'Sandbox/.', 'Sandbox/..']
+
+        for text in texts_to_test:
+            with self.assertRaisesRegex(
+                    InvalidTitle,
+                    generate_contains_dot_combinations_exc_regex(text)):
+                Link(text, self.get_site()).parse()
+
         # Tilde
-        self.assertRaises(InvalidTitle, Link('A ~~~ Name', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A ~~~~ Signature', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('A ~~~~~ Timestamp', self.get_site()).parse)
+        def generate_contains_tilde_exc_regex(text):
+            exc_regex = r'^\(contains ~~~\): (u|)\'%s\'$' % re.escape(text)
+            return exc_regex
+
+        texts_to_test = ['A ~~~ Name', 'A ~~~~ Signature', 'A ~~~~~ Timestamp']
+
+        for text in texts_to_test:
+            with self.assertRaisesRegex(
+                    InvalidTitle,
+                    generate_contains_tilde_exc_regex(text)):
+                Link(text, self.get_site()).parse()
+
         # Overlength
-        self.assertRaises(InvalidTitle, Link('x' * 256, self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Invalid:' + 'X' * 248, self.get_site()).parse)
+        def generate_overlength_exc_regex(text):
+            exc_regex = r'^\(over 255 bytes\): (u|)\'%s\'$' % re.escape(text)
+            return exc_regex
+
+        texts_to_test = [('x' * 256), ('Invalid:' + 'X' * 248)]
+
+        for text in texts_to_test:
+            with self.assertRaisesRegex(
+                    InvalidTitle,
+                    generate_overlength_exc_regex(text)):
+                Link(text, self.get_site()).parse()
+
         # Namespace prefix without actual title
-        self.assertRaises(InvalidTitle, Link('Talk:', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Category: ', self.get_site()).parse)
-        self.assertRaises(InvalidTitle, Link('Category: #bar', self.get_site()).parse)
+        def generate_has_no_title_exc_regex(text):
+            exc_regex = r'^(u|)\'%s\' has no title\.$' % re.escape(text)
+            return exc_regex
+
+        texts_to_test = ['Talk:', 'Category: ', 'Category: #bar']
+
+        for text in texts_to_test:
+            with self.assertRaisesRegex(
+                    InvalidTitle,
+                    generate_has_no_title_exc_regex(text.strip())):
+                Link(text, self.get_site()).parse()
 
     def test_relative(self):
         """Test that relative links are handled properly."""
@@ -183,7 +246,13 @@ class Issue10254TestCase(DefaultDrySiteTestCase):
         """Test Python issue 10254 causes an exception."""
         pywikibot.page.unicodedata = __import__('unicodedata')
         title = 'Li̍t-sṳ́'
-        self.assertRaises(UnicodeError, Link, title, self.site)
+        with self.assertRaisesRegex(
+                UnicodeError,
+                re.escape('Link(%r, %s): combining characters detected, which '
+                          'are not supported by Pywikibot on Python 2.6.6. '
+                          'See https://phabricator.wikimedia.org/T102461'
+                          % (title, self.site))):
+            Link(title, self.site)
 
 
 # ---- The first set of tests are explicit links, starting with a ':'.
