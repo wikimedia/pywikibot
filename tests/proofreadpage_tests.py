@@ -331,8 +331,8 @@ class TestProofreadPageIndexProperty(TestCase):
     }
 
     existing_multilinked = {
-        'title': 'Page:Pywikibot test page 1/1',
-        'index_1': 'Index:Pywikibot test page 1',
+        'title': 'Page:Pywikibot test page.djvu/1',
+        'index_1': 'Index:Pywikibot test page.djvu',
         'index_2': 'Index:Pywikibot test page 2',
     }
 
