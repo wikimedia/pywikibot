@@ -1274,7 +1274,11 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
             '\nSee https://de.wikipedia.org/wiki/Hilfe:Personendaten'
             '#Kopiervorlage')
         return oldtext
-    separator = site.family.category_text_separator
+    if re.search(r'\{\{ *(' + r'|'.join(site.getmagicwords('defaultsort'))
+                 + r')', oldtext, flags=re.I):
+        separator = config.line_separator
+    else:
+        separator = site.family.category_text_separator
     iseparator = site.family.interwiki_text_separator
     separatorstripped = separator.strip()
     iseparatorstripped = iseparator.strip()

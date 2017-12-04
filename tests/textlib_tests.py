@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2016
+# (C) Pywikibot team, 2011-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -207,6 +207,20 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         # Restore the default separator.
         config.line_separator = sep
         self.assertEqual(old, new)
+
+    def test_indentation(self):
+        """Test indentation from previous block."""
+        # Block of text
+        old = 'Some text%(LS)s%(LS)s' % {'LS': config.LS} + self.old
+        cats = textlib.getCategoryLinks(old, site=self.site)
+        new = textlib.replaceCategoryLinks(old, cats, site=self.site)
+        self.assertEqual(old, new)
+
+        # DEFAULTSORT
+        old_ds = '{{DEFAULTSORT:key}}%(LS)s' % {'LS': config.LS} + self.old
+        cats_ds = textlib.getCategoryLinks(old_ds, site=self.site)
+        new_ds = textlib.replaceCategoryLinks(old_ds, cats_ds, site=self.site)
+        self.assertEqual(old_ds, new_ds)
 
     def test_in_place_replace(self):
         """Test in-place category change is reversible."""
