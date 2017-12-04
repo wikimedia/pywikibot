@@ -39,10 +39,10 @@ scripts.basic script
     :show-inheritance:
 
 
-scripts.blockpagechecker script
--------------------------------
+scripts.blockpageschecker script
+--------------------------------
 
-.. automodule:: scripts.blockpagechecker
+.. automodule:: scripts.blockpageschecker
     :members:
     :undoc-members:
     :show-inheritance:
@@ -105,7 +105,7 @@ scripts.claimit script
 scripts.clean_sandbox script
 ----------------------------
 
-.. automodule:: scripts.clean_sandboy
+.. automodule:: scripts.clean_sandbox
     :members:
     :undoc-members:
     :show-inheritance:
@@ -129,10 +129,10 @@ scripts.commonscat script
     :show-inheritance:
 
 
-scripts.coodinate_import script
--------------------------------
+scripts.coordinate_import script
+--------------------------------
 
-.. automodule:: scripts.coodinate_import
+.. automodule:: scripts.coordinate_import
     :members:
     :undoc-members:
     :show-inheritance:

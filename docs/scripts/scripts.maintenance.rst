@@ -46,7 +46,7 @@ scripts.maintenance.make_i18n_dict script
 
 
 scripts.maintenance.wikimedia_sites script
------------------------------------------
+------------------------------------------
 
 .. automodule:: scripts.maintenance.wikimedia_sites
     :members:
