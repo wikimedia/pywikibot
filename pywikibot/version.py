@@ -16,6 +16,7 @@ import codecs
 import datetime
 import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -54,6 +55,18 @@ class ParseError(Exception):
 def _get_program_dir():
     _program_dir = os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
     return _program_dir
+
+
+def get_toolforge_hostname():
+    """Get hostname of the current Toolforge host.
+
+    @return: The hostname of the currently running host,
+             if it is in Wikimedia Toolforge; otherwise return None.
+    @rtype: str or None
+    """
+    if socket.getfqdn().endswith('.tools.eqiad.wmflabs'):
+        return socket.gethostname()
+    return None
 
 
 def getversion(online=True):
