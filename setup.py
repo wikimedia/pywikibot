@@ -74,9 +74,12 @@ if PY2:
         'unicode7': ['unicodedata2>=7.0.0-2'],
     })
 elif PYTHON_VERSION[:2] == (3, 3):
-    # requests[security] requires cryptography, but cryptography does not
+    # requests[security] requires cryptography, but cryptography 2.0+ does not
     # support Python 3.3; T178241
     extra_deps['security'].append('cryptography<2.0')
+    # PyOpenSSL is required by requests[security] but has dropped support for
+    # Python 3.3 since version 17.5.0 (2017-11-30); T181912
+    extra_deps['security'].append('PyOpenSSL<17.5.0')
 
 script_deps = {
     'flickrripper.py': ['Pillow<3.5.0' if PY26 else 'Pillow'],
