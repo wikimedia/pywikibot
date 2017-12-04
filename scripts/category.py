@@ -485,7 +485,11 @@ class CategoryMoveRobot(object):
         template_vars = {'oldcat': self.oldcat.title(withNamespace=False)}
         if self.newcat:
             template_vars.update({
-                'newcat': self.newcat.title(withNamespace=False, asLink=True),
+                'newcat': self.newcat.title(
+                    withNamespace=False,
+                    asLink=True,
+                    textlink=True
+                ),
                 'title': self.newcat.title(withNamespace=False)})
         # Set edit summary for changed pages.
         if comment:
