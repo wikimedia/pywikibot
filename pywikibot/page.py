@@ -2704,6 +2704,7 @@ class FilePage(Page):
         """
         return self.site.globalusage(self, total=total)
 
+
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
 

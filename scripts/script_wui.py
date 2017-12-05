@@ -93,7 +93,7 @@ from pywikibot.tools.formatter import color_format
 if sys.version_info[0] > 2:
     import _thread as thread
 else:
-    import thread  # flake8: disable=H237 (module does not exist in Python 3)
+    import thread  # noqa: H237 (module does not exist in Python 3)
 
 try:
     import resource
@@ -220,7 +220,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         try:
             thread.start_new_thread(main_script, (self.refs[page_title], rev,
                                                   params))
-        except:
+        except Exception:
             # (done according to subster in trunk and submit in
             # rewrite/.../data/api.py)
             # TODO: is this error handling here needed at all??!?
@@ -263,7 +263,7 @@ def main_script(page, rev=None, params=NotImplemented):
         code = page.getOldVersion(rev)  # crontab; scheduled
     try:
         exec(code)
-    except:
+    except Exception:
         # (done according to subster in trunk and submit in
         # rewrite/.../data/api.py)
 
@@ -355,7 +355,7 @@ def main(*args):
     bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
     try:
         bot.start()
-    except:
+    except Exception:
         bot.t.cancel()
         raise
 

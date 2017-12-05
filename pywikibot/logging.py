@@ -180,7 +180,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
     Use directly after an 'except' statement::
 
         ...
-        except:
+        except Exception:
             pywikibot.exception()
         ...
 

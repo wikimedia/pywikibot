@@ -1998,7 +1998,7 @@ class Request(MutableMapping):
                             self._params[param] = [str(int(value) // 2)]
                             pywikibot.output(u"Set %s = %s"
                                              % (param, self._params[param]))
-                        except:
+                        except Exception:
                             pass
                 self.wait()
                 continue

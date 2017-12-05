@@ -291,13 +291,13 @@ class CaseChecker(object):
                         batchStart:batchStart + batchSize]
                     for data in self.RunQuery(self.queryParams):
                         self.ProcessDataBlock(data)
-        except:
+        except Exception:
             pywikibot.output(u'Exception at Title = %s, Next = %s'
                              % (self.currentTitle, self.apfrom))
             try:
                 import traceback
                 pywikibot.output(traceback.format_exc())
-            except:
+            except Exception:
                 pywikibot.output(u'Unable to print exception info')
             raise
 

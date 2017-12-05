@@ -171,7 +171,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 continue
             except KeyboardInterrupt:
                 raise
-            except:
+            except Exception:
                 return (None, None)
 
     def readyToEdit(self, cat):
@@ -342,7 +342,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # do a null edit on cat
                 try:
                     cat.save()
-                except:
+                except Exception:
                     pass
 
         # delete record entries for non-existent categories
@@ -380,7 +380,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # categories this wiki might maintain
                 try:
                     cat.save()
-                except:
+                except Exception:
                     pass
                 continue
             if dest.isCategoryRedirect():
@@ -392,7 +392,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                     # do a null edit on cat
                     try:
                         cat.save()
-                    except:
+                    except Exception:
                         pass
                 else:
                     self.log_text.append(
@@ -432,7 +432,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             # do a null edit on cat
             try:
                 cat.save()
-            except:
+            except Exception:
                 pass
 
         with open(datafile, "wb") as f:

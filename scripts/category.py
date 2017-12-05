@@ -195,7 +195,7 @@ class CategoryDatabase(object):
                 # like the above, but for supercategories
                 self.superclassDB = databases['superclassDB']
                 del databases
-            except:
+            except Exception:
                 # If something goes wrong, just rebuild the database
                 self.rebuild()
 

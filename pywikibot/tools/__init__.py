@@ -180,7 +180,7 @@ def py2_encode_utf_8(func):
         return func
 
 
-class classproperty(object):  # flake8: disable=N801
+class classproperty(object):  # noqa: N801
 
     """
     Metaclass to accesss a class method as a property.
@@ -207,7 +207,7 @@ class classproperty(object):  # flake8: disable=N801
         return self.method(owner)
 
 
-class suppress_warnings(catch_warnings):  # flake8: disable=N801
+class suppress_warnings(catch_warnings):  # noqa: N801
 
     """A context manager that temporarily suppresses warnings."""
 

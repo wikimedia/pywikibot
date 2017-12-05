@@ -78,7 +78,7 @@ def tryimport_pwb():
         remove_modules()
 
         os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
-        import pywikibot  # flake8: disable=E402
+        import pywikibot  # noqa: E402
         pwb = pywikibot
 
 
@@ -211,7 +211,7 @@ def main():
                             'scripts.maintenance',
                             'scripts.archive',
                             'scripts.userscripts']
-            from pywikibot import config  # flake8: disable=E402
+            from pywikibot import config  # noqa: E402
             if config.user_script_paths:
                 if isinstance(config.user_script_paths, (tuple, list)):
                     script_paths = config.user_script_paths + script_paths

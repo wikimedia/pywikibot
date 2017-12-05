@@ -828,7 +828,7 @@ class Foo(object):
     _bar = 'baz'
 
     @classproperty
-    def bar(cls):  # flake8: disable=N805
+    def bar(cls):  # noqa: N805
         """Class property method."""
         return cls._bar
 

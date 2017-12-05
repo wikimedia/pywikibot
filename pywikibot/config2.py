@@ -418,7 +418,7 @@ try:
         console_encoding = sys.stdout.encoding
     else:
         console_encoding = sys.stdout.encoding.decode('ascii')
-except:
+except Exception:
     # When using pywikibot inside a daemonized twisted application,
     # we get "StdioOnnaStick instance has no attribute 'encoding'"
     console_encoding = None
@@ -474,7 +474,7 @@ ring_bell = False
 try:
     # Don't print colorized when the output is, for example, piped to a file.
     colorized_output = sys.stdout.isatty()
-except:
+except Exception:
     colorized_output = False
 
 # An indication of the size of your screen, or rather the size of the screen

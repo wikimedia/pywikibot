@@ -417,7 +417,7 @@ def getfileversion(filename):
                 if line.find('__version__') == 0:
                     try:
                         exec(line)
-                    except:
+                    except Exception:
                         pass
                     break
         stat = os.stat(fn)

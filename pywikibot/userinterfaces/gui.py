@@ -22,7 +22,7 @@ import sys
 if sys.version_info[0] > 2:
     import tkinter as Tkinter
     from tkinter.scrolledtext import ScrolledText
-    from tkinter import simpledialog as tkSimpleDialog  # flake8: disable=N812
+    from tkinter import simpledialog as tkSimpleDialog  # noqa: N812
 else:
     import Tkinter
     import tkSimpleDialog

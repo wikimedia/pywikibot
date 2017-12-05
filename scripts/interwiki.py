@@ -1459,8 +1459,7 @@ class Subject(interwiki_graph.Subject):
                     f.write("\n")
                     f.close()
                 # FIXME: What errors are we catching here?
-                # except: should be avoided!!
-                except:
+                except Exception:
                     # raise
                     pywikibot.output(
                         'File autonomous_problems.dat open or corrupted! '
@@ -2360,10 +2359,10 @@ def compareLanguages(old, new, insite, summary):
     if not summary and \
        len(adding) + len(removing) + len(modifying) <= 3:
         # Use an extended format for the string linking to all added pages.
-        fmt = lambda d, site: unicode(d[site])  # flake8: disable=E731
+        fmt = lambda d, site: unicode(d[site])  # noqa: E731
     else:
         # Use short format, just the language code
-        fmt = lambda d, site: site.code  # flake8: disable=E731
+        fmt = lambda d, site: site.code  # noqa: E731
 
     mods = mcomment = u''
 
@@ -2631,7 +2630,7 @@ def main(*args):
         bot.run()
     except KeyboardInterrupt:
         dumpFileName = bot.dump(append)
-    except:
+    except Exception:
         dumpFileName = bot.dump(append)
         raise
     finally:

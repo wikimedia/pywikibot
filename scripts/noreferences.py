@@ -735,7 +735,7 @@ def main(*args):
         try:
             cat = site.expand_text(
                 site.mediawiki_message(maintenance_category))
-        except:
+        except Exception:
             pass
         else:
             cat = pywikibot.Category(site, "%s:%s" % (

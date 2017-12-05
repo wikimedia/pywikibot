@@ -67,7 +67,7 @@ def multi(value, tuplst):
                 res = func(value)
                 if pred(res):
                     return res
-            except:
+            except Exception:
                 pass
     else:
         # Find a predicate that gives true for this int value, and run a
@@ -2358,7 +2358,7 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
         try:
             year = dict[lang](title)
             return dictName, year
-        except:
+        except Exception:
             pass
     # sometimes the title may begin with an upper case while its listed as
     # lower case, or the other way around
@@ -2370,7 +2370,7 @@ def getAutoFormat(lang, title, ignoreFirstLetterCase=True):
             else:
                 title = first_upper(title)
             return getAutoFormat(lang, title, ignoreFirstLetterCase=False)
-        except:
+        except Exception:
             pass
     return None, None
 

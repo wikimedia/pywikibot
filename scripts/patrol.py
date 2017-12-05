@@ -279,7 +279,7 @@ class PatrolBot(SingleSiteBot):
         author_ns = 0
         try:
             author_ns = self.site.family.authornamespaces[self.site.lang][0]
-        except:
+        except Exception:
             pass
         if author_ns:
             author_ns_prefix = self.site.namespace(author_ns)
