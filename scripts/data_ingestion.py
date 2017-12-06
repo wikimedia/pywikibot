@@ -285,26 +285,21 @@ def main(*args):
 
         filename = os.path.join(csv_dir, configuration['csvFile'])
         try:
-
             f = codecs.open(filename, 'r', configuration['csvEncoding'])
         except (IOError, OSError) as e:
             pywikibot.error('%s could not be opened: %s' % (filename, e))
-            continue
+        else:
+            with f:
+                files = CSVReader(f, urlcolumn='url',
+                                  site=config_page.site,
+                                  dialect=configuration['csvDialect'],
+                                  delimiter=str(configuration['csvDelimiter']))
 
-        try:
-            files = CSVReader(f, urlcolumn='url',
-                              site=config_page.site,
-                              dialect=configuration['csvDialect'],
-                              delimiter=str(configuration['csvDelimiter']))
-
-            bot = DataIngestionBot(files,
-                                   configuration['titleFormat'],
-                                   configuration['formattingTemplate'],
-                                   site=None)
-
-            bot.run()
-        finally:
-            f.close()
+                bot = DataIngestionBot(files,
+                                       configuration['titleFormat'],
+                                       configuration['formattingTemplate'],
+                                       site=None)
+                bot.run()
 
 
 if __name__ == "__main__":
