@@ -178,11 +178,7 @@ def main(*args):
             robot = CategoryMoveBot(oldcat=src, batch=True, comment=summary,
                                     deletion_comment=action_summary,
                                     inplace=True)
-        else:
-            # This line does not fit any of our regular expressions,
-            # so ignore it.
-            pass
-        if summary != "" and robot is not None:
+        if summary and robot is not None:
             pywikibot.stdout(summary)
             # Run, robot, run!
             robot.run()

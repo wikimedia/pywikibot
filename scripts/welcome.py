@@ -748,10 +748,8 @@ class WelcomeBot(object):
                             if self.site.family.name != 'wikinews':
                                 welcome_text = (welcome_text
                                                 % choice(self.defineSign()))
-                            if self.site.family.name == 'wiktionary' and \
-                               self.site.code == 'it':
-                                pass
-                            else:
+                            if self.site.family.name != 'wiktionary' or \
+                               self.site.code != 'it':
                                 welcome_text += timeselected
                         elif (self.site.family.name != 'wikinews' and
                               self.site.code != 'it'):

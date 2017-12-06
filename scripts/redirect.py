@@ -291,7 +291,6 @@ class RedirectGenerator(OptionHandler):
                             pass
                 except KeyError:
                     result = None
-                    pass
                 yield (redirect, result, target, final)
 
     def retrieve_broken_redirects(self):
@@ -513,10 +512,8 @@ class RedirectRobot(SingleSiteBot):
                 pywikibot.warning(
                     u'Redirect target %s is not a valid page title.'
                     % str(e)[10:])
-                pass
             except pywikibot.InvalidTitle:
                 pywikibot.exception()
-                pass
             except pywikibot.NoPage:
                 movedTarget = None
                 try:
@@ -611,8 +608,7 @@ class RedirectRobot(SingleSiteBot):
                         u'Skipping: Redirect target %s is not a redirect.'
                         % newRedir.title(asLink=True))
                     break  # do nothing
-                else:
-                    pass  # target found
+                # else target found
             except pywikibot.SectionError:
                 pywikibot.warning(
                     u"Redirect target section %s doesn't exist."
@@ -683,7 +679,6 @@ class RedirectRobot(SingleSiteBot):
                     if targetPage.isStaticRedirect():
                         pywikibot.output(
                             u"   Redirect target is STATICREDIRECT.")
-                        pass
                     else:
                         newRedir = targetPage
                         continue

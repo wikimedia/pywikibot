@@ -129,8 +129,6 @@ def main(*args):
                                 suffix = 1 << 10
                             elif suffix == "mi":
                                 suffix = 1 << 20
-                            else:
-                                pass  # huh?
                         else:
                             suffix = 1
                         chunk_size = math.trunc(base * suffix)

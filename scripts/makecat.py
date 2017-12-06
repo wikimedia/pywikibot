@@ -79,7 +79,6 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None, summary=''):
             pass
         except pywikibot.IsRedirectPage:
             cl = True
-            pass
         else:
             cats = [x for x in pl.categories()]
             if workingcat not in cats:

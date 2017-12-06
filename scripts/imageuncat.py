@@ -1294,7 +1294,7 @@ def addUncat(page):
     Add the uncat template to the page.
 
     @param page: Page to be modified
-    @rtype: Page
+    @type page: pywikibot.Page
     """
     newtext = page.get() + puttext
     pywikibot.showDiff(page.get(), newtext)

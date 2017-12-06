@@ -7,7 +7,7 @@
 # (C) Andre Engels, 2004-2005
 # (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
 #       (years/decades/centuries/millenniums str <=> int conversions)
-# (C) Pywikibot team, 2004-2016
+# (C) Pywikibot team, 2004-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -377,10 +377,10 @@ def escapePattern2(pattern):
         decoders = []
         for s in _reParameters.split(pattern):
             if s is None:
-                pass
-            elif (len(s) in (2, 3) and s[0] == '%' and
-                  s[-1] in _digitDecoders and
-                  (len(s) == 2 or s[1] in _decimalDigits)):
+                continue
+            if (len(s) in (2, 3) and s[0] == '%' and
+                    s[-1] in _digitDecoders and
+                    (len(s) == 2 or s[1] in _decimalDigits)):
                 # Must match a "%2d" or "%d" style
                 dec = _digitDecoders[s[-1]]
                 if isinstance(dec, basestring):

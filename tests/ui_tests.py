@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #
@@ -670,7 +670,6 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
     @classmethod
     def tearDownClass(cls):
         cls.tearDownProcess()
-        pass
 
     def testOutputUnicodeText_no_transliterate(self):
         self.sendstdin(

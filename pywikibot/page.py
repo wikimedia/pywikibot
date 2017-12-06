@@ -5978,6 +5978,5 @@ def url2unicode(title, encodings='utf-8'):
         except UnicodeError as ex:
             if not firstException:
                 firstException = ex
-            pass
     # Couldn't convert, raise the original exception
     raise firstException

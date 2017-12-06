@@ -546,7 +546,6 @@ class CheckHostnameMixin(TestCaseBase):
                                 % (cls.__name__, hostname))
                 pywikibot.exception(e2, tb=True)
                 e = e2
-                pass
 
             if e:
                 cls._checked_hostnames[hostname] = e

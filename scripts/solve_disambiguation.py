@@ -462,15 +462,13 @@ class PrimaryIgnoreManager(object):
         try:
             # The file is stored in the disambiguation/ subdir.
             # Create if necessary.
-            f = codecs.open(filename, 'r', 'utf-8')
-            for line in f.readlines():
-                # remove trailing newlines and carriage returns
-                while line[-1] in ['\n', '\r']:
-                    line = line[:-1]
-                # skip empty lines
-                if line != '':
-                    self.ignorelist.append(line)
-            f.close()
+            with codecs.open(filename, 'r', 'utf-8') as f:
+                for line in f:
+                    # remove trailing newlines and carriage returns
+                    line = line.rstrip('\r\n')
+                    # skip empty lines
+                    if line:
+                        self.ignorelist.append(line)
         except IOError:
             pass
 
