@@ -264,18 +264,18 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
     def test_translateMagicWords(self):
         """Test translateMagicWords method."""
         self.assertEqual(
-            '[[File:Foo.bar|miniatur]]',
+            '[[File:Foo.bar|mini]]',
             self.cct.translateMagicWords('[[File:Foo.bar|thumb]]'))
         self.assertEqual(
-            '[[File:Foo.bar|miniatur]]',
-            self.cct.translateMagicWords('[[File:Foo.bar|mini]]'))
+            '[[File:Foo.bar|mini]]',
+            self.cct.translateMagicWords('[[File:Foo.bar|miniatur]]'))
         # test local namespace
         self.assertEqual(
-            '[[Datei:Foo.bar|miniatur]]',
+            '[[Datei:Foo.bar|mini]]',
             self.cct.translateMagicWords('[[Datei:Foo.bar|thumb]]'))
         # test multiple magic words
         self.assertEqual(
-            '[[File:Foo.bar|links|miniatur]]',
+            '[[File:Foo.bar|links|mini]]',
             self.cct.translateMagicWords('[[File:Foo.bar|left|thumb]]'))
         # test magic words at the end
         self.assertEqual(
