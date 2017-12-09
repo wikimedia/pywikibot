@@ -14,11 +14,6 @@ import sys
 
 from distutils.version import LooseVersion
 
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
 import pywikibot
 from pywikibot import pagegenerators, date
 
@@ -32,7 +27,7 @@ from pywikibot.pagegenerators import (
 
 from pywikibot.tools import has_module
 
-from tests import join_data_path
+from tests import join_data_path, patch
 from tests.aspects import (
     unittest,
     TestCase,
