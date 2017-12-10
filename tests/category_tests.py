@@ -18,7 +18,7 @@ class TestCategoryObject(TestCase):
     """Test Category object."""
 
     NOCATEGORYNAMESPACE_RE = '\'(.*?)\' is not in the category namespace!'
-    NOREDIRECTPAGE_RE = 'Page \[\[(.*?)\]\] is not a redirect page.'
+    NOREDIRECTPAGE_RE = r'Page \[\[(.*?)\]\] is not a redirect page.'
 
     family = 'wikipedia'
     code = 'en'

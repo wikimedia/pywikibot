@@ -229,9 +229,15 @@ class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
 
     """Test static/classmethods in Namespace replaced by NamespacesDict."""
 
-    CONTAINSINAPPROPRIATE_RE = 'identifiers contains inappropriate types: (.*?)'
-    INTARGNOTSTRINGORNUMBER_RE = 'int\(\) argument must be a string or a number, not \'(.*?)\''
-    NAMESPACEIDNOTRECOGNISED_RE = 'Namespace identifier\(s\) not recognised: (.*?)'
+    CONTAINSINAPPROPRIATE_RE = (
+        r'identifiers contains inappropriate types: (.*?)'
+    )
+    INTARGNOTSTRINGORNUMBER_RE = (
+        r"int\(\) argument must be a string or a number, not '(.*?)'"
+    )
+    NAMESPACEIDNOTRECOGNISED_RE = (
+        r'Namespace identifier\(s\) not recognised: (.*?)'
+    )
 
     net = False
 
@@ -377,8 +383,8 @@ class TestNamespacesDictGetItem(TestCase):
 
     """Test NamespacesDict.__getitem__."""
 
-    VALIDNUMBER_RE = '-?(0|[1-9]\d*)'
-    EMPTYTEXT_RE = '\s*'
+    VALIDNUMBER_RE = r'-?(0|[1-9]\d*)'
+    EMPTYTEXT_RE = r'\s*'
 
     net = False
 
