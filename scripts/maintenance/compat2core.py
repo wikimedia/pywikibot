@@ -26,8 +26,8 @@ to show warnings about deprecated methods:
     python pwb.py compat2core <scriptname> -warnonly
 """
 #
-# (C) xqt, 2014-2018
-# (C) Pywikibot team, 2014-2018
+# (C) xqt, 2014-2020
+# (C) Pywikibot team, 2014-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -112,7 +112,7 @@ warnings = (
      '"wikipedia" library has been changed to "pywikibot". Please find the\n'
      'right way to import your object.'),
     ('from pywikibot.compat import',
-     'compat module has been dropped. Please refer README-conversion.txt for\n'
+     'compat module has been removed. Please refer README-conversion.txt for\n'
      'core implementation.'),
     ('query.GetData(',
      'query.GetData() should be replaced by pywikibot.data.api.Request or\n'

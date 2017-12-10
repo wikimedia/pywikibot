@@ -14,7 +14,7 @@ to set the default site like (see T216825):
 
     python pwb.py -lang:de bot_tests -v
 """
-# (C) Pywikibot team, 2012-2019
+# (C) Pywikibot team, 2012-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -145,9 +145,8 @@ def handle_args(pwb_py, *args):
 absolute_path = abspath(os.path.dirname(sys.argv[0]))
 rewrite_path = absolute_path
 
-sys.path = [sys.path[0], rewrite_path,
-            os.path.join(rewrite_path, 'pywikibot', 'compat'),
-            ] + sys.path[1:]
+if rewrite_path not in sys.path[:2]:
+    sys.path.insert(1, rewrite_path)
 
 try:
     import requests
