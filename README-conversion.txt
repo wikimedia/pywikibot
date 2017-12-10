@@ -29,9 +29,10 @@ The following changes, at a minimum, need to be made to allow scripts to run:
     change "import wikipedia" to "import pywikibot"
     change "import pagegenerators" to "from pywikibot import pagegenerators"
     change "import config" to "from pywikibot import config"
-    change "import catlib" to "from pywikibot.compat import catlib"
-    change "import query" to "from pywikibot.compat import query"
-    change "import userlib" to "from pywikibot.compat import userlib"
+    change "catlib.Category" to "pywikibot.Category"
+    change "catlib.change_category(page, ...)" to "page.change_category(...)"
+    change "query.GetData(request)" to "pywikibot.data.api.request(**request).submit()"
+    change "userlib.User" to "pywikibot.User"
     change "wikipedia." to "pywikibot."
 
 wikipedia.setAction() no longer works; you must revise the script to pass an
