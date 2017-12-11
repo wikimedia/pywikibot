@@ -532,12 +532,12 @@ class ProofreadPage(pywikibot.Page):
             soup = Soup(response.content)
 
             try:
-                # None if nothing is found by .find()
                 self._url_image = soup.find(class_='prp-page-image')
+                # if None raises AttributeError
                 self._url_image = self._url_image.find('img')
                 # if None raises TypeError.
                 self._url_image = self._url_image['src']
-            except TypeError:
+            except (TypeError, AttributeError):
                 raise ValueError('No prp-page-image src found for %s.' % self)
             else:
                 self._url_image = 'https:' + self._url_image
