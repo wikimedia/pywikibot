@@ -1,9 +1,11 @@
 Release history
 ===============
 
-3.0.20170917
---------------
+Current release
+---------------
 
+* Introduce userscripts directory
+* Generator settings inside (user-)fixes.py
 * BaseUnlinkBot has become part of the framework in specialbots.py
 * Decommission of rcstream
 * Script files added to https://doc.wikimedia.org/pywikibot/
