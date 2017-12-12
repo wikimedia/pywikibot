@@ -7,17 +7,12 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-import sys
-
 import pywikibot.data.sparql as sparql
 from pywikibot.tools import UnicodeType
 
 from tests.aspects import unittest, TestCase, WikidataTestCase
+from tests import patch
 
-if sys.version_info[0] > 2:
-    from unittest.mock import patch
-else:
-    from mock import patch
 
 # See: https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 

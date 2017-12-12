@@ -10,10 +10,6 @@ from __future__ import absolute_import, unicode_literals
 
 import pickle
 import re
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 
 import pywikibot
 import pywikibot.page
@@ -32,6 +28,7 @@ from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
     DefaultDrySiteTestCase, DeprecationTestCase,
 )
+from tests import mock
 
 
 EMPTY_TITLE_RE = r'Title must be specified and not empty if source is a Site\.'

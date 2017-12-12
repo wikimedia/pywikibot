@@ -11,10 +11,6 @@ import codecs
 import functools
 import os
 import re
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 import pywikibot
 import pywikibot.textlib as textlib
@@ -28,6 +24,7 @@ from tests.aspects import (
     unittest, require_modules, TestCase, DefaultDrySiteTestCase,
     PatchingTestCase, SiteAttributeTestCase,
 )
+from tests import mock
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")

@@ -7,17 +7,12 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-try:
-    from unittest.mock import Mock, patch
-except ImportError:
-    from mock import Mock, patch
-
 import pywikibot
-
 from pywikibot import site, Page, i18n
 
 from scripts.redirect import RedirectRobot
 
+from tests import Mock, patch
 from tests.aspects import DefaultSiteTestCase
 
 

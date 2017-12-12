@@ -12,10 +12,6 @@ e.g. used to test password-file based login.
 from __future__ import absolute_import, unicode_literals
 
 from collections import defaultdict
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 from io import StringIO
 
 from pywikibot.exceptions import NoUsername
@@ -25,6 +21,7 @@ from tests.aspects import (
     unittest,
     DefaultDrySiteTestCase,
 )
+from tests import mock
 
 
 class FakeFamily(object):

@@ -7,18 +7,11 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
 
-import sys
-
 from pywikibot.diff import cherry_pick, html_comparator, PatchManager
 from pywikibot.tools import PY2
 
-from tests import join_html_data_path
+from tests import join_html_data_path, patch
 from tests.aspects import TestCase, require_modules, unittest
-
-if sys.version_info[0] > 2:
-    from unittest.mock import patch
-else:
-    from mock import patch
 
 
 @require_modules('bs4')

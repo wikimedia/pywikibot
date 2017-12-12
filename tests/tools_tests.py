@@ -15,20 +15,13 @@ import subprocess
 import tempfile
 import warnings
 
-try:
-    import mock
-except ImportError as e:
-    mock = e
-
 from pywikibot import tools
 from pywikibot.tools import classproperty
 
-from tests import join_xml_data_path
-
+from tests import join_xml_data_path, mock
 from tests.aspects import (
     unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
 )
-
 from tests.utils import add_metaclass
 
 
@@ -710,7 +703,6 @@ class TestPythonArgSpec(TestArgSpec):
             return inspect.getargspec(method)
 
 
-@require_modules('mock')
 class TestFileModeChecker(TestCase):
 
     """Test parsing password files."""
