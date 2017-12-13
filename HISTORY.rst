@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20171212
+------------
+
 * Introduce userscripts directory
 * Generator settings inside (user-)fixes.py
 * BaseUnlinkBot has become part of the framework in specialbots.py
