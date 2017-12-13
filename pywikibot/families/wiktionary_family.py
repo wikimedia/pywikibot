@@ -34,14 +34,14 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Initializer."""
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'ku',
-            'sv', 'pl', 'el', 'it', 'ta', 'hu', 'fi', 'tr', 'ca', 'ko', 'io',
-            'kn', 'pt', 'hy', 'vi', 'sr', 'chr', 'ja', 'hi', 'ro', 'no', 'th',
+            'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'sv',
+            'ku', 'pl', 'el', 'it', 'ta', 'hu', 'fi', 'tr', 'ca', 'ko', 'io',
+            'kn', 'pt', 'hy', 'vi', 'sr', 'chr', 'ja', 'hi', 'th', 'ro', 'no',
             'ml', 'id', 'et', 'uz', 'li', 'my', 'or', 'te', 'fa', 'eo', 'cs',
             'ar', 'jv', 'az', 'eu', 'gl', 'oc', 'da', 'lo', 'br', 'uk', 'hr',
-            'fj', 'tg', 'bg', 'ps', 'simple', 'cy', 'vo', 'wa', 'sk', 'is',
-            'zh-min-nan', 'la', 'scn', 'he', 'ast', 'af', 'tl', 'sw', 'ky',
-            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'ka', 'nds', 'sl', 'pa', 'sq',
+            'fj', 'tg', 'bg', 'ps', 'simple', 'cy', 'sk', 'wa', 'vo', 'is',
+            'zh-min-nan', 'la', 'scn', 'af', 'he', 'ast', 'tl', 'sw', 'ky',
+            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'ka', 'pa', 'nds', 'sl', 'sq',
             'lb', 'bs', 'nah', 'sa', 'kk', 'tk', 'bn', 'km', 'sm', 'mk', 'hsb',
             'be', 'ms', 'ga', 'ur', 'an', 'wo', 'vec', 'ang', 'tt', 'sd', 'gn',
             'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si', 'hif',
