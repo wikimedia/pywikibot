@@ -51,10 +51,9 @@ def get_latest_patchset():
     """Return the PatchSet for the latest commit."""
     # regex from https://github.com/PyCQA/pylint/blob/master/pylintrc
     output = check_output(
-        ['git', 'diff', '-U0', '@~..@'], universal_newlines=True)
-    if version_info.major == 2:
-        return PatchSet.from_string(output, encoding='utf-8')
-    return PatchSet.from_string(output)
+        ['git', 'diff', '-U0', '@~..@'])
+    return PatchSet.from_string(
+        output.replace(b'\r\n', b'\n'), encoding='utf-8')
 
 
 def print_error(path, line_no, col_no, error):
@@ -119,7 +118,7 @@ def check(latest_patchset):
                     )
                     error = True
         if added_lines:
-            error = check_tokens(path, added_lines) and error
+            error = not check_tokens(path, added_lines) or error
     return not error
 
 
