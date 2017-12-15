@@ -6,13 +6,14 @@ Currently the script checks the following code style issues:
     - Line lengths: Newly added lines longer than 79 chars are not allowed.
     - Unicode literal notations: They are not allowed since we instead import
         unicode_literals from __future__.
+    - Any added double quoted string should contain a single quote.
 
 See [[Manual:Pywikibot/Development/Guidelines]] for more info.
 
 Todo: The following rules can be added in the future:
     - For any changes or new lines use single quotes for strings, or double
         quotes  if the string contains a single quote. But keep older code
-        unchanged.
+        unchanged. (partially implemented)
     - Prefer string.format() instead of modulo operator % for string
         formatting. The modulo operator might be deprecated by a future
         python release.
@@ -25,8 +26,13 @@ Todo: The following rules can be added in the future:
 
 from __future__ import absolute_import, unicode_literals
 
-from re import compile as re_compile, IGNORECASE, VERBOSE
+from re import compile as re_compile, IGNORECASE
 from subprocess import check_output
+from sys import version_info
+if version_info.major == 3:
+    from tokenize import tokenize, STRING
+else:
+    from tokenize import generate_tokens as tokenize, STRING
 
 from unidiff import PatchSet
 
@@ -35,28 +41,9 @@ from unidiff import PatchSet
 # It does not make sense to break long URLs.
 # https://github.com/PyCQA/pylint/blob/d42e74bb9428f895f36808d30bd8a1fe31e28f63/pylintrc#L145
 IGNORABLE_LONG_LINE = re_compile(r'\s*(# )?<?https?://\S+>?$').match
-# The U_PREFIX regex cannot be 100% accurate without tokenizing the whole
-# module, but thee accuracy of this simple regex should be enough for our
-# purposes.
-U_PREFIX = re_compile(
-    r'''
-        (.*?)\b
-        (?=
-            ur?
-            (?=
-                ['"]{3}
-                |
-                # to reduce the false positive possibilities like  's t u',
-                # check that the non-triple-quoted strings are closed  on the
-                # same line.
-                '[^']*'
-                |
-                "[^"]*"
-            )
-        )
-        (?<!['"])
-    ''',
-    IGNORECASE | VERBOSE
+
+STRING_MATCH = re_compile(
+    r'(?P<unicode_literal>u)?[bfr]*(?P<quote>\'+|"+)', IGNORECASE,
 ).match
 
 
@@ -65,12 +52,44 @@ def get_latest_patchset():
     # regex from https://github.com/PyCQA/pylint/blob/master/pylintrc
     output = check_output(
         ['git', 'diff', '-U0', '@~..@'], universal_newlines=True)
+    if version_info.major == 2:
+        return PatchSet.from_string(output, encoding='utf-8')
     return PatchSet.from_string(output)
 
 
 def print_error(path, line_no, col_no, error):
     """Print the error."""
     print('{0}:{1}:{2}: {3}'.format(path, line_no, col_no, error))
+
+
+def check_tokens(file_path, line_nos):
+    """Check the style of lines in the given file_path."""
+    error = False
+    max_line = max(line_nos)
+    with open(file_path, 'rb') as f:
+        token_generator = tokenize(f.readline)
+        for type_, string, start, end, line_val in token_generator:
+            if max_line < start[0]:
+                break
+            if start[0] not in line_nos or type_ != STRING:
+                continue
+            match = STRING_MATCH(string)
+            if match.group('unicode_literal'):
+                error = True
+                print_error(
+                    file_path, start[0], start[1] + 1,
+                    'newly-added/modified line with u"" prefixed string '
+                    'literal',
+                )
+            if match.group('quote') == '"' and "'" not in string:
+                error = True
+                print_error(
+                    file_path, start[0], start[1] + 1,
+                    'newly-added/modified line with "double quoted string" not'
+                    ' containing any single quotes; use a \'single quoted '
+                    'string\' instead',
+                )
+    return not error
 
 
 def check(latest_patchset):
@@ -81,30 +100,26 @@ def check(latest_patchset):
     """
     error = False
     for patched_file in latest_patchset:
-        target_file = patched_file.target_file
-        if not (target_file.endswith('.py') or patched_file.is_removed_file):
+        path = patched_file.path
+        if not (path.endswith('.py') or patched_file.is_removed_file):
             continue
+        added_lines = set()
         for hunk in patched_file:
             for line in hunk:
                 if not line.is_added:
                     continue
+                line_no = line.target_line_no
+                added_lines.add(line_no)
                 line_val = line.value
                 # Check line length
                 if len(line_val) > 80 and not IGNORABLE_LONG_LINE(line_val):
                     print_error(
-                        target_file, line.target_line_no, len(line_val),
+                        path, line_no, len(line_val),
                         'newly-added/modified line longer than 79 characters',
                     )
                     error = True
-                # Check that u-prefix is not used
-                u_match = U_PREFIX(line_val)
-                if u_match:
-                    print_error(
-                        target_file, line.target_line_no, u_match.end() + 1,
-                        'newly-added/modified line with u\"" prefixed string '
-                        'literal',
-                    )
-                    error = True
+        if added_lines:
+            error = check_tokens(path, added_lines) and error
     return not error
 
 
