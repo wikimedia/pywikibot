@@ -29,9 +29,19 @@ else:
 
     from ScrolledText import ScrolledText
 
-from idlelib import SearchDialog, ReplaceDialog, configDialog
-from idlelib.configHandler import idleConf
-from idlelib.MultiCall import MultiCallCreator
+# T164163: Fix idlelib import in Python 3.6
+if sys.version_info > (3, 5):
+    from idlelib import (
+        search as SearchDialog,
+        replace as ReplaceDialog,
+        configdialog as configDialog
+    )
+    from idlelib.config import idleConf
+    from idlelib.multicall import MultiCallCreator
+else:
+    from idlelib import SearchDialog, ReplaceDialog, configDialog
+    from idlelib.configHandler import idleConf
+    from idlelib.MultiCall import MultiCallCreator
 
 import pywikibot
 
