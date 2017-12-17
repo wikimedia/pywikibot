@@ -22,10 +22,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
         'aa', 'advisory', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mo',
-        'mus', 'ng', 'quality', 'strategy', 'ten', 'usability',
-        'wikimania2005', 'wikimania2006', 'wikimania2007', 'wikimania2008',
-        'wikimania2009', 'wikimania2010', 'wikimania2011', 'wikimania2012',
-        'wikimania2013', 'wikimania2014', 'wikimania2015',
+        'mus', 'ng', 'quality', 'strategy', 'ten', 'usability'
     ]
 
     removed_wikis = [
@@ -123,6 +120,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'species',
             'strategy',
             'test',
+            'wikimania'
         ]
 
         # Global bot allowed languages on

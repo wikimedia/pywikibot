@@ -687,6 +687,14 @@ class Family(object):
             'wm2008':           'wm2008',
             'wm2009':           'wm2009',
             'wm2010':           'wm2010',
+            'wm2011':           'wm2011',
+            'wm2012':           'wm2012',
+            'wm2013':           'wm2013',
+            'wm2014':           'wm2014',
+            'wm2015':           'wm2015',
+            'wm2016':           'wm2016',
+            'wm2017':           'wm2017',
+            'wm2018':           'wm2018',
             'wmania':           'wmania',
             'wmcz':             'wmcz',
             'wmf':              'wmf',
@@ -1544,7 +1552,7 @@ class WikimediaFamily(Family):
 
     wikimedia_org_meta_families = [
         'meta', 'outreach', 'strategy',
-        'wikimediachapter',
+        'wikimediachapter', 'wikimania',
     ]
 
     wikimedia_org_other_families = [

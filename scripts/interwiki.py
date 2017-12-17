@@ -152,6 +152,7 @@ These arguments are useful to provide hints to the bot:
                       * species:   Interlanguage links of the wikispecies wiki
                       * strategy:  Links in pages on Wikimedias strategy wiki
                       * test:      Take interwiki links from Test Wikipedia
+                      * wikimania: Interwiki links of Wikimania
 
                    Languages, groups and families having the same page title
                    can be combined, as -hint:5,scand,sr,pt,commons:New_York
