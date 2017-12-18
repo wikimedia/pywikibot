@@ -354,7 +354,7 @@ class DuplicateReferences(object):
                     continue
                 name = v[0]
                 if not name:
-                    name = self.autogen + str(id)
+                    name = '"%s%d"' % (self.autogen, id)
                     id += 1
                 elif v[2]:
                     name = u'"%s"' % name
