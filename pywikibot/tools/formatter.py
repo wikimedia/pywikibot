@@ -156,7 +156,8 @@ class _ColorFormatter(Formatter):
             raise ValueError('Keyword argument(s) use valid color(s): ' +
                              '", "'.join(self.colors.intersection(kwargs)))
         if not isinstance(format_string, UnicodeType):
-            raise TypeError('expected str, got {0}'.format(type(format_string)))
+            raise TypeError('expected {0}, got {1}'
+                            .format(type(''), type(format_string)))
         return super(_ColorFormatter, self).vformat(format_string, args,
                                                     kwargs)
 
