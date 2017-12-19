@@ -80,7 +80,7 @@ flickrapi ; python_version >= '2.7' and python_version != '3.3'
 irc ; python_version > '2.6'
 
 # textlib.py and patrol.py
-mwparserfromhell>=0.3.3 ; python_version <= '3.4'
+mwparserfromhell>=0.3.3
 
 # The mysql generator in pagegenerators depends on either oursql or MySQLdb
 # pywikibot prefers oursql.  Both are Python 2 only; T89976.
