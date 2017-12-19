@@ -74,8 +74,9 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
 
         del FakeConfig.usernames['*']
         FakeConfig.usernames['*']['en'] = FakeUsername
-        self.assertRaises(NoUsername, LoginManager)
-
+        error_undefined_username = 'ERROR: Username for.*is undefined.\nIf'
+        self.assertRaisesRegex(NoUsername, error_undefined_username,
+                               LoginManager)
         FakeConfig.usernames['*']['*'] = FakeUsername
         lm = LoginManager()
         self.assertEqual(lm.username, FakeUsername)
