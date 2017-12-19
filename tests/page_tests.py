@@ -1094,6 +1094,30 @@ class HtmlEntity(TestCase):
         self.assertEqual(pywikibot.page.html2unicode('&#x70&#x79;'), '&#x70y')
 
 
+class TestPermalink(DefaultSiteTestCase):
+    """Test that permalink links are correct."""
+
+    family = 'test'
+    code = 'test'
+
+    def test_permalink(self):
+        """Test permalink function."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/permalink')
+        self.assertEqual(p1.permalink(),
+                         '//test.wikipedia.org/w/index.php?title=User%3A'
+                         'Framawiki/pwb_tests/permalink&oldid=340685')
+        self.assertEqual(p1.permalink(oldid='340684'),
+                         '//test.wikipedia.org/w/index.php?title=User%3A'
+                         'Framawiki/pwb_tests/permalink&oldid=340684')
+        self.assertEqual(p1.permalink(percent_encoded=False),
+                         '//test.wikipedia.org/w/index.php?title=User:'
+                         'Framawiki/pwb_tests/permalink&oldid=340685')
+        self.assertEqual(p1.permalink(with_protocol=True),
+                         'https://test.wikipedia.org/w/index.php?title=User%3A'
+                         'Framawiki/pwb_tests/permalink&oldid=340685')
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
