@@ -1058,9 +1058,9 @@ class TestImageUsage(DefaultSiteTestCase):
 
     @property
     def imagepage(self):
-        """Find an image which is used on a page.
+        """Find an image which is used on the main page.
 
-        If there are no images included in pages it'll skip all tests.
+        If there are no images included in main page it'll skip all tests.
 
         Note: This is not implemented as setUpClass which would be invoked
         while initialising all tests, to reduce chance of an error preventing
@@ -1070,15 +1070,12 @@ class TestImageUsage(DefaultSiteTestCase):
             return self.__class__._image_page
 
         mysite = self.get_site()
-        for page in mysite.allpages(filterredir=False):
-            try:
-                imagepage = next(iter(page.imagelinks()))  # 1st image of page
-            except StopIteration:
-                pass
-            else:
-                break
-        else:
-            raise unittest.SkipTest("No images on site {0!r}".format(mysite))
+        page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
+        try:
+            imagepage = next(iter(page.imagelinks()))  # 1st image of page
+        except StopIteration:
+            raise unittest.SkipTest(
+                'No images on the main page of site {0!r}'.format(mysite))
 
         pywikibot.output(u'site_tests.TestImageUsage found %s on %s'
                          % (imagepage, page))
