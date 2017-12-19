@@ -530,7 +530,8 @@ def main(*args):
                         # Do the TkdialogIC to accept/reject and change te name
                         (newname, skip) = TkdialogIC(
                             imagepage.title(withNamespace=False),
-                            imagepage.get(), username, imagepage.permalink(),
+                            imagepage.get(), username,
+                            imagepage.permalink(with_protocol=True),
                             imagepage.templates()).getnewname()
 
                         if skip:
