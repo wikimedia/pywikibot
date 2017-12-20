@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Ship wikimania family file
 * Drop battlestarwiki family file
 * Bugfixes and improvements
 * Localisation updates

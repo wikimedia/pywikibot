@@ -137,6 +137,14 @@ pywikibot.families.wikidata_family module
     :undoc-members:
     :show-inheritance:
 
+pywikibot.families.wikimania_family module
+------------------------------------------
+
+.. automodule:: pywikibot.families.wikimania_family
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pywikibot.families.wikimediachapter_family module
 -------------------------------------------------
 
