@@ -326,7 +326,6 @@ class Family(object):
             'aspienetwiki':     'aspienetwiki',
             'atmwiki':          'atmwiki',
             'b':                'wikibooks',
-            'battlestarwiki':   'battlestarwiki',
             'bemi':             'bemi',
             'benefitswiki':     'benefitswiki',
             'betawiki':         'betawiki',

@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Drop battlestarwiki family file
 * Bugfixes and improvements
 * Localisation updates
 
