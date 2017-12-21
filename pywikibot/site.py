@@ -2038,10 +2038,18 @@ class APISite(BaseSite):
         auth_token = get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
 
-    def login(self, sysop=False):
+    def login(self, sysop=False, autocreate=False):
         """
         Log the user in if not already logged in.
 
+        @param sysop: if true, log in with the sysop account.
+        @type sysop: bool
+
+        @param autocreate: if true, allow auto-creation of the account
+                           using unified login
+        @type autocreate: bool
+
+        @raises NoUsername: Username is not recognised by the site.
         U{https://www.mediawiki.org/wiki/API:Login}
         """
         # TODO: this should include an assert that loginstatus
@@ -2075,6 +2083,10 @@ class APISite(BaseSite):
         # May occur if you are not logged in (no API read permissions).
         except api.APIError:
             pass
+        except NoUsername as e:
+            if not autocreate:
+                raise e
+
         if self.is_oauth_token_available():
             if sysop:
                 raise NoUsername('No sysop is permitted with OAuth')
@@ -2088,7 +2100,7 @@ class APISite(BaseSite):
                 raise NoUsername('Logging in on %s via OAuth failed' % self)
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
-        if loginMan.login(retry=True):
+        if loginMan.login(retry=True, autocreate=autocreate):
             self._username[sysop] = loginMan.username
             self.getuserinfo(force=True)
             self._loginstatus = (LoginStatus.AS_SYSOP
