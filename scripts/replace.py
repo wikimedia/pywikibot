@@ -659,7 +659,7 @@ class ReplaceRobot(Bot):
 
         return new_text
 
-    @deprecated('apply_replacements')
+    @deprecated('apply_replacements', since='20160816')
     def doReplacements(self, original_text, page=None):
         """Apply replacements to the given text and page."""
         if page is None:
@@ -947,7 +947,8 @@ def main(*args):
         elif arg.startswith(('-sql', '-mysqlquery')):
             if arg.startswith('-sql'):
                 issue_deprecation_warning('The usage of "-sql"', '-mysqlquery',
-                                          1, ArgumentDeprecationWarning)
+                                          1, ArgumentDeprecationWarning,
+                                          since='20180617')
             useSql = True
             sql_query = arg.partition(':')[2]
         elif arg.startswith('-excepttitle:'):
@@ -988,7 +989,7 @@ def main(*args):
             issue_deprecation_warning(
                 '-replacementfile',
                 '-pairsfile',
-                2, ArgumentDeprecationWarning)
+                2, ArgumentDeprecationWarning, since='20160304')
         elif arg.startswith('-pairsfile'):
             if len(commandline_replacements) % 2:
                 replacement_file_arg_misplaced = True

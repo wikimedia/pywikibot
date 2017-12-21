@@ -226,7 +226,7 @@ def user_agent(site=None, format_string=None):
     return formatted
 
 
-@deprecated('pywikibot.comms.http.fake_user_agent')
+@deprecated('pywikibot.comms.http.fake_user_agent', since='20161205')
 def get_fake_user_agent():
     """
     Return a fake user agent depending on `fake_user_agent` option in config.
@@ -298,7 +298,8 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
     if not site:
         # +1 because of @deprecate_arg
         issue_deprecation_warning(
-            'Invoking http.request without argument site', 'http.fetch()', 3)
+            'Invoking http.request without argument site', 'http.fetch()', 3,
+            since='20150814')
         r = fetch(uri, method, params, body, headers, **kwargs)
         return r.text
 

@@ -1558,7 +1558,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     """Test cases for deprecation function in the tools module."""
 
-    _generic_match = re.compile(r'.* is deprecated(; use .* instead)?\.')
+    _generic_match = re.compile(
+        r'.* is deprecated(?: for \d+ [^;]*)?(; use .* instead)?\.')
 
     source_adjustment_skips = [
         unittest.case._AssertRaisesContext,
@@ -1658,7 +1659,14 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
                 self.fail('No generic deprecation message match found in '
                           '{0}'.format(deprecation_messages))
         else:
-            self.assertIn(msg, self.deprecation_messages)
+            head, _, tail = msg.partition('; ')
+            for message in self.deprecation_messages:
+                if message.startswith(head) \
+                   and message.endswith(tail):
+                    break
+            else:
+                self.fail("'{}' not found in {} (ignoring since)"
+                          .format(msg, self.deprecation_messages))
         if self._do_test_warning_filename:
             self.assertDeprecationFile(self.expect_warning_filename)
 

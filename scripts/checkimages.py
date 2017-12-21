@@ -1602,7 +1602,8 @@ def main(*args):
                 length = len('-sleep')
             else:
                 issue_deprecation_warning('-time', '-sleep', 2,
-                                          ArgumentDeprecationWarning)
+                                          ArgumentDeprecationWarning,
+                                          since='20151209')
                 length = len('-time')
             if len(arg) == length:
                 time_sleep = int(pywikibot.input(
@@ -1619,7 +1620,8 @@ def main(*args):
             if arg == '-duplicatereport':
                 issue_deprecation_warning('-duplicatereport',
                                           '-duplicatesreport',
-                                          2, ArgumentDeprecationWarning)
+                                          2, ArgumentDeprecationWarning,
+                                          since='20161116')
             duplicatesReport = True
         elif arg.startswith('-duplicates'):
             duplicatesActive = True

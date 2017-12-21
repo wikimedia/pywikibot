@@ -378,7 +378,7 @@ def filterCountries(categories):
     return list(set(result))
 
 
-@deprecated
+@deprecated(since='20180120')
 def filterParents(categories):
     """
     Remove all parent categories from the set to prevent overcategorization.

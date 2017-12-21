@@ -46,7 +46,7 @@ from pywikibot.tools import (
 from pywikibot.userinterfaces import (
     terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
 )
-from tests.aspects import TestCase
+from tests.aspects import TestCase, TestCaseBase
 from tests.utils import unittest, FakeModule
 
 if os.name == "nt":
@@ -209,7 +209,7 @@ loggingcontext = {'caller_name': 'ui_tests',
                   'newline': '\n'}
 
 
-class UITestCase(unittest.TestCase):
+class UITestCase(TestCaseBase):
 
     """UI tests."""
 
@@ -290,10 +290,11 @@ class TestTerminalOutput(UITestCase):
             self.assertEqual(newstdout.getvalue(), 'output\n')
             self.assertEqual(len(w), 1)
             self.assertEqual(w[0].category, DeprecationWarning)
-            self.assertEqual(
-                str(w[0].message),
-                '"toStdout" parameter is deprecated; use pywikibot.stdout() instead.'
-            )
+            message = str(w[0].message)
+            self.assertStringMethod(str.startswith, message,
+                                    '"toStdout" parameter is deprecated')
+            self.assertStringMethod(str.endswith, message,
+                                    'use pywikibot.stdout() instead.')
 
     def test_stdout(self):
         pywikibot.stdout('output')

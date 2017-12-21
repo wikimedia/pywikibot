@@ -142,7 +142,8 @@ class LoginStatus(object):
 
 Family = redirect_func(pywikibot.family.Family.load,
                        target_module='pywikibot.family.Family',
-                       old_name='Family')
+                       old_name='Family',
+                       since='20141001')
 
 
 class Namespace(Iterable, ComparableMixin, UnicodeMixin):
@@ -452,7 +453,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         return False
 
     @classmethod
-    @deprecated('NamespacesDict.lookup_name')
+    @deprecated('NamespacesDict.lookup_name', since='20150703')
     def lookup_name(cls, name, namespaces=None):
         """
         Find the Namespace for a name.
@@ -470,7 +471,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         return NamespacesDict._lookup_name(name, namespaces)
 
     @staticmethod
-    @deprecated('NamespacesDict.resolve')
+    @deprecated('NamespacesDict.resolve', since='20150703')
     def resolve(identifiers, namespaces=None):
         """
         Resolve namespace identifiers to obtain Namespace objects.
@@ -785,14 +786,15 @@ class BaseSite(ComparableMixin):
         self._pagemutex = threading.Lock()
         self._locked_pages = []
 
-    @deprecated
+    @deprecated(since='20141225')
     def has_api(self):
         """Return whether this site has an API."""
         return False
 
     @property
     @deprecated(
-        "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'")
+        "APISite.siteinfo['case'] or Namespace.case == 'case-sensitive'",
+        since='20170504')
     def nocapitalize(self):
         """
         Return whether this site's default title case is case-sensitive.
@@ -990,7 +992,7 @@ class BaseSite(ComparableMixin):
         """
         return self._interwikimap[prefix].local
 
-    @deprecated('APISite.namespaces.lookup_name')
+    @deprecated('APISite.namespaces.lookup_name', since='20150703')
     def ns_index(self, namespace):
         """
         Return the Namespace for a given namespace name.
@@ -1002,7 +1004,7 @@ class BaseSite(ComparableMixin):
         """
         return self.namespaces.lookup_name(namespace)
 
-    @deprecated('APISite.namespaces.lookup_name')
+    @deprecated('APISite.namespaces.lookup_name', since='20150703')
     def getNamespaceIndex(self, namespace):
         """DEPRECATED: Return the Namespace for a given namespace name."""
         return self.namespaces.lookup_name(namespace)
@@ -1034,7 +1036,8 @@ class BaseSite(ComparableMixin):
     # for backwards-compatibility
     normalizeNamespace = redirect_func(ns_normalize,
                                        old_name='normalizeNamespace',
-                                       class_name='BaseSite')
+                                       class_name='BaseSite',
+                                       since='20141001')
 
     @remove_last_args(('default', ))
     def redirect(self):
@@ -1118,7 +1121,7 @@ class BaseSite(ComparableMixin):
                     '{site.family.name}_family for {site}'.format(site=self))
         return pywikibot.Category(pywikibot.Link(name, self))
 
-    @deprecated("pywikibot.Link")
+    @deprecated('pywikibot.Link', since='20090307')
     def linkto(self, title, othersite=None):
         """DEPRECATED. Return a wikilink to a page.
 
@@ -1199,32 +1202,32 @@ class BaseSite(ComparableMixin):
 
     # namespace shortcuts for backwards-compatibility
 
-    @deprecated('namespaces.SPECIAL.custom_name')
+    @deprecated('namespaces.SPECIAL.custom_name', since='20160407')
     def special_namespace(self):
         """Return local name for the Special: namespace."""
         return self.namespace(-1)
 
-    @deprecated('namespaces.FILE.custom_name')
+    @deprecated('namespaces.FILE.custom_name', since='20160407')
     def image_namespace(self):
         """Return local name for the File namespace."""
         return self.namespace(6)
 
-    @deprecated('namespaces.MEDIAWIKI.custom_name')
+    @deprecated('namespaces.MEDIAWIKI.custom_name', since='20160407')
     def mediawiki_namespace(self):
         """Return local name for the MediaWiki namespace."""
         return self.namespace(8)
 
-    @deprecated('namespaces.TEMPLATE.custom_name')
+    @deprecated('namespaces.TEMPLATE.custom_name', since='20160407')
     def template_namespace(self):
         """Return local name for the Template namespace."""
         return self.namespace(10)
 
-    @deprecated('namespaces.CATEGORY.custom_name')
+    @deprecated('namespaces.CATEGORY.custom_name', since='20160407')
     def category_namespace(self):
         """Return local name for the Category namespace."""
         return self.namespace(14)
 
-    @deprecated('list(namespaces.CATEGORY)')
+    @deprecated('list(namespaces.CATEGORY)', since='20150829')
     def category_namespaces(self):
         """Return names for the Category namespace."""
         return list(self.namespace(14, all=True))
@@ -1246,17 +1249,18 @@ class BaseSite(ComparableMixin):
 
     # deprecated methods for backwards-compatibility
 
-    @deprecated("family attribute")
+    @deprecated('family attribute', since='20090307')
     def fam(self):
         """Return Family object for this Site."""
         return self.family
 
-    @deprecated("pywikibot.data.api.encode_url")
+    @deprecated('pywikibot.data.api.encode_url', since='20151211')
     def urlEncode(self, query):
         """DEPRECATED."""
         return api.encode_url(query)
 
-    @deprecated('pywikibot.data.api.Request or pywikibot.comms.http.request')
+    @deprecated('pywikibot.data.api.Request or pywikibot.comms.http.request',
+                since='20141225')
     @deprecated_args(compress=None, no_hostname=None, cookies_only=None,
                      refer=None, back_response=None)
     def getUrl(self, path, retry=None, sysop=None, data=None):
@@ -1277,12 +1281,12 @@ class BaseSite(ComparableMixin):
         else:
             return http.request(self, path)
 
-    @deprecated
+    @deprecated(since='20141225')
     def postForm(self, address, predata, sysop=False, cookies=None):
         """DEPRECATED."""
         return self.getUrl(address, data=predata)
 
-    @deprecated
+    @deprecated(since='20141225')
     @deprecated_args(contentType=None)
     def postData(self, address, data, sysop=False,
                  compress=True, cookies=None):
@@ -1720,7 +1724,7 @@ class Siteinfo(Container):
     def __call__(self, key='general', force=False, dump=False):
         """DEPRECATED: Return the entry for key or dump the complete cache."""
         issue_deprecation_warning(
-            'Calling siteinfo', 'itself as a dictionary', 2
+            'Calling siteinfo', 'itself as a dictionary', 2, since='20161221'
         )
         if not dump:
             return self.get(key, expiry=0 if force else False)
@@ -1898,7 +1902,7 @@ class APISite(BaseSite):
                         return cls(site['code'], site['code'])
         raise ValueError("Cannot parse a site out of %s." % dbname)
 
-    @deprecated
+    @deprecated(since='20141225')
     def has_api(self):
         """Return whether this site has an API."""
         return True
@@ -1997,7 +2001,7 @@ class APISite(BaseSite):
 
         return True
 
-    @deprecated("Site.user()")
+    @deprecated('Site.user()', since='20090307')
     def loggedInAs(self, sysop=False):
         """Return the current username if logged in, otherwise return None.
 
@@ -2102,7 +2106,7 @@ class APISite(BaseSite):
 
     # alias for backward-compatibility
     forceLogin = redirect_func(login, old_name='forceLogin',
-                               class_name='APISite')
+                               class_name='APISite', since='20141001')
 
     def _relogin(self):
         """Force a login sequence without logging out, using the current user.
@@ -2213,7 +2217,7 @@ class APISite(BaseSite):
             self.login(sysop)
         return 'blockinfo' in self._userinfo
 
-    @deprecated('has_right() or is_blocked()')
+    @deprecated('has_right() or is_blocked()', since='20141218')
     def checkBlocks(self, sysop=False):
         """
         Raise an exception when the user is blocked. DEPRECATED.
@@ -2366,7 +2370,7 @@ class APISite(BaseSite):
         """
         if keys == '*' or keys == ['*']:
             issue_deprecation_warning('mediawiki_messages("*")',
-                                      'specific messages', 2)
+                                      'specific messages', 2, since='20150905')
 
         if not all(_key in self._msgcache for _key in keys):
             parameters = {'meta': 'allmessages',
@@ -2471,7 +2475,8 @@ class APISite(BaseSite):
         if not args:
             return u''
         if PY2 and any(isinstance(arg, str) for arg in args):
-            issue_deprecation_warning('arg of type str', 'type unicode', 2)
+            issue_deprecation_warning('arg of type str', 'type unicode', 2,
+                                      since='20151014')
 
         args = [unicode(e) for e in args]
         try:
@@ -2528,7 +2533,8 @@ class APISite(BaseSite):
 
     getExpandedString = redirect_func(expand_text,
                                       old_name='getExpandedString',
-                                      class_name='APISite')
+                                      class_name='APISite',
+                                      since='20170504')
 
     def getcurrenttimestamp(self):
         """
@@ -2562,7 +2568,7 @@ class APISite(BaseSite):
                 self.expand_text("{{CURRENTTIMESTAMP}}"))
 
     getcurrenttime = redirect_func(server_time, old_name='getcurrenttime',
-                                   class_name='APISite')
+                                   class_name='APISite', since='20141225')
 
     @need_version("1.14")
     def getmagicwords(self, word):
@@ -2577,7 +2583,7 @@ class APISite(BaseSite):
         else:
             return [word]
 
-    @deprecated('expand_text')
+    @deprecated('expand_text', since='20150831')
     def resolvemagicwords(self, wikitext):
         """
         Replace the {{ns:xx}} marks in a wikitext with the namespace names.
@@ -2665,7 +2671,7 @@ class APISite(BaseSite):
         return _namespaces
 
     @need_version("1.14")
-    @deprecated("has_extension")
+    @deprecated('has_extension', since='20140819')
     def hasExtension(self, name, unknown=None):
         """Determine whether extension `name` is loaded.
 
@@ -2707,7 +2713,7 @@ class APISite(BaseSite):
         """Site information dict."""
         return self._siteinfo
 
-    @deprecated('siteinfo or Namespace instance')
+    @deprecated('siteinfo or Namespace instance', since='20150830')
     def case(self):
         """Return this site's capitalization rule."""
         # This is the global setting via $wgCapitalLinks, it is used whenever
@@ -2718,7 +2724,7 @@ class APISite(BaseSite):
         """Return this site's internal id."""
         return self.siteinfo['wikiid']
 
-    @deprecated('APISite.lang')
+    @deprecated('APISite.lang', since='20150629')
     def language(self):
         """Return the code for the language of this Site."""
         return self.lang
@@ -2759,7 +2765,7 @@ class APISite(BaseSite):
         return self.data_repository() is not None
 
     @property
-    @deprecated('has_data_repository')
+    @deprecated('has_data_repository', since='20160405')
     def has_transcluded_data(self):
         """Return True if site has a shared data repository like Wikidata."""
         return self.has_data_repository
@@ -2927,7 +2933,7 @@ class APISite(BaseSite):
             return self.namespaces[num]
         return self.namespaces[num][0]
 
-    @deprecated("version()")
+    @deprecated('version()', since='20140612')
     def live_version(self, force=False):
         """Return the 'real' version number found on [[Special:Version]].
 
@@ -3099,7 +3105,7 @@ class APISite(BaseSite):
         return (pageitem['imageinfo']
                 if history else pageitem['imageinfo'][0])
 
-    @deprecated('Check the content model instead')
+    @deprecated('Check the content model instead', since='20150128')
     def loadflowinfo(self, page):
         """
         Load Flow-related information about a given page.
@@ -3559,7 +3565,7 @@ class APISite(BaseSite):
 
         return user_tokens
 
-    @deprecated("the 'tokens' property")
+    @deprecated("the 'tokens' property", since='20140613')
     def token(self, page, tokentype):
         """Return token retrieved from wiki to allow changing page content.
 
@@ -3569,7 +3575,7 @@ class APISite(BaseSite):
         """
         return self.tokens[tokentype]
 
-    @deprecated("the 'tokens' property")
+    @deprecated("the 'tokens' property", since='20150218')
     def getToken(self, getalways=True, getagain=False, sysop=False):
         """DEPRECATED: Get edit token."""
         if self.username(sysop) != self.user():
@@ -3585,7 +3591,7 @@ class APISite(BaseSite):
             del self.tokens._tokens[self.user()][token]
         return self.tokens[token]
 
-    @deprecated("the 'tokens' property")
+    @deprecated("the 'tokens' property", since='20150218')
     def getPatrolToken(self, sysop=False):
         """DEPRECATED: Get patrol token."""
         if self.username(sysop) != self.user():
@@ -4262,7 +4268,7 @@ class APISite(BaseSite):
             apgen.request["gapdir"] = "descending"
         return apgen
 
-    @deprecated("Site.allpages()")
+    @deprecated('Site.allpages()', since='20090307')
     def prefixindex(self, prefix, namespace=0, includeredirects=True):
         """Yield all pages with a given prefix. Deprecated.
 
@@ -4340,7 +4346,7 @@ class APISite(BaseSite):
             acgen.request["gacdir"] = "descending"
         return acgen
 
-    @deprecated("Site.allcategories()")
+    @deprecated('Site.allcategories()', since='20090307')
     def categories(self, number=10, repeat=False):
         """DEPRECATED."""
         if repeat:
@@ -4614,7 +4620,7 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated('APISite.logevents()')
+    @deprecated('APISite.logevents()', since='20141225')
     @deprecated_args(repeat=None)
     def logpages(self, number=50, mode=None, title=None, user=None,
                  namespace=[], start=None, end=None, tag=None, newer=False,
@@ -4787,12 +4793,14 @@ class APISite(BaseSite):
                 searchstring = 'intitle:' + searchstring
                 issue_deprecation_warning(
                     "where='{0}'".format(where),
-                    "searchstring='{0}'".format(searchstring), 2)
+                    "searchstring='{0}'".format(searchstring), 2,
+                    since='20160224')
                 where = None  # default
             else:
                 if where == 'titles':
                     issue_deprecation_warning("where='titles'",
-                                              "where='title'", 2)
+                                              "where='title'", 2,
+                                              since='20160224')
                 if MediaWikiVersion(self.version()) < MediaWikiVersion('1.11'):
                     where = 'titles'
                 else:
@@ -4986,7 +4994,7 @@ class APISite(BaseSite):
                 'ususers': usernames, 'usprop': usprop})
         return usgen
 
-    @deprecated('Site.randompages(total=1)')
+    @deprecated('Site.randompages(total=1)', since='20130828')
     def randompage(self, redirect=False):
         """
         DEPRECATED.
@@ -4996,7 +5004,7 @@ class APISite(BaseSite):
         """
         return self.randompages(total=1, redirects=redirect)
 
-    @deprecated("Site.randompages(total=1, redirects=True)")
+    @deprecated('Site.randompages(total=1, redirects=True)', since='20130828')
     def randomredirectpage(self):
         """
         DEPRECATED: Use Site.randompages() instead.
@@ -5952,7 +5960,7 @@ class APISite(BaseSite):
         return True
 
     @must_be(group='user')
-    @deprecated('Site().watch')
+    @deprecated('Site().watch', since='20160102')
     def watchpage(self, page, unwatch=False):
         """
         Add or remove page from watchlist.
@@ -6004,7 +6012,7 @@ class APISite(BaseSite):
             purged += ['linkupdate' in page for page in result]
         return all(purged)
 
-    @deprecated("Site().exturlusage")
+    @deprecated('Site().exturlusage', since='20090529')
     def linksearch(self, siteurl, limit=None, euprotocol=None):
         """Backwards-compatible interface to exturlusage()."""
         return self.exturlusage(siteurl, total=limit, protocol=euprotocol)
@@ -6021,7 +6029,7 @@ class APISite(BaseSite):
         return [image.title(with_ns=False)
                 for image in self.allimages(sha1=hash_found)]
 
-    @deprecated('Site().allimages')
+    @deprecated('Site().allimages', since='20141219')
     def getFilesFromAnHash(self, hash_found=None):
         """
         Return all files that have the same hash.
@@ -6030,7 +6038,7 @@ class APISite(BaseSite):
         """
         return self._get_titles_with_hash(hash_found)
 
-    @deprecated('Site().allimages')
+    @deprecated('Site().allimages', since='20141219')
     def getImagesFromAnHash(self, hash_found=None):
         """
         Return all images that have the same hash.
@@ -6200,7 +6208,7 @@ class APISite(BaseSite):
                                       '"report_success" is True or None',
                                       '"report_success=False" or define '
                                       '"ignore_warnings" as callable/iterable',
-                                      3)
+                                      3, since='20150823')
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
             ignore_warnings = lambda warnings: all(  # noqa: E731
@@ -6529,7 +6537,7 @@ class APISite(BaseSite):
                 yield (newpage, pageitem['timestamp'], pageitem['newlen'],
                        u'', pageitem['user'], pageitem['comment'])
 
-    @deprecated('APISite.logevents(logtype="upload")')
+    @deprecated('APISite.logevents(logtype="upload")', since='20170619')
     @deprecated_args(lestart='start', leend='end', leuser='user', letitle=None,
                      repeat=None, number='total', step=None)
     def newfiles(self, user=None, start=None, end=None, reverse=False,
@@ -6552,7 +6560,7 @@ class APISite(BaseSite):
             comment = event.comment() or u''
             yield (filepage, date, user, comment)
 
-    @deprecated('APISite.logevents(logtype="upload")')
+    @deprecated('APISite.logevents(logtype="upload")', since='20140808')
     @deprecated_args(number='total', repeat=None)
     def newimages(self, *args, **kwargs):
         """
@@ -6725,7 +6733,7 @@ class APISite(BaseSite):
                                gqppage='Unusedimages',
                                total=total)
 
-    @deprecated("Site().unusedfiles()")
+    @deprecated('Site().unusedfiles()', since='20140808')
     @deprecated_args(extension=None, number='total', step=None, repeat=None)
     def unusedimages(self, total=None):
         """Yield FilePage objects from Special:Unusedimages.
@@ -7354,9 +7362,9 @@ class APISite(BaseSite):
 
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
-                              class_name='APISite')
+                              class_name='APISite', since='20141218')
     isAllowed = redirect_func(has_right, old_name='isAllowed',
-                              class_name='APISite')
+                              class_name='APISite', since='20141218')
 
 
 class DataSite(APISite):
@@ -7449,7 +7457,8 @@ class DataSite(APISite):
     def _get_baserevid(self, claim, baserevid):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
-            issue_deprecation_warning('claim without on_item set', None, 3)
+            issue_deprecation_warning('claim without on_item set', None, 3,
+                                      since='20160309')
             if not baserevid:
                 warn('Neither claim.on_item nor baserevid provided',
                      UserWarning, 3)
@@ -7459,7 +7468,8 @@ class DataSite(APISite):
             return claim.on_item.latest_revision_id
 
         issue_deprecation_warning(
-            'Site method with baserevid', 'claim with on_item set', 3)
+            'Site method with baserevid', 'claim with on_item set', 3,
+            since='20150910')
         if baserevid != claim.on_item.latest_revision_id:
             warn('Using baserevid {0} instead of claim baserevid {1}'
                  ''.format(baserevid, claim.on_item.latest_revision_id),
@@ -7499,7 +7509,7 @@ class DataSite(APISite):
                 else:  # urls
                     instead = None
                 issue_deprecation_warning('DataSite.{0}()'.format(attr),
-                                          instead, 2)
+                                          instead, 2, since='20151022')
                 if props == 'urls':
                     props = 'sitelinks/urls'
                 method = self._get_propertyitem
@@ -7523,7 +7533,7 @@ class DataSite(APISite):
             "API wbgetentities response lacks %s key" % props
         return wbdata[props]
 
-    @deprecated('pywikibot.ItemPage')
+    @deprecated('pywikibot.ItemPage', since='20130307')
     def get_item(self, source, **params):
         """Get the data for multiple Wikibase items."""
         return self._get_item(source, **params)
@@ -7652,7 +7662,7 @@ class DataSite(APISite):
                     pass
                 yield page
 
-    @deprecated('DataSite.preload_entities')
+    @deprecated('DataSite.preload_entities', since='20170314')
     def preloaditempages(self, pagelist, groupsize=50):
         """DEPRECATED."""
         return self.preload_entities(pagelist, groupsize)

@@ -75,8 +75,8 @@ class Throttle(object):
             self.checkMultiplicity()
         self.setDelays()
 
-    @deprecated
     @property
+    @deprecated(since='20180423')
     def lastwait(self):
         """DEPRECATED property."""
         return 0.0

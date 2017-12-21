@@ -142,7 +142,7 @@ def getversiondict():
     return cache
 
 
-@deprecated('getversion_svn_setuptools')
+@deprecated('getversion_svn_setuptools', since='20150405')
 def svn_rev_info(path):
     """Fetch information about the current revision of an Subversion checkout.
 
@@ -248,7 +248,7 @@ def getversion_svn_setuptools(path=None):
     return (tag, rev, date, hsh)
 
 
-@deprecated('getversion_svn_setuptools')
+@deprecated('getversion_svn_setuptools', since='20150405')
 def getversion_svn(path=None):
     """Get version info for a Subversion checkout.
 
@@ -392,7 +392,8 @@ def getversion_onlinerepo():
         raise ParseError(repr(e) + ' while parsing ' + repr(buf))
 
 
-@deprecated('get_module_version, get_module_filename and get_module_mtime')
+@deprecated('get_module_version, get_module_filename and get_module_mtime',
+            since='20150221')
 def getfileversion(filename):
     """Retrieve revision number of file.
 

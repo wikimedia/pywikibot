@@ -189,7 +189,7 @@ class HttpRequest(UnicodeMixin):
         return self.raw.decode(encoding, errors)
 
     @property
-    @deprecated('the `text` property')
+    @deprecated('the `text` property', since='20180321')
     def content(self):
         """DEPRECATED. Return the response decoded by the detected encoding."""
         return self.text

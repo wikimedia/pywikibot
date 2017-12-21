@@ -584,7 +584,7 @@ class GeneratorFactory(object):
             issue_deprecation_warning(
                 'The usage of "{0}" as actual parameter of '
                 'pagegenerators.getCategory'.format(category),
-                categoryname, 2, ArgumentDeprecationWarning)
+                categoryname, 2, ArgumentDeprecationWarning, since='20141019')
         else:
             categoryname = category
 
@@ -1174,7 +1174,7 @@ def _int_none(v):
     return v if (v is None or v is '') else int(v)
 
 
-@deprecated('Site.allpages()')
+@deprecated('Site.allpages()', since='20180512')
 @deprecated_args(step=None)
 def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
                           site=None, total=None, content=False):
@@ -1282,7 +1282,7 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
             pywikibot.exception(e)
 
 
-@deprecated("LogeventsPageGenerator")
+@deprecated('LogeventsPageGenerator', since='20141210')
 @deprecated_args(number="total", mode="logtype", repeat=None)
 def LogpagesPageGenerator(total=500, logtype='', user=None,
                           site=None, namespace=[]):
@@ -1400,7 +1400,7 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
     return gen
 
 
-@deprecated('site.unconnected_pages()')
+@deprecated('site.unconnected_pages()', since='20180512')
 @deprecated_args(step=None)
 def UnconnectedPageGenerator(site=None, total=None):
     """
@@ -2051,7 +2051,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
             pywikibot.output('Skipping %s' % page.title(as_link=True))
 
 
-@deprecated('itertools.chain(*iterables)')
+@deprecated('itertools.chain(*iterables)', since='20180513')
 def CombinedPageGenerator(generators):
     """Yield from each iterable until exhausted, then proceed with the next."""
     return itertools.chain(*generators)
@@ -2089,7 +2089,7 @@ def PageWithTalkPageGenerator(generator, return_talk_only=False):
             yield page.toggleTalkPage()
 
 
-@deprecated('LiveRCPageGenerator or EventStreams')
+@deprecated('LiveRCPageGenerator or EventStreams', since='20180415')
 def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
                        total=None, **kwargs):
     """Yield items in live time.
@@ -2837,13 +2837,13 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
         self.parser = dump.parse()
 
     @property
-    @deprecated('self.start')
+    @deprecated('self.start', since='20160414')
     def xmlStart(self):
         """Getter for deprecated xmlStart instance variable."""
         return self.start
 
     @xmlStart.setter
-    @deprecated('self.start')
+    @deprecated('self.start', since='20160414')
     def xmlStart(self, value):
         """Setter for deprecated xmlStart instance variable."""
         self.start = value
@@ -3090,19 +3090,24 @@ class PetScanPageGenerator(object):
 
 
 PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
-                                        old_name='PreloadingItemGenerator')
+                                        old_name='PreloadingItemGenerator',
+                                        since='20170314')
 # Deprecated old names available for compatibility with compat.
-ImageGenerator = redirect_func(PageClassGenerator, old_name='ImageGenerator')
-FileGenerator = redirect_func(PageClassGenerator, old_name='FileGenerator')
-CategoryGenerator = redirect_func(PageClassGenerator,
-                                  old_name='CategoryGenerator')
+ImageGenerator = redirect_func(
+    PageClassGenerator, old_name='ImageGenerator', since='20161017')
+FileGenerator = redirect_func(
+    PageClassGenerator, old_name='FileGenerator', since='20161017')
+CategoryGenerator = redirect_func(
+    PageClassGenerator, old_name='CategoryGenerator', since='20161017')
 UnCategorizedTemplatesGenerator = redirect_func(
-    UnCategorizedTemplateGenerator, old_name='UnCategorizedTemplatesGenerator')
+    UnCategorizedTemplateGenerator, old_name='UnCategorizedTemplatesGenerator',
+    since='20141225')
 RecentchangesPageGenerator = redirect_func(
-    RecentChangesPageGenerator, old_name='RecentchangesPageGenerator')
+    RecentChangesPageGenerator, old_name='RecentchangesPageGenerator',
+    since='20141225')
 # Deprecated old names from Pywikibot 2.0 beta1
 WikidataItemGenerator = redirect_func(
-    WikibaseItemGenerator, old_name='WikidataItemGenerator')
+    WikibaseItemGenerator, old_name='WikidataItemGenerator', since='20141225')
 
 
 if __name__ == "__main__":

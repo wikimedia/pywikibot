@@ -899,7 +899,7 @@ class ParamInfo(Container):
         return param_data
 
     @property
-    @deprecated('submodules() or module_paths')
+    @deprecated('submodules() or module_paths', since='20150715')
     def modules(self):
         """
         Set of all main and query modules without path prefixes.
@@ -964,7 +964,7 @@ class ParamInfo(Container):
         return {'{0}+{1}'.format(prefix, mod) for mod in modules}
 
     @property
-    @deprecated('prefix_map')
+    @deprecated('prefix_map', since='20150715')
     def prefixes(self):
         """
         Mapping of module to its prefix for all modules with a prefix.
@@ -1010,7 +1010,7 @@ class ParamInfo(Container):
         return {mod: self[mod][attribute]
                 for mod in modules if attribute in self[mod]}
 
-    @deprecated('attributes')
+    @deprecated('attributes', since='20150715')
     def module_attribute_map(self, attribute, modules=None):
         """
         Mapping of modules with an attribute to the attribute value.
@@ -1034,7 +1034,7 @@ class ParamInfo(Container):
                 for mod in modules if self[mod][attribute]}
 
     @property
-    @deprecated('parameter()')
+    @deprecated('parameter()', since='20150905')
     def query_modules_with_limits(self):
         """Set of all query modules which have limits."""
         if not self._with_limits:
@@ -1649,7 +1649,7 @@ class Request(MutableMapping):
         except TypeError:
             self.mime_params = {} if value else None
 
-    @deprecated('_http_param_string')
+    @deprecated('_http_param_string', since='20141006')
     def http_params(self):
         """Return the parameters formatted for inclusion in an HTTP request.
 
@@ -2981,7 +2981,7 @@ class PageGenerator(QueryGenerator):
         return p
 
 
-@deprecated("PageGenerator")
+@deprecated('PageGenerator', since='20141106')
 class CategoryPageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields Category objects instead of Pages."""
@@ -2989,7 +2989,7 @@ class CategoryPageGenerator(PageGenerator):
     pass
 
 
-@deprecated("PageGenerator")
+@deprecated('PageGenerator', since='20141106')
 class ImagePageGenerator(PageGenerator):
 
     """Like PageGenerator, but yields FilePage objects instead of Pages."""

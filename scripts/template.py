@@ -130,7 +130,7 @@ from pywikibot.tools import deprecated
 from scripts.replace import ReplaceRobot as ReplaceBot
 
 
-@deprecated('XMLDumpPageGenerator')
+@deprecated('XMLDumpPageGenerator', since='20151109')
 class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
 
     """

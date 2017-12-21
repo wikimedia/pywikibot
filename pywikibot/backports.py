@@ -18,7 +18,7 @@ import logging
 from pywikibot.tools import deprecated
 
 
-@deprecated('difflib._format_range_unified')
+@deprecated('difflib._format_range_unified', since='20160111')
 def format_range_unified(start, stop):
     """
     Convert range to the "ed" format.
@@ -29,7 +29,7 @@ def format_range_unified(start, stop):
     return _format_range_unified(start, stop)
 
 
-@deprecated('logging.NullHandler')
+@deprecated('logging.NullHandler', since='20160111')
 class NullHandler(logging.NullHandler):
 
     """This handler does nothing."""
@@ -37,7 +37,7 @@ class NullHandler(logging.NullHandler):
     pass
 
 
-@deprecated('logging.captureWarnings')
+@deprecated('logging.captureWarnings', since='20160111')
 def captureWarnings(capture):
     """
     Capture warnings into logging.

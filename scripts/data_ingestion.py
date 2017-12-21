@@ -174,13 +174,13 @@ class DataIngestionBot(pywikibot.Bot):
         self.pagefmt = pagefmt
 
     @property
-    @deprecated('generator')
+    @deprecated('generator', since='20150508')
     def reader(self):
         """Get generator. Deprecated."""
         return self.generator
 
     @reader.setter
-    @deprecated('generator')
+    @deprecated('generator', since='20150508')
     def reader(self, value):
         """Set generator. Deprecated."""
         self.generator = value
@@ -207,7 +207,7 @@ class DataIngestionBot(pywikibot.Bot):
 
         return title
 
-    @deprecated("treat()")
+    @deprecated('treat()', since='20150118')
     def doSingle(self):
         """Process one page."""
         return self.treat(next(self.reader))

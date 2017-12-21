@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikia."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,7 +20,7 @@ class Family(family.SingleSiteFamily, family.WikiaFamily):
     name = u'wikia'
     domain = 'www.wikia.com'
 
-    @deprecated('APISite.version()')
+    @deprecated('APISite.version()', since='20141225')
     def version(self, code):
         """Return the version for this family."""
         return '1.19.24'

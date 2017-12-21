@@ -543,7 +543,7 @@ def main(*args):
         elif option == '-auto':
             issue_deprecation_warning(
                 'The usage of "-auto"', '-always',
-                1, ArgumentDeprecationWarning)
+                1, ArgumentDeprecationWarning, since='20170205')
             options['always'] = True
         elif option in ['-always', '-quiet', '-skipwarning']:
             options[option[1:]] = True
@@ -552,7 +552,7 @@ def main(*args):
                 if option == '-sql':
                     issue_deprecation_warning(
                         'The usage of "-sql"', '-mysqlquery',
-                        1, ArgumentDeprecationWarning)
+                        1, ArgumentDeprecationWarning, since='20170205')
 
                 query = value or """
 SELECT page_namespace, page_title

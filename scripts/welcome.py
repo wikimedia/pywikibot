@@ -963,7 +963,8 @@ def main(*args):
         elif arg == '-quiet':
             globalvar.quiet = True
         elif arg == '-quick':
-            issue_deprecation_warning('The usage of "-quick" option', None, 2)
+            issue_deprecation_warning('The usage of "-quick" option', None, 2,
+                                      since='20160211')
 
     # Filename and Pywikibot path
     # file where is stored the random signature index
