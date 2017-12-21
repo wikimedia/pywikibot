@@ -27,6 +27,7 @@ from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
     StringTypes as basestring,
+    suppress_warnings,
     UnicodeType as unicode,
 )
 
@@ -1477,6 +1478,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
             raise
 
+    @suppress_warnings("where='title' is deprecated", DeprecationWarning)
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         try:

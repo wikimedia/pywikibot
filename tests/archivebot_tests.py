@@ -98,7 +98,7 @@ class TestArchiveBotFunctions(TestCase):
     def test_checkstr(self):
         """Test for extracting key and duration from shorthand notation of durations."""
         self.assertEqual(archivebot.checkstr('400s'), ('s', '400'))
-        with suppress_warnings():
+        with suppress_warnings('Time period without qualifier', UserWarning):
             self.assertEqual(archivebot.checkstr('3000'), ('s', '3000'))
         self.assertEqual(archivebot.checkstr('7d'), ('d', '7'))
         self.assertEqual(archivebot.checkstr('3y'), ('y', '3'))

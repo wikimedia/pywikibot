@@ -23,7 +23,8 @@ import time
 import types
 
 from distutils.version import Version
-from warnings import catch_warnings, simplefilter, warn
+from functools import wraps
+from warnings import catch_warnings, showwarning, warn
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
@@ -209,12 +210,58 @@ class classproperty(object):  # noqa: N801
 
 class suppress_warnings(catch_warnings):  # noqa: N801
 
-    """A context manager that temporarily suppresses warnings."""
+    """A decorator/context manager that temporarily suppresses warnings.
+
+    Those suppressed warnings that do not match the parameters will be raised
+    shown upon exit.
+    """
+
+    def __init__(self, message='', category=Warning, filename=''):
+        """Initialize the object.
+
+        The parameter semantics are similar to those of
+        `warnings.filterwarnings`.
+
+        @param message: A string containing a regular expression that the start
+            of the warning message must match. (case-insensitive)
+        @type message: str
+        @param category: A class (a subclass of Warning) of which the warning
+            category must be a subclass in order to match.
+        @type category: Warning
+        @param filename: A string containing a regular expression that the
+            start of the path to the warning module must match.
+            (case-sensitive)
+        @type filename: str
+        """
+        self.message_match = re.compile(message, re.I).match
+        self.category = category
+        self.filename_match = re.compile(filename).match
+        super(suppress_warnings, self).__init__(record=True)
 
     def __enter__(self):
-        """Catch the old filter settings and ignore all warnings."""
-        super(suppress_warnings, self).__enter__()
-        simplefilter('ignore')
+        """Catch all warnings and store them in `self.log`."""
+        self.log = super(suppress_warnings, self).__enter__()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Stop logging warnings and show those that do not match to params."""
+        super(suppress_warnings, self).__exit__()
+        for warning in self.log:
+            if (
+                not issubclass(warning.category, self.category)
+                or not self.message_match(str(warning.message))
+                or not self.filename_match(warning.filename)
+            ):
+                showwarning(
+                    warning.message, warning.category, warning.filename,
+                    warning.lineno, warning.file, warning.line)
+
+    def __call__(self, func):
+        """Decorate func to suppress warnings."""
+        @wraps(func)
+        def suppressed_func(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+        return suppressed_func
 
 
 class UnicodeMixin(object):
