@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* Maintenance script to download Wikimedia database dump
+* Option to auto-create accounts when logging in
 * Ship wikimania family file
 * Drop battlestarwiki family file
 * Bugfixes and improvements
