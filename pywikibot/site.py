@@ -1286,26 +1286,6 @@ class BaseSite(ComparableMixin):
         """DEPRECATED."""
         return self.getUrl(address, data=data)
 
-    @deprecated
-    def checkCharset(self, charset):
-        """DEPRECATED."""
-        raise NotImplementedError
-
-    @deprecated
-    def cookies(self, sysop=False):
-        """DEPRECATED."""
-        raise NotImplementedError
-
-    @deprecated
-    def updateCookies(self, datas, sysop=False):
-        """DEPRECATED."""
-        raise NotImplementedError
-
-    @deprecated
-    def solveCaptcha(self, data):
-        """DEPRECATED."""
-        raise NotImplementedError
-
 
 def must_be(group=None, right=None):
     """Decorator to require a certain user status when method is called.

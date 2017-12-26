@@ -2217,20 +2217,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
         restrictions = self.protection()
         return dict((k, list(restrictions[k])) for k in restrictions)
 
-# ###### DISABLED METHODS (warnings provided) ######
-    # these methods are easily replaced by editing the page's text using
-    # textlib methods and then using put() on the result.
-
-    def removeImage(self, image, put=False, summary=None, safe=True):
-        """Old method to remove all instances of an image from page."""
-        warn('Page.removeImage() is no longer supported.',
-             _NotImplementedWarning, 2)
-
-    def replaceImage(self, image, replacement=None, put=False, summary=None,
-                     safe=True):
-        """Old method to replace all instances of an image with another."""
-        warn('Page.replaceImage() is no longer supported.',
-             _NotImplementedWarning, 2)
+    def __getattr__(self, name):
+        """Generic disabled method warnings."""
+        if name in ('removeImage', 'replaceImage'):
+            warn('Page.{0}() is no longer supported.'.format(name),
+                 _NotImplementedWarning, 2)
+            return lambda x: None
+        raise AttributeError("'{0}' object has no attribute '{1}'"
+                             .format(self.__class__.__name__, name))
 
 
 class Page(BasePage):
