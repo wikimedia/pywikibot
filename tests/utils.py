@@ -27,6 +27,8 @@ from pywikibot.tools import PY2
 
 if not PY2:
     import six
+else:
+    ResourceWarning = None  # flake8: F821
 
 import pywikibot
 
@@ -254,6 +256,13 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                         break
                     else:
                         skip_frames -= 1
+
+            # Ignore socket IO warnings (T183696)
+            if (PYTHON_VERSION >= (3, 2)
+                    and issubclass(warn_msg.category, ResourceWarning)
+                    and 'unclosed <socket.socket' in str(warn_msg.message)
+                    and warn_msg.filename.endswith('socket.py')):
+                return
 
             log.append(warn_msg)
 
