@@ -1,3 +1,12 @@
+.. image:: https://secure.travis-ci.org/wikimedia/pywikibot.png?branch=master
+   :alt: Build Status
+   :target: https://travis-ci.org/wikimedia/pywikibot
+.. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graphs/badge.svg?branch=master
+   :alt: Code coverage
+   :target: http://codecov.io/github/wikimedia/pywikibot?branch=master
+.. image:: https://img.shields.io/pypi/v/pywikibot.svg
+   :alt: Pywikibot release
+   :target: https://pypi.python.org/pypi/pywikibot
 
 Pywikibot
 =========
@@ -66,9 +75,4 @@ Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikim
 `learn <https://www.mediawiki.org/wiki/Special:MyLanguage/Developer_access>`_ how to get
 started.
 
-.. image:: https://secure.travis-ci.org/wikimedia/pywikibot-core.png?branch=master
-   :alt: Build Status
-   :target: https://travis-ci.org/wikimedia/pywikibot
-.. image:: https://img.shields.io/pypi/v/pywikibot.svg
-   :alt: Pywikibot release
-   :target: https://pypi.python.org/pypi/pywikibot
+.. include:: CODE_OF_CONDUCT.rst
