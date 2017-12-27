@@ -1492,7 +1492,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     _generic_match = re.compile(r'.* is deprecated(; use .* instead)?\.')
 
-    skip_list = [
+    source_adjustment_skips = [
         unittest.case._AssertRaisesContext,
         TestCase.assertRaises,
         TestCase.assertRaisesRegex,
@@ -1506,7 +1506,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
 
     # Python 3 component in the call stack of _AssertRaisesContext
     if hasattr(unittest.case, '_AssertRaisesBaseContext'):
-        skip_list.append(unittest.case._AssertRaisesBaseContext)
+        source_adjustment_skips.append(unittest.case._AssertRaisesBaseContext)
 
     def __init__(self, *args, **kwargs):
         """Constructor."""
@@ -1520,7 +1520,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         self._do_test_warning_filename = True
         self._ignore_unknown_warning_packages = False
 
-        self.context_manager = WarningSourceSkipContextManager(self.skip_list)
+        self.context_manager = WarningSourceSkipContextManager(
+            self.source_adjustment_skips)
 
     def _reset_messages(self):
         """Reset captured deprecation warnings."""
@@ -1667,7 +1668,7 @@ class AutoDeprecationTestCase(CapturingTestCase, DeprecationTestCase):
             assertion, *args, **kwargs)
         self.assertOneDeprecation()
 
-    skip_list = DeprecationTestCase.skip_list + [
+    source_adjustment_skips = DeprecationTestCase.source_adjustment_skips + [
         CapturingTestCase.process_assert,
         CapturingTestCase.patch_assert,
     ]

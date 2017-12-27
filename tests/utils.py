@@ -182,7 +182,8 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         """
         Constructor.
 
-        @param skip_list: List of objects to be skipped
+        @param skip_list: List of objects to be skipped. The source of any
+            warning that matches the skip_list won't be adjusted.
         @type skip_list: list of object or (obj, str, int, int)
         """
         super(WarningSourceSkipContextManager, self).__init__(record=True)
@@ -220,40 +221,48 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
         """Enter the context manager."""
         def detailed_show_warning(*args, **kwargs):
             """Replacement handler for warnings.showwarning."""
-            entry = warnings.WarningMessage(*args, **kwargs)
+            warn_msg = warnings.WarningMessage(*args, **kwargs)
 
-            skip_lines = 0
-            entry_line_found = False
+            skip_frames = 0
+            a_frame_has_matched_warn_msg = False
 
-            for (_, filename, fileno, _, line, _) in inspect.stack():
-                if any(start <= fileno <= end
+            # The following for-loop will adjust the warn_msg only if the
+            # warning does not match the skip_list.
+            for (_, frame_filename, frame_lineno, _, _, _) in inspect.stack():
+                if any(start <= frame_lineno <= end
                        for (_, skip_filename, start, end) in self.skip_list
-                       if skip_filename == filename):
-                    if entry_line_found:
+                       if skip_filename == frame_filename):
+                    # this frame matches to one of the items in the skip_list
+                    if a_frame_has_matched_warn_msg:
                         continue
                     else:
-                        skip_lines += 1
+                        skip_frames += 1
 
-                if (filename, fileno) == (entry.filename, entry.lineno):
-                    if not skip_lines:
+                if (
+                    frame_filename == warn_msg.filename
+                    and frame_lineno == warn_msg.lineno
+                ):
+                    if not skip_frames:
                         break
-                    entry_line_found = True
+                    a_frame_has_matched_warn_msg = True
 
-                if entry_line_found:
-                    if not skip_lines:
-                        (entry.filename, entry.lineno) = (filename, fileno)
+                if a_frame_has_matched_warn_msg:
+                    if not skip_frames:
+                        # adjust the warn_msg
+                        warn_msg.filename = frame_filename
+                        warn_msg.lineno = frame_lineno
                         break
                     else:
-                        skip_lines -= 1
+                        skip_frames -= 1
 
             # Avoid failures because cryptography is mentioning Python 2.6
             # is outdated
             if PYTHON_VERSION < (2, 7):
-                if (isinstance(entry, DeprecationWarning) and
-                        str(entry.message) == PYTHON_26_CRYPTO_WARN):
+                if (isinstance(warn_msg, DeprecationWarning) and
+                        str(warn_msg.message) == PYTHON_26_CRYPTO_WARN):
                     return
 
-            log.append(entry)
+            log.append(warn_msg)
 
         log = super(WarningSourceSkipContextManager, self).__enter__()
         self._module.showwarning = detailed_show_warning
