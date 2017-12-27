@@ -244,6 +244,15 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         # First and third categories are the same
         self.assertEqual([cats[1], cats[3]], temp_cats)
 
+        # Testing adding categories
+        temp = textlib.replaceCategoryInPlace(
+            self.old, cats[0], cats[1], site=self.site,
+            add_only=True)
+        self.assertNotEqual(temp, self.old)
+        temp_cats = textlib.getCategoryLinks(temp, site=self.site)
+        self.assertEqual([cats[0], cats[1], cats[1],
+                          cats[2], cats[1], cats[3]], temp_cats)
+
         new_cats = textlib.getCategoryLinks(new, site=self.site)
         self.assertEqual(cats, new_cats)
 
