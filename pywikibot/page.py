@@ -4923,10 +4923,10 @@ class Claim(Property):
         """Set the rank of the Claim."""
         self.rank = rank
 
-    def changeRank(self, rank):
+    def changeRank(self, rank, **kwargs):
         """Change the rank of the Claim and save."""
         self.rank = rank
-        return self.repo.save_claim(self)
+        return self.repo.save_claim(self, **kwargs)
 
     def changeSnakType(self, value=None, **kwargs):
         """
