@@ -9,6 +9,9 @@ This script supports the following command line parameters:
 
     -storepath:#    The stored file's path.
 
+    -revision:#     The revision date of the dump (default to `latest`)
+                    formatted as YYYYMMDD.
+
 """
 #
 # (C) Pywikibot team, 2017
@@ -55,6 +58,7 @@ class DownloadDumpBot(Bot):
         'wikiname': '',
         'filename': '',
         'storepath': './',
+        'revision': 'latest',
     }
 
     def __init__(self, **kwargs):
@@ -78,8 +82,11 @@ class DownloadDumpBot(Bot):
         """Run bot."""
         pywikibot.output('Downloading dump from ' + self.getOption('wikiname'))
 
-        download_filename = self.getOption('wikiname') + \
-            '-latest-' + self.getOption('filename')
+        download_filename = '{wiki_name}-{revision}-{filename}'.format(
+            wiki_name=self.getOption('wikiname'),
+            revision=self.getOption('revision'),
+            filename=self.getOption('filename')
+        )
         temp_filename = download_filename + '-' + \
             binascii.b2a_hex(urandom(8)).decode('ascii') + '.part'
 
@@ -104,14 +111,27 @@ class DownloadDumpBot(Bot):
                             remove(file_final_storepath)
                     symlink(toolforge_dump_filepath, file_current_storepath)
                 else:
-                    url = 'https://dumps.wikimedia.org/{0}/latest/{1}'.format(
-                        self.getOption('wikiname'), download_filename)
+                    url = 'https://dumps.wikimedia.org/{0}/{1}/{2}'.format(
+                        self.getOption('wikiname'),
+                        self.getOption('revision'),
+                        download_filename)
                     pywikibot.output('Downloading file from ' + url)
                     response = fetch(url, stream=True)
                     if response.status == 200:
                         with open(file_current_storepath, 'wb') as result_file:
                             for data in response.data.iter_content(100 * 1024):
                                 result_file.write(data)
+                    elif response.status == 404:
+                        pywikibot.output(
+                            'File with name "{filename}", '
+                            'from revision "{revision}", '
+                            'and wiki "{wikiname}" ({url}) isn\'t '
+                            'available in the Wikimedia Dumps'.format(
+                                filename=self.getOption('filename'),
+                                revision=self.getOption('revision'),
+                                url=url,
+                                wikiname=self.getOption('wikiname')))
+                        return
                     else:
                         return
                 # Rename the temporary file to the target file
@@ -165,6 +185,11 @@ def main(*args):
                 opts[option] = os.path.abspath(value) or pywikibot.input(
                     'Enter the store path: ')
                 continue
+            elif option == 'revision':
+                opts[option] = value or pywikibot.input(
+                    'Enter the revision of the dump: ')
+                continue
+
         unknown_args += [arg]
 
     missing = []
