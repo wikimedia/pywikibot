@@ -80,6 +80,14 @@ class DownloadDumpBot(Bot):
 
     def run(self):
         """Run bot."""
+        def convert_from_bytes(bytes):
+            for unit in ['B', 'K', 'M', 'G', 'T']:
+                if abs(bytes) < 1024:
+                    return str(bytes) + unit
+                bytes = float(format(
+                    bytes / 1024.0, '.2f'))
+            return str(bytes) + 'P'
+
         pywikibot.output('Downloading dump from ' + self.getOption('wikiname'))
 
         download_filename = '{wiki_name}-{revision}-{filename}'.format(
@@ -119,8 +127,40 @@ class DownloadDumpBot(Bot):
                     response = fetch(url, stream=True)
                     if response.status == 200:
                         with open(file_current_storepath, 'wb') as result_file:
+                            try:
+                                total = int(response.response_headers[
+                                    'content-length'])
+                            except KeyError:
+                                pywikibot.exception()
+                                total = -1
+                            downloaded = 0
+                            parts = 50
+                            display_string = ''
+
+                            pywikibot.output('')
                             for data in response.data.iter_content(100 * 1024):
                                 result_file.write(data)
+
+                                if total > 0:
+                                    downloaded += len(data)
+                                    done = int(parts * downloaded / total)
+                                    display = map(convert_from_bytes,
+                                                  (downloaded, total))
+                                    prior_display = display_string
+                                    display_string = ('\r|{0}{1}|' +
+                                                      ' ' * 5 +
+                                                      '{2}/{3}').format(
+                                        '=' * done,
+                                        '-' * (parts - done),
+                                        *display)
+                                    # Add whitespace to cover up prior bar
+                                    display_string += ' ' * (
+                                        len(prior_display.rstrip()) -
+                                        len(display_string.rstrip()))
+
+                                    pywikibot.output(display_string,
+                                                     newline=False)
+                            pywikibot.output('')
                     elif response.status == 404:
                         pywikibot.output(
                             'File with name "{filename}", '
