@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,8 +38,8 @@ from pywikibot.exceptions import (
     Error, TimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.tools import (
-    MediaWikiVersion, deprecated, itergroup, ip, PY2, getargspec,
-    UnicodeType
+    MediaWikiVersion, deprecated, itergroup, ip, PY2, PYTHON_VERSION,
+    getargspec, UnicodeType
 )
 from pywikibot.tools.formatter import color_format
 
@@ -2242,7 +2242,8 @@ class CachedRequest(Request):
         @return: base directory path for cache entries
         @rtype: basestring
         """
-        path = os.path.join(pywikibot.config2.base_dir, 'apicache')
+        path = os.path.join(pywikibot.config2.base_dir,
+                            'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
         return path
 
