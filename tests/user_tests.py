@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,6 +68,7 @@ class TestUserClass(TestCase):
         self.assertGreater(user.editCount(), 0)
         self.assertEqual(user.gender(), 'male')
         self.assertIn('userid', user.getprops())
+        self.assertTrue(user.is_thankable)
 
     def test_female_user(self):
         """Test female user."""
@@ -77,6 +78,7 @@ class TestUserClass(TestCase):
         self.assertGreater(user.editCount(), 0)
         self.assertEqual(user.gender(), 'female')
         self.assertIn('userid', user.getprops())
+        self.assertTrue(user.is_thankable)
 
     def test_anonymous_user(self):
         """Test registered user."""
@@ -104,6 +106,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isEmailable())
         self.assertEqual(user.gender(), 'unknown')
         self.assertIn('missing', user.getprops())
+        self.assertFalse(user.is_thankable)
 
     def test_invalid_user(self):
         """Test invalid user."""
@@ -117,6 +120,7 @@ class TestUserClass(TestCase):
         self.assertFalse(user.isEmailable())
         self.assertEqual(user.gender(), 'unknown')
         self.assertIn('invalid', user.getprops())
+        self.assertFalse(user.is_thankable)
 
 
 if __name__ == '__main__':  # pragma: no cover
