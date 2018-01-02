@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikimedia Commons."""
 #
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,6 +38,7 @@ class Family(family.WikimediaFamily):
                 u'Synonym taxon category redirect',
                 u'Invalid taxon category redirect',
                 u'Monotypic taxon category redirect',
+                'Endashcatredirect',
             ),
         }
 
