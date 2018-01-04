@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -1224,9 +1224,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-limit:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        # ABC
+        # American Broadcasting Company
         page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q287078')
+        self.assertEqual(page1.title(), 'Q169889')
 
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:en:abc')
