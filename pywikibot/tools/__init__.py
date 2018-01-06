@@ -1733,6 +1733,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
             else:
                 warning_message = u"{0}.{1} is deprecated."
 
+        if hasattr(self, name):
+            # __getattr__ will only be invoked if self.<name> does not exist.
+            delattr(self, name)
         self._deprecated[name] = replacement_name, replacement, warning_message
 
     def __setattr__(self, attr, value):
