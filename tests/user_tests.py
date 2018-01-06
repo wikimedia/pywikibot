@@ -122,6 +122,12 @@ class TestUserClass(TestCase):
         self.assertIn('invalid', user.getprops())
         self.assertFalse(user.is_thankable)
 
+    def test_bot_user(self):
+        """Test bot user."""
+        user = User(self.site, 'Xqbot')
+        self.assertIn('bot', user.groups())
+        self.assertFalse(user.is_thankable)
+
 
 if __name__ == '__main__':  # pragma: no cover
     try:
