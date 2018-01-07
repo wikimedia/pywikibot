@@ -76,6 +76,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             '_default': (),
             'ar': ('تحويل تصنيف',),
             'arz': (u'تحويل تصنيف',),
+            'bs': ('Category redirect',),
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
             'en': (u'Category redirect',),
@@ -101,6 +102,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sh': ('Prekat',),
             'simple': ('Category redirect',),
             'sl': ('Preusmeritev kategorije',),
+            'sr': ('Category redirect',),
             'sq': ('Kategori e zhvendosur',),
             'sv': ('Kategoriomdirigering',),
             'tl': (u'Category redirect',),
@@ -171,10 +173,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # TODO: Remove comments for appropriate pages
         self.doc_subpages = {
             '_default': ((u'/doc', ),
-                         ['ar', 'bn', 'cs', 'da', 'en', 'es',
+                         ['ar', 'bn', 'cs', 'da', 'en', 'es', 'hr',
                           'hu', 'id', 'ilo', 'ja', 'ms',
-                          'ms', 'pt', 'ro', 'ru', 'simple', 'vi', 'zh']
+                          'pt', 'ro', 'ru', 'simple', 'sh', 'vi', 'zh']
                          ),
+            'bs': ('/dok', ),
             'ca': (u'/ús', ),
             'de': (u'Doku', u'/Meta'),
             'dsb': (u'/Dokumentacija', ),
@@ -191,6 +194,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'nn': (u'/dok', ),
             'pl': (u'/opis', ),
             'sk': (u'/Dokumentácia', ),
+            'sr': ('/док', ),
             'sv': (u'/dok', ),
             'uk': (u'/Документація', ),
         }
