@@ -25,19 +25,12 @@ scripts_path = join_root_path('scripts')
 
 archive_path = join_root_path('scripts', 'archive')
 
-if PY2:
-    TK_IMPORT = 'Tkinter'
-else:
-    TK_IMPORT = 'tkinter'
-
 # These dependencies are not always the package name which is in setup.py.
 # e.g. 'PIL.ImageTk' is a object provided by several different pypi packages,
 # and setup.py requests that 'Pillow' is installed to provide 'PIL.ImageTk'.
 # Here, it doesnt matter which pypi package was requested and installed.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
-    'imagecopy': [TK_IMPORT],
-    'imagecopy_self': [TK_IMPORT],
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
     'flickrripper': ['flickrapi'],

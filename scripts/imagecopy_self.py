@@ -44,7 +44,7 @@ check it yourself.
 # English Wikipedia specific bot by:
 # (C) Multichill 2010-2012
 #
-# (C) Pywikibot team, 2010-2017
+# (C) Pywikibot team, 2010-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,17 +66,14 @@ from pywikibot.tools import PY2
 from scripts import imagerecat, image
 
 if not PY2:
-    import tkinter as Tkinter
-
     from queue import Queue
 else:
-    import Tkinter
-
     from Queue import Queue
 
 try:
-    from pywikibot.userinterfaces.gui import Tkdialog
+    from pywikibot.userinterfaces.gui import Tkdialog, Tkinter
 except ImportError as _tk_error:
+    Tkinter = _tk_error
     Tkdialog = object
 
 NL = ''
@@ -694,6 +691,10 @@ class TkdialogICS(Tkdialog):
             categories
         """
         """Constructor."""
+        # Check if `Tkinter` wasn't imported
+        if isinstance(Tkinter, ImportError):
+            raise Tkinter
+
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         # Always appear the same size and in the bottom-left corner

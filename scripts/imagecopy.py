@@ -54,7 +54,7 @@ By default the bot works on your home wiki (set in user-config)
 #
 # Another rewrite by:
 # (C) Multichill 2008-2011
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -76,18 +76,15 @@ from pywikibot.tools import PY2
 from scripts import image
 
 if not PY2:
-    import tkinter as Tkinter
-
     from urllib.parse import urlencode
     from urllib.request import urlopen
 else:
-    import Tkinter
-
     from urllib import urlencode, urlopen
 
 try:
-    from pywikibot.userinterfaces.gui import Tkdialog
+    from pywikibot.userinterfaces.gui import Tkdialog, Tkinter
 except ImportError as _tk_error:
+    Tkinter = _tk_error
     Tkdialog = object
 
 NL = ''
@@ -383,6 +380,10 @@ class TkdialogIC(Tkdialog):
     def __init__(self, image_title, content, uploader, url, templates,
                  commonsconflict=0):
         """Constructor."""
+        # Check if `Tkinter` wasn't imported
+        if isinstance(Tkinter, ImportError):
+            raise Tkinter
+
         super(TkdialogIC, self).__init__()
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
