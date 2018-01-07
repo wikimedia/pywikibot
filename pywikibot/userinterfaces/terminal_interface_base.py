@@ -510,15 +510,6 @@ class TerminalHandler(logging.Handler):
             if 'message' in record.__dict__:
                 return
 
-            # Remove the last line, if it appears to be the warn() call
-            msg = record.args[0]
-            is_useless_source_output = any(
-                s in msg for s in
-                (str('warn('), str('exceptions.'), str('Warning)'), str('Warning,')))
-
-            if is_useless_source_output:
-                record.args = ('\n'.join(record.args[0].splitlines()[0:-1]),)
-
             if 'newline' not in record.__dict__:
                 record.__dict__['newline'] = '\n'
 
