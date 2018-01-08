@@ -64,6 +64,7 @@ extra_deps = {
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
+    'HTTP/2': ['hyper'],
 }
 
 if PY2:

@@ -19,7 +19,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id$'
+__version__ = '$Id: bbf20b3f61eae24d1119c246db904e51f1696c7e $'
 __docformat__ = 'epytext'
 
 import atexit
@@ -108,6 +108,15 @@ else:
     debug('Loaded cookies from file.', _logger)
 
 session = requests.Session()
+if config.usehttp2:
+    try:
+        from hyper.contrib import HTTP20Adapter
+        adapter = HTTP20Adapter()
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        debug('Enabled HTTP/2 with hyper.', _logger)
+    except ImportError:
+        pass
 session.cookies = cookie_jar
 
 
