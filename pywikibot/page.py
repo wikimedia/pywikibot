@@ -3188,7 +3188,8 @@ class User(Page):
         @rtype: bool
         """
         # T135828: the registration timestamp may be None but the key exists
-        return 'registration' in self.getprops(force)
+        return (not self.isAnonymous()
+                and 'registration' in self.getprops(force))
 
     def isAnonymous(self):
         """
