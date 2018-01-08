@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -254,13 +254,6 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                         break
                     else:
                         skip_frames -= 1
-
-            # Avoid failures because cryptography is mentioning Python 2.6
-            # is outdated
-            if PYTHON_VERSION < (2, 7):
-                if (isinstance(warn_msg, DeprecationWarning) and
-                        str(warn_msg.message) == PYTHON_26_CRYPTO_WARN):
-                    return
 
             log.append(warn_msg)
 
