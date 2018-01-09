@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180108
+------------
+
 * Maintenance script to download Wikimedia database dump
 * Option to auto-create accounts when logging in
 * Ship wikimania family file
