@@ -32,7 +32,7 @@ are not installed by default on some Linux distributions:
 
 You need to have at least python version `2.6.5 <http://www.python.org/download/>`_
 or newer installed on your computer to be able to run any of the code in this
-package, but not 3.0-3.2. It works fine with 3.3-3.4 versions of python installed.
+package, but not 3.0-3.3. It works fine with 3.4+ versions of python installed.
 Support for older versions of python is not planned. Some scripts could run with
 older python releases. Please refer the manual at mediawiki for further details
 and restrictions.

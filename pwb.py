@@ -36,14 +36,14 @@ versions_required_message = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 2.6.5+, 2.7.2+ or 3.3+.
+This version of Pywikibot only supports Python 2.6.5+, 2.7.2+ or 3.4+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
     # Any change to this must be copied to setup.py
-    return (PYTHON_VERSION >= (3, 3, 0) or
+    return (PYTHON_VERSION >= (3, 4, 0) or
             (PY2 and PYTHON_VERSION >= (2, 7, 2)) or
             (PY26 and PYTHON_VERSION >= (2, 6, 5)))
 

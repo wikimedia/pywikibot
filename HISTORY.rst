@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Dropped support for Python 3.3 (T184508)
 * Bugfixes and improvements
 * Localisation updates
 

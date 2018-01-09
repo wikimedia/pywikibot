@@ -135,9 +135,9 @@ deprecated = redirect_func(__deprecated)
 deprecate_arg = redirect_func(_deprecate_arg)
 
 
-if sys.version_info[:2] in ((2, 6), (3, 3)):
+if sys.version_info[:2] == (2, 6):
     warn(
-        'Pywikibot will soon drop support for Python 2.6 and 3.3',
+        'Pywikibot will soon drop support for Python 2.6',
         DeprecationWarning,
     )
 

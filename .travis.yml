@@ -7,7 +7,6 @@ sudo: false
 python:
   - '2.6'
   - '2.7'
-  - '3.3'
   - '3.4'
   - '3.5'
   - '3.6'
@@ -146,13 +145,13 @@ matrix:
     # Disabled due to T173498
     #- python: '2.7'
     #  env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
-    #- python: '3.3'
+    #- python: '3.6'
     #  env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
     - python: '3.4'
       env: LANGUAGE=en FAMILY=wsbeta SITE_ONLY=1
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT2_TEST_NO_RC=1
-    - python: '3.3'
+    - python: '3.5'
       env: LANGUAGE=en FAMILY=musicbrainz SITE_ONLY=1
     # Disabled due to T173498
     #- python: '3.4'

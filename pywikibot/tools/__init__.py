@@ -108,7 +108,7 @@ if PYTHON_VERSION < (2, 7):
     except ImportError:
         warn("""
 pywikibot support of Python 2.6 relies on package future for many features.
-Please upgrade to Python 2.7+ or Python 3.3+, or run:
+Please upgrade to Python 2.7+ or Python 3.4+, or run:
     "pip install future>=0.15.0"
 """, RuntimeWarning)
         try:
@@ -1221,8 +1221,6 @@ def signature(obj):
     Safely return function Signature object (PEP 362).
 
     inspect.signature was introduced in 3.3, however backports are available.
-    In Python 3.3, it does not support all types of callables, and should
-    not be relied upon. Python 3.4 works correctly.
 
     Any exception calling inspect.signature is ignored and None is returned.
 
