@@ -78,6 +78,7 @@ To complete a move of a page, one can use:
 from __future__ import absolute_import, unicode_literals
 
 import codecs
+from itertools import chain
 import os
 import re
 
@@ -395,7 +396,6 @@ class ReferringPageGeneratorWithIgnore(object):
         # TODO: start yielding before all referring pages have been found
         refs = [
             page for page in self.disambPage.getReferences(
-                follow_redirects=False,
                 withTemplateInclusion=False,
                 namespaces=0 if self.main_only else None
             )
@@ -636,11 +636,12 @@ class DisambiguationRobot(Bot):
         """
         Check if the text matches any of the ignore regexes.
 
-        For a given text, returns False if none of the regular
-        expressions given in the dictionary at the top of this class
-        matches a substring of the text.
-        Otherwise returns the substring which is matched by one of
-        the regular expressions.
+        @param text: wikitext of a page
+        @type text: str
+        @return: None if none of the regular expressions
+            given in the dictionary at the top of this class matches
+            a substring of the text, otherwise the matched substring
+        @rtype: str or None
         """
         for ig in self.ignore_contents_regexes:
             match = ig.search(text)
@@ -695,16 +696,44 @@ class DisambiguationRobot(Bot):
                                 flags=re.X)
 
     def treat(self, refPage, disambPage):
-        """Treat a page.
+        """Resolve the links to disambPage or its redirects.
 
         @param disambPage: the disambiguation page or redirect we don't want
             anything to link to
         @type disambPage: pywikibot.Page
         @param refPage: a page linking to disambPage
         @type refPage: pywikibot.Page
-        @return: False if the user pressed q to completely quit the program,
-            True otherwise
-        @rtype: bool
+        @rtype: None
+
+        """
+        nochange = True
+
+        for page in chain(
+            (disambPage,), disambPage.getReferences(redirectsOnly=True)
+        ):
+            treat_result = self.treat_disamb_only(refPage, page)
+            if treat_result == 'nextpage':
+                return
+            elif treat_result in ('nochange', 'done'):
+                continue
+            elif nochange:
+                nochange = False
+
+        if nochange:
+            pywikibot.output('No changes necessary in ' + refPage.title())
+
+    def treat_disamb_only(self, refPage, disambPage):
+        """Resolve the links to disambPage but don't look for its redirects.
+
+        @param disambPage: the disambiguation page or redirect we don't want
+            anything to link to
+        @type disambPage: pywikibot.Page
+        @param refPage: a page linking to disambPage
+        @type refPage: pywikibot.Page
+        @return: "nextpage" if the user enters "n" to skip this page,
+            "nochange" if the page needs no change, and
+            "done" if the page is processed successfully
+        @rtype: str
 
         """
         # TODO: break this function up into subroutines!
@@ -748,8 +777,7 @@ class DisambiguationRobot(Bot):
                     preloadingGen = pagegenerators.PreloadingGenerator(gen)
                     for refPage2 in preloadingGen:
                         # run until the user selected 'quit'
-                        if not self.treat(refPage2, refPage):
-                            break
+                        self.treat(refPage2, refPage)
                 elif choice == 'c':
                     text = refPage.get(get_redirect=True)
                     include = "redirect"
@@ -770,9 +798,8 @@ class DisambiguationRobot(Bot):
                 m = self.linkR.search(text, pos=curpos)
                 if not m:
                     if n == 0:
-                        pywikibot.output(u"No changes necessary in %s"
-                                         % refPage.title())
-                        return True
+                        # No changes necessary for this disambiguation title.
+                        return 'nochange'
                     else:
                         # stop loop and save page
                         break
@@ -856,7 +883,7 @@ class DisambiguationRobot(Bot):
                         # If run with the -primary argument, skip this
                         # occurrence next time.
                         self.primaryIgnoreManager.ignore(refPage)
-                    return True
+                    return 'nextpage'
 
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
@@ -943,7 +970,7 @@ class DisambiguationRobot(Bot):
                                   % (new_page_title, section, link_text)
                     text = text[:m.start()] + newlink + text[m.end():]
                     continue
-
+                # Todo: This line is unreachable (T155337)
                 pywikibot.output(text[max(0, m.start() - 30):m.end() + 30])
             if text == original_text:
                 pywikibot.output(u'\nNo changes have been made:\n')
@@ -960,7 +987,7 @@ class DisambiguationRobot(Bot):
                     pywikibot.output(u'Page not saved: page is locked')
                 except pywikibot.PageNotSaved as error:
                     pywikibot.output(u'Page not saved: %s' % error.args)
-        return True
+        return 'done'
 
     def findAlternatives(self, disambPage):
         """Extend self.alternatives using correctcap of disambPage.linkedPages.
