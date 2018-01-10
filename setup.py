@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot 3.0 framework."""
 #
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -26,10 +26,10 @@ PY2 = (PYTHON_VERSION[0] == 2)
 PY26 = (PYTHON_VERSION < (2, 7))
 
 versions_required_message = """
-Pywikibot not available on:
-%s
+Pywikibot is not available on:
+{version}
 
-Pywikibot is only supported under Python 2.6.5+, 2.7.2+ or 3.3+
+This version of Pywikibot only supports Python 2.6.5+, 2.7.2+ or 3.3+.
 """
 
 
@@ -42,7 +42,7 @@ def python_is_supported():
 
 
 if not python_is_supported():
-    raise RuntimeError(versions_required_message % sys.version)
+    raise RuntimeError(versions_required_message.format(version=sys.version))
 
 test_deps = ['bz2file', 'mock']
 
