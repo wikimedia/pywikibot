@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wiktionary."""
 #
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,13 +36,13 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.languages_by_size = [
             'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'sv',
             'ku', 'pl', 'el', 'it', 'ta', 'hu', 'fi', 'tr', 'ca', 'ko', 'io',
-            'kn', 'pt', 'hy', 'vi', 'sr', 'chr', 'ja', 'hi', 'th', 'ro', 'no',
-            'ml', 'id', 'et', 'uz', 'li', 'my', 'or', 'te', 'fa', 'eo', 'cs',
+            'kn', 'pt', 'hy', 'vi', 'sr', 'ja', 'chr', 'hi', 'th', 'ro', 'no',
+            'ml', 'id', 'et', 'uz', 'li', 'my', 'or', 'te', 'fa', 'cs', 'eo',
             'ar', 'jv', 'az', 'eu', 'gl', 'oc', 'da', 'lo', 'br', 'uk', 'hr',
-            'fj', 'tg', 'bg', 'ps', 'simple', 'cy', 'sk', 'wa', 'vo', 'is',
-            'zh-min-nan', 'la', 'scn', 'af', 'he', 'ast', 'tl', 'sw', 'ky',
-            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'ka', 'pa', 'nds', 'sl', 'sq',
-            'lb', 'bs', 'nah', 'sa', 'kk', 'tk', 'bn', 'km', 'sm', 'mk', 'hsb',
+            'fj', 'tg', 'bg', 'simple', 'ps', 'cy', 'sk', 'vo', 'wa', 'is',
+            'zh-min-nan', 'la', 'scn', 'af', 'he', 'ast', 'tl', 'ky', 'sw',
+            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'pa', 'ka', 'nds', 'sl', 'sq',
+            'lb', 'bs', 'nah', 'sa', 'kk', 'bn', 'tk', 'km', 'sm', 'mk', 'hsb',
             'be', 'ms', 'ga', 'ur', 'an', 'wo', 'vec', 'ang', 'tt', 'sd', 'gn',
             'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si', 'hif',
             'ia', 'ie', 'mi', 'ay', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu',

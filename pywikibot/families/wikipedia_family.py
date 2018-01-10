@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,7 +44,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'lb', 'mr', 'sco', 'af', 'pnb', 'ga', 'is', 'ba', 'cv', 'fy', 'su',
             'sw', 'my', 'lmo', 'an', 'yo', 'ne', 'pa', 'gu', 'io', 'nds',
             'scn', 'bpy', 'als', 'bar', 'ku', 'kn', 'ia', 'ckb', 'qu', 'mn',
-            'arz', 'bat-smg', 'gd', 'wa', 'nap', 'si', 'yi', 'bug', 'am',
+            'arz', 'bat-smg', 'gd', 'nap', 'wa', 'si', 'yi', 'bug', 'am',
             'cdo', 'or', 'map-bms', 'fo', 'mzn', 'hsb', 'xmf', 'mai', 'li',
             'sah', 'sa', 'vec', 'ilo', 'os', 'mrj', 'hif', 'mhr', 'bh', 'eml',
             'roa-tara', 'ps', 'diq', 'pam', 'sd', 'hak', 'nso', 'se',
@@ -53,12 +53,12 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'fiu-vro', 'co', 'lrc', 'tk', 'kv', 'csb', 'so', 'gv', 'as', 'lad',
             'myv', 'zea', 'nv', 'ay', 'udm', 'lez', 'stq', 'ie', 'kw', 'nrm',
             'pcd', 'mwl', 'rm', 'koi', 'ab', 'gom', 'ug', 'cbk-zam', 'lij',
-            'gn', 'mt', 'fur', 'kab', 'dsb', 'dv', 'sn', 'ang', 'ext', 'ln',
+            'gn', 'mt', 'fur', 'dsb', 'dv', 'sn', 'ang', 'ln', 'ext', 'kab',
             'frp', 'ksh', 'lo', 'gag', 'dty', 'pag', 'pi', 'olo', 'av', 'xal',
             'pfl', 'bxr', 'haw', 'krc', 'pap', 'kaa', 'rw', 'pdc', 'bjn', 'to',
-            'nov', 'kl', 'ha', 'arc', 'jam', 'kbd', 'tyv', 'tpi', 'tet', 'ig',
-            'ki', 'na', 'roa-rup', 'lbe', 'jbo', 'ty', 'bi', 'mdf', 'za', 'kg',
-            'lg', 'wo', 'srn', 'tcy', 'zu', 'chr', 'kbp', 'ltg', 'sm', 'om',
+            'nov', 'ha', 'kl', 'arc', 'jam', 'kbd', 'tyv', 'tpi', 'tet', 'ig',
+            'ki', 'na', 'roa-rup', 'lbe', 'jbo', 'ty', 'mdf', 'za', 'kg', 'lg',
+            'wo', 'bi', 'srn', 'tcy', 'zu', 'chr', 'kbp', 'sm', 'ltg', 'om',
             'xh', 'rmy', 'tn', 'cu', 'pih', 'rn', 'chy', 'tw', 'tum', 'ts',
             'st', 'got', 'pnt', 'ss', 'ch', 'bm', 'fj', 'ady', 'iu', 'ny',
             'atj', 'ee', 'ks', 'ak', 'ik', 've', 'sg', 'ff', 'dz', 'ti', 'cr',
