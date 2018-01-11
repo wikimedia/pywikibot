@@ -9,8 +9,6 @@ from __future__ import (absolute_import, division,
 #
 # Distributed under the terms of the MIT license
 #
-__version__ = '$Id$'
-#
 
 # system imports
 import codecs

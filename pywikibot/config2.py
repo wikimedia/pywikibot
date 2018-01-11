@@ -39,9 +39,6 @@ build paths relative to base_dir:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import collections
 import os
 import platform

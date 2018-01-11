@@ -48,13 +48,11 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
@@ -68,7 +66,6 @@ import json
 import logging
 import logging.handlers
 import os
-import re
 import sys
 import time
 import warnings
@@ -954,20 +951,6 @@ def handle_args(args=None, do_help=True):
     writeToCommandLogFile()
 
     if config.verbose_output:
-        # Please don't change the regular expression here unless you really
-        # have to - some git versions (like 1.7.0.4) seem to treat lines
-        # containing just `$Id:` as if they were ident lines (see
-        # gitattributes(5)) leading to unwanted behaviour like automatic
-        # replacement with `$Id$`
-        # or `$Id$`.
-        m = re.search(r"\$Id"
-                      r": (\w+) \$", pywikibot.__version__)
-        if m:
-            pywikibot.output(u'Pywikibot r%s' % m.group(1))
-        else:
-            # Version ID not available on SVN repository.
-            # Maybe this information should be imported from version.py
-            pywikibot.output(u'Pywikibot SVN repository')
         pywikibot.output(u'Python %s' % sys.version)
 
     if do_help:

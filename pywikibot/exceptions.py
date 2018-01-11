@@ -86,8 +86,6 @@ UserWarning: warnings targetted at users
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot.tools import (
     # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
     deprecated as __deprecated,

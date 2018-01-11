@@ -19,7 +19,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 # Distributed under the terms of the MIT license.
 #
 
-__version__ = '$Id$'
 __docformat__ = 'epytext'
 
 import atexit

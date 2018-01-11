@@ -13,8 +13,6 @@ http://python-irclib.sourceforge.net/
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot
 # scripts, instead of writing each one from scratch.
