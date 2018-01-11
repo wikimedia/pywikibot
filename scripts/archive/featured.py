@@ -63,9 +63,6 @@ This script understands various command-line arguments:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pickle
 import re
 import sys

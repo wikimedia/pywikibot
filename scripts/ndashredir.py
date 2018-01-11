@@ -33,9 +33,6 @@ The following generators and filters are supported:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import pywikibot
 from pywikibot import i18n, pagegenerators
 
