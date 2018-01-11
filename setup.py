@@ -52,6 +52,14 @@ dependencies = ['requests!=2.18.2']
 irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
 csv_dep = 'unicodecsv!=0.14.0' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
 
+# According to https://pillow.readthedocs.io/en/latest/installation.html#notes
+if PY26:
+    pillow = 'Pillow<4.0.0'
+elif PYTHON_VERSION[:2] == (3, 3):
+    pillow = 'Pillow>=2.0.0,<5.0.0'
+else:
+    pillow = 'Pillow'
+
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient'],
@@ -60,7 +68,7 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': ['Pillow<3.5.0' if PY26 else 'Pillow'],
+    'Tkinter': [pillow],
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
@@ -82,7 +90,7 @@ elif PYTHON_VERSION[:2] == (3, 3):
     extra_deps['security'].append('PyOpenSSL<17.5.0')
 
 script_deps = {
-    'flickrripper.py': ['Pillow<3.5.0' if PY26 else 'Pillow'],
+    'flickrripper.py': [pillow],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client>=0.5.1,!=0.6.0'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],
