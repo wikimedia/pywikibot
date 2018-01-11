@@ -226,6 +226,10 @@ To enable 'write' tests, set PYWIKIBOT2_TEST_WRITE=1
 Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
 automatically.
 
+Some tests are also using VCR.py, which means that these tests are dry and all
+requests are recorded and used later, being stored in 'tests/cassettes'.
+To avoid using recorded requests and to run live tests set PYWIKIBOT_LIVE_TESTS=1
+
 Decorators
 =====================
 
@@ -356,3 +360,4 @@ Other class attributes
 - ``user = True`` : test class needs to login to site
 - ``sysop = True`` : test class needs to login to site as a sysop
 - ``write = True`` : test class needs to write to a site
+- ``vcr = True``: test class uses VCR.py to record requests for dry testing

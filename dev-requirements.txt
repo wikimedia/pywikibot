@@ -24,6 +24,8 @@ codecov
 coverage
 mock ; python_version < '3'
 
+vcrpy-unittest
+
 # pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
 # excluded from this file as they are quite expensive to install, and they
 # are not useful on the Appveyor Win32 builds since the relevant UI tests
