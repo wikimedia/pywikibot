@@ -12,8 +12,6 @@ import datetime
 import logging
 import sys
 
-from distutils.version import LooseVersion
-
 import pywikibot
 from pywikibot import pagegenerators, date
 
@@ -1411,17 +1409,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         super(EventStreamsPageGeneratorTestCase, cls).setUpClass()
         cls.client = 'sseclient'
         if not has_module(cls.client):
-            cls.client = 'socketIO_client'
-            try:
-                import socketIO_client
-            except ImportError:
-                raise unittest.SkipTest(
-                    'Neither sseclient nor socketIO_client is available')
-            if LooseVersion(
-                    socketIO_client.__version__) >= LooseVersion('0.6.1'):
-                raise unittest.SkipTest(
-                    'socketIO_client %s not supported by Wikimedia-Stream'
-                    % socketIO_client.__version__)
+            raise unittest.SkipTest('{0} is not available'.format(cls.client))
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""
