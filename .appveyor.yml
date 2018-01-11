@@ -108,6 +108,10 @@ install:
   - pip install virtualenv
   - virtualenv env
   - env\Scripts\activate.bat
+  # wheel version 0.29.0 is enforced because version 0.30.0 doesn't support
+  # Python 2.6 and 3.3 anymore. Once we drop support for those versions we
+  # can use the latest version of wheel.
+  - pip install wheel==0.29.0
   - pip install -r dev-requirements.txt
   - pip install -r requests-requirements.txt
 
