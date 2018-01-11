@@ -24,8 +24,6 @@ inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from functools import partial
 import json
 import re

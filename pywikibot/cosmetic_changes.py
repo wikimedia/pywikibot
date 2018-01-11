@@ -56,9 +56,6 @@ or by adding a list to the given one:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 from warnings import warn

@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 
-__version__ = '$Id$'
-
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
 class Family(family.SubdomainFamily, family.WikimediaFamily):

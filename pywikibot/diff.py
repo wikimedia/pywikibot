@@ -7,9 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
-
 import difflib
 import math
 import sys

@@ -18,9 +18,6 @@ This module also includes objects:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import hashlib
 import logging
 import os.path

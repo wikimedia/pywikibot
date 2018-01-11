@@ -12,9 +12,6 @@ groups of wikis on the same topic in different languages.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import copy
 import datetime
 import functools

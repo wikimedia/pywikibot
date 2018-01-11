@@ -23,9 +23,6 @@ messages. See L{twntranslate} for more information on the messages.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import json
 import os
 import pkgutil

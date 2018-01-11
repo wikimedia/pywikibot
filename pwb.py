@@ -14,7 +14,6 @@ search paths so the package does not need to be installed, etc.
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, print_function, unicode_literals
-__version__ = '$Id$'
 
 # The following snippet was developed by Ned Batchelder (and others)
 # for coverage [1], with python 3 support [2] added later,

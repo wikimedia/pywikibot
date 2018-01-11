@@ -20,9 +20,6 @@ These parameters are supported to specify which pages titles to print:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import calendar
 import codecs
 import datetime

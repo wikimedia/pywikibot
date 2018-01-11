@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """Http backend layer, formerly providing a httplib2 wrapper."""
 from __future__ import absolute_import, unicode_literals
-# (C) Pywikibot team, 2007-2017
 
-__version__ = '$Id$'
+#
+# (C) Pywikibot team, 2007-2017
+#
+# Distributed under the terms of the MIT license.
+#
+
 __docformat__ = 'epytext'
 
 # standard python libraries

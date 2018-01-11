@@ -7,14 +7,11 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from pywikibot import config
 from pywikibot import family
 
+
 # The Wikidata family
-
-
 class Family(family.WikimediaFamily):
 
     """Family class for Wikidata."""
