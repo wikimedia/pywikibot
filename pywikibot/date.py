@@ -7,7 +7,7 @@
 # (C) Andre Engels, 2004-2005
 # (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
 #       (years/decades/centuries/millenniums str <=> int conversions)
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -384,10 +384,9 @@ def escapePattern2(pattern):
                 if isinstance(dec, basestring):
                     # Special case for strings that are replaced instead of
                     # decoded
-                    if len(s) == 3:
-                        raise AssertionError(
-                            "Invalid pattern %s: Cannot use zero padding size "
-                            "in %s!" % (pattern, s))
+                    assert len(s) < 3, (
+                        'Invalid pattern {0}: Cannot use zero padding size '
+                        'in {1}!'.format(pattern, s))
                     newPattern += re.escape(dec)
                     strPattern += s         # Keep the original text
                 else:
@@ -451,8 +450,8 @@ def dh(value, pattern, encf, decf, filter=None):
                       for i in range(len(decoders))]
             decValue = decf(values)
 
-            if isinstance(decValue, basestring):
-                raise AssertionError("Decoder must not return a string!")
+            assert not isinstance(decValue, basestring), \
+                'Decoder must not return a string!'
 
             # recursive call to re-encode and see if we get the original
             # (may through filter exception)
@@ -473,19 +472,17 @@ def dh(value, pattern, encf, decf, filter=None):
         MakeParameter = _make_parameter
 
         if type(params) in _listTypes:
-            if len(params) != len(decoders):
-                raise AssertionError(
-                    "parameter count (%d) does not match decoder count (%d)"
-                    % (len(params), len(decoders)))
+            assert len(params) == len(decoders), (
+                'parameter count ({0}) does not match decoder count ({1})'
+                .format(len(params), len(decoders)))
             # convert integer parameters into their textual representation
             params = [MakeParameter(decoders[i], params[i])
                       for i in range(len(params))]
             return strPattern % tuple(params)
         else:
-            if 1 != len(decoders):
-                raise AssertionError(
-                    "A single parameter does not match %d decoders."
-                    % len(decoders))
+            assert len(decoders) == 1, (
+                'A single parameter does not match {0} decoders.'
+                .format(len(decoders)))
             # convert integer parameter into its textual representation
             return strPattern % MakeParameter(decoders[0], params)
 
@@ -1959,15 +1956,16 @@ for monthOfYear in yrMnthFmts:
 
 
 def addFmt1(lang, isMnthOfYear, patterns):
-    """Add 12 month formats for a specific type ('January','Feb..), for a given language.
+    """Add 12 month formats for a specific type ('January', 'Feb.').
 
     The function must accept one parameter for the ->int or ->string
     conversions, just like everywhere else in the formats map.
     The patterns parameter is a list of 12 elements to be used for each month.
 
+    @param lang: language code
+    @type lang: str
     """
-    if len(patterns) != 12:
-        raise AssertionError(u'pattern %s does not have 12 elements' % lang)
+    assert len(patterns) == 12, 'pattern %s does not have 12 elements' % lang
 
     for i in range(12):
         if patterns[i] is not None:
