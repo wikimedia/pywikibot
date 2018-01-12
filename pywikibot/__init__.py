@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """The initialization file for the Pywikibot framework."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -132,6 +132,13 @@ for _name in textlib_methods:
 
 deprecated = redirect_func(__deprecated)
 deprecate_arg = redirect_func(_deprecate_arg)
+
+
+if sys.version_info[:2] in ((2, 6), (3, 3)):
+    warn(
+        'Pywikibot will soon drop support for Python 2.6 and 3.3',
+        DeprecationWarning,
+    )
 
 
 class Timestamp(datetime.datetime):
