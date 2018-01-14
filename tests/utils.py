@@ -21,7 +21,6 @@ import warnings
 
 from collections import Mapping
 from types import ModuleType
-from warnings import warn
 
 from pywikibot.tools import PY2
 
@@ -462,10 +461,8 @@ class DrySite(pywikibot.site.APISite):
         return self._userinfo
 
     def version(self):
-        """Dummy version, with warning to show the callers context."""
-        warn('%r returning version 1.24; override if unsuitable.'
-             % self, DrySiteNote, stacklevel=2)
-        return '1.24'
+        """Return a big dummy version string."""
+        return '999.999'
 
     def image_repository(self):
         """Return Site object for image repository e.g. commons."""
