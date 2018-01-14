@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module to transliterate text."""
 #
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -688,52 +688,31 @@ class transliterator(object):
             self.trans[char] = u"["
         for char in u"］】〗":
             self.trans[char] = u"]"
-        for char in u"｛":
-            self.trans[char] = u"{"
-        for char in u"｝":
-            self.trans[char] = u"}"
-        for char in u"っ":
-            self.trans[char] = u":"
-        for char in u"ー":
-            self.trans[char] = u"h"
-        for char in u"゛":
-            self.trans[char] = u"'"
-        for char in u"゜":
-            self.trans[char] = u"p"
-        for char in u"。":
-            self.trans[char] = u". "
-        for char in u"、":
-            self.trans[char] = u", "
-        for char in u"・":
-            self.trans[char] = u" "
-        for char in u"〆":
-            self.trans[char] = u"shime"
-        for char in u"〜":
-            self.trans[char] = u"-"
-        for char in u"…":
-            self.trans[char] = u"..."
-        for char in u"‥":
-            self.trans[char] = u".."
-        for char in u"ヶ":
-            self.trans[char] = u"months"
+        self.trans['｛'] = '{'
+        self.trans['｝'] = '}'
+        self.trans['っ'] = ':'
+        self.trans['ー'] = 'h'
+        self.trans['゛'] = "'"
+        self.trans['゜'] = 'p'
+        self.trans['。'] = '. '
+        self.trans['、'] = ', '
+        self.trans['・'] = ' '
+        self.trans['〆'] = 'shime'
+        self.trans['〜'] = '-'
+        self.trans['…'] = '...'
+        self.trans['‥'] = '..'
+        self.trans['ヶ'] = 'months'
         for char in u"•◦":
             self.trans[char] = u"_"
         for char in u"※＊":
             self.trans[char] = u"*"
-        for char in u"Ⓧ":
-            self.trans[char] = u"(X)"
-        for char in u"Ⓨ":
-            self.trans[char] = u"(Y)"
-        for char in u"！":
-            self.trans[char] = u"!"
-        for char in u"？":
-            self.trans[char] = u"?"
-        for char in u"；":
-            self.trans[char] = u";"
-        for char in u"：":
-            self.trans[char] = u":"
-        for char in u"。":
-            self.trans[char] = u"."
+        self.trans['Ⓧ'] = '(X)'
+        self.trans['Ⓨ'] = '(Y)'
+        self.trans['！'] = '!'
+        self.trans['？'] = '?'
+        self.trans['；'] = ';'
+        self.trans['：'] = ':'
+        self.trans['。'] = '.'
         for char in u"，、":
             self.trans[char] = u","
 
