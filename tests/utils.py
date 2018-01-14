@@ -791,7 +791,9 @@ def execute(command, data_in=None, timeout=0, error=None):
     if PYTHON_VERSION < (2, 7):
         command.insert(
             1, '-W ignore:{0}:DeprecationWarning'.format(PYTHON_26_CRYPTO_WARN))
-
+    if PYTHON_VERSION[:2] in ((3, 3), (2, 6)):
+        command.insert(1, '-W ignore:{0}:DeprecationWarning'.format(
+            'Pywikibot will soon drop support for Python 2.6 and 3.3'))
     # Any environment variables added on Windows must be of type
     # str() on Python 2.
     env = os.environ.copy()
