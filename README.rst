@@ -11,6 +11,10 @@
 Pywikibot
 =========
 
+.. image:: https://badges.gitter.im/wikimedia/pywikibot-core.svg
+   :alt: Join the chat at https://gitter.im/wikimedia/pywikibot-core
+   :target: https://gitter.im/wikimedia/pywikibot-core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 The Pywikibot framework is a Python library that interfaces with the
 `MediaWiki API <https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page>`_
 version 1.14 or higher.
