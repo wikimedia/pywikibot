@@ -1,0 +1,16 @@
+version: "2"
+
+checks:
+  argument-count:
+    enabled: false
+  file-lines:
+    enabled: false
+
+exclude_patterns:
+- docs/
+- !docs/conf.py
+- scripts/archive/
+- ez_setup.py
+- *.rst
+- *.txt
+
