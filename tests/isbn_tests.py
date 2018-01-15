@@ -34,10 +34,29 @@ if StdNumValidationError:
 else:
     AnyIsbnValidationException = IsbnExc
 
+ISBNINVALIDCHECKSUM_RE = (
+    r'The ISBN checksum of ([A-Z0-9]*) is incorrect'
+)
+
+ISBNINVALIDLENGTH_RE = (
+    r'The ISBN ([A-Z0-9]*) is not (10|13) digits long'
+)
+
+ISBNINVALIDCHARACTERS_RE = (
+    r'The ISBN ([A-Z0-9]*) contains invalid characters'
+)
+
 
 class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
 
     """Test CosmeticChanges ISBN fix."""
+
+    INVALIDNUMBERLENGTH_RE = (
+        r'The number has an invalid length'
+    )
+    INVALIDNUMBERCHECKSUM_RE = (
+        r'The number\'s checksum or check digit is invalid'
+    )
 
     def test_valid_isbn(self):
         """Test ISBN."""
@@ -54,17 +73,25 @@ class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
         cc = CosmeticChangesToolkit(self.site, namespace=0)
 
         # Invalid characters
-        self.assertRaises(AnyIsbnValidationException,
-                          cc.fix_ISBN, 'ISBN 0975229LOL')
+        self.assertRaisesRegex(AnyIsbnValidationException,
+                               (ISBNINVALIDLENGTH_RE + '|' +
+                                self.INVALIDNUMBERLENGTH_RE),
+                               cc.fix_ISBN, 'ISBN 0975229LOL')
         # Invalid checksum
-        self.assertRaises(AnyIsbnValidationException,
-                          cc.fix_ISBN, 'ISBN 0975229801')
+        self.assertRaisesRegex(AnyIsbnValidationException,
+                               (ISBNINVALIDCHECKSUM_RE + '|' +
+                                self.INVALIDNUMBERCHECKSUM_RE),
+                               cc.fix_ISBN, 'ISBN 0975229801')
         # Invalid length
-        self.assertRaises(AnyIsbnValidationException,
-                          cc.fix_ISBN, 'ISBN 09752298')
+        self.assertRaisesRegex(AnyIsbnValidationException,
+                               (ISBNINVALIDLENGTH_RE + '|' +
+                                self.INVALIDNUMBERLENGTH_RE),
+                               cc.fix_ISBN, 'ISBN 09752298')
         # X in the middle
-        self.assertRaises(AnyIsbnValidationException,
-                          cc.fix_ISBN, 'ISBN 09752X9801')
+        self.assertRaisesRegex(AnyIsbnValidationException,
+                               (ISBNINVALIDCHARACTERS_RE + '|' +
+                                self.INVALIDNUMBERLENGTH_RE),
+                               cc.fix_ISBN, 'ISBN 09752X9801')
 
     def test_ignore_invalid_isbn(self):
         """Test fixing ISBN numbers with an invalid ISBN."""
@@ -77,6 +104,10 @@ class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
 class TestIsbn(TestCase):
 
     """Test ISBN-related classes and helper functions."""
+
+    ISBNXINTHEMIDDLE_RE = (
+        r'ISBN ([A-Z0-9]*): X is only allowed at the end of the ISBN'
+    )
 
     net = False
 
@@ -94,10 +125,14 @@ class TestIsbn(TestCase):
         self.assertEqual(isbn13.code, '978-0-9752298-0-4')
 
         # Errors
-        self.assertRaises(IsbnExc, ISBN10, '0975229LOL')  # Invalid characters
-        self.assertRaises(IsbnExc, ISBN10, '0975229801')  # Invalid checksum
-        self.assertRaises(IsbnExc, ISBN10, '09752298')  # Invalid length
-        self.assertRaises(IsbnExc, ISBN10, '09752X9801')  # X in the middle
+        self.assertRaisesRegex(IsbnExc, ISBNINVALIDCHARACTERS_RE,
+                               ISBN10, '0975229LOL')  # Invalid characters
+        self.assertRaisesRegex(IsbnExc, ISBNINVALIDCHECKSUM_RE,
+                               ISBN10, '0975229801')  # Invalid checksum
+        self.assertRaisesRegex(IsbnExc, ISBNINVALIDLENGTH_RE,
+                               ISBN10, '09752298')  # Invalid length
+        self.assertRaisesRegex(IsbnExc, self.ISBNXINTHEMIDDLE_RE,
+                               ISBN10, '09752X9801')  # X in the middle
 
     def test_isbn13(self):
         """Test ISBN13."""
@@ -111,9 +146,12 @@ class TestIsbn(TestCase):
         self.assertEqual(isbn.code, '9788090273412')
 
         # Errors
-        self.assertRaises(IsbnExc, ISBN13, '9783161484LOL')  # Invalid chars
-        self.assertRaises(IsbnExc, ISBN13, '9783161484105')  # Invalid checksum
-        self.assertRaises(IsbnExc, ISBN13, '9783161484')  # Invalid length
+        self.assertRaisesRegex(IsbnExc, ISBNINVALIDCHARACTERS_RE,
+                               ISBN13, '9783161484LOL')  # Invalid characters
+        self.assertRaisesRegex(IsbnExc, ISBNINVALIDCHECKSUM_RE,
+                               ISBN13, '9783161484105')  # Invalid checksum
+        self.assertRaisesRegex(IsbnExc, ISBNINVALIDLENGTH_RE,
+                               ISBN13, '9783161484')  # Invalid length
 
     def test_general(self):
         """Test things that apply both to ISBN10 and ISBN13."""
