@@ -256,11 +256,12 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
                     else:
                         skip_frames -= 1
 
-            # Ignore socket IO warnings (T183696)
+            # Ignore socket IO warnings (T183696, T184996)
             if (PYTHON_VERSION >= (3, 2)
                     and issubclass(warn_msg.category, ResourceWarning)
                     and 'unclosed <socket.socket' in str(warn_msg.message)
-                    and warn_msg.filename.endswith('socket.py')):
+                    and warn_msg.filename.rpartition('/')[2] in (
+                        'cookiejar.py', 'inspect.py', 'socket.py')):
                 return
 
             log.append(warn_msg)
