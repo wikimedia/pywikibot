@@ -1301,8 +1301,6 @@ class TestRedirects(WikidataTestCase):
 
     """Test redirect and non-redirect items."""
 
-    vcr = True
-
     def test_normal_item(self):
         """Test normal item."""
         wikidata = self.get_repo()
@@ -1557,8 +1555,6 @@ class TestLinks(WikidataTestCase):
         }
     }
 
-    vcr = True
-
     def setUp(self):
         """Setup Tests."""
         super(TestLinks, self).setUp()
@@ -1669,8 +1665,6 @@ class TestPreloadingItemGenerator(TestCase):
 class TestNamespaces(WikidataTestCase):
 
     """Test cases to test namespaces of Wikibase entities."""
-
-    vcr = True
 
     def test_empty_wikibase_page(self):
         """
