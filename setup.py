@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot 3.0 framework."""
 #
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -266,7 +266,7 @@ setup(
     test_suite="tests.collector",
     tests_require=test_deps,
     classifiers=[
-        'Development Status :: 4 - Beta',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
