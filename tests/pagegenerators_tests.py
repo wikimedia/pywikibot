@@ -15,7 +15,7 @@ import sys
 import pywikibot
 from pywikibot import pagegenerators, date
 
-from pywikibot.exceptions import UnknownExtension
+from pywikibot.exceptions import ServerError, UnknownExtension
 
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
@@ -362,8 +362,12 @@ class PetScanPageGeneratorTestCase(TestCase):
         """Test PetScanPageGenerator."""
         site = self.get_site()
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'], True, None, site)
-        self.assertPagelistTitles(gen, titles=('User:Sn1per/ProtectTest1',
-                                               'User:Sn1per/ProtectTest2'), site=site)
+        try:
+            self.assertPagelistTitles(gen, titles=(
+                'User:Sn1per/ProtectTest1', 'User:Sn1per/ProtectTest2'),
+                site=site)
+        except ServerError as e:
+            self.skipTest(e)
 
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'], False, None, site)
         self.assertPagelistTitles(gen, titles=('User:Sn1per/ProtectTest1',
