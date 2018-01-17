@@ -17,6 +17,16 @@ Magnus Manske at his talk page. Please be very specific in your request
 so he can test at: [[de:Benutzer Diskussion:Magnus Manske]]. You can
 write him in German and English.
 
+Command line options:
+
+-always      Skip the GUI validation
+
+-setcat:     Set the category of the copied image
+
+-delete      Delete the image after the image has been transferred. This will
+             only work if the user has sysops privileges, otherwise the image
+             will only be marked for deletion.
+
 Examples
 
 Work on a single image::
@@ -494,8 +504,8 @@ def main(*args):
     for arg in local_args:
         if arg == '-always':
             always = True
-        elif arg.startswith('-cc:'):
-            category = arg[len('-cc:'):]
+        elif arg.startswith('-setcat:'):
+            category = arg[len('-setcat:'):]
         elif arg == '-delete':
             delete_after_done = True
         else:
