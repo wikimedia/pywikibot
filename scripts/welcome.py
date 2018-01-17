@@ -204,7 +204,6 @@ logbook = {
     'nl': u'Project:Logboek welkom',
     'no': u'Project:Velkomstlogg',
     'sq': u'Project:Tung log',
-    'sr': u'Project:Добродошлице',
     'zh': u'User:Welcomebot/欢迎日志',
     'commons': u'Project:Welcome log',
 }
@@ -224,6 +223,7 @@ netext = {
         'fr': u'{{subst:Discussion Projet:Aide/Bienvenue}} %s',
         'ga': u'{{subst:fáilte}} %s',
         'he': u'{{ס:ברוך הבא}} %s',
+        'hr': '{{subst:dd}} %s',
         'id': u'{{subst:sdbot2}}\n%s',
         'it': u'<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s',
         'ja': u'{{subst:Welcome/intro}}\n{{subst:welcome|%s}}',
