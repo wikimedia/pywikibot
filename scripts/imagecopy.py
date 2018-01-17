@@ -19,6 +19,8 @@ write him in German and English.
 
 Command line options:
 
+&params;
+
 -always      Skip the GUI validation
 
 -setcat:     Set the category of the copied image
@@ -51,9 +53,7 @@ deletion)::
 
  python pwb.py imagecopy.py -page:Image:<imagename> -delete
 
-See pagegenerators.py for more ways to get a list of images.
 By default the bot works on your home wiki (set in user-config)
-
 """
 # Based on upload.py by:
 # (C) Rob W.W. Hooft, Andre Engels 2003-2007
@@ -93,7 +93,11 @@ except ImportError as _tk_error:
     Tkinter = _tk_error
     Tkdialog = object
 
-NL = ''
+# This is required for the text that is shown when you run this script
+# with the parameter -help.
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp
+}
 
 nowCommonsTemplate = {
     '_default': u'{{NowCommons|%s}}',
