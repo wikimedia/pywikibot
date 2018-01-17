@@ -49,7 +49,11 @@ from pywikibot.tools import (
 from pywikibot import date, config, i18n, xmlreader
 from pywikibot.bot import ListOption
 from pywikibot.comms import http
-from pywikibot.exceptions import ArgumentDeprecationWarning, UnknownExtension
+from pywikibot.exceptions import (
+    ArgumentDeprecationWarning,
+    ServerError,
+    UnknownExtension,
+)
 from pywikibot.logentries import LogEntryFactory
 from pywikibot.proofreadpage import ProofreadPage
 
@@ -2915,6 +2919,9 @@ class PetScanPageGenerator(object):
         url = 'https://petscan.wmflabs.org'
 
         req = http.fetch(url, params=self.opts)
+        if 500 <= req.status < 600:
+            raise ServerError(
+                'received {0} status from {1}'.format(req.status, req.uri))
         j = json.loads(req.content)
         raw_pages = j['*'][0]['a']['*']
         for raw_page in raw_pages:
