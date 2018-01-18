@@ -879,10 +879,16 @@ def removeLanguageLinks(text, site=None, marker=''):
     """Return text with all inter-language links removed.
 
     If a link to an unknown language is encountered, a warning is printed.
-    If a marker is defined, that string is placed at the location of the
-    last occurrence of an interwiki link (at the end if there are no
-    interwiki links).
 
+    @param text: The text that needs to be modified.
+    @type text: str
+    @param site: The site that the text is coming from.
+    @type site: pywikibot.Site
+    @param marker: If defined, marker is placed after the the last language
+        link, or at the end of text if there are no language links.
+    @type marker: str
+    @return: The modified text.
+    @rtype: str
     """
     if site is None:
         site = pywikibot.Site()
@@ -906,10 +912,19 @@ def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
     Return text with inter-language links and preceding separators removed.
 
     If a link to an unknown language is encountered, a warning is printed.
-    If a marker is defined, that string is placed at the location of the
-    last occurrence of an interwiki link (at the end if there are no
-    interwiki links).
 
+    @param text: The text that needs to be modified.
+    @type text: str
+    @param site: The site that the text is coming from.
+    @type site: pywikibot.Site
+    @param marker: If defined, marker is placed after the the last interwiki
+        link, or at the end of text if there are no interwiki links.
+    @type marker: str
+    @param separator: The separator string that will be removed if is followed
+        by the language links.
+    @type separator: str
+    @return: The modified text
+    @rtype: str
     """
     if separator:
         mymarker = findmarker(text, u'@L@')
@@ -924,9 +939,24 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                          template=False, template_subpage=False):
     """Replace inter-language links in the text with a new set of links.
 
-    'new' should be a dict with the Site objects as keys, and Page or Link
-    objects as values (i.e., just like the dict returned by getLanguageLinks
-    function).
+    @param oldtext: The text that needs to be modified.
+    @type oldtext: str
+    @param new: A dict with the Site objects as keys, and Page or Link objects
+        as values (i.e., just like the dict returned by getLanguageLinks
+        function).
+    @type new: dict
+    @param site: The site that the text is from.
+    @type site: pywikibot.Site
+    @param addOnly: If True, do not remove old language links, only add new
+        ones.
+    @type addOnly: bool
+    @param template: Indicates if text belongs to a template page or not.
+    @type template: bool
+    @param template_subpage: Indicates if text belongs to a template sub-page
+        or not.
+    @type template_subpage: bool
+    @return The modified text.
+    @rtype str
     """
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)
@@ -936,9 +966,6 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     cseparator = site.family.category_text_separator
     separatorstripped = separator.strip()
     cseparatorstripped = cseparator.strip()
-    do_not_strip = oldtext.strip() != oldtext
-    if do_not_strip:
-        issue_deprecation_warning('Using unstripped text', 'stripped text', 2)
     if addOnly:
         s2 = oldtext
     else:
@@ -1006,7 +1033,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                     newtext = s2.replace(marker, '').strip() + separator + s
     else:
         newtext = s2.replace(marker, '')
-    return newtext if do_not_strip else newtext.strip()
+    return newtext
 
 
 def interwikiFormat(links, insite=None):
@@ -1221,10 +1248,17 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     Replace all existing category links with new category links.
 
     @param oldtext: The text that needs to be replaced.
+    @type oldtext: str
     @param new: Should be a list of Category objects or strings
         which can be either the raw name or [[Category:..]].
+    @type new: iterable
+    @param site: The site that the text is from.
+    @type site: pywikibot.Site
     @param addOnly: If addOnly is True, the old category won't be deleted and the
         category(s) given will be added (and so they won't replace anything).
+    @type addOnly: bool
+    @return: The modified text.
+    @rtype: str
     """
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)
@@ -1242,52 +1276,53 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     separatorstripped = separator.strip()
     iseparatorstripped = iseparator.strip()
     if addOnly:
-        s2 = oldtext
+        cats_removed_text = oldtext
     else:
-        s2 = removeCategoryLinksAndSeparator(oldtext, site=site, marker=marker,
-                                             separator=separatorstripped)
-    s = categoryFormat(new, insite=site)
-    if s:
+        cats_removed_text = removeCategoryLinksAndSeparator(
+            oldtext, site=site, marker=marker, separator=separatorstripped)
+    new_cats = categoryFormat(new, insite=site)
+    if new_cats:
         if site.code in site.family.category_attop:
-            newtext = s + separator + s2
+            newtext = new_cats + separator + cats_removed_text
         else:
             # calculate what was after the categories links on the page
-            firstafter = s2.find(marker)
+            firstafter = cats_removed_text.find(marker)
             if firstafter < 0:
-                firstafter = len(s2)
+                firstafter = len(cats_removed_text)
             else:
                 firstafter += len(marker)
             # Is there text in the 'after' part that means we should keep it
             # after?
-            if "</noinclude>" in s2[firstafter:]:
+            if '</noinclude>' in cats_removed_text[firstafter:]:
                 if separatorstripped:
-                    s = separator + s
-                newtext = (s2[:firstafter].replace(marker, '') +
-                           s +
-                           s2[firstafter:])
+                    new_cats = separator + new_cats
+                newtext = (cats_removed_text[:firstafter].replace(marker, '')
+                           + new_cats + cats_removed_text[firstafter:])
             elif site.code in site.family.categories_last:
-                newtext = s2.replace(marker, '').strip() + separator + s
+                newtext = (cats_removed_text.replace(marker, '').strip()
+                           + separator + new_cats)
             else:
-                interwiki = getLanguageLinks(s2, insite=site)
-                s2 = removeLanguageLinksAndSeparator(s2.replace(marker, ''),
-                                                     site, '',
-                                                     iseparatorstripped
-                                                     ) + separator + s
-                newtext = replaceLanguageLinks(s2, interwiki, site=site,
-                                               addOnly=True)
+                interwiki = getLanguageLinks(cats_removed_text, insite=site)
+                langs_removed_text = removeLanguageLinksAndSeparator(
+                    cats_removed_text.replace(marker, ''), site, '',
+                    iseparatorstripped) + separator + new_cats
+                newtext = replaceLanguageLinks(
+                    langs_removed_text, interwiki, site, addOnly=True)
     else:
-        newtext = s2.replace(marker, '')
+        newtext = cats_removed_text.replace(marker, '')
     return newtext.strip()
 
 
 def categoryFormat(categories, insite=None):
     """Return a string containing links to all categories in a list.
 
-    'categories' should be a list of Category or Page objects or strings
-    which can be either the raw name, [[Category:..]] or [[cat_localised_ns:...]].
-
-    The string is formatted for inclusion in insite.
-    Category namespace is converted to localised namespace.
+    @param categories: A list of Category or Page objects or strings which can
+        be either the raw name, [[Category:..]] or [[cat_localised_ns:...]].
+    @type categories: iterable
+    @param insite: Used to to localise the category namespace.
+    @type insite: pywikibot.Site
+    @return: String of categories
+    @rtype: str
     """
     if not categories:
         return ''
