@@ -3241,6 +3241,8 @@ class User(Page):
 
         @rtype: pywikibot.Timestamp or None
         """
+        if self.isAnonymous():
+            return None
         reg = self.getprops(force).get('registration')
         if reg:
             return pywikibot.Timestamp.fromISOformat(reg)
@@ -3278,7 +3280,7 @@ class User(Page):
 
         @rtype: bool
         """
-        return 'emailable' in self.getprops(force)
+        return (not self.isAnonymous() and 'emailable' in self.getprops(force))
 
     def groups(self, force=False):
         """
@@ -3301,6 +3303,8 @@ class User(Page):
         @return: return 'male', 'female', or 'unknown'
         @rtype: str
         """
+        if self.isAnonymous():
+            return 'unknown'
         return self.getprops(force).get('gender', 'unknown')
 
     def rights(self, force=False):
