@@ -61,10 +61,6 @@ class DownloadDumpBot(Bot):
         'revision': 'latest',
     }
 
-    def __init__(self, **kwargs):
-        """Constructor."""
-        super(DownloadDumpBot, self).__init__(**kwargs)
-
     def get_dump_name(self, db_name, typ):
         """Check if dump file exists locally in a Toolforge server."""
         db_path = '/public/dumps/public/{0}/'.format(db_name)
