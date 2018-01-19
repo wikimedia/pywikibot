@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test i18n module."""
 #
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -336,7 +336,7 @@ class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
             u'Robot: Changer seulement une page.')
 
 
-class ScriptMessagesTestCase(TWNTestCaseBase):
+class ScriptMessagesTestCase(TWNTestCaseBase, AutoDeprecationTestCase):
 
     """Real messages test."""
 
