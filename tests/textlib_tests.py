@@ -18,7 +18,7 @@ from pywikibot.textlib import _MultiTemplateMatchBuilder
 
 from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
-from pywikibot.tools import OrderedDict
+from pywikibot.tools import OrderedDict, suppress_warnings
 
 from tests.aspects import (
     unittest, require_modules, TestCase, DefaultDrySiteTestCase,
@@ -580,7 +580,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|{{c}} }}'))
         self.assertIsNone(func('{{a|{{c|d}} }}'))
 
-        func = textlib.TEMP_REGEX.search
+        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
+            func = textlib.TEMP_REGEX.search
 
         self.assertIsNotNone(func('{{{1}}}'))
         self.assertIsNotNone(func('{{a|b={{c}} }}'))
@@ -588,7 +589,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNotNone(func('{{a|{{c}} }}'))
         self.assertIsNotNone(func('{{a|{{c|d}} }}'))
 
-        func = textlib.TEMP_REGEX.match
+        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
+            func = textlib.TEMP_REGEX.match
 
         self.assertIsNotNone(func('{{#if:foo}}'))
         self.assertIsNotNone(func('{{foo:}}'))

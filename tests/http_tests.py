@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,10 +19,11 @@ from pywikibot import config2 as config
 from pywikibot.comms import http, threadedhttp
 from pywikibot.tools import (
     PYTHON_VERSION,
+    suppress_warnings,
     UnicodeType as unicode,
 )
 
-from tests import join_images_path
+from tests import join_images_path, patch
 from tests.aspects import (
     unittest,
     TestCase,
@@ -123,8 +124,12 @@ class TestGetAuthenticationConfig(TestCase):
             'https://wmflabs.org': None,
             'https://www.wikiquote.org/': None,
         }
-        for url, auth in pairs.items():
-            self.assertEqual(http.get_authentication(url), auth)
+        with suppress_warnings(
+            r'config.authenticate\["\*.wmflabs.org"] has invalid value.',
+            UserWarning,
+        ):
+            for url, auth in pairs.items():
+                self.assertEqual(http.get_authentication(url), auth)
 
 
 class HttpsCertificateTestCase(TestCase):
@@ -546,7 +551,9 @@ class CharsetTestCase(TestCase):
         """Test decoding with different charsets and valid header charset."""
         req = CharsetTestCase._create_request('latin1')
         self.assertEqual('latin1', req.charset)
-        self.assertEqual('utf-8', req.encoding)
+        # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
+        with patch('pywikibot.warning'):
+            self.assertEqual('utf-8', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.content, CharsetTestCase.STR)
 
@@ -555,7 +562,9 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('latin1',
                                               CharsetTestCase.LATIN1_BYTES)
         self.assertEqual('latin1', req.charset)
-        self.assertEqual('latin1', req.encoding)
+        # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
+        with patch('pywikibot.warning'):
+            self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.content, CharsetTestCase.STR)
 
@@ -564,7 +573,11 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('utf16',
                                               CharsetTestCase.LATIN1_BYTES)
         self.assertEqual('utf16', req.charset)
-        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.encoding)
+        # Ignore WARNING: Encoding "utf16" requested but "utf-8" received
+        with patch('pywikibot.warning'):
+            self.assertRaisesRegex(
+                UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
+                lambda: req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.content)
 

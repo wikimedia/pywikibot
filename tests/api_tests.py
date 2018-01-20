@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2016
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,6 +18,7 @@ import pywikibot.site
 
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
+    suppress_warnings,
     MediaWikiVersion,
     PY2,
     UnicodeType,
@@ -143,6 +144,9 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
         for item in req.items():
             self.assertEqual(len(item), 2, item)
 
+    @suppress_warnings(
+        'Instead of using kwargs |Both kwargs and parameters are set',
+        DeprecationWarning)
     def test_mixed_mode(self):
         """Test if parameters is used with kwargs."""
         req1 = api.Request(site=self.site, action='test', parameters='foo')
@@ -570,7 +574,7 @@ class TestDryPageGenerator(TestCase):
         mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
                                      generator="links",
-                                     titles="User:R'n'B")
+                                     parameters={'titles': "User:R'n'B"})
         # following test data is copied from an actual api.php response,
         # but that query no longer matches this dataset.
         # http://en.wikipedia.org/w/api.php?action=query&generator=links&titles=User:R%27n%27B

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Bot tests."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,7 +13,7 @@ import pywikibot
 import pywikibot.bot
 
 from pywikibot import i18n
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, suppress_warnings
 
 from tests.aspects import (
     unittest, DefaultSiteTestCase, SiteAttributeTestCase, TestCase,
@@ -222,6 +222,7 @@ class TestDrySiteBot(TestBotTreatExit, SiteAttributeTestCase):
         self.bot.run()
         self.assertEqual(self.bot.site, self._treat_site)
 
+    @suppress_warnings('pywikibot.bot.MultipleSitesBot.site is deprecated')
     def test_MultipleSitesBot(self):
         """Test MultipleSitesBot class."""
         # Assert no specific site

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2014
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -17,8 +17,9 @@ from pywikibot.data.api import (
     QueryGenerator,
 )
 from pywikibot.family import Family
+from pywikibot.tools import suppress_warnings
 
-from tests import join_images_path
+from tests import join_images_path, patch
 from tests.utils import DummySiteinfo
 from tests.aspects import (
     unittest, TestCase, DefaultDrySiteTestCase, SiteAttributeTestCase,
@@ -58,10 +59,11 @@ class DryCachedRequestTests(SiteAttributeTestCase):
             expiry=1, site=self.altsite,
             parameters={'action': 'query', 'meta': 'userinfo'})
         # When using ** the paramters are still unicode
-        self.deprecated_explicit = CachedRequest(
-            expiry=1, site=self.basesite, action='query', meta='userinfo')
-        self.deprecated_asterisks = CachedRequest(
-            expiry=1, site=self.basesite, **self.parms)
+        with suppress_warnings('Instead of using kwargs ', DeprecationWarning):
+            self.deprecated_explicit = CachedRequest(
+                expiry=1, site=self.basesite, action='query', meta='userinfo')
+            self.deprecated_asterisks = CachedRequest(
+                expiry=1, site=self.basesite, **self.parms)
 
     def test_expiry_formats(self):
         """Test using a timedelta as expiry."""
@@ -250,8 +252,9 @@ class DryWriteAssertTests(DefaultDrySiteTestCase):
         site = self.get_site()
         site._userinfo = {'name': 'other_username', 'groups': []}
         site._username[0] = 'myusername'
-
-        Request(site=site, parameters={'action': 'edit'})
+        # Ignore warning: API write action by unexpected username commenced.
+        with patch('pywikibot.warning'):
+            Request(site=site, parameters={'action': 'edit'})
 
     def test_normal(self):
         """Test Request object when username is correct."""
