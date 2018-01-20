@@ -649,7 +649,7 @@ class CosmeticChangesToolkit(object):
             return text
         return textlib.replaceExcept(
             text,
-            r'(?m)^(={1,7}) *(?P<title>[^=]+?) *\1 *\r?\n',
+            r'(?m)^(={1,6})[ \t]*(?P<title>.*[^\s=])[ \t]*\1[ \t]*\r?\n',
             r'\1 \g<title> \1%s' % config.LS,
             ['comment', 'math', 'nowiki', 'pre'])
 

@@ -72,7 +72,7 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
                          self.cct.removeUselessSpaces(' Foo  bar '))
         # tab
         self.assertEqual('Fooooo bar',
-                         self.cct.removeUselessSpaces('Fooooo bar	'))
+                         self.cct.removeUselessSpaces('Fooooo bar\t'))
 
     def test_removeNonBreakingSpaceBeforePercent(self):
         """Test removeNonBreakingSpaceBeforePercent method."""
@@ -83,6 +83,12 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         """Test cleanUpSectionHeaders method."""
         self.assertEqual('=== Header ===\n',
                          self.cct.cleanUpSectionHeaders('===Header===\n'))
+        # tab
+        self.assertEqual('=== Header ===\n',
+                         self.cct.cleanUpSectionHeaders('===Header===\t\n'))
+        # tabs inside
+        self.assertEqual('=== Header ===\n',
+                         self.cct.cleanUpSectionHeaders('===\tHeader\t===\n'))
 
     def test_putSpacesInLists(self):
         """Test putSpacesInLists method."""
