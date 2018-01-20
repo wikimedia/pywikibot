@@ -35,3 +35,5 @@ vcrpy-unittest
 # are not useful on the Appveyor Win32 builds since the relevant UI tests
 # also require accessing the menu of the console window, which doesnt exist
 # in the Appveyor environment.
+
+setuptools_scm ; python_version == '2.6'
