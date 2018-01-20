@@ -27,7 +27,7 @@ The following command line parameters are supported:
 """
 #
 # (C) Multichill, 2008-2011
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,6 +43,7 @@ import pywikibot
 
 from pywikibot import pagegenerators, textlib
 from pywikibot.comms.http import fetch
+from pywikibot.tools import deprecated
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlencode
@@ -293,12 +294,10 @@ def getUsage(use):
 
 def applyAllFilters(categories):
     """Apply all filters on categories."""
-    result = []
     result = filterDisambiguation(categories)
     result = followRedirects(result)
     result = filterBlacklist(result)
     result = filterCountries(result)
-    result = filterParents(result)
     return result
 
 
@@ -370,29 +369,16 @@ def filterCountries(categories):
     return list(set(result))
 
 
+@deprecated
 def filterParents(categories):
-    """Remove all parent categories from the set to prevent overcategorization."""
-    result = []
-    toFilter = u''
-    for cat in categories:
-        cat = cat.replace('_', ' ')
-        toFilter = toFilter + "[[Category:" + cat + "]]\n"
-    parameters = urlencode({'source': toFilter.encode('utf-8'),
-                            'bot': '1'})
-    filterCategoriesRe = re.compile(r'\[\[Category:([^\]]*)\]\]')
-    try:
-        filterCategoriesPage = fetch(
-            "https://toolserver.org/~multichill/filtercats.php?%s" % parameters)
-        result = filterCategoriesRe.findall(
-            filterCategoriesPage.content)
-    except IOError:
-        # Something is wrong, forget about this filter, and return the input
-        return categories
+    """
+    Remove all parent categories from the set to prevent overcategorization.
 
-    if not result:
-        # Is empty, dont want to remove all categories
-        return categories
-    return result
+    DEPRECATED: Toolserver script isn't available anymore (T78462).
+    This method is kept for compatibility and may be restored sometime by a new
+    implementation.
+    """
+    return categories
 
 
 def saveImagePage(imagepage, newcats, usage, galleries, onlyFilter):
