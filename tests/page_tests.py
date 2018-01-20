@@ -1106,16 +1106,16 @@ class TestPermalink(DefaultSiteTestCase):
         p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/permalink')
         self.assertEqual(p1.permalink(),
                          '//test.wikipedia.org/w/index.php?title=User%3A'
-                         'Framawiki/pwb_tests/permalink&oldid=340685')
+                         'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340685')
         self.assertEqual(p1.permalink(oldid='340684'),
                          '//test.wikipedia.org/w/index.php?title=User%3A'
-                         'Framawiki/pwb_tests/permalink&oldid=340684')
+                         'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340684')
         self.assertEqual(p1.permalink(percent_encoded=False),
                          '//test.wikipedia.org/w/index.php?title=User:'
                          'Framawiki/pwb_tests/permalink&oldid=340685')
         self.assertEqual(p1.permalink(with_protocol=True),
                          'https://test.wikipedia.org/w/index.php?title=User%3A'
-                         'Framawiki/pwb_tests/permalink&oldid=340685')
+                         'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340685')
 
 
 if __name__ == '__main__':  # pragma: no cover

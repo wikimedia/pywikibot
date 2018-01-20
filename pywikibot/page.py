@@ -367,7 +367,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             title = title.replace(u' ', u'_')
         if asUrl:
             encodedTitle = title.encode(self.site.encoding())
-            title = quote_from_bytes(encodedTitle)
+            title = quote_from_bytes(encodedTitle, safe='')
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems.
