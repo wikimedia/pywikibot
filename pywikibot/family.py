@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -937,7 +937,7 @@ class Family(object):
         if fam in config.family_files:
             family_file = config.family_files[fam]
 
-            if family_file.startswith('http://') or family_file.startswith('https://'):
+            if family_file.startswith(('http://', 'https://')):
                 myfamily = AutoFamily(fam, family_file)
                 Family._families[fam] = myfamily
                 return Family._families[fam]

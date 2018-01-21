@@ -80,7 +80,7 @@ right parameter.
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1581,7 +1581,7 @@ def main(*args):
                     u'How many files do you want to check?'))
             else:
                 limit = int(arg[7:])
-        if arg.startswith('-sleep') or arg.startswith('-time'):
+        if arg.startswith(('-sleep', '-time')):
             if arg.startswith('-sleep'):
                 length = len('-sleep')
             else:

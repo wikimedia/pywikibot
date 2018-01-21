@@ -259,8 +259,9 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
             # Ignore socket IO warnings (T183696, T184996)
             if (PYTHON_VERSION >= (3, 2)
                     and issubclass(warn_msg.category, ResourceWarning)
-                    and any(str(warn_msg.message).startswith(msg) for msg in (
-                    'unclosed <ssl.SSLSocket', 'unclosed <socket.socket'))):
+                    and str(warn_msg.message).startswith(
+                        ('unclosed <ssl.SSLSocket',
+                         'unclosed <socket.socket'))):
                 return
 
             log.append(warn_msg)

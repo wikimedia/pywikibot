@@ -49,7 +49,7 @@ Delete everything in the category "To delete" without prompting.
     python pwb.py delete -cat:"To delete" -always
 """
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2017-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -267,7 +267,7 @@ def main(*args):
         if not summary:
             un = 'un' if 'undelete' in options else ''
             if pageName:
-                if arg.startswith('-cat') or arg.startswith('-subcats'):
+                if arg.startswith(('-cat', '-subcats')):
                     summary = i18n.twtranslate(mysite, 'delete-from-category',
                                                {'page': pageName})
                 elif arg.startswith('-links'):
