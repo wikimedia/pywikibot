@@ -17,7 +17,6 @@ scripts.maintenance.cache script
     :undoc-members:
     :show-inheritance:
 
-
 scripts.maintenance.colors script
 ---------------------------------
 
@@ -25,7 +24,6 @@ scripts.maintenance.colors script
     :members:
     :undoc-members:
     :show-inheritance:
-
 
 scripts.maintenance.compat2core script
 --------------------------------------
@@ -35,7 +33,6 @@ scripts.maintenance.compat2core script
     :undoc-members:
     :show-inheritance:
 
-
 scripts.maintenance.make_i18n_dict script
 -----------------------------------------
 
@@ -43,7 +40,6 @@ scripts.maintenance.make_i18n_dict script
     :members:
     :undoc-members:
     :show-inheritance:
-
 
 scripts.maintenance.wikimedia_sites script
 ------------------------------------------
