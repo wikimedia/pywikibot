@@ -260,9 +260,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
             if (PYTHON_VERSION >= (3, 2)
                     and issubclass(warn_msg.category, ResourceWarning)
                     and any(str(warn_msg.message).startswith(msg) for msg in (
-                        'unclosed <ssl.SSLSocket', 'unclosed <socket.socket'))
-                    and warn_msg.filename.rpartition('/')[2] in (
-                        'cookiejar.py', 'inspect.py', 'socket.py')):
+                    'unclosed <ssl.SSLSocket', 'unclosed <socket.socket'))):
                 return
 
             log.append(warn_msg)
