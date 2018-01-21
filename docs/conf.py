@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -260,7 +260,7 @@ def pywikibot_script_docstring_fixups(
     if os.path.sep + "scripts" + os.path.sep not in obj.__file__:
         return
     for index, line in enumerate(lines):
-        if line in ('&params;', '&pagegenerators_help;'):
+        if line == '&params;':
             lines[index] = ('This script supports use of '
                             ':py:mod:`pywikibot.pagegenerators` arguments.')
         elif line == '&fixes-help;':
