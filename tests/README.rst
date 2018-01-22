@@ -226,6 +226,10 @@ To enable 'write' tests, set PYWIKIBOT2_TEST_WRITE=1
 Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
 automatically.
 
+Some tests are also using VCR.py, which means that these tests are dry and all
+requests are recorded and used later, being stored in 'tests/cassettes'.
+To avoid using recorded requests and to run live tests set PYWIKIBOT_LIVE_TESTS=1
+
 Decorators
 =====================
 
@@ -271,14 +275,13 @@ Replaces `target` with object specified in `new`. Refer to mock's documentation.
 This is especially useful in tests, where requests to third-parties should be
 avoided.
 
-In Python 3, this is part of the built-in unittest module.
+In Python 3, this is part of the built-in unittest module. But `mock` should
+be installed using pip for Python 2. Import whichever is available from the
+`tests` package.
 
 ::
 
-  if sys.version_info[0] > 2:
-    from unittest.mock import patch
-  else:
-    from mock import patch
+  from tests import patch
 
 
   def fake_ping(url):
@@ -357,3 +360,4 @@ Other class attributes
 - ``user = True`` : test class needs to login to site
 - ``sysop = True`` : test class needs to login to site as a sysop
 - ``write = True`` : test class needs to write to a site
+- ``vcr = True``: test class uses VCR.py to record requests for dry testing

@@ -9,7 +9,7 @@ from __future__ import absolute_import, unicode_literals
 
 from types import FunctionType
 
-import mock
+from tests import mock
 
 from pywikibot.comms.eventstreams import EventStreams
 from pywikibot import config

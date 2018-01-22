@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
 
 import datetime
 import hashlib
@@ -38,8 +36,8 @@ from pywikibot.exceptions import (
     Error, TimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.tools import (
-    MediaWikiVersion, deprecated, itergroup, ip, PY2, getargspec,
-    UnicodeType
+    MediaWikiVersion, deprecated, itergroup, ip, PY2, PYTHON_VERSION,
+    getargspec, UnicodeType
 )
 from pywikibot.tools.formatter import color_format
 
@@ -93,7 +91,7 @@ else:
 _logger = "data.api"
 
 lagpattern = re.compile(
-    r'Waiting for [\w. ]+: (?P<lag>\d+)(?:\.\d+)? seconds? lagged')
+    r'Waiting for [\w.: ]+: (?P<lag>\d+)(?:\.\d+)? seconds? lagged')
 
 
 class APIError(Error):
@@ -298,15 +296,6 @@ class ParamInfo(Container):
             assert 'query' not in self._paraminfo
             self._fetch(set(['query']))
         assert 'query' in self._modules
-
-        _reused_module_names = self._action_modules & self._modules['query']
-
-        # The only name clash in core between actions and query submodules is
-        # action=tokens and actions=query&meta=tokens, and this will warn if
-        # any new ones appear.
-        if _reused_module_names > set(['tokens']):
-            warn('Unexpected overlap between action and query submodules: %s'
-                 % (_reused_module_names - set(['tokens'])), UserWarning)
 
     def _emulate_pageset(self):
         """Emulate the pageset module, which existed in MW 1.15-1.24."""
@@ -2007,7 +1996,7 @@ class Request(MutableMapping):
                             self._params[param] = [str(int(value) // 2)]
                             pywikibot.output(u"Set %s = %s"
                                              % (param, self._params[param]))
-                        except:
+                        except ValueError:
                             pass
                 self.wait()
                 continue
@@ -2251,7 +2240,8 @@ class CachedRequest(Request):
         @return: base directory path for cache entries
         @rtype: basestring
         """
-        path = os.path.join(pywikibot.config2.base_dir, 'apicache')
+        path = os.path.join(pywikibot.config2.base_dir,
+                            'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
         return path
 

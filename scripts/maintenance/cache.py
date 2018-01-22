@@ -304,7 +304,7 @@ def _parse_command(command, name):
     else:
         try:
             return eval('lambda entry: ' + command)
-        except:
+        except Exception:
             pywikibot.exception()
             pywikibot.error(
                 'Cannot compile {0} command: {1}'.format(name, command))

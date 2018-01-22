@@ -9,8 +9,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 import codecs
 import os
 import webbrowser
@@ -283,19 +281,24 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                 else:
                     warn('Invalid password format', _PasswordFileWarning)
 
-    def login(self, retry=False):
+    def login(self, retry=False, autocreate=False):
         """
         Attempt to log into the server.
 
         @param retry: infinitely retry if the API returns an unknown error
         @type retry: bool
 
+        @param autocreate: if true, allow auto-creation of the account
+                           using unified login
+        @type autocreate: bool
+
         @raises NoUsername: Username is not recognised by the site.
         """
         if not self.password:
             # First check that the username exists,
             # to avoid asking for a password that will not work.
-            self.check_user_exists()
+            if not autocreate:
+                self.check_user_exists()
 
             # As we don't want the password to appear on the screen, we set
             # password = True

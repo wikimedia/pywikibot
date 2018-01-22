@@ -99,7 +99,7 @@ Syntax examples:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -360,7 +360,7 @@ class LinkChecker(object):
                 conn.request('HEAD', '/', None, self.header)
                 self.response = conn.getresponse()
                 self.readEncodingFromResponse(self.response)
-            except:
+            except Exception:
                 pass
             if not self.serverEncoding:
                 # TODO: We might also load a page, then check for an encoding
@@ -379,7 +379,7 @@ class LinkChecker(object):
                 charsetR = re.compile('charset=(.+)')
                 charset = charsetR.search(ct).group(1)
                 self.serverEncoding = charset
-            except:
+            except Exception:
                 pass
 
     def changeUrl(self, url):
@@ -442,8 +442,7 @@ class LinkChecker(object):
                 except UnicodeError:
                     redirTarget = redirTarget.decode(
                         self.getEncodingUsedByServer())
-                if redirTarget.startswith('http://') or \
-                   redirTarget.startswith('https://'):
+                if redirTarget.startswith(('http://', 'https://')):
                     self.changeUrl(redirTarget)
                     return True
                 elif redirTarget.startswith('/'):
@@ -605,7 +604,7 @@ class LinkCheckThread(threading.Thread):
             message = i18n.twtranslate(self.page.site,
                                        'weblinkchecker-badurl_msg',
                                        {'URL': self.url})
-        except:
+        except Exception:
             pywikibot.output('Exception while processing URL %s in page %s'
                              % (self.url, self.page.title()))
             raise

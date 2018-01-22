@@ -94,7 +94,7 @@ def _signal_handler(signal, frame):
     if not willstop:
         willstop = True
         print('Received ctrl-c. Finishing current item; '
-              'press ctrl-c again to abort.')  # noqa
+              'press ctrl-c again to abort.')
     else:
         raise KeyboardInterrupt
 

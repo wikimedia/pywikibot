@@ -17,20 +17,43 @@ Magnus Manske at his talk page. Please be very specific in your request
 so he can test at: [[de:Benutzer Diskussion:Magnus Manske]]. You can
 write him in German and English.
 
+Command line options:
+
+&params;
+
+-always      Skip the GUI validation
+
+-setcat:     Set the category of the copied image
+
+-delete      Delete the image after the image has been transferred. This will
+             only work if the user has sysops privileges, otherwise the image
+             will only be marked for deletion.
+
 Examples
 
-Work on a single image
+Work on a single image::
+
  python pwb.py imagecopy.py -page:Image:<imagename>
-Work on the 100 newest images:
+
+Work on the 100 newest images::
+
  python pwb.py imagecopy.py -newimages:100
-Work on all images in a category:<cat>
+
+Work on all images in a category:<cat>::
+
  python pwb.py imagecopy.py -cat:<cat>
-Work on all images which transclude a template
+
+Work on all images which transclude a template::
+
  python pwb.py imagecopy.py -transcludes:<template>
 
-See pagegenerators.py for more ways to get a list of images.
-By default the bot works on your home wiki (set in user-config)
+Work on a single image and deletes the image when the transfer is complete
+(only works if the user has sysops privilege, otherwise it will be marked for
+deletion)::
 
+ python pwb.py imagecopy.py -page:Image:<imagename> -delete
+
+By default the bot works on your home wiki (set in user-config)
 """
 # Based on upload.py by:
 # (C) Rob W.W. Hooft, Andre Engels 2003-2007
@@ -41,7 +64,7 @@ By default the bot works on your home wiki (set in user-config)
 #
 # Another rewrite by:
 # (C) Multichill 2008-2011
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,35 +72,32 @@ from __future__ import absolute_import, unicode_literals
 
 import codecs
 import re
-import socket
 import threading
 import webbrowser
 
 import pywikibot
 
+from requests.exceptions import RequestException
+
 from pywikibot import pagegenerators, config, i18n
 
+from pywikibot.comms.http import fetch
+
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import PY2
 
 from scripts import image
 
-if not PY2:
-    import tkinter as Tkinter
-
-    from urllib.parse import urlencode
-    from urllib.request import urlopen
-else:
-    import Tkinter
-
-    from urllib import urlencode, urlopen
-
 try:
-    from pywikibot.userinterfaces.gui import Tkdialog
+    from pywikibot.userinterfaces.gui import Tkdialog, Tkinter
 except ImportError as _tk_error:
+    Tkinter = _tk_error
     Tkdialog = object
 
-NL = ''
+# This is required for the text that is shown when you run this script
+# with the parameter -help.
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp
+}
 
 nowCommonsTemplate = {
     '_default': u'{{NowCommons|%s}}',
@@ -191,18 +211,27 @@ moveToCommonsTemplate = {
 
 
 def pageTextPost(url, parameters):
-    """Get data from commons helper page."""
+    """
+    Get data from commons helper page.
+
+    @param url: This parameter is not used here, we keep it here to avoid user
+                scripts from breaking.
+    @param parameters: Data that will be submitted to CommonsHelper.
+    @type parameters: dict
+    @return: A CommonHelper description message.
+    @rtype: str
+    """
     gotInfo = False
     while not gotInfo:
         try:
-            commonsHelperPage = urlopen(
-                "http://tools.wmflabs.org/commonshelper/index.php", parameters)
-            data = commonsHelperPage.read().decode('utf-8')
+            commonsHelperPage = fetch(
+                'https://tools.wmflabs.org/commonshelper/',
+                method='POST',
+                data=parameters)
+            data = commonsHelperPage.data.content.decode('utf-8')
             gotInfo = True
-        except IOError:
-            pywikibot.output(u'Got an IOError, let\'s try again')
-        except socket.timeout:
-            pywikibot.output(u'Got a timeout, let\'s try again')
+        except RequestException:
+            pywikibot.output("Got a RequestException, let's try again")
     return data
 
 
@@ -210,11 +239,13 @@ class imageTransfer(threading.Thread):
 
     """Facilitate transfer of image/file to commons."""
 
-    def __init__(self, imagePage, newname, category):
+    def __init__(self, imagePage, newname, category, delete_after_done=False):
         """Constructor."""
         self.imagePage = imagePage
+        self.image_repo = imagePage.site.image_repository()
         self.newname = newname
         self.category = category
+        self.delete_after_done = delete_after_done
         threading.Thread.__init__(self)
 
     def run(self):
@@ -231,7 +262,6 @@ class imageTransfer(threading.Thread):
                   'doit': 'Uitvoeren'
                   }
 
-        tosend = urlencode(tosend)
         pywikibot.output(tosend)
         CH = pageTextPost('http://tools.wmflabs.org/commonshelper/index.php',
                           tosend)
@@ -258,11 +288,11 @@ class imageTransfer(threading.Thread):
         bot = UploadRobot(url=self.imagePage.fileUrl(), description=CH,
                           useFilename=self.newname, keepFilename=True,
                           verifyDescription=False, ignoreWarning=True,
-                          targetSite=pywikibot.Site('commons', 'commons'))
+                          targetSite=self.image_repo)
         bot.run()
 
         # Should check if the image actually was uploaded
-        if pywikibot.Page(pywikibot.Site('commons', 'commons'),
+        if pywikibot.Page(self.image_repo,
                           u'Image:' + self.newname).exists():
             # Get a fresh copy, force to get the page so we dont run into edit
             # conflicts
@@ -294,21 +324,27 @@ class imageTransfer(threading.Thread):
             self.gen = pagegenerators.FileLinksGenerator(self.imagePage)
             self.preloadingGen = pagegenerators.PreloadingGenerator(self.gen)
 
+            moveSummary = i18n.twtranslate(
+                self.imagePage.site,
+                'commons-file-moved',
+                {'localfile': self.imagePage.title(withNamespace=False),
+                 'commonsfile': self.newname})
+
             # If the image is uploaded under a different name, replace all
             # instances
             if self.imagePage.title(withNamespace=False) != self.newname:
-                moveSummary = i18n.twtranslate(
-                    self.imagePage.site,
-                    'commons-file-moved',
-                    {'localfile': self.imagePage.title(withNamespace=False),
-                     'commonsfile': self.newname})
-
                 imagebot = image.ImageRobot(
                     generator=self.preloadingGen,
                     oldImage=self.imagePage.title(withNamespace=False),
                     newImage=self.newname,
                     summary=moveSummary, always=True, loose=True)
                 imagebot.run()
+
+            # If the user want to delete the page and
+            # the user has sysops privilege, delete the page, otherwise
+            # it will be marked for deletion.
+            if self.delete_after_done:
+                self.imagePage.delete(moveSummary, False)
         return
 
     def fixAuthor(self, pageText):
@@ -362,6 +398,10 @@ class TkdialogIC(Tkdialog):
     def __init__(self, image_title, content, uploader, url, templates,
                  commonsconflict=0):
         """Constructor."""
+        # Check if `Tkinter` wasn't imported
+        if isinstance(Tkinter, ImportError):
+            raise Tkinter
+
         super(TkdialogIC, self).__init__()
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
@@ -460,6 +500,7 @@ def main(*args):
     imagepage = None
     always = False
     category = u''
+    delete_after_done = False
     # Load a lot of default generators
     local_args = pywikibot.handle_args(args)
     genFactory = pagegenerators.GeneratorFactory()
@@ -467,8 +508,10 @@ def main(*args):
     for arg in local_args:
         if arg == '-always':
             always = True
-        elif arg.startswith('-cc:'):
-            category = arg[len('-cc:'):]
+        elif arg.startswith('-setcat:'):
+            category = arg[len('-setcat:'):]
+        elif arg == '-delete':
+            delete_after_done = True
         else:
             genFactory.handleArg(arg)
 
@@ -507,7 +550,8 @@ def main(*args):
                         # Do the TkdialogIC to accept/reject and change te name
                         (newname, skip) = TkdialogIC(
                             imagepage.title(withNamespace=False),
-                            imagepage.get(), username, imagepage.permalink(),
+                            imagepage.get(), username,
+                            imagepage.permalink(with_protocol=True),
                             imagepage.templates()).getnewname()
 
                         if skip:
@@ -523,7 +567,7 @@ def main(*args):
 
                         # Check if the image already exists
                         CommonsPage = pywikibot.Page(
-                            pywikibot.Site('commons', 'commons'),
+                            imagepage.site.image_repository(),
                             u'File:' + newname)
                         if not CommonsPage.exists():
                             break
@@ -535,7 +579,8 @@ def main(*args):
                         # the start of the loop
 
             if not skip:
-                imageTransfer(imagepage, newname, category).start()
+                imageTransfer(imagepage, newname, category,
+                              delete_after_done).start()
 
     pywikibot.output('Still ' + str(threading.activeCount()) +
                      ' active threads, lets wait')

@@ -12,14 +12,11 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import hashlib
 import logging
@@ -370,7 +367,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             title = title.replace(u' ', u'_')
         if asUrl:
             encodedTitle = title.encode(self.site.encoding())
-            title = quote_from_bytes(encodedTitle)
+            title = quote_from_bytes(encodedTitle, safe='')
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems.
@@ -541,21 +538,26 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # TODO: what about redirects, errors?
         return self._revisions[oldid].text
 
-    def permalink(self, oldid=None, percent_encoded=True):
+    def permalink(self, oldid=None, percent_encoded=True, with_protocol=False):
         """Return the permalink URL of an old revision of this page.
 
         @param oldid: The revid of the revision desired.
+        @param percent_encoded: if false, the link will be provided
+            without title uncoded.
+        @param with_protocol: if true, http or https prefixes will be
+            included before the double slash.
         @rtype: unicode
         """
         if percent_encoded:
             title = self.title(asUrl=True)
         else:
             title = self.title(asUrl=False).replace(' ', '_')
-        return "//%s%s/index.php?title=%s&oldid=%s" \
-               % (self.site.hostname(),
-                  self.site.scriptpath(),
-                  title,
-                  (oldid if oldid is not None else self.latest_revision_id))
+        return '{0}//{1}{2}/index.php?title={3}&oldid={4}'.format(
+            self.site.protocol() + ':' if with_protocol else '',
+            self.site.hostname(),
+            self.site.scriptpath(),
+            title,
+            oldid if oldid is not None else self.latest_revision_id)
 
     @property
     def latest_revision_id(self):
@@ -2513,7 +2515,7 @@ class FilePage(Page):
             return False
         elif 'wikitravel_shared' in self.site.shared_image_repository():
             return self.latest_file_info.url.startswith(
-                u'http://wikitravel.org/upload/shared/')
+                'https://wikitravel.org/upload/shared/')
         else:
             return self.latest_file_info.url.startswith(
                 'https://upload.wikimedia.org/wikipedia/commons/')
@@ -2703,6 +2705,7 @@ class FilePage(Page):
         @rtype: generator
         """
         return self.site.globalusage(self, total=total)
+
 
 wrapper = _ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('ImagePage', FilePage)
@@ -3182,7 +3185,8 @@ class User(Page):
         @rtype: bool
         """
         # T135828: the registration timestamp may be None but the key exists
-        return 'registration' in self.getprops(force)
+        return (not self.isAnonymous()
+                and 'registration' in self.getprops(force))
 
     def isAnonymous(self):
         """
@@ -3237,6 +3241,8 @@ class User(Page):
 
         @rtype: pywikibot.Timestamp or None
         """
+        if self.isAnonymous():
+            return None
         reg = self.getprops(force).get('registration')
         if reg:
             return pywikibot.Timestamp.fromISOformat(reg)
@@ -3274,7 +3280,7 @@ class User(Page):
 
         @rtype: bool
         """
-        return 'emailable' in self.getprops(force)
+        return (not self.isAnonymous() and 'emailable' in self.getprops(force))
 
     def groups(self, force=False):
         """
@@ -3297,6 +3303,8 @@ class User(Page):
         @return: return 'male', 'female', or 'unknown'
         @rtype: str
         """
+        if self.isAnonymous():
+            return 'unknown'
         return self.getprops(force).get('gender', 'unknown')
 
     def rights(self, force=False):
@@ -3522,6 +3530,8 @@ class User(Page):
         @rtype: bool
         """
         if self.isAnonymous():
+            return False
+        if not self.isRegistered():
             return False
         if 'bot' in self.groups():
             return False
@@ -4917,10 +4927,10 @@ class Claim(Property):
         """Set the rank of the Claim."""
         self.rank = rank
 
-    def changeRank(self, rank):
+    def changeRank(self, rank, **kwargs):
         """Change the rank of the Claim and save."""
         self.rank = rank
-        return self.repo.save_claim(self)
+        return self.repo.save_claim(self, **kwargs)
 
     def changeSnakType(self, value=None, **kwargs):
         """
@@ -5977,6 +5987,5 @@ def url2unicode(title, encodings='utf-8'):
         except UnicodeError as ex:
             if not firstException:
                 firstException = ex
-            pass
     # Couldn't convert, raise the original exception
     raise firstException

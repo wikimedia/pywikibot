@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
-#
 
 import codecs
 import os

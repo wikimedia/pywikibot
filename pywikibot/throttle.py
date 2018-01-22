@@ -7,9 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import math
 import threading
 import time
@@ -89,9 +86,7 @@ class Throttle(object):
             try:
                 f = open(self.ctrlfilename, 'r')
             except IOError:
-                if not pid:
-                    pass
-                else:
+                if pid:
                     raise
             else:
                 now = time.time()

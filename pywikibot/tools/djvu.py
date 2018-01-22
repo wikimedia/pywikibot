@@ -8,8 +8,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import os
 import re
 import subprocess
@@ -123,7 +121,7 @@ class DjVuFile(object):
         """Deprecated file_djvu instance variable."""
         return self.file
 
-    def check_cache(fn):  # flake8: disable=N805
+    def check_cache(fn):  # noqa: N805
         """Decorator to check if cache shall be cleared."""
         cache = ['_page_count', '_has_text', '_page_info']
 
@@ -136,7 +134,7 @@ class DjVuFile(object):
             return _res
         return wrapper
 
-    def check_page_number(fn):  # flake8: disable=N805
+    def check_page_number(fn):  # noqa: N805
         """Decorator to check if page number is valid.
 
         @raises ValueError

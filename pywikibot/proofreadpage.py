@@ -24,8 +24,6 @@ inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 from functools import partial
 import json
 import re
@@ -271,7 +269,7 @@ class ProofreadPage(pywikibot.Page):
             return self._quality
         return self.ql
 
-    def decompose(fn):  # flake8: disable=N805
+    def decompose(fn):  # noqa: N805
         """Decorator.
 
         Decompose text if needed and recompose text.
@@ -532,12 +530,12 @@ class ProofreadPage(pywikibot.Page):
             soup = Soup(response.content)
 
             try:
-                # None if nothing is found by .find()
                 self._url_image = soup.find(class_='prp-page-image')
+                # if None raises AttributeError
                 self._url_image = self._url_image.find('img')
                 # if None raises TypeError.
                 self._url_image = self._url_image['src']
-            except TypeError:
+            except (TypeError, AttributeError):
                 raise ValueError('No prp-page-image src found for %s.' % self)
             else:
                 self._url_image = 'https:' + self._url_image
@@ -704,7 +702,7 @@ class IndexPage(pywikibot.Page):
 
         self._cached = False
 
-    def check_if_cached(fn):  # flake8: disable=N805
+    def check_if_cached(fn):  # noqa: N805
         """Decorator to check if data are cached and cache them if needed."""
         def wrapper(self, *args, **kwargs):
             if self._cached is False:

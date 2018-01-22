@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 
-__version__ = '$Id$'
-
 
 # The Wikimedia family that is known as Wikibooks
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -41,8 +39,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'vi', 'th', 'ca', 'fi', 'id', 'sq', 'fa', 'zh', 'ru', 'az', 'cs',
             'sv', 'da', 'hr', 'sr', 'tr', 'ko', 'ar', 'no', 'gl', 'ba', 'ro',
             'ta', 'tl', 'mk', 'is', 'uk', 'sa', 'hi', 'ka', 'lt', 'sk', 'tt',
-            'eo', 'el', 'bg', 'li', 'bn', 'hy', 'si', 'ms', 'sl', 'ur', 'la',
-            'ml', 'km', 'ia', 'et', 'cv', 'mr', 'kk', 'oc', 'eu', 'be', 'pa',
+            'eo', 'el', 'bg', 'bn', 'li', 'hy', 'si', 'ms', 'sl', 'ur', 'la',
+            'ml', 'km', 'ia', 'et', 'cv', 'mr', 'eu', 'kk', 'oc', 'be', 'pa',
             'ne', 'fy', 'tg', 'te', 'af', 'ku', 'ky', 'bs', 'mg', 'cy',
         ]
 

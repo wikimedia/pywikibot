@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-
 
 import difflib
 import math
@@ -610,7 +607,7 @@ def html_comparator(compare_string):
     from bs4 import BeautifulSoup
 
     comparands = {'deleted-context': [], 'added-context': []}
-    soup = BeautifulSoup(compare_string)
+    soup = BeautifulSoup(compare_string, 'html.parser')
     for change_type, css_class in (('deleted-context', 'diff-deletedline'),
                                    ('added-context', 'diff-addedline')):
         crutons = soup.find_all('td', class_=css_class)

@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, add_full_name, remove_last_args
 )
+
 from tests.aspects import unittest, DeprecationTestCase
 
 

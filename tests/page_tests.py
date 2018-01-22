@@ -10,10 +10,6 @@ from __future__ import absolute_import, unicode_literals
 
 import pickle
 import re
-try:
-    import unittest.mock as mock
-except ImportError:
-    import mock
 
 import pywikibot
 import pywikibot.page
@@ -32,6 +28,7 @@ from tests.aspects import (
     unittest, TestCase, DefaultSiteTestCase, SiteAttributeTestCase,
     DefaultDrySiteTestCase, DeprecationTestCase,
 )
+from tests import mock
 
 
 EMPTY_TITLE_RE = r'Title must be specified and not empty if source is a Site\.'
@@ -1095,6 +1092,30 @@ class HtmlEntity(TestCase):
         self.assertEqual(pywikibot.page.html2unicode('A&#7f;O'), 'A&#7f;O')
         self.assertEqual(pywikibot.page.html2unicode('&#7f'), '&#7f')
         self.assertEqual(pywikibot.page.html2unicode('&#x70&#x79;'), '&#x70y')
+
+
+class TestPermalink(DefaultSiteTestCase):
+    """Test that permalink links are correct."""
+
+    family = 'test'
+    code = 'test'
+
+    def test_permalink(self):
+        """Test permalink function."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/permalink')
+        self.assertEqual(p1.permalink(),
+                         '//test.wikipedia.org/w/index.php?title=User%3A'
+                         'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340685')
+        self.assertEqual(p1.permalink(oldid='340684'),
+                         '//test.wikipedia.org/w/index.php?title=User%3A'
+                         'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340684')
+        self.assertEqual(p1.permalink(percent_encoded=False),
+                         '//test.wikipedia.org/w/index.php?title=User:'
+                         'Framawiki/pwb_tests/permalink&oldid=340685')
+        self.assertEqual(p1.permalink(with_protocol=True),
+                         'https://test.wikipedia.org/w/index.php?title=User%3A'
+                         'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340685')
 
 
 if __name__ == '__main__':  # pragma: no cover

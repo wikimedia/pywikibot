@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 
-__version__ = '$Id$'
-
 
 # The Wikimedia family that is known as Wikiversity
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -22,7 +20,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'de', 'en', 'fr', 'ru', 'it', 'cs', 'beta', 'pt', 'es', 'ar', 'sv',
+            'de', 'en', 'fr', 'ru', 'it', 'cs', 'pt', 'beta', 'es', 'ar', 'sv',
             'fi', 'sl', 'el', 'hi', 'ja', 'ko',
         ]
 

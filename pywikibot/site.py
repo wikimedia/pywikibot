@@ -12,9 +12,6 @@ groups of wikis on the same topic in different languages.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import copy
 import datetime
 import functools
@@ -2038,10 +2035,18 @@ class APISite(BaseSite):
         auth_token = get_authentication(self.base_url(''))
         return auth_token is not None and len(auth_token) == 4
 
-    def login(self, sysop=False):
+    def login(self, sysop=False, autocreate=False):
         """
         Log the user in if not already logged in.
 
+        @param sysop: if true, log in with the sysop account.
+        @type sysop: bool
+
+        @param autocreate: if true, allow auto-creation of the account
+                           using unified login
+        @type autocreate: bool
+
+        @raises NoUsername: Username is not recognised by the site.
         U{https://www.mediawiki.org/wiki/API:Login}
         """
         # TODO: this should include an assert that loginstatus
@@ -2075,20 +2080,34 @@ class APISite(BaseSite):
         # May occur if you are not logged in (no API read permissions).
         except api.APIError:
             pass
+        except NoUsername as e:
+            if not autocreate:
+                raise e
+
         if self.is_oauth_token_available():
             if sysop:
                 raise NoUsername('No sysop is permitted with OAuth')
             elif self.userinfo['name'] != self._username[sysop]:
-                raise NoUsername('Logged in on %(site)s via OAuth as '
-                                 '%(wrong)s, but expect as %(right)s'
-                                 % {'site': self,
-                                    'wrong': self.userinfo['name'],
-                                    'right': self._username[sysop]})
+                if self._username == [None, None]:
+                    raise NoUsername('No username has been defined in your '
+                                     'user-config.py: you have to add in this '
+                                     'file the following line:\n'
+                                     "usernames['{family}']['{lang}'] "
+                                     "= '{username}'"
+                                     .format(family=self.family,
+                                             lang=self.lang,
+                                             username=self.userinfo['name']))
+                else:
+                    raise NoUsername('Logged in on {site} via OAuth as '
+                                     '{wrong}, but expect as {right}'
+                                     .format(site=self,
+                                             wrong=self.userinfo['name'],
+                                             right=self._username[sysop]))
             else:
                 raise NoUsername('Logging in on %s via OAuth failed' % self)
         loginMan = api.LoginManager(site=self, sysop=sysop,
                                     user=self._username[sysop])
-        if loginMan.login(retry=True):
+        if loginMan.login(retry=True, autocreate=autocreate):
             self._username[sysop] = loginMan.username
             self.getuserinfo(force=True)
             self._loginstatus = (LoginStatus.AS_SYSOP
@@ -3345,7 +3364,14 @@ class APISite(BaseSite):
             next_prio = 0
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
-            if len(pageids) == len(sublist):
+
+            parameter = self._paraminfo.parameter('query+info', 'prop')
+            if self.logged_in() and self.has_right('apihighlimits'):
+                max_ids = int(parameter['highlimit'])
+            else:
+                max_ids = int(parameter['limit'])  # T78333, T161783
+
+            if len(pageids) == len(sublist) and len(set(pageids)) <= max_ids:
                 # only use pageids if all pages have them
                 rvgen.request['pageids'] = set(pageids)
             else:
@@ -4924,7 +4950,7 @@ class APISite(BaseSite):
             'users', ususers=usernames, site=self, usprop=usprop)
         return usgen
 
-    @deprecated("Site.randompages()")
+    @deprecated('Site.randompages(total=1)')
     def randompage(self, redirect=False):
         """
         DEPRECATED.
@@ -4934,7 +4960,7 @@ class APISite(BaseSite):
         """
         return self.randompages(total=1, redirects=redirect)
 
-    @deprecated("Site.randompages()")
+    @deprecated("Site.randompages(total=1, redirects=True)")
     def randomredirectpage(self):
         """
         DEPRECATED: Use Site.randompages() instead.
@@ -4956,17 +4982,34 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param redirects: if True, include only redirect pages in results
-            (default: include only non-redirects)
+        @param redirects: if True, include only redirect pages in results,
+            False does not include redirects and None (MW 1.26+) include both
+            types. (default: False)
+        @type redirects: bool or None
         @param content: if True, load the current content of each iterated page
             (default False)
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
+        @raises AssertError: unsupported redirects parameter
         """
+        mapping = {False: None, True: 'redirects', None: 'all'}
+        assert redirects in mapping
+        redirects = mapping[redirects]
+        params = {}
+        if redirects is not None:
+            if MediaWikiVersion(self.version()) < MediaWikiVersion('1.26'):
+                if redirects == 'all':
+                    warn("parameter redirects=None to retrieve 'all' random"
+                         'page types is not supported by mw version {0}. '
+                         'Using default.'.format(self.version()),
+                         UserWarning)
+                params['grnredirect'] = redirects == 'redirects'
+            else:
+                params['grnfilterredir'] = redirects
         rngen = self._generator(api.PageGenerator, type_arg="random",
                                 namespaces=namespaces, total=total,
-                                g_content=content, grnredirect=redirects)
+                                g_content=content, **params)
         return rngen
 
     # Catalog of editpage error codes, for use in generating messages.
@@ -6119,7 +6162,7 @@ class APISite(BaseSite):
                                       3)
         if isinstance(ignore_warnings, Iterable):
             ignored_warnings = ignore_warnings
-            ignore_warnings = lambda warnings: all(  # flake8: disable=E731
+            ignore_warnings = lambda warnings: all(  # noqa: E731
                 w.code in ignored_warnings for w in warnings)
         ignore_all_warnings = not callable(ignore_warnings) and ignore_warnings
         if text is None:

@@ -9,12 +9,11 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import codecs
 import datetime
+import json
 import os
+import socket
 import subprocess
 import sys
 import time
@@ -36,7 +35,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, PY2
+from pywikibot.tools import deprecated, PY2, PYTHON_VERSION
 
 if not PY2:
     basestring = (str, )
@@ -53,6 +52,18 @@ class ParseError(Exception):
 def _get_program_dir():
     _program_dir = os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
     return _program_dir
+
+
+def get_toolforge_hostname():
+    """Get hostname of the current Toolforge host.
+
+    @return: The hostname of the currently running host,
+             if it is in Wikimedia Toolforge; otherwise return None.
+    @rtype: str or None
+    """
+    if socket.getfqdn().endswith('.tools.eqiad.wmflabs'):
+        return socket.gethostname()
+    return None
 
 
 def getversion(online=True):
@@ -355,7 +366,7 @@ def getversion_package(path=None):  # pylint: disable=unused-argument
         - hash (git hash for the current revision of 'pywikibot/__init__.py')
     @rtype: C{tuple} of four C{str}
     """
-    hsh = get_module_version(pywikibot)
+    hsh = ''
     date = get_module_mtime(pywikibot).timetuple()
 
     tag = 'pywikibot/__init__.py'
@@ -364,19 +375,17 @@ def getversion_package(path=None):  # pylint: disable=unused-argument
     return (tag, rev, date, hsh)
 
 
-def getversion_onlinerepo(repo=None):
-    """Retrieve current framework revision number from online repository.
-
-    @param repo: (optional) Online repository location
-    @type repo: URL or string
-    """
+def getversion_onlinerepo():
+    """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
 
-    url = repo or 'https://git.wikimedia.org/feed/pywikibot/core'
+    url = 'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/branches/master'
+    # Gerrit API responses include )]}' at the beginning, make sure to strip it out
     buf = http.fetch(uri=url,
-                     headers={'user-agent': '{pwb}'}).content.splitlines()
+                     headers={'user-agent': '{pwb}'}).content[4:]
+
     try:
-        hsh = buf[13].split('/')[5][:-1]
+        hsh = json.loads(buf)['revision']
         return hsh
     except Exception as e:
         raise ParseError(repr(e) + ' while parsing ' + repr(buf))
@@ -405,7 +414,7 @@ def getfileversion(filename):
                 if line.find('__version__') == 0:
                     try:
                         exec(line)
-                    except:
+                    except Exception:
                         pass
                     break
         stat = os.stat(fn)
@@ -444,6 +453,8 @@ def get_module_filename(module):
     """
     if hasattr(module, '__file__') and os.path.exists(module.__file__):
         filename = module.__file__
+        if PYTHON_VERSION < (3, 4):
+            filename = os.path.abspath(filename)
         if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
             filename = filename[:-1]
         program_dir = _get_program_dir()

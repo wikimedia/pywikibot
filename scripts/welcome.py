@@ -204,7 +204,6 @@ logbook = {
     'nl': u'Project:Logboek welkom',
     'no': u'Project:Velkomstlogg',
     'sq': u'Project:Tung log',
-    'sr': u'Project:Добродошлице',
     'zh': u'User:Welcomebot/欢迎日志',
     'commons': u'Project:Welcome log',
 }
@@ -224,6 +223,7 @@ netext = {
         'fr': u'{{subst:Discussion Projet:Aide/Bienvenue}} %s',
         'ga': u'{{subst:fáilte}} %s',
         'he': u'{{ס:ברוך הבא}} %s',
+        'hr': '{{subst:dd}} %s',
         'id': u'{{subst:sdbot2}}\n%s',
         'it': u'<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n%s',
         'ja': u'{{subst:Welcome/intro}}\n{{subst:welcome|%s}}',
@@ -748,10 +748,8 @@ class WelcomeBot(object):
                             if self.site.family.name != 'wikinews':
                                 welcome_text = (welcome_text
                                                 % choice(self.defineSign()))
-                            if self.site.family.name == 'wiktionary' and \
-                               self.site.code == 'it':
-                                pass
-                            else:
+                            if self.site.family.name != 'wiktionary' or \
+                               self.site.code != 'it':
                                 welcome_text += timeselected
                         elif (self.site.family.name != 'wikinews' and
                               self.site.code != 'it'):

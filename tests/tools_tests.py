@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2016
+# (C) Pywikibot team, 2016-2017
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -15,21 +15,14 @@ import subprocess
 import tempfile
 import warnings
 
-try:
-    import mock
-except ImportError as e:
-    mock = e
-
 from pywikibot import tools
 from pywikibot.tools import classproperty
 
-from tests import join_xml_data_path
-
+from tests import join_xml_data_path, mock
 from tests.aspects import (
     unittest, require_modules, DeprecationTestCase, TestCase, MetaTestCaseClass
 )
-
-from tests.utils import expected_failure_if, add_metaclass
+from tests.utils import add_metaclass
 
 
 class ContextManagerWrapperTestCase(TestCase):
@@ -573,10 +566,10 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.strs, container=deduped, key=hash)
         self._test_dedup_str(deduped, deduper, hash)
 
-    @expected_failure_if(not tools.PY2)
+    @unittest.skipIf(not tools.PY2,
+                     'str in Py3 behave like objects and id as key fails')
     def test_str_id(self):
-        """Test str using id as key fails on Python 3."""
-        # str in Python 3 behave like objects.
+        """Test str using id as key."""
         deduped = set()
         deduper = tools.filter_unique(self.strs, container=deduped, key=id)
         self._test_dedup_str(deduped, deduper, id)
@@ -710,7 +703,6 @@ class TestPythonArgSpec(TestArgSpec):
             return inspect.getargspec(method)
 
 
-@require_modules('mock')
 class TestFileModeChecker(TestCase):
 
     """Test parsing password files."""
@@ -828,7 +820,7 @@ class Foo(object):
     _bar = 'baz'
 
     @classproperty
-    def bar(cls):  # flake8: disable=N805
+    def bar(cls):  # noqa: N805
         """Class property method."""
         return cls._bar
 

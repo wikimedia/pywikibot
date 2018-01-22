@@ -16,6 +16,11 @@ Furthermore, the following command line parameters are supported:
                   the page selector. If no summary is supplied or couldn't
                   determine one from the selector it'll ask for one.
 
+-expiry:          Supply a custom protection expiry, which defaults to
+                  indefinite. Any string understandable by MediaWiki, including
+                  relative and absolute, is acceptable. See:
+                  https://www.mediawiki.org/wiki/API:Protect#Parameters
+
 -unprotect        Acts like "default:all"
 
 -default:         Sets the default protection level (default 'sysop'). If no
@@ -84,6 +89,7 @@ class ProtectionRobot(SingleSiteBot):
         """
         self.availableOptions.update({
             'summary': None,
+            'expiry': None,
         })
         super(ProtectionRobot, self).__init__(site=site, **kwargs)
         self.generator = generator
@@ -104,6 +110,7 @@ class ProtectionRobot(SingleSiteBot):
         protections = dict(
             prot for prot in self.protections.items() if prot[0] in applicable)
         page.protect(reason=self.getOption('summary'),
+                     expiry=self.getOption('expiry'),
                      protections=protections)
 
 
@@ -177,6 +184,12 @@ def main(*args):
                 options['summary'] = None
             else:
                 options['summary'] = arg[len('-summary:'):]
+        elif arg.startswith('-expiry'):
+            if len(arg) == len('-expiry'):
+                options['expiry'] = pywikibot.input(
+                    'Enter a protection expiry:')
+            else:
+                options['expiry'] = arg[len('-expiry:'):]
         elif arg.startswith('-images'):
             pywikibot.output(color_format(
                 '\n{lightred}-image option is deprecated. '

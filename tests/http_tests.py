@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for http module."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,10 +19,11 @@ from pywikibot import config2 as config
 from pywikibot.comms import http, threadedhttp
 from pywikibot.tools import (
     PYTHON_VERSION,
+    suppress_warnings,
     UnicodeType as unicode,
 )
 
-from tests import join_images_path
+from tests import join_images_path, patch
 from tests.aspects import (
     unittest,
     TestCase,
@@ -123,8 +124,12 @@ class TestGetAuthenticationConfig(TestCase):
             'https://wmflabs.org': None,
             'https://www.wikiquote.org/': None,
         }
-        for url, auth in pairs.items():
-            self.assertEqual(http.get_authentication(url), auth)
+        with suppress_warnings(
+            r'config.authenticate\["\*.wmflabs.org"] has invalid value.',
+            UserWarning,
+        ):
+            for url, auth in pairs.items():
+                self.assertEqual(http.get_authentication(url), auth)
 
 
 class HttpsCertificateTestCase(TestCase):
@@ -483,6 +488,49 @@ class CharsetTestCase(TestCase):
         self.assertIsNone(req.charset)
         self.assertEqual('utf-8', req.encoding)
 
+    def test_content_type_xml_without_charset(self):
+        """Test decoding without explicit charset but xml content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = CharsetTestCase.UTF8_BYTES[:]
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('utf-8', req.encoding)
+
+    def test_content_type_xml_with_charset(self):
+        """Test xml content with utf-8 encoding given in content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = '<?xml version="1.0" encoding="UTF-8"?>'.encode(
+            'utf-8')
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('UTF-8', req.encoding)
+
+    def test_content_type_xml_with_charset_and_more_data(self):
+        """Test xml content with utf-8 encoding given in content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = '<?xml version="1.0" encoding="UTF-8" someparam="ignored"?>'.encode(
+            'utf-8')
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('UTF-8', req.encoding)
+
+    def test_content_type_xml_with_variant_charset(self):
+        """Test xml content with latin1 encoding given in content."""
+        req = CharsetTestCase._create_request()
+        resp = requests.Response()
+        req._data = resp
+        resp._content = "<?xml version='1.0' encoding='latin1'?>".encode(
+            'latin1')
+        resp.headers = {'content-type': 'text/xml'}
+        self.assertIsNone(req.charset)
+        self.assertEqual('latin1', req.encoding)
+
     def test_server_charset(self):
         """Test decoding with server explicit charset."""
         req = CharsetTestCase._create_request()
@@ -503,7 +551,9 @@ class CharsetTestCase(TestCase):
         """Test decoding with different charsets and valid header charset."""
         req = CharsetTestCase._create_request('latin1')
         self.assertEqual('latin1', req.charset)
-        self.assertEqual('utf-8', req.encoding)
+        # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
+        with patch('pywikibot.warning'):
+            self.assertEqual('utf-8', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
         self.assertEqual(req.content, CharsetTestCase.STR)
 
@@ -512,7 +562,9 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('latin1',
                                               CharsetTestCase.LATIN1_BYTES)
         self.assertEqual('latin1', req.charset)
-        self.assertEqual('latin1', req.encoding)
+        # Ignore WARNING: Encoding "latin1" requested but "utf-8" received
+        with patch('pywikibot.warning'):
+            self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertEqual(req.content, CharsetTestCase.STR)
 
@@ -521,7 +573,11 @@ class CharsetTestCase(TestCase):
         req = CharsetTestCase._create_request('utf16',
                                               CharsetTestCase.LATIN1_BYTES)
         self.assertEqual('utf16', req.charset)
-        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.encoding)
+        # Ignore WARNING: Encoding "utf16" requested but "utf-8" received
+        with patch('pywikibot.warning'):
+            self.assertRaisesRegex(
+                UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
+                lambda: req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
         self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.content)
 

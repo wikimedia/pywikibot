@@ -7,15 +7,11 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-try:
-    from unittest.mock import patch, Mock
-except ImportError:
-    from mock import patch, Mock
-
 from pywikibot import BaseSite
 
 from scripts.category import CategoryMoveRobot
 
+from tests import patch, Mock
 from tests.aspects import unittest, DefaultSiteTestCase
 
 

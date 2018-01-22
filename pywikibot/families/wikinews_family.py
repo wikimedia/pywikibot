@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 
-__version__ = '$Id$'
-
 
 # The Wikimedia family that is known as Wikinews
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -28,7 +26,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'sr', 'en', 'fr', 'ru', 'de', 'pt', 'pl', 'es', 'it', 'zh', 'cs',
-            'nl', 'ar', 'ca', 'el', 'ta', 'sv', 'fa', 'uk', 'ro', 'tr', 'ja',
+            'ar', 'ca', 'el', 'ta', 'nl', 'sv', 'uk', 'fa', 'ro', 'tr', 'ja',
             'sq', 'no', 'eo', 'fi', 'bs', 'he', 'ko', 'bg',
         ]
 

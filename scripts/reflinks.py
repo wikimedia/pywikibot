@@ -12,15 +12,12 @@ link in the reference, i.e.
 The bot checks every 20 edits a special stop page. If the page has been edited,
 it stops.
 
-DumZiBoT is running that script on en: & fr: at every new dump, running it on
-de: is not allowed anymore.
+Warning: Running this script on German Wikipedia is not allowed anymore.
 
 As it uses it, you need to configure noreferences.py for your wiki, or it will
 not work.
 
 pdfinfo is needed for parsing pdf titles.
-
-See [[:en:User:DumZiBoT/refLinks]] for more information on the bot.
 
 &params;
 
@@ -84,7 +81,7 @@ localized_msg = ('fr', 'it', 'pl')  # localized message at MediaWiki
 # should be moved to MediaWiki Pywikibot manual
 
 
-stopPage = {
+stop_page = {
     'fr': u'Utilisateur:DumZiBoT/EditezCettePagePourMeStopper',
     'da': u'Bruger:DumZiBoT/EditThisPageToStopMe',
     'de': u'Benutzer:DumZiBoT/EditThisPageToStopMe',
@@ -102,7 +99,6 @@ stopPage = {
 deadLinkTag = {
     'fr': u'[%s] {{lien mort}}',
     'da': u'[%s] {{dødt link}}',
-    'de': u'',
     'fa': u'[%s] {{پیوند مرده}}',
     'he': u'{{קישור שבור}}',
     'hi': '[%s] {{Dead link}}',
@@ -217,8 +213,14 @@ class RefLink(object):
 
     def refDead(self):
         """Dead link, tag it with a {{dead link}}."""
-        tag = i18n.translate(self.site, deadLinkTag) % self.link
-        return '<ref%s>%s</ref>' % (self.refname, tag)
+        tag = i18n.translate(self.site, deadLinkTag)
+        if not tag:
+            dead_link = self.refLink()
+        elif '%s' in tag:
+            dead_link = '<ref%s>%s</ref>' % (self.refname, tag % self.link)
+        else:
+            dead_link = '<ref%s>%s</ref>' % (self.refname, tag)
+        return dead_link
 
     def transform(self, ispdf=False):
         """Normalize the title."""
@@ -352,7 +354,7 @@ class DuplicateReferences(object):
                     continue
                 name = v[0]
                 if not name:
-                    name = self.autogen + str(id)
+                    name = '"%s%d"' % (self.autogen, id)
                     id += 1
                 elif v[2]:
                     name = u'"%s"' % name
@@ -410,8 +412,6 @@ class ReferencesRobot(Bot):
             self.msg = i18n.twtranslate(self.site, 'reflinks-msg', locals())
         else:
             self.msg = self.getOption('summary')
-        self.stopPage = pywikibot.Page(self.site,
-                                       i18n.translate(self.site, stopPage))
 
         local = i18n.translate(self.site, badtitles)
         if local:
@@ -421,12 +421,15 @@ class ReferencesRobot(Bot):
         self.titleBlackList = re.compile(bad, re.I | re.S | re.X)
         self.norefbot = noreferences.NoReferencesBot(None, verbose=False)
         self.deduplicator = DuplicateReferences()
-        try:
-            self.stopPageRevId = self.stopPage.latest_revision_id
-        except pywikibot.NoPage:
-            pywikibot.output(u'The stop page %s does not exist'
-                             % self.stopPage.title(asLink=True))
-            raise
+
+        self.site_stop_page = i18n.translate(self.site, stop_page)
+        if self.site_stop_page:
+            self.stop_page = pywikibot.Page(self.site, self.site_stop_page)
+            if self.stop_page.exists():
+                self.stop_page_rev_id = self.stop_page.latest_revision_id
+            else:
+                pywikibot.warning('The stop page %s does not exist'
+                                  % self.stop_page.title(asLink=True))
 
         # Regex to grasp content-type meta HTML tag in HTML source
         self.META_CONTENT = re.compile(br'(?i)<meta[^>]*content\-type[^>]*>')
@@ -456,7 +459,7 @@ class ReferencesRobot(Bot):
         """
         pywikibot.output(u'PDF file.')
         fd, infile = tempfile.mkstemp()
-        urlobj = os.fdopen(fd, 'r+w')
+        urlobj = os.fdopen(fd, 'w+')
         urlobj.write(f.content)
 
         try:
@@ -475,9 +478,9 @@ class ReferencesRobot(Bot):
             pywikibot.output(u'pdfinfo value error.')
         except OSError:
             pywikibot.output(u'pdfinfo OS error.')
-        except:  # Ignore errors
+        except Exception:  # Ignore errors
             pywikibot.output(u'PDF processing error.')
-            pass
+            pywikibot.exception()
         finally:
             urlobj.close()
             os.unlink(infile)
@@ -487,11 +490,11 @@ class ReferencesRobot(Bot):
         try:
             deadLinks = codecs.open(listof404pages, 'r', 'latin_1').read()
         except IOError:
-            pywikibot.output(
-                'You need to download '
-                'http://www.twoevils.org/files/wikipedia/404-links.txt.gz '
-                'and to ungzip it in the same directory')
-            raise
+            raise NotImplementedError(
+                '404-links.txt is required for reflinks.py\n'
+                'You need to download\n'
+                'http://www.twoevils.org/files/wikipedia/404-links.txt.gz\n'
+                'and to unzip it in the same directory')
 
         editedpages = 0
         for page in self.generator:
@@ -585,7 +588,7 @@ class ReferencesRobot(Bot):
                             new_text = new_text.replace(match.group(), repl)
                         continue
 
-                    linkedpagetext = f.content
+                    linkedpagetext = f.raw
                 except UnicodeError:
                     # example : http://www.adminet.com/jo/20010615¦/ECOC0100037D.html
                     # in [[fr:Cyanure]]
@@ -711,12 +714,13 @@ class ReferencesRobot(Bot):
                     new_text = self.norefbot.addReferences(new_text)
 
             new_text = self.deduplicator.process(new_text)
+            old_text = page.text
 
-            self.userPut(page, page.text, new_text, summary=self.msg,
+            self.userPut(page, old_text, new_text, summary=self.msg,
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
 
-            if new_text == page.text:
+            if new_text == old_text:
                 continue
             else:
                 editedpages += 1
@@ -725,15 +729,17 @@ class ReferencesRobot(Bot):
                 pywikibot.output('Edited %s pages, stopping.' % self.getOption('limit'))
                 return
 
-            if editedpages % 20 == 0:
-                pywikibot.output(color_format(
-                    '{lightgreen}Checking stop page...{default}'))
-                actualRev = self.stopPage.latest_revision_id
-                if actualRev != self.stopPageRevId:
-                    pywikibot.output(
-                        u'[[%s]] has been edited : Someone wants us to stop.'
-                        % self.stopPage)
-                    return
+            if self.site_stop_page and editedpages % 20 == 0:
+                self.stop_page = pywikibot.Page(self.site, self.site_stop_page)
+                if self.stop_page.exists():
+                    pywikibot.output(color_format(
+                        '{lightgreen}Checking stop page...{default}'))
+                    actual_rev = self.stop_page.latest_revision_id
+                    if actual_rev != self.stop_page_rev_id:
+                        pywikibot.output(
+                            '%s has been edited : Someone wants us to stop.'
+                            % self.stop_page.title(asLink=True))
+                        return
 
 
 def main(*args):

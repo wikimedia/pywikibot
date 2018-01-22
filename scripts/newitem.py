@@ -116,7 +116,8 @@ class NewItemRobot(WikidataBot):
                 "Haven't implemented that yet so skipping.")
             return
 
-        self.create_item_for_page(page, callback=self._callback)
+        self.create_item_for_page(
+            page, callback=lambda _, exc: self._callback(page, exc))
 
 
 def main(*args):

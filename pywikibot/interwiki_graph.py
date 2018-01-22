@@ -7,9 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import itertools
 import threading
 
@@ -235,7 +232,7 @@ class GraphDrawer(object):
         """
         Create graph of the interwiki links.
 
-        For more info see U{http://meta.wikimedia.org/wiki/Interwiki_graphs}
+        For more info see U{https://meta.wikimedia.org/wiki/Interwiki_graphs}
         """
         pywikibot.output(u'Preparing graph for %s'
                          % self.subject.originPage.title())

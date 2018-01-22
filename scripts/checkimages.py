@@ -80,7 +80,7 @@ right parameter.
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -117,10 +117,12 @@ n_txt = {
     'fa': u'{{جا:حق تکثیر تصویر نامعلوم}}',
     'fr': u'{{subst:lid}}',
     'ga': u'{{subst:Ceadúnas de dhíth}}',
+    'hr': '{{Bez licence}}',
     'hu': u'{{nincslicenc|~~~~~}}',
     'it': u'{{subst:unverdata}}',
     'ja': u'{{subst:Nld}}',
     'ko': u'{{subst:nld}}',
+    'sr': '{{датотека без лиценце}}',
     'ta': u'{{subst:nld}}',
     'ur': u'{{subst:حقوق نسخہ تصویر نامعلوم}}',
     'zh': u'{{subst:No license/auto}}',
@@ -141,12 +143,13 @@ txt_find = {
     'en': [u'{{nld', u'{{no license'],
     'fa': [u'{{حق تکثیر تصویر نامعلوم۲'],
     'ga': [u'{{Ceadúnas de dhíth', u'{{Ceadúnas de dhíth'],
+    'hr': ['{{bez licence'],
     'hu': [u'{{nincsforrás', u'{{nincslicenc'],
     'it': [u'{{unverdata', u'{{unverified'],
     'ja': [u'{{no source', u'{{unknown',
            u'{{non free', u'<!--削除についての議論が終了するまで'],
-    'ta': [u'{{no source', u'{{nld', u'{{no license'],
     'ko': [u'{{출처 없음', u'{{라이선스 없음', u'{{Unknown'],
+    'ta': ['{{no source', '{{nld', '{{no license'],
     'ur': [u'{{ناحوالہ', u'{{اجازہ نامعلوم', u'{{Di-no'],
     'zh': [u'{{no source', u'{{unknown', u'{{No license'],
 }
@@ -162,6 +165,7 @@ empty = {
     'fa': u'{{جا:خوشامدید|%s}}',
     'fr': u'{{Bienvenue nouveau\n~~~~\n',
     'ga': u'{{subst:Fáilte}} - ~~~~\n',
+    'hr': '{{subst:dd}}--~~~~\n',
     'hu': u'{{subst:Üdvözlet|~~~~}}\n',
     'it': '<!-- inizio template di benvenuto -->\n{{subst:Benvebot}}\n~~~~\n'
           '<!-- fine template di benvenuto -->',
@@ -232,6 +236,7 @@ msg_del_comm = {
     'fa': 'ربات: اضافه کردن %(adding)s',
     'ga': 'Róbó: Cuir %(adding)s leis',
     'fr': 'Robot : Ajouté %(adding)s',
+    'hr': 'Bot: Dodato %(adding)s',
     'hu': 'Robot:"%(adding)s" hozzáadása',
     'it': 'Bot: Aggiungo %(adding)s',
     'ja': 'ロボットによる: 追加 %(adding)s',
@@ -374,6 +379,7 @@ HiddenTemplate = {
     'fa': [u'الگو:اطلاعات'],
     'fr': [u'Template:Information'],
     'ga': [u'Template:Information'],
+    'hr': ['Template:Infoslika'],
     'hu': [u'Template:Információ', u'Template:Enwiki', u'Template:Azonnali'],
     'it': [u'Template:EDP', u'Template:Informazioni file',
            u'Template:Information', u'Template:Trademark',
@@ -591,7 +597,7 @@ class checkImagesBot(object):
         """Function to make the reports easier."""
         self.image_to_report = image_to_report
         self.newtext = newtext
-        self.head = head or u''
+        self.head = head or ''
         self.notification = notification
         self.notification2 = notification2
 
@@ -603,34 +609,24 @@ class checkImagesBot(object):
                                         notification2)
         self.commTalk = commTalk
         self.commImage = commImage or self.comment
-
-        while True:
+        image_tagged = False
+        try:
+            image_tagged = self.tag_image(unver)
+        except pywikibot.NoPage:
+            pywikibot.output('The page has been deleted! Skip!')
+        except pywikibot.EditConflict:
+            pywikibot.output('Edit conflict! Skip!')
+        if image_tagged and self.notification:
             try:
-                resPutMex = self.tag_image(unver)
-            except pywikibot.NoPage:
-                pywikibot.output(u"The page has been deleted! Skip!")
-                break
+                self.put_mex_in_talk()
             except pywikibot.EditConflict:
-                pywikibot.output(u"Edit conflict! Skip!")
-                break
-            else:
-                if not resPutMex:
-                    break
-            if self.notification:
+                pywikibot.output('Edit Conflict! Retrying...')
                 try:
                     self.put_mex_in_talk()
-                except pywikibot.EditConflict:
-                    pywikibot.output(u"Edit Conflict! Retrying...")
-                    try:
-                        self.put_mex_in_talk()
-                    except:
-                        pywikibot.output(
-                            u"Another error... skipping the user..")
-                        break
-                else:
-                    break
-            else:
-                break
+                except Exception:
+                    pywikibot.exception()
+                    pywikibot.output(
+                        'Another error... skipping the user..')
 
     def uploadBotChangeFunction(self, reportPageText, upBotArray):
         """Detect the user that has uploaded the file through the upload bot."""
@@ -653,7 +649,7 @@ class checkImagesBot(object):
             reportPageText = reportPageObject.get()
         except pywikibot.NoPage:
             pywikibot.output(u'%s has been deleted...' % self.imageName)
-            return
+            return False
         # You can use this function also to find only the user that
         # has upload the image (FixME: Rewrite a bit this part)
         if put:
@@ -665,7 +661,7 @@ class checkImagesBot(object):
                                      summary=self.commImage)
             except pywikibot.LockedPage:
                 pywikibot.output(u'File is locked. Skipping.')
-                return
+                return False
         # paginetta it's the image page object.
         try:
             if reportPageObject == self.image and self.uploader:
@@ -679,7 +675,7 @@ class checkImagesBot(object):
             repme = self.list_entry + "problems '''with the APIs'''"
             self.report_image(self.image_to_report, self.rep_page, self.com,
                               repme)
-            return
+            return False
         upBots = i18n.translate(self.site, uploadBots)
         user = pywikibot.User(self.site, nick)
         luser = user.title(asUrl=True)
@@ -1585,7 +1581,7 @@ def main(*args):
                     u'How many files do you want to check?'))
             else:
                 limit = int(arg[7:])
-        if arg.startswith('-sleep') or arg.startswith('-time'):
+        if arg.startswith(('-sleep', '-time')):
             if arg.startswith('-sleep'):
                 length = len('-sleep')
             else:

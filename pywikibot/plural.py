@@ -8,8 +8,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
 
 plural_rules = {
     '_default': {'nplurals': 2, 'plural': lambda n: (n != 1)},

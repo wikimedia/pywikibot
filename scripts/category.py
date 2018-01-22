@@ -195,7 +195,7 @@ class CategoryDatabase(object):
                 # like the above, but for supercategories
                 self.superclassDB = databases['superclassDB']
                 del databases
-            except:
+            except Exception:
                 # If something goes wrong, just rebuild the database
                 self.rebuild()
 
@@ -362,7 +362,7 @@ class CategoryAddBot(MultipleSitesBot):
             return
         # store old text, so we don't have reload it every time
         old_text = text
-        cats = textlib.getCategoryLinks(text)
+        cats = textlib.getCategoryLinks(text, self.current_page.site)
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
@@ -485,7 +485,11 @@ class CategoryMoveRobot(object):
         template_vars = {'oldcat': self.oldcat.title(withNamespace=False)}
         if self.newcat:
             template_vars.update({
-                'newcat': self.newcat.title(withNamespace=False, asLink=True),
+                'newcat': self.newcat.title(
+                    withNamespace=False,
+                    asLink=True,
+                    textlink=True
+                ),
                 'title': self.newcat.title(withNamespace=False)})
         # Set edit summary for changed pages.
         if comment:

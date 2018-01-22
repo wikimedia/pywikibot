@@ -29,7 +29,8 @@ class TestMediaWikiFlowSandbox(TestCase):
 
     def setUp(self):
         """Set up unit test."""
-        self._page = Board(self.site, 'Project_talk:Sandbox/Flow test')
+        self._page = Board(self.site,
+                           'Project talk:Sandbox/Structured_Discussions_test')
         super(TestMediaWikiFlowSandbox, self).setUp()
 
 
@@ -43,7 +44,6 @@ class TestBoardBasePageMethods(BasePageMethodsTestBase,
         self._test_invoke()
         self._test_return_datatypes()
         self.assertFalse(self._page.isRedirectPage())
-        self.assertGreater(self._page.latest_revision.parent_id, 0)
 
     def test_content_model(self):
         """Test Flow page content model."""
@@ -211,3 +211,34 @@ class TestFlowFactoryErrors(TestCase):
         self.assertRaises(AssertionError, Post.fromJSON, real_topic, 'abc',
                           {'posts': {'abc': ['123']},
                            'revisions': {'123': {'content': 789}}})
+
+
+class TestFlowTopic(TestCase):
+    """Test Topic functions."""
+
+    family = 'test'
+    code = 'test'
+
+    def test_topic(self):
+        """Test general functions of the Topic class."""
+        topic = Topic(self.site, 'Topic:U5y4l1rzitlplyc5')
+        self.assertEqual(topic.root.uuid, 'u5y4l1rzitlplyc5')
+        replies = topic.replies()
+        self.assertEqual(len(replies), 3)
+        self.assertTrue(all(isinstance(reply, Post)
+                            for reply in replies))
+        self.assertEqual(replies[1].uuid, 'u5y5lysqcvyne4k1')
+
+    def test_topic_moderation(self):
+        """Test Topic functions about moderation."""
+        topic_closed = Topic(self.site, 'Topic:U5y4efgaprfe7ssi')
+        self.assertTrue(topic_closed.is_locked)
+        self.assertTrue(topic_closed.is_moderated)
+
+        topic_open = Topic(self.site, 'Topic:U5y4l1rzitlplyc5')
+        self.assertFalse(topic_open.is_locked)
+        self.assertFalse(topic_open.is_moderated)
+
+        topic_hidden = Topic(self.site, 'Topic:U5y53rn0dp6h70nw')
+        self.assertFalse(topic_hidden.is_locked)
+        self.assertTrue(topic_hidden.is_moderated)

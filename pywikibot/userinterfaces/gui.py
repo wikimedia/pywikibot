@@ -14,24 +14,32 @@ from __future__ import absolute_import, unicode_literals
 #
 # Distributed under the terms of the MIT license.
 #
-__version__ = '$Id$'
-#
 
 import sys
 
 if sys.version_info[0] > 2:
     import tkinter as Tkinter
     from tkinter.scrolledtext import ScrolledText
-    from tkinter import simpledialog as tkSimpleDialog  # flake8: disable=N812
+    from tkinter import simpledialog as tkSimpleDialog
 else:
     import Tkinter
     import tkSimpleDialog
 
     from ScrolledText import ScrolledText
 
-from idlelib import SearchDialog, ReplaceDialog, configDialog
-from idlelib.configHandler import idleConf
-from idlelib.MultiCall import MultiCallCreator
+# T164163: Fix idlelib import in Python 3.6
+if sys.version_info > (3, 5):
+    from idlelib import (
+        search as SearchDialog,
+        replace as ReplaceDialog,
+        configdialog as configDialog
+    )
+    from idlelib.config import idleConf
+    from idlelib.multicall import MultiCallCreator
+else:
+    from idlelib import SearchDialog, ReplaceDialog, configDialog
+    from idlelib.configHandler import idleConf
+    from idlelib.MultiCall import MultiCallCreator
 
 import pywikibot
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot 3.0 framework."""
 #
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,6 +52,14 @@ dependencies = ['requests!=2.18.2']
 irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
 csv_dep = 'unicodecsv!=0.14.0' if PYTHON_VERSION < (2, 7) else 'unicodecsv'
 
+# According to https://pillow.readthedocs.io/en/latest/installation.html#notes
+if PY26:
+    pillow = 'Pillow<4.0.0'
+elif PYTHON_VERSION[:2] == (3, 3):
+    pillow = 'Pillow>=2.0.0,<5.0.0'
+else:
+    pillow = 'Pillow'
+
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient'],
@@ -60,7 +68,7 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'IRC': [irc_dep],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': ['Pillow<3.5.0' if PY26 else 'Pillow'],
+    'Tkinter': [pillow],
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
@@ -73,9 +81,16 @@ if PY2:
         'MySQL': ['oursql'],
         'unicode7': ['unicodedata2>=7.0.0-2'],
     })
+elif PYTHON_VERSION[:2] == (3, 3):
+    # requests[security] requires cryptography, but cryptography 2.0+ does not
+    # support Python 3.3; T178241
+    extra_deps['security'].append('cryptography<2.0')
+    # PyOpenSSL is required by requests[security] but has dropped support for
+    # Python 3.3 since version 17.5.0 (2017-11-30); T181912
+    extra_deps['security'].append('PyOpenSSL<17.5.0')
 
 script_deps = {
-    'flickrripper.py': ['Pillow<3.5.0' if PY26 else 'Pillow'],
+    'flickrripper.py': [pillow],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client>=0.5.1,!=0.6.0'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],
@@ -88,8 +103,12 @@ script_deps = {
 # and will be first packaged for Fedora Core 21.
 # flickrapi 1.4.x does not run on Python 3, and setuptools can only
 # select flickrapi 2.x for Python 3 installs.
-script_deps['flickrripper.py'].append(
-    'flickrapi>=1.4.5,<2' if PY26 else 'flickrapi')
+# flickrapi 2.3.1 dropped support for Python 3.3.
+if PYTHON_VERSION[:2] == (3, 3):
+    script_deps['flickrripper.py'].append('flickrapi<2.3.1')
+else:
+    script_deps['flickrripper.py'].append(
+        'flickrapi>=1.4.5,<2' if PY26 else 'flickrapi')
 
 # lunatic-python is only available for Linux
 if sys.platform.startswith('linux'):
@@ -203,17 +222,36 @@ except Exception as e:
     print(e)
     version = version + "-dev"
 
-github_url = 'https://github.com/wikimedia/pywikibot-core'
-with open('README.rst') as f:
-    long_description = f.read()
+
+def read_desc(filename):
+    """Read long description.
+
+    Combine included restructured text files which must be done before
+    uploading because the source isn't available after creating the package.
+    """
+    desc = []
+    with open(filename) as f:
+        for line in f:
+            if line.strip().startswith('.. include::'):
+                include = os.path.relpath(line.rsplit('::')[1].strip())
+                if os.path.exists(include):
+                    with open(include) as g:
+                        desc.append(g.read())
+                else:
+                    print('Cannot include {0}; file not found'.format(include))
+            else:
+                desc.append(line)
+    return ''.join(desc)
+
 
 setup(
     name=name,
     version=version,
     description='Python MediaWiki Bot Framework',
-    long_description=long_description,
-    keywords=('pywikibot', 'python', 'mediawiki', 'bot', 'wiki', 'framework',
-              'wikimedia', 'wikipedia', 'pwb', 'pywikipedia', 'API'),
+    long_description=read_desc('README.rst'),
+    keywords=('API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
+              'pywikibot', 'pywikipedia', 'pywikipediabot', 'wiki',
+              'wikimedia', 'wikipedia'),
     maintainer='The Pywikibot team',
     maintainer_email='pywikibot@lists.wikimedia.org',
     license='MIT License',
@@ -224,19 +262,25 @@ setup(
     dependency_links=dependency_links,
     extras_require=extra_deps,
     url='https://www.mediawiki.org/wiki/Pywikibot',
+    download_url='https://tools.wmflabs.org/pywikibot/',
     test_suite="tests.collector",
     tests_require=test_deps,
     classifiers=[
-        'License :: OSI Approved :: MIT License',
-        'Development Status :: 4 - Beta',
-        'Operating System :: OS Independent',
-        'Intended Audience :: Developers',
+        'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: MIT License',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Utilities',
     ],
     use_2to3=False
 )

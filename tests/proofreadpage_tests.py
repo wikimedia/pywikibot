@@ -331,8 +331,8 @@ class TestProofreadPageIndexProperty(TestCase):
     }
 
     existing_multilinked = {
-        'title': 'Page:Pywikibot test page 1/1',
-        'index_1': 'Index:Pywikibot test page 1',
+        'title': 'Page:Pywikibot test page.djvu/1',
+        'index_1': 'Index:Pywikibot test page.djvu',
         'index_2': 'Index:Pywikibot test page 2',
     }
 
@@ -651,11 +651,11 @@ class TestIndexPageMappingsRedlinks(IndexPageTestCase):
 
     cached = True
 
-    index_name = 'Index:Pywikibot test page 1'
-    page_names = ['Page:Pywikibot test page 1/1',
-                  'Page:Pywikibot test page 2/2',
+    index_name = 'Index:Pywikibot test page.djvu'
+    page_names = ['Page:Pywikibot test page.djvu/1',
+                  'Page:Pywikibot test page.djvu/2',
                   ]
-    missing_name = 'Page:Pywikibot test page 2/2'
+    missing_name = 'Page:Pywikibot test page.djvu/2'
 
     @classmethod
     def setUpClass(cls):

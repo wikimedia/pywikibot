@@ -14,7 +14,6 @@ search paths so the package does not need to be installed, etc.
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, print_function, unicode_literals
-__version__ = '$Id$'
 
 # The following snippet was developed by Ned Batchelder (and others)
 # for coverage [1], with python 3 support [2] added later,
@@ -78,7 +77,7 @@ def tryimport_pwb():
         remove_modules()
 
         os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
-        import pywikibot  # flake8: disable=E402
+        import pywikibot  # noqa: E402
         pwb = pywikibot
 
 
@@ -194,6 +193,7 @@ except RuntimeError as err:
                         ['generate_user_files.py'])
         # because we have loaded pywikibot without user-config.py loaded, we need to re-start
         # the entire process. Ask the user to do so.
+        print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
 
 
@@ -211,7 +211,7 @@ def main():
                             'scripts.maintenance',
                             'scripts.archive',
                             'scripts.userscripts']
-            from pywikibot import config  # flake8: disable=E402
+            from pywikibot import config  # noqa: E402
             if config.user_script_paths:
                 if isinstance(config.user_script_paths, (tuple, list)):
                     script_paths = config.user_script_paths + script_paths

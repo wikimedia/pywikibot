@@ -8,8 +8,7 @@ pytest-runner
 pytest-cov
 pytest-attrib
 pytest-httpbin
-httpbin<0.6.0 ; python_version < '2.7'
-httpbin!=0.6.0,!=0.6.1 ; os_name != 'posix' and python_version >= '2.7'
+httpbin<0.6.0 ; os_name != 'posix' or python_version < '2.7'
 
 six
 
@@ -25,8 +24,16 @@ codecov
 coverage
 mock ; python_version < '3'
 
+# vcrpy requires yarl in Python 3.4, yarl v1.0.0 requires multidict>=4.0.0,
+# multidict v4.0.0 requires Python>=3.4.1 (T185000)
+yarl<1.0.0 ; python_version == "3.4" and python_full_version < "3.4.1"
+multidict<4.0.0,>=2.0 ; python_version == "3.4" and python_full_version < "3.4.1"
+vcrpy-unittest
+
 # pywin32 & pywinauto>=0.4.0 are Win32 UI test dependencies that have been
 # excluded from this file as they are quite expensive to install, and they
 # are not useful on the Appveyor Win32 builds since the relevant UI tests
 # also require accessing the menu of the console window, which doesnt exist
 # in the Appveyor environment.
+
+setuptools_scm ; python_version == '2.6'

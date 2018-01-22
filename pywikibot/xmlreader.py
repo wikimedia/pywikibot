@@ -15,9 +15,6 @@ XmlEntry objects which can be used by other bots.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 import threading
 

@@ -1,15 +1,13 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikipedia."""
 #
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
-
-__version__ = '$Id$'
 
 
 # The Wikimedia family that is known as Wikipedia, the Free Encyclopedia
@@ -22,10 +20,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
         'aa', 'advisory', 'cho', 'ho', 'hz', 'ii', 'kj', 'kr', 'mh', 'mo',
-        'mus', 'ng', 'quality', 'strategy', 'ten', 'usability',
-        'wikimania2005', 'wikimania2006', 'wikimania2007', 'wikimania2008',
-        'wikimania2009', 'wikimania2010', 'wikimania2011', 'wikimania2012',
-        'wikimania2013', 'wikimania2014', 'wikimania2015',
+        'mus', 'ng', 'quality', 'strategy', 'ten', 'usability'
     ]
 
     removed_wikis = [
@@ -37,35 +32,35 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'ceb', 'sv', 'de', 'fr', 'nl', 'ru', 'it', 'es', 'war', 'pl',
-            'vi', 'ja', 'pt', 'zh', 'uk', 'fa', 'ca', 'ar', 'no', 'sh', 'fi',
-            'hu', 'id', 'ko', 'cs', 'ro', 'sr', 'ms', 'tr', 'eu', 'eo', 'bg',
+            'vi', 'ja', 'pt', 'zh', 'uk', 'sr', 'fa', 'ca', 'ar', 'no', 'sh',
+            'fi', 'hu', 'id', 'ko', 'cs', 'ro', 'ms', 'tr', 'eu', 'eo', 'bg',
             'hy', 'da', 'zh-min-nan', 'sk', 'min', 'kk', 'he', 'lt', 'hr',
-            'ce', 'et', 'sl', 'be', 'gl', 'el', 'nn', 'uz', 'simple', 'la',
-            'az', 'ur', 'hi', 'vo', 'th', 'ka', 'ta', 'cy', 'mk', 'mg', 'oc',
-            'tl', 'ky', 'lv', 'bs', 'tt', 'new', 'sq', 'tg', 'te', 'pms', 'br',
-            'be-tarask', 'zh-yue', 'bn', 'ml', 'ht', 'ast', 'lb', 'jv', 'mr',
-            'azb', 'af', 'sco', 'pnb', 'ga', 'is', 'cv', 'ba', 'fy', 'su',
-            'sw', 'my', 'lmo', 'an', 'yo', 'ne', 'gu', 'io', 'pa', 'nds',
-            'scn', 'bpy', 'als', 'bar', 'ku', 'kn', 'ia', 'qu', 'ckb', 'mn',
-            'arz', 'bat-smg', 'wa', 'gd', 'nap', 'bug', 'yi', 'am', 'si',
-            'cdo', 'map-bms', 'or', 'fo', 'mzn', 'hsb', 'xmf', 'li', 'mai',
-            'sah', 'sa', 'vec', 'ilo', 'os', 'mrj', 'hif', 'mhr', 'bh',
-            'roa-tara', 'eml', 'diq', 'pam', 'ps', 'sd', 'hak', 'nso', 'se',
-            'ace', 'bcl', 'mi', 'nah', 'zh-classical', 'nds-nl', 'szl', 'gan',
-            'vls', 'rue', 'wuu', 'bo', 'glk', 'vep', 'sc', 'fiu-vro', 'co',
-            'frr', 'crh', 'km', 'lrc', 'tk', 'kv', 'csb', 'so', 'gv', 'as',
-            'lad', 'zea', 'ay', 'udm', 'myv', 'lez', 'kw', 'stq', 'ie', 'nrm',
-            'nv', 'pcd', 'mwl', 'rm', 'koi', 'gom', 'ug', 'lij', 'ab', 'gn',
-            'mt', 'fur', 'dsb', 'dv', 'cbk-zam', 'ang', 'ln', 'ext', 'kab',
-            'sn', 'ksh', 'lo', 'gag', 'frp', 'pag', 'pi', 'olo', 'av', 'dty',
-            'xal', 'pfl', 'krc', 'haw', 'bxr', 'kaa', 'pap', 'rw', 'pdc',
-            'bjn', 'to', 'nov', 'kl', 'arc', 'jam', 'kbd', 'ha', 'tpi', 'tyv',
-            'tet', 'ig', 'ki', 'na', 'lbe', 'roa-rup', 'jbo', 'ty', 'mdf',
-            'kg', 'za', 'wo', 'lg', 'bi', 'srn', 'zu', 'chr', 'tcy', 'ltg',
-            'sm', 'om', 'xh', 'tn', 'pih', 'chy', 'rmy', 'tw', 'cu', 'kbp',
-            'tum', 'ts', 'st', 'got', 'rn', 'pnt', 'ss', 'fj', 'bm', 'ch',
-            'ady', 'iu', 'ny', 'ee', 'ks', 'ak', 'ik', 've', 'sg', 'dz', 'ff',
-            'ti', 'cr', 'atj', 'din',
+            'et', 'ce', 'sl', 'be', 'gl', 'el', 'nn', 'simple', 'az', 'uz',
+            'la', 'ur', 'hi', 'th', 'vo', 'ka', 'ta', 'cy', 'tg', 'mk', 'tl',
+            'mg', 'oc', 'lv', 'ky', 'bs', 'tt', 'new', 'sq', 'te', 'pms',
+            'zh-yue', 'br', 'be-tarask', 'azb', 'ast', 'bn', 'ml', 'ht', 'jv',
+            'lb', 'mr', 'sco', 'af', 'ga', 'pnb', 'is', 'ba', 'cv', 'fy', 'su',
+            'sw', 'my', 'lmo', 'an', 'yo', 'ne', 'pa', 'gu', 'io', 'nds',
+            'scn', 'bpy', 'als', 'bar', 'ku', 'kn', 'ckb', 'ia', 'qu', 'mn',
+            'arz', 'bat-smg', 'gd', 'wa', 'nap', 'si', 'yi', 'bug', 'am',
+            'cdo', 'or', 'map-bms', 'fo', 'mzn', 'hsb', 'xmf', 'mai', 'li',
+            'sah', 'sa', 'vec', 'ilo', 'os', 'mrj', 'hif', 'mhr', 'bh', 'eml',
+            'roa-tara', 'ps', 'diq', 'pam', 'sd', 'hak', 'nso', 'se',
+            'zh-classical', 'bcl', 'ace', 'mi', 'nah', 'nds-nl', 'szl', 'wuu',
+            'gan', 'rue', 'frr', 'vls', 'km', 'bo', 'vep', 'glk', 'sc', 'crh',
+            'fiu-vro', 'co', 'lrc', 'tk', 'kv', 'csb', 'gv', 'as', 'myv',
+            'lad', 'so', 'zea', 'nv', 'ay', 'udm', 'lez', 'ie', 'stq', 'kw',
+            'nrm', 'pcd', 'mwl', 'rm', 'koi', 'ab', 'gom', 'ug', 'lij',
+            'cbk-zam', 'gn', 'mt', 'fur', 'dsb', 'sn', 'dv', 'ang', 'ln',
+            'ext', 'kab', 'ksh', 'frp', 'lo', 'gag', 'dty', 'pag', 'pi', 'olo',
+            'av', 'xal', 'pfl', 'bxr', 'haw', 'krc', 'pap', 'kaa', 'rw', 'pdc',
+            'bjn', 'to', 'nov', 'ha', 'kl', 'arc', 'jam', 'kbd', 'tyv', 'tpi',
+            'tet', 'ig', 'ki', 'na', 'roa-rup', 'lbe', 'jbo', 'ty', 'mdf',
+            'za', 'kg', 'lg', 'wo', 'bi', 'srn', 'tcy', 'zu', 'chr', 'kbp',
+            'ltg', 'sm', 'om', 'xh', 'rmy', 'tn', 'cu', 'pih', 'rn', 'chy',
+            'tw', 'tum', 'ts', 'st', 'got', 'pnt', 'ss', 'ch', 'bm', 'fj',
+            'ady', 'iu', 'ny', 'atj', 'ee', 'ks', 'ak', 'ik', 've', 'sg', 'ff',
+            'dz', 'ti', 'cr', 'din',
         ]
 
         # Sites we want to edit but not count as real languages
@@ -79,6 +74,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             '_default': (),
             'ar': ('تحويل تصنيف',),
             'arz': (u'تحويل تصنيف',),
+            'bs': ('Category redirect',),
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
             'en': (u'Category redirect',),
@@ -104,6 +100,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sh': ('Prekat',),
             'simple': ('Category redirect',),
             'sl': ('Preusmeritev kategorije',),
+            'sr': ('Category redirect',),
             'sq': ('Kategori e zhvendosur',),
             'sv': ('Kategoriomdirigering',),
             'tl': (u'Category redirect',),
@@ -123,6 +120,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'species',
             'strategy',
             'test',
+            'wikimania'
         ]
 
         # Global bot allowed languages on
@@ -173,10 +171,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # TODO: Remove comments for appropriate pages
         self.doc_subpages = {
             '_default': ((u'/doc', ),
-                         ['ar', 'bn', 'cs', 'da', 'en', 'es',
+                         ['ar', 'bn', 'cs', 'da', 'en', 'es', 'hr',
                           'hu', 'id', 'ilo', 'ja', 'ms',
-                          'ms', 'pt', 'ro', 'ru', 'simple', 'vi', 'zh']
+                          'pt', 'ro', 'ru', 'simple', 'sh', 'vi', 'zh']
                          ),
+            'bs': ('/dok', ),
             'ca': (u'/ús', ),
             'de': (u'Doku', u'/Meta'),
             'dsb': (u'/Dokumentacija', ),
@@ -193,6 +192,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'nn': (u'/dok', ),
             'pl': (u'/opis', ),
             'sk': (u'/Dokumentácia', ),
+            'sr': ('/док', ),
             'sv': (u'/dok', ),
             'uk': (u'/Документація', ),
         }

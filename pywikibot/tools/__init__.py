@@ -6,7 +6,6 @@
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-__version__ = '$Id$'
 
 import collections
 import gzip
@@ -23,7 +22,8 @@ import time
 import types
 
 from distutils.version import Version
-from warnings import warn
+from functools import wraps
+from warnings import catch_warnings, showwarning, warn
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
@@ -180,7 +180,7 @@ def py2_encode_utf_8(func):
         return func
 
 
-class classproperty(object):  # flake8: disable=N801
+class classproperty(object):  # noqa: N801
 
     """
     Metaclass to accesss a class method as a property.
@@ -205,6 +205,62 @@ class classproperty(object):  # flake8: disable=N801
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""
         return self.method(owner)
+
+
+class suppress_warnings(catch_warnings):  # noqa: N801
+
+    """A decorator/context manager that temporarily suppresses warnings.
+
+    Those suppressed warnings that do not match the parameters will be raised
+    shown upon exit.
+    """
+
+    def __init__(self, message='', category=Warning, filename=''):
+        """Initialize the object.
+
+        The parameter semantics are similar to those of
+        `warnings.filterwarnings`.
+
+        @param message: A string containing a regular expression that the start
+            of the warning message must match. (case-insensitive)
+        @type message: str
+        @param category: A class (a subclass of Warning) of which the warning
+            category must be a subclass in order to match.
+        @type category: Warning
+        @param filename: A string containing a regular expression that the
+            start of the path to the warning module must match.
+            (case-sensitive)
+        @type filename: str
+        """
+        self.message_match = re.compile(message, re.I).match
+        self.category = category
+        self.filename_match = re.compile(filename).match
+        super(suppress_warnings, self).__init__(record=True)
+
+    def __enter__(self):
+        """Catch all warnings and store them in `self.log`."""
+        self.log = super(suppress_warnings, self).__enter__()
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Stop logging warnings and show those that do not match to params."""
+        super(suppress_warnings, self).__exit__()
+        for warning in self.log:
+            if (
+                not issubclass(warning.category, self.category)
+                or not self.message_match(str(warning.message))
+                or not self.filename_match(warning.filename)
+            ):
+                showwarning(
+                    warning.message, warning.category, warning.filename,
+                    warning.lineno, warning.file, warning.line)
+
+    def __call__(self, func):
+        """Decorate func to suppress warnings."""
+        @wraps(func)
+        def suppressed_func(*args, **kwargs):
+            with self:
+                return func(*args, **kwargs)
+        return suppressed_func
 
 
 class UnicodeMixin(object):
@@ -440,8 +496,14 @@ def first_upper(string):
     Return a string with the first character capitalized.
 
     Empty strings are supported. The original string is not changed.
+
+    Warning: Python 2 and 3 capitalize "ß" differently. MediaWiki does
+    not capitalize ß at the beginning. See T179115.
     """
-    return string[:1].upper() + string[1:]
+    first = string[:1]
+    if first != 'ß':
+        first = first.upper()
+    return first + string[1:]
 
 
 def normalize_username(username):
@@ -1670,6 +1732,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
             else:
                 warning_message = u"{0}.{1} is deprecated."
 
+        if hasattr(self, name):
+            # __getattr__ will only be invoked if self.<name> does not exist.
+            delattr(self, name)
         self._deprecated[name] = replacement_name, replacement, warning_message
 
     def __setattr__(self, attr, value):

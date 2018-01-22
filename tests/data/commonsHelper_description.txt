@@ -1,0 +1,25 @@
+
+== {{int:filedesc}} ==
+{{Information
+|Description={{id|http://www.bekasikota.go.id/pages/profil-wakil-walikota-bekasi}}
+|Source={{transferred from|id.wikipedia}}
+|Date={{Original upload date|2018-01-07}}
+|Author={{Original uploader|Ramdan Herawan|wikipedia|id}}
+|Permission=PD-IDGOV.
+|other_versions=
+}}
+
+== {{int:license-header}} ==
+{{PD-IDGov}}
+<!-- Templates "Template:DU-PemerintahIndonesia", "Template:Lambang Indonesia" were used in the original description page as well , but do not appear to exist on commons. -->
+
+== {{Original upload log}} ==
+{{original description|id.wikipedia|Ahmad+Syaikhu+Wakil+Walikota+Bekasi.jpg}}
+{| class="wikitable filehistory"
+! {{int:filehist-datetime}} !! {{int:filehist-dimensions}} !! {{int:filehist-user}} !! {{int:filehist-comment}}
+|-
+| 2018-01-07 01:03 || 448&times;539&times; (46784 bytes) || [[:id:User:Ramdan Herawan|Ramdan Herawan]] || ''<nowiki>http://www.bekasikota.go.id/pages/profil-wakil-walikota-bekasi</nowiki>''
+|}
+__NOTOC__
+
+{{subst:Unc}} <!-- Remove this line once you have added categories -->

@@ -12,7 +12,7 @@ original page will be automatically updated and the modified page uploaded.
 
 These command-line arguments can be used to specify which pages to work on:
 
-&pagegenerators_help;
+&params;
 
     -days:         Like -years, but runs through all date pages. Stops at
                    Dec 31. If the argument is given in the form -days:X,
@@ -152,6 +152,7 @@ These arguments are useful to provide hints to the bot:
                       * species:   Interlanguage links of the wikispecies wiki
                       * strategy:  Links in pages on Wikimedias strategy wiki
                       * test:      Take interwiki links from Test Wikipedia
+                      * wikimania: Interwiki links of Wikimania
 
                    Languages, groups and families having the same page title
                    can be combined, as -hint:5,scand,sr,pt,commons:New_York
@@ -336,8 +337,8 @@ that you have to break it off, use "-continue" next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2017
-# (C) Pywikibot team, 2007-2017
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -365,7 +366,7 @@ if sys.version_info[0] > 2:
     unicode = str
 
 docuReplacements = {
-    '&pagegenerators_help;': pagegenerators.parameterHelp
+    '&params;': pagegenerators.parameterHelp
 }
 
 
@@ -1459,8 +1460,7 @@ class Subject(interwiki_graph.Subject):
                     f.write("\n")
                     f.close()
                 # FIXME: What errors are we catching here?
-                # except: should be avoided!!
-                except:
+                except Exception:
                     # raise
                     pywikibot.output(
                         'File autonomous_problems.dat open or corrupted! '
@@ -2360,10 +2360,10 @@ def compareLanguages(old, new, insite, summary):
     if not summary and \
        len(adding) + len(removing) + len(modifying) <= 3:
         # Use an extended format for the string linking to all added pages.
-        fmt = lambda d, site: unicode(d[site])  # flake8: disable=E731
+        fmt = lambda d, site: unicode(d[site])  # noqa: E731
     else:
         # Use short format, just the language code
-        fmt = lambda d, site: site.code  # flake8: disable=E731
+        fmt = lambda d, site: site.code  # noqa: E731
 
     mods = mcomment = u''
 
@@ -2631,7 +2631,7 @@ def main(*args):
         bot.run()
     except KeyboardInterrupt:
         dumpFileName = bot.dump(append)
-    except:
+    except Exception:
         dumpFileName = bot.dump(append)
         raise
     finally:

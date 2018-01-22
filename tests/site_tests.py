@@ -27,6 +27,7 @@ from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
     StringTypes as basestring,
+    suppress_warnings,
     UnicodeType as unicode,
 )
 
@@ -748,6 +749,19 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(cat, pywikibot.Category)
             self.assertLessEqual(cat.title(withNamespace=False), "Hij")
 
+    def test_botusers(self):
+        """Test the site.botusers() method."""
+        mysite = self.get_site()
+        bu = list(mysite.botusers(total=10))
+        self.assertLessEqual(len(bu), 10)
+        for botuser in bu:
+            self.assertIsInstance(botuser, dict)
+            self.assertIn('name', botuser)
+            self.assertIn('userid', botuser)
+            self.assertIn('editcount', botuser)
+            self.assertIn('registration', botuser)
+            self.assertIn('bot', botuser['groups'])
+
     def test_allusers(self):
         """Test the site.allusers() method."""
         mysite = self.get_site()
@@ -758,6 +772,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIn("name", user)
             self.assertIn("editcount", user)
             self.assertIn("registration", user)
+            self.assertIn('user', user['groups'])
 
     def test_allusers_with_start(self):
         """Test the site.allusers(start=..) method."""
@@ -1058,9 +1073,9 @@ class TestImageUsage(DefaultSiteTestCase):
 
     @property
     def imagepage(self):
-        """Find an image which is used on a page.
+        """Find an image which is used on the main page.
 
-        If there are no images included in pages it'll skip all tests.
+        If there are no images included in main page it'll skip all tests.
 
         Note: This is not implemented as setUpClass which would be invoked
         while initialising all tests, to reduce chance of an error preventing
@@ -1070,15 +1085,12 @@ class TestImageUsage(DefaultSiteTestCase):
             return self.__class__._image_page
 
         mysite = self.get_site()
-        for page in mysite.allpages(filterredir=False):
-            try:
-                imagepage = next(iter(page.imagelinks()))  # 1st image of page
-            except StopIteration:
-                pass
-            else:
-                break
-        else:
-            raise unittest.SkipTest("No images on site {0!r}".format(mysite))
+        page = pywikibot.Page(mysite, mysite.siteinfo['mainpage'])
+        try:
+            imagepage = next(iter(page.imagelinks()))  # 1st image of page
+        except StopIteration:
+            raise unittest.SkipTest(
+                'No images on the main page of site {0!r}'.format(mysite))
 
         pywikibot.output(u'site_tests.TestImageUsage found %s on %s'
                          % (imagepage, page))
@@ -1480,6 +1492,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 raise unittest.SkipTest("gsrsearch returned timeout on site: %r" % e)
             raise
 
+    @suppress_warnings("where='title' is deprecated", DeprecationWarning)
     def test_search_where_title(self):
         """Test site.search() method with 'where' parameter set to title."""
         try:
@@ -2005,6 +2018,12 @@ class SiteRandomTestCase(DefaultSiteTestCase):
         for rndpage in mysite.randompages(total=5, redirects=True):
             self.assertIsInstance(rndpage, pywikibot.Page)
             self.assertTrue(rndpage.isRedirectPage())
+
+    def test_all(self):
+        """Test site.randompages() with both types."""
+        mysite = self.get_site()
+        for rndpage in mysite.randompages(total=5, redirects=None):
+            self.assertIsInstance(rndpage, pywikibot.Page)
 
     def test_namespaces(self):
         """Test site.randompages() with namespaces."""

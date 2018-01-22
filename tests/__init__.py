@@ -12,7 +12,7 @@ import os
 import warnings
 
 __all__ = ('requests', 'unittest', 'TestRequest',
-           'patch_request', 'unpatch_request')
+           'patch_request', 'unpatch_request', 'mock', 'Mock', 'patch')
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
@@ -30,6 +30,12 @@ if PYTHON_VERSION < (2, 7, 3):
     import unittest2 as unittest
 else:
     import unittest
+try:
+    import unittest.mock as mock
+    from unittest.mock import Mock, patch
+except ImportError:
+    import mock
+    from mock import Mock, patch
 
 import pywikibot.data.api
 

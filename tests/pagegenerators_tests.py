@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -12,17 +12,10 @@ import datetime
 import logging
 import sys
 
-from distutils.version import LooseVersion
-
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
-
 import pywikibot
 from pywikibot import pagegenerators, date
 
-from pywikibot.exceptions import UnknownExtension
+from pywikibot.exceptions import ServerError, UnknownExtension
 
 from pywikibot.pagegenerators import (
     PagesFromTitlesGenerator,
@@ -32,7 +25,7 @@ from pywikibot.pagegenerators import (
 
 from pywikibot.tools import has_module
 
-from tests import join_data_path
+from tests import join_data_path, patch
 from tests.aspects import (
     unittest,
     TestCase,
@@ -369,8 +362,12 @@ class PetScanPageGeneratorTestCase(TestCase):
         """Test PetScanPageGenerator."""
         site = self.get_site()
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'], True, None, site)
-        self.assertPagelistTitles(gen, titles=('User:Sn1per/ProtectTest1',
-                                               'User:Sn1per/ProtectTest2'), site=site)
+        try:
+            self.assertPagelistTitles(gen, titles=(
+                'User:Sn1per/ProtectTest1', 'User:Sn1per/ProtectTest2'),
+                site=site)
+        except ServerError as e:
+            self.skipTest(e)
 
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'], False, None, site)
         self.assertPagelistTitles(gen, titles=('User:Sn1per/ProtectTest1',
@@ -1229,9 +1226,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-limit:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        # ABC disambiguation
+        # American Broadcasting Company
         page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q286874')
+        self.assertEqual(page1.title(), 'Q169889')
 
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:en:abc')
@@ -1241,9 +1238,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         # American Broadcasting Company
         page1 = next(gen)
         self.assertEqual(page1.title(), 'Q169889')
-        # ABC disambiguation
+        # Australian Broadcasting Corporation
         page2 = next(gen)
-        self.assertEqual(page2.title(), 'Q286874')
+        self.assertEqual(page2.title(), 'Q781365')
 
     def test_get_category_site(self):
         """Test the getCategory method."""
@@ -1416,17 +1413,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         super(EventStreamsPageGeneratorTestCase, cls).setUpClass()
         cls.client = 'sseclient'
         if not has_module(cls.client):
-            cls.client = 'socketIO_client'
-            try:
-                import socketIO_client
-            except ImportError:
-                raise unittest.SkipTest(
-                    'Neither sseclient nor socketIO_client is available')
-            if LooseVersion(
-                    socketIO_client.__version__) >= LooseVersion('0.6.1'):
-                raise unittest.SkipTest(
-                    'socketIO_client %s not supported by Wikimedia-Stream'
-                    % socketIO_client.__version__)
+            raise unittest.SkipTest('{0} is not available'.format(cls.client))
 
     def test_RC_pagegenerator_result(self):
         """Test RC pagegenerator."""

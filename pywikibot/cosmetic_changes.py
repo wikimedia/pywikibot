@@ -56,9 +56,6 @@ or by adding a list to the given one:
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-#
-
 import re
 
 from warnings import warn
@@ -621,7 +618,7 @@ class CosmeticChangesToolkit(object):
         exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
-        text = textlib.replaceExcept(text, r'(?m) +( |$)', r'\1', exceptions,
+        text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1', exceptions,
                                      site=self.site)
         return text
 
@@ -644,11 +641,11 @@ class CosmeticChangesToolkit(object):
         Example: ==Section title== becomes == Section title ==
 
         NOTE: This space is recommended in the syntax help on the English and
-        German Wikipedia. It is not wanted on Lojban Wiktionary (per T168399)
-        and it might be that it is not wanted on other wikis. If there are any
-        complaints, please file a bug report.
+        German Wikipedia. It is not wanted on Lojban and English Wiktionary
+        (T168399, T169064) and it might be that it is not wanted on other
+        wikis. If there are any complaints, please file a bug report.
         """
-        if self.site.sitename == 'wiktionary:jbo':
+        if self.site.sitename in ['wiktionary:jbo', 'wiktionary:en']:
             return text
         return textlib.replaceExcept(
             text,

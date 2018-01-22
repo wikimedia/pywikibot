@@ -1,9 +1,28 @@
 Release history
 ===============
 
-3.0.20170917
---------------
+Current release
+---------------
 
+* Deprecation warning: support for py2.6 and py3.3 will be dropped
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180108
+------------
+
+* Maintenance script to download Wikimedia database dump
+* Option to auto-create accounts when logging in
+* Ship wikimania family file
+* Drop battlestarwiki family file
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20171212
+------------
+
+* Introduce userscripts directory
+* Generator settings inside (user-)fixes.py
 * BaseUnlinkBot has become part of the framework in specialbots.py
 * Decommission of rcstream
 * Script files added to https://doc.wikimedia.org/pywikibot/

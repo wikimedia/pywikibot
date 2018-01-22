@@ -11,8 +11,6 @@ It imports the appropriate operating system specific implementation.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import sys
 
 if sys.platform == 'win32':

@@ -11,8 +11,6 @@ import os.path
 
 from pywikibot import config
 
-__version__ = '$Id$'
-
 parameter_help = u"""
                   Currently available predefined fixes are:
 
@@ -380,7 +378,7 @@ fixes = {
     },
 
     'isbn': {
-        'generator': ['-search:insource:/nowiki\>ISBN:?(?:&nbsp;| *)[0-9]/',
+        'generator': [r'-search:insource:/nowiki\>ISBN:?(?:&nbsp;| *)[0-9]/',
                       '-namespace:0'],
         'regex': True,
         'msg': 'isbn-formatting',  # use i18n translations

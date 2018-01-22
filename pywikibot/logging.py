@@ -7,8 +7,6 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
 import logging
 import os
 import sys
@@ -180,7 +178,7 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
     Use directly after an 'except' statement::
 
         ...
-        except:
+        except Exception:
             pywikibot.exception()
         ...
 

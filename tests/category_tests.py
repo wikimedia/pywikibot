@@ -17,6 +17,9 @@ class TestCategoryObject(TestCase):
 
     """Test Category object."""
 
+    NOCATEGORYNAMESPACE_RE = '\'(.*?)\' is not in the category namespace!'
+    NOREDIRECTPAGE_RE = r'Page \[\[(.*?)\]\] is not a redirect page.'
+
     family = 'wikipedia'
     code = 'en'
 
@@ -25,7 +28,8 @@ class TestCategoryObject(TestCase):
     def test_init(self):
         """Test the category's __init__ for one condition that can't be dry."""
         site = self.get_site()
-        self.assertRaises(ValueError, pywikibot.Category, site, 'Wikipedia:Test')
+        self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE,
+                               pywikibot.Category, site, 'Wikipedia:Test')
 
     def test_is_empty(self):
         """Test if category is empty or not."""
@@ -146,13 +150,15 @@ class TestCategoryObject(TestCase):
         self.assertEqual(tgt, cat2)
 
         # Raise exception if target is fetched for non Category redirects.
-        self.assertRaises(pywikibot.IsNotRedirectPage,
-                          cat2.getCategoryRedirectTarget)
+        self.assertRaisesRegex(pywikibot.IsNotRedirectPage,
+                               self.NOREDIRECTPAGE_RE, cat2.getCategoryRedirectTarget)
 
 
 class TestCategoryDryObject(TestCase):
 
     """Test the category object with dry tests."""
+
+    NOCATEGORYNAMESPACE_RE = '\'(.*?)\' is not in the category namespace!'
 
     family = 'wikipedia'
     code = 'en'
@@ -178,7 +184,8 @@ class TestCategoryDryObject(TestCase):
         self.assertTrue(cat_dup_ns.title(withNamespace=False), 'Page:Foo')
         self.assertTrue(cat_dup_ns.namespace(), 14)
 
-        self.assertRaises(ValueError, pywikibot.Category, site, 'Talk:Foo')
+        self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE,
+                               pywikibot.Category, site, 'Talk:Foo')
 
     def test_section(self):
         """Test the section method."""

@@ -10,8 +10,6 @@ from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 
-__version__ = '$Id$'
-
 
 class Family(family.SubdomainFamily, family.WikimediaFamily):
 
@@ -22,8 +20,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'en', 'de', 'fa', 'it', 'fr', 'pl', 'ru', 'nl', 'pt', 'fi', 'es',
-            'zh', 'he', 'vi', 'sv', 'el', 'ro', 'uk', 'hi',
+            'en', 'de', 'fa', 'it', 'fr', 'pl', 'ru', 'nl', 'pt', 'zh', 'es',
+            'he', 'fi', 'vi', 'sv', 'el', 'ro', 'uk', 'hi',
         ]
 
         super(Family, self).__init__()

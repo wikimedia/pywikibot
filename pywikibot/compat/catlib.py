@@ -13,9 +13,6 @@ function/method instead.
 #
 from __future__ import absolute_import, unicode_literals
 
-__version__ = '$Id$'
-
-
 from pywikibot import Category
 from pywikibot.tools import ModuleDeprecationWrapper
 

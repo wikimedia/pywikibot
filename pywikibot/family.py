@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 """Objects representing MediaWiki families."""
 #
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-__version__ = '$Id$'
-#
 
 import collections
 import logging
@@ -150,6 +147,7 @@ class Family(object):
             'an': u'[a-záéíóúñ]*',
             'ar': u'[a-zء-ي]*',
             'ast': u'[a-záéíóúñ]*',
+            'atj': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'arz': u'[a-zء-ي]*',
             'azb': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
             'av': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -177,6 +175,7 @@ class Family(object):
             'cy': u'[àáâèéêìíîïòóôûŵŷa-z]*',
             'da': u'[a-zæøå]*',
             'de': u'[a-zäöüß]*',
+            'din': '[äëɛɛ̈éɣïŋöɔɔ̈óa-z]*',
             'dsb': u'[äöüßa-z]*',
             'el': u'[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*',
             'eml': u'[a-zàéèíîìóòúù]*',
@@ -209,6 +208,7 @@ class Family(object):
             'is': u'[áðéíóúýþæöa-z-–]*',
             'it': u'[a-zàéèíîìóòúù]*',
             'ka': u'[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
+            'kbp': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'kk': u'[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*',
             'kl': u'[a-zæøå]*',
             'koi': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -289,6 +289,7 @@ class Family(object):
             'tyv': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'udm': u'[a-zа-яёӝӟӥӧӵ]*',
             'uk': u'[a-zабвгґдеєжзиіїйклмнопрстуфхцчшщьєюяёъы“»]*',
+            'ur': '[ابپتٹثجچحخدڈذر​ڑ​زژسشصضطظعغفقکگل​م​نوؤہھیئےآأءۃ]*',
             'uz': u'[a-zʻʼ“»]*',
             'vec': u'[a-zàéèíîìóòúù]*',
             'vep': u'[äöõšüža-z]*',
@@ -322,7 +323,6 @@ class Family(object):
             'aspienetwiki':     'aspienetwiki',
             'atmwiki':          'atmwiki',
             'b':                'wikibooks',
-            'battlestarwiki':   'battlestarwiki',
             'bemi':             'bemi',
             'benefitswiki':     'benefitswiki',
             'betawiki':         'betawiki',
@@ -683,6 +683,14 @@ class Family(object):
             'wm2008':           'wm2008',
             'wm2009':           'wm2009',
             'wm2010':           'wm2010',
+            'wm2011':           'wm2011',
+            'wm2012':           'wm2012',
+            'wm2013':           'wm2013',
+            'wm2014':           'wm2014',
+            'wm2015':           'wm2015',
+            'wm2016':           'wm2016',
+            'wm2017':           'wm2017',
+            'wm2018':           'wm2018',
             'wmania':           'wmania',
             'wmcz':             'wmcz',
             'wmf':              'wmf',
@@ -929,7 +937,7 @@ class Family(object):
         if fam in config.family_files:
             family_file = config.family_files[fam]
 
-            if family_file.startswith('http://') or family_file.startswith('https://'):
+            if family_file.startswith(('http://', 'https://')):
                 myfamily = AutoFamily(fam, family_file)
                 Family._families[fam] = myfamily
                 return Family._families[fam]
@@ -1540,7 +1548,7 @@ class WikimediaFamily(Family):
 
     wikimedia_org_meta_families = [
         'meta', 'outreach', 'strategy',
-        'wikimediachapter',
+        'wikimediachapter', 'wikimania',
     ]
 
     wikimedia_org_other_families = [

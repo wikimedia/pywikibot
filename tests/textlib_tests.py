@@ -11,10 +11,6 @@ import codecs
 import functools
 import os
 import re
-try:
-    from unittest import mock
-except ImportError:
-    import mock
 
 import pywikibot
 import pywikibot.textlib as textlib
@@ -22,12 +18,13 @@ from pywikibot.textlib import _MultiTemplateMatchBuilder
 
 from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
-from pywikibot.tools import OrderedDict
+from pywikibot.tools import OrderedDict, suppress_warnings
 
 from tests.aspects import (
     unittest, require_modules, TestCase, DefaultDrySiteTestCase,
     PatchingTestCase, SiteAttributeTestCase,
 )
+from tests import mock
 
 files = {}
 dirname = os.path.join(os.path.dirname(__file__), "pages")
@@ -246,6 +243,15 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
         self.assertNotIn(cats[0], temp_cats)
         # First and third categories are the same
         self.assertEqual([cats[1], cats[3]], temp_cats)
+
+        # Testing adding categories
+        temp = textlib.replaceCategoryInPlace(
+            self.old, cats[0], cats[1], site=self.site,
+            add_only=True)
+        self.assertNotEqual(temp, self.old)
+        temp_cats = textlib.getCategoryLinks(temp, site=self.site)
+        self.assertEqual([cats[0], cats[1], cats[1],
+                          cats[2], cats[1], cats[3]], temp_cats)
 
         new_cats = textlib.getCategoryLinks(new, site=self.site)
         self.assertEqual(cats, new_cats)
@@ -574,7 +580,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNone(func('{{a|{{c}} }}'))
         self.assertIsNone(func('{{a|{{c|d}} }}'))
 
-        func = textlib.TEMP_REGEX.search
+        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
+            func = textlib.TEMP_REGEX.search
 
         self.assertIsNotNone(func('{{{1}}}'))
         self.assertIsNotNone(func('{{a|b={{c}} }}'))
@@ -582,7 +589,8 @@ class TestTemplateParams(TestCase):
         self.assertIsNotNone(func('{{a|{{c}} }}'))
         self.assertIsNotNone(func('{{a|{{c|d}} }}'))
 
-        func = textlib.TEMP_REGEX.match
+        with suppress_warnings('textlib.TEMP_REGEX is deprecated'):
+            func = textlib.TEMP_REGEX.match
 
         self.assertIsNotNone(func('{{#if:foo}}'))
         self.assertIsNotNone(func('{{foo:}}'))

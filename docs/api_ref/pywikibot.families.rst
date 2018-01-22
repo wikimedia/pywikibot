@@ -9,14 +9,6 @@ pywikibot.families package
 Submodules
 ----------
 
-pywikibot.families.battlestarwiki_family module
------------------------------------------------
-
-.. automodule:: pywikibot.families.battlestarwiki_family
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 pywikibot.families.commons_family module
 ----------------------------------------
 
@@ -141,6 +133,14 @@ pywikibot.families.wikidata_family module
 -----------------------------------------
 
 .. automodule:: pywikibot.families.wikidata_family
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pywikibot.families.wikimania_family module
+------------------------------------------
+
+.. automodule:: pywikibot.families.wikimania_family
     :members:
     :undoc-members:
     :show-inheritance:

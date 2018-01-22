@@ -229,6 +229,17 @@ class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
 
     """Test static/classmethods in Namespace replaced by NamespacesDict."""
 
+    CONTAINSINAPPROPRIATE_RE = (
+        r'identifiers contains inappropriate types: (.*?)'
+    )
+    INTARGNOTSTRINGORNUMBER_RE = (
+        r"int\(\) argument must be a string(, a bytes-like object)? "
+        r"or a number, not '(.*?)'"
+    )
+    NAMESPACEIDNOTRECOGNISED_RE = (
+        r'Namespace identifier\(s\) not recognised: (.*?)'
+    )
+
     net = False
 
     def test_resolve_equal(self):
@@ -269,26 +280,33 @@ class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
 
     def test_resolve_exceptions(self):
         """Test Namespace.resolve failure."""
-        self.assertRaises(TypeError, Namespace.resolve, [True])
-        self.assertRaises(TypeError, Namespace.resolve, [False])
-        self.assertRaises(TypeError, Namespace.resolve, [None])
-        self.assertRaises(TypeError, Namespace.resolve, True)
-        self.assertRaises(TypeError, Namespace.resolve, False)
-        self.assertRaises(TypeError, Namespace.resolve, None)
+        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
+                               Namespace.resolve, [True])
+        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
+                               Namespace.resolve, [False])
+        self.assertRaisesRegex(TypeError, self.INTARGNOTSTRINGORNUMBER_RE,
+                               Namespace.resolve, [None])
+        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
+                               Namespace.resolve, True)
+        self.assertRaisesRegex(TypeError, self.CONTAINSINAPPROPRIATE_RE,
+                               Namespace.resolve, False)
+        self.assertRaisesRegex(TypeError, self.INTARGNOTSTRINGORNUMBER_RE,
+                               Namespace.resolve, None)
 
-        self.assertRaises(KeyError, Namespace.resolve, -10)
-        self.assertRaises(KeyError, Namespace.resolve, '-10')
-        self.assertRaises(KeyError, Namespace.resolve, 'foo')
-        self.assertRaises(KeyError, Namespace.resolve, ['foo'])
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
+                               Namespace.resolve, -10)
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
+                               Namespace.resolve, '-10')
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
+                               Namespace.resolve, 'foo')
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
+                               Namespace.resolve, ['foo'])
 
-        self.assertRaisesRegex(KeyError,
-                               r'Namespace identifier\(s\) not recognised: -10',
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
                                Namespace.resolve, [-10, 0])
-        self.assertRaisesRegex(KeyError,
-                               r'Namespace identifier\(s\) not recognised: foo',
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
                                Namespace.resolve, [0, 'foo'])
-        self.assertRaisesRegex(KeyError,
-                               r'Namespace identifier\(s\) not recognised: -10,-11',
+        self.assertRaisesRegex(KeyError, self.NAMESPACEIDNOTRECOGNISED_RE,
                                Namespace.resolve, [-10, 0, -11])
 
     def test_lookup_name(self):
@@ -366,6 +384,9 @@ class TestNamespacesDictGetItem(TestCase):
 
     """Test NamespacesDict.__getitem__."""
 
+    VALIDNUMBER_RE = r'-?(0|[1-9]\d*)'
+    EMPTYTEXT_RE = r'\s*'
+
     net = False
 
     def test_ids(self):
@@ -385,8 +406,10 @@ class TestNamespacesDictGetItem(TestCase):
         namespaces = builtin_NamespacesDict()
         lower = min(namespaces.keys()) - 1
         higher = max(namespaces.keys()) + 1
-        self.assertRaises(KeyError, namespaces.__getitem__, lower)
-        self.assertRaises(KeyError, namespaces.__getitem__, higher)
+        with self.assertRaisesRegex(KeyError, self.VALIDNUMBER_RE):
+            namespaces[lower]
+        with self.assertRaisesRegex(KeyError, self.VALIDNUMBER_RE):
+            namespaces[higher]
 
     def test_canonical_name(self):
         """Test lookup by canonical namespace name."""
@@ -418,9 +441,11 @@ class TestNamespacesDictGetItem(TestCase):
     def test_invalid_name(self):
         """Test lookup by invalid name."""
         namespaces = builtin_NamespacesDict()
-        self.assertRaises(KeyError, namespaces.__getitem__, 'FOO')
+        with self.assertRaisesRegex(KeyError, self.EMPTYTEXT_RE):
+            namespaces['FOO']
         # '|' is not permitted in namespace names
-        self.assertRaises(KeyError, namespaces.__getitem__, '|')
+        with self.assertRaisesRegex(KeyError, self.EMPTYTEXT_RE):
+            namespaces['|']
 
 
 if __name__ == '__main__':  # pragma: no cover

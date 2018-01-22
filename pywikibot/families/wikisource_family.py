@@ -9,8 +9,6 @@ from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
 
-__version__ = '$Id$'
-
 
 # The Wikimedia family that is known as Wikisource
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -32,10 +30,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'pl', 'ru', 'de', 'fr', 'zh', 'he', 'it', 'es', 'ar', 'cs',
-            'pt', 'fa', 'www', 'hu', 'ml', 'ko', 'sv', 'sr', 'gu', 'bn', 'sl',
-            'te', 'sa', 'el', 'ro', 'fi', 'uk', 'vi', 'ja', 'az', 'th', 'hy',
-            'ca', 'br', 'hr', 'ta', 'nl', 'is', 'la', 'no', 'vec', 'eo', 'tr',
-            'be', 'et', 'mk', 'yi', 'kn', 'id', 'da', 'bg', 'li', 'mr', 'as',
+            'pt', 'www', 'fa', 'hu', 'ml', 'ko', 'sv', 'gu', 'sr', 'bn', 'sl',
+            'sa', 'te', 'el', 'ro', 'fi', 'uk', 'vi', 'ja', 'th', 'az', 'hy',
+            'ca', 'ta', 'kn', 'br', 'hr', 'nl', 'is', 'la', 'no', 'vec', 'eo',
+            'tr', 'be', 'et', 'mk', 'yi', 'id', 'da', 'bg', 'li', 'mr', 'as',
             'or', 'bs', 'sah', 'lt', 'gl', 'sk', 'cy', 'pa', 'zh-min-nan',
             'fo',
         ]

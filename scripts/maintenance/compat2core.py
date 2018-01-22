@@ -12,8 +12,8 @@ finally.
 The scripts asks for the .py file and converts it to
 <scriptname>-core.py in the same directory. The following option is supported:
 
-- warnonly: Do not convert the source but show warning messages. This is good
-            to check already merged scripts.
+-warnonly  Do not convert the source but show warning messages. This is good
+           to check already merged scripts.
 
 usage
 

@@ -227,6 +227,7 @@ placeBeforeSections = {
 # Titles of sections where a reference tag would fit into.
 # The first title should be the preferred one: It's the one that
 # will be used when a new section has to be created.
+# Except for the first, others are tested as regexes.
 referencesSections = {
     'ar': [             # not sure about which ones are preferred.
         u'مراجع',
@@ -287,11 +288,11 @@ referencesSections = {
         u'Viitteet',
     ],
     'fr': [             # [[fr:Aide:Note]]
-        u'Notes et références',
-        u'Références',
-        u'References',
-        'Notes',
-        'Sources',
+        'Notes et références',
+        'Notes? et r[ée]f[ée]rences?',
+        'R[ée]f[ée]rences?',
+        'Notes?',
+        'Sources?',
     ],
     'he': [
         u'הערות שוליים',
@@ -417,7 +418,7 @@ referencesTemplates = {
         'ru': [u'Reflist', u'Ref-list', u'Refs', u'Sources',
                u'Примечания', u'Список примечаний',
                u'Сноска', u'Сноски'],
-        'sr': ['Reflist'],
+        'sr': ['Reflist', 'Референце', 'Извори'],
         'szl': [u'Przipisy', u'Připisy'],
         'th': [u'รายการอ้างอิง'],
         'zh': [u'Reflist', u'RefFoot', u'NoteFoot'],
@@ -635,16 +636,26 @@ class NoReferencesBot(Bot):
         return self.createReferenceSection(oldText, index)
 
     def createReferenceSection(self, oldText, index, ident='=='):
-        """Create a reference section and insert it into the given text."""
+        """Create a reference section and insert it into the given text.
+
+        @param oldText: page text that is going to be be amended
+        @type oldText: str
+        @param index: the index of oldText where the reference section should
+            be inserted at
+        @type index: int
+        @param ident: symbols to be inserted before and after reference section
+            title
+        @type ident: str
+        @return: the amended page text with reference section added
+        @rtype: str
+        """
         if self.site.code in noTitleRequired:
-            newSection = u'\n%s\n' % (self.referencesText)
+            ref_section = '\n\n%s\n' % self.referencesText
         else:
-            newSection = u'\n%s %s %s\n%s\n' % (ident,
-                                                i18n.translate(
-                                                    self.site,
-                                                    referencesSections)[0],
-                                                ident, self.referencesText)
-        return oldText[:index] + newSection + oldText[index:]
+            ref_section = '\n\n{ident} {title} {ident}\n{text}\n'.format(
+                title=i18n.translate(self.site, referencesSections)[0],
+                ident=ident, text=self.referencesText)
+        return oldText[:index].rstrip() + ref_section + oldText[index:]
 
     def run(self):
         """Run the bot."""
@@ -724,7 +735,7 @@ def main(*args):
         try:
             cat = site.expand_text(
                 site.mediawiki_message(maintenance_category))
-        except:
+        except Exception:
             pass
         else:
             cat = pywikibot.Category(site, "%s:%s" % (

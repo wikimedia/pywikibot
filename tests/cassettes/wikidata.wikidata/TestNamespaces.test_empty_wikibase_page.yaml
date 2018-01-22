@@ -1,0 +1,55 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept: ['*/*']
+      Accept-Encoding: ['gzip, deflate']
+      Connection: [keep-alive]
+      Content-Type: [application/x-www-form-urlencoded]
+    method: GET
+    uri: https://www.wikidata.org/w/api.php?action=query&meta=siteinfo%7Cuserinfo&siprop=namespaces%7Cnamespacealiases%7Cgeneral&continue=&uiprop=blockinfo%7Chasmsg&maxlag=5&format=json
+  response:
+    body: {string: '{"batchcomplete":"","query":{"namespaces":{"-2":{"id":-2,"case":"first-letter","canonical":"Media","*":"Media"},"-1":{"id":-1,"case":"first-letter","canonical":"Special","*":"Special"},"0":{"id":0,"case":"first-letter","content":"","defaultcontentmodel":"wikibase-item","*":""},"1":{"id":1,"case":"first-letter","subpages":"","canonical":"Talk","*":"Talk"},"2":{"id":2,"case":"first-letter","subpages":"","canonical":"User","*":"User"},"3":{"id":3,"case":"first-letter","subpages":"","canonical":"User
+        talk","*":"User talk"},"4":{"id":4,"case":"first-letter","subpages":"","canonical":"Project","*":"Wikidata"},"5":{"id":5,"case":"first-letter","subpages":"","canonical":"Project
+        talk","*":"Wikidata talk"},"6":{"id":6,"case":"first-letter","canonical":"File","*":"File"},"7":{"id":7,"case":"first-letter","subpages":"","canonical":"File
+        talk","*":"File talk"},"8":{"id":8,"case":"first-letter","subpages":"","canonical":"MediaWiki","*":"MediaWiki"},"9":{"id":9,"case":"first-letter","subpages":"","canonical":"MediaWiki
+        talk","*":"MediaWiki talk"},"10":{"id":10,"case":"first-letter","subpages":"","canonical":"Template","*":"Template"},"11":{"id":11,"case":"first-letter","subpages":"","canonical":"Template
+        talk","*":"Template talk"},"12":{"id":12,"case":"first-letter","subpages":"","canonical":"Help","*":"Help"},"13":{"id":13,"case":"first-letter","subpages":"","canonical":"Help
+        talk","*":"Help talk"},"14":{"id":14,"case":"first-letter","canonical":"Category","*":"Category"},"15":{"id":15,"case":"first-letter","subpages":"","canonical":"Category
+        talk","*":"Category talk"},"120":{"id":120,"case":"first-letter","canonical":"Property","defaultcontentmodel":"wikibase-property","*":"Property"},"121":{"id":121,"case":"first-letter","subpages":"","canonical":"Property
+        talk","*":"Property talk"},"122":{"id":122,"case":"first-letter","canonical":"Query","*":"Query"},"123":{"id":123,"case":"first-letter","canonical":"Query
+        talk","*":"Query talk"},"828":{"id":828,"case":"first-letter","subpages":"","canonical":"Module","*":"Module"},"829":{"id":829,"case":"first-letter","subpages":"","canonical":"Module
+        talk","*":"Module talk"},"1198":{"id":1198,"case":"first-letter","subpages":"","canonical":"Translations","*":"Translations"},"1199":{"id":1199,"case":"first-letter","subpages":"","canonical":"Translations
+        talk","*":"Translations talk"},"2300":{"id":2300,"case":"first-letter","canonical":"Gadget","*":"Gadget"},"2301":{"id":2301,"case":"first-letter","canonical":"Gadget
+        talk","*":"Gadget talk"},"2302":{"id":2302,"case":"case-sensitive","canonical":"Gadget
+        definition","defaultcontentmodel":"GadgetDefinition","*":"Gadget definition"},"2303":{"id":2303,"case":"case-sensitive","canonical":"Gadget
+        definition talk","*":"Gadget definition talk"},"2600":{"id":2600,"case":"first-letter","canonical":"Topic","defaultcontentmodel":"flow-board","*":"Topic"}},"namespacealiases":[{"id":0,"*":"Item"},{"id":1,"*":"Item
+        talk"},{"id":4,"*":"WD"},{"id":5,"*":"WT"},{"id":6,"*":"Image"},{"id":7,"*":"Image
+        talk"},{"id":120,"*":"P"}],"general":{"mainpage":"Wikidata:Main Page","base":"https://www.wikidata.org/wiki/Wikidata:Main_Page","sitename":"Wikidata","logo":"//www.wikidata.org/static/images/project-logos/wikidatawiki.png","generator":"MediaWiki
+        1.31.0-wmf.15","phpversion":"5.6.99-hhvm","phpsapi":"srv","hhvmversion":"3.18.6-dev","dbtype":"mysql","dbversion":"10.0.33-MariaDB","imagewhitelistenabled":"","langconversion":"","titleconversion":"","linkprefixcharset":"","linkprefix":"","linktrail":"/^([a-z]+)(.*)$/sD","legaltitlechars":"
+        %!\"$&''()*,\\-.\\/0-9:;=?@A-Z\\\\^_`a-z~\\x80-\\xFF+","invalidusernamechars":"@:","fixarabicunicode":"","fixmalayalamunicode":"","git-hash":"09537008d55f929003bd153df63a3a66b5f779c4","git-branch":"wmf/1.31.0-wmf.15","case":"first-letter","lang":"en","fallback":[],"fallback8bitEncoding":"windows-1252","writeapi":"","maxarticlesize":2097152,"timezone":"UTC","timeoffset":0,"articlepath":"/wiki/$1","scriptpath":"/w","script":"/w/index.php","variantarticlepath":false,"server":"//www.wikidata.org","servername":"www.wikidata.org","wikiid":"wikidatawiki","time":"2018-01-15T12:16:11Z","misermode":"","maxuploadsize":4294967296,"minuploadchunksize":1024,"galleryoptions":{"imagesPerRow":0,"imageWidth":120,"imageHeight":120,"captionLength":"","showBytes":"","mode":"traditional","showDimensions":""},"thumblimits":[120,150,180,200,220,250,300,400],"imagelimits":[{"width":320,"height":240},{"width":640,"height":480},{"width":800,"height":600},{"width":1024,"height":768},{"width":1280,"height":1024}],"favicon":"//www.wikidata.org/static/favicon/wikidata.ico","centralidlookupprovider":"CentralAuth","allcentralidlookupproviders":["CentralAuth","local"],"interwikimagic":"","magiclinks":{"ISBN":"","PMID":"","RFC":""},"categorycollation":"uppercase","wmf-config":{"wmfMasterDatacenter":"eqiad"},"wikibase-propertytypes":{"commonsMedia":{"valuetype":"string"},"geo-shape":{"valuetype":"string"},"globe-coordinate":{"valuetype":"globecoordinate"},"monolingualtext":{"valuetype":"monolingualtext"},"quantity":{"valuetype":"quantity"},"string":{"valuetype":"string"},"tabular-data":{"valuetype":"string"},"time":{"valuetype":"time"},"url":{"valuetype":"string"},"external-id":{"valuetype":"string"},"wikibase-item":{"valuetype":"wikibase-entityid"},"wikibase-property":{"valuetype":"wikibase-entityid"},"math":{"valuetype":"string"}},"wikibase-conceptbaseuri":"http://www.wikidata.org/entity/","wikibase-geoshapestoragebaseurl":"https://commons.wikimedia.org/wiki/","wikibase-tabulardatastoragebaseurl":"https://commons.wikimedia.org/wiki/","wikibase-sparql":"https://query.wikidata.org/sparql","linter":{"high":["deletable-table-tag","html5-misnesting","misc-tidy-replacement-issues","multiline-html-table-in-list","multiple-unclosed-formatting-tags","pwrap-bug-workaround","self-closed-tag","tidy-font-bug","tidy-whitespace-bug","unclosed-quotes-in-heading"],"medium":["bogus-image-options","fostered","misnested-tag","multi-colon-escape"],"low":["missing-end-tag","obsolete-tag","stripped-tag"]},"mobileserver":"https://m.wikidata.org","pageviewservice-supported-metrics":{"pageviews":{"pageviews":""},"siteviews":{"pageviews":"","uniques":""},"mostviewed":{"pageviews":""}},"readinglists-config":{"maxListsPerUser":100,"maxEntriesPerList":1000,"deletedRetentionDays":30}},"userinfo":{"id":0,"name":"192.0.2.42","anon":""}}}'}
+    headers:
+      Accept-Ranges: [bytes]
+      Age: ['0']
+      Backend-Timing: [D=35264 t=1516018571586812]
+      Cache-control: ['private, must-revalidate, max-age=0']
+      Connection: [keep-alive]
+      Content-Disposition: [inline; filename="api-result.json"]
+      Content-Type: [application/json; charset=utf-8]
+      Date: ['Mon, 15 Jan 2018 12:16:11 GMT']
+      P3P: ['CP="This is not a P3P policy! See https://www.wikidata.org/wiki/Special:CentralAutoLogin/P3P
+          for more info."']
+      Server: [mw1314.eqiad.wmnet]
+      Strict-Transport-Security: [max-age=106384710; includeSubDomains; preload]
+      Vary: [Accept-Encoding]
+      Via: ['1.1 varnish-v4, 1.1 varnish-v4, 1.1 varnish-v4, 1.1 varnish-v4']
+      X-Analytics: [ns=-1;special=Badtitle;https=1;nocookies=1]
+      X-Cache: ['cp1066 pass, cp2010 pass, cp4030 pass, cp4027 pass']
+      X-Cache-Status: [pass]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [DENY]
+      X-Powered-By: [HHVM/3.18.6-dev]
+      X-Varnish: ['874748940, 632554111, 1022853630, 26121057']
+      content-length: ['6374']
+    status: {code: 200, message: OK}
+version: 1

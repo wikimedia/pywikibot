@@ -90,7 +90,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'sco': "Category:Wikipaedia soft redirectit categories",
             'simple': "Category:Category redirects",
             'sh': u"Kategorija:Preusmjerene kategorije Wikipedije",
-            'sr': 'Категорија:Wikipedia soft redirected categories',
+            'sr': 'Категорија:Википедијине меко преусмерене категорије',
             'vi': u"Thể loại:Thể loại đổi hướng",
             'zh': u"Category:已重定向的分类",
             'ro': 'Categorie:Categorii de redirecționare',
@@ -171,7 +171,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 continue
             except KeyboardInterrupt:
                 raise
-            except:
+            except Exception:
                 return (None, None)
 
     def readyToEdit(self, cat):
@@ -223,9 +223,8 @@ class CategoryRedirectBot(pywikibot.Bot):
         comment = i18n.twtranslate(self.site, self.redir_comment)
 
         # generator yields all hard redirect pages in namespace 14
-        for page in pagegenerators.PreloadingGenerator(
-                self.site.allpages(namespace=14, filterredir=True),
-                groupsize=250):
+        for page in self.site.allpages(namespace=14, filterredir=True,
+                                       content=True):
             if page.isCategoryRedirect():
                 # this is already a soft-redirect, so skip it (for now)
                 continue
@@ -342,7 +341,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # do a null edit on cat
                 try:
                     cat.save()
-                except:
+                except Exception:
                     pass
 
         # delete record entries for non-existent categories
@@ -380,7 +379,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                 # categories this wiki might maintain
                 try:
                     cat.save()
-                except:
+                except Exception:
                     pass
                 continue
             if dest.isCategoryRedirect():
@@ -392,7 +391,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                     # do a null edit on cat
                     try:
                         cat.save()
-                    except:
+                    except Exception:
                         pass
                 else:
                     self.log_text.append(
@@ -432,7 +431,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             # do a null edit on cat
             try:
                 cat.save()
-            except:
+            except Exception:
                 pass
 
         with open(datafile, "wb") as f:
