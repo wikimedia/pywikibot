@@ -1,7 +1,7 @@
 Scripts reference
--------------
+-----------------
 
-Provided Scripts by pywikibot
+Provided scripts by pywikibot
 =============================
 
 Pywikibot framework has a lot of ready-to-use scripts for several tasks.

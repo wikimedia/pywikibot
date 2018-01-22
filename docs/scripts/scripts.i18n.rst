@@ -5,4 +5,3 @@ scripts.i18n translation files
     :members:
     :undoc-members:
     :show-inheritance:
-
