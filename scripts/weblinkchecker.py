@@ -99,7 +99,7 @@ Syntax examples:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -442,8 +442,7 @@ class LinkChecker(object):
                 except UnicodeError:
                     redirTarget = redirTarget.decode(
                         self.getEncodingUsedByServer())
-                if redirTarget.startswith('http://') or \
-                   redirTarget.startswith('https://'):
+                if redirTarget.startswith(('http://', 'https://')):
                     self.changeUrl(redirTarget)
                     return True
                 elif redirTarget.startswith('/'):
