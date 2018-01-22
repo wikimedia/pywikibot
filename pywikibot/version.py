@@ -35,7 +35,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, PY2
+from pywikibot.tools import deprecated, PY2, PYTHON_VERSION
 
 if not PY2:
     basestring = (str, )
@@ -366,7 +366,7 @@ def getversion_package(path=None):  # pylint: disable=unused-argument
         - hash (git hash for the current revision of 'pywikibot/__init__.py')
     @rtype: C{tuple} of four C{str}
     """
-    hsh = get_module_version(pywikibot)
+    hsh = ''
     date = get_module_mtime(pywikibot).timetuple()
 
     tag = 'pywikibot/__init__.py'
@@ -453,6 +453,8 @@ def get_module_filename(module):
     """
     if hasattr(module, '__file__') and os.path.exists(module.__file__):
         filename = module.__file__
+        if PYTHON_VERSION < (3, 4):
+            filename = os.path.abspath(filename)
         if filename[-4:-1] == '.py' and os.path.exists(filename[:-1]):
             filename = filename[:-1]
         program_dir = _get_program_dir()
