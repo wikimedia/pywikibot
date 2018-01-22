@@ -4,6 +4,9 @@
 .. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graphs/badge.svg?branch=master
    :alt: Code coverage
    :target: http://codecov.io/github/wikimedia/pywikibot?branch=master
+.. image:: https://codeclimate.com/github/wikimedia/pywikibot-core/badges/gpa.svg
+   :alt: Maintainability
+   :target: https://codeclimate.com/github/wikimedia/pywikibot-core
 .. image:: https://img.shields.io/pypi/v/pywikibot.svg
    :alt: Pywikibot release
    :target: https://pypi.python.org/pypi/pywikibot
