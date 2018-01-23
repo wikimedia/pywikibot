@@ -78,7 +78,8 @@ def getversion(online=True):
         try:
             hsh2 = getversion_onlinerepo()
             hsh1 = data['hsh']
-            data['cmp_ver'] = 'OUTDATED' if hsh1 != hsh2 else 'ok'
+            data['cmp_ver'] = 'UNKNOWN' if not hsh1 else (
+                'OUTDATED' if hsh1 != hsh2 else 'ok')
         except Exception:
             pass
 
