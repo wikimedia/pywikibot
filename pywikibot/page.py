@@ -3592,7 +3592,7 @@ class WikibasePage(BasePage):
                     self._namespace = site.property_namespace
                 else:
                     raise ValueError('%r: Namespace "%d" is not valid'
-                                     % self.site)
+                                     % (site, ns))
 
         if 'entity_type' in kwargs:
             entity_type = kwargs.pop('entity_type')
