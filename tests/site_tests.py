@@ -1065,6 +1065,21 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertLessEqual(len(tuple(upgen)), 3)
 
 
+class TestLinterPages(DefaultSiteTestCase):
+
+    """Test linter_pages methods."""
+
+    def test_linter_pages(self):
+        """Test the deprecated site.logpages() method."""
+        le = list(self.site.linter_pages(
+            lint_categories='obsolete-tag|missing-end-tag', total=5))
+        self.assertLessEqual(len(le), 5)
+        for entry in le:
+            self.assertIsInstance(entry, pywikibot.Page)
+            self.assertIn(entry._lintinfo['category'],
+                          ['obsolete-tag', 'missing-end-tag'])
+
+
 class TestImageUsage(DefaultSiteTestCase):
 
     """Test cases for Site.imageusage method."""

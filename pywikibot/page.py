@@ -160,7 +160,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         '_contentmodel', '_langlinks', '_isredir', '_coords',
         '_preloadedtext', '_timestamp', '_applicable_protections',
         '_flowinfo', '_quality', '_pageprops', '_revid', '_quality_text',
-        '_pageimage', '_item'
+        '_pageimage', '_item', '_lintinfo',
     )
 
     def __init__(self, source, title=u"", ns=0):

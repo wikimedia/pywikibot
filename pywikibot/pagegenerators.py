@@ -276,6 +276,19 @@ GENERATOR OPTIONS
                     "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
                     and supplied multiple times for multiple pages.
 
+-linter             Work on pages that contains lint errors. Extension Linter
+                    must be available on the site.
+                    -linter select all categories.
+                    -linter:high, -linter:medium or -linter:low select all
+                    categories for that prio.
+                    Single categories can be selected with commas as in
+                    -linter:cat1,cat2,cat3
+
+                    Adding '/int' indentifies Lint ID to start querying from:
+                    e.g. -linter:high/10000
+
+                    -linter:show just shows available categories.
+
 
 FILTER OPTIONS
 ==============
@@ -312,9 +325,9 @@ FILTER OPTIONS
                     -ns:not:2,3
                     -ns:not:Help,File
 
-                    If used with -newpages/-random/-randomredirect generators,
-                    -namespace/ns must be provided before
-                    -newpages/-random/-randomredirect.
+                    If used with -newpages/-random/-randomredirect/linter
+                    generators, -namespace/ns must be provided before
+                    -newpages/-random/-randomredirect/linter.
                     If used with -recentchanges generator, efficiency is
                     improved if -namespace is provided before -recentchanges.
 
@@ -699,6 +712,41 @@ class GeneratorFactory(object):
                 value = 'Image:' + value
             page = pywikibot.FilePage(self.site, value)
             gen = FileLinksGenerator(page)
+        elif arg == '-linter':
+            if not self.site.has_extension('Linter'):
+                raise UnknownExtension(
+                    '-linter needs a site with Linter extension.')
+            cats = self.site.siteinfo.get('linter')  # Get linter categories.
+            valid_cats = [c for _list in cats.values() for c in _list]
+
+            cat, sep, lint_from = value.partition('/')
+            if not lint_from:
+                lint_from = None
+
+            if cat == 'show':  # Display categories of lint errors.
+                _i = ' ' * 4
+                txt = 'Available categories of lint errors:\n'
+                for prio, _list in cats.items():
+                    txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
+                    for c in _list:
+                        txt += '{indent}{cat}\n'.format(indent=2 * _i, cat=c)
+                pywikibot.output('%s' % txt)
+                return True
+
+            if not cat:
+                lint_cats = valid_cats
+            elif cat in ['low', 'medium', 'high']:
+                lint_cats = cats[cat]
+            else:
+                lint_cats = cat.split(',')
+                for lint_cat in lint_cats:
+                    if lint_cat not in valid_cats:
+                        raise ValueError('Invalid category of lint errors: %s'
+                                         % cat)
+
+            gen = self.site.linter_pages(lint_categories='|'.join(lint_cats),
+                                         namespaces=self.namespaces,
+                                         lint_from=lint_from)
         elif arg == '-unusedfiles':
             gen = UnusedFilesGenerator(total=intNone(value), site=self.site)
         elif arg == '-lonelypages':
