@@ -189,8 +189,10 @@ CircleCI Ubuntu servers.
 3. create a project in circleci.com
 4. go to https://circleci.com/gh/<username>/pywikibot-core/edit#env-vars
    and add the following variables:
-     PYWIKIBOT2_NO_USER_CONFIG=2
-     TOXENV=py27,py34
+
+     - PYWIKIBOT2_NO_USER_CONFIG=2
+     - TOXENV=py27,py34
+
 5. push changes into the forked git repository
 6. watch the build at https://circleci.com/gh/<username>/pywikibot-core
 
