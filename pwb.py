@@ -9,7 +9,7 @@ Run scripts using:
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
 """
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -166,6 +166,8 @@ del requests
 
 if len(sys.argv) > 1 and sys.argv[1][0] != '-':
     filename = sys.argv[1]
+    if not filename.endswith('.py'):
+        filename += '.py'
 else:
     filename = None
 
@@ -185,8 +187,9 @@ try:
     pwb = pywikibot
 except RuntimeError as err:
     # user-config.py to be created
-    print("NOTE: 'user-config.py' was not found!")
-    if filename is not None and not filename.startswith('generate_'):
+    if filename is not None and not (filename.startswith('generate_')
+                                     or filename == 'version.py'):
+        print("NOTE: 'user-config.py' was not found!")
         print("Please follow the prompts to create it:")
         run_python_file('generate_user_files.py',
                         ['generate_user_files.py'],
@@ -204,8 +207,6 @@ def main():
         file_package = None
         tryimport_pwb()
         argvu = pwb.argvu[1:]
-        if not filename.endswith('.py'):
-            filename += '.py'
         if not os.path.exists(filename):
             script_paths = ['scripts',
                             'scripts.maintenance',
