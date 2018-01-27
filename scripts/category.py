@@ -109,7 +109,7 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2016
+# (C) xqt, 2009-2018
 # (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
@@ -415,9 +415,11 @@ class CategoryAddBot(MultipleSitesBot):
             if not comment:
                 comment = i18n.twtranslate(self.current_page.site,
                                            'category-adding',
-                                           {'newcat': catpl.title(withNamespace=False)})
+                                           {'newcat': catpl.title(
+                                               withNamespace=False)})
             try:
-                self.userPut(self.current_page, old_text, text, summary=comment)
+                self.userPut(self.current_page, old_text, text,
+                             summary=comment)
             except pywikibot.PageSaveRelatedError as error:
                 pywikibot.output(u'Page %s not saved: %s'
                                  % (self.current_page.title(asLink=True),
@@ -484,7 +486,8 @@ class CategoryMoveRobot(object):
             page don't exist.
         """
         self.site = pywikibot.Site()
-        self.can_move_cats = ('move-categorypages' in self.site.userinfo['rights'])
+        self.can_move_cats = (
+            'move-categorypages' in self.site.userinfo['rights'])
         # Create attributes for the categories and their talk pages.
         self.oldcat = self._makecat(oldcat)
         self.oldtalk = self.oldcat.toggleTalkPage()
@@ -512,9 +515,9 @@ class CategoryMoveRobot(object):
             repo = self.site.data_repository()
             if self.wikibase and repo.username() is None:
                 # The bot can't move categories nor update the Wikibase repo
-                raise pywikibot.NoUsername(u"The 'wikibase' option is turned on"
-                                           u" and %s has no registered username."
-                                           % repo)
+                raise pywikibot.NoUsername(
+                    "The 'wikibase' option is turned on and {0} has no "
+                    'registered username.'.format(repo))
 
         template_vars = {'oldcat': self.oldcat.title(withNamespace=False)}
         if self.newcat:
@@ -552,8 +555,8 @@ class CategoryMoveRobot(object):
                                                          template_vars)
             else:
                 # Category is deleted.
-                self.deletion_comment = i18n.twtranslate(self.site,
-                                                         'category-was-disbanded')
+                self.deletion_comment = i18n.twtranslate(
+                    self.site, 'category-was-disbanded')
         self.move_comment = move_comment if move_comment else self.comment
 
     def run(self):
@@ -650,15 +653,17 @@ class CategoryMoveRobot(object):
                                      inPlace=self.inplace,
                                      sortKey=self.keep_sortkey)
 
-                # Categories for templates can be included in <includeonly> section
-                # of Template:Page/doc subpage.
-                # TODO: doc page for a template can be Anypage/doc, as specified in
+                # Categories for templates can be included in <includeonly>
+                # section of Template:Page/doc subpage.
+                # TODO: doc page for a template can be Anypage/doc, as
+                # specified in
                 #    {{Template:Documentation}} -> not managed here
                 # TODO: decide if/how to enable/disable this feature
                 if page.namespace() == 10:
                     docs = page.site.doc_subpage  # return tuple
                     for doc in docs:
-                        doc_page = pywikibot.Page(page.site, page.title() + doc)
+                        doc_page = pywikibot.Page(page.site,
+                                                  page.title() + doc)
                         template_docs.add(doc_page)
 
         for doc_page in pagegenerators.PreloadingGenerator(template_docs):
@@ -704,7 +709,8 @@ class CategoryMoveRobot(object):
         comma = self.site.mediawiki_message('comma-separator')
         authors = comma.join(self.oldcat.contributingUsers())
         template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
-        summary = i18n.twtranslate(self.site, 'category-renamed', template_vars)
+        summary = i18n.twtranslate(self.site, 'category-renamed',
+                                   template_vars)
         self.newcat.text = self.oldcat.text
         self._strip_cfd_templates(summary)
 
@@ -804,9 +810,10 @@ class CategoryRemoveRobot(CategoryMoveRobot):
     """
 
     @deprecated('CategoryMoveRobot.__init__()')
-    def __init__(self, catTitle, batchMode=False, editSummary='',
-                 useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
-                 titleRegex=None, inPlace=False, pagesonly=False):
+    def __init__(
+            self, catTitle, batchMode=False, editSummary='',
+            useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
+            titleRegex=None, inPlace=False, pagesonly=False):
         """Constructor."""
         super(CategoryRemoveRobot, self).__init__(
             oldcat=catTitle,
@@ -876,13 +883,13 @@ class CategoryTidyRobot(pywikibot.Bot):
     """Script to help by moving articles of the category into subcategories.
 
     Specify the category name on the command line. The program will pick up the
-    page, and look for all subcategories and supercategories, and show them with
-    a number adjacent to them. It will then automatically loop over all pages
-    in the category. It will ask you to type the number of the appropriate
-    replacement, and perform the change robotically.
+    page, and look for all subcategories and supercategories, and show them
+    with a number adjacent to them. It will then automatically loop over all
+    pages in the category. It will ask you to type the number of the
+    appropriate replacement, and perform the change robotically.
 
-    If you don't want to move the article to a subcategory or supercategory, but
-    to another category, you can use the 'j' (jump) command.
+    If you don't want to move the article to a subcategory or supercategory,
+    but to another category, you can use the 'j' (jump) command.
 
     Typing 's' will leave the complete page unchanged.
 
@@ -928,7 +935,7 @@ class CategoryTidyRobot(pywikibot.Bot):
             def output_range(self, start, end):
                 pywikibot.output('\n' + full_text[:end] + '\n')
 
-                # if categories possibly weren't visible, show them additionally
+                # if categories weren't visible, show them additionally
                 # (maybe this should always be shown?)
                 if len(self.text) > end:
                     pywikibot.output('')
@@ -984,7 +991,8 @@ class CategoryTidyRobot(pywikibot.Bot):
                    StandardOption('skip this article', 's'),
                    StandardOption('remove this category tag', 'r'),
                    context_option,
-                   StandardOption('save category as "{0}"'.format(current_cat.title()), 'c'))
+                   StandardOption('save category as "{0}"'
+                                  .format(current_cat.title()), 'c'))
         choice = pywikibot.input_choice(color_format(
             'Choice for page {lightpurple}{0}{default}:\n',
             article.title()), options, default='c')
@@ -1106,11 +1114,6 @@ class CategoryTreeRobot(object):
 
         After string was generated by treeview it is either printed to the
         console or saved it to a file.
-
-        Parameters:
-            * catTitle - the title of the category which will be the tree's root
-            * maxDepth - the limit beyond which no subcategories will be listed
-
         """
         cat = pywikibot.Category(self.site, self.catTitle)
         pywikibot.output('Generating tree...', newline=False)
@@ -1295,8 +1298,8 @@ def main(*args):
         catTitle = pywikibot.input(
             u'For which category do you want to create a tree view?')
         filename = pywikibot.input(
-            u'Please enter the name of the file where the tree should be saved,'
-            u'\nor press enter to simply show the tree:')
+            'Please enter the name of the file where the tree should be saved,'
+            '\nor press enter to simply show the tree:')
         bot = CategoryTreeRobot(catTitle, catDB, filename, depth)
     elif action == 'listify':
         if not fromGiven:

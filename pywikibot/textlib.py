@@ -134,8 +134,8 @@ def to_local_digits(phrase, lang):
     """
     Change Latin digits based on language to localized version.
 
-    Be aware that this function only works for several languages,
-    and that it returns an unchanged string if an unsupported language is given.
+    Be aware that this function only works for several languages, and that it
+    returns an unchanged string if an unsupported language is given.
 
     @param phrase: The phrase to convert to localized numerical
     @param lang: language code
@@ -245,7 +245,8 @@ def _create_default_regexes():
                              list(site.family.obsolete.keys()))),
         # Wikibase property inclusions
         'property':     (r'(?i)\{\{\s*\#(?:%s):\s*p\d+.*?\}\}',
-                         lambda site: '|'.join(site.getmagicwords('property'))),
+                         lambda site: '|'.join(
+                             site.getmagicwords('property'))),
         # Module invocations (currently only Lua)
         'invoke':       (r'(?is)\{\{\s*\#(?:%s):.*?\}\}',
                          lambda site: '|'.join(site.getmagicwords('invoke'))),
@@ -384,11 +385,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
                 # We cannot just insert the new string, as it may contain regex
                 # group references such as \2 or \g<name>.
                 # On the other hand, this approach does not work because it
-                # can't handle lookahead or lookbehind (see bug T123185):
-                #
-                #  replacement = old.sub(new, text[match.start():match.end()])
-                #  text = text[:match.start()] + replacement + text[match.end():]
-
+                # can't handle lookahead or lookbehind (see bug T123185).
                 # So we have to process the group references manually.
                 replacement = ''
 
@@ -418,7 +415,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
             else:
                 index = match.start() + len(replacement)
             if not match.group():
-                # When the regex allows to match nothing, shift by one character
+                # When the regex allows to match nothing, shift by one char
                 index += 1
             markerpos = match.start() + len(replacement)
             replaced += 1
@@ -473,7 +470,8 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
 
     """
     # try to merge with 'removeDisabledParts()' above into one generic function
-    # thanks to https://www.hellboundhackers.org/articles/read-article.php?article_id=841
+    # thanks to:
+    # https://www.hellboundhackers.org/articles/read-article.php?article_id=841
     parser = _GetDataHTML()
     parser.keeptags = keeptags
     parser.feed(text)
@@ -500,7 +498,7 @@ class _GetDataHTML(HTMLParser):
 
 def isDisabled(text, index, tags=['*']):
     """
-    Return True if text[index] is disabled, e.g. by a comment or by nowiki tags.
+    Return True if text[index] is disabled, e.g. by a comment or nowiki tags.
 
     For the tags parameter, see L{removeDisabledParts}.
     """
@@ -535,8 +533,8 @@ def expandmarker(text, marker='', separator=''):
     @param separator: the separator string allowed before the marker. If empty
         it won't include whitespace too.
     @type separator: str
-    @return: the marker with the separator and whitespace from the text in front
-        of it. It'll be just the marker if the separator is empty.
+    @return: the marker with the separator and whitespace from the text in
+        front of it. It'll be just the marker if the separator is empty.
     @rtype: str
     """
     # set to remove any number of separator occurrences plus arbitrary
@@ -567,9 +565,9 @@ def replace_links(text, replace, site=None):
 
     The text is searched for a link and on each link it replaces the text
     depending on the result for that link. If the result is just None it skips
-    that link. When it's False it unlinks it and just inserts the label. When it
-    is a Link instance it'll use the target, section and label from that Link
-    instance. If it's a Page instance it'll use just the target from the
+    that link. When it's False it unlinks it and just inserts the label. When
+    it is a Link instance it'll use the target, section and label from that
+    Link instance. If it's a Page instance it'll use just the target from the
     replacement and the section and label from the original link.
 
     If it's a string and the replacement was a sequence it converts it into a
@@ -589,13 +587,13 @@ def replace_links(text, replace, site=None):
         allows for user interaction. The groups are a dict containing 'title',
         'section', 'label' and 'linktrail' and the rng are the start and end
         position of the link. The 'label' in groups contains everything after
-        the first pipe which might contain additional data which is used in File
-        namespace for example.
+        the first pipe which might contain additional data which is used in
+        File namespace for example.
         Alternatively it can be a sequence containing two items where the first
-        must be a Link or Page and the second has almost the same meaning as the
-        result by the callable. It'll convert that into a callable where the
-        first item (the Link or Page) has to be equal to the found link and in
-        that case it will apply the second value from the sequence.
+        must be a Link or Page and the second has almost the same meaning as
+        the result by the callable. It'll convert that into a callable where
+        the first item (the Link or Page) has to be equal to the found link and
+        in that case it will apply the second value from the sequence.
     @type replace: sequence of pywikibot.Page/pywikibot.Link/str or
         callable
     @param site: a Site object to use if replace is not a sequence or the link
@@ -733,8 +731,8 @@ def replace_links(text, replace, site=None):
             curpos = rng[0] + len(replacement)
             continue
         elif isinstance(replacement, bytes):
-            raise ValueError('The result must be unicode (str in Python 3) and '
-                             'not bytes (str in Python 2).')
+            raise ValueError('The result must be unicode (str in Python 3) '
+                             'and not bytes (str in Python 2).')
 
         # Verify that it's either Link, Page or basestring
         check_replacement_class(replacement)
@@ -771,11 +769,13 @@ def replace_links(text, replace, site=None):
             parsed_link_title = title_section(parsed_link_text)
             replacement_title = title_section(replacement)
             # compare title, but only with parts if linktrail works
-            if not linktrail.sub('', parsed_link_title[len(replacement_title):]):
+            if not linktrail.sub('',
+                                 parsed_link_title[len(replacement_title):]):
                 # TODO: This must also compare everything that was used as a
                 #       prefix (in case insensitive)
-                must_piped = (not parsed_link_title.startswith(replacement_title) or
-                              parsed_link_text.namespace != replacement.namespace)
+                must_piped = (
+                    not parsed_link_title.startswith(replacement_title)
+                    or parsed_link_text.namespace != replacement.namespace)
 
         if must_piped:
             newlink = '[[{0}|{1}]]'.format(new_page_title, link_text)
@@ -1159,7 +1159,8 @@ def removeCategoryLinks(text, site=None, marker=''):
     catNamespace = '|'.join(site.namespaces.CATEGORY)
     categoryR = re.compile(r'\[\[\s*(%s)\s*:.*?\]\]\s*' % catNamespace, re.I)
     text = replaceExcept(text, categoryR, '',
-                         ['nowiki', 'comment', 'math', 'pre', 'source', 'includeonly'],
+                         ['nowiki', 'comment', 'math', 'pre', 'source',
+                          'includeonly'],
                          marker=marker,
                          site=site)
     if marker:
@@ -1224,7 +1225,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     if newcat is None:
         # First go through and try the more restrictive regex that removes
         # an entire line, if the category is the only thing on that line (this
-        # prevents blank lines left over in category lists following a removal.)
+        # prevents blank lines left over in category lists following a removal)
         text = replaceExcept(oldtext, categoryRN, '',
                              exceptions, site=site)
         text = replaceExcept(text, categoryR, '',
@@ -1237,8 +1238,9 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
             exceptions, site=site)
     else:
         text = replaceExcept(oldtext, categoryR,
-                             '[[%s:%s\\2' % (site.namespace(14),
-                                             newcat.title(withNamespace=False)),
+                             '[[{0}:{1}\\2'
+                             .format(site.namespace(14),
+                                     newcat.title(withNamespace=False)),
                              exceptions, site=site)
     return text
 
@@ -1254,8 +1256,8 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     @type new: iterable
     @param site: The site that the text is from.
     @type site: pywikibot.Site
-    @param addOnly: If addOnly is True, the old category won't be deleted and the
-        category(s) given will be added (and so they won't replace anything).
+    @param addOnly: If addOnly is True, the old category won't be deleted and
+        the category(s) given will be added (and they won't replace anything).
     @type addOnly: bool
     @return: The modified text.
     @rtype: str
@@ -1268,8 +1270,9 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
         pywikibot.error(
             'The Pywikibot is no longer allowed to touch categories on the '
             'German\nWikipedia on pages that contain the Personendaten '
-            'template because of the\nnon-standard placement of that template.\n'
-            'See https://de.wikipedia.org/wiki/Hilfe:Personendaten#Kopiervorlage')
+            'template because of the\nnon-standard placement of that template.'
+            '\nSee https://de.wikipedia.org/wiki/Hilfe:Personendaten'
+            '#Kopiervorlage')
         return oldtext
     separator = site.family.category_text_separator
     iseparator = site.family.interwiki_text_separator
@@ -1334,7 +1337,8 @@ def categoryFormat(categories, insite=None):
         if isinstance(category, basestring):
             category, separator, sortKey = category.strip('[]').partition('|')
             sortKey = sortKey if separator else None
-            prefix = category.split(":", 1)[0]  # whole word if no ":" is present
+            # whole word if no ":" is present
+            prefix = category.split(':', 1)[0]
             if prefix not in insite.namespaces[14]:
                 category = u'{0}:{1}'.format(insite.namespace(14), category)
             category = pywikibot.Category(pywikibot.Link(category,
@@ -1380,7 +1384,8 @@ def compileLinkR(withoutBracketed=False, onlyBracketed=False):
     # .'' shouldn't be considered as part of the link.
     regex = r'(?P<url>http[s]?://[^%(notInside)s]*?[^%(notAtEnd)s]' \
             r'(?=[%(notAtEnd)s]*\'\')|http[s]?://[^%(notInside)s]*' \
-            r'[^%(notAtEnd)s])' % {'notInside': notInside, 'notAtEnd': notAtEnd}
+            r'[^%(notAtEnd)s])' % {'notInside': notInside,
+                                   'notAtEnd': notAtEnd}
 
     if withoutBracketed:
         regex = r'(?<!\[)' + regex
@@ -1593,31 +1598,6 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
             # {{#if: }}
             if not name or name.startswith('#'):
                 continue
-
-# TODO: implement the following; 'self' and site dont exist in this function
-#            if self.site().isInterwikiLink(name):
-#                continue
-#            # {{DEFAULTSORT:...}}
-#            from pywikibot.tools import MediaWikiVersion
-#            defaultKeys = MediaWikiVersion(self.site.version()) > MediaWikiVersion("1.13") and \
-#                          self.site().getmagicwords('defaultsort')
-#            # It seems some wikis does not have this magic key
-#            if defaultKeys:
-#                found = False
-#                for key in defaultKeys:
-#                    if name.startswith(key):
-#                        found = True
-#                        break
-#                if found: continue
-#
-#            try:
-#                name = Page(self.site(), name).title()
-#            except InvalidTitle:
-#                if name:
-#                    output(
-#                        u"Page %s contains invalid template name {{%s}}."
-#                       % (self.title(), name.strip()))
-#                continue
 
             # Parameters
             paramString = m.group('params')
@@ -1938,7 +1918,8 @@ class TimeStripper(object):
         self.groups = ['year', 'month', 'hour', 'time', 'day', 'minute',
                        'tzinfo']
 
-        timeR = r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h](?P<minute>[0-5]\d))'
+        timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
+                 r'(?P<minute>[0-5]\d))')
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
         yearR = r'(?P<year>(19|20)\d\d)(?:%s)?' % u'\ub144'
         # if months have 'digits' as names, they need to be
@@ -1955,7 +1936,9 @@ class TimeStripper(object):
             self.is_digit_month = True
             monthR = r'(?P<month>(%s)|(?:1[012]|0?[1-9])\.)' \
                 % u'|'.join(escaped_months)
-            dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:%s)?\.?\s*(?:[01]?\d\.)?' % u'\uc77c'
+            dayR = (
+                r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:{0})?\.?\s*(?:[01]?\d\.)?'
+                .format('\uc77c'))
         else:
             self.is_digit_month = False
             monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
@@ -2089,8 +2072,8 @@ class TimeStripper(object):
         # rightmost one.
         most_recent = []
         for comment in self._comment_pat.finditer(line):
-            # Recursion levels can be maximum two. If a comment is found, it will
-            # not for sure be found in the next level.
+            # Recursion levels can be maximum two. If a comment is found, it
+            # will not for sure be found in the next level.
             # Nested comments are excluded by design.
             timestamp = self.timestripper(comment.group(1))
             most_recent.append(timestamp)
@@ -2142,7 +2125,7 @@ class TimeStripper(object):
             try:
                 value = self.origNames2monthNum[dateDict['month']['value']]
             except KeyError:
-                pywikibot.output(u'incorrect month name "%s" in page in site %s'
+                pywikibot.output('incorrect month name "%s" in page in site %s'
                                  % (dateDict['month']['value'], self.site))
                 raise KeyError
             else:
@@ -2155,8 +2138,9 @@ class TimeStripper(object):
                 try:
                     dateDict[k] = int(v['value'])
                 except ValueError:
-                    raise ValueError('Value: %s could not be converted for key: %s.'
-                                     % (v['value'], k))
+                    raise ValueError(
+                        'Value: {0} could not be converted for key: {1}.'
+                        .format(v['value'], k))
 
             # find timezone
             dateDict['tzinfo'] = self.tzinfo

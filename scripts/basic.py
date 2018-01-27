@@ -25,7 +25,7 @@ The following parameters are supported:
 -summary:         Set the action summary message for the edit.
 """
 #
-# (C) Pywikibot team, 2006-2017
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -58,10 +58,10 @@ class BasicBot(
     """
     An incomplete sample bot.
 
-    @ivar summary_key: Edit summary message key. The message that should be used
-        is placed on /i18n subdirectory. The file containing these messages
-        should have the same name as the caller script (i.e. basic.py in this
-        case). Use summary_key to set a default edit summary message.
+    @ivar summary_key: Edit summary message key. The message that should be
+        used is placed on /i18n subdirectory. The file containing these
+        messages should have the same name as the caller script (i.e. basic.py
+        in this case). Use summary_key to set a default edit summary message.
     @type summary_key: str
     """
 

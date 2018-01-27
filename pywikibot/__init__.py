@@ -372,8 +372,8 @@ class Coordinate(_WbRepresentation):
         u"""
         Return the precision of the geo coordinate.
 
-        The precision is calculated if the Coordinate does not have a precision,
-        and self._dim is set.
+        The precision is calculated if the Coordinate does not have a
+        precision, and self._dim is set.
 
         When no precision and no self._dim exists, None is returned.
 
@@ -385,13 +385,15 @@ class Coordinate(_WbRepresentation):
 
         In small angle approximation (and thus in radians):
 
-        M{Δλ ≈ Δpos / r_φ}, where r_φ is the radius of earth at the given latitude.
+        M{Δλ ≈ Δpos / r_φ}, where r_φ is the radius of earth at the given
+        latitude.
         Δλ is the error in longitude.
 
         M{r_φ = r cos φ}, where r is the radius of earth, φ the latitude
 
         Therefore::
-            precision = math.degrees(self._dim/(radius*math.cos(math.radians(self.lat))))
+            precision = math.degrees(
+                self._dim/(radius*math.cos(math.radians(self.lat))))
 
         @rtype: float or None
         """
@@ -408,19 +410,24 @@ class Coordinate(_WbRepresentation):
         self._precision = value
 
     def precisionToDim(self):
-        """Convert precision from Wikibase to GeoData's dim and return the latter.
+        """
+        Convert precision from Wikibase to GeoData's dim and return the latter.
 
-        dim is calculated if the Coordinate doesn't have a dimension, and precision is set.
-        When neither dim nor precision are set, ValueError is thrown.
+        dim is calculated if the Coordinate doesn't have a dimension, and
+        precision is set. When neither dim nor precision are set, ValueError
+        is thrown.
 
         Carrying on from the earlier derivation of precision, since
-        precision = math.degrees(dim/(radius*math.cos(math.radians(self.lat)))), we get
-            dim = math.radians(precision)*radius*math.cos(math.radians(self.lat))
-        But this is not valid, since it returns a float value for dim which is an integer.
-        We must round it off to the nearest integer.
+        precision = math.degrees(dim/(radius*math.cos(math.radians(self.lat))))
+        we get:
+            dim = math.radians(
+                precision)*radius*math.cos(math.radians(self.lat))
+        But this is not valid, since it returns a float value for dim which is
+        an integer. We must round it off to the nearest integer.
 
         Therefore::
-            dim = int(round(math.radians(precision)*radius*math.cos(math.radians(self.lat))))
+            dim = int(round(math.radians(
+                precision)*radius*math.cos(math.radians(self.lat))))
 
         @rtype: int or None
         """
@@ -430,7 +437,8 @@ class Coordinate(_WbRepresentation):
             radius = 6378137
             self._dim = int(
                 round(
-                    math.radians(self._precision) * radius * math.cos(math.radians(self.lat))
+                    math.radians(self._precision) * radius * math.cos(
+                        math.radians(self.lat))
                 )
             )
         return self._dim
@@ -496,11 +504,15 @@ class WbTime(_WbRepresentation):
         readable string, e.g., 'hour'. If no precision is given, it is set
         according to the given time units.
 
-        Timezone information is given in three different ways depending on the time:
-        * Times after the implementation of UTC (1972): as an offset from UTC in minutes;
-        * Times before the implementation of UTC: the offset of the time zone from universal time;
-        * Before the implementation of time zones: The longitude of the place of
-          the event, in the range −180° to 180°, multiplied by 4 to convert to minutes.
+        Timezone information is given in three different ways depending on the
+        time:
+        * Times after the implementation of UTC (1972): as an offset from UTC
+          in minutes;
+        * Times before the implementation of UTC: the offset of the time zone
+          from universal time;
+        * Before the implementation of time zones: The longitude of the place
+          of the event, in the range −180° to 180°, multiplied by 4 to convert
+          to minutes.
 
         @param year: The year as a signed integer of between 1 and 16 digits.
         @type year: long
@@ -516,11 +528,11 @@ class WbTime(_WbRepresentation):
         @type second: int
         @param precision: The unit of the precision of the time.
         @type precision: int or str
-        @param before: Number of units after the given time it could be, if uncertain.
-            The unit is given by the precision.
+        @param before: Number of units after the given time it could be, if
+            uncertain. The unit is given by the precision.
         @type before: int
-        @param after: Number of units before the given time it could be, if uncertain.
-            The unit is given by the precision.
+        @param after: Number of units before the given time it could be, if
+            uncertain. The unit is given by the precision.
         @type after: int
         @param timezone: Timezone information in minutes.
         @type timezone: int
@@ -583,18 +595,19 @@ class WbTime(_WbRepresentation):
         The timestamp differs from ISO 8601 in that:
         * The year is always signed and having between 1 and 16 digits;
         * The month, day and time are zero if they are unknown;
-        * The Z is discarded since time zone is determined from the timezone param.
+        * The Z is discarded since time zone is determined from the timezone
+          param.
 
         @param datetimestr: Timestamp in a format resembling ISO 8601,
             e.g. +2013-01-01T00:00:00Z
         @type datetimestr: str
         @param precision: The unit of the precision of the time.
         @type precision: int or str
-        @param before: Number of units after the given time it could be, if uncertain.
-            The unit is given by the precision.
+        @param before: Number of units after the given time it could be, if
+            uncertain. The unit is given by the precision.
         @type before: int
-        @param after: Number of units before the given time it could be, if uncertain.
-            The unit is given by the precision.
+        @param after: Number of units before the given time it could be, if
+            uncertain. The unit is given by the precision.
         @type after: int
         @param timezone: Timezone information in minutes.
         @type timezone: int
@@ -623,11 +636,11 @@ class WbTime(_WbRepresentation):
         @type timestamp: pywikibot.Timestamp
         @param precision: The unit of the precision of the time.
         @type precision: int or str
-        @param before: Number of units after the given time it could be, if uncertain.
-            The unit is given by the precision.
+        @param before: Number of units after the given time it could be, if
+            uncertain. The unit is given by the precision.
         @type before: int
-        @param after: Number of units before the given time it could be, if uncertain.
-            The unit is given by the precision.
+        @param after: Number of units before the given time it could be, if
+            uncertain. The unit is given by the precision.
         @type after: int
         @param timezone: Timezone information in minutes.
         @type timezone: int
@@ -668,7 +681,8 @@ class WbTime(_WbRepresentation):
         @return: Timestamp
         @rtype: pywikibot.Timestamp
 
-        @raises ValueError: instance value can not be represented using Timestamp
+        @raises ValueError: instance value can not be represented using
+            Timestamp
         """
         if self.year <= 0:
             raise ValueError('You cannot turn BC dates into a Timestamp')
@@ -716,7 +730,7 @@ class WbQuantity(_WbRepresentation):
     @staticmethod
     def _require_errors(site):
         """
-        Check if the Wikibase site is so old it requires error bounds to be given.
+        Check if Wikibase site is so old it requires error bounds to be given.
 
         If no site item is supplied it raises a warning and returns True.
 
@@ -729,7 +743,8 @@ class WbQuantity(_WbRepresentation):
                 "WbQuantity now expects a 'site' parameter. This is needed to "
                 "ensure correct handling of error bounds.")
             return False
-        return MediaWikiVersion(site.version()) < MediaWikiVersion('1.29.0-wmf.2')
+        return MediaWikiVersion(
+            site.version()) < MediaWikiVersion('1.29.0-wmf.2')
 
     @staticmethod
     def _todecimal(value):
@@ -768,14 +783,14 @@ class WbQuantity(_WbRepresentation):
         Create a new WbQuantity object.
 
         @param amount: number representing this quantity
-        @type amount: string or Decimal. Other types are accepted, and converted
-                      via str to Decimal.
+        @type amount: string or Decimal. Other types are accepted, and
+            converted via str to Decimal.
         @param unit: the Wikibase item for the unit or the entity URI of this
-                     Wikibase item.
+            Wikibase item.
         @type unit: pywikibot.ItemPage, str or None
         @param error: the uncertainty of the amount (e.g. ±1)
-        @type error: same as amount, or tuple of two values, where the first value is
-                     the upper error and the second is the lower error value.
+        @type error: same as amount, or tuple of two values, where the first
+            value is the upper error and the second is the lower error value.
         @param site: The Wikibase site
         @type site: pywikibot.site.DataSite
         """
@@ -909,7 +924,7 @@ class WbMonolingualText(_WbRepresentation):
     @classmethod
     def fromWikibase(cls, wb):
         """
-        Create a WbMonolingualText from the JSON data given by the Wikibase API.
+        Create a WbMonolingualText from the JSON data given by Wikibase API.
 
         @param wb: Wikibase JSON
         @type wb: dict
@@ -1320,8 +1335,8 @@ def _flush(stop=True):
     """
     Drop this process from the throttle log, after pending threads finish.
 
-    Wait for the page-putter to flush its queue. Also drop this process from the
-    throttle log. Called automatically at Python exit.
+    Wait for the page-putter to flush its queue. Also drop this process from
+    the throttle log. Called automatically at Python exit.
     """
     _logger = "wiki"
 
