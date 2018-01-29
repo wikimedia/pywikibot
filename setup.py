@@ -46,7 +46,7 @@ if not python_is_supported():
 
 test_deps = ['bz2file', 'mock']
 
-dependencies = ['requests!=2.18.2']
+dependencies = ['requests>=2.9,!=2.18.2']
 
 # the irc module has no Python 2.6 support since 10.0
 irc_dep = 'irc==8.9' if sys.version_info < (2, 7) else 'irc'
@@ -62,7 +62,7 @@ else:
 
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient'],
+    'eventstreams': ['sseclient>=0.0.18'],
     'isbn': ['python-stdnum'],
     'Graphviz': ['pydot>=1.0.28'],
     'Google': ['google>=1.7'],

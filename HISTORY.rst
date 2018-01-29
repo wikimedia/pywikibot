@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Changed requirements for requests and sseclient
 * Bugfixes and improvements
 * Localisation updates
 
@@ -11,6 +12,7 @@ Current release
 ------------
 
 * Deprecation warning: support for py2.6 and py3.3 will be dropped
+* Changed requirements for cryprography, Pillow and pyOpenSSL
 * Bugfixes and improvements
 * Localisation updates
 
