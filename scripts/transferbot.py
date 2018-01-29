@@ -36,7 +36,7 @@ Copy the template "Query service" from the Toolserver wiki to wikitech:
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -134,10 +134,13 @@ def main(*args):
            'gen_args': gen_args, 'prefix': prefix})
 
     for page in gen:
-        summary = 'Moved page from %s' % page.title(asLink=True, insite=tosite)
         targetpage = pywikibot.Page(tosite, prefix + page.title())
         edithistpage = pywikibot.Page(tosite, prefix + page.title() +
                                       '/edithistory')
+        summary = 'Moved page from {old} ([[{new}/edithistory|history]])'\
+                  .format(old=page.title(asLink=True, insite=tosite),
+                          new=targetpage.title() if not
+                          targetpage.namespace().subpages else '')
 
         if targetpage.exists() and not overwrite:
             pywikibot.output(
