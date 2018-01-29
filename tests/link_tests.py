@@ -95,13 +95,13 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(Link('A &nbsp; B', self.get_site()).title, 'A B')
         self.assertEqual(Link('A &#160; B', self.get_site()).title, 'A B')
 
-        l = Link('A | B', self.get_site())
-        self.assertEqual(l.title, 'A')
-        self.assertEqual(l.anchor, ' B')
+        anchor_link = Link('A | B', self.get_site())
+        self.assertEqual(anchor_link.title, 'A')
+        self.assertEqual(anchor_link.anchor, ' B')
 
-        l = Link('A%23B', self.get_site())
-        self.assertEqual(l.title, 'A')
-        self.assertEqual(l.section, 'B')
+        section_link = Link('A%23B', self.get_site())
+        self.assertEqual(section_link.title, 'A')
+        self.assertEqual(section_link.section, 'B')
 
     def test_invalid(self):
         """Test that invalid titles raise InvalidTitle exception."""
@@ -207,18 +207,18 @@ class TestLink(DefaultDrySiteTestCase):
     def test_relative(self):
         """Test that relative links are handled properly."""
         # Subpage
-        p = Page(self.get_site(), 'Foo')
-        l = Link('/bar', p)
-        self.assertEqual(l.title, 'Foo/bar')
-        self.assertEqual(l.site, self.get_site())
+        page = Page(self.get_site(), 'Foo')
+        rel_link = Link('/bar', page)
+        self.assertEqual(rel_link.title, 'Foo/bar')
+        self.assertEqual(rel_link.site, self.get_site())
         # Subpage of Page with section
-        p = Page(self.get_site(), 'Foo#Baz')
-        l = Link('/bar', p)
-        self.assertEqual(l.title, 'Foo/bar')
-        self.assertEqual(l.site, self.get_site())
+        page = Page(self.get_site(), 'Foo#Baz')
+        rel_link = Link('/bar', page)
+        self.assertEqual(rel_link.title, 'Foo/bar')
+        self.assertEqual(rel_link.site, self.get_site())
         # Non-subpage link text beginning with slash
-        l = Link('/bar', self.get_site())
-        self.assertEqual(l.title, '/bar')
+        abs_link = Link('/bar', self.get_site())
+        self.assertEqual(abs_link.title, '/bar')
 
 
 class Issue10254TestCase(DefaultDrySiteTestCase):
@@ -238,8 +238,8 @@ class Issue10254TestCase(DefaultDrySiteTestCase):
     def test_no_change(self):
         """Test T102461 (Python issue 10254) is not encountered."""
         title = 'Li̍t-sṳ́'
-        l = Link(title, self.site)
-        self.assertEqual(l.title, 'Li̍t-sṳ́')
+        link = Link(title, self.site)
+        self.assertEqual(link.title, 'Li̍t-sṳ́')
 
     @unittest.skipIf(PYTHON_VERSION != (2, 6, 6), 'Python 2.6.6-only test')
     def test_py266_bug_exception(self):

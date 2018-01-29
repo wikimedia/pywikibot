@@ -107,25 +107,25 @@ class TestLinkObject(SiteAttributeTestCase):
         """Test that Link() normalizes namespace names."""
         for num in self.namespaces:
             for prefix in self.namespaces[num]:
-                l = pywikibot.page.Link(prefix + list(self.titles.keys())[0],
-                                        self.enwiki)
-                self.assertEqual(l.namespace, num)
+                link = pywikibot.page.Link(
+                    prefix + list(self.titles.keys())[0], self.enwiki)
+                self.assertEqual(link.namespace, num)
                 # namespace prefixes are case-insensitive
-                m = pywikibot.page.Link(prefix.lower() + list(self.titles.keys())[1],
-                                        self.enwiki)
-                self.assertEqual(m.namespace, num)
+                lowered_link = pywikibot.page.Link(
+                    prefix.lower() + list(self.titles.keys())[1], self.enwiki)
+                self.assertEqual(lowered_link.namespace, num)
 
     def testTitles(self):
         """Test that Link() normalizes titles."""
         for title in self.titles:
             for num in (0, 1):
-                l = pywikibot.page.Link(self.namespaces[num][0] + title,
-                                        self.enwiki)
-                self.assertEqual(l.title, self.titles[title])
+                link = pywikibot.page.Link(self.namespaces[num][0] + title,
+                                           self.enwiki)
+                self.assertEqual(link.title, self.titles[title])
                 # prefixing name with ":" shouldn't change result
-                m = pywikibot.page.Link(":" + self.namespaces[num][0] + title,
-                                        self.enwiki)
-                self.assertEqual(m.title, self.titles[title])
+                prefixed_link = pywikibot.page.Link(
+                    ':' + self.namespaces[num][0] + title, self.enwiki)
+                self.assertEqual(prefixed_link.title, self.titles[title])
 
     def testHashCmp(self):
         """Test hash comparison."""

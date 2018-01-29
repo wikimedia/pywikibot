@@ -275,8 +275,8 @@ class CategoryRedirectBot(pywikibot.Bot):
         user = self.site.user()  # invokes login()
         newredirs = []
 
-        l = time.localtime()
-        today = "%04d-%02d-%02d" % l[:3]
+        localtime = time.localtime()
+        today = '%04d-%02d-%02d' % localtime[:3]
         edit_request_page = pywikibot.Page(
             self.site, u"User:%s/category edit requests" % user)
         datafile = pywikibot.config.datafilepath("%s-catmovebot-data"
