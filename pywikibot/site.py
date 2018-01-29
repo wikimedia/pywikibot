@@ -55,6 +55,7 @@ from pywikibot.exceptions import (
     FamilyMaintenanceWarning,
     NoUsername,
     SpamfilterError,
+    TitleblacklistError,
     NoCreateError,
     UserBlocked,
     EntityTypeUnknownException,
@@ -5042,6 +5043,7 @@ class APISite(BaseSite):
         "protectedpage": LockedPage,
         "protectedtitle": LockedNoPage,
         "cascadeprotected": CascadeLockedPage,
+        'titleblacklist-forbidden': TitleblacklistError,
     }
     _ep_text_overrides = set(['appendtext', 'prependtext', 'undo'])
 
