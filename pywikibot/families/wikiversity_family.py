@@ -20,7 +20,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Constructor."""
         self.languages_by_size = [
-            'de', 'en', 'fr', 'ru', 'it', 'cs', 'pt', 'beta', 'es', 'ar', 'sv',
+            'de', 'en', 'fr', 'ru', 'it', 'cs', 'beta', 'pt', 'es', 'ar', 'sv',
             'fi', 'sl', 'el', 'hi', 'ja', 'ko',
         ]
 
