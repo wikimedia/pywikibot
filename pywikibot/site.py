@@ -6883,6 +6883,61 @@ class APISite(BaseSite):
         comparison = data['compare']['*']
         return comparison
 
+    @need_extension('Linter')
+    def linter_pages(self, lint_categories=None, total=None,
+                     namespaces=None, pageids=None, lint_from=None):
+        """Return a generator to pages containing linter errors.
+
+        @param lint_categories: categories of lint errors
+        @type lntcategories: an iterable that returns values (str),
+            or a pipe-separated string of values.
+
+        @param total: if not None, yielding this many items in total
+        @type total: int
+
+        @param namespaces: only iterate pages in these namespaces
+        @type namespaces: iterable of basestring or Namespace key,
+            or a single instance of those types. May be a '|' separated
+            list of namespace identifiers.
+
+        @param pageids: only include lint errors from the specified pageids
+        @type pageids: an iterable that returns pageids (str or int),
+            or a comma- or pipe-separated string of pageids
+            (e.g. '945097,1483753, 956608' or '945097|483753|956608')
+
+        @param lint_from: Lint ID to start querying from
+        @type lint_from: str representing digit or integer
+
+        @return: pages with Linter errors.
+        @rtype: generator of Page
+
+        """
+        query = self._generator(api.ListGenerator, type_arg='linterrors',
+                                total=total,  # Will set lntlimit
+                                namespaces=namespaces)
+
+        if lint_categories:
+            if isinstance(lint_categories, basestring):
+                lint_categories = lint_categories.split('|')
+                lint_categories = [p.strip() for p in lint_categories]
+            query.request['lntcategories'] = '|'.join(lint_categories)
+
+        if pageids:
+            if isinstance(pageids, basestring):
+                pageids = pageids.split('|')
+                pageids = [p.strip() for p in pageids]
+            # Validate pageids.
+            pageids = (str(int(p)) for p in pageids if int(p) > 0)
+            query.request['lntpageid'] = '|'.join(pageids)
+
+        if lint_from:
+            query.request['lntfrom'] = int(lint_from)
+
+        for pageitem in query:
+            page = pywikibot.Page(self, pageitem['title'])
+            api.update_page(page, pageitem)
+            yield page
+
     # Thanks API calls
     @need_extension('Thanks')
     def thank_revision(self, revid, source=None):

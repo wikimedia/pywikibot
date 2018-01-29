@@ -1177,6 +1177,26 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen2)
         self.assertEqual(list(gen1), list(gen2))
 
+    def test_linter_generator_ns_valid_cat(self):
+        """Test generator of pages with lint errors."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-limit:3')
+        gf.handleArg('-linter:obsolete-tag')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 5)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertEqual(page._lintinfo['category'], 'obsolete-tag')
+        self.assertPagesInNamespaces(pages, set([1, ]))
+
+    def test_linter_generator_invalid_cat(self):
+        """Test generator of pages with lint errors."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
+
 
 class TestFactoryGeneratorWikibase(WikidataTestCase):
 

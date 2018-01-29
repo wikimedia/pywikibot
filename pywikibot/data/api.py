@@ -3268,3 +3268,9 @@ def update_page(page, pagedict, props=[]):
 
     if "flowinfo" in pagedict:
         page._flowinfo = pagedict['flowinfo']['flow']
+
+    if 'lintId' in pagedict:
+        page._lintinfo = pagedict
+        page._lintinfo.pop('pageid')
+        page._lintinfo.pop('title')
+        page._lintinfo.pop('ns')
