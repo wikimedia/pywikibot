@@ -110,7 +110,7 @@ This will move all pages in the category US to the category United States.
 # (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
 # (C) xqt, 2009-2016
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -336,6 +336,7 @@ class CategoryAddBot(MultipleSitesBot):
 
     def treat(self, page):
         """Process one page."""
+        includeonly = []
         if page.isRedirectPage():
             # if it's a redirect use the redirect target instead
             redirTarget = page.getRedirectTarget()
@@ -348,7 +349,17 @@ class CategoryAddBot(MultipleSitesBot):
                 # loading it will throw an error if we don't jump out before
                 return
         else:
-            self.current_page = page
+            if page.namespace() == page.site.namespaces.TEMPLATE:
+                docs = page.site.doc_subpage  # return tuple
+                for doc in docs:
+                    doc_page = pywikibot.Page(
+                        page.site, page.title() + doc)
+                    if doc_page.exists():
+                        self.current_page = doc_page
+                        includeonly = ['includeonly']
+                        break
+            if not self.current_page:
+                self.current_page = page
         if self.current_page.exists():
             # Load the page
             text = self.current_page.text
@@ -362,7 +373,8 @@ class CategoryAddBot(MultipleSitesBot):
             return
         # store old text, so we don't have reload it every time
         old_text = text
-        cats = textlib.getCategoryLinks(text, self.current_page.site)
+        cats = textlib.getCategoryLinks(
+            text, self.current_page.site, include=includeonly)
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
@@ -374,9 +386,31 @@ class CategoryAddBot(MultipleSitesBot):
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
-            cats.append(catpl)
-            text = textlib.replaceCategoryLinks(text, cats,
-                                                site=self.current_page.site)
+            if page.namespace() == page.site.namespaces.TEMPLATE:
+                tagname = 'noinclude'
+                if includeonly == ['includeonly']:
+                    tagname = 'includeonly'
+                tagnameregexp = re.compile(r'(.*)(<\/{0}>)'.format(tagname),
+                                           re.I | re.DOTALL)
+                categorytitle = catpl.title(asLink=True, allowInterwiki=False)
+                if tagnameregexp.search(text):
+                    # add category into the <includeonly> tag in the
+                    # template document page or the <noinclude> tag
+                    # in the template page
+                    text = textlib.replaceExcept(
+                        text, tagnameregexp,
+                        r'\1{0}\n\2'.format(categorytitle),
+                        ['nowiki', 'comment', 'math', 'pre', 'source'],
+                        site=self.current_page.site)
+                else:
+                    if includeonly == ['includeonly']:
+                        text += '\n\n'
+                    text += '<{0}>\n{1}\n</{0}>'.format(
+                            tagname, categorytitle)
+            else:
+                cats.append(catpl)
+                text = textlib.replaceCategoryLinks(
+                    text, cats, site=self.current_page.site)
             comment = self.comment
             if not comment:
                 comment = i18n.twtranslate(self.current_page.site,
