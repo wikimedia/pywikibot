@@ -1071,7 +1071,7 @@ class TestLinterPages(DefaultSiteTestCase):
 
     def setUp(self):
         """Skip tests if Linter extension is missing."""
-        super(TestLinterPages, self).setUpClass()
+        super(TestLinterPages, self).setUp()
         if not self.site.has_extension('Linter'):
             raise unittest.SkipTest(
                 'The site {0} does not use Linter extension'.format(self.site))
