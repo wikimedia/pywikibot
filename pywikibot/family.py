@@ -728,6 +728,10 @@ class Family(object):
             '_default': []
         }
 
+        # A dict of tuples for different sites with names of templates
+        # that indicate an edit should be avoided
+        self.edit_restricted_templates = {}
+
         # A list of projects that share cross-project sessions.
         if not hasattr(self, 'cross_projects'):
             self.cross_projects = []

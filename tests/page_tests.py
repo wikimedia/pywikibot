@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -816,6 +816,11 @@ class TestPageBotMayEdit(TestCase):
         self.assertTrue(page.botMayEdit(),
                         u'%s: %s but user=%s'
                         % (page.text, page.botMayEdit(), user))
+
+        # Ban all users including bots.
+        page.text = '{{in use}}'
+        page._templates = [pywikibot.Page(site, 'Template:In use')]
+        self.assertFalse(page.botMayEdit())
 
 
 class TestPageHistory(DefaultSiteTestCase):

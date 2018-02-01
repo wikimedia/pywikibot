@@ -1145,9 +1145,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Determine whether the active bot is allowed to edit the page.
 
-        This will be True if the page doesn't contain {{bots}} or
-        {{nobots}}, or it contains them and the active bot is allowed to
-        edit this page. (This method is only useful on those sites that
+        This will be True if the page doesn't contain {{bots}} or {{nobots}}
+        or any other template from edit_restricted_templates list
+        in x_family.py file, or it contains them and the active bot is allowed
+        to edit this page. (This method is only useful on those sites that
         recognize the bot-exclusion protocol; on other sites, it will always
         return True.)
 
@@ -1175,8 +1176,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         # go through all templates and look for any restriction
         # multiple bots/nobots templates are allowed
+        restrictions = self.family.edit_restricted_templates.get(
+            self.site.code)
         for template, params in templates:
             title = template.title(withNamespace=False)
+            if restrictions:
+                if title in restrictions:
+                    return False
             if title == 'Nobots':
                 if not params:
                     return False
@@ -1258,7 +1264,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             watch = 'unwatch'
         if not force and not self.botMayEdit():
             raise pywikibot.OtherPageSaveError(
-                self, "Editing restricted by {{bots}} template")
+                self, 'Editing restricted by {{bots}}, {{nobots}} '
+                'or site\'s equivalent of {{in use}} template')
         self._save(summary=summary, watch=watch, minor=minor, botflag=botflag,
                    asynchronous=asynchronous, callback=callback,
                    cc=apply_cosmetic_changes, quiet=quiet, **kwargs)

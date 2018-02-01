@@ -198,6 +198,19 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'uk': (u'/Документація', ),
         }
 
+        # Templates that indicate an edit should be avoided
+        self.edit_restricted_templates = {
+            'ar': ('تحرر',),
+            'bs': ('Izmjena u toku',),
+            'cs': ('Pracuje se',),
+            'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',),
+            'en': ('Inuse', 'In use'),
+            'fa': ('ویرایش',),
+            'hr': ('Radovi',),
+            'sr': ('Радови у току', 'Рут',),
+            'zh': ('Inuse',),
+        }
+
     def get_known_families(self, site):
         """Override the family interwiki prefixes for each site."""
         # In Swedish Wikipedia 's:' is part of page title not a family
