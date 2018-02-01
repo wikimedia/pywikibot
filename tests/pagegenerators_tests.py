@@ -1179,6 +1179,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     def test_linter_generator_ns_valid_cat(self):
         """Test generator of pages with lint errors."""
+        if not self.site.has_extension('Linter'):
+            raise unittest.SkipTest(
+                'The site {0} does not use Linter extension'.format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-ns:1')
         gf.handleArg('-limit:3')
@@ -1194,6 +1197,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     def test_linter_generator_invalid_cat(self):
         """Test generator of pages with lint errors."""
+        if not self.site.has_extension('Linter'):
+            raise unittest.SkipTest(
+                'The site {0} does not use Linter extension'.format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
 
