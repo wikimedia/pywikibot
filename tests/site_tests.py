@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1068,6 +1068,13 @@ class TestSiteGenerators(DefaultSiteTestCase):
 class TestLinterPages(DefaultSiteTestCase):
 
     """Test linter_pages methods."""
+
+    def setUp(self):
+        """Skip tests if Linter extension is missing."""
+        super(TestLinterPages, self).setUpClass()
+        if not self.site.has_extension('Linter'):
+            raise unittest.SkipTest(
+                'The site {0} does not use Linter extension'.format(self.site))
 
     def test_linter_pages(self):
         """Test the deprecated site.logpages() method."""
