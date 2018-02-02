@@ -30,8 +30,10 @@ from re import compile as re_compile, IGNORECASE
 from subprocess import check_output
 from sys import version_info
 if version_info.major == 3:
+    PY2 = False
     from tokenize import tokenize, STRING
 else:
+    PY2 = True
     from tokenize import generate_tokens as tokenize, STRING
 
 from unidiff import PatchSet
@@ -72,6 +74,8 @@ def check_tokens(file_path, line_nos):
                 break
             if start[0] not in line_nos or type_ != STRING:
                 continue
+            if PY2:
+                string = string.decode('utf-8')
             match = STRING_MATCH(string)
             if match.group('unicode_literal'):
                 error = True
