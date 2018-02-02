@@ -71,7 +71,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,7 +85,7 @@ import re
 import pywikibot
 from pywikibot import editor as editarticle
 from pywikibot.tools import first_lower, first_upper as firstcap
-from pywikibot import pagegenerators, config, i18n
+from pywikibot import pagegenerators, config, i18n, textlib
 from pywikibot.bot import (
     Bot, QuitKeyboardInterrupt,
     StandardOption, HighlightContextOption, ListOption, OutputProxyOption,
@@ -96,6 +96,53 @@ from pywikibot.tools.formatter import SequenceOutputter
 dn_template = {
     'en': u'{{dn}}',
     'fr': u'{{Lien vers un homonyme}}',
+}
+
+# Regexes of disambiguation template titles to exclude links from
+disamb_templates = {
+    'wikipedia': {
+        'bs': [r'[Čč]vor', r'[Dd]isambig'],
+        'cs': [r'[Rr]ozcestník', r'[Rr]ozcestník[ _]-[ _][^\}]+'],
+        'en': [r'[Dd]isambig-plants', r'[Dd]isambig(uation)?',
+               r'[Dd]isambiguation[ _]cleanup', r'[Gg]eodis',
+               r'[Hh]ndis-cleanup',
+               r'[Ll]etter-Number[ _]Combination[ _]Disambiguation',
+               r'[Mm]il-unit-dis', r'[Nn]umberdis', r'.+?[ _]disambiguation'],
+        'haw': [r'[Hh]uaʻōlelo[ _]puana[ _]like'],
+        'hr': [r'[Rr]azdvojba', r'[Dd]isambig'],
+        'no': [r'[Pp]eker', r'[Ee]tternavn', r'[Dd]isambig',
+               r'[Tt]obokstavsforkortelse', r'[Tt]rebokstavsforkortelse',
+               r'[Ff]lertydig', r'[Pp]ekerside'],
+        'nov': [r'[Dd]esambig'],
+        'qr': [r"[Ss]ut'ichana[ _]qillqa", r'[Dd]isambig', r'SJM'],
+        'rmy': [r'[Dd]udalipen'],
+        'sk': [r'[Dd]isambig', r'[Rr]ozlišovacia[ _]stránka',
+               r'[Dd]isambiguation'],
+        'sr': [r'[Dd]isambig(uation)?', r'ВЗО', r'[Вв]зо', r'[Вв]ишезначна',
+               r'[Вв]ишезначна[ _]одредница', r'[Вв]ишезначност',
+               r'[Vv]išeznačna[ _]odrednica-lat'],
+        'tg': [r'Ибҳомзудоӣ', r'[Dd]isambig', r'Рафъи[ _]ибҳом',
+               r'[Dd]isambiguation'],
+        'tr': [r'[Aa]nlam[ _]ayrım', r'[Dd]isambig', r'[Aa]nlam[ _]ayrımı',
+               r'[Kk]işi[ _]adları[ _]\(anlam[ _]ayrımı\)',
+               r'[Yy]erleşim[ _]yerleri[ _]\(anlam[ _]ayrımı\)',
+               r'[Kk]ısaltmalar[ _]\(anlam[ _]ayrımı\)',
+               r'[Cc]oğrafya[ _]\(anlam[ _]ayrımı\)',
+               r'[Yy]erleşim[ _]yerleri[ _]\(anlam[ _]ayrımı\)',
+               r'[Ss]ayılar[ _]\(anlam[ _]ayrımı\)',
+               r"ABD'deki[ _]iller[ _]\(anlam[ _]ayrımı\)"],
+        'wo': [r'[Bb]okktekki'],
+        'yi': [r'באדייטען'],
+        'zea': [r'[Dd]p', r'[Dd]eurverwiespagina'],
+        'zh-classical': [r'釋義', r'消歧義', r'[Dd]isambig'],
+    },
+    'loveto': {
+        '1911': [r'[Dd]isamb'],
+    },
+    'wowwiki': {
+        'en': [r'[Dd]isambig', r'[Dd]isambig\/quest', r'[Dd]isambig\/quest2',
+               r'[Dd]isambig\/achievement2'],
+    },
 }
 
 # disambiguation page name format for "primary topic" disambiguations
@@ -989,6 +1036,35 @@ class DisambiguationRobot(Bot):
                     pywikibot.output(u'Page not saved: %s' % error.args)
         return 'done'
 
+    def get_disambiguation_links(self, disambPage):
+        """Get links from disambPage excluding links from disamb_templates.
+
+        @param disambPage: the disambiguation page
+        @type disambPage: pywikibot.Page
+        @return: list of processed links
+        @rtype: list of str
+
+        """
+        site_disamb_templates = i18n.translate(self.site, disamb_templates)
+        if site_disamb_templates:
+            exceptions = ['nowiki', 'comment', 'category', 'file', 'interwiki']
+            stripped_text = disambPage.text
+            exc_regexes = textlib._get_regexes(exceptions, self.site)
+            for exc in exc_regexes:
+                stripped_text = exc.sub(r'', stripped_text)
+            for template in site_disamb_templates:
+                template_regex = re.compile(
+                    r'\{\{ *(?:' + r':|'.join(self.site.namespaces[10]) +
+                    r':)?' + template + r'\s*(\|[^\}]*)?\}\}'
+                )
+                stripped_text = template_regex.sub(r'', stripped_text)
+            disambPage.text = stripped_text
+            full_text = disambPage.expand_text()
+            links = re.findall(r'\[\[([^\]\|]+)(?:\|[^\]]*|)\]\]', full_text)
+        else:
+            links = disambPage.linkedPages()
+        return links
+
     def findAlternatives(self, disambPage):
         """Extend self.alternatives using correctcap of disambPage.linkedPages.
 
@@ -1013,12 +1089,12 @@ class DisambiguationRobot(Bot):
                 try:
                     disambPage2 = pywikibot.Page(
                         pywikibot.Link(disambTitle, self.mysite))
-                    links = disambPage2.linkedPages()
+                    links = self.get_disambiguation_links(disambPage2)
                     links = [correctcap(l, disambPage2.get()) for l in links]
                 except pywikibot.NoPage:
                     pywikibot.output(u"No page at %s, using redirect target."
                                      % disambTitle)
-                    links = disambPage.linkedPages()[:1]
+                    links = self.get_disambiguation_links(disambPage)[:1]
                     links = [correctcap(l, disambPage.get(get_redirect=True))
                              for l in links]
                 self.alternatives += links
@@ -1049,19 +1125,19 @@ or press enter to quit:""")
                                 primary_topic_format[self.mylang]
                                 % disambPage.title(),
                                 self.mysite))
-                        links = disambPage2.linkedPages()
+                        links = self.get_disambiguation_links(disambPage2)
                         links = [correctcap(l, disambPage2.get())
                                  for l in links]
                     except pywikibot.NoPage:
                         pywikibot.output(
                             'Page does not exist; using first link in page %s.'
                             % disambPage.title())
-                        links = disambPage.linkedPages()[:1]
+                        links = self.get_disambiguation_links(disambPage)[:1]
                         links = [correctcap(l, disambPage.get())
                                  for l in links]
                 else:
                     try:
-                        links = disambPage.linkedPages()
+                        links = self.get_disambiguation_links(disambPage)
                         links = [correctcap(l, disambPage.get())
                                  for l in links]
                     except pywikibot.NoPage:
