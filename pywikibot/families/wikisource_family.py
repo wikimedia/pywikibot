@@ -63,6 +63,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             '_default': [0],
             'ar': [102],
             'be': [102],
+            'bn': [100],
             'bg': [100],
             'ca': [106],
             'cs': [100],
