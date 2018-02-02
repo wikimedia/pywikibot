@@ -170,14 +170,16 @@ class Family(object):
             'crh': u'[a-zâçğıñöşüа-яё“»]*',
             'cs': u'[a-záčďéěíňóřšťúůýž]*',
             'csb': u'[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
-            'cu': u'[a-zабвгдеєжѕзїіıићклмнопсстѹфхѡѿцчшщъыьѣюѥѧѩѫѭѯѱѳѷѵґѓђёјйљњќуўџэ҄я“»]*',
+            'cu': ('[a-zабвгдеєжѕзїіıићклмнопсстѹфхѡѿцчшщъыьѣюѥѧѩѫѭѯѱѳѷѵґѓђё'
+                   'јйљњќуўџэ҄я“»]*'),
             'cv': u'[a-zа-яĕçăӳ"»]*',
             'cy': u'[àáâèéêìíîïòóôûŵŷa-z]*',
             'da': u'[a-zæøå]*',
             'de': u'[a-zäöüß]*',
             'din': '[äëɛɛ̈éɣïŋöɔɔ̈óa-z]*',
             'dsb': u'[äöüßa-z]*',
-            'el': u'[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*',
+            'el': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέή'
+                   'ίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
             'eml': u'[a-zàéèíîìóòúù]*',
             'es': u'[a-záéíóúñ]*',
             'eu': u'[a-záéíóúñ]*',
@@ -209,7 +211,8 @@ class Family(object):
             'it': u'[a-zàéèíîìóòúù]*',
             'ka': u'[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
             'kbp': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'kk': u'[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*',
+            'kk': ('[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһ'
+                   'ٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*'),
             'kl': u'[a-zæøå]*',
             'koi': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
             'krc': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
@@ -251,7 +254,8 @@ class Family(object):
             'oc': u'[a-zàâçéèêîôû]*',
             'olo': '[a-zčČšŠžŽäÄöÖ]*',
             'or': u'[a-z଀-୿]*',
-            'pa': u'[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*',
+            'pa': ('[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾ'
+                   'ਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*'),
             'pcd': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
             'pdc': u'[äöüßa-z]*',
             'pfl': u'[äöüßa-z]*',
@@ -274,7 +278,8 @@ class Family(object):
             'sh': u'[a-zčćđžš]*',
             'sk': u'[a-záäčďéíľĺňóôŕšťúýž]*',
             'sl': u'[a-zčćđžš]*',
-            'sr': u'[abvgdđežzijklljmnnjoprstćufhcčdžšабвгдђежзијклљмнњопрстћуфхцчџш]*',
+            'sr': ('[abvgdđežzijklljmnnjoprstćufhcčdžšабвгдђежзијклљмнњопрстћу'
+                   'фхцчџш]*'),
             'srn': u'[a-zäöüïëéèà]*',
             'stq': u'[äöüßa-z]*',
             'sv': u'[a-zåäöéÅÄÖÉ]*',
@@ -715,7 +720,7 @@ class Family(object):
             '_default': []
         }
 
-        # A list of languages that use hard (instead of soft) category redirects
+        # A list of languages that use hard (not soft) category redirects
         self.use_hard_category_redirects = []
 
         # A list of disambiguation template names in different languages
@@ -851,10 +856,11 @@ class Family(object):
                 'nrm', 'nv', 'ny', 'oc', 'om', 'pag', 'pam', 'pap', 'pcd',
                 'pdc', 'pfl', 'pih', 'pl', 'pms', 'pt', 'qu', 'rm', 'rn', 'ro',
                 'roa-rup', 'roa-tara', 'rw', 'sc', 'scn', 'sco', 'se', 'sg',
-                'simple', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'srn', 'ss', 'st',
-                'stq', 'su', 'sv', 'sw', 'szl', 'tet', 'tl', 'tn', 'to', 'tpi',
-                'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've', 'vec', 'vi', 'vls',
-                'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea', 'zh-min-nan', 'zu',
+                'simple', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'srn', 'ss',
+                'st', 'stq', 'su', 'sv', 'sw', 'szl', 'tet', 'tl', 'tn', 'to',
+                'tpi', 'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've', 'vec', 'vi',
+                'vls', 'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea',
+                'zh-min-nan', 'zu',
                 # languages using multiple scripts, including latin
                 'az', 'chr', 'ckb', 'ha', 'iu', 'kk', 'ku', 'rmy', 'sh', 'sr',
                 'tt', 'ug', 'za'
@@ -1123,8 +1129,8 @@ class Family(object):
 
         @param code: The site code
         @param uri: The absolute path after the hostname
-        @param protocol: The protocol which is used. If None it'll determine the
-            protocol from the code.
+        @param protocol: The protocol which is used. If None it'll determine
+            the protocol from the code.
         @return: The full URL
         @rtype: str
         """
@@ -1633,7 +1639,8 @@ class WikimediaFamily(Family):
     @property
     def domain(self):
         """Domain property."""
-        if self.name in self.multi_language_content_families + self.other_content_families:
+        if self.name in (self.multi_language_content_families
+                         + self.other_content_families):
             return self.name + '.org'
         elif self.name in self.wikimedia_org_families:
             return 'wikimedia.org'

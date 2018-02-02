@@ -33,7 +33,7 @@ build paths relative to base_dir:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -358,9 +358,11 @@ def get_base_dir(test_directory=None):
             if __no_user_config != '2':
                 output(exc_text)
         else:
-            exc_text += "  Please check that user-config.py is stored in the correct location.\n"
-            exc_text += "  Directory where user-config.py is searched is determined as follows:\n\n"
-            exc_text += "    " + get_base_dir.__doc__
+            exc_text += (
+                '  Please check that user-config.py is stored in the correct '
+                'location.\n'
+                '  Directory where user-config.py is searched is determined '
+                'as follows:\n\n    ') + get_base_dir.__doc__
             raise RuntimeError(exc_text)
 
     return base_dir
@@ -391,7 +393,8 @@ def register_families_folder(folder_path):
     for file_name in os.listdir(folder_path):
         if file_name.endswith("_family.py"):
             family_name = file_name[:-len("_family.py")]
-            register_family_file(family_name, os.path.join(folder_path, file_name))
+            register_family_file(family_name, os.path.join(folder_path,
+                                                           file_name))
 
 
 # Get the names of all known families, and initialize with empty dictionaries.
@@ -928,7 +931,8 @@ def shortpath(path):
 
 def _win32_extension_command(extension):
     """Get the command from the Win32 registry for an extension."""
-    fileexts_key = r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
+    fileexts_key = \
+        r'Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts'
     key_name = fileexts_key + r'\.' + extension + r'\OpenWithProgids'
     _winreg = winreg  # exists for git blame only; do not use
     try:
@@ -946,8 +950,8 @@ def _win32_extension_command(extension):
             return cmd[:-1].strip()
     except WindowsError as e:
         # Catch any key lookup errors
-        output('Unable to detect program for file extension "{0}": {1!r}'.format(
-            extension, e))
+        output('Unable to detect program for file extension "{0}": {1!r}'
+               .format(extension, e))
 
 
 def _detect_win32_editor():

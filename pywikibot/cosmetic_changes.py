@@ -5,7 +5,9 @@ This module can do slight modifications to tidy a wiki page's source code.
 
 The changes are not supposed to change the look of the rendered wiki page.
 
-If you wish to run this as an stand-alone script, use scripts/cosmetic_changes.py
+If you wish to run this as an stand-alone script, use:
+
+    scripts/cosmetic_changes.py
 
 For regular use, it is recommended to put this line into your user-config.py:
 
@@ -46,11 +48,12 @@ the given list by adding such lines to your user-config.py:
 
 or by adding a list to the given one:
 
-    cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
+    cosmetic_changes_deny_script += ['your_script_name_1',
+                                     'your_script_name_2']
 """
 #
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2006-2017
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -205,7 +208,8 @@ class CosmeticChangesToolkit(object):
         try:
             self.namespace = self.site.namespaces.resolve(namespace).pop(0)
         except (KeyError, TypeError, IndexError):
-            raise ValueError('%s needs a valid namespace' % self.__class__.__name__)
+            raise ValueError('{0} needs a valid namespace'
+                             .format(self.__class__.__name__))
         self.template = (self.namespace == 10)
         self.talkpage = self.namespace >= 0 and self.namespace % 2 == 1
         self.title = pageTitle
@@ -269,7 +273,8 @@ class CosmeticChangesToolkit(object):
             new_text = self._change(text)
         except Exception as e:
             if self.ignore == CANCEL_PAGE:
-                pywikibot.warning(u'Skipped "{0}", because an error occurred.'.format(self.title))
+                pywikibot.warning('Skipped "{0}", because an error occurred.'
+                                  .format(self.title))
                 pywikibot.exception(e)
                 return False
             else:
@@ -317,7 +322,7 @@ class CosmeticChangesToolkit(object):
            self.site.code not in ('et', 'it', 'bg', 'ru'):
             categories = textlib.getCategoryLinks(text, site=self.site)
 
-        if not self.talkpage:  # and pywikibot.calledModuleName() <> 'interwiki':
+        if not self.talkpage:
             subpage = False
             if self.template:
                 loc = None
@@ -340,11 +345,6 @@ class CosmeticChangesToolkit(object):
             # e.g. using categories.sort()
 
             # TODO: Taking main cats to top
-            #   for name in categories:
-            #       if (re.search(u"(.+?)\|(.{,1}?)",name.title()) or
-            #               name.title() == name.title().split(":")[0] + title):
-            #            categories.remove(name)
-            #            categories.insert(0, name)
             text = textlib.replaceCategoryLinks(text, categories,
                                                 site=self.site)
         # Adding the interwiki
@@ -373,8 +373,8 @@ class CosmeticChangesToolkit(object):
             namespaces = list(namespace)
             thisNs = namespaces.pop(0)
             if namespace.id == 6 and family.name == 'wikipedia':
-                if self.site.code in ('en', 'fr') and \
-                   MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.14'):
+                if self.site.code in ('en', 'fr') and MediaWikiVersion(
+                        self.site.version()) >= MediaWikiVersion('1.14'):
                     # do not change "Image" on en-wiki and fr-wiki
                     assert u'Image' in namespaces
                     namespaces.remove(u'Image')
@@ -615,11 +615,12 @@ class CosmeticChangesToolkit(object):
 
     def removeUselessSpaces(self, text):
         """Cleanup multiple or trailing spaces."""
-        exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace', 'table']
+        exceptions = ['comment', 'math', 'nowiki', 'pre', 'startspace',
+                      'table']
         if self.site.sitename != 'wikipedia:cs':
             exceptions.append('template')
-        text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1', exceptions,
-                                     site=self.site)
+        text = textlib.replaceExcept(text, r'(?m)[\t ]+( |$)', r'\1',
+                                     exceptions, site=self.site)
         return text
 
     def removeNonBreakingSpaceBeforePercent(self, text):
@@ -658,15 +659,16 @@ class CosmeticChangesToolkit(object):
         Add a space between the * or # and the text.
 
         NOTE: This space is recommended in the syntax help on the English,
-        German, and French Wikipedia. It might be that it is not wanted on other
-        wikis. If there are any complaints, please file a bug report.
+        German, and French Wikipedia. It might be that it is not wanted on
+        other wikis. If there are any complaints, please file a bug report.
         """
         if not self.template:
-            exceptions = ['comment', 'math', 'nowiki', 'pre', 'source', 'template',
-                          'timeline', self.site.redirectRegex()]
+            exceptions = ['comment', 'math', 'nowiki', 'pre', 'source',
+                          'template', 'timeline', self.site.redirectRegex()]
             text = textlib.replaceExcept(
                 text,
-                r'(?m)^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)',
+                r'(?m)'
+                r'^(?P<bullet>[:;]*(\*+|#+)[:;\*#]*)(?P<char>[^\s\*#:;].+?)',
                 r'\g<bullet> \g<char>',
                 exceptions)
         return text
@@ -797,7 +799,8 @@ class CosmeticChangesToolkit(object):
 
     def fixReferences(self, text):
         """Fix references tags."""
-        # See also https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
+        # See also
+        # https://en.wikipedia.org/wiki/User:AnomieBOT/source/tasks/OrphanReferenceFixer.pm
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
                       'startspace']
 
@@ -825,7 +828,8 @@ class CosmeticChangesToolkit(object):
     def fixTypo(self, text):
         """Fix units."""
         exceptions = ['nowiki', 'comment', 'math', 'pre', 'source',
-                      'startspace', 'gallery', 'hyperlink', 'interwiki', 'link']
+                      'startspace', 'gallery', 'hyperlink', 'interwiki',
+                      'link']
         # change <number> ccm -> <number> cm³
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?ccm',
                                      r'\1&nbsp;cm³', exceptions,
@@ -835,7 +839,8 @@ class CosmeticChangesToolkit(object):
         pattern = re.compile(u'«.*?»', re.UNICODE)
         exceptions.append(pattern)
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
-                                     r'\1&nbsp;°\2', exceptions, site=self.site)
+                                     r'\1&nbsp;°\2', exceptions,
+                                     site=self.site)
         text = textlib.replaceExcept(text, u'º([CF])', u'°' + r'\1',
                                      exceptions,
                                      site=self.site)
@@ -874,7 +879,8 @@ class CosmeticChangesToolkit(object):
         # not to let bot edits in latin content
         exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
                                      % {'fa': faChrs}))
-        text = textlib.replaceExcept(text, ',', '،', exceptions, site=self.site)
+        text = textlib.replaceExcept(text, ',', '،', exceptions,
+                                     site=self.site)
         if self.site.code == 'ckb':
             text = textlib.replaceExcept(text,
                                          '\u0647([.\u060c_<\\]\\s])',
@@ -915,7 +921,8 @@ class CosmeticChangesToolkit(object):
         It is working according to [1] and works only on pages in the file
         namespace on the Wikimedia Commons.
 
-        [1]: https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
+        [1]:
+        https://commons.wikimedia.org/wiki/Commons:Tools/pywiki_file_description_cleanup
         """
         if self.site.sitename != 'commons:commons' or self.namespace == 6:
             return
@@ -932,14 +939,16 @@ class CosmeticChangesToolkit(object):
             r"\1== {{int:license-header}} ==", exceptions, True)
         text = textlib.replaceExcept(
             text,
-            r"([\r\n])\=\= *(Licensing|License information|{{int:license}}) *\=\=",
+            r'([\r\n])'
+            r'\=\= *(Licensing|License information|{{int:license}}) *\=\=',
             r"\1== {{int:license-header}} ==", exceptions, True)
 
         # frequent field values to {{int:}} versions
         text = textlib.replaceExcept(
             text,
             r'([\r\n]\|[Ss]ource *\= *)'
-            r'(?:[Oo]wn work by uploader|[Oo]wn work|[Ee]igene [Aa]rbeit) *([\r\n])',
+            r'(?:[Oo]wn work by uploader|[Oo]wn work|[Ee]igene [Aa]rbeit) *'
+            r'([\r\n])',
             r'\1{{own}}\2', exceptions, True)
         text = textlib.replaceExcept(
             text,
@@ -960,7 +969,8 @@ class CosmeticChangesToolkit(object):
         # duplicated section headers
         text = textlib.replaceExcept(
             text,
-            r'([\r\n]|^)\=\= *{{int:filedesc}} *\=\=(?:[\r\n ]*)\=\= *{{int:filedesc}} *\=\=',
+            r'([\r\n]|^)\=\= *{{int:filedesc}} *\=\=(?:[\r\n ]*)\=\= *'
+            r'{{int:filedesc}} *\=\=',
             r'\1== {{int:filedesc}} ==', exceptions, True)
         text = textlib.replaceExcept(
             text,

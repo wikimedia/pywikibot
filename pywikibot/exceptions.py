@@ -80,7 +80,7 @@ UserWarning: warnings targetted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -442,7 +442,8 @@ class ArticleExistsConflict(EditConflict):
 
     """Page already exists."""
 
-    message = u"Destination article %s already exists and is not a redirect to the source article"
+    message = ('Destination article %s already exists and is not a redirect '
+               'to the source article')
 
     pass
 
@@ -451,7 +452,8 @@ class SpamfilterError(PageSaveRelatedError):
 
     """Page save failed because MediaWiki detected a blacklisted spam URL."""
 
-    message = "Edit to page %(title)s rejected by spam filter due to content:\n%(url)s"
+    message = ('Edit to page %(title)s rejected by spam filter due to '
+               'content:\n%(url)s')
 
     def __init__(self, page, url):
         """Constructor."""

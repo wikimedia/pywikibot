@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """File containing all standard fixes."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,18 +59,23 @@ fixes = {
             (r'(?i)<em>(.*?)</em>',            r"''\1''"),
             # horizontal line without attributes in a single line
             (r'(?i)([\r\n])<hr[ /]*>([\r\n])', r'\1----\2'),
-            # horizontal line without attributes with more text in the same line
+            # horizontal line without attributes with more text in same line
             #   (r'(?i) +<hr[ /]*> +',             r'\r\n----\r\n'),
             # horizontal line with attributes; can't be done with wiki syntax
             # so we only make it XHTML compliant
             (r'(?i)<hr ([^>/]+?)>',            r'<hr \1 />'),
             # a header where only spaces are in the same line
-            (r'(?i)([\r\n]) *<h1> *([^<]+?) *</h1> *([\r\n])',  r"\1= \2 =\3"),
-            (r'(?i)([\r\n]) *<h2> *([^<]+?) *</h2> *([\r\n])',  r"\1== \2 ==\3"),
-            (r'(?i)([\r\n]) *<h3> *([^<]+?) *</h3> *([\r\n])',  r"\1=== \2 ===\3"),
-            (r'(?i)([\r\n]) *<h4> *([^<]+?) *</h4> *([\r\n])',  r"\1==== \2 ====\3"),
-            (r'(?i)([\r\n]) *<h5> *([^<]+?) *</h5> *([\r\n])',  r"\1===== \2 =====\3"),
-            (r'(?i)([\r\n]) *<h6> *([^<]+?) *</h6> *([\r\n])',  r"\1====== \2 ======\3"),
+            (r'(?i)([\r\n]) *<h1> *([^<]+?) *</h1> *([\r\n])', r'\1= \2 =\3'),
+            (r'(?i)([\r\n]) *<h2> *([^<]+?) *</h2> *([\r\n])',
+             r'\1== \2 ==\3'),
+            (r'(?i)([\r\n]) *<h3> *([^<]+?) *</h3> *([\r\n])',
+             r'\1=== \2 ===\3'),
+            (r'(?i)([\r\n]) *<h4> *([^<]+?) *</h4> *([\r\n])',
+             r'\1==== \2 ====\3'),
+            (r'(?i)([\r\n]) *<h5> *([^<]+?) *</h5> *([\r\n])',
+             r'\1===== \2 =====\3'),
+            (r'(?i)([\r\n]) *<h6> *([^<]+?) *</h6> *([\r\n])',
+             r'\1====== \2 ======\3'),
             # TODO: maybe we can make the bot replace <p> tags with \r\n's.
         ],
         'exceptions': {
@@ -102,12 +107,14 @@ fixes = {
             # zusammengesetztes Wort, Bindestrich wird durchgeschleift
             (r'(?<!\w)(\d+|\d+[.,]\d+)(\$|€|DM|£|¥|mg|g|kg|ml|cl|l|t|ms|min'
              r'|µm|mm|cm|dm|m|km|ha|°C|kB|MB|GB|TB|W|kW|MW|GW|PS|Nm|eV|kcal'
-             r'|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)([²³]?-[\w\[])', r'\1-\2\3'),
+             r'|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)([²³]?-[\w\[])',
+             r'\1-\2\3'),
             # Größenangabe ohne Leerzeichen vor Einheit
             # weggelassen wegen vieler falsch Positiver: s, A, V, C, S, J, %
             (r'(?<!\w)(\d+|\d+[.,]\d+)(\$|€|DM|£|¥|mg|g|kg|ml|cl|l|t|ms|min'
              r'|µm|mm|cm|dm|m|km|ha|°C|kB|MB|GB|TB|W|kW|MW|GW|PS|Nm|eV|kcal'
-             r'|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)(?=\W|²|³|$)', r'\1 \2'),
+             r'|mA|mV|kV|Ω|Hz|kHz|MHz|GHz|mol|Pa|Bq|Sv|mSv)(?=\W|²|³|$)',
+             r'\1 \2'),
             # Temperaturangabe mit falsch gesetztem Leerzeichen
             (r'(?<!\w)(\d+|\d+[.,]\d+)° C(?=\W|²|³|$)', r'\1 °C'),
             # Kein Leerzeichen nach Komma
@@ -119,7 +126,8 @@ fixes = {
             # https://de.wikipedia.org/wiki/Plenk#Franz.C3.B6sische_Sprache
             # Leerzeichen vor Doppelpunkt/Semikolon kann korrekt sein,
             # z.B. nach Quellenangaben
-            (r'([a-zäöüß](\]\])?) ([,.!?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])', r'\1\3 \4'),
+            (r'([a-zäöüß](\]\])?) ([,.!?]) ((\[\[)?[a-zäöüA-ZÄÖÜ])',
+             r'\1\3 \4'),
             #   (u'([a-z]\.)([A-Z])', r'\1 \2'),
         ],
         'exceptions': {
@@ -152,9 +160,11 @@ fixes = {
                 r'DOS/4GW',   # Software
                 r'ntfs-3g',   # Dateisystem-Treiber
                 r'/\w(,\w)*/',      # Laut-Aufzählung in der Linguistik
-                # Variablen in der Mathematik (unklar, ob Leerzeichen hier Pflicht sind)
+                # Variablen in der Mathematik
+                # (unklar, ob Leerzeichen hier Pflicht sind)
                 r'[xyz](,[xyz])+',
-                # Definitionslisten, dort gibt es oft absichtlich Leerzeichen vor Doppelpunkten
+                # Definitionslisten, dort gibt es oft absichtlich Leerzeichen
+                # vor Doppelpunkten
                 r'(?m)^;(.*?)$',
                 r'\d+h( |&nbsp;)\d+m',
                 # Schreibweise für Zeiten, vor allem in Film-Infoboxen.
@@ -162,7 +172,8 @@ fixes = {
                 r'(?i)\[\[(Bild|Image|Media):.+?\|',  # Dateinamen auslassen
                 r'{{bgc\|.*?}}',                      # Hintergrundfarbe
                 r'<sup>\d+m</sup>',                   # bei chemischen Formeln
-                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*(<sup>.*?</sup>|<sub>.*?</sub>|))+\)'
+                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*'
+                r'(<sup>.*?</sup>|<sub>.*?</sub>|))+\)'
                 # chemische Formel, z. B. AuPb(Pb,Sb,Bi)Te.
                 # Hier sollen keine Leerzeichen hinter die Kommata.
             ],
@@ -251,7 +262,8 @@ fixes = {
             # dash in external link, where the correct end of the URL can
             # be detected from the file extension. It is very unlikely that
             # this will cause mistakes.
-            (r'\[(?P<url>https?://[^\|\] ]+?(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\|'
+            (r'\[(?P<url>https?://[^\|\] ]+?'
+             r'(\.pdf|\.html|\.htm|\.php|\.asp|\.aspx|\.jsp)) *\|'
              r' *(?P<label>[^\|\]]+?)\]', r'[\g<url> \g<label>]'),
         ],
         'exceptions': {
@@ -311,7 +323,8 @@ fixes = {
         },
         'replacements': [
             # Bindestrich, Gedankenstrich, Geviertstrich
-            (r'(von \d{3,4}) *(-|&ndash;|–|&mdash;|—) *(\d{3,4})', r'\1 bis \3'),
+            (r'(von \d{3,4}) *(-|&ndash;|–|&mdash;|—) *(\d{3,4})',
+             r'\1 bis \3'),
         ],
     },
 
@@ -355,8 +368,10 @@ fixes = {
             #   (u'†\[\[(\d)', u'† [[\\1'),
             #   (u'&dagger;\[\[(\d)', u'† [[\\1'),
             (r'\[\[(\d+\. (?:Januar|Februar|März|April|Mai|Juni|Juli|August|'
-             r'September|Oktober|November|Dezember)) (\d{1,4})\]\]', r'[[\1]] [[\2]]'),
-            # Keine führende Null beim Datum (erst einmal nur bei fehlenden Leerzeichen)
+             r'September|Oktober|November|Dezember)) (\d{1,4})\]\]',
+             r'[[\1]] [[\2]]'),
+            # Keine führende Null beim Datum
+            # (erst einmal nur bei fehlenden Leerzeichen)
             (r'0(\d+)\.(Januar|Februar|März|April|Mai|Juni|Juli|August|'
              r'September|Oktober|November|Dezember)', r'\1. \2'),
             # Kein Leerzeichen zwischen Tag und Monat
@@ -386,9 +401,11 @@ fixes = {
             # Remove colon between the word ISBN and the number
             (r'ISBN: (\d+)', r'ISBN \1'),
             # superfluous word "number"
-            (r'ISBN(?: [Nn]umber| [Nn]o\.?|-Nummer|-Nr\.):? (\d+)', r'ISBN \1'),
+            (r'ISBN(?: [Nn]umber| [Nn]o\.?|-Nummer|-Nr\.):? (\d+)',
+             r'ISBN \1'),
             # Space, minus, dot, hypen, en dash, em dash, etc. instead of
-            # hyphen-minus as separator, or spaces between digits and separators.
+            # hyphen-minus as separator,
+            # or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
             # these won't be changed.
             # These two regexes don't verify that the ISBN is of a valid format
@@ -399,7 +416,8 @@ fixes = {
              r'*[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d)(?!\d)',
              r'ISBN \1-\2-\3-\4-\5'),  # ISBN-13
 
-            (r'ISBN (\d+) *[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d|X|x)(?!\d)',
+            (r'ISBN (\d+) *[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d+) *'
+             r'[\- −.‐-―] *(\d|X|x)(?!\d)',
              r'ISBN \1-\2-\3-\4'),  # ISBN-10
             # missing space before ISBN-10 or before ISBN-13,
             # or multiple spaces or non-breaking space.
@@ -568,8 +586,8 @@ fixes = {
             (u'Special:Whatlinkshere',   u'Special:WhatLinksHere'),
         ],
     },
-    # yu top-level domain will soon be disabled,
-    # see http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
+    # yu top-level domain will soon be disabled, see
+    # http://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
     # The following are domains that are often-used.
     'yu-tld': {
         'regex': False,
@@ -578,7 +596,8 @@ fixes = {
             'de':  u'Bot: Ersetze Links auf .yu-Domains',
             'en':  u'Robot: Replacing links to .yu domains',
             'fa':  u'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',
-            'fr':  u'Robot: Correction des liens pointant vers le domaine .yu, qui expire en 2009',
+            'fr':  ('Robot: Correction des liens pointant vers le domaine '
+                    '.yu, qui expire en 2009'),
             'ksh': u'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
         },
         'replacements': [
@@ -592,7 +611,8 @@ fixes = {
             (u'eunet.yu',                    u'eunet.rs'),
             (u'www.zastava-arms.co.yu',      u'www.zastava-arms.co.rs'),
             (u'www.airportnis.co.yu',        u'www.airportnis.rs'),
-            # (u'www.danas.co.yu',             u'www.danas.rs'), # Archive links don't seem to work
+            # Archive links don't seem to work
+            # (u'www.danas.co.yu',             u'www.danas.rs'),
             (u'www.belex.co.yu',             u'www.belex.rs'),
             (u'beograd.org.yu',              u'beograd.rs'),
             (u'www.vlada.cg.yu',             u'www.vlada.me'),

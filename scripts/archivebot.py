@@ -88,8 +88,8 @@ Options (may be omitted):
 """
 #
 # (C) Misza13, 2006-2010
-# (C) xqt, 2009-2016
-# (C) Pywikibot team, 2007-2017
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -164,7 +164,7 @@ def str2localized_duration(site, string):
     Localise a shorthand duration.
 
     Translates a duration written in the shorthand notation (ex. "24h", "7d")
-    into an expression in the local language of the wiki ("24 hours", "7 days").
+    into an expression in the local wiki language ("24 hours", "7 days").
     """
     key, duration = checkstr(string)
     template = site.mediawiki_message(MW_KEYS[key])
@@ -594,7 +594,8 @@ class PageArchiver(object):
 
     def load_config(self):
         """Load and validate archiver template."""
-        pywikibot.output(u'Looking for: {{%s}} in %s' % (self.tpl.title(), self.page))
+        pywikibot.output('Looking for: {{%s}} in %s' % (self.tpl.title(),
+                                                        self.page))
         for tpl in self.page.templatesWithParams():
             if tpl[0] == pywikibot.Page(self.site, self.tpl.title(), ns=10):
                 for param in tpl[1]:
@@ -616,14 +617,15 @@ class PageArchiver(object):
         Also checks for security violations.
         """
         title = archive.title()
+        page_title = self.page.title()
         if not title:
             return
-        if not self.force \
-           and not self.page.title() + '/' == title[:len(self.page.title()) + 1] \
-           and not self.key_ok():
+        if not (self.force
+                or page_title + '/' == title[:len(page_title) + 1]
+                or self.key_ok()):
             raise ArchiveSecurityError(
                 u"Archive page %s does not start with page title (%s)!"
-                % (archive, self.page.title()))
+                % (archive, page_title))
         if title not in self.archives:
             self.archives[title] = DiscussionPage(archive, self, params)
         return self.archives[title].feed_thread(thread, max_archive_size)
@@ -650,15 +652,20 @@ class PageArchiver(object):
                 params = {
                     'counter': to_local_digits(arch_counter, lang),
                     'year': to_local_digits(t.timestamp.year, lang),
-                    'isoyear': to_local_digits(t.timestamp.isocalendar()[0], lang),
-                    'isoweek': to_local_digits(t.timestamp.isocalendar()[1], lang),
+                    'isoyear': to_local_digits(t.timestamp.isocalendar()[0],
+                                               lang),
+                    'isoweek': to_local_digits(t.timestamp.isocalendar()[1],
+                                               lang),
                     'quarter': to_local_digits(
                         int(ceil(float(t.timestamp.month) / 3)), lang),
                     'month': to_local_digits(t.timestamp.month, lang),
-                    'monthname': self.month_num2orig_names[t.timestamp.month]['long'],
-                    'monthnameshort': self.month_num2orig_names[t.timestamp.month]['short'],
+                    'monthname': self.month_num2orig_names[
+                        t.timestamp.month]['long'],
+                    'monthnameshort': self.month_num2orig_names[
+                        t.timestamp.month]['short'],
                     'week': to_local_digits(
-                        int(time.strftime('%W', t.timestamp.timetuple())), lang),
+                        int(time.strftime('%W',
+                                          t.timestamp.timetuple())), lang),
                 }
                 archive = pywikibot.Page(self.site, archive % params)
                 if self.feed_archive(archive, t, max_arch_size, params):
@@ -685,16 +692,19 @@ class PageArchiver(object):
         if whys:
             # Search for the marker template
             rx = re.compile(r'\{\{%s\s*?\n.*?\n\}\}'
-                            % (template_title_regex(self.tpl).pattern), re.DOTALL)
+                            % (template_title_regex(self.tpl).pattern),
+                            re.DOTALL)
             if not rx.search(self.page.header):
                 raise MalformedConfigError(
                     "Couldn't find the template in the header"
                 )
 
-            pywikibot.output(u'Archiving %d thread(s).' % self.archived_threads)
+            pywikibot.output('Archiving {0} thread(s).'
+                             .format(self.archived_threads))
             # Save the archives first (so that bugs don't cause a loss of data)
             for a in sorted(self.archives.keys()):
-                self.comment_params['count'] = self.archives[a].archived_threads
+                self.comment_params['count'] = self.archives[
+                    a].archived_threads
                 comment = i18n.twtranslate(self.site.code,
                                            'archivebot-archive-summary',
                                            self.comment_params)
@@ -771,12 +781,15 @@ def main(*args):
         if page.exists():
             calc = page.title()
         else:
-            pywikibot.output(u'NOTE: the specified page "%s" does not (yet) exist.' % calc)
+            pywikibot.output(
+                'NOTE: the specified page "{0}" does not (yet) exist.'
+                .format(calc))
         pywikibot.output('key = %s' % calc_md5_hexdigest(calc, salt))
         return
 
     if not args:
-        pywikibot.bot.suggest_help(additional_text='No template was specified.')
+        pywikibot.bot.suggest_help(
+            additional_text='No template was specified.')
         return False
 
     for a in args:
@@ -807,7 +820,7 @@ def main(*args):
                 pywikibot.error('Missing or malformed template in page %s: %s'
                                 % (pg, e))
             except Exception:
-                pywikibot.error(u'Error occurred while processing page %s' % pg)
+                pywikibot.error('Error occurred while processing page %s' % pg)
                 pywikibot.exception(tb=True)
 
 
