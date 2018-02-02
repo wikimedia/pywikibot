@@ -27,9 +27,7 @@ class TestGettingDisambigLinks(TestCase):
                                   minimum=0)
         page.text = '* [[Link1]]\n* [[Link2]]'
         newlinks = bot.get_disambiguation_links(page)
-        links = [
-            pywikibot.Link('Link1', self.site),
-            pywikibot.Link('Link2', self.site)]
+        links = ['Link1', 'Link2']
         self.assertEqual(newlinks, links)
 
     def test_get_without_templates(self):
@@ -39,7 +37,7 @@ class TestGettingDisambigLinks(TestCase):
                                   minimum=0)
         page.text = '* [[Link1]]\n{{Disambig}}'
         newlinks = bot.get_disambiguation_links(page)
-        links = [pywikibot.Link('Link1', self.site)]
+        links = ['Link1']
         self.assertEqual(newlinks, links)
 
 
