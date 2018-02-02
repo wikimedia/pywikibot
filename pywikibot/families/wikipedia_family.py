@@ -74,6 +74,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             '_default': (),
             'ar': ('تحويل تصنيف',),
             'arz': (u'تحويل تصنيف',),
+            'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
             'bs': ('Category redirect',),
             'cs': (u'Zastaralá kategorie',),
             'da': (u'Kategoriomdirigering',),
