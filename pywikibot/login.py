@@ -3,7 +3,7 @@
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -165,17 +165,17 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         if self.site.family.name in botList \
                 and self.site.code in botList[self.site.family.name]:
-            botListPageTitle, botTemplate = botList[
+            botlist_pagetitle, bot_template_title = botList[
                 self.site.family.name][self.site.code]
-            botListPage = pywikibot.Page(self.site, botListPageTitle)
-            if botTemplate:
-                for template in botListPage.templatesWithParams():
-                    if template[0] == botTemplate \
-                       and template[1][0] == self.username:
+            botlist_page = pywikibot.Page(self.site, botlist_pagetitle)
+            if bot_template_title:
+                for template, params in botlist_page.templatesWithParams():
+                    if (template.title() == bot_template_title
+                            and params[0] == self.username):
                         return True
             else:
-                for linkedPage in botListPage.linkedPages():
-                    if linkedPage.title(withNamespace=False) == self.username:
+                for linked_page in botlist_page.linkedPages():
+                    if linked_page.title(withNamespace=False) == self.username:
                         return True
             return False
         else:
