@@ -850,7 +850,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return False
         if not hasattr(self, "_catredirect"):
             catredirs = self.site.category_redirects()
-            for (template, args) in self.templatesWithParams():
+            for template, args in self.templatesWithParams():
                 if template.title(withNamespace=False) in catredirs:
                     # Get target (first template argument)
                     try:
@@ -1175,30 +1175,32 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         # go through all templates and look for any restriction
         # multiple bots/nobots templates are allowed
-        for template in templates:
-            title = template[0].title(withNamespace=False)
+        for template, params in templates:
+            title = template.title(withNamespace=False)
             if title == 'Nobots':
-                if len(template[1]) == 0:
+                if not params:
                     return False
                 else:
-                    bots = template[1][0].split(',')
+                    bots = params[0].split(',')
                     if 'all' in bots or pywikibot.calledModuleName() in bots \
                        or username in bots:
                         return False
             elif title == 'Bots':
-                if len(template[1]) == 0:
+                if not params:
                     return True
                 else:
-                    (ttype, bots) = template[1][0].split('=', 1)
+                    (ttype, bots) = params[0].split('=', 1)
                     bots = bots.split(',')
                     if ttype == 'allow':
                         return 'all' in bots or username in bots
                     if ttype == 'deny':
                         return not ('all' in bots or username in bots)
                     if ttype == 'allowscript':
-                        return 'all' in bots or pywikibot.calledModuleName() in bots
+                        return ('all' in bots
+                                or pywikibot.calledModuleName() in bots)
                     if ttype == 'denyscript':
-                        return not ('all' in bots or pywikibot.calledModuleName() in bots)
+                        return not ('all' in bots
+                                    or pywikibot.calledModuleName() in bots)
         # no restricting template found
         return True
 
