@@ -34,7 +34,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -564,12 +564,15 @@ class NoReferencesBot(Bot):
                         pywikibot.output(
                             'Adding references tag to existing %s section...\n'
                             % section)
-                        newText = (
-                            oldText[:match.end()] + u'\n' +
-                            self.referencesText + u'\n' +
-                            oldText[match.end():]
-                        )
-                        return newText
+                        templates_or_comments = re.compile(
+                            r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
+                            flags=re.DOTALL)
+                        new_text = (
+                            oldText[:match.end()]
+                            + templates_or_comments.sub(
+                                r'\1\n{0}\n'.format(self.referencesText),
+                                oldText[match.end():]))
+                        return new_text
                 else:
                     break
 
