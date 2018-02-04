@@ -438,15 +438,14 @@ class imageFetcher(threading.Thread):
         for key, value in informationFields[imagepage.site.lang].items():
             contents[value] = u''
 
-        templates = imagepage.templatesWithParams()
         information = informationTemplate[imagepage.site.lang]
         fields = informationFields[imagepage.site.lang]
 
-        for (template, params) in templates:
-            if template == information:
+        for template, params in imagepage.templatesWithParams():
+            if template.title() == information:
                 for param in params:
                     # Split at =
-                    (field, sep, value) = param.partition(u'=')
+                    field, sep, value = param.partition('=')
                     # To lowercase, remove underscores and strip of spaces
                     field = field.lower().replace(u'_', u' ').strip()
                     key = fields.get(field)
