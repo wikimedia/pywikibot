@@ -250,6 +250,9 @@ netext = {
         'it': u'{{subst:benvenuto}}',
         'zh': u'{{subst:welcome}} %s',
     },
+    'wikisource': {
+        'bn': '{{subst:স্বাগতম}} %s',
+    },
     'wiktionary': {
         'ar': u'{{subst:ترحيب}} %s',
         'bn': u'{{subst:স্বাগতম|%s}}',
