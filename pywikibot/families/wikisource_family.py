@@ -43,6 +43,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.category_redirect_templates = {
             '_default': (),
             'ar': ('قالب:تحويل تصنيف',),
+            'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
             'en': ('Category redirect',),
             'ro': ('Redirect categorie',),
             'zh': ('分類重定向',),
