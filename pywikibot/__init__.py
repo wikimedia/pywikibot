@@ -57,8 +57,9 @@ from pywikibot.exceptions import (
     LockedPage, CascadeLockedPage, LockedNoPage, NoCreateError,
     EditConflict, PageDeletedConflict, PageCreatedConflict,
     ServerError, FatalServerError, Server504Error,
-    CaptchaError, SpamfilterError, CircularRedirect, InterwikiRedirectPage,
-    WikiBaseError, CoordinateGlobeUnknownException,
+    CaptchaError, SpamfilterError, TitleblacklistError,
+    CircularRedirect, InterwikiRedirectPage, WikiBaseError,
+    CoordinateGlobeUnknownException,
     DeprecatedPageNotFoundError as _DeprecatedPageNotFoundError,
     _EmailUserError,
 )
@@ -113,8 +114,8 @@ __all__ = (
     'EditConflict', 'PageDeletedConflict', 'PageCreatedConflict',
     'UploadWarning',
     'ServerError', 'FatalServerError', 'Server504Error',
-    'CaptchaError', 'SpamfilterError', 'CircularRedirect',
-    'InterwikiRedirectPage',
+    'CaptchaError', 'SpamfilterError', 'TitleblacklistError',
+    'CircularRedirect', 'InterwikiRedirectPage',
     'WikiBaseError', 'CoordinateGlobeUnknownException',
     'QuitKeyboardInterrupt',
 )

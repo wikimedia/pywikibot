@@ -40,6 +40,7 @@ PageSaveRelatedError: page exceptions within the save operation on a Page
 (alias: PageNotSaved).
 
   - SpamfilterError: MediaWiki spam filter detected a blacklisted URL
+  - TitleblacklistError: MediaWiki detected a blacklisted page title
   - OtherPageSaveError: misc. other save related exception.
   - LockedPage: Page is locked
       - LockedNoPage: Title is locked against creation
@@ -459,6 +460,15 @@ class SpamfilterError(PageSaveRelatedError):
         """Constructor."""
         self.url = url
         super(SpamfilterError, self).__init__(page)
+
+
+class TitleblacklistError(PageSaveRelatedError):
+
+    """Page save failed because MediaWiki detected a blacklisted page title."""
+
+    message = 'Page %s is title-blacklisted.'
+
+    pass
 
 
 class ServerError(Error):  # noqa

@@ -20,6 +20,7 @@ from pywikibot import (
     NoPage,
     LockedPage,
     SpamfilterError,
+    TitleblacklistError,
     OtherPageSaveError,
     NoCreateError,
     PageCreatedConflict,
@@ -50,6 +51,11 @@ class TestSaveFailure(TestCase):
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
         self.assertRaisesRegex(SpamfilterError, 'badsite.com', page.save)
+
+    def test_titleblacklist(self):
+        """Test that title blacklist raise the appropriate exception."""
+        page = pywikibot.Page(self.site, 'User:UpsandDowns1234/Blacklisttest')
+        self.assertRaises(TitleblacklistError, page.save)
 
     def test_nobots(self):
         """Test that {{nobots}} raise the appropriate exception."""
