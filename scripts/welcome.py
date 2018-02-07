@@ -252,6 +252,7 @@ netext = {
     },
     'wikisource': {
         'bn': '{{subst:স্বাগতম}} %s',
+        'mr': '{{subst:Welcome}} %s',
     },
     'wiktionary': {
         'ar': u'{{subst:ترحيب}} %s',
