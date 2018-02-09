@@ -19,6 +19,7 @@ from scripts import archivebot
 
 from tests.aspects import unittest, TestCase
 
+
 THREADS = {
     'als': 4, 'ar': 1, 'bar': 0, 'bg': 0, 'bjn': 1, 'bs': 0, 'ca': 5, 'ckb': 2,
     'cs': 0, 'de': 1, 'en': 25, 'eo': 2, 'es': 13, 'fa': 2, 'fr': 25, 'frr': 2,
@@ -227,6 +228,41 @@ class TestArchiveBotAfterDateUpdate(TestCase):
                 raise
 
     expected_failures = []
+
+
+class TestDiscussionPageObject(TestCase):
+
+    """Test DiscussionPage object."""
+
+    cached = True
+    family = 'test'
+    code = 'test'
+
+    def testTwoThreadsWithCommentedOutThread(self):
+        """Test recognizing two threads and ignoring a commented out thread.
+
+        Talk:For-pywikibot-archivebot must have:
+
+        {{User:MiszaBot/config
+        |archive = Talk:Main_Page/archive
+        |algo = old(30d)
+        }}
+        <!-- normal comments -->
+        == A ==
+        foo bar
+        <!--
+        == Z ==
+        foo bar bar
+        -->
+        == B ==
+        foo bar bar bar
+        """
+        page = pywikibot.Page(self.get_site(), 'Talk:For-pywikibot-archivebot')
+        archiver = archivebot.PageArchiver(
+            page=page, tpl='User:MiszaBot/config', salt='', force=False)
+        page = archivebot.DiscussionPage(page, archiver)
+        page.load_page()
+        self.assertEqual([x.title for x in page.threads], ['A', 'B'])
 
 
 if __name__ == '__main__':  # pragma: no cover
