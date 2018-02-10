@@ -84,6 +84,8 @@ content = {
            u'ایستفاده هاکنین، اته لطف هاکنین اینتا پیغوم ره شه بقیه رفقون وسه '
            u'بیلین. اینتا صفحه هرچند ساعت ربوت جا پاک بونه.-->',
     'nds': u'{{subst:/Vörlaag}}',
+    'ne': '{{User sandbox}}\n'
+          '<!-- कृप्या! यो लाइनको तल सम्पादन गर्नुहोला। -->',
     'nl': u'{{subst:Wikipedia:Zandbak/schoon zand}}',
     'nn': u'{{sandkasse}}\n<!-- Ver snill og IKKJE FJERN DENNE LINA OG LINA '
           u'OVER ({{sandkasse}}) Nedanføre kan du derimot ha det artig og '
