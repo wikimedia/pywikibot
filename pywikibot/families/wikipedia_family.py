@@ -93,6 +93,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'ml': (u'Category redirect',),
             'ms': ('Pengalihan kategori',),
             'mt': ('Rindirizzament kategorija',),
+            'ne': ('श्रेणी अनुप्रेषण',),
             'no': ('Kategoriomdirigering',),
             'pt': ('Redirecionamento de categoria',),
             'ro': (u'Redirect categorie',),
