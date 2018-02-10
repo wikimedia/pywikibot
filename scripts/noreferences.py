@@ -229,152 +229,157 @@ placeBeforeSections = {
 # will be used when a new section has to be created.
 # Except for the first, others are tested as regexes.
 referencesSections = {
-    'ar': [             # not sure about which ones are preferred.
-        u'مراجع',
-        u'المراجع',
-        u'مصادر',
-        u'المصادر',
-        u'مراجع ومصادر',
-        u'مصادر ومراجع',
-        u'المراجع والمصادر',
-        u'المصادر والمراجع',
-    ],
-    'ca': [
-        u'Referències',
-    ],
-    'cs': [
-        u'Reference',
-        u'Poznámky',
-    ],
-    'da': [
-        u'Noter',
-    ],
-    'de': [             # see [[de:WP:REF]]
-        u'Einzelnachweise',
-        u'Anmerkungen',
-        u'Belege',
-        u'Endnoten',
-        u'Fußnoten',
-        u'Fuß-/Endnoten',
-        u'Quellen',
-        u'Quellenangaben',
-    ],
-    'dsb': [
-        u'Nožki',
-    ],
-    'en': [             # not sure about which ones are preferred.
-        u'References',
-        u'Footnotes',
-        u'Notes',
-    ],
-    'ru': [
-        u'Примечания',
-        u'Сноски',
-        u'Источники',
-    ],
-    'eo': [
-        u'Referencoj',
-    ],
-    'es': [
-        u'Referencias',
-        u'Notas',
-    ],
-    'fa': [
-        u'منابع',
-        u'منبع'
-    ],
-    'fi': [
-        u'Lähteet',
-        u'Viitteet',
-    ],
-    'fr': [             # [[fr:Aide:Note]]
-        'Notes et références',
-        'Notes? et r[ée]f[ée]rences?',
-        'R[ée]f[ée]rences?',
-        'Notes?',
-        'Sources?',
-    ],
-    'he': [
-        u'הערות שוליים',
-    ],
-    'hsb': [
-        u'Nóžki',
-    ],
-    'hu': [
-        u'Források és jegyzetek',
-        u'Források',
-        u'Jegyzetek',
-        u'Hivatkozások',
-        u'Megjegyzések',
-    ],
-    'is': [
-        u'Heimildir',
-        u'Tilvísanir',
-    ],
-    'it': [
-        u'Note',
-        u'Riferimenti',
-    ],
-    'ja': [
-        u'脚注',
-        u'脚注欄',
-        u'脚注・出典',
-        u'出典',
-        u'注釈',
-        u'註',
-    ],
-    'ko': [
-        u'주석',
-        u'각주'
-        u'주석 및 참고 자료'
-        u'주석 및 참고자료',
-        u'주석 및 참고 출처'
-    ],
-    'lt': [             # not sure about which ones are preferred.
-        u'Šaltiniai',
-        u'Literatūra',
-    ],
-    'nl': [             # not sure about which ones are preferred.
-        u'Voetnoten',
-        u'Voetnoot',
-        u'Referenties',
-        u'Noten',
-        u'Bronvermelding',
-    ],
-    'pdc': [
-        u'Aamarrickunge',
-    ],
-    'pl': [
-        u'Przypisy',
-        u'Uwagi',
-    ],
-    'pt': [
-        u'Referências',
-    ],
-    'sk': [
-        u'Referencie',
-    ],
-    'sr': [
-        'Референце',
-    ],
-    'szl': [
-        u'Przipisy',
-        u'Připisy',
-    ],
-    'th': [
-        u'อ้างอิง',
-        u'เชิงอรรถ',
-        u'หมายเหตุ',
-    ],
-    'zh': [
-        u'參考資料',
-        u'参考资料',
-        u'參考文獻',
-        u'参考文献',
-        u'資料來源',
-        u'资料来源',
-    ],
+    'wikipedia': {
+        'ar': [             # not sure about which ones are preferred.
+            'مراجع',
+            'المراجع',
+            'مصادر',
+            'المصادر',
+            'مراجع ومصادر',
+            'مصادر ومراجع',
+            'المراجع والمصادر',
+            'المصادر والمراجع',
+        ],
+        'ca': [
+            'Referències',
+        ],
+        'cs': [
+            'Reference',
+            'Poznámky',
+        ],
+        'da': [
+            'Noter',
+        ],
+        'de': [             # see [[de:WP:REF]]
+            'Einzelnachweise',
+            'Anmerkungen',
+            'Belege',
+            'Endnoten',
+            'Fußnoten',
+            'Fuß-/Endnoten',
+            'Quellen',
+            'Quellenangaben',
+        ],
+        'dsb': [
+            'Nožki',
+        ],
+        'en': [             # not sure about which ones are preferred.
+            'References',
+            'Footnotes',
+            'Notes',
+        ],
+        'ru': [
+            'Примечания',
+            'Сноски',
+            'Источники',
+        ],
+        'eo': [
+            'Referencoj',
+        ],
+        'es': [
+            'Referencias',
+            'Notas',
+        ],
+        'fa': [
+            'منابع',
+            'منبع'
+        ],
+        'fi': [
+            'Lähteet',
+            'Viitteet',
+        ],
+        'fr': [             # [[fr:Aide:Note]]
+            'Notes et références',
+            'Notes? et r[ée]f[ée]rences?',
+            'R[ée]f[ée]rences?',
+            'Notes?',
+            'Sources?',
+        ],
+        'he': [
+            'הערות שוליים',
+        ],
+        'hsb': [
+            'Nóžki',
+        ],
+        'hu': [
+            'Források és jegyzetek',
+            'Források',
+            'Jegyzetek',
+            'Hivatkozások',
+            'Megjegyzések',
+        ],
+        'is': [
+            'Heimildir',
+            'Tilvísanir',
+        ],
+        'it': [
+            'Note',
+            'Riferimenti',
+        ],
+        'ja': [
+            '脚注',
+            '脚注欄',
+            '脚注・出典',
+            '出典',
+            '注釈',
+            '註',
+        ],
+        'ko': [
+            '주석',
+            '각주'
+            '주석 및 참고 자료'
+            '주석 및 참고자료',
+            '주석 및 참고 출처'
+        ],
+        'lt': [             # not sure about which ones are preferred.
+            'Šaltiniai',
+            'Literatūra',
+        ],
+        'nl': [             # not sure about which ones are preferred.
+            'Voetnoten',
+            'Voetnoot',
+            'Referenties',
+            'Noten',
+            'Bronvermelding',
+        ],
+        'pdc': [
+            'Aamarrickunge',
+        ],
+        'pl': [
+            'Przypisy',
+            'Uwagi',
+        ],
+        'pt': [
+            'Referências',
+        ],
+        'sk': [
+            'Referencie',
+        ],
+        'sr': [
+            'Референце',
+        ],
+        'szl': [
+            'Przipisy',
+            'Připisy',
+        ],
+        'th': [
+            'อ้างอิง',
+            'เชิงอรรถ',
+            'หมายเหตุ',
+        ],
+        'zh': [
+            '參考資料',
+            '参考资料',
+            '參考文獻',
+            '参考文献',
+            '資料來源',
+            '资料来源',
+        ],
+    },
 }
+# Header on Czech Wiktionary should be different (T123091)
+referencesSections['wiktionary'] = dict(referencesSections['wikipedia'])
+referencesSections['wiktionary'].update(cs=['poznámky', 'reference'])
 
 # Templates which include a <references /> tag. If there is no such template
 # on your wiki, you don't have to enter anything here.
