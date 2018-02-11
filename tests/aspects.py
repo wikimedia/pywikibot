@@ -51,7 +51,7 @@ from pywikibot.tools import PY2, StringTypes
 
 import tests
 
-from tests import unittest, patch_request, unpatch_request
+from tests import unittest, patch_request, unpatch_request, unittest_print
 from tests.utils import (
     add_metaclass, execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
@@ -122,13 +122,13 @@ class TestCaseBase(unittest.TestCase):
 
     def _addUnexpectedSuccess(self, result):
         """Report and ignore."""
-        print(' unexpected success ', end='')
+        unittest_print(' unexpected success ', end='')
         sys.stdout.flush()
         result.addSuccess(self)
 
     def _addExpectedFailure(self, result, exc_info=None):
         """Report and ignore."""
-        print(' expected failure ', end='')
+        unittest_print(' expected failure ', end='')
         sys.stdout.flush()
         result.addSuccess(self)
 
@@ -336,7 +336,7 @@ class TestTimerMixin(TestCaseBase):
         duration = self.test_completed - self.test_start
 
         if duration > self.test_duration_warning_interval:
-            print(' %0.3fs' % duration, end=' ')
+            unittest_print(' %0.3fs' % duration, end=' ')
             sys.stdout.flush()
 
         super(TestTimerMixin, self).tearDown()
@@ -480,9 +480,9 @@ class CacheInfoMixin(TestCaseBase):
         self.cache_hits = tests.cache_hits - self.cache_hits_start
 
         if self.cache_misses:
-            print(' %d cache misses' % self.cache_misses, end=' ')
+            unittest_print(' %d cache misses' % self.cache_misses, end=' ')
         if self.cache_hits:
-            print(' %d cache hits' % self.cache_hits, end=' ')
+            unittest_print(' %d cache hits' % self.cache_hits, end=' ')
 
         if self.cache_misses or self.cache_hits:
             sys.stdout.flush()
@@ -1271,8 +1271,9 @@ class DefaultSiteTestCase(TestCase):
         @param site: site tests should use
         @type site: BaseSite
         """
-        print('%s using %s instead of %s:%s.'
-              % (cls.__name__, site, cls.family, cls.code))
+        unittest_print(
+            '{cls.__name__} using {site} instead of {cls.family}:{cls.code}.'
+            .format(cls=cls, site=site))
         cls.site = site
         cls.family = site.family.name
         cls.code = site.code

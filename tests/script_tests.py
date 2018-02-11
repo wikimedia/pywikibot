@@ -16,7 +16,7 @@ from pywikibot.tools import (
     StringTypes,
 )
 
-from tests import join_root_path
+from tests import join_root_path, unittest_print
 from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
                            PwbTestCase)
 from tests.utils import allowed_failure, execute_pwb, add_metaclass
@@ -55,8 +55,8 @@ def check_script_deps(script_name):
             try:
                 __import__(package_name)
             except ImportError as e:
-                print('%s depends on %s, which isnt available:\n%s'
-                      % (script_name, package_name, e))
+                unittest_print('%s depends on %s, which isnt available:\n%s'
+                               % (script_name, package_name, e))
                 return False
     return True
 
@@ -187,13 +187,13 @@ def collector(loader=unittest.loader.defaultTestLoader):
     # discover() ordering of unit tests.
 
     if unrunnable_script_list:
-        print('Skipping execution of unrunnable scripts:\n  %r'
-              % unrunnable_script_list)
+        unittest_print('Skipping execution of unrunnable scripts:\n  %r'
+                       % unrunnable_script_list)
 
     if not enable_autorun_tests:
-        print('Skipping execution of auto-run scripts '
-              '(set PYWIKIBOT2_TEST_AUTORUN=1 to enable):\n  %r'
-              % auto_run_script_list)
+        unittest_print('Skipping execution of auto-run scripts '
+                       '(set PYWIKIBOT2_TEST_AUTORUN=1 to enable):\n  %r'
+                       % auto_run_script_list)
 
     tests = (['test__login'] +
              ['test_' + name
@@ -282,10 +282,10 @@ class TestScriptMeta(MetaTestCaseClass):
                 stderr_other = [l for l in stderr
                                 if not l.startswith('Sleeping for ')]
                 if stderr_sleep:
-                    print(u'\n'.join(stderr_sleep))
+                    unittest_print('\n'.join(stderr_sleep))
 
                 if result['exit_code'] == -9:
-                    print(' killed', end='  ')
+                    unittest_print(' killed', end='  ')
 
                 if error:
                     self.assertIn(error, result['stderr'])
@@ -307,14 +307,15 @@ class TestScriptMeta(MetaTestCaseClass):
                     exit_codes = [0, -9]
 
                     if (not result['stdout'] and not result['stderr']):
-                        print(' auto-run script unresponsive after %d seconds'
-                              % timeout, end=' ')
+                        unittest_print(' auto-run script unresponsive after '
+                                       '%d seconds' % timeout, end=' ')
                     elif 'SIMULATION: edit action blocked' in result['stderr']:
-                        print(' auto-run script simulated edit blocked',
-                              end='  ')
+                        unittest_print(' auto-run script simulated edit '
+                                       'blocked', end='  ')
                     else:
-                        print(' auto-run script stderr within %d seconds: %r'
-                              % (timeout, result['stderr']), end='  ')
+                        unittest_print(
+                            ' auto-run script stderr within %d seconds: %r'
+                            % (timeout, result['stderr']), end='  ')
 
                 self.assertNotIn('Traceback (most recent call last)',
                                  result['stderr'])
