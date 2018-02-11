@@ -340,11 +340,12 @@ def get_base_dir(test_directory=None):
 
             for dir in base_dir_cand:
                 dir = os.path.join(*dir)
-                if not os.path.isdir(dir):
+                try:
                     os.makedirs(dir, mode=private_files_permission)
-                if exists(dir):
-                    base_dir = dir
-                    break
+                except OSError:  # PermissionError or already exists
+                    if exists(dir):
+                        base_dir = dir
+                        break
 
     if not os.path.isabs(base_dir):
         base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
