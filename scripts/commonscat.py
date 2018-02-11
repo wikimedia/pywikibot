@@ -127,6 +127,7 @@ commonscatTemplates = {
             u'Commons category']),
     'ml': (u'Commonscat', [u'Commons cat', u'Commons2']),
     'ms': (u'Kategori Commons', [u'Commonscat', u'Commons category']),
+    'ne': ('कमन्सश्रेणी', ['Commonscat']),
     'nn': (u'Commonscat', [u'Commons cat']),
     'os': (u'Commonscat', [u'Commons cat']),
     'pt': (u'Commonscat', [u'Commons cat']),
