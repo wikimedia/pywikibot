@@ -193,7 +193,7 @@ if 'PYWIKIBOT_TEST_MODULES' in os.environ:
 
 def unittest_print(*args, **kwargs):
     """Print information in test log."""
-    print(*args, **kwargs)
+    print(*args, **kwargs)  # noqa: T001
 
 
 def collector(loader=unittest.loader.defaultTestLoader):
@@ -205,16 +205,19 @@ def collector(loader=unittest.loader.defaultTestLoader):
     # cause the loader to fallback to its own
     # discover() ordering of unit tests.
     if disabled_test_modules:
-        print('Disabled test modules (to run: python -m unittest ...):\n  %s'
-              % ', '.join(disabled_test_modules))
+        unittest_print(
+            'Disabled test modules (to run: python -m unittest ...):\n  %s'
+            % ', '.join(disabled_test_modules))
 
     if extra_test_modules:
-        print('Extra test modules (run after library, before scripts):\n  %s'
-              % ', '.join(extra_test_modules))
+        unittest_print(
+            'Extra test modules (run after library, before scripts):\n  %s'
+            % ', '.join(extra_test_modules))
 
     if disabled_tests:
-        print('Skipping tests (to run: python -m unittest ...):\n  %r'
-              % disabled_tests)
+        unittest_print(
+            'Skipping tests (to run: python -m unittest ...):\n  %r'
+            % disabled_tests)
 
     modules = [module
                for module in test_modules
@@ -263,7 +266,8 @@ CachedRequest._get_cache_dir = classmethod(
 # frequently in code paths resulting from mishandled server problems.
 if config.max_retries > 2:
     if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
-        print('tests: max_retries reduced from %d to 1' % config.max_retries)
+        unittest_print(
+            'tests: max_retries reduced from %d to 1' % config.max_retries)
     config.max_retries = 1
 
 cache_misses = 0
