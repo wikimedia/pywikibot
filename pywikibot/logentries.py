@@ -143,7 +143,11 @@ class LogEntry(object):
         return self._timestamp
 
     def comment(self):
-        """Return the logentry's comment."""
+        """Return the logentry's comment.
+
+        @raise KeyError: The log entry has no 'comment' key.
+        @rtype: str
+        """
         return self.data['comment']
 
 
