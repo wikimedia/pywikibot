@@ -75,10 +75,10 @@ class TestLogentriesBase(TestCase):
         else:
             self.assertNotIn(logentry.type(), logentry.data)
         self.assertIsInstance(logentry.action(), unicode)
-        if hasattr(logentry, 'comment'):
+        try:
             self.assertIsInstance(logentry.comment(), unicode)
-        else:
-            self.assertRaises(KeyError, logentry.comment)
+        except KeyError as e:
+            self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
         self.assertIsInstance(logentry.logid(), int)
         self.assertIsInstance(logentry.ns(), int)
         self.assertIsInstance(logentry.pageid(), int)
