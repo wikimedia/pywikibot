@@ -124,3 +124,19 @@ Current release
 
 * First stable release branch
 
+1.0 rv 2007-06-19
+-----------------
+* BeautifulSoup becomes mandatory
+* new scripts where added
+* new family files where supported
+* some scripts where archived
+
+1.0
+---
+
+*Sep 26, 2005*
+
+* First PyWikipediaBot framework release
+* scripts and libraries for standardizing content
+* tools for making minor modifications
+* script making interwiki links
