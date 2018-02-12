@@ -454,8 +454,9 @@ class DiscussionPage(pywikibot.Page):
         self.archives = {}
         self.archived_threads = 0
         text = self.get()
+
         # Replace text in following exceptions by spaces, but don't change line
-        # numbers
+        # numbers and character positions
         exceptions = ['comment', 'code', 'pre', 'source', 'nowiki']
         exc_regexes = _get_regexes(exceptions, self.site)
         stripped_text = text
@@ -464,8 +465,9 @@ class DiscussionPage(pywikibot.Page):
                 before = stripped_text[:match.start()]
                 restricted = stripped_text[match.start():match.end()]
                 after = stripped_text[match.end():]
-                restricted = re.sub(r'[^\n]', r'', restricted)
+                restricted = re.sub(r'[^\n]', ' ', restricted)
                 stripped_text = before + restricted + after
+
         # Find thread headers in stripped text and return their line numbers
         stripped_lines = stripped_text.split('\n')
         thread_headers = []
