@@ -374,7 +374,8 @@ def writelogheader():
     if not http or not hasattr(http, 'threads') or not len(http.threads):
         return
 
-    log('=== Pywikibot framework v3.0 -- Logging header ===')
+    log('=== Pywikibot framework v{} -- Logging header ==='
+        .format(pywikibot.__version__))
 
     # script call
     log('COMMAND: {0}'.format(sys.argv))

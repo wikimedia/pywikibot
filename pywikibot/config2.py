@@ -55,6 +55,7 @@ from warnings import warn
 
 from requests import __version__ as requests_version
 
+from pywikibot import __version__ as pwb_version
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import PY2, issue_deprecation_warning
 
@@ -237,7 +238,7 @@ password_file = None
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
-default_edit_summary = 'Pywikibot 3.0-dev'
+default_edit_summary = 'Pywikibot ' + pwb_version
 
 # What permissions to use to set private files to it
 # such as password file.
