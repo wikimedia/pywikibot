@@ -34,7 +34,9 @@ Available tests
         :members:
     .. autoclass:: tests.wikibase_tests.TestRedirects
         :members:
-    .. autoclass:: tests.wikibase_tests.TestWikibaseTypes
+    .. autoclass:: tests.wikibase_tests.TestWbTime
+        :members:
+    .. autoclass:: tests.wikibase_tests.TestWbQuantity
         :members:
     .. autoclass:: tests.wikibase_tests.TestWriteNormalizeData
         :members:

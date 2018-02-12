@@ -22,6 +22,6 @@ Available tests
         :members:
     .. autoclass:: tests.pagegenerators_tests.PageGeneratorIntersectTestCase
         :members:
-    .. autoclass:: tests.pagegenerators_tests.EnglishWikipediaPageGeneratorIntersectTestCase
+    .. autoclass:: tests.pagegenerators_tests.EnWikipediaPageGeneratorIntersectTestCase
         :members:
 
