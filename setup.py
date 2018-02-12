@@ -1,5 +1,28 @@
 # -*- coding: utf-8 -*-
-"""Installer script for Pywikibot framework."""
+"""Installer script for Pywikibot framework.
+
+To create a new distribution:
+-----------------------------
+
+- replace the developmental version string in ``pywikibot.__metadata.py``
+  by the corresponing final release
+- create the package with::
+
+    python setup.py sdist
+
+- push the change to gerrit and merge it to the repository
+- upload the package to pypy by::
+
+    twine upload dist/*
+
+- create a new tag with the version number of the final release
+- move the existing 'stable' tag to that new tag
+- delete 'stable' tag in gerrit to be overridden later
+- synchronize the local tags with the remote repositoy
+- prepare the next release by increasing the version number in
+  ``pywikibot.__metadata.py`` and adding developmental identifier
+- upload this patchset to gerrit and merge it.
+"""
 #
 # (C) Pywikibot team, 2009-2020
 #
@@ -8,6 +31,7 @@
 import os
 import sys
 
+from pkg_resources import parse_version, safe_version
 from setuptools import setup
 
 PYTHON_VERSION = sys.version_info[:3]
@@ -117,32 +141,80 @@ test_deps += extra_deps['eventstreams']
 test_deps += ['six']
 
 
-def get_version(name):
-    """Get a valid pywikibot module version string.
+class _DottedDict(dict):
+    __getattr__ = dict.__getitem__
 
-    Either create a timebased version number for the package
-    or read the version number from the package.
+
+# import metadata
+metadata = _DottedDict()
+name = 'pywikibot'
+path = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(path, name, '__metadata__.py')) as f:
+    exec(f.read(), metadata)
+assert metadata.__name__ == name
+
+
+def get_validated_version():
+    """Get a validated pywikibot module version string.
+
+    The version number from pywikibot.__metadata__.__version__ is used.
+    setup.py with 'sdist' option is used to create a new source distribution.
+    In that case the version number is validated: Read tags from git.
+    Verify that the new release is higher than the last repository tag
+    and is not a developmental release.
 
     @return: pywikibot module version string
     @rtype: str
     """
-    version = '4.0'
+    version = metadata.__version__
+    if 'sdist' not in sys.argv:
+        return version
+
+    if PY2:
+        raise RuntimeError(
+            'A new distribution cannot be created with Python {}'
+            .format(sys.version.split(None, 1)[0]))
+
+    # validate version for sdist
+    from contextlib import suppress
+    from subprocess import run, PIPE
     try:
-        import subprocess
-        date = subprocess.check_output(
-            ['git', 'log', '-1', '--format=%ci']).strip()
-        date = date.decode().split(' ', 1)[0].replace('-', '')
-        version += '.' + date
-        if 'sdist' not in sys.argv:
-            version += '.dev0'
+        tags = run(['git', 'tag'], check=True, stdout=PIPE,
+                   universal_newlines=True).stdout.splitlines()
     except Exception as e:
         print(e)
-        from pkg_resources import get_distribution, DistributionNotFound
-        try:
-            version = get_distribution(name).version
-        except DistributionNotFound as e:
-            print(e)
-            version += '.dev0'
+        sys.exit('Creating source distribution canceled.')
+
+    for tag in ('stable', 'python2'):
+        with suppress(ValueError):
+            tags.remove(tag)
+        
+    last_tag = tags[-1]
+
+    warnings = []
+    if 'dev' in version:
+        warnings.append('Distribution must not be a developmental release.')
+
+    if parse_version(version) < parse_version('0'):
+        # any version which is not a valid PEP 440 version will be considered
+        # less than any valid PEP 440 version
+        warnings.append(
+            version + ' is not a valid version string following PEP 440.')
+    elif safe_version(version) != version:
+        warnings.append(
+            '{} does not follow PEP 440. Use {} as version string instead.'
+            .format(version, safe_version(version)))
+
+    if parse_version(version) <= parse_version(last_tag):
+        warnings.append(
+            'New version "{}" is not higher than last version "{}".'
+            .format(version, last_tag))
+
+    if warnings:
+        print(__doc__)
+        print('\n\n'.join(warnings))
+        sys.exit('\nBuild of distribution package canceled.')
+
     return version
 
 
@@ -176,24 +248,22 @@ def get_packages(name):
 
 def main():
     """Setup entry point."""
-    name = 'pywikibot'
+    version = get_validated_version()
     setup(
-        name=name,
-        version=get_version(name),
-        description='Python MediaWiki Bot Framework',
+        name=metadata.__name__,
+        version=version,
+        description=metadata.__description__,
         long_description=read_desc('README.rst'),
-        keywords=['API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
-                  'pywikibot', 'pywikipedia', 'pywikipediabot', 'wiki',
-                  'wikimedia', 'wikipedia'],
-        maintainer='The Pywikibot team',
-        maintainer_email='pywikibot@lists.wikimedia.org',
-        license='MIT License',
+        keywords=metadata.__keywords__.split(),
+        maintainer=metadata.__maintainer__,
+        maintainer_email=metadata.__maintainer_email__,
+        license=metadata.__license__,
         packages=get_packages(name),
         python_requires='>=3.5.0',
         install_requires=dependencies,
         extras_require=extra_deps,
-        url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
-        download_url='https://tools.wmflabs.org/pywikibot/',
+        url=metadata.__url__,
+        download_url=metadata.__download_url__,
         test_suite='tests.collector',
         tests_require=test_deps,
         classifiers=[
@@ -216,6 +286,10 @@ def main():
         ],
         use_2to3=False
     )
+
+    # Finally show distribution version before uploading
+    if 'sdist' in sys.argv:
+        print('\nDistribution package created for version {}'.format(version))
 
 
 if __name__ == '__main__':
