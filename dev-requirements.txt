@@ -4,7 +4,8 @@ unittest2==0.8.0 ; python_full_version < '2.7.3'
 
 pytest>=2.8.0
 pytest-timeout
-pytest-runner
+pytest-runner<=3.0 ; python_version == '3.3'
+pytest-runner ; python_version != '3.3'
 pytest-cov
 pytest-attrib
 pytest-httpbin
