@@ -29,7 +29,7 @@ from warnings import warn
 
 import requests
 
-from pywikibot import __release__
+from pywikibot import __version__
 from pywikibot.bot import calledModuleName
 from pywikibot.comms import threadedhttp
 from pywikibot import config
@@ -128,7 +128,7 @@ atexit.register(_flush)
 USER_AGENT_PRODUCTS = {
     'python': 'Python/' + '.'.join([str(i) for i in sys.version_info]),
     'http_backend': 'requests/' + requests.__version__,
-    'pwb': 'Pywikibot/' + __release__,
+    'pwb': 'Pywikibot/' + __version__,
 }
 
 

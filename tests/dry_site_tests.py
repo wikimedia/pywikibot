@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2014
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,7 +53,7 @@ class TestDrySite(DefaultDrySiteTestCase):
         x._userinfo = {'name': 'foo'}
         x._username = ('foo', None)
 
-        self.assertEqual('Pywikibot/' + pywikibot.__release__,
+        self.assertEqual('Pywikibot/' + pywikibot.__version__,
                          user_agent(x, format_string='{pwb}'))
 
         self.assertEqual(x.family.name,
