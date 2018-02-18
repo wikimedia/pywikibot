@@ -121,6 +121,8 @@ warnings = (
      'the first item of each template info is a Page object of the template,\n'
      'not the title. '
      'Please refer README-conversion.txt and the documentation.'),
+    ('templates(',
+     'returns a list of template title not a list of templage page objects.'),
 )
 
 

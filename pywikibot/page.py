@@ -1540,6 +1540,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """DEPRECATED. Use templates()."""
         return self.templates()
 
+    @deprecate_arg('get_redirect', None)
     def templates(self, content=False):
         """
         Return a list of Page objects for templates used on this Page.

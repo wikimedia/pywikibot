@@ -614,7 +614,7 @@ class DisambiguationRobot(Bot):
     }
 
     primary_redir_template = {
-        # Page.templates() format, first letter uppercase
+        # First letter uppercase
         'hu': u'Egyért-redir',
     }
 
@@ -1008,10 +1008,9 @@ class DisambiguationRobot(Bot):
         if disambPage.isRedirectPage() and not self.primary:
             if (disambPage.site.lang in self.primary_redir_template and
                     self.primary_redir_template[disambPage.site.lang]
-                    in disambPage.templates(get_redirect=True)):
+                    in disambPage.templates()):
                 baseTerm = disambPage.title()
-                for template in disambPage.templatesWithParams(
-                        get_redirect=True):
+                for template in disambPage.templatesWithParams():
                     if template[0] == self.primary_redir_template[
                         disambPage.site.lang] \
                             and len(template[1]) > 0:
