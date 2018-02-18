@@ -802,7 +802,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @rtype: bool
         """
-        return self.site.page_exists(self)
+        return self.pageid > 0
 
     @property
     def oldest_revision(self):

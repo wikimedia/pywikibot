@@ -436,7 +436,9 @@ class TestSiteObject(DefaultSiteTestCase):
         """Test ApiSite methods for getting page-specific info."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        self.assertIsInstance(mysite.page_exists(mainpage), bool)
+        with suppress_warnings('pywikibot.site.APISite.page_exists',
+                               DeprecationWarning):
+            self.assertIsInstance(mysite.page_exists(mainpage), bool)
         self.assertIsInstance(mysite.page_restrictions(mainpage), dict)
         self.assertIsInstance(mysite.page_can_be_edited(mainpage), bool)
         self.assertIsInstance(mysite.page_isredirect(mainpage), bool)
@@ -446,7 +448,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertRaises(pywikibot.IsNotRedirectPage,
                               mysite.getredirtarget, mainpage)
         a = list(mysite.preloadpages([mainpage]))
-        self.assertEqual(len(a), int(mysite.page_exists(mainpage)))
+        self.assertEqual(len(a), int(mainpage.exists()))
         if a:
             self.assertEqual(a[0], mainpage)
 
@@ -614,37 +616,37 @@ class TestSiteGenerators(DefaultSiteTestCase):
         self.assertLessEqual(len(fwd), 10)
         for page in fwd:
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
         rev = list(mysite.allpages(reverse=True, start="Aa", total=12))
         self.assertLessEqual(len(rev), 12)
         for page in rev:
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
             self.assertLessEqual(page.title(), "Aa")
         for page in mysite.allpages(start="Py", total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
             self.assertGreaterEqual(page.title(), "Py")
         for page in mysite.allpages(prefix="Pre", total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.title().startswith("Pre"))
         for page in mysite.allpages(namespace=1, total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 1)
         for page in mysite.allpages(filterredir=True, total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
             self.assertTrue(page.isRedirectPage())
         for page in mysite.allpages(filterredir=False, total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
             self.assertFalse(page.isRedirectPage())
 
@@ -654,7 +656,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for page in mysite.allpages(
                 filterlanglinks=True, total=3, namespace=4):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 4)
             self.assertNotEqual(page.langlinks(), [])
 
@@ -663,7 +665,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         mysite = self.get_site()
         for page in mysite.allpages(filterlanglinks=False, total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertEqual(page.namespace(), 0)
             self.assertEqual(page.langlinks(), [])
 
@@ -672,12 +674,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
         mysite = self.get_site()
         for page in mysite.allpages(minsize=100, total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertGreaterEqual(len(page.text.encode(mysite.encoding())),
                                     100)
         for page in mysite.allpages(maxsize=200, total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             if (len(page.text.encode(mysite.encoding())) > 200 and
                     mysite.data_repository() == mysite):
                 unittest_print(
@@ -692,12 +694,12 @@ class TestSiteGenerators(DefaultSiteTestCase):
         mysite = self.get_site()
         for page in mysite.allpages(protect_type="edit", total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertIn("edit", page._protection)
         for page in mysite.allpages(protect_type="edit",
                                     protect_level="sysop", total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertTrue(mysite.page_exists(page))
+            self.assertTrue(page.exists())
             self.assertIn("edit", page._protection)
             self.assertIn("sysop", page._protection["edit"])
 
@@ -815,24 +817,24 @@ class TestSiteGenerators(DefaultSiteTestCase):
                             for image in ai))
         for impage in mysite.allimages(start="Ba", total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
-            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.exists())
             self.assertGreaterEqual(impage.title(withNamespace=False), "Ba")
         # Bug T17985 - reverse and start combined; fixed in v 1.14
         for impage in mysite.allimages(start="Da", reverse=True, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
-            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.exists())
             self.assertLessEqual(impage.title(withNamespace=False), "Da")
         for impage in mysite.allimages(prefix="Ch", total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
-            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.exists())
             self.assertTrue(impage.title(withNamespace=False).startswith("Ch"))
         for impage in mysite.allimages(minsize=100, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
-            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.exists())
             self.assertGreaterEqual(impage.latest_file_info["size"], 100)
         for impage in mysite.allimages(maxsize=2000, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
-            self.assertTrue(mysite.page_exists(impage))
+            self.assertTrue(impage.exists())
             self.assertLessEqual(impage.latest_file_info["size"], 2000)
 
     def test_newfiles(self):
@@ -1039,7 +1041,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             if item in pnames:
                 for page in mysite.pages_with_property(item, total=5):
                     self.assertIsInstance(page, pywikibot.Page)
-                    self.assertTrue(mysite.page_exists(page))
+                    self.assertTrue(page.exists())
                     if item == 'disambiguation':
                         self.assertTrue(page.isDisambig)
             else:
