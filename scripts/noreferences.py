@@ -455,10 +455,7 @@ referencesSubstitute = {
 
 # Sites where no title is required for references template
 # as it is already included there
-# like pl.wiki where {{Przypisy}} generates
-# == Przypisy ==
-# <references />
-noTitleRequired = [u'pl', u'be', u'szl']
+noTitleRequired = ['be', 'szl']
 
 maintenance_category = 'cite_error_refs_without_references_category'
 
