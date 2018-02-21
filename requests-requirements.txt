@@ -1,4 +1,4 @@
-requests>=2.4.1,!=2.18.2
+requests>=2.9,!=2.18.2
 
 # requests security extra
 # Bug T105767 on Python 2.7 release 9+
