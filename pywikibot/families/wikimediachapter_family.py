@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""Family module for Wikimedia chapter wikis."""
+"""Family module for Wikimedia chapter, thematic organisation and WUG wikis."""
 #
-# (C) Pywikibot team, 2012-2015
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,14 +13,17 @@ from pywikibot.tools import deprecated
 
 class Family(family.SubdomainFamily, family.WikimediaFamily):
 
-    """Family for Wikimedia chapters hosted on wikimedia.org."""
+    """Family class for WCH, WTO and WUG wikis hosted on wikimedia.org."""
 
     name = 'wikimediachapter'
     code_aliases = {}
 
+    closed_wikis = ['nz', 'pa-us', ]
+
     codes = [
-        'ar', 'br', 'bd', 'co', 'dk', 'fi', 'mk', 'mx', 'nl', 'no',
-        'nyc', 'pl', 'rs', 'ru', 'se', 'ua', 'uk', 've',
+        'am', 'ar', 'bd', 'be', 'br', 'ca', 'cn', 'co', 'dk', 'ec', 'et', 'fi',
+        'il', 'mai', 'mk', 'mx', 'nl', 'no', 'nyc', 'pl', 'pt', 'rs', 'ru',
+        'se', 'tr', 'ua', 'uk', 've', 'wb',
     ]
 
     @property

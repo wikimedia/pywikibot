@@ -26,7 +26,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     removed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=deleted.dblist
-        'dk', 'ba', 'tlh', 'tokipona',
+        'ba', 'dk', 'tlh', 'tokipona',
     ]
 
     def __init__(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikibooks."""
 #
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,8 +20,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     closed_wikis = [
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
         'aa', 'ak', 'als', 'ang', 'as', 'ast', 'ay',
-        'bi', 'bm', 'bo', 'ch', 'co', 'ga', 'got', 'gn',
-        'gu', 'kn', 'ie', 'ks', 'lb', 'ln', 'lv', 'mi',
+        'bi', 'bm', 'bo', 'ch', 'co', 'ga', 'gn', 'got',
+        'gu', 'ie', 'kn', 'ks', 'lb', 'ln', 'lv', 'mi',
         'mn', 'my', 'na', 'nah', 'nds', 'ps', 'qu', 'rm',
         'se', 'simple', 'su', 'sw', 'tk', 'ug', 'uz',
         'vo', 'wa', 'xh', 'yo', 'za', 'zh-min-nan', 'zu',
