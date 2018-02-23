@@ -33,18 +33,18 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Initializer."""
         self.languages_by_size = [
             'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'lt', 'sv',
-            'ku', 'pl', 'el', 'it', 'ta', 'fi', 'hu', 'tr', 'ca', 'ko', 'io',
+            'ku', 'pl', 'el', 'it', 'fi', 'ta', 'hu', 'tr', 'ca', 'ko', 'io',
             'kn', 'pt', 'hy', 'vi', 'sr', 'ja', 'chr', 'hi', 'th', 'ro', 'no',
-            'id', 'ml', 'et', 'uz', 'li', 'my', 'or', 'te', 'fa', 'cs', 'eo',
+            'id', 'ml', 'et', 'uz', 'li', 'my', 'or', 'te', 'cs', 'fa', 'eo',
             'ar', 'jv', 'az', 'eu', 'gl', 'oc', 'da', 'br', 'lo', 'uk', 'hr',
-            'fj', 'tg', 'bg', 'simple', 'ps', 'cy', 'sk', 'vo', 'wa', 'is',
-            'zh-min-nan', 'la', 'af', 'scn', 'he', 'ast', 'tl', 'ky', 'sw',
-            'fy', 'nn', 'lv', 'co', 'pnb', 'mn', 'pa', 'ka', 'nds', 'sl', 'sq',
+            'fj', 'tg', 'bg', 'simple', 'ps', 'sk', 'cy', 'vo', 'wa', 'is',
+            'zh-min-nan', 'la', 'af', 'scn', 'ast', 'he', 'ky', 'tl', 'sw',
+            'fy', 'nn', 'lv', 'co', 'pa', 'pnb', 'mn', 'ka', 'nds', 'sl', 'sq',
             'lb', 'bs', 'nah', 'sa', 'kk', 'bn', 'tk', 'km', 'sm', 'mk', 'hsb',
             'be', 'ms', 'ur', 'ga', 'an', 'wo', 'vec', 'ang', 'tt', 'sd', 'gn',
-            'mr', 'so', 'csb', 'ug', 'gd', 'mt', 'st', 'roa-rup', 'si', 'ie',
+            'mr', 'so', 'mt', 'csb', 'ug', 'ie', 'gd', 'st', 'roa-rup', 'si',
             'hif', 'ia', 'mi', 'ay', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu',
-            'gv', 'kw', 'rw', 'ts', 'ne', 'om', 'qu', 'su', 'ss', 'ha', 'iu',
+            'gv', 'kw', 'rw', 'ne', 'ts', 'om', 'qu', 'su', 'ss', 'ha', 'iu',
             'am', 'dv', 'tpi', 'yi', 'ti', 'sg', 'tn', 'ks',
         ]
 
