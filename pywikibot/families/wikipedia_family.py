@@ -185,7 +185,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'fa': (u'/doc', u'/توضیحات'),
             # fi: no idea how to handle this type of subpage at :Metasivu:
             'fi': ((), ),
-            'fr': (u'/documentation', ),
+            'fr': ('/Documentation',),
             'hsb': (u'/Dokumentacija', ),
             'it': (u'/Man', ),
             'ka': (u'/ინფო', ),
@@ -207,6 +207,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',),
             'en': ('Inuse', 'In use'),
             'fa': ('ویرایش',),
+            'fr': ('En travaux', 'Recyclage en cours', 'Travail de groupe',
+                   'Pas fini', 'En construction', 'Travaux', 'En cours',
+                   'Plusieurs en cours', 'Inuse',),
             'hr': ('Radovi',),
             'sr': ('Радови у току', 'Рут',),
             'zh': ('Inuse',),
