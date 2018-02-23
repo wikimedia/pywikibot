@@ -1176,7 +1176,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         # go through all templates and look for any restriction
         # multiple bots/nobots templates are allowed
-        restrictions = self.family.edit_restricted_templates.get(
+        restrictions = self.site.family.edit_restricted_templates.get(
             self.site.code)
         for template, params in templates:
             title = template.title(withNamespace=False)
