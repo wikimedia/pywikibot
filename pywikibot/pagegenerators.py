@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -719,6 +719,7 @@ class GeneratorFactory(object):
             cats = self.site.siteinfo.get('linter')  # Get linter categories.
             valid_cats = [c for _list in cats.values() for c in _list]
 
+            value = '' if value is None else value
             cat, sep, lint_from = value.partition('/')
             if not lint_from:
                 lint_from = None
