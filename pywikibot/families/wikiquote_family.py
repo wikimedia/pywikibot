@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -21,7 +21,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         # See https://noc.wikimedia.org/conf/highlight.php?file=closed.dblist
         'als', 'am', 'ang', 'ast', 'bm', 'co', 'cr', 'ga', 'kk',
         'kr', 'ks', 'kw', 'lb', 'na', 'nds', 'qu', 'simple',
-        'tk', 'tt', 'ug', 'vo', 'za', 'zh_min_nan',
+        'tk', 'tt', 'ug', 'vo', 'za', 'zh-min-nan',
     ]
 
     removed_wikis = [
