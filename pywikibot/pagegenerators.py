@@ -2074,11 +2074,11 @@ def DequePreloadingGenerator(generator, groupsize=50):
 
 
 @deprecated_args(step='groupsize')
-def PreloadingItemGenerator(generator, groupsize=50):
+def PreloadingEntityGenerator(generator, groupsize=50):
     """
     Yield preloaded pages taken from another generator.
 
-    Function basically is copied from above, but for ItemPage's
+    Function basically is copied from above, but for Wikibase entities.
 
     @param generator: pages to iterate over
     @param groupsize: how many pages to preload at once
@@ -2086,26 +2086,16 @@ def PreloadingItemGenerator(generator, groupsize=50):
     """
     sites = {}
     for page in generator:
-        if not isinstance(page, pywikibot.page.WikibasePage):
-            datasite = page.site.data_repository()
-            if page.namespace() != datasite.item_namespace:
-                pywikibot.output(
-                    u'PreloadingItemGenerator skipping %s as it is not in %s'
-                    % (page, datasite.item_namespace))
-                continue
-
-            page = pywikibot.ItemPage(datasite, page.title())
-
         site = page.site
         sites.setdefault(site, []).append(page)
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)
-            for i in site.preloaditempages(group, groupsize):
+            for i in site.preload_entities(group, groupsize):
                 yield i
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
-        for i in site.preloaditempages(pages, groupsize):
+        for i in site.preload_entities(pages, groupsize):
             yield i
 
 
@@ -2983,6 +2973,8 @@ class PetScanPageGenerator(object):
             yield page
 
 
+PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
+                                        old_name='PreloadingItemGenerator')
 # Deprecated old names available for compatibility with compat.
 ImageGenerator = redirect_func(PageClassGenerator, old_name='ImageGenerator')
 FileGenerator = redirect_func(PageClassGenerator, old_name='FileGenerator')

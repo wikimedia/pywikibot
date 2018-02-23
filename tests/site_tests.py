@@ -3007,7 +3007,7 @@ class TestPagePreloading(DefaultSiteTestCase):
 
 class TestDataSitePreloading(WikidataTestCase):
 
-    """Test DataSite.preloaditempages for repo pages."""
+    """Test DataSite.preload_entities for repo pages."""
 
     def test_item(self):
         """Test that ItemPage preloading works for Item objects."""
@@ -3016,7 +3016,7 @@ class TestDataSitePreloading(WikidataTestCase):
                  for num in range(1, 6)]
 
         seen = []
-        for item in datasite.preloaditempages(items):
+        for item in datasite.preload_entities(items):
             self.assertIsInstance(item, pywikibot.ItemPage)
             self.assertTrue(hasattr(item, '_content'))
             self.assertNotIn(item, seen)
@@ -3031,24 +3031,32 @@ class TestDataSitePreloading(WikidataTestCase):
                  for num in range(1, 6)]
 
         seen = []
-        for item in datasite.preloaditempages(pages):
+        for item in datasite.preload_entities(pages):
             self.assertIsInstance(item, pywikibot.ItemPage)
             self.assertTrue(hasattr(item, '_content'))
             self.assertNotIn(item, seen)
             seen.append(item)
         self.assertEqual(len(seen), 5)
 
+    def test_property(self):
+        """Test that preloading works for properties."""
+        datasite = self.get_repo()
+        page = pywikibot.Page(datasite, 'P6')
+        property_page = next(datasite.preload_entities([page]))
+        self.assertIsInstance(property_page, pywikibot.PropertyPage)
+        self.assertTrue(hasattr(property_page, '_content'))
+
 
 class TestDataSiteClientPreloading(DefaultWikidataClientTestCase):
 
-    """Test DataSite.preloaditempages for client pages."""
+    """Test DataSite.preload_entities for client pages."""
 
     def test_non_item(self):
         """Test that ItemPage preloading works with Page generator."""
         mainpage = self.get_mainpage()
         datasite = self.get_repo()
 
-        item = next(datasite.preloaditempages([mainpage]))
+        item = next(datasite.preload_entities([mainpage]))
         self.assertIsInstance(item, pywikibot.ItemPage)
         self.assertTrue(hasattr(item, '_content'))
         self.assertEqual(item.id, 'Q5296')
