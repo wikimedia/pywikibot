@@ -7,7 +7,7 @@ It also copies edit history to a subpage.
 
 -tolang:          The target site code.
 
--tosite:          The target site family.
+-tofamily:        The target site family.
 
 -prefix:          Page prefix on the new site.
 
@@ -36,7 +36,7 @@ Copy the template "Query service" from the Toolserver wiki to wikitech:
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
