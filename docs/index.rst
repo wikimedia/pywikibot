@@ -50,7 +50,7 @@ For framework developers:
 =========================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    api_ref/tests/index
    scripts.maintenance
