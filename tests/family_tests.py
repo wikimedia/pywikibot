@@ -197,8 +197,8 @@ class TestFamilyUrlRegex(PatchingTestCase):
         # Text after $1 is not allowed
         with self.assertRaisesRegex(
                 ValueError,
-                r'Text after the \$1 placeholder is not supported'
-                r' \(T111513\)'):
+                'Url: .+\nText /foo after the '
+                r'\$1 placeholder is not supported \(T111513\)\.'):
             f.from_url('//vo.wikipedia.org/wiki/$1/foo')
 
         # the IWM may contain the wrong protocol, but it's only used to

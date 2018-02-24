@@ -840,8 +840,8 @@ class Family:
         # Discard $1 and everything after it
         path, _, suffix = path.partition('$1')
         if suffix:
-            raise ValueError('Text after the $1 placeholder is not supported '
-                             '(T111513).')
+            raise ValueError('Url: {}\nText {} after the $1 placeholder is '
+                             'not supported (T111513).'.format(url, suffix))
 
         for domain in self.domains:
             if domain in parsed.netloc:

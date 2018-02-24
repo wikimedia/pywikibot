@@ -93,6 +93,7 @@ library_test_modules = {
     'i18n',
     'interwiki_graph',
     'interwiki_link',
+    'interwikimap',
     'link',
     'linter',
     'logentries',
