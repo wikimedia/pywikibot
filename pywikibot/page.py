@@ -4469,6 +4469,7 @@ class ItemPage(WikibasePage):
         item.latest_revision_id = data['to']['lastrevid']
         if data.get('redirected', 0):
             self._isredir = True
+            self._redirtarget = item
 
     def set_redirect_target(self, target_page, create=False, force=False,
                             keep_section=False, save=True, **kwargs):
@@ -4478,7 +4479,7 @@ class ItemPage(WikibasePage):
         You need to define an extra argument to make this work, like save=True
 
         @param target_page: target of the redirect, this argument is required.
-        @type target_page: pywikibot.Item or string
+        @type target_page: ItemPage or string
         @param force: if true, it sets the redirect target even the page
             is not redirect.
         @type force: bool
@@ -4491,8 +4492,12 @@ class ItemPage(WikibasePage):
             raise pywikibot.IsNotRedirectPage(self)
         if not save or keep_section or create:
             raise NotImplementedError
-        self.repo.set_redirect_target(
+        data = self.repo.set_redirect_target(
             from_item=self, to_item=target_page)
+        if data.get('success', 0):
+            del self.latest_revision_id
+            self._isredir = True
+            self._redirtarget = target_page
 
     def isRedirectPage(self):
         """Return True if item is a redirect, False if not or not existing."""
