@@ -566,14 +566,11 @@ class NoReferencesBot(Bot):
                         pywikibot.output(
                             'Adding references tag to existing %s section...\n'
                             % section)
-                        templates_or_comments = re.compile(
-                            r'^((?:\s*(?:\{\{[^\{\}]*?\}\}|<!--.*?-->))*)',
-                            flags=re.DOTALL)
                         new_text = (
-                            oldText[:match.end()]
-                            + templates_or_comments.sub(
-                                r'\1\n{0}\n'.format(self.referencesText),
-                                oldText[match.end():]))
+                            oldText[:match.end()] + '\n' +
+                            self.referencesText + '\n' +
+                            oldText[match.end():]
+                        )
                         return new_text
                 else:
                     break
