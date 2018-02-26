@@ -1187,7 +1187,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 if not params:
                     return False
                 else:
-                    bots = params[0].split(',')
+                    bots = [bot.strip() for bot in params[0].split(',')]
                     if 'all' in bots or pywikibot.calledModuleName() in bots \
                        or username in bots:
                         return False
@@ -1195,8 +1195,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 if not params:
                     return True
                 else:
-                    (ttype, bots) = params[0].split('=', 1)
-                    bots = bots.split(',')
+                    (ttype, bots) = [part.strip() for part
+                                     in params[0].split('=', 1)]
+                    bots = [bot.strip() for bot in bots.split(',')]
                     if ttype == 'allow':
                         return 'all' in bots or username in bots
                     if ttype == 'deny':
