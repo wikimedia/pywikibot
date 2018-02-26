@@ -38,10 +38,16 @@ Commandline parameters
 -whitelist         page title for whitelist (optional)
 -autopatroluserns  Takes user consent to automatically patrol
 -versionchecktime  Check versionchecktime lapse in sec
+-repeat            Repeat run after 60 seconds
+-newpages          Run on unpatrolled new pages
+                   (default for Wikipedia Projects)
+-recentchanges     Run on complete unpatrolled recentchanges
+                   (default for any project except Wikipedia Projects)
+-usercontribs      Filter generators above to the given user
 
 """
 #
-# (C) Pywikibot team, 2011-2017
+# (C) Pywikibot team, 2011-2018
 #
 # Distributed under the terms of the MIT license.
 #
