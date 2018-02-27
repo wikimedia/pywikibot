@@ -158,7 +158,7 @@ badwords at all but can be used for some bad-nickname.
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
 # (C) xqt, 2009-2017
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -204,6 +204,7 @@ logbook = {
     'nl': u'Project:Logboek welkom',
     'no': u'Project:Velkomstlogg',
     'sq': u'Project:Tung log',
+    'ur': 'Project:نوشتہ خوش آمدید',
     'zh': u'User:Welcomebot/欢迎日志',
     'commons': u'Project:Welcome log',
 }
@@ -239,6 +240,7 @@ netext = {
         'ru': u'{{Hello}} %s',
         'sq': u'{{subst:tung}} %s',
         'sr': u'{{Добродошлица}} %s',
+        'ur': '{{نقل:خوش آمدید}}%s',
         'vec': u'{{subst:Benvegnù|%s}}',
         'vo': u'{{benokömö}} %s',
         'zh': u'{{subst:welcome|sign=%s}}',
@@ -259,6 +261,7 @@ netext = {
         'bn': u'{{subst:স্বাগতম|%s}}',
         'fa': u'{{جا:خوشامد|%s}}',
         'it': u'{{subst:Utente:Filnik/Benve|firma=%s}}',
+        'ur': '{{جا:خوش آمدید}}%s',
     },
     'wikiversity': {
         'ar': u'{{subst:ترحيب}} %s',
@@ -290,6 +293,7 @@ report_page = {
         'ru': u'Участник:LatitudeBot/Рапорт',
         'sq': u'User:EagleBot/Report',
         'sr': 'User:ZoranBot/Записи',
+        'ur': 'Project:تختہ اعلانات برائے منتظمین/صارف نام برائے پڑتال',
         'zh': u'User:Welcomebot/report',
         'zh-yue': u'User:Alexbot/report',
     }
@@ -356,6 +360,7 @@ random_sign = {
     'nap': u'User:Cellistbot/Firme',
     'roa-tara': u'Wikipedia:Bovègne Bot/Firme',
     'ru': u'Участник:LatitudeBot/Sign',
+    'ur': 'Project:خوش آمدید/دستخطیں',
     'vec': u'Utente:FriBot/Firme',
     'zh': u'User:Welcomebot/欢迎日志/用户',
 }

@@ -15,7 +15,7 @@ The following parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -259,6 +259,23 @@ templates = {
 
         u'{{wikify}}': {
             'msg': u'Robotkoll: Artikeln behöver wikifieras',
+            'pos': 'top'},
+    },
+    'ur': {
+        '{{حذف}}': {
+            'msg': 'خودکار: مضمون قابل حذف ہے',
+            'pos': 'top'},
+
+        '{{صفائی}}': {
+            'msg': 'خودکار: مضمون کی تحریر قابل اصلاح ہے',
+            'pos': 'top'},
+
+        '{{نامکمل}}': {
+            'msg': 'خودکار: سانچہ نامکمل کی ٹیگ کاری',
+            'pos': 'bottom'},
+
+        '{{ویکائی}}': {
+            'msg': 'خودکار: مضمون کی ویکائی درکار ہے',
             'pos': 'top'},
     },
     'zh': {

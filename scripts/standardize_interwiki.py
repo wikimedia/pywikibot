@@ -9,7 +9,7 @@ Parameters:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,6 +37,7 @@ comment = {
     'nl': u'Bot: standaardisatie interwikiverwijzingen',
     'no': u'bot: Språklenkestandardisering',
     'ro': 'Robot: Standardizare interwiki',
+    'ur': 'خودکار: بین الویکی روابط کی معیار بندی',
     'zh': u'機器人: 跨語連結標準化',
 }
 

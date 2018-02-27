@@ -50,7 +50,7 @@ Furthermore, the following command line parameters are supported:
 # (C) Monobi a.k.a. Wikihermit, 2007
 # (C) Filnik, 2007-2011
 # (C) Nicolas Dumazet (NicDumZ), 2008-2009
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -151,6 +151,7 @@ categoryToCheck = {
     'pt': [u'Category:!Páginas protegidas',
            u'Category:!Páginas semiprotegidas'],
     'sr': [u'Category:Странице закључане за анонимне кориснике', u'Category:Закључане странице'],
+    'ur': ['زمرہ:محفوظ شدہ صفحات'],
     'zh': [u'Category:被保护的页面', u'Category:被保護的模板',
            u'Category:暂时不能移动的页面', u'Category:被半保护的页面'],
 }

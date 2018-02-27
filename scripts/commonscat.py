@@ -151,6 +151,8 @@ commonscatTemplates = {
     'tr': (u'Commons kategori',
            [u'CommonsKat', u'Commonscat', u'Commons cat']),
     'uk': (u'Commonscat', [u'Commons cat', u'Category', u'Commonscat-inline']),
+    'ur': ('زمرہ کومنز',
+           ['Commonscat', 'زمرہ العام', 'Commons cat', 'CommonsCat']),
     'vi': (u'Commonscat',
            [u'Commons2', u'Commons cat', u'Commons category', u'Commons+cat']),
     'yi': (u'קאמאנסקאט', [u'Commonscat']),

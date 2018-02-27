@@ -15,7 +15,7 @@ Parameters:
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
 # (c) xqt, 2011-2016
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,11 +28,13 @@ template_to_the_image = {
     'meta': '{{Orphan file}}',
     'it': u'{{immagine orfana}}',
     'fa': u'{{تصاویر بدون استفاده}}',
+    'ur': '{{غیر مستعمل تصاویر}}',
 }
 
 # This template message should use subst:
 template_to_the_user = {
     'fa': '\n\n{{جا:اخطار به کاربر برای تصاویر بدون استفاده|%(title)s}}--~~~~',
+    'ur': '\n\n{{جا:اطلاع برائے غیر مستعمل تصاویر}}--~~~~',
 }
 
 
