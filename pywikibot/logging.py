@@ -12,7 +12,8 @@ import os
 import sys
 
 # logging levels
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL, StreamHandler
+
 STDOUT = 16
 VERBOSE = 18
 INPUT = 25
@@ -72,6 +73,9 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
         logger = logging.getLogger("pywiki." + _logger)
     else:
         logger = logging.getLogger("pywiki")
+
+    if not logger.handlers:  # lastResort for Python 2 (T188417)
+        logger.handlers.append(StreamHandler())
 
     # invoke any init routines
     if _init_routines:
