@@ -35,7 +35,7 @@ pdfinfo is needed for parsing pdf titles.
                   one from i18n/reflinks.py
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -93,6 +93,7 @@ stop_page = {
     'en': u'User:DumZiBoT/EditThisPageToStopMe',
     'pl': u'Wikipedysta:MastiBot/EditThisPageToStopMe',
     'ru': u'User:Rubinbot/EditThisPageToStopMe',
+    'ur': 'صارف:Shuaib-bot/EditThisPageToStopMe',
     'zh': u'User:Sz-iwbot',
 }
 
@@ -110,6 +111,7 @@ deadLinkTag = {
     'pl': u'[%s] {{Martwy link}}',
     'ru': u'[%s] {{subst:dead}}',
     'sr': '[%s] {{dead link}}',
+    'ur': '[%s] {{مردہ ربط}}',
 }
 
 

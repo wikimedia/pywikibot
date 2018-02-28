@@ -23,7 +23,7 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -91,6 +91,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'simple': "Category:Category redirects",
             'sh': u"Kategorija:Preusmjerene kategorije Wikipedije",
             'sr': 'Категорија:Википедијине меко преусмерене категорије',
+            'ur': 'زمرہ:منتقل شدہ زمرہ جات',
             'vi': u"Thể loại:Thể loại đổi hướng",
             'zh': u"Category:已重定向的分类",
             'ro': 'Categorie:Categorii de redirecționare',

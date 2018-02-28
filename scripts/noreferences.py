@@ -216,6 +216,11 @@ placeBeforeSections = {
         u'ดูเพิ่ม',
         u'หมายเหตุ',
     ],
+    'ur': [              # no explicit policy on where to put the references
+        'مزید دیکھیے',
+        'حوالہ جات',
+        'بیرونی روابط',
+    ],
     'zh': [
         u'外部链接',
         u'外部連结',
@@ -367,6 +372,10 @@ referencesSections = {
             'เชิงอรรถ',
             'หมายเหตุ',
         ],
+        'ur': [
+            'حوالہ جات',
+            'حوالہ',
+        ],
         'zh': [
             '參考資料',
             '参考资料',
@@ -426,6 +435,8 @@ referencesTemplates = {
         'sr': ['Reflist', 'Референце', 'Извори'],
         'szl': [u'Przipisy', u'Připisy'],
         'th': [u'รายการอ้างอิง'],
+        'ur': ['Reflist', 'Refs', 'Reference',
+               'حوالہ جات', 'حوالے'],
         'zh': [u'Reflist', u'RefFoot', u'NoteFoot'],
     },
 }
@@ -449,6 +460,7 @@ referencesSubstitute = {
         'sr': '{{reflist}}',
         'szl': u'{{Przipisy}}',
         'th': u'{{รายการอ้างอิง}}',
+        'ur': '{{حوالہ جات}}',
         'zh': u'{{reflist}}',
     },
 }
