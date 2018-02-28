@@ -432,7 +432,7 @@ referencesTemplates = {
         'ru': [u'Reflist', u'Ref-list', u'Refs', u'Sources',
                u'Примечания', u'Список примечаний',
                u'Сноска', u'Сноски'],
-        'sr': ['Reflist', 'Референце', 'Извори'],
+        'sr': ['Reflist', 'Референце', 'Извори', 'Рефлист'],
         'szl': [u'Przipisy', u'Připisy'],
         'th': [u'รายการอ้างอิง'],
         'ur': ['Reflist', 'Refs', 'Reference',

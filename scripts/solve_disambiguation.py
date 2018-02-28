@@ -71,7 +71,7 @@ To complete a move of a page, one can use:
 # (C) Daniel Herding, 2004
 # (C) Andre Engels, 2003-2004
 # (C) WikiWichtel, 2004
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -337,6 +337,9 @@ ignore_title = {
             u'Википедия:Вики-уборка/Статьи без языковых ссылок',
             u'Википедия:Страницы с пометкой «(значения)»',
             u'Список общерусских фамилий',
+        ],
+        'sr': [
+            'Википедија:Вишезначна одредница',
         ],
     },
     'memoryalpha': {
