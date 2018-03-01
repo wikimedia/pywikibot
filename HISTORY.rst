@@ -1,7 +1,7 @@
 Release history
 ===============
 
-Current release
+3.0.20180301
 ---------------
 
 * Changed requirements for requests and sseclient
@@ -142,3 +142,4 @@ Current release
 * scripts and libraries for standardizing content
 * tools for making minor modifications
 * script making interwiki links
+
