@@ -699,35 +699,34 @@ class History(object):
 
     def setLinkDead(self, url, error, page, weblink_dead_days):
         """Add the fact that the link was found dead to the .dat file."""
-        self.semaphore.acquire()
-        now = time.time()
-        if url in self.historyDict:
-            timeSinceFirstFound = now - self.historyDict[url][0][1]
-            timeSinceLastFound = now - self.historyDict[url][-1][1]
-            # if the last time we found this dead link is less than an hour
-            # ago, we won't save it in the history this time.
-            if timeSinceLastFound > 60 * 60:
-                self.historyDict[url].append((page.title(), now, error))
-            # if the first time we found this link longer than x day ago
-            # (default is a week), it should probably be fixed or removed.
-            # We'll list it in a file so that it can be removed manually.
-            if timeSinceFirstFound > 60 * 60 * 24 * weblink_dead_days:
-                # search for archived page
-                try:
-                    archiveURL = get_archive_url(url)
-                except Exception as e:
-                    pywikibot.warning(
-                        'get_closest_memento_url({0}) failed: {1}'.format(
-                            url, e))
-                    archiveURL = None
-                if archiveURL is None:
-                    archiveURL = weblib.getInternetArchiveURL(url)
-                if archiveURL is None:
-                    archiveURL = weblib.getWebCitationURL(url)
-                self.log(url, error, page, archiveURL)
-        else:
-            self.historyDict[url] = [(page.title(), now, error)]
-        self.semaphore.release()
+        with self.semaphore:
+            now = time.time()
+            if url in self.historyDict:
+                timeSinceFirstFound = now - self.historyDict[url][0][1]
+                timeSinceLastFound = now - self.historyDict[url][-1][1]
+                # if the last time we found this dead link is less than an hour
+                # ago, we won't save it in the history this time.
+                if timeSinceLastFound > 60 * 60:
+                    self.historyDict[url].append((page.title(), now, error))
+                # if the first time we found this link longer than x day ago
+                # (default is a week), it should probably be fixed or removed.
+                # We'll list it in a file so that it can be removed manually.
+                if timeSinceFirstFound > 60 * 60 * 24 * weblink_dead_days:
+                    # search for archived page
+                    try:
+                        archiveURL = get_archive_url(url)
+                    except Exception as e:
+                        pywikibot.warning(
+                            'get_closest_memento_url({0}) failed: {1}'.format(
+                                url, e))
+                        archiveURL = None
+                    if archiveURL is None:
+                        archiveURL = weblib.getInternetArchiveURL(url)
+                    if archiveURL is None:
+                        archiveURL = weblib.getWebCitationURL(url)
+                    self.log(url, error, page, archiveURL)
+            else:
+                self.historyDict[url] = [(page.title(), now, error)]
 
     def setLinkAlive(self, url):
         """
@@ -738,13 +737,13 @@ class History(object):
         @return: True if previously found dead, else returns False.
         """
         if url in self.historyDict:
-            self.semaphore.acquire()
-            try:
-                del self.historyDict[url]
-            except KeyError:
-                # Not sure why this can happen, but I guess we can ignore this.
-                pass
-            self.semaphore.release()
+            with self.semaphore:
+                try:
+                    del self.historyDict[url]
+                except KeyError:
+                    # Not sure why this can happen, but I guess we can
+                    # ignore this.
+                    pass
             return True
         else:
             return False
@@ -774,9 +773,8 @@ class DeadLinkReportThread(threading.Thread):
 
     def report(self, url, errorReport, containingPage, archiveURL):
         """Report error on talk page of the page containing the dead link."""
-        self.semaphore.acquire()
-        self.queue.append((url, errorReport, containingPage, archiveURL))
-        self.semaphore.release()
+        with self.semaphore:
+            self.queue.append((url, errorReport, containingPage, archiveURL))
 
     def shutdown(self):
         """Finish thread."""
@@ -796,64 +794,65 @@ class DeadLinkReportThread(threading.Thread):
                 else:
                     time.sleep(0.1)
             else:
-                self.semaphore.acquire()
-                (url, errorReport, containingPage, archiveURL) = self.queue[0]
-                self.queue = self.queue[1:]
-                talkPage = containingPage.toggleTalkPage()
-                pywikibot.output(color_format(
-                    '{lightaqua}** Reporting dead link on {0}...{default}',
-                    talkPage.title(asLink=True)))
-                try:
-                    content = talkPage.get() + "\n\n\n"
-                    if url in content:
-                        pywikibot.output(color_format(
-                            '{lightaqua}** Dead link seems to have already '
-                            'been reported on {0}{default}',
-                            talkPage.title(asLink=True)))
-                        self.semaphore.release()
-                        continue
-                except (pywikibot.NoPage, pywikibot.IsRedirectPage):
-                    content = u''
-
-                if archiveURL:
-                    archiveMsg = u'\n' + \
-                                 i18n.twtranslate(containingPage.site,
-                                                  'weblinkchecker-archive_msg',
-                                                  {'URL': archiveURL})
-                else:
-                    archiveMsg = u''
-                # The caption will default to "Dead link". But if there is
-                # already such a caption, we'll use "Dead link 2",
-                # "Dead link 3", etc.
-                caption = i18n.twtranslate(containingPage.site,
-                                           'weblinkchecker-caption')
-                i = 1
-                count = u''
-                # Check if there is already such a caption on the talk page.
-                while re.search('= *%s%s *=' % (caption, count),
-                                content) is not None:
-                    i += 1
-                    count = u' ' + str(i)
-                caption += count
-                content += '== %s ==\n\n%s\n\n%s%s\n--~~~~' % \
-                           (caption,
-                            i18n.twtranslate(containingPage.site,
-                                             'weblinkchecker-report'),
-                            errorReport,
-                            archiveMsg)
-                comment = u'[[%s#%s|→]] %s' % \
-                          (talkPage.title(), caption,
-                           i18n.twtranslate(containingPage.site,
-                                            'weblinkchecker-summary'))
-                try:
-                    talkPage.put(content, comment)
-                except pywikibot.SpamfilterError as error:
+                with self.semaphore:
+                    url, errorReport, containingPage, archiveURL = \
+                        self.queue[0]
+                    self.queue = self.queue[1:]
+                    talkPage = containingPage.toggleTalkPage()
                     pywikibot.output(color_format(
-                        '{lightaqua}** SpamfilterError while trying to '
-                        'change {0}: {1}{default}',
-                        talkPage.title(asLink=True), error.url))
+                        '{lightaqua}** Reporting dead link on '
+                        '{0}...{default}',
+                        talkPage.title(asLink=True)))
+                    try:
+                        content = talkPage.get() + '\n\n\n'
+                        if url in content:
+                            pywikibot.output(color_format(
+                                '{lightaqua}** Dead link seems to have '
+                                'already been reported on {0}{default}',
+                                talkPage.title(asLink=True)))
+                            continue
+                    except (pywikibot.NoPage, pywikibot.IsRedirectPage):
+                        content = ''
 
-                self.semaphore.release()
+                    if archiveURL:
+                        archiveMsg = '\n' + \
+                                     i18n.twtranslate(
+                                         containingPage.site,
+                                         'weblinkchecker-archive_msg',
+                                         {'URL': archiveURL})
+                    else:
+                        archiveMsg = ''
+                    # The caption will default to "Dead link". But if there
+                    # is already such a caption, we'll use "Dead link 2",
+                    # "Dead link 3", etc.
+                    caption = i18n.twtranslate(containingPage.site,
+                                               'weblinkchecker-caption')
+                    i = 1
+                    count = ''
+                    # Check if there is already such a caption on
+                    # the talk page.
+                    while re.search('= *%s%s *=' % (caption, count),
+                                    content) is not None:
+                        i += 1
+                        count = ' ' + str(i)
+                    caption += count
+                    content += '== %s ==\n\n%s\n\n%s%s\n--~~~~' % \
+                               (caption,
+                                i18n.twtranslate(containingPage.site,
+                                                 'weblinkchecker-report'),
+                                errorReport,
+                                archiveMsg)
+                    comment = '[[%s#%s|→]] %s' % \
+                              (talkPage.title(), caption,
+                               i18n.twtranslate(containingPage.site,
+                                                'weblinkchecker-summary'))
+                    try:
+                        talkPage.put(content, comment)
+                    except pywikibot.SpamfilterError as error:
+                        pywikibot.output(color_format(
+                            '{lightaqua}** SpamfilterError while trying to '
+                            'change {0}: {1}{default}',
+                            talkPage.title(asLink=True), error.url))
 
 
 class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
