@@ -2966,6 +2966,7 @@ class APISite(BaseSite):
                                 inprop=inprop)
         self._update_page(page, query)
 
+    @need_extension('GeoData')
     def loadcoordinfo(self, page):
         """Load [[mw:Extension:GeoData]] info."""
         title = page.title(withSection=False)
