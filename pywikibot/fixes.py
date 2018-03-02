@@ -30,11 +30,11 @@ parameter_help = u"""
                   * datum       - specific date formats in German
                   * correct-ar  - Corrections for Arabic Wikipedia and any
                                   Arabic wiki.
-                  * yu-tld      - the yu top-level domain will soon be
-                                  disabled, see
+                  * yu-tld      - Fix links to .yu domains because it is
+                                  disabled, see:
+                                  https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
                   * fckeditor   - Try to convert FCKeditor HTML tags to wiki
                                   syntax.
-                                  https://lists.wikimedia.org/pipermail/wikibots-l/2009-February/000290.html
 """
 
 __doc__ = __doc__ + parameter_help
@@ -599,6 +599,7 @@ fixes = {
             'fr':  ('Robot: Correction des liens pointant vers le domaine '
                     '.yu, qui expire en 2009'),
             'ksh': u'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
+            'sr': 'Бот: Исправљање линкова ка .yu домену',
         },
         'replacements': [
             (u'www.budva.cg.yu',             u'www.budva.rs'),
