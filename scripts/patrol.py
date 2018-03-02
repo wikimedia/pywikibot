@@ -33,7 +33,7 @@ Commandline parameters
 ======================
 
 -namespace         Filter the page generator to only yield pages in
-                    specified namespaces
+                   specified namespaces
 -ask               If True, confirm each patrol action
 -whitelist         page title for whitelist (optional)
 -autopatroluserns  Takes user consent to automatically patrol
@@ -112,7 +112,7 @@ class PatrolBot(SingleSiteBot):
                                       self.site.namespace(2),
                                       self.site.username(),
                                       local_whitelist_subpage_name)
-        self.whitelist = self.getOption('whitelist')
+        self.whitelist = None
         self.whitelist_ts = 0
         self.whitelist_load_ts = 0
 
