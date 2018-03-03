@@ -7,10 +7,10 @@ checks:
     enabled: false
 
 exclude_patterns:
-- docs/
-- !docs/conf.py
-- scripts/archive/
-- ez_setup.py
-- *.rst
-- *.txt
+- "docs/"
+- "!docs/conf.py"
+- "scripts/archive/"
+- "ez_setup.py"
+- "*.rst"
+- "*.txt"
 
