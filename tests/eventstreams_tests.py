@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2017-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-from types import FunctionType
 
 from tests import mock
 
@@ -139,7 +137,7 @@ class TestEventStreamsSettingTests(TestCase):
     def test_filter_settings(self):
         """Test EventStreams filter settings."""
         self.es.register_filter(foo='bar')
-        self.assertIsInstance(self.es.filter['all'][0], FunctionType)
+        self.assertTrue(callable(self.es.filter['all'][0]))
         self.es.register_filter(bar='baz')
         self.assertEqual(len(self.es.filter['all']), 2)
 
@@ -193,6 +191,20 @@ class TestEventStreamsFilterTests(TestCase):
         """Test EventStreams filter with assignment of a int value."""
         self.es.register_filter(foo=10)
         self.assertFalse(self.es.streamfilter(self.data))
+
+    def test_filter_multiple(self):
+        """Test EventStreams filter with multiple arguments."""
+        self.es.register_filter(foo=False, bar='baz')
+        self.assertFalse(self.es.streamfilter(self.data))
+        self.es.filter = {'all': [], 'any': [], 'none': []}
+        self.es.register_filter(foo=True, bar='baz')
+        self.assertTrue(self.es.streamfilter(self.data))
+        # check whether filter functions are different
+        f, g = self.es.filter['all']
+        c = {'foo': True}
+        self.assertNotEqual(f(c), g(c))
+        c = {'bar': 'baz'}
+        self.assertNotEqual(f(c), g(c))
 
     def _test_filter(self, none_type, all_type, any_type, result):
         """Test a single fixed filter."""
