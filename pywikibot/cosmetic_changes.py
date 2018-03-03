@@ -76,32 +76,56 @@ from pywikibot.tools import deprecated_args, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
 
-# This is from interwiki.py;
-# move it to family file and implement global instances
+# Subpage templates. Must be in lower case,
+# whereas subpage itself must be case sensitive
+# This is also used by interwiki.py
+# TODO: Maybe move it to family file and implement global instances
 moved_links = {
+    'ar': (['documentation', 'template documentation', 'شرح', 'توثيق'],
+           '/doc'),
+    'bn': ('documentation', '/doc'),
     'ca': (u'ús de la plantilla', u'/ús'),
-    'cs': (u'dokumentace', u'/doc'),
+    'cs': ('dokumentace', '/doc'),
+    'da': ('dokumentation', '/doc'),
     'de': (u'dokumentation', u'/Meta'),
-    'en': ([u'documentation',
-            u'template documentation',
-            u'template doc',
-            u'doc',
-            u'documentation, template'], u'/doc'),
+    'dsb': (['dokumentacija', 'doc'], '/Dokumentacija'),
+    'en': (['documentation', 'template documentation', 'template doc',
+            'doc', 'documentation, template'], '/doc'),
     'es': ([u'documentación', u'documentación de plantilla'], u'/doc'),
-    'fa': ([u'documentation', u'توضیحات', u'توضیحات الگو',
-            u'doc'], u'/توضیحات'),
-    'fr': (u'/documentation', u'/Documentation'),
+    'eu': ('txantiloi dokumentazioa', '/dok'),
+    'fa': (['documentation', 'template documentation', 'template doc',
+            'doc', 'توضیحات', 'زیرصفحه توضیحات'], '/doc'),
+    # fi: no idea how to handle this type of subpage at :Metasivu:
+    'fi': ('mallineohje', None),
+    'fr': (['/documentation', 'documentation', 'doc_modèle',
+            'documentation modèle', 'documentation modèle compliqué',
+            'documentation modèle en sous-page',
+            'documentation modèle compliqué en sous-page',
+            'documentation modèle utilisant les parserfunctions en sous-page',
+            ],
+           '/Documentation'),
+    'hsb': (['dokumentacija', 'doc'], '/Dokumentacija'),
     'hu': (u'sablondokumentáció', u'/doc'),
-    'id': (u'template doc', u'/doc'),
+    'id': ('template doc', '/doc'),
+    'ilo': ('documentation', '/doc'),
     'ja': (u'documentation', u'/doc'),
-    'ka': (u'თარგის ინფო', u'/ინფო'),
+    'ka': ('თარგის ინფო', '/ინფო'),
     'ko': (u'documentation', u'/설명문서'),
     'ms': (u'documentation', u'/doc'),
-    'pl': (u'dokumentacja', u'/opis'),
+    'no': ('dokumentasjon', '/dok'),
+    'nn': ('dokumentasjon', '/dok'),
+    'pl': ('dokumentacja', '/opis'),
     'pt': ([u'documentação', u'/doc'], u'/doc'),
-    'ro': (u'documentaţie', u'/doc'),
+    'ro': ('documentaţie', '/doc'),
     'ru': (u'doc', u'/doc'),
+    'simple': (['documentation',
+                'template documentation',
+                'template doc',
+                'doc',
+                'documentation, template'], '/doc'),
+    'sk': ('dokumentácia', '/Dokumentácia'),
     'sv': (u'dokumentation', u'/dok'),
+    'uk': (['документація', 'doc', 'documentation'], '/Документація'),
     'vi': (u'documentation', u'/doc'),
     'zh': ([u'documentation', u'doc'], u'/doc'),
 }
@@ -325,12 +349,11 @@ class CosmeticChangesToolkit(object):
         if not self.talkpage:
             subpage = False
             if self.template:
-                loc = None
                 try:
                     tmpl, loc = moved_links[self.site.code]
                     del tmpl
                 except KeyError:
-                    pass
+                    loc = None
                 if loc is not None and loc in self.title:
                     subpage = True
             interwikiLinks = textlib.getLanguageLinks(
