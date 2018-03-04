@@ -359,6 +359,7 @@ from pywikibot import config, i18n, pagegenerators, textlib, interwiki_graph
 from pywikibot import titletranslate
 
 from pywikibot.bot import ListOption, StandardOption
+from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import first_upper
 from pywikibot.tools.formatter import color_format
 
@@ -389,58 +390,6 @@ class GiveUpOnPage(pywikibot.Error):
 
     pass
 
-
-# Subpage templates. Must be in lower case,
-# whereas subpage itself must be case sensitive
-moved_links = {
-    'ar': ([u'documentation', u'template documentation', u'شرح', u'توثيق'],
-           u'/doc'),
-    'bn': (u'documentation', u'/doc'),
-    'ca': (u'ús de la plantilla', u'/ús'),
-    'cs': ('dokumentace', '/doc'),
-    'da': (u'dokumentation', u'/doc'),
-    'de': (u'dokumentation', u'/Meta'),
-    'dsb': ([u'dokumentacija', u'doc'], u'/Dokumentacija'),
-    'en': ([u'documentation', u'template documentation', u'template doc',
-            u'doc', u'documentation, template'], u'/doc'),
-    'es': ([u'documentación', u'documentación de plantilla'], u'/doc'),
-    'eu': (u'txantiloi dokumentazioa', u'/dok'),
-    'fa': ([u'documentation', u'template documentation', u'template doc',
-            u'doc', u'توضیحات', u'زیرصفحه توضیحات'], u'/doc'),
-    # fi: no idea how to handle this type of subpage at :Metasivu:
-    'fi': (u'mallineohje', None),
-    'fr': ([u'/documentation', u'documentation', u'doc_modèle',
-            u'documentation modèle', u'documentation modèle compliqué',
-            u'documentation modèle en sous-page',
-            u'documentation modèle compliqué en sous-page',
-            u'documentation modèle utilisant les parserfunctions en sous-page',
-            ],
-           u'/Documentation'),
-    'hsb': ([u'dokumentacija', u'doc'], u'/Dokumentacija'),
-    'hu': (u'sablondokumentáció', u'/doc'),
-    'id': ('template doc', '/doc'),
-    'ilo': (u'documentation', u'/doc'),
-    'ja': (u'documentation', u'/doc'),
-    'ka': ('თარგის ინფო', '/ინფო'),
-    'ko': (u'documentation', u'/설명문서'),
-    'ms': (u'documentation', u'/doc'),
-    'no': (u'dokumentasjon', u'/dok'),
-    'nn': (u'dokumentasjon', u'/dok'),
-    'pl': ('dokumentacja', '/opis'),
-    'pt': ([u'documentação', u'/doc'], u'/doc'),
-    'ro': ('documentaţie', '/doc'),
-    'ru': (u'doc', u'/doc'),
-    'simple': ([u'documentation',
-                u'template documentation',
-                u'template doc',
-                u'doc',
-                u'documentation, template'], u'/doc'),
-    'sk': (u'dokumentácia', u'/Dokumentácia'),
-    'sv': (u'dokumentation', u'/dok'),
-    'uk': ([u'документація', u'doc', u'documentation'], u'/Документація'),
-    'vi': (u'documentation', u'/doc'),
-    'zh': ([u'documentation', u'doc'], u'/doc'),
-}
 
 # A list of template names in different languages.
 # Pages which contain these shouldn't be changed.
@@ -2175,12 +2124,11 @@ class InterwikiBot(object):
                         pywikibot.output(u'Skipping: %s is a talk page' % page)
                         continue
                     if page.namespace() == 10:
-                        loc = None
                         try:
                             tmpl, loc = moved_links[page.site.code]
                             del tmpl
                         except KeyError:
-                            pass
+                            loc = None
                         if loc is not None and loc in page.title():
                             pywikibot.output(
                                 'Skipping: %s is a templates subpage'
@@ -2401,11 +2349,10 @@ def compareLanguages(old, new, insite, summary):
 
 def botMayEdit(page):
     """Test for allowed edits."""
-    tmpl = []
     try:
         tmpl, loc = moved_links[page.site.code]
     except KeyError:
-        pass
+        tmpl = []
     if not isinstance(tmpl, list):
         tmpl = [tmpl]
     try:
