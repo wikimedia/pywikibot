@@ -25,9 +25,8 @@ else:
 
 from warnings import warn
 
-import requests
-
 import pywikibot
+from pywikibot.comms.http import fetch
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
@@ -1296,10 +1295,10 @@ class Family(object):
         """
         # Here we return the latest mw release for downloading
         if not hasattr(self, '_version'):
-            self._version = requests.get(
+            self._version = fetch(
                 'https://www.mediawiki.org/w/api.php?action=expandtemplates'
                 '&text={{MW_stable_release_number}}&prop=wikitext&format=json'
-            ).json()['expandtemplates']['wikitext']
+            ).data.json()['expandtemplates']['wikitext']
         return self._version
 
     def force_version(self, code):
