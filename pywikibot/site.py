@@ -8094,7 +8094,8 @@ class DataSite(APISite):
         result = self.editEntity({}, data, bot=bot, **kwargs)
         return pywikibot.ItemPage(self, result['entity']['id'])
 
-    def search_entities(self, search, language, limit=None, **kwargs):
+    @deprecated_args(limit='total')
+    def search_entities(self, search, language, total=None, **kwargs):
         """
         Search for pages or properties that contain the given text.
 
@@ -8102,7 +8103,7 @@ class DataSite(APISite):
         @type search: str
         @param language: Language to search in.
         @type language: str
-        @param limit: Maximum number of pages to retrieve in total, or None in
+        @param total: Maximum number of pages to retrieve in total, or None in
             case of no limit.
         @type limit: int or None
         @return: 'search' list from API output.
@@ -8124,6 +8125,6 @@ class DataSite(APISite):
         parameters = dict(search=search, language=language, **kwargs)
         gen = api.APIGenerator('wbsearchentities', data_name='search',
                                site=self, parameters=parameters)
-        if limit is not None:
-            gen.set_maximum_items(limit)
+        if total is not None:
+            gen.set_maximum_items(total)
         return gen

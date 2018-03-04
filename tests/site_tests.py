@@ -3069,11 +3069,11 @@ class TestDataSiteSearchEntities(WikidataTestCase):
     def test_general(self):
         """Test basic search_entities functionality."""
         datasite = self.get_repo()
-        pages = datasite.search_entities('abc', 'en', limit=50)
+        pages = datasite.search_entities('abc', 'en', total=50)
         self.assertGreater(len(list(pages)), 0)
         self.assertLessEqual(len(list(pages)), 50)
         pages = datasite.search_entities('alphabet', 'en', type='property',
-                                         limit=50)
+                                         total=50)
         self.assertGreater(len(list(pages)), 0)
         self.assertLessEqual(len(list(pages)), 50)
 
