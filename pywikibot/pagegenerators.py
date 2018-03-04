@@ -2884,7 +2884,7 @@ def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
         language = site.lang
     repo = site.data_repository()
 
-    data = repo.search_entities(text, language, limit=total)
+    data = repo.search_entities(text, language, total=total)
     for item in data:
         yield pywikibot.ItemPage(repo, item['id'])
 
