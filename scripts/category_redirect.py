@@ -346,7 +346,7 @@ class CategoryRedirectBot(pywikibot.Bot):
                     pass
 
         # delete record entries for non-existent categories
-        for cat_name in record.keys():
+        for cat_name in list(record.keys()):
             if pywikibot.Category(self.site,
                                   self.catprefix + cat_name) not in catpages:
                 del record[cat_name]
