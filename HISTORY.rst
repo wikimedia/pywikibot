@@ -1,8 +1,14 @@
 Release history
 ===============
 
-3.0.20180301
+Current release
 ---------------
+
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180302
+------------
 
 * Changed requirements for requests and sseclient
 * Bugfixes and improvements
