@@ -2438,16 +2438,19 @@ class APIGenerator(_RequestWrapper):
         more data to be retrieved from the API.
 
         @param value: The value of maximum number of items to be retrieved
-            in total to set.
-        @type value: int
+            in total to set. Ignores None value.
+        @type value: int or str or None
         """
-        self.limit = int(value)
-        if self.query_increment and self.limit < self.query_increment:
-            self.request[self.limit_name] = self.limit
-            pywikibot.debug(u"%s: Set request item limit to %i"
-                            % (self.__class__.__name__, self.limit), _logger)
-        pywikibot.debug(u"%s: Set limit (maximum_items) to %i."
-                        % (self.__class__.__name__, self.limit), _logger)
+        if value is not None and int(value) > 0:
+            self.limit = int(value)
+            if self.query_increment and self.limit < self.query_increment:
+                self.request[self.limit_name] = self.limit
+                pywikibot.debug('{0}: Set request item limit to {1}'
+                                .format(self.__class__.__name__, self.limit),
+                                _logger)
+            pywikibot.debug('{0}: Set limit (maximum_items) to {1}.'
+                            .format(self.__class__.__name__, self.limit),
+                            _logger)
 
     def __iter__(self):
         """
@@ -2640,8 +2643,12 @@ class QueryGenerator(_RequestWrapper):
         prop=revisions), this is necessary to signal that only current
         revision is to be returned.
 
+        @param value: The value of maximum number of items to be retrieved
+            in total to set. Ignores None value.
+        @type value: int or str or None
         """
-        self.limit = int(value)
+        if value is not None:
+            self.limit = int(value)
 
     def _update_limit(self):
         """Set query limit for self.module based on api response."""

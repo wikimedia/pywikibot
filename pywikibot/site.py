@@ -1936,8 +1936,7 @@ class APISite(BaseSite):
             gen = gen_class(**req_args)
         if namespaces is not None:
             gen.set_namespace(namespaces)
-        if total is not None and int(total) > 0:
-            gen.set_maximum_items(int(total))
+        gen.set_maximum_items(total)
         return gen
 
     def _request_class(self, kwargs):
@@ -8125,6 +8124,5 @@ class DataSite(APISite):
         parameters = dict(search=search, language=language, **kwargs)
         gen = api.APIGenerator('wbsearchentities', data_name='search',
                                site=self, parameters=parameters)
-        if total is not None:
-            gen.set_maximum_items(total)
+        gen.set_maximum_items(total)
         return gen
