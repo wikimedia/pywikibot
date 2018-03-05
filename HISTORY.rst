@@ -7,6 +7,12 @@ Current release
 * Bugfixes and improvements
 * Localisation updates
 
+3.0.20180304
+------------
+
+* Bugfixes and improvements
+* Localisation updates
+
 3.0.20180302
 ------------
 
