@@ -124,6 +124,7 @@ primary_topic_format = {
     'sr': u'%s_(вишезначна одредница)',
     'sv': u'%s_(olika betydelser)',
     'uk': u'%s_(значення)',
+    'ur': '%s_(ضد ابہام)',
 }
 
 # List pages that will be ignored if they got a link to a disambiguation
@@ -340,6 +341,9 @@ ignore_title = {
         ],
         'sr': [
             'Википедија:Вишезначна одредница',
+        ],
+        'ur': [
+            'زمرہ:ضد ابہام صفحات',
         ],
     },
     'memoryalpha': {
