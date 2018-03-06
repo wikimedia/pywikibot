@@ -16,6 +16,7 @@ This module requires sseclient to be installed:
 from __future__ import absolute_import, unicode_literals
 
 from distutils.version import LooseVersion
+from functools import partial
 import json
 import socket
 
@@ -51,7 +52,10 @@ class EventStreams(object):
     Usage:
 
     >>> stream = EventStreams(stream='recentchange')
+    >>> stream.register_filter(type='edit', wiki='wikidatawiki')
     >>> change = next(iter(stream))
+    >>> print('{type} on page {title} by {user}.'.format(**change))
+    edit od page Q32857263 by XXN-bot.
     >>> change
     {'comment': '/* wbcreateclaim-create:1| */ [[Property:P31]]: [[Q4167836]]',
      'wiki': 'wikidatawiki', 'type': 'edit', 'server_name': 'www.wikidata.org',
@@ -206,6 +210,15 @@ class EventStreams(object):
         @type kwargs: str, list, tuple or other sequence
         @raise TypeError: A given args parameter is not a callable.
         """
+        def _is(data, key=None, value=None):
+            return key in data and data[key] is value
+
+        def _eq(data, key=None, value=None):
+            return key in data and data[key] == value
+
+        def _in(data, key=None, value=None):
+            return key in data and data[key] in value
+
         ftype = kwargs.pop('ftype', 'all')  # set default ftype value
 
         # register an external filter function
@@ -219,16 +232,13 @@ class EventStreams(object):
         for key, value in kwargs.items():
             # append function for singletons
             if isinstance(value, (bool, type(None))):
-                self.filter[ftype].append(lambda e: key in e and
-                                          e[key] is value)
+                self.filter[ftype].append(partial(_is, key=key, value=value))
             # append function for a single value
             elif isinstance(value, (StringTypes, int)):
-                self.filter[ftype].append(lambda e: key in e and
-                                          e[key] == value)
+                self.filter[ftype].append(partial(_eq, key=key, value=value))
             # append function for an iterable as value
             else:
-                self.filter[ftype].append(lambda e: key in e and
-                                          e[key] in value)
+                self.filter[ftype].append(partial(_in, key=key, value=value))
 
     def streamfilter(self, data):
         """Filter function for eventstreams.
