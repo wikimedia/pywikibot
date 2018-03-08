@@ -39,9 +39,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'he', 'id', 'sq', 'fi', 'fa', 'zh', 'ca', 'ru', 'az', 'vi', 'da',
             'gl', 'sv', 'sr', 'ko', 'cs', 'hr', 'ba', 'no', 'tr', 'ar', 'ta',
             'sa', 'sk', 'uk', 'hi', 'is', 'ro', 'eo', 'si', 'mk', 'bn', 'bg',
-            'ka', 'ms', 'lt', 'tt', 'el', 'li', 'ur', 'sl', 'km', 'tl', 'kk',
-            'et', 'ml', 'oc', 'be', 'ia', 'eu', 'ne', 'pa', 'hy', 'la', 'cv',
-            'tg', 'fy', 'ku', 'bs', 'te', 'cy', 'af', 'mr', 'mg', 'ky',
+            'ka', 'ms', 'lt', 'tt', 'li', 'el', 'ur', 'sl', 'km', 'tl', 'kk',
+            'et', 'ml', 'oc', 'be', 'ia', 'ne', 'eu', 'pa', 'hy', 'la', 'cv',
+            'tg', 'fy', 'ku', 'bs', 'te', 'af', 'cy', 'mr', 'mg', 'ky',
         ]
 
         super(Family, self).__init__()
