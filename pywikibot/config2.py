@@ -1081,8 +1081,6 @@ _check_user_config_types(_uc, _glv, _imports)
 _modified = [_key for _key in _gl
              if _uc[_key] != globals()[_key] or
              _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
-# Retain the list of modified key names
-__modified__ = _modified
 
 if ('user_agent_format' in _modified):
     _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
@@ -1125,7 +1123,8 @@ if OSWIN32 and editor:
             'path delimiter.')
 
 if userinterface_lang is None:
-    userinterface_lang = getdefaultlocale()[0]
+    userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
+        or getdefaultlocale()[0]
     if userinterface_lang in [None, 'C']:
         userinterface_lang = 'en'
     else:
