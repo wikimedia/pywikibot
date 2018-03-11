@@ -1514,7 +1514,7 @@ class PwbTestCase(TestCase):
         site = self.get_site()
 
         args = args + ['-family:' + site.family.name,
-                       '-code:' + site.code]
+                       '-lang:' + site.code]
 
         return execute_pwb(args, data_in, timeout, error)
 
