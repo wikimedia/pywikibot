@@ -2,8 +2,8 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
-# (C) xqt, 2010-2016
-# (C) Pywikibot team, 2007-2016
+# (C) xqt, 2010-2018
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -165,10 +165,10 @@ def svn_rev_info(path):
                 for i in range(3):
                     entries.readline()
                 tag = entries.readline().strip()
-                t = tag.split('://')
+                t = tag.split('://', 1)
                 t[1] = t[1].replace('svn.wikimedia.org/svnroot/pywikipedia/',
                                     '')
-                tag = '[%s] %s' % (t[0], t[1])
+                tag = '[{0}] {1}'.format(*t)
                 for i in range(4):
                     entries.readline()
                 date = time.strptime(entries.readline()[:19],

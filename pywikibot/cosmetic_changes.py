@@ -705,8 +705,7 @@ class CosmeticChangesToolkit(object):
            self.site.code in deprecatedTemplates[self.site.family.name]:
             for template in deprecatedTemplates[
                     self.site.family.name][self.site.code]:
-                old = template[0]
-                new = template[1]
+                old, new = template
                 if new is None:
                     new = ''
                 else:

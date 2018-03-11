@@ -1230,8 +1230,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
         cached = _url_cache[url]
         if cached:
-            code = cached[0]
-            fam = cached[1]
+            code, fam = cached
         else:
             raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
     else:
