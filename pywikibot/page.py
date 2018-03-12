@@ -5569,13 +5569,11 @@ class Link(ComparableMixin):
         # * with 'relative' URLs. Forbid them explicitly.
 
         if u'.' in t and (
-                t == u'.' or t == u'..' or
-                t.startswith(u'./') or
-                t.startswith(u'../') or
+                t in ('.', '..') or
+                t.startswith(('./', '../')) or
                 u'/./' in t or
                 u'/../' in t or
-                t.endswith(u'/.') or
-                t.endswith(u'/..')
+                t.endswith(('/.', '/..'))
         ):
             raise pywikibot.InvalidTitle(
                 u"(contains . / combinations): '%s'"
