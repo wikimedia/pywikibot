@@ -1,6 +1,9 @@
 .. image:: https://secure.travis-ci.org/wikimedia/pywikibot.png?branch=master
-   :alt: Build Status
+   :alt: Travis Build Status
    :target: https://travis-ci.org/wikimedia/pywikibot
+.. image:: https://img.shields.io/appveyor/ci/ladsgroup/pywikibot-g4xqx/master.svg?style=flat-square&label=AppVeyor%20CI
+   :alt: AppVeyor Build Status
+   :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
 .. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graphs/badge.svg?branch=master
    :alt: Code coverage
    :target: http://codecov.io/github/wikimedia/pywikibot?branch=master
