@@ -108,6 +108,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'tl': (u'Category redirect',),
             'tr': ('Kategori yönlendirme',),
             'uk': (u'Categoryredirect',),
+            'ur': ('زمرہ رجوع مکرر',),
             'vi': ('Đổi hướng thể loại',),
             'yi': (u'קאטעגאריע אריבערפירן',),
             'zh': ('分类重定向',),
@@ -197,6 +198,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sr': ('/док', ),
             'sv': (u'/dok', ),
             'uk': (u'/Документація', ),
+            'ur': ('/doc', '/دستاویز'),
         }
 
         # Templates that indicate an edit should be avoided
@@ -212,6 +214,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
                    'Plusieurs en cours', 'Inuse',),
             'hr': ('Radovi',),
             'sr': ('Радови у току', 'Рут',),
+            'ur': ('زیر ترمیم',),
             'zh': ('Inuse',),
         }
 

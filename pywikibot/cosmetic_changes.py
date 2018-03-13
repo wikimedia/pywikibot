@@ -126,6 +126,9 @@ moved_links = {
     'sk': ('dokumentácia', '/Dokumentácia'),
     'sv': (u'dokumentation', u'/dok'),
     'uk': (['документація', 'doc', 'documentation'], '/Документація'),
+    'ur': (['دستاویز', 'توثيق', 'شرح', 'توضیحات',
+            'documentation', 'template doc', 'doc',
+            'documentation, template'], '/doc'),
     'vi': (u'documentation', u'/doc'),
     'zh': ([u'documentation', u'doc'], u'/doc'),
 }
