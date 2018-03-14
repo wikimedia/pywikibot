@@ -7306,15 +7306,17 @@ class APISite(BaseSite):
         @type sysop: bool
         @param force_reload: Reload watchlist
         @type force_reload: bool
+        @param total: if not None, limit the generator to yielding this many
+            items in total
+        @type total: int
         @return: list of pages in watchlist
         @rtype: list of pywikibot.Page objects
         """
         self.login(sysop=sysop)
-        if not total:
-            total = pywikibot.config.special_page_limit
         expiry = None if force else pywikibot.config.API_config_expiry
         gen = api.PageGenerator(site=self, generator='watchlistraw',
-                                expiry=expiry, gwrlimit=total)
+                                expiry=expiry)
+        gen.set_maximum_items(total)
         return gen
 
     # aliases for backwards compatibility
