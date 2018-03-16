@@ -290,3 +290,7 @@ def setup(app):
 
 
 pywikibot_env()
+
+autodoc_default_flags = [
+    'special-members',
+]

@@ -666,11 +666,11 @@ class IndexPage(pywikibot.Page):
 
         In this class:
         page number is the number in the page title in the Page namespace, if
-            the wikisource site adopts this convention (e.g. page_number is 12
-            for Page:Popular Science Monthly Volume 1.djvu/12) or the sequential
-            number of the pages linked from the index section in the Index page
-            if the index is built via transclusion of a list of pages (e.g. like
-            on de wikisource).
+        the wikisource site adopts this convention (e.g. page_number is 12
+        for Page:Popular Science Monthly Volume 1.djvu/12) or the sequential
+        number of the pages linked from the index section in the Index page
+        if the index is built via transclusion of a list of pages (e.g. like
+        on de wikisource).
         page label is the label associated with a page in the Index page.
 
         This class provides methods to get pages contained in Index page,
