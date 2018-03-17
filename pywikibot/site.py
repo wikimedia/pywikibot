@@ -2778,7 +2778,7 @@ class APISite(BaseSite):
                 r'Unrecognized value for parameter [\'"]meta[\'"]: wikibase',
                 warning))
 
-        req = self._simple_request(action='query', meta='wikibase')
+        req = self._request(action='query', meta='wikibase', expiry=7)
         req._warning_handler = handle_warning
         data = req.submit()
         if 'query' in data and 'wikibase' in data['query']:
