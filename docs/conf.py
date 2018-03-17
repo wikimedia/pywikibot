@@ -284,9 +284,22 @@ def pywikibot_script_docstring_fixups(
             lines[index] = '  ' + line.strip()
 
 
+def pywikibot_skip_members(app, what, name, obj, skip, options):
+    """Skip certain members from documentation."""
+    inclusions = ('__init__', )
+    exclusions = ('__dict__', '__weakref__',)
+    if name in inclusions:
+        return False
+    if obj.__doc__ is not None \
+       and obj.__doc__.startswith(('DEPRECATED', 'Deprecated')):
+        return True
+    return skip or name in exclusions
+
+
 def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
+    app.connect('autodoc-skip-member', pywikibot_skip_members)
 
 
 pywikibot_env()
