@@ -72,13 +72,11 @@ def tryimport_pwb():
     global pwb
     try:
         import pywikibot
-        pwb = pywikibot
     except RuntimeError:
         remove_modules()
-
         os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
         import pywikibot  # noqa: E402
-        pwb = pywikibot
+    pwb = pywikibot
 
 
 def run_python_file(filename, argv, argvu, package=None):
@@ -151,17 +149,9 @@ sys.path = [sys.path[0], rewrite_path,
 
 try:
     import requests
-    if not hasattr(requests, '__version__'):
-        print("requests import problem: requests.__version__ does not exist.")
-        requests = None
 except ImportError as e:
-    print("ImportError: %s" % e)
-    requests = None
-
-if not requests:
-    raise ImportError("Python module 'requests' is required.\n"
-                      "Try running 'pip install requests'.")
-
+    raise ImportError("{0}\nPython module 'requests' is required.\n"
+                      "Try running 'pip install requests'.".format(e))
 del requests
 
 if len(sys.argv) > 1 and sys.argv[1][0] != '-':
