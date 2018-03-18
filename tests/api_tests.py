@@ -480,8 +480,6 @@ class TestParaminfoModules(DefaultSiteTestCase):
 
     """Test loading all paraminfo modules."""
 
-    vcr = True
-
     def test_action_modules(self):
         """Test loading all action modules."""
         self.site._paraminfo.fetch(self.site._paraminfo.action_modules)
