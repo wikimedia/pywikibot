@@ -349,17 +349,17 @@ class CategoryAddBot(MultipleSitesBot):
                 # loading it will throw an error if we don't jump out before
                 return
         else:
+            current_page = page
             if page.namespace() == page.site.namespaces.TEMPLATE:
                 docs = page.site.doc_subpage  # return tuple
                 for doc in docs:
                     doc_page = pywikibot.Page(
                         page.site, page.title() + doc)
                     if doc_page.exists():
-                        self.current_page = doc_page
+                        current_page = doc_page
                         includeonly = ['includeonly']
                         break
-            if not self.current_page:
-                self.current_page = page
+            self.current_page = current_page
         if self.current_page.exists():
             # Load the page
             text = self.current_page.text
