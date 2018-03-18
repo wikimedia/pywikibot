@@ -17,7 +17,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.page import WikibasePage, ItemPage, PropertyPage, Page
 from pywikibot.site import Namespace, NamespacesDict
-from pywikibot.tools import MediaWikiVersion
+from pywikibot.tools import MediaWikiVersion, suppress_warnings
 
 from tests import join_pages_path, mock
 from tests.aspects import (
@@ -1346,6 +1346,7 @@ class TestPropertyPage(WikidataTestCase):
         with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
             PropertyPage(wikidata)
 
+    @suppress_warnings('pywikibot.page.Property.getType is deprecated')
     def test_globe_coordinate(self):
         """Test a coordinate PropertyPage has the correct type."""
         wikidata = self.get_repo()
