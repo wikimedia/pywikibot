@@ -205,8 +205,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.edit_restricted_templates = {
             'ar': ('تحرر',),
             'bs': ('Izmjena u toku',),
-            'cs': ('Pracuje se',),
-            'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',),
+            'cs': ('Pracuje se', 'Archiv', 'Archiv Wikipedie',
+                   'Archiv diskuse', 'Archivace start', 'Posloupnost archivů',
+                   'Rfa-archiv-start', 'Rfc-archiv-start',),
+            'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',
+                   'Archiv',),
             'en': ('Inuse', 'In use'),
             'fa': ('ویرایش',),
             'fr': ('En travaux', 'Recyclage en cours', 'Travail de groupe',
