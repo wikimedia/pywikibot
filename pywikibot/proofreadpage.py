@@ -18,7 +18,7 @@ inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 
 """
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -527,7 +527,7 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.error('Error fetching HTML for %s.' % self)
                 raise
 
-            soup = Soup(response.content)
+            soup = Soup(response.text)
 
             try:
                 self._url_image = soup.find(class_='prp-page-image')
@@ -566,7 +566,7 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.error('Querying %s: %s' % (cmd_uri, e))
             return (True, e)
 
-        data = json.loads(response.content)
+        data = json.loads(response.text)
 
         assert 'error' in data, 'Error from phe-tools: %s' % data
         assert data['error'] in [0, 1], 'Error from phe-tools: %s' % data

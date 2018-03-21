@@ -87,7 +87,7 @@ class Container(object):
 
     def __init__(self, value):
         """Create container."""
-        self.content = value
+        self.text = value
 
 
 class TestSparql(WikidataTestCase):

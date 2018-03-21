@@ -166,7 +166,7 @@ def getCommonshelperCats(imagepage):
                 commonsHelperPage = fetch(
                     "https://toolserver.org/~daniel/WikiSense/CommonSense.php?%s" % parameters)
                 matches = commonsenseRe.search(
-                    commonsHelperPage.content)
+                    commonsHelperPage.text)
                 gotInfo = True
             else:
                 break
@@ -229,7 +229,7 @@ def getOpenStreetMap(latitude, longitude):
     while not gotInfo:
         try:
             page = fetch('https://nominatim.openstreetmap.org/reverse?format=xml&%s' % parameters)
-            et = xml.etree.ElementTree.fromstring(page.content)
+            et = xml.etree.ElementTree.fromstring(page.text)
             gotInfo = True
         except IOError:
             pywikibot.output(u'Got an IOError, let\'s try again')

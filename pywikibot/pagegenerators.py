@@ -2961,7 +2961,7 @@ class PetScanPageGenerator(object):
         if 500 <= req.status < 600:
             raise ServerError(
                 'received {0} status from {1}'.format(req.status, req.uri))
-        j = json.loads(req.content)
+        j = json.loads(req.text)
         raw_pages = j['*'][0]['a']['*']
         for raw_page in raw_pages:
             yield raw_page

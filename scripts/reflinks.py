@@ -462,7 +462,7 @@ class ReferencesRobot(Bot):
         pywikibot.output(u'PDF file.')
         fd, infile = tempfile.mkstemp()
         urlobj = os.fdopen(fd, 'w+')
-        urlobj.write(f.content)
+        urlobj.write(f.text)
 
         try:
             pdfinfo_out = subprocess.Popen([r"pdfinfo", "/dev/stdin"],

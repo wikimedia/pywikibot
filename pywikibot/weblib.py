@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Functions for manipulating external links or querying third-party sites."""
 #
-# (C) Pywikibot team, 2013
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,7 +48,7 @@ def getInternetArchiveURL(url, timestamp=None):
     retry_count = 0
     while retry_count <= config2.max_retries:
         try:
-            jsontext = http.fetch(uri).content
+            jsontext = http.fetch(uri).text
             break
         except RequestsConnectionError as e:
             error = e
@@ -85,7 +85,7 @@ def getWebCitationURL(url, timestamp=None):
         query['date'] = timestamp
 
     uri = uri + urlencode(query)
-    xmltext = http.fetch(uri).content
+    xmltext = http.fetch(uri).text
     if "success" in xmltext:
         data = ET.fromstring(xmltext)
         return data.find('.//webcite_url').text

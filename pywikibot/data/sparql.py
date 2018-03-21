@@ -144,10 +144,10 @@ class SparqlQuery(object):
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
-                if not self.last_response.content:
+                if not self.last_response.text:
                     return None
                 try:
-                    return json.loads(self.last_response.content)
+                    return json.loads(self.last_response.text)
                 except ValueError:
                     return None
             except Timeout:

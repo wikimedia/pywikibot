@@ -383,7 +383,7 @@ def getversion_onlinerepo():
     url = 'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/branches/master'
     # Gerrit API responses include )]}' at the beginning, make sure to strip it out
     buf = http.fetch(uri=url,
-                     headers={'user-agent': '{pwb}'}).content[4:]
+                     headers={'user-agent': '{pwb}'}).text[4:]
 
     try:
         hsh = json.loads(buf)['revision']

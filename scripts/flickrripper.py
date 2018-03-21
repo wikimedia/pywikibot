@@ -168,7 +168,7 @@ def getFlinfoDescription(photo_id):
     parameters = urlencode({'id': photo_id, 'raw': 'on'})
 
     return fetch(
-        'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).content
+        'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).text
 
 
 def getFilename(photoInfo, site=None, project=u'Flickr'):

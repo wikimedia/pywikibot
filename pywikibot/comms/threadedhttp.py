@@ -3,7 +3,7 @@
 from __future__ import absolute_import, unicode_literals
 
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,7 +22,7 @@ else:
 
 import pywikibot
 
-from pywikibot.tools import UnicodeMixin
+from pywikibot.tools import deprecated, UnicodeMixin
 
 _logger = "comm.threadedhttp"
 
@@ -189,13 +189,19 @@ class HttpRequest(UnicodeMixin):
         return self.raw.decode(encoding, errors)
 
     @property
+    @deprecated('the `text` property')
     def content(self):
+        """DEPRECATED. Return the response decoded by the detected encoding."""
+        return self.text
+
+    @property
+    def text(self):
         """Return the response decoded by the detected encoding."""
         return self.decode(self.encoding)
 
     def __unicode__(self):
         """Return the response decoded by the detected encoding."""
-        return self.content
+        return self.text
 
     def __bytes__(self):
         """Return the undecoded response."""
