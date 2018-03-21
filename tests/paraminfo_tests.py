@@ -147,7 +147,6 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         wmf = [
             'MassMessageListContent',
             'SecurePoll',
-            'flow-board',
             'Scribunto',
             'JsonSchema',
         ]
@@ -158,9 +157,6 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         self._check_param_subset(self.site, 'parse', 'contentmodel', base)
 
         if isinstance(self.site.family, WikimediaFamily):
-            # T151151 - en.wiki uninstalled Flow extension:
-            if self.site.family == 'wikipedia' and self.site.code == 'en':
-                wmf.remove('flow-board')
             self._check_param_subset(self.site, 'parse', 'contentmodel', wmf)
 
     def test_revision_deletion_type(self):
