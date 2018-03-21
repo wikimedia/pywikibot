@@ -1356,7 +1356,18 @@ def add_full_name(obj):
 
 
 def issue_deprecation_warning(name, instead, depth, warning_class=None):
-    """Issue a deprecation warning."""
+    """Issue a deprecation warning.
+
+    @param name: the name of the deprecated object
+    @type name: str
+    @param instead: suggested replacement for the deprecated object
+    @type instead: str
+    @param depth: depth + 1 will be used as stacklevel for the warnings
+    @type depth: int
+    @param warning_class: a warning class (category) to be used, defaults to
+        DeprecationWarning
+    @type warning_class: type
+    """
     if instead:
         if warning_class is None:
             warning_class = DeprecationWarning
