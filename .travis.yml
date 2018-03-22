@@ -50,6 +50,7 @@ before_install:
     fi
 
 before_script:
+  - pip install -U setuptools
   - pip install -r dev-requirements.txt
 
 script:
