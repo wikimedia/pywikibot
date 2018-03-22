@@ -40,7 +40,8 @@ Quick start
 Or to install using PyPI (excluding scripts)
 ::
 
-    pip install pywikibot --pre
+    pip install -U setuptools
+    pip install pywikibot
 
 Our `installation
 guide <https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Installation>`_
