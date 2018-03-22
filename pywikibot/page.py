@@ -849,28 +849,26 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not self.is_categorypage():
             return False
         if not hasattr(self, "_catredirect"):
+            self._catredirect = False
             catredirs = self.site.category_redirects()
             for template, args in self.templatesWithParams():
                 if template.title(withNamespace=False) in catredirs:
-                    # Get target (first template argument)
-                    try:
-                        p = pywikibot.Page(self.site, args[0].strip(), ns=14)
-                        if p.namespace() == 14:
+                    if args:
+                        # Get target (first template argument)
+                        p = pywikibot.Page(
+                            self.site, args[0].strip(), Namespace.CATEGORY)
+                        if p.namespace() == Namespace.CATEGORY:
                             self._catredirect = p.title()
                         else:
                             pywikibot.warning(
-                                u"Target %s on %s is not a category"
-                                % (p.title(asLink=True),
-                                   self.title(asLink=True)))
-                            self._catredirect = False
-                    except IndexError:
+                                'Category redirect target {0} on {1} is not a '
+                                'category'.format(p.title(asLink=True),
+                                                  self.title(asLink=True)))
+                    else:
                         pywikibot.warning(
-                            u"No target for category redirect on %s"
-                            % self.title(asLink=True))
-                        self._catredirect = False
+                            'No target found for category redirect on '
+                            + self.title(asLink=True))
                     break
-            else:
-                self._catredirect = False
         return bool(self._catredirect)
 
     def getCategoryRedirectTarget(self):
