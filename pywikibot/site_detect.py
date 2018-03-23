@@ -15,6 +15,7 @@ from requests import RequestException
 import pywikibot
 
 from pywikibot.comms.http import fetch
+from pywikibot import config
 from pywikibot.exceptions import ServerError
 from pywikibot.tools import MediaWikiVersion, PY2, PYTHON_VERSION
 
@@ -172,9 +173,24 @@ class MWSite(object):
         self.private_wiki = ('error' in info and
                              info['error']['code'] == 'readapidenied')
         if self.private_wiki:
-            return
-
-        info = info['query']['general']
+            # user-config.py is not loaded because PYWIKIBOT2_NO_USER_CONFIG
+            # is set to '2' by generate_family_file.py.
+            # Prepare a temporary config for login.
+            username = pywikibot.input(
+                'Private wiki detected. Login is required.\n'
+                'Please enter your username?')
+            config.usernames['temporary_family'] = {'temporary_code': username}
+            # Setup a dummy family so that we can create a site object
+            fam = pywikibot.Family()
+            fam.name = 'temporary_family'
+            fam.scriptpath = lambda code: self.api[:-8]  # without /api.php
+            fam.langs = {'temporary_code': self.server}
+            site = pywikibot.Site('temporary_code', fam)
+            site.version = lambda: str(self.version)
+            # Now the site object is able to login
+            info = site.siteinfo
+        else:
+            info = info['query']['general']
         self.version = MediaWikiVersion.from_generator(info['generator'])
         if self.version < MediaWikiVersion('1.17'):
             return

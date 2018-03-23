@@ -3079,7 +3079,7 @@ class LoginManager(login.LoginManager):
         if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.27'):
             login_request["lgtoken"] = self.get_login_token()
 
-        self.site._loginstatus = -2
+        self.site._loginstatus = -2  # IN_PROGRESS
         while True:
             login_result = login_request.submit()
             if u"login" not in login_result:
