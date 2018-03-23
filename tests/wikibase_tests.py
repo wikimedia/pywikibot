@@ -1647,19 +1647,35 @@ class TestWriteNormalizeData(TestCase):
         self.assertEqual(response, self.data_out)
 
 
-class TestPreloadingItemGenerator(TestCase):
+class TestPreloadingEntityGenerator(TestCase):
 
     """Test preloading item generator."""
 
-    family = 'wikidata'
-    code = 'wikidata'
+    sites = {
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+        },
+        'enwiki': {
+            'family': 'wikipedia',
+            'code': 'en',
+        }
+    }
 
     def test_non_item_gen(self):
-        """Test TestPreloadingItemGenerator with ReferringPageGenerator."""
-        site = self.get_site()
+        """Test PreloadingEntityGenerator with ReferringPageGenerator."""
+        site = self.get_site('wikidata')
         instance_of_page = pywikibot.Page(site, 'Property:P31')
         ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
-        gen = pagegenerators.PreloadingItemGenerator(ref_gen)
+        gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
+        self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
+
+    def test_foreign_page_item_gen(self):
+        """Test PreloadingEntityGenerator with connected pages."""
+        site = self.get_site('enwiki')
+        page_gen = [pywikibot.Page(site, 'Main Page'),
+                    pywikibot.Page(site, 'New York City')]
+        gen = pagegenerators.PreloadingEntityGenerator(page_gen)
         self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
 
 

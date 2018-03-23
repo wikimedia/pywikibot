@@ -2081,6 +2081,7 @@ def PreloadingEntityGenerator(generator, groupsize=50):
     Function basically is copied from above, but for Wikibase entities.
 
     @param generator: pages to iterate over
+    @type generator: Iterable
     @param groupsize: how many pages to preload at once
     @type groupsize: int
     """
@@ -2091,11 +2092,13 @@ def PreloadingEntityGenerator(generator, groupsize=50):
         if len(sites[site]) >= groupsize:
             # if this site is at the groupsize, process it
             group = sites.pop(site)
-            for i in site.preload_entities(group, groupsize):
+            repo = site.data_repository()
+            for i in repo.preload_entities(group, groupsize):
                 yield i
     for site, pages in sites.items():
         # process any leftover sites that never reached the groupsize
-        for i in site.preload_entities(pages, groupsize):
+        repo = site.data_repository()
+        for i in repo.preload_entities(pages, groupsize):
             yield i
 
 

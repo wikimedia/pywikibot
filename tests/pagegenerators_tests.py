@@ -600,16 +600,16 @@ class TestDequePreloadingGenerator(DefaultSiteTestCase):
         self.assertTrue(pages_out[1].isTalkPage())
 
 
-class TestPreloadingItemGenerator(WikidataTestCase):
+class TestPreloadingEntityGenerator(WikidataTestCase):
 
     """Test preloading item generator."""
 
     def test_non_item_gen(self):
-        """Test TestPreloadingItemGenerator with ReferringPageGenerator."""
+        """Test TestPreloadingEntityGenerator with ReferringPageGenerator."""
         site = self.get_site()
         instance_of_page = pywikibot.Page(site, 'Property:P31')
         ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
-        gen = pagegenerators.PreloadingItemGenerator(ref_gen)
+        gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
         self.assertTrue(all(isinstance(item, pywikibot.ItemPage) for item in gen))
 
 
