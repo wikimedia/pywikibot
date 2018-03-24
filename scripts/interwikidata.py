@@ -186,7 +186,8 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                     item.title(asLink=True))
             return False
         output('Adding link to %s' % item.title())
-        item.setSitelink(self.current_page)
+        item.setSitelink(self.current_page, summary='Added %s' % (
+            self.current_page.title(asLink=True, insite=item.site)))
         return item
 
     def try_to_merge(self, item):
