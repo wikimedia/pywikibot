@@ -1472,7 +1472,8 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
         },
     }
 
-    example_text = '[[en:Site]] [[de:Site|Piped]] [[commons:Site]] [[baden:Site]]'
+    example_text = ('[[en:Site]] [[de:Site|Piped]] [[commons:Site]] '
+                    '[[baden:Site]] [[fr:{{PAGENAME}}]]')
 
     @classmethod
     def setUpClass(cls):
@@ -1482,7 +1483,11 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
 
     def test_getLanguageLinks(self, key):
         """Test if the function returns the correct titles and sites."""
-        lang_links = textlib.getLanguageLinks(self.example_text, self.site)
+        with mock.patch('pywikibot.output') as m:
+            lang_links = textlib.getLanguageLinks(self.example_text, self.site)
+        m.assert_called_once_with(
+            '[getLanguageLinks] Text contains invalid interwiki link '
+            '[[fr:{{PAGENAME}}]].')
         self.assertEqual(set(page.title() for page in lang_links.values()),
                          set(['Site']))
         self.assertEqual(set(lang_links), self.sites_set - set([self.site]))
