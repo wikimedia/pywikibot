@@ -48,8 +48,8 @@ class HttpTestCase(TestCase):
         r = http._enqueue('http://www.wikipedia.org/')
         self.assertIsInstance(r, threadedhttp.HttpRequest)
         self.assertEqual(r.status, 200)
-        self.assertIn('<html lang="mul"', r.content)
-        self.assertIsInstance(r.content, unicode)
+        self.assertIn('<html lang="mul"', r.text)
+        self.assertIsInstance(r.text, unicode)
         self.assertIsInstance(r.raw, bytes)
 
     def test_fetch(self):
@@ -57,8 +57,10 @@ class HttpTestCase(TestCase):
         r = http.fetch('http://www.wikipedia.org/')
         self.assertIsInstance(r, threadedhttp.HttpRequest)
         self.assertEqual(r.status, 200)
-        self.assertIn('<html lang="mul"', r.content)
-        self.assertIsInstance(r.content, unicode)
+        self.assertIn('<html lang="mul"', r.text)
+        self.assertIsInstance(r.text, unicode)
+        with suppress_warnings(r'.*HttpRequest\.content is deprecated'):
+            self.assertEqual(r.content, r.text)
         self.assertIsInstance(r.raw, bytes)
 
 
@@ -150,7 +152,7 @@ class HttpsCertificateTestCase(TestCase):
             response = http.fetch(
                 uri='https://testssl-expire-r2i2.disig.sk/index.en.html',
                 disable_ssl_certificate_validation=True)
-        r = response.content
+        r = response.text
         self.assertIsInstance(r, unicode)
         self.assertTrue(re.search(r'<title>.*</title>', r))
         http.session.close()  # clear the connection
@@ -454,7 +456,7 @@ class CharsetTestCase(TestCase):
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual(req.content, CharsetTestCase.STR)
+        self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_no_charset(self):
         """Test decoding without explicit charset."""
@@ -466,7 +468,7 @@ class CharsetTestCase(TestCase):
         self.assertIsNone(req.charset)
         self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual(req.content, CharsetTestCase.STR)
+        self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_content_type_application_json_without_charset(self):
         """Test decoding without explicit charset but JSON content."""
@@ -537,7 +539,7 @@ class CharsetTestCase(TestCase):
         self.assertIsNone(req.charset)
         self.assertEqual('utf-8', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
-        self.assertEqual(req.content, CharsetTestCase.STR)
+        self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_same_charset(self):
         """Test decoding with explicit and equal charsets."""
@@ -545,7 +547,7 @@ class CharsetTestCase(TestCase):
         self.assertEqual('utf-8', req.charset)
         self.assertEqual('utf-8', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
-        self.assertEqual(req.content, CharsetTestCase.STR)
+        self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_header_charset(self):
         """Test decoding with different charsets and valid header charset."""
@@ -555,7 +557,7 @@ class CharsetTestCase(TestCase):
         with patch('pywikibot.warning'):
             self.assertEqual('utf-8', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.UTF8_BYTES)
-        self.assertEqual(req.content, CharsetTestCase.STR)
+        self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_code_charset(self):
         """Test decoding with different charsets and invalid header charset."""
@@ -566,7 +568,7 @@ class CharsetTestCase(TestCase):
         with patch('pywikibot.warning'):
             self.assertEqual('latin1', req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
-        self.assertEqual(req.content, CharsetTestCase.STR)
+        self.assertEqual(req.text, CharsetTestCase.STR)
 
     def test_invalid_charset(self):
         """Test decoding with different and invalid charsets."""
@@ -579,7 +581,8 @@ class CharsetTestCase(TestCase):
                 UnicodeDecodeError, self.CODEC_CANT_DECODE_RE,
                 lambda: req.encoding)
         self.assertEqual(req.raw, CharsetTestCase.LATIN1_BYTES)
-        self.assertRaisesRegex(UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.content)
+        self.assertRaisesRegex(
+            UnicodeDecodeError, self.CODEC_CANT_DECODE_RE, lambda: req.text)
 
 
 class BinaryTestCase(TestCase):
@@ -645,7 +648,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         r = http.fetch(uri=self.get_httpbin_url('/get'), params={})
         self.assertEqual(r.status, 200)
 
-        content = json.loads(r.content)
+        content = json.loads(r.text)
         self.assertDictEqual(content['args'], {})
 
     def test_unencoded_params(self):
@@ -658,7 +661,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         r = http.fetch(uri=self.get_httpbin_url('/get'), params={'fish&chips': 'delicious'})
         self.assertEqual(r.status, 200)
 
-        content = json.loads(r.content)
+        content = json.loads(r.text)
         self.assertDictEqual(content['args'], {'fish&chips': 'delicious'})
 
     def test_encoded_params(self):
@@ -672,7 +675,7 @@ class QueryStringParamsTestCase(HttpbinTestCase):
                        params={'fish%26chips': 'delicious'})
         self.assertEqual(r.status, 200)
 
-        content = json.loads(r.content)
+        content = json.loads(r.text)
         self.assertDictEqual(content['args'], {'fish%26chips': 'delicious'})
 
 
@@ -686,8 +689,8 @@ class DataBodyParameterTestCase(HttpbinTestCase):
         r_body = http.fetch(uri=self.get_httpbin_url('/post'), method='POST',
                             body={'fish&chips': 'delicious'})
 
-        self.assertDictEqual(json.loads(r_data.content),
-                             json.loads(r_body.content))
+        self.assertDictEqual(json.loads(r_data.text),
+                             json.loads(r_body.text))
 
 
 if __name__ == '__main__':  # pragma: no cover

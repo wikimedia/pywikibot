@@ -14,7 +14,7 @@ This module is responsible for
 from __future__ import absolute_import, print_function, unicode_literals
 
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -303,7 +303,7 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
         issue_deprecation_warning(
             'Invoking http.request without argument site', 'http.fetch()', 3)
         r = fetch(uri, method, params, body, headers, **kwargs)
-        return r.content
+        return r.text
 
     baseuri = site.base_url(uri)
 
@@ -319,7 +319,7 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
     headers['user-agent'] = user_agent(site, format_string)
 
     r = fetch(baseuri, method, params, body, headers, **kwargs)
-    return r.content
+    return r.text
 
 
 def get_authentication(uri):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Classes for detecting a MediaWiki site."""
 #
-# (C) Pywikibot team, 2010-2015
+# (C) Pywikibot team, 2010-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,7 +63,7 @@ class MWSite(object):
 
         self.fromurl = fromurl
 
-        data = r.content
+        data = r.text
 
         wp = WikiHTMLPageParser(fromurl)
         wp.feed(data)
@@ -118,7 +118,7 @@ class MWSite(object):
         response = fetch(
             self.api +
             "?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local&format=json")
-        iw = json.loads(response.content)
+        iw = json.loads(response.text)
         if 'error' in iw:
             raise RuntimeError('%s - %s' % (iw['error']['code'],
                                             iw['error']['info']))
@@ -146,7 +146,7 @@ class MWSite(object):
         """Extract the version from API help with ?version enabled."""
         if self.version is None:
             try:
-                d = fetch(self.api + '?version&format=json').content
+                d = fetch(self.api + '?version&format=json').text
                 try:
                     d = json.loads(d)
                 except ValueError:
@@ -167,7 +167,7 @@ class MWSite(object):
         response = fetch(self.api + '?action=query&meta=siteinfo&format=json')
         check_response(response)
         # remove preleading newlines and Byte Order Mark (BOM), see T128992
-        content = response.content.strip().lstrip('\uFEFF')
+        content = response.text.strip().lstrip('\uFEFF')
         info = json.loads(content)
         self.private_wiki = ('error' in info and
                              info['error']['code'] == 'readapidenied')
@@ -306,5 +306,5 @@ def check_response(response):
         raise ServerError('Bad Gateway')
     elif response.status == 500:
         raise ServerError('Internal Server Error')
-    elif response.status == 200 and SERVER_DB_ERROR_MSG in response.content:
+    elif response.status == 200 and SERVER_DB_ERROR_MSG in response.text:
         raise ServerError('Server cannot access the database')

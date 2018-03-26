@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Weblib test module."""
 #
-# (C) Pywikibot team, 2014-2015
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,7 +35,7 @@ class TestInternetArchive(DeprecationTestCase):
     def _test_response(self, response, *args, **kwargs):
         # for later tests this is must be present, and it'll tell us the
         # original content if that does not match
-        self.assertIn('closest', response.content)
+        self.assertIn('closest', response.text)
 
     def _get_archive_url(self, url, date_string=None):
         with PatchedHttp(weblib, False) as p:
