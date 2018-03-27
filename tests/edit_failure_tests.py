@@ -8,7 +8,7 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -147,18 +147,22 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text='Test this!',
                                                    language='foo')
-        self.assertAPIError('modification-failed', 'Illegal value: foo',
-                            item.addClaim, claim)
+        self.assertRaisesRegex(
+            OtherPageSaveError,
+            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'modification-failed: "foo" is not a known language code.',
+            item.addClaim, claim)
 
     def test_WbMonolingualText_invalid_text(self):
         """Attempt adding a monolingual text with an invalid non-string text."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
-        self.assertAPIError('invalid-snak',
-                            'Invalid snak. (Can only construct a '
-                            'MonolingualTextValue with a string value.)',
-                            item.addClaim, claim)
+        self.assertRaisesRegex(
+            OtherPageSaveError,
+            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'invalid-snak: Invalid snak data.',
+            item.addClaim, claim)
 
     def test_math_invalid_function(self):
         """Attempt adding invalid latex to a math claim."""
@@ -166,7 +170,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P717', datatype='math')
         claim.setTarget('\foo')
-        self.assertAPIError('modification-failed', None, item.addClaim, claim)
+        self.assertRaisesRegex(
+            OtherPageSaveError,
+            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'modification-failed: Malformed input: �oo',
+            item.addClaim, claim)
 
     def test_url_malformed_url(self):
         """Attempt adding a malformed URL to a url claim."""
@@ -174,9 +182,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
         claim.setTarget('Not a URL at all')
-        self.assertAPIError('modification-failed',
-                            'Malformed URL: Not a URL at all',
-                            item.addClaim, claim)
+        self.assertRaisesRegex(
+            OtherPageSaveError,
+            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'modification-failed: This URL misses a scheme like "https://": '
+            r'Not a URL at all', item.addClaim, claim)
 
     def test_url_invalid_protocol(self):
         """Attempt adding a URL with an invalid protocol to a url claim."""
@@ -184,9 +194,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         item = pywikibot.ItemPage(repo, 'Q68')
         claim = pywikibot.page.Claim(repo, 'P506', datatype='url')
         claim.setTarget('wtf://wikiba.se')
-        self.assertAPIError('modification-failed',
-                            'Unsupported URL scheme: wtf',
-                            item.addClaim, claim)
+        self.assertRaisesRegex(
+            OtherPageSaveError,
+            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'modification-failed: An URL scheme "wtf" is not supported.',
+            item.addClaim, claim)
 
 
 if __name__ == '__main__':  # pragma: no cover
