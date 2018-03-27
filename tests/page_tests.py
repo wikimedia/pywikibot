@@ -264,6 +264,19 @@ class TestPageObjectEnglish(TestCase):
                                   withNamespace=False, insite=site),
                          u"[[:File:Jean-Léon Gérôme 003.jpg|Jean-Léon Gérôme 003.jpg]]")
 
+    def testImageAndDataRepository(self):
+        """Test image_repository and data_repository page attributes."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, 'Help:Test page#Testing')
+        self.assertIsInstance(p1.image_repository, pywikibot.site.APISite)
+        self.assertEqual(p1.image_repository,
+                         pywikibot.site.APISite('commons', 'commons'))
+
+        p2 = pywikibot.Page(site, 'File:Jean-Léon Gérôme 003.jpg')
+        self.assertIsInstance(p2.data_repository, pywikibot.site.APISite)
+        self.assertEqual(p2.data_repository,
+                         pywikibot.site.APISite('wikidata', 'wikidata'))
+
     def test_creation(self):
         """Test Page.oldest_revision."""
         mainpage = self.get_mainpage()
