@@ -35,32 +35,33 @@ from pywikibot.comms.http import get_authentication
 from pywikibot.data import api
 from pywikibot.echo import Notification
 from pywikibot.exceptions import (
-    Error,
-    PageRelatedError,
+    ArticleExistsConflict,
+    CaptchaError,
+    CascadeLockedPage,
+    CircularRedirect,
     EditConflict,
+    EntityTypeUnknownException,
+    Error,
+    FamilyMaintenanceWarning,
+    FatalServerError,
+    InconsistentTitleReceived,
+    InterwikiRedirectPage,
+    IsNotRedirectPage,
+    LockedNoPage,
+    LockedPage,
+    NoCreateError,
+    NoPage,
+    NoUsername,
     PageCreatedConflict,
     PageDeletedConflict,
-    ArticleExistsConflict,
-    IsNotRedirectPage,
-    CircularRedirect,
-    InterwikiRedirectPage,
-    InconsistentTitleReceived,
-    LockedPage,
-    CascadeLockedPage,
-    LockedNoPage,
-    NoPage,
+    PageRelatedError,
+    PageSaveRelatedError,
     SiteDefinitionError,
-    UnknownSite,
-    UnknownExtension,
-    FamilyMaintenanceWarning,
-    NoUsername,
     SpamfilterError,
     TitleblacklistError,
-    NoCreateError,
+    UnknownExtension,
+    UnknownSite,
     UserBlocked,
-    EntityTypeUnknownException,
-    FatalServerError,
-    PageSaveRelatedError,
 )
 from pywikibot.family import WikimediaFamily
 from pywikibot.throttle import Throttle
@@ -5069,6 +5070,8 @@ class APISite(BaseSite):
         @rtype: bool
         @raises Error: No text to be saved
         @raises NoPage: recreate is disabled and page does not exist
+        @raises CaptchaError: config.solve_captcha is False and saving
+            the page requires solving a captcha
         """
         basetimestamp = True
         text_overrides = self._ep_text_overrides.intersection(kwargs.keys())
@@ -5175,6 +5178,9 @@ class APISite(BaseSite):
                     return True
                 elif result["edit"]["result"] == "Failure":
                     if "captcha" in result["edit"]:
+                        if not pywikibot.config.solve_captcha:
+                            raise CaptchaError('captcha encountered while '
+                                               'config.solve_captcha is False')
                         captcha = result["edit"]["captcha"]
                         req['captchaid'] = captcha['id']
                         if captcha["type"] == "math":

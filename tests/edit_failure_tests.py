@@ -52,7 +52,10 @@ class TestSaveFailure(TestCase):
         """Test that spam in content raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'Wikipedia:Sandbox')
         page.text = 'http://badsite.com'
-        self.assertRaisesRegex(SpamfilterError, 'badsite.com', page.save)
+        try:
+            self.assertRaisesRegex(SpamfilterError, 'badsite.com', page.save)
+        except OtherPageSaveError as e:
+            self.skipTest(e)
 
     def test_titleblacklist(self):
         """Test that title blacklist raise the appropriate exception."""
@@ -152,7 +155,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                                                    language='foo')
         self.assertRaisesRegex(
             OtherPageSaveError,
-            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
             r'modification-failed: "foo" is not a known language code.',
             item.addClaim, claim)
 
@@ -163,7 +166,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
         self.assertRaisesRegex(
             OtherPageSaveError,
-            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
             r'invalid-snak: Invalid snak data.',
             item.addClaim, claim)
 
@@ -175,8 +178,8 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim.setTarget('\foo')
         self.assertRaisesRegex(
             OtherPageSaveError,
-            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
-            r'modification-failed: Malformed input: �oo',
+            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
+            r'modification-failed: Malformed input:',
             item.addClaim, claim)
 
     def test_url_malformed_url(self):
@@ -187,7 +190,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim.setTarget('Not a URL at all')
         self.assertRaisesRegex(
             OtherPageSaveError,
-            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
             r'modification-failed: This URL misses a scheme like "https://": '
             r'Not a URL at all', item.addClaim, claim)
 
@@ -199,7 +202,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
         claim.setTarget('wtf://wikiba.se')
         self.assertRaisesRegex(
             OtherPageSaveError,
-            r'Edit to page \[\[wikidata:test:Q68]] failed:\n'
+            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
             r'modification-failed: An URL scheme "wtf" is not supported.',
             item.addClaim, claim)
 

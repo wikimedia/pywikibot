@@ -270,6 +270,9 @@ if config.max_retries > 2:
             'tests: max_retries reduced from %d to 1' % config.max_retries)
     config.max_retries = 1
 
+# Raise CaptchaError if a test requires solving a captcha
+config.solve_captcha = False
+
 cache_misses = 0
 cache_hits = 0
 
