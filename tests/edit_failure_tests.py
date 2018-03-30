@@ -16,6 +16,7 @@ from __future__ import absolute_import, unicode_literals
 
 import pywikibot
 from pywikibot import (
+    config,
     Error,
     NoPage,
     LockedPage,
@@ -26,6 +27,7 @@ from pywikibot import (
     PageCreatedConflict,
 )
 
+from tests import patch
 from tests.aspects import unittest, TestCase, WikibaseTestCase
 
 
@@ -60,7 +62,8 @@ class TestSaveFailure(TestCase):
     def test_nobots(self):
         """Test that {{nobots}} raise the appropriate exception."""
         page = pywikibot.Page(self.site, 'User:John Vandenberg/nobots')
-        self.assertRaisesRegex(OtherPageSaveError, 'nobots', page.save)
+        with patch.object(config, 'ignore_bot_templates', False):
+            self.assertRaisesRegex(OtherPageSaveError, 'nobots', page.save)
 
     def test_touch(self):
         """Test that Page.touch() does not do a real edit."""
