@@ -220,11 +220,18 @@ available_ssl_project = []
 # By default you are asked for a password on the terminal.
 # A password file may be used, e.g. password_file = ".passwd".
 # The path to the password file is relative to that of the user_config file.
-# The password file should consist of lines containing
-# Python tuples of any of the following formats:
+# The password file should consist of lines containing Python tuples of any
+# of the following formats:
 # (code, family, username, password)
 # (family, username, password)
 # (username, password)
+# It's also possible (and safer) for bot users to use BotPasswords to limit
+# the permissions given to a bot. When using BotPasswords, each instance gets
+# keys. This combination can only access the API, not the normal web interface.
+# See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords to know how
+# use them. In this case, the password file should contein a BotPassword object
+# in the following format:
+# (username, BotPassword(botname, botpassword))
 password_file = None
 
 # edit summary to use if not supplied by bot script
