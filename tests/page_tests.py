@@ -21,6 +21,7 @@ from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
     StringTypes as basestring,
+    suppress_warnings,
     UnicodeType as unicode,
 )
 
@@ -430,12 +431,18 @@ class TestPageObject(DefaultSiteTestCase):
         # since there is no way to predict what data the wiki will return,
         # we only check that the returned objects are of correct type.
         self.assertIsInstance(mainpage.get(), unicode)
-        self.assertIsInstance(mainpage.latestRevision(), int)
+        with suppress_warnings(
+                'pywikibot.page.BasePage.latestRevision is deprecated; '
+                'use latest_revision_id instead.'):
+            self.assertIsInstance(mainpage.latestRevision(), int)
         self.assertIsInstance(mainpage.userName(), unicode)
         self.assertIsInstance(mainpage.isIpEdit(), bool)
         self.assertIsInstance(mainpage.exists(), bool)
         self.assertIsInstance(mainpage.isRedirectPage(), bool)
-        self.assertIsInstance(mainpage.isEmpty(), bool)
+        with suppress_warnings(
+                'pywikibot.page.BasePage.isEmpty is deprecated; '
+                'use interwiki.page_empty_check(page) instead.'):
+            self.assertIsInstance(mainpage.isEmpty(), bool)
         self.assertIsInstance(mainpage.isDisambig(), bool)
         self.assertIsInstance(mainpage.canBeEdited(), bool)
         self.assertIsInstance(mainpage.botMayEdit(), bool)
