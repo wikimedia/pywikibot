@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,6 +48,20 @@ class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
 
         text = cc.fix_ISBN(' ISBN 9780975229804 ')
         self.assertEqual(text, ' ISBN 978-0-9752298-0-4 ')
+
+    @unittest.expectedFailure  # T144288
+    def test_valid_isbn_failing(self):
+        """Test ISBN.
+
+        This test fails with current library parts.
+        """
+        cc = CosmeticChangesToolkit(self.site, namespace=0)
+
+        text = cc.fix_ISBN(' ISBN 9783955390631 ')
+        self.assertEqual(text, ' ISBN 978-3-95539-063-1 ')
+
+        text = cc.fix_ISBN(' ISBN 9791091447034 ')
+        self.assertEqual(text, ' ISBN 979-10-91447-03-4 ')
 
     def test_invalid_isbn(self):
         """Test that it'll fail when the ISBN is invalid."""
@@ -99,14 +113,14 @@ class TestIsbn(TestCase):
         self.assertRaises(IsbnExc, ISBN10, '09752298')  # Invalid length
         self.assertRaises(IsbnExc, ISBN10, '09752X9801')  # X in the middle
 
-    def test_isbn13(self):
-        """Test ISBN13."""
-        # Test general features
+    def test_isbn13_978(self):
+        """General test ISBN13 features with prefix 978."""
         isbn = ISBN13('9783161484100')
         isbn.format()
         self.assertEqual(isbn.code, '978-3-16-148410-0')
         self.assertEqual(isbn.digits(),
                          [9, 7, 8, 3, 1, 6, 1, 4, 8, 4, 1, 0, 0])
+
         isbn = ISBN13('978809027341', checksumMissing=True)
         self.assertEqual(isbn.code, '9788090273412')
 
@@ -114,6 +128,15 @@ class TestIsbn(TestCase):
         self.assertRaises(IsbnExc, ISBN13, '9783161484LOL')  # Invalid chars
         self.assertRaises(IsbnExc, ISBN13, '9783161484105')  # Invalid checksum
         self.assertRaises(IsbnExc, ISBN13, '9783161484')  # Invalid length
+
+    @unittest.expectedFailure  # T144288
+    def test_isbn13_979(self):
+        """Test ISBN13 with prefix 979."""
+        isbn = ISBN13('9791091447089')
+        isbn.format()
+        self.assertEqual(isbn.code, '979-10-91447-08-9')
+        self.assertEqual(isbn.digits(),
+                         [9, 7, 9, 1, 0, 9, 1, 4, 4, 7, 0, 8, 9])
 
     def test_general(self):
         """Test things that apply both to ISBN10 and ISBN13."""
@@ -143,14 +166,27 @@ class TestIsbn(TestCase):
         )
 
         # Errors
-        isbn = ISBN10('9492098059')
+        isbn = ISBN10('9912098056')
         self.assertRaisesRegex(IsbnExc,
-                               'ISBN 9492098059: group number unknown.',
+                               'ISBN 9912098056: group number unknown.',
                                isbn.format)
         isbn = ISBN10('9095012042')
         self.assertRaisesRegex(IsbnExc,
                                'ISBN 9095012042: publisher number unknown.',
                                isbn.format)
+
+    @unittest.expectedFailure  # T144288
+    def test_general_failing(self):
+        """Test things that apply both to ISBN10 and ISBN13.
+
+        This test fails due to outdated libraries.
+        """
+        # hyphenateIsbnNumbers
+        self.assertEqual(hyphenateIsbnNumbers('ISBN 9791091447089'),
+                         'ISBN 979-10-91447-08-9')
+        # convertIsbn10toIsbn13
+        self.assertEqual(convertIsbn10toIsbn13('ISBN 10-91447-08-X'),
+                         'ISBN 979-10-91447-08-9')
 
 
 class TestIsbnBot(ScriptMainTestCase):
