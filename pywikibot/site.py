@@ -4513,10 +4513,8 @@ class APISite(BaseSite):
         @note: logevents with logtype='block' only logs user blocks whereas
             site.blocks iterates all blocks including IP ranges.
 
-        @param logtype: only iterate entries of this type (see wiki
-            documentation for available types, which will include "block",
-            "protect", "rights", "delete", "upload", "move", "import",
-            "patrol", "merge")
+        @param logtype: only iterate entries of this type
+            (see mediawiki api documentation for available types)
         @type logtype: basestring
         @param user: only iterate entries that match this user name
         @type user: basestring
@@ -4777,8 +4775,11 @@ class APISite(BaseSite):
             list of namespace identifiers.
         @param showMinor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
+        @param total: limit result to this number of pages
+        @type total: int
         @param top_only: if True, iterate only edits which are the latest
-            revision
+            revision (default: False)
+        @raises Error: either user or userprefix must be non-empty
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
