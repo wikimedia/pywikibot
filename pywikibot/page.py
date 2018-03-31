@@ -3599,8 +3599,7 @@ class User(Page):
 
         @rtype: bool
         """
-        return not (self.isAnonymous() or self.isRegistered()
-                    or 'bot' in self.groups())
+        return self.isRegistered() and 'bot' not in self.groups()
 
 
 class WikibasePage(BasePage):
