@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Script to create user-config.py."""
 #
-# (C) Pywikibot team, 2010-2017
+# (C) Pywikibot team, 2010-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -238,8 +238,7 @@ def create_user_config(args=None, force=False):
     """
     _fnc = os.path.join(base_dir, "user-config.py")
     _fncpass = os.path.join(base_dir, 'user-password.py')
-    # TODO: T167573: better check for existing user-password file
-    if file_exists(_fnc) or file_exists(_fncpass):
+    if file_exists(_fnc):
         return
 
     if args and force and not config.verbose_output:
@@ -261,7 +260,7 @@ def create_user_config(args=None, force=False):
     if not main_username:
         usernames = "# usernames['{0}']['{1}'] = u'MyUsername'".format(
             main_family, main_code)
-    else:
+    elif not file_exists(_fncpass):
         # For each different username entered, ask if user wants to save a
         # BotPassword (username, BotPassword name, BotPassword pass)
         seen = set()
