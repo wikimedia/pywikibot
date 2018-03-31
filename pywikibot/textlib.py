@@ -105,13 +105,30 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 # The namespace names must be substituted into this regex.
 # e.g. FILE_LINK_REGEX % 'File' or FILE_LINK_REGEX % '|'.join(site.namespaces)
 FILE_LINK_REGEX = r"""
-\[\[\s*(?:%s)\s*:[^|]*?\s*
-  (\|
-    ( ( \[\[ .*? \]\] )? [^[]*?
-     | \[ [^]]*? \]
-    )*
-  )?
-\]\]
+    \[\[\s*
+    (?:%s)  # namespace aliases
+    \s*:
+    (?=(?P<filename>
+        [^]|]*
+    ))(?P=filename)
+    (
+        \|
+        (
+            (
+                (?=(?P<inner_link>
+                    \[\[.*?\]\]
+                ))(?P=inner_link)
+            )?
+            (?=(?P<other_chars>
+                [^\[\]]*
+            ))(?P=other_chars)
+        |
+            (?=(?P<not_wikilink>
+                \[[^]]*\]
+            ))(?P=not_wikilink)
+        )*?
+    )??
+    \]\]
 """
 
 NON_LATIN_DIGITS = {
