@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -115,6 +115,7 @@ class LogEntry(object):
         @note: title may be missing in data dict e.g. by oversight action to
                hide the title. In that case a KeyError exception will raise
 
+        @return: page on action was performed
         @rtype: pywikibot.Page
         @raise: KeyError: title was missing from log entry
         """
@@ -165,7 +166,7 @@ class UserTargetLogEntry(LogEntry):
         @rtype: pywikibot.User
         """
         if not hasattr(self, '_page'):
-            self._page = pywikibot.User(super(UserTargetLogEntry, self).page())
+            self._page = pywikibot.User(self.site, self.data['title'])
         return self._page
 
 
@@ -394,7 +395,7 @@ class PatrolEntry(LogEntry):
         return 'auto' in self._params and self._params['auto'] != 0
 
 
-class NewUsersEntry(LogEntry):
+class NewUsersEntry(UserTargetLogEntry):
 
     """New user log entry."""
 
