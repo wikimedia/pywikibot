@@ -4931,7 +4931,8 @@ class APISite(BaseSite):
         if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.17'):
             usprop.append('rights')
         usgen = api.ListGenerator(
-            'users', ususers=usernames, site=self, usprop=usprop)
+            'users', site=self, parameters={
+                'ususers': usernames, 'usprop': usprop})
         return usgen
 
     @deprecated('Site.randompages(total=1)')

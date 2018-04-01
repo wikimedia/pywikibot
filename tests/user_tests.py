@@ -13,6 +13,7 @@ from pywikibot import Page, Timestamp, User
 from pywikibot.exceptions import AutoblockUser
 from pywikibot.tools import StringTypes, suppress_warnings
 
+from tests import patch
 from tests.aspects import DefaultSiteTestCase, TestCase, unittest
 
 
@@ -131,9 +132,13 @@ class TestUserClass(TestCase):
 
     def test_autoblocked_user(self):
         """Test autoblocked user."""
-        user = User(self.site, '#1242976')
+        with patch.object(pywikibot, 'output') as p:
+            user = User(self.site, '#1242976')
+        p.assert_called_once_with(
+            'This is an autoblock ID, you can only use to unblock it.')
         self.assertEqual('#1242976', user.username)
-        self.assertEqual(user.name(), user.username)
+        with suppress_warnings('pywikibot.page.User.name is deprecated'):
+            self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(withNamespace=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
@@ -148,9 +153,12 @@ class TestUserClass(TestCase):
 
     def test_autoblocked_user_with_namespace(self):
         """Test autoblocked user."""
-        user = User(self.site, 'User:#1242976')
+        # Suppress output: This is an autoblock ID, you can only use to unblock
+        with patch.object(pywikibot, 'output'):
+            user = User(self.site, 'User:#1242976')
         self.assertEqual('#1242976', user.username)
-        self.assertEqual(user.name(), user.username)
+        with suppress_warnings('pywikibot.page.User.name is deprecated'):
+            self.assertEqual(user.name(), user.username)
         self.assertEqual(user.title(withNamespace=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
