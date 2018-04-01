@@ -3491,9 +3491,9 @@ class User(Page):
         """Return last user activity.
 
         @return: last user log entry
-        @rtype: LogEntry
+        @rtype: LogEntry or None
         """
-        return next(iter(self.logevents(total=1)))
+        return next(iter(self.logevents(total=1)), None)
 
     @deprecated("contributions")
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
@@ -3551,9 +3551,9 @@ class User(Page):
 
         @return: first user contribution entry
         @return tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
-        @rtype: tuple
+        @rtype: tuple or None
         """
-        return next(self.contributions(reverse=True, total=1))
+        return next(self.contributions(reverse=True, total=1), None)
 
     @property
     def last_edit(self):
@@ -3561,9 +3561,9 @@ class User(Page):
 
         @return: last user contribution entry
         @return tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
-        @rtype: tuple
+        @rtype: tuple or None
         """
-        return next(self.contributions(total=1))
+        return next(self.contributions(total=1), None)
 
     @deprecate_arg("number", "total")
     def uploadedImages(self, total=10):
