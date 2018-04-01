@@ -7,7 +7,7 @@ such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -157,7 +157,7 @@ class TestCaseBase(unittest.TestCase):
         @type namespaces: int or set of int
         """
         if isinstance(namespaces, int):
-            namespaces = set([namespaces])
+            namespaces = {namespaces}
 
         self.assertIn(page.namespace(), namespaces,
                       "%s not in namespace %r" % (page, namespaces))
@@ -222,7 +222,7 @@ class TestCaseBase(unittest.TestCase):
         @type namespaces: int or set of int
         """
         if isinstance(namespaces, int):
-            namespaces = set([namespaces])
+            namespaces = {namespaces}
 
         for page in gen:
             self.assertPageInNamespaces(page, namespaces)
@@ -241,7 +241,7 @@ class TestCaseBase(unittest.TestCase):
         @param skip: bool
         """
         if isinstance(namespaces, int):
-            namespaces = set([namespaces])
+            namespaces = {namespaces}
         else:
             assert isinstance(namespaces, set)
 
@@ -511,14 +511,16 @@ class CheckHostnameMixin(TestCaseBase):
         if issubclass(cls, HttpbinTestCase):
             # If test uses httpbin, then check is pytest test runner is used
             # and pytest_httpbin module is installed.
-            httpbin_used = hasattr(sys, '_test_runner_pytest') and pytest_httpbin
+            httpbin_used = hasattr(sys,
+                                   '_test_runner_pytest') and pytest_httpbin
         else:
             httpbin_used = False
 
-        # If pytest_httpbin will be used during tests, then remove httpbin.org from sites.
+        # If pytest_httpbin will be used during tests, then remove httpbin.org
+        # from sites.
         if httpbin_used:
-            cls.sites = dict((k, v) for k, v in cls.sites.items()
-                             if 'httpbin.org' not in v['hostname'])
+            cls.sites = {k: v for k, v in cls.sites.items()
+                         if 'httpbin.org' not in v['hostname']}
 
         for key, data in cls.sites.items():
             if 'hostname' not in data:

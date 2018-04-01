@@ -190,7 +190,7 @@ class TestParamInfo(DefaultSiteTestCase):
             else:
                 assert 'query' not in modules
             original_generate_submodules(modules)
-        pi = api.ParamInfo(self.site, set(['query', 'main']))
+        pi = api.ParamInfo(self.site, {'query', 'main'})
         self.assertEqual(len(pi), 0)
         original_generate_submodules = pi._generate_submodules
         pi._generate_submodules = patched_generate_submodules
@@ -202,7 +202,7 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test initializing with only the pageset."""
         site = self.get_site()
         self.assertNotIn('query', api.ParamInfo.init_modules)
-        pi = api.ParamInfo(site, set(['pageset']))
+        pi = api.ParamInfo(site, {'pageset'})
         self.assertNotIn('query', api.ParamInfo.init_modules)
         self.assertEqual(len(pi), 0)
         pi._init()
@@ -232,7 +232,7 @@ class TestParamInfo(DefaultSiteTestCase):
     def test_generators(self):
         """Test requesting the generator parameter."""
         site = self.get_site()
-        pi = api.ParamInfo(site, set(['pageset', 'query']))
+        pi = api.ParamInfo(site, {'pageset', 'query'})
         self.assertEqual(len(pi), 0)
         pi._init()
 
@@ -548,7 +548,7 @@ class TestDryOptionSet(DefaultDrySiteTestCase):
         options['c'] = None
         self.assertCountEqual(['a', 'b'], list(options.keys()))
         self.assertCountEqual([True, False], list(options.values()))
-        self.assertEqual(set(), set(options.values()) - set([True, False]))
+        self.assertEqual(set(), set(options.values()) - {True, False})
         self.assertCountEqual([('a', True), ('b', False)], list(options.items()))
 
 
@@ -808,7 +808,7 @@ class TestDryListGenerator(TestCase):
             'limit': {'max': 10},
             'namespace': {'multi': True}
         }
-        mysite._paraminfo.query_modules_with_limits = set(['allpages'])
+        mysite._paraminfo.query_modules_with_limits = {'allpages'}
         self.gen = api.ListGenerator(listaction="allpages", site=mysite)
 
     def test_namespace_none(self):

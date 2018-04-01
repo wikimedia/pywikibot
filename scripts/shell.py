@@ -9,7 +9,7 @@ Usage:
 
 If no arguments are given, the pywikibot library will not be loaded.
 """
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,7 +31,7 @@ def main(*args):
 if __name__ == "__main__":
     import sys
     args = []
-    if set(sys.argv) - set(['shell', 'shell.py']):
+    if set(sys.argv) - {'shell', 'shell.py'}:
         args = sys.argv
     del sys
     main(*args)

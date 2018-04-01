@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2016-2017
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -121,8 +121,7 @@ class TestArchiveBot(TestCase):
     """Test archivebot script on 40+ Wikipedia sites."""
 
     family = 'wikipedia'
-    sites = dict((code, {'family': 'wikipedia', 'code': code})
-                 for code in THREADS)
+    sites = {code: {'family': 'wikipedia', 'code': code} for code in THREADS}
 
     cached = True
 
@@ -188,8 +187,8 @@ class TestArchiveBotAfterDateUpdate(TestCase):
     """
 
     family = 'wikipedia'
-    sites = dict((code, {'family': 'wikipedia', 'code': code})
-                 for code in THREADS_WITH_UPDATED_FORMAT)
+    sites = {code: {'family': 'wikipedia', 'code': code}
+             for code in THREADS_WITH_UPDATED_FORMAT}
 
     cached = True
 

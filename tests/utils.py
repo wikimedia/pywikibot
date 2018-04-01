@@ -329,7 +329,7 @@ class DummySiteinfo(object):
 
     def __init__(self, cache):
         """Constructor."""
-        self._cache = dict((key, (item, False)) for key, item in cache.items())
+        self._cache = {key: (item, False) for key, item in cache.items()}
 
     def __getitem__(self, key):
         """Get item."""

@@ -1983,8 +1983,8 @@ class Subject(interwiki_graph.Subject):
                 page = new[site]
                 if not page.section():
                     try:
-                        linkedPages = set(pywikibot.Page(l)
-                                          for l in page.iterlanglinks())
+                        linkedPages = {pywikibot.Page(l)
+                                       for l in page.iterlanglinks()}
                     except pywikibot.NoPage:
                         pywikibot.warning(
                             'Page %s does no longer exist?!' % page)

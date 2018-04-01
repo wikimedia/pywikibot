@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2017
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -171,20 +171,20 @@ class CaseChecker(object):
                 self.titleList = [self.Page(t) for t in f]
             self.failedTitles += '.failed'
 
-        self.lclToLatDict = dict(
-            (ord(self.localSuspects[i]), self.latinSuspects[i])
-            for i in xrange(len(self.localSuspects)))
-        self.latToLclDict = dict(
-            (ord(self.latinSuspects[i]), self.localSuspects[i])
-            for i in xrange(len(self.localSuspects)))
+        self.lclToLatDict = {
+            ord(self.localSuspects[i]): self.latinSuspects[i]
+            for i in xrange(len(self.localSuspects))}
+        self.latToLclDict = {
+            ord(self.latinSuspects[i]): self.localSuspects[i]
+            for i in xrange(len(self.localSuspects))}
 
         if self.localKeyboard is not None:
-            self.lclToLatKeybDict = dict(
-                (ord(self.localKeyboard[i]), self.latinKeyboard[i])
-                for i in xrange(len(self.localKeyboard)))
-            self.latToLclKeybDict = dict(
-                (ord(self.latinKeyboard[i]), self.localKeyboard[i])
-                for i in xrange(len(self.localKeyboard)))
+            self.lclToLatKeybDict = {
+                ord(self.localKeyboard[i]): self.latinKeyboard[i]
+                for i in xrange(len(self.localKeyboard))}
+            self.latToLclKeybDict = {
+                ord(self.latinKeyboard[i]): self.localKeyboard[i]
+                for i in xrange(len(self.localKeyboard))}
         else:
             self.lclToLatKeybDict = {}
             self.latToLclKeybDict = {}
@@ -464,9 +464,9 @@ class CaseChecker(object):
         badWords = list(self.FindBadWords(title))
         if len(badWords) > 0:
             # Allow known words, allow any roman numerals with local suffixes
-            badWords = set(i for i in badWords
-                           if i not in self.knownWords and
-                           self.romanNumSfxPtrn.match(i) is not None)
+            badWords = {i for i in badWords
+                        if i not in self.knownWords
+                        and self.romanNumSfxPtrn.match(i) is not None}
 
         if len(badWords) == 0 or self.Page(title).is_filepage():
             return

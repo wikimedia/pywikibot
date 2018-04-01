@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -491,8 +491,8 @@ class TestIndexPageMappings(IndexPageTestCase):
             'num_pages': 804,
             'page': 'Page:Popular Science Monthly Volume 1.djvu/{0}',
             'get_label': [11, 11, '1'],
-            'get_number': [[1, set([11])],
-                           ['Cvr', set([1, 9, 10, 804])],
+            'get_number': [[1, {11}],
+                           ['Cvr', {1, 9, 10, 804}],
                            ],
             # 'get_page' is filled in setUpClass.
         },
@@ -503,7 +503,7 @@ class TestIndexPageMappings(IndexPageTestCase):
             'num_pages': 272,
             'page': 'Seite:Schiller_Musenalmanach_1799_{0:3d}.jpg',
             'get_label': [120, 120, '120'],  # page no, title no, label
-            'get_number': [[120, set([120])],
+            'get_number': [[120, {120}],
                            ],
             # 'get_page' is filled in setUpClass.
         },
@@ -514,7 +514,7 @@ class TestIndexPageMappings(IndexPageTestCase):
             'num_pages': 107,
             'page': 'Page:Segard - Hymnes profanes, 1894.djvu/{0}',
             'get_label': [11, 11, '8'],
-            'get_number': [[8, set([11])],
+            'get_number': [[8, {11}],
                            ['-', set(range(1, 4)) | set(range(101, 108))],
                            ],
             # 'get_page' is filled in setUpClass.
@@ -534,8 +534,8 @@ class TestIndexPageMappings(IndexPageTestCase):
             # 'get_page' has same structure as 'get_number'.
             site_def['get_page'] = []
             for label, page_numbers in site_def['get_number']:
-                page_set = set(ProofreadPage(site, base_title.format(i))
-                               for i in page_numbers)
+                page_set = {ProofreadPage(site, base_title.format(i))
+                            for i in page_numbers}
                 site_def['get_page'].append([label, page_set])
 
     def test_check_if_cached(self, key):

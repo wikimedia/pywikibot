@@ -45,8 +45,8 @@ Please fix these if you are capable and motivated:
 #
 # (C) Wikipedian, 2006-2007
 # (C) Siebrand Mazeland, 2007-2008
-# (C) xqt, 2010-2017
-# (C) Pywikibot team, 2006-2017
+# (C) xqt, 2010-2018
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -206,8 +206,8 @@ class NowCommonsDeleteBot(Bot):
     def nc_templates(self):
         """A set of now commons template Page instances."""
         if not hasattr(self, '_nc_templates'):
-            self._nc_templates = set(pywikibot.Page(self.site, title, ns=10)
-                                     for title in self.ncTemplates())
+            self._nc_templates = {pywikibot.Page(self.site, title, ns=10)
+                                  for title in self.ncTemplates()}
         return self._nc_templates
 
     @property

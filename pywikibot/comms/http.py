@@ -364,7 +364,7 @@ def _http_process(session, http_request):
     body = http_request.body
     headers = http_request.headers
     if PY2 and headers:
-        headers = dict((key, str(value)) for key, value in headers.items())
+        headers = {key: str(value) for key, value in headers.items()}
     auth = get_authentication(uri)
     if auth is not None and len(auth) == 4:
         if isinstance(requests_oauthlib, ImportError):

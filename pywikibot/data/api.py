@@ -264,8 +264,9 @@ class ParamInfo(Container):
 
         # v1.18 and earlier paraminfo doesnt include modules; must use 'query'
         # Assume that by v1.26, it will be desirable to prefetch 'query'
-        if _mw_ver > MediaWikiVersion('1.26') or _mw_ver < MediaWikiVersion('1.19'):
-            self.preloaded_modules |= set(['query'])
+        if _mw_ver > MediaWikiVersion('1.26') \
+           or _mw_ver < MediaWikiVersion('1.19'):
+            self.preloaded_modules |= {'query'}
 
         self._fetch(self.preloaded_modules)
 
@@ -294,7 +295,7 @@ class ParamInfo(Container):
 
         if 'query' not in self._modules:
             assert 'query' not in self._paraminfo
-            self._fetch(set(['query']))
+            self._fetch({'query'})
         assert 'query' in self._modules
 
     def _emulate_pageset(self):
@@ -621,7 +622,7 @@ class ParamInfo(Container):
                 if 'query' not in self._paraminfo:
                     pywikibot.debug('paraminfo batch: added query', _logger)
                     module_batch.append('query')
-                    self.preloaded_modules |= set(['query'])
+                    self.preloaded_modules |= {'query'}
 
             params = {
                 'action': 'paraminfo',
@@ -709,9 +710,9 @@ class ParamInfo(Container):
                 # Boolean submodule info added to MW API in afa153ae
                 if self.site.version() < MediaWikiVersion('1.24wmf18'):
                     if module == 'main':
-                        params = set(['action'])
+                        params = {'action'}
                     elif module == 'query':
-                        params = set(['prop', 'list', 'meta'])
+                        params = {'prop', 'list', 'meta'}
                     else:
                         params = set()
                     for param in parameters:
@@ -745,11 +746,11 @@ class ParamInfo(Container):
 
         assert(self._action_modules)
 
-        return set('query+' + mod if '+' not in mod and
-                   mod in self.query_modules and
-                   mod not in self._action_modules
-                   else mod
-                   for mod in modules)
+        return {'query+' + mod
+                if '+' not in mod and mod in self.query_modules
+                and mod not in self._action_modules
+                else mod
+                for mod in modules}
 
     def normalize_modules(self, modules):
         """
@@ -833,7 +834,7 @@ class ParamInfo(Container):
         If the key does not include a '+' and is not present in the top level
         of the API, it will fallback to looking for the key 'query+x'.
         """
-        self.fetch(set([key]))
+        self.fetch({key})
         if key in self._paraminfo:
             return self._paraminfo[key]
         elif '+' not in key:
@@ -959,7 +960,7 @@ class ParamInfo(Container):
     @staticmethod
     def _prefix_submodules(modules, prefix):
         """Prefix submodules with path."""
-        return set('{0}+{1}'.format(prefix, mod) for mod in modules)
+        return {'{0}+{1}'.format(prefix, mod) for mod in modules}
 
     @property
     @deprecated('prefix_map')
@@ -981,9 +982,10 @@ class ParamInfo(Container):
         This loads paraminfo for all modules.
         """
         if not self._prefix_map:
-            self._prefix_map = dict((module, prefix) for module, prefix in
-                                    self.attributes('prefix').items()
-                                    if prefix)
+            self._prefix_map = {module: prefix
+                                for module, prefix
+                                in self.attributes('prefix').items()
+                                if prefix}
         return self._prefix_map.copy()
 
     def attributes(self, attribute, modules=None):
@@ -1004,9 +1006,8 @@ class ParamInfo(Container):
             modules = self.module_paths
         self.fetch(modules)
 
-        return dict((mod, self[mod][attribute])
-                    for mod in modules
-                    if attribute in self[mod])
+        return {mod: self[mod][attribute]
+                for mod in modules if attribute in self[mod]}
 
     @deprecated('attributes')
     def module_attribute_map(self, attribute, modules=None):
@@ -1027,9 +1028,8 @@ class ParamInfo(Container):
 
         self.fetch(modules)
 
-        return dict((mod, self[mod][attribute])
-                    for mod in modules
-                    if self[mod][attribute])
+        return {mod: self[mod][attribute]
+                for mod in modules if self[mod][attribute]}
 
     @property
     @deprecated('parameter()')
@@ -1517,21 +1517,21 @@ class Request(MutableMapping):
         else:
             raise ValueError('Request was not a super class of '
                              '{0!r}'.format(cls))
-        args -= set(['self'])
+        args -= {'self'}
         old_kwargs = set(kwargs)
         # all kwargs defined above but not in args indicate 'kwargs' mode
         if old_kwargs - args:
             # Move all kwargs into parameters
-            parameters = dict((name, value) for name, value in kwargs.items()
-                              if name not in args or name == 'parameters')
+            parameters = {name: value for name, value in kwargs.items()
+                          if name not in args or name == 'parameters'}
             if 'parameters' in parameters:
                 cls._warn_both()
             # Copy only arguments and not the parameters
-            kwargs = dict((name, value) for name, value in kwargs.items()
-                          if name in args or name == 'self')
+            kwargs = {name: value for name, value in kwargs.items()
+                      if name in args or name == 'self'}
             kwargs['parameters'] = parameters
             # Make sure that all arguments have remained
-            assert(old_kwargs | set(['parameters']) ==
+            assert(old_kwargs | {'parameters'} ==
                    set(kwargs) | set(kwargs['parameters']))
             assert(('parameters' in old_kwargs) is
                    ('parameters' in kwargs['parameters']))
@@ -1901,7 +1901,7 @@ class Request(MutableMapping):
                 for mod_type_name in ('list', 'prop', 'generator'):
                     modules.update(self._params.get(mod_type_name, []))
             else:
-                modules = set([self.action])
+                modules = {self.action}
             if modules:
                 self.site._paraminfo.fetch(modules)
                 use_get = all('mustbeposted' not in self.site._paraminfo[mod]
@@ -2138,8 +2138,8 @@ class Request(MutableMapping):
             if code == 'badtoken':
                 user_tokens = self.site.tokens._tokens[self.site.user()]
                 # all token values mapped to their type
-                tokens = dict((token, t_type)
-                              for t_type, token in user_tokens.items())
+                tokens = {token: t_type
+                          for t_type, token in user_tokens.items()}
                 # determine which tokens are bad
                 invalid_param = {}
                 for name, param in self._params.items():
@@ -2552,9 +2552,9 @@ class QueryGenerator(_RequestWrapper):
 
         self.site._paraminfo.fetch('query+' + mod for mod in self.modules)
 
-        limited_modules = set(
-            mod for mod in self.modules
-            if self.site._paraminfo.parameter('query+' + mod, 'limit'))
+        limited_modules = {mod for mod in self.modules
+                           if self.site._paraminfo.parameter('query+' + mod,
+                                                             'limit')}
 
         if not limited_modules:
             self.limited_module = None
@@ -2810,9 +2810,9 @@ class QueryGenerator(_RequestWrapper):
                                        self.limit),
                                     _logger)
                 if "normalized" in self.data["query"]:
-                    self.normalized = dict((item['to'], item['from'])
-                                           for item in
-                                           self.data["query"]["normalized"])
+                    self.normalized = {
+                        item['to']: item['from']
+                        for item in self.data['query']['normalized']}
                 else:
                     self.normalized = {}
                 for item in resultdata:

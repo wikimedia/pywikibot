@@ -42,7 +42,7 @@ destination_wiki  destination wiki(s)
 """
 #
 # (C) Kasper Souren, 2012-2013
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,7 +61,7 @@ from pywikibot.tools import deprecated
 @deprecated('BaseSite.namespaces')
 def namespaces(site):
     """Return a dictionary from namespace number to prefix."""
-    return dict((n.id, n.custom_name) for n in site.namespaces)
+    return {n.id: n.custom_name for n in site.namespaces}
 
 
 def multiple_replace(text, word_dict):

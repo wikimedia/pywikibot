@@ -80,10 +80,9 @@ script_list = (['login'] +
                list_scripts(scripts_path, 'login.py') +
                list_scripts(archive_path))
 
-runnable_script_list = (['login'] +
-                        sorted(set(script_list) -
-                               set(['login']) -
-                               set(unrunnable_script_list)))
+runnable_script_list = (
+    ['login'] + sorted(set(script_list)
+                       - {'login'} - set(unrunnable_script_list)))
 
 script_input = {
     'catall': 'q\n',  # q for quit

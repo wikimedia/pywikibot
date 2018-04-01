@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,8 +56,8 @@ class TestFamily(TestCase):
             if isinstance(f, SingleSiteFamily):
                 self.assertIsNotNone(f.code)
                 self.assertIsNotNone(f.domain)
-                self.assertEqual(set(f.langs), set([f.code]))
-                self.assertEqual(set(f.codes), set([f.code]))
+                self.assertEqual(set(f.langs), {f.code})
+                self.assertEqual(set(f.codes), {f.code})
 
     def test_family_load_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""

@@ -7,7 +7,7 @@
 # (C) Andre Engels, 2004-2005
 # (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
 #       (years/decades/centuries/millenniums str <=> int conversions)
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -261,28 +261,28 @@ def monthName(lang, ind):
 
 # Helper for KN: digits representation
 _knDigits = u'೦೧೨೩೪೫೬೭೮೯'
-_knDigitsToLocal = dict((ord(unicode(i)), _knDigits[i]) for i in range(10))
-_knLocalToDigits = dict((ord(_knDigits[i]), unicode(i)) for i in range(10))
+_knDigitsToLocal = {ord(unicode(i)): _knDigits[i] for i in range(10)}
+_knLocalToDigits = {ord(_knDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for Urdu/Persian languages
 _faDigits = u'۰۱۲۳۴۵۶۷۸۹'
-_faDigitsToLocal = dict((ord(unicode(i)), _faDigits[i]) for i in range(10))
-_faLocalToDigits = dict((ord(_faDigits[i]), unicode(i)) for i in range(10))
+_faDigitsToLocal = {ord(unicode(i)): _faDigits[i] for i in range(10)}
+_faLocalToDigits = {ord(_faDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for HI:, MR:
 _hiDigits = u'०१२३४५६७८९'
-_hiDigitsToLocal = dict((ord(unicode(i)), _hiDigits[i]) for i in range(10))
-_hiLocalToDigits = dict((ord(_hiDigits[i]), unicode(i)) for i in range(10))
+_hiDigitsToLocal = {ord(unicode(i)): _hiDigits[i] for i in range(10)}
+_hiLocalToDigits = {ord(_hiDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for BN:
 _bnDigits = u'০১২৩৪৫৬৭৮৯'
-_bnDigitsToLocal = dict((ord(unicode(i)), _bnDigits[i]) for i in range(10))
-_bnLocalToDigits = dict((ord(_bnDigits[i]), unicode(i)) for i in range(10))
+_bnDigitsToLocal = {ord(unicode(i)): _bnDigits[i] for i in range(10)}
+_bnLocalToDigits = {ord(_bnDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for GU:
 _guDigits = u'૦૧૨૩૪૫૬૭૮૯'
-_guDigitsToLocal = dict((ord(unicode(i)), _guDigits[i]) for i in range(10))
-_guLocalToDigits = dict((ord(_guDigits[i]), unicode(i)) for i in range(10))
+_guDigitsToLocal = {ord(unicode(i)): _guDigits[i] for i in range(10)}
+_guLocalToDigits = {ord(_guDigits[i]): unicode(i) for i in range(10)}
 
 
 def intToLocalDigitsStr(value, digitsToLocalDict):

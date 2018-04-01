@@ -970,7 +970,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             try:
                 default = set(self.site.family.disambig('_default'))
             except KeyError:
-                default = set([u'Disambig'])
+                default = {'Disambig'}
             try:
                 distl = self.site.family.disambig(self.site.code,
                                                   fallback=False)
@@ -980,25 +980,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 disambigpages = Page(self.site,
                                      "MediaWiki:Disambiguationspage")
                 if disambigpages.exists():
-                    disambigs = set(link.title(withNamespace=False)
-                                    for link in disambigpages.linkedPages()
-                                    if link.namespace() == 10)
+                    disambigs = {link.title(withNamespace=False)
+                                 for link in disambigpages.linkedPages()
+                                 if link.namespace() == 10}
                 elif self.site.has_mediawiki_message('disambiguationspage'):
                     message = self.site.mediawiki_message(
                         'disambiguationspage').split(':', 1)[1]
                     # add the default template(s) for default mw message
                     # only
-                    disambigs = set([first_upper(message)]) | default
+                    disambigs = {first_upper(message)} | default
                 else:
                     disambigs = default
                 self.site._disambigtemplates = disambigs
             else:
                 # Normalize template capitalization
-                self.site._disambigtemplates = set(
-                    first_upper(t) for t in distl
-                )
-        templates = set(tl.title(withNamespace=False)
-                        for tl in self.templates())
+                self.site._disambigtemplates = {first_upper(t) for t in distl}
+        templates = {tl.title(withNamespace=False) for tl in self.templates()}
         disambigs = set()
         # always use cached disambig templates
         disambigs.update(self.site._disambigtemplates)
@@ -1118,7 +1115,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         p_types = set(self.site.protection_types())
         if not self.exists():
-            return set(['create']) if 'create' in p_types else set()
+            return {'create'} if 'create' in p_types else set()
         else:
             p_types.remove('create')  # no existing page allows that
             if not self.is_filepage():  # only file pages allow upload
@@ -2059,8 +2056,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if unprotect:
             warn(u'"unprotect" argument of protect() is deprecated',
                  DeprecationWarning, 2)
-            protections = dict(
-                (p_type, "") for p_type in self.applicable_protections())
+            protections = {p_type: ''
+                           for p_type in self.applicable_protections()}
         answer = 'y'
         if called_using_deprecated_arg and prompt is None:
             prompt = True
@@ -2219,7 +2216,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def getRestrictions(self):
         """DEPRECATED. Use self.protection() instead."""
         restrictions = self.protection()
-        return dict((k, list(restrictions[k])) for k in restrictions)
+        return {k: list(restrictions[k]) for k in restrictions}
 
     def __getattr__(self, name):
         """Generic disabled method warnings."""
@@ -5944,10 +5941,10 @@ def html2unicode(text, ignore=None):
         158: 382,   # ž
         159: 376    # Ÿ
     }
-    # ensuring that illegal &#129; &#141; and &#157, which have no known values,
-    # don't get converted to chr(129), chr(141) or chr(157)
-    ignore = (set(map(lambda x: convertIllegalHtmlEntities.get(x, x), ignore)) |
-              set([129, 141, 157]))
+    # ensuring that illegal &#129; &#141; and &#157, which have no known
+    # values, don't get converted to chr(129), chr(141) or chr(157)
+    ignore = (set(map(lambda x: convertIllegalHtmlEntities.get(x, x),
+                      ignore)) | {129, 141, 157})
 
     def handle_entity(match):
         if match.group('decimal'):

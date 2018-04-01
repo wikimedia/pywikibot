@@ -1545,8 +1545,8 @@ def remove_last_args(arg_names):
                 deprecated.update(arg_names[:len(__args) - len(args)])
             # remove at most |arg_names| entries from the back
             new_args = tuple(__args[:max(len(args), len(__args) - len(arg_names))])
-            new_kwargs = dict((arg, val) for arg, val in __kw.items()
-                              if arg not in arg_names)
+            new_kwargs = {arg: val for arg, val in __kw.items()
+                          if arg not in arg_names}
 
             if deprecated:
                 # sort them according to arg_names
