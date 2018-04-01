@@ -80,10 +80,10 @@ class TestLogentriesBase(TestCase):
         except KeyError as e:
             self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
         self.assertIsInstance(logentry.logid(), int)
-        self.assertIsInstance(logentry.ns(), int)
-        self.assertIsInstance(logentry.pageid(), int)
         self.assertIsInstance(logentry.timestamp(), pywikibot.Timestamp)
         if 'title' in logentry.data:  # title may be missing
+            self.assertIsInstance(logentry.ns(), int)
+            self.assertIsInstance(logentry.pageid(), int)
             if logtype == 'block' and logentry.isAutoblockRemoval:
                 self.assertIsInstance(logentry.page(), int)
             elif isinstance(logentry, UserTargetLogEntry):
