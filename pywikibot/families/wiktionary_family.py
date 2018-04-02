@@ -32,15 +32,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def __init__(self):
         """Initializer."""
         self.languages_by_size = [
-            'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'sv', 'lt',
-            'pl', 'ku', 'el', 'it', 'fi', 'ta', 'hu', 'tr', 'ca', 'ko', 'io',
+            'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'ku', 'sv',
+            'lt', 'pl', 'el', 'it', 'fi', 'ta', 'hu', 'tr', 'ca', 'ko', 'io',
             'kn', 'pt', 'hy', 'vi', 'sr', 'ja', 'chr', 'hi', 'th', 'ro', 'no',
             'id', 'ml', 'et', 'my', 'uz', 'li', 'or', 'te', 'cs', 'fa', 'eo',
             'ar', 'jv', 'az', 'eu', 'gl', 'oc', 'da', 'br', 'lo', 'uk', 'hr',
             'fj', 'tg', 'bg', 'simple', 'ps', 'sk', 'cy', 'vo', 'wa', 'is',
-            'zh-min-nan', 'la', 'af', 'scn', 'ast', 'he', 'ky', 'tl', 'sw',
-            'fy', 'nn', 'lv', 'pa', 'co', 'pnb', 'mn', 'ka', 'nds', 'sl', 'sq',
-            'lb', 'bs', 'nah', 'sa', 'kk', 'bn', 'tk', 'km', 'sm', 'mk', 'hsb',
+            'la', 'zh-min-nan', 'af', 'scn', 'ast', 'he', 'ky', 'tl', 'sw',
+            'fy', 'nn', 'lv', 'bn', 'pa', 'co', 'pnb', 'mn', 'ka', 'nds', 'sl',
+            'sq', 'lb', 'bs', 'nah', 'sa', 'kk', 'tk', 'km', 'sm', 'mk', 'hsb',
             'ur', 'be', 'ms', 'ga', 'an', 'wo', 'vec', 'ang', 'tt', 'sd', 'mt',
             'gn', 'mr', 'ie', 'so', 'csb', 'ug', 'gd', 'st', 'roa-rup', 'si',
             'hif', 'ia', 'mi', 'ay', 'kl', 'fo', 'jbo', 'ln', 'zu', 'na', 'gu',
