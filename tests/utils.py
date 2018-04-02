@@ -638,6 +638,10 @@ def execute(command, data_in=None, timeout=0, error=None):
     @param command: executable to run and arguments to use
     @type command: list of unicode
     """
+    if PYTHON_VERSION[:2] == (2, 7) and PYTHON_VERSION[2] in (2, 3):
+        command.insert(1, '-W ignore:{0}:DeprecationWarning'.format(
+            'Pywikibot will soon drop support for Python 2.7.2 and 2.7.3, '
+            'please update your Python.'))
     # Any environment variables added on Windows must be of type
     # str() on Python 2.
     env = os.environ.copy()
