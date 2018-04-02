@@ -73,8 +73,8 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004
 # (C) Purodha Blissenbach, 2009
-# (C) xqt, 2009-2017
-# (C) Pywikibot team, 2004-2017
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -267,8 +267,8 @@ class RedirectGenerator(OptionHandler):
                 raise RuntimeError("No results given.")
             redirects = {}
             pages = {}
-            redirects = dict((x['from'], x['to'])
-                             for x in data['query']['redirects'])
+            redirects = {x['from']: x['to']
+                         for x in data['query']['redirects']}
 
             for pagetitle in data['query']['pages'].values():
                 if 'missing' in pagetitle and 'pageid' not in pagetitle:

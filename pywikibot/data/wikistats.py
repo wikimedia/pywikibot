@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -45,12 +45,12 @@ class WikiStats(object):
 
     MISC_SITES_TABLE = 'mediawikis'
 
-    WMF_MULTILANG_TABLES = set([
+    WMF_MULTILANG_TABLES = {
         'wikipedias', 'wiktionaries', 'wikisources', 'wikinews',
         'wikibooks', 'wikiquotes', 'wikivoyage', 'wikiversity',
-    ])
+    }
 
-    OTHER_MULTILANG_TABLES = set([
+    OTHER_MULTILANG_TABLES = {
         'uncyclomedia',
         'rodovid',
         'wikifur',
@@ -61,9 +61,9 @@ class WikiStats(object):
         'lxde',
         'pardus',
         'gentoo',
-    ])
+    }
 
-    OTHER_TABLES = set([
+    OTHER_TABLES = {
         # Farms
         'wikia',
         'wikkii',
@@ -79,9 +79,9 @@ class WikiStats(object):
         'w3cwikis',
         'neoseeker',
         'sourceforge',
-    ])
+    }
 
-    ALL_TABLES = (set([MISC_SITES_TABLE]) | WMF_MULTILANG_TABLES |
+    ALL_TABLES = ({MISC_SITES_TABLE} | WMF_MULTILANG_TABLES |
                   OTHER_MULTILANG_TABLES | OTHER_TABLES)
 
     ALL_KEYS = set(FAMILY_MAPPING.keys()) | ALL_TABLES
@@ -222,8 +222,7 @@ class WikiStats(object):
         @type format: 'xml' or 'csv', or None to autoselect.
         @rtype: dict
         """
-        return dict((data['prefix'], data)
-                    for data in self.get(table, format))
+        return {data['prefix']: data for data in self.get(table, format)}
 
     def sorted(self, table, key):
         """

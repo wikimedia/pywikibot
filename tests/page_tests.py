@@ -471,7 +471,7 @@ class TestPageObject(DefaultSiteTestCase):
         if not site.has_extension('Disambiguator'):
             raise unittest.SkipTest('Disambiguator extension not loaded on test site')
         pg = pywikibot.Page(site, 'Random')
-        pg._pageprops = set(['disambiguation', ''])
+        pg._pageprops = {'disambiguation', ''}
         self.assertTrue(pg.isDisambig())
         pg._pageprops = set()
         self.assertFalse(pg.isDisambig())
@@ -878,7 +878,7 @@ class TestPageHistory(DefaultSiteTestCase):
         self.assertIsInstance(top_two[0], tuple)
         self.assertIsInstance(top_two[0][0], basestring)
         self.assertIsInstance(top_two[0][1], int)
-        top_two_usernames = set([top_two[0][0], top_two[1][0]])
+        top_two_usernames = {top_two[0][0], top_two[1][0]}
         self.assertEqual(len(top_two_usernames), 2)
         top_two_counts = ([top_two[0][1], top_two[1][1]])
         top_two_edit_count = mp.revision_count(top_two_usernames)
@@ -1022,7 +1022,7 @@ class TestApplicablePageProtections(TestCase):
         pp2 = p2.applicable_protections()
         pp3 = p3.applicable_protections()
 
-        self.assertEqual(pp1, set(['create']))
+        self.assertEqual(pp1, {'create'})
         self.assertIn('edit', pp2)
         self.assertNotIn('create', pp2)
         self.assertNotIn('upload', pp2)

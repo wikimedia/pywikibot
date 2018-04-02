@@ -419,9 +419,8 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
     @classmethod
     def builtin_namespaces(cls, use_image_name=False, case='first-letter'):
         """Return a dict of the builtin namespaces."""
-        return dict((i, cls(i, use_image_name=use_image_name,
-                            case=cls.default_case(i, case)))
-                    for i in range(-2, 16))
+        return {i: cls(i, use_image_name=use_image_name,
+                       case=cls.default_case(i, case)) for i in range(-2, 16)}
 
     @staticmethod
     def normalize_name(name):
@@ -692,8 +691,8 @@ class _InterwikiMap(object):
         # _iw_sites is a local cache to return a APISite instance depending
         # on the interwiki prefix of that site
         if self._map is None:
-            self._map = dict((iw['prefix'], _IWEntry('local' in iw, iw['url']))
-                             for iw in self._site.siteinfo['interwikimap'])
+            self._map = {iw['prefix']: _IWEntry('local' in iw, iw['url'])
+                         for iw in self._site.siteinfo['interwikimap']}
         return self._map
 
     def __getitem__(self, prefix):
@@ -710,8 +709,8 @@ class _InterwikiMap(object):
 
     def get_by_url(self, url):
         """Return a set of prefixes applying to the URL."""
-        return set(prefix for prefix, iw_entry in self._iw_sites
-                   if iw_entry.url == url)
+        return {prefix for prefix, iw_entry in self._iw_sites
+                if iw_entry.url == url}
 
 
 class BaseSite(ComparableMixin):
@@ -2252,9 +2251,9 @@ class APISite(BaseSite):
             self._useroptions['_name'] = (
                 None if 'anon' in uidata['query']['userinfo'] else
                 uidata['query']['userinfo']['name'])
-        return set(ns for ns in self.namespaces.values() if ns.id >= 0 and
-                   self._useroptions['searchNs{0}'.format(ns.id)]
-                   in ['1', True])
+        return {ns for ns in self.namespaces.values() if ns.id >= 0
+                and self._useroptions['searchNs{0}'.format(ns.id)]
+                in ['1', True]}
 
     @property
     def article_path(self):
@@ -2385,7 +2384,7 @@ class APISite(BaseSite):
                         raise KeyError("Site %s has no message '%s'"
                                        % (self, key))
 
-        return dict((_key, self._msgcache[_key]) for _key in keys)
+        return {_key: self._msgcache[_key] for _key in keys}
 
     @deprecated_args(forceReload=None)
     def mediawiki_message(self, key):
@@ -2565,8 +2564,8 @@ class APISite(BaseSite):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, "_magicwords"):
             magicwords = self.siteinfo.get("magicwords", cache=False)
-            self._magicwords = dict((item["name"], item["aliases"])
-                                    for item in magicwords)
+            self._magicwords = {item['name']: item['aliases']
+                                for item in magicwords}
 
         if word in self._magicwords:
             return self._magicwords[word]
@@ -2596,8 +2595,7 @@ class APISite(BaseSite):
         """
         # NOTE: this is needed, since the API can give false positives!
         try:
-            keywords = set(s.lstrip("#")
-                           for s in self.getmagicwords("redirect"))
+            keywords = {s.lstrip('#') for s in self.getmagicwords('redirect')}
             keywords.add("REDIRECT")  # just in case
             pattern = "(?:" + "|".join(keywords) + ")"
         except KeyError:
@@ -3181,12 +3179,13 @@ class APISite(BaseSite):
                 "getredirtarget: No 'redirects' found for page %s."
                 % title.encode(self.encoding()))
 
-        redirmap = dict((item['from'],
-                         {'title': item['to'],
-                          'section': u'#' + item['tofragment']
-                          if 'tofragment' in item and item['tofragment']
-                          else ''})
-                        for item in result['query']['redirects'])
+        redirmap = {item['from']: {'title': item['to'],
+                                   'section': '#'
+                                   + item['tofragment']
+                                   if 'tofragment' in item
+                                   and item['tofragment']
+                                   else ''}
+                    for item in result['query']['redirects']}
 
         # Normalize title
         for item in result['query'].get('normalized', []):
@@ -3491,7 +3490,7 @@ class APISite(BaseSite):
             query = api.PropertyGenerator(
                 'info',
                 titles='Dummy page',
-                intoken=valid_tokens - set(['patrol']),
+                intoken=valid_tokens - {'patrol'},
                 site=self)
             query.request._warning_handler = warn_handler
 
@@ -3547,9 +3546,9 @@ class APISite(BaseSite):
                 data = data['query']
 
             if 'tokens' in data and data['tokens']:
-                user_tokens = dict((key[:-5], val)
-                                   for key, val in data['tokens'].items()
-                                   if val != '+\\')
+                user_tokens = {key[:-5]: val
+                               for key, val in data['tokens'].items()
+                               if val != '+\\'}
 
         return user_tokens
 
@@ -3873,7 +3872,7 @@ class APISite(BaseSite):
                 "categorymembers: startsort must be less than endsort")
 
         if isinstance(member_type, basestring):
-            member_type = set([member_type])
+            member_type = {member_type}
 
         if (member_type and
                 (sortby == 'timestamp' or
@@ -5029,7 +5028,7 @@ class APISite(BaseSite):
         "cascadeprotected": CascadeLockedPage,
         'titleblacklist-forbidden': TitleblacklistError,
     }
-    _ep_text_overrides = set(['appendtext', 'prependtext', 'undo'])
+    _ep_text_overrides = {'appendtext', 'prependtext', 'undo'}
 
     @must_be(group='user')
     def editpage(self, page, summary=None, minor=True, notminor=False,
@@ -5120,7 +5119,7 @@ class APISite(BaseSite):
         if basetimestamp and 'basetimestamp' not in kwargs:
             params['basetimestamp'] = basetimestamp
 
-        watch_items = set(["watch", "unwatch", "preferences", "nochange"])
+        watch_items = {'watch', 'unwatch', 'preferences', 'nochange'}
         if watch in watch_items:
             if MediaWikiVersion(self.version()) < MediaWikiVersion("1.16"):
                 if watch in ['preferences', 'nochange']:
@@ -5739,11 +5738,11 @@ class APISite(BaseSite):
             raise Error('No rcid, revid or revision provided.')
 
         if isinstance(rcid, int) or isinstance(rcid, basestring):
-            rcid = set([rcid])
+            rcid = {rcid}
         if isinstance(revid, int) or isinstance(revid, basestring):
-            revid = set([revid])
+            revid = {revid}
         if isinstance(revision, pywikibot.page.Revision):
-            revision = set([revision])
+            revision = {revision}
 
         # Handle param=None.
         rcid = rcid or set()
@@ -5757,7 +5756,7 @@ class APISite(BaseSite):
                 u'Support of "revid" parameter\n'
                 u'is not implemented in MediaWiki version < "1.22"')
         else:
-            combined_revid = set(revid) | set(r.revid for r in revision)
+            combined_revid = set(revid) | {r.revid for r in revision}
 
         gen = itertools.chain(
             zip_longest(rcid, [], fillvalue='rcid'),
@@ -7507,9 +7506,9 @@ class DataSite(APISite):
     # Only separated from get_item to avoid the deprecation message via
     # _get_propertyitem
     def _get_item(self, source, **params):
-        assert set(params) <= set(['props']), \
+        assert set(params) <= {'props'}, \
             'Only "props" is a valid kwarg, not {0}'.format(set(params) -
-                                                            set(['props']))
+                                                            {'props'})
         if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)
@@ -7902,7 +7901,7 @@ class DataSite(APISite):
         for claim in claims:
             baserevid = self._get_baserevid(claim, baserevid)
 
-        items = set(claim.on_item for claim in claims if claim.on_item)
+        items = {claim.on_item for claim in claims if claim.on_item}
         assert len(items) == 1
 
         params = {

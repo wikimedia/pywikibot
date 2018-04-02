@@ -1480,7 +1480,7 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
     def setUpClass(cls):
         """Define set of valid targets for the example text."""
         super(TestGetLanguageLinks, cls).setUpClass()
-        cls.sites_set = set([cls.enwp, cls.dewp])
+        cls.sites_set = {cls.enwp, cls.dewp}
 
     def test_getLanguageLinks(self, key):
         """Test if the function returns the correct titles and sites."""
@@ -1489,9 +1489,9 @@ class TestGetLanguageLinks(SiteAttributeTestCase):
         m.assert_called_once_with(
             '[getLanguageLinks] Text contains invalid interwiki link '
             '[[fr:{{PAGENAME}}]].')
-        self.assertEqual(set(page.title() for page in lang_links.values()),
-                         set(['Site']))
-        self.assertEqual(set(lang_links), self.sites_set - set([self.site]))
+        self.assertEqual({page.title() for page in lang_links.values()},
+                         {'Site'})
+        self.assertEqual(set(lang_links), self.sites_set - {self.site})
 
 
 class TestUnescape(TestCase):

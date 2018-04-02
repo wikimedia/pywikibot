@@ -234,7 +234,7 @@ class _SuperHunk(Sequence):
 
     @property
     def reviewed(self):
-        assert len(set(hunk.reviewed for hunk in self._hunks)) == 1, \
+        assert len({hunk.reviewed for hunk in self._hunks}) == 1, \
             'All hunks should have the same review status'
         return self._hunks[0].reviewed
 

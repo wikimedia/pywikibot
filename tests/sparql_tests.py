@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cases for the SPARQL API."""
 #
-# (C) Pywikibot team, 2016
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -144,7 +144,7 @@ class TestSparql(WikidataTestCase):
                                                       ITEM_Q677525)))
         q = sparql.SparqlQuery()
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat')
-        self.assertSetEqual(res, set(['Q498787', 'Q677525']))
+        self.assertSetEqual(res, {'Q498787', 'Q677525'})
         res = q.get_items('SELECT * WHERE { ?x ?y ?z }', 'cat',
                           result_type=list)
         self.assertEqual(res, ['Q498787', 'Q677525', 'Q677525'])

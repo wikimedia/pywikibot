@@ -1430,8 +1430,7 @@ class Family(object):
         @return: mapping of old codes to new codes (or None)
         @rtype: dict
         """
-        data = dict((code, None)
-                    for code in self.interwiki_removals)
+        data = {code: None for code in self.interwiki_removals}
         data.update(self.interwiki_replacements)
         return FrozenDict(data,
                           'Family.obsolete not updatable; '
@@ -1506,8 +1505,8 @@ class SubdomainFamily(Family):
         if hasattr(self, 'test_codes'):
             codes = codes + self.test_codes
 
-        self.langs = dict(
-            (code, '%s.%s' % (code, self.domain)) for code in codes)
+        self.langs = {code: '{0}.{1}'.format(code, self.domain)
+                      for code in codes}
 
         super(SubdomainFamily, self).__init__()
 

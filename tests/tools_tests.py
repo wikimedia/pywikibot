@@ -457,7 +457,7 @@ class TestFilterUnique(TestCase):
             elif isinstance(deduped, collections.Mapping):
                 self.assertCountEqual(list(deduped.keys()), [1, 3])
             else:
-                self.assertEqual(deduped, set([1, 3]))
+                self.assertEqual(deduped, {1, 3})
 
         self.assertEqual(next(deduper), 2)
         self.assertEqual(next(deduper), 4)
@@ -468,7 +468,7 @@ class TestFilterUnique(TestCase):
             elif isinstance(deduped, collections.Mapping):
                 self.assertCountEqual(list(deduped.keys()), [1, 2, 3, 4])
             else:
-                self.assertEqual(deduped, set([1, 2, 3, 4]))
+                self.assertEqual(deduped, {1, 2, 3, 4})
 
         self.assertRaises(StopIteration, next, deduper)
 
@@ -486,7 +486,7 @@ class TestFilterUnique(TestCase):
             if isinstance(deduped, collections.Mapping):
                 self.assertEqual(deduped.keys(), [key('1'), key('3')])
             else:
-                self.assertEqual(deduped, set([key('1'), key('3')]))
+                self.assertEqual(deduped, {key('1'), key('3')})
 
         self.assertEqual(next(deduper), '2')
         self.assertEqual(next(deduper), '4')
@@ -495,7 +495,7 @@ class TestFilterUnique(TestCase):
             if isinstance(deduped, collections.Mapping):
                 self.assertEqual(deduped.keys(), [key(i) for i in self.strs])
             else:
-                self.assertEqual(deduped, set(key(i) for i in self.strs))
+                self.assertEqual(deduped, {key(i) for i in self.strs})
 
         self.assertRaises(StopIteration, next, deduper)
 
@@ -593,7 +593,7 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertCountEqual(deduped, deduped_out)
-        self.assertEqual(deduped, set([2, 4]))
+        self.assertEqual(deduped, {2, 4})
 
     def test_process_again(self):
         """Test filter_unique with an ignoring container."""
@@ -601,7 +601,7 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertEqual(deduped_out, [1, 3, 2, 1, 1, 4])
-        self.assertEqual(deduped, set([2, 4]))
+        self.assertEqual(deduped, {2, 4})
 
     def test_stop(self):
         """Test filter_unique with an ignoring container."""
@@ -610,7 +610,7 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertCountEqual(deduped, deduped_out)
-        self.assertEqual(deduped, set([1, 3]))
+        self.assertEqual(deduped, {1, 3})
 
         # And it should not resume
         self.assertRaises(StopIteration, next, deduper)
@@ -620,7 +620,7 @@ class TestFilterUnique(TestCase):
         deduper = tools.filter_unique(self.ints, container=deduped)
         deduped_out = list(deduper)
         self.assertCountEqual(deduped, deduped_out)
-        self.assertEqual(deduped, set([1, 2, 3]))
+        self.assertEqual(deduped, {1, 2, 3})
 
         # And it should not resume
         self.assertRaises(StopIteration, next, deduper)

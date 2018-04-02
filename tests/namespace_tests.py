@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -348,7 +348,7 @@ class TestNamespaceCollections(TestCase):
         """Test performing set minus operation on set of Namespace objects."""
         namespaces = Namespace.builtin_namespaces(use_image_name=False)
 
-        excluded_namespaces = set([-1, -2])
+        excluded_namespaces = {-1, -2}
 
         positive_namespaces = set(namespaces) - excluded_namespaces
 

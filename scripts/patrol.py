@@ -124,8 +124,8 @@ class PatrolBot(SingleSiteBot):
         self.patrol_counter = 0  # and how many times an action was taken
         for entry in self.site.siteinfo['specialpagealiases']:
             if entry['realname'] == 'Prefixindex':
-                self._prefixindex_aliases = set(alias.lower()
-                                                for alias in entry['aliases'])
+                self._prefixindex_aliases = {alias.lower()
+                                             for alias in entry['aliases']}
                 break
         else:
             raise RuntimeError('No alias for "prefixindex"')

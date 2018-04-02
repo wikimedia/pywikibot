@@ -157,9 +157,9 @@ class GraphDrawer(object):
         each_site = [page.site for page in page_list
                      if page.exists() and not page.isRedirectPage()]
 
-        return set(x[0] for x in itertools.takewhile(
+        return {x[0] for x in itertools.takewhile(
             lambda x: x[1] > 1,
-            Counter(each_site).most_common()))
+            Counter(each_site).most_common())}
 
     def addNode(self, page):
         """Add a node for page."""

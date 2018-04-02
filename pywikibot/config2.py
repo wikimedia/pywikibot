@@ -983,8 +983,8 @@ def _detect_win32_editor():
 
 # System-level and User-level changes.
 # Store current variables and their types.
-_glv = dict((_key, _val) for _key, _val in globals().items()
-            if _key[0] != '_' and _key not in _imports)
+_glv = {_key: _val for _key, _val in globals().items()
+        if _key[0] != '_' and _key not in _imports}
 _gl = list(_glv.keys())
 _tp = {}
 for _key in _gl:

@@ -51,7 +51,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting.
 # Written by https://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -245,8 +245,8 @@ def main(*args):
                                                    protection_levels)
         # set the default value for all
         # None (not the string 'none') will be ignored by Site.protect()
-        combined_protections = dict(
-            (p_type, default_level) for p_type in protection_types)
+        combined_protections = {p_type: default_level
+                                for p_type in protection_types}
         for p_type, level in protections.items():
             level = check_protection_level(p_type, level, protection_levels,
                                            default_level)

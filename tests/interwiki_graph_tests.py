@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test Interwiki Graph functionality."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -70,7 +70,7 @@ class TestWiktionaryGraph(SiteAttributeTestCase):
 
         drawer = interwiki_graph.GraphDrawer(data)
 
-        self.assertEqual(set([self.pages['en'].site]), drawer._octagon_site_set())
+        self.assertEqual({self.pages['en'].site}, drawer._octagon_site_set())
 
         drawer.createGraph()
 

@@ -505,8 +505,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for bl in backlinks_ns_0:
             self.assertIsInstance(bl, pywikibot.Page)
 
-        self.assertEqual(filtered & redirs, set([]))
-        self.assertEqual(indirect & redirs, set([]))
+        self.assertEqual(filtered & redirs, set())
+        self.assertEqual(indirect & redirs, set())
         self.assertLessEqual(filtered, indirect)
         self.assertLessEqual(filtered, backlinks_ns_0)
         self.assertLessEqual(redirs, backlinks_ns_0)
@@ -600,7 +600,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         gen_params = links_gen.request._params.copy()
         expected_params['gplnamespace'] = [0, 1]
         self.assertEqual(gen_params, expected_params)
-        self.assertPagesInNamespaces(links_gen, set([0, 1]))
+        self.assertPagesInNamespaces(links_gen, {0, 1})
 
         for target in self.site.preloadpages(
                 self.site.pagelinks(self.mainpage, follow_redirects=True, total=5)):
@@ -1377,7 +1377,7 @@ class TestRecentChanges(DefaultSiteTestCase):
             pagelist = [mainpage]
             if imagepage:
                 pagelist += [imagepage]
-            titlelist = set(page.title() for page in pagelist)
+            titlelist = {page.title() for page in pagelist}
             for change in mysite.recentchanges(pagelist=pagelist,
                                                total=5):
                 self.assertIsInstance(change, dict)
