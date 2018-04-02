@@ -988,48 +988,6 @@ class DequeGenerator(IteratorNextMixin, collections.deque):
             raise StopIteration
 
 
-class ContextManagerWrapper(object):
-
-    """
-    Wraps an object in a context manager.
-
-    It is redirecting all access to the wrapped object and executes 'close' when
-    used as a context manager in with-statements. In such statements the value
-    set via 'as' is directly the wrapped object. For example:
-
-    >>> class Wrapper(object):
-    ...     def close(self): pass
-    >>> an_object = Wrapper()
-    >>> wrapped = ContextManagerWrapper(an_object)
-    >>> with wrapped as another_object:
-    ...      assert another_object is an_object
-
-    It does not subclass the object though, so isinstance checks will fail
-    outside a with-statement.
-    """
-
-    def __init__(self, wrapped):
-        """Create a new wrapper."""
-        super(ContextManagerWrapper, self).__init__()
-        super(ContextManagerWrapper, self).__setattr__('_wrapped', wrapped)
-
-    def __enter__(self):
-        """Enter a context manager and use the wrapped object directly."""
-        return self._wrapped
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Call close on the wrapped object when exiting a context manager."""
-        self._wrapped.close()
-
-    def __getattr__(self, name):
-        """Get the attribute from the wrapped object."""
-        return getattr(self._wrapped, name)
-
-    def __setattr__(self, name, value):
-        """Set the attribute in the wrapped object."""
-        setattr(self._wrapped, name, value)
-
-
 def open_archive(filename, mode='rb', use_extension=True):
     """
     Open a file and uncompress it if needed.
@@ -1060,17 +1018,8 @@ def open_archive(filename, mode='rb', use_extension=True):
         It is also raised by bz2 when its content is invalid. gzip does not
         immediately raise that error but only on reading it.
     @return: A file-like object returning the uncompressed data in binary mode.
-        Before Python 2.7 the GzipFile object and before 2.7.1 the BZ2File are
-        wrapped in a ContextManagerWrapper with its advantages/disadvantages.
     @rtype: file-like object
     """
-    def wrap(wrapped, sub_ver):
-        """Wrap in a wrapper when this is below Python version 2.7."""
-        if PYTHON_VERSION < (2, 7, sub_ver):
-            return ContextManagerWrapper(wrapped)
-        else:
-            return wrapped
-
     if mode in ('r', 'a', 'w'):
         mode += 'b'
     elif mode not in ('rb', 'ab', 'wb'):
@@ -1097,9 +1046,9 @@ def open_archive(filename, mode='rb', use_extension=True):
     if extension == 'bz2':
         if isinstance(bz2, ImportError):
             raise bz2
-        return wrap(bz2.BZ2File(filename, mode), 1)
+        return bz2.BZ2File(filename, mode)
     elif extension == 'gz':
-        return wrap(gzip.open(filename, mode), 0)
+        return gzip.open(filename, mode)
     elif extension == '7z':
         if mode != 'rb':
             raise NotImplementedError('It is not possible to write a 7z file.')
@@ -1785,8 +1734,53 @@ def compute_file_hash(filename, sha='sha1', bytes_to_read=None):
             sha.update(read_bytes)
     return sha.hexdigest()
 
+# deprecated parts ############################################################
+
+
+class ContextManagerWrapper(object):
+
+    """
+    DEPRECATED. Wraps an object in a context manager.
+
+    It is redirecting all access to the wrapped object and executes 'close'
+    when used as a context manager in with-statements. In such statements the
+    value set via 'as' is directly the wrapped object. For example:
+
+    >>> class Wrapper(object):
+    ...     def close(self): pass
+    >>> an_object = Wrapper()
+    >>> wrapped = ContextManagerWrapper(an_object)
+    >>> with wrapped as another_object:
+    ...      assert another_object is an_object
+
+    It does not subclass the object though, so isinstance checks will fail
+    outside a with-statement.
+    """
+
+    def __init__(self, wrapped):
+        """Create a new wrapper."""
+        super(ContextManagerWrapper, self).__init__()
+        super(ContextManagerWrapper, self).__setattr__('_wrapped', wrapped)
+
+    def __enter__(self):
+        """Enter a context manager and use the wrapped object directly."""
+        return self._wrapped
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Call close on the wrapped object when exiting a context manager."""
+        self._wrapped.close()
+
+    def __getattr__(self, name):
+        """Get the attribute from the wrapped object."""
+        return getattr(self._wrapped, name)
+
+    def __setattr__(self, name, value):
+        """Set the attribute in the wrapped object."""
+        setattr(self._wrapped, name, value)
+
 
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('Counter', collections.Counter)
 wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict)
 wrapper._add_deprecated_attr('count', itertools.count)
+wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='')

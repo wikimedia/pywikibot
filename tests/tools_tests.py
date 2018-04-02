@@ -16,7 +16,7 @@ import tempfile
 import warnings
 
 from pywikibot import tools
-from pywikibot.tools import classproperty
+from pywikibot.tools import classproperty, suppress_warnings
 
 from tests import join_xml_data_path, mock
 from tests.aspects import (
@@ -49,7 +49,9 @@ class ContextManagerWrapperTestCase(TestCase):
     def test_wrapper(self):
         """Create a test instance and verify the wrapper redirects."""
         obj = self.DummyClass()
-        wrapped = tools.ContextManagerWrapper(obj)
+        with suppress_warnings(
+                'pywikibot.tools.ContextManagerWrapper is deprecated.'):
+            wrapped = tools.ContextManagerWrapper(obj)
         self.assertIs(wrapped.class_var, obj.class_var)
         self.assertIs(wrapped.instance_var, obj.instance_var)
         self.assertIs(wrapped._wrapped, obj)
@@ -63,7 +65,9 @@ class ContextManagerWrapperTestCase(TestCase):
 
     def test_exec_wrapper(self):
         """Check that the wrapper permits exceptions."""
-        wrapper = tools.ContextManagerWrapper(self.DummyClass())
+        with suppress_warnings(
+                'pywikibot.tools.ContextManagerWrapper is deprecated.'):
+            wrapper = tools.ContextManagerWrapper(self.DummyClass())
         self.assertFalse(wrapper.closed)
         with self.assertRaisesRegex(ZeroDivisionError,
                                     '(integer division or modulo by zero|division by zero)'):

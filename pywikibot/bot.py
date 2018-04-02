@@ -96,7 +96,7 @@ from pywikibot.logging import (
 )
 from pywikibot.logging import critical
 from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, PY2, PYTHON_VERSION,
+    deprecated, deprecate_arg, deprecated_args, PY2,
 )
 from pywikibot.tools._logging import (
     LoggingFormatter as _LoggingFormatter,
@@ -1380,10 +1380,7 @@ class BaseBot(OptionHandler):
                          % (self._treat_counter, self._save_counter))
         if hasattr(self, '_start_ts'):
             delta = (pywikibot.Timestamp.now() - self._start_ts)
-            if PYTHON_VERSION >= (2, 7):
-                seconds = int(delta.total_seconds())
-            else:
-                seconds = delta.seconds + delta.days * 86400
+            seconds = int(delta.total_seconds())
             if delta.days:
                 pywikibot.output("Execution time: %d days, %d seconds"
                                  % (delta.days, delta.seconds))
