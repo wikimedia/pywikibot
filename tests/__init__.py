@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -19,9 +19,9 @@ import warnings
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
 #   however if unavailable this will fail on use; see pywikibot/tools.py
-# - unittest2; see below
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 import requests
+import unittest
 
 from pywikibot import config
 import pywikibot.data.api
@@ -30,11 +30,6 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot import i18n
 from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION == (2, 7, 2):
-    # Use unittest2 for python 2.7.2 (T106512)
-    import unittest2 as unittest
-else:
-    import unittest
 try:
     import unittest.mock as mock
     from unittest.mock import MagicMock, Mock, patch

@@ -30,7 +30,7 @@ are not installed by default on some Linux distributions:
   * python-tkinter (optional, used by some experimental GUI stuff)
 
 
-You need to have at least python version `2.7.2 <http://www.python.org/download/>`_
+You need to have at least python version `2.7.4 <http://www.python.org/download/>`_
 or newer installed on your computer to be able to run any of the code in this
 package, but not 3.0-3.3. It works fine with 3.4+ versions of python installed.
 Support for older versions of python is not planned. Some scripts could run with

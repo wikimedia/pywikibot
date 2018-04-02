@@ -3,7 +3,7 @@ Release history
 
 Current release
 ---------------
-
+* Dropped support for py2.7.2 and py2.7.3 (T191192)
 * Bugfixes and improvements
 * Localisation updates
 

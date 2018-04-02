@@ -9,7 +9,7 @@ Run scripts using:
 and it will use the package directory to store all user files, will fix up
 search paths so the package does not need to be installed, etc.
 """
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -29,14 +29,14 @@ versions_required_message = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 2.7.2+ or 3.4+.
+This version of Pywikibot only supports Python 2.7.4+ or 3.4+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
     # Any change to this must be copied to setup.py
-    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 2)
+    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 4)
 
 
 if not python_is_supported():

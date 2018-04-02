@@ -24,8 +24,6 @@ requests>=2.20.0
 # requests security extra
 requests[security] ; python_full_version > '2.7.6' and python_full_version < '2.7.9'
 
-future>=0.15.0 ; python_full_version < '2.7.3'
-
 ipaddr>=2.1.10 ; python_version < '3'
 
 # OAuth support

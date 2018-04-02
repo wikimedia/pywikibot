@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -110,44 +110,32 @@ NESTED_TEMPLATE_REGEX = re.compile(r"""
 # [[ or ]].
 # The namespace names must be substituted into this regex.
 # e.g. FILE_LINK_REGEX % 'File' or FILE_LINK_REGEX % '|'.join(site.namespaces)
-if sys.version_info[:3] >= (2, 7, 4):
-    FILE_LINK_REGEX = r"""
-        \[\[\s*
-        (?:%s)  # namespace aliases
-        \s*:
-        (?=(?P<filename>
-            [^]|]*
-        ))(?P=filename)
+FILE_LINK_REGEX = r"""
+    \[\[\s*
+    (?:%s)  # namespace aliases
+    \s*:
+    (?=(?P<filename>
+        [^]|]*
+    ))(?P=filename)
+    (
+        \|
         (
-            \|
             (
-                (
-                    (?=(?P<inner_link>
-                        \[\[.*?\]\]
-                    ))(?P=inner_link)
-                )?
-                (?=(?P<other_chars>
-                    [^\[\]]*
-                ))(?P=other_chars)
-            |
-                (?=(?P<not_wikilink>
-                    \[[^]]*\]
-                ))(?P=not_wikilink)
-            )*?
-        )??
-        \]\]
-    """
-else:
-    # Python 2.7.2 and 2.7.3 re bug (T191161)
-    FILE_LINK_REGEX = r"""
-    \[\[\s*(?:%s)\s*:[^|]*?\s*
-      (\|
-        ( ( \[\[ .*? \]\] )? [^[]*?
-         | \[ [^]]*? \]
-        )*
-      )?
+                (?=(?P<inner_link>
+                    \[\[.*?\]\]
+                ))(?P=inner_link)
+            )?
+            (?=(?P<other_chars>
+                [^\[\]]*
+            ))(?P=other_chars)
+        |
+            (?=(?P<not_wikilink>
+                \[[^]]*\]
+            ))(?P=not_wikilink)
+        )*?
+    )??
     \]\]
-    """
+"""
 
 NON_LATIN_DIGITS = {
     'ckb': '٠١٢٣٤٥٦٧٨٩',
