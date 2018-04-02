@@ -107,9 +107,9 @@ FILE_LINK_REGEX = r"""
     \[\[\s*
     (?:%s)  # namespace aliases
     \s*:
-    (?=(?P<filename>
-        [^]|]*
-    ))(?P=filename)
+    ((?=(?P<filename>
+        [^]|]+  # * quantifier may crash on Python 2.7.2 (T191161)
+    ))(?P=filename))?
     (
         \|
         (
@@ -118,9 +118,9 @@ FILE_LINK_REGEX = r"""
                     \[\[.*?\]\]
                 ))(?P=inner_link)
             )?
-            (?=(?P<other_chars>
-                [^\[\]]*
-            ))(?P=other_chars)
+            ((?=(?P<other_chars>
+                [^\[\]]+  # * quantifier may crash on Python 2.7.2 (T191161)
+            ))(?P=other_chars))?
         |
             (?=(?P<not_wikilink>
                 \[[^]]*\]
