@@ -99,7 +99,7 @@ if PYTHON_VERSION == (2, 7, 2):
         import unittest2
         sys.modules['unittest'] = unittest2
 
-if sys.version_info[0] == 2:
+if PY2:
     # tools.ip does not have a hard dependency on an IP address module,
     # as it falls back to using regexes if one is not available.
     # The functional backport of py3 ipaddress is acceptable:
@@ -110,10 +110,10 @@ if sys.version_info[0] == 2:
     # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
 
-    if sys.version_info == (2, 7, 2):
+    if PYTHON_VERSION == (2, 7, 2):
         dependencies.append('future>=0.15.0')  # Bug fixes for HTMLParser
 
-    if sys.version_info < (2, 7, 9):
+    if PYTHON_VERSION < (2, 7, 9):
         # Python versions before 2.7.9 will cause urllib3 to trigger
         # InsecurePlatformWarning warnings for all HTTPS requests. By
         # installing with security extras, requests will automatically set
@@ -155,11 +155,11 @@ if 'PYSETUP_TEST_EXTRAS' in os.environ:
 
     if 'requests[security]' in test_deps:
         # Bug T105767 on Python 2.7 release 9+
-        if sys.version_info[:2] == (2, 7) and sys.version_info[2] >= 9:
+        if PY2 and PYTHON_VERSION[2] >= 9:
             test_deps.remove('requests[security]')
 
 # These extra dependencies are needed other unittest fails to load tests.
-if sys.version_info[0] == 2:
+if PY2:
     test_deps += extra_deps['csv'] + ['mock']
 else:
     test_deps += ['six']
