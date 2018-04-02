@@ -77,7 +77,6 @@ _logger = "bot"
 
 import pywikibot
 
-from pywikibot import backports
 from pywikibot import config
 from pywikibot import daemonize
 from pywikibot import i18n
@@ -250,10 +249,7 @@ def init_handlers(strm=None):
 
     # If there are command line warnings options, do not override them
     if not sys.warnoptions:
-        if hasattr(logging, 'captureWarnings'):
-            logging.captureWarnings(True)  # introduced in Python >= 2.7
-        else:
-            backports.captureWarnings(True)
+        logging.captureWarnings(True)
 
         if config.debug_log or 'deprecation' in config.log:
             warnings.filterwarnings("always")

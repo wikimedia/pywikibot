@@ -12,6 +12,7 @@ import math
 import sys
 
 from collections import Sequence
+from difflib import _format_range_unified as format_range_unified
 if sys.version_info[0] > 2:
     from itertools import zip_longest
 else:
@@ -20,7 +21,6 @@ else:
 import pywikibot
 from pywikibot.tools import chars
 
-from pywikibot.backports import format_range_unified  # introduced in 2.7.2
 from pywikibot.tools import deprecated_args
 from pywikibot.tools.formatter import color_format
 

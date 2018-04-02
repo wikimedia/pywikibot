@@ -22,11 +22,9 @@
 requests>=2.9,!=2.18.2
 
 # requests security extra
-cryptography>=1.3.4 ; python_version != '2.6' and python_full_version < '2.7.9'
-cryptography>=1.3.4,<=2.0.3 ; python_version == '2.6' and platform_system == 'Windows'
-cryptography>=1.3.4,<2.2 ; python_version == '2.6' and platform_system != 'Windows'
-pyOpenSSL>=0.14,!=17.2.0 ; python_full_version < '2.7.9' and python_version != '2.6'
-PyOpenSSL<17.5.0 ; python_version == '2.6'
+cryptography>=1.3.4 ; python_full_version < '2.7.9'
+pyOpenSSL>=0.14,!=17.2.0 ; python_full_version < '2.7.9'
+
 idna>=2.0.0 ; python_full_version < '2.7.9'
 # https://github.com/eliben/pycparser/issues/147
 pycparser != 2.14
@@ -46,15 +44,13 @@ mwoauth>=0.2.4,!=0.3.1
 git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29
 
 # wikistats.py and scripts
-unicodecsv!=0.14.0 ; python_version < '2.7'
-unicodecsv ; python_version < '3' and python_version >= '2.7'
+unicodecsv ; python_version < '3'
 
 # cosmetic_changes and scripts/isbn
 python-stdnum
 
 # GUI
-Pillow<4.0.0 ; python_version == '2.6'
-Pillow ; python_version == '2.7' or python_version >= '3.4'
+Pillow
 
 # core pagegenerators
 google >= 1.7
@@ -63,21 +59,11 @@ sseclient >= 0.0.18
 # scripts/script_wui.py:
 crontab
 
-# scipts/replicate_wiki.py and scripts/editarticle.py
-argparse ; python_version < '2.7'
-
 # scripts/flickrripper.py
-# On Python 2, flickrapi 1.4.x or 2.x may be used.  Only 2.x works on Python 3.
-# The following automatically selects 2.x on all Python versions, which depends
-# on requests 2.x, which may cause pip to report an error like the following:
-#   pkg_resources.VersionConflict: (requests 1.2.3 (/usr/lib/python2.7/site-packages), Requirement.parse('requests>=2.2.1'))
-# If you see that on Python 2, change this to flickrapi==1.4.5
-# On Python 3, force pip to install requests 2.2.1, or remove flickrapi below.
-flickrapi>=1.4.5,<2 ; python_version < '2.7'
-flickrapi ; python_version >= '2.7'
+flickrapi
 
 # incomplete core component botirc
-irc ; python_version > '2.6'
+irc
 
 # textlib.py and patrol.py
 mwparserfromhell>=0.3.3

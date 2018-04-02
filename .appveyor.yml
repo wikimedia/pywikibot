@@ -17,15 +17,6 @@ environment:
 
     # Test the lowest supported release of each major Python version.
 
-    # Pywikibot support matrix suggests 'should run' on Python 2.6.5+
-    # Only Python 2.6.6 is able to be set up on Appveyor.
-    # https://github.com/ogrisel/python-appveyor-demo/issues/10
-    # fwiw, Redhat Enterprise Linux ships with 2.6.6.
-
-    - PYTHON: "C:\\Python266-x64"
-      PYTHON_VERSION: "2.6.6"
-      PYTHON_ARCH: "64"
-
     - PYTHON: "C:\\Python272"
       PYTHON_VERSION: "2.7.2"
       PYTHON_ARCH: "32"
@@ -92,10 +83,6 @@ install:
   - pip install virtualenv
   - virtualenv env
   - env\Scripts\activate.bat
-  # wheel version 0.29.0 is enforced because version 0.30.0 doesn't support
-  # Python 2.6 and 3.3 anymore. Once we drop support for those versions we
-  # can use the latest version of wheel.
-  - pip install wheel==0.29.0
   - pip install -r dev-requirements.txt
   - pip install -r requests-requirements.txt
 

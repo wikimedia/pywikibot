@@ -30,22 +30,19 @@ from warnings import warn
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
-PY26 = (PYTHON_VERSION < (2, 7))
 
 versions_required_message = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 2.6.5+, 2.7.2+ or 3.4+.
+This version of Pywikibot only supports Python 2.7.2+ or 3.4+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
     # Any change to this must be copied to setup.py
-    return (PYTHON_VERSION >= (3, 4, 0) or
-            (PY2 and PYTHON_VERSION >= (2, 7, 2)) or
-            (PY26 and PYTHON_VERSION >= (2, 6, 5)))
+    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 2)
 
 
 if not python_is_supported():

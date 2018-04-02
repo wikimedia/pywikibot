@@ -8,6 +8,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import codecs
+from collections import OrderedDict
 import functools
 import os
 import re
@@ -18,7 +19,7 @@ from pywikibot.textlib import _MultiTemplateMatchBuilder
 
 from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
-from pywikibot.tools import OrderedDict, suppress_warnings
+from pywikibot.tools import suppress_warnings
 
 from tests.aspects import (
     unittest, require_modules, TestCase, DefaultDrySiteTestCase,

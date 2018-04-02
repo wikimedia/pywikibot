@@ -16,13 +16,12 @@ import warnings
 
 PY3 = sys.version_info[0] > 2
 if PY3:
-    from os.path import basename, dirname, splitext
-    from importlib import import_module
     import urllib.parse as urlparse
 else:
-    import imp
     import urlparse
 
+from os.path import basename, dirname, splitext
+from importlib import import_module
 from warnings import warn
 
 import pywikibot
@@ -959,12 +958,8 @@ class Family(object):
             #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", RuntimeWarning)
-                if PY3:
-                    sys.path.append(dirname(family_file))
-                    mod = import_module(splitext(basename(family_file))[0])
-                else:
-                    # Python 2.6 has no importlib.import_module
-                    mod = imp.load_source(fam, family_file)
+                sys.path.append(dirname(family_file))
+                mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
             raise UnknownFamily(u'Family %s does not exist' % fam)
         cls = mod.Family()

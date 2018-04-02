@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Package tests."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,7 +16,6 @@ __all__ = ('requests', 'unittest', 'TestRequest',
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
-# - future is needed as a fallback for python 2.6,
 #   however if unavailable this will fail on use; see pywikibot/tools.py
 # - unittest2; see below
 # - mwparserfromhell is optional, so is only imported in textlib_tests
@@ -24,9 +23,8 @@ import requests
 
 from pywikibot.tools import PYTHON_VERSION
 
-if PYTHON_VERSION < (2, 7, 3):
-    # unittest2 is a backport of python 2.7s unittest module to python 2.6
-    # Also use unittest2 for python 2.7.2 (T106512)
+if PYTHON_VERSION == (2, 7, 2):
+    # Use unittest2 for python 2.7.2 (T106512)
     import unittest2 as unittest
 else:
     import unittest

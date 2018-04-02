@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 """Module with the Graphviz drawing calls."""
 #
-# (C) Pywikibot team, 2006-2016
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
+from collections import Counter
 import itertools
 import threading
 
@@ -18,7 +19,6 @@ except ImportError as e:
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import Counter
 
 # deprecated value
 pydotfound = not isinstance(pydot, ImportError)
