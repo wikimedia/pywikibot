@@ -672,7 +672,7 @@ class TestPropertyGenerator(TestCase):
                   for l in links]
         gen = api.PropertyGenerator(site=self.site,
                                     prop="info",
-                                    titles='|'.join(titles))
+                                    parameters={'titles': '|'.join(titles)})
 
         count = 0
         for pagedata in gen:
@@ -690,7 +690,7 @@ class TestPropertyGenerator(TestCase):
                   for l in links]
         gen = api.PropertyGenerator(site=self.site,
                                     prop="revisions",
-                                    titles='|'.join(titles))
+                                    parameters={'titles': '|'.join(titles)})
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
         count = 0
@@ -710,7 +710,7 @@ class TestPropertyGenerator(TestCase):
                   for l in links]
         gen = api.PropertyGenerator(site=self.site,
                                     prop="revisions|coordinates",
-                                    titles='|'.join(titles))
+                                    parameters={'titles': '|'.join(titles)})
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
         count = 0
@@ -729,10 +729,12 @@ class TestPropertyGenerator(TestCase):
         links = list(self.site.pagelinks(mainpage, total=30))
         titles = [l.title(withSection=False)
                   for l in links]
-        gen = api.PropertyGenerator(site=self.site,
-                                    prop="revisions|info|categoryinfo|langlinks|templates",
-                                    rvprop="ids|flags|timestamp|user|comment|content",
-                                    titles='|'.join(titles))
+        gen = api.PropertyGenerator(
+            site=self.site,
+            prop='revisions|info|categoryinfo|langlinks|templates',
+            parameters={
+                'rvprop': 'ids|flags|timestamp|user|comment|content',
+                'titles': '|'.join(titles)})
 
         # An APIError is raised if set_maximum_items is not called.
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
@@ -755,9 +757,9 @@ class TestPropertyGenerator(TestCase):
         links = list(self.site.pagelinks(mainpage, total=30))
         titles = [l.title(withSection=False)
                   for l in links]
-        gen = api.PropertyGenerator(site=self.site,
-                                    prop="info|categoryinfo|langlinks|templates",
-                                    titles='|'.join(titles))
+        gen = api.PropertyGenerator(
+            site=self.site, prop='info|categoryinfo|langlinks|templates',
+            parameters={'titles': '|'.join(titles)})
         # Force the generator into continuation mode
         gen.set_query_increment(5)
 
@@ -776,9 +778,9 @@ class TestPropertyGenerator(TestCase):
         links = list(mainpage.backlinks(total=300))
         titles = [l.title(withSection=False)
                   for l in links]
-        gen = api.PropertyGenerator(site=self.site,
-                                    prop="info|categoryinfo|langlinks|templates",
-                                    titles='|'.join(titles))
+        gen = api.PropertyGenerator(
+            site=self.site, prop='info|categoryinfo|langlinks|templates',
+            parameters={'titles': '|'.join(titles)})
         # Force the generator into continuation mode
         gen.set_query_increment(50)
 

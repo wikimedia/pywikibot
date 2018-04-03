@@ -3489,9 +3489,10 @@ class APISite(BaseSite):
             # don't request patrol
             query = api.PropertyGenerator(
                 'info',
-                titles='Dummy page',
-                intoken=valid_tokens - {'patrol'},
-                site=self)
+                site=self,
+                parameters={
+                    'intoken': valid_tokens - {'patrol'},
+                    'titles': 'Dummy page'})
             query.request._warning_handler = warn_handler
 
             for item in query:
