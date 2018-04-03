@@ -12,7 +12,8 @@ import datetime
 import pywikibot
 
 from pywikibot.exceptions import HiddenKeyError
-from pywikibot.logentries import LogEntryFactory, UserTargetLogEntry
+from pywikibot.logentries import (
+    LogEntryFactory, OtherLogEntry, UserTargetLogEntry)
 from pywikibot.tools import (
     MediaWikiVersion,
     UnicodeType as unicode,
@@ -67,10 +68,10 @@ class TestLogentriesBase(TestCase):
     def _test_logevent(self, logtype):
         """Test a single logtype entry."""
         logentry = self._get_logentry(logtype)
-        if logtype in LogEntryFactory.logtypes:
-            self.assertEqual(logentry._expectedType, logtype)
-        else:
-            self.assertIsNone(logentry._expectedType)
+        self.assertIn(logtype, logentry.__class__.__name__.lower())
+        self.assertEqual(logentry._expectedType, logtype)
+        if logtype not in LogEntryFactory._logtypes:
+            self.assertIsInstance(logentry, OtherLogEntry)
         if self.site_key == 'old':
             self.assertNotIn('params', logentry.data)
         else:
@@ -123,7 +124,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
             return test_logevent
 
         # create test methods for the support logtype classes
-        for logtype in LogEntryFactory.logtypes:
+        for logtype in LogEntryFactory._logtypes:
             cls.add_method(dct, 'test_%sEntry' % logtype.title(),
                            test_method(logtype))
 
@@ -147,9 +148,8 @@ class TestSimpleLogentries(TestLogentriesBase):
         # Unfortunately it's not possible to use the metaclass to create a
         # bunch of test methods for this too as the site instances haven't been
         # initialized yet.
-        available_types = set(self.site._paraminfo.parameter(
-            'query+logevents', 'type')['type'])
-        for simple_type in available_types - set(LogEntryFactory.logtypes):
+        for simple_type in (self.site.logtypes
+                            - set(LogEntryFactory._logtypes)):
             if not simple_type:
                 # paraminfo also reports an empty string as a type
                 continue
@@ -241,13 +241,20 @@ class TestLogentryParams(TestLogentriesBase):
         """Test equality of LogEntry instances."""
         site = self.get_site('dewp')
         other_site = self.get_site('tewp')
-        le1 = next(iter(site.logevents(reverse=True, total=1)))
-        le2 = next(iter(site.logevents(reverse=True, total=1)))
+        gen1 = iter(site.logevents(reverse=True, total=2))
+        gen2 = iter(site.logevents(reverse=True, total=2))
+        le1 = next(gen1)
+        le2 = next(gen2)
         le3 = next(iter(other_site.logevents(reverse=True, total=1)))
+        le4 = next(gen1)
+        le5 = next(gen2)
         self.assertEqual(le1, le2)
         self.assertFalse(le1 != le2)  # __ne__ test
         self.assertNotEqual(le1, le3)
         self.assertNotEqual(le1, site)
+        self.assertIsInstance(le4, OtherLogEntry)
+        self.assertIsInstance(le5, OtherLogEntry)
+        self.assertEqual(type(le4), type(le5))
 
 
 class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):

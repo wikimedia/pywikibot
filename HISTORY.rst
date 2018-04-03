@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* Enable any LogEntry subclass for each logevent type (T199013)
+* Deprecated pagegenerators options -<logtype>log aren't supported any longer (T199013)
 * Open RotatingFileHandler with utf-8 encoding (T188231)
 * Fix occasional failure of TestLogentries due to hidden namespace (T197506)
 * Remove multiple empty sections at once in cosmetic_changes (T196324)

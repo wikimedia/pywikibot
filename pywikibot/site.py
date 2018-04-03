@@ -4539,6 +4539,12 @@ class APISite(BaseSite):
                                namespaces=namespaces,
                                total=total, g_content=content, **iuargs)
 
+    @property
+    def logtypes(self):
+        """Return a set of log types available on current site."""
+        return set(filter(None, self._paraminfo.parameter(
+            'query+logevents', 'type')['type']))
+
     @deprecated_args(step=None)
     def logevents(self, logtype=None, user=None, page=None, namespace=None,
                   start=None, end=None, reverse=False, tag=None, total=None):

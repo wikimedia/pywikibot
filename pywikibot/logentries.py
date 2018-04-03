@@ -157,6 +157,13 @@ class LogEntry(object):
         return self.data['comment']
 
 
+class OtherLogEntry(LogEntry):
+
+    """A log entry class for unspecified log events."""
+
+    pass
+
+
 class UserTargetLogEntry(LogEntry):
 
     """A log entry whose target is a user page."""
@@ -260,13 +267,6 @@ class BlockEntry(LogEntry):
         return self._expiry
 
 
-class ProtectEntry(LogEntry):
-
-    """Protection log entry."""
-
-    _expectedType = 'protect'
-
-
 class RightsEntry(LogEntry):
 
     """Rights log entry."""
@@ -286,13 +286,6 @@ class RightsEntry(LogEntry):
         if 'new' in self._params:  # old mw style
             return self._params['new'].split(',') if self._params['new'] else []
         return self._params['newgroups']
-
-
-class DeleteEntry(LogEntry):
-
-    """Deletion log entry."""
-
-    _expectedType = 'delete'
 
 
 class UploadEntry(LogEntry):
@@ -361,13 +354,6 @@ class MoveEntry(LogEntry):
         return 'suppressedredirect' in self._params
 
 
-class ImportEntry(LogEntry):
-
-    """Import log entry."""
-
-    _expectedType = 'import'
-
-
 class PatrolEntry(LogEntry):
 
     """Patrol log entry."""
@@ -396,22 +382,6 @@ class PatrolEntry(LogEntry):
         return 'auto' in self._params and self._params['auto'] != 0
 
 
-class NewUsersEntry(UserTargetLogEntry):
-
-    """New user log entry."""
-
-    _expectedType = 'newusers'
-
-
-class ThanksEntry(UserTargetLogEntry):
-
-    """Thanks log entry."""
-
-    _expectedType = 'thanks'
-
-# TODO entries for merge,suppress,makebot,gblblock,renameuser,globalauth,gblrights ?
-
-
 class LogEntryFactory(object):
 
     """
@@ -420,17 +390,12 @@ class LogEntryFactory(object):
     Only available method is create()
     """
 
-    logtypes = {
+    _logtypes = {
         'block': BlockEntry,
-        'protect': ProtectEntry,
         'rights': RightsEntry,
-        'delete': DeleteEntry,
         'upload': UploadEntry,
         'move': MoveEntry,
-        'import': ImportEntry,
         'patrol': PatrolEntry,
-        'newusers': NewUsersEntry,
-        'thanks': ThanksEntry,
     }
 
     def __init__(self, site, logtype=None):
@@ -450,14 +415,14 @@ class LogEntryFactory(object):
         else:
             # Bind a Class object to self._creator:
             # When called, it will initialize a new object of that class
-            logclass = LogEntryFactory._getEntryClass(logtype)
+            logclass = self.get_valid_entry_class(logtype)
             self._creator = lambda data: logclass(data, self._site)
 
     @classproperty
-    @deprecated('LogEntryFactory.logtypes')
-    def _logtypes(cls):  # noqa: N805
+    @deprecated('Site.logtypes or LogEntryFactory.get_entry_class(logtype)')
+    def logtypes(cls):  # noqa: N805
         """DEPRECATED LogEntryFactory class attribute of log types."""
-        return cls.logtypes
+        return cls._logtypes
 
     def create(self, logdata):
         """
@@ -470,20 +435,40 @@ class LogEntryFactory(object):
         """
         return self._creator(logdata)
 
-    @classmethod
-    def _getEntryClass(cls, logtype):
+    def get_valid_entry_class(self, logtype):
         """
         Return the class corresponding to the @logtype string parameter.
 
-        @return: specified subclass of LogEntry, or LogEntry
-        @rtype: class
+        @return: specified subclass of LogEntry
+        @rtype: LogEntry
+        @raise KeyError: logtype is not valid
         """
-        try:
-            return cls.logtypes[logtype]
-        except KeyError:
-            pywikibot.warning(
-                'Log entry key {0} is not known.'.format(logtype))
-            return LogEntry
+        if logtype not in self._site.logtypes:
+            raise KeyError('{} is not a valid logtype'.format(logtype))
+        return LogEntryFactory.get_entry_class(logtype)
+
+    @classmethod
+    def get_entry_class(cls, logtype):
+        """
+        Return the class corresponding to the @logtype string parameter.
+
+        @return: specified subclass of LogEntry
+        @rtype: LogEntry
+        @note: this class method cannot verify whether the given logtype
+            already exits for a given site; to verify use Site.logtypes
+            or use the get_valid_entry_class instance method instead.
+        """
+        if logtype not in cls._logtypes:
+            if logtype in ('newusers', 'thanks'):
+                bases = (UserTargetLogEntry, OtherLogEntry)
+            else:
+                bases = (OtherLogEntry, )
+            classname = str(logtype.capitalize() + 'Entry'
+                            if logtype is not None
+                            else OtherLogEntry.__name__)
+            cls._logtypes[logtype] = type(
+                classname, bases, {'_expectedType': logtype})
+        return cls._logtypes[logtype]
 
     def _createFromData(self, logdata):
         """
@@ -499,4 +484,12 @@ class LogEntryFactory(object):
             pywikibot.debug('API log entry received:\n{0}'.format(logdata),
                             _logger)
             raise Error("Log entry has no 'type' key")
-        return LogEntryFactory._getEntryClass(logtype)(logdata, self._site)
+        return LogEntryFactory.get_entry_class(logtype)(logdata, self._site)
+
+
+# For backward compatibility
+ProtectEntry = LogEntryFactory.get_entry_class('protect')
+DeleteEntry = LogEntryFactory.get_entry_class('delete')
+ImportEntry = LogEntryFactory.get_entry_class('import')
+NewUsersEntry = LogEntryFactory.get_entry_class('newusers')
+ThanksEntry = LogEntryFactory.get_entry_class('thanks')
