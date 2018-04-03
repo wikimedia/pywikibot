@@ -172,8 +172,6 @@ class ParamInfo(Container):
 
     It does not support the format modules.
 
-    TODO: Rewrite help parser to support earlier releases.
-
     TODO: establish a data structure in the class which prefills
         the param information available for a site given its
         version, using the API information available for each
