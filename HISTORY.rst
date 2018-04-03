@@ -3,6 +3,13 @@ Release history
 
 Current release
 ---------------
+
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180403
+------------
+
 * Deprecation warning: support for py2.7.2 and py2.7.3 will be dropped
 * Dropped support for Python 2.6 (T154771)
 * Dropped support for Python 3.3 (T184508)
