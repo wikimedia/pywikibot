@@ -1176,6 +1176,35 @@ _sites = {}
 _url_cache = {}  # The code/fam pair for each URL
 
 
+def _code_fam_from_url(url):
+    """Set url to cache and get code and family from cache.
+
+    Site helper method.
+    @param url: The site URL to get code and family
+    @type url: string
+    @raises SiteDefinitionError: Unknown URL
+    """
+    if url not in _url_cache:
+        matched_sites = []
+        # Iterate through all families and look, which does apply to
+        # the given URL
+        for fam in config.family_files:
+            family = Family.load(fam)
+            code = family.from_url(url)
+            if code is not None:
+                matched_sites.append((code, family))
+
+        if not matched_sites:
+            # TODO: As soon as AutoFamily is ready, try and use an
+            #       AutoFamily
+            raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
+        if len(matched_sites) > 1:
+            warning('Found multiple matches for URL "{0}": {1} (use first)'
+                    .format(url, ', '.join(str(s) for s in matched_sites)))
+        _url_cache[url] = matched_sites[0]
+    return _url_cache[url]
+
+
 def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     """A factory method to obtain a Site object.
 
@@ -1199,41 +1228,19 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         URL. Still requires that the family supporting that URL exists.
     @type url: string
     @rtype: pywikibot.site.APISite
-
+    @raises ValueError: URL and pair of code and family given
+    @raises ValueError: Invalid interface name
+    @raises SiteDefinitionError: Unknown URL
     """
-    # Either code and fam or only url
-    if url and (code or fam):
-        raise ValueError('URL to the wiki OR a pair of code and family name '
-                         'should be provided')
     _logger = "wiki"
 
     if url:
-        if url not in _url_cache:
-            matched_sites = []
-            # Iterate through all families and look, which does apply to
-            # the given URL
-            for fam in config.family_files:
-                family = Family.load(fam)
-                code = family.from_url(url)
-                if code is not None:
-                    matched_sites += [(code, family)]
-
-            if matched_sites:
-                if len(matched_sites) > 1:
-                    warning(
-                        'Found multiple matches for URL "{0}": {1} (use first)'
-                        .format(url, ', '.join(str(s) for s in matched_sites)))
-                _url_cache[url] = matched_sites[0]
-            else:
-                # TODO: As soon as AutoFamily is ready, try and use an
-                #       AutoFamily
-                _url_cache[url] = None
-
-        cached = _url_cache[url]
-        if cached:
-            code, fam = cached
-        else:
-            raise SiteDefinitionError("Unknown URL '{0}'.".format(url))
+        # Either code and fam or only url
+        if code or fam:
+            raise ValueError(
+                'URL to the wiki OR a pair of code and family name '
+                'should be provided')
+        code, fam = _code_fam_from_url(url)
     else:
         # Fallback to config defaults
         code = code or config.mylang
@@ -1259,9 +1266,10 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
         # If it isnt a class, assume it is a string
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
-            interface = getattr(tmp, interface)
         except ImportError:
             raise ValueError('Invalid interface name: {0}'.format(interface))
+        else:
+            interface = getattr(tmp, interface)
 
     if not issubclass(interface, BaseSite):
         warning('Site called with interface=%s' % interface.__name__)
