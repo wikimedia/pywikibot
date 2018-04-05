@@ -1159,6 +1159,10 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept('<pre>x</pre>', 'x', 'y',
                                                ['pre'], site=self.site),
                          '<pre>x</pre>')
+        self.assertEqual(textlib.replaceExcept('<nowiki   >x</nowiki    >x',
+                                               'x', 'y', ['nowiki'],
+                                               site=self.site),
+                         '<nowiki   >x</nowiki    >y')  # T191559
         self.assertEqual(textlib.replaceExcept('<source lang="xml">x</source>',
                                                'x', 'y', ['source'],
                                                site=self.site),

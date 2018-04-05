@@ -244,48 +244,48 @@ class _MultiTemplateMatchBuilder(object):
 def _create_default_regexes():
     """Fill (and possibly overwrite) _regex_cache with default regexes."""
     _regex_cache.update({
-        'comment':      re.compile(r'(?s)<!--.*?-->'),
+        'comment':    re.compile(r'(?s)<!--.*?-->'),
         # section headers
-        'header':       re.compile(r'(?m)^=+.+=+ *$'),
+        'header':     re.compile(r'(?m)^=+.+=+ *$'),
         # preformatted text
-        'pre':          re.compile(r'(?is)<pre[ >].*?</pre>'),
-        'source':       re.compile(r'(?is)<source .*?</source>'),
-        'score':        re.compile(r'(?is)<score[ >].*?</score>'),
+        'pre':        re.compile(r'(?is)<pre[ >].*?</pre\s*>'),
+        'source':     re.compile(r'(?is)<source .*?</source\s*>'),
+        'score':      re.compile(r'(?is)<score[ >].*?</score\s*>'),
         # inline references
-        'ref':          re.compile(r'(?is)<ref[ >].*?</ref>'),
-        'template':     NESTED_TEMPLATE_REGEX,
+        'ref':        re.compile(r'(?is)<ref[ >].*?</ref>'),
+        'template':   NESTED_TEMPLATE_REGEX,
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
-        'startspace':   re.compile(r'(?m)^ (.*?)$'),
+        'startspace': re.compile(r'(?m)^ (.*?)$'),
         # tables often have whitespace that is used to improve wiki
         # source code readability.
         # TODO: handle nested tables.
-        'table':        re.compile(r'(?ims)^{\|.*?^\|}|<table[ >].*?</table>'),
-        'hyperlink':    compileLinkR(),
-        'gallery':      re.compile(r'(?is)<gallery.*?>.*?</gallery>'),
+        'table':      re.compile(r'(?ims)'
+                                 r'^{\|.*?^\|}|<table[ >].*?</table\s*>'),
+        'hyperlink':  compileLinkR(),
+        'gallery':    re.compile(r'(?is)<gallery.*?>.*?</gallery\s*>'),
         # this matches internal wikilinks, but also interwiki, categories, and
         # images.
-        'link':         re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
+        'link':       re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
         # also finds links to foreign sites with preleading ":"
-        'interwiki':    (r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*',
-                         lambda site: '|'.join(
-                             site.validLanguageLinks() +
-                             list(site.family.obsolete.keys()))),
+        'interwiki':  (r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*',
+                       lambda site: '|'.join(
+                           site.validLanguageLinks()
+                           + list(site.family.obsolete.keys()))),
         # Wikibase property inclusions
-        'property':     (r'(?i)\{\{\s*\#(?:%s):\s*p\d+.*?\}\}',
-                         lambda site: '|'.join(
-                             site.getmagicwords('property'))),
+        'property':   (r'(?i)\{\{\s*\#(?:%s):\s*p\d+.*?\}\}',
+                       lambda site: '|'.join(site.getmagicwords('property'))),
         # Module invocations (currently only Lua)
-        'invoke':       (r'(?is)\{\{\s*\#(?:%s):.*?\}\}',
-                         lambda site: '|'.join(site.getmagicwords('invoke'))),
+        'invoke':     (r'(?is)\{\{\s*\#(?:%s):.*?\}\}',
+                       lambda site: '|'.join(site.getmagicwords('invoke'))),
         # categories
-        'category':     (r'\[\[ *(?:%s)\s*:.*?\]\]',
-                         lambda site: '|'.join(site.namespaces[14])),
+        'category':   (r'\[\[ *(?:%s)\s*:.*?\]\]',
+                       lambda site: '|'.join(site.namespaces[14])),
         # files
-        'file':         (FILE_LINK_REGEX,
-                         lambda site: '|'.join(site.namespaces[6])),
+        'file':       (FILE_LINK_REGEX,
+                       lambda site: '|'.join(site.namespaces[6])),
         # pagelist tag (used in Proofread extension).
-        'pagelist':      re.compile(r'(?is)<pagelist.*?/>'),
+        'pagelist':   re.compile(r'(?is)<pagelist.*?/>'),
     })
 
 
@@ -321,12 +321,12 @@ def _get_regexes(keys, site):
                 # nowiki, noinclude, includeonly, timeline, math and other
                 # extensions
                 _regex_cache[exc] = re.compile(
-                    r'(?is)<{0}>.*?</{0}>'.format(exc))
+                    r'(?is)<{0}\s*>.*?</{0}\s*>'.format(exc))
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
                 dontTouchRegexes.append(re.compile(
-                    r'(?is)<syntaxhighlight .*?</syntaxhighlight>'))
+                    r'(?is)<syntaxhighlight .*?</syntaxhighlight\s*>'))
         else:
             # assume it's a regular expression
             dontTouchRegexes.append(exc)
@@ -469,11 +469,11 @@ def removeDisabledParts(text, tags=['*'], include=[]):
     """
     regexes = {
         'comments':        r'<!--.*?-->',
-        'includeonly':     r'<includeonly>.*?</includeonly>',
-        'nowiki':          r'<nowiki>.*?</nowiki>',
-        'pre':             r'<pre>.*?</pre>',
-        'source':          r'<source .*?</source>',
-        'syntaxhighlight': r'<syntaxhighlight .*?</syntaxhighlight>',
+        'includeonly':     r'<includeonly\s*>.*?</includeonly\s*>',
+        'nowiki':          r'<nowiki\s*>.*?</nowiki\s*>',
+        'pre':             r'<pre\s*>.*?</pre\s*>',
+        'source':          r'<source .*?</source\s*>',
+        'syntaxhighlight': r'<syntaxhighlight .*?</syntaxhighlight\s*>',
     }
     if '*' in tags:
         tags = list(regexes.keys())
