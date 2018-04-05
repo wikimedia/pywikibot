@@ -32,7 +32,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Constructor."""
         self.languages_by_size = [
             'en', 'ceb', 'sv', 'de', 'fr', 'nl', 'ru', 'it', 'es', 'pl', 'war',
-            'vi', 'ja', 'zh', 'pt', 'uk', 'sr', 'fa', 'ca', 'ar', 'no', 'sh',
+            'vi', 'ja', 'zh', 'pt', 'uk', 'fa', 'sr', 'ca', 'ar', 'no', 'sh',
             'fi', 'hu', 'id', 'ko', 'cs', 'ro', 'ms', 'tr', 'eu', 'eo', 'bg',
             'hy', 'da', 'zh-min-nan', 'sk', 'he', 'min', 'kk', 'hr', 'lt',
             'et', 'ce', 'sl', 'be', 'gl', 'el', 'ur', 'nn', 'az', 'simple',
@@ -50,15 +50,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'frr', 'rue', 'gan', 'vls', 'km', 'bo', 'crh', 'vep', 'sc', 'glk',
             'co', 'fiu-vro', 'lrc', 'tk', 'kv', 'csb', 'myv', 'gv', 'as',
             'lad', 'so', 'nv', 'zea', 'udm', 'ay', 'lez', 'stq', 'ie', 'kw',
-            'nrm', 'pcd', 'mwl', 'ug', 'gom', 'rm', 'gn', 'koi', 'ab', 'lij',
-            'mt', 'sn', 'fur', 'dsb', 'dv', 'ang', 'ln', 'frp', 'cbk-zam',
+            'nrm', 'pcd', 'mwl', 'ug', 'gom', 'gn', 'rm', 'koi', 'ab', 'lij',
+            'sn', 'mt', 'fur', 'dsb', 'dv', 'ang', 'ln', 'cbk-zam', 'frp',
             'kab', 'ext', 'dty', 'ksh', 'lo', 'gag', 'olo', 'pag', 'pi', 'av',
             'bxr', 'haw', 'pfl', 'xal', 'krc', 'pap', 'kaa', 'rw', 'pdc',
             'bjn', 'ha', 'to', 'nov', 'kl', 'arc', 'jam', 'kbd', 'tyv', 'tpi',
             'tet', 'kbp', 'ki', 'ig', 'na', 'roa-rup', 'jbo', 'lbe', 'ty',
             'mdf', 'za', 'kg', 'bi', 'wo', 'lg', 'srn', 'tcy', 'zu', 'chr',
             'ltg', 'sm', 'om', 'xh', 'rmy', 'cu', 'tn', 'pih', 'rn', 'chy',
-            'tw', 'tum', 'ts', 'bm', 'got', 'st', 'pnt', 'ak', 'ss', 'atj',
+            'tw', 'tum', 'ts', 'bm', 'got', 'st', 'ak', 'pnt', 'atj', 'ss',
             'ch', 'fj', 'ady', 'iu', 'ny', 'ee', 'ks', 'ik', 've', 'sg', 'ff',
             'dz', 'ti', 'cr', 'din',
         ]
