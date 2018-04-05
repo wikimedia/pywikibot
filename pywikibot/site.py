@@ -3811,7 +3811,9 @@ class APISite(BaseSite):
     def categorymembers(self, category, namespaces=None, sortby=None,
                         reverse=False, starttime=None, endtime=None,
                         startsort=None, endsort=None, total=None,
-                        content=False, member_type=None):
+                        content=False, member_type=None,
+                        startprefix=None, endprefix=None,
+                        ):
         """Iterate members of specified category.
 
         @param category: The Category to iterate.
@@ -3833,13 +3835,22 @@ class APISite(BaseSite):
         @type starttime: pywikibot.Timestamp
         @param endtime: if provided, only generate pages added before this
             time; not valid unless sortby="timestamp"
-        @type endtime: pywikibot.Timestamp
-        @param startsort: if provided, only generate pages >= this title
-            lexically; not valid if sortby="timestamp"
+        @param startsort: if provided, only generate pages that have a
+            sortkey >= startsort; not valid if sortby="timestamp"
+            (Deprecated in MW 1.24)
         @type startsort: str
-        @param endsort: if provided, only generate pages <= this title
-            lexically; not valid if sortby="timestamp"
+        @param endsort: if provided, only generate pages that have a
+            sortkey <= endsort; not valid if sortby="timestamp"
+            (Deprecated in MW 1.24)
         @type endsort: str
+        @param startprefix: if provided, only generate pages >= this title
+            lexically; not valid if sortby="timestamp"; overrides "startsort"
+            (requires MW 1.18+)
+        @type startprefix: str
+        @param endprefix: if provided, only generate pages < this title
+            lexically; not valid if sortby="timestamp"; overrides "endsort"
+            (requires MW 1.18+)
+        @type endprefix: str
         @param content: if True, load the current content of each iterated page
             (default False)
         @type content: bool
@@ -3849,6 +3860,8 @@ class APISite(BaseSite):
         @type member_type: str or iterable of str; values: page, subcat, file
 
         @raises KeyError: a namespace identifier was not resolved
+        @raises NotImplementedError: startprefix or endprefix parameters are
+            given but site.version is less than 1.18.
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
@@ -3868,7 +3881,10 @@ class APISite(BaseSite):
         if starttime and endtime and starttime > endtime:
             raise ValueError(
                 "categorymembers: starttime must be before endtime")
-        if startsort and endsort and startsort > endsort:
+        if startprefix and endprefix and startprefix > endprefix:
+            raise ValueError(
+                'categorymembers: startprefix must be less than endprefix')
+        elif startsort and endsort and startsort > endsort:
             raise ValueError(
                 "categorymembers: startsort must be less than endsort")
 
@@ -3923,6 +3939,7 @@ class APISite(BaseSite):
             # sort; we take care of this reversal for the user
             (starttime, endtime) = (endtime, starttime)
             (startsort, endsort) = (endsort, startsort)
+            (startprefix, endprefix) = (endprefix, startprefix)
         if starttime and sortby == "timestamp":
             cmargs["gcmstart"] = starttime
         elif starttime:
@@ -3933,12 +3950,28 @@ class APISite(BaseSite):
         elif endtime:
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'endtime'")
-        if startsort and sortby != "timestamp":
+        if startprefix and sortby != 'timestamp':
+            if self.version() < MediaWikiVersion('1.18'):
+                raise NotImplementedError(
+                    'categorymembers: "startprefix" requires MW 1.18+')
+            cmargs['gcmstartsortkeyprefix'] = startprefix
+        elif startprefix:
+            raise ValueError('categorymembers: invalid combination of '
+                             "'sortby' and 'startprefix'")
+        elif startsort and sortby != 'timestamp':
             cmargs["gcmstartsortkey"] = startsort
         elif startsort:
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'startsort'")
-        if endsort and sortby != "timestamp":
+        if endprefix and sortby != 'timestamp':
+            if self.version() < MediaWikiVersion('1.18'):
+                raise NotImplementedError(
+                    'categorymembers: "endprefix" requires MW 1.18+')
+            cmargs['cmendsortkeyprefix'] = endprefix
+        elif endprefix:
+            raise ValueError('categorymembers: '
+                             "invalid combination of 'sortby' and 'endprefix'")
+        elif endsort and sortby != 'timestamp':
             cmargs["gcmendsortkey"] = endsort
         elif endsort:
             raise ValueError("categorymembers: "
