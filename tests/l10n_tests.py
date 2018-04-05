@@ -49,7 +49,12 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                     # check whether template exists
                     title = templates[0][0]
                     page = pywikibot.Page(site, title, ns=10)
-                    self.assertTrue(page.exists())
+                    self.assertTrue(
+                        page.exists(),
+                        msg='Invalid L10N in package "{package}"\n'
+                        'template "{title}" does not exist for lang '
+                        '"{site.lang}" on site "{site}"'
+                        .format(package=package, title=title, site=site))
 
             return test_template
 
