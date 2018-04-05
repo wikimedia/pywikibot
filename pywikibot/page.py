@@ -5287,10 +5287,9 @@ class Revision(DotReadableDict):
         @rtype: int or long
         @raises AssertionError: parent id not supplied to the constructor
         """
-        if self._parent_id is None:
-            raise AssertionError(
-                'Revision %d was instantiated without a parent id'
-                % self.revid)
+        assert self._parent_id is not None, (
+            'Revision {0} was instantiated without a parent id'
+            .format(self.revid))
 
         return self._parent_id
 
@@ -5305,10 +5304,9 @@ class Revision(DotReadableDict):
             which always occurs for MediaWiki versions lower than 1.21.
         """
         # TODO: T102735: Add a sane default of 'wikitext' and others for <1.21
-        if self._content_model is None:
-            raise AssertionError(
-                'Revision %d was instantiated without a content model'
-                % self.revid)
+        assert self._content_model is not None, (
+            'Revision {0} was instantiated without a content model'
+            .format(self.revid))
 
         return self._content_model
 
