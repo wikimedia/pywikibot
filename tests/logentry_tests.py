@@ -11,6 +11,7 @@ import datetime
 
 import pywikibot
 
+from pywikibot.exceptions import HiddenKeyError
 from pywikibot.logentries import LogEntryFactory, UserTargetLogEntry
 from pywikibot.tools import (
     MediaWikiVersion,
@@ -77,6 +78,11 @@ class TestLogentriesBase(TestCase):
         self.assertIsInstance(logentry.action(), unicode)
         try:
             self.assertIsInstance(logentry.comment(), unicode)
+        except HiddenKeyError as e:
+            self.assertRegex(
+                str(e),
+                "Log entry ([^)]+) has a hidden 'comment' key, and you don't "
+                'have permission to view it.')
         except KeyError as e:
             self.assertRegex(str(e), "Log entry ([^)]+) has no 'comment' key")
         self.assertIsInstance(logentry.logid(), int)

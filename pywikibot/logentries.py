@@ -10,7 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import sys
 
 import pywikibot
-from pywikibot.exceptions import Error
+from pywikibot.exceptions import Error, HiddenKeyError
 from pywikibot.tools import deprecated, classproperty
 
 if sys.version_info[0] > 2:
@@ -22,7 +22,10 @@ _logger = "wiki"
 class LogDict(dict):
 
     """
-    Simple custom dict that raises a custom KeyError when a key is missing.
+    Simple custom dict that raises custom Errors when a key is missing.
+
+    HiddenKeyError is raised when the user does not have permission.
+    KeyError is raised otherwise.
 
     It also logs debugging information when a key is missing.
     """
@@ -31,6 +34,13 @@ class LogDict(dict):
         """Debug when the key is missing."""
         pywikibot.debug(u"API log entry received:\n" + repr(self),
                         _logger)
+        if ((key in ('ns', 'title', 'pageid', 'logpage', 'params', 'action')
+             and 'actionhidden' in self)
+                or (key == 'comment' and 'commenthidden' in self)
+                or (key == 'user' and 'userhidden' in self)):
+            raise HiddenKeyError(
+                "Log entry ({0}) has a hidden '{1}' key and you don't have "
+                'permission to view it.'.format(self._type, key))
         raise KeyError("Log entry (%s) has no '%s' key" % (self._type, key))
 
 
@@ -112,12 +122,8 @@ class LogEntry(object):
         """
         Page on which action was performed.
 
-        @note: title may be missing in data dict e.g. by oversight action to
-               hide the title. In that case a KeyError exception will raise
-
         @return: page on action was performed
         @rtype: pywikibot.Page
-        @raise: KeyError: title was missing from log entry
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.Page(self.site, self.data['title'])
@@ -146,7 +152,6 @@ class LogEntry(object):
     def comment(self):
         """Return the logentry's comment.
 
-        @raise KeyError: The log entry has no 'comment' key.
         @rtype: str
         """
         return self.data['comment']
@@ -300,11 +305,7 @@ class UploadEntry(LogEntry):
         """
         Return FilePage on which action was performed.
 
-        Note: title may be missing in data dict e.g. by oversight action to
-              hide the title. In that case a KeyError exception will raise
-
         @rtype: pywikibot.FilePage
-        @raise: KeyError: title was missing from log entry
         """
         if not hasattr(self, '_page'):
             self._page = pywikibot.FilePage(self.site, self.data['title'])

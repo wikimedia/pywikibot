@@ -542,6 +542,13 @@ class UserRightsError(Error):
     pass
 
 
+class HiddenKeyError(UserRightsError, KeyError):
+
+    """Insufficient user rights to view the hidden key."""
+
+    pass
+
+
 class NotEmailableError(PageRelatedError):
 
     """This user is not emailable."""
