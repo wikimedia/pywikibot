@@ -9,11 +9,12 @@
 from __future__ import absolute_import, unicode_literals
 
 import codecs
+from collections import namedtuple
 import os
 import re
 import sys
 
-from textwrap import wrap
+from textwrap import fill
 from warnings import warn
 
 # Disable user-config usage as we are creating it here
@@ -38,6 +39,9 @@ pywikibot_dir = sys.path[0]
 if console_encoding is None or sys.platform == 'cygwin':
     console_encoding = "iso-8859-1"
 
+USER_BASENAME = 'user-config.py'
+PASS_BASENAME = 'user-password.py'
+
 
 def change_base_dir():
     """Create a new user directory."""
@@ -53,7 +57,6 @@ def change_base_dir():
                 pywikibot.error("directory access restricted")
                 continue
             pywikibot.output("Using existing directory")
-            break
         else:
             try:
                 os.mkdir(new_base, pywikibot.config2.private_files_permission)
@@ -61,20 +64,19 @@ def change_base_dir():
                 pywikibot.error('directory creation failed: {0}'.format(e))
                 continue
             pywikibot.output("Created new directory.")
-            break
+        break
 
     if new_base == pywikibot.config2.get_base_dir(new_base):
         # config would find that file
         return new_base
 
-    msg = wrap(u"""WARNING: Your user files will be created in the directory
+    msg = fill("""WARNING: Your user files will be created in the directory
 '%(new_base)s' you have chosen. To access these files, you will either have
 to use the argument "-dir:%(new_base)s" every time you run the bot, or set
 the environment variable "PYWIKIBOT2_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
 set environment variables.""" % {'new_base': new_base}, width=76)
-    for line in msg:
-        pywikibot.output(line)
+    pywikibot.output(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
     pywikibot.output("Aborting changes.")
@@ -84,7 +86,8 @@ set environment variables.""" % {'new_base': new_base}, width=76)
 def file_exists(filename):
     """Return whether the file exists and print a message if it exists."""
     if os.path.exists(filename):
-        pywikibot.output(u"'%s' already exists." % filename)
+        pywikibot.output('{1} already exists in the target directory "{0}".'
+                         .format(*os.path.split(filename)))
         return True
     return False
 
@@ -126,7 +129,8 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
         known_langs = []
 
     if len(known_langs) == 0:
-        pywikibot.output('There were no known languages found in {0}.'.format(fam.name))
+        pywikibot.output('There were no known languages found in {}.'
+                         .format(fam.name))
         default_lang = None
     elif len(known_langs) == 1:
         pywikibot.output('The only known language: {0}'.format(known_langs[0]))
@@ -139,16 +143,16 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
                 default_lang = 'en'
             else:
                 default_lang = None
-    message = "The language code of the site we're working on"
 
+    message = "The language code of the site we're working on"
     mycode = None
     while not mycode:
         mycode = pywikibot.input(message, default=default_lang, force=force)
         if known_langs and mycode and mycode not in known_langs:
-            if not pywikibot.input_yn("The language code {0} is not in the "
-                                      "list of known languages. Do you want "
-                                      "to continue?".format(mycode),
-                                      default=False, automatic_quit=False):
+            if not pywikibot.input_yn(
+                    fill('The language code {} is not in the list of known '
+                         'languages. Do you want to continue?'.format(mycode)),
+                    default=False, automatic_quit=False):
                 mycode = None
 
     message = 'Username on {0}:{1}'.format(mycode, fam.name)
@@ -230,74 +234,65 @@ PASSFILE_CONFIG = """# This is an automatically generated file used to store
 {botpasswords}"""
 
 
-def create_user_config(args=None, force=False):
+def create_user_config(main_family, main_code, main_username, force=False):
     """
     Create a user-config.py in base_dir.
 
     Create a user-password.py if necessary.
     """
-    _fnc = os.path.join(base_dir, "user-config.py")
-    _fncpass = os.path.join(base_dir, 'user-password.py')
-    if file_exists(_fnc):
-        return
+    _fnc = os.path.join(base_dir, USER_BASENAME)
+    _fncpass = os.path.join(base_dir, PASS_BASENAME)
 
-    if args and force and not config.verbose_output:
-        # main_username may be None, which is used in the next block
-        main_family, main_code, main_username = args
-        usernames = [args]
+    useritem = namedtuple('useritem', 'family, code, name')
+    userlist = []
+    if force and not config.verbose_output:
+        if main_username:
+            userlist = [useritem(main_family, main_code, main_username)]
     else:
-        main_family, main_code, main_username = get_site_and_lang(*args,
-                                                                  force=force)
-        usernames = [(main_family, main_code, main_username)]
+        while True:
+            userlist += [useritem(*get_site_and_lang(
+                main_family, main_code, main_username, force=force))]
+            if not pywikibot.input_yn('Do you want to add any other projects?',
+                                      force=force,
+                                      default=False, automatic_quit=False):
+                break
 
-        while pywikibot.input_yn("Do you want to add any other projects?",
-                                 force=force,
-                                 default=False, automatic_quit=False):
-            usernames += [get_site_and_lang(main_family, main_code,
-                                            main_username)]
-
+    # For each different username entered, ask if user wants to save a
+    # BotPassword (username, BotPassword name, BotPassword pass)
+    msg = fill('See https://www.mediawiki.org/wiki/'
+               'Manual:Pywikibot/BotPasswords to know how to get codes.'
+               'Please note that plain text in {} and anyone with read '
+               'access to that directory will be able read the file.'
+               .format(_fncpass))
     botpasswords = []
-    if not main_username:
-        usernames = "# usernames['{0}']['{1}'] = u'MyUsername'".format(
-            main_family, main_code)
-    elif not file_exists(_fncpass):
-        # For each different username entered, ask if user wants to save a
-        # BotPassword (username, BotPassword name, BotPassword pass)
-        seen = set()
-        for username in usernames:
-            if username[2] in seen:
-                continue
-            seen.add(username[2])
-            if pywikibot.input_yn('Do you want to add a BotPassword for {0}?'
-                                  .format(username[2]),
-                                  force=force, default=False):
-                if not botpasswords:
-                    pywikibot.output(
-                        'See https://www.mediawiki.org/wiki/'
-                        'Manual:Pywikibot/BotPasswords to know '
-                        'how to get codes.')
-                    pywikibot.output('Please note that plain text in {0} and '
-                                     'anyone with read access to that '
-                                     'directory will be able read the file.'
-                                     .format(_fncpass))
-                message = 'BotPassword\'s "bot name" for {0}'.format(
-                    username[2])
-                botpasswordname = pywikibot.input(message, force=force)
-                message = 'BotPassword\'s "password" for BotPassword "{0}" ' \
-                          '(no characters will be shown)' \
-                    .format(botpasswordname)
-                botpasswordpass = pywikibot.input(message, force=force,
-                                                  password=True)
-                if botpasswordname and botpasswordpass:
-                    botpasswords.append((username[2], botpasswordname,
-                                         botpasswordpass))
+    userset = {user.name for user in userlist}
+    for username in userset:
+        if pywikibot.input_yn('Do you want to add a BotPassword for {}?'
+                              .format(username), force=force, default=False):
+            if msg:
+                pywikibot.output(msg)
+            msg = None
+            message = 'BotPassword\'s "bot name" for {}'.format(username)
+            botpasswordname = pywikibot.input(message, force=force)
+            message = 'BotPassword\'s "password" for "{}" ' \
+                      '(no characters will be shown)' \
+                      .format(botpasswordname)
+            botpasswordpass = pywikibot.input(message, force=force,
+                                              password=True)
+            if botpasswordname and botpasswordpass:
+                botpasswords.append((username, botpasswordname,
+                                     botpasswordpass))
 
+    if not userlist:  # Show a sample
+        usernames = "# usernames['{}']['{}'] = u'MyUsername'".format(
+            main_family, main_code)
+    else:
         usernames = '\n'.join(
-            u"usernames['{0}']['{1}'] = u'{2}'".format(*username)
-            for username in usernames)
-        botpasswords = '\n'.join(
-            "('{0}', BotPassword('{1}', '{2}'))".format(*botpassword)
-            for botpassword in botpasswords)
+            "usernames['{user.family}']['{user.code}'] = u'{user.name}'"
+            .format(user=user) for user in userlist)
+    botpasswords = '\n'.join(
+        "('{0}', BotPassword('{1}', '{2}'))".format(*botpassword)
+        for botpassword in botpasswords)
 
     config_text = ''
     config_content = SMALL_CONFIG
@@ -346,14 +341,14 @@ def create_user_config(args=None, force=False):
     try:
         # Finally save user-config.py
         with codecs.open(_fnc, "w", "utf-8") as f:
-            f.write(config_content.format(main_family=main_family,
-                                          main_code=main_code,
-                                          usernames=usernames,
-                                          config_text=config_text,
-                                          botpasswords='password_file = ' +
-                                                       ('"user-password.py"'
-                                                        if botpasswords
-                                                        else 'None')))
+            f.write(config_content.format(
+                main_family=main_family,
+                main_code=main_code,
+                usernames=usernames,
+                config_text=config_text,
+                botpasswords='password_file = ' + ('"{}"'.format(PASS_BASENAME)
+                                                   if botpasswords
+                                                   else 'None')))
         pywikibot.output(u"'%s' written." % _fnc)
     except BaseException:
         if os.path.exists(_fnc):
@@ -378,6 +373,38 @@ def create_user_config(args=None, force=False):
             raise
 
 
+def ask_for_dir_change(force):
+    """Ask whether the base directory is has to be changed.
+
+    Only give option for directory change if user-config.py or user-password
+    already exists in the directory. This will repeat if user-config.py also
+    exists in the requested directory.
+
+    @param force: Skip asking for directory change
+    @type force: bool
+    @return: whether user file or password file exists already
+    @rtype: tuple of bool
+    """
+    global base_dir
+
+    pywikibot.output('\nYour default user directory is "{}"'.format(base_dir))
+    while True:
+        # Show whether file exists
+        userfile = file_exists(os.path.join(base_dir, USER_BASENAME))
+        passfile = file_exists(os.path.join(base_dir, PASS_BASENAME))
+        if force and not config.verbose_output or not (userfile or passfile):
+            break
+        if pywikibot.input_yn(
+                'Would you like to change the directory?',
+                default=True, automatic_quit=False, force=force):
+            new_base = change_base_dir()
+            if new_base:
+                base_dir = new_base
+        else:
+            break
+    return userfile, passfile
+
+
 def main(*args):
     """
     Process command line arguments and generate user-config.
@@ -395,49 +422,31 @@ def main(*args):
     # and 'force' mode can be activated below.
     (config.family, config.mylang) = ('wikipedia', None)
 
-    pywikibot.output('You can abort at any time by pressing ctrl-c')
-
     local_args = pywikibot.handle_args(args)
     if local_args:
         pywikibot.output('Unknown arguments: %s' % ' '.join(local_args))
         return False
 
+    pywikibot.output('You can abort at any time by pressing ctrl-c')
     if config.mylang is not None:
         force = True
         pywikibot.output(u'Automatically generating user-config.py')
     else:
         force = False
         # Force default site of en.wikipedia
-        (config.family, config.mylang) = ('wikipedia', 'en')
+        config.family, config.mylang = 'wikipedia', 'en'
 
     username = config.usernames[config.family].get(config.mylang)
-    args = (config.family, config.mylang, username)
 
-    # Only give option for directory change if user-config.py already exists
-    # in the directory. This will repeat if user-config.py also exists in
-    # the requested directory.
-    # TODO: T167573: check for user-password.py too
-    if not force or config.verbose_output:
-        pywikibot.output(u'\nYour default user directory is "%s"' % base_dir)
-        while os.path.isfile(os.path.join(base_dir, "user-config.py")):
-            pywikibot.output('user-config.py already exists'
-                             ' in the target directory.')
-            if pywikibot.input_yn('Would you like to change the directory?',
-                                  default=True,
-                                  automatic_quit=False, force=force):
-                new_base = change_base_dir()
-                if new_base:
-                    base_dir = new_base
-            else:
-                break
+    try:
+        has_userfile, has_passfile = ask_for_dir_change(force)
+        if not (has_userfile or has_userfile):
+            create_user_config(config.family, config.mylang, username,
+                               force=force)
+    except KeyboardInterrupt:
+        pywikibot.output('\nScript terminated by user.')
 
-    # user-fixes.py also used to be created here, but has
-    # been replaced by an example file.
-    if not os.path.isfile(os.path.join(base_dir, "user-config.py")):
-        create_user_config(args, force=force)
-    else:
-        pywikibot.output('user-config.py already exists in the target '
-                         'directory "{0}".'.format(base_dir))
+    # Creation of user-fixes.py has been replaced by an example file.
 
 
 if __name__ == '__main__':
