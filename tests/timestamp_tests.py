@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Timestamp class."""
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -80,6 +80,8 @@ class TestTimestamp(TestCase):
     def test_mediawiki_format(self):
         """Test conversion from and to timestamp format."""
         t1 = Timestamp.utcnow()
+        if not t1.microsecond:  # T191827: ensure microsecond is not 0
+            t1 = t1.replace(microsecond=1000)
         ts1 = t1.totimestampformat()
         t2 = Timestamp.fromtimestampformat(ts1)
         ts2 = t2.totimestampformat()
