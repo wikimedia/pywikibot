@@ -508,7 +508,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # If not already stored, fetch revision
         if self._latest_cached_revision() is None:
             try:
-                self.site.loadrevisions(self, getText=True, sysop=sysop)
+                self.site.loadrevisions(self, content=True, sysop=sysop)
             except (pywikibot.NoPage, pywikibot.SectionError) as e:
                 self._getexception = e
                 raise
@@ -530,7 +530,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if force or oldid not in self._revisions \
                 or self._revisions[oldid].text is None:
             self.site.loadrevisions(self,
-                                    getText=True,
+                                    content=True,
                                     revids=oldid,
                                     sysop=sysop)
         # TODO: what about redirects, errors?
@@ -1697,7 +1697,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                   rollback=False, starttime=None, endtime=None):
         """Generator which loads the version history as Revision instances."""
         # TODO: Only request uncached revisions
-        self.site.loadrevisions(self, getText=content, rvdir=reverse,
+        self.site.loadrevisions(self, content=content, rvdir=reverse,
                                 starttime=starttime, endtime=endtime,
                                 total=total, rollback=rollback)
         return (self._revisions[rev] for rev in
