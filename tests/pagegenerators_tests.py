@@ -1252,9 +1252,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-limit:1')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        # American Broadcasting Company
+        # alphabet, also known as ABC
         page1 = next(gen)
-        self.assertEqual(page1.title(), 'Q169889')
+        self.assertEqual(page1.title(), 'Q9779')
 
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-searchitem:en:abc')
@@ -1264,9 +1264,9 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         # American Broadcasting Company
         page1 = next(gen)
         self.assertEqual(page1.title(), 'Q169889')
-        # Australian Broadcasting Corporation
+        # alphabet, also known as ABC
         page2 = next(gen)
-        self.assertEqual(page2.title(), 'Q781365')
+        self.assertEqual(page2.title(), 'Q9779')
 
     def test_get_category_site(self):
         """Test the getCategory method."""
