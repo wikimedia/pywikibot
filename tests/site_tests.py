@@ -2384,9 +2384,9 @@ class TestSiteLoadRevisions(TestCase):
         # The revision content will be loaded by .text
         self.assertIsNotNone(self.mainpage.text)
 
-    def testLoadRevisions_getText(self):
-        """Test the site.loadrevisions() method with getText=True."""
-        self.mysite.loadrevisions(self.mainpage, getText=True, total=5)
+    def test_loadrevisions_content(self):
+        """Test the site.loadrevisions() method with content=True."""
+        self.mysite.loadrevisions(self.mainpage, content=True, total=5)
         self.assertFalse(hasattr(self.mainpage, '_text'))
         self.assertIn(self.mainpage._revid, self.mainpage._revisions)
         self.assertIsNotNone(self.mainpage._revisions[self.mainpage._revid].text)

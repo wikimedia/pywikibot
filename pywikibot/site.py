@@ -3981,7 +3981,8 @@ class APISite(BaseSite):
                                 total=total, g_content=content, **cmargs)
         return cmgen
 
-    def loadrevisions(self, page, getText=False, revids=None,
+    @deprecated_args(getText='content')
+    def loadrevisions(self, page, content=False, revids=None,
                       startid=None, endid=None, starttime=None,
                       endtime=None, rvdir=None, user=None, excludeuser=None,
                       section=None, sysop=False, step=None, total=None,
@@ -4000,10 +4001,11 @@ class APISite(BaseSite):
 
         @param page: retrieve revisions of this Page (required unless ids
             is specified)
-        @param getText: if True, retrieve the wiki-text of each revision;
+        @param content: if True, retrieve the wiki-text of each revision;
             otherwise, only retrieve the revision metadata (default)
+        @type content: bool
         @param section: if specified, retrieve only this section of the text
-            (getText must be True); section must be given by number (top of
+            (content must be True); section must be given by number (top of
             the article is section 0), not name
         @type section: int
         @param revids: retrieve only the specified revision ids (raise
@@ -4058,7 +4060,7 @@ class APISite(BaseSite):
             rvargs['rvprop'].append('contentmodel')
         if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.19'):
             rvargs['rvprop'].append('sha1')
-        if getText:
+        if content:
             rvargs['rvprop'].append('content')
             if section is not None:
                 rvargs[u"rvsection"] = unicode(section)
