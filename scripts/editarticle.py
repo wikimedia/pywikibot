@@ -45,10 +45,6 @@ class ArticleEditor(object):
 
     """Edit a wiki page."""
 
-    # join lines if line starts with this ones
-    # TODO: No apparent usage
-    # joinchars = string.letters + '[]' + string.digits
-
     def __init__(self, *args):
         """Constructor."""
         self.set_options(*args)
@@ -85,9 +81,8 @@ class ArticleEditor(object):
     def handle_edit_conflict(self, new):
         """When an edit conflict occures save the new text to a file."""
         fn = os.path.join(tempfile.gettempdir(), self.page.title())
-        fp = open(fn, 'w')
-        fp.write(new)
-        fp.close()
+        with open(fn, 'w') as fp:
+            fp.write(new)
         pywikibot.output(
             "An edit conflict has arisen. Your edit has been saved to %s. "
             "Please try again." % fn)
