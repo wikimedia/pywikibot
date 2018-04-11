@@ -52,8 +52,8 @@ class ArticleEditor(object):
     def __init__(self, *args):
         """Constructor."""
         self.set_options(*args)
-        self.setpage()
         self.site = pywikibot.Site()
+        self.setpage()
 
     def set_options(self, *args):
         """Parse commandline and set options attribute."""
