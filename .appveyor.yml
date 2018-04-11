@@ -2,25 +2,32 @@ clone_depth: 50
 environment:
 
   global:
+    APPVEYOR_PYTHON_URL: "https://raw.githubusercontent.com/ogrisel/python-appveyor-demo/master/appveyor/"
+
+    # SDK v7.0 MSVC Express 2008's SetEnv.cmd script will fail if the
+    # /E:ON and /V:ON options are not enabled in the batch script intepreter
+    # See: http://stackoverflow.com/a/13751649/163740
+    CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
     PYWIKIBOT2_DIR: "%appdata%\\Pywikibot"
     PYWIKIBOT2_USER_CONFIG: "%appdata%\\Pywikibot\\user-config.py"
+
     PYSETUP_TEST_EXTRAS: "1"
 
   matrix:
 
     # Test the lowest supported release of each major Python version.
 
-    - PYTHON: "C:\\Python277"
-      PYTHON_VERSION: "2.7.7"
+    - PYTHON: "C:\\Python272"
+      PYTHON_VERSION: "2.7.2"
       PYTHON_ARCH: "32"
 
     - PYTHON: "C:\\Python340"
       PYTHON_VERSION: "3.4.0"
       PYTHON_ARCH: "32"
 
-    - PYTHON: "C:\\Python277-x64"
-      PYTHON_VERSION: "2.7.7"
+    - PYTHON: "C:\\Python272-x64"
+      PYTHON_VERSION: "2.7.2"
       PYTHON_ARCH: "64"
 
     - PYTHON: "C:\\Python340-x64"
@@ -66,9 +73,19 @@ init:
 
 install:
   - git submodule update --init
-  - python scripts\maintenance\appveyor_python_setup.py
-  - pip install -r dev-requirements.txt -r requests-requirements.txt
-  - where python pip
+  # Download the Appveyor Python build accessories into subdirectory .\appveyor
+  - mkdir appveyor
+  - ps: $wc = new-object net.webclient
+  - ps: $run = $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'run_with_env.cmd')
+  - ps: $run | Out-File -Encoding ascii -FilePath appveyor\run_with_env.cmd
+
+  # This is needed for Python versions not installed on Appveyor build machines
+  - ps: if (-not(Test-Path($env:PYTHON))) { iex $wc.DownloadString($env:APPVEYOR_PYTHON_URL + 'install.ps1') }
+  - pip install virtualenv
+  - virtualenv env
+  - env\Scripts\activate.bat
+  - pip install -r dev-requirements.txt
+  - pip install -r requests-requirements.txt
 
 build: off
 
@@ -77,11 +94,11 @@ test_script:
   - set PYTHONIOENCODING=utf8
 
   - "mkdir %PYWIKIBOT2_DIR%"
-  - "%PYTHON%/python.exe -Werror::UserWarning -m generate_user_files -dir:%PYWIKIBOT2_DIR% -family:wikipedia -lang:en -v -debug"
+  - "python -Werror::UserWarning -m generate_user_files -dir:%PYWIKIBOT2_DIR% -family:wikipedia -lang:en -v -debug"
   - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT2_USER_CONFIG, 'max_retries = 2; maximum_GET_length = 5000; transliteration_target = None;')"
 
   - set PYSETUP_TEST_NO_UI=1
-  - coverage run setup.py test
+  - "%CMD_IN_ENV% coverage run setup.py test"
 
 on_failure:
   - codecov
