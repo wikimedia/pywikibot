@@ -845,9 +845,9 @@ class MetaTestCaseClass(type):
         if 'family' in dct or 'code' in dct:
             dct['site'] = True
 
-            if (('sites' not in dct or not len(dct['sites'])) and
-                    'family' in dct and
-                    'code' in dct and dct['code'] != '*'):
+            if (('sites' not in dct or not len(dct['sites']))
+                    and 'family' in dct
+                    and 'code' in dct and dct['code'] != '*'):
                 # Add entry to self.sites
                 dct['sites'] = {
                     str(dct['family'] + ':' + dct['code']): {

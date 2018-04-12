@@ -443,12 +443,12 @@ class CategoryRedirectBot(pywikibot.Bot):
         newredirs.sort()
         comment = i18n.twtranslate(self.site, self.maint_comment)
         self.log_page.text = (u"\n== %i-%02i-%02iT%02i:%02i:%02iZ ==\n"
-                              % time.gmtime()[:6] +
-                              u'\n'.join(self.log_text) +
-                              u'\n* New redirects since last report:\n' +
-                              u'\n'.join(newredirs) +
-                              u'\n' + u'\n'.join(self.problems) +
-                              u'\n' + self.get_log_text())
+                              % time.gmtime()[:6]
+                              + '\n'.join(self.log_text)
+                              + '\n* New redirects since last report:\n'
+                              + '\n'.join(newredirs)
+                              + '\n' + '\n'.join(self.problems)
+                              + '\n' + self.get_log_text())
         self.log_page.save(comment)
         if self.edit_requests:
             edit_request_page.text = (self.edit_request_text

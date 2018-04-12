@@ -169,13 +169,13 @@ def _unknown_test_modules():
     """List tests which are to be executed."""
     dir_list = os.listdir(join_tests_path())
     all_test_list = [name[0:-9] for name in dir_list  # strip '_tests.py'
-                     if name.endswith('_tests.py') and
-                     not name.startswith('_')]   # skip __init__.py and _*
+                     if name.endswith('_tests.py')
+                     and not name.startswith('_')]   # skip __init__.py and _*
 
     unknown_test_modules = [name
                             for name in all_test_list
-                            if name not in library_test_modules and
-                            name not in script_test_modules]
+                            if name not in library_test_modules
+                            and name not in script_test_modules]
 
     return unknown_test_modules
 

@@ -192,8 +192,8 @@ def collector(loader=unittest.loader.defaultTestLoader):
     tests = (['test__login'] +
              ['test_' + name
               for name in sorted(script_list)
-              if name != 'login' and
-              name not in unrunnable_script_list
+              if name != 'login'
+              and name not in unrunnable_script_list
               ])
 
     test_list = ['tests.script_tests.TestScriptHelp.' + name
@@ -202,10 +202,10 @@ def collector(loader=unittest.loader.defaultTestLoader):
     tests = (['test__login'] +
              ['test_' + name
               for name in sorted(script_list)
-              if name != 'login' and
-              name not in failed_dep_script_list and
-              name not in unrunnable_script_list and
-              (enable_autorun_tests or name not in auto_run_script_list)
+              if name != 'login'
+              and name not in failed_dep_script_list
+              and name not in unrunnable_script_list
+              and (enable_autorun_tests or name not in auto_run_script_list)
               ])
 
     test_list += ['tests.script_tests.TestScriptSimulate.' + name

@@ -135,8 +135,8 @@ def main(*args):
 
     for page in gen:
         targetpage = pywikibot.Page(tosite, prefix + page.title())
-        edithistpage = pywikibot.Page(tosite, prefix + page.title() +
-                                      '/edithistory')
+        edithistpage = pywikibot.Page(tosite, prefix + page.title()
+                                      + '/edithistory')
         summary = 'Moved page from {old} ([[{new}/edithistory|history]])'\
                   .format(old=page.title(asLink=True, insite=tosite),
                           new=targetpage.title() if not
