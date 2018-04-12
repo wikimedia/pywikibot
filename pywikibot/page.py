@@ -5543,7 +5543,7 @@ class Link(ComparableMixin):
         self._is_interwiki = False
         ns_prefix = False
 
-        old_position = 0 if self._text.find(':') != 0 else 1
+        old_position = int(self._text.startswith(':'))
         colon_position = self._text.find(':', old_position)
         first_other_site = None
         while colon_position >= 0:
