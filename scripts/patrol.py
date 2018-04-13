@@ -63,7 +63,7 @@ import pywikibot
 
 from pywikibot import pagegenerators
 
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt
 
 _logger = 'patrol'
 
@@ -303,8 +303,12 @@ class PatrolBot(SingleSiteBot):
             self.load_whitelist()
         if not feed:
             feed = self.getOption('feed')
-        for page in feed:
-            self.treat(page)
+        try:
+            for page in feed:
+                self.treat(page)
+        except QuitKeyboardInterrupt:
+            pywikibot.output('\nUser quit {} bot run.'
+                             .format(self.__class__.__name__))
 
     def treat(self, page):
         """It loads the given page, does some changes, and saves it."""
@@ -349,8 +353,7 @@ class PatrolBot(SingleSiteBot):
 
             if self.getOption('ask'):
                 choice = pywikibot.input_yn(
-                    'Do you want to mark page as patrolled?',
-                    automatic_quit=False)
+                    'Do you want to mark page as patrolled?')
 
             # Patrol the page
             if choice:
