@@ -54,7 +54,10 @@ import time
 
 from collections import defaultdict
 
-import mwparserfromhell
+try:
+    import mwparserfromhell
+except ImportError as e:
+    mwparserfromhell = e
 
 import pywikibot
 
@@ -126,9 +129,11 @@ class PatrolBot(SingleSiteBot):
 
     def load_whitelist(self):
         """Load most recent watchlist_page for further processing."""
+        if isinstance(mwparserfromhell, Exception):
+            raise mwparserfromhell
         # Check for a more recent version after versionchecktime in sec.
-        if (self.whitelist_load_ts and (time.time() - self.whitelist_load_ts <
-                                        self.getOption('versionchecktime'))):
+        if (self.whitelist_load_ts and (time.time() - self.whitelist_load_ts
+                                        < self.getOption('versionchecktime'))):
             verbose_output('Whitelist not stale yet')
             return
 
