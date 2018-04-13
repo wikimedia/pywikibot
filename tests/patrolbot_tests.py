@@ -56,23 +56,22 @@ class TestPatrolBot(DefaultDrySiteTestCase):
 
     def test_in_list(self):
         """Test the method which returns whether a page is in the list."""
-        # Return the title if there is an exact match
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foo'), 'Foo')
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foobar'),
-                         'Foobar')
+        # Return True if there is an exact match
+        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foo'))
+        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foobar'))
+        self.assertFalse(self.bot.in_list(['Foo', 'Foobar'], 'Bar'))
 
-        # Return the first entry which starts with the title if there is no
+        # Return True if an entry starts with the title if there is no
         # exact match
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foob'), 'Foo')
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foobarz'),
-                         'Foo')
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar', 'Bar'], 'Barz'),
-                         'Bar')
+        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foob'))
+        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foobarz'))
+        self.assertTrue(self.bot.in_list(['Foo', 'Foobar', 'Bar'], 'Barz'))
+        self.assertFalse(self.bot.in_list(['Foobar', 'Bar'], 'Foo'))
 
-        # '' returns .* if there is no exact match
-        self.assertEqual(self.bot.in_list([''], 'Foo'), '.*')
-        self.assertEqual(self.bot.in_list(['', 'Foobar'], 'Foo'), '.*')
-        self.assertEqual(self.bot.in_list(['', 'Foo'], 'Foo'), 'Foo')
+        # '' returns True if there is no exact match
+        self.assertTrue(self.bot.in_list([''], 'Foo'))
+        self.assertTrue(self.bot.in_list(['', 'Foobar'], 'Foo'))
+        self.assertTrue(self.bot.in_list(['', 'Foo'], 'Foo'))
 
 
 if __name__ == '__main__':  # pragma: no cover
