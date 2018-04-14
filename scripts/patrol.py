@@ -502,9 +502,15 @@ def main(*args):
     site.login()
 
     if usercontribs:
-        pywikibot.output(u'Processing user: %s' % usercontribs)
+        user = pywikibot.User(site, usercontribs)
+        if user.isAnonymous() or user.isRegistered():
+            pywikibot.output('Processing user: {}'.format(usercontribs))
+        else:
+            pywikibot.warning('User {} does not exist on site {}.'
+                              .format(usercontribs, site))
 
-    if not newpages and not recentchanges and not usercontribs:
+    # default behaviour
+    if not any((newpages, recentchanges, usercontribs)):
         if site.family.name == 'wikipedia':
             newpages = True
         else:
