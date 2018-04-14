@@ -632,8 +632,8 @@ class NamespacesDict(Mapping, SelfCallMixin):
         # int(None) raises TypeError; however, bool needs special handling.
         result = [NotImplemented if isinstance(ns, bool) else
                   NamespacesDict._lookup_name(ns, namespaces)
-                  if isinstance(ns, basestring) and
-                  not ns.lstrip('-').isdigit() else
+                  if isinstance(ns, basestring)
+                  and not ns.lstrip('-').isdigit() else
                   namespaces[int(ns)] if int(ns) in namespaces
                   else None
                   for ns in identifiers]
@@ -2234,8 +2234,8 @@ class APISite(BaseSite):
         @rtype: C{set} of L{Namespace}
         """
         # TODO: Integrate into _userinfo
-        if (force or not hasattr(self, '_useroptions') or
-                self.user() != self._useroptions['_name']):
+        if (force or not hasattr(self, '_useroptions')
+                or self.user() != self._useroptions['_name']):
             uirequest = self._simple_request(
                 action="query",
                 meta="userinfo",
@@ -6392,8 +6392,8 @@ class APISite(BaseSite):
                         final_request['filekey'] = _file_key
                     else:
                         file_contents = f.read()
-                        filetype = (mimetypes.guess_type(source_filename)[0] or
-                                    'application/octet-stream')
+                        filetype = (mimetypes.guess_type(source_filename)[0]
+                                    or 'application/octet-stream')
                         final_request.mime_params = {
                             'file': (file_contents, filetype.split('/'),
                                      {'filename': mime_filename})

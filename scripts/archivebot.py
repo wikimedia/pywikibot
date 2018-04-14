@@ -579,8 +579,8 @@ class PageArchiver(object):
 
     def saveables(self):
         """Return a list of saveable attributes."""
-        return [a for a in self.attributes if self.attributes[a][1] and
-                a != 'maxage']
+        return [a for a in self.attributes if self.attributes[a][1]
+                and a != 'maxage']
 
     def attr2text(self):
         """Return a template with archiver saveable attributes."""

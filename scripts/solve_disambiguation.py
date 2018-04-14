@@ -944,8 +944,8 @@ class DisambiguationRobot(Bot):
                     new_page_title = answer[1]
                     repPl = pywikibot.Page(pywikibot.Link(new_page_title,
                                                           disambPage.site))
-                    if (new_page_title[0].isupper() or
-                            link_text[0].isupper()):
+                    if (new_page_title[0].isupper()
+                            or link_text[0].isupper()):
                         new_page_title = repPl.title()
                     else:
                         new_page_title = repPl.title()
@@ -956,8 +956,8 @@ class DisambiguationRobot(Bot):
                         newlink = "[[%s%s]]%s" % (new_page_title,
                                                   section,
                                                   trailing_chars)
-                    elif replaceit or (new_page_title == link_text and
-                                       not section):
+                    elif replaceit or (new_page_title == link_text
+                                       and not section):
                         newlink = "[[%s]]" % new_page_title
                     # check if we can create a link with trailing characters
                     # instead of a pipelink
@@ -1006,8 +1006,8 @@ class DisambiguationRobot(Bot):
 
         """
         if disambPage.isRedirectPage() and not self.primary:
-            if (disambPage.site.lang in self.primary_redir_template and
-                    self.primary_redir_template[disambPage.site.lang]
+            if (disambPage.site.lang in self.primary_redir_template
+                    and self.primary_redir_template[disambPage.site.lang]
                     in disambPage.templates()):
                 baseTerm = disambPage.title()
                 for template in disambPage.templatesWithParams():

@@ -630,8 +630,8 @@ class ParamInfo(Container):
                 params['modules'] = module_batch
             else:
                 params['modules'] = [mod for mod in module_batch
-                                     if not mod.startswith('query+') and
-                                     mod not in self.root_modules]
+                                     if not mod.startswith('query+')
+                                     and mod not in self.root_modules]
                 params['querymodules'] = [mod[6:] for mod in module_batch
                                           if mod.startswith('query+')]
 
@@ -1460,8 +1460,8 @@ class Request(MutableMapping):
             self["assert"] = 'user'  # make sure user is logged in
 
         if (self.site.protocol() == 'http' and (config.use_SSL_always or (
-                self.action == 'login' and config.use_SSL_onlogin)) and
-                self.site.family.name in config.available_ssl_project):
+                self.action == 'login' and config.use_SSL_onlogin))
+                and self.site.family.name in config.available_ssl_project):
             self.site = EnableSSLSiteWrapper(self.site)
 
     @classmethod
@@ -1767,9 +1767,9 @@ class Request(MutableMapping):
 
     def __str__(self):
         """Return a string representation."""
-        return unquote(self.site.scriptpath() +
-                       '/api.php?' +
-                       self._http_param_string())
+        return unquote(self.site.scriptpath()
+                       + '/api.php?'
+                       + self._http_param_string())
 
     def __repr__(self):
         """Return internal representation."""

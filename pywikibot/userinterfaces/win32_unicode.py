@@ -280,8 +280,8 @@ def get_unicode_console():
             """Return whether the handle is not to a console."""
             if handle == INVALID_HANDLE_VALUE or handle is None:
                 return True
-            return ((GetFileType(handle) & ~FILE_TYPE_REMOTE) != FILE_TYPE_CHAR or
-                    GetConsoleMode(handle, byref(DWORD())) == 0)
+            return ((GetFileType(handle) & ~FILE_TYPE_REMOTE) != FILE_TYPE_CHAR
+                    or GetConsoleMode(handle, byref(DWORD())) == 0)
 
         old_stdin_fileno = old_fileno('in')
         old_stdout_fileno = old_fileno('out')

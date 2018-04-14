@@ -338,8 +338,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 target_family = config.family
             if forceInterwiki or \
                (allowInterwiki and
-                (self.site.family.name != target_family or
-                 self.site.code != target_code)):
+                (self.site.family.name != target_family
+                 or self.site.code != target_code)):
                 if self.site.family.name != target_family \
                    and self.site.family.name != self.site.code:
                     title = u'%s:%s:%s' % (self.site.family.name,
@@ -1941,8 +1941,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         if hasattr(self, "_deletedRevs"):
             if timestamp in self._deletedRevs and (
-                    (not retrieveText) or
-                    'content' in self._deletedRevs[timestamp]):
+                    (not retrieveText)
+                    or 'content' in self._deletedRevs[timestamp]):
                 return self._deletedRevs[timestamp]
         for item in self.site.deletedrevs(self, start=timestamp,
                                           get_text=retrieveText, total=1):
@@ -5622,11 +5622,11 @@ class Link(ComparableMixin):
         # * with 'relative' URLs. Forbid them explicitly.
 
         if u'.' in t and (
-                t in ('.', '..') or
-                t.startswith(('./', '../')) or
-                u'/./' in t or
-                u'/../' in t or
-                t.endswith(('/.', '/..'))
+                t in ('.', '..')
+                or t.startswith(('./', '../'))
+                or '/./' in t
+                or '/../' in t
+                or t.endswith(('/.', '/..'))
         ):
             raise pywikibot.InvalidTitle(
                 u"(contains . / combinations): '%s'"
