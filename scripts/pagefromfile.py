@@ -1,62 +1,64 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 r"""
-Bot to upload pages from a file.
+Bot to upload pages from a text file.
 
-This bot takes its input from a file that contains a number of
-pages to be put on the wiki. The pages should all have the same
-begin and end text (which may not overlap).
+This bot takes its input from the UTF-8 text file that contains
+a number of pages to be put on the wiki. The pages should all have
+the same beginning and ending text (which may not overlap).
+The beginning and ending text is not uploaded with the page content
+by default.
 
-By default the text should have the intended title of the page
-as the first text in bold (that is, between ''' and '''),
-you can modify this behavior with command line options.
-
-The default is not to include the begin and
-end text in the page, if you want to include that text, use
-the -include option.
+As a pagename is by default taken the first text block
+from the page content marked in bold (wrapped between ''' and ''').
+If you expect the page title not to be present in the text
+or marked by different markers, use -titlestart, -titleend,
+and -notitle parameters.
 
 Specific arguments:
 
--begin:xxx      Specify the text that marks the beginning of a page
--end:xxx        Specify the text that marks the end of a page
--file:xxx       Give the filename we are getting our material from
-                (default: dict.txt)
--include        The beginning and end markers should be included
-                in the page.
--titlestart:xxx Use xxx in place of ''' for identifying the
-                beginning of page title
--titleend:xxx   Use xxx in place of ''' for identifying the
-                end of page title
--notitle        do not include the title, including titlestart, and
-                titleend, in the page
--nocontent      If page has this statment it doesn't append
-                (example: -nocontent:"{{infobox")
--noredirect     if you don't want to upload on redirect page
-                it is True by default and bot adds pages to redirected pages
--summary:xxx    Use xxx as the edit summary for the upload - if
-                a page exists, standard messages are appended
-                after xxx for appending, prepending, or replacement
--autosummary    Use MediaWikis autosummary when creating a new page,
-                overrides -summary in this case
--minor          set minor edit flag on page edits
--showdiff       show difference between page and page to upload; it forces
-                -always=False; default to False.
+-file:xxx       The filename we are getting our material from,
+                the default value is "dict.txt"
+-begin:xxx      The text that marks the beginning of a page,
+                the default value is "{{-start-}}"
+-end:xxx        The text that marks the end of the page,
+                the default value is "{{-stop-}}"
+-include        Include the beginning and end markers to the page
+-titlestart:xxx The text used in place of ''' for identifying
+                the beginning of a page title
+-titleend:xxx   The text used in place of ''' for identifying
+                the end of the page title
+-notitle        Do not include the page title, including titlestart
+                and titleend, to the page. Can be used to specify unique
+                page title above the page content
+-nocontent:xxx  If the existing page contains specified statement,
+                the page is skipped from editing
+-noredirect     Do not upload on redirect pages
+-summary:xxx    The text used as an edit summary for the upload.
+                If the page exists, standard messages for prepending,
+                appending, or replacement are appended after it
+-autosummary    Use MediaWiki's autosummary when creating a new page,
+                overrides -summary
+-minor          Set the minor edit flag on page edits
+-showdiff       Show difference between current page and page to upload,
+                also forces the bot to ask for confirmation
+                on every edit
 
-If the page to be uploaded already exists:
+If the page to be uploaded already exists, it is skipped by default.
+But you can override this behavior if you want to:
 
--safe           do nothing (default)
--appendtop      add the text to the top of it
--appendbottom   add the text to the bottom of it
--force          overwrite the existing page
+-appendtop      Add the text to the top of the existing page
+-appendbottom   Add the text to the bottom of the existing page
+-force          Overwrite the existing page
 
-It's possible to define a separator after the 'append' modes which is added
-between the exisiting and new text. For example -appendtop:foo would add 'foo'
-between the parts. The \n (two separate characters) is replaced by the newline
-character.
+It is possible to define a separator after the 'append' modes which
+is added between the existing and the new text. For example
+a parameter -appendtop:foo would add 'foo' between them. A new line
+can be added between them by specifying '\n' as a value.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -307,9 +309,6 @@ def main(*args):
             options['append'] = ('top', value)
         elif option in ('force', 'minor', 'autosummary', 'showdiff'):
             options[option] = True
-        elif option == 'safe':
-            options['force'] = False
-            options['append'] = None
         elif option == 'noredirect':
             options['redirect'] = False
         elif option in ('nocontent', 'summary'):
