@@ -280,18 +280,19 @@ class EventStreams(object):
                 if event is not None:
                     self.sse_kwargs['last_id'] = event.id
                 continue
-            if event.event == 'message' and event.data:
-                try:
-                    element = json.loads(event.data)
-                except ValueError as e:
-                    warning('Could not load json data from\n{0}\n{1}'
-                            .format(event, e))
+            if event.event == 'message':
+                if event.data:
+                    try:
+                        element = json.loads(event.data)
+                    except ValueError as e:
+                        warning('Could not load json data from\n{0}\n{1}'
+                                .format(event, e))
+                    else:
+                        if self.streamfilter(element):
+                            n += 1
+                            yield element
                 else:
-                    if self.streamfilter(element):
-                        n += 1
-                        yield element
-            elif event.event == 'message' and not event.data:
-                warning('Empty message found.')
+                    warning('Empty message found.')
             elif event.event == 'error':
                 warning('Encountered error: {0}'.format(event.data))
             else:
