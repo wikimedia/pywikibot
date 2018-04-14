@@ -274,12 +274,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not hasattr(self, '_depth'):
             # Check if the namespace allows subpages
             if self._namespace_obj.subpages:
-                _depth = self.title().count('/')
+                self._depth = self.title().count('/')
             else:
                 # Does not allow subpages, which means depth is always 0
-                _depth = 0
+                self._depth = 0
 
-        return _depth
+        return self._depth
 
     @property
     def pageid(self):
