@@ -2063,60 +2063,59 @@ class InterwikiBot(object):
             'NOTE: Number of pages queued is {0}, trying to add {1} more.'
             .format(len(self.subjects), number))
         for i in range(number):
-            try:
-                while True:
+            for page in self.pageGenerator:
+                if page in self.conf.skip:
+                    pywikibot.output('Skipping: {0} is in the skip list'
+                                     .format(page))
+                    continue
+                if self.conf.skipauto:
+                    dictName, year = page.autoFormat()
+                    if dictName is not None:
+                        pywikibot.output(
+                            'Skipping: {0} is an auto entry {1}({2})'
+                            .format(page, dictName, year))
+                        continue
+                if self.conf.parenthesesonly:
+                    # Only yield pages that have ( ) in titles
+                    if '(' not in page.title():
+                        continue
+                if page.isTalkPage():
+                    pywikibot.output('Skipping: {} is a talk page'
+                                     .format(page))
+                    continue
+                if page.namespace() == 10:
                     try:
-                        page = next(self.pageGenerator)
-                    except IOError:
-                        pywikibot.output(u'IOError occurred; skipping')
+                        tmpl, loc = moved_links[page.site.code]
+                        del tmpl
+                    except KeyError:
+                        loc = None
+                    if loc is not None and loc in page.title():
+                        pywikibot.output(
+                            'Skipping: {} is a templates subpage'
+                            .format(page.title()))
                         continue
-                    if page in self.conf.skip:
-                        pywikibot.output('Skipping: {0} is in the skip list'
-                                         .format(page))
-                        continue
-                    if self.conf.skipauto:
-                        dictName, year = page.autoFormat()
-                        if dictName is not None:
-                            pywikibot.output(
-                                'Skipping: {0} is an auto entry {1}({2})'
-                                .format(page, dictName, year))
-                            continue
-                    if self.conf.parenthesesonly:
-                        # Only yield pages that have ( ) in titles
-                        if "(" not in page.title():
-                            continue
-                    if page.isTalkPage():
-                        pywikibot.output(u'Skipping: %s is a talk page' % page)
-                        continue
-                    if page.namespace() == 10:
-                        try:
-                            tmpl, loc = moved_links[page.site.code]
-                            del tmpl
-                        except KeyError:
-                            loc = None
-                        if loc is not None and loc in page.title():
-                            pywikibot.output(
-                                'Skipping: %s is a templates subpage'
-                                % page.title())
-                            continue
+                break
+            else:  # generator stopped
+                break
+
+            if self.generateUntil:
+                until = self.generateUntil
+                page_namespace = (
+                    page.site.namespaces[int(page.namespace())])
+                if page_namespace.case == 'first-letter':
+                    until = first_upper(until)
+                if page.title(withNamespace=False) > until:
                     break
 
-                if self.generateUntil:
-                    until = self.generateUntil
-                    page_namespace = (
-                        page.site.namespaces[int(page.namespace())])
-                    if page_namespace.case == 'first-letter':
-                        until = first_upper(until)
-                    if page.title(withNamespace=False) > until:
-                        raise StopIteration
-                self.add(page, hints=self.conf.hints)
-                self.generated += 1
-                if self.generateNumber:
-                    if self.generated >= self.generateNumber:
-                        raise StopIteration
-            except StopIteration:
-                self.pageGenerator = None
-                break
+            self.add(page, hints=self.conf.hints)
+            self.generated += 1
+            if self.generateNumber:
+                if self.generated >= self.generateNumber:
+                    break
+        else:
+            return
+        # for loop was exited by break statement
+        self.pageGenerator = None
 
     def firstSubject(self):
         """Return the first subject that is still being worked on."""
