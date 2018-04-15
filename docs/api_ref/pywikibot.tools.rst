@@ -17,6 +17,22 @@ pywikibot.tools.chars module
     :undoc-members:
     :show-inheritance:
 
+pywikibot.tools.djvu module
+---------------------------
+
+.. automodule:: pywikibot.tools.djvu
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pywikibot.tools.formatter module
+--------------------------------
+
+.. automodule:: pywikibot.tools.formatter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pywikibot.tools.ip module
 -------------------------
 
@@ -24,3 +40,5 @@ pywikibot.tools.ip module
     :members:
     :undoc-members:
     :show-inheritance:
+
+

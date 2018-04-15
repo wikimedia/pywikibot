@@ -1,13 +1,7 @@
-====================
-interwiki_link_tests
-====================
-    Tests in ``tests.interwiki_link_tests``:
+tests.interwiki\_link\_tests module
+===================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.interwiki_link_tests.TestInterwikiLinksToNonLocalSites
-        :members:
-    .. autoclass:: tests.interwiki_link_tests.TestPartiallyQualifiedLinkDifferentCodeParser
-        :members:
-
+.. automodule:: tests.interwiki_link_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

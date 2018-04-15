@@ -9,8 +9,8 @@ pywikibot.userinterfaces package
 Submodules
 ----------
 
-pywikibot.userinterfaces.cgi_interface module
----------------------------------------------
+pywikibot.userinterfaces.cgi\_interface module
+----------------------------------------------
 
 .. automodule:: pywikibot.userinterfaces.cgi_interface
     :members:
@@ -25,32 +25,32 @@ pywikibot.userinterfaces.gui module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.userinterfaces.terminal_interface module
---------------------------------------------------
+pywikibot.userinterfaces.terminal\_interface module
+---------------------------------------------------
 
 .. automodule:: pywikibot.userinterfaces.terminal_interface
     :members:
     :undoc-members:
     :show-inheritance:
 
-pywikibot.userinterfaces.terminal_interface_base module
--------------------------------------------------------
+pywikibot.userinterfaces.terminal\_interface\_base module
+---------------------------------------------------------
 
 .. automodule:: pywikibot.userinterfaces.terminal_interface_base
     :members:
     :undoc-members:
     :show-inheritance:
 
-pywikibot.userinterfaces.terminal_interface_unix module
--------------------------------------------------------
+pywikibot.userinterfaces.terminal\_interface\_unix module
+---------------------------------------------------------
 
 .. automodule:: pywikibot.userinterfaces.terminal_interface_unix
     :members:
     :undoc-members:
     :show-inheritance:
 
-pywikibot.userinterfaces.terminal_interface_win32 module
---------------------------------------------------------
+pywikibot.userinterfaces.terminal\_interface\_win32 module
+----------------------------------------------------------
 
 .. automodule:: pywikibot.userinterfaces.terminal_interface_win32
     :members:
@@ -65,10 +65,12 @@ pywikibot.userinterfaces.transliteration module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.userinterfaces.win32_unicode module
----------------------------------------------
+pywikibot.userinterfaces.win32\_unicode module
+----------------------------------------------
 
 .. automodule:: pywikibot.userinterfaces.win32_unicode
     :members:
     :undoc-members:
     :show-inheritance:
+
+

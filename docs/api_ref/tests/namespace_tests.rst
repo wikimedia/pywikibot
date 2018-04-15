@@ -1,11 +1,7 @@
-===============
-namespace_tests
-===============
-    Tests in ``tests.namespace_tests``:
+tests.namespace\_tests module
+=============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.namespace_tests.TestNamespaceObject
-        :members:
-
+.. automodule:: tests.namespace_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,11 +1,7 @@
-===============
-wikistats_tests
-===============
-    Tests in ``tests.wikistats_tests``:
+tests.wikistats\_tests module
+=============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.wikistats_tests.WikiStatsTestCase
-        :members:
-
+.. automodule:: tests.wikistats_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,0 +1,7 @@
+tests.i18n.pywikibot module
+===========================
+
+.. automodule:: tests.i18n.pywikibot
+    :members:
+    :undoc-members:
+    :show-inheritance:

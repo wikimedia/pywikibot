@@ -1,11 +1,7 @@
-============
-upload_tests
-============
-    Tests in ``tests.upload_tests``:
+tests.upload\_tests module
+==========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.upload_tests.TestUpload
-        :members:
-
+.. automodule:: tests.upload_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

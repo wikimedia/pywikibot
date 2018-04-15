@@ -1,11 +1,7 @@
-===========
-oauth_tests
-===========
-    Tests in ``tests.oauth_tests``:
+tests.oauth\_tests module
+=========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.oauth_tests.TestOauthLoginManger
-        :members:
-
+.. automodule:: tests.oauth_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

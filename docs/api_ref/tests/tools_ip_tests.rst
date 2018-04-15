@@ -1,12 +1,7 @@
-==============
-tools_ip_tests
-==============
-    Tests in ``tests.tools_ip_tests``:
+tests.tools\_ip\_tests module
+=============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.tools_ip_tests.IPRegexTestCase
-        :members:
-    .. autoclass:: tests.tools_ip_tests.IPAddressModuleTestCase
-        :members:
+.. automodule:: tests.tools_ip_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

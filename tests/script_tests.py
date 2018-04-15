@@ -136,7 +136,7 @@ auto_run_script_list = [
 # Some of these are not pretty, but at least they are informative
 # and not backtraces starting deep in the pywikibot package.
 no_args_expected_results = {
-    # TODO: until done here, remember to set editor = None in user_config.py
+    # TODO: until done here, remember to set editor = None in user-config.py
     'checkimages': 'Execution time: 0 seconds',
     'editarticle': 'Nothing changed',
     'featured': '0 pages written.',

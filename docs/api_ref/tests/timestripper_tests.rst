@@ -1,13 +1,7 @@
-==================
-timestripper_tests
-==================
-    Tests in ``tests.timestripper_tests``:
+tests.timestripper\_tests module
+================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.timestripper_tests.TestTimeStripperWithDigitsAsMonths
-        :members:
-    .. autoclass:: tests.timestripper_tests.TestTimeStripperWithNoDigitsAsMonths
-        :members:
-
+.. automodule:: tests.timestripper_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,11 +1,7 @@
-=========
-pwb_tests
-=========
-    Tests in ``tests.pwb_tests``:
+tests.pwb\_tests module
+=======================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.pwb_tests.TestPwb
-        :members:
-
+.. automodule:: tests.pwb_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

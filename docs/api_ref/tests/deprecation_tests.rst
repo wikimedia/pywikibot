@@ -1,13 +1,7 @@
-=================
-deprecation_tests
-=================
-    Tests in ``tests.deprecation_tests``:
+tests.deprecation\_tests module
+===============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.deprecation_tests.DecoratorFullNameTestCase
-        :members:
-    .. autoclass:: tests.deprecation_tests.DeprecatorTestCase
-        :members:
-
+.. automodule:: tests.deprecation_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

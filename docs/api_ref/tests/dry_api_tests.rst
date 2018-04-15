@@ -1,19 +1,7 @@
-=============
-dry_api_tests
-=============
-    Tests in ``tests.dry_api_tests``:
+tests.dry\_api\_tests module
+============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.dry_api_tests.DryCachedRequestTests
-        :members:
-    .. autoclass:: tests.dry_api_tests.DryMimeTests
-        :members:
-    .. autoclass:: tests.dry_api_tests.MimeTests
-        :members:
-    .. autoclass:: tests.dry_api_tests.MockCachedRequestKeyTests
-        :members:
-    .. autoclass:: tests.dry_api_tests.QueryGenTests
-        :members:
-
+.. automodule:: tests.dry_api_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -152,8 +152,7 @@ class EventStreams(object):
     def register_filter(self, *args, **kwargs):
         """Register a filter.
 
-        Filter types
-        ============
+        Filter types:
 
         There are 3 types of filter: 'all', 'any' and 'none'.
         The filter type must be given with the keyword argument 'ftype'
@@ -167,8 +166,7 @@ class EventStreams(object):
         - B{'all'}: Skip if not all filter matches. Otherwise check 'any':
         - B{'any'}: Skip if no given filter matches. Otherwise pass.
 
-        Filter functions
-        ================
+        Filter functions:
 
         Filter may be specified as external function methods given as
         positional argument like::
@@ -182,8 +180,7 @@ class EventStreams(object):
         a parameter and that method must handle it in a proper way and return
         C{True} if the filter matches and C{False} otherwise.
 
-        Filter keys and values
-        ======================
+        Filter keys and values:
 
         Another method to register a filter is to pass pairs of keys and values
         as keyword arguments to this method. The key must be a key of the event

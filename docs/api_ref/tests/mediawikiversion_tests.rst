@@ -1,11 +1,7 @@
-======================
-mediawikiversion_tests
-======================
-    Tests in ``tests.mediawikiversion_tests``:
+tests.mediawikiversion\_tests module
+====================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.mediawikiversion_tests.TestMediaWikiVersion
-        :members:
-
+.. automodule:: tests.mediawikiversion_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

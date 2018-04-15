@@ -1,10 +1,7 @@
-=================
-tools_chars_tests
-=================
-    Tests in ``tests.tools_chars_tests``:
+tests.tools\_chars\_tests module
+================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.tools_chars_tests.CharsTestCase
-        :members:
+.. automodule:: tests.tools_chars_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

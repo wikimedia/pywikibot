@@ -17,6 +17,21 @@ pywikibot.data.api module
     :undoc-members:
     :show-inheritance:
 
+pywikibot.data.mysql module
+---------------------------
+
+.. automodule:: pywikibot.data.mysql
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pywikibot.data.sparql module
+----------------------------
+
+.. automodule:: pywikibot.data.sparql
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 pywikibot.data.wikistats module
 -------------------------------
@@ -25,3 +40,5 @@ pywikibot.data.wikistats module
     :members:
     :undoc-members:
     :show-inheritance:
+
+
