@@ -1521,10 +1521,15 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
     """
     if site is None:
         site = pywikibot.Site()
+
+    user = pywikibot.User(site, username)
+    if not (user.isAnonymous() or user.isRegistered()):
+            pywikibot.warning('User "{}" does not exist on site "{}".'
+                              .format(user.username, site))
+
     return _filter_unique(
-        pywikibot.Page(pywikibot.Link(contrib["title"], source=site))
-        for contrib in site.usercontribs(user=username, namespaces=namespaces,
-                                         total=total)
+        contrib[0]
+        for contrib in user.contributions(namespaces=namespaces, total=total)
     )
 
 
