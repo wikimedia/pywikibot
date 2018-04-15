@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* pagegenerators.RepeatingGenerator is marked as deprecated
 * Bugfixes and improvements
 * Localisation updates
 

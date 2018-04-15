@@ -1981,6 +1981,7 @@ def PageWithTalkPageGenerator(generator, return_talk_only=False):
             yield page.toggleTalkPage()
 
 
+@deprecated('LiveRCPageGenerator or EventStreams')
 def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
                        total=None, **kwargs):
     """Yield items in live time.
