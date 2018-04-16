@@ -30,6 +30,10 @@ def main(*args):
 
 if __name__ == "__main__":
     import sys
+    if sys.platform == 'win32':
+        import os
+        os.system('title Python {} Shell'.format(*sys.version.split(' ', 1)))
+        del os
     args = []
     if set(sys.argv) - {'shell', 'shell.py'}:
         args = sys.argv
