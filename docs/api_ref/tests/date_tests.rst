@@ -1,11 +1,7 @@
-==========
-date_tests
-==========
-    Tests in ``tests.date_tests``:
+tests.date\_tests module
+========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.date_tests.TestDate
-        :members:
-
+.. automodule:: tests.date_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

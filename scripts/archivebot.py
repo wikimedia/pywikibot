@@ -17,16 +17,16 @@ will be incremented when the archive reaches a certain size.
 
 Trancluded template may contain the following parameters:
 
-{{TEMPLATE_PAGE
-|archive             =
-|algo                =
-|counter             =
-|maxarchivesize      =
-|minthreadsleft      =
-|minthreadstoarchive =
-|archiveheader       =
-|key                 =
-}}
+ {{TEMPLATE_PAGE
+ |archive             =
+ |algo                =
+ |counter             =
+ |maxarchivesize      =
+ |minthreadsleft      =
+ |minthreadstoarchive =
+ |archiveheader       =
+ |key                 =
+ }}
 
 Meanings of parameters are:
 

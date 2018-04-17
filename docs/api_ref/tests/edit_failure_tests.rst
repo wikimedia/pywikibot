@@ -1,15 +1,7 @@
-==================
-edit_failure_tests
-==================
-    Tests in ``tests.edit_failure_tests``:
+tests.edit\_failure\_tests module
+=================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.edit_failure_tests.TestActionFailure
-        :members:
-    .. autoclass:: tests.edit_failure_tests.TestSaveFailure
-        :members:
-    .. autoclass:: tests.edit_failure_tests.TestWikibaseSaveTest
-        :members:
-
+.. automodule:: tests.edit_failure_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

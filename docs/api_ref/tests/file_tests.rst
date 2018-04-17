@@ -1,11 +1,7 @@
-==========
-file_tests
-==========
-    Tests in ``tests.file_tests``:
+tests.file\_tests module
+========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.file_tests.TestShareFiles
-        :members:
-
+.. automodule:: tests.file_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

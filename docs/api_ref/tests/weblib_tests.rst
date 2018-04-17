@@ -1,13 +1,7 @@
-============
-weblib_tests
-============
-    Tests in ``tests.weblib_tests``:
+tests.weblib\_tests module
+==========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.weblib_tests.TestInternetArchive
-        :members:
-    .. autoclass:: tests.weblib_tests.TestWebCite
-        :members:
-
+.. automodule:: tests.weblib_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

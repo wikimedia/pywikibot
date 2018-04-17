@@ -42,7 +42,10 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.coverage',
               'sphinx.ext.viewcode',
               'sphinx.ext.autosummary',
-              'numpydoc']
+              'sphinx.ext.napoleon']
+
+# Allow lines like "Example:" to be followed by a code block
+napoleon_use_admonition_for_examples = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -282,6 +285,9 @@ def pywikibot_script_docstring_fixups(
         elif line.strip().startswith('python'):
             # Indent commands
             lines[index] = '  ' + line.strip()
+        if '=' in line:
+            # Escape equal signs
+            lines[index] = line.replace('=', '\\=')
 
 
 def pywikibot_skip_members(app, what, name, obj, skip, options):

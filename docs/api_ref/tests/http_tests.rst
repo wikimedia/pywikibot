@@ -1,17 +1,7 @@
-==========
-http_tests
-==========
-    Tests in ``tests.http_tests``:
+tests.http\_tests module
+========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.http_tests.DefaultUserAgentTestCase
-        :members:
-    .. autoclass:: tests.http_tests.HttpTestCase
-        :members:
-    .. autoclass:: tests.http_tests.TestGetAuthenticationConfig
-        :members:
-    .. autoclass:: tests.http_tests.UserAgentTestCase
-        :members:
-
+.. automodule:: tests.http_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

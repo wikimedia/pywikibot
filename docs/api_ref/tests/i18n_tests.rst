@@ -1,15 +1,7 @@
-==========
-i18n_tests
-==========
-    Tests in ``tests.i18n_tests``:
+tests.i18n\_tests module
+========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.i18n_tests.TestTWNTranslate
-        :members:
-    .. autoclass:: tests.i18n_tests.TestTWTranslate
-        :members:
-    .. autoclass:: tests.i18n_tests.TestTranslate
-        :members:
-
+.. automodule:: tests.i18n_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

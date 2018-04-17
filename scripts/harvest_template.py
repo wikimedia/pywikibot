@@ -5,11 +5,11 @@ Template harvesting script.
 
 Usage (see below for explanations and examples):
 
-* python pwb.py harvest_template -transcludes:"..." \
+- python pwb.py harvest_template -transcludes:"..." \
     [default optional arguments] \
     template_parameter PID [local optional arguments] \
     [template_parameter PID [local optional arguments]]
-* python pwb.py harvest_template [generators] -template:"..." \
+- python pwb.py harvest_template [generators] -template:"..." \
     [default optional arguments] \
     template_parameter PID [local optional arguments] \
     [template_parameter PID [local optional arguments]]

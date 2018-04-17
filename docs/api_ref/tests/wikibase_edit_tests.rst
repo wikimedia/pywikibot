@@ -1,11 +1,7 @@
-===================
-wikibase_edit_tests
-===================
-    Tests in ``tests.wikibase_edit_tests``:
+tests.wikibase\_edit\_tests module
+==================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.wikibase_edit_tests.TestWikibaseWriteGeneral
-        :members:
-
+.. automodule:: tests.wikibase_edit_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -1,13 +1,7 @@
-====================
-data_ingestion_tests
-====================
-    Tests in ``tests.data_ingestion_tests``:
+tests.data\_ingestion\_tests module
+===================================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.data_ingestion_tests.TestCSVReader
-        :members:
-    .. autoclass:: tests.data_ingestion_tests.TestPhoto
-        :members:
-
+.. automodule:: tests.data_ingestion_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

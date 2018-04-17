@@ -1,13 +1,7 @@
-============
-family_tests
-============
-    Tests in ``tests.family_tests``:
+tests.family\_tests module
+==========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.family_tests.TestFamily
-        :members:
-    .. autoclass:: tests.family_tests.TestOldFamilyMethod
-        :members:
-
+.. automodule:: tests.family_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

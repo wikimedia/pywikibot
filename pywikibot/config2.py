@@ -821,7 +821,7 @@ cosmetic_changes_disable = {}
 
 # cosmetic_changes_deny_script is a list of scripts for which cosmetic changes
 # are disabled. You may add additional scripts by appending script names in
-# your user_config.py ("+=" operator is strictly recommended):
+# your user-config.py ("+=" operator is strictly recommended):
 # cosmetic_changes_deny_script += ['your_script_name_1', 'your_script_name_2']
 # Appending the script name also works:
 # cosmetic_changes_deny_script.append('your_script_name')
@@ -829,7 +829,7 @@ cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
                                 'newitem', 'touch']
 
 # ############# REPLICATION BOT ################
-# You can add replicate_replace to your user_config.py, which has the following
+# You can add replicate_replace to your user-config.py, which has the following
 # format:
 #
 # replicate_replace = {

@@ -1021,7 +1021,7 @@ GLOBAL OPTIONS
 -v                useful in debugging.
 
 -cosmeticchanges  Toggles the cosmetic_changes setting made in config.py or
--cc               user_config.py to its inverse and overrules it. All other
+-cc               user-config.py to its inverse and overrules it. All other
                   settings and restrictions are untouched.
 
 -simulate         Disables writing to the server. Useful for testing and

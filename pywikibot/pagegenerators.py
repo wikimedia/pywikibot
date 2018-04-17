@@ -135,7 +135,7 @@ GENERATOR OPTIONS
                     redirects)
                     -logevents:delete,,20 gives 20 pages from deletion log
                     -logevents:protect,Usr gives pages from protect by user Usr
-                    -logevents:patrol,Usr,20 gives 20 patroled pages by  Usr
+                    -logevents:patrol,Usr,20 gives 20 patroled pages by Usr
                     -logevents:upload,,20121231,20100101 gives upload pages
                     in the 2010s, 2011s, and 2012s
                     -logevents:review,,20121231 gives review pages since the
@@ -171,7 +171,7 @@ GENERATOR OPTIONS
                     given as -recentchanges:x, will work on the x most recently
                     changed pages. If given as -recentchanges:offset,duration
                     it will work on pages changed from 'offset' minutes with
-                    'duration'  minutes of timespan. rctags are supported too.
+                    'duration' minutes of timespan. rctags are supported too.
                     The rctag must be the very first parameter part.
 
                     Examples:

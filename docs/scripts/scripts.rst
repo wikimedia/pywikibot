@@ -1,5 +1,5 @@
-user scripts package
-====================
+scripts package
+===============
 
 .. automodule:: scripts
     :members:
@@ -11,14 +11,16 @@ Subpackages
 
 .. toctree::
 
+    scripts.archive
     scripts.i18n
     scripts.maintenance
+    scripts.userscripts
 
 Submodules
 ----------
 
-scripts.add_text script
------------------------
+scripts.add\_text script
+------------------------
 
 .. automodule:: scripts.add_text
     :members:
@@ -27,6 +29,11 @@ scripts.add_text script
 
 scripts.archivebot script
 -------------------------
+
+.. automodule:: scripts.archivebot
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 scripts.basic script
 --------------------
@@ -44,10 +51,18 @@ scripts.blockpageschecker script
     :undoc-members:
     :show-inheritance:
 
-scripts.capitalize_redirects script
------------------------------------
+scripts.capitalize\_redirects script
+------------------------------------
 
 .. automodule:: scripts.capitalize_redirects
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.casechecker script
+--------------------------
+
+.. automodule:: scripts.casechecker
     :members:
     :undoc-members:
     :show-inheritance:
@@ -64,6 +79,14 @@ scripts.category script
 -----------------------
 
 .. automodule:: scripts.category
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.category\_redirect script
+---------------------------------
+
+.. automodule:: scripts.category_redirect
     :members:
     :undoc-members:
     :show-inheritance:
@@ -92,16 +115,16 @@ scripts.claimit script
     :undoc-members:
     :show-inheritance:
 
-scripts.clean_sandbox script
-----------------------------
+scripts.clean\_sandbox script
+-----------------------------
 
 .. automodule:: scripts.clean_sandbox
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.commons_link script
----------------------------
+scripts.commons\_link script
+----------------------------
 
 .. automodule:: scripts.commons_link
     :members:
@@ -116,32 +139,32 @@ scripts.commonscat script
     :undoc-members:
     :show-inheritance:
 
-scripts.coordinate_import script
---------------------------------
+scripts.coordinate\_import script
+---------------------------------
 
 .. automodule:: scripts.coordinate_import
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.cosmetic_changes script
--------------------------------
+scripts.cosmetic\_changes script
+--------------------------------
 
 .. automodule:: scripts.cosmetic_changes
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.create_categories script
---------------------------------
+scripts.create\_categories script
+---------------------------------
 
 .. automodule:: scripts.create_categories
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.data_ingestion script
------------------------------
+scripts.data\_ingestion script
+------------------------------
 
 .. automodule:: scripts.data_ingestion
     :members:
@@ -180,8 +203,8 @@ scripts.editarticle script
     :undoc-members:
     :show-inheritance:
 
-scripts.fixing_redirects script
--------------------------------
+scripts.fixing\_redirects script
+--------------------------------
 
 .. automodule:: scripts.fixing_redirects
     :members:
@@ -212,11 +235,16 @@ scripts.freebasemappingupload script
     :undoc-members:
     :show-inheritance:
 
-scripts.harvest_template script
--------------------------------
+scripts.harvest\_template script
+--------------------------------
 
-scripts.illustrate_wikidata script
-----------------------------------
+.. automodule:: scripts.harvest_template
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.illustrate\_wikidata script
+-----------------------------------
 
 .. automodule:: scripts.illustrate_wikidata
     :members:
@@ -239,8 +267,8 @@ scripts.imagecopy script
     :undoc-members:
     :show-inheritance:
 
-scripts.imagecopy_self script
------------------------------
+scripts.imagecopy\_self script
+------------------------------
 
 .. automodule:: scripts.imagecopy_self
     :members:
@@ -281,6 +309,12 @@ scripts.imageuncat script
 
 scripts.interwiki script
 ------------------------
+
+.. automodule:: scripts.interwiki
+    :members:
+    :exclude-members: Subject
+    :undoc-members:
+    :show-inheritance:
 
 scripts.interwikidata script
 ----------------------------
@@ -330,8 +364,8 @@ scripts.makecat script
     :undoc-members:
     :show-inheritance:
 
-scripts.match_images script
----------------------------
+scripts.match\_images script
+----------------------------
 
 .. automodule:: scripts.match_images
     :members:
@@ -413,6 +447,11 @@ scripts.piper script
 scripts.protect script
 ----------------------
 
+.. automodule:: scripts.protect
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 scripts.redirect script
 -----------------------
 
@@ -432,8 +471,8 @@ scripts.replace script
     :undoc-members:
     :show-inheritance:
 
-scripts.replicate_wiki script
------------------------------
+scripts.replicate\_wiki script
+------------------------------
 
 .. automodule:: scripts.replicate_wiki
     :members:
@@ -448,8 +487,8 @@ scripts.revertbot script
     :undoc-members:
     :show-inheritance:
 
-scripts.script_wui script
--------------------------
+scripts.script\_wui script
+--------------------------
 
 .. automodule:: scripts.script_wui
     :members:
@@ -472,8 +511,8 @@ scripts.shell script
     :undoc-members:
     :show-inheritance:
 
-scripts.solve_disambiguation script
------------------------------------
+scripts.solve\_disambiguation script
+------------------------------------
 
 .. automodule:: scripts.solve_disambiguation
     :members:
@@ -488,26 +527,26 @@ scripts.spamremove script
     :undoc-members:
     :show-inheritance:
 
-scripts.standardize_interwiki script
-------------------------------------
+scripts.standardize\_interwiki script
+-------------------------------------
 
 .. automodule:: scripts.standardize_interwiki
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.states_redirect script
-------------------------------
+scripts.states\_redirect script
+-------------------------------
 
 .. automodule:: scripts.states_redirect
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.surnames_redirect script
---------------------------------
+scripts.surnames\_redirects script
+----------------------------------
 
-.. automodule:: scripts.surnames_redirect
+.. automodule:: scripts.surnames_redirects
     :members:
     :undoc-members:
     :show-inheritance:
@@ -610,3 +649,5 @@ scripts.wikisourcetext script
     :members:
     :undoc-members:
     :show-inheritance:
+
+

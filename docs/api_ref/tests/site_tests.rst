@@ -1,53 +1,7 @@
-==========
-site_tests
-==========
-    Tests in ``tests.site_tests``:
+tests.site\_tests module
+========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.site_tests.SiteRandomTestCase
-        :members:
-    .. autoclass:: tests.site_tests.SiteSysopTestCase
-        :members:
-    .. autoclass:: tests.site_tests.SiteUserTestCase
-        :members:
-    .. autoclass:: tests.site_tests.TestUsernameInUsers
-        :members:
-    .. autoclass:: tests.site_tests.TestUserList
-        :members:
-    .. autoclass:: tests.site_tests.PatrolTestCase
-        :members:
-    .. autoclass:: tests.site_tests.TestDeprecatedEditTokenFunctions
-        :members:
-    .. autoclass:: tests.site_tests.TestDeprecatedPatrolToken
-        :members:
-    .. autoclass:: tests.site_tests.TestCommonsSite
-        :members:
-    .. autoclass:: tests.site_tests.TestDataSiteClientPreloading
-        :members:
-    .. autoclass:: tests.site_tests.TestDataSitePreloading
-        :members:
-    .. autoclass:: tests.site_tests.TestImageUsage
-        :members:
-    .. autoclass:: tests.site_tests.TestNonEnglishWikipediaSite
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteAPILimits
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteExtensions
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteInfo
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteLoadRevisions
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteLoadRevisionsSysop
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteObject
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteObjectDeprecatedFunctions
-        :members:
-    .. autoclass:: tests.site_tests.TestSiteTokens
-        :members:
-    .. autoclass:: tests.site_tests.TestWiktionarySite
-        :members:
-
+.. automodule:: tests.site_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

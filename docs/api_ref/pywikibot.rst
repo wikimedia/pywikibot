@@ -29,6 +29,14 @@ pywikibot.bot module
     :undoc-members:
     :show-inheritance:
 
+pywikibot.bot\_choice module
+----------------------------
+
+.. automodule:: pywikibot.bot_choice
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pywikibot.botirc module
 -----------------------
 
@@ -45,8 +53,8 @@ pywikibot.config2 module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.cosmetic_changes module
----------------------------------
+pywikibot.cosmetic\_changes module
+----------------------------------
 
 .. automodule:: pywikibot.cosmetic_changes
     :members:
@@ -118,7 +126,7 @@ pywikibot.fixes module
     :show-inheritance:
 
 pywikibot.flow module
-----------------------
+---------------------
 
 .. automodule:: pywikibot.flow
     :members:
@@ -133,8 +141,8 @@ pywikibot.i18n module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.interwiki_graph module
---------------------------------
+pywikibot.interwiki\_graph module
+---------------------------------
 
 .. automodule:: pywikibot.interwiki_graph
     :members:
@@ -145,6 +153,14 @@ pywikibot.logentries module
 ---------------------------
 
 .. automodule:: pywikibot.logentries
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pywikibot.logging module
+------------------------
+
+.. automodule:: pywikibot.logging
     :members:
     :undoc-members:
     :show-inheritance:
@@ -197,6 +213,22 @@ pywikibot.site module
     :undoc-members:
     :show-inheritance:
 
+pywikibot.site\_detect module
+-----------------------------
+
+.. automodule:: pywikibot.site_detect
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+pywikibot.specialbots module
+----------------------------
+
+.. automodule:: pywikibot.specialbots
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 pywikibot.textlib module
 ------------------------
 
@@ -244,3 +276,5 @@ pywikibot.xmlreader module
     :members:
     :undoc-members:
     :show-inheritance:
+
+

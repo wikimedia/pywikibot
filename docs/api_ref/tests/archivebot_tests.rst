@@ -1,11 +1,7 @@
-================
-archivebot_tests
-================
-    Tests in ``tests.archivebot_tests``:
+tests.archivebot\_tests module
+==============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.archivebot_tests.TestArchiveBot
-        :members:
-
+.. automodule:: tests.archivebot_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

@@ -12,7 +12,7 @@ from pywikibot import family
 
 # The LyricWiki family
 
-# user_config.py:
+# user-config.py:
 # usernames['lyricwiki']['en'] = 'user'
 class Family(family.SingleSiteFamily, family.WikiaFamily):
 

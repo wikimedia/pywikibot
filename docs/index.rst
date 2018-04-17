@@ -54,7 +54,7 @@ For framework developers:
    :maxdepth: 1
 
    api_ref/tests/index
-   scripts.maintenance
+   scripts/scripts.maintenance
 
 
 Miscellaneous

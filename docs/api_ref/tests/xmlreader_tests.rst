@@ -1,11 +1,7 @@
-===============
-xmlreader_tests
-===============
-    Tests in ``tests.xmlreader_tests``:
+tests.xmlreader\_tests module
+=============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.xmlreader_tests.XmlReaderTestCase
-        :members:
-
+.. automodule:: tests.xmlreader_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

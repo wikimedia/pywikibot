@@ -25,10 +25,11 @@ The following parameters are supported:
                    Page range to upload;
                    optional, start=1, end=djvu file number of images.
                    Page ranges can be specified as:
-                     A-B -> pages A until B
-                     A-  -> pages A until number of images
-                     A   -> just page A
-                     -B  -> pages 1 until B
+
+                   | A-B -> pages A until B
+                   | A-  -> pages A until number of images
+                   | A   -> just page A
+                   | -B  -> pages 1 until B
 
     -showdiff:     show difference between curent text and new text when
                    saving the page

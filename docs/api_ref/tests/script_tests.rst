@@ -1,14 +1,7 @@
-============
-script_tests
-============
-    Tests in ``tests.script_tests``:
+tests.script\_tests module
+==========================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.script_tests.TestScriptHelp
-        :members:
-    .. autoclass:: tests.script_tests.TestScriptSimulate
-        :members:
-    .. autofunction:: tests.script_tests.load_tests
-
+.. automodule:: tests.script_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

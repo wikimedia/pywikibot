@@ -1,15 +1,7 @@
-==============
-dry_site_tests
-==============
-    Tests in ``tests.dry_site_tests``:
+tests.dry\_site\_tests module
+=============================
 
----------------
-Available tests
----------------
-    .. autoclass:: tests.dry_site_tests.TestDrySite
-        :members:
-    .. autoclass:: tests.dry_site_tests.TestMustBe
-        :members:
-    .. autoclass:: tests.dry_site_tests.TestNeedVersion
-        :members:
-
+.. automodule:: tests.dry_site_tests
+    :members:
+    :undoc-members:
+    :show-inheritance:

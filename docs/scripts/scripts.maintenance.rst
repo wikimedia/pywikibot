@@ -33,18 +33,36 @@ scripts.maintenance.compat2core script
     :undoc-members:
     :show-inheritance:
 
-scripts.maintenance.make_i18n_dict script
+scripts.maintenance.diff\_checker script
+----------------------------------------
+
+.. automodule:: scripts.maintenance.diff_checker
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.maintenance.download\_dump script
 -----------------------------------------
+
+.. automodule:: scripts.maintenance.download_dump
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+scripts.maintenance.make\_i18n\_dict script
+-------------------------------------------
 
 .. automodule:: scripts.maintenance.make_i18n_dict
     :members:
     :undoc-members:
     :show-inheritance:
 
-scripts.maintenance.wikimedia_sites script
-------------------------------------------
+scripts.maintenance.wikimedia\_sites script
+-------------------------------------------
 
 .. automodule:: scripts.maintenance.wikimedia_sites
     :members:
     :undoc-members:
     :show-inheritance:
+
+
