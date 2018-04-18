@@ -38,7 +38,8 @@ is applied.
 
 Usage: python protect.py <OPTIONS>
 
-Examples:
+Examples
+--------
 
 Protect everything in the category 'To protect' prompting.
 

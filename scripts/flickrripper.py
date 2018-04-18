@@ -4,24 +4,25 @@
 Tool to copy a flickr stream to Commons.
 
 # Get a set to work on (start with just a username).
-# * Make it possible to delimit the set (from/to)
-#For each image
-#*Check the license
-#*Check if it isn't already on Commons
-#*Build suggested filename
-#**Check for name collision and maybe alter it
-#*Pull description from Flinfo
-#*Show image and description to user
-#**Add a nice hotcat lookalike for the adding of categories
-#**Filter the categories
-#*Upload the image
+  * Make it possible to delimit the set (from/to)
+# For each image
+  * Check the license
+  * Check if it isn't already on Commons
+  * Build suggested filename
+    * Check for name collision and maybe alter it
+  * Pull description from Flinfo
+  * Show image and description to user
+    * Add a nice hotcat lookalike for the adding of categories
+    * Filter the categories
+  * Upload the image
 
-Todo:
-*Check if the image is already uploaded (SHA hash)
-*Check and prevent filename collisions
-**Initial suggestion
-**User input
-*Filter the categories
+Todo
+----
+* Check if the image is already uploaded (SHA hash)
+* Check and prevent filename collisions
+  * Initial suggestion
+  * User input
+* Filter the categories
 """
 #
 # (C) Multichill, 2009

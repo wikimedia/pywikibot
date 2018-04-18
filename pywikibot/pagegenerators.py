@@ -615,7 +615,7 @@ class GeneratorFactory(object):
 
         @param category: category name with start parameter
         @type category: str
-        @rtype generator
+        @rtype: generator
         """
         cat, startfrom = self.getCategory(category)
 

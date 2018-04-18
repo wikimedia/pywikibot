@@ -984,8 +984,8 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     @param template_subpage: Indicates if text belongs to a template sub-page
         or not.
     @type template_subpage: bool
-    @return The modified text.
-    @rtype str
+    @return: The modified text.
+    @rtype: str
     """
     # Find a marker that is not already in the text.
     marker = findmarker(oldtext)

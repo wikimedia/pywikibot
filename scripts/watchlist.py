@@ -10,6 +10,7 @@ Syntax:
     python pwb.py watchlist [-all | -new]
 
 Command line options:
+
     -all  -  Reloads watchlists for all wikis where a watchlist is already
              present
     -new  -  Load watchlists for all wikis where accounts is setting in

@@ -1569,8 +1569,11 @@ class Request(MutableMapping):
         """Set MediaWiki API request parameter.
 
         @param key: param key
+
         @type key: basestring
+
         @param value: param value(s)
+
         @type value: unicode or str in site encoding
             (string types may be a |-separated list)
             iterable, where items are converted to unicode

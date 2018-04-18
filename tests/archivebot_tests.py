@@ -242,19 +242,19 @@ class TestDiscussionPageObject(TestCase):
 
         Talk:For-pywikibot-archivebot must have:
 
-        {{User:MiszaBot/config
-        |archive = Talk:Main_Page/archive
-        |algo = old(30d)
-        }}
-        <!-- normal comments -->
-        == A ==
-        foo bar
-        <!--
-        == Z ==
-        foo bar bar
-        -->
-        == B ==
-        foo bar bar bar
+         {{User:MiszaBot/config
+         |archive = Talk:Main_Page/archive
+         |algo = old(30d)
+         }}
+         <!-- normal comments -->
+         == A ==
+         foo bar
+         <!--
+         == Z ==
+         foo bar bar
+         -->
+         == B ==
+         foo bar bar bar
         """
         page = pywikibot.Page(self.get_site(), 'Talk:For-pywikibot-archivebot')
         archiver = archivebot.PageArchiver(

@@ -66,7 +66,7 @@ These parameters are supported to specify which pages titles to print:
             translation key.
 
 Custom format can be applied to the following items extrapolated from a
-    page object:
+page object:
 
     site: obtained from page._link._site.
 

@@ -3,8 +3,6 @@
 """
 Generate a i18n file from a given script.
 
-usage:
-
 run IDLE at topmost level:
 
 >>> import pwb

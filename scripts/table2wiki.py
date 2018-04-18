@@ -26,7 +26,7 @@ These command line parameters can be used to specify which pages to work on:
 
 Example:
 
-      pwb.py table2wiki -xml:20050713_pages_current.xml -lang:de
+    python pwb.py table2wiki -xml:20050713_pages_current.xml -lang:de
 
 FEATURES
 Save against missing </td>

@@ -7,7 +7,8 @@ Very often sysops block the pages for a setted time but then the forget to
 remove the warning! This script is useful if you want to remove those useless
 warning left in these pages.
 
-Parameters:
+Parameters
+----------
 
 These command line parameters can be used to specify which pages to work on:
 

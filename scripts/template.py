@@ -58,7 +58,8 @@ other:       First argument is the old template name, second one is the new
              If you want to address a template which has spaces, put quotation
              marks around it, or use underscores.
 
-Examples:
+Examples
+--------
 
 If you have a template called [[Template:Cities in Washington]] and want to
 change it to [[Template:Cities in Washington state]], start

@@ -1,3 +1,12 @@
+===========
+Subpackages
+===========
+
+.. toctree::
+
+    i18n
+    pwb
+
 =============
 Library tests
 =============
