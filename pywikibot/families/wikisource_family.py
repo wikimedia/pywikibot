@@ -35,7 +35,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'ca', 'ta', 'kn', 'br', 'nl', 'hr', 'is', 'la', 'no', 'vec', 'eo',
             'tr', 'et', 'be', 'mk', 'yi', 'da', 'id', 'bg', 'li', 'mr', 'as',
             'or', 'bs', 'sah', 'lt', 'gl', 'sk', 'cy', 'pa', 'zh-min-nan',
-            'fo',
+            'fo', 'eu',
         ]
 
         super(Family, self).__init__()
