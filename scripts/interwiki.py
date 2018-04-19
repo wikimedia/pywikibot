@@ -455,125 +455,103 @@ class InterwikiBotConfig(object):
     summary = u''
     repository = False
 
-    def readOptions(self, arg):
-        """Read all commandline parameters for the global container."""
-        if arg == '-noauto':
-            self.auto = False
-        elif arg.startswith('-hint:'):
-            self.hints.append(arg[6:])
-        elif arg.startswith('-hintfile'):
-            hintfilename = arg[10:]
-            if (hintfilename is None) or (hintfilename == ''):
-                hintfilename = pywikibot.input(
-                    u'Please enter the hint filename:')
-            f = codecs.open(hintfilename, 'r', config.textfile_encoding)
+    def note(self, text):
+        """Output a notification message with.
 
+        The text will be printed only if conf.quiet isn't set.
+        @param text: text to be shown
+        @type text: str
+        """
+        if not self.quiet:
+            pywikibot.output('NOTE: ' + text)
+
+    def readOptions(self, option):
+        """Read all commandline parameters for the global container."""
+        arg, _, value = option.partition(':')
+        if not arg.startswith('-'):
+            return False
+
+        arg = arg[1:]
+        if arg == 'noauto':
+            self.auto = False
+        elif arg == 'hint':
+            self.hints.append(value)
+        elif arg == 'hintfile':
+            hintfilename = value or pywikibot.input(
+                'Please enter the hint filename:')
             # hint or title ends either before | or before ]]
             R = re.compile(r'\[\[(.+?)(?:\]\]|\|)')
-            for pageTitle in R.findall(f.read()):
-                self.hints.append(pageTitle)
-            f.close()
-        elif arg == '-force':
-            self.force = True
-        elif arg == '-cleanup':
-            self.cleanup = True
-        elif arg == '-same':
-            self.same = True
-        elif arg == '-wiktionary':
+            with codecs.open(hintfilename, 'r', config.textfile_encoding) as f:
+                self.hints += R.findall(f.read())
+        elif arg == 'wiktionary':
             self.same = 'wiktionary'
             # Don't use auto-translation in -wiktionary mode
             # where page titles must be the same
             self.auto = False
-        elif arg == '-repository':
-            self.repository = True
-        elif arg == '-untranslated':
-            self.untranslated = True
-        elif arg == '-untranslatedonly':
+        elif arg == 'untranslatedonly':
             self.untranslated = True
             self.untranslatedonly = True
-        elif arg == '-askhints':
+        elif arg == 'askhints':
             self.untranslated = True
             self.untranslatedonly = False
             self.askhints = True
-        elif arg == '-hintnobracket':
-            self.hintnobracket = True
-        elif arg == '-confirm':
-            self.confirm = True
-        elif arg == '-select':
-            self.select = True
-        elif arg == '-autonomous' or arg == '-auto':
+        elif arg in ('autonomous', 'auto'):
             self.autonomous = True
-        elif arg == '-noredirect':
+        elif arg == 'noredirect':
             self.followredirect = False
-        elif arg == '-initialredirect':
-            self.initialredirect = True
-        elif arg == '-localonly':
-            self.localonly = True
-        elif arg == '-limittwo':
+        elif arg == 'limittwo':
             self.limittwo = True
             self.strictlimittwo = True
-        elif arg.startswith('-whenneeded'):
+        elif arg == 'whenneeded':
             self.limittwo = True
             self.strictlimittwo = False
-            try:
-                self.needlimit = int(arg[12:])
-            except KeyError:
-                pass
-            except ValueError:
-                pass
-        elif arg.startswith('-skipfile:'):
-            skipfile = arg[10:]
-            skipPageGen = pagegenerators.TextfilePageGenerator(skipfile)
-            for page in skipPageGen:
-                self.skip.add(page)
-            del skipPageGen
-        elif arg == '-skipauto':
-            self.skipauto = True
-        elif arg.startswith('-neverlink:'):
-            self.neverlink += arg[11:].split(",")
-        elif arg.startswith('-ignore:'):
+            if value.isdigit():
+                self.needlimit = int(value)
+        elif arg == 'skipfile':
+            skip_page_gen = pagegenerators.TextfilePageGenerator(value)
+            self.skip.update(skip_page_gen)
+            del skip_page_gen
+        elif arg == 'neverlink':
+            self.neverlink += value.split(',')
+        elif arg == 'ignore':
             self.ignore += [pywikibot.Page(pywikibot.Site(), p)
-                            for p in arg[8:].split(',')]
-        elif arg.startswith('-ignorefile:'):
-            ignorefile = arg[12:]
-            ignorePageGen = pagegenerators.TextfilePageGenerator(ignorefile)
-            for page in ignorePageGen:
-                self.ignore.append(page)
-            del ignorePageGen
-        elif arg == '-showpage':
+                            for p in value.split(',')]
+        elif arg == 'ignorefile':
+            ignore_page_gen = pagegenerators.TextfilePageGenerator(value)
+            self.ignore.update(ignore_page_gen)
+            del ignore_page_gen
+        elif arg == 'showpage':
             self.showtextlink += self.showtextlinkadd
-        elif arg == '-graph':
+        elif arg == 'graph':
             # override configuration
             config.interwiki_graph = True
-        elif arg == '-bracket':
+        elif arg == 'bracket':
             self.parenthesesonly = True
-        elif arg == '-localright':
+        elif arg == 'localright':
             self.followinterwiki = False
-        elif arg == '-hintsareright':
-            self.hintsareright = True
-        elif arg.startswith('-array:'):
-            self.minsubjects = int(arg[7:])
-        elif arg.startswith('-query:'):
-            self.maxquerysize = int(arg[7:])
-        elif arg == '-back':
+        elif arg == 'array':
+            if value.isdigit():
+                self.minsubjects = int(value)
+        elif arg == 'query':
+            if value.isdigit():
+                self.maxquerysize = int(value)
+        elif arg == 'back':
             self.nobackonly = True
-        elif arg == '-quiet':
-            self.quiet = True
-        elif arg == '-async':
+        elif arg == 'async':
             self.asynchronous = True
-        elif arg.startswith('-summary'):
-            if len(arg) == 8:
-                self.summary = pywikibot.input(
-                    u'What summary do you want to use?')
-            else:
-                self.summary = arg[9:]
-        elif arg.startswith('-lack:'):
-            remainder = arg[6:].split(':')
-            self.lacklanguage = remainder[0]
-            if len(remainder) > 1:
-                self.minlinks = int(remainder[1])
-            else:
-                self.minlinks = 1
+        elif arg == 'summary':
+            self.summary = value or pywikibot.input(
+                'What summary do you want to use?')
+        elif arg == 'lack':
+            self.lacklanguage, sep, minlinks = value.partition(':')
+            self.minlinks = int(minlinks) if minlinks.isdigit() else 1
+        elif arg in ('cleanup', 'confirm', 'force', 'hintnobracket',
+                     'hintsareright', 'initialredirect', 'localonly', 'quiet',
+                     'repository', 'same', 'select', 'skipauto',
+                     'untranslated'):
+            assert hasattr(self, arg)
+            assert value == ''
+            setattr(self, arg, True)
         else:
             return False
         return True
@@ -1169,9 +1147,8 @@ class Subject(interwiki_graph.Subject):
 
     def reportInterwikilessPage(self, page):
         """Report interwikiless page."""
-        if not self.conf.quiet:
-            pywikibot.output(u"NOTE: %s does not have any interwiki links"
-                             % self.originPage)
+        self.conf.note('{} does not have any interwiki links'
+                       .format(self.originPage))
         if config.without_interwiki:
             f = codecs.open(
                 pywikibot.config.datafilepath('without_interwiki.txt'),
@@ -1262,9 +1239,7 @@ class Subject(interwiki_graph.Subject):
 
             if not page.exists():
                 self.conf.remove.append(unicode(page))
-                if not self.conf.quiet:
-                    pywikibot.output(u"NOTE: %s does not exist. Skipping."
-                                     % page)
+                self.conf.note('{} does not exist. Skipping.'.format(page))
                 if page == self.originPage:
                     # The page we are working on is the page that does not
                     # exist. No use in doing any work on it in that case.
@@ -1283,9 +1258,8 @@ class Subject(interwiki_graph.Subject):
                 else:
                     redirectTargetPage = page.getCategoryRedirectTarget()
                     redir = 'category '
-                if not self.conf.quiet:
-                    pywikibot.output(u"NOTE: %s is %sredirect to %s"
-                                     % (page, redir, redirectTargetPage))
+                self.conf.note('{} is {}redirect to {}'
+                               .format(page, redir, redirectTargetPage))
                 if self.originPage is None or page == self.originPage:
                     # the 1st existig page becomes the origin page, if none was
                     # supplied
@@ -1307,13 +1281,10 @@ class Subject(interwiki_graph.Subject):
                             counter.minus(site, count)
                         self.todo = PageTree()
                 elif not self.conf.followredirect:
-                    if not self.conf.quiet:
-                        pywikibot.output(u"NOTE: not following %sredirects."
-                                         % redir)
+                    self.conf.note('not following {}redirects.'.format(redir))
                 elif page.isStaticRedirect():
-                    if not self.conf.quiet:
-                        pywikibot.output(
-                            u"NOTE: not following static %sredirects." % redir)
+                    self.conf.note('not following static {}redirects.'
+                                   .format(redir))
                 elif (page.site.family == redirectTargetPage.site.family and
                       not self.skipPage(page, redirectTargetPage, counter)):
                     if self.addIfNew(redirectTargetPage, counter, page):
@@ -1327,8 +1298,7 @@ class Subject(interwiki_graph.Subject):
             # otherwise a redirect error would be raised
             elif page_empty_check(page):
                 self.conf.remove.append(unicode(page))
-                if not self.conf.quiet:
-                    pywikibot.output(u"NOTE: %s is empty. Skipping." % page)
+                self.conf.note('{} is empty. Skipping.'.format(page))
                 if page == self.originPage:
                     for site, count in self.todo.siteCounts():
                         counter.minus(site, count)
@@ -1338,9 +1308,7 @@ class Subject(interwiki_graph.Subject):
                 continue
 
             elif page.section():
-                if not self.conf.quiet:
-                    pywikibot.output(u"NOTE: %s is a page section. Skipping."
-                                     % page)
+                self.conf.note('{} is a page section. Skipping.'.format(page))
                 continue
 
             # Page exists, isnt a redirect, and is a plain link (no section)
@@ -1351,9 +1319,7 @@ class Subject(interwiki_graph.Subject):
             try:
                 iw = page.langlinks()
             except pywikibot.UnknownSite:
-                if not self.conf.quiet:
-                    pywikibot.output(u"NOTE: site %s does not exist."
-                                     % page.site)
+                self.conf.note('site {} does not exist.'.format(page.site))
                 continue
 
             (skip, alternativePage) = self.disambigMismatch(page, counter)
@@ -1846,8 +1812,7 @@ class Subject(interwiki_graph.Subject):
                 self.conf.summary
             )
         if not mods:
-            if not self.conf.quiet:
-                pywikibot.output(u'No changes needed on page %s' % page)
+            self.conf.note('No changes needed on page {}'.format(page))
             return False
 
         # Show a message in purple.
@@ -1913,8 +1878,7 @@ class Subject(interwiki_graph.Subject):
             answer = 'y'
         # If we got permission to submit, do so
         if answer == 'y':
-            if not self.conf.quiet:
-                pywikibot.output(u"NOTE: Updating live wiki...")
+            self.conf.note('Updating live wiki...')
             timeout = 60
             page.text = newtext
             while True:
@@ -2091,9 +2055,9 @@ class InterwikiBot(object):
         PageGenerator
         """
         fs = self.firstSubject()
-        if fs and (not self.conf.quiet):
-            pywikibot.output(u"NOTE: The first unfinished subject is %s"
-                             % fs.originPage)
+        if fs:
+            self.conf.note('The first unfinished subject is {}'
+                           .format(fs.originPage))
         pywikibot.output(
             'NOTE: Number of pages queued is {0}, trying to add {1} more.'
             .format(len(self.subjects), number))
