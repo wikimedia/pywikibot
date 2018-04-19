@@ -89,7 +89,7 @@ def messages_available():
     return True
 
 
-def _altlang(code):
+def _altlang(lang):
     """Define fallback languages for particular languages.
 
     If no translation is available to a specified language, translate() will
@@ -101,207 +101,207 @@ def _altlang(code):
 
     This code is used by other translating methods below.
 
-    @param code: The language code
-    @type code: string
+    @param lang: The language code
+    @type lang: string
     @return: language codes
     @rtype: list of str
     """
     # Akan
-    if code in ['ak', 'tw']:
+    if lang in ['ak', 'tw']:
         return ['ak', 'tw']
     # Amharic
-    if code in ['aa', 'ti']:
+    if lang in ['aa', 'ti']:
         return ['am']
     # Arab
-    if code in ['arc', 'arz', 'so']:
+    if lang in ['arc', 'arz', 'so']:
         return ['ar']
-    if code == 'kab':
+    if lang == 'kab':
         return ['ar', 'fr']
     # Bulgarian
-    if code in ['cu', 'mk']:
+    if lang in ['cu', 'mk']:
         return ['bg', 'sr', 'sh']
     # Czech
-    if code in ['cs', 'sk']:
+    if lang in ['cs', 'sk']:
         return ['cs', 'sk']
     # German
-    if code in ['bar', 'frr', 'ksh', 'pdc', 'pfl']:
+    if lang in ['bar', 'frr', 'ksh', 'pdc', 'pfl']:
         return ['de']
-    if code == 'lb':
+    if lang == 'lb':
         return ['de', 'fr']
-    if code in ['als', 'gsw']:
+    if lang in ['als', 'gsw']:
         return ['als', 'gsw', 'de']
-    if code == 'nds':
+    if lang == 'nds':
         return ['nds-nl', 'de']
-    if code in ['dsb', 'hsb']:
+    if lang in ['dsb', 'hsb']:
         return ['hsb', 'dsb', 'de']
-    if code == 'sli':
+    if lang == 'sli':
         return ['de', 'pl']
-    if code == 'rm':
+    if lang == 'rm':
         return ['de', 'it']
-    if code == 'stq':
+    if lang == 'stq':
         return ['nds', 'de']
     # Greek
-    if code in ['grc', 'pnt']:
+    if lang in ['grc', 'pnt']:
         return ['el']
     # Esperanto
-    if code in ['io', 'nov']:
+    if lang in ['io', 'nov']:
         return ['eo']
     # Spanish
-    if code in ['an', 'arn', 'ast', 'ay', 'ext', 'lad', 'nah', 'nv', 'qu',
+    if lang in ['an', 'arn', 'ast', 'ay', 'ext', 'lad', 'nah', 'nv', 'qu',
                 'yua']:
         return ['es']
-    if code == 'ca':
+    if lang == 'ca':
         return ['oc', 'es']
-    if code in ['gl', 'gn']:
+    if lang in ['gl', 'gn']:
         return ['es', 'pt']
-    if code == 'eu':
+    if lang == 'eu':
         return ['es', 'fr']
-    if code == 'cbk-zam':
+    if lang == 'cbk-zam':
         return ['es', 'tl']
     # Estonian
-    if code in ['fiu-vro', 'vro']:
+    if lang in ['fiu-vro', 'vro']:
         return ['fiu-vro', 'vro', 'et']
-    if code == 'liv':
+    if lang == 'liv':
         return ['et', 'lv']
     # Persian (Farsi)
-    if code in ['azb', 'lrc', 'ps']:
+    if lang in ['azb', 'lrc', 'ps']:
         return ['fa']
-    if code in ['glk', 'mzn']:
+    if lang in ['glk', 'mzn']:
         return ['glk', 'mzn', 'fa', 'ar']
     # Finnish
-    if code == 'vep':
+    if lang == 'vep':
         return ['et', 'fi', 'ru']
-    if code == 'fit':
+    if lang == 'fit':
         return ['fi', 'sv']
-    if code == 'olo':
+    if lang == 'olo':
         return ['fi']
     # French
-    if code in ['atj', 'bm', 'br', 'ff', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm',
+    if lang in ['atj', 'bm', 'br', 'ff', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm',
                 'pcd', 'rw', 'sg', 'ty', 'wa', 'wo']:
         return ['fr']
-    if code == 'oc':
+    if lang == 'oc':
         return ['fr', 'ca', 'es']
-    if code in ['co', 'frp']:
+    if lang in ['co', 'frp']:
         return ['fr', 'it']
     # Hindi
-    if code in ['mai', 'sa']:
+    if lang in ['mai', 'sa']:
         return ['hi']
-    if code in ['ne', 'new']:
+    if lang in ['ne', 'new']:
         return ['ne', 'new', 'hi']
-    if code == 'dty':
+    if lang == 'dty':
         return ['ne']
-    if code in ['bh', 'bho']:
+    if lang in ['bh', 'bho']:
         return ['bh', 'bho']
     # Indonesian and Malay
-    if code in ['ace', 'bug', 'bjn', 'id', 'jv', 'ms', 'su']:
+    if lang in ['ace', 'bug', 'bjn', 'id', 'jv', 'ms', 'su']:
         return ['id', 'ms', 'jv']
-    if code == 'map-bms':
+    if lang == 'map-bms':
         return ['jv', 'id', 'ms']
-    if code == 'min':
+    if lang == 'min':
         return ['id']
     # Inuit languages
-    if code in ['ik', 'iu']:
+    if lang in ['ik', 'iu']:
         return ['iu', 'kl']
-    if code == 'kl':
+    if lang == 'kl':
         return ['da', 'iu', 'no', 'nb']
     # Italian
-    if code in ['eml', 'fur', 'lij', 'lmo', 'nap', 'pms', 'roa-tara', 'sc',
+    if lang in ['eml', 'fur', 'lij', 'lmo', 'nap', 'pms', 'roa-tara', 'sc',
                 'scn', 'vec']:
         return ['it']
     # Lithuanian
-    if code in ['bat-smg', 'sgs']:
+    if lang in ['bat-smg', 'sgs']:
         return ['bat-smg', 'sgs', 'lt']
     # Latvian
-    if code == 'ltg':
+    if lang == 'ltg':
         return ['lv']
     # Dutch
-    if code in ['af', 'fy', 'li', 'pap', 'srn', 'vls', 'zea']:
+    if lang in ['af', 'fy', 'li', 'pap', 'srn', 'vls', 'zea']:
         return ['nl']
-    if code == 'nds-nl':
+    if lang == 'nds-nl':
         return ['nds', 'nl']
     # Polish
-    if code in ['csb', 'szl']:
+    if lang in ['csb', 'szl']:
         return ['pl']
     # Portuguese
-    if code in ['fab', 'mwl', 'tet']:
+    if lang in ['fab', 'mwl', 'tet']:
         return ['pt']
     # Romanian
-    if code in ['roa-rup', 'rup']:
+    if lang in ['roa-rup', 'rup']:
         return ['roa-rup', 'rup', 'ro']
-    if code in ['mo', 'rmy']:
+    if lang in ['mo', 'rmy']:
         return ['ro']
     # Russian and Belarusian
-    if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'inh', 'kk', 'koi', 'krc',
+    if lang in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'inh', 'kk', 'koi', 'krc',
                 'kv', 'ky', 'lbe', 'lez', 'mdf', 'mhr', 'mn', 'mrj', 'myv',
                 'os', 'sah', 'tg', 'tyv', 'udm', 'uk', 'xal']:
         return ['ru']
-    if code in ['kbd', 'ady']:
+    if lang in ['kbd', 'ady']:
         return ['kbd', 'ady', 'ru']
-    if code == 'tt':
+    if lang == 'tt':
         return ['tt-cyrl', 'ru']
-    if code in ['be', 'be-tarask']:
+    if lang in ['be', 'be-tarask']:
         return ['be', 'be-tarask', 'ru']
-    if code == 'kaa':
+    if lang == 'kaa':
         return ['uz', 'ru']
     # Serbocroatian
-    if code in ['bs', 'hr', 'sh']:
+    if lang in ['bs', 'hr', 'sh']:
         return ['sh', 'hr', 'bs', 'sr', 'sr-el']
-    if code == 'sr':
+    if lang == 'sr':
         return ['sr-el', 'sh', 'hr', 'bs']
     # Tagalog
-    if code in ['bcl', 'ceb', 'ilo', 'pag', 'pam', 'war']:
+    if lang in ['bcl', 'ceb', 'ilo', 'pag', 'pam', 'war']:
         return ['tl']
     # Turkish and Kurdish
-    if code in ['diq', 'ku']:
+    if lang in ['diq', 'ku']:
         return ['ku', 'ku-latn', 'tr']
-    if code == 'gag':
+    if lang == 'gag':
         return ['tr']
-    if code == 'ckb':
+    if lang == 'ckb':
         return ['ku']
     # Ukrainian
-    if code in ['crh', 'crh-latn']:
+    if lang in ['crh', 'crh-latn']:
         return ['crh', 'crh-latn', 'uk', 'ru']
-    if code in ['rue']:
+    if lang in ['rue']:
         return ['uk', 'ru']
     # Chinese
-    if code in ['zh-classical', 'lzh', 'minnan', 'nan', 'zh-tw',
+    if lang in ['zh-classical', 'lzh', 'minnan', 'nan', 'zh-tw',
                 'zh', 'zh-hans']:
         return ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']
-    if code == 'zh-min-nan':
+    if lang == 'zh-min-nan':
         return ['cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical',
                 'lzh']
-    if code in ['cdo', 'gan', 'hak', 'ii', 'wuu', 'za', 'zh-classical', 'lzh',
+    if lang in ['cdo', 'gan', 'hak', 'ii', 'wuu', 'za', 'zh-classical', 'lzh',
                 'zh-cn', 'zh-yue', 'yue']:
         return ['zh', 'zh-hans' 'zh-cn', 'zh-tw', 'zh-classical', 'lzh']
     # Scandinavian languages
-    if code in ['da', 'sv']:
+    if lang in ['da', 'sv']:
         return ['da', 'no', 'nb', 'sv', 'nn']
-    if code in ['fo', 'is']:
+    if lang in ['fo', 'is']:
         return ['da', 'no', 'nb', 'nn', 'sv']
-    if code == 'nn':
+    if lang == 'nn':
         return ['no', 'nb', 'sv', 'da']
-    if code in ['no', 'nb']:
+    if lang in ['no', 'nb']:
         return ['no', 'nb', 'da', 'nn', 'sv']
-    if code == 'se':
+    if lang == 'se':
         return ['sv', 'no', 'nb', 'nn', 'fi']
     # Other languages
-    if code in ['bi', 'tpi']:
+    if lang in ['bi', 'tpi']:
         return ['bi', 'tpi']
-    if code == 'yi':
+    if lang == 'yi':
         return ['he', 'de']
-    if code in ['ia', 'ie']:
+    if lang in ['ia', 'ie']:
         return ['ia', 'la', 'it', 'fr', 'es']
-    if code == 'xmf':
+    if lang == 'xmf':
         return ['ka']
-    if code in ['nso', 'st']:
+    if lang in ['nso', 'st']:
         return ['st', 'nso']
-    if code in ['kj', 'ng']:
+    if lang in ['kj', 'ng']:
         return ['kj', 'ng']
-    if code in ['meu', 'hmo']:
+    if lang in ['meu', 'hmo']:
         return ['meu', 'hmo']
-    if code in ['as', 'bpy']:
+    if lang in ['as', 'bpy']:
         return ['bn']
-    if code == 'tcy':
+    if lang == 'tcy':
         return ['kn']
     # Default value
     return []
