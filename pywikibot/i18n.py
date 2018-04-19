@@ -147,9 +147,11 @@ def _altlang(code):
     if code in ['io', 'nov']:
         return ['eo']
     # Spanish
-    if code in ['an', 'arn', 'ast', 'ay', 'ca', 'ext', 'lad', 'nah', 'nv', 'qu',
+    if code in ['an', 'arn', 'ast', 'ay', 'ext', 'lad', 'nah', 'nv', 'qu',
                 'yua']:
         return ['es']
+    if code == 'ca':
+        return ['oc', 'es']
     if code in ['gl', 'gn']:
         return ['es', 'pt']
     if code == 'eu':
@@ -162,28 +164,32 @@ def _altlang(code):
     if code == 'liv':
         return ['et', 'lv']
     # Persian (Farsi)
-    if code == 'ps':
+    if code in ['azb', 'lrc', 'ps']:
         return ['fa']
     if code in ['glk', 'mzn']:
         return ['glk', 'mzn', 'fa', 'ar']
     # Finnish
     if code == 'vep':
-        return ['fi', 'ru']
+        return ['et', 'fi', 'ru']
     if code == 'fit':
         return ['fi', 'sv']
+    if code == 'olo':
+        return ['fi']
     # French
-    if code in ['atj', 'bm', 'br', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm', 'pcd',
-                'rw', 'sg', 'ty', 'wa']:
+    if code in ['atj', 'bm', 'br', 'ff', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm',
+                'pcd', 'rw', 'sg', 'ty', 'wa', 'wo']:
         return ['fr']
     if code == 'oc':
         return ['fr', 'ca', 'es']
     if code in ['co', 'frp']:
         return ['fr', 'it']
     # Hindi
-    if code in ['sa']:
+    if code in ['mai', 'sa']:
         return ['hi']
     if code in ['ne', 'new']:
         return ['ne', 'new', 'hi']
+    if code == 'dty':
+        return ['ne']
     if code in ['bh', 'bho']:
         return ['bh', 'bho']
     # Indonesian and Malay
@@ -191,6 +197,8 @@ def _altlang(code):
         return ['id', 'ms', 'jv']
     if code == 'map-bms':
         return ['jv', 'id', 'ms']
+    if code == 'min':
+        return ['id']
     # Inuit languages
     if code in ['ik', 'iu']:
         return ['iu', 'kl']
@@ -209,7 +217,7 @@ def _altlang(code):
     # Dutch
     if code in ['af', 'fy', 'li', 'pap', 'srn', 'vls', 'zea']:
         return ['nl']
-    if code == ['nds-nl']:
+    if code == 'nds-nl':
         return ['nds', 'nl']
     # Polish
     if code in ['csb', 'szl']:
@@ -220,12 +228,12 @@ def _altlang(code):
     # Romanian
     if code in ['roa-rup', 'rup']:
         return ['roa-rup', 'rup', 'ro']
-    if code == 'mo':
+    if code in ['mo', 'rmy']:
         return ['ro']
     # Russian and Belarusian
     if code in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'inh', 'kk', 'koi', 'krc',
                 'kv', 'ky', 'lbe', 'lez', 'mdf', 'mhr', 'mn', 'mrj', 'myv',
-                'os', 'sah', 'tg', 'udm', 'uk', 'xal']:
+                'os', 'sah', 'tg', 'tyv', 'udm', 'uk', 'xal']:
         return ['ru']
     if code in ['kbd', 'ady']:
         return ['kbd', 'ady', 'ru']
@@ -256,9 +264,12 @@ def _altlang(code):
     if code in ['rue']:
         return ['uk', 'ru']
     # Chinese
-    if code in ['zh-classical', 'lzh', 'minnan', 'zh-min-nan', 'nan', 'zh-tw',
+    if code in ['zh-classical', 'lzh', 'minnan', 'nan', 'zh-tw',
                 'zh', 'zh-hans']:
         return ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']
+    if code == 'zh-min-nan':
+        return ['cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical',
+                'lzh']
     if code in ['cdo', 'gan', 'hak', 'ii', 'wuu', 'za', 'zh-classical', 'lzh',
                 'zh-cn', 'zh-yue', 'yue']:
         return ['zh', 'zh-hans' 'zh-cn', 'zh-tw', 'zh-classical', 'lzh']
@@ -288,8 +299,10 @@ def _altlang(code):
         return ['kj', 'ng']
     if code in ['meu', 'hmo']:
         return ['meu', 'hmo']
-    if code == ['as']:
+    if code in ['as', 'bpy']:
         return ['bn']
+    if code == 'tcy':
+        return ['kn']
     # Default value
     return []
 
