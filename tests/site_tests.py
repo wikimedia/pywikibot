@@ -3567,8 +3567,8 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
     """Test page_from_repository method."""
 
     sites = {
-        'it.wb': {
-            'family': 'wikinews',
+        'it.ws': {
+            'family': 'wikisource',
             'code': 'it',
             'result': 'Categoria:2016',
         },
