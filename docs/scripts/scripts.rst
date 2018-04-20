@@ -312,7 +312,6 @@ scripts.interwiki script
 
 .. automodule:: scripts.interwiki
     :members:
-    :exclude-members: Subject
     :undoc-members:
     :show-inheritance:
 
