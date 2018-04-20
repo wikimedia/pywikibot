@@ -454,6 +454,10 @@ scripts.protect script
 
 scripts.redirect script
 -----------------------
+.. automodule:: scripts.redirect
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 scripts.reflinks script
 -----------------------
