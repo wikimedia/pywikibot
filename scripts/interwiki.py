@@ -134,6 +134,7 @@ These arguments are useful to provide hints to the bot:
 
                    There are some special hints, trying a number of languages
                    at once:
+
                       * all:       All languages with at least ca. 100 articles
                       * 10:        The 10 largest languages (sites with most
                                    articles). Analogous for any other natural
@@ -146,6 +147,7 @@ These arguments are useful to provide hints to the bot:
 
                    Names of families that forward their interlanguage links
                    to the wiki family being worked upon can be used, they are:
+
                       * commons:   Interlanguage links of Mediawiki Commons
                       * incubator: Links in pages on the Mediawiki Incubator
                       * meta:      Interlanguage links of named pages on Meta
@@ -285,10 +287,12 @@ multiple languages, and specify on which sites the bot should modify pages:
 
     -whenneeded    works like limittwo, but other languages are changed in the
                    following cases:
+
                    * If there are no interwiki links at all on the page
                    * If an interwiki link must be removed
                    * If an interwiki link must be changed and there has been
                      a conflict for this page
+
                    Optionally, -whenneeded can be given an additional number
                    (for example -whenneeded:3), in which case other languages
                    will be changed if there are that number or more links to
@@ -723,8 +727,11 @@ class Subject(interwiki_graph.Subject):
     A formal way to compute that closure would be:
 
     With P a set of pages, NL ('NextLevel') a function on sets defined as:
+
         NL(P) = { target | ∃ source ∈ P, target ∈ source.langlinks() }
-    pseudocode:
+
+    pseudocode::
+
         todo <- [originPage]
         done <- []
         while todo != []:
@@ -738,7 +745,7 @@ class Subject(interwiki_graph.Subject):
     to compute efficiently NL(P), one has to load the page contents of
     pages in P.
     (Not only the langlinks have to be parsed from each Page, but we also want
-     to know if the Page is a redirect, a disambiguation, etc...)
+    to know if the Page is a redirect, a disambiguation, etc...)
 
     Because of this, the pages in pending have to be preloaded.
     However, because the pages in pending are likely to be in several sites
@@ -748,7 +755,8 @@ class Subject(interwiki_graph.Subject):
     Site, and we put in pending all the pages from todo that belong to that
     Site:
 
-    Code becomes:
+    Code becomes::
+
         todo <- {originPage.site:[originPage]}
         done <- []
         while todo != {}:
@@ -763,6 +771,7 @@ class Subject(interwiki_graph.Subject):
 
     Subject objects only operate on pages that should have been preloaded
     before. In fact, at any time:
+
       * todo contains new Pages that have not been loaded yet
       * done contains Pages that have been loaded, and that have been treated.
       * If batch preloadings are successful, Page._get() is never called from
