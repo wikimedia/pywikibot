@@ -20,7 +20,8 @@ Pages to work on can be specified using any of:
 
 &params;
 
-Example commands:
+Examples
+--------
 
 Transfer all pages in category "Query service" from the English Wikipedia to
 the Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:

@@ -16,11 +16,13 @@ Arguments:
   -chunked:     Upload the file in chunks (more overhead, but restartable). If
                 no value is specified the chunk size is 1 MiB. The value must
                 be a number which can be preceded by a suffix. The units are:
-                  No suffix: Bytes
-                  'k': Kilobytes (1000 B)
-                  'M': Megabytes (1000000 B)
-                  'Ki': Kibibytes (1024 B)
-                  'Mi': Mebibytes (1024x1024 B)
+
+                    No suffix: Bytes
+                    'k': Kilobytes (1000 B)
+                    'M': Megabytes (1000000 B)
+                    'Ki': Kibibytes (1024 B)
+                    'Mi': Mebibytes (1024x1024 B)
+
                 The suffixes are case insensitive.
   -always       Don't ask the user anything. This will imply -keep and
                 -noverify and require that either -abortonwarn or -ignorewarn

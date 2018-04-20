@@ -578,10 +578,9 @@ class ThreadedGenerator(threading.Thread):
         an iterable object).
 
         @param qsize: The size of the lookahead queue. The larger the qsize,
-        the more values will be computed in advance of use (which can eat
-        up memory and processor time).
+            the more values will be computed in advance of use (which can eat
+            up memory and processor time).
         @type qsize: int
-
         """
         if kwargs is None:
             kwargs = {}

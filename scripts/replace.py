@@ -76,8 +76,10 @@ Furthermore, the following command line parameters are supported:
                   it'll ask for additional replacements at start.
 
 -pairsfile        Lines from the given file name(s) will be read as replacement
-                  arguments. i.e. a file containing lines "a" and "b", used as
-                  python pwb.py replace -page:X -pairsfile:file c d
+                  arguments. i.e. a file containing lines "a" and "b", used as:
+
+                      python pwb.py replace -page:X -pairsfile:file c d
+
                   will replace 'a' with 'b' and 'c' with 'd'.
 
 -always           Don't prompt you for each replacement
@@ -97,7 +99,8 @@ other:            First argument is the old text, second argument is the new
                   It is possible to introduce more than one pair of old text
                   and replacement.
 
-Examples:
+Examples
+--------
 
 If you want to change templates from the old syntax, e.g. {{msg:Stub}}, to the
 new syntax, e.g. {{Stub}}, download an XML dump file (pages-articles) from

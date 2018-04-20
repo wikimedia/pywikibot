@@ -2027,7 +2027,7 @@ class APISite(BaseSite):
         @type autocreate: bool
 
         @raises NoUsername: Username is not recognised by the site.
-        U{https://www.mediawiki.org/wiki/API:Login}
+        @see: U{https://www.mediawiki.org/wiki/API:Login}
         """
         # TODO: this should include an assert that loginstatus
         #       is not already IN_PROGRESS, however the

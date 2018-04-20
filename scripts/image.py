@@ -24,7 +24,8 @@ Command line options:
            more mistakes. This only works with image replacement, not image
            removal.
 
-Examples:
+Examples
+--------
 
 The image "FlagrantCopyvio.jpg" is about to be deleted, so let's first remove
 it from everything that displays it:

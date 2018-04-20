@@ -42,7 +42,8 @@ Usage:
 
     python pwb.py delete [-category categoryName]
 
-Examples:
+Examples
+--------
 
 Delete everything in the category "To delete" without prompting.
 

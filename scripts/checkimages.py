@@ -52,10 +52,10 @@ This script understands the following command-line arguments:
 -nologerror         If given, this option will disable the error that is risen
                     when the log is full.
 
----- Instructions for the real-time settings ----
-* For every new block you have to add:
+Instructions for the real-time settings.
+For every new block you have to add:
 
-<------- ------->
+ <------- ------->
 
 In this way the Bot can understand where the block starts in order to take the
 right parameter.
@@ -69,7 +69,8 @@ right parameter.
 * Text=     This is the template that the bot will use when it will report the
             image's problem.
 
----- Known issues/FIXMEs: ----
+Todo
+----
 * Clean the code, some passages are pretty difficult to understand.
 * Add the "catch the language" function for commons.
 * Fix and reorganise the new documentation

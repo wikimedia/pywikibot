@@ -71,6 +71,7 @@ mwparserfromhell>=0.3.3
 # The mysql generator in pagegenerators depends on either oursql or MySQLdb
 # pywikibot prefers oursql.  Both are Python 2 only; T89976.
 oursql ; python_version < '3'
+mysqlclient ; python_version >= '3'
 
 # scripts/script_wui.py depends on Lua, which is not available using pip
 # but can be obtained from: https://github.com/bastibe/lunatic-python

@@ -33,12 +33,15 @@ This script understands various command-line arguments:
     -replaceonly    Use this if you do not have a local sysop account, but do
                     wish to replace links from the NowCommons template.
 
--- Example --
+Example
+-------
 
     python pwb.py nowcommons -replaceonly -replaceloose -replacealways -replace
 
--- Known issues --
+Todo
+----
 Please fix these if you are capable and motivated:
+
 - if a file marked nowcommons is not present on Wikimedia Commons, the bot
   will exit.
 """

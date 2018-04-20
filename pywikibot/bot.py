@@ -1815,13 +1815,18 @@ class WikidataBot(Bot, ExistingPageBot):
         already ItemPage (page in treat_page_and_item will be None).
         If None it'll use ItemPage.fromPage when the page is not in the site's
         item namespace.
+
     @type use_from_page: bool, None
+
     @cvar treat_missing_item: Whether pages without items should be treated.
         Note that this is checked after create_missing_item.
+
     @type treat_missing_item: bool
+
     @ivar create_missing_item: If True, new items will be created if the current
         page doesn't have one. Subclasses should override this in the
         constructor with a bool value or using self.getOption.
+
     @type create_missing_item: bool
     """
 

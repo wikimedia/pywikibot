@@ -642,6 +642,11 @@ scripts.weblinkchecker script
 scripts.welcome script
 ----------------------
 
+.. automodule:: scripts.welcome
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 scripts.wikisourcetext script
 -----------------------------
 

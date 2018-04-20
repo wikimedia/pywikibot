@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-u"""
+"""
 Script to welcome new users.
 
 This script works out of the box for Wikis that
@@ -13,19 +13,20 @@ Everything that needs customisation to support additional projects is
 indicated by comments.
 
 Description of basic functionality:
-* Request a list of new users every period (default: 3600 seconds)
-  You can choose to break the script after the first check (see arguments)
-* Check if new user has passed a threshold for a number of edits
-  (default: 1 edit)
-* Optional: check username for bad words in the username or if the username
-  consists solely of numbers; log this somewhere on the wiki (default: False)
-  Update: Added a whitelist (explanation below).
-* If user has made enough edits (it can be also 0), check if user has an empty
-  talk page
-* If user has an empty talk page, add a welcome message.
-* Optional: Once the set number of users have been welcomed, add this to the
-  configured log page, one for each day (default: True)
-* If no log page exists, create a header for the log page first.
+
+ * Request a list of new users every period (default: 3600 seconds)
+   You can choose to break the script after the first check (see arguments)
+ * Check if new user has passed a threshold for a number of edits
+   (default: 1 edit)
+ * Optional: check username for bad words in the username or if the username
+   consists solely of numbers; log this somewhere on the wiki (default: False)
+   Update: Added a whitelist (explanation below).
+ * If user has made enough edits (it can be also 0), check if user has an empty
+   talk page
+ * If user has an empty talk page, add a welcome message.
+ * Optional: Once the set number of users have been welcomed, add this to the
+   configured log page, one for each day (default: True)
+ * If no log page exists, create a header for the log page first.
 
 This script (by default not yet implemented) uses two templates that need to
 be on the local wiki:
@@ -96,6 +97,7 @@ Report, Bad and white list guide:
     recheck in the bad word list to see if there are other badword in the
     username.
     Example:
+
         * dio is a badword
         * Claudio is a normal name
         * The username is "Claudio90 fuck!"
@@ -109,6 +111,7 @@ Report, Bad and white list guide:
         * You can decide to put a "you are blocked, change another username"
           template or not.
         * Delete the username from the page.
+
         IMPORTANT : The Bot check the user in this order:
             * Search if he has a talkpage (if yes, skip)
             * Search if he's blocked, if yes he will be skipped
@@ -125,8 +128,8 @@ some of these messages from newbies.
 1) Set the page that the bot will load
 2) Add the signatures in this way:
 
-*<SPACE>SIGNATURE
-<NEW LINE>
+    *<SPACE>SIGNATURE
+    <NEW LINE>
 
 Example:
 <pre>

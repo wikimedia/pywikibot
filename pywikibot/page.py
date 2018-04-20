@@ -3545,7 +3545,7 @@ class User(Page):
             not None, iterate only non-minor edits (default: iterate both)
         @keyword top_only: if True, iterate only edits which are the latest
             revision (default: False)
-        @return tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
+        @return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
         @rtype: tuple
         """
         for contrib in self.site.usercontribs(
@@ -3561,7 +3561,7 @@ class User(Page):
         """Return first user contribution.
 
         @return: first user contribution entry
-        @return tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
+        @return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
         @rtype: tuple or None
         """
         return next(self.contributions(reverse=True, total=1), None)
@@ -3571,7 +3571,7 @@ class User(Page):
         """Return last user contribution.
 
         @return: last user contribution entry
-        @return tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
+        @return: tuple of pywikibot.Page, revid, pywikibot.Timestamp, comment
         @rtype: tuple or None
         """
         return next(self.contributions(total=1), None)

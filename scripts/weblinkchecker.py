@@ -63,7 +63,7 @@ Furthermore, the following command line parameters are supported:
 
 The following config variables are supported:
 
-max_external_links        - The maximum number of web pages that should be
+ max_external_links         The maximum number of web pages that should be
                             loaded simultaneously. You should change this
                             according to your Internet connection speed.
                             Be careful: if it is set too high, the script
@@ -71,12 +71,12 @@ max_external_links        - The maximum number of web pages that should be
                             is congested, and will then think that the page
                             is offline.
 
-report_dead_links_on_talk - If set to true, causes the script to report dead
+ report_dead_links_on_talk  If set to true, causes the script to report dead
                             links on the article's talk page if (and ONLY if)
                             the linked page has been unavailable at least two
                             times during a timespan of at least one week.
 
-weblink_dead_days         - sets the timespan (default: one week) after which
+ weblink_dead_days          sets the timespan (default: one week) after which
                             a dead link will be reported
 
 Syntax examples:
@@ -640,12 +640,12 @@ class History(object):
 
     Example:
 
-    dict = {
-        'https://www.example.org/page': [
-            ('WikiPageTitle', DATE, '404: File not found'),
-            ('WikiPageName2', DATE, '404: File not found'),
-        ]
-
+     dict = {
+         'https://www.example.org/page': [
+             ('WikiPageTitle', DATE, '404: File not found'),
+             ('WikiPageName2', DATE, '404: File not found'),
+         ]
+     }
     """
 
     def __init__(self, reportThread, site=None):

@@ -29,6 +29,8 @@ repo_dir = abspath(join(docs_dir, '..'))
 sys.path.insert(0, repo_dir)
 os.chdir(repo_dir)
 
+from scripts.cosmetic_changes import warning
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
@@ -264,30 +266,40 @@ def pywikibot_script_docstring_fixups(
     if what != "module":
         return
 
-    if os.path.sep + "scripts" + os.path.sep not in obj.__file__:
+    if not name.startswith('scripts.'):
         return
     for index, line in enumerate(lines):
         if line == '&params;':
             lines[index] = ('This script supports use of '
                             ':py:mod:`pywikibot.pagegenerators` arguments.')
-        elif line == '&fixes-help;':
+        elif name == 'scripts.replace' and line == '&fixes-help;':
             lines[index] = ('                  The available fixes are listed '
                             'in :py:mod:`pywikibot.fixes`.')
+        elif name == 'scripts.cosmetic_changes' and line == '&warning;':
+            lines[index] = warning
+        elif name == 'scripts.login' and '*' in line:
+            # Escape star wildcard in scripts/login.py
+            lines[index] = line.replace('*', '\\*')
         elif (line.endswith(':') and not line.strip().startswith(':') and
                 'Traceback (most recent call last)' not in line):
-            lines[index] = line + ':'
-        elif line.startswith('-'):
+            # Initiate code block except pagegenerator arguments follows
+            for afterline in lines[index + 1:]:
+                if afterline == '':
+                    continue
+                elif afterline == '&params;':
+                    break
+                else:
+                    lines[index] = line + ':'
+                    break
+        if line.startswith('-'):
             # Indent options
             lines[index] = ' ' + line
         elif line.startswith('                '):
             # Indent description of options (as options are indented)
             lines[index] = line.replace('                ', '                 ')
-        elif line.strip().startswith('python'):
-            # Indent commands
-            lines[index] = '  ' + line.strip()
-        if '=' in line:
-            # Escape equal signs
-            lines[index] = line.replace('=', '\\=')
+        if '|' in line:
+            # Escape vertical bars
+            lines[index] = line.replace('|', '\\|')
 
 
 def pywikibot_skip_members(app, what, name, obj, skip, options):

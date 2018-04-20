@@ -62,6 +62,7 @@ class BasicBot(
         used is placed on /i18n subdirectory. The file containing these
         messages should have the same name as the caller script (i.e. basic.py
         in this case). Use summary_key to set a default edit summary message.
+
     @type summary_key: str
     """
 

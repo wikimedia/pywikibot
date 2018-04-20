@@ -7,7 +7,7 @@ Example:
 
     python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -o nl li fy
 
-or
+or:
 
     python pwb.py replicate_wiki [-r] -ns 10 -family:wikipedia -lang:nl li fy
 
@@ -18,27 +18,25 @@ pages if -r /is/ present.
 You can add replicate_replace to your user-config.py, which has the following
 format:
 
-replicate_replace = {
-    'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
-}
+ replicate_replace = {
+     'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
+ }
 
 to replace all occurrences of 'Hoofdpagina' with 'Veurblaad' when writing to
 liwiki. Note that this does not take the origin wiki into account.
 
 The following parameters are supported:
--r                actually replace pages (without this option
---replace         you will only get an overview page)
 
--o                original wiki
---original        (you may use -lang:<code> option instead)
+-r, --replace           actually replace pages (without this option
+                        you will only get an overview page)
 
-destination_wiki  destination wiki(s)
+-o, --original          original wiki (you may use -lang:<code> option
+                        instead)
+-ns, --namespace        specify namespace
 
--ns               specify namespace
---namespace
+-dns, --dest-namespace  destination namespace (if different)
 
--dns              destination namespace (if different)
---dest-namespace
+ destination_wiki       destination wiki(s)
 """
 #
 # (C) Kasper Souren, 2012-2013

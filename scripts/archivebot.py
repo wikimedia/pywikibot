@@ -30,28 +30,28 @@ Trancluded template may contain the following parameters:
 
 Meanings of parameters are:
 
-archive              Name of the page to which archived threads will be put.
-                     Must be a subpage of the current page. Variables are
-                     supported.
-algo                 specifies the maximum age of a thread. Must be in the form
-                     old(<delay>) where <delay> specifies the age in
-                     seconds (s), hours (h), days (d), weeks(w), or years (y)
-                     like 24h or 5d.
-                     Default is old(24h).
-counter              The current value of a counter which could be assigned as
-                     variable. Will be actualized by bot. Initial value is 1.
-maxarchivesize       The maximum archive size before incrementing the counter.
-                     Value can be given with appending letter like K or M which
-                     indicates KByte or MByte. Default value is 1000M.
-minthreadsleft       Minimum number of threads that should be left on a page.
-                     Default value is 5.
-minthreadstoarchive  The minimum number of threads to archive at once. Default
-                     value is 2.
-archiveheader        Content that will be put on new archive pages as the
-                     header. This parameter supports the use of variables.
-                     Default value is {{talkarchive}}
-key                  A secret key that (if valid) allows archives to not be
-                     subpages of the page being archived.
+ archive              Name of the page to which archived threads will be put.
+                      Must be a subpage of the current page. Variables are
+                      supported.
+ algo                 specifies the maximum age of a thread. Must be
+                      in the form old(<delay>) where <delay> specifies
+                      the age in seconds (s), hours (h), days (d),
+                      weeks(w), or years (y) like 24h or 5d. Default is
+                      old(24h).
+ counter              The current value of a counter which could be assigned as
+                      variable. Will be actualized by bot. Initial value is 1.
+ maxarchivesize       The maximum archive size before incrementing the counter.
+                      Value can be given with appending letter like K or M
+                      which indicates KByte or MByte. Default value is 1000M.
+ minthreadsleft       Minimum number of threads that should be left on a page.
+                      Default value is 5.
+ minthreadstoarchive  The minimum number of threads to archive at once. Default
+                      value is 2.
+ archiveheader        Content that will be put on new archive pages as the
+                      header. This parameter supports the use of variables.
+                      Default value is {{talkarchive}}
+ key                  A secret key that (if valid) allows archives to not be
+                      subpages of the page being archived.
 
 Variables below can be used in the value for "archive" in the template above:
 
@@ -77,6 +77,7 @@ See also:
  - https://docs.python.org/3.4/library/datetime.html#datetime.date.isocalendar
 
 Options (may be omitted):
+
   -help           show this help message and exit
   -calc:PAGE      calculate key for PAGE and exit
   -file:FILE      load list of pages from FILE

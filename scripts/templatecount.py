@@ -19,7 +19,8 @@ Command line options:
 -namespace:   Filters the search to a given namespace. If this is specified
               multiple times it will search all given namespaces
 
-Examples:
+Examples
+--------
 
 Counts how many times {{ref}} and {{note}} are transcluded in articles:
 

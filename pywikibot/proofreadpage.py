@@ -509,8 +509,8 @@ class ProofreadPage(pywikibot.Page):
         @return: file url of the scan ProofreadPage or None.
         @rtype: str/unicode
 
-        @raises:
-        - Exception in case of http errors.
+        @raises Exception: in case of http errors
+        @raises ValueError: in case of no prp_page_image src found for scan
         """
         # wrong link fail with various possible Exceptions.
         if not hasattr(self, '_url_image'):

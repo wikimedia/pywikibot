@@ -27,6 +27,7 @@ If action is "add", the following options are supported:
 &params;
 
 Options for "listify" action:
+
  * -overwrite   - This overwrites the current page with the list even if
                   something is already there.
  * -showimages  - This displays images rather than linking them in the list.
@@ -34,12 +35,14 @@ Options for "listify" action:
                   listified in addition to the pages themselves.
 
 Options for "remove" action:
+
  * -nodelsum    - This specifies not to use the custom edit summary as the
                   deletion reason. Instead, it uses the default deletion reason
                   for the language, which is "Category was disbanded" in
                   English.
 
 Options for "move" action:
+
  * -hist        - Creates a nice wikitable on the talk page of target category
                   that contains detailed page history of the source category.
  * -nodelete    - Don't delete the old category after move
@@ -55,12 +58,14 @@ Options for "move" action:
                   option.
 
 Options for "tidy" action:
+
  * -namespaces    Filter the arcitles in the specified namespaces. Separate
    -namespace     multiple namespace numbers or names with commas. Examples:
    -ns            -ns:0,2,4
                   -ns:Help,MediaWiki
 
 Options for several actions:
+
  * -rebuild     - reset the database
  * -from:       - The category to move from (for the move option)
                   Also, the category to remove from in the remove option
@@ -91,16 +96,15 @@ case.
 
 For example, to create a new category from a list of persons, type:
 
-  python pwb.py category add -person
+    python pwb.py category add -person
 
 and follow the on-screen instructions.
 
 Or to do it all from the command-line, use the following syntax:
 
-  python pwb.py category move -from:US -to:"United States"
+    python pwb.py category move -from:US -to:"United States"
 
 This will move all pages in the category US to the category United States.
-
 """
 #
 # (C) Rob W.W. Hooft, 2004

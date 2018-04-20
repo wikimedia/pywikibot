@@ -307,21 +307,21 @@ The following arguments influence how many pages the bot works on at once:
 
 Some configuration option can be used to change the working of this bot:
 
-interwiki_min_subjects: the minimum amount of subjects that should be processed
-                    at the same time.
+ interwiki_min_subjects: the minimum amount of subjects that should be
+                     processed at the same time.
 
-interwiki_backlink: if set to True, all problems in foreign wikis will
-                    be reported
+ interwiki_backlink: if set to True, all problems in foreign wikis will
+                     be reported
 
-interwiki_shownew:  should interwiki.py display every new link it discovers?
+ interwiki_shownew:  should interwiki.py display every new link it discovers?
 
-interwiki_graph:    output a graph PNG file on conflicts? You need pydot for
-                    this: https://pypi.python.org/pypi/pydot/1.0.2
-                    https://code.google.com/p/pydot/
+ interwiki_graph:    output a graph PNG file on conflicts? You need pydot for
+                     this: https://pypi.python.org/pypi/pydot/1.0.2
+                     https://code.google.com/p/pydot/
 
-interwiki_graph_format: the file format for interwiki graphs
+ interwiki_graph_format: the file format for interwiki graphs
 
-without_interwiki:  save file with local articles without interwikis
+ without_interwiki:  save file with local articles without interwikis
 
 All these options can be changed through the user-config.py configuration file.
 
@@ -656,6 +656,7 @@ class PageTree(object):
 
         @ivar tree: dictionary with Site as keys and list of page as values.
             All pages found within Site are kept in self.tree[site].
+
         @type tree: dict
         """
         self.tree = {}
