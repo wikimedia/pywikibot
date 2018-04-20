@@ -12,17 +12,16 @@ Syntax:
 
 where action can be one of these:
 
-double         Fix redirects which point to other redirects.
-do             Shortcut action command is "do".
+:double:       Shortcut: **do**. Fix redirects which point to other redirects.
 
-broken         Tries to fix redirect which point to nowhere by using the last
-br             moved target of the destination page. If this fails and the
-               -delete option is set, it either deletes the page or marks it
-               for deletion depending on whether the account has admin rights.
-               It will mark the redirect not for deletion if there is no speedy
-               deletion template available. Shortcut action command is "br".
+:broken:       Shortcut: **br**. Tries to fix redirect which point to nowhere
+               by using the last moved target of the destination page. If this
+               fails and the -delete option is set, it either deletes the page
+               or marks it for deletion depending on whether the account has
+               admin rights. It will mark the redirect not for deletion if
+               there is no speedy deletion template available.
 
-both           Both of the above. Retrieves redirect pages from live wiki,
+:both:         Both of the above. Retrieves redirect pages from live wiki,
                not from a special page.
 
 and arguments can be:
@@ -233,27 +232,30 @@ class RedirectGenerator(OptionHandler):
             yield apiQ
 
     def get_redirects_via_api(self, maxlen=8):
-        """
+        r"""
         Return a generator that yields tuples of data about redirect Pages.
 
-            0 - page title of a redirect page
-            1 - type of redirect:
-                         0 - broken redirect, target page title missing
-                         1 - normal redirect, target page exists and is not a
-                             redirect
-                 2..maxlen - start of a redirect chain of that many redirects
-                             (currently, the API seems not to return sufficient
-                             data to make these return values possible, but
-                             that may change)
-                  maxlen+1 - start of an even longer chain, or a loop
-                             (currently, the API seems not to return sufficient
-                             data to allow this return values, but that may
-                             change)
-                      None - start of a redirect chain of unknown length, or
-                             loop
-            2 - target page title of the redirect, or chain (may not exist)
-            3 - target page of the redirect, or end of chain, or page title
-                where chain or loop detecton was halted, or None if unknown
+        The description of returned tuple items is as follows:
+
+        :[0]: page title of a redirect page
+        :[1]: type of redirect:
+
+             :None: start of a redirect chain of unknown length, or loop
+             :[0]: broken redirect, target page title missing
+             :[1]: normal redirect, target page exists and is not a
+                          redirect
+             :[2\:maxlen]: start of a redirect chain of that many redirects
+                           (currently, the API seems not to return sufficient
+                           data to make these return values possible, but
+                           that may change)
+             :[maxlen+1]: start of an even longer chain, or a loop
+                          (currently, the API seems not to return sufficient
+                          data to allow this return values, but that may
+                          change)
+
+        :[2]: target page title of the redirect, or chain (may not exist)
+        :[3]: target page of the redirect, or end of chain, or page title
+              where chain or loop detecton was halted, or None if unknown
         """
         for apiQ in self._next_redirect_group():
             gen = pywikibot.data.api.Request(
@@ -265,7 +267,6 @@ class RedirectGenerator(OptionHandler):
                 raise RuntimeError("API query error: %s" % data)
             if data == [] or 'query' not in data:
                 raise RuntimeError("No results given.")
-            redirects = {}
             pages = {}
             redirects = {x['from']: x['to']
                          for x in data['query']['redirects']}
