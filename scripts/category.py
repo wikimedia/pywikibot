@@ -131,8 +131,10 @@ import pywikibot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
 from pywikibot.bot import (
-    MultipleSitesBot, IntegerOption, StandardOption, ContextOption,
+    MultipleSitesBot, IntegerOption, StandardOption, ContextOption, BaseBot,
+    Bot,
 )
+from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import (
     deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive
 )
@@ -164,6 +166,112 @@ cfd_templates = {
         'commons': [u'cfd', u'move']
     }
 }
+
+
+class CategoryPreprocess(BaseBot):
+
+    """A class to prepare a list of pages for robots."""
+
+    def __init__(self, page, follow_redirects=False, edit_redirects=False,
+                 create=False):
+        """Constructor."""
+        super(CategoryPreprocess, self).__init__()
+        page = page
+        self.follow_redirects = follow_redirects
+        self.edit_redirects = edit_redirects
+        self.create = create
+
+    def determine_type_target(self, page):
+        """
+        Return page to be categorized by type.
+
+        @param page: Existing, missing or redirect page to be processed
+        @type page: pywikibot.Page
+        @return: Page to be categorized
+        @rtype: pywikibot.Page
+        """
+        if page.exists():
+            if page.isRedirectPage():
+                # if it is a redirect, use the redirect target instead
+                redir_target = page.getRedirectTarget()
+                if self.follow_redirects:
+                    if redir_target.exists():
+                        return redir_target
+                    elif self.create:
+                        redir_target.text = ''
+                        pywikibot.output('Redirect target %s does not exist '
+                                         'yet; creating.'
+                                         % redir_target.title(asLink=True))
+                        return redir_target
+                    elif self.edit_redirects:
+                        return page
+                    else:
+                        pywikibot.warning('Redirect target %s can not '
+                                          'be modified; skipping.'
+                                          % redir_target.title(asLink=True))
+                        return
+                elif self.edit_redirects:
+                    return page
+                else:
+                    pywikibot.warning('Page %s is a redirect to %s; skipping.'
+                                      % (page.title(asLink=True),
+                                         redir_target.title(asLink=True)))
+                    return
+            else:
+                return page
+        elif self.create:
+            page.text = ''
+            pywikibot.output('Page %s does not exist yet; creating.'
+                             % page.title(asLink=True))
+            return page
+        else:
+            pywikibot.warning('Page %s does not exist; skipping.'
+                              % page.title(asLink=True))
+            return
+
+    def determine_template_target(self, page):
+        """
+        Return template page to be categorized.
+
+        Categories for templates can be included
+        in <includeonly> section of template doc page.
+
+        Also the doc page can be changed by doc template parameter.
+
+        TODO: decide if/how to enable/disable this feature
+
+        @param page: Page to be processed
+        @type page: pywikibot.Page
+        @return: Page to be categorized
+        @rtype: pywikibot.Page
+        """
+        includeonly = []
+        if page.namespace() == page.site.namespaces.TEMPLATE:
+            try:
+                tmpl, loc = moved_links[page.site.code]
+            except KeyError:
+                tmpl = []
+            if not isinstance(tmpl, list):
+                tmpl = [tmpl]
+            if tmpl != []:
+                templates = page.templatesWithParams()
+                for template in templates:
+                    if template[0].title(withNamespace=False).lower() in tmpl:
+                        doc_page = pywikibot.Page(page.site, template[1])
+                        if doc_page.exists():
+                            page = doc_page
+                            includeonly = ['includeonly']
+                            break
+            if includeonly == []:
+                docs = page.site.doc_subpage  # return tuple
+                for doc in docs:
+                    doc_page = pywikibot.Page(page.site, page.title() + doc)
+                    if doc_page.exists():
+                        page = doc_page
+                        includeonly = ['includeonly']
+                        break
+        self.includeonly = includeonly
+        return page
 
 
 class CategoryDatabase(object):
@@ -290,7 +398,7 @@ class CategoryDatabase(object):
                                  % config.shortpath(filename))
 
 
-class CategoryAddBot(MultipleSitesBot):
+class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
 
     """A robot to mass-add a category to a list of pages."""
 
@@ -340,45 +448,15 @@ class CategoryAddBot(MultipleSitesBot):
 
     def treat(self, page):
         """Process one page."""
-        includeonly = []
-        if page.isRedirectPage():
-            # if it's a redirect use the redirect target instead
-            redirTarget = page.getRedirectTarget()
-            if self.follow_redirects:
-                self.current_page = redirTarget
-            else:
-                pywikibot.warning(u"Page %s is a redirect to %s; skipping."
-                                  % (page.title(asLink=True),
-                                     redirTarget.title(asLink=True)))
-                # loading it will throw an error if we don't jump out before
-                return
-        else:
-            current_page = page
-            if page.namespace() == page.site.namespaces.TEMPLATE:
-                docs = page.site.doc_subpage  # return tuple
-                for doc in docs:
-                    doc_page = pywikibot.Page(
-                        page.site, page.title() + doc)
-                    if doc_page.exists():
-                        current_page = doc_page
-                        includeonly = ['includeonly']
-                        break
-            self.current_page = current_page
-        if self.current_page.exists():
-            # Load the page
-            text = self.current_page.text
-        elif self.create:
-            pywikibot.output(u"Page %s doesn't exist yet; creating."
-                             % (self.current_page.title(asLink=True)))
-            text = ''
-        else:
-            pywikibot.output(u"Page %s does not exist; skipping."
-                             % self.current_page.title(asLink=True))
-            return
+        # find correct categorization target
+        page = self.determine_type_target(page)
+        self.current_page = self.determine_template_target(page)
+        # load the page
+        text = self.current_page.text
         # store old text, so we don't have reload it every time
         old_text = text
         cats = textlib.getCategoryLinks(
-            text, self.current_page.site, include=includeonly)
+            text, self.current_page.site, include=self.includeonly)
         pywikibot.output(u"Current categories:")
         for cat in cats:
             pywikibot.output(u"* %s" % cat.title())
@@ -392,7 +470,7 @@ class CategoryAddBot(MultipleSitesBot):
             pywikibot.output(u'Adding %s' % catpl.title(asLink=True))
             if page.namespace() == page.site.namespaces.TEMPLATE:
                 tagname = 'noinclude'
-                if includeonly == ['includeonly']:
+                if self.includeonly == ['includeonly']:
                     tagname = 'includeonly'
                 tagnameregexp = re.compile(r'(.*)(<\/{0}>)'.format(tagname),
                                            re.I | re.DOTALL)
@@ -407,7 +485,7 @@ class CategoryAddBot(MultipleSitesBot):
                         ['nowiki', 'comment', 'math', 'pre', 'source'],
                         site=self.current_page.site)
                 else:
-                    if includeonly == ['includeonly']:
+                    if self.includeonly == ['includeonly']:
                         text += '\n\n'
                     text += '<{0}>\n{1}\n</{0}>'.format(
                             tagname, categorytitle)
@@ -430,7 +508,7 @@ class CategoryAddBot(MultipleSitesBot):
                                     error))
 
 
-class CategoryMoveRobot(object):
+class CategoryMoveRobot(CategoryPreprocess):
 
     """Change or remove the category from the pages.
 
@@ -640,14 +718,13 @@ class CategoryMoveRobot(object):
                                 mark=True)
 
     def _change(self, gen):
-        """Private function to move category contents.
+        """
+        Private function to move category contents.
 
         Do not use this function from outside the class.
 
         @param gen: Generator containing pages or categories.
         """
-        template_docs = set()  # buffer for template doc pages preloading
-
         for page in pagegenerators.PreloadingGenerator(gen):
             if not self.title_regex or re.search(self.title_regex,
                                                  page.title()):
@@ -657,27 +734,14 @@ class CategoryMoveRobot(object):
                                      inPlace=self.inplace,
                                      sortKey=self.keep_sortkey)
 
-                # Categories for templates can be included in <includeonly>
-                # section of Template:Page/doc subpage.
-                # TODO: doc page for a template can be Anypage/doc, as
-                # specified in
-                #    {{Template:Documentation}} -> not managed here
-                # TODO: decide if/how to enable/disable this feature
-                if page.namespace() == 10:
-                    docs = page.site.doc_subpage  # return tuple
-                    for doc in docs:
-                        doc_page = pywikibot.Page(page.site,
-                                                  page.title() + doc)
-                        template_docs.add(doc_page)
-
-        for doc_page in pagegenerators.PreloadingGenerator(template_docs):
-            if (doc_page.exists() and
-                (not self.title_regex or
-                 re.search(self.title_regex, doc_page.title()))):
+                doc_page = self.determine_template_target(page)
+                if doc_page != page and (not self.title_regex
+                                         or re.search(self.title_regex,
+                                                      doc_page.title())):
                     doc_page.change_category(self.oldcat, self.newcat,
                                              summary=self.comment,
                                              inPlace=self.inplace,
-                                             include=['includeonly'],
+                                             include=self.includeonly,
                                              sortKey=self.keep_sortkey)
 
     @staticmethod
@@ -882,9 +946,9 @@ class CategoryListifyRobot(object):
             self.list.put(listString, summary=self.editSummary)
 
 
-class CategoryTidyRobot(pywikibot.Bot):
+class CategoryTidyRobot(Bot, CategoryPreprocess):
 
-    """Script to help by moving articles of the category into subcategories.
+    """Script to help by moving members of the category into subcategories.
 
     Specify the category name on the command line. The program will pick up the
     page, and look for all subcategories and supercategories, and show them
@@ -892,13 +956,13 @@ class CategoryTidyRobot(pywikibot.Bot):
     pages in the category. It will ask you to type the number of the
     appropriate replacement, and perform the change robotically.
 
-    If you don't want to move the article to a subcategory or supercategory,
+    If you don't want to move the member to a subcategory or supercategory,
     but to another category, you can use the 'j' (jump) command.
 
     Typing 's' will leave the complete page unchanged.
 
     Typing '?' will show you the first few bytes of the current page, helping
-    you to find out what the article is about and in which other categories it
+    you to find out what the page is about and in which other categories it
     currently is.
 
     """
@@ -914,13 +978,14 @@ class CategoryTidyRobot(pywikibot.Bot):
         self.cat = pywikibot.Category(site, catTitle)
         super(CategoryTidyRobot, self).__init__(
             generator=pagegenerators.PreloadingGenerator(
-                self.cat.articles(namespaces=namespaces)))
+                self.cat.members(namespaces=namespaces)))
 
-    def move_to_category(self, article, original_cat, current_cat):
+    @deprecated_args(article='member')
+    def move_to_category(self, member, original_cat, current_cat):
         """
         Ask if it should be moved to one of the subcategories.
 
-        Given an article which is in category original_cat, ask the user if
+        Given a page which is in category original_cat, ask the user if
         it should be moved to one of original_cat's subcategories.
         Recursively run through subcategories' subcategories.
         NOTE: current_cat is only used for internal recursion. You should
@@ -944,7 +1009,7 @@ class CategoryTidyRobot(pywikibot.Bot):
                 if len(self.text) > end:
                     pywikibot.output('')
                     pywikibot.output('Original categories: ')
-                    for cat in article.categories():
+                    for cat in member.categories():
                         pywikibot.output(u'* %s' % cat.title())
 
         pywikibot.output(u'')
@@ -953,13 +1018,13 @@ class CategoryTidyRobot(pywikibot.Bot):
         pywikibot.output(color_format(
             'Treating page {0}, '
             'currently in {lightpurple}{1}{default}',
-            article.title(asLink=True), current_cat.title()))
+            member.title(asLink=True), current_cat.title()))
 
         # Determine a reasonable amount of context to print
         try:
-            full_text = article.get(get_redirect=True)
+            full_text = member.get(get_redirect=True)
         except pywikibot.NoPage:
-            pywikibot.output(u'Page %s not found.' % article.title())
+            pywikibot.output('Page %s not found.' % member.title())
             return
         try:
             contextLength = full_text.index('\n\n')
@@ -992,49 +1057,59 @@ class CategoryTidyRobot(pywikibot.Bot):
         options = (IntegerOption(0, len(supercatlist), 'u'),
                    IntegerOption(0, len(subcatlist)),
                    StandardOption('jump to another category', 'j'),
-                   StandardOption('skip this article', 's'),
+                   StandardOption('skip this page', 's'),
                    StandardOption('remove this category tag', 'r'),
                    context_option,
                    StandardOption('save category as "{0}"'
                                   .format(current_cat.title()), 'c'))
         choice = pywikibot.input_choice(color_format(
             'Choice for page {lightpurple}{0}{default}:\n',
-            article.title()), options, default='c')
+            member.title()), options, default='c')
 
         if choice == 'c':
             pywikibot.output(u'Saving category as %s' % current_cat.title())
             if current_cat == original_cat:
                 pywikibot.output('No changes necessary.')
             else:
-                article.change_category(original_cat, current_cat,
-                                        summary=self.editSummary)
+                member.change_category(original_cat, current_cat,
+                                       summary=self.editSummary)
+                doc_page = self.determine_template_target(member)
+                if doc_page != member:
+                    doc_page.change_category(original_cat, current_cat,
+                                             include=self.includeonly,
+                                             summary=self.editSummary)
         elif choice == 'j':
-            newCatTitle = pywikibot.input(u'Please enter the category the '
-                                          u'article should be moved to:',
+            newCatTitle = pywikibot.input('Please enter the category the '
+                                          'page should be moved to:',
                                           default=None)  # require an answer
             newCat = pywikibot.Category(pywikibot.Link('Category:' +
                                                        newCatTitle))
             # recurse into chosen category
-            self.move_to_category(article, original_cat, newCat)
+            self.move_to_category(member, original_cat, newCat)
         elif choice == 'r':
             # remove the category tag
-            article.change_category(original_cat, None,
-                                    summary=self.editSummary)
+            member.change_category(original_cat, None,
+                                   summary=self.editSummary)
+            doc_page = self.determine_template_target(member)
+            if doc_page != member:
+                doc_page.change_category(original_cat, None,
+                                         include=self.includeonly,
+                                         summary=self.editSummary)
         elif choice != 's':
             if choice[0] == 'u':
                 # recurse into supercategory
-                self.move_to_category(article, original_cat,
+                self.move_to_category(member, original_cat,
                                       supercatlist[choice[1]])
             elif choice[0] == '':
                 # recurse into subcategory
-                self.move_to_category(article, original_cat,
+                self.move_to_category(member, original_cat,
                                       subcatlist[choice[1]])
 
     def run(self):
         """Start bot."""
         super(CategoryTidyRobot, self).run()
         if not self._treat_counter:
-            pywikibot.output(u'There are no articles or files in category %s'
+            pywikibot.output('There are no pages or files in category %s'
                              % self.catTitle)
 
     def treat(self, page):
