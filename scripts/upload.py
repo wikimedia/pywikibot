@@ -50,7 +50,7 @@ parameter, and for a description.
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,6 +63,31 @@ import re
 import pywikibot
 from pywikibot.bot import suggest_help
 from pywikibot.specialbots import UploadRobot
+
+
+def get_chunk_size(match):
+    """Get chunk size."""
+    if not match:
+        pywikibot.error('Chunk size parameter is not valid.')
+        chunk_size = 0
+    elif match.group(1):  # number was in there
+        base = float(match.group(1))
+        if match.group(2):  # suffix too
+            suffix = match.group(2).lower()
+            if suffix == 'k':
+                suffix = 1000
+            elif suffix == 'm':
+                suffix = 1000000
+            elif suffix == 'ki':
+                suffix = 1 << 10
+            elif suffix == 'mi':
+                suffix = 1 << 20
+        else:
+            suffix = 1
+        chunk_size = math.trunc(base * suffix)
+    else:
+        chunk_size = 1 << 20  # default to 1 MiB
+    return chunk_size
 
 
 def main(*args):
@@ -83,65 +108,48 @@ def main(*args):
     verifyDescription = True
     aborts = set()
     ignorewarn = set()
-    chunk_size = 0
-    chunk_size_regex = r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$'
-    chunk_size_regex = re.compile(chunk_size_regex, re.I)
+    chunk_size_regex = re.compile(
+        r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
     recursive = False
 
     # process all global bot args
     # returns a list of non-global args, i.e. args for upload.py
-    for arg in pywikibot.handle_args(args):
-        if arg:
-            if arg == '-always':
-                keepFilename = True
-                always = True
-                verifyDescription = False
-            elif arg == '-recursive':
-                recursive = True
-            elif arg.startswith('-keep'):
-                keepFilename = True
-            elif arg.startswith('-filename:'):
-                useFilename = arg[10:]
-            elif arg.startswith('-summary'):
-                summary = arg[9:]
-            elif arg.startswith('-noverify'):
-                verifyDescription = False
-            elif arg.startswith('-abortonwarn'):
-                if len(arg) > len('-abortonwarn:') and aborts is not True:
-                    aborts.add(arg[len('-abortonwarn:'):])
-                else:
-                    aborts = True
-            elif arg.startswith('-ignorewarn'):
-                if len(arg) > len('-ignorewarn:') and ignorewarn is not True:
-                    ignorewarn.add(arg[len('-ignorewarn:'):])
-                else:
-                    ignorewarn = True
-            elif arg.startswith('-chunked'):
-                match = chunk_size_regex.match(arg)
-                if match:
-                    if match.group(1):  # number was in there
-                        base = float(match.group(1))
-                        if match.group(2):  # suffix too
-                            suffix = match.group(2).lower()
-                            if suffix == "k":
-                                suffix = 1000
-                            elif suffix == "m":
-                                suffix = 1000000
-                            elif suffix == "ki":
-                                suffix = 1 << 10
-                            elif suffix == "mi":
-                                suffix = 1 << 20
-                        else:
-                            suffix = 1
-                        chunk_size = math.trunc(base * suffix)
-                    else:
-                        chunk_size = 1 << 20  # default to 1 MiB
-                else:
-                    pywikibot.error('Chunk size parameter is not valid.')
-            elif url == u'':
+    local_args = pywikibot.handle_args(args)
+    for option in local_args:
+        arg, _, value = option.partition(':')
+        if arg == '-always':
+            keepFilename = True
+            always = True
+            verifyDescription = False
+        elif arg == '-recursive':
+            recursive = True
+        elif arg == '-keep':
+            keepFilename = True
+        elif arg == '-filename':
+            useFilename = value
+        elif arg == '-summary':
+            summary = value
+        elif arg == '-noverify':
+            verifyDescription = False
+        elif arg == '-abortonwarn':
+            if value and aborts is not True:
+                aborts.add(value)
+            else:
+                aborts = True
+        elif arg == '-ignorewarn':
+            if value and ignorewarn is not True:
+                ignorewarn.add(value)
+            else:
+                ignorewarn = True
+        elif arg == '-chunked':
+            match = chunk_size_regex.match(option)
+            chunk_size = get_chunk_size(match)
+        elif arg and not value:
+            if not url:
                 url = arg
             else:
                 description.append(arg)
+
     description = u' '.join(description)
     while not ("://" in url or os.path.exists(url)):
         if not url:
@@ -156,6 +164,7 @@ def main(*args):
         else:
             pywikibot.output(error)
         url = pywikibot.input(u'URL, file or directory where files are now:')
+
     if always and ((aborts is not True and ignorewarn is not True) or
                    not description or url is None):
         additional = ''
@@ -171,6 +180,7 @@ def main(*args):
         additional += 'Unable to run in -always mode'
         suggest_help(missing_parameters=missing, additional_text=additional)
         return False
+
     if os.path.isdir(url):
         file_list = []
         for directory_info in os.walk(url):
@@ -182,6 +192,7 @@ def main(*args):
         url = file_list
     else:
         url = [url]
+
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
                       verifyDescription=verifyDescription,
