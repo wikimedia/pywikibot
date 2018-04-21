@@ -57,7 +57,7 @@ Example
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,6 +79,57 @@ docuReplacements = {
 }
 
 
+def get_text(page, old, create):
+    """Get the old text."""
+    if old is None:
+        try:
+            text = page.get()
+        except pywikibot.NoPage:
+            if create:
+                pywikibot.output(
+                    "{} doesn't exist, creating it!".format(page.title()))
+                text = ''
+            else:
+                pywikibot.output(
+                    "{} doesn't exist, skip!".format(page.title()))
+                return None
+        except pywikibot.IsRedirectPage:
+            pywikibot.output('{} is a redirect, skip!'.format(page.title()))
+            return None
+    else:
+        text = old
+    return text
+
+
+def put_text(page, new, summary, count, asynchronous=False):
+    """Save the new text."""
+    page.text = new
+    try:
+        page.save(summary=summary, asynchronous=asynchronous,
+                  minorEdit=page.namespace() != 3)
+    except pywikibot.EditConflict:
+        pywikibot.output('Edit conflict! skip!')
+    except pywikibot.ServerError:
+        if count <= config.max_retries:
+            pywikibot.output('Server Error! Wait..')
+            time.sleep(config.retry_wait)
+            return None
+        else:
+            raise pywikibot.ServerError(
+                'Server Error! Maximum retries exceeded')
+    except pywikibot.SpamfilterError as e:
+        pywikibot.output(
+            'Cannot change {} because of blacklist entry {}'
+            .format(page.title(), e.url))
+    except pywikibot.LockedPage:
+        pywikibot.output('Skipping {} (locked page)'.format(page.title()))
+    except pywikibot.PageNotSaved as error:
+        pywikibot.output('Error putting page: {}'.format(error.args))
+    else:
+        return True
+    return False
+
+
 def add_text(page, addText, summary=None, regexSkip=None,
              regexSkipUrl=None, always=False, up=False, putText=True,
              oldTextGiven=None, reorderEnabled=True, create=False):
@@ -91,27 +142,13 @@ def add_text(page, addText, summary=None, regexSkip=None,
     if not summary:
         summary = i18n.twtranslate(site, 'add_text-adding',
                                    {'adding': addText[:200]})
-
-    errorCount = 0
-
     if putText:
         pywikibot.output(u'Loading %s...' % page.title())
-    if oldTextGiven is None:
-        try:
-            text = page.get()
-        except pywikibot.NoPage:
-            if create:
-                pywikibot.output(u"%s doesn't exist, creating it!"
-                                 % page.title())
-                text = u''
-            else:
-                pywikibot.output(u"%s doesn't exist, skip!" % page.title())
-                return (False, False, always)
-        except pywikibot.IsRedirectPage:
-            pywikibot.output(u"%s is a redirect, skip!" % page.title())
-            return (False, False, always)
-    else:
-        text = oldTextGiven
+
+    text = get_text(page, oldTextGiven, create)
+    if text is None:
+        return (False, False, always)
+
     # Understand if the bot has to skip the page or not
     # In this way you can use both -except and -excepturl
     if regexSkipUrl is not None:
@@ -159,66 +196,42 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext += u"%s%s" % (config.line_separator, addText)
     else:
         newtext = addText + config.line_separator + text
+
     if putText and text != newtext:
         pywikibot.output(color_format(
             '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
         pywikibot.showDiff(text, newtext)
+
     # Let's put the changes.
+    error_count = 0
     while True:
         # If someone load it as module, maybe it's not so useful to put the
         # text in the page
-        if putText:
-            if not always:
-                try:
-                    choice = pywikibot.input_choice(
-                        'Do you want to accept these changes?',
-                        [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
-                         ('open in Browser', 'b')], 'n')
-                except QuitKeyboardInterrupt:
-                    sys.exit('User quit bot run.')
-                if choice == 'a':
-                    always = True
-                elif choice == 'n':
-                    return (False, False, always)
-                elif choice == 'b':
-                    pywikibot.bot.open_webbrowser(page)
-            if always or choice == 'y':
-                try:
-                    if always:
-                        page.put(newtext, summary,
-                                 minorEdit=page.namespace() != 3)
-                    else:
-                        page.put_async(newtext, summary,
-                                       minorEdit=page.namespace() != 3)
-                except pywikibot.EditConflict:
-                    pywikibot.output(u'Edit conflict! skip!')
-                    return (False, False, always)
-                except pywikibot.ServerError:
-                    errorCount += 1
-                    if errorCount < config.max_retries:
-                        pywikibot.output(u'Server Error! Wait..')
-                        time.sleep(config.retry_wait)
-                        continue
-                    else:
-                        raise pywikibot.ServerError(u'Fifth Server Error!')
-                except pywikibot.SpamfilterError as e:
-                    pywikibot.output(
-                        u'Cannot change %s because of blacklist entry %s'
-                        % (page.title(), e.url))
-                    return (False, False, always)
-                except pywikibot.LockedPage:
-                    pywikibot.output(u'Skipping %s (locked page)'
-                                     % page.title())
-                    return (False, False, always)
-                except pywikibot.PageNotSaved as error:
-                    pywikibot.output(u'Error putting page: %s' % error.args)
-                    return (False, False, always)
-                else:
-                    # Break only if the errors are one after the other...
-                    errorCount = 0
-                    return (True, True, always)
-        else:
+        if not putText:
             return (text, newtext, always)
+
+        if not always:
+            try:
+                choice = pywikibot.input_choice(
+                    'Do you want to accept these changes?',
+                    [('Yes', 'y'), ('No', 'n'), ('All', 'a'),
+                     ('open in Browser', 'b')], 'n')
+            except QuitKeyboardInterrupt:
+                sys.exit('User quit bot run.')
+
+            if choice == 'a':
+                always = True
+            elif choice == 'n':
+                return (False, False, always)
+            elif choice == 'b':
+                pywikibot.bot.open_webbrowser(page)
+
+        if always or choice == 'y':
+            result = put_text(page, newtext, summary, error_count,
+                              asynchronous=not always)
+            if result is not None:
+                return (result, result, always)
+            error_count += 1
 
 
 def main(*args):
