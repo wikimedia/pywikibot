@@ -217,7 +217,7 @@ try:
     summary = i18n.twtranslate(mysite, 'makecat-create',
                                {'cat': workingcatname})
     workingcat = pywikibot.Category(mysite,
-                                    u'%s:%s'
+                                    '%s%s'
                                     % (mysite.namespaces.CATEGORY,
                                        workingcatname))
     filename = pywikibot.config.datafilepath(
