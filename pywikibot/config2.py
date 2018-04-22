@@ -901,33 +901,45 @@ special_page_limit = 500
 # #############################################
 
 
-def makepath(path):
+def makepath(path, create=True):
     """Return a normalized absolute version of the path argument.
 
-     - if the given path already exists in the filesystem
-       the filesystem is not modified.
-     - otherwise makepath creates directories along the given path
-       using the dirname() of the path. You may append
-       a '/' to the path if you want it to be a directory path.
+    If the given path already exists in the filesystem ore create is False
+    the filesystem is not modified.
+    Otherwise if create is True makepath creates directories along the given
+    path using the dirname() of the path. You may append a '/' to the path if
+    you want it to be a directory path.
 
     from holger@trillke.net 2002/03/18
 
+    @param path: path in the filesystem
+    @type path: str
+    @param create: create the directory if it is True. Otherwise do not change
+        the filesystem. Default is True.
+    @type create: bool
     """
     dpath = os.path.normpath(os.path.dirname(path))
-    if not os.path.exists(dpath):
+    if create and not os.path.exists(dpath):
         os.makedirs(dpath)
     return os.path.normpath(os.path.abspath(path))
 
 
-def datafilepath(*filename):
+def datafilepath(*filename, **kwargs):
     """Return an absolute path to a data file in a standard location.
 
     Argument(s) are zero or more directory names, optionally followed by a
     data file name. The return path is offset to config.base_dir. Any
-    directories in the path that do not already exist are created.
+    directories in the path that do not already exist are created if create
+    is True, otherwise the filesystem keeps unchanged.
 
+    @param path: path in the filesystem
+    @type path: str
+    @keyword create: create the directory if it is True. Otherwise don't change
+        the filesystem. Default is True.
+    @type create: bool
     """
-    return makepath(os.path.join(base_dir, *filename))
+    create = kwargs.get('create', True)
+    return makepath(os.path.join(base_dir, *filename), create=create)
 
 
 def shortpath(path):
