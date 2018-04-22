@@ -1373,6 +1373,7 @@ class BaseBot(OptionHandler):
         terminated gracefully or was halted by exception.
         May be overridden by subclasses.
         """
+        self.teardown()
         pywikibot.output("\n%i pages read"
                          "\n%i pages written"
                          % (self._treat_counter, self._save_counter))
@@ -1408,6 +1409,19 @@ class BaseBot(OptionHandler):
         """Return whether treat should be executed for the page."""
         pass
 
+    def setup(self):
+        """Some inital setup before run operation starts.
+
+        This can be used for reading huge parts from life wiki or file
+        operation which is more than just initialize the instance.
+        Invoked by run() before running through generator loop.
+        """
+        pass
+
+    def teardown(self):
+        """Some cleanups after run operation. Invoked by exit()."""
+        pass
+
     def run(self):
         """Process all pages in generator."""
         self._start_ts = pywikibot.Timestamp.now()
@@ -1422,7 +1436,7 @@ class BaseBot(OptionHandler):
             # Python 2 does not clear previous exceptions and method `exit`
             # relies on sys.exc_info returning exceptions occurring in `run`.
             sys.exc_clear()
-
+        self.setup()
         try:
             for page in self.generator:
                 try:
