@@ -56,6 +56,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.logentries import LogEntryFactory
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools import MediaWikiVersion
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -1386,8 +1387,17 @@ def CategorizedPageGenerator(category, recurse=False, start=None,
         'content': content, 'namespaces': namespaces,
     }
     if start:
-        kwargs['sortby'] = 'sortkey'
-        kwargs['startsort'] = start
+        if category.site.version() < MediaWikiVersion('1.18'):
+            kwargs.pop('total', None)
+            count = 0
+            for article in category.articles(**kwargs):
+                if article.title() >= start:
+                    count += 1
+                    yield article
+                    if count == total:
+                        return
+            return
+        kwargs['startprefix'] = start
     for a in category.articles(**kwargs):
         yield a
 
