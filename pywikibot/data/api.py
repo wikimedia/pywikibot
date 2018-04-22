@@ -2732,6 +2732,74 @@ class QueryGenerator(_RequestWrapper):
                 value = str(value)
             self.request[key] = value
 
+    def _handle_query_limit(self, prev_limit, new_limit, count, had_data):
+        """Handle query limit."""
+        if self.query_limit is None:
+            return prev_limit, new_limit
+
+        prev_limit = new_limit
+        if self.limit is None:
+            new_limit = self.query_limit
+        elif self.limit > 0:
+            if had_data:
+                # self.resultkey in data in last request.submit()
+                new_limit = min(self.query_limit, self.limit - count)
+            else:
+                # only "(query-)continue" returned. See Bug T74209.
+                # increase new_limit to advance faster until new
+                # useful data are found again.
+                new_limit = min(new_limit * 2, self.query_limit)
+        else:
+            new_limit = None
+
+        if new_limit and 'rvprop' in self.request \
+                and 'content' in self.request['rvprop']:
+            # queries that retrieve page content have lower limits
+            # Note: although API allows up to 500 pages for content
+            #       queries, these sometimes result in server-side errors
+            #       so use 250 as a safer limit
+            new_limit = min(new_limit, self.api_limit // 10, 250)
+
+        if new_limit is not None:
+            self.request[self.prefix + 'limit'] = str(new_limit)
+
+        if prev_limit != new_limit:
+            pywikibot.debug(
+                '{name}: query_limit: {query}, api_limit: {api}, '
+                'limit: {limit}, new_limit: {new}, count: {count}\n'
+                '{name}: {prefix}limit: {value}'
+                .format(name=self.__class__.__name__,
+                        query=self.query_limit,
+                        api=self.api_limit,
+                        limit=self.limit,
+                        new=new_limit,
+                        count=count,
+                        prefix=self.prefix,
+                        value=self.request[self.prefix + 'limit']),
+                _logger)
+        return prev_limit, new_limit
+
+    def _get_resultdata(self):
+        """Get resultdata and verify result."""
+        resultdata = keys = self.data['query'][self.resultkey]
+        if isinstance(resultdata, dict):
+            keys = list(resultdata.keys())
+            if 'results' in resultdata:
+                resultdata = resultdata['results']
+            elif 'pageids' in self.data['query']:
+                # this ensures that page data will be iterated
+                # in the same order as received from server
+                resultdata = [resultdata[k]
+                              for k in self.data['query']['pageids']]
+            else:
+                resultdata = [resultdata[k]
+                              for k in sorted(resultdata.keys())]
+        pywikibot.debug('{name} received {keys}; limit={limit}'
+                        .format(name=self.__class__.__name__,
+                                keys=keys, limit=self.limit),
+                        _logger)
+        return resultdata
+
     def __iter__(self):
         """Submit request and iterate the response based on self.resultkey.
 
@@ -2743,78 +2811,18 @@ class QueryGenerator(_RequestWrapper):
 
         count = 0
         while True:
-            if self.query_limit is not None:
-                prev_limit = new_limit
-                if self.limit is None:
-                    new_limit = self.query_limit
-                elif self.limit > 0:
-                    if previous_result_had_data:
-                        # self.resultkey in data in last request.submit()
-                        new_limit = min(self.query_limit, self.limit - count)
-                    else:
-                        # only "(query-)continue" returned. See Bug T74209.
-                        # increase new_limit to advance faster until new
-                        # useful data are found again.
-                        new_limit = min(new_limit * 2, self.query_limit)
-                else:
-                    new_limit = None
-
-                if new_limit and \
-                        "rvprop" in self.request \
-                        and "content" in self.request["rvprop"]:
-                    # queries that retrieve page content have lower limits
-                    # Note: although API allows up to 500 pages for content
-                    #   queries, these sometimes result in server-side errors
-                    #   so use 250 as a safer limit
-                    new_limit = min(new_limit, self.api_limit // 10, 250)
-                if new_limit is not None:
-                    self.request[self.prefix + "limit"] = str(new_limit)
-                if prev_limit != new_limit:
-                    pywikibot.debug(
-                        u"%s: query_limit: %s, api_limit: %s, "
-                        u"limit: %s, new_limit: %s, count: %s"
-                        % (self.__class__.__name__,
-                           self.query_limit, self.api_limit,
-                           self.limit, new_limit, count),
-                        _logger)
-                    pywikibot.debug(
-                        u"%s: %s: %s"
-                        % (self.__class__.__name__,
-                           self.prefix + "limit",
-                           self.request[self.prefix + "limit"]),
-                        _logger)
+            prev_limit, new_limit = self._handle_query_limit(
+                prev_limit, new_limit, count, previous_result_had_data)
             if not hasattr(self, "data"):
                 self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
-                    u"%s: stopped iteration because no dict retrieved from api."
-                    % self.__class__.__name__,
+                    '{}: stopped iteration because no dict retrieved from api.'
+                    .format(self.__class__.__name__),
                     _logger)
                 return
             if 'query' in self.data and self.resultkey in self.data["query"]:
-                resultdata = self.data["query"][self.resultkey]
-                if isinstance(resultdata, dict):
-                    pywikibot.debug(u"%s received %s; limit=%s"
-                                    % (self.__class__.__name__,
-                                       list(resultdata.keys()),
-                                       self.limit),
-                                    _logger)
-                    if "results" in resultdata:
-                        resultdata = resultdata["results"]
-                    elif "pageids" in self.data["query"]:
-                        # this ensures that page data will be iterated
-                        # in the same order as received from server
-                        resultdata = [resultdata[k]
-                                      for k in self.data["query"]["pageids"]]
-                    else:
-                        resultdata = [resultdata[k]
-                                      for k in sorted(resultdata.keys())]
-                else:
-                    pywikibot.debug(u"%s received %s; limit=%s"
-                                    % (self.__class__.__name__,
-                                       resultdata,
-                                       self.limit),
-                                    _logger)
+                resultdata = self._get_resultdata()
                 if "normalized" in self.data["query"]:
                     self.normalized = {
                         item['to']: item['from']
