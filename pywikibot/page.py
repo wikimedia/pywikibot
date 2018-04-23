@@ -3589,9 +3589,8 @@ class User(Page):
         @type total: int
         """
         if not self.isRegistered():
-            raise StopIteration
-        for item in self.logevents(
-                logtype='upload', total=total):
+            return
+        for item in self.logevents(logtype='upload', total=total):
             yield (item.page(),
                    unicode(item.timestamp()),
                    item.comment(),
