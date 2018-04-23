@@ -18,6 +18,7 @@ import datetime
 import re
 import sys
 
+from pywikibot.textlib import NON_LATIN_DIGITS
 from pywikibot.tools import first_lower, first_upper, deprecated
 
 if sys.version_info[0] > 2:
@@ -260,27 +261,27 @@ def monthName(lang, ind):
 
 
 # Helper for KN: digits representation
-_knDigits = u'೦೧೨೩೪೫೬೭೮೯'
+_knDigits = NON_LATIN_DIGITS['kn']
 _knDigitsToLocal = {ord(unicode(i)): _knDigits[i] for i in range(10)}
 _knLocalToDigits = {ord(_knDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for Urdu/Persian languages
-_faDigits = u'۰۱۲۳۴۵۶۷۸۹'
+_faDigits = NON_LATIN_DIGITS['fa']
 _faDigitsToLocal = {ord(unicode(i)): _faDigits[i] for i in range(10)}
 _faLocalToDigits = {ord(_faDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for HI:, MR:
-_hiDigits = u'०१२३४५६७८९'
+_hiDigits = NON_LATIN_DIGITS['hi']
 _hiDigitsToLocal = {ord(unicode(i)): _hiDigits[i] for i in range(10)}
 _hiLocalToDigits = {ord(_hiDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for BN:
-_bnDigits = u'০১২৩৪৫৬৭৮৯'
+_bnDigits = NON_LATIN_DIGITS['bn']
 _bnDigitsToLocal = {ord(unicode(i)): _bnDigits[i] for i in range(10)}
 _bnLocalToDigits = {ord(_bnDigits[i]): unicode(i) for i in range(10)}
 
 # Helper for GU:
-_guDigits = u'૦૧૨૩૪૫૬૭૮૯'
+_guDigits = NON_LATIN_DIGITS['gu']
 _guDigitsToLocal = {ord(unicode(i)): _guDigits[i] for i in range(10)}
 _guLocalToDigits = {ord(_guDigits[i]): unicode(i) for i in range(10)}
 
