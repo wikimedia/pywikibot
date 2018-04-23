@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Mechanics to slow down wiki read and/or write rate."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,6 +13,7 @@ import time
 
 import pywikibot
 from pywikibot import config
+from pywikibot.tools import deprecated
 
 _logger = "wiki.throttle"
 
@@ -64,13 +65,18 @@ class Throttle(object):
         # Free the process id after this many seconds:
         self.releasepid = 1200
 
-        self.lastwait = 0.0
         self.delay = 0
         self.checktime = 0
         self.multiplydelay = multiplydelay
         if self.multiplydelay:
             self.checkMultiplicity()
         self.setDelays()
+
+    @deprecated
+    @property
+    def lastwait(self):
+        """DEPRECATED property."""
+        return 0.0
 
     def checkMultiplicity(self):
         """Count running processes for site and set process_multiplicity."""
