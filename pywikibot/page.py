@@ -2798,7 +2798,7 @@ class Category(Page):
                             if total == 0:
                                 return
 
-    @deprecated_args(startFrom='startsort', step=None)
+    @deprecated_args(startFrom='startprefix', step=None)
     def articles(self, recurse=False, total=None,
                  content=False, namespaces=None, sortby=None,
                  reverse=False, starttime=None, endtime=None,
