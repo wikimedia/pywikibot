@@ -65,6 +65,7 @@ class Throttle(object):
         # Free the process id after this many seconds:
         self.releasepid = 1200
 
+        self.retry_after = 0  # set by http.request
         self.delay = 0
         self.checktime = 0
         self.multiplydelay = multiplydelay
@@ -274,18 +275,27 @@ class Throttle(object):
             else:
                 self.last_read = time.time()
 
-    def lag(self, lagtime):
+    def lag(self, lagtime=None):
         """Seize the throttle lock due to server lag.
 
-        This will prevent any thread from accessing this site.
+        Usually the self.retry-after value from response_header of the last
+        request if available which will be used for wait time. Default value
+        set by api and stored in self.retry_after is 5. If neither retry_after
+        nor lagtime is set, fallback to 5.
 
+        This method is used by api.request. It will prevent any thread from
+        accessing this site.
+
+        @param lagtime: The time to wait for the next request which is the
+            last maxlag time from api warning. This is only used as a fallback
+            if self.retry-after isn't set.
+        @type lagtime: int
         """
         started = time.time()
         with self.lock:
-            # start at 1/2 the current server lag time
-            # wait at least 5 seconds but not more than 120 seconds
-            delay = min(max(5, lagtime // 2), 120)
+            waittime = self.retry_after or lagtime or 5
+            # wait not more than 120 seconds
+            delay = min(waittime, 120)
             # account for any time we waited while acquiring the lock
             wait = delay - (time.time() - started)
-
             self.wait(wait)
