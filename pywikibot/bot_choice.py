@@ -7,6 +7,8 @@
 #
 from __future__ import absolute_import, unicode_literals
 
+from textwrap import fill
+
 import pywikibot
 
 
@@ -40,7 +42,8 @@ class Option(object):
         formatted_options = []
         for option in options:
             formatted_options.append(option.format(default=default))
-        return '{0} ({1})'.format(text, ', '.join(formatted_options))
+        return fill('{0} ({1})'.format(text, ', '.join(formatted_options)),
+                    width=77)
 
     @property
     def stop(self):
