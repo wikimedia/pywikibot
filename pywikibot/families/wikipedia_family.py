@@ -205,11 +205,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         self.edit_restricted_templates = {
             'ar': ('تحرر',),
             'bs': ('Izmjena u toku',),
-            'cs': ('Pracuje se', 'Archiv', 'Archiv Wikipedie',
-                   'Archiv diskuse', 'Archivace start', 'Posloupnost archivů',
-                   'Rfa-archiv-start', 'Rfc-archiv-start',),
-            'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',
-                   'Archiv',),
+            'cs': ('Pracuje se',),
+            'de': ('Inuse', 'In use', 'In bearbeitung', 'Inbearbeitung',),
             'en': ('Inuse', 'In use'),
             'fa': ('ویرایش',),
             'fr': ('En cours', 'Plusieurs en cours', 'Correction en cours',
@@ -218,6 +215,15 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             'sr': ('Радови у току', 'Рут',),
             'ur': ('زیر ترمیم',),
             'zh': ('Inuse',),
+        }
+
+        # Archive templates that indicate an edit of non-archive bots
+        # should be avoided
+        self.archived_page_templates = {
+            'cs': ('Archiv', 'Archiv Wikipedie', 'Archiv diskuse',
+                   'Archivace start', 'Posloupnost archivů',
+                   'Rfa-archiv-start', 'Rfc-archiv-start',),
+            'de': ('Archiv',),
         }
 
     def get_known_families(self, site):
