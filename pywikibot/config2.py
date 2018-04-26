@@ -904,7 +904,7 @@ special_page_limit = 500
 def makepath(path, create=True):
     """Return a normalized absolute version of the path argument.
 
-    If the given path already exists in the filesystem ore create is False
+    If the given path already exists in the filesystem or create is False
     the filesystem is not modified.
     Otherwise if create is True makepath creates directories along the given
     path using the dirname() of the path. You may append a '/' to the path if
