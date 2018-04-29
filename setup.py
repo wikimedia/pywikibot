@@ -160,7 +160,7 @@ if 'PYSETUP_TEST_EXTRAS' in os.environ:
 
 # These extra dependencies are needed other unittest fails to load tests.
 if PY2:
-    test_deps += extra_deps['csv'] + ['mock']
+    test_deps += extra_deps['csv']
 else:
     test_deps += ['six']
 
