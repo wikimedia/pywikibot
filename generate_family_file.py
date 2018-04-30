@@ -92,7 +92,7 @@ class FamilyFileGenerator(object):
             if self.dointerwiki is None:
                 makeiw = raw_input(
                     "\nThere are %i languages available."
-                    "\nDo you want to generate interwiki links?"
+                    '\nDo you want to generate interwiki links? '
                     "This might take a long time. ([y]es/[N]o/[e]dit)"
                     % len(self.langs)).lower()
             else:
