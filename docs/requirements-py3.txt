@@ -1,6 +1,6 @@
 # This is a PIP requirements file for building Sphinx documentation of pywikibot
 # using sphinx on python3.4.
-# requirements.txt and requests-requirements.txt are also needed
+# requirements.txt and pywikibot[security] are also needed
 
 sphinx
 sphinx-epytext>=0.0.4
