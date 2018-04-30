@@ -108,6 +108,7 @@ def main(*args):
     verifyDescription = True
     aborts = set()
     ignorewarn = set()
+    chunk_size = 0
     chunk_size_regex = re.compile(
         r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
     recursive = False
