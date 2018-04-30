@@ -9,6 +9,7 @@ pytest-cov
 pytest-attrib
 pytest-httpbin
 httpbin<0.6.0 ; os_name != 'posix'
+Flask<1.0.1  # T193383
 
 six
 
