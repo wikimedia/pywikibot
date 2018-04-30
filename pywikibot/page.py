@@ -1171,6 +1171,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # multiple bots/nobots templates are allowed
         restrictions = self.site.family.edit_restricted_templates.get(
             self.site.code)
+        # also add archive templates for non-archive bots
+        if pywikibot.calledModuleName() != 'archivebot':
+            archived = self.site.family.archived_page_templates.get(
+                self.site.code)
+            if restrictions and archived:
+                restrictions += archived
+            elif archived:
+                restrictions = archived
+
         for template, params in templates:
             title = template.title(withNamespace=False)
             if restrictions:

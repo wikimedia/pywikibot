@@ -730,6 +730,11 @@ class Family(object):
         # that indicate an edit should be avoided
         self.edit_restricted_templates = {}
 
+        # A dict of tuples for different sites with names of archive
+        # templates that indicate an edit of non-archive bots
+        # should be avoided
+        self.archived_page_templates = {}
+
         # A list of projects that share cross-project sessions.
         if not hasattr(self, 'cross_projects'):
             self.cross_projects = []
