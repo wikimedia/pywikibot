@@ -19,6 +19,7 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 from os.path import abspath, dirname, join
+import re
 import sys
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -268,6 +269,8 @@ def pywikibot_script_docstring_fixups(
 
     if not name.startswith('scripts.'):
         return
+
+    length = 0
     for index, line in enumerate(lines):
         if line == '&params;':
             lines[index] = ('This script supports use of '
@@ -280,7 +283,7 @@ def pywikibot_script_docstring_fixups(
         elif name == 'scripts.login' and '*' in line:
             # Escape star wildcard in scripts/login.py
             lines[index] = line.replace('*', '\\*')
-        elif (line.endswith(':') and not line.strip().startswith(':') and
+        elif (line.endswith(':') and not line.lstrip().startswith(':') and
                 'Traceback (most recent call last)' not in line):
             # Initiate code block except pagegenerator arguments follows
             for afterline in lines[index + 1:]:
@@ -291,12 +294,20 @@ def pywikibot_script_docstring_fixups(
                 else:
                     lines[index] = line + ':'
                     break
+
         if line.startswith('-'):
             # Indent options
+            match = re.match(r'-[^ ]+? +', line)
+            if match:
+                length = len(match.group(0))
             lines[index] = ' ' + line
-        elif line.startswith('                '):
-            # Indent description of options (as options are indented)
-            lines[index] = line.replace('                ', '                 ')
+        elif length and line.startswith(' ' * length):
+            # Indent descriptions of options (as options are indented)
+            lines[index] = ' ' + line
+        elif line != '':
+            # Reset length
+            length = 0
+
         if '|' in line:
             # Escape vertical bars
             lines[index] = line.replace('|', '\\|')
