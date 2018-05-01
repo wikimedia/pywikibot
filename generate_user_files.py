@@ -32,7 +32,13 @@ else:
     os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = _orig_no_user_config
 
 base_dir = pywikibot.config2.base_dir
-console_encoding = sys.stdout.encoding
+
+try:
+    console_encoding = sys.stdout.encoding
+# unittests fails with "StringIO instance has no attribute 'encoding'"
+except AttributeError:
+    console_encoding = None
+
 # the directory in which generate_user_files.py is located
 pywikibot_dir = sys.path[0]
 
