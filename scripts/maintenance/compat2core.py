@@ -27,7 +27,7 @@ to show warnings about deprecated methods:
 """
 #
 # (C) xqt, 2014-2017
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -93,7 +93,7 @@ replacements = (
 warnings = (
     ('pywikibot.setAction(',
      'setAction() no longer works; you must pass an explicit edit summary\n'
-     'message to put() or put_async()'),
+     'message to save() or put()'),
     ('.removeImage(',
      'Page.removeImage() is deprecated and does not work at core'),
     ('.replaceImage(',

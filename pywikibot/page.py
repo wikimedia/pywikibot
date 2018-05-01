@@ -1347,13 +1347,13 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param newtext: The complete text of the revised page.
         @type newtext: unicode
-
         """
         self.text = newtext
         self.save(summary=summary, watch=watch, minor=minor, botflag=botflag,
                   force=force, asynchronous=asynchronous, callback=callback,
                   **kwargs)
 
+    @deprecated('put(asynchronous=True) or save(asynchronous=True)')
     @deprecated_args(comment='summary', watchArticle='watch',
                      minorEdit='minor')
     def put_async(self, newtext, summary=None, watch=None, minor=True,
