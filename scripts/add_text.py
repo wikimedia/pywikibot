@@ -106,7 +106,7 @@ def put_text(page, new, summary, count, asynchronous=False):
     page.text = new
     try:
         page.save(summary=summary, asynchronous=asynchronous,
-                  minorEdit=page.namespace() != 3)
+                  minor=page.namespace() != 3)
     except pywikibot.EditConflict:
         pywikibot.output('Edit conflict! skip!')
     except pywikibot.ServerError:
