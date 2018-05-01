@@ -102,8 +102,8 @@ class ArticleEditor(object):
             comment = i18n.twtranslate(self.site, 'editarticle-edit',
                                        {'description': changes})
             try:
-                self.page.put(new, summary=comment, minorEdit=False,
-                              watchArticle=self.options.watch)
+                self.page.put(new, summary=comment, minor=False,
+                              watch=self.options.watch)
             except pywikibot.EditConflict:
                 self.handle_edit_conflict(new)
         else:

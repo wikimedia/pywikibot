@@ -747,7 +747,7 @@ class checkImagesBot(object):
             return
 
         try:
-            self.talk_page.put(newText, summary=commentox, minorEdit=False)
+            self.talk_page.put(newText, summary=commentox, minor=False)
         except pywikibot.LockedPage:
             pywikibot.output(u'Talk page blocked, skip.')
         else:
@@ -1075,7 +1075,7 @@ class checkImagesBot(object):
         else:
             # Adding the log
             another_page.put(text_get + rep_text, summary=com, force=True,
-                             minorEdit=False)
+                             minor=False)
             pywikibot.output(u"...Reported...")
         return reported
 
