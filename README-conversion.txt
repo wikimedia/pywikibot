@@ -36,7 +36,7 @@ The following changes, at a minimum, need to be made to allow scripts to run:
     change "wikipedia." to "pywikibot."
 
 wikipedia.setAction() no longer works; you must revise the script to pass an
-explicit edit summary message on each put() or put_async() call.
+explicit edit summary message on each put() call.
 
 There is a helper script which does a lot of changes automatically.
 Just call it:
@@ -77,6 +77,7 @@ methods still work, but print a warning message in debug mode):
 - sectionFreeTitle(): replaced by Page.title(withSection=False)
 - aslink(): replaced by Page.title(asLink=True)
 - encoding(): replaced by Page.site.encoding()
+- put_async(): replaced by Page.put(asynchronous=True)
 
 The following methods of the Page object have been obsoleted and no longer
 work (but these methods don't appear to be used anywhere in the code

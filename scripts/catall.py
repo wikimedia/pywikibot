@@ -21,7 +21,7 @@ Options:
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels, 2004
-# (C) Pywikibot team, 2004-2014
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -77,9 +77,9 @@ def make_categories(page, list, site=None):
     for p in list:
         cattitle = "%s:%s" % (site.namespaces.CATEGORY, p)
         pllist.append(pywikibot.Page(site, cattitle))
-    page.put_async(textlib.replaceCategoryLinks(page.get(), pllist,
-                                                site=page.site),
-                   summary=i18n.twtranslate(site, 'catall-changing'))
+    page.put(textlib.replaceCategoryLinks(page.get(), pllist, site=page.site),
+             asynchronous=True,
+             summary=i18n.twtranslate(site, 'catall-changing'))
 
 
 def main(*args):
