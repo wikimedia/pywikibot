@@ -440,7 +440,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if not hasattr(self, '_autoFormat'):
             from pywikibot import date
             self._autoFormat = date.getAutoFormat(
-                self.site.code,
+                self.site.lang,
                 self.title(withNamespace=False)
             )
         return self._autoFormat

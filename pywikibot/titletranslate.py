@@ -3,7 +3,7 @@
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Yuri Astrakhan, 2005
-# (C) Pywikibot team, 2003-2015
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,7 @@ from __future__ import absolute_import, unicode_literals
 import re
 
 import pywikibot
-import pywikibot.date as date
+from pywikibot import date
 
 from pywikibot import config
 from pywikibot.tools import deprecated_args
@@ -87,7 +87,7 @@ def translate(page=None, hints=None, auto=True, removebrackets=False,
     # existing interwiki links.
     if auto and page:
         # search inside all dictionaries for this link
-        sitelang = page.site.code
+        sitelang = page.site.lang
         dictName, value = date.getAutoFormat(sitelang, page.title())
         if dictName:
             pywikibot.output(
