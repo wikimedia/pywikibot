@@ -742,37 +742,35 @@ def main(*args):
     salt = ''
     force = False
     calc = None
-    args = []
+    templates = []
 
-    def if_arg_value(arg, name):
-        if arg.startswith(name):
-            yield arg[len(name) + 1:]
-
-    for arg in pywikibot.handle_args(args):
-        for v in if_arg_value(arg, '-file'):
-            filename = v
-        for v in if_arg_value(arg, '-locale'):
+    local_args = pywikibot.handle_args(args)
+    for arg in local_args:
+        option, _, value = arg.partition(':')
+        if not option.startswith('-'):
+            templates.append(arg)
+            continue
+        option = option[1:]
+        if option in ('file', 'filename'):
+            filename = value
+        elif option == 'locale':
             # Required for english month names
-            locale.setlocale(locale.LC_TIME, v.encode('utf8'))
-        for v in if_arg_value(arg, '-timezone'):
-            os.environ['TZ'] = v.timezone
+            locale.setlocale(locale.LC_TIME, value.encode('utf8'))
+        elif option == 'timezone':
+            os.environ['TZ'] = value.timezone
             # Or use the preset value
             if hasattr(time, 'tzset'):
                 time.tzset()
-        for v in if_arg_value(arg, '-calc'):
-            calc = v
-        for v in if_arg_value(arg, '-salt'):
-            salt = v
-        for v in if_arg_value(arg, '-force'):
+        elif option == 'calc':
+            calc = value
+        elif option == 'salt':
+            salt = value
+        elif option == 'force':
             force = True
-        for v in if_arg_value(arg, '-filename'):
-            filename = v
-        for v in if_arg_value(arg, '-page'):
-            pagename = v
-        for v in if_arg_value(arg, '-namespace'):
-            namespace = v
-        if not arg.startswith('-'):
-            args.append(arg)
+        elif option == 'page':
+            pagename = value
+        elif option == 'namespace':
+            namespace = value
 
     site = pywikibot.Site()
 
@@ -790,12 +788,12 @@ def main(*args):
         pywikibot.output('key = %s' % calc_md5_hexdigest(calc, salt))
         return
 
-    if not args:
+    if not templates:
         pywikibot.bot.suggest_help(
             additional_text='No template was specified.')
         return False
 
-    for a in args:
+    for a in templates:
         pagelist = []
         a = pywikibot.Page(site, a, ns=10).title()
         if not filename and not pagename:
