@@ -613,7 +613,7 @@ class WelcomeBot(object):
             com = i18n.twtranslate(self.site, 'welcome-bad_username')
             if rep_text != '':
                 rep_page.put(text_get + rep_text, summary=com, force=True,
-                             minorEdit=True)
+                             minor=True)
                 showStatus(5)
                 pywikibot.output(u'Reported')
             self.BAQueue = []
@@ -776,7 +776,7 @@ class WelcomeBot(object):
                         try:
                             # append welcomed, welcome_count++
                             ustp.put(welcome_text, welcome_comment,
-                                     minorEdit=False)
+                                     minor=False)
                             welcomed_count += 1
                             self._totallyCount += 1
                             self.welcomed_users.append(users)

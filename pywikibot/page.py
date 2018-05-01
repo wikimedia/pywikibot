@@ -1334,9 +1334,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return summary
 
     @deprecate_arg('async', 'asynchronous')  # T106230
-    @deprecated_args(comment='summary')
-    def put(self, newtext, summary=u'', watchArticle=None, minorEdit=True,
-            botflag=None, force=False, asynchronous=False, callback=None, **kwargs):
+    @deprecated_args(comment='summary', watchArticle='watch',
+                     minorEdit='minor')
+    def put(self, newtext, summary=None, watch=None, minor=True, botflag=None,
+            force=False, asynchronous=False, callback=None, **kwargs):
         """
         Save the page with the contents of the first argument as the text.
 
@@ -1349,14 +1350,14 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         """
         self.text = newtext
-        self.save(summary=summary, watch=watchArticle, minor=minorEdit,
-                  botflag=botflag, force=force, asynchronous=asynchronous,
-                  callback=callback, **kwargs)
+        self.save(summary=summary, watch=watch, minor=minor, botflag=botflag,
+                  force=force, asynchronous=asynchronous, callback=callback,
+                  **kwargs)
 
-    @deprecated_args(comment='summary')
-    def put_async(self, newtext, summary=u'', watchArticle=None,
-                  minorEdit=True, botflag=None, force=False, callback=None,
-                  **kwargs):
+    @deprecated_args(comment='summary', watchArticle='watch',
+                     minorEdit='minor')
+    def put_async(self, newtext, summary=None, watch=None, minor=True,
+                  botflag=None, force=False, callback=None, **kwargs):
         """
         Put page on queue to be saved to wiki asynchronously.
 
@@ -1365,8 +1366,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         the same as for .put(). This version is maintained solely for
         backwards-compatibility.
         """
-        self.put(newtext, summary=summary, watchArticle=watchArticle,
-                 minorEdit=minorEdit, botflag=botflag, force=force,
+        self.put(newtext, summary=summary, watch=watch,
+                 minor=minor, botflag=botflag, force=force,
                  asynchronous=True, callback=callback, **kwargs)
 
     def watch(self, unwatch=False):
