@@ -4,8 +4,12 @@ Release history
 Current release
 ---------------
 
-* pagegenerators.RepeatingGenerator is marked as deprecated
+* Enable makepath and datafilepath not to create the directory
+* Use API's retry-after value (T144023)
+* Provide startprefix parameter for Category.articles() (T74101, T143120)
+* pagegenerators.RepeatingGenerator is marked as deprecated (T192229)
 * Bugfixes and improvements
+* new mediawiki projects where provided
 * Localisation updates
 
 3.0.20180403
