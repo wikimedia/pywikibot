@@ -34,8 +34,6 @@ The contents of the package
     | README-conversion.txt     | Guide to converting bot scripts from version 1       |
     |                           | of the Pywikibot framework to version 3              |
     +---------------------------+------------------------------------------------------+
-    | requests-requirements.txt | PIP requirements file for Appveyor builds            |
-    +---------------------------+------------------------------------------------------+
     | requirements.txt          | General PIP requirements file                        |
     +---------------------------+------------------------------------------------------+
     | setup.py                  | Installer script for Pywikibot 3.0 framework         |

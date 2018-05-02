@@ -1,3 +1,5 @@
+# This file is DEPRECATED! Use `pip install pywikibot[security]` instead.
+
 requests>=2.9,!=2.18.2
 
 # requests security extra
