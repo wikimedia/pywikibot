@@ -25,21 +25,19 @@ from distutils.version import Version
 from functools import wraps
 from warnings import catch_warnings, showwarning, warn
 
+from pywikibot.logging import debug
+
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 
 if not PY2:
     import queue as Queue
-
     StringTypes = basestring = (str,)
     UnicodeType = unicode = str
 else:
     import Queue
-
     StringTypes = types.StringTypes
     UnicodeType = types.UnicodeType
-
-from pywikibot.logging import debug
 
 try:
     import bz2
@@ -50,6 +48,7 @@ except ImportError as bz2_import_error:
     except ImportError:
         warn('package bz2 and bz2file were not found', ImportWarning)
         bz2 = bz2_import_error
+
 
 if PYTHON_VERSION < (3, 5):
     # although deprecated in 3 completely no message was emitted until 3.5

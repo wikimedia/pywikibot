@@ -12,30 +12,15 @@ __url__ = 'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot'
 
 import atexit
 import datetime
+from decimal import Decimal
 import math
 import re
 import sys
 import threading
 
-from decimal import Decimal
-
-if sys.version_info[0] > 2:
-    from queue import Queue
-    long = int
-    basestring = str
-else:
-    from Queue import Queue
-
 from warnings import warn
 
-# logging must be imported first so that other modules can
-# use these logging methods during the initialisation sequence.
-from pywikibot.logging import (
-    critical, debug, error, exception, log, output, stdout, warning
-)
-
-from pywikibot import config2 as config
-
+from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.bot import (
     input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui,
     calledModuleName, Bot, CurrentPageBot, WikidataBot,
@@ -45,6 +30,7 @@ from pywikibot.bot import (
 from pywikibot.bot_choice import (
     QuitKeyboardInterrupt as _QuitKeyboardInterrupt,
 )
+from pywikibot import config2 as config
 from pywikibot.data.api import UploadWarning as _UploadWarning
 from pywikibot.diff import PatchManager
 from pywikibot.exceptions import (
@@ -65,7 +51,11 @@ from pywikibot.exceptions import (
 )
 from pywikibot.family import Family
 from pywikibot.i18n import translate
+from pywikibot.logging import (
+    critical, debug, error, exception, log, output, stdout, warning
+)
 from pywikibot.site import BaseSite
+import pywikibot.textlib as textlib
 from pywikibot.tools import (
     # __ to avoid conflict with ModuleDeprecationWrapper._deprecated
     classproperty,
@@ -80,7 +70,14 @@ from pywikibot.tools import (
 )
 from pywikibot.tools.formatter import color_format
 
-import pywikibot.textlib as textlib
+
+if sys.version_info[0] > 2:
+    from queue import Queue
+    long = int
+    basestring = str
+else:
+    from Queue import Queue
+
 
 textlib_methods = (
     'unescape', 'replaceExcept', 'removeDisabledParts', 'removeHTMLParts',
@@ -254,9 +251,6 @@ class Timestamp(datetime.datetime):
                              newdt.tzinfo)
         else:
             return newdt
-
-
-from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 
 
 class Coordinate(_WbRepresentation):
@@ -1293,7 +1287,7 @@ getSite = redirect_func(Site, old_name='getSite')
 
 
 # These imports depend on Wb* classes above.
-from pywikibot.page import (
+from pywikibot.page import (  # noqa: E402
     Page,
     FilePage,
     Category,
@@ -1303,7 +1297,8 @@ from pywikibot.page import (
     PropertyPage,
     Claim,
 )
-from pywikibot.page import html2unicode, url2unicode, unicode2html
+from pywikibot.page import (  # noqa: E402
+    html2unicode, url2unicode, unicode2html)
 
 
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')

@@ -49,10 +49,9 @@ import types
 
 from distutils.version import StrictVersion
 from locale import getdefaultlocale
+from warnings import warn
 
 from requests import __version__ as requests_version
-
-from warnings import warn
 
 from pywikibot.logging import error, output, warning
 from pywikibot.tools import PY2

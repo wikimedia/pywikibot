@@ -35,6 +35,20 @@ import sys
 import time
 import warnings
 
+import pywikibot
+from pywikibot.bot import (
+    ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
+)
+from pywikibot.tools import (
+    PY2,
+    UnicodeType as unicode,
+)
+from pywikibot.userinterfaces import (
+    terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
+)
+from tests.aspects import TestCase
+from tests.utils import unittest, FakeModule
+
 if os.name == "nt":
     from multiprocessing.managers import BaseManager
     import threading
@@ -53,22 +67,6 @@ if os.name == "nt":
         import win32clipboard
     except ImportError:
         win32clipboard = None
-
-import pywikibot
-
-from pywikibot.bot import (
-    ui, DEBUG, VERBOSE, INFO, STDOUT, INPUT, WARNING, ERROR, CRITICAL
-)
-from pywikibot.tools import (
-    PY2,
-    UnicodeType as unicode,
-)
-from pywikibot.userinterfaces import (
-    terminal_interface_win32, terminal_interface_base, terminal_interface_unix,
-)
-
-from tests.aspects import TestCase
-from tests.utils import unittest, FakeModule
 
 
 class Stream(object):

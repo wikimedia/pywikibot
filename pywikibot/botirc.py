@@ -20,6 +20,8 @@ from __future__ import absolute_import, unicode_literals
 
 import re
 
+import pywikibot
+
 try:
     from ircbot import SingleServerIRCBot
 except ImportError as e:
@@ -35,8 +37,6 @@ except ImportError as e:
 
 
 _logger = "botirc"
-
-import pywikibot
 
 
 class IRCBot(pywikibot.Bot, SingleServerIRCBot):

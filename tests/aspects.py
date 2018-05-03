@@ -12,20 +12,17 @@ mixin to show cache usage is included.
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, print_function, unicode_literals
-"""
-    TODO:
-
-        skip if the user is blocked.
-        sysop flag, implement in site & page, and
-            possibly some of the script tests.
-        slow flag
-            weblib - also slow
-            (this class, and a FastTest, could error/pass based
-             it consumed more than a specified amount of time allowed.)
-        net flag should disable network libraries
-        UITestCase:
-            Not integrated; direct subclass of unittest.TestCase.
-"""
+# TODO:
+#     skip if the user is blocked.
+#     sysop flag, implement in site & page, and
+#         possibly some of the script tests.
+#     slow flag
+#         weblib - also slow
+#         (this class, and a FastTest, could error/pass based
+#          it consumed more than a specified amount of time allowed.)
+#     net flag should disable network libraries
+#     UITestCase:
+#         Not integrated; direct subclass of unittest.TestCase.
 import inspect
 import itertools
 import os

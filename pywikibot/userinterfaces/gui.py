@@ -17,6 +17,10 @@ from __future__ import absolute_import, unicode_literals
 
 import sys
 
+import pywikibot
+from pywikibot import __url__
+from pywikibot.tools import PY2, UnicodeType
+
 if sys.version_info[0] > 2:
     import tkinter as Tkinter
     from tkinter.scrolledtext import ScrolledText
@@ -40,11 +44,6 @@ else:
     from idlelib import SearchDialog, ReplaceDialog, configDialog
     from idlelib.configHandler import idleConf
     from idlelib.MultiCall import MultiCallCreator
-
-import pywikibot
-
-from pywikibot import __url__
-from pywikibot.tools import PY2, UnicodeType
 
 
 class TextEditor(ScrolledText):

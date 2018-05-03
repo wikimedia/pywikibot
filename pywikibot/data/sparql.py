@@ -10,10 +10,6 @@ from __future__ import absolute_import, unicode_literals
 import json
 import sys
 import time
-if sys.version_info[0] > 2:
-    from urllib.parse import quote
-else:
-    from urllib2 import quote
 
 from requests.exceptions import Timeout
 
@@ -21,6 +17,12 @@ from pywikibot import config, warning, Site
 from pywikibot.comms import http
 from pywikibot.tools import UnicodeMixin, py2_encode_utf_8
 from pywikibot.exceptions import Error, TimeoutError
+
+if sys.version_info[0] > 2:
+    from urllib.parse import quote
+else:
+    from urllib2 import quote
+
 
 DEFAULT_HEADERS = {'cache-control': 'no-cache',
                    'Accept': 'application/sparql-results+json'}

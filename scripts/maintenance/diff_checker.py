@@ -29,14 +29,15 @@ from __future__ import absolute_import, unicode_literals
 from re import compile as re_compile, IGNORECASE
 from subprocess import check_output
 from sys import version_info
+
+from unidiff import PatchSet
+
 if version_info.major == 3:
     PY2 = False
     from tokenize import tokenize, STRING
 else:
     PY2 = True
     from tokenize import generate_tokens as tokenize, STRING
-
-from unidiff import PatchSet
 
 
 # Regexp for a line that is allowed to be longer than the limit.

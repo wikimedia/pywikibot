@@ -15,14 +15,14 @@ import codecs
 import re
 import sys
 
+import pywikibot
+from pywikibot.tools import deprecated, UnicodeMixin
+
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
 else:
     from urlparse import urlparse
 
-import pywikibot
-
-from pywikibot.tools import deprecated, UnicodeMixin
 
 _logger = "comm.threadedhttp"
 

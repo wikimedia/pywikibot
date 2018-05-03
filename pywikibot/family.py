@@ -8,20 +8,13 @@
 from __future__ import absolute_import, unicode_literals
 
 import collections
+from importlib import import_module
 import logging
+from os.path import basename, dirname, splitext
 import re
 import string
 import sys
 import warnings
-
-PY3 = sys.version_info[0] > 2
-if PY3:
-    import urllib.parse as urlparse
-else:
-    import urlparse
-
-from os.path import basename, dirname, splitext
-from importlib import import_module
 from warnings import warn
 
 import pywikibot
@@ -32,6 +25,13 @@ from pywikibot.tools import (
     deprecated, deprecated_args, issue_deprecation_warning,
     FrozenDict,
 )
+
+PY3 = sys.version_info[0] > 2
+if PY3:
+    import urllib.parse as urlparse
+else:
+    import urlparse
+
 
 logger = logging.getLogger("pywiki.wiki.family")
 

@@ -13,16 +13,16 @@ import sys
 
 from collections import Sequence
 from difflib import _format_range_unified as format_range_unified
+
+import pywikibot
+from pywikibot.tools import chars
+from pywikibot.tools import deprecated_args
+from pywikibot.tools.formatter import color_format
+
 if sys.version_info[0] > 2:
     from itertools import zip_longest
 else:
     from itertools import izip_longest as zip_longest
-
-import pywikibot
-from pywikibot.tools import chars
-
-from pywikibot.tools import deprecated_args
-from pywikibot.tools.formatter import color_format
 
 
 class Hunk(object):

@@ -20,28 +20,24 @@ import warnings
 from collections import Mapping
 from types import ModuleType
 
-from pywikibot.tools import PY2
+import pywikibot
+from pywikibot.comms import threadedhttp
+from pywikibot import config
+from pywikibot.data.api import CachedRequest, APIError
+from pywikibot.data.api import Request as _original_Request
+from pywikibot.site import Namespace
+from pywikibot.tools import (
+    PY2, PYTHON_VERSION,
+    UnicodeType as unicode,
+)
+from tests import _pwb_py
+from tests import unittest
 
 if not PY2:
     import six
 else:
     ResourceWarning = None  # flake8: F821
 
-import pywikibot
-
-from pywikibot import config
-
-from pywikibot.comms import threadedhttp
-from pywikibot.data.api import CachedRequest, APIError
-from pywikibot.data.api import Request as _original_Request
-from pywikibot.site import Namespace
-from pywikibot.tools import (
-    PYTHON_VERSION,
-    UnicodeType as unicode,
-)
-
-from tests import _pwb_py
-from tests import unittest
 
 OSWIN32 = (sys.platform == 'win32')
 

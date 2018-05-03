@@ -86,6 +86,11 @@ from __future__ import absolute_import, unicode_literals
 
 import signal
 
+import pywikibot
+from pywikibot import pagegenerators as pg, textlib
+from pywikibot.bot import WikidataBot, OptionHandler
+
+
 willstop = False
 
 
@@ -100,10 +105,6 @@ def _signal_handler(signal, frame):
 
 
 signal.signal(signal.SIGINT, _signal_handler)
-
-import pywikibot
-from pywikibot import pagegenerators as pg, textlib
-from pywikibot.bot import WikidataBot, OptionHandler
 
 docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
 

@@ -58,6 +58,29 @@ from __future__ import absolute_import, unicode_literals
 # class definition that can be subclassed to create new, functional bot
 # scripts, instead of writing each one from scratch.
 
+__all__ = (
+    'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
+    'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
+    'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
+    'init_handlers', 'writelogheader',
+    'input', 'input_choice', 'input_yn', 'inputChoice', 'input_list_choice',
+    'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
+    'ContextOption', 'ListOption', 'OutputProxyOption',
+    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswer',
+    'Choice', 'AlwaysChoice',
+    'QuitKeyboardInterrupt',
+    'InteractiveReplace',
+    'calledModuleName', 'handle_args', 'handleArgs',
+    'showHelp', 'suggest_help',
+    'writeToCommandLogFile', 'open_webbrowser',
+    'OptionHandler',
+    'BaseBot', 'Bot', 'SingleSiteBot', 'MultipleSitesBot',
+    'CurrentPageBot', 'AutomaticTWSummaryBot',
+    'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
+    'RedirectPageBot', 'NoRedirectPageBot',
+    'WikidataBot',
+)
+
 # Note: all output goes thru python std library "logging" module
 
 import codecs
@@ -69,15 +92,11 @@ import os
 import sys
 import time
 import warnings
+from warnings import warn
 import webbrowser
 
-from warnings import warn
-
-_logger = "bot"
-
 import pywikibot
-
-from pywikibot import config
+from pywikibot import config2 as config
 from pywikibot import daemonize
 from pywikibot import i18n
 from pywikibot import version
@@ -104,28 +123,8 @@ from pywikibot.tools._logging import (
 )
 from pywikibot.tools.formatter import color_format
 
-__all__ = (
-    'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
-    'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
-    'output', 'stdout', 'LoggingFormatter', 'RotatingFileHandler',
-    'init_handlers', 'writelogheader',
-    'input', 'input_choice', 'input_yn', 'inputChoice', 'input_list_choice',
-    'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
-    'ContextOption', 'ListOption', 'OutputProxyOption',
-    'HighlightContextOption', 'ChoiceException', 'UnhandledAnswer',
-    'Choice', 'AlwaysChoice',
-    'QuitKeyboardInterrupt',
-    'InteractiveReplace',
-    'calledModuleName', 'handle_args', 'handleArgs',
-    'showHelp', 'suggest_help',
-    'writeToCommandLogFile', 'open_webbrowser',
-    'OptionHandler',
-    'BaseBot', 'Bot', 'SingleSiteBot', 'MultipleSitesBot',
-    'CurrentPageBot', 'AutomaticTWSummaryBot',
-    'ExistingPageBot', 'FollowRedirectPageBot', 'CreatingPageBot',
-    'RedirectPageBot', 'NoRedirectPageBot',
-    'WikidataBot',
-)
+
+_logger = 'bot'
 
 if not PY2:
     unicode = str

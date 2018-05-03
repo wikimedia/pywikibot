@@ -39,6 +39,16 @@ import re
 import sys
 import time
 
+import pywikibot
+from pywikibot import config, textlib
+from pywikibot.comms.http import fetch
+from pywikibot.specialbots import UploadRobot
+
+try:
+    from pywikibot.userinterfaces.gui import Tkdialog
+except ImportError as _tk_error:
+    Tkdialog = _tk_error
+
 if sys.version_info[0] > 2:
     from urllib.parse import urlencode
 else:
@@ -51,18 +61,6 @@ except ImportError as e:
           'See: http://stuvel.eu/projects/flickrapi')
     print(e)
     sys.exit(1)
-
-import pywikibot
-
-from pywikibot import config, textlib
-from pywikibot.comms.http import fetch
-
-from pywikibot.specialbots import UploadRobot
-
-try:
-    from pywikibot.userinterfaces.gui import Tkdialog
-except ImportError as _tk_error:
-    Tkdialog = _tk_error
 
 
 flickr_allowed_license = {
