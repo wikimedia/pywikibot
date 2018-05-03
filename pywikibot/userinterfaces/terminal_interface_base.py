@@ -15,9 +15,7 @@ import sys
 import threading
 
 import pywikibot
-
-from pywikibot import config
-
+from pywikibot import config2 as config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.bot_choice import (
     Option, OutputOption, StandardOption, ChoiceException, QuitKeyboardInterrupt,

@@ -144,33 +144,29 @@ import sys
 import time
 import warnings
 
-if sys.version_info[0] > 2:
-    from queue import Queue
-    long = int
-else:
-    from Queue import Queue
-
 import pywikibot
-
-from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot import i18n, textlib, pagegenerators, Bot
-
 from pywikibot import editor as editarticle
-
+from pywikibot.exceptions import ArgumentDeprecationWarning
 # Imports predefined replacements tasks from fixes.py
 from pywikibot import fixes
-
+from pywikibot import i18n, textlib, pagegenerators, Bot
 from pywikibot.tools import (
     chars,
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
 )
-
 from pywikibot.tools.formatter import color_format
 
 if sys.version_info[0] > 2:
+    from queue import Queue
+    long = int
+else:
+    from Queue import Queue
+
+if sys.version_info[0] > 2:
     basestring = (str, )
+
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.

@@ -12,16 +12,16 @@ import sys
 from time import sleep
 import xml.etree.ElementTree as ET
 
-if sys.version_info[0] > 2:
-    from urllib.parse import urlencode
-else:
-    from urllib import urlencode
-
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from pywikibot.comms import http
 from pywikibot import config2
 from pywikibot.tools import deprecated
+
+if sys.version_info[0] > 2:
+    from urllib.parse import urlencode
+else:
+    from urllib import urlencode
 
 
 @deprecated('memento_client package')

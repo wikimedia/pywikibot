@@ -9,7 +9,10 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 
+import pywikibot
 from pywikibot.tools import PY2
+from tests.aspects import unittest, TestCase, DefaultSiteTestCase
+
 
 if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') == '1':
     if not PY2:
@@ -17,10 +20,6 @@ if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') == '1':
     else:
         import Tkinter
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
-
-import pywikibot
-
-from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
 class TestTkdialog(TestCase):

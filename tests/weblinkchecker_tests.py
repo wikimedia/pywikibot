@@ -12,15 +12,14 @@ import datetime
 from requests import ConnectionError as RequestsConnectionError
 
 from pywikibot.tools import PY2
+from scripts import weblinkchecker
+from tests.aspects import unittest, require_modules, TestCase
+from tests import weblib_tests
+
 if not PY2:
     from urllib.parse import urlparse
 else:
     from urlparse import urlparse
-
-from scripts import weblinkchecker
-
-from tests.aspects import unittest, require_modules, TestCase
-from tests import weblib_tests
 
 
 @require_modules('memento_client')

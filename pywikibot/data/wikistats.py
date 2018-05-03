@@ -7,10 +7,10 @@
 from __future__ import absolute_import, unicode_literals
 
 import sys
-
 from io import BytesIO, StringIO
 
 import pywikibot
+from pywikibot.comms import http
 
 if sys.version_info[0] > 2:
     import csv
@@ -23,8 +23,6 @@ else:
             'WikiStats: unicodecsv package required for using csv in Python 2;'
             ' falling back to using the larger XML datasets.')
         csv = None
-
-from pywikibot.comms import http
 
 
 class WikiStats(object):

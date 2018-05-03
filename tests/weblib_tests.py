@@ -10,16 +10,14 @@ from __future__ import absolute_import, unicode_literals
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from pywikibot.tools import PY2
+import pywikibot.weblib as weblib
+from tests.aspects import unittest, DeprecationTestCase
+from tests.utils import PatchedHttp
 
 if not PY2:
     from urllib.parse import urlparse
 else:
     from urlparse import urlparse
-
-import pywikibot.weblib as weblib
-
-from tests.aspects import unittest, DeprecationTestCase
-from tests.utils import PatchedHttp
 
 
 class TestInternetArchive(DeprecationTestCase):

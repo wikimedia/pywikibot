@@ -29,6 +29,24 @@ from warnings import warn
 
 import requests
 
+from pywikibot import __release__
+from pywikibot.bot import calledModuleName
+from pywikibot.comms import threadedhttp
+from pywikibot import config
+from pywikibot.exceptions import (
+    FatalServerError, Server504Error, Server414Error
+)
+from pywikibot.logging import critical, debug, error, log, warning
+from pywikibot.tools import (
+    deprecated,
+    deprecate_arg,
+    file_mode_checker,
+    issue_deprecation_warning,
+    PY2,
+    StringTypes,
+)
+import pywikibot.version
+
 try:
     import requests_oauthlib
 except ImportError as e:
@@ -42,25 +60,6 @@ else:
     from urllib2 import quote
     from urlparse import urlparse
 
-from pywikibot import config
-
-from pywikibot import __release__
-from pywikibot.bot import calledModuleName
-from pywikibot.comms import threadedhttp
-from pywikibot.exceptions import (
-    FatalServerError, Server504Error, Server414Error
-)
-from pywikibot.logging import critical, debug, error, log, warning
-from pywikibot.tools import (
-    deprecated,
-    deprecate_arg,
-    file_mode_checker,
-    issue_deprecation_warning,
-    PY2,
-    StringTypes,
-)
-
-import pywikibot.version
 
 # The error message for failed SSL certificate verification
 # 'certificate verify failed' is a commonly detectable string

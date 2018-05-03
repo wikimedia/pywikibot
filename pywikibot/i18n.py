@@ -34,7 +34,7 @@ from warnings import warn
 import pywikibot
 
 from pywikibot import __url__
-from pywikibot import config
+from pywikibot import config2 as config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
 from pywikibot.tools import (

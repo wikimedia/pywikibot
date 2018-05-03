@@ -18,6 +18,19 @@ import datetime
 import re
 import sys
 
+import pywikibot
+from pywikibot import config2 as config
+from pywikibot.exceptions import InvalidTitle
+from pywikibot.family import Family
+from pywikibot.tools import (
+    deprecate_arg,
+    deprecated,
+    DeprecatedRegex,
+    StringTypes,
+    UnicodeType,
+    issue_deprecation_warning
+)
+
 if sys.version_info[0] > 2:
     from html.parser import HTMLParser
     basestring = (str,)
@@ -30,19 +43,6 @@ try:
 except ImportError as e:
     mwparserfromhell = e
 
-import pywikibot
-
-from pywikibot import config2 as config
-from pywikibot.exceptions import InvalidTitle
-from pywikibot.family import Family
-from pywikibot.tools import (
-    deprecate_arg,
-    deprecated,
-    DeprecatedRegex,
-    StringTypes,
-    UnicodeType,
-    issue_deprecation_warning
-)
 
 # cache for replaceExcept to avoid recompile or regexes each call
 _regex_cache = {}

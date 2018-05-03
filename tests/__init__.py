@@ -7,12 +7,12 @@
 #
 from __future__ import absolute_import, print_function, unicode_literals
 
+__all__ = ('requests', 'unittest', 'TestRequest',
+           'patch_request', 'unpatch_request', 'mock', 'Mock', 'patch')
+
 import functools
 import os
 import warnings
-
-__all__ = ('requests', 'unittest', 'TestRequest',
-           'patch_request', 'unpatch_request', 'mock', 'Mock', 'patch')
 
 # Verify that the unit tests have a base working environment:
 # - requests is mandatory
@@ -21,6 +21,11 @@ __all__ = ('requests', 'unittest', 'TestRequest',
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 import requests
 
+from pywikibot import config
+import pywikibot.data.api
+from pywikibot.data.api import CachedRequest
+from pywikibot.data.api import Request as _original_Request
+from pywikibot import i18n
 from pywikibot.tools import PYTHON_VERSION
 
 if PYTHON_VERSION == (2, 7, 2):
@@ -34,14 +39,6 @@ try:
 except ImportError:
     import mock
     from mock import Mock, patch
-
-import pywikibot.data.api
-
-from pywikibot import config
-from pywikibot import i18n
-
-from pywikibot.data.api import CachedRequest
-from pywikibot.data.api import Request as _original_Request
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 

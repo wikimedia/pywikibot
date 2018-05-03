@@ -11,12 +11,15 @@ import itertools
 import os
 import sys
 
+from setuptools import find_packages, setup
+
 try:
     # Work around a traceback on Python < 2.7.4 and < 3.3.1
     # http://bugs.python.org/issue15881#msg170215
     import multiprocessing
 except ImportError:
     pass
+
 
 # pyflakes workaround
 __unused__ = (multiprocessing, )
@@ -163,8 +166,6 @@ if PY2:
     test_deps += extra_deps['csv']
 else:
     test_deps += ['six']
-
-from setuptools import setup, find_packages
 
 name = 'pywikibot'
 version = '3.0'

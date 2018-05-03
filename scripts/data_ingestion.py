@@ -19,24 +19,20 @@ import codecs
 import hashlib
 import io
 import os
-import sys
-
 import posixpath
+import sys
+from warnings import warn
+
+import pywikibot
+from pywikibot.comms.http import fetch
+from pywikibot import pagegenerators
+from pywikibot.specialbots import UploadRobot
+from pywikibot.tools import deprecated, deprecated_args
 
 if sys.version_info[0] > 2:
     import csv
 else:
     import unicodecsv as csv
-
-from warnings import warn
-
-import pywikibot
-
-from pywikibot import pagegenerators
-
-from pywikibot.comms.http import fetch
-from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated, deprecated_args
 
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse

@@ -15,6 +15,8 @@ import codecs
 import os
 import sys
 
+from pywikibot.site_detect import MWSite as Wiki
+
 # creating & retrieving urls
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
@@ -22,12 +24,11 @@ if sys.version_info[0] > 2:
 else:
     from urlparse import urlparse
 
+
 # Disable user-config checks so the family can be created first,
 # and then used when generating the user-config
 _orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
 os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
-
-from pywikibot.site_detect import MWSite as Wiki
 
 # Reset this flag in case another script is run by pwb after this script
 if not _orig_no_user_config:

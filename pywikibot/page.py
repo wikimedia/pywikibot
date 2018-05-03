@@ -32,7 +32,29 @@ except ImportError:
 from collections import Counter, defaultdict, namedtuple, OrderedDict
 from warnings import warn
 
-from pywikibot.tools import PY2
+import pywikibot
+from pywikibot.comms import http
+from pywikibot import config
+from pywikibot.exceptions import (
+    AutoblockUser,
+    NotEmailableError,
+    SiteDefinitionError,
+    UserRightsError,
+)
+from pywikibot.data.api import APIError
+from pywikibot.family import Family
+from pywikibot.site import DataSite, Namespace, need_version
+from pywikibot import textlib
+from pywikibot.tools import (
+    compute_file_hash,
+    MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
+    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
+    add_full_name, manage_wrapping,
+    ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
+    first_upper, redirect_func, remove_last_args, _NotImplementedWarning,
+)
+from pywikibot.tools.ip import ip_regexp
+from pywikibot.tools.ip import is_IP
 
 if not PY2:
     unicode = basestring = str
@@ -48,31 +70,6 @@ else:
     import htmlentitydefs
     from urllib import quote as quote_from_bytes, unquote as unquote_to_bytes
 
-import pywikibot
-
-from pywikibot import config
-from pywikibot import textlib
-
-from pywikibot.comms import http
-from pywikibot.exceptions import (
-    AutoblockUser,
-    NotEmailableError,
-    SiteDefinitionError,
-    UserRightsError,
-)
-from pywikibot.data.api import APIError
-from pywikibot.family import Family
-from pywikibot.site import DataSite, Namespace, need_version
-from pywikibot.tools import (
-    compute_file_hash,
-    MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
-    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
-    add_full_name, manage_wrapping,
-    ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    first_upper, redirect_func, remove_last_args, _NotImplementedWarning,
-)
-from pywikibot.tools.ip import ip_regexp
-from pywikibot.tools.ip import is_IP
 
 __all__ = (
     'BasePage',
