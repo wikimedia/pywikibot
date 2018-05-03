@@ -414,8 +414,6 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    global base_dir
-
     # set the config family and mylang values to an invalid state so that
     # the script can detect that the command line arguments -family & -lang
     # were used and and handle_args has updated these config values,
@@ -440,7 +438,7 @@ def main(*args):
 
     try:
         has_userfile, has_passfile = ask_for_dir_change(force)
-        if not (has_userfile or has_userfile):
+        if not (has_userfile or has_passfile):
             create_user_config(config.family, config.mylang, username,
                                force=force)
     except KeyboardInterrupt:
