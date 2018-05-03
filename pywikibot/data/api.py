@@ -3170,6 +3170,102 @@ def encode_url(query):
     return urlencode(query)
 
 
+def _update_pageid(page, pagedict):
+    """Update pageid."""
+    if 'pageid' in pagedict:
+        page._pageid = int(pagedict['pageid'])
+    elif 'missing' in pagedict:
+        page._pageid = 0  # Non-existent page
+    else:
+        # Something is wrong.
+        if page.site.sametitle(page.title(), pagedict['title']):
+            if 'invalid' in pagedict:
+                raise InvalidTitle('{}: {}'.format(page,
+                                                   pagedict['invalidreason']))
+        if int(pagedict['ns']) < 0:
+            raise UnsupportedPage(page)
+        raise RuntimeError(
+            "Page {} has neither 'pageid' nor 'missing' attribute"
+            .format(pagedict['title']))
+
+
+def _update_contentmodel(page, pagedict):
+    """Update page content model."""
+    page._contentmodel = pagedict.get('contentmodel')  # can be None
+
+    if (page._contentmodel
+            and page._contentmodel == 'proofread-page'
+            and 'proofread' in pagedict):
+        page._quality = pagedict['proofread']['quality']
+        page._quality_text = pagedict['proofread']['quality_text']
+
+
+def _update_protection(page, pagedict):
+    """Update page protection."""
+    if 'restrictiontypes' in pagedict:
+        page._applicable_protections = set(pagedict['restrictiontypes'])
+    else:
+        page._applicable_protections = None
+    page._protection = {item['type']: (item['level'], item['expiry'])
+                        for item in pagedict['protection']}
+
+
+def _update_revisions(page, revisions):
+    """Update page revisions."""
+    # TODO: T102735: Use the page content model for <1.21
+    for rev in revisions:
+        revision = pywikibot.page.Revision(
+            revid=rev['revid'],
+            timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
+            user=rev.get('user', ''),
+            anon='anon' in rev,
+            comment=rev.get('comment', ''),
+            minor='minor' in rev,
+            text=rev.get('*'),
+            rollbacktoken=rev.get('rollbacktoken'),
+            parentid=rev.get('parentid'),
+            contentmodel=rev.get('contentmodel'),
+            sha1=rev.get('sha1')
+        )
+        page._revisions[revision.revid] = revision
+
+
+def _update_templates(page, templates):
+    """Update page templates."""
+    templ_pages = [pywikibot.Page(page.site, tl['title']) for tl in templates]
+    if hasattr(page, '_templates'):
+        page._templates.extend(templ_pages)
+    else:
+        page._templates = templ_pages
+
+
+def _update_langlinks(page, langlinks):
+    """Update page langlinks."""
+    links = [pywikibot.Link.langlinkUnsafe(link['lang'], link['*'],
+                                           source=page.site)
+             for link in langlinks]
+
+    if hasattr(page, '_langlinks'):
+        page._langlinks.extend(links)
+    else:
+        page._langlinks = links
+
+
+def _update_coordinates(page, coordinates):
+    """Update page coordinates."""
+    coords = []
+    for co in coordinates:
+        coord = pywikibot.Coordinate(lat=co['lat'],
+                                     lon=co['lon'],
+                                     typ=co.get('type', ''),
+                                     name=co.get('name', ''),
+                                     dim=int(co.get('dim', 0)) or None,
+                                     globe=co['globe'],  # See [[gerrit:67886]]
+                                     )
+        coords.append(coord)
+    page._coords = coords
+
+
 def update_page(page, pagedict, props=[]):
     """Update attributes of Page object page, based on query data in pagedict.
 
@@ -3185,54 +3281,20 @@ def update_page(page, pagedict, props=[]):
     @raises InvalidTitle: Page title is invalid
     @raises UnsupportedPage: Page with namespace < 0 is not supported yet
     """
-    if "pageid" in pagedict:
-        page._pageid = int(pagedict['pageid'])
-    elif "missing" in pagedict:
-        page._pageid = 0    # Non-existent page
-    else:
-        # Something is wrong.
-        if page.site.sametitle(page.title(), pagedict['title']):
-            if 'invalid' in pagedict:
-                raise InvalidTitle('%s: %s' % (page, pagedict['invalidreason']))
-        if int(pagedict['ns']) < 0:
-            raise UnsupportedPage(page)
-        raise AssertionError(
-            "Page %s has neither 'pageid' nor 'missing' attribute" % pagedict['title'])
-    page._contentmodel = pagedict.get('contentmodel')  # can be None
-    if (page._contentmodel and
-            page._contentmodel == 'proofread-page' and
-            'proofread' in pagedict):
-        page._quality = pagedict['proofread']['quality']
-        page._quality_text = pagedict['proofread']['quality_text']
+    _update_pageid(page, pagedict)
+    _update_contentmodel(page, pagedict)
+
     if 'info' in props:
         page._isredir = 'redirect' in pagedict
+
     if 'touched' in pagedict:
         page._timestamp = pagedict['touched']
+
     if 'protection' in pagedict:
-        if 'restrictiontypes' in pagedict:
-            page._applicable_protections = set(pagedict['restrictiontypes'])
-        else:
-            page._applicable_protections = None
-        page._protection = {}
-        for item in pagedict['protection']:
-            page._protection[item['type']] = item['level'], item['expiry']
+        _update_protection(page, pagedict)
+
     if 'revisions' in pagedict:
-        # TODO: T102735: Use the page content model for <1.21
-        for rev in pagedict['revisions']:
-            revision = pywikibot.page.Revision(
-                revid=rev['revid'],
-                timestamp=pywikibot.Timestamp.fromISOformat(rev['timestamp']),
-                user=rev.get('user', u''),
-                anon='anon' in rev,
-                comment=rev.get('comment', u''),
-                minor='minor' in rev,
-                text=rev.get('*', None),
-                rollbacktoken=rev.get('rollbacktoken', None),
-                parentid=rev.get('parentid'),
-                contentmodel=rev.get('contentmodel', None),
-                sha1=rev.get('sha1', None)
-            )
-            page._revisions[revision.revid] = revision
+        _update_revisions(page, pagedict['revisions'])
 
     if 'lastrevid' in pagedict:
         page.latest_revision_id = pagedict['lastrevid']
@@ -3246,38 +3308,13 @@ def update_page(page, pagedict, props=[]):
         page._catinfo = pagedict["categoryinfo"]
 
     if "templates" in pagedict:
-        templates = [pywikibot.Page(page.site, tl['title'])
-                     for tl in pagedict['templates']]
-        if hasattr(page, "_templates"):
-            page._templates.extend(templates)
-        else:
-            page._templates = templates
+        _update_templates(page, pagedict['templates'])
 
     if "langlinks" in pagedict:
-        links = []
-        for ll in pagedict["langlinks"]:
-            link = pywikibot.Link.langlinkUnsafe(ll['lang'],
-                                                 ll['*'],
-                                                 source=page.site)
-            links.append(link)
-
-        if hasattr(page, "_langlinks"):
-            page._langlinks.extend(links)
-        else:
-            page._langlinks = links
+        _update_langlinks(page, pagedict['langlinks'])
 
     if "coordinates" in pagedict:
-        coords = []
-        for co in pagedict['coordinates']:
-            coord = pywikibot.Coordinate(lat=co['lat'],
-                                         lon=co['lon'],
-                                         typ=co.get('type', ''),
-                                         name=co.get('name', ''),
-                                         dim=int(co.get('dim', 0)) or None,
-                                         globe=co['globe'],  # See [[gerrit:67886]]
-                                         )
-            coords.append(coord)
-        page._coords = coords
+        _update_coordinates(page, pagedict['coordinates'])
 
     if 'pageimage' in pagedict:
         page._pageimage = pywikibot.FilePage(page.site, pagedict['pageimage'])
