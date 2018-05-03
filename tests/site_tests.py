@@ -266,20 +266,20 @@ class TestSiteObject(DefaultSiteTestCase):
 
     def test_repr(self):
         """Test __repr__."""
-        expect = 'Site("{0}", "{1}")'.format(self.code, self.family)
+        code = self.site.family.obsolete.get(self.code) or self.code
+        expect = 'Site("{0}", "{1}")'.format(code, self.family)
         self.assertStringMethod(str.endswith, repr(self.site), expect)
 
     def test_base_methods(self):
         """Test cases for BaseSite methods."""
         mysite = self.get_site()
+        code = self.site.family.obsolete.get(self.code) or self.code
         self.assertEqual(mysite.family.name, self.family)
-        self.assertEqual(mysite.code, self.code)
+        self.assertEqual(mysite.code, code)
         self.assertIsInstance(mysite.lang, basestring)
         self.assertEqual(mysite, pywikibot.Site(self.code, self.family))
         self.assertIsInstance(mysite.user(), (basestring, type(None)))
-        self.assertEqual(mysite.sitename(),
-                         "%s:%s" % (self.family,
-                                    self.code))
+        self.assertEqual(mysite.sitename(), '%s:%s' % (self.family, code))
         self.assertIsInstance(mysite.linktrail(), basestring)
         self.assertIsInstance(mysite.redirect(), basestring)
         try:
