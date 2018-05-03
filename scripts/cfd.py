@@ -13,7 +13,7 @@ Syntax:
 """
 #
 # (C) Ben McIlwain, 2008
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -199,31 +199,27 @@ def findDay(pageTitle, oldDay):
     page = pywikibot.Page(pywikibot.Site(), u"Category:" + pageTitle)
     try:
         pageSrc = page.text
-        m = findday.search(pageSrc)
     except pywikibot.NoPage:
         m = None
+    else:
+        m = findday.search(pageSrc)
 
     if m is not None:
-        return "[[" + m.group(1) + "]]"
-    else:
-        # Try to parse day link from CFD template parameters.
-        templates = page.templatesWithParams()
-        for template in templates:
-            if template[0].title() in cfdTemplates:
-                params = template[1]
-                (day, month, year) = [None, None, None]
-                for param in params:
-                    (paramName, paramVal) = param.split('=', 1)
-                    if paramName == 'day':
-                        day = paramVal
-                    elif paramName == 'month':
-                        month = paramVal
-                    elif paramName == 'year':
-                        year = paramVal
-                if day and month and year:
-                    return ('[[Wikipedia:Categories for discussion/Log/%s %s %s]]'
-                            % (year, month, day))
-        return oldDay
+        return '[[{}]]'.format(m.group(1))
+
+    # Try to parse day link from CFD template parameters.
+    templates = page.templatesWithParams()
+    for template, params in templates:
+        if template.title() in cfdTemplates:
+            period = {'year': None, 'day': None, 'month': None}
+            for param in params:
+                name, _, val = param.partition('=')
+                if name in period:
+                    period[name] = val
+            if all(period.values()):
+                return ('[[Wikipedia:Categories for discussion/Log/'
+                        '{year} {month} {day}]]'.format(**period))
+    return oldDay
 
 
 if __name__ == "__main__":
