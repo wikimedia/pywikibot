@@ -7,7 +7,9 @@ Current release
 * Enable makepath and datafilepath not to create the directory
 * Use API's retry-after value (T144023)
 * Provide startprefix parameter for Category.articles() (T74101, T143120)
+* Page.put_async() is marked as deprecated (T193494)
 * pagegenerators.RepeatingGenerator is marked as deprecated (T192229)
+* Deprecate requests-requirements.txt (T193476)
 * Bugfixes and improvements
 * new mediawiki projects where provided
 * Localisation updates
