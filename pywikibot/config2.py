@@ -376,10 +376,8 @@ def get_base_dir(test_directory=None):
     return base_dir
 
 
-_get_base_dir = get_base_dir  # for backward compatibility
-_base_dir = get_base_dir()
 # Save base_dir for use by other modules
-base_dir = _base_dir
+base_dir = get_base_dir()
 
 for arg in sys.argv[1:]:
     if arg.startswith(str('-verbose')) or arg == str('-v'):
@@ -1023,7 +1021,7 @@ if __no_user_config:
         warning('Skipping loading of user-config.py.')
     _fns = []
 else:
-    _fns = [os.path.join(_base_dir, "user-config.py")]
+    _fns = [os.path.join(base_dir, 'user-config.py')]
 for _filename in _fns:
     _thislevel += 1
     if os.path.exists(_filename):
