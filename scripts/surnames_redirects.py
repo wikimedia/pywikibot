@@ -16,7 +16,7 @@ Command-line arguments:
 Example: "python pwb.py surnames_redirects -start:B"
 """
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2017-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -64,26 +64,22 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
         if self.getOption('surnames_last'):
             name_parts = name.split(', ')
             if len(name_parts) == 2 and len(name.split(' ')) <= 3:
-                possible_names.append(name_parts[1] + ' ' + name_parts[0])
+                possible_names.append('{1} {0}'.format(*name_parts))
         else:
             words = name.split()
             if len(words) == 2 and name == name.title():
-                possible_names.append(words[1] + ', ' + words[0])
+                possible_names.append('{1}, {0}'.format(*words))
             elif len(words) == 3:
                 # title may have at most one non-titlecased word
                 if len(SequenceMatcher(None, name,
                    name.title()).get_matching_blocks()) <= 3:
-                    possible_names.append(words[1] + ' ' +
-                                          words[2] + ', ' +
-                                          words[0])
-                    possible_names.append(words[2] + ', ' +
-                                          words[0] + ' ' +
-                                          words[1])
+                    possible_names.append('{1} {2}, {0}'.format(*words))
+                    possible_names.append('{2}, {0} {1}'.format(*words))
 
         for possible_name in possible_names:
             # append disambiguation inside parenthesis if there is one
             if len(split_title) == 2:
-                possible_name += ' (' + split_title[1]
+                possible_name += ' ({1}'.format(*split_title)
 
             new_page = pywikibot.Page(site, possible_name)
             if new_page.exists():
