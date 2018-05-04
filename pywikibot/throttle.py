@@ -204,22 +204,23 @@ class Throttle(object):
                 lines = f.readlines()
         except IOError:
             return
-        else:
-            now = time.time()
-            for line in lines:
-                try:
-                    line = line.split(' ')
-                    this_pid = int(line[0])
-                    ptime = int(line[1].split('.')[0])
-                    this_site = line[2].rstrip()
-                except (IndexError, ValueError):
-                    # Sometimes the file gets corrupted ignore that line
-                    continue
-                if now - ptime <= self.releasepid \
-                   and this_pid != pid:
-                    processes.append({'pid': this_pid,
-                                      'time': ptime,
-                                      'site': this_site})
+
+        now = time.time()
+        for line in lines:
+            try:
+                line = line.split(' ')
+                this_pid = int(line[0])
+                ptime = int(line[1].split('.')[0])
+                this_site = line[2].rstrip()
+            except (IndexError, ValueError):
+                # Sometimes the file gets corrupted ignore that line
+                continue
+            if now - ptime <= self.releasepid \
+               and this_pid != pid:
+                processes.append({'pid': this_pid,
+                                  'time': ptime,
+                                  'site': this_site})
+
         processes.sort(key=lambda p: p['pid'])
         try:
             with open(self.ctrlfilename, 'w') as f:
