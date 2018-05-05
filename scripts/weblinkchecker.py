@@ -120,6 +120,7 @@ from warnings import warn
 
 try:
     import memento_client
+    from memento_client.memento_client import MementoClientException
 except ImportError as e:
     memento_client = e
 
@@ -199,7 +200,7 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
         try:
             memento_info = mc.get_memento_info(url, when)
             break
-        except requests.ConnectionError as e:
+        except (requests.ConnectionError, MementoClientException) as e:
             error = e
             retry_count += 1
             sleep(config2.retry_wait)
