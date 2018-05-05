@@ -28,6 +28,8 @@ class MementoTestCase(TestCase):
     """Test memento client."""
 
     def _get_archive_url(self, url, date_string=None):
+        from memento_client import MementoClientException  # noqa: E402
+
         if date_string is None:
             when = datetime.datetime.now()
         else:
@@ -35,7 +37,7 @@ class MementoTestCase(TestCase):
         try:
             return weblinkchecker._get_closest_memento_url(
                 url, when, self.timegate_uri)
-        except RequestsConnectionError as e:
+        except (RequestsConnectionError, MementoClientException) as e:
             self.skipTest(e)
 
 
