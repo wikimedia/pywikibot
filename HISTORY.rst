@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180505
+------------
+
 * Enable makepath and datafilepath not to create the directory
 * Use API's retry-after value (T144023)
 * Provide startprefix parameter for Category.articles() (T74101, T143120)
@@ -17,7 +23,7 @@ Current release
 3.0.20180403
 ------------
 
-* Deprecation warning: support for py2.7.2 and py2.7.3 will be dropped
+* Deprecation warning: support for Python 2.7.2 and 2.7.3 will be dropped (T191192)
 * Dropped support for Python 2.6 (T154771)
 * Dropped support for Python 3.3 (T184508)
 * Bugfixes and improvements
