@@ -35,7 +35,7 @@ if __name__ == "__main__":
         os.system('title Python {} Shell'.format(*sys.version.split(' ', 1)))
         del os
     args = []
-    if set(sys.argv) - {'shell', 'shell.py'}:
-        args = sys.argv
+    if sys.argv and sys.argv[0].endswith(('shell', 'shell.py')):
+        args = sys.argv[1:]
     del sys
     main(*args)
