@@ -167,17 +167,22 @@ if PY2:
 else:
     test_deps += ['six']
 
-name = 'pywikibot'
-version = '3.0'
 
-try:
-    import subprocess
-    date = subprocess.check_output(['git', 'log', '-1', '--format=%ci']).strip()
-    date = date.decode().split(' ')[0].replace('-', '')
-    version = version + "." + date
-except Exception as e:
-    print(e)
-    version = version + "-dev"
+def get_version():
+    """Get a valid pywikibot module version string."""
+    version = '3.0'
+    try:
+        import subprocess
+        date = subprocess.check_output(
+            ['git', 'log', '-1', '--format=%ci']).strip()
+        date = date.decode().split(' ')[0].replace('-', '')
+        version += '.' + date
+        if 'sdist' not in sys.argv:
+            version += '.dev0'
+    except Exception as e:
+        print(e)
+        version += '.dev0'
+    return version
 
 
 def read_desc(filename):
@@ -201,9 +206,10 @@ def read_desc(filename):
     return ''.join(desc)
 
 
+name = 'pywikibot'
 setup(
     name=name,
-    version=version,
+    version=get_version(),
     description='Python MediaWiki Bot Framework',
     long_description=read_desc('README.rst'),
     keywords=('API', 'bot', 'framework', 'mediawiki', 'pwb', 'python',
