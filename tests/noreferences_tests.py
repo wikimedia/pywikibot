@@ -42,5 +42,5 @@ class TestAddingReferences(TestCase):
         self.assertEqual(new_text, expected)
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':  # pragma: no cover
     unittest.main()
