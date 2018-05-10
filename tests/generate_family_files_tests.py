@@ -52,6 +52,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
         self.assertIsInstance(self.generator_instance.wikis, dict)
         self.assertIsInstance(self.generator_instance.langs, list)
 
+    @unittest.expectedFailure  # T194138
     def test_attibutes_after_run(self):
         """Test FamilyFileGenerator attributes after run()."""
         self.generator_instance.run()
