@@ -54,6 +54,304 @@ _messages_available = None
 _cache = defaultdict(dict)
 
 
+_LANG_TO_GROUP_NAME = defaultdict(str, {
+    'aa': 'aa',
+    'ab': 'ab',
+    'ace': 'ace',
+    'ady': 'kbd',
+    'af': 'af',
+    'ak': 'ak',
+    'als': 'als',
+    'an': 'an',
+    'arc': 'arc',
+    'arn': 'an',
+    'arz': 'arc',
+    'as': 'as',
+    'ast': 'an',
+    'atj': 'atj',
+    'av': 'ab',
+    'ay': 'an',
+    'azb': 'azb',
+    'ba': 'ab',
+    'bar': 'bar',
+    'bat-smg': 'bat-smg',
+    'bcl': 'bcl',
+    'be': 'be',
+    'be-tarask': 'be',
+    'bh': 'bh',
+    'bho': 'bh',
+    'bi': 'bi',
+    'bjn': 'ace',
+    'bm': 'atj',
+    'bpy': 'as',
+    'br': 'atj',
+    'bs': 'bs',
+    'bug': 'ace',
+    'bxr': 'ab',
+    'ca': 'ca',
+    'cbk-zam': 'cbk-zam',
+    'cdo': 'cdo',
+    'ce': 'ab',
+    'ceb': 'bcl',
+    'ckb': 'ckb',
+    'co': 'co',
+    'crh': 'crh',
+    'crh-latn': 'crh',
+    'cs': 'cs',
+    'csb': 'csb',
+    'cu': 'cu',
+    'cv': 'ab',
+    'da': 'da',
+    'diq': 'diq',
+    'dsb': 'dsb',
+    'dty': 'dty',
+    'eml': 'eml',
+    'eu': 'eu',
+    'ext': 'an',
+    'fab': 'fab',
+    'ff': 'atj',
+    'fit': 'fit',
+    'fiu-vro': 'fiu-vro',
+    'fo': 'fo',
+    'frp': 'co',
+    'frr': 'bar',
+    'fur': 'eml',
+    'fy': 'af',
+    'gag': 'gag',
+    'gan': 'cdo',
+    'gl': 'gl',
+    'glk': 'glk',
+    'gn': 'gl',
+    'grc': 'grc',
+    'gsw': 'als',
+    'hak': 'cdo',
+    'hmo': 'meu',
+    'hr': 'bs',
+    'hsb': 'dsb',
+    'ht': 'atj',
+    'ia': 'ia',
+    'id': 'ace',
+    'ie': 'ia',
+    'ii': 'cdo',
+    'ik': 'ik',
+    'ilo': 'bcl',
+    'inh': 'ab',
+    'io': 'io',
+    'is': 'fo',
+    'iu': 'ik',
+    'jv': 'ace',
+    'kaa': 'kaa',
+    'kab': 'kab',
+    'kbd': 'kbd',
+    'kbp': 'atj',
+    'kg': 'atj',
+    'kj': 'kj',
+    'kk': 'ab',
+    'kl': 'kl',
+    'koi': 'ab',
+    'krc': 'ab',
+    'ksh': 'bar',
+    'ku': 'diq',
+    'kv': 'ab',
+    'ky': 'ab',
+    'lad': 'an',
+    'lb': 'lb',
+    'lbe': 'ab',
+    'lez': 'ab',
+    'li': 'af',
+    'lij': 'eml',
+    'liv': 'liv',
+    'lmo': 'eml',
+    'ln': 'atj',
+    'lrc': 'azb',
+    'ltg': 'ltg',
+    'lzh': 'zh-classical',
+    'mai': 'mai',
+    'map-bms': 'map-bms',
+    'mdf': 'ab',
+    'meu': 'meu',
+    'mg': 'atj',
+    'mhr': 'ab',
+    'min': 'min',
+    'minnan': 'zh-classical',
+    'mk': 'cu',
+    'mn': 'ab',
+    'mo': 'mo',
+    'mrj': 'ab',
+    'ms': 'ace',
+    'mwl': 'fab',
+    'myv': 'ab',
+    'mzn': 'glk',
+    'nah': 'an',
+    'nan': 'zh-classical',
+    'nap': 'eml',
+    'nb': 'no',
+    'nds': 'nds',
+    'nds-nl': 'nds-nl',
+    'ne': 'ne',
+    'new': 'ne',
+    'ng': 'kj',
+    'nn': 'nn',
+    'no': 'no',
+    'nov': 'io',
+    'nrm': 'atj',
+    'nso': 'nso',
+    'nv': 'an',
+    'oc': 'oc',
+    'olo': 'olo',
+    'os': 'ab',
+    'pag': 'bcl',
+    'pam': 'bcl',
+    'pap': 'af',
+    'pcd': 'atj',
+    'pdc': 'bar',
+    'pfl': 'bar',
+    'pms': 'eml',
+    'pnt': 'grc',
+    'ps': 'azb',
+    'qu': 'an',
+    'rm': 'rm',
+    'rmy': 'mo',
+    'roa-rup': 'roa-rup',
+    'roa-tara': 'eml',
+    'rue': 'rue',
+    'rup': 'roa-rup',
+    'rw': 'atj',
+    'sa': 'mai',
+    'sah': 'ab',
+    'sc': 'eml',
+    'scn': 'eml',
+    'se': 'se',
+    'sg': 'atj',
+    'sgs': 'bat-smg',
+    'sh': 'bs',
+    'sk': 'cs',
+    'sli': 'sli',
+    'so': 'arc',
+    'sr': 'sr',
+    'srn': 'af',
+    'st': 'nso',
+    'stq': 'stq',
+    'su': 'ace',
+    'sv': 'da',
+    'szl': 'csb',
+    'tcy': 'tcy',
+    'tet': 'fab',
+    'tg': 'ab',
+    'ti': 'aa',
+    'tpi': 'bi',
+    'tt': 'tt',
+    'tw': 'ak',
+    'ty': 'atj',
+    'tyv': 'ab',
+    'udm': 'ab',
+    'uk': 'ab',
+    'vec': 'eml',
+    'vep': 'vep',
+    'vls': 'af',
+    'vro': 'fiu-vro',
+    'wa': 'atj',
+    'war': 'bcl',
+    'wo': 'atj',
+    'wuu': 'cdo',
+    'xal': 'ab',
+    'xmf': 'xmf',
+    'yi': 'yi',
+    'yua': 'an',
+    'yue': 'cdo',
+    'za': 'cdo',
+    'zea': 'af',
+    'zh': 'zh-classical',
+    'zh-classical': 'zh-classical',
+    'zh-cn': 'cdo',
+    'zh-hans': 'zh-classical',
+    'zh-min-nan': 'zh-min-nan',
+    'zh-tw': 'zh-classical',
+    'zh-yue': 'cdo'})
+_GROUP_NAME_TO_FALLBACKS = {
+    '': [],
+    'aa': ['am'],
+    'ab': ['ru'],
+    'ace': ['id', 'ms', 'jv'],
+    'af': ['nl'],
+    'ak': ['ak', 'tw'],
+    'als': ['als', 'gsw', 'de'],
+    'an': ['es'],
+    'arc': ['ar'],
+    'as': ['bn'],
+    'atj': ['fr'],
+    'azb': ['fa'],
+    'bar': ['de'],
+    'bat-smg': ['bat-smg', 'sgs', 'lt'],
+    'bcl': ['tl'],
+    'be': ['be', 'be-tarask', 'ru'],
+    'bh': ['bh', 'bho'],
+    'bi': ['bi', 'tpi'],
+    'bs': ['sh', 'hr', 'bs', 'sr', 'sr-el'],
+    'ca': ['oc', 'es'],
+    'cbk-zam': ['es', 'tl'],
+    'cdo': ['zh', 'zh-hanszh-cn', 'zh-tw', 'zh-classical', 'lzh'],
+    'ckb': ['ku'],
+    'co': ['fr', 'it'],
+    'crh': ['crh', 'crh-latn', 'uk', 'ru'],
+    'cs': ['cs', 'sk'],
+    'csb': ['pl'],
+    'cu': ['bg', 'sr', 'sh'],
+    'da': ['da', 'no', 'nb', 'sv', 'nn'],
+    'diq': ['ku', 'ku-latn', 'tr'],
+    'dsb': ['hsb', 'dsb', 'de'],
+    'dty': ['ne'],
+    'eml': ['it'],
+    'eu': ['es', 'fr'],
+    'fab': ['pt'],
+    'fit': ['fi', 'sv'],
+    'fiu-vro': ['fiu-vro', 'vro', 'et'],
+    'fo': ['da', 'no', 'nb', 'nn', 'sv'],
+    'gag': ['tr'],
+    'gl': ['es', 'pt'],
+    'glk': ['glk', 'mzn', 'fa', 'ar'],
+    'grc': ['el'],
+    'ia': ['ia', 'la', 'it', 'fr', 'es'],
+    'ik': ['iu', 'kl'],
+    'io': ['eo'],
+    'kaa': ['uz', 'ru'],
+    'kab': ['ar', 'fr'],
+    'kbd': ['kbd', 'ady', 'ru'],
+    'kj': ['kj', 'ng'],
+    'kl': ['da', 'iu', 'no', 'nb'],
+    'lb': ['de', 'fr'],
+    'liv': ['et', 'lv'],
+    'ltg': ['lv'],
+    'mai': ['hi'],
+    'map-bms': ['jv', 'id', 'ms'],
+    'meu': ['meu', 'hmo'],
+    'min': ['id'],
+    'mo': ['ro'],
+    'nds': ['nds-nl', 'de'],
+    'nds-nl': ['nds', 'nl'],
+    'ne': ['ne', 'new', 'hi'],
+    'nn': ['no', 'nb', 'sv', 'da'],
+    'no': ['no', 'nb', 'da', 'nn', 'sv'],
+    'nso': ['st', 'nso'],
+    'oc': ['fr', 'ca', 'es'],
+    'olo': ['fi'],
+    'rm': ['de', 'it'],
+    'roa-rup': ['roa-rup', 'rup', 'ro'],
+    'rue': ['uk', 'ru'],
+    'se': ['sv', 'no', 'nb', 'nn', 'fi'],
+    'sli': ['de', 'pl'],
+    'sr': ['sr-el', 'sh', 'hr', 'bs'],
+    'stq': ['nds', 'de'],
+    'tcy': ['kn'],
+    'tt': ['tt-cyrl', 'ru'],
+    'vep': ['et', 'fi', 'ru'],
+    'xmf': ['ka'],
+    'yi': ['he', 'de'],
+    'zh-classical': ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh'],
+    'zh-min-nan': [
+        'cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']}
+
+
 def set_messages_package(package_name):
     """Set the package name where i18n messages are located."""
     global _messages_package_name
@@ -106,205 +404,7 @@ def _altlang(lang):
     @return: language codes
     @rtype: list of str
     """
-    # Akan
-    if lang in ['ak', 'tw']:
-        return ['ak', 'tw']
-    # Amharic
-    if lang in ['aa', 'ti']:
-        return ['am']
-    # Arab
-    if lang in ['arc', 'arz', 'so']:
-        return ['ar']
-    if lang == 'kab':
-        return ['ar', 'fr']
-    # Bulgarian
-    if lang in ['cu', 'mk']:
-        return ['bg', 'sr', 'sh']
-    # Czech
-    if lang in ['cs', 'sk']:
-        return ['cs', 'sk']
-    # German
-    if lang in ['bar', 'frr', 'ksh', 'pdc', 'pfl']:
-        return ['de']
-    if lang == 'lb':
-        return ['de', 'fr']
-    if lang in ['als', 'gsw']:
-        return ['als', 'gsw', 'de']
-    if lang == 'nds':
-        return ['nds-nl', 'de']
-    if lang in ['dsb', 'hsb']:
-        return ['hsb', 'dsb', 'de']
-    if lang == 'sli':
-        return ['de', 'pl']
-    if lang == 'rm':
-        return ['de', 'it']
-    if lang == 'stq':
-        return ['nds', 'de']
-    # Greek
-    if lang in ['grc', 'pnt']:
-        return ['el']
-    # Esperanto
-    if lang in ['io', 'nov']:
-        return ['eo']
-    # Spanish
-    if lang in ['an', 'arn', 'ast', 'ay', 'ext', 'lad', 'nah', 'nv', 'qu',
-                'yua']:
-        return ['es']
-    if lang == 'ca':
-        return ['oc', 'es']
-    if lang in ['gl', 'gn']:
-        return ['es', 'pt']
-    if lang == 'eu':
-        return ['es', 'fr']
-    if lang == 'cbk-zam':
-        return ['es', 'tl']
-    # Estonian
-    if lang in ['fiu-vro', 'vro']:
-        return ['fiu-vro', 'vro', 'et']
-    if lang == 'liv':
-        return ['et', 'lv']
-    # Persian (Farsi)
-    if lang in ['azb', 'lrc', 'ps']:
-        return ['fa']
-    if lang in ['glk', 'mzn']:
-        return ['glk', 'mzn', 'fa', 'ar']
-    # Finnish
-    if lang == 'vep':
-        return ['et', 'fi', 'ru']
-    if lang == 'fit':
-        return ['fi', 'sv']
-    if lang == 'olo':
-        return ['fi']
-    # French
-    if lang in ['atj', 'bm', 'br', 'ff', 'ht', 'kbp', 'kg', 'ln', 'mg', 'nrm',
-                'pcd', 'rw', 'sg', 'ty', 'wa', 'wo']:
-        return ['fr']
-    if lang == 'oc':
-        return ['fr', 'ca', 'es']
-    if lang in ['co', 'frp']:
-        return ['fr', 'it']
-    # Hindi
-    if lang in ['mai', 'sa']:
-        return ['hi']
-    if lang in ['ne', 'new']:
-        return ['ne', 'new', 'hi']
-    if lang == 'dty':
-        return ['ne']
-    if lang in ['bh', 'bho']:
-        return ['bh', 'bho']
-    # Indonesian and Malay
-    if lang in ['ace', 'bug', 'bjn', 'id', 'jv', 'ms', 'su']:
-        return ['id', 'ms', 'jv']
-    if lang == 'map-bms':
-        return ['jv', 'id', 'ms']
-    if lang == 'min':
-        return ['id']
-    # Inuit languages
-    if lang in ['ik', 'iu']:
-        return ['iu', 'kl']
-    if lang == 'kl':
-        return ['da', 'iu', 'no', 'nb']
-    # Italian
-    if lang in ['eml', 'fur', 'lij', 'lmo', 'nap', 'pms', 'roa-tara', 'sc',
-                'scn', 'vec']:
-        return ['it']
-    # Lithuanian
-    if lang in ['bat-smg', 'sgs']:
-        return ['bat-smg', 'sgs', 'lt']
-    # Latvian
-    if lang == 'ltg':
-        return ['lv']
-    # Dutch
-    if lang in ['af', 'fy', 'li', 'pap', 'srn', 'vls', 'zea']:
-        return ['nl']
-    if lang == 'nds-nl':
-        return ['nds', 'nl']
-    # Polish
-    if lang in ['csb', 'szl']:
-        return ['pl']
-    # Portuguese
-    if lang in ['fab', 'mwl', 'tet']:
-        return ['pt']
-    # Romanian
-    if lang in ['roa-rup', 'rup']:
-        return ['roa-rup', 'rup', 'ro']
-    if lang in ['mo', 'rmy']:
-        return ['ro']
-    # Russian and Belarusian
-    if lang in ['ab', 'av', 'ba', 'bxr', 'ce', 'cv', 'inh', 'kk', 'koi', 'krc',
-                'kv', 'ky', 'lbe', 'lez', 'mdf', 'mhr', 'mn', 'mrj', 'myv',
-                'os', 'sah', 'tg', 'tyv', 'udm', 'uk', 'xal']:
-        return ['ru']
-    if lang in ['kbd', 'ady']:
-        return ['kbd', 'ady', 'ru']
-    if lang == 'tt':
-        return ['tt-cyrl', 'ru']
-    if lang in ['be', 'be-tarask']:
-        return ['be', 'be-tarask', 'ru']
-    if lang == 'kaa':
-        return ['uz', 'ru']
-    # Serbocroatian
-    if lang in ['bs', 'hr', 'sh']:
-        return ['sh', 'hr', 'bs', 'sr', 'sr-el']
-    if lang == 'sr':
-        return ['sr-el', 'sh', 'hr', 'bs']
-    # Tagalog
-    if lang in ['bcl', 'ceb', 'ilo', 'pag', 'pam', 'war']:
-        return ['tl']
-    # Turkish and Kurdish
-    if lang in ['diq', 'ku']:
-        return ['ku', 'ku-latn', 'tr']
-    if lang == 'gag':
-        return ['tr']
-    if lang == 'ckb':
-        return ['ku']
-    # Ukrainian
-    if lang in ['crh', 'crh-latn']:
-        return ['crh', 'crh-latn', 'uk', 'ru']
-    if lang in ['rue']:
-        return ['uk', 'ru']
-    # Chinese
-    if lang in ['zh-classical', 'lzh', 'minnan', 'nan', 'zh-tw',
-                'zh', 'zh-hans']:
-        return ['zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical', 'lzh']
-    if lang == 'zh-min-nan':
-        return ['cdo', 'zh', 'zh-hans', 'zh-tw', 'zh-cn', 'zh-classical',
-                'lzh']
-    if lang in ['cdo', 'gan', 'hak', 'ii', 'wuu', 'za', 'zh-classical', 'lzh',
-                'zh-cn', 'zh-yue', 'yue']:
-        return ['zh', 'zh-hans' 'zh-cn', 'zh-tw', 'zh-classical', 'lzh']
-    # Scandinavian languages
-    if lang in ['da', 'sv']:
-        return ['da', 'no', 'nb', 'sv', 'nn']
-    if lang in ['fo', 'is']:
-        return ['da', 'no', 'nb', 'nn', 'sv']
-    if lang == 'nn':
-        return ['no', 'nb', 'sv', 'da']
-    if lang in ['no', 'nb']:
-        return ['no', 'nb', 'da', 'nn', 'sv']
-    if lang == 'se':
-        return ['sv', 'no', 'nb', 'nn', 'fi']
-    # Other languages
-    if lang in ['bi', 'tpi']:
-        return ['bi', 'tpi']
-    if lang == 'yi':
-        return ['he', 'de']
-    if lang in ['ia', 'ie']:
-        return ['ia', 'la', 'it', 'fr', 'es']
-    if lang == 'xmf':
-        return ['ka']
-    if lang in ['nso', 'st']:
-        return ['st', 'nso']
-    if lang in ['kj', 'ng']:
-        return ['kj', 'ng']
-    if lang in ['meu', 'hmo']:
-        return ['meu', 'hmo']
-    if lang in ['as', 'bpy']:
-        return ['bn']
-    if lang == 'tcy':
-        return ['kn']
-    # Default value
-    return []
+    return _GROUP_NAME_TO_FALLBACKS[_LANG_TO_GROUP_NAME[lang]]
 
 
 class TranslationError(Error, ImportError):
