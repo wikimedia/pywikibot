@@ -135,8 +135,9 @@ GENERATOR OPTIONS
                     -logevents:move gives pages from move log (usually
                     redirects)
                     -logevents:delete,,20 gives 20 pages from deletion log
-                    -logevents:protect,Usr gives pages from protect by user Usr
-                    -logevents:patrol,Usr,20 gives 20 patroled pages by Usr
+                    -logevents:protect,Usr gives pages from protect log by user
+                    Usr
+                    -logevents:patrol,Usr,20 gives 20 patrolled pages by Usr
                     -logevents:upload,,20121231,20100101 gives upload pages
                     in the 2010s, 2011s, and 2012s
                     -logevents:review,,20121231 gives review pages since the
@@ -221,7 +222,7 @@ GENERATOR OPTIONS
                     Argument can be given as "-unwatched:n" where
                     n is the maximum number of articles to work on.
 
--property:name      Work on all pages with a given propery name from
+-property:name      Work on all pages with a given property name from
                     Special:PagesWithProp.
 
 -usercontribs       Work on all articles that were edited by a certain user.
@@ -277,7 +278,7 @@ GENERATOR OPTIONS
                     "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
                     and supplied multiple times for multiple pages.
 
--linter             Work on pages that contains lint errors. Extension Linter
+-linter             Work on pages that contain lint errors. Extension Linter
                     must be available on the site.
                     -linter select all categories.
                     -linter:high, -linter:medium or -linter:low select all
