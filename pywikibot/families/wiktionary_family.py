@@ -33,7 +33,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         """Initializer."""
         self.languages_by_size = [
             'en', 'mg', 'fr', 'sh', 'ru', 'es', 'zh', 'de', 'nl', 'ku', 'sv',
-            'pl', 'lt', 'el', 'it', 'fi', 'ta', 'hu', 'tr', 'ca', 'ko', 'io',
+            'pl', 'lt', 'el', 'it', 'fi', 'ta', 'hu', 'ca', 'tr', 'ko', 'io',
             'kn', 'pt', 'hy', 'vi', 'sr', 'ja', 'chr', 'hi', 'th', 'ro', 'no',
             'id', 'ml', 'et', 'my', 'uz', 'li', 'or', 'te', 'cs', 'fa', 'eo',
             'ar', 'jv', 'az', 'eu', 'gl', 'oc', 'da', 'br', 'lo', 'uk', 'hr',
