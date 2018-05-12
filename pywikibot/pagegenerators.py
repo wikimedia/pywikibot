@@ -1232,9 +1232,9 @@ def NewpagesPageGenerator(site=None, namespaces=[0], total=None):
     # defaults to namespace 0 because that's how Special:Newpages defaults
     if site is None:
         site = pywikibot.Site()
-    for item in site.recentchanges(changetype='new', namespaces=namespaces,
-                                   total=total):
-        yield pywikibot.Page(pywikibot.Link(item["title"], site))
+    for page, item in site.newpages(namespaces=namespaces, total=total,
+                                    returndict=True):
+        yield page
 
 
 @deprecated_args(nobots=None, step=None)
