@@ -97,9 +97,12 @@ Script tests
     data_ingestion<./data_ingestion_tests>
     deletionbot<./deletionbot_tests>
     disambredir<./disambredir_tests>
+    generate_family_files<./generate_family_files_tests>
+    generate_user_files<./generate_user_files_tests>
     imagecopy<./imagecopy_tests>
     interwikidata<./interwikidata_tests>
     isbn<./isbn_tests>
+    noreferences<./noreferences_tests>
     patrolbot<./patrolbot_tests>
     protectbot<./protectbot_tests>
     pwb<./pwb_tests>
