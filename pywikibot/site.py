@@ -3681,10 +3681,9 @@ class APISite(BaseSite):
         if filterRedirects is not None:
             eiargs["geifilterredir"] = (filterRedirects and "redirects" or
                                         "nonredirects")
-        eigen = self._generator(api.PageGenerator, type_arg="embeddedin",
-                                namespaces=namespaces, total=total,
-                                g_content=content, **eiargs)
-        return eigen
+        return self._generator(api.PageGenerator, type_arg='embeddedin',
+                               namespaces=namespaces, total=total,
+                               g_content=content, **eiargs)
 
     @deprecated_args(step=None)
     def pagereferences(self, page, followRedirects=False, filterRedirects=None,
@@ -3745,11 +3744,10 @@ class APISite(BaseSite):
         else:
             pltitle = page.title(withSection=False).encode(self.encoding())
             plargs['titles'] = pltitle
-        plgen = self._generator(api.PageGenerator, type_arg="links",
-                                namespaces=namespaces, total=total,
-                                g_content=content, redirects=follow_redirects,
-                                **plargs)
-        return plgen
+        return self._generator(api.PageGenerator, type_arg='links',
+                               namespaces=namespaces, total=total,
+                               g_content=content, redirects=follow_redirects,
+                               **plargs)
 
     # Sortkey doesn't work with generator
     @deprecated_args(withSortKey=None, step=None)
@@ -3766,10 +3764,9 @@ class APISite(BaseSite):
         else:
             clargs['titles'] = page.title(
                 withSection=False).encode(self.encoding())
-        clgen = self._generator(api.PageGenerator,
-                                type_arg='categories', total=total,
-                                g_content=content, **clargs)
-        return clgen
+        return self._generator(api.PageGenerator,
+                               type_arg='categories', total=total,
+                               g_content=content, **clargs)
 
     @deprecated_args(step=None)
     def pageimages(self, page, total=None, content=False):
@@ -3781,10 +3778,9 @@ class APISite(BaseSite):
 
         """
         imtitle = page.title(withSection=False).encode(self.encoding())
-        imgen = self._generator(api.PageGenerator, type_arg="images",
-                                titles=imtitle, total=total,
-                                g_content=content)
-        return imgen
+        return self._generator(api.PageGenerator, type_arg='images',
+                               titles=imtitle, total=total,
+                               g_content=content)
 
     @deprecated_args(step=None)
     def pagetemplates(self, page, namespaces=None, total=None, content=False):
@@ -3802,10 +3798,9 @@ class APISite(BaseSite):
             type such as NoneType or bool
         """
         tltitle = page.title(withSection=False).encode(self.encoding())
-        tlgen = self._generator(api.PageGenerator, type_arg="templates",
-                                titles=tltitle, namespaces=namespaces,
-                                total=total, g_content=content)
-        return tlgen
+        return self._generator(api.PageGenerator, type_arg='templates',
+                               titles=tltitle, namespaces=namespaces,
+                               total=total, g_content=content)
 
     @deprecated_args(step=None)
     def categorymembers(self, category, namespaces=None, sortby=None,
@@ -3977,9 +3972,8 @@ class APISite(BaseSite):
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'endsort'")
 
-        cmgen = self._generator(api.PageGenerator, namespaces=namespaces,
-                                total=total, g_content=content, **cmargs)
-        return cmgen
+        return self._generator(api.PageGenerator, namespaces=namespaces,
+                               total=total, g_content=content, **cmargs)
 
     @deprecated_args(getText='content')
     def loadrevisions(self, page, content=False, revids=None,
@@ -4505,11 +4499,10 @@ class APISite(BaseSite):
         @param protocol: The protocol prefix (default: "http")
 
         """
-        eugen = self._generator(api.PageGenerator, type_arg="exturlusage",
-                                geuquery=url, geuprotocol=protocol,
-                                namespaces=namespaces,
-                                total=total, g_content=content)
-        return eugen
+        return self._generator(api.PageGenerator, type_arg='exturlusage',
+                               geuquery=url, geuprotocol=protocol,
+                               namespaces=namespaces,
+                               total=total, g_content=content)
 
     @deprecated_args(step=None)
     def imageusage(self, image, namespaces=None, filterredir=None,
@@ -4535,10 +4528,9 @@ class APISite(BaseSite):
         if filterredir is not None:
             iuargs['giufilterredir'] = ('redirects' if filterredir else
                                         'nonredirects')
-        iugen = self._generator(api.PageGenerator, type_arg="imageusage",
-                                namespaces=namespaces,
-                                total=total, g_content=content, **iuargs)
-        return iugen
+        return self._generator(api.PageGenerator, type_arg='imageusage',
+                               namespaces=namespaces,
+                               total=total, g_content=content, **iuargs)
 
     @deprecated_args(step=None)
     def logevents(self, logtype=None, user=None, page=None, namespace=None,
@@ -5027,10 +5019,9 @@ class APISite(BaseSite):
                 params['grnredirect'] = redirects == 'redirects'
             else:
                 params['grnfilterredir'] = redirects
-        rngen = self._generator(api.PageGenerator, type_arg="random",
-                                namespaces=namespaces, total=total,
-                                g_content=content, **params)
-        return rngen
+        return self._generator(api.PageGenerator, type_arg='random',
+                               namespaces=namespaces, total=total,
+                               g_content=content, **params)
 
     # Catalog of editpage error codes, for use in generating messages.
     # The block at the bottom are page related errors.
@@ -6559,7 +6550,7 @@ class APISite(BaseSite):
         @param total: number of pages to return
         """
         lpgen = self._generator(api.ListGenerator,
-                                type_arg="querypage", qppage="Longpages",
+                                type_arg='querypage', qppage='Longpages',
                                 total=total)
         for pageitem in lpgen:
             yield (pywikibot.Page(self, pageitem['title']),
@@ -6574,7 +6565,7 @@ class APISite(BaseSite):
         @param total: number of pages to return
         """
         spgen = self._generator(api.ListGenerator,
-                                type_arg="querypage", qppage="Shortpages",
+                                type_arg='querypage', qppage='Shortpages',
                                 total=total)
         for pageitem in spgen:
             yield (pywikibot.Page(self, pageitem['title']),
@@ -6586,10 +6577,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        degen = self._generator(api.PageGenerator,
-                                type_arg="querypage", gqppage="Deadendpages",
-                                total=total)
-        return degen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Deadendpages',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def ancientpages(self, total=None):
@@ -6598,7 +6588,7 @@ class APISite(BaseSite):
         @param total: number of pages to return
         """
         apgen = self._generator(api.ListGenerator,
-                                type_arg="querypage", qppage="Ancientpages",
+                                type_arg='querypage', qppage='Ancientpages',
                                 total=total)
         for pageitem in apgen:
             yield (pywikibot.Page(self, pageitem['title']),
@@ -6610,10 +6600,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        lpgen = self._generator(api.PageGenerator,
-                                type_arg="querypage", gqppage="Lonelypages",
-                                total=total)
-        return lpgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Lonelypages',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def unwatchedpages(self, total=None):
@@ -6621,10 +6610,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        uwgen = self._generator(api.PageGenerator,
-                                type_arg="querypage", gqppage="Unwatchedpages",
-                                total=total)
-        return uwgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Unwatchedpages',
+                               total=total)
 
     @deprecated_args(step=None)
     def wantedpages(self, total=None):
@@ -6632,10 +6620,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        wpgen = self._generator(api.PageGenerator,
-                                type_arg="querypage", gqppage="Wantedpages",
-                                total=total)
-        return wpgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Wantedpages',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def wantedcategories(self, total=None):
@@ -6643,12 +6630,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        wcgen = self._generator(api.PageGenerator,
-                                type_arg='querypage',
-                                gqppage='Wantedcategories',
-                                total=total)
-
-        return wcgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Wantedcategories',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def uncategorizedcategories(self, total=None):
@@ -6656,11 +6641,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        ucgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Uncategorizedcategories",
-                                total=total)
-        return ucgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Uncategorizedcategories',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def uncategorizedimages(self, total=None):
@@ -6668,11 +6652,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        uigen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Uncategorizedimages",
-                                total=total)
-        return uigen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Uncategorizedimages',
+                               total=total)
 
     # synonym
     uncategorizedfiles = uncategorizedimages
@@ -6683,11 +6666,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        upgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Uncategorizedpages",
-                                total=total)
-        return upgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Uncategorizedpages',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def uncategorizedtemplates(self, total=None):
@@ -6695,11 +6677,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        utgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Uncategorizedtemplates",
-                                total=total)
-        return utgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Uncategorizedtemplates',
+                               total=total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def unusedcategories(self, total=None):
@@ -6707,11 +6688,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        ucgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Unusedcategories",
-                                total=total)
-        return ucgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Unusedcategories',
+                               total=total)
 
     @deprecated_args(extension=None, number='total', step=None, repeat=None)
     def unusedfiles(self, total=None):
@@ -6719,11 +6699,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        uigen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Unusedimages",
-                                total=total)
-        return uigen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Unusedimages',
+                               total=total)
 
     @deprecated("Site().unusedfiles()")
     @deprecated_args(extension=None, number='total', step=None, repeat=None)
@@ -6740,11 +6719,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        wigen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Withoutinterwiki",
-                                total=total)
-        return wigen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='Withoutinterwiki',
+                               total=total)
 
     @need_version("1.18")
     @deprecated_args(step=None)
@@ -6753,11 +6731,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        brgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="BrokenRedirects",
-                                total=total)
-        return brgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='BrokenRedirects',
+                               total=total)
 
     @need_version("1.18")
     @deprecated_args(step=None)
@@ -6766,11 +6742,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        drgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="DoubleRedirects",
-                                total=total)
-        return drgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='DoubleRedirects',
+                               total=total)
 
     @need_version("1.18")
     @deprecated_args(step=None)
@@ -6779,11 +6753,9 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        lrgen = self._generator(api.PageGenerator,
-                                type_arg="querypage",
-                                gqppage="Listredirects",
-                                total=total)
-        return lrgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Listredirects',
+                               total=total)
 
     @deprecated_args(step=None)
     @need_extension('Wikibase Client')
@@ -6792,11 +6764,10 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        upgen = self._generator(api.PageGenerator,
-                                type_arg='querypage',
-                                gqppage='UnconnectedPages',
-                                total=total)
-        return upgen
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage',
+                               gqppage='UnconnectedPages',
+                               total=total)
 
     @deprecated_args(lvl='level')
     def protectedpages(self, namespace=0, type='edit', level=False,
@@ -6860,11 +6831,8 @@ class APISite(BaseSite):
         if propname not in self.get_property_names():
             raise NotImplementedError(
                 '"{0}" is not a valid page property'.format(propname))
-        pwpgen = self._generator(api.PageGenerator,
-                                 type_arg='pageswithprop',
-                                 gpwppropname=propname,
-                                 total=total)
-        return pwpgen
+        return self._generator(api.PageGenerator, type_arg='pageswithprop',
+                               gpwppropname=propname, total=total)
 
     @need_version("1.18")
     def compare(self, old, diff):
