@@ -841,6 +841,21 @@ class TestClassProperty(TestCase):
         self.assertEqual(Foo.bar, Foo._bar)
 
 
+class TestMergeGenerator(TestCase):
+
+    """Test merging generators."""
+
+    net = False
+
+    def test_roundrobin_generators(self):
+        """Test merge_generators generator."""
+        gen = range(5)
+        result = list(tools.roundrobin_generators(gen, 'ABC'))
+        self.assertEqual(result, [0, 'A', 1, 'B', 2, 'C', 3, 4])
+        result = ''.join(tools.roundrobin_generators('HlWrd', 'e', 'lool'))
+        self.assertEqual(result, 'HelloWorld')
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
