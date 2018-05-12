@@ -929,10 +929,9 @@ class GeneratorFactory(object):
             if not value:
                 value = '!'
             firstpagelink = pywikibot.Link(value, self.site)
-            gen = AllpagesPageGenerator(firstpagelink.title,
-                                        firstpagelink.namespace,
-                                        includeredirects=False,
-                                        site=self.site)
+            gen = self.site.allpages(start=firstpagelink.title,
+                                     namespace=firstpagelink.namespace,
+                                     filterredir=False)
         elif arg == '-prefixindex':
             if not value:
                 value = pywikibot.input(
@@ -1084,6 +1083,7 @@ class GeneratorFactory(object):
             return False
 
 
+@deprecated('Site.allpages()')
 @deprecated_args(step=None)
 def AllpagesPageGenerator(start='!', namespace=0, includeredirects=True,
                           site=None, total=None, content=False):
