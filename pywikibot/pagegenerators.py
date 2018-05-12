@@ -950,8 +950,7 @@ class GeneratorFactory(object):
                                         total=intNone(value),
                                         site=self.site)
         elif arg == '-unconnectedpages':
-            gen = UnconnectedPageGenerator(total=intNone(value),
-                                           site=self.site)
+            gen = self.site.unconnected_pages(total=intNone(value))
         elif arg == '-imagesused':
             if not value:
                 value = pywikibot.input(
@@ -1309,6 +1308,7 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
     return gen
 
 
+@deprecated('site.unconnected_pages()')
 @deprecated_args(step=None)
 def UnconnectedPageGenerator(site=None, total=None):
     """
@@ -1323,8 +1323,7 @@ def UnconnectedPageGenerator(site=None, total=None):
         site = pywikibot.Site()
     if not site.data_repository():
         raise ValueError('The given site does not have Wikibase repository.')
-    for page in site.unconnected_pages(total=total):
-        yield page
+    return site.unconnected_pages(total=total)
 
 
 @deprecated_args(referredImagePage='referredFilePage', step=None)
