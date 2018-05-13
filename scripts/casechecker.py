@@ -171,20 +171,18 @@ class CaseChecker(object):
                 self.titleList = [self.Page(t) for t in f]
             self.failedTitles += '.failed'
 
+        ziplist = zip(self.localSuspects, self.latinSuspects)
         self.lclToLatDict = {
-            ord(self.localSuspects[i]): self.latinSuspects[i]
-            for i in xrange(len(self.localSuspects))}
+            ord(local): latin for local, latin in ziplist}
         self.latToLclDict = {
-            ord(self.latinSuspects[i]): self.localSuspects[i]
-            for i in xrange(len(self.localSuspects))}
+            ord(latin): local for local, latin in ziplist}
 
         if self.localKeyboard is not None:
+            ziplist = zip(self.localKeyboard, self.latinKeyboard)
             self.lclToLatKeybDict = {
-                ord(self.localKeyboard[i]): self.latinKeyboard[i]
-                for i in xrange(len(self.localKeyboard))}
+                ord(local): latin for local, latin in ziplist}
             self.latToLclKeybDict = {
-                ord(self.latinKeyboard[i]): self.localKeyboard[i]
-                for i in xrange(len(self.localKeyboard))}
+                ord(latin): local for local, latin in ziplist}
         else:
             self.lclToLatKeybDict = {}
             self.latToLclKeybDict = {}
