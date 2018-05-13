@@ -23,11 +23,7 @@ import logging
 import os.path
 import re
 import sys
-
-try:
-    import unicodedata2 as unicodedata
-except ImportError:
-    import unicodedata
+import unicodedata
 
 from collections import Counter, defaultdict, namedtuple, OrderedDict
 from warnings import warn
