@@ -106,13 +106,14 @@ user talk pages (namespace #3):
 #
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
-# (C) xqt, 2009-2017
-# (C) Pywikibot team, 2004-2017
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
+from itertools import chain
 import re
 
 from warnings import warn
@@ -351,12 +352,12 @@ def main(*args):
         gen = genFactory.getCombinedGenerator()
 
     if not gen:
-        gens = [
+        gens = (
             pagegenerators.ReferringPageGenerator(t,
                                                   onlyTemplateInclusion=True)
             for t in oldTemplates
-        ]
-        gen = pagegenerators.CombinedPageGenerator(gens)
+        )
+        gen = chain(*gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
     if user:
         gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp,
