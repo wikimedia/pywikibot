@@ -336,7 +336,6 @@ def writelogheader():
     check_package_list = [
         'requests',
         'mwparserfromhell',
-        'unicodedata', 'unicodedata2',  # T102461
     ]
 
     # report all imported packages

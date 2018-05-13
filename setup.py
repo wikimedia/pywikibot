@@ -67,7 +67,6 @@ if PY2:
     extra_deps.update({
         'csv': ['unicodecsv'],
         'MySQL': ['oursql'],
-        'unicode7': ['unicodedata2>=7.0.0-2'],
     })
 
 script_deps = {

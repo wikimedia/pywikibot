@@ -8,10 +8,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import unicodedata
-try:
-    import unicodedata2
-except ImportError:
-    unicodedata2 = None
 
 from tests.aspects import TestCase, unittest
 
@@ -45,12 +41,6 @@ class PythonTestCase(TestCase):
         # See T102461 and http://bugs.python.org/issue10254
         text = 'Li̍t-sṳ́'
         self.assertEqual(text, unicodedata.normalize('NFC', text))
-
-    @unittest.skipIf(not unicodedata2, 'unicodedata2 not found')
-    def test_issue_10254_unicodedata2(self):
-        """Test Python issue #10254 is avoided with unicodedata2 package."""
-        text = 'Li̍t-sṳ́'
-        self.assertEqual(text, unicodedata2.normalize('NFC', text))
 
 
 if __name__ == '__main__':  # pragma: no cover
