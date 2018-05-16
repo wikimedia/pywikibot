@@ -686,13 +686,13 @@ class History(object):
                                                     'results-%s-%s.txt'
                                                     % (self.site.family.name,
                                                        self.site.lang))
-        txtfile = codecs.open(txtfilename, 'a', 'utf-8')
-        self.logCount += 1
-        if self.logCount % 30 == 0:
-            # insert a caption
-            txtfile.write('=== %s ===\n' % containingPage.title()[:3])
-        txtfile.write(errorReport)
-        txtfile.close()
+        with codecs.open(txtfilename, 'a', 'utf-8') as txtfile:
+            self.logCount += 1
+            if self.logCount % 30 == 0:
+                # insert a caption
+                txtfile.write('=== {} ===\n'
+                              .format(containingPage.title()[:3]))
+            txtfile.write(errorReport)
 
         if self.reportThread and not containingPage.isTalkPage():
             self.reportThread.report(url, errorReport, containingPage,

@@ -207,9 +207,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         filename = config.datafilepath('pywikibot.lwp')
         pywikibot.debug(u"Storing cookies to %s" % filename,
                         _logger)
-        f = open(filename, 'w')
-        f.write(data)
-        f.close()
+        with open(filename, 'w') as f:
+            f.write(data)
 
     def readPassword(self):
         """

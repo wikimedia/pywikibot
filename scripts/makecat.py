@@ -37,7 +37,7 @@ R(emove) - remove a page that is already in the list
 L(ist) - show current list of pages to include or to check
 """
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -225,17 +225,15 @@ try:
         workingcatname.encode('ascii', 'xmlcharrefreplace').decode('ascii') +
         '_exclude.txt')
     try:
-        f = codecs.open(filename, 'r', encoding=mysite.encoding())
-        for line in f.readlines():
-            # remove trailing newlines and carriage returns
-            try:
-                while line[-1] in ['\n', '\r']:
-                    line = line[:-1]
-            except IndexError:
-                pass
-            pl = pywikibot.Page(mysite, line)
-            checked[pl] = pl
-        f.close()
+        with codecs.open(filename, 'r', encoding=mysite.encoding()) as f:
+            for line in f.readlines():
+                # remove leading and trailing spaces, LF and CR
+                line = line.strip()
+                if not line:
+                    continue
+                pl = pywikibot.Page(mysite, line)
+                checked[pl] = pl
+
         excludefile = codecs.open(filename, 'a', encoding=mysite.encoding())
     except IOError:
         # File does not exist
