@@ -17,6 +17,7 @@ import math
 import re
 import sys
 import threading
+import time
 
 from warnings import warn
 
@@ -1321,6 +1322,17 @@ def showDiff(oldtext, newtext, context=0):
 
 
 # Throttle and thread handling
+
+
+def sleep(secs):
+    """Suspend execution of the current thread for the given number of seconds.
+
+    Drop this process from the throttle log if wait time is greater than
+    30 seconds.
+    """
+    if secs >= 30:
+        stopme()
+    time.sleep(secs)
 
 
 def stopme():

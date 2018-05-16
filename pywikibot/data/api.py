@@ -14,7 +14,6 @@ import json
 import os
 import pprint
 import re
-import time
 import traceback
 
 from collections import Container, MutableMapping
@@ -2210,7 +2209,7 @@ class Request(MutableMapping):
             raise TimeoutError("Maximum retries attempted without success.")
         pywikibot.warning(u"Waiting %s seconds before retrying."
                           % self.retry_wait)
-        time.sleep(self.retry_wait)
+        pywikibot.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 
@@ -3074,9 +3073,10 @@ class LoginManager(login.LoginManager):
         if hasattr(self, '_waituntil'):
             if datetime.datetime.now() < self._waituntil:
                 diff = self._waituntil - datetime.datetime.now()
-                pywikibot.warning(u"Too many tries, waiting %s seconds before retrying."
-                                  % diff.seconds)
-                time.sleep(diff.seconds)
+                pywikibot.warning(
+                    'Too many tries, waiting {} seconds before retrying.'
+                    .format(diff.seconds))
+                pywikibot.sleep(diff.seconds)
 
         # base login request
         login_request = self.site._request(
