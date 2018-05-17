@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -146,13 +146,14 @@ if os.name == "nt":
         s.serve_forever()
 
 
-def patched_print(text, targetStream):
+def patched_print(text, target_stream):
     try:
-        stream = patched_streams[targetStream]
+        stream = patched_streams[target_stream]
     except KeyError:
-        assert isinstance(targetStream, pywikibot.userinterfaces.win32_unicode.UnicodeOutput)
-        assert targetStream._stream
-        stream = patched_streams[targetStream._stream]
+        assert isinstance(target_stream,
+                          pywikibot.userinterfaces.win32_unicode.UnicodeOutput)
+        assert target_stream._stream
+        stream = patched_streams[target_stream._stream]
     org_print(text, stream)
 
 
