@@ -40,12 +40,12 @@ class TestDateMeta(MetaTestCaseClass):
                             "date.formats['%s']['%s']:\ninvalid value %d"
                             % (formatname, code, value))
 
-                        newValue = convFunc(convFunc(value))
+                        new_value = convFunc(convFunc(value))
                         self.assertEqual(
-                            newValue, value,
+                            new_value, value,
                             "date.formats['%s']['%s']:\n"
                             "value %d does not match %s"
-                            % (formatname, code, newValue, value))
+                            % (formatname, code, new_value, value))
             return testMapEntry
 
         for formatname in date.formats:

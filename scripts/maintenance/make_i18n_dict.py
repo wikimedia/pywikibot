@@ -132,7 +132,7 @@ class i18nBot(object):  # noqa: N801
         @param quiet: Print the result if False
         @type quiet: bool
         """
-        IDENT = 4
+        indent = 4
 
         if not self.dict:
             self.run(quiet)
@@ -151,8 +151,8 @@ class i18nBot(object):  # noqa: N801
             with codecs.open(file_name, 'w', 'utf-8') as json_file:
                 new_dict.update(self.dict[lang])
                 s = json.dumps(new_dict, ensure_ascii=False, sort_keys=True,
-                               indent=IDENT, separators=(',', ': '))
-                s = s.replace(' ' * IDENT, '\t')
+                               indent=indent, separators=(',', ': '))
+                s = s.replace(' ' * indent, '\t')
                 json_file.write(s)
 
 

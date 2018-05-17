@@ -46,12 +46,12 @@ class WikiStatsTestCase(TestCase):
 
     def test_sorting_order(self):
         """Test sorting order of languages_by_size."""
-        FAMILY = 'wikipedia'
+        family = 'wikipedia'
         ws = WikiStats()
-        data = ws.get_dict(FAMILY)
+        data = ws.get_dict(family)
         last = sys.maxsize
         last_code = ''
-        for code in ws.languages_by_size(FAMILY):
+        for code in ws.languages_by_size(family):
             curr = int(data[code]['good'])
             self.assertGreaterEqual(
                 last, curr,

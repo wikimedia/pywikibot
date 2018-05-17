@@ -41,64 +41,62 @@ class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
-        txtWithOneMatch = u'this string has 3000, 1999 and 3000 in it'
-        txtWithTwoMatch = u'this string has 1998, 1999 and 3000 in it'
-        txtWithNoMatch = u'this string has no match'
+        txt_with_one_match = 'this string has 3000, 1999 and 3000 in it'
+        txt_with_two_match = 'this string has 1998, 1999 and 3000 in it'
+        txt_with_no_match = 'this string has no match'
         pat = self.ts.pyearR
 
-        txt, m = self.ts._last_match_and_replace(txtWithOneMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_one_match, pat)
         self.assertEqual('this string has 3000, @@@@ and 3000 in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'year': '1999'})
         self.assertEqual(m.start(), 22)
 
-        txt, m = self.ts._last_match_and_replace(txtWithTwoMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_two_match, pat)
         self.assertEqual('this string has @@@@, @@@@ and 3000 in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'year': '1999'})
         self.assertEqual(m.start(), 22)
 
-        self.assertEqual(self.ts._last_match_and_replace(txtWithNoMatch, pat),
-                         (txtWithNoMatch,
-                          None)
-                         )
+        self.assertEqual(
+            self.ts._last_match_and_replace(txt_with_no_match, pat),
+            (txt_with_no_match, None))
 
-        txtWithOneMatch = u'this string has XXX, YYY and février in it'
-        txtWithTwoMatch = u'this string has XXX, mars and février in it'
-        txtWithThreeMatch = u'this string has avr, mars and février in it'
-        txtWithNoMatch = u'this string has no match'
+        txt_with_one_match = 'this string has XXX, YYY and février in it'
+        txt_with_two_match = 'this string has XXX, mars and février in it'
+        txt_with_three_match = 'this string has avr, mars and février in it'
+        txt_with_no_match = 'this string has no match'
         pat = self.ts.pmonthR
 
-        txt, m = self.ts._last_match_and_replace(txtWithOneMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_one_match, pat)
         self.assertEqual('this string has XXX, YYY and @@@@@@@ in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'month': 'février'})
         self.assertEqual(m.start(), 29)
 
-        txt, m = self.ts._last_match_and_replace(txtWithTwoMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_two_match, pat)
         self.assertEqual('this string has XXX, @@@@ and @@@@@@@ in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'month': 'février'})
         self.assertEqual(m.start(), 30)
 
-        txt, m = self.ts._last_match_and_replace(txtWithThreeMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_three_match, pat)
         self.assertEqual('this string has @@@, @@@@ and @@@@@@@ in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'month': 'février'})
         self.assertEqual(m.start(), 30)
 
-        self.assertEqual(self.ts._last_match_and_replace(txtWithNoMatch, pat),
-                         (txtWithNoMatch,
-                          None)
-                         )
+        self.assertEqual(
+            self.ts._last_match_and_replace(txt_with_no_match, pat),
+            (txt_with_no_match, None))
 
     def test_hour(self):
         """Test that correct hour is matched."""
-        txtHourInRange = u'7 février 2010 à 23:00 (CET)'
-        txtHourOutOfRange = u'7 février 2010 à 24:00 (CET)'
+        txt_hour_in_range = '7 février 2010 à 23:00 (CET)'
+        txt_hour_out_of_range = '7 février 2010 à 24:00 (CET)'
 
-        self.assertNotEqual(self.ts.timestripper(txtHourInRange), None)
-        self.assertEqual(self.ts.timestripper(txtHourOutOfRange), None)
+        self.assertNotEqual(self.ts.timestripper(txt_hour_in_range), None)
+        self.assertEqual(self.ts.timestripper(txt_hour_out_of_range), None)
 
 
 class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
@@ -110,34 +108,33 @@ class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
 
     def test_last_match_and_replace(self):
         """Test that pattern matches and removes items correctly."""
-        txtWithOneMatch = u'this string has XX. YY. 12. in it'
-        txtWithTwoMatch = u'this string has XX. 1. 12. in it'
-        txtWithThreeMatch = u'this string has 1. 1. 12. in it'
-        txtWithNoMatch = u'this string has no match'
+        txt_with_one_match = 'this string has XX. YY. 12. in it'
+        txt_with_two_match = 'this string has XX. 1. 12. in it'
+        txt_with_three_match = 'this string has 1. 1. 12. in it'
+        txt_with_no_match = 'this string has no match'
         pat = self.ts.pmonthR
 
-        txt, m = self.ts._last_match_and_replace(txtWithOneMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_one_match, pat)
         self.assertEqual('this string has XX. YY. 12. in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'month': '12.'})
         self.assertEqual(m.start(), 24)
 
-        txt, m = self.ts._last_match_and_replace(txtWithTwoMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_two_match, pat)
         self.assertEqual('this string has XX. 1. 12. in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'month': '12.'})
         self.assertEqual(m.start(), 23)
 
-        txt, m = self.ts._last_match_and_replace(txtWithThreeMatch, pat)
+        txt, m = self.ts._last_match_and_replace(txt_with_three_match, pat)
         self.assertEqual('this string has @@ 1. 12. in it', txt)
         self.assertIsInstance(m, MatchObject)
         self.assertEqual(m.groupdict(), {'month': '12.'})
         self.assertEqual(m.start(), 22)
 
-        self.assertEqual(self.ts._last_match_and_replace(txtWithNoMatch, pat),
-                         (txtWithNoMatch,
-                          None)
-                         )
+        self.assertEqual(
+            self.ts._last_match_and_replace(txt_with_no_match, pat),
+            (txt_with_no_match, None))
 
 
 class TestTimeStripperNumberAndDate(TestTimeStripperCase):
@@ -228,46 +225,46 @@ class TestTimeStripperLanguage(TestCase):
         tzone = tzoneFixedOffset(self.ts.site.siteinfo['timeoffset'],
                                  self.ts.site.siteinfo['timezone'])
 
-        txtMatch = self.sites[key]['match']
+        txt_match = self.sites[key]['match']
 
         res = datetime.datetime(2010, 2, 7, 19, 48, tzinfo=tzone)
 
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
+        self.assertEqual(self.ts.timestripper(txt_match), res)
 
         if 'match2' not in self.sites[key]:
             return
 
-        txtMatch = self.sites[key]['match2']
+        txt_match = self.sites[key]['match2']
 
         res = datetime.datetime(2008, 9, 12, 16, 41, tzinfo=tzone)
 
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
+        self.assertEqual(self.ts.timestripper(txt_match), res)
 
         if 'match3' not in self.sites[key]:
             return
 
-        txtMatch = self.sites[key]['match3']
+        txt_match = self.sites[key]['match3']
 
         res = datetime.datetime(2014, 8, 14, 21, 18, tzinfo=tzone)
 
-        self.assertEqual(self.ts.timestripper(txtMatch), res)
+        self.assertEqual(self.ts.timestripper(txt_match), res)
 
     def test_timestripper_nomatch(self, key):
         """Test that correct date is not matched."""
         self.ts = TimeStripper(self.get_site(key))
 
         if 'nomatch' in self.sites[key]:
-            txtNoMatch = self.sites[key]['nomatch']
+            txt_no_match = self.sites[key]['nomatch']
         else:
-            txtNoMatch = u'3 March 2011 19:48 (UTC) 7 March 2010 19:48 (UTC)'
+            txt_no_match = '3 March 2011 19:48 (UTC) 7 March 2010 19:48 (UTC)'
 
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+        self.assertEqual(self.ts.timestripper(txt_no_match), None)
 
         if 'nomatch1' not in self.sites[key]:
             return
 
-        txtNoMatch = self.sites[key]['nomatch1']
-        self.assertEqual(self.ts.timestripper(txtNoMatch), None)
+        txt_no_match = self.sites[key]['nomatch1']
+        self.assertEqual(self.ts.timestripper(txt_no_match), None)
 
 
 class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
