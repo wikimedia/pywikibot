@@ -2802,7 +2802,8 @@ def YearPageGenerator(start=1, end=2050, site=None):
             yield pywikibot.Page(pywikibot.Link(current_year, site))
 
 
-def DayPageGenerator(startMonth=1, endMonth=12, site=None, year=2000):
+@deprecated_args(startMonth='start_month', endMonth='end_month')
+def DayPageGenerator(start_month=1, end_month=12, site=None, year=2000):
     """
     Day page generator.
 
@@ -2814,9 +2815,9 @@ def DayPageGenerator(startMonth=1, endMonth=12, site=None, year=2000):
     if site is None:
         site = pywikibot.Site()
     fd = date.FormatDate(site)
-    firstPage = pywikibot.Page(site, fd(startMonth, 1))
+    firstPage = pywikibot.Page(site, fd(start_month, 1))
     pywikibot.output(u"Starting with %s" % firstPage.title(asLink=True))
-    for month in range(startMonth, endMonth + 1):
+    for month in range(start_month, end_month + 1):
         for day in range(1, calendar.monthrange(year, month)[1] + 1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))
 
