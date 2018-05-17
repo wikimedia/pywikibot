@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test IP module/regex."""
 #
-# (C) Pywikibot team, 2012-2015
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
@@ -39,16 +39,16 @@ class TestIPBase(TestCase):
                 '{0} of {1} tests failed:\n{2}'.format(
                     self.fail, self.total, '\n'.join(self.errors)))
 
-    def ipv6test(self, result, IP):
-        """Perform one IP test."""
+    def ipv6test(self, result, ip_address):
+        """Perform one ip_address test."""
         self.total += 1
         try:
-            self.assertEqual(result, self._do_ip_test(IP))
+            self.assertEqual(result, self._do_ip_test(ip_address))
         except AssertionError:
             self.fail += 1
             self.errors.append(
                 '"%s" match should be %s - not OK'
-                % (IP, result))
+                % (ip_address, result))
 
     def _run_tests(self):
         """Test various IP."""

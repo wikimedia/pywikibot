@@ -478,18 +478,18 @@ class TestDayPageGenerator(DefaultSiteTestCase):
         cls.site = cls.get_site()
         cls.fd = date.FormatDate(cls.site)
 
-    def _run_test(self, startMonth=1, endMonth=12, year=2000):
+    def _run_test(self, start_month=1, end_month=12, year=2000):
         """Test method for DayPageGenerator."""
         params = {
-            'startMonth': startMonth,
-            'endMonth': endMonth,
+            'start_month': start_month,
+            'end_month': end_month,
             'site': self.site,
         }
         if year != 2000:
             params['year'] = year
         # use positional parameter
-        gen1 = pagegenerators.DayPageGenerator(startMonth, endMonth, self.site,
-                                               year)
+        gen1 = pagegenerators.DayPageGenerator(
+            start_month, end_month, self.site, year)
         # use keyworded parameter and default for year
         gen2 = pagegenerators.DayPageGenerator(**params)
 
@@ -498,7 +498,7 @@ class TestDayPageGenerator(DefaultSiteTestCase):
             self.assertTrue(page.isAutoTitle)
 
         expected = []
-        for month in range(startMonth, endMonth + 1):
+        for month in range(start_month, end_month + 1):
             for day in range(1, calendar.monthrange(year, month)[1] + 1):
                 expected.append(self.fd(month, day))
 
@@ -514,7 +514,7 @@ class TestDayPageGenerator(DefaultSiteTestCase):
 
     def test_year_2100(self):
         """Test for day page generator of year 2100."""
-        self._run_test(endMonth=2, year=2100)
+        self._run_test(end_month=2, year=2100)
 
     def test_start_0(self):
         """Test for day page generator with startMonth 0."""
