@@ -18,7 +18,7 @@ Command line options:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2017
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,16 +59,15 @@ def refresh_all(sysop=False):
     """Reload watchlists for all wikis where a watchlist is already present."""
     cache_path = CachedRequest._get_cache_dir()
     files = os.listdir(cache_path)
-    seen = []
+    seen = set()
     for filename in files:
         entry = CacheEntry(cache_path, filename)
         entry._load_cache()
         entry.parse_key()
         entry._rebuild()
-        if entry.site not in seen:
-            if entry._data.get('watchlistraw'):
-                refresh(entry.site, sysop)
-                seen.append(entry.site)
+        if entry.site not in seen and 'watchlistraw' in entry._data:
+            refresh(entry.site, sysop)
+            seen.add(entry.site)
 
 
 def refresh_new(sysop=False):
