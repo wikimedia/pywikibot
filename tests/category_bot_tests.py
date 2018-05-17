@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 """Tests for the category bot script."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
 
+import pywikibot
 from pywikibot import BaseSite
 
-from scripts.category import CategoryMoveRobot
+from scripts.category import CategoryPreprocess, CategoryMoveRobot
 
 from tests import patch, Mock
-from tests.aspects import unittest, DefaultSiteTestCase
+from tests.aspects import unittest, DefaultSiteTestCase, TestCase
 
 
 MOCKED_USERNAME = Mock(return_value='FakeUsername')
@@ -63,6 +64,52 @@ class CfdActions(DefaultSiteTestCase):
         ))
         bot._strip_cfd_templates(commit=False)
         self.assertEqual(bot.newcat.text, expected)
+
+
+class TestPreprocessingCategory(TestCase):
+    """Test determining template or type categorization target."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    def test_determine_type_target(self):
+        """Test determining type target."""
+        page = pywikibot.Page(self.site, 'Template:Doc')
+        bot = CategoryPreprocess(page, follow_redirects=True)
+        bot.site = self.site
+        new_page = bot.determine_type_target(page)
+        expected = pywikibot.Page(self.site, 'Template:Documentation')
+        self.assertEqual(new_page, expected)
+
+        page = pywikibot.Page(self.site, 'Template:Doc')
+        bot = CategoryPreprocess(page)
+        bot.site = self.site
+        new_page = bot.determine_type_target(page)
+        self.assertEqual(new_page, None)
+
+        page = pywikibot.Page(self.site, 'Template:Baz')
+        bot = CategoryPreprocess(page)
+        bot.site = self.site
+        new_page = bot.determine_type_target(page)
+        self.assertEqual(new_page, None)
+
+    def test_determine_template_target(self):
+        """Test determining template target."""
+        page = pywikibot.Page(self.site, 'Template:Documentation')
+        bot = CategoryPreprocess(page)
+        bot.site = self.site
+        new_page = bot.determine_template_target(page)
+        expected = pywikibot.Page(self.site, 'Template:Documentation/doc')
+        self.assertEqual(new_page, expected)
+        self.assertEqual(bot.includeonly, ['includeonly'])
+
+        page = pywikibot.Page(self.site, 'Template:Branches of chemistry')
+        bot = CategoryPreprocess(page)
+        bot.site = self.site
+        new_page = bot.determine_template_target(page)
+        expected = pywikibot.Page(self.site, 'Template:Branches of chemistry')
+        self.assertEqual(new_page, expected)
+        self.assertEqual(bot.includeonly, [])
 
 
 if __name__ == '__main__':  # pragma: no cover
