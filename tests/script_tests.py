@@ -240,7 +240,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     .format(script_name))
 
             def testScript(self):
-                GLOBAL_ARGS = 'Global arguments available for all'
+                global_args = 'Global arguments available for all'
 
                 cmd = [script_name]
 
@@ -293,7 +293,7 @@ class TestScriptMeta(MetaTestCaseClass):
                                       stderr_other)
                         self.assertNotIn('-help', args)
                     else:
-                        self.assertIn(GLOBAL_ARGS, result['stdout'])
+                        self.assertIn(global_args, result['stdout'])
 
                     exit_codes = [0]
                 else:
@@ -316,7 +316,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 self.assertNotIn('deprecated', result['stderr'].lower())
 
                 # If stdout doesnt include global help..
-                if GLOBAL_ARGS not in result['stdout']:
+                if global_args not in result['stdout']:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', result['stdout'].lower())
                     if result['stdout'] == '':

@@ -550,12 +550,12 @@ class FeaturedBot(pywikibot.Bot):
 
         tosite = dest.site
         add_tl, remove_tl = self.getTemplateList(tosite.code, task)
-        re_Link_add = compile_link(fromsite, add_tl)
-        re_Link_remove = compile_link(fromsite, remove_tl)
+        re_link_add = compile_link(fromsite, add_tl)
+        re_link_remove = compile_link(fromsite, remove_tl)
 
         text = dest.text
-        m1 = add_tl and re_Link_add.search(text)
-        m2 = remove_tl and re_Link_remove.search(text)
+        m1 = add_tl and re_link_add.search(text)
+        m2 = remove_tl and re_link_remove.search(text)
         changed = False
         interactive = self.getOption('interactive')
         if add_tl:
@@ -591,7 +591,7 @@ class FeaturedBot(pywikibot.Bot):
                         u'Connecting %s -> %s. Proceed?'
                         % (source.title(), dest.title()),
                         default=False, automatic_quit=False)):
-                    text = re.sub(re_Link_remove, '', text)
+                    text = re.sub(re_link_remove, '', text)
                     changed = True
             elif task == 'former':
                 pywikibot.output(u"(already removed)")

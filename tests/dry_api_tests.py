@@ -469,11 +469,12 @@ class QueryGenTests(DefaultDrySiteTestCase):
 
     def test_query_constructor(self):
         """Test QueryGenerator constructor."""
-        qGen1 = QueryGenerator(site=self.site,
-                               parameters={'action': 'query', 'meta': 'siteinfo'})
-        qGen2 = QueryGenerator(site=self.site,
-                               parameters={'meta': 'siteinfo'})
-        self.assertCountEqual(qGen1.request._params.items(), qGen2.request._params.items())
+        q_gen1 = QueryGenerator(
+            site=self.site, parameters={'action': 'query', 'meta': 'siteinfo'})
+        q_gen2 = QueryGenerator(
+            site=self.site, parameters={'meta': 'siteinfo'})
+        self.assertCountEqual(
+            q_gen1.request._params.items(), q_gen2.request._params.items())
 
 
 if __name__ == '__main__':  # pragma: no cover

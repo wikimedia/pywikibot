@@ -129,12 +129,12 @@ class OpenArchiveTestCase(TestCase):
     def test_open_archive_without_bz2(self):
         """Test open_archive when bz2 and bz2file are not available."""
         old_bz2 = tools.bz2
-        BZ2_IMPORT_ERROR = ('This is a fake exception message that is '
+        bz2_import_error = ('This is a fake exception message that is '
                             'used when bz2 and bz2file is not importable')
         try:
-            tools.bz2 = ImportError(BZ2_IMPORT_ERROR)
+            tools.bz2 = ImportError(bz2_import_error)
             self.assertRaisesRegex(ImportError,
-                                   BZ2_IMPORT_ERROR,
+                                   bz2_import_error,
                                    self._get_content,
                                    self.base_file + '.bz2')
         finally:
@@ -146,14 +146,13 @@ class OpenArchiveTestCase(TestCase):
 
     def test_open_archive_7z(self):
         """Test open_archive with 7za if installed."""
-        FAILED_TO_OPEN_7ZA = 'Unexpected STDERR output from 7za '
         try:
             subprocess.Popen(['7za'], stdout=subprocess.PIPE).stdout.close()
         except OSError:
             raise unittest.SkipTest('7za not installed')
         self.assertEqual(self._get_content(self.base_file + '.7z'), self.original_content)
         self.assertRaisesRegex(OSError,
-                               FAILED_TO_OPEN_7ZA,
+                               'Unexpected STDERR output from 7za ',
                                self._get_content,
                                self.base_file + '_invalid.7z',
                                use_extension=True)
@@ -207,24 +206,20 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def test_invalid_modes(self):
         """Test various invalid mode configurations."""
-        INVALID_MODE_RA = 'Invalid mode: "ra"'
-        INVALID_MODE_RT = 'Invalid mode: "rt"'
-        INVALID_MODE_BR = 'Invalid mode: "br"'
-        MN_DETECTION_ONLY = 'Magic number detection only when reading'
         self.assertRaisesRegex(ValueError,
-                               INVALID_MODE_RA,
+                               'Invalid mode: "ra"',
                                tools.open_archive,
                                '/dev/null', 'ra')  # two modes besides
         self.assertRaisesRegex(ValueError,
-                               INVALID_MODE_RT,
+                               'Invalid mode: "rt"',
                                tools.open_archive,
                                '/dev/null', 'rt')  # text mode
         self.assertRaisesRegex(ValueError,
-                               INVALID_MODE_BR,
+                               'Invalid mode: "br"',
                                tools.open_archive,
                                '/dev/null', 'br')  # binary at front
         self.assertRaisesRegex(ValueError,
-                               MN_DETECTION_ONLY,
+                               'Magic number detection only when reading',
                                tools.open_archive,
                                '/dev/null', 'wb', False)  # writing without extension
 
@@ -247,9 +242,8 @@ class OpenArchiveWriteTestCase(TestCase):
 
     def test_write_archive_7z(self):
         """Test writing an archive as a 7z archive."""
-        FAILED_TO_WRITE_7Z = 'It is not possible to write a 7z file.'
         self.assertRaisesRegex(NotImplementedError,
-                               FAILED_TO_WRITE_7Z,
+                               'It is not possible to write a 7z file.',
                                tools.open_archive,
                                '/dev/null.7z',
                                mode='wb')
@@ -368,9 +362,8 @@ class TestIsSliceWithEllipsis(TestCase):
 
     def test_accept_only_keyword_marker(self):
         """Test that the only kwargs accepted is 'marker'."""
-        GENERATOR_NOT_CALLABLE = "'generator' object is not callable"
         self.assertRaisesRegex(TypeError,
-                               GENERATOR_NOT_CALLABLE,
+                               "'generator' object is not callable",
                                tools.islice_with_ellipsis(self.it, 1, t=''))
 
 
