@@ -393,8 +393,9 @@ fixes = {
     },
 
     'isbn': {
-        'generator': [r'-search:insource:/nowiki\>ISBN:?(?:&nbsp;| *)[0-9]/',
-                      '-namespace:0'],
+        'generator': [
+            r'-search:insource:/nowiki\>ISBN:? *(?:&nbsp;|&\#160;)? *[0-9]/',
+            '-namespace:0'],
         'regex': True,
         'msg': 'isbn-formatting',  # use i18n translations
         'replacements': [
@@ -424,7 +425,8 @@ fixes = {
             (r'ISBN(?: *|&nbsp;)((\d(-?)){12}\d|(\d(-?)){9}[\dXx])',
              r'ISBN \1'),
             # remove <nowiki /> tags
-            (r'<nowiki>ISBN ([0-9\-xX]+)</nowiki>', r'ISBN \1'),
+            (r'<nowiki>ISBN:? *(?:&nbsp;|&#160;)? *([0-9\-xX]+)</nowiki>',
+             r'ISBN \1'),
         ],
         'exceptions': {
             'inside-tags': [
