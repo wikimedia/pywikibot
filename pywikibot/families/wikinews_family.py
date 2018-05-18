@@ -22,35 +22,31 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'hu', 'sd', 'th',
     ]
 
-    def __init__(self):
-        """Constructor."""
-        self.languages_by_size = [
-            'sr', 'en', 'fr', 'ru', 'de', 'pt', 'pl', 'es', 'it', 'ar', 'zh',
-            'cs', 'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'fa', 'ro', 'tr', 'ja',
-            'sq', 'no', 'eo', 'fi', 'bs', 'ko', 'he', 'bg',
-        ]
+    languages_by_size = [
+        'sr', 'en', 'fr', 'ru', 'de', 'pt', 'pl', 'es', 'it', 'ar', 'zh',
+        'cs', 'ca', 'nl', 'el', 'ta', 'sv', 'uk', 'fa', 'ro', 'tr', 'ja',
+        'sq', 'no', 'eo', 'fi', 'bs', 'ko', 'he', 'bg',
+    ]
 
-        super(Family, self).__init__()
+    category_redirect_templates = {
+        '_default': (),
+        'ar': ('قالب:تحويل تصنيف',),
+        'fa': ('الگو:رده بهتر',),
+        'no': ('Kategoriomdirigering',),
+        'ro': ('Redirect categorie',),
+        'ru': ('Category redirect',),
+        'tr': ('Kategori yönlendirme',),
+        'zh': ('分类重定向',),
+    }
 
-        self.category_redirect_templates = {
-            '_default': (),
-            'ar': ('قالب:تحويل تصنيف',),
-            'fa': ('الگو:رده بهتر',),
-            'no': ('Kategoriomdirigering',),
-            'ro': ('Redirect categorie',),
-            'ru': ('Category redirect',),
-            'tr': ('Kategori yönlendirme',),
-            'zh': ('分类重定向',),
-        }
+    # Global bot allowed languages on
+    # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+    # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
+    cross_allowed = [
+        'ar', 'bg', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he',
+        'ja', 'ko', 'nl', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr',
+        'uk', 'zh',
+    ]
 
-        # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
-        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
-        self.cross_allowed = [
-            'ar', 'bg', 'bs', 'ca', 'cs', 'el', 'en', 'eo', 'fa', 'fi', 'he',
-            'ja', 'ko', 'nl', 'no', 'pt', 'ro', 'sq', 'sr', 'sv', 'ta', 'tr',
-            'uk', 'zh',
-        ]
-
-        # TODO:
-        # Change site_tests.py when wikinews will have doc_subpage.
+    # TODO:
+    # Change site_tests.py when wikinews will have doc_subpage.

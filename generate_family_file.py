@@ -154,17 +154,15 @@ from pywikibot.tools import deprecated
 
 
 class Family(family.Family):
-    def __init__(self):
-        family.Family.__init__(self)
-        self.name = '%(name)s'
-        self.langs = {
+    name = '%(name)s'
+    langs = {
 """.lstrip() % {'url': self.base_url, 'name': self.name})
 
         for k, w in self.wikis.items():
-            f.write("            '%(lang)s': '%(hostname)s',\n"
+            f.write("        '%(lang)s': '%(hostname)s',\n"
                     % {'lang': k, 'hostname': urlparse(w.server).netloc})
 
-        f.write("        }\n\n")
+        f.write('    }\n\n')
         f.write("    def scriptpath(self, code):\n")
         f.write("        return {\n")
 

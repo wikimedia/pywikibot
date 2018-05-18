@@ -17,22 +17,18 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     name = 'wikiversity'
 
-    def __init__(self):
-        """Constructor."""
-        self.languages_by_size = [
-            'de', 'en', 'fr', 'ru', 'it', 'cs', 'beta', 'pt', 'es', 'ar', 'sv',
-            'fi', 'sl', 'el', 'hi', 'ja', 'ko',
-        ]
+    languages_by_size = [
+        'de', 'en', 'fr', 'ru', 'it', 'cs', 'beta', 'pt', 'es', 'ar', 'sv',
+        'fi', 'sl', 'el', 'hi', 'ja', 'ko',
+    ]
 
-        super(Family, self).__init__()
+    category_redirect_templates = {
+        '_default': (),
+        'ar': ('قالب:تحويل تصنيف',),
+        'en': ('Category redirect',),
+    }
 
-        self.category_redirect_templates = {
-            '_default': (),
-            'ar': ('قالب:تحويل تصنيف',),
-            'en': ('Category redirect',),
-        }
-
-        # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
-        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
-        self.cross_allowed = ['ja', 'ko', ]
+    # Global bot allowed languages on
+    # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+    # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
+    cross_allowed = ['ja', 'ko', ]

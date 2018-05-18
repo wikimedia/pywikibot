@@ -23,7 +23,7 @@ from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     deprecated, deprecated_args, issue_deprecation_warning,
-    FrozenDict,
+    FrozenDict, classproperty
 )
 
 PY3 = sys.version_info[0] > 2
@@ -42,869 +42,893 @@ CODE_CHARACTERS = string.ascii_lowercase + string.digits + '-'
 
 class Family(object):
 
-    """Parent class for all wiki families."""
+    """Parent singleton class for all wiki families."""
 
-    def __init__(self):
-        """Constructor."""
-        if not hasattr(self, 'name'):
-            self.name = None
+    def __new__(cls):
+        """Allocator."""
+        if cls is Family:
+            raise TypeError('Base Family class cannot be instantiated; '
+                            'subclass it instead')
 
-        if not hasattr(self, 'langs'):
-            self.langs = {}
+        # Override classproperty
+        cls.instance = super(Family, cls).__new__(cls)
+        # staticmethod is because python 2.7 binds the lambda to the class
+        cls.__new__ = staticmethod(lambda cls: cls.instance)  # shortcut
 
-        # For interwiki sorting order see
-        # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
+        # don't use hasattr() here. consider only the class itself
+        if '__init__' in cls.__dict__:
+            # Initializer deprecated. Families should be immutable and any
+            # instance / class modification should go to allocator (__new__)
+            cls.__init__ = deprecated(cls.__init__)
 
-        # The sorting order by language name from meta
-        # MediaWiki:Interwiki_config-sorting_order-native-languagename
-        self.alphabetic = [
-            'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar',
-            'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av',
-            'ay', 'az', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms',
-            'ba', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo',
-            'bs', 'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny',
-            'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv',
-            'nv', 'dsb', 'dty', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv',
-            'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff',
-            'fur', 'ga', 'gv', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu',
-            'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb',
-            'hr', 'io', 'ig', 'ilo', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os',
-            'xh', 'zu', 'is', 'it', 'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam',
-            'krc', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg',
-            'gom', 'ht', 'ku', 'kj', 'ky', 'mrj', 'lad', 'lbe', 'lez', 'lo',
-            'ltg', 'la', 'lv', 'lb', 'lt', 'lij', 'li', 'ln', 'olo', 'jbo',
-            'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi',
-            'mr', 'xmf', 'arz', 'mzn', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo',
-            'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
-            'new', 'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm',
-            'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
-            'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pms',
-            'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh',
-            'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'se', 'sm', 'sa',
-            'sg', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si',
-            'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn',
-            'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara', 'tt',
-            'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy',
-            'tr', 'azb', 'tk', 'tw', 'tyv', 'udm', 'bug', 'uk', 'ur', 'ug',
-            'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical',
-            'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq',
-            'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
-        ]
+            # Invoke initializer immediately and make initializer no-op.
+            # This is to avoid repeated initializer invokation on repeated
+            # invokations of the metaclass's __call__.
+            cls.instance.__init__()
+            cls.__init__ = lambda self: None  # no-op
 
-        # The revised sorting order by first word from meta
-        # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
-        self.alphabetic_revised = [
-            'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar',
-            'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av',
-            'ay', 'az', 'bjn', 'id', 'ms', 'bm', 'bn', 'zh-min-nan', 'nan',
-            'map-bms', 'jv', 'su', 'ba', 'min', 'be', 'be-tarask', 'bh', 'bcl',
-            'bi', 'bar', 'bo', 'bs', 'br', 'bug', 'bg', 'bxr', 'ca', 'ceb',
-            'cv', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',
-            'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz',
-            'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu',
-            'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'sm',
-            'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'got', 'hak', 'xal',
-            'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'io', 'ig',
-            'ilo', 'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it',
-            'he', 'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw',
-            'ky', 'rn', 'mrj', 'sw', 'kv', 'kg', 'gom', 'ht', 'ku', 'kj',
-            'lad', 'lbe', 'lez', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt',
-            'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai',
-            'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn',
-            'cdo', 'mwl', 'koi', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj',
-            'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih',
-            'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om',
-            'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps',
-            'jam', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa',
-            'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'rue', 'sah',
-            'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
-            'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
-            'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab',
-            'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
-            'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'udm',
-            'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa',
-            'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
-            'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
-        ]
+        return cls.instance
 
-        # Order for fy: alphabetical by code, but y counts as i
-        self.fyinterwiki = self.alphabetic[:]
-        self.fyinterwiki.remove('nb')
-        self.fyinterwiki.sort(key=lambda x:
-                              x.replace("y", "i") + x.count("y") * "!")
+    @classproperty
+    def instance(cls):
+        """Get the singleton instance."""
+        # This is a placeholder to invoke allocator before it's allocated.
+        # Allocator will override this classproperty.
+        return cls()
 
-        # letters that can follow a wikilink and are regarded as part of
-        # this link
-        # This depends on the linktrail setting in LanguageXx.php and on
-        # [[MediaWiki:Linktrail]].
-        # Note: this is a regular expression.
-        self.linktrails = {
-            '_default': u'[a-z]*',
-            'ab': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'als': u'[äöüßa-z]*',
-            'an': u'[a-záéíóúñ]*',
-            'ar': u'[a-zء-ي]*',
-            'ast': u'[a-záéíóúñ]*',
-            'atj': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'arz': u'[a-zء-ي]*',
-            'azb': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
-            'av': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'ay': u'[a-záéíóúñ]*',
-            'bar': u'[äöüßa-z]*',
-            'bat-smg': '[a-ząčęėįšųūž]*',
-            'be': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
-            'be-tarask': u'[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
-            'bg': u'[a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]*',
-            'bm': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'bn': '[ঀ-৿]*',
-            'bpy': '[ঀ-৿]*',
-            'bs': u'[a-zćčžšđž]*',
-            'bxr': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'ca': u'[a-zàèéíòóúç·ïü]*',
-            'cbk-zam': u'[a-záéíóúñ]*',
-            'ce': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'ckb': u'[ئابپتجچحخدرڕزژسشعغفڤقکگلڵمنوۆهھەیێ‌]*',
-            'co': u'[a-zàéèíîìóòúù]*',
-            'crh': u'[a-zâçğıñöşüа-яё“»]*',
-            'cs': u'[a-záčďéěíňóřšťúůýž]*',
-            'csb': u'[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
-            'cu': ('[a-zабвгдеєжѕзїіıићклмнопсстѹфхѡѿцчшщъыьѣюѥѧѩѫѭѯѱѳѷѵґѓђё'
-                   'јйљњќуўџэ҄я“»]*'),
-            'cv': u'[a-zа-яĕçăӳ"»]*',
-            'cy': u'[àáâèéêìíîïòóôûŵŷa-z]*',
-            'da': u'[a-zæøå]*',
-            'de': u'[a-zäöüß]*',
-            'din': '[äëɛɛ̈éɣïŋöɔɔ̈óa-z]*',
-            'dsb': u'[äöüßa-z]*',
-            'el': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέή'
-                   'ίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
-            'eml': u'[a-zàéèíîìóòúù]*',
-            'es': u'[a-záéíóúñ]*',
-            'eu': u'[a-záéíóúñ]*',
-            'et': u'[äöõšüža-z]*',
-            'ext': u'[a-záéíóúñ]*',
-            'fa': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
-            'ff': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'fi': u'[a-zäö]*',
-            'fiu-vro': u'[äöõšüža-z]*',
-            'fo': u'[áðíóúýæøa-z]*',
-            'fr': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'frp': u'[a-zàâçéèêîœôû·’æäåāăëēïīòöōùü‘]*',
-            'frr': u'[a-zäöüßåāđē]*',
-            'fur': u'[a-zàéèíîìóòúù]*',
-            'fy': u'[a-zàáèéìíòóùúâêîôûäëïöü]*',
-            'gag': u'[a-zÇĞçğİıÖöŞşÜüÂâÎîÛû]*',
-            'gl': u'[áâãàéêẽçíòóôõq̃úüűũa-z]*',
-            'glk': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
-            'gn': u'[a-záéíóúñ]*',
-            'gu': u'[઀-૿]*',
-            'he': u'[a-zא-ת]*',
-            'hi': u'[a-zऀ-ॣ०-꣠-ꣿ]*',
-            'hr': u'[čšžćđßa-z]*',
-            'hsb': u'[äöüßa-z]*',
-            'ht': u'[a-zàèòÀÈÒ]*',
-            'hu': u'[a-záéíóúöüőűÁÉÍÓÚÖÜŐŰ]*',
-            'hy': u'[a-zաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆև«»]*',
-            'is': u'[áðéíóúýþæöa-z-–]*',
-            'it': u'[a-zàéèíîìóòúù]*',
-            'ka': u'[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
-            'kbp': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'kk': ('[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһ'
-                   'ٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*'),
-            'kl': u'[a-zæøå]*',
-            'koi': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'krc': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'ksh': u'[a-zäöüėëĳßəğåůæœç]*',
-            'ku': '[a-zçêîşûẍḧÇÊÎŞÛẌḦ]*',
-            'kv': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'lad': u'[a-záéíóúñ]*',
-            'lb': u'[äöüßa-z]*',
-            'lbe': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӀ1“»]*',
-            'lez': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'li': u'[a-zäöüïëéèà]*',
-            'lij': u'[a-zàéèíîìóòúù]*',
-            'lmo': u'[a-zàéèíîìóòúù]*',
-            'ln': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'lrc': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
-            'lt': '[a-ząčęėįšųūž]*',
-            'ltg': u'[a-zA-ZĀāČčĒēĢģĪīĶķĻļŅņŠšŪūŽž]*',
-            'lv': u'[a-zA-ZĀāČčĒēĢģĪīĶķĻļŅņŠšŪūŽž]*',
-            'mai': '[a-zऀ-ॣ०-꣠-ꣿ]*',
-            'mdf': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'mg': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'mhr': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'mk': u'[a-zабвгдѓежзѕијклљмнњопрстќуфхцчџш]*',
-            'ml': u'[a-zം-ൿ]*',
-            'mn': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя“»]*',
-            'mr': u'[ऀ-ॣॱ-ॿ﻿‍]*',
-            'mrj': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'mwl': u'[áâãàéêẽçíòóôõq̃úüűũa-z]*',
-            'myv': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'mzn': u'[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
-            'nah': u'[a-záéíóúñ]*',
-            'nap': u'[a-zàéèíîìóòúù]*',
-            'nds': u'[äöüßa-z]*',
-            'nds-nl': u'[a-zäöüïëéèà]*',
-            'nl': u'[a-zäöüïëéèà]*',
-            'nn': u'[æøåa-z]*',
-            'no': u'[æøåa-z]*',
-            'nrm': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'oc': u'[a-zàâçéèêîôû]*',
-            'olo': '[a-zčČšŠžŽäÄöÖ]*',
-            'or': u'[a-z଀-୿]*',
-            'pa': ('[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾ'
-                   'ਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*'),
-            'pcd': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'pdc': u'[äöüßa-z]*',
-            'pfl': u'[äöüßa-z]*',
-            'pl': u'[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
-            'pms': u'[a-zàéèíîìóòúù]*',
-            'pnt': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ'
-                    'άέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
-            'pt': u'[a-záâãàéêẽçíòóôõq̃úüűũ]*',
-            'qu': u'[a-záéíóúñ]*',
-            'rmy': u'[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
-            'ro': u'[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
-            'roa-rup': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
-            'roa-tara': '[a-zàéèíîìóòúù]*',
-            'ru': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'rue': u'[a-zабвгґдеєжзиіїйклмнопрстуфхцчшщьєюяёъы“»]*',
-            'sa': u'[a-zऀ-ॣ०-꣠-ꣿ]*',
-            'sah': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'scn': u'[a-zàéèíîìóòúù]*',
-            'sg': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'sh': u'[a-zčćđžš]*',
-            'sk': u'[a-záäčďéíľĺňóôŕšťúýž]*',
-            'sl': u'[a-zčćđžš]*',
-            'sr': ('[abvgdđežzijklljmnnjoprstćufhcčdžšабвгдђежзијклљмнњопрстћу'
-                   'фхцчџш]*'),
-            'srn': u'[a-zäöüïëéèà]*',
-            'stq': u'[äöüßa-z]*',
-            'sv': u'[a-zåäöéÅÄÖÉ]*',
-            'szl': u'[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
-            'ta': u'[஀-௿]*',
-            'te': u'[ఁ-౯]*',
-            'tg': u'[a-zабвгдеёжзийклмнопрстуфхчшъэюяғӣқўҳҷцщыь]*',
-            'tk': u'[a-zÄäÇçĞğŇňÖöŞşÜüÝýŽž]*',
-            'tr': u'[a-zÇĞçğİıÖöŞşÜüÂâÎîÛû]*',
-            'tt': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӘәӨөҮүҖҗҢңҺһ]*',
-            'ty': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'tyv': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'udm': u'[a-zа-яёӝӟӥӧӵ]*',
-            'uk': u'[a-zабвгґдеєжзиіїйклмнопрстуфхцчшщьєюяёъы“»]*',
-            'ur': '[ابپتٹثجچحخدڈذر​ڑ​زژسشصضطظعغفقکگل​م​نںوؤہھیئےآأءۃ]*',
-            'uz': u'[a-zʻʼ“»]*',
-            'vec': u'[a-zàéèíîìóòúù]*',
-            'vep': u'[äöõšüža-z]*',
-            'vi': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'vls': u'[a-zäöüïëéèà]*',
-            'wa': u'[a-zåâêîôûçéè]*',
-            'wo': u'[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
-            'xal': u'[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
-            'xmf': u'[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
-            'yi': u'[a-zא-ת]*',
-            'zea': u'[a-zäöüïëéèà]*',
-        }
+    name = None
 
-        # A dictionary where keys are family codes that can be used in
-        # inter-family interwiki links. Do not use it directly but
-        # get_known_families() instead.
+    langs = {}
 
-        # TODO: replace this with API interwikimap call
-        self.known_families = {
-            'abbenormal':       'abbenormal',
-            'acronym':          'acronym',
-            'advisory':         'advisory',
-            'advogato':         'advogato',
-            'aew':              'aew',
-            'airwarfare':       'airwarfare',
-            'aiwiki':           'aiwiki',
-            'allwiki':          'allwiki',
-            'appropedia':       'appropedia',
-            'aquariumwiki':     'aquariumwiki',
-            'arxiv':            'arxiv',
-            'aspienetwiki':     'aspienetwiki',
-            'atmwiki':          'atmwiki',
-            'b':                'wikibooks',
-            'bemi':             'bemi',
-            'benefitswiki':     'benefitswiki',
-            'betawiki':         'betawiki',
-            'betawikiversity':  'betawikiversity',
-            'biblewiki':        'biblewiki',
-            'bluwiki':          'bluwiki',
-            'botwiki':          'botwiki',
-            'boxrec':           'boxrec',
-            'brickwiki':        'brickwiki',
-            'bridgeswiki':      'bridgeswiki',
-            'bugzilla':         'bugzilla',
-            'buzztard':         'buzztard',
-            'bytesmiths':       'bytesmiths',
-            'c2':               'c2',
-            'c2find':           'c2find',
-            'cache':            'cache',
-            'canwiki':          'canwiki',
-            'canyonwiki':       'canyonwiki',
-            'Ĉej':              'Ĉej',
-            'cellwiki':         'cellwiki',
-            'centralwikia':     'centralwikia',
-            'chapter':          'chapter',
-            'chej':             'chej',
-            'choralwiki':       'choralwiki',
-            'ciscavate':        'ciscavate',
-            'citizendium':      'citizendium',
-            'ckwiss':           'ckwiss',
-            'closed-zh-tw':     'closed-zh-tw',
-            'cndbname':         'cndbname',
-            'cndbtitle':        'cndbtitle',
-            'colab':            'colab',
-            'comcom':           'comcom',
-            'comixpedia':       'comixpedia',
-            'commons':          'commons',
-            'communityscheme':  'communityscheme',
-            'comune':           'comune',
-            'consciousness':    'consciousness',
-            'corpknowpedia':    'corpknowpedia',
-            'crazyhacks':       'crazyhacks',
-            'creatureswiki':    'creatureswiki',
-            'cxej':             'cxej',
-            'dawiki':           'dawiki',
-            'dbdump':           'dbdump',
-            'dcc':              'dcc',
-            'dcdatabase':       'dcdatabase',
-            'dcma':             'dcma',
-            'dejanews':         'dejanews',
-            'delicious':        'delicious',
-            'demokraatia':      'demokraatia',
-            'devmo':            'devmo',
-            'dict':             'dict',
-            'dictionary':       'dictionary',
-            'disinfopedia':     'disinfopedia',
-            'distributedproofreaders': 'distributedproofreaders',
-            'distributedproofreadersca': 'distributedproofreadersca',
-            'dk':               'dk',
-            'dmoz':             'dmoz',
-            'dmozs':            'dmozs',
-            'docbook':          'docbook',
-            'doom_wiki':        'doom_wiki',
-            'download':         'download',
-            'drae':             'drae',
-            'dreamhost':        'dreamhost',
-            'drumcorpswiki':    'drumcorpswiki',
-            'dwjwiki':          'dwjwiki',
-            'eĉei':             'eĉei',
-            'echei':            'echei',
-            'ecoreality':       'ecoreality',
-            'ecxei':            'ecxei',
-            'efnetceewiki':     'efnetceewiki',
-            'efnetcppwiki':     'efnetcppwiki',
-            'efnetpythonwiki':  'efnetpythonwiki',
-            'efnetxmlwiki':     'efnetxmlwiki',
-            'elibre':           'elibre',
-            'emacswiki':        'emacswiki',
-            'energiewiki':      'energiewiki',
-            'eokulturcentro':   'eokulturcentro',
-            'epo':              'epo',
-            'ethnologue':       'ethnologue',
-            'evowiki':          'evowiki',
-            'exotica':          'exotica',
-            'fanimutationwiki': 'fanimutationwiki',
-            'finalempire':      'finalempire',
-            'finalfantasy':     'finalfantasy',
-            'finnix':           'finnix',
-            'flickruser':       'flickruser',
-            'floralwiki':       'floralwiki',
-            'flyerwiki-de':     'flyerwiki-de',
-            'foldoc':           'foldoc',
-            'forthfreak':       'forthfreak',
-            'foundation':       'foundation',
-            'foxwiki':          'foxwiki',
-            'freebio':          'freebio',
-            'freebsdman':       'freebsdman',
-            'freeculturewiki':  'freeculturewiki',
-            'freedomdefined':   'freedomdefined',
-            'freefeel':         'freefeel',
-            'freekiwiki':       'freekiwiki',
-            'ganfyd':           'ganfyd',
-            'gausswiki':        'gausswiki',
-            'gentoo-wiki':      'gentoo',
-            'genwiki':          'genwiki',
-            'globalvoices':     'globalvoices',
-            'glossarwiki':      'glossarwiki',
-            'glossarywiki':     'glossarywiki',
-            'golem':            'golem',
-            'google':           'google',
-            'googledefine':     'googledefine',
-            'googlegroups':     'googlegroups',
-            'gotamac':          'gotamac',
-            'greatlakeswiki':   'greatlakeswiki',
-            'guildwiki':        'guildwiki',
-            'gutenberg':        'gutenberg',
-            'gutenbergwiki':    'gutenbergwiki',
-            'h2wiki':           'h2wiki',
-            'hammondwiki':      'hammondwiki',
-            'heroeswiki':       'heroeswiki',
-            'herzkinderwiki':   'herzkinderwiki',
-            'hkmule':           'hkmule',
-            'holshamtraders':   'holshamtraders',
-            'hrfwiki':          'hrfwiki',
-            'hrwiki':           'hrwiki',
-            'humancell':        'humancell',
-            'hupwiki':          'hupwiki',
-            'imdbcharacter':    'imdbcharacter',
-            'imdbcompany':      'imdbcompany',
-            'imdbname':         'imdbname',
-            'imdbtitle':        'imdbtitle',
-            'incubator':        'incubator',
-            'infoanarchy':      'infoanarchy',
-            'infosecpedia':     'infosecpedia',
-            'infosphere':       'infosphere',
-            'iso639-3':         'iso639-3',
-            'iuridictum':       'iuridictum',
-            'jameshoward':      'jameshoward',
-            'javanet':          'javanet',
-            'javapedia':        'javapedia',
-            'jefo':             'jefo',
-            'jiniwiki':         'jiniwiki',
-            'jspwiki':          'jspwiki',
-            'jstor':            'jstor',
-            'kamelo':           'kamelo',
-            'karlsruhe':        'karlsruhe',
-            'kerimwiki':        'kerimwiki',
-            'kinowiki':         'kinowiki',
-            'kmwiki':           'kmwiki',
-            'kontuwiki':        'kontuwiki',
-            'koslarwiki':       'koslarwiki',
-            'kpopwiki':         'kpopwiki',
-            'linguistlist':     'linguistlist',
-            'linuxwiki':        'linuxwiki',
-            'linuxwikide':      'linuxwikide',
-            'liswiki':          'liswiki',
-            'literateprograms': 'literateprograms',
-            'livepedia':        'livepedia',
-            'lojban':           'lojban',
-            'lostpedia':        'lostpedia',
-            'lqwiki':           'lqwiki',
-            'lugkr':            'lugkr',
-            'luxo':             'luxo',
-            'lyricwiki':        'lyricwiki',
-            'm':                'meta',
-            'm-w':              'm-w',
-            'mail':             'mail',
-            'mailarchive':      'mailarchive',
-            'mariowiki':        'mariowiki',
-            'marveldatabase':   'marveldatabase',
-            'meatball':         'meatball',
-            'mediazilla':       'mediazilla',
-            'memoryalpha':      'memoryalpha',
-            'meta':             'meta',
-            'metawiki':         'metawiki',
-            'metawikipedia':    'metawikipedia',
-            'mineralienatlas':  'mineralienatlas',
-            'moinmoin':         'moinmoin',
-            'monstropedia':     'monstropedia',
-            'mosapedia':        'mosapedia',
-            'mozcom':           'mozcom',
-            'mozillawiki':      'mozillawiki',
-            'mozillazinekb':    'mozillazinekb',
-            'musicbrainz':      'musicbrainz',
-            'mw':               'mw',
-            'mwod':             'mwod',
-            'mwot':             'mwot',
-            'n':                'wikinews',
-            'netvillage':       'netvillage',
-            'nkcells':          'nkcells',
-            'nomcom':           'nomcom',
-            'nosmoke':          'nosmoke',
-            'nost':             'nost',
-            'oeis':             'oeis',
-            'oldwikisource':    'oldwikisource',
-            'olpc':             'olpc',
-            'onelook':          'onelook',
-            'openfacts':        'openfacts',
-            'openstreetmap':    'openstreetmap',
-            'openwetware':      'openwetware',
-            'openwiki':         'openwiki',
-            'opera7wiki':       'opera7wiki',
-            'organicdesign':    'organicdesign',
-            'orgpatterns':      'orgpatterns',
-            'orthodoxwiki':     'orthodoxwiki',
-            'osi reference model': 'osi reference model',
-            'otrs':             'otrs',
-            'otrswiki':         'otrswiki',
-            'ourmedia':         'ourmedia',
-            'paganwiki':        'paganwiki',
-            'panawiki':         'panawiki',
-            'pangalacticorg':   'pangalacticorg',
-            'patwiki':          'patwiki',
-            'perlconfwiki':     'perlconfwiki',
-            'perlnet':          'perlnet',
-            'personaltelco':    'personaltelco',
-            'phpwiki':          'phpwiki',
-            'phwiki':           'phwiki',
-            'planetmath':       'planetmath',
-            'pmeg':             'pmeg',
-            'pmwiki':           'pmwiki',
-            'psycle':           'psycle',
-            'purlnet':          'purlnet',
-            'pythoninfo':       'pythoninfo',
-            'pythonwiki':       'pythonwiki',
-            'pywiki':           'pywiki',
-            'q':                'wikiquote',
-            'qcwiki':           'qcwiki',
-            'quality':          'quality',
-            'qwiki':            'qwiki',
-            'r3000':            'r3000',
-            'raec':             'raec',
-            'rakwiki':          'rakwiki',
-            'reuterswiki':      'reuterswiki',
-            'rev':              'rev',
-            'revo':             'revo',
-            'rfc':              'rfc',
-            'rheinneckar':      'rheinneckar',
-            'robowiki':         'robowiki',
-            'rowiki':           'rowiki',
-            's':                'wikisource',
-            's23wiki':          's23wiki',
-            'scholar':          'scholar',
-            'schoolswp':        'schoolswp',
-            'scores':           'scores',
-            'scoutwiki':        'scoutwiki',
-            'scramble':         'scramble',
-            'seapig':           'seapig',
-            'seattlewiki':      'seattlewiki',
-            'seattlewireless':  'seattlewireless',
-            'senseislibrary':   'senseislibrary',
-            'silcode':          'silcode',
-            'slashdot':         'slashdot',
-            'slwiki':           'slwiki',
-            'smikipedia':       'smikipedia',
-            'sourceforge':      'sourceforge',
-            'spcom':            'spcom',
-            'species':          'species',
-            'squeak':           'squeak',
-            'stable':           'stable',
-            'strategywiki':     'strategywiki',
-            'sulutil':          'sulutil',
-            'susning':          'susning',
-            'svgwiki':          'svgwiki',
-            'svn':              'svn',
-            'swinbrain':        'swinbrain',
-            'swingwiki':        'swingwiki',
-            'swtrain':          'swtrain',
-            'tabwiki':          'tabwiki',
-            'takipedia':        'takipedia',
-            'tavi':             'tavi',
-            'tclerswiki':       'tclerswiki',
-            'technorati':       'technorati',
-            'tejo':             'tejo',
-            'tesoltaiwan':      'tesoltaiwan',
-            'testwiki':         'testwiki',
-            'thelemapedia':     'thelemapedia',
-            'theopedia':        'theopedia',
-            'theppn':           'theppn',
-            'thinkwiki':        'thinkwiki',
-            'tibiawiki':        'tibiawiki',
-            'ticket':           'ticket',
-            'tmbw':             'tmbw',
-            'tmnet':            'tmnet',
-            'tmwiki':           'tmwiki',
-            'tokyonights':      'tokyonights',
-            'tools':            'tools',
-            'translatewiki':    'translatewiki',
-            'trash!italia':     'trash!italia',
-            'tswiki':           'tswiki',
-            'turismo':          'turismo',
-            'tviv':             'tviv',
-            'tvtropes':         'tvtropes',
-            'twiki':            'twiki',
-            'twistedwiki':      'twistedwiki',
-            'tyvawiki':         'tyvawiki',
-            'uncyclopedia':     'uncyclopedia',
-            'unreal':           'unreal',
-            'urbandict':        'urbandict',
-            'usej':             'usej',
-            'usemod':           'usemod',
-            'v':                'wikiversity',
-            'valuewiki':        'valuewiki',
-            'veropedia':        'veropedia',
-            'vinismo':          'vinismo',
-            'vkol':             'vkol',
-            'vlos':             'vlos',
-            'voipinfo':         'voipinfo',
-            'voy':              'wikivoyage',
-            'w':                'wikipedia',
-            'warpedview':       'warpedview',
-            'webdevwikinl':     'webdevwikinl',
-            'webisodes':        'webisodes',
-            'webseitzwiki':     'webseitzwiki',
-            'wg':               'wg',
-            'wiki':             'wiki',
-            'wikia':            'wikia',
-            'wikianso':         'wikianso',
-            'wikiasite':        'wikiasite',
-            'wikible':          'wikible',
-            'wikibooks':        'wikibooks',
-            'wikichat':         'wikichat',
-            'wikichristian':    'wikichristian',
-            'wikicities':       'wikicities',
-            'wikicity':         'wikicity',
-            'wikif1':           'wikif1',
-            'wikifur':          'wikifur',
-            'wikihow':          'wikihow',
-            'wikiindex':        'wikiindex',
-            'wikilemon':        'wikilemon',
-            'wikilivres':       'wikilivres',
-            'wikimac-de':       'wikimac-de',
-            'wikimac-fr':       'wikimac-fr',
-            'wikimedia':        'wikimedia',
-            'wikinews':         'wikinews',
-            'wikinfo':          'wikinfo',
-            'wikinurse':        'wikinurse',
-            'wikinvest':        'wikinvest',
-            'wikipaltz':        'wikipaltz',
-            'wikipedia':        'wikipedia',
-            'wikipediawikipedia': 'wikipediawikipedia',
-            'wikiquote':        'wikiquote',
-            'wikireason':       'wikireason',
-            'wikischool':       'wikischool',
-            'wikisophia':       'wikisophia',
-            'wikisource':       'wikisource',
-            'wikispecies':      'wikispecies',
-            'wikispot':         'wikispot',
-            'wikiti':           'wikiti',
-            'wikitravel':       'wikitravel',
-            'wikitree':         'wikitree',
-            'wikiversity':      'wikiversity',
-            'wikiwikiweb':      'wikiwikiweb',
-            'wikt':             'wiktionary',
-            'wiktionary':       'wiktionary',
-            'wipipedia':        'wipipedia',
-            'wlug':             'wlug',
-            'wm2005':           'wm2005',
-            'wm2006':           'wm2006',
-            'wm2007':           'wm2007',
-            'wm2008':           'wm2008',
-            'wm2009':           'wm2009',
-            'wm2010':           'wm2010',
-            'wm2011':           'wm2011',
-            'wm2012':           'wm2012',
-            'wm2013':           'wm2013',
-            'wm2014':           'wm2014',
-            'wm2015':           'wm2015',
-            'wm2016':           'wm2016',
-            'wm2017':           'wm2017',
-            'wm2018':           'wm2018',
-            'wmania':           'wmania',
-            'wmcz':             'wmcz',
-            'wmf':              'wmf',
-            'wmrs':             'wmrs',
-            'wmse':             'wmse',
-            'wookieepedia':     'wookieepedia',
-            'world66':          'world66',
-            'wowwiki':          'wowwiki',
-            'wqy':              'wqy',
-            'wurmpedia':        'wurmpedia',
-            'wznan':            'wznan',
-            'xboxic':           'xboxic',
-            'zh-cfr':           'zh-cfr',
-            'zrhwiki':          'zrhwiki',
-            'zum':              'zum',
-            'zwiki':            'zwiki',
-            'zzz wiki':         'zzz wiki',
-        }
+    # For interwiki sorting order see
+    # https://meta.wikimedia.org/wiki/Interwiki_sorting_order
 
-        # A list of category redirect template names in different languages
-        self.category_redirect_templates = {
-            '_default': []
-        }
+    # The sorting order by language name from meta
+    # MediaWiki:Interwiki_config-sorting_order-native-languagename
+    alphabetic = [
+        'ace', 'kbd', 'ady', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar',
+        'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av',
+        'ay', 'az', 'bm', 'bn', 'bjn', 'zh-min-nan', 'nan', 'map-bms',
+        'ba', 'be', 'be-tarask', 'bh', 'bcl', 'bi', 'bg', 'bar', 'bo',
+        'bs', 'br', 'bxr', 'ca', 'cv', 'ceb', 'cs', 'ch', 'cbk-zam', 'ny',
+        'sn', 'tum', 'cho', 'co', 'cy', 'da', 'dk', 'pdc', 'de', 'dv',
+        'nv', 'dsb', 'dty', 'dz', 'mh', 'et', 'el', 'eml', 'en', 'myv',
+        'es', 'eo', 'ext', 'eu', 'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff',
+        'fur', 'ga', 'gv', 'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu',
+        'got', 'hak', 'xal', 'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb',
+        'hr', 'io', 'ig', 'ilo', 'bpy', 'id', 'ia', 'ie', 'iu', 'ik', 'os',
+        'xh', 'zu', 'is', 'it', 'he', 'jv', 'kbp', 'kl', 'kn', 'kr', 'pam',
+        'krc', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw', 'rn', 'sw', 'kv', 'kg',
+        'gom', 'ht', 'ku', 'kj', 'ky', 'mrj', 'lad', 'lbe', 'lez', 'lo',
+        'ltg', 'la', 'lv', 'lb', 'lt', 'lij', 'li', 'ln', 'olo', 'jbo',
+        'lg', 'lmo', 'lrc', 'hu', 'mai', 'mk', 'mg', 'ml', 'mt', 'mi',
+        'mr', 'xmf', 'arz', 'mzn', 'ms', 'min', 'cdo', 'mwl', 'mdf', 'mo',
+        'mn', 'mus', 'my', 'nah', 'na', 'fj', 'nl', 'nds-nl', 'cr', 'ne',
+        'new', 'ja', 'nap', 'ce', 'frr', 'pih', 'no', 'nb', 'nn', 'nrm',
+        'nov', 'ii', 'oc', 'mhr', 'or', 'om', 'ng', 'hz', 'uz', 'pa', 'pi',
+        'pfl', 'pag', 'pnb', 'pap', 'ps', 'jam', 'koi', 'km', 'pcd', 'pms',
+        'tpi', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa', 'crh', 'ty', 'ksh',
+        'ro', 'rmy', 'rm', 'qu', 'rue', 'ru', 'sah', 'se', 'sm', 'sa',
+        'sg', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq', 'scn', 'si',
+        'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so', 'ckb', 'srn',
+        'sr', 'sh', 'su', 'fi', 'sv', 'tl', 'ta', 'kab', 'roa-tara', 'tt',
+        'te', 'tet', 'th', 'ti', 'tg', 'to', 'chr', 'chy', 've', 'tcy',
+        'tr', 'azb', 'tk', 'tw', 'tyv', 'udm', 'bug', 'uk', 'ur', 'ug',
+        'za', 'vec', 'vep', 'vi', 'vo', 'fiu-vro', 'wa', 'zh-classical',
+        'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo', 'zh-yue', 'diq',
+        'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+    ]
 
-        # A list of languages that use hard (not soft) category redirects
-        self.use_hard_category_redirects = []
+    # The revised sorting order by first word from meta
+    # MediaWiki:Interwiki_config-sorting_order-native-languagename-firstword
+    alphabetic_revised = [
+        'ace', 'ady', 'kbd', 'af', 'ak', 'als', 'am', 'ang', 'ab', 'ar',
+        'an', 'arc', 'roa-rup', 'frp', 'as', 'ast', 'atj', 'gn', 'av',
+        'ay', 'az', 'bjn', 'id', 'ms', 'bm', 'bn', 'zh-min-nan', 'nan',
+        'map-bms', 'jv', 'su', 'ba', 'min', 'be', 'be-tarask', 'bh', 'bcl',
+        'bi', 'bar', 'bo', 'bs', 'br', 'bug', 'bg', 'bxr', 'ca', 'ceb',
+        'cv', 'cs', 'ch', 'cbk-zam', 'ny', 'sn', 'tum', 'cho', 'co', 'cy',
+        'da', 'dk', 'pdc', 'de', 'dv', 'nv', 'dsb', 'na', 'dty', 'dz',
+        'mh', 'et', 'el', 'eml', 'en', 'myv', 'es', 'eo', 'ext', 'eu',
+        'ee', 'fa', 'hif', 'fo', 'fr', 'fy', 'ff', 'fur', 'ga', 'gv', 'sm',
+        'gag', 'gd', 'gl', 'gan', 'ki', 'glk', 'gu', 'got', 'hak', 'xal',
+        'ko', 'ha', 'haw', 'hy', 'hi', 'ho', 'hsb', 'hr', 'io', 'ig',
+        'ilo', 'bpy', 'ia', 'ie', 'iu', 'ik', 'os', 'xh', 'zu', 'is', 'it',
+        'he', 'kl', 'kn', 'kr', 'pam', 'ka', 'ks', 'csb', 'kk', 'kw', 'rw',
+        'ky', 'rn', 'mrj', 'sw', 'kv', 'kg', 'gom', 'ht', 'ku', 'kj',
+        'lad', 'lbe', 'lez', 'lo', 'la', 'ltg', 'lv', 'to', 'lb', 'lt',
+        'lij', 'li', 'ln', 'olo', 'jbo', 'lg', 'lmo', 'lrc', 'hu', 'mai',
+        'mk', 'mg', 'ml', 'krc', 'mt', 'mi', 'mr', 'xmf', 'arz', 'mzn',
+        'cdo', 'mwl', 'koi', 'mdf', 'mo', 'mn', 'mus', 'my', 'nah', 'fj',
+        'nl', 'nds-nl', 'cr', 'ne', 'new', 'ja', 'nap', 'ce', 'frr', 'pih',
+        'no', 'nb', 'nn', 'nrm', 'nov', 'ii', 'oc', 'mhr', 'or', 'om',
+        'ng', 'hz', 'uz', 'pa', 'pi', 'pfl', 'pag', 'pnb', 'pap', 'ps',
+        'jam', 'km', 'pcd', 'pms', 'nds', 'pl', 'pnt', 'pt', 'aa', 'kaa',
+        'crh', 'ty', 'ksh', 'ro', 'rmy', 'rm', 'qu', 'ru', 'rue', 'sah',
+        'se', 'sa', 'sg', 'sc', 'sco', 'stq', 'st', 'nso', 'tn', 'sq',
+        'scn', 'si', 'simple', 'sd', 'ss', 'sk', 'sl', 'cu', 'szl', 'so',
+        'ckb', 'srn', 'sr', 'sh', 'fi', 'sv', 'tl', 'ta', 'kab',
+        'roa-tara', 'tt', 'te', 'tet', 'th', 'vi', 'ti', 'tg', 'tpi',
+        'chr', 'chy', 've', 'tcy', 'tr', 'azb', 'tk', 'tw', 'tyv', 'udm',
+        'uk', 'ur', 'ug', 'za', 'vec', 'vep', 'vo', 'fiu-vro', 'wa',
+        'zh-classical', 'vls', 'war', 'wo', 'wuu', 'ts', 'yi', 'yo',
+        'zh-yue', 'diq', 'zea', 'bat-smg', 'zh', 'zh-tw', 'zh-cn',
+    ]
 
-        # A list of disambiguation template names in different languages
-        self.disambiguationTemplates = {
-            '_default': []
-        }
+    # Order for fy: alphabetical by code, but y counts as i
+    fyinterwiki = alphabetic[:]
+    fyinterwiki.remove('nb')
+    fyinterwiki.sort(key=lambda x:
+                     x.replace('y', 'i') + x.count('y') * '!')
 
-        # A dict of tuples for different sites with names of templates
-        # that indicate an edit should be avoided
-        self.edit_restricted_templates = {}
+    # letters that can follow a wikilink and are regarded as part of
+    # this link
+    # This depends on the linktrail setting in LanguageXx.php and on
+    # [[MediaWiki:Linktrail]].
+    # Note: this is a regular expression.
+    linktrails = {
+        '_default': '[a-z]*',
+        'ab': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'als': '[äöüßa-z]*',
+        'an': '[a-záéíóúñ]*',
+        'ar': '[a-zء-ي]*',
+        'ast': '[a-záéíóúñ]*',
+        'atj': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'arz': '[a-zء-ي]*',
+        'azb': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+        'av': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'ay': '[a-záéíóúñ]*',
+        'bar': '[äöüßa-z]*',
+        'bat-smg': '[a-ząčęėįšųūž]*',
+        'be': '[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
+        'be-tarask': '[абвгґджзеёжзійклмнопрстуўфхцчшыьэюяćčłńśšŭźža-z]*',
+        'bg': '[a-zабвгдежзийклмнопрстуфхцчшщъыьэюя]*',
+        'bm': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'bn': '[ঀ-৿]*',
+        'bpy': '[ঀ-৿]*',
+        'bs': '[a-zćčžšđž]*',
+        'bxr': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'ca': '[a-zàèéíòóúç·ïü]*',
+        'cbk-zam': '[a-záéíóúñ]*',
+        'ce': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'ckb': '[ئابپتجچحخدرڕزژسشعغفڤقکگلڵمنوۆهھەیێ‌]*',
+        'co': '[a-zàéèíîìóòúù]*',
+        'crh': '[a-zâçğıñöşüа-яё“»]*',
+        'cs': '[a-záčďéěíňóřšťúůýž]*',
+        'csb': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
+        'cu': ('[a-zабвгдеєжѕзїіıићклмнопсстѹфхѡѿцчшщъыьѣюѥѧѩѫѭѯѱѳѷѵґѓђё'
+               'јйљњќуўџэ҄я“»]*'),
+        'cv': '[a-zа-яĕçăӳ"»]*',
+        'cy': '[àáâèéêìíîïòóôûŵŷa-z]*',
+        'da': '[a-zæøå]*',
+        'de': '[a-zäöüß]*',
+        'din': '[äëɛɛ̈éɣïŋöɔɔ̈óa-z]*',
+        'dsb': '[äöüßa-z]*',
+        'el': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩάέή'
+               'ίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
+        'eml': '[a-zàéèíîìóòúù]*',
+        'es': '[a-záéíóúñ]*',
+        'eu': '[a-záéíóúñ]*',
+        'et': '[äöõšüža-z]*',
+        'ext': '[a-záéíóúñ]*',
+        'fa': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+        'ff': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'fi': '[a-zäö]*',
+        'fiu-vro': '[äöõšüža-z]*',
+        'fo': '[áðíóúýæøa-z]*',
+        'fr': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'frp': '[a-zàâçéèêîœôû·’æäåāăëēïīòöōùü‘]*',
+        'frr': '[a-zäöüßåāđē]*',
+        'fur': '[a-zàéèíîìóòúù]*',
+        'fy': '[a-zàáèéìíòóùúâêîôûäëïöü]*',
+        'gag': '[a-zÇĞçğİıÖöŞşÜüÂâÎîÛû]*',
+        'gl': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
+        'glk': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+        'gn': '[a-záéíóúñ]*',
+        'gu': '[઀-૿]*',
+        'he': '[a-zא-ת]*',
+        'hi': '[a-zऀ-ॣ०-꣠-ꣿ]*',
+        'hr': '[čšžćđßa-z]*',
+        'hsb': '[äöüßa-z]*',
+        'ht': '[a-zàèòÀÈÒ]*',
+        'hu': '[a-záéíóúöüőűÁÉÍÓÚÖÜŐŰ]*',
+        'hy': '[a-zաբգդեզէըթժիլխծկհձղճմյնշոչպջռսվտրցւփքօֆև«»]*',
+        'is': '[áðéíóúýþæöa-z-–]*',
+        'it': '[a-zàéèíîìóòúù]*',
+        'ka': '[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
+        'kbp': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'kk': ('[a-zäçéğıïñöşüýʺʹа-яёәғіқңөұүһ'
+               'ٴابپتجحدرزسشعفقكلمنڭەوۇۋۆىيچھ“»]*'),
+        'kl': '[a-zæøå]*',
+        'koi': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'krc': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'ksh': '[a-zäöüėëĳßəğåůæœç]*',
+        'ku': '[a-zçêîşûẍḧÇÊÎŞÛẌḦ]*',
+        'kv': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'lad': '[a-záéíóúñ]*',
+        'lb': '[äöüßa-z]*',
+        'lbe': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӀ1“»]*',
+        'lez': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'li': '[a-zäöüïëéèà]*',
+        'lij': '[a-zàéèíîìóòúù]*',
+        'lmo': '[a-zàéèíîìóòúù]*',
+        'ln': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'lrc': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+        'lt': '[a-ząčęėįšųūž]*',
+        'ltg': '[a-zA-ZĀāČčĒēĢģĪīĶķĻļŅņŠšŪūŽž]*',
+        'lv': '[a-zA-ZĀāČčĒēĢģĪīĶķĻļŅņŠšŪūŽž]*',
+        'mai': '[a-zऀ-ॣ०-꣠-ꣿ]*',
+        'mdf': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'mg': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'mhr': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'mk': '[a-zабвгдѓежзѕијклљмнњопрстќуфхцчџш]*',
+        'ml': '[a-zം-ൿ]*',
+        'mn': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя“»]*',
+        'mr': '[ऀ-ॣॱ-ॿ﻿‍]*',
+        'mrj': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'mwl': '[áâãàéêẽçíòóôõq̃úüűũa-z]*',
+        'myv': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'mzn': '[ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیآأئؤة‌]*',
+        'nah': '[a-záéíóúñ]*',
+        'nap': '[a-zàéèíîìóòúù]*',
+        'nds': '[äöüßa-z]*',
+        'nds-nl': '[a-zäöüïëéèà]*',
+        'nl': '[a-zäöüïëéèà]*',
+        'nn': '[æøåa-z]*',
+        'no': '[æøåa-z]*',
+        'nrm': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'oc': '[a-zàâçéèêîôû]*',
+        'olo': '[a-zčČšŠžŽäÄöÖ]*',
+        'or': '[a-z଀-୿]*',
+        'pa': ('[ਁਂਃਅਆਇਈਉਊਏਐਓਔਕਖਗਘਙਚਛਜਝਞਟਠਡਢਣਤਥਦਧਨਪਫਬਭਮਯਰਲਲ਼ਵਸ਼ਸਹ਼ਾ'
+               'ਿੀੁੂੇੈੋੌ੍ਖ਼ਗ਼ਜ਼ੜਫ਼ੰੱੲੳa-z]*'),
+        'pcd': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'pdc': '[äöüßa-z]*',
+        'pfl': '[äöüßa-z]*',
+        'pl': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
+        'pms': '[a-zàéèíîìóòúù]*',
+        'pnt': ('[a-zαβγδεζηθικλμνξοπρστυφχψωςΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ'
+                'άέήίόύώϊϋΐΰΆΈΉΊΌΎΏΪΫ]*'),
+        'pt': '[a-záâãàéêẽçíòóôõq̃úüűũ]*',
+        'qu': '[a-záéíóúñ]*',
+        'rmy': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
+        'ro': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
+        'roa-rup': '[a-zăâîşţșțĂÂÎŞŢȘȚ]*',
+        'roa-tara': '[a-zàéèíîìóòúù]*',
+        'ru': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'rue': '[a-zабвгґдеєжзиіїйклмнопрстуфхцчшщьєюяёъы“»]*',
+        'sa': '[a-zऀ-ॣ०-꣠-ꣿ]*',
+        'sah': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'scn': '[a-zàéèíîìóòúù]*',
+        'sg': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'sh': '[a-zčćđžš]*',
+        'sk': '[a-záäčďéíľĺňóôŕšťúýž]*',
+        'sl': '[a-zčćđžš]*',
+        'sr': ('[abvgdđežzijklljmnnjoprstćufhcčdžšабвгдђежзијклљмнњопрстћу'
+               'фхцчџш]*'),
+        'srn': '[a-zäöüïëéèà]*',
+        'stq': '[äöüßa-z]*',
+        'sv': '[a-zåäöéÅÄÖÉ]*',
+        'szl': '[a-zęóąśłżźćńĘÓĄŚŁŻŹĆŃ]*',
+        'ta': '[஀-௿]*',
+        'te': '[ఁ-౯]*',
+        'tg': '[a-zабвгдеёжзийклмнопрстуфхчшъэюяғӣқўҳҷцщыь]*',
+        'tk': '[a-zÄäÇçĞğŇňÖöŞşÜüÝýŽž]*',
+        'tr': '[a-zÇĞçğİıÖöŞşÜüÂâÎîÛû]*',
+        'tt': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюяӘәӨөҮүҖҗҢңҺһ]*',
+        'ty': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'tyv': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'udm': '[a-zа-яёӝӟӥӧӵ]*',
+        'uk': '[a-zабвгґдеєжзиіїйклмнопрстуфхцчшщьєюяёъы“»]*',
+        'ur': '[ابپتٹثجچحخدڈذر​ڑ​زژسشصضطظعغفقکگل​م​نںوؤہھیئےآأءۃ]*',
+        'uz': '[a-zʻʼ“»]*',
+        'vec': '[a-zàéèíîìóòúù]*',
+        'vep': '[äöõšüža-z]*',
+        'vi': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'vls': '[a-zäöüïëéèà]*',
+        'wa': '[a-zåâêîôûçéè]*',
+        'wo': '[a-zàâçéèêîôûäëïöüùÇÉÂÊÎÔÛÄËÏÖÜÀÈÙ]*',
+        'xal': '[a-zабвгдеёжзийклмнопрстуфхцчшщъыьэюя]*',
+        'xmf': '[a-zაბგდევზთიკლმნოპჟრსტუფქღყშჩცძწჭხჯჰ“»]*',
+        'yi': '[a-zא-ת]*',
+        'zea': '[a-zäöüïëéèà]*',
+    }
 
-        # A dict of tuples for different sites with names of archive
-        # templates that indicate an edit of non-archive bots
-        # should be avoided
-        self.archived_page_templates = {}
+    # A dictionary where keys are family codes that can be used in
+    # inter-family interwiki links. Do not use it directly but
+    # get_known_families() instead.
 
-        # A list of projects that share cross-project sessions.
-        if not hasattr(self, 'cross_projects'):
-            self.cross_projects = []
+    # TODO: replace this with API interwikimap call
+    known_families = {
+        'abbenormal':       'abbenormal',
+        'acronym':          'acronym',
+        'advisory':         'advisory',
+        'advogato':         'advogato',
+        'aew':              'aew',
+        'airwarfare':       'airwarfare',
+        'aiwiki':           'aiwiki',
+        'allwiki':          'allwiki',
+        'appropedia':       'appropedia',
+        'aquariumwiki':     'aquariumwiki',
+        'arxiv':            'arxiv',
+        'aspienetwiki':     'aspienetwiki',
+        'atmwiki':          'atmwiki',
+        'b':                'wikibooks',
+        'bemi':             'bemi',
+        'benefitswiki':     'benefitswiki',
+        'betawiki':         'betawiki',
+        'betawikiversity':  'betawikiversity',
+        'biblewiki':        'biblewiki',
+        'bluwiki':          'bluwiki',
+        'botwiki':          'botwiki',
+        'boxrec':           'boxrec',
+        'brickwiki':        'brickwiki',
+        'bridgeswiki':      'bridgeswiki',
+        'bugzilla':         'bugzilla',
+        'buzztard':         'buzztard',
+        'bytesmiths':       'bytesmiths',
+        'c2':               'c2',
+        'c2find':           'c2find',
+        'cache':            'cache',
+        'canwiki':          'canwiki',
+        'canyonwiki':       'canyonwiki',
+        'Ĉej':              'Ĉej',
+        'cellwiki':         'cellwiki',
+        'centralwikia':     'centralwikia',
+        'chapter':          'chapter',
+        'chej':             'chej',
+        'choralwiki':       'choralwiki',
+        'ciscavate':        'ciscavate',
+        'citizendium':      'citizendium',
+        'ckwiss':           'ckwiss',
+        'closed-zh-tw':     'closed-zh-tw',
+        'cndbname':         'cndbname',
+        'cndbtitle':        'cndbtitle',
+        'colab':            'colab',
+        'comcom':           'comcom',
+        'comixpedia':       'comixpedia',
+        'commons':          'commons',
+        'communityscheme':  'communityscheme',
+        'comune':           'comune',
+        'consciousness':    'consciousness',
+        'corpknowpedia':    'corpknowpedia',
+        'crazyhacks':       'crazyhacks',
+        'creatureswiki':    'creatureswiki',
+        'cxej':             'cxej',
+        'dawiki':           'dawiki',
+        'dbdump':           'dbdump',
+        'dcc':              'dcc',
+        'dcdatabase':       'dcdatabase',
+        'dcma':             'dcma',
+        'dejanews':         'dejanews',
+        'delicious':        'delicious',
+        'demokraatia':      'demokraatia',
+        'devmo':            'devmo',
+        'dict':             'dict',
+        'dictionary':       'dictionary',
+        'disinfopedia':     'disinfopedia',
+        'distributedproofreaders': 'distributedproofreaders',
+        'distributedproofreadersca': 'distributedproofreadersca',
+        'dk':               'dk',
+        'dmoz':             'dmoz',
+        'dmozs':            'dmozs',
+        'docbook':          'docbook',
+        'doom_wiki':        'doom_wiki',
+        'download':         'download',
+        'drae':             'drae',
+        'dreamhost':        'dreamhost',
+        'drumcorpswiki':    'drumcorpswiki',
+        'dwjwiki':          'dwjwiki',
+        'eĉei':             'eĉei',
+        'echei':            'echei',
+        'ecoreality':       'ecoreality',
+        'ecxei':            'ecxei',
+        'efnetceewiki':     'efnetceewiki',
+        'efnetcppwiki':     'efnetcppwiki',
+        'efnetpythonwiki':  'efnetpythonwiki',
+        'efnetxmlwiki':     'efnetxmlwiki',
+        'elibre':           'elibre',
+        'emacswiki':        'emacswiki',
+        'energiewiki':      'energiewiki',
+        'eokulturcentro':   'eokulturcentro',
+        'epo':              'epo',
+        'ethnologue':       'ethnologue',
+        'evowiki':          'evowiki',
+        'exotica':          'exotica',
+        'fanimutationwiki': 'fanimutationwiki',
+        'finalempire':      'finalempire',
+        'finalfantasy':     'finalfantasy',
+        'finnix':           'finnix',
+        'flickruser':       'flickruser',
+        'floralwiki':       'floralwiki',
+        'flyerwiki-de':     'flyerwiki-de',
+        'foldoc':           'foldoc',
+        'forthfreak':       'forthfreak',
+        'foundation':       'foundation',
+        'foxwiki':          'foxwiki',
+        'freebio':          'freebio',
+        'freebsdman':       'freebsdman',
+        'freeculturewiki':  'freeculturewiki',
+        'freedomdefined':   'freedomdefined',
+        'freefeel':         'freefeel',
+        'freekiwiki':       'freekiwiki',
+        'ganfyd':           'ganfyd',
+        'gausswiki':        'gausswiki',
+        'gentoo-wiki':      'gentoo',
+        'genwiki':          'genwiki',
+        'globalvoices':     'globalvoices',
+        'glossarwiki':      'glossarwiki',
+        'glossarywiki':     'glossarywiki',
+        'golem':            'golem',
+        'google':           'google',
+        'googledefine':     'googledefine',
+        'googlegroups':     'googlegroups',
+        'gotamac':          'gotamac',
+        'greatlakeswiki':   'greatlakeswiki',
+        'guildwiki':        'guildwiki',
+        'gutenberg':        'gutenberg',
+        'gutenbergwiki':    'gutenbergwiki',
+        'h2wiki':           'h2wiki',
+        'hammondwiki':      'hammondwiki',
+        'heroeswiki':       'heroeswiki',
+        'herzkinderwiki':   'herzkinderwiki',
+        'hkmule':           'hkmule',
+        'holshamtraders':   'holshamtraders',
+        'hrfwiki':          'hrfwiki',
+        'hrwiki':           'hrwiki',
+        'humancell':        'humancell',
+        'hupwiki':          'hupwiki',
+        'imdbcharacter':    'imdbcharacter',
+        'imdbcompany':      'imdbcompany',
+        'imdbname':         'imdbname',
+        'imdbtitle':        'imdbtitle',
+        'incubator':        'incubator',
+        'infoanarchy':      'infoanarchy',
+        'infosecpedia':     'infosecpedia',
+        'infosphere':       'infosphere',
+        'iso639-3':         'iso639-3',
+        'iuridictum':       'iuridictum',
+        'jameshoward':      'jameshoward',
+        'javanet':          'javanet',
+        'javapedia':        'javapedia',
+        'jefo':             'jefo',
+        'jiniwiki':         'jiniwiki',
+        'jspwiki':          'jspwiki',
+        'jstor':            'jstor',
+        'kamelo':           'kamelo',
+        'karlsruhe':        'karlsruhe',
+        'kerimwiki':        'kerimwiki',
+        'kinowiki':         'kinowiki',
+        'kmwiki':           'kmwiki',
+        'kontuwiki':        'kontuwiki',
+        'koslarwiki':       'koslarwiki',
+        'kpopwiki':         'kpopwiki',
+        'linguistlist':     'linguistlist',
+        'linuxwiki':        'linuxwiki',
+        'linuxwikide':      'linuxwikide',
+        'liswiki':          'liswiki',
+        'literateprograms': 'literateprograms',
+        'livepedia':        'livepedia',
+        'lojban':           'lojban',
+        'lostpedia':        'lostpedia',
+        'lqwiki':           'lqwiki',
+        'lugkr':            'lugkr',
+        'luxo':             'luxo',
+        'lyricwiki':        'lyricwiki',
+        'm':                'meta',
+        'm-w':              'm-w',
+        'mail':             'mail',
+        'mailarchive':      'mailarchive',
+        'mariowiki':        'mariowiki',
+        'marveldatabase':   'marveldatabase',
+        'meatball':         'meatball',
+        'mediazilla':       'mediazilla',
+        'memoryalpha':      'memoryalpha',
+        'meta':             'meta',
+        'metawiki':         'metawiki',
+        'metawikipedia':    'metawikipedia',
+        'mineralienatlas':  'mineralienatlas',
+        'moinmoin':         'moinmoin',
+        'monstropedia':     'monstropedia',
+        'mosapedia':        'mosapedia',
+        'mozcom':           'mozcom',
+        'mozillawiki':      'mozillawiki',
+        'mozillazinekb':    'mozillazinekb',
+        'musicbrainz':      'musicbrainz',
+        'mw':               'mw',
+        'mwod':             'mwod',
+        'mwot':             'mwot',
+        'n':                'wikinews',
+        'netvillage':       'netvillage',
+        'nkcells':          'nkcells',
+        'nomcom':           'nomcom',
+        'nosmoke':          'nosmoke',
+        'nost':             'nost',
+        'oeis':             'oeis',
+        'oldwikisource':    'oldwikisource',
+        'olpc':             'olpc',
+        'onelook':          'onelook',
+        'openfacts':        'openfacts',
+        'openstreetmap':    'openstreetmap',
+        'openwetware':      'openwetware',
+        'openwiki':         'openwiki',
+        'opera7wiki':       'opera7wiki',
+        'organicdesign':    'organicdesign',
+        'orgpatterns':      'orgpatterns',
+        'orthodoxwiki':     'orthodoxwiki',
+        'osi reference model': 'osi reference model',
+        'otrs':             'otrs',
+        'otrswiki':         'otrswiki',
+        'ourmedia':         'ourmedia',
+        'paganwiki':        'paganwiki',
+        'panawiki':         'panawiki',
+        'pangalacticorg':   'pangalacticorg',
+        'patwiki':          'patwiki',
+        'perlconfwiki':     'perlconfwiki',
+        'perlnet':          'perlnet',
+        'personaltelco':    'personaltelco',
+        'phpwiki':          'phpwiki',
+        'phwiki':           'phwiki',
+        'planetmath':       'planetmath',
+        'pmeg':             'pmeg',
+        'pmwiki':           'pmwiki',
+        'psycle':           'psycle',
+        'purlnet':          'purlnet',
+        'pythoninfo':       'pythoninfo',
+        'pythonwiki':       'pythonwiki',
+        'pywiki':           'pywiki',
+        'q':                'wikiquote',
+        'qcwiki':           'qcwiki',
+        'quality':          'quality',
+        'qwiki':            'qwiki',
+        'r3000':            'r3000',
+        'raec':             'raec',
+        'rakwiki':          'rakwiki',
+        'reuterswiki':      'reuterswiki',
+        'rev':              'rev',
+        'revo':             'revo',
+        'rfc':              'rfc',
+        'rheinneckar':      'rheinneckar',
+        'robowiki':         'robowiki',
+        'rowiki':           'rowiki',
+        's':                'wikisource',
+        's23wiki':          's23wiki',
+        'scholar':          'scholar',
+        'schoolswp':        'schoolswp',
+        'scores':           'scores',
+        'scoutwiki':        'scoutwiki',
+        'scramble':         'scramble',
+        'seapig':           'seapig',
+        'seattlewiki':      'seattlewiki',
+        'seattlewireless':  'seattlewireless',
+        'senseislibrary':   'senseislibrary',
+        'silcode':          'silcode',
+        'slashdot':         'slashdot',
+        'slwiki':           'slwiki',
+        'smikipedia':       'smikipedia',
+        'sourceforge':      'sourceforge',
+        'spcom':            'spcom',
+        'species':          'species',
+        'squeak':           'squeak',
+        'stable':           'stable',
+        'strategywiki':     'strategywiki',
+        'sulutil':          'sulutil',
+        'susning':          'susning',
+        'svgwiki':          'svgwiki',
+        'svn':              'svn',
+        'swinbrain':        'swinbrain',
+        'swingwiki':        'swingwiki',
+        'swtrain':          'swtrain',
+        'tabwiki':          'tabwiki',
+        'takipedia':        'takipedia',
+        'tavi':             'tavi',
+        'tclerswiki':       'tclerswiki',
+        'technorati':       'technorati',
+        'tejo':             'tejo',
+        'tesoltaiwan':      'tesoltaiwan',
+        'testwiki':         'testwiki',
+        'thelemapedia':     'thelemapedia',
+        'theopedia':        'theopedia',
+        'theppn':           'theppn',
+        'thinkwiki':        'thinkwiki',
+        'tibiawiki':        'tibiawiki',
+        'ticket':           'ticket',
+        'tmbw':             'tmbw',
+        'tmnet':            'tmnet',
+        'tmwiki':           'tmwiki',
+        'tokyonights':      'tokyonights',
+        'tools':            'tools',
+        'translatewiki':    'translatewiki',
+        'trash!italia':     'trash!italia',
+        'tswiki':           'tswiki',
+        'turismo':          'turismo',
+        'tviv':             'tviv',
+        'tvtropes':         'tvtropes',
+        'twiki':            'twiki',
+        'twistedwiki':      'twistedwiki',
+        'tyvawiki':         'tyvawiki',
+        'uncyclopedia':     'uncyclopedia',
+        'unreal':           'unreal',
+        'urbandict':        'urbandict',
+        'usej':             'usej',
+        'usemod':           'usemod',
+        'v':                'wikiversity',
+        'valuewiki':        'valuewiki',
+        'veropedia':        'veropedia',
+        'vinismo':          'vinismo',
+        'vkol':             'vkol',
+        'vlos':             'vlos',
+        'voipinfo':         'voipinfo',
+        'voy':              'wikivoyage',
+        'w':                'wikipedia',
+        'warpedview':       'warpedview',
+        'webdevwikinl':     'webdevwikinl',
+        'webisodes':        'webisodes',
+        'webseitzwiki':     'webseitzwiki',
+        'wg':               'wg',
+        'wiki':             'wiki',
+        'wikia':            'wikia',
+        'wikianso':         'wikianso',
+        'wikiasite':        'wikiasite',
+        'wikible':          'wikible',
+        'wikibooks':        'wikibooks',
+        'wikichat':         'wikichat',
+        'wikichristian':    'wikichristian',
+        'wikicities':       'wikicities',
+        'wikicity':         'wikicity',
+        'wikif1':           'wikif1',
+        'wikifur':          'wikifur',
+        'wikihow':          'wikihow',
+        'wikiindex':        'wikiindex',
+        'wikilemon':        'wikilemon',
+        'wikilivres':       'wikilivres',
+        'wikimac-de':       'wikimac-de',
+        'wikimac-fr':       'wikimac-fr',
+        'wikimedia':        'wikimedia',
+        'wikinews':         'wikinews',
+        'wikinfo':          'wikinfo',
+        'wikinurse':        'wikinurse',
+        'wikinvest':        'wikinvest',
+        'wikipaltz':        'wikipaltz',
+        'wikipedia':        'wikipedia',
+        'wikipediawikipedia': 'wikipediawikipedia',
+        'wikiquote':        'wikiquote',
+        'wikireason':       'wikireason',
+        'wikischool':       'wikischool',
+        'wikisophia':       'wikisophia',
+        'wikisource':       'wikisource',
+        'wikispecies':      'wikispecies',
+        'wikispot':         'wikispot',
+        'wikiti':           'wikiti',
+        'wikitravel':       'wikitravel',
+        'wikitree':         'wikitree',
+        'wikiversity':      'wikiversity',
+        'wikiwikiweb':      'wikiwikiweb',
+        'wikt':             'wiktionary',
+        'wiktionary':       'wiktionary',
+        'wipipedia':        'wipipedia',
+        'wlug':             'wlug',
+        'wm2005':           'wm2005',
+        'wm2006':           'wm2006',
+        'wm2007':           'wm2007',
+        'wm2008':           'wm2008',
+        'wm2009':           'wm2009',
+        'wm2010':           'wm2010',
+        'wm2011':           'wm2011',
+        'wm2012':           'wm2012',
+        'wm2013':           'wm2013',
+        'wm2014':           'wm2014',
+        'wm2015':           'wm2015',
+        'wm2016':           'wm2016',
+        'wm2017':           'wm2017',
+        'wm2018':           'wm2018',
+        'wmania':           'wmania',
+        'wmcz':             'wmcz',
+        'wmf':              'wmf',
+        'wmrs':             'wmrs',
+        'wmse':             'wmse',
+        'wookieepedia':     'wookieepedia',
+        'world66':          'world66',
+        'wowwiki':          'wowwiki',
+        'wqy':              'wqy',
+        'wurmpedia':        'wurmpedia',
+        'wznan':            'wznan',
+        'xboxic':           'xboxic',
+        'zh-cfr':           'zh-cfr',
+        'zrhwiki':          'zrhwiki',
+        'zum':              'zum',
+        'zwiki':            'zwiki',
+        'zzz wiki':         'zzz wiki',
+    }
 
-        # A list with the name for cross-project cookies.
-        # default for wikimedia centralAuth extensions.
-        self.cross_projects_cookies = ['centralauth_Session',
-                                       'centralauth_Token',
-                                       'centralauth_User']
-        self.cross_projects_cookie_username = 'centralauth_User'
+    # A list of category redirect template names in different languages
+    category_redirect_templates = {
+        '_default': []
+    }
 
-        # A list with the name in the cross-language flag permissions
-        self.cross_allowed = []
+    # A list of languages that use hard (not soft) category redirects
+    use_hard_category_redirects = []
 
-        # A dict with the name of the category containing disambiguation
-        # pages for the various languages. Only one category per language,
-        # and without the namespace, so add things like:
-        # 'en': "Disambiguation"
-        self.disambcatname = {}
+    # A list of disambiguation template names in different languages
+    disambiguationTemplates = {
+        '_default': []
+    }
 
-        # DEPRECATED, stores the code of the site which have a case sensitive
-        # main namespace. Use the Namespace given from the Site instead
-        self.nocapitalize = []
+    # A dict of tuples for different sites with names of templates
+    # that indicate an edit should be avoided
+    edit_restricted_templates = {}
 
-        # attop is a list of languages that prefer to have the interwiki
-        # links at the top of the page.
-        self.interwiki_attop = []
-        # on_one_line is a list of languages that want the interwiki links
-        # one-after-another on a single line
-        self.interwiki_on_one_line = []
-        # String used as separator between interwiki links and the text
-        self.interwiki_text_separator = config.line_separator * 2
+    # A dict of tuples for different sites with names of archive
+    # templates that indicate an edit of non-archive bots
+    # should be avoided
+    archived_page_templates = {}
 
-        # Similar for category
-        self.category_attop = []
-        # on_one_line is a list of languages that want the category links
-        # one-after-another on a single line
-        self.category_on_one_line = []
-        # String used as separator between category links and the text
-        self.category_text_separator = config.line_separator * 2
-        # When both at the bottom should categories come after interwikilinks?
-        # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
-        # extension which puts categories last on all sites. TO BE DEPRECATED!
-        self.categories_last = []
+    # A list of projects that share cross-project sessions.
+    cross_projects = []
 
-        # Which languages have a special order for putting interlanguage
-        # links, and what order is it? If a language is not in
-        # interwiki_putfirst, alphabetical order on language code is used.
-        # For languages that are in interwiki_putfirst, interwiki_putfirst
-        # is checked first, and languages are put in the order given there.
-        # All other languages are put after those, in code-alphabetical
-        # order.
-        self.interwiki_putfirst = {}
+    # A list with the name for cross-project cookies.
+    # default for wikimedia centralAuth extensions.
+    cross_projects_cookies = ['centralauth_Session',
+                              'centralauth_Token',
+                              'centralauth_User']
+    cross_projects_cookie_username = 'centralauth_User'
 
-        # Some families, e. g. commons and meta, are not multilingual and
-        # forward interlanguage links to another family (wikipedia).
-        # These families can set this variable to the name of the target
-        # family.
-        self.interwiki_forward = None
+    # A list with the name in the cross-language flag permissions
+    cross_allowed = []
 
-        # Some families, e. g. wikipedia, receive forwarded interlanguage
-        # links from other families, e. g. incubator, commons, or meta.
-        # These families can set this variable to the names of their source
-        # families.
-        self.interwiki_forwarded_from = {}
+    # A dict with the name of the category containing disambiguation
+    # pages for the various languages. Only one category per language,
+    # and without the namespace, so add things like:
+    # 'en': "Disambiguation"
+    disambcatname = {}
 
-        # Which language codes no longer exist and by which language code
-        # should they be replaced. If for example the language with code xx:
-        # now should get code yy:, add {'xx':'yy'} to obsolete.
-        if not hasattr(self, 'interwiki_replacements'):
-            self.interwiki_replacements = {}
+    # DEPRECATED, stores the code of the site which have a case sensitive
+    # main namespace. Use the Namespace given from the Site instead
+    nocapitalize = []
 
-        # Codes that should be removed, usually because the site has been
-        # taken down.
-        if not hasattr(self, 'interwiki_removals'):
-            self.interwiki_removals = []
+    # attop is a list of languages that prefer to have the interwiki
+    # links at the top of the page.
+    interwiki_attop = []
+    # on_one_line is a list of languages that want the interwiki links
+    # one-after-another on a single line
+    interwiki_on_one_line = []
+    # String used as separator between interwiki links and the text
+    interwiki_text_separator = config.line_separator * 2
 
-        # Language codes of the largest wikis. They should be roughly sorted
-        # by size.
-        if not hasattr(self, 'languages_by_size'):
-            self.languages_by_size = []
+    # Similar for category
+    category_attop = []
+    # on_one_line is a list of languages that want the category links
+    # one-after-another on a single line
+    category_on_one_line = []
+    # String used as separator between category links and the text
+    category_text_separator = config.line_separator * 2
+    # When both at the bottom should categories come after interwikilinks?
+    # TODO: T86284 Needed on Wikia sites, as it uses the CategorySelect
+    # extension which puts categories last on all sites. TO BE DEPRECATED!
+    categories_last = []
 
-        # Some languages belong to a group where the possibility is high that
-        # equivalent articles have identical titles among the group.
-        self.language_groups = {
-            # languages using the arabic script (incomplete)
-            'arab': [
-                'ar', 'arz', 'ps', 'sd', 'ur', 'bjn', 'ckb',
-                # languages using multiple scripts, including arabic
-                'kk', 'ku', 'tt', 'ug', 'pnb'
-            ],
-            # languages that use chinese symbols
-            'chinese': [
-                'wuu', 'zh', 'zh-classical', 'zh-yue', 'gan', 'ii',
-                # languages using multiple/mixed scripts, including chinese
-                'ja', 'za'
-            ],
-            # languages that use the cyrillic alphabet
-            'cyril': [
-                'ab', 'av', 'ba', 'be', 'be-tarask', 'bg', 'bxr', 'ce', 'cu',
-                'cv', 'kbd', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo',
-                'myv', 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk',
-                'udm', 'uk', 'xal',
-                # languages using multiple scripts, including cyrillic
-                'ha', 'kk', 'sh', 'sr', 'tt'
-            ],
-            # languages that use a greek script
-            'grec': [
-                'el', 'grc', 'pnt'
-                # languages using multiple scripts, including greek
-            ],
-            # languages that use the latin alphabet
-            'latin': [
-                'aa', 'ace', 'af', 'ak', 'als', 'an', 'ang', 'ast', 'ay', 'bar',
-                'bat-smg', 'bcl', 'bi', 'bm', 'br', 'bs', 'ca', 'cbk-zam',
-                'cdo', 'ceb', 'ch', 'cho', 'chy', 'co', 'crh', 'cs', 'csb',
-                'cy', 'da', 'de', 'diq', 'dsb', 'ee', 'eml', 'en', 'eo', 'es',
-                'et', 'eu', 'ext', 'ff', 'fi', 'fiu-vro', 'fj', 'fo', 'fr',
-                'frp', 'frr', 'fur', 'fy', 'ga', 'gag', 'gd', 'gl', 'gn', 'gv',
-                'hak', 'haw', 'hif', 'ho', 'hr', 'hsb', 'ht', 'hu', 'hz', 'ia',
-                'id', 'ie', 'ig', 'ik', 'ilo', 'io', 'is', 'it', 'jbo', 'jv',
-                'kaa', 'kab', 'kg', 'ki', 'kj', 'kl', 'kr', 'ksh', 'kw', 'la',
-                'lad', 'lb', 'lg', 'li', 'lij', 'lmo', 'ln', 'lt', 'ltg', 'lv',
-                'map-bms', 'mg', 'mh', 'mi', 'ms', 'mt', 'mus', 'mwl', 'na',
-                'nah', 'nap', 'nds', 'nds-nl', 'ng', 'nl', 'nn', 'no', 'nov',
-                'nrm', 'nv', 'ny', 'oc', 'om', 'pag', 'pam', 'pap', 'pcd',
-                'pdc', 'pfl', 'pih', 'pl', 'pms', 'pt', 'qu', 'rm', 'rn', 'ro',
-                'roa-rup', 'roa-tara', 'rw', 'sc', 'scn', 'sco', 'se', 'sg',
-                'simple', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'srn', 'ss',
-                'st', 'stq', 'su', 'sv', 'sw', 'szl', 'tet', 'tl', 'tn', 'to',
-                'tpi', 'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've', 'vec', 'vi',
-                'vls', 'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea',
-                'zh-min-nan', 'zu',
-                # languages using multiple scripts, including latin
-                'az', 'chr', 'ckb', 'ha', 'iu', 'kk', 'ku', 'rmy', 'sh', 'sr',
-                'tt', 'ug', 'za'
-            ],
-            # Scandinavian languages
-            'scand': [
-                'da', 'fo', 'is', 'nb', 'nn', 'no', 'sv'
-            ],
-        }
+    # Which languages have a special order for putting interlanguage
+    # links, and what order is it? If a language is not in
+    # interwiki_putfirst, alphabetical order on language code is used.
+    # For languages that are in interwiki_putfirst, interwiki_putfirst
+    # is checked first, and languages are put in the order given there.
+    # All other languages are put after those, in code-alphabetical
+    # order.
+    interwiki_putfirst = {}
 
-        # LDAP domain if your wiki uses LDAP authentication,
-        # https://www.mediawiki.org/wiki/Extension:LDAP_Authentication
-        self.ldapDomain = ()
+    # Some families, e. g. commons and meta, are not multilingual and
+    # forward interlanguage links to another family (wikipedia).
+    # These families can set this variable to the name of the target
+    # family.
+    interwiki_forward = None
 
-        # Allows crossnamespace interwiki linking.
-        # Lists the possible crossnamespaces combinations
-        # keys are originating NS
-        # values are dicts where:
-        #   keys are the originating langcode, or _default
-        #   values are dicts where:
-        #     keys are the languages that can be linked to from the lang+ns, or
-        #     '_default'; values are a list of namespace numbers
-        self.crossnamespace = collections.defaultdict(dict)
-        ##
-        # Examples :
-        #
-        # Allowing linking to pt' 102 NS from any other lang' 0 NS is
-        #
-        #   self.crossnamespace[0] = {
-        #       '_default': { 'pt': [102]}
-        #   }
-        #
-        # While allowing linking from pt' 102 NS to any other lang' = NS is
-        #
-        #   self.crossnamespace[102] = {
-        #       'pt': { '_default': [0]}
-        #   }
+    # Some families, e. g. wikipedia, receive forwarded interlanguage
+    # links from other families, e. g. incubator, commons, or meta.
+    # These families can set this variable to the names of their source
+    # families.
+    interwiki_forwarded_from = {}
+
+    # Which language codes no longer exist and by which language code
+    # should they be replaced. If for example the language with code xx:
+    # now should get code yy:, add {'xx':'yy'} to obsolete.
+    interwiki_replacements = {}
+
+    # Codes that should be removed, usually because the site has been
+    # taken down.
+    interwiki_removals = []
+
+    # Language codes of the largest wikis. They should be roughly sorted
+    # by size.
+    languages_by_size = []
+
+    # Some languages belong to a group where the possibility is high that
+    # equivalent articles have identical titles among the group.
+    language_groups = {
+        # languages using the arabic script (incomplete)
+        'arab': [
+            'ar', 'arz', 'ps', 'sd', 'ur', 'bjn', 'ckb',
+            # languages using multiple scripts, including arabic
+            'kk', 'ku', 'tt', 'ug', 'pnb'
+        ],
+        # languages that use chinese symbols
+        'chinese': [
+            'wuu', 'zh', 'zh-classical', 'zh-yue', 'gan', 'ii',
+            # languages using multiple/mixed scripts, including chinese
+            'ja', 'za'
+        ],
+        # languages that use the cyrillic alphabet
+        'cyril': [
+            'ab', 'av', 'ba', 'be', 'be-tarask', 'bg', 'bxr', 'ce', 'cu',
+            'cv', 'kbd', 'koi', 'kv', 'ky', 'mk', 'lbe', 'mdf', 'mn', 'mo',
+            'myv', 'mhr', 'mrj', 'os', 'ru', 'rue', 'sah', 'tg', 'tk',
+            'udm', 'uk', 'xal',
+            # languages using multiple scripts, including cyrillic
+            'ha', 'kk', 'sh', 'sr', 'tt'
+        ],
+        # languages that use a greek script
+        'grec': [
+            'el', 'grc', 'pnt'
+            # languages using multiple scripts, including greek
+        ],
+        # languages that use the latin alphabet
+        'latin': [
+            'aa', 'ace', 'af', 'ak', 'als', 'an', 'ang', 'ast', 'ay', 'bar',
+            'bat-smg', 'bcl', 'bi', 'bm', 'br', 'bs', 'ca', 'cbk-zam',
+            'cdo', 'ceb', 'ch', 'cho', 'chy', 'co', 'crh', 'cs', 'csb',
+            'cy', 'da', 'de', 'diq', 'dsb', 'ee', 'eml', 'en', 'eo', 'es',
+            'et', 'eu', 'ext', 'ff', 'fi', 'fiu-vro', 'fj', 'fo', 'fr',
+            'frp', 'frr', 'fur', 'fy', 'ga', 'gag', 'gd', 'gl', 'gn', 'gv',
+            'hak', 'haw', 'hif', 'ho', 'hr', 'hsb', 'ht', 'hu', 'hz', 'ia',
+            'id', 'ie', 'ig', 'ik', 'ilo', 'io', 'is', 'it', 'jbo', 'jv',
+            'kaa', 'kab', 'kg', 'ki', 'kj', 'kl', 'kr', 'ksh', 'kw', 'la',
+            'lad', 'lb', 'lg', 'li', 'lij', 'lmo', 'ln', 'lt', 'ltg', 'lv',
+            'map-bms', 'mg', 'mh', 'mi', 'ms', 'mt', 'mus', 'mwl', 'na',
+            'nah', 'nap', 'nds', 'nds-nl', 'ng', 'nl', 'nn', 'no', 'nov',
+            'nrm', 'nv', 'ny', 'oc', 'om', 'pag', 'pam', 'pap', 'pcd',
+            'pdc', 'pfl', 'pih', 'pl', 'pms', 'pt', 'qu', 'rm', 'rn', 'ro',
+            'roa-rup', 'roa-tara', 'rw', 'sc', 'scn', 'sco', 'se', 'sg',
+            'simple', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'srn', 'ss',
+            'st', 'stq', 'su', 'sv', 'sw', 'szl', 'tet', 'tl', 'tn', 'to',
+            'tpi', 'tr', 'ts', 'tum', 'tw', 'ty', 'uz', 've', 'vec', 'vi',
+            'vls', 'vo', 'wa', 'war', 'wo', 'xh', 'yo', 'zea',
+            'zh-min-nan', 'zu',
+            # languages using multiple scripts, including latin
+            'az', 'chr', 'ckb', 'ha', 'iu', 'kk', 'ku', 'rmy', 'sh', 'sr',
+            'tt', 'ug', 'za'
+        ],
+        # Scandinavian languages
+        'scand': [
+            'da', 'fo', 'is', 'nb', 'nn', 'no', 'sv'
+        ],
+    }
+
+    # LDAP domain if your wiki uses LDAP authentication,
+    # https://www.mediawiki.org/wiki/Extension:LDAP_Authentication
+    ldapDomain = ()
+
+    # Allows crossnamespace interwiki linking.
+    # Lists the possible crossnamespaces combinations
+    # keys are originating NS
+    # values are dicts where:
+    #   keys are the originating langcode, or _default
+    #   values are dicts where:
+    #     keys are the languages that can be linked to from the lang+ns, or
+    #     '_default'; values are a list of namespace numbers
+    crossnamespace = collections.defaultdict(dict)
+    ##
+    # Examples :
+    #
+    # Allowing linking to pt' 102 NS from any other lang' 0 NS is
+    #
+    #   crossnamespace[0] = {
+    #       '_default': { 'pt': [102]}
+    #   }
+    #
+    # While allowing linking from pt' 102 NS to any other lang' = NS is
+    #
+    #   crossnamespace[102] = {
+    #       'pt': { '_default': [0]}
+    #   }
 
     _families = {}
 
@@ -967,7 +991,7 @@ class Family(object):
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
             raise UnknownFamily(u'Family %s does not exist' % fam)
-        cls = mod.Family()
+        cls = mod.Family.instance
         if cls.name != fam:
             warn(u'Family name %s does not match family module name %s'
                  % (cls.name, fam), FamilyMaintenanceWarning)
@@ -985,13 +1009,13 @@ class Family(object):
         Family._families[fam] = cls
         return cls
 
-    @property
+    @classproperty
     @deprecated('Family.codes or APISite.validLanguageLinks')
-    def iwkeys(self):
+    def iwkeys(cls):
         """DEPRECATED: List of (interwiki_forward's) family codes."""
-        if self.interwiki_forward:
-            return list(pywikibot.Family(self.interwiki_forward).langs.keys())
-        return list(self.langs.keys())
+        if cls.interwiki_forward:
+            return list(pywikibot.Family(cls.interwiki_forward).langs.keys())
+        return list(cls.langs.keys())
 
     @deprecated('APISite.interwiki')
     def get_known_families(self, site):
@@ -1362,10 +1386,8 @@ class Family(object):
         """
         if not isinstance(other, Family):
             other = self.load(other)
-        try:
-            return self.name == other.name
-        except AttributeError:
-            return id(self) == id(other)
+
+        return self is other
 
     def __ne__(self, other):
         try:
@@ -1452,8 +1474,8 @@ class Family(object):
                                            for (old, new) in data.items()
                                            if new is not None)
 
-    @property
-    def domains(self):
+    @classproperty
+    def domains(cls):
         """
         Get list of unique domain names included in this family.
 
@@ -1461,37 +1483,37 @@ class Family(object):
 
         @rtype: iterable of str
         """
-        return set(self.langs.values())
+        return set(cls.langs.values())
 
-    @property
-    def codes(self):
+    @classproperty
+    def codes(cls):
         """
         Get list of codes used by this family.
 
         @rtype: iterable of str
         """
-        return set(self.langs.keys())
+        return set(cls.langs.keys())
 
 
 class SingleSiteFamily(Family):
 
     """Single site family."""
 
-    def __init__(self):
+    def __new__(cls):
         """Constructor."""
-        if not hasattr(self, 'code'):
-            self.code = self.name
+        if not hasattr(cls, 'code'):
+            cls.code = cls.name
 
-        assert self.domain
+        assert cls.domain
 
-        super(SingleSiteFamily, self).__init__()
+        cls.langs = {cls.code: cls.domain}
 
-        self.langs = {self.code: self.domain}
+        return super(SingleSiteFamily, cls).__new__(cls)
 
-    @property
-    def domains(self):
+    @classproperty
+    def domains(cls):
         """Return the full domain name of the site."""
-        return (self.domain, )
+        return (cls.domain, )
 
     def hostname(self, code):
         """Return the domain as the hostname."""
@@ -1502,32 +1524,36 @@ class SubdomainFamily(Family):
 
     """Multi site wikis that are subdomains of the same top level domain."""
 
-    def __init__(self):
+    def __new__(cls):
         """Constructor."""
-        assert self.domain
+        assert cls.domain
+        return super(SubdomainFamily, cls).__new__(cls)
 
-        codes = self.codes
-        if hasattr(self, 'test_codes'):
-            codes = codes + self.test_codes
+    @classproperty
+    def langs(cls):
+        """Property listing family languages."""
+        codes = cls.codes
+        if hasattr(cls, 'test_codes'):
+            codes = codes + cls.test_codes
 
-        self.langs = {code: '{0}.{1}'.format(code, self.domain)
-                      for code in codes}
+        # shortcut this classproperty
+        cls.langs = {code: '{0}.{1}'.format(code, cls.domain)
+                     for code in codes}
+        return cls.langs
 
-        super(SubdomainFamily, self).__init__()
-
-    @property
-    def codes(self):
+    @classproperty
+    def codes(cls):
         """Property listing family codes."""
-        if hasattr(self, 'languages_by_size'):
-            return self.languages_by_size
+        if hasattr(cls, 'languages_by_size'):
+            return cls.languages_by_size
         raise NotImplementedError(
             'Family %s needs property "languages_by_size" or "codes"'
-            % self.name)
+            % cls.name)
 
-    @property
-    def domains(self):
+    @classproperty
+    def domains(cls):
         """Return the domain name of the sites in this family."""
-        return [self.domain]
+        return [cls.domain]
 
 
 class WikiaFamily(Family):
@@ -1630,36 +1656,33 @@ class WikimediaFamily(Family):
         'mo': 'ro',
     }
 
-    def __init__(self):
-        """Constructor."""
-        super(WikimediaFamily, self).__init__()
-        # WikimediaFamily uses wikibase for the category name containing
-        # disambiguation pages for the various languages. We need the
-        # wikibase code and item number:
-        self.disambcatname = {'wikidata': 'Q1982926'}
+    # WikimediaFamily uses wikibase for the category name containing
+    # disambiguation pages for the various languages. We need the
+    # wikibase code and item number:
+    disambcatname = {'wikidata': 'Q1982926'}
 
-    @property
-    def domain(self):
+    @classproperty
+    def domain(cls):
         """Domain property."""
-        if self.name in (self.multi_language_content_families
-                         + self.other_content_families):
-            return self.name + '.org'
-        elif self.name in self.wikimedia_org_families:
+        if cls.name in (cls.multi_language_content_families
+                        + cls.other_content_families):
+            return cls.name + '.org'
+        elif cls.name in cls.wikimedia_org_families:
             return 'wikimedia.org'
 
         raise NotImplementedError(
-            'Family %s needs to define property \'domain\'' % self.name)
+            'Family %s needs to define property \'domain\'' % cls.name)
 
-    @property
-    def interwiki_removals(self):
+    @classproperty
+    def interwiki_removals(cls):
         """Return a list of interwiki codes to be removed from wiki pages."""
-        return frozenset(self.removed_wikis + self.closed_wikis)
+        return frozenset(cls.removed_wikis + cls.closed_wikis)
 
-    @property
-    def interwiki_replacements(self):
+    @classproperty
+    def interwiki_replacements(cls):
         """Return an interwiki code replacement mapping."""
-        rv = self.code_aliases.copy()
-        rv.update(self.interwiki_replacement_overrides)
+        rv = cls.code_aliases.copy()
+        rv.update(cls.interwiki_replacement_overrides)
         return FrozenDict(rv)
 
     def shared_image_repository(self, code):
@@ -1688,30 +1711,26 @@ class WikimediaOrgFamily(SingleSiteFamily, WikimediaFamily):
 
     """Single site family for sites hosted at C{*.wikimedia.org}."""
 
-    @property
-    def domain(self):
+    @classproperty
+    def domain(cls):
         """Return the parents domain with a subdomain prefix."""
-        return '{0}.wikimedia.org'.format(self.name)
+        return '{0}.wikimedia.org'.format(cls.name)
 
 
-class AutoFamily(SingleSiteFamily):
+@deprecated_args(site=None)
+def AutoFamily(name, url):
+    """
+    Family that automatically loads the site configuration.
 
-    """Family that automatically loads the site configuration."""
-
-    @deprecated_args(site=None)
-    def __init__(self, name, url):
-        """
-        Constructor.
-
-        @param name: Name for the family
-        @type name: str
-        @param url: API endpoint URL of the wiki
-        @type url: str
-        """
-        self.name = name
-        self.url = urlparse.urlparse(url)
-        self.domain = self.url.netloc
-        super(AutoFamily, self).__init__()
+    @param name: Name for the family
+    @type name: str
+    @param url: API endpoint URL of the wiki
+    @type url: str
+    @return: Generated family class
+    @rtype: SingleSiteFamily
+    """
+    url = urlparse.urlparse(url)
+    domain = url.netloc
 
     def protocol(self, code):
         """Return the protocol of the URL."""
@@ -1722,4 +1741,9 @@ class AutoFamily(SingleSiteFamily):
         if self.url.path.endswith('/api.php'):
             return self.url.path[0:-8]
         else:
+            # AutoFamily refers to the variable set below, not the function
             return super(AutoFamily, self).scriptpath(code)
+
+    # str() used because py2 can't accept a unicode as the name of a class
+    AutoFamily = type(str('AutoFamily'), (SingleSiteFamily,), locals())
+    return AutoFamily()

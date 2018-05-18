@@ -17,23 +17,19 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     name = 'wikivoyage'
 
-    def __init__(self):
-        """Constructor."""
-        self.languages_by_size = [
-            'en', 'de', 'fa', 'it', 'fr', 'pl', 'ru', 'nl', 'pt', 'zh', 'es',
-            'he', 'fi', 'vi', 'sv', 'el', 'ro', 'uk', 'hi',
-        ]
+    languages_by_size = [
+        'en', 'de', 'fa', 'it', 'fr', 'pl', 'ru', 'nl', 'pt', 'zh', 'es',
+        'he', 'fi', 'vi', 'sv', 'el', 'ro', 'uk', 'hi',
+    ]
 
-        super(Family, self).__init__()
+    category_redirect_templates = {
+        '_default': (),
+        'zh': ('分类重定向',),
+    }
 
-        self.category_redirect_templates = {
-            '_default': (),
-            'zh': ('分类重定向',),
-        }
-
-        # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
-        # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
-        self.cross_allowed = [
-            'el', 'en', 'es', 'fa', 'ru',
-        ]
+    # Global bot allowed languages on
+    # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+    # & https://meta.wikimedia.org/wiki/Special:WikiSets/2
+    cross_allowed = [
+        'el', 'en', 'es', 'fa', 'ru',
+    ]

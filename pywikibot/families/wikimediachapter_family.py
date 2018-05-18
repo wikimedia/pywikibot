@@ -8,7 +8,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, classproperty
 
 
 class Family(family.SubdomainFamily, family.WikimediaFamily):
@@ -26,8 +26,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'se', 'tr', 'ua', 'uk', 've', 'wb',
     ]
 
-    @property
+    @classproperty
     @deprecated
-    def countries(self):
+    def countries(cls):
         """Deprecated."""
-        return self.codes
+        return cls.codes

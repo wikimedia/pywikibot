@@ -17,11 +17,7 @@ class Family(family.WikimediaOrgFamily):
 
     name = 'strategy'
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
-
-        self.interwiki_forward = 'wikipedia'
+    interwiki_forward = 'wikipedia'
 
     def dbName(self, code):
         """Return the database name for this family."""

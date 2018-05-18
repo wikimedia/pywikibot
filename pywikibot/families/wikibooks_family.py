@@ -32,39 +32,35 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'dk', 'tokipona',
     ]
 
-    def __init__(self):
-        """Constructor."""
-        self.languages_by_size = [
-            'en', 'hu', 'de', 'fr', 'pt', 'ja', 'it', 'nl', 'es', 'pl', 'th',
-            'he', 'id', 'sq', 'fi', 'fa', 'zh', 'ca', 'ru', 'az', 'vi', 'da',
-            'ko', 'sv', 'gl', 'sr', 'cs', 'hr', 'ba', 'no', 'tr', 'ar', 'ta',
-            'sa', 'sk', 'uk', 'is', 'hi', 'ro', 'eo', 'si', 'mk', 'bn', 'bg',
-            'ka', 'ms', 'lt', 'tt', 'li', 'el', 'ur', 'sl', 'km', 'tl', 'kk',
-            'et', 'ml', 'oc', 'be', 'ia', 'eu', 'ne', 'pa', 'hy', 'la', 'cv',
-            'tg', 'fy', 'ku', 'bs', 'cy', 'te', 'af', 'mr', 'mg', 'ky',
-        ]
+    languages_by_size = [
+        'en', 'hu', 'de', 'fr', 'pt', 'ja', 'it', 'nl', 'es', 'pl', 'th', 'he',
+        'id', 'sq', 'fi', 'fa', 'zh', 'ca', 'ru', 'az', 'vi', 'da', 'ko', 'sv',
+        'gl', 'sr', 'cs', 'hr', 'ba', 'no', 'tr', 'ar', 'ta', 'sa', 'sk', 'uk',
+        'is', 'hi', 'ro', 'eo', 'si', 'mk', 'bn', 'bg', 'ka', 'ms', 'lt', 'tt',
+        'li', 'el', 'ur', 'sl', 'km', 'tl', 'kk', 'et', 'ml', 'oc', 'be', 'ia',
+        'eu', 'ne', 'pa', 'hy', 'la', 'cv', 'tg', 'fy', 'ku', 'bs', 'cy', 'te',
+        'af', 'mr', 'mg', 'ky',
+    ]
 
-        super(Family, self).__init__()
+    category_redirect_templates = {
+        '_default': (),
+        'en': ('Category redirect',),
+        'es': ('Categoría redirigida',),
+        'ro': ('Redirect categorie',),
+        'vi': ('Đổi hướng thể loại',),
+    }
 
-        self.category_redirect_templates = {
-            '_default': (),
-            'en': ('Category redirect',),
-            'es': ('Categoría redirigida',),
-            'ro': ('Redirect categorie',),
-            'vi': ('Đổi hướng thể loại',),
-        }
+    # Global bot allowed languages on
+    # https://meta.wikimedia.org/wiki/BPI#Current_implementation
+    cross_allowed = [
+        'af', 'ca', 'fa', 'fy', 'gl', 'it', 'nl', 'ru', 'th', 'zh',
+    ]
 
-        # Global bot allowed languages on
-        # https://meta.wikimedia.org/wiki/BPI#Current_implementation
-        self.cross_allowed = [
-            'af', 'ca', 'fa', 'fy', 'gl', 'it', 'nl', 'ru', 'th', 'zh',
-        ]
-
-        # Subpages for documentation.
-        # TODO: List is incomplete, to be completed for missing languages.
-        self.doc_subpages = {
-            '_default': ((u'/doc', ),
-                         ['en']
-                         ),
-            'es': ('/uso', '/doc'),
-        }
+    # Subpages for documentation.
+    # TODO: List is incomplete, to be completed for missing languages.
+    doc_subpages = {
+        '_default': (('/doc', ),
+                     ['en']
+                     ),
+        'es': ('/uso', '/doc'),
+    }
