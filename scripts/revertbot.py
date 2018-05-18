@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-"""
+r"""
 This script can be used for reverting certain edits.
 
 The following command line parameters are supported:
@@ -9,10 +9,34 @@ The following command line parameters are supported:
 
 -rollback         Rollback edits instead of reverting them.
                   Note that in rollback, no diff would be shown.
+
+Users who want to customize the behaviour should subclass the `BaseRevertBot`
+and override its `callback` method. Here is a sample:
+
+.. code-block::
+
+    class myRevertBot(BaseRevertBot):
+
+        '''Example revert bot.'''
+
+        def callback(self, item):
+            '''Sample callback function for 'private' revert bot.
+
+            @param item: an item from user contributions
+            @type item: dict
+            @rtype: bool
+            '''
+            if 'top' in item:
+                page = pywikibot.Page(self.site, item['title'])
+                text = page.get(get_redirect=True)
+                pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
+                return bool(pattern.search(text))
+            return False
+
 """
 #
 # (C) Bryan Tong Minh, 2008
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
 # for Google Code-In 2013
@@ -20,8 +44,6 @@ The following command line parameters are supported:
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, unicode_literals
-
-import re
 
 import pywikibot
 from pywikibot import i18n
@@ -33,7 +55,6 @@ class BaseRevertBot(object):
     """Base revert bot.
 
     Subclass this bot and override callback to get it to do something useful.
-
     """
 
     def __init__(self, site, user=None, comment=None, rollback=False):
@@ -114,27 +135,7 @@ class BaseRevertBot(object):
         pywikibot.output(msg)
 
 
-class RevertBot(BaseRevertBot):
-
-    """Example revert bot."""
-
-    def callback(self, item):
-        """Callback function for 'private' revert bot.
-
-        @param item: an item from user contributions
-        @type item: dict
-        @rtype: bool
-
-        """
-        if 'top' in item:
-            page = pywikibot.Page(self.site, item['title'])
-            text = page.get(get_redirect=True)
-            pattern = re.compile(r'\[\[.+?:.+?\..+?\]\]', re.UNICODE)
-            return bool(pattern.search(text))
-        return False
-
-
-myRevertBot = RevertBot  # for compatibility only
+myRevertBot = BaseRevertBot  # for compatibility only
 
 
 def main(*args):
