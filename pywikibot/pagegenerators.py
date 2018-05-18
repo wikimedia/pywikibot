@@ -527,7 +527,7 @@ class GeneratorFactory(object):
                 # By definition no duplicates are possible.
                 dupfiltergen = gensList
             else:
-                gensList = CombinedPageGenerator(self.gens)
+                gensList = itertools.chain(*self.gens)
                 dupfiltergen = self._filter_unique(gensList)
 
         # Add on subpage filter generator
@@ -1960,6 +1960,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
             pywikibot.output(u'Skipping %s' % page.title(asLink=True))
 
 
+@deprecated('itertools.chain(*iterables)')
 def CombinedPageGenerator(generators):
     """Yield from each iterable until exhausted, then proceed with the next."""
     return itertools.chain(*generators)

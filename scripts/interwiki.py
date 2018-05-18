@@ -349,6 +349,7 @@ that you have to break it off, use "-continue" next time.
 from __future__ import absolute_import, unicode_literals
 
 import codecs
+from itertools import chain
 import os
 import pickle
 import re
@@ -2519,8 +2520,7 @@ def main(*args):
                 namespace = 0
             gen2 = pagegenerators.AllpagesPageGenerator(
                 nextPage, namespace, includeredirects=False)
-            hintlessPageGen = pagegenerators.CombinedPageGenerator(
-                [hintlessPageGen, gen2])
+            hintlessPageGen = chain(hintlessPageGen, gen2)
         restoredFiles.append(dumpFileName)
 
     bot = InterwikiBot(iwconf)

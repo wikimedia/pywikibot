@@ -55,6 +55,7 @@ Please fix these if you are capable and motivated:
 #
 from __future__ import absolute_import, unicode_literals
 
+from itertools import chain
 import sys
 
 import pywikibot
@@ -216,10 +217,10 @@ class NowCommonsDeleteBot(Bot):
     @property
     def generator(self):
         """Generator method."""
-        gens = [t.getReferences(follow_redirects=True, namespaces=[6],
+        gens = (t.getReferences(follow_redirects=True, namespaces=[6],
                                 onlyTemplateInclusion=True)
-                for t in self.nc_templates]
-        gen = pg.CombinedPageGenerator(gens)
+                for t in self.nc_templates)
+        gen = chain(*gens)
         gen = pg.DuplicateFilterPageGenerator(gen)
         gen = pg.PreloadingGenerator(gen)
         return gen
