@@ -3,7 +3,7 @@
 """Library containing special bots."""
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,10 +44,9 @@ class UploadRobot(BaseBot):
 
     @deprecated_args(uploadByUrl=None)
     def __init__(self, url, urlEncoding=None, description=u'',
-                 useFilename=None, keepFilename=False,
-                 verifyDescription=True, ignoreWarning=False,
-                 targetSite=None, aborts=[], chunk_size=0,
-                 summary=None, **kwargs):
+                 useFilename=None, keepFilename=False, verifyDescription=True,
+                 ignoreWarning=False, targetSite=None, aborts=[], chunk_size=0,
+                 summary=None, filename_prefix=None, **kwargs):
         """
         Constructor.
 
@@ -82,6 +81,9 @@ class UploadRobot(BaseBot):
             restartable) specified in bytes. If no value is specified the file
             will be uploaded as whole.
         @type chunk_size: integer
+        @param filename_prefix: Specify prefix for the title of every
+            file's page.
+        @type filename_prefix: string
         @param always: Disables any input, requires that either ignoreWarning
             or aborts are set to True and that the description is also set. It
             overwrites verifyDescription to False and keepFilename to True.
@@ -112,6 +114,7 @@ class UploadRobot(BaseBot):
         self.aborts = aborts
         self.chunk_size = chunk_size
         self.summary = summary
+        self.filename_prefix = filename_prefix
         if config.upload_to_commons:
             self.targetSite = targetSite or pywikibot.Site('commons',
                                                            'commons')
@@ -249,6 +252,8 @@ class UploadRobot(BaseBot):
         filename = os.path.basename(filename)
         if self.useFilename:
             filename = self.useFilename
+        if self.filename_prefix:
+            filename = self.filename_prefix + filename
         if not self.keepFilename:
             pywikibot.output(
                 u"The filename on the target wiki will default to: %s"
