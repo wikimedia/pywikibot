@@ -178,7 +178,7 @@ except RuntimeError as err:
                                      or filename == 'version.py'):
         print("NOTE: 'user-config.py' was not found!")
         print("Please follow the prompts to create it:")
-        run_python_file('generate_user_files.py',
+        run_python_file(os.path.join(_pwb_dir, 'generate_user_files.py'),
                         ['generate_user_files.py'],
                         ['generate_user_files.py'])
         # because we have loaded pywikibot without user-config.py loaded, we need to re-start
