@@ -5781,11 +5781,11 @@ class Link(ComparableMixin):
                                   title)
 
     if sys.version_info[0] > 2:
-        def __str__(self):  # noqa: N807
+        def __str__(self):
             """Return a string representation."""
             return self.__unicode__()
     else:
-        def __str__(self):  # noqa: N807
+        def __str__(self):
             """Return a string representation."""
             return self.astext().encode("ascii", "backslashreplace")
 
