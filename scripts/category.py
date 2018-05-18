@@ -1200,9 +1200,8 @@ class CategoryTreeRobot(object):
         pywikibot.output(u'')
         if self.filename:
             pywikibot.output(u'Saving results in %s' % self.filename)
-            f = codecs.open(self.filename, 'a', 'utf-8')
-            f.write(tree)
-            f.close()
+            with codecs.open(self.filename, 'a', 'utf-8') as f:
+                f.write(tree)
         else:
             pywikibot.stdout(tree)
 

@@ -1463,24 +1463,24 @@ def TextfilePageGenerator(filename=None, site=None):
         filename = pywikibot.input(u'Please enter the filename:')
     if site is None:
         site = pywikibot.Site()
-    f = codecs.open(filename, 'r', config.textfile_encoding)
-    linkmatch = None
-    for linkmatch in pywikibot.link_regex.finditer(f.read()):
-        # If the link is in interwiki format, the Page object may reside
-        # on a different Site than the default.
-        # This makes it possible to work on different wikis using a single
-        # text file, but also could be dangerous because you might
-        # inadvertently change pages on another wiki!
-        yield pywikibot.Page(pywikibot.Link(linkmatch.group("title"), site))
-    if linkmatch is None:
-        f.seek(0)
-        for title in f:
-            title = title.strip()
-            if '|' in title:
-                title = title[:title.index('|')]
-            if title:
-                yield pywikibot.Page(site, title)
-    f.close()
+    with codecs.open(filename, 'r', config.textfile_encoding) as f:
+        linkmatch = None
+        for linkmatch in pywikibot.link_regex.finditer(f.read()):
+            # If the link is in interwiki format, the Page object may reside
+            # on a different Site than the default.
+            # This makes it possible to work on different wikis using a single
+            # text file, but also could be dangerous because you might
+            # inadvertently change pages on another wiki!
+            yield pywikibot.Page(pywikibot.Link(linkmatch.group('title'),
+                                                site))
+        if linkmatch is None:
+            f.seek(0)
+            for title in f:
+                title = title.strip()
+                if '|' in title:
+                    title = title[:title.index('|')]
+                if title:
+                    yield pywikibot.Page(site, title)
 
 
 def PagesFromTitlesGenerator(iterable, site=None):

@@ -502,9 +502,8 @@ class PrimaryIgnoreManager(object):
                 self.disambPage.title(asUrl=True) + '.txt')
             try:
                 # Open file for appending. If none exists, create a new one.
-                f = codecs.open(filename, 'a', 'utf-8')
-                f.write(refPage.title(asUrl=True) + '\n')
-                f.close()
+                with codecs.open(filename, 'a', 'utf-8') as f:
+                    f.write(refPage.title(asUrl=True) + '\n')
             except IOError:
                 pass
 

@@ -75,17 +75,17 @@ import re
 import threading
 import webbrowser
 
-import pywikibot
+from os import path
 
 from requests.exceptions import RequestException
 
-from pywikibot import pagegenerators, config, i18n
+import pywikibot
 
+from pywikibot import config, i18n, pagegenerators
 from pywikibot.comms.http import fetch
-
 from pywikibot.specialbots import UploadRobot
 
-from scripts import image
+from scripts.image import ImageRobot
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog, Tkinter
@@ -333,7 +333,7 @@ class imageTransfer(threading.Thread):
             # If the image is uploaded under a different name, replace all
             # instances
             if self.imagePage.title(withNamespace=False) != self.newname:
-                imagebot = image.ImageRobot(
+                imagebot = ImageRobot(
                     generator=self.preloadingGen,
                     oldImage=self.imagePage.title(withNamespace=False),
                     newImage=self.newname,
@@ -374,19 +374,15 @@ class imageTransfer(threading.Thread):
 # -label ok skip view
 # textarea
 archivo = config.datafilepath("Uploadbot.localskips.txt")
-try:
-    open(archivo, 'r')
-except IOError:
-    tocreate = open(archivo, 'w')
-    tocreate.write("{{NowCommons")
-    tocreate.close()
+if not path.exists(archivo):
+    with open(archivo, 'w') as tocreate:
+        tocreate.write('{{NowCommons')
 
 
 def getautoskip():
     """Get a list of templates to skip."""
-    f = codecs.open(archivo, 'r', 'utf-8')
-    txt = f.read()
-    f.close()
+    with codecs.open(archivo, 'r', 'utf-8') as f:
+        txt = f.read()
     toreturn = txt.split('{{')[1:]
     return toreturn
 

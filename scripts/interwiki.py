@@ -1160,11 +1160,10 @@ class Subject(interwiki_graph.Subject):
         self.conf.note('{} does not have any interwiki links'
                        .format(self.originPage))
         if config.without_interwiki:
-            f = codecs.open(
-                pywikibot.config.datafilepath('without_interwiki.txt'),
-                'a', 'utf-8')
-            f.write(u"# %s \n" % page)
-            f.close()
+            with codecs.open(
+                    pywikibot.config.datafilepath('without_interwiki.txt'),
+                    'a', 'utf-8') as f:
+                f.write('# {} \n'.format(page))
 
     def askForHints(self, counter):
         """Ask for hints to other sites."""
@@ -1369,21 +1368,21 @@ class Subject(interwiki_graph.Subject):
                                  % (self.originPage, duplicate, page))
                 self.makeForcedStop(counter)
                 try:
-                    f = codecs.open(
+                    with codecs.open(
                         pywikibot.config.datafilepath(
                             'autonomous_problems.dat'),
-                        'a', 'utf-8')
-                    f.write(u"* %s {Found more than one link for %s}"
-                            % (self.originPage, page.site))
-                    if config.interwiki_graph and config.interwiki_graph_url:
-                        filename = interwiki_graph.getFilename(
-                            self.originPage,
-                            extension=config.interwiki_graph_formats[0])
-                        f.write(
-                            ' [%s%s graph]'
-                            % (config.interwiki_graph_url, filename))
-                    f.write("\n")
-                    f.close()
+                            'a', 'utf-8') as f:
+                        f.write('* %s {Found more than one link for %s}'
+                                % (self.originPage, page.site))
+                        if config.interwiki_graph \
+                           and config.interwiki_graph_url:
+                            filename = interwiki_graph.getFilename(
+                                self.originPage,
+                                extension=config.interwiki_graph_formats[0])
+                            f.write(' [{}{} graph]'
+                                    .format(config.interwiki_graph_url,
+                                            filename))
+                        f.write('\n')
                 # FIXME: What errors are we catching here?
                 except Exception:
                     # raise
