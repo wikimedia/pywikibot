@@ -133,10 +133,10 @@ class MisspellingRobot(DisambiguationRobot):
                 templates = (templates, )
             for template, params in disambPage.templatesWithParams():
                 if template.title(withNamespace=False) in templates:
-                    # The correct spelling is in the last paramter.
+                    # The correct spelling is in the last parameter.
                     correctSpelling = params[-1]
                     # On de.wikipedia, there are some cases where the
-                    # misspelling is ambigous, see for example:
+                    # misspelling is ambiguous, see for example:
                     # https://de.wikipedia.org/wiki/Buthan
                     for match in self.linkR.finditer(correctSpelling):
                         self.alternatives.append(match.group('title'))
