@@ -22,8 +22,6 @@ from pywikibot.__metadata__ import (
     __copyright__, __description__, __download_url__, __license__,
     __maintainer__, __maintainer_email__, __name__, __url__, __version__)
 
-__release__ = __version__  # backward compatibility
-
 from pywikibot._wbtypes import WbRepresentation as _WbRepresentation
 from pywikibot.bot import (
     input, input_choice, input_yn, inputChoice, handle_args, showHelp, ui,
@@ -1453,3 +1451,6 @@ wrapper._add_deprecated_attr(
     warning_message='pywikibot.MediaWikiVersion is deprecated; '
                     'use pywikibot.tools.MediaWikiVersion instead.',
     since='20180827')
+wrapper._add_deprecated_attr('__release__', __version__,
+                             replacement_name='pywikibot.__version__',
+                             since='20200707')
