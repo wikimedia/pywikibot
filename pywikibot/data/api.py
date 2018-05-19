@@ -2920,6 +2920,7 @@ class PageGenerator(QueryGenerator):
         if not ('inprop' in parameters and 'protection' in parameters['inprop']):
             appendParams(parameters, 'inprop', 'protection')
         appendParams(parameters, 'iiprop', 'timestamp|user|comment|url|size|sha1|metadata')
+        appendParams(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         QueryGenerator.__init__(self, **kwargs)
         self.resultkey = "pages"  # element to look for in result

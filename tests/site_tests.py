@@ -2581,6 +2581,56 @@ class TestSiteLoadRevisionsSysop(DefaultSiteTestCase):
                             for rev in mainpage._revisions.values()))
 
 
+class TestBacklinks(TestCase):
+
+    """Test for backlinks (issue T194233)."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
+    def setUp(self):
+        """Setup tests."""
+        super(TestBacklinks, self).setUp()
+        self.page = pywikibot.Page(
+            self.site,
+            'File:Băieţi de Cartier - La Familia cover.jpg')
+        self.backlinks = list(self.page.backlinks(followRedirects=False,
+                                                  filterRedirects=True,
+                                                  total=5))
+        self.references = list(self.page.getReferences(follow_redirects=True,
+                                                       redirectsOnly=True,
+                                                       total=5))
+        self.nofollow = list(self.page.getReferences(follow_redirects=False,
+                                                     redirectsOnly=True,
+                                                     total=5))
+
+    def test_backlinks_redirects_length(self):
+        """Test backlinks redirects lenght."""
+        self.assertEqual(len(self.backlinks), 1)
+        self.assertEqual(len(self.references), 1)
+        self.assertEqual(len(self.nofollow), 1)
+
+    def test_backlinks_redirects_status(self):
+        """Test backlinks redirects statur."""
+        for page in self.backlinks:
+            self.assertTrue(page.isRedirectPage())
+        for page in self.references:
+            self.assertTrue(page.isRedirectPage())
+        for page in self.nofollow:
+            self.assertTrue(page.isRedirectPage())
+
+    def test_backlinks_redirects_pageid(self):
+        """Test backlinks redirects pageid."""
+        for page in self.backlinks:
+            self.assertEqual(page.pageid, 45341783)
+        for page in self.references:
+            self.assertEqual(page.pageid, 45341783)
+        for page in self.nofollow:
+            self.assertEqual(page.pageid, 45341783)
+
+
 class TestCommonsSite(TestCase):
 
     """Test cases for Site methods on Commons."""
