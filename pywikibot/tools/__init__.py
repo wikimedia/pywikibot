@@ -172,7 +172,7 @@ class suppress_warnings(catch_warnings):  # noqa: N801
         @type message: str
         @param category: A class (a subclass of Warning) of which the warning
             category must be a subclass in order to match.
-        @type category: Warning
+        @type category: type
         @param filename: A string containing a regular expression that the
             start of the path to the warning module must match.
             (case-sensitive)
