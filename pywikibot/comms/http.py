@@ -141,8 +141,7 @@ class _UserAgentFormatter(Formatter):
         # This is the Pywikibot revision; also map it to {version} at present.
         if key == 'version' or key == 'revision':
             return pywikibot.version.getversiondict()['rev']
-        else:
-            return super(_UserAgentFormatter, self).get_value(key, args, kwargs)
+        return super(_UserAgentFormatter, self).get_value(key, args, kwargs)
 
 
 _USER_AGENT_FORMATTER = _UserAgentFormatter()
@@ -417,8 +416,8 @@ def error_handling_callback(request):
         warning('Http response status {0}'.format(request.data.status_code))
 
 
-def _enqueue(uri, method="GET", params=None, body=None, headers=None, data=None,
-             **kwargs):
+def _enqueue(uri, method='GET', params=None, body=None, headers=None,
+             data=None, **kwargs):
     """
     Enqueue non-blocking threaded HTTP request with callback.
 
@@ -499,7 +498,8 @@ def fetch(uri, method="GET", params=None, body=None, headers=None,
     # Change user agent depending on fake UA settings.
     # Set header to new UA if needed.
     headers = headers or {}
-    if not headers.get('user-agent', None):  # Skip if already specified in request.
+    # Skip if already specified in request.
+    if not headers.get('user-agent', None):
         # Get fake UA exceptions from `fake_user_agent_exceptions` config.
         uri_domain = urlparse(uri).netloc
         use_fake_user_agent = config.fake_user_agent_exceptions.get(

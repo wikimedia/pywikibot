@@ -118,21 +118,21 @@ class SparqlQuery(object):
             for row in data['results']['bindings']:
                 values = {}
                 for var in qvars:
-                    if var in row:
-                        if full_data:
-                            if row[var]['type'] not in VALUE_TYPES:
-                                raise ValueError('Unknown type: %s' % row[var]['type'])
-                            valtype = VALUE_TYPES[row[var]['type']]
-                            values[var] = valtype(row[var], entity_url=self.entity_url)
-                        else:
-                            values[var] = row[var]['value']
-                    else:
+                    if var not in row:
                         # var is not available (OPTIONAL is probably used)
                         values[var] = None
+                    elif full_data:
+                        if row[var]['type'] not in VALUE_TYPES:
+                            raise ValueError('Unknown type: {}'
+                                             .format(row[var]['type']))
+                        valtype = VALUE_TYPES[row[var]['type']]
+                        values[var] = valtype(row[var],
+                                              entity_url=self.entity_url)
+                    else:
+                        values[var] = row[var]['value']
                 result.append(values)
             return result
-        else:
-            return None
+        return None
 
     def query(self, query, headers=DEFAULT_HEADERS):
         """
@@ -182,7 +182,8 @@ class SparqlQuery(object):
 
         Items are returned as Wikibase IDs.
 
-        @param query: Query string. Must contain ?{item_name} as one of the projected values.
+        @param query: Query string. Must contain ?{item_name} as one of the
+            projected values.
         @param item_name: Name of the value to extract
         @param result_type: type of the iterable in which
               SPARQL results are stored (default set)

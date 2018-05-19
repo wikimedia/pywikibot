@@ -514,7 +514,8 @@ class MediaWikiVersion(Version):
             for handled in ('wmf', 'alpha', 'beta', 'rc'):
                 # if any of those pops up here our parser has failed
                 assert handled not in version_match.group(2), \
-                    'Found "{0}" in "{1}"'.format(handled, version_match.group(2))
+                    'Found "{0}" in "{1}"'.format(handled,
+                                                  version_match.group(2))
             if version_match.group(2):
                 debug('Additional unused version part '
                       '"{0}"'.format(version_match.group(2)),
@@ -734,7 +735,7 @@ class ThreadList(list):
                 raise TypeError("Cannot add '%s' to ThreadList" % type(item))
 
     def active_count(self):
-        """Return the number of alive threads, and delete all non-alive ones."""
+        """Return the number of alive threads and delete all non-alive ones."""
         cnt = 0
         for item in self[:]:
             if item.isAlive():
@@ -1007,8 +1008,8 @@ def open_archive(filename, mode='rb', use_extension=True):
         'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
         mode. It defaults to 'rb'.
     @type mode: string
-    @raises ValueError: When 7za is not available or the opening mode is unknown
-        or it tries to write a 7z archive.
+    @raises ValueError: When 7za is not available or the opening mode is
+        unknown or it tries to write a 7z archive.
     @raises FileNotFoundError: When the filename doesn't exist and it tries
         to read from it or it tries to determine the compression algorithm (or
         IOError on Python 2).
@@ -1075,7 +1076,7 @@ def open_archive(filename, mode='rb', use_extension=True):
 
 def merge_unique_dicts(*args, **kwargs):
     """
-    Return a merged dict and making sure that the original dicts had unique keys.
+    Return a merged dict and make sure that the original dicts keys are unique.
 
     The positional arguments are the dictionaries to be merged. It is also
     possible to define an additional dict using the keyword arguments.
@@ -1087,8 +1088,9 @@ def merge_unique_dicts(*args, **kwargs):
         conflicts |= set(arg.keys()) & set(result.keys())
         result.update(arg)
     if conflicts:
-        raise ValueError('Multiple dicts contain the same keys: '
-                         '{0}'.format(', '.join(sorted(unicode(key) for key in conflicts))))
+        raise ValueError('Multiple dicts contain the same keys: {0}'
+                         .format(', '.join(sorted(unicode(key)
+                                                  for key in conflicts))))
     return result
 
 
@@ -1338,7 +1340,8 @@ def deprecated(*args, **kwargs):
 
         return wrapper
 
-    without_parameters = len(args) == 1 and len(kwargs) == 0 and callable(args[0])
+    without_parameters = (len(args) == 1 and len(kwargs) == 0
+                          and callable(args[0]))
     if 'instead' in kwargs:
         instead = kwargs['instead']
     elif not without_parameters and len(args) == 1:
@@ -1491,7 +1494,8 @@ def remove_last_args(arg_names):
             if len(__args) > len(args):
                 deprecated.update(arg_names[:len(__args) - len(args)])
             # remove at most |arg_names| entries from the back
-            new_args = tuple(__args[:max(len(args), len(__args) - len(arg_names))])
+            new_args = tuple(__args[:max(len(args),
+                                         len(__args) - len(arg_names))])
             new_kwargs = {arg: val for arg, val in __kw.items()
                           if arg not in arg_names}
 

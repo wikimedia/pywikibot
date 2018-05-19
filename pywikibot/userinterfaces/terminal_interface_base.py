@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Base for terminal user interfaces."""
 #
-# (C) Pywikibot team, 2003-2016
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -18,7 +18,8 @@ import pywikibot
 from pywikibot import config2 as config
 from pywikibot.bot import VERBOSE, INFO, STDOUT, INPUT, WARNING
 from pywikibot.bot_choice import (
-    Option, OutputOption, StandardOption, ChoiceException, QuitKeyboardInterrupt,
+    Option, OutputOption, StandardOption, ChoiceException,
+    QuitKeyboardInterrupt,
 )
 from pywikibot.tools import deprecated, PY2
 from pywikibot.userinterfaces import transliteration
@@ -147,7 +148,8 @@ class UI(object):
 
     def _print(self, text, target_stream):
         """Write the text to the target stream handling the colors."""
-        colorized = config.colorized_output and self.support_color(target_stream)
+        colorized = (config.colorized_output
+                     and self.support_color(target_stream))
         colored_line = False
         # Color tags might be cascaded, e.g. because of transliteration.
         # Therefore we need this stack.
@@ -201,8 +203,9 @@ class UI(object):
             codecedText = text.encode(self.encoding,
                                       'replace').decode(self.encoding)
             if self.transliteration_target:
-                codecedText = codecedText.encode(self.transliteration_target,
-                                                 'replace').decode(self.transliteration_target)
+                codecedText = codecedText.encode(
+                    self.transliteration_target,
+                    'replace').decode(self.transliteration_target)
             transliteratedText = ''
             # Note: A transliteration replacement might be longer than the
             # original character, e.g. ч is transliterated to ch.
@@ -310,8 +313,8 @@ class UI(object):
             text = text.decode(self.encoding)
         return text
 
-    def input_choice(self, question, options, default=None, return_shortcut=True,
-                     automatic_quit=True, force=False):
+    def input_choice(self, question, options, default=None,
+                     return_shortcut=True, automatic_quit=True, force=False):
         """
         Ask the user and returns a value from the options.
 
@@ -335,8 +338,8 @@ class UI(object):
         @param return_shortcut: Whether the shortcut or the index in the option
             should be returned.
         @type return_shortcut: bool
-        @param automatic_quit: Adds the option 'Quit' ('q') if True and throws a
-            L{QuitKeyboardInterrupt} if selected.
+        @param automatic_quit: Adds the option 'Quit' ('q') if True and throws
+            a L{QuitKeyboardInterrupt} if selected.
         @type automatic_quit: bool
         @param force: Automatically use the default
         @type force: bool
@@ -402,7 +405,8 @@ class UI(object):
         into a tuple list. It always returns the hotkeys and throws no
         L{QuitKeyboardInterrupt} if quit was selected.
         """
-        return self.input_choice(question=question, options=zip(options, hotkeys),
+        return self.input_choice(question=question, options=zip(options,
+                                                                hotkeys),
                                  default=default, return_shortcut=True,
                                  automatic_quit=False)
 
@@ -458,7 +462,8 @@ class UI(object):
         """Return the decoded arguments from argv."""
         try:
             return [s.decode(self.encoding) for s in self.argv]
-        except AttributeError:  # in python 3, self.argv is unicode and thus cannot be decoded
+        # in python 3, self.argv is unicode and thus cannot be decoded
+        except AttributeError:
             return [s for s in self.argv]
 
 

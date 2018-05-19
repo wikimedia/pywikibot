@@ -24,10 +24,10 @@ class SequenceOutputter(object):
     It is possible to customize the appearance by changing C{format_string}
     which is used by C{str.format} with C{index}, C{width} and C{item}. Each
     line is joined by the separator and the complete text is surrounded by the
-    prefix and the suffix. All three are by default a new line. The index starts
-    at 1 and for the width it's using the width of the sequence's length written
-    as a decimal number. So a length of 100 will result in a with of 3 and a
-    length of 99 in a width of 2.
+    prefix and the suffix. All three are by default a new line. The index
+    starts at 1 and for the width it's using the width of the sequence's length
+    written as a decimal number. So a length of 100 will result in a with of 3
+    and a length of 99 in a width of 2.
 
     It is iterating over C{self.sequence} to generate the text. That sequence
     can be any iterator but the result is better when it has an order.
