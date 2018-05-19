@@ -569,6 +569,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             'titles': [self.mainpage.title()],
             'prop': ['info', 'imageinfo', 'categoryinfo'],
             'inprop': ['protection'],
+            'iilimit': ['max'],
             'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                        'sha1', 'metadata'],
             'generator': ['templates'], 'action': ['query'],
@@ -600,6 +601,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             'redirects': [False],
             'prop': ['info', 'imageinfo', 'categoryinfo'],
             'inprop': ['protection'],
+            'iilimit': ['max'],
             'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                        'sha1', 'metadata'], 'generator': ['links'],
             'action': ['query'], 'indexpageids': [True], 'continue': [True]}
@@ -1094,6 +1096,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 'gqppage': ['UnconnectedPages'],
                 'prop': ['info', 'imageinfo', 'categoryinfo'],
                 'inprop': ['protection'],
+                'iilimit': ['max'],
                 'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                            'sha1', 'metadata'],
                 'generator': ['querypage'], 'action': ['query'],
