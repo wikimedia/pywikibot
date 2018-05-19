@@ -73,6 +73,9 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '\n==Bar==',
             self.cct.removeEmptySections('\n==Foo==\n<!-- Baz -->\n==Bar=='))
+        # comments and content between
+        testcase = '\n== Foo ==\n<!-- Baz -->\nBaz\n<!-- Foo -->\n== Bar =='
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
         # inside comment
         self.assertEqual(
             '<!--\n==Foo==\n\n==Bar==\n-->',

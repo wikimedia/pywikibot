@@ -642,7 +642,7 @@ class CosmeticChangesToolkit(object):
         return text
 
     def removeEmptySections(self, text):
-        """Cleanup multiple empty sections."""
+        """Cleanup empty sections."""
         exceptions = ['comment', 'pre', 'source', 'nowiki', 'code',
                       'startspace']
 
@@ -654,15 +654,24 @@ class CosmeticChangesToolkit(object):
         if self.site.code in skip_templates:
             for template in skip_templates[self.site.code]:
                 skip_regexes.append(
-                    re.compile(r'\{\{\s*' + template + r'\s*\}\}', re.I))
-        skip_regexes.append(re.compile(r'\s*'))
+                    re.compile(r'\{\{\s*%s\s*\}\}' % template, re.I))
+        stripped_text = str(text)
+        for reg in skip_regexes:
+            stripped_text = reg.sub(r'', stripped_text)
 
-        pattern = re.compile(r'\n(=+) *[^=]+? *\1(?:'
-                             + '|'.join(x.pattern for x in skip_regexes)
-                             + r')+(?=\1 *[^=]+? *\1)', re.I)
-        text = textlib.replaceExcept(text, pattern, r'\n',
-                                     exceptions=exceptions,
-                                     caseInsensitive=True)
+        stripped_pattern = re.compile(
+            r'\n((=+) *[^\n=]+? *\2) *\n\s*(?=(\2 *[^\n=]+? *\2))')
+        pos = 0
+        while True:
+            match = stripped_pattern.search(stripped_text[pos:])
+            if not match:
+                break
+            pattern = re.compile(r'\n{}.+?(?={})'.format(
+                match.group(1), match.group(3)), re.DOTALL)
+            text = textlib.replaceExcept(text, pattern, r'\n',
+                                         exceptions=exceptions)
+            pos = match.end()
+
         return text
 
     def removeUselessSpaces(self, text):
