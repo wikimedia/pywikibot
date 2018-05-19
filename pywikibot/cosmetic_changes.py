@@ -71,7 +71,8 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config, textlib
-from pywikibot.textlib import _MultiTemplateMatchBuilder, FILE_LINK_REGEX
+from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
+                               _get_regexes)
 from pywikibot.tools import deprecated_args, first_lower, first_upper
 from pywikibot.tools import MediaWikiVersion
 
@@ -255,6 +256,7 @@ class CosmeticChangesToolkit(object):
             self.replaceDeprecatedTemplates,
             # FIXME: fix bugs and re-enable
             # self.resolveHtmlEntities,
+            self.removeEmptySections,
             self.removeUselessSpaces,
             self.removeNonBreakingSpaceBeforePercent,
 
@@ -637,6 +639,30 @@ class CosmeticChangesToolkit(object):
         if self.template:
             ignore += [58]
         text = pywikibot.html2unicode(text, ignore=ignore)
+        return text
+
+    def removeEmptySections(self, text):
+        """Cleanup multiple empty sections."""
+        exceptions = ['comment', 'pre', 'source', 'nowiki', 'code',
+                      'startspace']
+
+        skippings = ['comment']
+        skip_regexes = _get_regexes(skippings, self.site)
+        skip_templates = {
+            'cs': ('Pahýl[ _]část',),  # stub section
+        }
+        if self.site.code in skip_templates:
+            for template in skip_templates[self.site.code]:
+                skip_regexes.append(
+                    re.compile(r'\{\{\s*' + template + r'\s*\}\}', re.I))
+        skip_regexes.append(re.compile(r'\s*'))
+
+        pattern = re.compile(r'\n(=+) *[^=]+? *\1(?:'
+                             + '|'.join(x.pattern for x in skip_regexes)
+                             + r')+(?=\1 *[^=]+? *\1)', re.I)
+        text = textlib.replaceExcept(text, pattern, r'\n',
+                                     exceptions=exceptions,
+                                     caseInsensitive=True)
         return text
 
     def removeUselessSpaces(self, text):

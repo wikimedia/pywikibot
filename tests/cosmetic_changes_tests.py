@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cosmetic_changes module."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,6 +55,28 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '&amp;#&nbsp;# #0#&#62;#x',
             self.cct.resolveHtmlEntities('&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
+
+    def test_removeEmptySections(self):
+        """Test removeEmptySections method."""
+        # same level
+        self.assertEqual(
+            '\n==Bar==',
+            self.cct.removeEmptySections('\n== Foo ==\n\n==Bar=='))
+        # different level
+        self.assertEqual(
+            '\n===Foo===\n\n==Bar==',
+            self.cct.removeEmptySections('\n===Foo===\n\n==Bar=='))
+        self.assertEqual(
+            '\n==Foo==\n\n===Bar===',
+            self.cct.removeEmptySections('\n==Foo==\n\n===Bar==='))
+        # comment inside
+        self.assertEqual(
+            '\n==Bar==',
+            self.cct.removeEmptySections('\n==Foo==\n<!-- Baz -->\n==Bar=='))
+        # inside comment
+        self.assertEqual(
+            '<!--\n==Foo==\n\n==Bar==\n-->',
+            self.cct.removeEmptySections('<!--\n==Foo==\n\n==Bar==\n-->'))
 
     def test_removeUselessSpaces(self):
         """Test removeUselessSpaces method."""
