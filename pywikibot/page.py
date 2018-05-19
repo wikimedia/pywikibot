@@ -2855,6 +2855,7 @@ class Category(Page):
             (requires MW 1.18+)
         @type endprefix: str
         """
+        seen = set()
         for member in self.site.categorymembers(self,
                                                 namespaces=namespaces,
                                                 total=total,
@@ -2868,6 +2869,8 @@ class Category(Page):
                                                 endprefix=endprefix,
                                                 member_type=['page', 'file']
                                                 ):
+            if recurse:
+                seen.add(hash(member))
             yield member
             if total is not None:
                 total -= 1
@@ -2889,6 +2892,10 @@ class Category(Page):
                                                startprefix=startprefix,
                                                endprefix=endprefix,
                                                ):
+                    hash_value = hash(article)
+                    if hash_value in seen:
+                        continue
+                    seen.add(hash_value)
                     yield article
                     if total is not None:
                         total -= 1
