@@ -6,7 +6,8 @@ Script to upload images to wikipedia.
 Arguments:
 
   -keep         Keep the filename as is
-  -filename     Target filename without the namespace prefix
+  -filename:    Target filename without the namespace prefix
+  -prefix:      Add specified prefix to every filename.
   -noverify     Do not ask for verification of the upload description if one
                 is given
   -abortonwarn: Abort upload on the specified warning type. If no warning type
@@ -31,7 +32,7 @@ Arguments:
                 the 'exists' warning.
   -recursive    When the filename is a directory it also uploads the files from
                 the subdirectories.
-  -summary      Pick a custom edit summary for the bot.
+  -summary:     Pick a custom edit summary for the bot.
 
 It is possible to combine -abortonwarn and -ignorewarn so that if the specific
 warning is given it won't apply the general one but more specific one. So if it
@@ -105,6 +106,7 @@ def main(*args):
     keepFilename = False
     always = False
     useFilename = None
+    filename_prefix = None
     verifyDescription = True
     aborts = set()
     ignorewarn = set()
@@ -128,6 +130,8 @@ def main(*args):
             keepFilename = True
         elif arg == '-filename':
             useFilename = value
+        elif arg == '-prefix':
+            filename_prefix = value
         elif arg == '-summary':
             summary = value
         elif arg == '-noverify':
@@ -196,10 +200,10 @@ def main(*args):
 
     bot = UploadRobot(url, description=description, useFilename=useFilename,
                       keepFilename=keepFilename,
-                      verifyDescription=verifyDescription,
-                      aborts=aborts, ignoreWarning=ignorewarn,
-                      chunk_size=chunk_size, always=always,
-                      summary=summary)
+                      verifyDescription=verifyDescription, aborts=aborts,
+                      ignoreWarning=ignorewarn, chunk_size=chunk_size,
+                      always=always, summary=summary,
+                      filename_prefix=filename_prefix)
     bot.run()
 
 
