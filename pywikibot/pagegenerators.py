@@ -27,7 +27,6 @@ import itertools
 import json
 import re
 import sys
-import time
 
 from datetime import timedelta
 from warnings import warn
@@ -2043,7 +2042,7 @@ def RepeatingGenerator(generator, key_func=lambda x: x, sleep_duration=60,
                         return
                 else:
                     break
-            time.sleep(sleep_duration)
+            pywikibot.sleep(sleep_duration)
         for item in list(filtered_generator())[::-1]:
             yield item
 

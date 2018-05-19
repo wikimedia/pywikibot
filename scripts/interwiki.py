@@ -356,7 +356,6 @@ import re
 import shelve
 import socket
 import sys
-import time
 
 import pywikibot
 
@@ -1922,7 +1921,7 @@ class Subject(interwiki_graph.Subject):
                     pywikibot.output('Sleeping %i seconds before trying again.'
                                      % (timeout,))
                     timeout *= 2
-                    time.sleep(timeout)
+                    pywikibot.sleep(timeout)
                 except pywikibot.ServerError:
                     if timeout > 3600:
                         raise
@@ -1930,7 +1929,7 @@ class Subject(interwiki_graph.Subject):
                     pywikibot.output('Sleeping %i seconds before trying again.'
                                      % (timeout,))
                     timeout *= 2
-                    time.sleep(timeout)
+                    pywikibot.sleep(timeout)
                 else:
                     break
             return True
@@ -2177,7 +2176,7 @@ class InterwikiBot(object):
                             'ERROR: could not retrieve more pages. '
                             'Will try again in %d seconds'
                             % timeout)
-                        time.sleep(timeout)
+                        pywikibot.sleep(timeout)
                         timeout *= 2
                     else:
                         break

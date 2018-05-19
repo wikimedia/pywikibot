@@ -26,7 +26,7 @@ Todo
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,7 +37,6 @@ import hashlib
 import io
 import re
 import sys
-import time
 
 import pywikibot
 from pywikibot import config, textlib
@@ -92,7 +91,7 @@ def getPhoto(flickr, photo_id):
             return photoInfo, photoSizes
         except flickrapi.exceptions.FlickrError:
             pywikibot.output(u'Flickr api problem, sleeping')
-            time.sleep(30)
+            pywikibot.sleep(30)
 
 
 def isAllowedLicense(photoInfo):
@@ -390,7 +389,7 @@ def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
             except flickrapi.exceptions.FlickrError:
                 gotPhotos = False
                 pywikibot.output(u'Flickr api problem, sleeping')
-                time.sleep(30)
+                pywikibot.sleep(30)
 
     return
 

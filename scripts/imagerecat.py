@@ -36,7 +36,6 @@ from __future__ import absolute_import, unicode_literals
 import re
 import socket
 import sys
-import time
 import xml.etree.ElementTree
 
 import pywikibot
@@ -233,10 +232,10 @@ def getOpenStreetMap(latitude, longitude):
             gotInfo = True
         except IOError:
             pywikibot.output(u'Got an IOError, let\'s try again')
-            time.sleep(30)
+            pywikibot.sleep(30)
         except socket.timeout:
             pywikibot.output(u'Got a timeout, let\'s try again')
-            time.sleep(30)
+            pywikibot.sleep(30)
     validParts = [u'hamlet', u'village', u'city', u'county', u'country']
     invalidParts = [u'path', u'road', u'suburb', u'state', u'country_code']
     addressparts = et.find('addressparts')

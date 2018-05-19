@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2017
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,11 +9,10 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 import sys
-import time
 
 from requests.exceptions import Timeout
 
-from pywikibot import config, warning, Site
+from pywikibot import config, warning, Site, sleep
 from pywikibot.comms import http
 from pywikibot.tools import UnicodeMixin, py2_encode_utf_8
 from pywikibot.exceptions import Error, TimeoutError
@@ -162,7 +161,7 @@ class SparqlQuery(object):
         if self.max_retries < 0:
             raise TimeoutError('Maximum retries attempted without success.')
         warning('Waiting {0} seconds before retrying.'.format(self.retry_wait))
-        time.sleep(self.retry_wait)
+        sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
         self.retry_wait = min(120, self.retry_wait * 2)
 

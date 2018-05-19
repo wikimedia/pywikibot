@@ -454,7 +454,7 @@ def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
                 yield page[1]
         if repeat:
             pywikibot.output(u'Sleeping for %d seconds' % delay)
-            time.sleep(delay)
+            pywikibot.sleep(delay)
         else:
             break
 

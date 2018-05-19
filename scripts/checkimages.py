@@ -1754,8 +1754,7 @@ def main(*args):
 
         if repeat:
             pywikibot.output(u"Waiting for %s seconds," % time_sleep)
-            pywikibot.stopme()
-            time.sleep(time_sleep)
+            pywikibot.sleep(time_sleep)
         else:
             break
 

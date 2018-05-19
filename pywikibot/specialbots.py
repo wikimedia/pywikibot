@@ -3,7 +3,7 @@
 """Library containing special bots."""
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,7 +11,6 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import tempfile
-import time
 
 import pywikibot
 import pywikibot.data.api
@@ -181,7 +180,7 @@ class UploadRobot(BaseBot):
                     if valid_ranges and rlen > 0:
                         resume = True
                     pywikibot.output(u"Sleeping for %d seconds..." % dt)
-                    time.sleep(dt)
+                    pywikibot.sleep(dt)
                     if dt <= 60:
                         dt += 15
                     elif dt < 360:

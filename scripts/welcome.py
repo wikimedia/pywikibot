@@ -845,8 +845,7 @@ class WelcomeBot(object):
                             u"%d %b %Y %H:%M:%S (UTC)", time.gmtime())
                     pywikibot.output(u'Sleeping %d seconds before rerun. %s'
                                      % (globalvar.timeRecur, strfstr))
-                    pywikibot.stopme()
-                    time.sleep(globalvar.timeRecur)
+                    pywikibot.sleep(globalvar.timeRecur)
                 else:
                     raise KeyboardInterrupt
             except KeyboardInterrupt:
