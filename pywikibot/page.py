@@ -1910,8 +1910,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
                     self.site._noMarkDeletePrompt = True
             if answer == 'y':
                 template = '{{delete|1=%s}}\n' % reason
-                self.text = template + self.text
-                return self.save(summary=reason)
+                # We can't add templates in a wikidata item, so let's use its
+                # talk page
+                if isinstance(self, pywikibot.ItemPage):
+                    talk = self.toggleTalkPage()
+                    talk.text = template + talk.text
+                    talk.save(summary=reason)
+                else:
+                    self.text = template + self.text
+                    self.save(summary=reason)
 
     @deprecated_args(step=None)
     def loadDeletedRevisions(self, total=None):
