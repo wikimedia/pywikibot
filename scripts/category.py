@@ -255,9 +255,10 @@ class CategoryPreprocess(BaseBot):
                 tmpl = [tmpl]
             if tmpl != []:
                 templates = page.templatesWithParams()
-                for template in templates:
-                    if template[0].title(withNamespace=False).lower() in tmpl:
-                        doc_page = pywikibot.Page(page.site, template[1])
+                for template, params in templates:
+                    if (template.title(withNamespace=False).lower() in tmpl
+                            and params):
+                        doc_page = pywikibot.Page(page.site, params[0])
                         if doc_page.exists():
                             page = doc_page
                             includeonly = ['includeonly']
