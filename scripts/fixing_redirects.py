@@ -13,7 +13,7 @@ options -file, -ref, -links, ...
 
 """
 #
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,7 +25,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                            AutomaticTWSummaryBot, suggest_help)
-from pywikibot.textlib import does_text_contain_section
+from pywikibot.textlib import does_text_contain_section, isDisabled
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import first_lower, first_upper as firstcap
 
@@ -64,9 +64,11 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 break
             # Make sure that next time around we will not find this same hit.
             curpos = m.start() + 1
-            # ignore interwiki links and links to sections of the same page
-            if m.group('title').strip() == '' or \
-               mysite.isInterwikiLink(m.group('title')):
+            # ignore interwiki links, links in the disabled area
+            # and links to sections of the same page
+            if (m.group('title').strip() == ''
+                    or mysite.isInterwikiLink(m.group('title'))
+                    or isDisabled(text, m.start())):
                 continue
             else:
                 actualLinkPage = pywikibot.Page(targetPage.site, m.group('title'))
