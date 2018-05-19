@@ -843,14 +843,14 @@ def filter_unique(iterable, container=None, key=None, add=None):
     """
     Yield unique items from an iterable, omitting duplicates.
 
-    By default, to provide uniqueness, it puts the generated items into
-    the keys of a dict created as a local variable, each with a value of True.
-    It only yields items which are not already present in the local dict.
+    By default, to provide uniqueness, it puts the generated items into a
+    set created as a local variable. It only yields items which are not
+    already present in the local set.
 
     For large collections, this is not memory efficient, as a strong reference
-    to every item is kept in a local dict which can not be cleared.
+    to every item is kept in a local set which can not be cleared.
 
-    Also, the local dict cant be re-used when chaining unique operations on
+    Also, the local set can't be re-used when chaining unique operations on
     multiple generators.
 
     To avoid these issues, it is advisable for the caller to provide their own
@@ -876,7 +876,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
     @type add: callable
     """
     if container is None:
-        container = {}
+        container = set()
 
     if not add:
         if hasattr(container, 'add'):
