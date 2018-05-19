@@ -80,8 +80,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
         # Which languages have a special order for putting interlanguage links,
         # and what order is it? If a language is not in interwiki_putfirst,
-        # alphabetical order on language code is used. For languages that are in
-        # interwiki_putfirst, interwiki_putfirst is checked first, and
+        # alphabetical order on language code is used. For languages that are
+        # in interwiki_putfirst, interwiki_putfirst is checked first, and
         # languages are put in the order given there. All other languages are
         # put after those, in code-alphabetical order.
 

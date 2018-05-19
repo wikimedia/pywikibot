@@ -7,7 +7,7 @@ function/method instead.
 
 """
 #
-# (C) Pywikibot team, 2008
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -27,4 +27,5 @@ __all__ = ('Category', 'change_category',)
 
 wrapper = ModuleDeprecationWrapper(__name__)
 wrapper._add_deprecated_attr('Category', replacement_name='pywikibot.Category')
-wrapper._add_deprecated_attr('change_category', replacement_name='Page.change_category')
+wrapper._add_deprecated_attr('change_category',
+                             replacement_name='Page.change_category')

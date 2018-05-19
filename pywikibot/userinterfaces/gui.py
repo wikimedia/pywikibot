@@ -10,7 +10,7 @@ from __future__ import absolute_import, unicode_literals
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 #     Wikiwichtel
-# (C) Pywikibot team, 2008-2014
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -80,7 +80,8 @@ class TextEditor(ScrolledText):
             'height': idleConf.GetOption('main', 'EditorWindow', 'height'),
         }
         fontWeight = 'normal'
-        if idleConf.GetOption('main', 'EditorWindow', 'font-bold', type='bool'):
+        if idleConf.GetOption('main', 'EditorWindow', 'font-bold',
+                              type='bool'):
             fontWeight = 'bold'
         textcf['font'] = (idleConf.GetOption('main', 'EditorWindow', 'font'),
                           idleConf.GetOption('main', 'EditorWindow',
@@ -280,7 +281,7 @@ class EditBoxWindow(Tkinter.Frame):
         self.bind("<<open-config-dialog>>", self.config_dialog)
 
         bottom = Tkinter.Frame(parent)
-        # lower left subframe which will contain a textfield and a Search button
+        # lower left subframe with a textfield and a Search button
         bottom_left_frame = Tkinter.Frame(bottom)
         self.textfield = Tkinter.Entry(bottom_left_frame)
         self.textfield.pack(side=Tkinter.LEFT, fill=Tkinter.X, expand=1)
@@ -389,8 +390,8 @@ class EditBoxWindow(Tkinter.Frame):
             # lines are indexed starting at 1
             line = text[:jumpIndex].count('\n') + 1
             column = jumpIndex - (text[:jumpIndex].rfind('\n') + 1)
-            # don't know how to place the caret, but scrolling to the right line
-            # should already be helpful.
+            # don't know how to place the caret, but scrolling to the right
+            # line should already be helpful.
             self.editbox.see('%d.%d' % (line, column))
         # wait for user to push a button which will destroy (close) the window
         self.parent.mainloop()
@@ -464,7 +465,8 @@ class ListBoxWindow(object):
         self.bottom_frame = Tkinter.Frame(parent)
         self.bottom_frame.pack(side=Tkinter.BOTTOM)
 
-        buttonOK = Tkinter.Button(self.bottom_frame, text='OK', command=self.pressedOK)
+        buttonOK = Tkinter.Button(self.bottom_frame, text='OK',
+                                  command=self.pressedOK)
         buttonOK.pack(side=Tkinter.LEFT, fill=Tkinter.X)
         # idea: set title to cur_disambiguation
 
@@ -512,7 +514,8 @@ class Tkdialog(object):
         self.image_panel.image = self.image
 
         # The filename
-        self.filename_label = Tkinter.Label(self.root, text=u"Suggested filename")
+        self.filename_label = Tkinter.Label(self.root,
+                                            text='Suggested filename')
         self.filename_field = Tkinter.Entry(self.root, width=100)
         self.filename_field.insert(Tkinter.END, filename)
 
@@ -523,9 +526,9 @@ class Tkdialog(object):
                                                        orient=Tkinter.VERTICAL)
         self.description_field = Tkinter.Text(self.root)
         self.description_field.insert(Tkinter.END, photo_description)
-        self.description_field.config(state=Tkinter.NORMAL, height=12, width=100,
-                                      padx=0, pady=0, wrap=Tkinter.WORD,
-                                      yscrollcommand=self.description_scrollbar.set)
+        self.description_field.config(
+            state=Tkinter.NORMAL, height=12, width=100, padx=0, pady=0,
+            wrap=Tkinter.WORD, yscrollcommand=self.description_scrollbar.set)
         self.description_scrollbar.config(command=self.description_field.yview)
 
         # The buttons

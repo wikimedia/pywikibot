@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Omega Wiki."""
 #
-# (C) Pywikibot team, 2006-2015
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -22,8 +22,8 @@ class Family(family.SingleSiteFamily):
         """Constructor."""
         super(Family, self).__init__()
 
-        # On most Wikipedias page names must start with a capital letter, but some
-        # languages don't use this.
+        # On most Wikipedias page names must start with a capital letter,
+        # but some languages don't use this.
 
         self.nocapitalize = list(self.langs.keys())
 

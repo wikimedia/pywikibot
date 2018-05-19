@@ -2,7 +2,7 @@
 """Stdout, stderr and argv support for unicode."""
 #
 # (C) David-Sarah Hopwood, 2010
-# (C) Pywikibot team, 2012-2015
+# (C) Pywikibot team, 2012-2018
 #
 ##############################################
 # Support for unicode in windows cmd.exe
@@ -78,7 +78,8 @@ class UnicodeInput(IOBase):
         """Read one line from the input."""
         maxnum = DWORD(self.bufsize - 1)
         numrecv = DWORD(0)
-        result = ReadConsoleW(self._hConsole, self.buffer, maxnum, byref(numrecv), None)
+        result = ReadConsoleW(self._hConsole, self.buffer, maxnum,
+                              byref(numrecv), None)
         if not result:
             raise Exception("stdin failure")
         data = self.buffer.value[:numrecv.value]
@@ -169,7 +170,7 @@ def old_fileno(std_name):
             pass
 
 
-# If any exception occurs in this code, we'll probably try to print it on stderr,
+# If any exception occurs in this code, try to print it on stderr,
 # which makes for frustrating debugging if stderr is directed to our wrapper.
 # So be paranoid about catching errors and reporting them to original_stderr,
 # so that we can at least see them.
@@ -181,7 +182,8 @@ def _complain(message):
 def register_cp65001():
     """Register codecs cp65001 as utf-8."""
     # Work around <http://bugs.python.org/issue6058>.
-    codecs.register(lambda name: name == 'cp65001' and codecs.lookup('utf-8') or None)
+    codecs.register(lambda name: name == 'cp65001'
+                    and codecs.lookup('utf-8') or None)
 
 
 def force_truetype_console(h_stdout):
@@ -245,7 +247,8 @@ def get_unicode_console():
     """
     # Make Unicode console output work independently of the current code page.
     # This also fixes <http://bugs.python.org/issue1602>.
-    # Credit to Michael Kaplan <http://blogs.msdn.com/b/michkap/archive/2010/04/07/9989346.aspx>
+    # Credit to Michael Kaplan
+    # <http://blogs.msdn.com/b/michkap/archive/2010/04/07/9989346.aspx>
     # and TZOmegaTZIOY
     # <https://stackoverflow.com/questions/878972/windows-cmd-encoding-change-causes-python-crash/1432462#1432462>.
 
@@ -265,11 +268,13 @@ def get_unicode_console():
         # <https://msdn.microsoft.com/en-us/library/ms683167(VS.85).aspx>
         # BOOL WINAPI GetConsoleMode(HANDLE hConsole, LPDWORD lpMode);
 
-        GetStdHandle = WINFUNCTYPE(HANDLE, DWORD)(("GetStdHandle", windll.kernel32))
+        GetStdHandle = WINFUNCTYPE(HANDLE, DWORD)(('GetStdHandle',
+                                                   windll.kernel32))
         STD_INPUT_HANDLE = DWORD(-10)
         STD_OUTPUT_HANDLE = DWORD(-11)
         STD_ERROR_HANDLE = DWORD(-12)
-        GetFileType = WINFUNCTYPE(DWORD, DWORD)(("GetFileType", windll.kernel32))
+        GetFileType = WINFUNCTYPE(DWORD, DWORD)(('GetFileType',
+                                                 windll.kernel32))
         FILE_TYPE_CHAR = 0x0002
         FILE_TYPE_REMOTE = 0x8000
         GetConsoleMode = (WINFUNCTYPE(BOOL, HANDLE, POINTER(DWORD))
@@ -329,7 +334,8 @@ def get_unicode_console():
                 stderr = UnicodeOutput(None, sys.stderr, old_stderr_fileno,
                                        '<Unicode redirected stderr>')
     except Exception as e:
-        _complain("exception %r while fixing up sys.stdout and sys.stderr" % (e,))
+        _complain('exception {!r} while fixing up sys.stdout and sys.stderr'
+                  .format(e))
 
     # While we're at it, let's unmangle the command-line arguments:
 
@@ -356,8 +362,8 @@ def get_unicode_console():
                 break
             argv = argv[1:]
             if arg == u'-m':
-                # sys.argv[0] should really be the absolute path of the module source,
-                # but never mind
+                # sys.argv[0] should really be the absolute path of the module
+                # source, but never mind
                 break
             if arg == u'-c':
                 argv[0] = u'-c'

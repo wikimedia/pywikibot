@@ -21,669 +21,672 @@ class transliterator(object):
         @type encoding: str
         """
         self.trans = {}
-        for char in u"ÀÁÂẦẤẪẨẬÃĀĂẰẮẴẶẲȦǠẠḀȂĄǍẢ":
-            self.trans[char] = u"A"
-        for char in u"ȀǞ":
-            self.trans[char] = u"Ä"
-        self.trans[u"Ǻ"] = u"Å"
-        self.trans[u"Ä"] = u"Ae"
-        self.trans[u"Å"] = u"Aa"
-        for char in u"àáâầấẫẩậãāăằắẵặẳȧǡạḁȃąǎảẚ":
-            self.trans[char] = u"a"
-        for char in u"ȁǟ":
-            self.trans[char] = u"ä"
-        self.trans[u"ǻ"] = u"å"
-        self.trans[u"ä"] = u"ae"
-        self.trans[u"å"] = u"aa"
-        for char in u"ḂḄḆƁƂ":
-            self.trans[char] = u"B"
-        for char in u"ḃḅḇƀɓƃ":
-            self.trans[char] = u"b"
-        for char in u"ĆĈĊÇČƇ":
-            self.trans[char] = u"C"
-        for char in u"ćĉċçčƈȼ":
-            self.trans[char] = u"c"
-        self.trans[u"Ḉ"] = u"Ç"
-        self.trans[u"ḉ"] = u"ç"
-        self.trans[u"Ð"] = u"Dh"
-        self.trans[u"ð"] = u"dh"
-        for char in u"ĎḊḌḎḐḒĐƉƊƋ":
-            self.trans[char] = u"D"
-        for char in u"ďḋḍḏḑḓđɖɗƌ":
-            self.trans[char] = u"d"
-        for char in u"ÈȄÉÊḚËĒḔḖĔĖẸE̩ȆȨḜĘĚẼḘẺ":
-            self.trans[char] = u"E"
-        for char in u"ỀẾỄỆỂ":
-            self.trans[char] = u"Ê"
-        for char in u"èȅéêḛëēḕḗĕėẹe̩ȇȩḝęěẽḙẻ":
-            self.trans[char] = u"e"
-        for char in u"ềếễệể":
-            self.trans[char] = u"ê"
-        for char in u"ḞƑ":
-            self.trans[char] = u"F"
-        for char in u"ḟƒ":
-            self.trans[char] = u"f"
-        for char in u"ǴḠĞĠĢǦǤƓ":
-            self.trans[char] = u"G"
-        for char in u"ǵḡğġģǧǥɠ":
-            self.trans[char] = u"g"
-        self.trans[u"Ĝ"] = u"Gx"
-        self.trans[u"ĝ"] = u"gx"
-        for char in u"ḢḤḦȞḨḪH̱ĦǶ":
-            self.trans[char] = u"H"
-        for char in u"ḣḥḧȟḩḫ̱ẖħƕ":
-            self.trans[char] = u"h"
-        for char in u"IÌȈÍÎĨḬÏḮĪĬȊĮǏİỊỈƗ":
-            self.trans[char] = u"I"
-        for char in u"ıìȉíîĩḭïḯīĭȋįǐiịỉɨ":
-            self.trans[char] = u"i"
-        for char in u"ĴJ":
-            self.trans[char] = u"J"
-        for char in u"ɟĵ̌ǰ":
-            self.trans[char] = u"j"
-        for char in u"ḰǨĶḲḴƘ":
-            self.trans[char] = u"K"
-        for char in u"ḱǩķḳḵƙ":
-            self.trans[char] = u"k"
-        for char in u"ĹĻĽḶḸḺḼȽŁ":
-            self.trans[char] = u"L"
-        for char in u"ĺļľḷḹḻḽƚłɫ":
-            self.trans[char] = u"l"
-        for char in u"ḾṀṂ":
-            self.trans[char] = u"M"
-        for char in u"ḿṁṃɱ":
-            self.trans[char] = u"m"
-        for char in u"ǸŃÑŅŇṄṆṈṊŊƝɲȠ":
-            self.trans[char] = u"N"
-        for char in u"ǹńñņňṅṇṉṋŋɲƞ":
-            self.trans[char] = u"n"
-        for char in u"ÒÓÔÕṌṎȬÖŌṐṒŎǑȮȰỌǪǬƠỜỚỠỢỞỎƟØǾ":
-            self.trans[char] = u"O"
-        for char in u"òóôõṍṏȭöōṑṓŏǒȯȱọǫǭơờớỡợởỏɵøǿ":
-            self.trans[char] = u"o"
-        for char in u"ȌŐȪ":
-            self.trans[char] = u"Ö"
-        for char in u"ȍőȫ":
-            self.trans[char] = u"ö"
-        for char in u"ỒỐỖỘỔȎ":
-            self.trans[char] = u"Ô"
-        for char in u"ồốỗộổȏ":
-            self.trans[char] = u"ô"
-        for char in u"ṔṖƤ":
-            self.trans[char] = u"P"
-        for char in u"ṕṗƥ":
-            self.trans[char] = u"p"
-        self.trans[u"ᵽ"] = u"q"
-        for char in u"ȐŔŖŘȒṘṚṜṞ":
-            self.trans[char] = u"R"
-        for char in u"ȑŕŗřȓṙṛṝṟɽ":
-            self.trans[char] = u"r"
-        for char in u"ŚṤŞȘŠṦṠṢṨ":
-            self.trans[char] = u"S"
-        for char in u"śṥşșšṧṡṣṩȿ":
-            self.trans[char] = u"s"
-        self.trans[u"Ŝ"] = u"Sx"
-        self.trans[u"ŝ"] = u"sx"
-        for char in u"ŢȚŤṪṬṮṰŦƬƮ":
-            self.trans[char] = u"T"
-        for char in u"ţțťṫṭṯṱŧȾƭʈ":
-            self.trans[char] = u"t"
-        for char in u"ÙÚŨṸṴÜṲŪṺŬỤŮŲǓṶỦƯỮỰỬ":
-            self.trans[char] = u"U"
-        for char in u"ùúũṹṵüṳūṻŭụůųǔṷủưữựửʉ":
-            self.trans[char] = u"u"
-        for char in u"ȔŰǛǗǕǙ":
-            self.trans[char] = u"Ü"
-        for char in u"ȕűǜǘǖǚ":
-            self.trans[char] = u"ü"
-        self.trans[u"Û"] = u"Ux"
-        self.trans[u"û"] = u"ux"
-        self.trans[u"Ȗ"] = u"Û"
-        self.trans[u"ȗ"] = u"û"
-        self.trans[u"Ừ"] = u"Ù"
-        self.trans[u"ừ"] = u"ù"
-        self.trans[u"Ứ"] = u"Ú"
-        self.trans[u"ứ"] = u"ú"
-        for char in u"ṼṾ":
-            self.trans[char] = u"V"
-        for char in u"ṽṿ":
-            self.trans[char] = u"v"
-        for char in u"ẀẂŴẄẆẈ":
-            self.trans[char] = u"W"
-        for char in u"ẁẃŵẅẇẉ":
-            self.trans[char] = u"w"
-        for char in u"ẊẌ":
-            self.trans[char] = u"X"
-        for char in u"ẋẍ":
-            self.trans[char] = u"x"
-        for char in u"ỲÝŶŸỸȲẎỴỶƳ":
-            self.trans[char] = u"Y"
-        for char in u"ỳýŷÿỹȳẏỵỷƴ":
-            self.trans[char] = u"y"
-        for char in u"ŹẐŻẒŽẔƵȤ":
-            self.trans[char] = u"Z"
-        for char in u"źẑżẓžẕƶȥ":
-            self.trans[char] = u"z"
-        self.trans[u"ɀ"] = u"zv"
+        for char in 'ÀÁÂẦẤẪẨẬÃĀĂẰẮẴẶẲȦǠẠḀȂĄǍẢ':
+            self.trans[char] = 'A'
+        for char in 'ȀǞ':
+            self.trans[char] = 'Ä'
+        self.trans['Ǻ'] = 'Å'
+        self.trans['Ä'] = 'Ae'
+        self.trans['Å'] = 'Aa'
+        for char in 'àáâầấẫẩậãāăằắẵặẳȧǡạḁȃąǎảẚ':
+            self.trans[char] = 'a'
+        for char in 'ȁǟ':
+            self.trans[char] = 'ä'
+        self.trans['ǻ'] = 'å'
+        self.trans['ä'] = 'ae'
+        self.trans['å'] = 'aa'
+        for char in 'ḂḄḆƁƂ':
+            self.trans[char] = 'B'
+        for char in 'ḃḅḇƀɓƃ':
+            self.trans[char] = 'b'
+        for char in 'ĆĈĊÇČƇ':
+            self.trans[char] = 'C'
+        for char in 'ćĉċçčƈȼ':
+            self.trans[char] = 'c'
+        self.trans['Ḉ'] = 'Ç'
+        self.trans['ḉ'] = 'ç'
+        self.trans['Ð'] = 'Dh'
+        self.trans['ð'] = 'dh'
+        for char in 'ĎḊḌḎḐḒĐƉƊƋ':
+            self.trans[char] = 'D'
+        for char in 'ďḋḍḏḑḓđɖɗƌ':
+            self.trans[char] = 'd'
+        for char in 'ÈȄÉÊḚËĒḔḖĔĖẸE̩ȆȨḜĘĚẼḘẺ':
+            self.trans[char] = 'E'
+        for char in 'ỀẾỄỆỂ':
+            self.trans[char] = 'Ê'
+        for char in 'èȅéêḛëēḕḗĕėẹe̩ȇȩḝęěẽḙẻ':
+            self.trans[char] = 'e'
+        for char in 'ềếễệể':
+            self.trans[char] = 'ê'
+        for char in 'ḞƑ':
+            self.trans[char] = 'F'
+        for char in 'ḟƒ':
+            self.trans[char] = 'f'
+        for char in 'ǴḠĞĠĢǦǤƓ':
+            self.trans[char] = 'G'
+        for char in 'ǵḡğġģǧǥɠ':
+            self.trans[char] = 'g'
+        self.trans['Ĝ'] = 'Gx'
+        self.trans['ĝ'] = 'gx'
+        for char in 'ḢḤḦȞḨḪH̱ĦǶ':
+            self.trans[char] = 'H'
+        for char in 'ḣḥḧȟḩḫ̱ẖħƕ':
+            self.trans[char] = 'h'
+        for char in 'IÌȈÍÎĨḬÏḮĪĬȊĮǏİỊỈƗ':
+            self.trans[char] = 'I'
+        for char in 'ıìȉíîĩḭïḯīĭȋįǐiịỉɨ':
+            self.trans[char] = 'i'
+        for char in 'ĴJ':
+            self.trans[char] = 'J'
+        for char in 'ɟĵ̌ǰ':
+            self.trans[char] = 'j'
+        for char in 'ḰǨĶḲḴƘ':
+            self.trans[char] = 'K'
+        for char in 'ḱǩķḳḵƙ':
+            self.trans[char] = 'k'
+        for char in 'ĹĻĽḶḸḺḼȽŁ':
+            self.trans[char] = 'L'
+        for char in 'ĺļľḷḹḻḽƚłɫ':
+            self.trans[char] = 'l'
+        for char in 'ḾṀṂ':
+            self.trans[char] = 'M'
+        for char in 'ḿṁṃɱ':
+            self.trans[char] = 'm'
+        for char in 'ǸŃÑŅŇṄṆṈṊŊƝɲȠ':
+            self.trans[char] = 'N'
+        for char in 'ǹńñņňṅṇṉṋŋɲƞ':
+            self.trans[char] = 'n'
+        for char in 'ÒÓÔÕṌṎȬÖŌṐṒŎǑȮȰỌǪǬƠỜỚỠỢỞỎƟØǾ':
+            self.trans[char] = 'O'
+        for char in 'òóôõṍṏȭöōṑṓŏǒȯȱọǫǭơờớỡợởỏɵøǿ':
+            self.trans[char] = 'o'
+        for char in 'ȌŐȪ':
+            self.trans[char] = 'Ö'
+        for char in 'ȍőȫ':
+            self.trans[char] = 'ö'
+        for char in 'ỒỐỖỘỔȎ':
+            self.trans[char] = 'Ô'
+        for char in 'ồốỗộổȏ':
+            self.trans[char] = 'ô'
+        for char in 'ṔṖƤ':
+            self.trans[char] = 'P'
+        for char in 'ṕṗƥ':
+            self.trans[char] = 'p'
+        self.trans['ᵽ'] = 'q'
+        for char in 'ȐŔŖŘȒṘṚṜṞ':
+            self.trans[char] = 'R'
+        for char in 'ȑŕŗřȓṙṛṝṟɽ':
+            self.trans[char] = 'r'
+        for char in 'ŚṤŞȘŠṦṠṢṨ':
+            self.trans[char] = 'S'
+        for char in 'śṥşșšṧṡṣṩȿ':
+            self.trans[char] = 's'
+        self.trans['Ŝ'] = 'Sx'
+        self.trans['ŝ'] = 'sx'
+        for char in 'ŢȚŤṪṬṮṰŦƬƮ':
+            self.trans[char] = 'T'
+        for char in 'ţțťṫṭṯṱŧȾƭʈ':
+            self.trans[char] = 't'
+        for char in 'ÙÚŨṸṴÜṲŪṺŬỤŮŲǓṶỦƯỮỰỬ':
+            self.trans[char] = 'U'
+        for char in 'ùúũṹṵüṳūṻŭụůųǔṷủưữựửʉ':
+            self.trans[char] = 'u'
+        for char in 'ȔŰǛǗǕǙ':
+            self.trans[char] = 'Ü'
+        for char in 'ȕűǜǘǖǚ':
+            self.trans[char] = 'ü'
+        self.trans['Û'] = 'Ux'
+        self.trans['û'] = 'ux'
+        self.trans['Ȗ'] = 'Û'
+        self.trans['ȗ'] = 'û'
+        self.trans['Ừ'] = 'Ù'
+        self.trans['ừ'] = 'ù'
+        self.trans['Ứ'] = 'Ú'
+        self.trans['ứ'] = 'ú'
+        for char in 'ṼṾ':
+            self.trans[char] = 'V'
+        for char in 'ṽṿ':
+            self.trans[char] = 'v'
+        for char in 'ẀẂŴẄẆẈ':
+            self.trans[char] = 'W'
+        for char in 'ẁẃŵẅẇẉ':
+            self.trans[char] = 'w'
+        for char in 'ẊẌ':
+            self.trans[char] = 'X'
+        for char in 'ẋẍ':
+            self.trans[char] = 'x'
+        for char in 'ỲÝŶŸỸȲẎỴỶƳ':
+            self.trans[char] = 'Y'
+        for char in 'ỳýŷÿỹȳẏỵỷƴ':
+            self.trans[char] = 'y'
+        for char in 'ŹẐŻẒŽẔƵȤ':
+            self.trans[char] = 'Z'
+        for char in 'źẑżẓžẕƶȥ':
+            self.trans[char] = 'z'
+        self.trans['ɀ'] = 'zv'
 
         # Latin: extended Latin alphabet
-        self.trans[u"ɑ"] = u"a"
-        for char in u"ÆǼǢ":
-            self.trans[char] = u"AE"
-        for char in u"æǽǣ":
-            self.trans[char] = u"ae"
-        self.trans[u"Ð"] = u"Dh"
-        self.trans[u"ð"] = u"dh"
-        for char in u"ƎƏƐ":
-            self.trans[char] = u"E"
-        for char in u"ǝəɛ":
-            self.trans[char] = u"e"
-        for char in u"ƔƢ":
-            self.trans[char] = u"G"
-        for char in u"ᵷɣƣᵹ":
-            self.trans[char] = u"g"
-        self.trans[u"Ƅ"] = u"H"
-        self.trans[u"ƅ"] = u"h"
-        self.trans[u"Ƕ"] = u"Wh"
-        self.trans[u"ƕ"] = u"wh"
-        self.trans[u"Ɩ"] = u"I"
-        self.trans[u"ɩ"] = u"i"
-        self.trans[u"Ŋ"] = u"Ng"
-        self.trans[u"ŋ"] = u"ng"
-        self.trans[u"Œ"] = u"OE"
-        self.trans[u"œ"] = u"oe"
-        self.trans[u"Ɔ"] = u"O"
-        self.trans[u"ɔ"] = u"o"
-        self.trans[u"Ȣ"] = u"Ou"
-        self.trans[u"ȣ"] = u"ou"
-        self.trans[u"Ƽ"] = u"Q"
-        for char in u"ĸƽ":
-            self.trans[char] = u"q"
-        self.trans[u"ȹ"] = u"qp"
-        self.trans[u""] = u"r"
-        self.trans[u"ſ"] = u"s"
-        self.trans[u"ß"] = u"ss"
-        self.trans[u"Ʃ"] = u"Sh"
-        for char in u"ʃᶋ":
-            self.trans[char] = u"sh"
-        self.trans[u"Ʉ"] = u"U"
-        self.trans[u"ʉ"] = u"u"
-        self.trans[u"Ʌ"] = u"V"
-        self.trans[u"ʌ"] = u"v"
-        for char in u"ƜǷ":
-            self.trans[char] = u"W"
-        for char in u"ɯƿ":
-            self.trans[char] = u"w"
-        self.trans[u"Ȝ"] = u"Y"
-        self.trans[u"ȝ"] = u"y"
-        self.trans[u"Ĳ"] = u"IJ"
-        self.trans[u"ĳ"] = u"ij"
-        self.trans[u"Ƨ"] = u"Z"
-        for char in u"ʮƨ":
-            self.trans[char] = u"z"
-        self.trans[u"Ʒ"] = u"Zh"
-        self.trans[u"ʒ"] = u"zh"
-        self.trans[u"Ǯ"] = u"Dzh"
-        self.trans[u"ǯ"] = u"dzh"
-        for char in u"ƸƹʔˀɁɂ":
+        self.trans['ɑ'] = 'a'
+        for char in 'ÆǼǢ':
+            self.trans[char] = 'AE'
+        for char in 'æǽǣ':
+            self.trans[char] = 'ae'
+        self.trans['Ð'] = 'Dh'
+        self.trans['ð'] = 'dh'
+        for char in 'ƎƏƐ':
+            self.trans[char] = 'E'
+        for char in 'ǝəɛ':
+            self.trans[char] = 'e'
+        for char in 'ƔƢ':
+            self.trans[char] = 'G'
+        for char in 'ᵷɣƣᵹ':
+            self.trans[char] = 'g'
+        self.trans['Ƅ'] = 'H'
+        self.trans['ƅ'] = 'h'
+        self.trans['Ƕ'] = 'Wh'
+        self.trans['ƕ'] = 'wh'
+        self.trans['Ɩ'] = 'I'
+        self.trans['ɩ'] = 'i'
+        self.trans['Ŋ'] = 'Ng'
+        self.trans['ŋ'] = 'ng'
+        self.trans['Œ'] = 'OE'
+        self.trans['œ'] = 'oe'
+        self.trans['Ɔ'] = 'O'
+        self.trans['ɔ'] = 'o'
+        self.trans['Ȣ'] = 'Ou'
+        self.trans['ȣ'] = 'ou'
+        self.trans['Ƽ'] = 'Q'
+        for char in 'ĸƽ':
+            self.trans[char] = 'q'
+        self.trans['ȹ'] = 'qp'
+        self.trans[''] = 'r'
+        self.trans['ſ'] = 's'
+        self.trans['ß'] = 'ss'
+        self.trans['Ʃ'] = 'Sh'
+        for char in 'ʃᶋ':
+            self.trans[char] = 'sh'
+        self.trans['Ʉ'] = 'U'
+        self.trans['ʉ'] = 'u'
+        self.trans['Ʌ'] = 'V'
+        self.trans['ʌ'] = 'v'
+        for char in 'ƜǷ':
+            self.trans[char] = 'W'
+        for char in 'ɯƿ':
+            self.trans[char] = 'w'
+        self.trans['Ȝ'] = 'Y'
+        self.trans['ȝ'] = 'y'
+        self.trans['Ĳ'] = 'IJ'
+        self.trans['ĳ'] = 'ij'
+        self.trans['Ƨ'] = 'Z'
+        for char in 'ʮƨ':
+            self.trans[char] = 'z'
+        self.trans['Ʒ'] = 'Zh'
+        self.trans['ʒ'] = 'zh'
+        self.trans['Ǯ'] = 'Dzh'
+        self.trans['ǯ'] = 'dzh'
+        for char in 'ƸƹʔˀɁɂ':
             self.trans[char] = u"'"
         self.trans['Þ'] = 'Th'
         self.trans['þ'] = 'th'
-        for char in u"Cʗǃ":
-            self.trans[char] = u"!"
+        for char in 'Cʗǃ':
+            self.trans[char] = '!'
 
         # Punctuation and typography
-        for char in u"«»“”„¨":
+        for char in '«»“”„¨':
             self.trans[char] = u'"'
-        for char in u"‘’′":
+        for char in '‘’′':
             self.trans[char] = u"'"
-        self.trans[u"•"] = u"*"
-        self.trans[u"@"] = u"(at)"
-        self.trans[u"¤"] = u"$"
-        self.trans[u"¢"] = u"c"
-        self.trans[u"€"] = u"E"
-        self.trans[u"£"] = u"L"
-        self.trans[u"¥"] = u"yen"
-        self.trans[u"†"] = u"+"
-        self.trans[u"‡"] = u"++"
-        self.trans[u"°"] = u":"
-        self.trans[u"¡"] = u"!"
-        self.trans[u"¿"] = u"?"
-        self.trans[u"‰"] = u"o/oo"
-        self.trans[u"‱"] = u"o/ooo"
-        for char in u"¶§":
-            self.trans[char] = u">"
+        self.trans['•'] = '*'
+        self.trans['@'] = '(at)'
+        self.trans['¤'] = '$'
+        self.trans['¢'] = 'c'
+        self.trans['€'] = 'E'
+        self.trans['£'] = 'L'
+        self.trans['¥'] = 'yen'
+        self.trans['†'] = '+'
+        self.trans['‡'] = '++'
+        self.trans['°'] = ':'
+        self.trans['¡'] = '!'
+        self.trans['¿'] = '?'
+        self.trans['‰'] = 'o/oo'
+        self.trans['‱'] = 'o/ooo'
+        for char in '¶§':
+            self.trans[char] = '>'
         self.trans['…'] = '...'
-        for char in u"‒–—―":
-            self.trans[char] = u"-"
+        for char in '‒–—―':
+            self.trans[char] = '-'
         self.trans['·'] = ' '
-        self.trans[u"¦"] = u"|"
-        self.trans[u"⁂"] = u"***"
-        self.trans[u"◊"] = u"<>"
-        self.trans[u"‽"] = u"?!"
-        self.trans[u"؟"] = u";-)"
-        self.trans[u"¹"] = u"1"
-        self.trans[u"²"] = u"2"
-        self.trans[u"³"] = u"3"
+        self.trans['¦'] = '|'
+        self.trans['⁂'] = '***'
+        self.trans['◊'] = '<>'
+        self.trans['‽'] = '?!'
+        self.trans['؟'] = ';-)'
+        self.trans['¹'] = '1'
+        self.trans['²'] = '2'
+        self.trans['³'] = '3'
 
         # Cyrillic
-        self.trans.update({u"А": u"A", u"а": u"a", u"Б": u"B", u"б": u"b",
-                           u"В": u"V", u"в": u"v", u"Г": u"G", u"г": u"g",
-                           u"Д": u"D", u"д": u"d", u"Е": u"E", u"е": u"e",
-                           u"Ж": u"Zh", u"ж": u"zh", u"З": u"Z", u"з": u"z",
-                           u"И": u"I", u"и": u"i", u"Й": u"J", u"й": u"j",
-                           u"К": u"K", u"к": u"k", u"Л": u"L", u"л": u"l",
-                           u"М": u"M", u"м": u"m", u"Н": u"N", u"н": u"n",
-                           u"О": u"O", u"о": u"o", u"П": u"P", u"п": u"p",
-                           u"Р": u"R", u"р": u"r", u"С": u"S", u"с": u"s",
-                           u"Т": u"T", u"т": u"t", u"У": u"U", u"у": u"u",
-                           u"Ф": u"F", u"ф": u"f", u"х": u"kh", u"Ц": u"C",
-                           u"ц": u"c", u"Ч": u"Ch", u"ч": u"ch", u"Ш": u"Sh",
-                           u"ш": u"sh", u"Щ": u"Shch", u"щ": u"shch", u"Ь": u"'",
-                           u"ь": "'", u"Ъ": u'"', u"ъ": '"', u"Ю": u"Yu",
-                           u"ю": u"yu", u"Я": u"Ya", u"я": u"ya", u"Х": u"Kh",
-                           u"Χ": u"Kh"})
+        self.trans.update({'А': 'A', 'а': 'a', 'Б': 'B', 'б': 'b',
+                           'В': 'V', 'в': 'v', 'Г': 'G', 'г': 'g',
+                           'Д': 'D', 'д': 'd', 'Е': 'E', 'е': 'e',
+                           'Ж': 'Zh', 'ж': 'zh', 'З': 'Z', 'з': 'z',
+                           'И': 'I', 'и': 'i', 'Й': 'J', 'й': 'j',
+                           'К': 'K', 'к': 'k', 'Л': 'L', 'л': 'l',
+                           'М': 'M', 'м': 'm', 'Н': 'N', 'н': 'n',
+                           'О': 'O', 'о': 'o', 'П': 'P', 'п': 'p',
+                           'Р': 'R', 'р': 'r', 'С': 'S', 'с': 's',
+                           'Т': 'T', 'т': 't', 'У': 'U', 'у': 'u',
+                           'Ф': 'F', 'ф': 'f', 'х': 'kh', 'Ц': 'C',
+                           'ц': 'c', 'Ч': 'Ch', 'ч': 'ch', 'Ш': 'Sh',
+                           'ш': 'sh', 'Щ': 'Shch', 'щ': 'shch', 'Ь': "'",
+                           'ь': "'", 'Ъ': '"', 'ъ': '"', 'Ю': 'Yu',
+                           'ю': 'yu', 'Я': 'Ya', 'я': 'ya', 'Х': 'Kh',
+                           'Χ': 'Kh'})
 
-        # Additional Cyrillic letters, most occuring in only one or a few languages
-        self.trans.update({u"Ы": u"Y", u"ы": u"y", u"Ё": u"Ë", u"ё": u"ë",
-                           u"Э": u"È", u"Ѐ": u"È", u"э": u"è", u"ѐ": u"è",
-                           u"І": u"I", u"і": u"i", u"Ї": u"Ji", u"ї": u"ji",
-                           u"Є": u"Je", u"є": u"je", u"Ґ": u"G", u"Ҝ": u"G",
-                           u"ґ": u"g", u"ҝ": u"g", u"Ђ": u"Dj", u"ђ": u"dj",
-                           "Љ": "Lj", "љ": "lj",
-                           u"Њ": u"Nj", u"њ": u"nj", u"Ћ": u"Cj", u"ћ": u"cj",
-                           'Җ': 'Zhj', 'Ѓ': 'Gj', 'ѓ': 'gj',
-                           u"Ќ": u"Kj", u"ќ": u"kj", u"Ӣ": u"Ii", u"ӣ": u"ii",
-                           "Ҳ": "H", "ҳ": "h",
-                           u"Ҷ": u"Dz", u"ҷ": u"dz", u"Ө": u"Ô", u"Ӫ": u"Ô",
-                           u"ө": u"ô", u"ӫ": u"ô", u"Ү": u"Y", u"ү": u"y", u"Һ": u"H",
-                           u"һ": u"h", u"Ә": u"AE", u"Ӕ": u"AE", u"ә": u"ae",
-                           'Ӛ': 'Ë', 'Ӭ': 'Ë', 'ӛ': 'ë', 'ӭ': 'ë',
-                           'җ': 'zhj', 'Ұ': 'U', 'ў': 'ù', 'Ў': 'Ù',
-                           u"ѝ": u"ì", u"Ѝ": u"Ì", u"Ӑ": u"A", u"ă": u"a", u"Ӓ": u"Ä",
-                           "Ҽ": "Ts", "Ҿ": "Ts", "ҽ": "ts", "ҿ": "ts",
-                           u"Ҙ": u"Dh", u"ҙ": u"dh", u"Ӏ": u"", u"ӏ": u"", u"Ӆ": u"L",
-                           u"ӆ": u"l", u"Ӎ": u"M", u"ӎ": u"m", u"Ӧ": u"Ö", u"ӧ": u"ö",
-                           u"Ҩ": u"u", u"ҩ": u"u", u"Ҧ": u"Ph", u"ҧ": u"ph", u"Ҏ": u"R",
-                           u"ҏ": u"r", u"Ҫ": u"Th", u"ҫ": u"th", u"Ҭ": u"T", u"ҭ": u"t",
-                           'Ӯ': 'Û', 'ӯ': 'û', 'Ӹ': 'U', 'ұ': 'u',
-                           u"ӹ": u"u", u"Ҵ": u"Tts", u"ҵ": u"tts", u"Ӵ": u"Ch", u"ӵ": u"ch"})
+        # Additional Cyrillic letters, most occuring in only a few languages
+        self.trans.update({
+            'Ы': 'Y', 'ы': 'y', 'Ё': 'Ë', 'ё': 'ë',
+            'Э': 'È', 'Ѐ': 'È', 'э': 'è', 'ѐ': 'è',
+            'І': 'I', 'і': 'i', 'Ї': 'Ji', 'ї': 'ji',
+            'Є': 'Je', 'є': 'je', 'Ґ': 'G', 'Ҝ': 'G',
+            'ґ': 'g', 'ҝ': 'g', 'Ђ': 'Dj', 'ђ': 'dj',
+            'Љ': 'Lj', 'љ': 'lj',
+            'Њ': 'Nj', 'њ': 'nj', 'Ћ': 'Cj', 'ћ': 'cj',
+            'Җ': 'Zhj', 'Ѓ': 'Gj', 'ѓ': 'gj',
+            'Ќ': 'Kj', 'ќ': 'kj', 'Ӣ': 'Ii', 'ӣ': 'ii',
+            'Ҳ': 'H', 'ҳ': 'h',
+            'Ҷ': 'Dz', 'ҷ': 'dz', 'Ө': 'Ô', 'Ӫ': 'Ô',
+            'ө': 'ô', 'ӫ': 'ô', 'Ү': 'Y', 'ү': 'y', 'Һ': 'H',
+            'һ': 'h', 'Ә': 'AE', 'Ӕ': 'AE', 'ә': 'ae',
+            'Ӛ': 'Ë', 'Ӭ': 'Ë', 'ӛ': 'ë', 'ӭ': 'ë',
+            'җ': 'zhj', 'Ұ': 'U', 'ў': 'ù', 'Ў': 'Ù',
+            'ѝ': 'ì', 'Ѝ': 'Ì', 'Ӑ': 'A', 'ă': 'a', 'Ӓ': 'Ä',
+            'Ҽ': 'Ts', 'Ҿ': 'Ts', 'ҽ': 'ts', 'ҿ': 'ts',
+            'Ҙ': 'Dh', 'ҙ': 'dh', 'Ӏ': '', 'ӏ': '', 'Ӆ': 'L',
+            'ӆ': 'l', 'Ӎ': 'M', 'ӎ': 'm', 'Ӧ': 'Ö', 'ӧ': 'ö',
+            'Ҩ': 'u', 'ҩ': 'u', 'Ҧ': 'Ph', 'ҧ': 'ph', 'Ҏ': 'R',
+            'ҏ': 'r', 'Ҫ': 'Th', 'ҫ': 'th', 'Ҭ': 'T', 'ҭ': 't',
+            'Ӯ': 'Û', 'ӯ': 'û', 'Ӹ': 'U', 'ұ': 'u',
+            'ӹ': 'u', 'Ҵ': 'Tts', 'ҵ': 'tts', 'Ӵ': 'Ch', 'ӵ': 'ch'})
 
-        for char in u"ЈӤҊ":
-            self.trans[char] = u"J"
-        for char in u"јӥҋ":
-            self.trans[char] = u"j"
-        for char in u"ЏӁӜҶ":
-            self.trans[char] = u"Dzh"
-        for char in u"џӂӝҷ":
-            self.trans[char] = u"dzh"
-        for char in u"ЅӞӠӋҸ":
-            self.trans[char] = u"Dz"
-        for char in u"ѕӟӡӌҹ":
-            self.trans[char] = u"dz"
-        for char in u"ҒӶҔ":
-            self.trans[char] = u"G"
-        for char in u"ғӷҕ":
-            self.trans[char] = u"g"
-        for char in u"ҚҞҠӃ":
-            self.trans[char] = u"Q"
-        for char in u"қҟҡӄ":
-            self.trans[char] = u"q"
-        for char in u"ҢҤӉӇ":
-            self.trans[char] = u"Ng"
-        for char in u"ңҥӊӈ":
-            self.trans[char] = u"ng"
-        for char in u"ӖѢҌ":
-            self.trans[char] = u"E"
-        for char in u"ӗѣҍ":
-            self.trans[char] = u"e"
-        for char in u"ӲӰҮ":
-            self.trans[char] = u"Ü"
-        for char in u"ӳӱү":
-            self.trans[char] = u"ü"
+        for char in 'ЈӤҊ':
+            self.trans[char] = 'J'
+        for char in 'јӥҋ':
+            self.trans[char] = 'j'
+        for char in 'ЏӁӜҶ':
+            self.trans[char] = 'Dzh'
+        for char in 'џӂӝҷ':
+            self.trans[char] = 'dzh'
+        for char in 'ЅӞӠӋҸ':
+            self.trans[char] = 'Dz'
+        for char in 'ѕӟӡӌҹ':
+            self.trans[char] = 'dz'
+        for char in 'ҒӶҔ':
+            self.trans[char] = 'G'
+        for char in 'ғӷҕ':
+            self.trans[char] = 'g'
+        for char in 'ҚҞҠӃ':
+            self.trans[char] = 'Q'
+        for char in 'қҟҡӄ':
+            self.trans[char] = 'q'
+        for char in 'ҢҤӉӇ':
+            self.trans[char] = 'Ng'
+        for char in 'ңҥӊӈ':
+            self.trans[char] = 'ng'
+        for char in 'ӖѢҌ':
+            self.trans[char] = 'E'
+        for char in 'ӗѣҍ':
+            self.trans[char] = 'e'
+        for char in 'ӲӰҮ':
+            self.trans[char] = 'Ü'
+        for char in 'ӳӱү':
+            self.trans[char] = 'ü'
 
         # Archaic Cyrillic letters
-        self.trans.update({u"Ѹ": u"Ou", u"ѹ": u"ou", u"Ѡ": u"O", u"Ѻ": u"O", u"ѡ": u"o",
-                           u"ѻ": u"o", u"Ѿ": u"Ot", u"ѿ": u"ot", u"Ѣ": u"E", u"ѣ": u"e",
-                           u"Ѥ": u"Ei", u"Ѧ": u"Ei", u"ѥ": u"ei", u"ѧ": u"ei", u"Ѫ": u"Ai",
-                           u"ѫ": u"ai", u"Ѯ": u"X", u"ѯ": u"x", u"Ѱ": u"Ps", u"ѱ": u"ps",
-                           u"Ѳ": u"Th", u"ѳ": u"th", u"Ѵ": u"Ü", u"Ѷ": u"Ü", u"ѵ": u"ü"})
+        self.trans.update({
+            'Ѹ': 'Ou', 'ѹ': 'ou', 'Ѡ': 'O', 'Ѻ': 'O', 'ѡ': 'o',
+            'ѻ': 'o', 'Ѿ': 'Ot', 'ѿ': 'ot', 'Ѣ': 'E', 'ѣ': 'e',
+            'Ѥ': 'Ei', 'Ѧ': 'Ei', 'ѥ': 'ei', 'ѧ': 'ei', 'Ѫ': 'Ai',
+            'ѫ': 'ai', 'Ѯ': 'X', 'ѯ': 'x', 'Ѱ': 'Ps', 'ѱ': 'ps',
+            'Ѳ': 'Th', 'ѳ': 'th', 'Ѵ': 'Ü', 'Ѷ': 'Ü', 'ѵ': 'ü'})
 
         # Hebrew alphabet
-        for char in u"אע":
+        for char in 'אע':
             self.trans[char] = u"'"
-        self.trans[u"ב"] = u"b"
-        self.trans[u"ג"] = u"g"
-        self.trans[u"ד"] = u"d"
-        self.trans[u"ה"] = u"h"
-        self.trans[u"ו"] = u"v"
-        self.trans[u"ז"] = u"z"
-        self.trans[u"ח"] = u"kh"
-        self.trans[u"ט"] = u"t"
-        self.trans[u"י"] = u"y"
-        for char in u"ךכ":
-            self.trans[char] = u"k"
-        self.trans[u"ל"] = u"l"
-        for char in u"םמ":
-            self.trans[char] = u"m"
-        for char in u"ןנ":
-            self.trans[char] = u"n"
-        self.trans[u"ס"] = u"s"
-        for char in u"ףפ":
-            self.trans[char] = u"ph"
-        for char in u"ץצ":
-            self.trans[char] = u"ts"
-        self.trans[u"ק"] = u"q"
-        self.trans[u"ר"] = u"r"
-        self.trans[u"ש"] = u"sh"
-        self.trans[u"ת"] = u"th"
+        self.trans['ב'] = 'b'
+        self.trans['ג'] = 'g'
+        self.trans['ד'] = 'd'
+        self.trans['ה'] = 'h'
+        self.trans['ו'] = 'v'
+        self.trans['ז'] = 'z'
+        self.trans['ח'] = 'kh'
+        self.trans['ט'] = 't'
+        self.trans['י'] = 'y'
+        for char in 'ךכ':
+            self.trans[char] = 'k'
+        self.trans['ל'] = 'l'
+        for char in 'םמ':
+            self.trans[char] = 'm'
+        for char in 'ןנ':
+            self.trans[char] = 'n'
+        self.trans['ס'] = 's'
+        for char in 'ףפ':
+            self.trans[char] = 'ph'
+        for char in 'ץצ':
+            self.trans[char] = 'ts'
+        self.trans['ק'] = 'q'
+        self.trans['ר'] = 'r'
+        self.trans['ש'] = 'sh'
+        self.trans['ת'] = 'th'
 
         # Arab alphabet
-        for char in u"اﺍﺎ":
-            self.trans[char] = u"a"
-        for char in u"بﺏﺐﺒﺑ":
-            self.trans[char] = u"b"
-        for char in u"تﺕﺖﺘﺗ":
-            self.trans[char] = u"t"
-        for char in u"ثﺙﺚﺜﺛ":
-            self.trans[char] = u"th"
-        for char in u"جﺝﺞﺠﺟ":
-            self.trans[char] = u"g"
-        for char in u"حﺡﺢﺤﺣ":
-            self.trans[char] = u"h"
-        for char in u"خﺥﺦﺨﺧ":
-            self.trans[char] = u"kh"
-        for char in u"دﺩﺪ":
-            self.trans[char] = u"d"
-        for char in u"ذﺫﺬ":
-            self.trans[char] = u"dh"
-        for char in u"رﺭﺮ":
-            self.trans[char] = u"r"
-        for char in u"زﺯﺰ":
-            self.trans[char] = u"z"
-        for char in u"سﺱﺲﺴﺳ":
-            self.trans[char] = u"s"
-        for char in u"شﺵﺶﺸﺷ":
-            self.trans[char] = u"sh"
-        for char in u"صﺹﺺﺼﺻ":
-            self.trans[char] = u"s"
-        for char in u"ضﺽﺾﻀﺿ":
-            self.trans[char] = u"d"
-        for char in u"طﻁﻂﻄﻃ":
-            self.trans[char] = u"t"
-        for char in u"ظﻅﻆﻈﻇ":
-            self.trans[char] = u"z"
-        for char in u"عﻉﻊﻌﻋ":
+        for char in 'اﺍﺎ':
+            self.trans[char] = 'a'
+        for char in 'بﺏﺐﺒﺑ':
+            self.trans[char] = 'b'
+        for char in 'تﺕﺖﺘﺗ':
+            self.trans[char] = 't'
+        for char in 'ثﺙﺚﺜﺛ':
+            self.trans[char] = 'th'
+        for char in 'جﺝﺞﺠﺟ':
+            self.trans[char] = 'g'
+        for char in 'حﺡﺢﺤﺣ':
+            self.trans[char] = 'h'
+        for char in 'خﺥﺦﺨﺧ':
+            self.trans[char] = 'kh'
+        for char in 'دﺩﺪ':
+            self.trans[char] = 'd'
+        for char in 'ذﺫﺬ':
+            self.trans[char] = 'dh'
+        for char in 'رﺭﺮ':
+            self.trans[char] = 'r'
+        for char in 'زﺯﺰ':
+            self.trans[char] = 'z'
+        for char in 'سﺱﺲﺴﺳ':
+            self.trans[char] = 's'
+        for char in 'شﺵﺶﺸﺷ':
+            self.trans[char] = 'sh'
+        for char in 'صﺹﺺﺼﺻ':
+            self.trans[char] = 's'
+        for char in 'ضﺽﺾﻀﺿ':
+            self.trans[char] = 'd'
+        for char in 'طﻁﻂﻄﻃ':
+            self.trans[char] = 't'
+        for char in 'ظﻅﻆﻈﻇ':
+            self.trans[char] = 'z'
+        for char in 'عﻉﻊﻌﻋ':
             self.trans[char] = u"'"
-        for char in u"غﻍﻎﻐﻏ":
-            self.trans[char] = u"gh"
-        for char in u"فﻑﻒﻔﻓ":
-            self.trans[char] = u"f"
-        for char in u"قﻕﻖﻘﻗ":
-            self.trans[char] = u"q"
-        for char in u"كﻙﻚﻜﻛک":
-            self.trans[char] = u"k"
-        for char in u"لﻝﻞﻠﻟ":
-            self.trans[char] = u"l"
-        for char in u"مﻡﻢﻤﻣ":
-            self.trans[char] = u"m"
-        for char in u"نﻥﻦﻨﻧ":
-            self.trans[char] = u"n"
-        for char in u"هﻩﻪﻬﻫ":
-            self.trans[char] = u"h"
-        for char in u"وﻭﻮ":
-            self.trans[char] = u"w"
-        for char in u"یيﻱﻲﻴﻳ":
-            self.trans[char] = u"y"
+        for char in 'غﻍﻎﻐﻏ':
+            self.trans[char] = 'gh'
+        for char in 'فﻑﻒﻔﻓ':
+            self.trans[char] = 'f'
+        for char in 'قﻕﻖﻘﻗ':
+            self.trans[char] = 'q'
+        for char in 'كﻙﻚﻜﻛک':
+            self.trans[char] = 'k'
+        for char in 'لﻝﻞﻠﻟ':
+            self.trans[char] = 'l'
+        for char in 'مﻡﻢﻤﻣ':
+            self.trans[char] = 'm'
+        for char in 'نﻥﻦﻨﻧ':
+            self.trans[char] = 'n'
+        for char in 'هﻩﻪﻬﻫ':
+            self.trans[char] = 'h'
+        for char in 'وﻭﻮ':
+            self.trans[char] = 'w'
+        for char in 'یيﻱﻲﻴﻳ':
+            self.trans[char] = 'y'
         # Arabic - additional letters, modified letters and ligatures
-        self.trans[u"ﺀ"] = u"'"
-        for char in u"آﺁﺂ":
+        self.trans['ﺀ'] = "'"
+        for char in 'آﺁﺂ':
             self.trans[char] = u"'a"
-        for char in u"ةﺓﺔ":
-            self.trans[char] = u"th"
-        for char in u"ىﻯﻰ":
-            self.trans[char] = u"á"
-        for char in u"یﯼﯽﯿﯾ":
-            self.trans[char] = u"y"
-        self.trans[u"؟"] = u"?"
+        for char in 'ةﺓﺔ':
+            self.trans[char] = 'th'
+        for char in 'ىﻯﻰ':
+            self.trans[char] = 'á'
+        for char in 'یﯼﯽﯿﯾ':
+            self.trans[char] = 'y'
+        self.trans['؟'] = '?'
         # Arabic - ligatures
-        for char in u"ﻻﻼ":
-            self.trans[char] = u"la"
-        self.trans[u"ﷲ"] = u"llah"
-        for char in u"إأ":
+        for char in 'ﻻﻼ':
+            self.trans[char] = 'la'
+        self.trans['ﷲ'] = 'llah'
+        for char in 'إأ':
             self.trans[char] = u"a'"
-        self.trans[u"ؤ"] = u"w'"
-        self.trans[u"ئ"] = u"y'"
-        for char in u"◌◌":
-            self.trans[char] = u""  # indicates absence of vowels
+        self.trans['ؤ'] = "w'"
+        self.trans['ئ'] = "y'"
+        for char in '◌◌':
+            self.trans[char] = ""  # indicates absence of vowels
         # Arabic vowels
-        self.trans[u"◌"] = u"a"
-        self.trans[u"◌"] = u"u"
-        self.trans[u"◌"] = u"i"
-        self.trans[u"◌"] = u"a"
-        self.trans[u"◌"] = u"ay"
-        self.trans[u"◌"] = u"ay"
-        self.trans[u"◌"] = u"u"
-        self.trans[u"◌"] = u"iy"
+        self.trans['◌'] = 'a'
+        self.trans['◌'] = 'u'
+        self.trans['◌'] = 'i'
+        self.trans['◌'] = 'a'
+        self.trans['◌'] = 'ay'
+        self.trans['◌'] = 'ay'
+        self.trans['◌'] = 'u'
+        self.trans['◌'] = 'iy'
         # Arab numerals
-        for char in u"٠۰":
-            self.trans[char] = u"0"
-        for char in u"١۱":
-            self.trans[char] = u"1"
-        for char in u"٢۲":
-            self.trans[char] = u"2"
-        for char in u"٣۳":
-            self.trans[char] = u"3"
-        for char in u"٤۴":
-            self.trans[char] = u"4"
-        for char in u"٥۵":
-            self.trans[char] = u"5"
-        for char in u"٦۶":
-            self.trans[char] = u"6"
-        for char in u"٧۷":
-            self.trans[char] = u"7"
-        for char in u"٨۸":
-            self.trans[char] = u"8"
-        for char in u"٩۹":
-            self.trans[char] = u"9"
+        for char in '٠۰':
+            self.trans[char] = '0'
+        for char in '١۱':
+            self.trans[char] = '1'
+        for char in '٢۲':
+            self.trans[char] = '2'
+        for char in '٣۳':
+            self.trans[char] = '3'
+        for char in '٤۴':
+            self.trans[char] = '4'
+        for char in '٥۵':
+            self.trans[char] = '5'
+        for char in '٦۶':
+            self.trans[char] = '6'
+        for char in '٧۷':
+            self.trans[char] = '7'
+        for char in '٨۸':
+            self.trans[char] = '8'
+        for char in '٩۹':
+            self.trans[char] = '9'
         # Perso-Arabic
-        for char in u"پﭙﭙپ":
-            self.trans[char] = u"p"
-        for char in u"چچچچ":
-            self.trans[char] = u"ch"
-        for char in u"ژژ":
-            self.trans[char] = u"zh"
-        for char in u"گﮔﮕﮓ":
-            self.trans[char] = u"g"
+        for char in 'پﭙﭙپ':
+            self.trans[char] = 'p'
+        for char in 'چچچچ':
+            self.trans[char] = 'ch'
+        for char in 'ژژ':
+            self.trans[char] = 'zh'
+        for char in 'گﮔﮕﮓ':
+            self.trans[char] = 'g'
 
         # Greek
-        self.trans.update({u"Α": u"A", u"α": u"a", u"Β": u"B", u"β": u"b", u"Γ": u"G",
-                           u"γ": u"g", u"Δ": u"D", u"δ": u"d", u"Ε": u"E", u"ε": u"e",
-                           u"Ζ": u"Z", u"ζ": u"z", u"Η": u"I", u"η": u"i", u"θ": u"th",
-                           u"Θ": u"Th", u"Ι": u"I", u"ι": u"i", u"Κ": u"K", u"κ": u"k",
-                           u"Λ": u"L", u"λ": u"l", u"Μ": u"M", u"μ": u"m", u"Ν": u"N",
-                           u"ν": u"n", u"Ξ": u"X", u"ξ": u"x", u"Ο": u"O", u"ο": u"o",
-                           u"Π": u"P", u"π": u"p", u"Ρ": u"R", u"ρ": u"r", u"Σ": u"S",
-                           u"σ": u"s", u"ς": u"s", u"Τ": u"T", u"τ": u"t", u"Υ": u"Y",
-                           u"υ": u"y", u"Φ": u"F", u"φ": u"f", u"Ψ": u"Ps", u"ψ": u"ps",
-                           u"Ω": u"O", u"ω": u"o", u"ϗ": u"&", u"Ϛ": u"St", u"ϛ": u"st",
-                           u"Ϙ": u"Q", u"Ϟ": u"Q", u"ϙ": u"q", u"ϟ": u"q", u"Ϻ": u"S",
-                           u"ϻ": u"s", u"Ϡ": u"Ss", u"ϡ": u"ss", u"Ϸ": u"Sh", u"ϸ": u"sh",
-                           u"·": u":", u"Ά": u"Á", u"ά": u"á", u"Έ": u"É", u"Ή": u"É",
-                           u"έ": u"é", u"ή": u"é", u"Ί": u"Í", u"ί": u"í", u"Ϊ": u"Ï",
-                           u"ϊ": u"ï", u"ΐ": u"ï", u"Ό": u"Ó", u"ό": u"ó", u"Ύ": u"Ý",
-                           u"ύ": u"ý", u"Ϋ": u"Y", u"ϋ": u"ÿ", u"ΰ": u"ÿ", u"Ώ": u"Ó",
-                           u"ώ": u"ó"})
+        self.trans.update({
+            'Α': 'A', 'α': 'a', 'Β': 'B', 'β': 'b', 'Γ': 'G',
+            'γ': 'g', 'Δ': 'D', 'δ': 'd', 'Ε': 'E', 'ε': 'e',
+            'Ζ': 'Z', 'ζ': 'z', 'Η': 'I', 'η': 'i', 'θ': 'th',
+            'Θ': 'Th', 'Ι': 'I', 'ι': 'i', 'Κ': 'K', 'κ': 'k',
+            'Λ': 'L', 'λ': 'l', 'Μ': 'M', 'μ': 'm', 'Ν': 'N',
+            'ν': 'n', 'Ξ': 'X', 'ξ': 'x', 'Ο': 'O', 'ο': 'o',
+            'Π': 'P', 'π': 'p', 'Ρ': 'R', 'ρ': 'r', 'Σ': 'S',
+            'σ': 's', 'ς': 's', 'Τ': 'T', 'τ': 't', 'Υ': 'Y',
+            'υ': 'y', 'Φ': 'F', 'φ': 'f', 'Ψ': 'Ps', 'ψ': 'ps',
+            'Ω': 'O', 'ω': 'o', 'ϗ': '&', 'Ϛ': 'St', 'ϛ': 'st',
+            'Ϙ': 'Q', 'Ϟ': 'Q', 'ϙ': 'q', 'ϟ': 'q', 'Ϻ': 'S',
+            'ϻ': 's', 'Ϡ': 'Ss', 'ϡ': 'ss', 'Ϸ': 'Sh', 'ϸ': 'sh',
+            '·': ':', 'Ά': 'Á', 'ά': 'á', 'Έ': 'É', 'Ή': 'É',
+            'έ': 'é', 'ή': 'é', 'Ί': 'Í', 'ί': 'í', 'Ϊ': 'Ï',
+            'ϊ': 'ï', 'ΐ': 'ï', 'Ό': 'Ó', 'ό': 'ó', 'Ύ': 'Ý',
+            'ύ': 'ý', 'Ϋ': 'Y', 'ϋ': 'ÿ', 'ΰ': 'ÿ', 'Ώ': 'Ó',
+            'ώ': 'ó'})
 
         # Japanese (katakana and hiragana)
-        for char in u"アァあ":
-            self.trans[char] = u"a"
-        for char in u"イィい":
-            self.trans[char] = u"i"
-        for char in u"ウう":
-            self.trans[char] = u"u"
-        for char in u"エェえ":
-            self.trans[char] = u"e"
-        for char in u"オォお":
-            self.trans[char] = u"o"
-        for char in u"ャや":
-            self.trans[char] = u"ya"
-        for char in u"ュゆ":
-            self.trans[char] = u"yu"
-        for char in u"ョよ":
-            self.trans[char] = u"yo"
-        for char in u"カか":
-            self.trans[char] = u"ka"
-        for char in u"キき":
-            self.trans[char] = u"ki"
-        for char in u"クく":
-            self.trans[char] = u"ku"
-        for char in u"ケけ":
-            self.trans[char] = u"ke"
-        for char in u"コこ":
-            self.trans[char] = u"ko"
-        for char in u"サさ":
-            self.trans[char] = u"sa"
-        for char in u"シし":
-            self.trans[char] = u"shi"
-        for char in u"スす":
-            self.trans[char] = u"su"
-        for char in u"セせ":
-            self.trans[char] = u"se"
-        for char in u"ソそ":
-            self.trans[char] = u"so"
-        for char in u"タた":
-            self.trans[char] = u"ta"
-        for char in u"チち":
-            self.trans[char] = u"chi"
-        for char in u"ツつ":
-            self.trans[char] = u"tsu"
-        for char in u"テて":
-            self.trans[char] = u"te"
-        for char in u"トと":
-            self.trans[char] = u"to"
-        for char in u"ナな":
-            self.trans[char] = u"na"
-        for char in u"ニに":
-            self.trans[char] = u"ni"
-        for char in u"ヌぬ":
-            self.trans[char] = u"nu"
-        for char in u"ネね":
-            self.trans[char] = u"ne"
-        for char in u"ノの":
-            self.trans[char] = u"no"
-        for char in u"ハは":
-            self.trans[char] = u"ha"
-        for char in u"ヒひ":
-            self.trans[char] = u"hi"
-        for char in u"フふ":
-            self.trans[char] = u"fu"
-        for char in u"ヘへ":
-            self.trans[char] = u"he"
-        for char in u"ホほ":
-            self.trans[char] = u"ho"
-        for char in u"マま":
-            self.trans[char] = u"ma"
-        for char in u"ミみ":
-            self.trans[char] = u"mi"
-        for char in u"ムむ":
-            self.trans[char] = u"mu"
-        for char in u"メめ":
-            self.trans[char] = u"me"
-        for char in u"モも":
-            self.trans[char] = u"mo"
-        for char in u"ラら":
-            self.trans[char] = u"ra"
-        for char in u"リり":
-            self.trans[char] = u"ri"
-        for char in u"ルる":
-            self.trans[char] = u"ru"
-        for char in u"レれ":
-            self.trans[char] = u"re"
-        for char in u"ロろ":
-            self.trans[char] = u"ro"
-        for char in u"ワわ":
-            self.trans[char] = u"wa"
-        for char in u"ヰゐ":
-            self.trans[char] = u"wi"
-        for char in u"ヱゑ":
-            self.trans[char] = u"we"
-        for char in u"ヲを":
-            self.trans[char] = u"wo"
-        for char in u"ンん":
-            self.trans[char] = u"n"
-        for char in u"ガが":
-            self.trans[char] = u"ga"
-        for char in u"ギぎ":
-            self.trans[char] = u"gi"
-        for char in u"グぐ":
-            self.trans[char] = u"gu"
-        for char in u"ゲげ":
-            self.trans[char] = u"ge"
-        for char in u"ゴご":
-            self.trans[char] = u"go"
-        for char in u"ザざ":
-            self.trans[char] = u"za"
-        for char in u"ジじ":
-            self.trans[char] = u"ji"
-        for char in u"ズず":
-            self.trans[char] = u"zu"
-        for char in u"ゼぜ":
-            self.trans[char] = u"ze"
-        for char in u"ゾぞ":
-            self.trans[char] = u"zo"
-        for char in u"ダだ":
-            self.trans[char] = u"da"
-        for char in u"ヂぢ":
-            self.trans[char] = u"dji"
-        for char in u"ヅづ":
-            self.trans[char] = u"dzu"
-        for char in u"デで":
-            self.trans[char] = u"de"
-        for char in u"ドど":
-            self.trans[char] = u"do"
-        for char in u"バば":
-            self.trans[char] = u"ba"
-        for char in u"ビび":
-            self.trans[char] = u"bi"
-        for char in u"ブぶ":
-            self.trans[char] = u"bu"
-        for char in u"ベべ":
-            self.trans[char] = u"be"
-        for char in u"ボぼ":
-            self.trans[char] = u"bo"
-        for char in u"パぱ":
-            self.trans[char] = u"pa"
-        for char in u"ピぴ":
-            self.trans[char] = u"pi"
-        for char in u"プぷ":
-            self.trans[char] = u"pu"
-        for char in u"ペぺ":
-            self.trans[char] = u"pe"
-        for char in u"ポぽ":
-            self.trans[char] = u"po"
-        for char in u"ヴゔ":
-            self.trans[char] = u"vu"
-        self.trans[u"ヷ"] = u"va"
-        self.trans[u"ヸ"] = u"vi"
-        self.trans[u"ヹ"] = u"ve"
-        self.trans[u"ヺ"] = u"vo"
+        for char in 'アァあ':
+            self.trans[char] = 'a'
+        for char in 'イィい':
+            self.trans[char] = 'i'
+        for char in 'ウう':
+            self.trans[char] = 'u'
+        for char in 'エェえ':
+            self.trans[char] = 'e'
+        for char in 'オォお':
+            self.trans[char] = 'o'
+        for char in 'ャや':
+            self.trans[char] = 'ya'
+        for char in 'ュゆ':
+            self.trans[char] = 'yu'
+        for char in 'ョよ':
+            self.trans[char] = 'yo'
+        for char in 'カか':
+            self.trans[char] = 'ka'
+        for char in 'キき':
+            self.trans[char] = 'ki'
+        for char in 'クく':
+            self.trans[char] = 'ku'
+        for char in 'ケけ':
+            self.trans[char] = 'ke'
+        for char in 'コこ':
+            self.trans[char] = 'ko'
+        for char in 'サさ':
+            self.trans[char] = 'sa'
+        for char in 'シし':
+            self.trans[char] = 'shi'
+        for char in 'スす':
+            self.trans[char] = 'su'
+        for char in 'セせ':
+            self.trans[char] = 'se'
+        for char in 'ソそ':
+            self.trans[char] = 'so'
+        for char in 'タた':
+            self.trans[char] = 'ta'
+        for char in 'チち':
+            self.trans[char] = 'chi'
+        for char in 'ツつ':
+            self.trans[char] = 'tsu'
+        for char in 'テて':
+            self.trans[char] = 'te'
+        for char in 'トと':
+            self.trans[char] = 'to'
+        for char in 'ナな':
+            self.trans[char] = 'na'
+        for char in 'ニに':
+            self.trans[char] = 'ni'
+        for char in 'ヌぬ':
+            self.trans[char] = 'nu'
+        for char in 'ネね':
+            self.trans[char] = 'ne'
+        for char in 'ノの':
+            self.trans[char] = 'no'
+        for char in 'ハは':
+            self.trans[char] = 'ha'
+        for char in 'ヒひ':
+            self.trans[char] = 'hi'
+        for char in 'フふ':
+            self.trans[char] = 'fu'
+        for char in 'ヘへ':
+            self.trans[char] = 'he'
+        for char in 'ホほ':
+            self.trans[char] = 'ho'
+        for char in 'マま':
+            self.trans[char] = 'ma'
+        for char in 'ミみ':
+            self.trans[char] = 'mi'
+        for char in 'ムむ':
+            self.trans[char] = 'mu'
+        for char in 'メめ':
+            self.trans[char] = 'me'
+        for char in 'モも':
+            self.trans[char] = 'mo'
+        for char in 'ラら':
+            self.trans[char] = 'ra'
+        for char in 'リり':
+            self.trans[char] = 'ri'
+        for char in 'ルる':
+            self.trans[char] = 'ru'
+        for char in 'レれ':
+            self.trans[char] = 're'
+        for char in 'ロろ':
+            self.trans[char] = 'ro'
+        for char in 'ワわ':
+            self.trans[char] = 'wa'
+        for char in 'ヰゐ':
+            self.trans[char] = 'wi'
+        for char in 'ヱゑ':
+            self.trans[char] = 'we'
+        for char in 'ヲを':
+            self.trans[char] = 'wo'
+        for char in 'ンん':
+            self.trans[char] = 'n'
+        for char in 'ガが':
+            self.trans[char] = 'ga'
+        for char in 'ギぎ':
+            self.trans[char] = 'gi'
+        for char in 'グぐ':
+            self.trans[char] = 'gu'
+        for char in 'ゲげ':
+            self.trans[char] = 'ge'
+        for char in 'ゴご':
+            self.trans[char] = 'go'
+        for char in 'ザざ':
+            self.trans[char] = 'za'
+        for char in 'ジじ':
+            self.trans[char] = 'ji'
+        for char in 'ズず':
+            self.trans[char] = 'zu'
+        for char in 'ゼぜ':
+            self.trans[char] = 'ze'
+        for char in 'ゾぞ':
+            self.trans[char] = 'zo'
+        for char in 'ダだ':
+            self.trans[char] = 'da'
+        for char in 'ヂぢ':
+            self.trans[char] = 'dji'
+        for char in 'ヅづ':
+            self.trans[char] = 'dzu'
+        for char in 'デで':
+            self.trans[char] = 'de'
+        for char in 'ドど':
+            self.trans[char] = 'do'
+        for char in 'バば':
+            self.trans[char] = 'ba'
+        for char in 'ビび':
+            self.trans[char] = 'bi'
+        for char in 'ブぶ':
+            self.trans[char] = 'bu'
+        for char in 'ベべ':
+            self.trans[char] = 'be'
+        for char in 'ボぼ':
+            self.trans[char] = 'bo'
+        for char in 'パぱ':
+            self.trans[char] = 'pa'
+        for char in 'ピぴ':
+            self.trans[char] = 'pi'
+        for char in 'プぷ':
+            self.trans[char] = 'pu'
+        for char in 'ペぺ':
+            self.trans[char] = 'pe'
+        for char in 'ポぽ':
+            self.trans[char] = 'po'
+        for char in 'ヴゔ':
+            self.trans[char] = 'vu'
+        self.trans['ヷ'] = 'va'
+        self.trans['ヸ'] = 'vi'
+        self.trans['ヹ'] = 've'
+        self.trans['ヺ'] = 'vo'
 
         # Japanese and Chinese punctuation and typography
-        for char in u"・·":
-            self.trans[char] = u" "
-        for char in u"〃『』《》":
+        for char in '・·':
+            self.trans[char] = ' '
+        for char in '〃『』《》':
             self.trans[char] = u'"'
-        for char in u"「」〈〉〘〙〚〛":
+        for char in '「」〈〉〘〙〚〛':
             self.trans[char] = u"'"
-        for char in u"（〔":
-            self.trans[char] = u"("
-        for char in u"）〕":
-            self.trans[char] = u")"
-        for char in u"［【〖":
-            self.trans[char] = u"["
-        for char in u"］】〗":
-            self.trans[char] = u"]"
+        for char in '（〔':
+            self.trans[char] = '('
+        for char in '）〕':
+            self.trans[char] = ')'
+        for char in '［【〖':
+            self.trans[char] = '['
+        for char in '］】〗':
+            self.trans[char] = ']'
         self.trans['｛'] = '{'
         self.trans['｝'] = '}'
         self.trans['っ'] = ':'
@@ -698,10 +701,10 @@ class transliterator(object):
         self.trans['…'] = '...'
         self.trans['‥'] = '..'
         self.trans['ヶ'] = 'months'
-        for char in u"•◦":
-            self.trans[char] = u"_"
-        for char in u"※＊":
-            self.trans[char] = u"*"
+        for char in '•◦':
+            self.trans[char] = '_'
+        for char in '※＊':
+            self.trans[char] = '*'
         self.trans['Ⓧ'] = '(X)'
         self.trans['Ⓨ'] = '(Y)'
         self.trans['！'] = '!'
@@ -709,16 +712,16 @@ class transliterator(object):
         self.trans['；'] = ';'
         self.trans['：'] = ':'
         self.trans['。'] = '.'
-        for char in u"，、":
-            self.trans[char] = u","
+        for char in '，、':
+            self.trans[char] = ','
 
         # Georgian
         self.trans['ა'] = 'a'
         self.trans['ბ'] = 'b'
         self.trans['გ'] = 'g'
         self.trans['დ'] = 'd'
-        for char in u"ეჱ":
-            self.trans[char] = u"e"
+        for char in 'ეჱ':
+            self.trans[char] = 'e'
         self.trans['ვ'] = 'v'
         self.trans['ზ'] = 'z'
         self.trans['თ'] = 'th'
@@ -737,15 +740,15 @@ class transliterator(object):
         self.trans['ფ'] = 'ph'
         self.trans['ქ'] = 'q'
         self.trans['ღ'] = 'gh'
-        for char in u"ყ":
+        for char in 'ყ':
             self.trans[char] = u"q'"
         self.trans['შ'] = 'sh'
         self.trans['ჩ'] = 'ch'
         self.trans['ც'] = 'ts'
         self.trans['ძ'] = 'dz'
-        for char in u"წ":
+        for char in 'წ':
             self.trans[char] = u"ts'"
-        for char in u"ჭ":
+        for char in 'ჭ':
             self.trans[char] = u"ch'"
         self.trans['ხ'] = 'kh'
         self.trans['ჯ'] = 'j'
@@ -755,36 +758,36 @@ class transliterator(object):
         self.trans['ჶ'] = 'f'
 
         # Devanagari
-        for char in u"पप":
-            self.trans[char] = u"p"
+        for char in 'पप':
+            self.trans[char] = 'p'
         self.trans['अ'] = 'a'
-        for char in u"आा":
-            self.trans[char] = u"aa"
+        for char in 'आा':
+            self.trans[char] = 'aa'
         self.trans['प'] = 'pa'
-        for char in u"इि":
-            self.trans[char] = u"i"
-        for char in u"ईी":
-            self.trans[char] = u"ii"
-        for char in u"उु":
-            self.trans[char] = u"u"
-        for char in u"ऊू":
-            self.trans[char] = u"uu"
-        for char in u"एे":
-            self.trans[char] = u"e"
-        for char in u"ऐै":
-            self.trans[char] = u"ai"
-        for char in u"ओो":
-            self.trans[char] = u"o"
-        for char in u"औौ":
-            self.trans[char] = u"au"
-        for char in u"ऋृर":
-            self.trans[char] = u"r"
-        for char in u"ॠॄ":
-            self.trans[char] = u"rr"
-        for char in u"ऌॢल":
-            self.trans[char] = u"l"
-        for char in u"ॡॣ":
-            self.trans[char] = u"ll"
+        for char in 'इि':
+            self.trans[char] = 'i'
+        for char in 'ईी':
+            self.trans[char] = 'ii'
+        for char in 'उु':
+            self.trans[char] = 'u'
+        for char in 'ऊू':
+            self.trans[char] = 'uu'
+        for char in 'एे':
+            self.trans[char] = 'e'
+        for char in 'ऐै':
+            self.trans[char] = 'ai'
+        for char in 'ओो':
+            self.trans[char] = 'o'
+        for char in 'औौ':
+            self.trans[char] = 'au'
+        for char in 'ऋृर':
+            self.trans[char] = 'r'
+        for char in 'ॠॄ':
+            self.trans[char] = 'rr'
+        for char in 'ऌॢल':
+            self.trans[char] = 'l'
+        for char in 'ॡॣ':
+            self.trans[char] = 'll'
         self.trans['क'] = 'k'
         self.trans['ख'] = 'kh'
         self.trans['ग'] = 'g'
@@ -795,16 +798,16 @@ class transliterator(object):
         self.trans['ज'] = 'j'
         self.trans['झ'] = 'jh'
         self.trans['ञ'] = 'ñ'
-        for char in u"टत":
-            self.trans[char] = u"t"
-        for char in u"ठथ":
-            self.trans[char] = u"th"
-        for char in u"डद":
-            self.trans[char] = u"d"
-        for char in u"ढध":
-            self.trans[char] = u"dh"
-        for char in u"णन":
-            self.trans[char] = u"n"
+        for char in 'टत':
+            self.trans[char] = 't'
+        for char in 'ठथ':
+            self.trans[char] = 'th'
+        for char in 'डद':
+            self.trans[char] = 'd'
+        for char in 'ढध':
+            self.trans[char] = 'dh'
+        for char in 'णन':
+            self.trans[char] = 'n'
         self.trans['फ'] = 'ph'
         self.trans['ब'] = 'b'
         self.trans['भ'] = 'bh'
@@ -812,32 +815,32 @@ class transliterator(object):
         self.trans['य'] = 'y'
         self.trans['व'] = 'v'
         self.trans['श'] = 'sh'
-        for char in u"षस":
-            self.trans[char] = u"s"
+        for char in 'षस':
+            self.trans[char] = 's'
         self.trans['ह'] = 'h'
         self.trans['क'] = 'x'
         self.trans['त'] = 'tr'
         self.trans['ज'] = 'gj'
-        for char in u"क़":
-            self.trans[char] = u"q"
+        for char in 'क़':
+            self.trans[char] = 'q'
         self.trans['फ'] = 'f'
         self.trans['ख'] = 'hh'
         self.trans['H'] = 'gh'
         self.trans['ज'] = 'z'
-        for char in u"डढ":
-            self.trans[char] = u"r"
+        for char in 'डढ':
+            self.trans[char] = 'r'
         # Devanagari ligatures (possibly incomplete and/or incorrect)
-        for char in u"ख्":
-            self.trans[char] = u"khn"
+        for char in 'ख्':
+            self.trans[char] = 'khn'
         self.trans['त'] = 'tn'
-        for char in u"द्":
-            self.trans[char] = u"dn"
+        for char in 'द्':
+            self.trans[char] = 'dn'
         self.trans['श'] = 'cn'
-        for char in u"ह्":
-            self.trans[char] = u"fn"
-        for char in u"अँ":
-            self.trans[char] = u"m"
-        for char in u"॒॑":
+        for char in 'ह्':
+            self.trans[char] = 'fn'
+        for char in 'अँ':
+            self.trans[char] = 'm'
+        for char in '॒॑':
             self.trans[char] = u""
         self.trans['०'] = '0'
         self.trans['१'] = '1'
@@ -911,9 +914,9 @@ class transliterator(object):
         self.trans['ս'] = 's'
         self.trans['Վ'] = 'V'
         self.trans['վ'] = 'v'
-        for char in u"Տ":
+        for char in 'Տ':
             self.trans[char] = u"T'"
-        for char in u"տ":
+        for char in 'տ':
             self.trans[char] = u"t'"
         self.trans['Ր'] = 'R'
         self.trans['ր'] = 'r'
@@ -936,33 +939,33 @@ class transliterator(object):
         self.trans['՛'] = ''
 
         # Tamil
-        for char in u"க்":
-            self.trans[char] = u"k"
-        for char in u"ஙண்ந்ன்":
-            self.trans[char] = u"n"
+        for char in 'க்':
+            self.trans[char] = 'k'
+        for char in 'ஙண்ந்ன்':
+            self.trans[char] = 'n'
         self.trans['ச'] = 'c'
-        for char in u"ஞ்":
-            self.trans[char] = u"ñ"
-        for char in u"ட்":
-            self.trans[char] = u"th"
+        for char in 'ஞ்':
+            self.trans[char] = 'ñ'
+        for char in 'ட்':
+            self.trans[char] = 'th'
         self.trans['த'] = 't'
         self.trans['ப'] = 'p'
-        for char in u"ம்":
-            self.trans[char] = u"m"
-        for char in u"ய்":
-            self.trans[char] = u"y"
-        for char in u"ர்ழ்ற":
-            self.trans[char] = u"r"
-        for char in u"ல்ள":
-            self.trans[char] = u"l"
-        for char in u"வ்":
-            self.trans[char] = u"v"
+        for char in 'ம்':
+            self.trans[char] = 'm'
+        for char in 'ய்':
+            self.trans[char] = 'y'
+        for char in 'ர்ழ்ற':
+            self.trans[char] = 'r'
+        for char in 'ல்ள':
+            self.trans[char] = 'l'
+        for char in 'வ்':
+            self.trans[char] = 'v'
         self.trans['ஜ'] = 'j'
         self.trans['ஷ'] = 'sh'
         self.trans['ஸ'] = 's'
         self.trans['ஹ'] = 'h'
-        for char in u"க்ஷ":
-            self.trans[char] = u"x"
+        for char in 'க்ஷ':
+            self.trans[char] = 'x'
         self.trans['அ'] = 'a'
         self.trans['ஆ'] = 'aa'
         self.trans['இ'] = 'i'
@@ -979,22 +982,22 @@ class transliterator(object):
 
         # Bengali
         self.trans['অ'] = 'ô'
-        for char in u"আা":
-            self.trans[char] = u"a"
-        for char in u"ইিঈী":
-            self.trans[char] = u"i"
-        for char in u"উুঊূ":
-            self.trans[char] = u"u"
-        for char in u"ঋৃ":
-            self.trans[char] = u"ri"
-        for char in u"এেয়":
-            self.trans[char] = u"e"
-        for char in u"ঐৈ":
-            self.trans[char] = u"oi"
-        for char in u"ওো":
-            self.trans[char] = u"o"
-        for char in u"ঔৌ":
-            self.trans[char] = "ou"
+        for char in 'আা':
+            self.trans[char] = 'a'
+        for char in 'ইিঈী':
+            self.trans[char] = 'i'
+        for char in 'উুঊূ':
+            self.trans[char] = 'u'
+        for char in 'ঋৃ':
+            self.trans[char] = 'ri'
+        for char in 'এেয়':
+            self.trans[char] = 'e'
+        for char in 'ঐৈ':
+            self.trans[char] = 'oi'
+        for char in 'ওো':
+            self.trans[char] = 'o'
+        for char in 'ঔৌ':
+            self.trans[char] = 'ou'
         self.trans['্'] = ''
         self.trans['ৎ'] = 't'
         self.trans['ং'] = 'n'
@@ -1010,16 +1013,16 @@ class transliterator(object):
         self.trans['জ'] = 'j'
         self.trans['ঝ'] = 'jh'
         self.trans['ঞ'] = 'n'
-        for char in u"টত":
-            self.trans[char] = u"t"
-        for char in u"ঠথ":
-            self.trans[char] = u"th"
-        for char in u"ডদ":
-            self.trans[char] = u"d"
-        for char in u"ঢধ":
-            self.trans[char] = u"dh"
-        for char in u"ণন":
-            self.trans[char] = u"n"
+        for char in 'টত':
+            self.trans[char] = 't'
+        for char in 'ঠথ':
+            self.trans[char] = 'th'
+        for char in 'ডদ':
+            self.trans[char] = 'd'
+        for char in 'ঢধ':
+            self.trans[char] = 'dh'
+        for char in 'ণন':
+            self.trans[char] = 'n'
         self.trans['প'] = 'p'
         self.trans['ফ'] = 'ph'
         self.trans['ব'] = 'b'
@@ -1030,10 +1033,10 @@ class transliterator(object):
         self.trans['ল'] = 'l'
         self.trans['শ'] = 's'
         self.trans['হ'] = 'h'
-        for char in u"য়":
-            self.trans[char] = u"-"
-        for char in u"ড়":
-            self.trans[char] = u"r"
+        for char in 'য়':
+            self.trans[char] = '-'
+        for char in 'ড়':
+            self.trans[char] = 'r'
         self.trans['ঢ'] = 'rh'
         self.trans['০'] = '0'
         self.trans['১'] = '1'
@@ -1049,46 +1052,46 @@ class transliterator(object):
         # Thai (because of complications of the alphabet, self.transliterations
         #       are very imprecise here)
         self.trans['ก'] = 'k'
-        for char in u"ขฃคฅฆ":
-            self.trans[char] = u"kh"
+        for char in 'ขฃคฅฆ':
+            self.trans[char] = 'kh'
         self.trans['ง'] = 'ng'
-        for char in u"จฉชฌ":
-            self.trans[char] = u"ch"
-        for char in u"ซศษส":
-            self.trans[char] = u"s"
-        for char in u"ญย":
-            self.trans[char] = u"y"
-        for char in u"ฎด":
-            self.trans[char] = u"d"
-        for char in u"ฏต":
-            self.trans[char] = u"t"
-        for char in u"ฐฑฒถทธ":
-            self.trans[char] = u"th"
-        for char in u"ณน":
-            self.trans[char] = u"n"
+        for char in 'จฉชฌ':
+            self.trans[char] = 'ch'
+        for char in 'ซศษส':
+            self.trans[char] = 's'
+        for char in 'ญย':
+            self.trans[char] = 'y'
+        for char in 'ฎด':
+            self.trans[char] = 'd'
+        for char in 'ฏต':
+            self.trans[char] = 't'
+        for char in 'ฐฑฒถทธ':
+            self.trans[char] = 'th'
+        for char in 'ณน':
+            self.trans[char] = 'n'
         self.trans['บ'] = 'b'
         self.trans['ป'] = 'p'
-        for char in u"ผพภ":
-            self.trans[char] = u"ph"
-        for char in u"ฝฟ":
-            self.trans[char] = u"f"
+        for char in 'ผพภ':
+            self.trans[char] = 'ph'
+        for char in 'ฝฟ':
+            self.trans[char] = 'f'
         self.trans['ม'] = 'm'
         self.trans['ร'] = 'r'
         self.trans['ฤ'] = 'rue'
         self.trans['ๅ'] = ':'
-        for char in u"ลฬ":
-            self.trans[char] = u"l"
+        for char in 'ลฬ':
+            self.trans[char] = 'l'
         self.trans['ฦ'] = 'lue'
         self.trans['ว'] = 'w'
-        for char in u"หฮ":
-            self.trans[char] = u"h"
+        for char in 'หฮ':
+            self.trans[char] = 'h'
         self.trans['อ'] = ''
         self.trans['ร'] = 'ü'
         self.trans['ว'] = 'ua'
-        for char in u"อวโิ":
-            self.trans[char] = u"o"
-        for char in u"ะัา":
-            self.trans[char] = u"a"
+        for char in 'อวโิ':
+            self.trans[char] = 'o'
+        for char in 'ะัา':
+            self.trans[char] = 'a'
         self.trans['ว'] = 'u'
         self.trans['ำ'] = 'am'
         self.trans['ิ'] = 'i'
@@ -1097,12 +1100,12 @@ class transliterator(object):
         self.trans['ื'] = 'ue:'
         self.trans['ุ'] = 'u'
         self.trans['ู'] = 'u:'
-        for char in u"เ็":
-            self.trans[char] = u"e"
+        for char in 'เ็':
+            self.trans[char] = 'e'
         self.trans['แ'] = 'ae'
-        for char in u"ใไ":
-            self.trans[char] = u"ai"
-        for char in u"่้๊๋็์":
+        for char in 'ใไ':
+            self.trans[char] = 'ai'
+        for char in '่้๊๋็์':
             self.trans[char] = u""
         self.trans['ฯ'] = '.'
         self.trans['ๆ'] = '(2)'
@@ -1153,1350 +1156,1364 @@ class transliterator(object):
         self.trans['도'] = 'do'
 
         # Kannada
-        self.trans[u"ಅ"] = u"a"
-        for char in u"ಆಾ":
-            self.trans[char] = u"aa"
-        for char in u"ಇಿ":
-            self.trans[char] = u"i"
-        for char in u"ಈೀ":
-            self.trans[char] = u"ii"
-        for char in u"ಉು":
-            self.trans[char] = u"u"
-        for char in u"ಊೂ":
-            self.trans[char] = u"uu"
-        for char in u"ಋೂ":
+        self.trans['ಅ'] = 'a'
+        for char in 'ಆಾ':
+            self.trans[char] = 'aa'
+        for char in 'ಇಿ':
+            self.trans[char] = 'i'
+        for char in 'ಈೀ':
+            self.trans[char] = 'ii'
+        for char in 'ಉು':
+            self.trans[char] = 'u'
+        for char in 'ಊೂ':
+            self.trans[char] = 'uu'
+        for char in 'ಋೂ':
             self.trans[char] = u"r'"
-        for char in u"ಎೆ":
-            self.trans[char] = u"e"
-        for char in u"ಏೇ":
-            self.trans[char] = u"ee"
-        for char in u"ಐೈ":
-            self.trans[char] = u"ai"
-        for char in u"ಒೊ":
-            self.trans[char] = u"o"
-        for char in u"ಓೋ":
-            self.trans[char] = u"oo"
-        for char in u"ಔೌ":
-            self.trans[char] = u"au"
-        self.trans[u"ಂ"] = u"m'"
-        self.trans[u"ಃ"] = u"h'"
-        self.trans[u"ಕ"] = u"k"
-        self.trans[u"ಖ"] = u"kh"
-        self.trans[u"ಗ"] = u"g"
-        self.trans[u"ಘ"] = u"gh"
-        self.trans[u"ಙ"] = u"ng"
-        self.trans[u"ಚ"] = u"c"
-        self.trans[u"ಛ"] = u"ch"
-        self.trans[u"ಜ"] = u"j"
-        self.trans[u"ಝ"] = u"ny"
-        self.trans[u"ಟ"] = u"tt"
-        self.trans[u"ಠ"] = u"tth"
-        self.trans[u"ಡ"] = u"dd"
-        self.trans[u"ಢ"] = u"ddh"
-        self.trans[u"ಣ"] = u"nn"
-        self.trans[u"ತ"] = u"t"
-        self.trans[u"ಥ"] = u"th"
-        self.trans[u"ದ"] = u"d"
-        self.trans[u"ಧ"] = u"dh"
-        self.trans[u"ನ"] = u"n"
-        self.trans[u"ಪ"] = u"p"
-        self.trans[u"ಫ"] = u"ph"
-        self.trans[u"ಬ"] = u"b"
-        self.trans[u"ಭ"] = u"bh"
-        self.trans[u"ಮ"] = u"m"
-        self.trans[u"ಯ"] = u"y"
-        self.trans[u"ರ"] = u"r"
-        self.trans[u"ಲ"] = u"l"
-        self.trans[u"ವ"] = u"v"
-        self.trans[u"ಶ"] = u"sh"
-        self.trans[u"ಷ"] = u"ss"
-        self.trans[u"ಸ"] = u"s"
-        self.trans[u"ಹ"] = u"h"
-        self.trans[u"ಳ"] = u"ll"
-        self.trans[u"೦"] = u"0"
-        self.trans[u"೧"] = u"1"
-        self.trans[u"೨"] = u"2"
-        self.trans[u"೩"] = u"3"
-        self.trans[u"೪"] = u"4"
-        self.trans[u"೫"] = u"5"
-        self.trans[u"೬"] = u"6"
-        self.trans[u"೭"] = u"7"
-        self.trans[u"೮"] = u"8"
-        self.trans[u"೯"] = u"9"
+        for char in 'ಎೆ':
+            self.trans[char] = 'e'
+        for char in 'ಏೇ':
+            self.trans[char] = 'ee'
+        for char in 'ಐೈ':
+            self.trans[char] = 'ai'
+        for char in 'ಒೊ':
+            self.trans[char] = 'o'
+        for char in 'ಓೋ':
+            self.trans[char] = 'oo'
+        for char in 'ಔೌ':
+            self.trans[char] = 'au'
+        self.trans['ಂ'] = "m'"
+        self.trans['ಃ'] = "h'"
+        self.trans['ಕ'] = 'k'
+        self.trans['ಖ'] = 'kh'
+        self.trans['ಗ'] = 'g'
+        self.trans['ಘ'] = 'gh'
+        self.trans['ಙ'] = 'ng'
+        self.trans['ಚ'] = 'c'
+        self.trans['ಛ'] = 'ch'
+        self.trans['ಜ'] = 'j'
+        self.trans['ಝ'] = 'ny'
+        self.trans['ಟ'] = 'tt'
+        self.trans['ಠ'] = 'tth'
+        self.trans['ಡ'] = 'dd'
+        self.trans['ಢ'] = 'ddh'
+        self.trans['ಣ'] = 'nn'
+        self.trans['ತ'] = 't'
+        self.trans['ಥ'] = 'th'
+        self.trans['ದ'] = 'd'
+        self.trans['ಧ'] = 'dh'
+        self.trans['ನ'] = 'n'
+        self.trans['ಪ'] = 'p'
+        self.trans['ಫ'] = 'ph'
+        self.trans['ಬ'] = 'b'
+        self.trans['ಭ'] = 'bh'
+        self.trans['ಮ'] = 'm'
+        self.trans['ಯ'] = 'y'
+        self.trans['ರ'] = 'r'
+        self.trans['ಲ'] = 'l'
+        self.trans['ವ'] = 'v'
+        self.trans['ಶ'] = 'sh'
+        self.trans['ಷ'] = 'ss'
+        self.trans['ಸ'] = 's'
+        self.trans['ಹ'] = 'h'
+        self.trans['ಳ'] = 'll'
+        self.trans['೦'] = '0'
+        self.trans['೧'] = '1'
+        self.trans['೨'] = '2'
+        self.trans['೩'] = '3'
+        self.trans['೪'] = '4'
+        self.trans['೫'] = '5'
+        self.trans['೬'] = '6'
+        self.trans['೭'] = '7'
+        self.trans['೮'] = '8'
+        self.trans['೯'] = '9'
         # Telugu
         self.trans['అ'] = 'a'
-        for char in u"ఆా":
-            self.trans[char] = u"aa"
-        for char in u"ఇి":
-            self.trans[char] = u"i"
-        for char in u"ఈీ":
-            self.trans[char] = u"ii"
-        for char in u"ఉు":
-            self.trans[char] = u"u"
-        for char in u"ఊూ":
-            self.trans[char] = u"uu"
-        for char in u"ఋృ":
-            self.trans[char] = u"r'"
-        for char in u"ౠౄ":
-            self.trans[char] = u'r"'
-        self.trans[u"ఌ"] = u"l'"
-        self.trans[u"ౡ"] = u'l"'
-        for char in u"ఎె":
-            self.trans[char] = u"e"
-        for char in u"ఏే":
-            self.trans[char] = u"ee"
-        for char in u"ఐై":
-            self.trans[char] = u"ai"
-        for char in u"ఒొ":
-            self.trans[char] = u"o"
-        for char in u"ఓో":
-            self.trans[char] = u"oo"
-        for char in u"ఔౌ":
-            self.trans[char] = u"au"
-        self.trans[u"ం"] = u"'"
-        self.trans[u"ః"] = u'"'
-        self.trans[u"క"] = u"k"
-        self.trans[u"ఖ"] = u"kh"
-        self.trans[u"గ"] = u"g"
-        self.trans[u"ఘ"] = u"gh"
-        self.trans[u"ఙ"] = u"ng"
-        self.trans[u"చ"] = u"ts"
-        self.trans[u"ఛ"] = u"tsh"
-        self.trans[u"జ"] = u"j"
-        self.trans[u"ఝ"] = u"jh"
-        self.trans[u"ఞ"] = u"ñ"
-        for char in u"టత":
-            self.trans[char] = u"t"
-        for char in u"ఠథ":
-            self.trans[char] = u"th"
-        for char in u"డద":
-            self.trans[char] = u"d"
-        for char in u"ఢధ":
-            self.trans[char] = u"dh"
-        for char in u"ణన":
-            self.trans[char] = u"n"
-        self.trans[u"ప"] = u"p"
-        self.trans[u"ఫ"] = u"ph"
-        self.trans[u"బ"] = u"b"
-        self.trans[u"భ"] = u"bh"
-        self.trans[u"మ"] = u"m"
-        self.trans[u"య"] = u"y"
-        for char in u"రఱ":
-            self.trans[char] = u"r"
-        for char in u"లళ":
-            self.trans[char] = u"l"
-        self.trans[u"వ"] = u"v"
-        self.trans[u"శ"] = u"sh"
-        for char in u"షస":
-            self.trans[char] = u"s"
-        self.trans[u"హ"] = u"h"
-        self.trans[u"్"] = ""
-        for char in u"ంఁ":
-            self.trans[char] = u"^"
-        self.trans[u"ః"] = u"-"
-        self.trans[u"౦"] = u"0"
-        self.trans[u"౧"] = u"1"
-        self.trans[u"౨"] = u"2"
-        self.trans[u"౩"] = u"3"
-        self.trans[u"౪"] = u"4"
-        self.trans[u"౫"] = u"5"
-        self.trans[u"౬"] = u"6"
-        self.trans[u"౭"] = u"7"
-        self.trans[u"౮"] = u"8"
-        self.trans[u"౯"] = u"9"
-        self.trans[u"౹"] = u"1/4"
-        self.trans[u"౺"] = u"1/2"
-        self.trans[u"౻"] = u"3/4"
-        self.trans[u"౼"] = u"1/16"
-        self.trans[u"౽"] = u"1/8"
-        self.trans[u"౾"] = u"3/16"
+        for char in 'ఆా':
+            self.trans[char] = 'aa'
+        for char in 'ఇి':
+            self.trans[char] = 'i'
+        for char in 'ఈీ':
+            self.trans[char] = 'ii'
+        for char in 'ఉు':
+            self.trans[char] = 'u'
+        for char in 'ఊూ':
+            self.trans[char] = 'uu'
+        for char in 'ఋృ':
+            self.trans[char] = "r'"
+        for char in 'ౠౄ':
+            self.trans[char] = 'r"'
+        self.trans['ఌ'] = "l'"
+        self.trans['ౡ'] = 'l"'
+        for char in 'ఎె':
+            self.trans[char] = 'e'
+        for char in 'ఏే':
+            self.trans[char] = 'ee'
+        for char in 'ఐై':
+            self.trans[char] = 'ai'
+        for char in 'ఒొ':
+            self.trans[char] = 'o'
+        for char in 'ఓో':
+            self.trans[char] = 'oo'
+        for char in 'ఔౌ':
+            self.trans[char] = 'au'
+        self.trans['ం'] = "'"
+        self.trans['ః'] = '"'
+        self.trans['క'] = 'k'
+        self.trans['ఖ'] = 'kh'
+        self.trans['గ'] = 'g'
+        self.trans['ఘ'] = 'gh'
+        self.trans['ఙ'] = 'ng'
+        self.trans['చ'] = 'ts'
+        self.trans['ఛ'] = 'tsh'
+        self.trans['జ'] = 'j'
+        self.trans['ఝ'] = 'jh'
+        self.trans['ఞ'] = 'ñ'
+        for char in 'టత':
+            self.trans[char] = 't'
+        for char in 'ఠథ':
+            self.trans[char] = 'th'
+        for char in 'డద':
+            self.trans[char] = 'd'
+        for char in 'ఢధ':
+            self.trans[char] = 'dh'
+        for char in 'ణన':
+            self.trans[char] = 'n'
+        self.trans['ప'] = 'p'
+        self.trans['ఫ'] = 'ph'
+        self.trans['బ'] = 'b'
+        self.trans['భ'] = 'bh'
+        self.trans['మ'] = 'm'
+        self.trans['య'] = 'y'
+        for char in 'రఱ':
+            self.trans[char] = 'r'
+        for char in 'లళ':
+            self.trans[char] = 'l'
+        self.trans['వ'] = 'v'
+        self.trans['శ'] = 'sh'
+        for char in 'షస':
+            self.trans[char] = 's'
+        self.trans['హ'] = 'h'
+        self.trans['్'] = ""
+        for char in 'ంఁ':
+            self.trans[char] = '^'
+        self.trans['ః'] = '-'
+        self.trans['౦'] = '0'
+        self.trans['౧'] = '1'
+        self.trans['౨'] = '2'
+        self.trans['౩'] = '3'
+        self.trans['౪'] = '4'
+        self.trans['౫'] = '5'
+        self.trans['౬'] = '6'
+        self.trans['౭'] = '7'
+        self.trans['౮'] = '8'
+        self.trans['౯'] = '9'
+        self.trans['౹'] = '1/4'
+        self.trans['౺'] = '1/2'
+        self.trans['౻'] = '3/4'
+        self.trans['౼'] = '1/16'
+        self.trans['౽'] = '1/8'
+        self.trans['౾'] = '3/16'
         # Lao - note: pronounciation in initial position is used;
         # different pronounciation in final position is ignored
-        self.trans[u"ກ"] = "k"
-        for char in u"ຂຄ":
-            self.trans[char] = "kh"
-        self.trans[u"ງ"] = "ng"
-        self.trans[u"ຈ"] = "ch"
-        for char in u"ສຊ":
-            self.trans[char] = "s"
-        self.trans[u"ຍ"] = "ny"
-        self.trans[u"ດ"] = "d"
-        self.trans[u"ຕ"] = "t"
-        for char in u"ຖທ":
-            self.trans[char] = "th"
-        self.trans[u"ນ"] = "n"
-        self.trans[u"ບ"] = "b"
-        self.trans[u"ປ"] = "p"
-        for char in u"ຜພ":
-            self.trans[char] = "ph"
-        for char in u"ຝຟ":
-            self.trans[char] = "f"
-        for char in u"ມໝ":
-            self.trans[char] = "m"
-        self.trans[u"ຢ"] = "y"
-        for char in u"ຣຼ":
-            self.trans[char] = "r"
-        for char in u"ລຼ":
-            self.trans[char] = "l"
-        self.trans[u"ວ"] = "v"
+        self.trans['ກ'] = 'k'
+        for char in 'ຂຄ':
+            self.trans[char] = 'kh'
+        self.trans['ງ'] = 'ng'
+        self.trans['ຈ'] = 'ch'
+        for char in 'ສຊ':
+            self.trans[char] = 's'
+        self.trans['ຍ'] = 'ny'
+        self.trans['ດ'] = 'd'
+        self.trans['ຕ'] = 't'
+        for char in 'ຖທ':
+            self.trans[char] = 'th'
+        self.trans['ນ'] = 'n'
+        self.trans['ບ'] = 'b'
+        self.trans['ປ'] = 'p'
+        for char in 'ຜພ':
+            self.trans[char] = 'ph'
+        for char in 'ຝຟ':
+            self.trans[char] = 'f'
+        for char in 'ມໝ':
+            self.trans[char] = 'm'
+        self.trans['ຢ'] = 'y'
+        for char in 'ຣຼ':
+            self.trans[char] = 'r'
+        for char in 'ລຼ':
+            self.trans[char] = 'l'
+        self.trans['ວ'] = 'v'
         self.trans['ຮ'] = 'h'
-        self.trans[u"ອ"] = "'"
-        for char in u"ະັ":
-            self.trans[char] = "a"
-        self.trans[u"ິ"] = "i"
-        self.trans[u"ຶ"] = "ue"
-        self.trans[u"ຸ"] = "u"
-        self.trans[u"ເ"] = u"é"
-        self.trans[u"ແ"] = u"è"
-        for char in u"ໂົາໍ":
-            self.trans[char] = "o"
-        self.trans[u"ຽ"] = "ia"
-        self.trans[u"ເຶ"] = "uea"
-        self.trans[u"ຍ"] = "i"
-        for char in u"ໄໃ":
-            self.trans[char] = "ai"
-        self.trans[u"ຳ"] = "am"
-        self.trans[u"າ"] = "aa"
-        self.trans[u"ີ"] = "ii"
-        self.trans[u"ື"] = "yy"
-        self.trans[u"ູ"] = "uu"
-        self.trans[u"ເ"] = "e"
-        self.trans[u"ແ"] = "ei"
-        self.trans[u"໐"] = "0"
-        self.trans[u"໑"] = "1"
-        self.trans[u"໒"] = "2"
-        self.trans[u"໓"] = "3"
-        self.trans[u"໔"] = "4"
-        self.trans[u"໕"] = "5"
-        self.trans[u"໖"] = "6"
-        self.trans[u"໗"] = "7"
-        self.trans[u"໘"] = "8"
-        self.trans[u"໙"] = "9"
+        self.trans['ອ'] = "'"
+        for char in 'ະັ':
+            self.trans[char] = 'a'
+        self.trans['ິ'] = 'i'
+        self.trans['ຶ'] = 'ue'
+        self.trans['ຸ'] = 'u'
+        self.trans['ເ'] = 'é'
+        self.trans['ແ'] = 'è'
+        for char in 'ໂົາໍ':
+            self.trans[char] = 'o'
+        self.trans['ຽ'] = 'ia'
+        self.trans['ເຶ'] = 'uea'
+        self.trans['ຍ'] = 'i'
+        for char in 'ໄໃ':
+            self.trans[char] = 'ai'
+        self.trans['ຳ'] = 'am'
+        self.trans['າ'] = 'aa'
+        self.trans['ີ'] = 'ii'
+        self.trans['ື'] = 'yy'
+        self.trans['ູ'] = 'uu'
+        self.trans['ເ'] = 'e'
+        self.trans['ແ'] = 'ei'
+        self.trans['໐'] = '0'
+        self.trans['໑'] = '1'
+        self.trans['໒'] = '2'
+        self.trans['໓'] = '3'
+        self.trans['໔'] = '4'
+        self.trans['໕'] = '5'
+        self.trans['໖'] = '6'
+        self.trans['໗'] = '7'
+        self.trans['໘'] = '8'
+        self.trans['໙'] = '9'
         # Chinese -- note: incomplete
-        for char in u"埃挨哎唉哀皑癌蔼矮艾碍爱隘":
-            self.trans[char] = u"ai"
-        for char in u"鞍氨安俺按暗岸胺案":
-            self.trans[char] = u"an"
-        for char in u"肮昂盎":
-            self.trans[char] = u"ang"
-        for char in u"凹敖熬翱袄傲奥懊澳":
-            self.trans[char] = u"ao"
-        for char in u"芭捌扒叭吧笆八疤巴拔跋靶把耙坝霸罢爸":
-            self.trans[char] = u"ba"
-        for char in u"白柏百摆佰败拜稗":
-            self.trans[char] = u"bai"
-        for char in u"斑班搬扳般颁板版扮拌伴瓣半办绊":
-            self.trans[char] = u"ban"
-        for char in u"邦帮梆榜膀绑棒磅蚌镑傍谤":
-            self.trans[char] = u"bang"
-        for char in u"苞胞包褒剥薄雹保堡饱宝抱报暴豹鲍爆":
-            self.trans[char] = u"bao"
-        for char in u"杯碑悲卑北辈背贝钡倍狈备惫焙被":
-            self.trans[char] = u"bei"
-        for char in u"奔苯本笨":
-            self.trans[char] = u"ben"
-        for char in u"崩绷甭泵蹦迸":
-            self.trans[char] = u"beng"
-        for char in u"逼鼻比鄙笔彼碧蓖蔽毕毙毖币庇痹闭敝弊必辟壁臂避陛":
-            self.trans[char] = u"bi"
-        for char in u"鞭边编贬扁便变卞辨辩辫遍":
-            self.trans[char] = u"bian"
-        for char in u"标彪膘表":
-            self.trans[char] = u"biao"
-        for char in u"鳖憋别瘪":
-            self.trans[char] = u"bie"
-        for char in u"彬斌濒滨宾摈":
-            self.trans[char] = u"bin"
-        for char in u"兵冰柄丙秉饼炳病并":
-            self.trans[char] = u"bing"
-        for char in u"玻菠播拨钵波博勃搏铂箔伯帛舶脖膊渤泊驳捕卜亳":
-            self.trans[char] = u"bo"
-        for char in u"哺补埠不布步簿部怖":
-            self.trans[char] = u"bu"
-        for char in u"猜裁材才财睬踩采彩菜蔡":
-            self.trans[char] = u"cai"
-        for char in u"餐参蚕残惭惨灿":
-            self.trans[char] = u"can"
-        for char in u"苍舱仓沧藏":
-            self.trans[char] = u"cang"
-        for char in u"操糙槽曹草":
-            self.trans[char] = u"cao"
-        for char in u"厕策侧册测":
-            self.trans[char] = u"ce"
-        for char in u"层蹭":
-            self.trans[char] = u"ceng"
-        for char in u"插叉茬茶查碴搽察岔差诧":
-            self.trans[char] = u"cha"
-        for char in u"拆柴豺":
-            self.trans[char] = u"chai"
-        for char in u"搀掺蝉馋谗缠铲产阐颤":
-            self.trans[char] = u"chan"
-        for char in u"昌猖场尝常长偿肠厂敞畅唱倡":
-            self.trans[char] = u"chang"
-        for char in u"超抄钞朝嘲潮巢吵炒":
-            self.trans[char] = u"chao"
-        for char in u"车扯撤掣彻澈":
-            self.trans[char] = u"che"
-        for char in u"郴臣辰尘晨忱沉陈趁衬":
-            self.trans[char] = u"chen"
-        for char in u"撑称城橙成呈乘程惩澄诚承逞骋秤":
-            self.trans[char] = u"cheng"
-        for char in u"吃痴持匙池迟弛驰耻齿侈尺赤翅斥炽":
-            self.trans[char] = u"chi"
-        for char in u"充冲虫崇宠":
-            self.trans[char] = u"chong"
-        for char in u"抽酬畴踌稠愁筹仇绸瞅丑臭":
-            self.trans[char] = u"chou"
-        for char in u"初出橱厨躇锄雏滁除楚储矗搐触处":
-            self.trans[char] = u"chu"
+        for char in '埃挨哎唉哀皑癌蔼矮艾碍爱隘':
+            self.trans[char] = 'ai'
+        for char in '鞍氨安俺按暗岸胺案':
+            self.trans[char] = 'an'
+        for char in '肮昂盎':
+            self.trans[char] = 'ang'
+        for char in '凹敖熬翱袄傲奥懊澳':
+            self.trans[char] = 'ao'
+        for char in '芭捌扒叭吧笆八疤巴拔跋靶把耙坝霸罢爸':
+            self.trans[char] = 'ba'
+        for char in '白柏百摆佰败拜稗':
+            self.trans[char] = 'bai'
+        for char in '斑班搬扳般颁板版扮拌伴瓣半办绊':
+            self.trans[char] = 'ban'
+        for char in '邦帮梆榜膀绑棒磅蚌镑傍谤':
+            self.trans[char] = 'bang'
+        for char in '苞胞包褒剥薄雹保堡饱宝抱报暴豹鲍爆':
+            self.trans[char] = 'bao'
+        for char in '杯碑悲卑北辈背贝钡倍狈备惫焙被':
+            self.trans[char] = 'bei'
+        for char in '奔苯本笨':
+            self.trans[char] = 'ben'
+        for char in '崩绷甭泵蹦迸':
+            self.trans[char] = 'beng'
+        for char in '逼鼻比鄙笔彼碧蓖蔽毕毙毖币庇痹闭敝弊必辟壁臂避陛':
+            self.trans[char] = 'bi'
+        for char in '鞭边编贬扁便变卞辨辩辫遍':
+            self.trans[char] = 'bian'
+        for char in '标彪膘表':
+            self.trans[char] = 'biao'
+        for char in '鳖憋别瘪':
+            self.trans[char] = 'bie'
+        for char in '彬斌濒滨宾摈':
+            self.trans[char] = 'bin'
+        for char in '兵冰柄丙秉饼炳病并':
+            self.trans[char] = 'bing'
+        for char in '玻菠播拨钵波博勃搏铂箔伯帛舶脖膊渤泊驳捕卜亳':
+            self.trans[char] = 'bo'
+        for char in '哺补埠不布步簿部怖':
+            self.trans[char] = 'bu'
+        for char in '猜裁材才财睬踩采彩菜蔡':
+            self.trans[char] = 'cai'
+        for char in '餐参蚕残惭惨灿':
+            self.trans[char] = 'can'
+        for char in '苍舱仓沧藏':
+            self.trans[char] = 'cang'
+        for char in '操糙槽曹草':
+            self.trans[char] = 'cao'
+        for char in '厕策侧册测':
+            self.trans[char] = 'ce'
+        for char in '层蹭':
+            self.trans[char] = 'ceng'
+        for char in '插叉茬茶查碴搽察岔差诧':
+            self.trans[char] = 'cha'
+        for char in '拆柴豺':
+            self.trans[char] = 'chai'
+        for char in '搀掺蝉馋谗缠铲产阐颤':
+            self.trans[char] = 'chan'
+        for char in '昌猖场尝常长偿肠厂敞畅唱倡':
+            self.trans[char] = 'chang'
+        for char in '超抄钞朝嘲潮巢吵炒':
+            self.trans[char] = 'chao'
+        for char in '车扯撤掣彻澈':
+            self.trans[char] = 'che'
+        for char in '郴臣辰尘晨忱沉陈趁衬':
+            self.trans[char] = 'chen'
+        for char in '撑称城橙成呈乘程惩澄诚承逞骋秤':
+            self.trans[char] = 'cheng'
+        for char in '吃痴持匙池迟弛驰耻齿侈尺赤翅斥炽':
+            self.trans[char] = 'chi'
+        for char in '充冲虫崇宠':
+            self.trans[char] = 'chong'
+        for char in '抽酬畴踌稠愁筹仇绸瞅丑臭':
+            self.trans[char] = 'chou'
+        for char in '初出橱厨躇锄雏滁除楚储矗搐触处':
+            self.trans[char] = 'chu'
         self.trans['揣'] = 'chuai'
-        for char in u"川穿椽传船喘串":
-            self.trans[char] = u"chuan"
-        for char in u"疮窗幢床闯创":
-            self.trans[char] = u"chuang"
-        for char in u"吹炊捶锤垂":
-            self.trans[char] = u"chui"
-        for char in u"春椿醇唇淳纯蠢":
-            self.trans[char] = u"chun"
-        for char in u"戳绰":
-            self.trans[char] = u"chuo"
-        for char in u"疵茨磁雌辞慈瓷词此刺赐次":
-            self.trans[char] = u"ci"
-        for char in u"聪葱囱匆从丛":
-            self.trans[char] = u"cong"
+        for char in '川穿椽传船喘串':
+            self.trans[char] = 'chuan'
+        for char in '疮窗幢床闯创':
+            self.trans[char] = 'chuang'
+        for char in '吹炊捶锤垂':
+            self.trans[char] = 'chui'
+        for char in '春椿醇唇淳纯蠢':
+            self.trans[char] = 'chun'
+        for char in '戳绰':
+            self.trans[char] = 'chuo'
+        for char in '疵茨磁雌辞慈瓷词此刺赐次':
+            self.trans[char] = 'ci'
+        for char in '聪葱囱匆从丛':
+            self.trans[char] = 'cong'
         self.trans['凑'] = 'cou'
-        for char in u"粗醋簇促":
-            self.trans[char] = u"cu"
-        for char in u"蹿篡窜":
-            self.trans[char] = u"cuan"
-        for char in u"摧崔催脆瘁粹淬翠":
-            self.trans[char] = u"cui"
-        for char in u"村存寸":
-            self.trans[char] = u"cun"
-        for char in u"磋撮搓措挫错":
-            self.trans[char] = u"cuo"
-        for char in u"搭达答瘩打大":
-            self.trans[char] = u"da"
-        for char in u"呆歹傣戴带殆代贷袋待逮怠":
-            self.trans[char] = u"dai"
-        for char in u"耽担丹单郸掸胆旦氮但惮淡诞弹蛋儋":
-            self.trans[char] = u"dan"
-        for char in u"当挡党荡档":
-            self.trans[char] = u"dang"
-        for char in u"刀捣蹈倒岛祷导到稻悼道盗":
-            self.trans[char] = u"dao"
-        for char in u"德得的":
-            self.trans[char] = u"de"
-        for char in u"蹬灯登等瞪凳邓":
-            self.trans[char] = u"deng"
-        for char in u"堤低滴迪敌笛狄涤翟嫡抵底地蒂第帝弟递缔":
-            self.trans[char] = u"di"
-        for char in u"颠掂滇碘点典靛垫电佃甸店惦奠淀殿":
-            self.trans[char] = u"dian"
-        for char in u"碉叼雕凋刁掉吊钓调":
-            self.trans[char] = u"diao"
-        for char in u"跌爹碟蝶迭谍叠":
-            self.trans[char] = u"die"
-        for char in u"丁盯叮钉顶鼎锭定订":
-            self.trans[char] = u"ding"
+        for char in '粗醋簇促':
+            self.trans[char] = 'cu'
+        for char in '蹿篡窜':
+            self.trans[char] = 'cuan'
+        for char in '摧崔催脆瘁粹淬翠':
+            self.trans[char] = 'cui'
+        for char in '村存寸':
+            self.trans[char] = 'cun'
+        for char in '磋撮搓措挫错':
+            self.trans[char] = 'cuo'
+        for char in '搭达答瘩打大':
+            self.trans[char] = 'da'
+        for char in '呆歹傣戴带殆代贷袋待逮怠':
+            self.trans[char] = 'dai'
+        for char in '耽担丹单郸掸胆旦氮但惮淡诞弹蛋儋':
+            self.trans[char] = 'dan'
+        for char in '当挡党荡档':
+            self.trans[char] = 'dang'
+        for char in '刀捣蹈倒岛祷导到稻悼道盗':
+            self.trans[char] = 'dao'
+        for char in '德得的':
+            self.trans[char] = 'de'
+        for char in '蹬灯登等瞪凳邓':
+            self.trans[char] = 'deng'
+        for char in '堤低滴迪敌笛狄涤翟嫡抵底地蒂第帝弟递缔':
+            self.trans[char] = 'di'
+        for char in '颠掂滇碘点典靛垫电佃甸店惦奠淀殿':
+            self.trans[char] = 'dian'
+        for char in '碉叼雕凋刁掉吊钓调':
+            self.trans[char] = 'diao'
+        for char in '跌爹碟蝶迭谍叠':
+            self.trans[char] = 'die'
+        for char in '丁盯叮钉顶鼎锭定订':
+            self.trans[char] = 'ding'
         self.trans['丢'] = 'diu'
-        for char in u"东冬董懂动栋侗恫冻洞":
-            self.trans[char] = u"dong"
-        for char in u"兜抖斗陡豆逗痘":
-            self.trans[char] = u"dou"
-        for char in u"都督毒犊独读堵睹赌杜镀肚度渡妒":
-            self.trans[char] = u"du"
-        for char in u"端短锻段断缎":
-            self.trans[char] = u"duan"
-        for char in u"堆兑队对":
-            self.trans[char] = u"dui"
-        for char in u"墩吨蹲敦顿囤钝盾遁":
-            self.trans[char] = u"dun"
-        for char in u"掇哆多夺垛躲朵跺舵剁惰堕":
-            self.trans[char] = u"duo"
-        for char in u"蛾峨鹅俄额讹娥恶厄扼遏鄂饿":
-            self.trans[char] = u"e"
-        for char in u"恩嗯":
-            self.trans[char] = u"en"
-        for char in u"而儿耳尔饵洱二贰":
-            self.trans[char] = u"er"
-        for char in u"发罚筏伐乏阀法珐":
-            self.trans[char] = u"fa"
-        for char in u"藩帆番翻樊矾钒繁凡烦反返范贩犯饭泛":
-            self.trans[char] = u"fan"
-        for char in u"坊芳方肪房防妨仿访纺放":
-            self.trans[char] = u"fang"
-        for char in u"菲非啡飞肥匪诽吠肺废沸费":
-            self.trans[char] = u"fei"
-        for char in u"芬酚吩氛分纷坟焚汾粉奋份忿愤粪":
-            self.trans[char] = u"fen"
-        for char in u"丰封枫蜂峰锋风疯烽逢冯缝讽奉凤":
-            self.trans[char] = u"feng"
+        for char in '东冬董懂动栋侗恫冻洞':
+            self.trans[char] = 'dong'
+        for char in '兜抖斗陡豆逗痘':
+            self.trans[char] = 'dou'
+        for char in '都督毒犊独读堵睹赌杜镀肚度渡妒':
+            self.trans[char] = 'du'
+        for char in '端短锻段断缎':
+            self.trans[char] = 'duan'
+        for char in '堆兑队对':
+            self.trans[char] = 'dui'
+        for char in '墩吨蹲敦顿囤钝盾遁':
+            self.trans[char] = 'dun'
+        for char in '掇哆多夺垛躲朵跺舵剁惰堕':
+            self.trans[char] = 'duo'
+        for char in '蛾峨鹅俄额讹娥恶厄扼遏鄂饿':
+            self.trans[char] = 'e'
+        for char in '恩嗯':
+            self.trans[char] = 'en'
+        for char in '而儿耳尔饵洱二贰':
+            self.trans[char] = 'er'
+        for char in '发罚筏伐乏阀法珐':
+            self.trans[char] = 'fa'
+        for char in '藩帆番翻樊矾钒繁凡烦反返范贩犯饭泛':
+            self.trans[char] = 'fan'
+        for char in '坊芳方肪房防妨仿访纺放':
+            self.trans[char] = 'fang'
+        for char in '菲非啡飞肥匪诽吠肺废沸费':
+            self.trans[char] = 'fei'
+        for char in '芬酚吩氛分纷坟焚汾粉奋份忿愤粪':
+            self.trans[char] = 'fen'
+        for char in '丰封枫蜂峰锋风疯烽逢冯缝讽奉凤':
+            self.trans[char] = 'feng'
         self.trans['佛'] = 'fo'
         self.trans['否'] = 'fou'
-        for char in u"夫敷肤孵扶拂辐幅氟符伏俘服浮涪福袱弗甫抚辅俯釜斧脯腑府腐赴副覆赋复傅付阜父腹负富讣附妇缚咐":
-            self.trans[char] = u"fu"
-        for char in u"噶嘎":
-            self.trans[char] = u"ga"
-        for char in u"该改概钙盖溉":
-            self.trans[char] = u"gai"
-        for char in u"干甘杆柑竿肝赶感秆敢赣":
-            self.trans[char] = u"gan"
-        for char in u"冈刚钢缸肛纲岗港杠":
-            self.trans[char] = u"gang"
-        for char in u"篙皋高膏羔糕搞镐稿告":
-            self.trans[char] = u"gao"
-        for char in u"哥歌搁戈鸽胳疙割革葛格蛤阁隔铬个各":
-            self.trans[char] = u"ge"
+        for char in ('夫敷肤孵扶拂辐幅氟符伏俘服浮涪福袱弗甫抚辅俯釜斧脯腑府腐赴副覆赋'
+                     '复傅付阜父腹负富讣附妇缚咐'):
+            self.trans[char] = 'fu'
+        for char in '噶嘎':
+            self.trans[char] = 'ga'
+        for char in '该改概钙盖溉':
+            self.trans[char] = 'gai'
+        for char in '干甘杆柑竿肝赶感秆敢赣':
+            self.trans[char] = 'gan'
+        for char in '冈刚钢缸肛纲岗港杠':
+            self.trans[char] = 'gang'
+        for char in '篙皋高膏羔糕搞镐稿告':
+            self.trans[char] = 'gao'
+        for char in '哥歌搁戈鸽胳疙割革葛格蛤阁隔铬个各':
+            self.trans[char] = 'ge'
         self.trans['给'] = 'gei'
-        for char in u"根跟":
-            self.trans[char] = u"gen"
-        for char in u"耕更庚羹埂耿梗":
-            self.trans[char] = u"geng"
-        for char in u"工攻功恭龚供躬公宫弓巩汞拱贡共":
-            self.trans[char] = u"gong"
-        for char in u"钩勾沟苟狗垢构购够":
-            self.trans[char] = u"gou"
-        for char in u"辜菇咕箍估沽孤姑鼓古蛊骨谷股故顾固雇":
-            self.trans[char] = u"gu"
-        for char in u"刮瓜剐寡挂褂":
-            self.trans[char] = u"gua"
-        for char in u"乖拐怪":
-            self.trans[char] = u"guai"
-        for char in u"棺关官冠观管馆罐惯灌贯":
-            self.trans[char] = u"guan"
-        for char in u"光广逛":
-            self.trans[char] = u"guang"
-        for char in u"瑰规圭硅归龟闺轨鬼诡癸桂柜跪贵刽":
-            self.trans[char] = u"gui"
-        for char in u"辊滚棍":
-            self.trans[char] = u"gun"
-        for char in u"锅郭国果裹过":
-            self.trans[char] = u"guo"
+        for char in '根跟':
+            self.trans[char] = 'gen'
+        for char in '耕更庚羹埂耿梗':
+            self.trans[char] = 'geng'
+        for char in '工攻功恭龚供躬公宫弓巩汞拱贡共':
+            self.trans[char] = 'gong'
+        for char in '钩勾沟苟狗垢构购够':
+            self.trans[char] = 'gou'
+        for char in '辜菇咕箍估沽孤姑鼓古蛊骨谷股故顾固雇':
+            self.trans[char] = 'gu'
+        for char in '刮瓜剐寡挂褂':
+            self.trans[char] = 'gua'
+        for char in '乖拐怪':
+            self.trans[char] = 'guai'
+        for char in '棺关官冠观管馆罐惯灌贯':
+            self.trans[char] = 'guan'
+        for char in '光广逛':
+            self.trans[char] = 'guang'
+        for char in '瑰规圭硅归龟闺轨鬼诡癸桂柜跪贵刽':
+            self.trans[char] = 'gui'
+        for char in '辊滚棍':
+            self.trans[char] = 'gun'
+        for char in '锅郭国果裹过':
+            self.trans[char] = 'guo'
         self.trans['哈'] = 'ha'
-        for char in u"骸孩海氦亥害骇":
-            self.trans[char] = u"hai"
-        for char in u"酣憨邯韩含涵寒函喊罕翰撼捍旱憾悍焊汗汉":
-            self.trans[char] = u"han"
-        for char in u"夯杭航":
-            self.trans[char] = u"hang"
-        for char in u"壕嚎豪毫郝好耗号浩":
-            self.trans[char] = u"hao"
-        for char in u"呵喝荷菏核禾和何合盒貉阂河涸赫褐鹤贺":
-            self.trans[char] = u"he"
-        for char in u"嘿黑":
-            self.trans[char] = u"hei"
-        for char in u"痕很狠恨":
-            self.trans[char] = u"hen"
-        for char in u"哼亨横衡恒":
-            self.trans[char] = u"heng"
-        for char in u"轰哄烘虹鸿洪宏弘红":
-            self.trans[char] = u"hong"
-        for char in u"喉侯猴吼厚候后":
-            self.trans[char] = u"hou"
-        for char in u"呼乎忽瑚壶葫胡蝴狐糊湖弧虎唬护互沪户":
-            self.trans[char] = u"hu"
-        for char in u"花哗华猾滑画划化话":
-            self.trans[char] = u"hua"
-        for char in u"槐徊怀淮坏":
-            self.trans[char] = u"huai"
-        for char in u"欢环桓还缓换患唤痪豢焕涣宦幻":
-            self.trans[char] = u"huan"
-        for char in u"荒慌黄磺蝗簧皇凰惶煌晃幌恍谎":
-            self.trans[char] = u"huang"
-        for char in u"灰挥辉徽恢蛔回毁悔慧卉惠晦贿秽会烩汇讳诲绘":
-            self.trans[char] = u"hui"
-        for char in u"荤昏婚魂浑混":
-            self.trans[char] = u"hun"
-        for char in u"豁活伙火获或惑霍货祸":
-            self.trans[char] = u"huo"
-        for char in u"击圾基机畸稽积箕肌饥迹激讥鸡姬绩缉吉极棘辑籍集及急疾汲即嫉级挤几脊己蓟技冀季伎祭剂悸济寄寂计记既忌际妓继纪":
-            self.trans[char] = u"ji"
-        for char in u"嘉枷夹佳家加荚颊贾甲钾假稼价架驾嫁":
-            self.trans[char] = u"jia"
-        for char in u"歼监坚尖笺间煎兼肩艰奸缄茧检柬碱硷拣捡简俭剪减荐槛鉴践贱见键箭件健舰剑饯渐溅涧建":
-            self.trans[char] = u"jian"
-        for char in u"僵姜将浆江疆蒋桨奖讲匠酱降":
-            self.trans[char] = u"jiang"
-        for char in u"蕉椒礁焦胶交郊浇骄娇嚼搅铰矫侥脚狡角饺缴绞剿教酵轿较叫窖":
-            self.trans[char] = u"jiao"
-        for char in u"揭接皆秸街阶截劫节桔杰捷睫竭洁结解姐戒藉芥界借介疥诫届":
-            self.trans[char] = u"jie"
-        for char in u"巾筋斤金今津襟紧锦仅谨进靳晋禁近烬浸尽劲":
-            self.trans[char] = u"jin"
-        for char in u"荆兢茎睛晶鲸京惊精粳经井警景颈静境敬镜径痉靖竟竞净":
-            self.trans[char] = u"jing"
-        for char in u"囧炯窘":
-            self.trans[char] = u"jiong"
-        for char in u"揪究纠玖韭久灸九酒厩救旧臼舅咎就疚":
-            self.trans[char] = u"jiu"
-        for char in u"鞠拘狙疽居驹菊局咀矩举沮聚拒据巨具距踞锯俱句惧炬剧":
-            self.trans[char] = u"ju"
-        for char in u"捐鹃娟倦眷卷绢":
-            self.trans[char] = u"juan"
-        for char in u"撅攫抉掘倔爵觉决诀绝":
-            self.trans[char] = u"jue"
-        for char in u"均菌钧军君峻俊竣浚郡骏":
-            self.trans[char] = u"jun"
-        for char in u"喀咖卡咯":
-            self.trans[char] = u"ka"
-        for char in u"开揩楷凯慨":
-            self.trans[char] = u"kai"
-        for char in u"刊堪勘坎砍看":
-            self.trans[char] = u"kan"
-        for char in u"康慷糠扛抗亢炕":
-            self.trans[char] = u"kang"
-        for char in u"考拷烤靠":
-            self.trans[char] = u"kao"
-        for char in u"坷苛柯棵磕颗科壳咳可渴克刻客课":
-            self.trans[char] = u"ke"
-        for char in u"肯啃垦恳":
-            self.trans[char] = u"ken"
-        for char in u"坑吭":
-            self.trans[char] = u"keng"
-        for char in u"空恐孔控":
-            self.trans[char] = u"kong"
-        for char in u"抠口扣寇":
-            self.trans[char] = u"kou"
-        for char in u"枯哭窟苦酷库裤":
-            self.trans[char] = u"ku"
-        for char in u"夸垮挎跨胯":
-            self.trans[char] = u"kua"
-        for char in u"块筷侩快":
-            self.trans[char] = u"kuai"
-        for char in u"宽款":
-            self.trans[char] = u"kuan"
-        for char in u"匡筐狂框矿眶旷况":
-            self.trans[char] = u"kuang"
-        for char in u"亏盔岿窥葵奎魁傀馈愧溃":
-            self.trans[char] = u"kui"
-        for char in u"坤昆捆困":
-            self.trans[char] = u"kun"
-        for char in u"括扩廓阔":
-            self.trans[char] = u"kuo"
-        for char in u"垃拉喇蜡腊辣啦":
-            self.trans[char] = u"la"
-        for char in u"莱来赖":
-            self.trans[char] = u"lai"
-        for char in u"蓝婪栏拦篮阑兰澜谰揽览懒缆烂滥":
-            self.trans[char] = u"lan"
-        for char in u"琅榔狼廊郎朗浪":
-            self.trans[char] = u"lang"
-        for char in u"捞劳牢老佬姥酪烙涝":
-            self.trans[char] = u"lao"
-        for char in u"勒乐":
-            self.trans[char] = u"le"
-        for char in u"雷镭蕾磊累儡垒擂肋类泪":
-            self.trans[char] = u"lei"
-        for char in u"棱楞冷":
-            self.trans[char] = u"leng"
-        for char in u"厘梨犁黎篱狸离漓理李里鲤礼莉荔吏栗丽厉励砾历利傈例俐痢立粒沥隶力璃哩":
-            self.trans[char] = u"li"
+        for char in '骸孩海氦亥害骇':
+            self.trans[char] = 'hai'
+        for char in '酣憨邯韩含涵寒函喊罕翰撼捍旱憾悍焊汗汉':
+            self.trans[char] = 'han'
+        for char in '夯杭航':
+            self.trans[char] = 'hang'
+        for char in '壕嚎豪毫郝好耗号浩':
+            self.trans[char] = 'hao'
+        for char in '呵喝荷菏核禾和何合盒貉阂河涸赫褐鹤贺':
+            self.trans[char] = 'he'
+        for char in '嘿黑':
+            self.trans[char] = 'hei'
+        for char in '痕很狠恨':
+            self.trans[char] = 'hen'
+        for char in '哼亨横衡恒':
+            self.trans[char] = 'heng'
+        for char in '轰哄烘虹鸿洪宏弘红':
+            self.trans[char] = 'hong'
+        for char in '喉侯猴吼厚候后':
+            self.trans[char] = 'hou'
+        for char in '呼乎忽瑚壶葫胡蝴狐糊湖弧虎唬护互沪户':
+            self.trans[char] = 'hu'
+        for char in '花哗华猾滑画划化话':
+            self.trans[char] = 'hua'
+        for char in '槐徊怀淮坏':
+            self.trans[char] = 'huai'
+        for char in '欢环桓还缓换患唤痪豢焕涣宦幻':
+            self.trans[char] = 'huan'
+        for char in '荒慌黄磺蝗簧皇凰惶煌晃幌恍谎':
+            self.trans[char] = 'huang'
+        for char in '灰挥辉徽恢蛔回毁悔慧卉惠晦贿秽会烩汇讳诲绘':
+            self.trans[char] = 'hui'
+        for char in '荤昏婚魂浑混':
+            self.trans[char] = 'hun'
+        for char in '豁活伙火获或惑霍货祸':
+            self.trans[char] = 'huo'
+        for char in ('击圾基机畸稽积箕肌饥迹激讥鸡姬绩缉吉极棘辑籍集及急疾汲即嫉级挤几'
+                     '脊己蓟技冀季伎祭剂悸济寄寂计记既忌际妓继纪'):
+            self.trans[char] = 'ji'
+        for char in '嘉枷夹佳家加荚颊贾甲钾假稼价架驾嫁':
+            self.trans[char] = 'jia'
+        for char in ('歼监坚尖笺间煎兼肩艰奸缄茧检柬碱硷拣捡简俭剪减荐槛鉴践贱见键箭件健'
+                     '舰剑饯渐溅涧建'):
+            self.trans[char] = 'jian'
+        for char in '僵姜将浆江疆蒋桨奖讲匠酱降':
+            self.trans[char] = 'jiang'
+        for char in '蕉椒礁焦胶交郊浇骄娇嚼搅铰矫侥脚狡角饺缴绞剿教酵轿较叫窖':
+            self.trans[char] = 'jiao'
+        for char in '揭接皆秸街阶截劫节桔杰捷睫竭洁结解姐戒藉芥界借介疥诫届':
+            self.trans[char] = 'jie'
+        for char in '巾筋斤金今津襟紧锦仅谨进靳晋禁近烬浸尽劲':
+            self.trans[char] = 'jin'
+        for char in '荆兢茎睛晶鲸京惊精粳经井警景颈静境敬镜径痉靖竟竞净':
+            self.trans[char] = 'jing'
+        for char in '囧炯窘':
+            self.trans[char] = 'jiong'
+        for char in '揪究纠玖韭久灸九酒厩救旧臼舅咎就疚':
+            self.trans[char] = 'jiu'
+        for char in '鞠拘狙疽居驹菊局咀矩举沮聚拒据巨具距踞锯俱句惧炬剧':
+            self.trans[char] = 'ju'
+        for char in '捐鹃娟倦眷卷绢':
+            self.trans[char] = 'juan'
+        for char in '撅攫抉掘倔爵觉决诀绝':
+            self.trans[char] = 'jue'
+        for char in '均菌钧军君峻俊竣浚郡骏':
+            self.trans[char] = 'jun'
+        for char in '喀咖卡咯':
+            self.trans[char] = 'ka'
+        for char in '开揩楷凯慨':
+            self.trans[char] = 'kai'
+        for char in '刊堪勘坎砍看':
+            self.trans[char] = 'kan'
+        for char in '康慷糠扛抗亢炕':
+            self.trans[char] = 'kang'
+        for char in '考拷烤靠':
+            self.trans[char] = 'kao'
+        for char in '坷苛柯棵磕颗科壳咳可渴克刻客课':
+            self.trans[char] = 'ke'
+        for char in '肯啃垦恳':
+            self.trans[char] = 'ken'
+        for char in '坑吭':
+            self.trans[char] = 'keng'
+        for char in '空恐孔控':
+            self.trans[char] = 'kong'
+        for char in '抠口扣寇':
+            self.trans[char] = 'kou'
+        for char in '枯哭窟苦酷库裤':
+            self.trans[char] = 'ku'
+        for char in '夸垮挎跨胯':
+            self.trans[char] = 'kua'
+        for char in '块筷侩快':
+            self.trans[char] = 'kuai'
+        for char in '宽款':
+            self.trans[char] = 'kuan'
+        for char in '匡筐狂框矿眶旷况':
+            self.trans[char] = 'kuang'
+        for char in '亏盔岿窥葵奎魁傀馈愧溃':
+            self.trans[char] = 'kui'
+        for char in '坤昆捆困':
+            self.trans[char] = 'kun'
+        for char in '括扩廓阔':
+            self.trans[char] = 'kuo'
+        for char in '垃拉喇蜡腊辣啦':
+            self.trans[char] = 'la'
+        for char in '莱来赖':
+            self.trans[char] = 'lai'
+        for char in '蓝婪栏拦篮阑兰澜谰揽览懒缆烂滥':
+            self.trans[char] = 'lan'
+        for char in '琅榔狼廊郎朗浪':
+            self.trans[char] = 'lang'
+        for char in '捞劳牢老佬姥酪烙涝':
+            self.trans[char] = 'lao'
+        for char in '勒乐':
+            self.trans[char] = 'le'
+        for char in '雷镭蕾磊累儡垒擂肋类泪':
+            self.trans[char] = 'lei'
+        for char in '棱楞冷':
+            self.trans[char] = 'leng'
+        for char in ('厘梨犁黎篱狸离漓理李里鲤礼莉荔吏栗丽厉励砾历利傈例俐痢立粒沥隶力'
+                     '璃哩'):
+            self.trans[char] = 'li'
         self.trans['俩'] = 'lia'
-        for char in u"联莲连镰廉怜涟帘敛脸链恋炼练":
-            self.trans[char] = u"lian"
-        for char in u"粮凉梁粱良两辆量晾亮谅":
-            self.trans[char] = u"liang"
-        for char in u"撩聊僚疗燎寥辽潦了撂镣廖料":
-            self.trans[char] = u"liao"
-        for char in u"列裂烈劣猎":
-            self.trans[char] = u"lie"
-        for char in u"琳林磷霖临邻鳞淋凛赁吝拎":
-            self.trans[char] = u"lin"
-        for char in u"玲菱零龄铃伶羚凌灵陵岭领另令":
-            self.trans[char] = u"ling"
-        for char in u"溜琉榴硫馏留刘瘤流柳六":
-            self.trans[char] = u"liu"
-        for char in u"龙聋咙笼窿隆垄拢陇":
-            self.trans[char] = u"long"
-        for char in u"楼娄搂篓漏陋":
-            self.trans[char] = u"lou"
-        for char in u"芦卢颅庐炉掳卤虏鲁麓碌露路赂鹿潞禄录陆戮泸":
-            self.trans[char] = u"lu"
-        for char in u"峦挛孪滦卵乱":
-            self.trans[char] = u"luan"
-        for char in u"掠略":
-            self.trans[char] = u"lue"
-        for char in u"抡轮伦仑沦纶论":
-            self.trans[char] = u"lun"
-        for char in u"萝螺罗逻锣箩骡裸落洛骆络漯":
-            self.trans[char] = u"luo"
-        for char in u"驴吕铝侣旅履屡缕虑氯律率滤绿":
-            self.trans[char] = u"lv"
-        for char in u"妈麻玛码蚂马骂嘛吗":
-            self.trans[char] = u"ma"
-        for char in u"埋买麦卖迈脉":
-            self.trans[char] = u"mai"
-        for char in u"瞒馒蛮满蔓曼慢漫谩":
-            self.trans[char] = u"man"
-        for char in u"芒茫盲氓忙莽":
-            self.trans[char] = u"mang"
-        for char in u"猫茅锚毛矛铆卯茂冒帽貌贸":
-            self.trans[char] = u"mao"
+        for char in '联莲连镰廉怜涟帘敛脸链恋炼练':
+            self.trans[char] = 'lian'
+        for char in '粮凉梁粱良两辆量晾亮谅':
+            self.trans[char] = 'liang'
+        for char in '撩聊僚疗燎寥辽潦了撂镣廖料':
+            self.trans[char] = 'liao'
+        for char in '列裂烈劣猎':
+            self.trans[char] = 'lie'
+        for char in '琳林磷霖临邻鳞淋凛赁吝拎':
+            self.trans[char] = 'lin'
+        for char in '玲菱零龄铃伶羚凌灵陵岭领另令':
+            self.trans[char] = 'ling'
+        for char in '溜琉榴硫馏留刘瘤流柳六':
+            self.trans[char] = 'liu'
+        for char in '龙聋咙笼窿隆垄拢陇':
+            self.trans[char] = 'long'
+        for char in '楼娄搂篓漏陋':
+            self.trans[char] = 'lou'
+        for char in '芦卢颅庐炉掳卤虏鲁麓碌露路赂鹿潞禄录陆戮泸':
+            self.trans[char] = 'lu'
+        for char in '峦挛孪滦卵乱':
+            self.trans[char] = 'luan'
+        for char in '掠略':
+            self.trans[char] = 'lue'
+        for char in '抡轮伦仑沦纶论':
+            self.trans[char] = 'lun'
+        for char in '萝螺罗逻锣箩骡裸落洛骆络漯':
+            self.trans[char] = 'luo'
+        for char in '驴吕铝侣旅履屡缕虑氯律率滤绿':
+            self.trans[char] = 'lv'
+        for char in '妈麻玛码蚂马骂嘛吗':
+            self.trans[char] = 'ma'
+        for char in '埋买麦卖迈脉':
+            self.trans[char] = 'mai'
+        for char in '瞒馒蛮满蔓曼慢漫谩':
+            self.trans[char] = 'man'
+        for char in '芒茫盲氓忙莽':
+            self.trans[char] = 'mang'
+        for char in '猫茅锚毛矛铆卯茂冒帽貌贸':
+            self.trans[char] = 'mao'
         self.trans['么'] = 'me'
-        for char in u"玫枚梅酶霉煤没眉媒镁每美昧寐妹媚":
-            self.trans[char] = u"mei"
-        for char in u"门闷们":
-            self.trans[char] = u"men"
-        for char in u"萌蒙檬盟锰猛梦孟":
-            self.trans[char] = u"meng"
-        for char in u"眯醚靡糜迷谜弥米秘觅泌蜜密幂":
-            self.trans[char] = u"mi"
-        for char in u"棉眠绵冕免勉娩缅面":
-            self.trans[char] = u"mian"
-        for char in u"苗描瞄藐秒渺庙妙":
-            self.trans[char] = u"miao"
-        for char in u"蔑灭":
-            self.trans[char] = u"mie"
-        for char in u"民抿皿敏悯闽":
-            self.trans[char] = u"min"
-        for char in u"明螟鸣铭名命":
-            self.trans[char] = u"ming"
+        for char in '玫枚梅酶霉煤没眉媒镁每美昧寐妹媚':
+            self.trans[char] = 'mei'
+        for char in '门闷们':
+            self.trans[char] = 'men'
+        for char in '萌蒙檬盟锰猛梦孟':
+            self.trans[char] = 'meng'
+        for char in '眯醚靡糜迷谜弥米秘觅泌蜜密幂':
+            self.trans[char] = 'mi'
+        for char in '棉眠绵冕免勉娩缅面':
+            self.trans[char] = 'mian'
+        for char in '苗描瞄藐秒渺庙妙':
+            self.trans[char] = 'miao'
+        for char in '蔑灭':
+            self.trans[char] = 'mie'
+        for char in '民抿皿敏悯闽':
+            self.trans[char] = 'min'
+        for char in '明螟鸣铭名命':
+            self.trans[char] = 'ming'
         self.trans['谬'] = 'miu'
-        for char in u"摸摹蘑模膜磨摩魔抹末莫墨默沫漠寞陌":
-            self.trans[char] = u"mo"
-        for char in u"谋牟某":
-            self.trans[char] = u"mou"
-        for char in u"拇牡亩姆母墓暮幕募慕木目睦牧穆":
-            self.trans[char] = u"mu"
-        for char in u"拿哪呐钠那娜纳":
-            self.trans[char] = u"na"
-        for char in u"氖乃奶耐奈":
-            self.trans[char] = u"nai"
-        for char in u"南男难":
-            self.trans[char] = u"nan"
+        for char in '摸摹蘑模膜磨摩魔抹末莫墨默沫漠寞陌':
+            self.trans[char] = 'mo'
+        for char in '谋牟某':
+            self.trans[char] = 'mou'
+        for char in '拇牡亩姆母墓暮幕募慕木目睦牧穆':
+            self.trans[char] = 'mu'
+        for char in '拿哪呐钠那娜纳':
+            self.trans[char] = 'na'
+        for char in '氖乃奶耐奈':
+            self.trans[char] = 'nai'
+        for char in '南男难':
+            self.trans[char] = 'nan'
         self.trans['囊'] = 'nang'
-        for char in u"挠脑恼闹淖":
-            self.trans[char] = u"nao"
+        for char in '挠脑恼闹淖':
+            self.trans[char] = 'nao'
         self.trans['呢'] = 'ne'
-        for char in u"馁内":
-            self.trans[char] = u"nei"
+        for char in '馁内':
+            self.trans[char] = 'nei'
         self.trans['嫩'] = 'nen'
         self.trans['能'] = 'neng'
-        for char in u"妮霓倪泥尼拟你匿腻逆溺":
-            self.trans[char] = u"ni"
-        for char in u"蔫拈年碾撵捻念":
-            self.trans[char] = u"nian"
-        for char in u"娘酿":
-            self.trans[char] = u"niang"
-        for char in u"鸟尿":
-            self.trans[char] = u"niao"
-        for char in u"捏聂孽啮镊镍涅":
-            self.trans[char] = u"nie"
+        for char in '妮霓倪泥尼拟你匿腻逆溺':
+            self.trans[char] = 'ni'
+        for char in '蔫拈年碾撵捻念':
+            self.trans[char] = 'nian'
+        for char in '娘酿':
+            self.trans[char] = 'niang'
+        for char in '鸟尿':
+            self.trans[char] = 'niao'
+        for char in '捏聂孽啮镊镍涅':
+            self.trans[char] = 'nie'
         self.trans['您'] = 'nin'
-        for char in u"柠狞凝宁拧泞":
-            self.trans[char] = u"ning"
-        for char in u"牛扭钮纽":
-            self.trans[char] = u"niu"
-        for char in u"脓浓农弄":
-            self.trans[char] = u"nong"
-        for char in u"奴努怒":
-            self.trans[char] = u"nu"
+        for char in '柠狞凝宁拧泞':
+            self.trans[char] = 'ning'
+        for char in '牛扭钮纽':
+            self.trans[char] = 'niu'
+        for char in '脓浓农弄':
+            self.trans[char] = 'nong'
+        for char in '奴努怒':
+            self.trans[char] = 'nu'
         self.trans['暖'] = 'nuan'
-        for char in u"虐疟":
-            self.trans[char] = u"nue"
-        for char in u"挪懦糯诺":
-            self.trans[char] = u"nuo"
+        for char in '虐疟':
+            self.trans[char] = 'nue'
+        for char in '挪懦糯诺':
+            self.trans[char] = 'nuo'
         self.trans['女'] = 'nv'
         self.trans['哦'] = 'o'
-        for char in u"欧鸥殴藕呕偶沤":
-            self.trans[char] = u"ou"
-        for char in u"啪趴爬帕怕琶":
-            self.trans[char] = u"pa"
-        for char in u"拍排牌徘湃派":
-            self.trans[char] = u"pai"
-        for char in u"攀潘盘磐盼畔判叛":
-            self.trans[char] = u"pan"
-        for char in u"乓庞旁耪胖":
-            self.trans[char] = u"pang"
-        for char in u"抛咆刨炮袍跑泡":
-            self.trans[char] = u"pao"
-        for char in u"呸胚培裴赔陪配佩沛":
-            self.trans[char] = u"pei"
-        for char in u"喷盆":
-            self.trans[char] = u"pen"
-        for char in u"砰抨烹澎彭蓬棚硼篷膨朋鹏捧碰":
-            self.trans[char] = u"peng"
-        for char in u"坯砒霹批披劈琵毗啤脾疲皮匹痞僻屁譬":
-            self.trans[char] = u"pi"
-        for char in u"篇偏片骗":
-            self.trans[char] = u"pian"
-        for char in u"飘漂瓢票":
-            self.trans[char] = u"piao"
-        for char in u"撇瞥":
-            self.trans[char] = u"pie"
-        for char in u"拼频贫品聘":
-            self.trans[char] = u"pin"
-        for char in u"乒坪苹萍平凭瓶评屏":
-            self.trans[char] = u"ping"
-        for char in u"坡泼颇婆破魄迫粕剖":
-            self.trans[char] = u"po"
-        for char in u"扑铺仆莆葡菩蒲埔朴圃普浦谱曝瀑濮":
-            self.trans[char] = u"pu"
-        for char in u"期欺栖戚妻七凄漆柒沏其棋奇歧畦崎脐齐旗祈祁骑起岂乞企启契砌器气迄弃汽泣讫":
-            self.trans[char] = u"qi"
-        for char in u"掐恰洽":
-            self.trans[char] = u"qia"
-        for char in u"牵扦钎铅千迁签仟谦乾黔钱钳前潜遣浅谴堑嵌欠歉":
-            self.trans[char] = u"qian"
-        for char in u"枪呛腔羌墙蔷强抢":
-            self.trans[char] = u"qiang"
-        for char in u"橇锹敲悄桥瞧乔侨巧鞘撬翘峭俏窍":
-            self.trans[char] = u"qiao"
-        for char in u"切茄且怯窃":
-            self.trans[char] = u"qie"
-        for char in u"钦侵亲秦琴勤芹擒禽寝沁":
-            self.trans[char] = u"qin"
-        for char in u"青轻氢倾卿清擎晴氰情顷请庆":
-            self.trans[char] = u"qing"
-        for char in u"琼穷":
-            self.trans[char] = u"qiong"
-        for char in u"秋丘邱球求囚酋泅":
-            self.trans[char] = u"qiu"
-        for char in u"趋区蛆曲躯屈驱渠取娶龋趣去":
-            self.trans[char] = u"qu"
-        for char in u"圈颧权醛泉全痊拳犬券劝":
-            self.trans[char] = u"quan"
-        for char in u"缺炔瘸却鹊榷确雀":
-            self.trans[char] = u"que"
-        for char in u"裙群":
-            self.trans[char] = u"qun"
-        for char in u"然燃冉染":
-            self.trans[char] = u"ran"
-        for char in u"瓤壤攘嚷让":
-            self.trans[char] = u"rang"
-        for char in u"饶扰绕":
-            self.trans[char] = u"rao"
-        for char in u"惹热":
-            self.trans[char] = u"re"
-        for char in u"壬仁人忍韧任认刃妊纫":
-            self.trans[char] = u"ren"
-        for char in u"扔仍":
-            self.trans[char] = u"reng"
+        for char in '欧鸥殴藕呕偶沤':
+            self.trans[char] = 'ou'
+        for char in '啪趴爬帕怕琶':
+            self.trans[char] = 'pa'
+        for char in '拍排牌徘湃派':
+            self.trans[char] = 'pai'
+        for char in '攀潘盘磐盼畔判叛':
+            self.trans[char] = 'pan'
+        for char in '乓庞旁耪胖':
+            self.trans[char] = 'pang'
+        for char in '抛咆刨炮袍跑泡':
+            self.trans[char] = 'pao'
+        for char in '呸胚培裴赔陪配佩沛':
+            self.trans[char] = 'pei'
+        for char in '喷盆':
+            self.trans[char] = 'pen'
+        for char in '砰抨烹澎彭蓬棚硼篷膨朋鹏捧碰':
+            self.trans[char] = 'peng'
+        for char in '坯砒霹批披劈琵毗啤脾疲皮匹痞僻屁譬':
+            self.trans[char] = 'pi'
+        for char in '篇偏片骗':
+            self.trans[char] = 'pian'
+        for char in '飘漂瓢票':
+            self.trans[char] = 'piao'
+        for char in '撇瞥':
+            self.trans[char] = 'pie'
+        for char in '拼频贫品聘':
+            self.trans[char] = 'pin'
+        for char in '乒坪苹萍平凭瓶评屏':
+            self.trans[char] = 'ping'
+        for char in '坡泼颇婆破魄迫粕剖':
+            self.trans[char] = 'po'
+        for char in '扑铺仆莆葡菩蒲埔朴圃普浦谱曝瀑濮':
+            self.trans[char] = 'pu'
+        for char in ('期欺栖戚妻七凄漆柒沏其棋奇歧畦崎脐齐旗祈祁骑起岂乞企启契砌器气迄'
+                     '弃汽泣讫'):
+            self.trans[char] = 'qi'
+        for char in '掐恰洽':
+            self.trans[char] = 'qia'
+        for char in '牵扦钎铅千迁签仟谦乾黔钱钳前潜遣浅谴堑嵌欠歉':
+            self.trans[char] = 'qian'
+        for char in '枪呛腔羌墙蔷强抢':
+            self.trans[char] = 'qiang'
+        for char in '橇锹敲悄桥瞧乔侨巧鞘撬翘峭俏窍':
+            self.trans[char] = 'qiao'
+        for char in '切茄且怯窃':
+            self.trans[char] = 'qie'
+        for char in '钦侵亲秦琴勤芹擒禽寝沁':
+            self.trans[char] = 'qin'
+        for char in '青轻氢倾卿清擎晴氰情顷请庆':
+            self.trans[char] = 'qing'
+        for char in '琼穷':
+            self.trans[char] = 'qiong'
+        for char in '秋丘邱球求囚酋泅':
+            self.trans[char] = 'qiu'
+        for char in '趋区蛆曲躯屈驱渠取娶龋趣去':
+            self.trans[char] = 'qu'
+        for char in '圈颧权醛泉全痊拳犬券劝':
+            self.trans[char] = 'quan'
+        for char in '缺炔瘸却鹊榷确雀':
+            self.trans[char] = 'que'
+        for char in '裙群':
+            self.trans[char] = 'qun'
+        for char in '然燃冉染':
+            self.trans[char] = 'ran'
+        for char in '瓤壤攘嚷让':
+            self.trans[char] = 'rang'
+        for char in '饶扰绕':
+            self.trans[char] = 'rao'
+        for char in '惹热':
+            self.trans[char] = 're'
+        for char in '壬仁人忍韧任认刃妊纫':
+            self.trans[char] = 'ren'
+        for char in '扔仍':
+            self.trans[char] = 'reng'
         self.trans['日'] = 'ri'
-        for char in u"戎茸蓉荣融熔溶容绒冗":
-            self.trans[char] = u"rong"
-        for char in u"揉柔肉":
-            self.trans[char] = u"rou"
-        for char in u"茹蠕儒孺如辱乳汝入褥":
-            self.trans[char] = u"ru"
-        for char in u"软阮":
-            self.trans[char] = u"ruan"
-        for char in u"蕊瑞锐":
-            self.trans[char] = u"rui"
-        for char in u"闰润":
-            self.trans[char] = u"run"
-        for char in u"若弱":
-            self.trans[char] = u"ruo"
-        for char in u"撒洒萨":
-            self.trans[char] = u"sa"
-        for char in u"腮鳃塞赛":
-            self.trans[char] = u"sai"
-        for char in u"三叁伞散":
-            self.trans[char] = u"san"
-        for char in u"桑嗓丧":
-            self.trans[char] = u"sang"
-        for char in u"搔骚扫嫂":
-            self.trans[char] = u"sao"
-        for char in u"瑟色涩":
-            self.trans[char] = u"se"
+        for char in '戎茸蓉荣融熔溶容绒冗':
+            self.trans[char] = 'rong'
+        for char in '揉柔肉':
+            self.trans[char] = 'rou'
+        for char in '茹蠕儒孺如辱乳汝入褥':
+            self.trans[char] = 'ru'
+        for char in '软阮':
+            self.trans[char] = 'ruan'
+        for char in '蕊瑞锐':
+            self.trans[char] = 'rui'
+        for char in '闰润':
+            self.trans[char] = 'run'
+        for char in '若弱':
+            self.trans[char] = 'ruo'
+        for char in '撒洒萨':
+            self.trans[char] = 'sa'
+        for char in '腮鳃塞赛':
+            self.trans[char] = 'sai'
+        for char in '三叁伞散':
+            self.trans[char] = 'san'
+        for char in '桑嗓丧':
+            self.trans[char] = 'sang'
+        for char in '搔骚扫嫂':
+            self.trans[char] = 'sao'
+        for char in '瑟色涩':
+            self.trans[char] = 'se'
         self.trans['森'] = 'sen'
         self.trans['僧'] = 'seng'
-        for char in u"莎砂杀刹沙纱傻啥煞":
-            self.trans[char] = u"sha"
-        for char in u"筛晒":
-            self.trans[char] = u"shai"
-        for char in u"珊苫杉山删煽衫闪陕擅赡膳善汕扇缮":
-            self.trans[char] = u"shan"
-        for char in u"墒伤商赏晌上尚裳":
-            self.trans[char] = u"shang"
-        for char in u"梢捎稍烧芍勺韶少哨邵绍":
-            self.trans[char] = u"shao"
-        for char in u"奢赊蛇舌舍赦摄射慑涉社设":
-            self.trans[char] = u"she"
-        for char in u"砷申呻伸身深娠绅神沈审婶甚肾慎渗":
-            self.trans[char] = u"shen"
-        for char in u"声生甥牲升绳省盛剩胜圣":
-            self.trans[char] = u"sheng"
-        for char in u"师失狮施湿诗尸虱十石拾时什食蚀实识史矢使屎驶始式示士世柿事拭誓逝势是嗜噬适仕侍释饰氏市恃室视试":
-            self.trans[char] = u"shi"
-        for char in u"收手首守寿授售受瘦兽":
-            self.trans[char] = u"shou"
-        for char in u"蔬枢梳殊抒输叔舒淑疏书赎孰熟薯暑曙署蜀黍鼠属术述树束戍竖墅庶数漱恕":
-            self.trans[char] = u"shu"
-        for char in u"刷耍":
-            self.trans[char] = u"shua"
-        for char in u"摔衰甩帅":
-            self.trans[char] = u"shuai"
-        for char in u"栓拴":
-            self.trans[char] = u"shuan"
-        for char in u"霜双爽":
-            self.trans[char] = u"shuang"
-        for char in u"谁水睡税":
-            self.trans[char] = u"shui"
-        for char in u"吮瞬顺舜":
-            self.trans[char] = u"shun"
-        for char in u"说硕朔烁":
-            self.trans[char] = u"shuo"
-        for char in u"斯撕嘶思私司丝死肆寺嗣四伺似饲巳":
-            self.trans[char] = u"si"
-        for char in u"松耸怂颂送宋讼诵":
-            self.trans[char] = u"song"
-        for char in u"搜艘擞":
-            self.trans[char] = u"sou"
-        for char in u"嗽苏酥俗素速粟僳塑溯宿诉肃":
-            self.trans[char] = u"su"
-        for char in u"酸蒜算":
-            self.trans[char] = u"suan"
-        for char in u"虽隋随绥髓碎岁穗遂隧祟":
-            self.trans[char] = u"sui"
-        for char in u"孙损笋":
-            self.trans[char] = u"sun"
-        for char in u"蓑梭唆缩琐索锁所":
-            self.trans[char] = u"suo"
-        for char in u"塌他它她塔獭挞蹋踏":
-            self.trans[char] = u"ta"
-        for char in u"胎苔抬台泰酞太态汰":
-            self.trans[char] = u"tai"
-        for char in u"坍摊贪瘫滩坛檀痰潭谭谈坦毯袒碳探叹炭":
-            self.trans[char] = u"tan"
-        for char in u"汤塘搪堂棠膛唐糖倘躺淌趟烫":
-            self.trans[char] = u"tang"
-        for char in u"掏涛滔绦萄桃逃淘陶讨套":
-            self.trans[char] = u"tao"
+        for char in '莎砂杀刹沙纱傻啥煞':
+            self.trans[char] = 'sha'
+        for char in '筛晒':
+            self.trans[char] = 'shai'
+        for char in '珊苫杉山删煽衫闪陕擅赡膳善汕扇缮':
+            self.trans[char] = 'shan'
+        for char in '墒伤商赏晌上尚裳':
+            self.trans[char] = 'shang'
+        for char in '梢捎稍烧芍勺韶少哨邵绍':
+            self.trans[char] = 'shao'
+        for char in '奢赊蛇舌舍赦摄射慑涉社设':
+            self.trans[char] = 'she'
+        for char in '砷申呻伸身深娠绅神沈审婶甚肾慎渗':
+            self.trans[char] = 'shen'
+        for char in '声生甥牲升绳省盛剩胜圣':
+            self.trans[char] = 'sheng'
+        for char in ('师失狮施湿诗尸虱十石拾时什食蚀实识史矢使屎驶始式示士世柿事拭誓逝'
+                     '势是嗜噬适仕侍释饰氏市恃室视试'):
+            self.trans[char] = 'shi'
+        for char in '收手首守寿授售受瘦兽':
+            self.trans[char] = 'shou'
+        for char in (
+                '蔬枢梳殊抒输叔舒淑疏书赎孰熟薯暑曙署蜀黍鼠属术述树束戍竖墅庶数漱恕'):
+            self.trans[char] = 'shu'
+        for char in '刷耍':
+            self.trans[char] = 'shua'
+        for char in '摔衰甩帅':
+            self.trans[char] = 'shuai'
+        for char in '栓拴':
+            self.trans[char] = 'shuan'
+        for char in '霜双爽':
+            self.trans[char] = 'shuang'
+        for char in '谁水睡税':
+            self.trans[char] = 'shui'
+        for char in '吮瞬顺舜':
+            self.trans[char] = 'shun'
+        for char in '说硕朔烁':
+            self.trans[char] = 'shuo'
+        for char in '斯撕嘶思私司丝死肆寺嗣四伺似饲巳':
+            self.trans[char] = 'si'
+        for char in '松耸怂颂送宋讼诵':
+            self.trans[char] = 'song'
+        for char in '搜艘擞':
+            self.trans[char] = 'sou'
+        for char in '嗽苏酥俗素速粟僳塑溯宿诉肃':
+            self.trans[char] = 'su'
+        for char in '酸蒜算':
+            self.trans[char] = 'suan'
+        for char in '虽隋随绥髓碎岁穗遂隧祟':
+            self.trans[char] = 'sui'
+        for char in '孙损笋':
+            self.trans[char] = 'sun'
+        for char in '蓑梭唆缩琐索锁所':
+            self.trans[char] = 'suo'
+        for char in '塌他它她塔獭挞蹋踏':
+            self.trans[char] = 'ta'
+        for char in '胎苔抬台泰酞太态汰':
+            self.trans[char] = 'tai'
+        for char in '坍摊贪瘫滩坛檀痰潭谭谈坦毯袒碳探叹炭':
+            self.trans[char] = 'tan'
+        for char in '汤塘搪堂棠膛唐糖倘躺淌趟烫':
+            self.trans[char] = 'tang'
+        for char in '掏涛滔绦萄桃逃淘陶讨套':
+            self.trans[char] = 'tao'
         self.trans['特'] = 'te'
-        for char in u"藤腾疼誊":
-            self.trans[char] = u"teng"
-        for char in u"梯剔踢锑提题蹄啼体替嚏惕涕剃屉":
-            self.trans[char] = u"ti"
-        for char in u"兲天添填田甜恬舔腆":
-            self.trans[char] = u"tian"
-        for char in u"挑条迢眺跳":
-            self.trans[char] = u"tiao"
-        for char in u"贴铁帖":
-            self.trans[char] = u"tie"
-        for char in u"厅听烃汀廷停亭庭挺艇":
-            self.trans[char] = u"ting"
-        for char in u"通桐酮瞳同铜彤童桶捅筒统痛":
-            self.trans[char] = u"tong"
-        for char in u"偷投头透":
-            self.trans[char] = u"tou"
-        for char in u"凸秃突图徒途涂屠土吐兔":
-            self.trans[char] = u"tu"
-        for char in u"湍团":
-            self.trans[char] = u"tuan"
-        for char in u"推颓腿蜕褪退":
-            self.trans[char] = u"tui"
-        for char in u"吞屯臀":
-            self.trans[char] = u"tun"
-        for char in u"拖托脱鸵陀驮驼椭妥拓唾":
-            self.trans[char] = u"tuo"
-        for char in u"挖哇蛙洼娃瓦袜":
-            self.trans[char] = u"wa"
-        for char in u"歪外":
-            self.trans[char] = u"wai"
-        for char in u"豌弯湾玩顽丸烷完碗挽晚皖惋宛婉万腕莞":
-            self.trans[char] = u"wan"
-        for char in u"汪王亡枉网往旺望忘妄":
-            self.trans[char] = u"wang"
-        for char in u"威巍微危韦违桅围唯惟为潍维苇萎委伟伪尾纬未蔚味畏胃喂魏位渭谓尉慰卫":
-            self.trans[char] = u"wei"
-        for char in u"瘟温蚊文闻纹吻稳紊问":
-            self.trans[char] = u"wen"
-        for char in u"嗡翁瓮":
-            self.trans[char] = u"weng"
-        for char in u"挝蜗涡窝我斡卧握沃":
-            self.trans[char] = u"wo"
-        for char in u"巫呜钨乌污诬屋无芜梧吾吴毋武五捂午舞伍侮坞戊雾晤物勿务悟误":
-            self.trans[char] = u"wu"
-        for char in u"昔熙析西硒矽晰嘻吸锡牺稀息希悉膝夕惜熄烯溪汐犀檄袭席习媳喜铣洗系隙戏细":
-            self.trans[char] = u"xi"
-        for char in u"瞎虾匣霞辖暇峡侠狭下厦夏吓":
-            self.trans[char] = u"xia"
-        for char in u"掀锨先仙鲜纤咸贤衔舷闲涎弦嫌显险现献县腺馅羡宪陷限线":
-            self.trans[char] = u"xian"
-        for char in u"相厢镶香箱襄湘乡翔祥详想响享项巷橡像向象":
-            self.trans[char] = u"xiang"
-        for char in u"萧硝霄削哮嚣销消宵淆晓小孝校肖啸笑效":
-            self.trans[char] = u"xiao"
-        for char in u"楔些歇蝎鞋协挟携邪斜胁谐写械卸蟹懈泄泻谢屑":
-            self.trans[char] = u"xie"
-        for char in u"薪芯锌欣辛新忻心信衅":
-            self.trans[char] = u"xin"
-        for char in u"星腥猩惺兴刑型形邢行醒幸杏性姓":
-            self.trans[char] = u"xing"
-        for char in u"兄凶胸匈汹雄熊":
-            self.trans[char] = u"xiong"
-        for char in u"休修羞朽嗅锈秀袖绣":
-            self.trans[char] = u"xiu"
-        for char in u"墟戌需虚嘘须徐许蓄酗叙旭序畜恤絮婿绪续":
-            self.trans[char] = u"xu"
-        for char in u"轩喧宣悬旋玄选癣眩绚":
-            self.trans[char] = u"xuan"
-        for char in u"靴薛学穴雪血":
-            self.trans[char] = u"xue"
-        for char in u"勋熏循旬询寻驯巡殉汛训讯逊迅":
-            self.trans[char] = u"xun"
-        for char in u"压押鸦鸭呀丫芽牙蚜崖衙涯雅哑亚讶":
-            self.trans[char] = u"ya"
-        for char in u"焉咽阉烟淹盐严研蜒岩延言颜阎炎沿奄掩眼衍演艳堰燕厌砚雁唁彦焰宴谚验":
-            self.trans[char] = u"yan"
-        for char in u"殃央鸯秧杨扬佯疡羊洋阳氧仰痒养样漾":
-            self.trans[char] = u"yang"
-        for char in u"邀腰妖瑶摇尧遥窑谣姚咬舀药要耀":
-            self.trans[char] = u"yao"
-        for char in u"椰噎耶爷野冶也页掖业叶曳腋夜液":
-            self.trans[char] = u"ye"
-        for char in u"一壹医揖铱依伊衣颐夷遗移仪胰疑沂宜姨彝椅蚁倚已乙矣以艺抑易邑屹亿役臆逸肄疫亦裔意毅忆义益溢诣议谊译异翼翌绎":
-            self.trans[char] = u"yi"
-        for char in u"茵荫因殷音阴姻吟银淫寅饮尹引隐印":
-            self.trans[char] = u"yin"
-        for char in u"英樱婴鹰应缨莹萤营荧蝇迎赢盈影颖硬映":
-            self.trans[char] = u"ying"
+        for char in '藤腾疼誊':
+            self.trans[char] = 'teng'
+        for char in '梯剔踢锑提题蹄啼体替嚏惕涕剃屉':
+            self.trans[char] = 'ti'
+        for char in '兲天添填田甜恬舔腆':
+            self.trans[char] = 'tian'
+        for char in '挑条迢眺跳':
+            self.trans[char] = 'tiao'
+        for char in '贴铁帖':
+            self.trans[char] = 'tie'
+        for char in '厅听烃汀廷停亭庭挺艇':
+            self.trans[char] = 'ting'
+        for char in '通桐酮瞳同铜彤童桶捅筒统痛':
+            self.trans[char] = 'tong'
+        for char in '偷投头透':
+            self.trans[char] = 'tou'
+        for char in '凸秃突图徒途涂屠土吐兔':
+            self.trans[char] = 'tu'
+        for char in '湍团':
+            self.trans[char] = 'tuan'
+        for char in '推颓腿蜕褪退':
+            self.trans[char] = 'tui'
+        for char in '吞屯臀':
+            self.trans[char] = 'tun'
+        for char in '拖托脱鸵陀驮驼椭妥拓唾':
+            self.trans[char] = 'tuo'
+        for char in '挖哇蛙洼娃瓦袜':
+            self.trans[char] = 'wa'
+        for char in '歪外':
+            self.trans[char] = 'wai'
+        for char in '豌弯湾玩顽丸烷完碗挽晚皖惋宛婉万腕莞':
+            self.trans[char] = 'wan'
+        for char in '汪王亡枉网往旺望忘妄':
+            self.trans[char] = 'wang'
+        for char in '威巍微危韦违桅围唯惟为潍维苇萎委伟伪尾纬未蔚味畏胃喂魏位渭谓尉慰卫':
+            self.trans[char] = 'wei'
+        for char in '瘟温蚊文闻纹吻稳紊问':
+            self.trans[char] = 'wen'
+        for char in '嗡翁瓮':
+            self.trans[char] = 'weng'
+        for char in '挝蜗涡窝我斡卧握沃':
+            self.trans[char] = 'wo'
+        for char in '巫呜钨乌污诬屋无芜梧吾吴毋武五捂午舞伍侮坞戊雾晤物勿务悟误':
+            self.trans[char] = 'wu'
+        for char in ('昔熙析西硒矽晰嘻吸锡牺稀息希悉膝夕惜熄烯溪汐犀檄袭席习媳喜铣洗系'
+                     '隙戏细'):
+            self.trans[char] = 'xi'
+        for char in '瞎虾匣霞辖暇峡侠狭下厦夏吓':
+            self.trans[char] = 'xia'
+        for char in '掀锨先仙鲜纤咸贤衔舷闲涎弦嫌显险现献县腺馅羡宪陷限线':
+            self.trans[char] = 'xian'
+        for char in '相厢镶香箱襄湘乡翔祥详想响享项巷橡像向象':
+            self.trans[char] = 'xiang'
+        for char in '萧硝霄削哮嚣销消宵淆晓小孝校肖啸笑效':
+            self.trans[char] = 'xiao'
+        for char in '楔些歇蝎鞋协挟携邪斜胁谐写械卸蟹懈泄泻谢屑':
+            self.trans[char] = 'xie'
+        for char in '薪芯锌欣辛新忻心信衅':
+            self.trans[char] = 'xin'
+        for char in '星腥猩惺兴刑型形邢行醒幸杏性姓':
+            self.trans[char] = 'xing'
+        for char in '兄凶胸匈汹雄熊':
+            self.trans[char] = 'xiong'
+        for char in '休修羞朽嗅锈秀袖绣':
+            self.trans[char] = 'xiu'
+        for char in '墟戌需虚嘘须徐许蓄酗叙旭序畜恤絮婿绪续':
+            self.trans[char] = 'xu'
+        for char in '轩喧宣悬旋玄选癣眩绚':
+            self.trans[char] = 'xuan'
+        for char in '靴薛学穴雪血':
+            self.trans[char] = 'xue'
+        for char in '勋熏循旬询寻驯巡殉汛训讯逊迅':
+            self.trans[char] = 'xun'
+        for char in '压押鸦鸭呀丫芽牙蚜崖衙涯雅哑亚讶':
+            self.trans[char] = 'ya'
+        for char in '焉咽阉烟淹盐严研蜒岩延言颜阎炎沿奄掩眼衍演艳堰燕厌砚雁唁彦焰宴谚验':
+            self.trans[char] = 'yan'
+        for char in '殃央鸯秧杨扬佯疡羊洋阳氧仰痒养样漾':
+            self.trans[char] = 'yang'
+        for char in '邀腰妖瑶摇尧遥窑谣姚咬舀药要耀':
+            self.trans[char] = 'yao'
+        for char in '椰噎耶爷野冶也页掖业叶曳腋夜液':
+            self.trans[char] = 'ye'
+        for char in ('一壹医揖铱依伊衣颐夷遗移仪胰疑沂宜姨彝椅蚁倚已乙矣以艺抑易邑屹亿'
+                     '役臆逸肄疫亦裔意毅忆义益溢诣议谊译异翼翌绎'):
+            self.trans[char] = 'yi'
+        for char in '茵荫因殷音阴姻吟银淫寅饮尹引隐印':
+            self.trans[char] = 'yin'
+        for char in '英樱婴鹰应缨莹萤营荧蝇迎赢盈影颖硬映':
+            self.trans[char] = 'ying'
         self.trans['哟'] = 'yo'
-        for char in u"拥佣臃痈庸雍踊蛹咏泳涌永恿勇用":
-            self.trans[char] = u"yong"
-        for char in u"幽优悠忧尤由邮铀犹油游酉有友右佑釉诱又幼迂":
-            self.trans[char] = u"you"
-        for char in u"淤于盂榆虞愚舆余俞逾鱼愉渝渔隅予娱雨与屿禹宇语羽玉域芋郁吁遇喻峪御愈欲狱育誉浴寓裕预豫驭":
-            self.trans[char] = u"yu"
-        for char in u"鸳渊冤元垣袁原援辕园员圆猿源缘远苑愿怨院":
-            self.trans[char] = u"yuan"
-        for char in u"曰约越跃钥岳粤月悦阅":
-            self.trans[char] = u"yue"
-        for char in u"耘云郧匀陨允运蕴酝晕韵孕":
-            self.trans[char] = u"yun"
-        for char in u"匝砸杂":
-            self.trans[char] = u"za"
-        for char in u"栽哉灾宰载再在":
-            self.trans[char] = u"zai"
-        for char in u"咱攒暂赞":
-            self.trans[char] = u"zan"
-        for char in u"赃脏葬":
-            self.trans[char] = u"zang"
-        for char in u"遭糟凿藻枣早澡蚤躁噪造皂灶燥":
-            self.trans[char] = u"zao"
-        for char in u"责择则泽":
-            self.trans[char] = u"ze"
+        for char in '拥佣臃痈庸雍踊蛹咏泳涌永恿勇用':
+            self.trans[char] = 'yong'
+        for char in '幽优悠忧尤由邮铀犹油游酉有友右佑釉诱又幼迂':
+            self.trans[char] = 'you'
+        for char in ('淤于盂榆虞愚舆余俞逾鱼愉渝渔隅予娱雨与屿禹宇语羽玉域芋郁吁遇喻'
+                     '峪御愈欲狱育誉浴寓裕预豫驭'):
+            self.trans[char] = 'yu'
+        for char in '鸳渊冤元垣袁原援辕园员圆猿源缘远苑愿怨院':
+            self.trans[char] = 'yuan'
+        for char in '曰约越跃钥岳粤月悦阅':
+            self.trans[char] = 'yue'
+        for char in '耘云郧匀陨允运蕴酝晕韵孕':
+            self.trans[char] = 'yun'
+        for char in '匝砸杂':
+            self.trans[char] = 'za'
+        for char in '栽哉灾宰载再在':
+            self.trans[char] = 'zai'
+        for char in '咱攒暂赞':
+            self.trans[char] = 'zan'
+        for char in '赃脏葬':
+            self.trans[char] = 'zang'
+        for char in '遭糟凿藻枣早澡蚤躁噪造皂灶燥':
+            self.trans[char] = 'zao'
+        for char in '责择则泽':
+            self.trans[char] = 'ze'
         self.trans['贼'] = 'zei'
         self.trans['怎'] = 'zen'
-        for char in u"增憎曾赠":
-            self.trans[char] = u"zeng"
-        for char in u"扎喳渣札轧铡闸眨栅榨咋乍炸诈":
-            self.trans[char] = u"zha"
-        for char in u"摘斋宅窄债寨":
-            self.trans[char] = u"zhai"
-        for char in u"瞻毡詹粘沾盏斩辗崭展蘸栈占战站湛绽":
-            self.trans[char] = u"zhan"
-        for char in u"樟章彰漳张掌涨杖丈帐账仗胀瘴障":
-            self.trans[char] = u"zhang"
-        for char in u"招昭找沼赵照罩兆肇召":
-            self.trans[char] = u"zhao"
-        for char in u"遮折哲蛰辙者锗蔗这浙":
-            self.trans[char] = u"zhe"
-        for char in u"珍斟真甄砧臻贞针侦枕疹诊震振镇阵圳":
-            self.trans[char] = u"zhen"
-        for char in u"蒸挣睁征狰争怔整拯正政帧症郑证":
-            self.trans[char] = u"zheng"
-        for char in u"芝枝支吱蜘知肢脂汁之织职直植殖执值侄址指止趾只旨纸志挚掷至致置帜峙制智秩稚质炙痔滞治窒":
-            self.trans[char] = u"zhi"
-        for char in u"中盅忠钟衷终种肿重仲众":
-            self.trans[char] = u"zhong"
-        for char in u"舟周州洲诌粥轴肘帚咒皱宙昼骤":
-            self.trans[char] = u"zhou"
-        for char in u"珠株蛛朱猪诸诛逐竹烛煮拄瞩嘱主著柱助蛀贮铸筑住注祝驻":
-            self.trans[char] = u"zhu"
-        for char in u"抓爪":
-            self.trans[char] = u"zhua"
+        for char in '增憎曾赠':
+            self.trans[char] = 'zeng'
+        for char in '扎喳渣札轧铡闸眨栅榨咋乍炸诈':
+            self.trans[char] = 'zha'
+        for char in '摘斋宅窄债寨':
+            self.trans[char] = 'zhai'
+        for char in '瞻毡詹粘沾盏斩辗崭展蘸栈占战站湛绽':
+            self.trans[char] = 'zhan'
+        for char in '樟章彰漳张掌涨杖丈帐账仗胀瘴障':
+            self.trans[char] = 'zhang'
+        for char in '招昭找沼赵照罩兆肇召':
+            self.trans[char] = 'zhao'
+        for char in '遮折哲蛰辙者锗蔗这浙':
+            self.trans[char] = 'zhe'
+        for char in '珍斟真甄砧臻贞针侦枕疹诊震振镇阵圳':
+            self.trans[char] = 'zhen'
+        for char in '蒸挣睁征狰争怔整拯正政帧症郑证':
+            self.trans[char] = 'zheng'
+        for char in ('芝枝支吱蜘知肢脂汁之织职直植殖执值侄址指止趾只旨纸志挚掷至致置'
+                     '帜峙制智秩稚质炙痔滞治窒'):
+            self.trans[char] = 'zhi'
+        for char in '中盅忠钟衷终种肿重仲众':
+            self.trans[char] = 'zhong'
+        for char in '舟周州洲诌粥轴肘帚咒皱宙昼骤':
+            self.trans[char] = 'zhou'
+        for char in '珠株蛛朱猪诸诛逐竹烛煮拄瞩嘱主著柱助蛀贮铸筑住注祝驻':
+            self.trans[char] = 'zhu'
+        for char in '抓爪':
+            self.trans[char] = 'zhua'
         self.trans['拽'] = 'zhuai'
-        for char in u"专砖转撰赚篆":
-            self.trans[char] = u"zhuan"
-        for char in u"桩庄装妆撞壮状":
-            self.trans[char] = u"zhuang"
-        for char in u"椎锥追赘坠缀":
-            self.trans[char] = u"zhui"
-        for char in u"谆准":
-            self.trans[char] = u"zhun"
-        for char in u"捉拙卓桌琢茁酌啄着灼浊":
-            self.trans[char] = u"zhuo"
-        for char in u"兹咨资姿滋淄孜紫仔籽滓子自渍字":
-            self.trans[char] = u"zi"
-        for char in u"鬃棕踪宗综总纵":
-            self.trans[char] = u"zong"
-        for char in u"邹走奏揍":
-            self.trans[char] = u"zou"
-        for char in u"租足卒族祖诅阻组":
-            self.trans[char] = u"zu"
-        for char in u"钻纂":
-            self.trans[char] = u"zuan"
-        for char in u"嘴醉最罪":
-            self.trans[char] = u"zui"
-        for char in u"尊遵":
-            self.trans[char] = u"zun"
-        for char in u"昨左佐柞做作坐座":
-            self.trans[char] = u"zuo"
-        # from: https://www.wikidata.org/wiki/MediaWiki:Gadget-SimpleTransliterate.js
-        self.trans[u"ଂ"] = "anusvara"
-        self.trans[u"ઇ"] = "i"
-        self.trans[u"എ"] = "e"
-        self.trans[u"ગ"] = "ga"
-        self.trans[u"ਜ"] = "ja"
-        self.trans[u"ഞ"] = "nya"
-        self.trans[u"ଢ"] = "ddha"
-        self.trans[u"ધ"] = "dha"
-        self.trans[u"ਬ"] = "ba"
-        self.trans[u"മ"] = "ma"
-        self.trans[u"ଲ"] = "la"
-        self.trans[u"ષ"] = "ssa"
-        self.trans[u"਼"] = "nukta"
-        self.trans[u"ാ"] = "aa"
-        self.trans[u"ୂ"] = "uu"
-        self.trans[u"ે"] = "e"
-        self.trans[u"ੌ"] = "au"
-        self.trans[u"ൎ"] = "reph"
-        self.trans[u"ੜ"] = "rra"
-        self.trans[u"՞"] = "?"
-        self.trans[u"ୢ"] = "l"
-        self.trans[u"૧"] = "1"
-        self.trans[u"੬"] = "6"
-        self.trans[u"൮"] = "8"
-        self.trans[u"୲"] = "quarter"
-        self.trans[u"ൾ"] = "ll"
-        self.trans[u"ਇ"] = "i"
-        self.trans[u"ഉ"] = "u"
-        self.trans[u"ઌ"] = "l"
-        self.trans[u"ਗ"] = "ga"
-        self.trans[u"ങ"] = "nga"
-        self.trans[u"ଝ"] = "jha"
-        self.trans[u"જ"] = "ja"
-        self.trans[u"؟"] = "?"
-        self.trans[u"ਧ"] = "dha"
-        self.trans[u"ഩ"] = "nnna"
-        self.trans[u"ଭ"] = "bha"
-        self.trans[u"બ"] = "ba"
-        self.trans[u"ഹ"] = "ha"
-        self.trans[u"ଽ"] = "avagraha"
-        self.trans[u"઼"] = "nukta"
-        self.trans[u"ੇ"] = "ee"
-        self.trans[u"୍"] = "virama"
-        self.trans[u"ૌ"] = "au"
-        self.trans[u"੧"] = "1"
-        self.trans[u"൩"] = "3"
-        self.trans[u"୭"] = "7"
-        self.trans[u"૬"] = "6"
-        self.trans[u"൹"] = "mark"
-        self.trans[u"ਖ਼"] = "khha"
-        self.trans[u"ਂ"] = "bindi"
-        self.trans[u"ഈ"] = "ii"
-        self.trans[u"ઍ"] = "e"
-        self.trans[u"ଌ"] = "l"
-        self.trans[u"ഘ"] = "gha"
-        self.trans[u"ઝ"] = "jha"
-        self.trans[u"ଡ଼"] = "rra"
-        self.trans[u"ਢ"] = "ddha"
-        self.trans[u"ന"] = "na"
-        self.trans[u"ભ"] = "bha"
-        self.trans[u"ବ"] = "ba"
-        self.trans[u"ਲ"] = "la"
-        self.trans[u"സ"] = "sa"
-        self.trans[u"ઽ"] = "avagraha"
-        self.trans[u"଼"] = "nukta"
-        self.trans[u"ੂ"] = "uu"
-        self.trans[u"ൈ"] = "ai"
-        self.trans[u"્"] = "virama"
-        self.trans[u"ୌ"] = "au"
-        self.trans[u"൨"] = "2"
-        self.trans[u"૭"] = "7"
-        self.trans[u"୬"] = "6"
-        self.trans[u"ੲ"] = "iri"
-        self.trans[u"ഃ"] = "visarga"
-        self.trans[u"ં"] = "anusvara"
-        self.trans[u"ଇ"] = "i"
-        self.trans[u"ഓ"] = "oo"
-        self.trans[u"ଗ"] = "ga"
-        self.trans[u"ਝ"] = "jha"
-        self.trans[u"？"] = "?"
-        self.trans[u"ണ"] = "nna"
-        self.trans[u"ઢ"] = "ddha"
-        self.trans[u"ଧ"] = "dha"
-        self.trans[u"ਭ"] = "bha"
-        self.trans[u"ള"] = "lla"
-        self.trans[u"લ"] = "la"
-        self.trans[u"ଷ"] = "ssa"
-        self.trans[u"ൃ"] = "r"
-        self.trans[u"ૂ"] = "uu"
-        self.trans[u"େ"] = "e"
-        self.trans[u"੍"] = "virama"
-        self.trans[u"ୗ"] = "mark"
-        self.trans[u"ൣ"] = "ll"
-        self.trans[u"ૢ"] = "l"
-        self.trans[u"୧"] = "1"
-        self.trans[u"੭"] = "7"
-        self.trans[u"൳"] = "1/4"
-        self.trans[u"୷"] = "sixteenths"
-        self.trans[u"ଆ"] = "aa"
-        self.trans[u"ઋ"] = "r"
-        self.trans[u"ഊ"] = "uu"
-        self.trans[u"ਐ"] = "ai"
-        self.trans[u"ଖ"] = "kha"
-        self.trans[u"છ"] = "cha"
-        self.trans[u"ച"] = "ca"
-        self.trans[u"ਠ"] = "ttha"
-        self.trans[u"ଦ"] = "da"
-        self.trans[u"ફ"] = "pha"
-        self.trans[u"പ"] = "pa"
-        self.trans[u"ਰ"] = "ra"
-        self.trans[u"ଶ"] = "sha"
-        self.trans[u"ഺ"] = "ttta"
-        self.trans[u"ੀ"] = "ii"
-        self.trans[u"ો"] = "o"
-        self.trans[u"ൊ"] = "o"
-        self.trans[u"ୖ"] = "mark"
-        self.trans[u"୦"] = "0"
-        self.trans[u"૫"] = "5"
-        self.trans[u"൪"] = "4"
-        self.trans[u"ੰ"] = "tippi"
-        self.trans[u"୶"] = "eighth"
-        self.trans[u"ൺ"] = "nn"
-        self.trans[u"ଁ"] = "candrabindu"
-        self.trans[u"അ"] = "a"
-        self.trans[u"ઐ"] = "ai"
-        self.trans[u"ക"] = "ka"
-        self.trans[u"ਸ਼"] = "sha"
-        self.trans[u"ਛ"] = "cha"
-        self.trans[u"ଡ"] = "dda"
-        self.trans[u"ઠ"] = "ttha"
-        self.trans[u"ഥ"] = "tha"
-        self.trans[u"ਫ"] = "pha"
-        self.trans[u"ર"] = "ra"
-        self.trans[u"വ"] = "va"
-        self.trans[u"ୁ"] = "u"
-        self.trans[u"ી"] = "ii"
-        self.trans[u"ੋ"] = "oo"
-        self.trans[u"ૐ"] = "om"
-        self.trans[u"ୡ"] = "ll"
-        self.trans[u"ૠ"] = "rr"
-        self.trans[u"੫"] = "5"
-        self.trans[u"ୱ"] = "wa"
-        self.trans[u"૰"] = "sign"
-        self.trans[u"൵"] = "quarters"
-        self.trans[u"ਫ਼"] = "fa"
-        self.trans[u"ઁ"] = "candrabindu"
-        self.trans[u"ਆ"] = "aa"
-        self.trans[u"ઑ"] = "o"
-        self.trans[u"ଐ"] = "ai"
-        self.trans[u"ഔ"] = "au"
-        self.trans[u"ਖ"] = "kha"
-        self.trans[u"ડ"] = "dda"
-        self.trans[u"ଠ"] = "ttha"
-        self.trans[u"ത"] = "ta"
-        self.trans[u"ਦ"] = "da"
-        self.trans[u"ର"] = "ra"
-        self.trans[u"ഴ"] = "llla"
-        self.trans[u"ુ"] = "u"
-        self.trans[u"ୀ"] = "ii"
-        self.trans[u"ൄ"] = "rr"
-        self.trans[u"ૡ"] = "ll"
-        self.trans[u"ୠ"] = "rr"
-        self.trans[u"੦"] = "0"
-        self.trans[u"૱"] = "sign"
-        self.trans[u"୰"] = "isshar"
-        self.trans[u"൴"] = "1/2"
-        self.trans[u"ਁ"] = "bindi"
-        self.trans[u"આ"] = "aa"
-        self.trans[u"ଋ"] = "r"
-        self.trans[u"ഏ"] = "ee"
-        self.trans[u"ખ"] = "kha"
-        self.trans[u"ଛ"] = "cha"
-        self.trans[u"ട"] = "tta"
-        self.trans[u"ਡ"] = "dda"
-        self.trans[u"દ"] = "da"
-        self.trans[u"ଫ"] = "pha"
-        self.trans[u"യ"] = "ya"
-        self.trans[u"શ"] = "sha"
-        self.trans[u"ി"] = "i"
-        self.trans[u"ੁ"] = "u"
-        self.trans[u"ୋ"] = "o"
-        self.trans[u"ੑ"] = "udaat"
-        self.trans[u"૦"] = "0"
-        self.trans[u"୫"] = "5"
-        self.trans[u"൯"] = "9"
-        self.trans[u"ੱ"] = "addak"
-        self.trans[u"ൿ"] = "k"
-        self.trans[u"ആ"] = "aa"
-        self.trans[u"ଊ"] = "uu"
-        self.trans[u"એ"] = "e"
-        self.trans[u"ਔ"] = "au"
-        self.trans[u"ഖ"] = "kha"
-        self.trans[u"ଚ"] = "ca"
-        self.trans[u"ટ"] = "tta"
-        self.trans[u"ਤ"] = "ta"
-        self.trans[u"ദ"] = "da"
-        self.trans[u"ପ"] = "pa"
-        self.trans[u"ય"] = "ya"
-        self.trans[u"ശ"] = "sha"
-        self.trans[u"િ"] = "i"
-        self.trans[u"െ"] = "e"
-        self.trans[u"൦"] = "0"
-        self.trans[u"୪"] = "4"
-        self.trans[u"૯"] = "9"
-        self.trans[u"ੴ"] = "onkar"
-        self.trans[u"ଅ"] = "a"
-        self.trans[u"ਏ"] = "ee"
-        self.trans[u"କ"] = "ka"
-        self.trans[u"ઔ"] = "au"
-        self.trans[u"ਟ"] = "tta"
-        self.trans[u"ഡ"] = "dda"
-        self.trans[u"ଥ"] = "tha"
-        self.trans[u"ત"] = "ta"
-        self.trans[u"ਯ"] = "ya"
-        self.trans[u"റ"] = "rra"
-        self.trans[u"ଵ"] = "va"
-        self.trans[u"ਿ"] = "i"
-        self.trans[u"ു"] = "u"
-        self.trans[u"ૄ"] = "rr"
-        self.trans[u"ൡ"] = "ll"
-        self.trans[u"੯"] = "9"
-        self.trans[u"൱"] = "100"
-        self.trans[u"୵"] = "sixteenth"
-        self.trans[u"અ"] = "a"
-        self.trans[u"ਊ"] = "uu"
-        self.trans[u"ഐ"] = "ai"
-        self.trans[u"ક"] = "ka"
-        self.trans[u"ଔ"] = "au"
-        self.trans[u"ਚ"] = "ca"
-        self.trans[u"ഠ"] = "ttha"
-        self.trans[u"થ"] = "tha"
-        self.trans[u"ତ"] = "ta"
-        self.trans[u"ਪ"] = "pa"
-        self.trans[u"ര"] = "ra"
-        self.trans[u"વ"] = "va"
-        self.trans[u"ീ"] = "ii"
-        self.trans[u"ૅ"] = "e"
-        self.trans[u"ୄ"] = "rr"
-        self.trans[u"ൠ"] = "rr"
-        self.trans[u"ਜ਼"] = "za"
-        self.trans[u"੪"] = "4"
-        self.trans[u"൰"] = "10"
-        self.trans[u"୴"] = "quarters"
-        self.trans[u"ਅ"] = "a"
-        self.trans[u"ഋ"] = "r"
-        self.trans[u"ઊ"] = "uu"
-        self.trans[u"ଏ"] = "e"
-        self.trans[u"ਕ"] = "ka"
-        self.trans[u"ഛ"] = "cha"
-        self.trans[u"ચ"] = "ca"
-        self.trans[u"ଟ"] = "tta"
-        self.trans[u"ਥ"] = "tha"
-        self.trans[u"ഫ"] = "pha"
-        self.trans[u"પ"] = "pa"
-        self.trans[u"ଯ"] = "ya"
-        self.trans[u"ਵ"] = "va"
-        self.trans[u"ି"] = "i"
-        self.trans[u"ോ"] = "oo"
-        self.trans[u"ୟ"] = "yya"
-        self.trans[u"൫"] = "5"
-        self.trans[u"૪"] = "4"
-        self.trans[u"୯"] = "9"
-        self.trans[u"ੵ"] = "yakash"
-        self.trans[u"ൻ"] = "n"
-        self.trans[u"ઃ"] = "visarga"
-        self.trans[u"ം"] = "anusvara"
-        self.trans[u"ਈ"] = "ii"
-        self.trans[u"ઓ"] = "o"
-        self.trans[u"ഒ"] = "o"
-        self.trans[u"ਘ"] = "gha"
-        self.trans[u"ଞ"] = "nya"
-        self.trans[u"ણ"] = "nna"
-        self.trans[u"ഢ"] = "ddha"
-        self.trans[u"ਲ਼"] = "lla"
-        self.trans[u"ਨ"] = "na"
-        self.trans[u"ମ"] = "ma"
-        self.trans[u"ળ"] = "lla"
-        self.trans[u"ല"] = "la"
-        self.trans[u"ਸ"] = "sa"
-        self.trans[u"¿"] = "?"
-        self.trans[u"ା"] = "aa"
-        self.trans[u"ૃ"] = "r"
-        self.trans[u"ൂ"] = "uu"
-        self.trans[u"ੈ"] = "ai"
-        self.trans[u"ૣ"] = "ll"
-        self.trans[u"ൢ"] = "l"
-        self.trans[u"੨"] = "2"
-        self.trans[u"୮"] = "8"
-        self.trans[u"൲"] = "1000"
-        self.trans[u"ਃ"] = "visarga"
-        self.trans[u"ଉ"] = "u"
-        self.trans[u"ઈ"] = "ii"
-        self.trans[u"ਓ"] = "oo"
-        self.trans[u"ଙ"] = "nga"
-        self.trans[u"ઘ"] = "gha"
-        self.trans[u"ഝ"] = "jha"
-        self.trans[u"ਣ"] = "nna"
-        self.trans[u"ન"] = "na"
-        self.trans[u"ഭ"] = "bha"
-        self.trans[u"ଜ"] = "ja"
-        self.trans[u"ହ"] = "ha"
-        self.trans[u"સ"] = "sa"
-        self.trans[u"ഽ"] = "avagraha"
-        self.trans[u"ૈ"] = "ai"
-        self.trans[u"്"] = "virama"
-        self.trans[u"୩"] = "3"
-        self.trans[u"૨"] = "2"
-        self.trans[u"൭"] = "7"
-        self.trans[u"ੳ"] = "ura"
-        self.trans[u"ൽ"] = "l"
-        self.trans[u"ઉ"] = "u"
-        self.trans[u"ଈ"] = "ii"
-        self.trans[u"ഌ"] = "l"
-        self.trans[u"ઙ"] = "nga"
-        self.trans[u"ଘ"] = "gha"
-        self.trans[u"ജ"] = "ja"
-        self.trans[u"ਞ"] = "nya"
-        self.trans[u"ନ"] = "na"
-        self.trans[u"ബ"] = "ba"
-        self.trans[u"ਮ"] = "ma"
-        self.trans[u"હ"] = "ha"
-        self.trans[u"ସ"] = "sa"
-        self.trans[u"ਾ"] = "aa"
-        self.trans[u"ૉ"] = "o"
-        self.trans[u"ୈ"] = "ai"
-        self.trans[u"ൌ"] = "au"
-        self.trans[u"૩"] = "3"
-        self.trans[u"୨"] = "2"
-        self.trans[u"൬"] = "6"
-        self.trans[u"੮"] = "8"
-        self.trans[u"ർ"] = "rr"
-        self.trans[u"ଃ"] = "visarga"
-        self.trans[u"ഇ"] = "i"
-        self.trans[u"ਉ"] = "u"
-        self.trans[u"ଓ"] = "o"
-        self.trans[u"ഗ"] = "ga"
-        self.trans[u"ਙ"] = "nga"
-        self.trans[u"ઞ"] = "nya"
-        self.trans[u"ଣ"] = "nna"
-        self.trans[u"ധ"] = "dha"
-        self.trans[u"મ"] = "ma"
-        self.trans[u"ଳ"] = "lla"
-        self.trans[u"ഷ"] = "ssa"
-        self.trans[u"ਹ"] = "ha"
-        self.trans[u"ਗ਼"] = "ghha"
-        self.trans[u"ા"] = "aa"
-        self.trans[u"ୃ"] = "r"
-        self.trans[u"േ"] = "ee"
-        self.trans[u"ൗ"] = "mark"
-        self.trans[u"ଢ଼"] = "rha"
-        self.trans[u"ୣ"] = "ll"
-        self.trans[u"൧"] = "1"
-        self.trans[u"੩"] = "3"
-        self.trans[u"૮"] = "8"
-        self.trans[u"୳"] = "half"
+        for char in '专砖转撰赚篆':
+            self.trans[char] = 'zhuan'
+        for char in '桩庄装妆撞壮状':
+            self.trans[char] = 'zhuang'
+        for char in '椎锥追赘坠缀':
+            self.trans[char] = 'zhui'
+        for char in '谆准':
+            self.trans[char] = 'zhun'
+        for char in '捉拙卓桌琢茁酌啄着灼浊':
+            self.trans[char] = 'zhuo'
+        for char in '兹咨资姿滋淄孜紫仔籽滓子自渍字':
+            self.trans[char] = 'zi'
+        for char in '鬃棕踪宗综总纵':
+            self.trans[char] = 'zong'
+        for char in '邹走奏揍':
+            self.trans[char] = 'zou'
+        for char in '租足卒族祖诅阻组':
+            self.trans[char] = 'zu'
+        for char in '钻纂':
+            self.trans[char] = 'zuan'
+        for char in '嘴醉最罪':
+            self.trans[char] = 'zui'
+        for char in '尊遵':
+            self.trans[char] = 'zun'
+        for char in '昨左佐柞做作坐座':
+            self.trans[char] = 'zuo'
+        # from:
+        # https://www.wikidata.org/wiki/MediaWiki:Gadget-SimpleTransliterate.js
+        self.trans['ଂ'] = 'anusvara'
+        self.trans['ઇ'] = 'i'
+        self.trans['എ'] = 'e'
+        self.trans['ગ'] = 'ga'
+        self.trans['ਜ'] = 'ja'
+        self.trans['ഞ'] = 'nya'
+        self.trans['ଢ'] = 'ddha'
+        self.trans['ધ'] = 'dha'
+        self.trans['ਬ'] = 'ba'
+        self.trans['മ'] = 'ma'
+        self.trans['ଲ'] = 'la'
+        self.trans['ષ'] = 'ssa'
+        self.trans['਼'] = 'nukta'
+        self.trans['ാ'] = 'aa'
+        self.trans['ୂ'] = 'uu'
+        self.trans['ે'] = 'e'
+        self.trans['ੌ'] = 'au'
+        self.trans['ൎ'] = 'reph'
+        self.trans['ੜ'] = 'rra'
+        self.trans['՞'] = '?'
+        self.trans['ୢ'] = 'l'
+        self.trans['૧'] = '1'
+        self.trans['੬'] = '6'
+        self.trans['൮'] = '8'
+        self.trans['୲'] = 'quarter'
+        self.trans['ൾ'] = 'll'
+        self.trans['ਇ'] = 'i'
+        self.trans['ഉ'] = 'u'
+        self.trans['ઌ'] = 'l'
+        self.trans['ਗ'] = 'ga'
+        self.trans['ങ'] = 'nga'
+        self.trans['ଝ'] = 'jha'
+        self.trans['જ'] = 'ja'
+        self.trans['؟'] = '?'
+        self.trans['ਧ'] = 'dha'
+        self.trans['ഩ'] = 'nnna'
+        self.trans['ଭ'] = 'bha'
+        self.trans['બ'] = 'ba'
+        self.trans['ഹ'] = 'ha'
+        self.trans['ଽ'] = 'avagraha'
+        self.trans['઼'] = 'nukta'
+        self.trans['ੇ'] = 'ee'
+        self.trans['୍'] = 'virama'
+        self.trans['ૌ'] = 'au'
+        self.trans['੧'] = '1'
+        self.trans['൩'] = '3'
+        self.trans['୭'] = '7'
+        self.trans['૬'] = '6'
+        self.trans['൹'] = 'mark'
+        self.trans['ਖ਼'] = 'khha'
+        self.trans['ਂ'] = 'bindi'
+        self.trans['ഈ'] = 'ii'
+        self.trans['ઍ'] = 'e'
+        self.trans['ଌ'] = 'l'
+        self.trans['ഘ'] = 'gha'
+        self.trans['ઝ'] = 'jha'
+        self.trans['ଡ଼'] = 'rra'
+        self.trans['ਢ'] = 'ddha'
+        self.trans['ന'] = 'na'
+        self.trans['ભ'] = 'bha'
+        self.trans['ବ'] = 'ba'
+        self.trans['ਲ'] = 'la'
+        self.trans['സ'] = 'sa'
+        self.trans['ઽ'] = 'avagraha'
+        self.trans['଼'] = 'nukta'
+        self.trans['ੂ'] = 'uu'
+        self.trans['ൈ'] = 'ai'
+        self.trans['્'] = 'virama'
+        self.trans['ୌ'] = 'au'
+        self.trans['൨'] = '2'
+        self.trans['૭'] = '7'
+        self.trans['୬'] = '6'
+        self.trans['ੲ'] = 'iri'
+        self.trans['ഃ'] = 'visarga'
+        self.trans['ં'] = 'anusvara'
+        self.trans['ଇ'] = 'i'
+        self.trans['ഓ'] = 'oo'
+        self.trans['ଗ'] = 'ga'
+        self.trans['ਝ'] = 'jha'
+        self.trans['？'] = '?'
+        self.trans['ണ'] = 'nna'
+        self.trans['ઢ'] = 'ddha'
+        self.trans['ଧ'] = 'dha'
+        self.trans['ਭ'] = 'bha'
+        self.trans['ള'] = 'lla'
+        self.trans['લ'] = 'la'
+        self.trans['ଷ'] = 'ssa'
+        self.trans['ൃ'] = 'r'
+        self.trans['ૂ'] = 'uu'
+        self.trans['େ'] = 'e'
+        self.trans['੍'] = 'virama'
+        self.trans['ୗ'] = 'mark'
+        self.trans['ൣ'] = 'll'
+        self.trans['ૢ'] = 'l'
+        self.trans['୧'] = '1'
+        self.trans['੭'] = '7'
+        self.trans['൳'] = '1/4'
+        self.trans['୷'] = 'sixteenths'
+        self.trans['ଆ'] = 'aa'
+        self.trans['ઋ'] = 'r'
+        self.trans['ഊ'] = 'uu'
+        self.trans['ਐ'] = 'ai'
+        self.trans['ଖ'] = 'kha'
+        self.trans['છ'] = 'cha'
+        self.trans['ച'] = 'ca'
+        self.trans['ਠ'] = 'ttha'
+        self.trans['ଦ'] = 'da'
+        self.trans['ફ'] = 'pha'
+        self.trans['പ'] = 'pa'
+        self.trans['ਰ'] = 'ra'
+        self.trans['ଶ'] = 'sha'
+        self.trans['ഺ'] = 'ttta'
+        self.trans['ੀ'] = 'ii'
+        self.trans['ો'] = 'o'
+        self.trans['ൊ'] = 'o'
+        self.trans['ୖ'] = 'mark'
+        self.trans['୦'] = '0'
+        self.trans['૫'] = '5'
+        self.trans['൪'] = '4'
+        self.trans['ੰ'] = 'tippi'
+        self.trans['୶'] = 'eighth'
+        self.trans['ൺ'] = 'nn'
+        self.trans['ଁ'] = 'candrabindu'
+        self.trans['അ'] = 'a'
+        self.trans['ઐ'] = 'ai'
+        self.trans['ക'] = 'ka'
+        self.trans['ਸ਼'] = 'sha'
+        self.trans['ਛ'] = 'cha'
+        self.trans['ଡ'] = 'dda'
+        self.trans['ઠ'] = 'ttha'
+        self.trans['ഥ'] = 'tha'
+        self.trans['ਫ'] = 'pha'
+        self.trans['ર'] = 'ra'
+        self.trans['വ'] = 'va'
+        self.trans['ୁ'] = 'u'
+        self.trans['ી'] = 'ii'
+        self.trans['ੋ'] = 'oo'
+        self.trans['ૐ'] = 'om'
+        self.trans['ୡ'] = 'll'
+        self.trans['ૠ'] = 'rr'
+        self.trans['੫'] = '5'
+        self.trans['ୱ'] = 'wa'
+        self.trans['૰'] = 'sign'
+        self.trans['൵'] = 'quarters'
+        self.trans['ਫ਼'] = 'fa'
+        self.trans['ઁ'] = 'candrabindu'
+        self.trans['ਆ'] = 'aa'
+        self.trans['ઑ'] = 'o'
+        self.trans['ଐ'] = 'ai'
+        self.trans['ഔ'] = 'au'
+        self.trans['ਖ'] = 'kha'
+        self.trans['ડ'] = 'dda'
+        self.trans['ଠ'] = 'ttha'
+        self.trans['ത'] = 'ta'
+        self.trans['ਦ'] = 'da'
+        self.trans['ର'] = 'ra'
+        self.trans['ഴ'] = 'llla'
+        self.trans['ુ'] = 'u'
+        self.trans['ୀ'] = 'ii'
+        self.trans['ൄ'] = 'rr'
+        self.trans['ૡ'] = 'll'
+        self.trans['ୠ'] = 'rr'
+        self.trans['੦'] = '0'
+        self.trans['૱'] = 'sign'
+        self.trans['୰'] = 'isshar'
+        self.trans['൴'] = '1/2'
+        self.trans['ਁ'] = 'bindi'
+        self.trans['આ'] = 'aa'
+        self.trans['ଋ'] = 'r'
+        self.trans['ഏ'] = 'ee'
+        self.trans['ખ'] = 'kha'
+        self.trans['ଛ'] = 'cha'
+        self.trans['ട'] = 'tta'
+        self.trans['ਡ'] = 'dda'
+        self.trans['દ'] = 'da'
+        self.trans['ଫ'] = 'pha'
+        self.trans['യ'] = 'ya'
+        self.trans['શ'] = 'sha'
+        self.trans['ി'] = 'i'
+        self.trans['ੁ'] = 'u'
+        self.trans['ୋ'] = 'o'
+        self.trans['ੑ'] = 'udaat'
+        self.trans['૦'] = '0'
+        self.trans['୫'] = '5'
+        self.trans['൯'] = '9'
+        self.trans['ੱ'] = 'addak'
+        self.trans['ൿ'] = 'k'
+        self.trans['ആ'] = 'aa'
+        self.trans['ଊ'] = 'uu'
+        self.trans['એ'] = 'e'
+        self.trans['ਔ'] = 'au'
+        self.trans['ഖ'] = 'kha'
+        self.trans['ଚ'] = 'ca'
+        self.trans['ટ'] = 'tta'
+        self.trans['ਤ'] = 'ta'
+        self.trans['ദ'] = 'da'
+        self.trans['ପ'] = 'pa'
+        self.trans['ય'] = 'ya'
+        self.trans['ശ'] = 'sha'
+        self.trans['િ'] = 'i'
+        self.trans['െ'] = 'e'
+        self.trans['൦'] = '0'
+        self.trans['୪'] = '4'
+        self.trans['૯'] = '9'
+        self.trans['ੴ'] = 'onkar'
+        self.trans['ଅ'] = 'a'
+        self.trans['ਏ'] = 'ee'
+        self.trans['କ'] = 'ka'
+        self.trans['ઔ'] = 'au'
+        self.trans['ਟ'] = 'tta'
+        self.trans['ഡ'] = 'dda'
+        self.trans['ଥ'] = 'tha'
+        self.trans['ત'] = 'ta'
+        self.trans['ਯ'] = 'ya'
+        self.trans['റ'] = 'rra'
+        self.trans['ଵ'] = 'va'
+        self.trans['ਿ'] = 'i'
+        self.trans['ു'] = 'u'
+        self.trans['ૄ'] = 'rr'
+        self.trans['ൡ'] = 'll'
+        self.trans['੯'] = '9'
+        self.trans['൱'] = '100'
+        self.trans['୵'] = 'sixteenth'
+        self.trans['અ'] = 'a'
+        self.trans['ਊ'] = 'uu'
+        self.trans['ഐ'] = 'ai'
+        self.trans['ક'] = 'ka'
+        self.trans['ଔ'] = 'au'
+        self.trans['ਚ'] = 'ca'
+        self.trans['ഠ'] = 'ttha'
+        self.trans['થ'] = 'tha'
+        self.trans['ତ'] = 'ta'
+        self.trans['ਪ'] = 'pa'
+        self.trans['ര'] = 'ra'
+        self.trans['વ'] = 'va'
+        self.trans['ീ'] = 'ii'
+        self.trans['ૅ'] = 'e'
+        self.trans['ୄ'] = 'rr'
+        self.trans['ൠ'] = 'rr'
+        self.trans['ਜ਼'] = 'za'
+        self.trans['੪'] = '4'
+        self.trans['൰'] = '10'
+        self.trans['୴'] = 'quarters'
+        self.trans['ਅ'] = 'a'
+        self.trans['ഋ'] = 'r'
+        self.trans['ઊ'] = 'uu'
+        self.trans['ଏ'] = 'e'
+        self.trans['ਕ'] = 'ka'
+        self.trans['ഛ'] = 'cha'
+        self.trans['ચ'] = 'ca'
+        self.trans['ଟ'] = 'tta'
+        self.trans['ਥ'] = 'tha'
+        self.trans['ഫ'] = 'pha'
+        self.trans['પ'] = 'pa'
+        self.trans['ଯ'] = 'ya'
+        self.trans['ਵ'] = 'va'
+        self.trans['ି'] = 'i'
+        self.trans['ോ'] = 'oo'
+        self.trans['ୟ'] = 'yya'
+        self.trans['൫'] = '5'
+        self.trans['૪'] = '4'
+        self.trans['୯'] = '9'
+        self.trans['ੵ'] = 'yakash'
+        self.trans['ൻ'] = 'n'
+        self.trans['ઃ'] = 'visarga'
+        self.trans['ം'] = 'anusvara'
+        self.trans['ਈ'] = 'ii'
+        self.trans['ઓ'] = 'o'
+        self.trans['ഒ'] = 'o'
+        self.trans['ਘ'] = 'gha'
+        self.trans['ଞ'] = 'nya'
+        self.trans['ણ'] = 'nna'
+        self.trans['ഢ'] = 'ddha'
+        self.trans['ਲ਼'] = 'lla'
+        self.trans['ਨ'] = 'na'
+        self.trans['ମ'] = 'ma'
+        self.trans['ળ'] = 'lla'
+        self.trans['ല'] = 'la'
+        self.trans['ਸ'] = 'sa'
+        self.trans['¿'] = '?'
+        self.trans['ା'] = 'aa'
+        self.trans['ૃ'] = 'r'
+        self.trans['ൂ'] = 'uu'
+        self.trans['ੈ'] = 'ai'
+        self.trans['ૣ'] = 'll'
+        self.trans['ൢ'] = 'l'
+        self.trans['੨'] = '2'
+        self.trans['୮'] = '8'
+        self.trans['൲'] = '1000'
+        self.trans['ਃ'] = 'visarga'
+        self.trans['ଉ'] = 'u'
+        self.trans['ઈ'] = 'ii'
+        self.trans['ਓ'] = 'oo'
+        self.trans['ଙ'] = 'nga'
+        self.trans['ઘ'] = 'gha'
+        self.trans['ഝ'] = 'jha'
+        self.trans['ਣ'] = 'nna'
+        self.trans['ન'] = 'na'
+        self.trans['ഭ'] = 'bha'
+        self.trans['ଜ'] = 'ja'
+        self.trans['ହ'] = 'ha'
+        self.trans['સ'] = 'sa'
+        self.trans['ഽ'] = 'avagraha'
+        self.trans['ૈ'] = 'ai'
+        self.trans['്'] = 'virama'
+        self.trans['୩'] = '3'
+        self.trans['૨'] = '2'
+        self.trans['൭'] = '7'
+        self.trans['ੳ'] = 'ura'
+        self.trans['ൽ'] = 'l'
+        self.trans['ઉ'] = 'u'
+        self.trans['ଈ'] = 'ii'
+        self.trans['ഌ'] = 'l'
+        self.trans['ઙ'] = 'nga'
+        self.trans['ଘ'] = 'gha'
+        self.trans['ജ'] = 'ja'
+        self.trans['ਞ'] = 'nya'
+        self.trans['ନ'] = 'na'
+        self.trans['ബ'] = 'ba'
+        self.trans['ਮ'] = 'ma'
+        self.trans['હ'] = 'ha'
+        self.trans['ସ'] = 'sa'
+        self.trans['ਾ'] = 'aa'
+        self.trans['ૉ'] = 'o'
+        self.trans['ୈ'] = 'ai'
+        self.trans['ൌ'] = 'au'
+        self.trans['૩'] = '3'
+        self.trans['୨'] = '2'
+        self.trans['൬'] = '6'
+        self.trans['੮'] = '8'
+        self.trans['ർ'] = 'rr'
+        self.trans['ଃ'] = 'visarga'
+        self.trans['ഇ'] = 'i'
+        self.trans['ਉ'] = 'u'
+        self.trans['ଓ'] = 'o'
+        self.trans['ഗ'] = 'ga'
+        self.trans['ਙ'] = 'nga'
+        self.trans['ઞ'] = 'nya'
+        self.trans['ଣ'] = 'nna'
+        self.trans['ധ'] = 'dha'
+        self.trans['મ'] = 'ma'
+        self.trans['ଳ'] = 'lla'
+        self.trans['ഷ'] = 'ssa'
+        self.trans['ਹ'] = 'ha'
+        self.trans['ਗ਼'] = 'ghha'
+        self.trans['ા'] = 'aa'
+        self.trans['ୃ'] = 'r'
+        self.trans['േ'] = 'ee'
+        self.trans['ൗ'] = 'mark'
+        self.trans['ଢ଼'] = 'rha'
+        self.trans['ୣ'] = 'll'
+        self.trans['൧'] = '1'
+        self.trans['੩'] = '3'
+        self.trans['૮'] = '8'
+        self.trans['୳'] = 'half'
         for char in self.trans:
             value = self.trans[char]
-            if value == "?":
+            if value == '?':
                 continue
-            while value.encode(encoding, 'replace').decode(encoding) == "?" and value in self.trans:
-                assert value != self.trans[value], "%r == self.trans[%r]!" % (value, value)
+            while (value.encode(encoding, 'replace').decode(encoding) == '?'
+                   and value in self.trans):
+                assert value != self.trans[value], \
+                    '{!r} == self.trans[{!r}]!'.format(value, value)
                 value = self.trans[value]
             self.trans[char] = value
 
@@ -2518,17 +2535,17 @@ class transliterator(object):
         if char in self.trans:
             return self.trans[char]
         # Arabic
-        if char == u"◌":
+        if char == '◌':
             return prev
         # Japanese
-        if char == u"ッ":
+        if char == 'ッ':
             return self.transliterate(next)[0]
-        if char in u"々仝ヽヾゝゞ〱〲〳〵〴〵":
+        if char in '々仝ヽヾゝゞ〱〲〳〵〴〵':
             return prev
         # Lao
-        if char == u"ຫ":
-            if next in u"ງຍນຣລຼຼວ":
+        if char == 'ຫ':
+            if next in 'ງຍນຣລຼຼວ':
                 return ""
             else:
-                return "h"
+                return 'h'
         return default
