@@ -23,9 +23,9 @@ from pywikibot.pagegenerators import (
     CategorizedPageGenerator
 )
 
-from pywikibot.tools import has_module
+from pywikibot.tools import has_module, suppress_warnings
 
-from tests import join_data_path, patch
+from tests import join_data_path
 from tests.aspects import (
     unittest,
     TestCase,
@@ -1484,15 +1484,21 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
         """Test UnconnectedPageGenerator."""
         if not self.site.data_repository():
             raise unittest.SkipTest('Site is not using a Wikibase repository')
-        upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
-
-        def unconnected_pages(total=None):
-            """Assert unconnected_pages is called correctly."""
-            self.assertEqual(total, 3)
-            yield
-
-        with patch.object(self.site, 'unconnected_pages', unconnected_pages):
-            self.assertEqual(tuple(upgen), (None,))
+        with suppress_warnings(
+                'pywikibot.pagegenerators.UnconnectedPageGenerator is '
+                'deprecated', DeprecationWarning):
+            upgen = pagegenerators.UnconnectedPageGenerator(self.site, 3)
+        self.assertDictEqual(
+            upgen.request._params, {
+                'gqppage': ['UnconnectedPages'],
+                'prop': ['info', 'imageinfo', 'categoryinfo'],
+                'inprop': ['protection'],
+                'iilimit': ['max'],
+                'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
+                           'sha1', 'metadata'],
+                'generator': ['querypage'], 'action': ['query'],
+                'indexpageids': [True], 'continue': [True]})
+        self.assertLessEqual(len(tuple(upgen)), 3)
 
     def test_unconnected_without_repo(self):
         """Test that it raises a ValueError on sites without repository."""
