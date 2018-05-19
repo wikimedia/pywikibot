@@ -2518,8 +2518,9 @@ def main(*args):
                     'Dump file is empty?! Starting at the beginning.')
                 nextPage = "!"
                 namespace = 0
-            gen2 = pagegenerators.AllpagesPageGenerator(
-                nextPage, namespace, includeredirects=False)
+            gen2 = site.allpages(start=nextPage,
+                                 namespace=namespace,
+                                 filterredir=False)
             hintlessPageGen = chain(hintlessPageGen, gen2)
         restoredFiles.append(dumpFileName)
 
