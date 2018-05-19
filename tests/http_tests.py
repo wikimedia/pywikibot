@@ -239,11 +239,11 @@ class UserAgentTestCase(TestCase):
         self.assertEqual('', http.user_agent(format_string='{family}'))
         self.assertEqual('', http.user_agent(format_string='{lang}'))
 
-        self.assertEqual('Pywikibot/' + pywikibot.__release__,
+        self.assertEqual('Pywikibot/' + pywikibot.__version__,
                          http.user_agent(format_string='{pwb}'))
         self.assertNotIn(' ', http.user_agent(format_string=' {pwb} '))
 
-        self.assertIn('Pywikibot/' + pywikibot.__release__,
+        self.assertIn('Pywikibot/' + pywikibot.__version__,
                       http.user_agent(format_string='SVN/1.7.5 {pwb}'))
 
     def test_user_agent_username(self):
@@ -295,7 +295,7 @@ class DefaultUserAgentTestCase(TestCase):
         """Config defined format string test."""
         self.assertTrue(http.user_agent().startswith(
             pywikibot.calledModuleName()))
-        self.assertIn('Pywikibot/' + pywikibot.__release__, http.user_agent())
+        self.assertIn('Pywikibot/' + pywikibot.__version__, http.user_agent())
         self.assertNotIn('  ', http.user_agent())
         self.assertNotIn('()', http.user_agent())
         self.assertNotIn('(;', http.user_agent())

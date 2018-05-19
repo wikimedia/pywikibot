@@ -3,8 +3,8 @@
 """Script to determine the Pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2008
-# (C) xqt, 2010-2016
-# (C) Pywikibot team, 2007-2017
+# (C) xqt, 2010-2018
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -42,7 +42,7 @@ def check_environ(environ_name):
 def main(*args):
     """Print pywikibot version and important settings."""
     pywikibot.output('Pywikibot: %s' % getversion())
-    pywikibot.output('Release version: %s' % pywikibot.__release__)
+    pywikibot.output('Release version: %s' % pywikibot.__version__)
     pywikibot.output('requests version: %s' % requests.__version__)
 
     has_wikimedia_cert = False
