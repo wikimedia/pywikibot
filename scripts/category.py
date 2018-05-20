@@ -981,7 +981,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         self.cat = pywikibot.Category(site, catTitle)
         super(CategoryTidyRobot, self).__init__(
             generator=pagegenerators.PreloadingGenerator(
-                self.cat.members(namespaces=namespaces)))
+                self.cat.articles(namespaces=namespaces)))
 
     @deprecated_args(article='member')
     def move_to_category(self, member, original_cat, current_cat):
