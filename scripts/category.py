@@ -814,9 +814,10 @@ class CategoryMoveRobot(CategoryPreprocess):
 
         Do not use this function from outside the class.
         """
+        cat_name_only = self.newcat.title(withNamespace=False)
         comment = i18n.twtranslate(self.site, 'category-was-moved',
-                                   {'newcat': self.newcat.title(),
-                                    'title': self.newcat.title()})
+                                   {'newcat': cat_name_only,
+                                    'title': cat_name_only})
         self.oldtalk.move(self.newtalk.title(), comment)
 
     def _update_wikibase_item(self):
@@ -830,9 +831,10 @@ class CategoryMoveRobot(CategoryPreprocess):
             except pywikibot.NoPage:
                 item = None
             if item and item.exists():
+                cat_name_only = self.newcat.title(withNamespace=False)
                 comment = i18n.twtranslate(self.site, 'category-was-moved',
-                                           {'newcat': self.newcat.title(),
-                                            'title': self.newcat.title()})
+                                           {'newcat': cat_name_only,
+                                            'title': cat_name_only})
                 item.setSitelink(self.newcat, summary=comment)
 
     def _hist(self):
