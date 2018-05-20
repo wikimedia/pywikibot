@@ -250,7 +250,7 @@ def _create_default_regexes():
         'header':     re.compile(r'(?m)^=+.+=+ *$'),
         # preformatted text
         'pre':        re.compile(r'(?is)<pre[ >].*?</pre\s*>'),
-        'source':     re.compile(r'(?is)<source .*?</source\s*>'),
+        'source':     re.compile(r'(?is)<source[ >].*?</source\s*>'),
         'score':      re.compile(r'(?is)<score[ >].*?</score\s*>'),
         # inline references
         'ref':        re.compile(r'(?is)<ref[ >].*?</ref>'),
@@ -327,7 +327,7 @@ def _get_regexes(keys, site):
             # handle alias
             if exc == 'source':
                 dontTouchRegexes.append(re.compile(
-                    r'(?is)<syntaxhighlight .*?</syntaxhighlight\s*>'))
+                    r'(?is)<syntaxhighlight[ >].*?</syntaxhighlight\s*>'))
         else:
             # assume it's a regular expression
             dontTouchRegexes.append(exc)
@@ -473,8 +473,8 @@ def removeDisabledParts(text, tags=['*'], include=[]):
         'includeonly':     r'<includeonly\s*>.*?</includeonly\s*>',
         'nowiki':          r'<nowiki\s*>.*?</nowiki\s*>',
         'pre':             r'<pre\s*>.*?</pre\s*>',
-        'source':          r'<source .*?</source\s*>',
-        'syntaxhighlight': r'<syntaxhighlight .*?</syntaxhighlight\s*>',
+        'source':          r'<source[ >].*?</source\s*>',
+        'syntaxhighlight': r'<syntaxhighlight[ >].*?</syntaxhighlight\s*>',
     }
     if '*' in tags:
         tags = list(regexes.keys())
