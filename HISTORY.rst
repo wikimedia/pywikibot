@@ -4,8 +4,17 @@ Release history
 Current release
 ---------------
 
+* UploadBot got a filename prefix parameter (T170123)
+* cosmetic_changes is able to remove empty sections (T140570)
+* Pywikibot is following PEP 396 versioning
+* pagegenerators AllpagesPageGenerator, CombinedPageGenerator, UnconnectedPageGenerator are deprecated
+* Some DayPageGenerator parameters has been renamed
+* unicodedata2, httpbin and Flask dependency was removed (T102461, T108068, T178864, T193383)
+* new projects where provided
 * Bugfixes and improvements
-* Localisation updates
+* Documentation updates
+* Localisation updates (T194893)
+* Translation updates
 
 3.0.20180505
 ------------
