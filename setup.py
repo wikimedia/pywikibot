@@ -13,16 +13,16 @@ import sys
 
 from setuptools import find_packages, setup
 
-try:
-    # Work around a traceback on Python < 2.7.4 and < 3.3.1
-    # http://bugs.python.org/issue15881#msg170215
-    import multiprocessing
-except ImportError:
-    pass
+if sys.version_info[:3] < (2, 7, 4):
+    try:
+        # Work around a traceback on Python < 2.7.4
+        # http://bugs.python.org/issue15881#msg170215
+        import multiprocessing
+    except ImportError:
+        pass
+    else:
+        _unused = multiprocessing  # pyflakes workaround
 
-
-# pyflakes workaround
-__unused__ = (multiprocessing, )
 
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
@@ -96,7 +96,7 @@ if PYTHON_VERSION == (2, 7, 2):
     # work around distutils hardcoded unittest dependency
     # work around T106512
     import unittest
-    __unused__ += (unittest, )
+    _unused = unittest
     if 'test' in sys.argv:
         import unittest2
         sys.modules['unittest'] = unittest2
@@ -128,10 +128,12 @@ if PY2:
 
 try:
     import bz2
-    __unused__ += (bz2, )
 except ImportError:
     # Use bz2file if the python is not compiled with bz2 support.
     dependencies.append('bz2file')
+else:
+    _unused = bz2
+
 
 # Some of the ui_tests depend on accessing the console window's menu
 # to set the console font and copy and paste, achieved using pywinauto
