@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for WOW Wiki."""
 #
-# (C) Pywikibot team, 2009-2015
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
