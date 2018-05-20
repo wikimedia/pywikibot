@@ -176,11 +176,11 @@ def main(*args):
 if __name__ == "__main__":
     try:
         main()
-    except TargetSiteMissing as e:
+    except TargetSiteMissing:
         pywikibot.error(u'Need to specify a target site and/or language')
         pywikibot.error(u'Try running this script with -help for help/usage')
         pywikibot.exception()
-    except TargetPagesMissing as e:
+    except TargetPagesMissing:
         pywikibot.error(u'Need to specify a page range')
         pywikibot.error(u'Try running this script with -help for help/usage')
         pywikibot.exception()

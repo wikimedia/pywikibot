@@ -172,7 +172,7 @@ try:
     os.environ[str('PYWIKIBOT2_DIR_PWB')] = _pwb_dir
     import pywikibot
     pwb = pywikibot
-except RuntimeError as err:
+except RuntimeError:
     # user-config.py to be created
     if filename is not None and not (filename.startswith('generate_')
                                      or filename == 'version.py'):

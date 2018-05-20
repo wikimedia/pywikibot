@@ -2069,7 +2069,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
         except api.APIError as error:
             if error.code == u'badtoken':
                 raise unittest.SkipTest(error)
-        except pywikibot.Error as error:
+        except pywikibot.Error:
             # expected result
             pass
 
