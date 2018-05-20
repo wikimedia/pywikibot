@@ -732,6 +732,7 @@ class ReplaceRobot(Bot):
             applied = set()
             new_text = original_text
             last_text = None
+            context = 0
             while True:
                 if self.isTextExcepted(new_text):
                     pywikibot.output(u'Skipping %s because it contains text '
@@ -761,15 +762,18 @@ class ReplaceRobot(Bot):
                 # Highlight the title in purple.
                 pywikibot.output(color_format(
                     '\n\n>>> {lightpurple}{0}{default} <<<', page.title()))
-                pywikibot.showDiff(original_text, new_text)
+                pywikibot.showDiff(original_text, new_text, context=context)
                 if self.getOption('always'):
                     break
                 choice = pywikibot.input_choice(
                     u'Do you want to accept these changes?',
                     [('Yes', 'y'), ('No', 'n'), ('Edit original', 'e'),
-                     ('edit Latest', 'l'),
-                     ('open in Browser', 'b'), ('all', 'a')],
+                     ('edit Latest', 'l'), ('open in Browser', 'b'),
+                     ('More context', 'm'), ('All', 'a')],
                     default='N')
+                if choice == 'm':
+                    context = context * 3 if context else 3
+                    continue
                 if choice == 'e':
                     editor = editarticle.TextEditor()
                     as_edited = editor.edit(original_text)
