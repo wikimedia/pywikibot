@@ -72,7 +72,7 @@ class MisspellingRobot(DisambiguationRobot):
     }
 
     def __init__(self, always, firstPageTitle, main_only):
-        """Constructor."""
+        """Initializer."""
         super(MisspellingRobot, self).__init__(
             always, [], True, False, None, False, main_only)
         self.generator = self.createPageGenerator(firstPageTitle)

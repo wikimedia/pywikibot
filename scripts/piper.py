@@ -29,7 +29,7 @@ The following parameters are supported:
                    the order which they are given
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
 
     def __init__(self, generator, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: The page generator that determines on which pages
             to work on.

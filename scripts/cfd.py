@@ -59,7 +59,7 @@ class ReCheck(object):
     """Helper class."""
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         self.result = None
 
     def check(self, pattern, text):

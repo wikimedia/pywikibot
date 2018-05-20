@@ -76,7 +76,7 @@ class EventStreams(object):
     """
 
     def __init__(self, **kwargs):
-        """Constructor.
+        """Initializer.
 
         @keyword site: a project site object. Used when no url is given
         @type site: APISite

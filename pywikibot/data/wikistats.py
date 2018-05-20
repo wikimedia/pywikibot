@@ -85,7 +85,7 @@ class WikiStats(object):
     ALL_KEYS = set(FAMILY_MAPPING.keys()) | ALL_TABLES
 
     def __init__(self, url='https://wikistats.wmflabs.org/'):
-        """Constructor."""
+        """Initializer."""
         self.url = url
         self._raw = {}
         self._data = {}

@@ -197,7 +197,7 @@ class _MultiTemplateMatchBuilder(object):
     """Build template matcher."""
 
     def __init__(self, site):
-        """Constructor."""
+        """Initializer."""
         self.site = site
 
     def pattern(self, template, flags=re.DOTALL):
@@ -1907,7 +1907,7 @@ class tzoneFixedOffset(datetime.tzinfo):
     """
 
     def __init__(self, offset, name):
-        """Constructor."""
+        """Initializer."""
         self.__offset = datetime.timedelta(minutes=offset)
         self.__name = name
 
@@ -1937,7 +1937,7 @@ class TimeStripper(object):
     """Find timestamp in page and return it as pywikibot.Timestamp object."""
 
     def __init__(self, site=None):
-        """Constructor."""
+        """Initializer."""
         if site is None:
             self.site = pywikibot.Site()
         else:

@@ -32,8 +32,8 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 """
 #
 # (C) Multichill, 2011
-# (C) xqt, 2011-2016
-# (c) Pywikibot team, 2017
+# (C) xqt, 2011-2018
+# (c) Pywikibot team, 2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,7 +48,7 @@ class CreateCategoriesBot(Bot):
     """Category creator bot."""
 
     def __init__(self, generator, parent, basename, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(CreateCategoriesBot, self).__init__(**kwargs)
         self.generator = generator
         self.parent = parent

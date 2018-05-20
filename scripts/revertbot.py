@@ -58,7 +58,7 @@ class BaseRevertBot(object):
     """
 
     def __init__(self, site, user=None, comment=None, rollback=False):
-        """Constructor."""
+        """Initializer."""
         self.site = site
         self.comment = comment
         self.user = user

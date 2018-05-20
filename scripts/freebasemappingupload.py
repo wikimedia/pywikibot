@@ -15,7 +15,7 @@ The script takes a single parameter:
 """
 #
 # (C) Denny Vrandecic, 2013
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -33,7 +33,7 @@ class FreebaseMapperRobot(object):
     """Freebase Mapping bot."""
 
     def __init__(self, filename):
-        """Constructor."""
+        """Initializer."""
         self.repo = pywikibot.Site('wikidata', 'wikidata').data_repository()
         self.filename = filename
         if not os.path.exists(self.filename):

@@ -408,12 +408,12 @@ class XmlDumpReplacePageGenerator(object):
         compiled regular expression) and replacement text (as a string).
     @type replacements: list of 2-tuples
     @param exceptions: A dictionary which defines when to ignore an
-        occurrence. See docu of the ReplaceRobot constructor below.
+        occurrence. See docu of the ReplaceRobot initializer below.
     @type exceptions: dict
     """
 
     def __init__(self, xmlFilename, xmlStart, replacements, exceptions, site):
-        """Constructor."""
+        """Initializer."""
         self.xmlFilename = xmlFilename
         self.replacements = replacements
         self.exceptions = exceptions
@@ -547,7 +547,7 @@ class ReplaceRobot(Bot):
     def __init__(self, generator, replacements, exceptions={},
                  allowoverlap=False, recursive=False, addedCat=None,
                  sleep=None, summary='', **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(ReplaceRobot, self).__init__(generator=generator,
                                            **kwargs)
 

@@ -65,7 +65,7 @@ class LoginManager(object):
     @deprecated_args(username="user", verbose=None)
     def __init__(self, password=None, sysop=False, site=None, user=None):
         """
-        Constructor.
+        Initializer.
 
         All parameters default to defaults in user-config.
 
@@ -358,7 +358,7 @@ class BotPassword(object):
 
     def __init__(self, suffix, password):
         """
-        Constructor.
+        Initializer.
 
         BotPassword function by using a separate password paired with a suffixed
         username of the form <username>@<suffix>.
@@ -396,7 +396,7 @@ class OauthLoginManager(LoginManager):
 
     def __init__(self, password=None, sysop=False, site=None, user=None):
         """
-        Constructor.
+        Initializer.
 
         All parameters default to defaults in user-config.
 

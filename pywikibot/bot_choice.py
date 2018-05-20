@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Choices for input_choice."""
 #
-# (C) Pywikibot team, 2015-2016
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,7 +32,7 @@ class Option(object):
     """
 
     def __init__(self, stop=True):
-        """Constructor."""
+        """Initializer."""
         super(Option, self).__init__()
         self._stop = stop
 
@@ -99,7 +99,7 @@ class StandardOption(Option):
     """An option with a description and shortcut and returning the shortcut."""
 
     def __init__(self, option, shortcut, stop=True):
-        """Constructor."""
+        """Initializer."""
         super(StandardOption, self).__init__(stop)
         self.option = option
         self.shortcut = shortcut.lower()
@@ -150,7 +150,7 @@ class NestedOption(OutputOption, StandardOption):
     """
 
     def __init__(self, option, shortcut, description, options):
-        """Constructor."""
+        """Initializer."""
         super(NestedOption, self).__init__(option, shortcut, False)
         self.description = description
         self.options = options
@@ -179,7 +179,7 @@ class ContextOption(OutputOption, StandardOption):
     """An option to show more and more context."""
 
     def __init__(self, option, shortcut, text, context, delta=100, start=0, end=0):
-        """Constructor."""
+        """Initializer."""
         super(ContextOption, self).__init__(option, shortcut, False)
         self.text = text
         self.context = context
@@ -208,7 +208,7 @@ class IntegerOption(Option):
     """An option allowing a range of integers."""
 
     def __init__(self, minimum=1, maximum=None, prefix=''):
-        """Constructor."""
+        """Initializer."""
         super(IntegerOption, self).__init__()
         if not ((minimum is None or isinstance(minimum, int)) and
                 (maximum is None or isinstance(maximum, int))):
@@ -285,7 +285,7 @@ class ListOption(IntegerOption):
     """An option to select something from a list."""
 
     def __init__(self, sequence, prefix=''):
-        """Constructor."""
+        """Initializer."""
         self._list = sequence
         try:
             super(ListOption, self).__init__(1, self.maximum, prefix)

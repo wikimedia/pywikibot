@@ -50,7 +50,7 @@ class CategoryRedirectBot(pywikibot.Bot):
     """Page category update bot."""
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'tiny': False,  # use Non-empty category redirects only
             'delay': 7,  # cool down delay in days

@@ -48,7 +48,7 @@ but 'p' must be included.
 """
 #
 # (C) Legoktm, 2013
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -72,7 +72,7 @@ class ClaimRobot(WikidataBot):
 
     def __init__(self, generator, claims, exists_arg=''):
         """
-        Constructor.
+        Initializer.
 
         @param generator: A generator that yields Page objects.
         @type generator: iterator

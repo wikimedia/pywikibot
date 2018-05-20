@@ -141,7 +141,7 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
 
     def __init__(self, templates, xmlfilename):
         """
-        Constructor.
+        Initializer.
 
         @param templateNames: A list of Page objects representing the searched
             templates
@@ -179,7 +179,7 @@ class TemplateRobot(ReplaceBot):
 
     def __init__(self, generator, templates, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: the pages to work on
         @type generator: iterable

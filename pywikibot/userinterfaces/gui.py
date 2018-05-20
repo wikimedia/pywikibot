@@ -57,7 +57,7 @@ class TextEditor(ScrolledText):
 
     def __init__(self, master=None, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         Get default settings from user's IDLE configuration.
         """
@@ -269,7 +269,7 @@ class EditBoxWindow(Tkinter.Frame):
     """Edit box window."""
 
     def __init__(self, parent=None, **kwargs):
-        """Constructor."""
+        """Initializer."""
         if parent is None:
             # create a new window
             parent = Tkinter.Tk()
@@ -493,7 +493,7 @@ class Tkdialog(object):
     """The dialog window for image info."""
 
     def __init__(self, photo_description, photo, filename):
-        """Constructor."""
+        """Initializer."""
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
         self.root.geometry("%ix%i+10-10" % (pywikibot.config.tkhorsize,

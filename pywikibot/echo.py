@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Classes and functions for working with the Echo extension."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,7 @@ class Notification(object):
     """A notification issued by the Echo extension."""
 
     def __init__(self, site):
-        """Construct an empty Notification object."""
+        """Initialize an empty Notification object."""
         self.site = site
 
     @classmethod

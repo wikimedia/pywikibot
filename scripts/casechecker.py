@@ -88,7 +88,7 @@ class CaseChecker(object):
     filterredir = 'nonredirects'
 
     def __init__(self):
-        """Constructor with arg parsing."""
+        """Initializer with arg parsing."""
         for arg in pywikibot.handle_args():
             arg, sep, value = arg.partition(':')
             if arg == '-from':

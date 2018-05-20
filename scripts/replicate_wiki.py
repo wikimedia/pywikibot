@@ -74,7 +74,7 @@ class SyncSites(object):
     """Work is done in here."""
 
     def __init__(self, options):
-        """Constructor."""
+        """Initializer."""
         self.options = options
 
         if options.original_wiki:

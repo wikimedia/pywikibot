@@ -128,7 +128,7 @@ class LoginStatus(object):
                        % search_value)
 
     def __init__(self, state):
-        """Constructor."""
+        """Initializer."""
         self.state = state
 
     def __repr__(self):
@@ -209,7 +209,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
 
     def __init__(self, id, canonical_name=None, custom_name=None,
                  aliases=None, use_image_name=False, **kwargs):
-        """Constructor.
+        """Initializer.
 
         @param custom_name: Name defined in server LocalSettings.php
         @type custom_name: unicode
@@ -719,7 +719,7 @@ class BaseSite(ComparableMixin):
 
     def __init__(self, code, fam=None, user=None, sysop=None):
         """
-        Constructor.
+        Initializer.
 
         @param code: the site's language code
         @type code: str
@@ -1729,7 +1729,7 @@ class TokenWallet(object):
     """Container for tokens."""
 
     def __init__(self, site):
-        """Constructor."""
+        """Initializer."""
         self.site = site
         self._tokens = {}
         self.failed_cache = set()  # cache unavailable tokens.
@@ -1805,7 +1805,7 @@ class RemovedSite(BaseSite):
     """Site removed from a family."""
 
     def __init__(self, code, fam, user=None, sysop=None):
-        """Constructor."""
+        """Initializer."""
         super(RemovedSite, self).__init__(code, fam, user, sysop)
 
 
@@ -1814,7 +1814,7 @@ class NonMWAPISite(BaseSite):
     """API interface to non MediaWiki sites."""
 
     def __init__(self, url):
-        """Constructor."""
+        """Initializer."""
         self.netloc = urlparse(url).netloc
 
     def __getattribute__(self, attr):
@@ -1837,7 +1837,7 @@ class APISite(BaseSite):
     """
 
     def __init__(self, code, fam=None, user=None, sysop=None):
-        """Constructor."""
+        """Initializer."""
         BaseSite.__init__(self, code, fam, user, sysop)
         self._msgcache = {}
         self._loginstatus = LoginStatus.NOT_ATTEMPTED
@@ -1905,7 +1905,7 @@ class APISite(BaseSite):
 
         All generic keyword arguments are passed as MW API parameter except for
         'g_content' which is passed as a normal parameter to the generator's
-        constructor.
+        Initializer.
 
         @param gen_class: the type of generator to construct (must be
             a subclass of pywikibot.data.api.QueryGenerator)
@@ -7343,7 +7343,7 @@ class DataSite(APISite):
     """Wikibase data capable site."""
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(DataSite, self).__init__(*args, **kwargs)
         self._item_namespace = None
         self._property_namespace = None

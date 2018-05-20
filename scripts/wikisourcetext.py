@@ -46,7 +46,7 @@ The following parameters are supported:
     -always        don't bother asking to confirm any of the changes.
 """
 #
-# (C) Pywikibot team, 2016-2017
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -75,7 +75,7 @@ class UploadTextBot(SingleSiteBot):
 
     def __init__(self, generator, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: page generator
         @type generator: generator

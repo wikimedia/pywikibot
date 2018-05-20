@@ -230,7 +230,7 @@ class CommonscatBot(Bot):
     """Commons categorisation bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'summary': None,
         })

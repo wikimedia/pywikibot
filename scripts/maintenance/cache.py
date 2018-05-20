@@ -59,7 +59,7 @@ Available output commands:
     uniquedesc(entry)
 """
 #
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -98,7 +98,7 @@ class CacheEntry(api.CachedRequest):
     """A Request cache entry."""
 
     def __init__(self, directory, filename):
-        """Constructor."""
+        """Initializer."""
         self.directory = directory
         self.filename = filename
 

@@ -436,7 +436,7 @@ class WelcomeBot(object):
     """Bot to add welcome messages on User pages."""
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         self.site = pywikibot.Site()
         self.check_managed_sites()
         self.bname = {}

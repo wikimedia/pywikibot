@@ -2348,7 +2348,7 @@ class FormatDate(object):
     """Format a date."""
 
     def __init__(self, site):
-        """Constructor."""
+        """Initializer."""
         self.site = site
 
     def __call__(self, m, d):

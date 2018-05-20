@@ -382,7 +382,7 @@ class ReferringPageGeneratorWithIgnore(object):
     """Referring Page generator, with an ignore manager."""
 
     def __init__(self, disambPage, primary=False, minimum=0, main_only=False):
-        """Constructor.
+        """Initializer.
 
         @type disambPage: pywikibot.Page
         @type primary: bool
@@ -442,7 +442,7 @@ class PrimaryIgnoreManager(object):
     """
 
     def __init__(self, disambPage, enabled=False):
-        """Constructor.
+        """Initializer.
 
         @type disambPage: pywikibot.Page
         @type enabled: bool
@@ -524,7 +524,7 @@ class EditOption(StandardOption):
     """Edit the text."""
 
     def __init__(self, option, shortcut, text, start, title):
-        """Constructor.
+        """Initializer.
 
         @type option: str
         @type shortcut: str
@@ -561,7 +561,7 @@ class ShowPageOption(StandardOption):
     """Show the page's contents in an editor."""
 
     def __init__(self, option, shortcut, start, page):
-        """Constructor."""
+        """Initializer."""
         super(ShowPageOption, self).__init__(option, shortcut, False)
         self._start = start
         if page.isRedirectPage():
@@ -581,7 +581,7 @@ class AliasOption(StandardOption):
     """An option allowing multiple aliases which also select it."""
 
     def __init__(self, option, shortcuts, stop=True):
-        """Constructor."""
+        """Initializer."""
         super(AliasOption, self).__init__(option, shortcuts[0], stop)
         self._aliases = frozenset(s.lower() for s in shortcuts[1:])
 
@@ -619,7 +619,7 @@ class DisambiguationRobot(Bot):
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip,
                  generator, primary, main_only, minimum=0):
-        """Constructor."""
+        """Initializer."""
         super(DisambiguationRobot, self).__init__()
         self.always = always
         self.alternatives = alternatives

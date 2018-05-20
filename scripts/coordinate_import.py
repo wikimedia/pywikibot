@@ -29,7 +29,7 @@ The following command line parameters are supported:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of MIT License.
 #
@@ -48,7 +48,7 @@ class CoordImportRobot(WikidataBot):
 
     def __init__(self, generator, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: A generator that yields Page objects.
         """

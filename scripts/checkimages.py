@@ -549,8 +549,9 @@ class checkImagesBot(object):
     """A robot to check recently uploaded files."""
 
     def __init__(self, site, logFulNumber=25000, sendemailActive=False,
-                 duplicatesReport=False, logFullError=True, max_user_notify=None):
-        """Constructor, define some global variable."""
+                 duplicatesReport=False, logFullError=True,
+                 max_user_notify=None):
+        """Initializer, define some instance variables."""
         self.site = site
         self.logFullError = logFullError
         self.logFulNumber = logFulNumber

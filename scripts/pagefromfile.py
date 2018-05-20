@@ -83,7 +83,7 @@ class NoTitle(Exception):
     """No title found."""
 
     def __init__(self, offset):
-        """Constructor."""
+        """Initializer."""
         self.offset = offset
 
 
@@ -97,7 +97,7 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
     """
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'always': True,
             'force': False,
@@ -205,7 +205,7 @@ class PageFromFileReader(OptionHandler):
     }
 
     def __init__(self, filename, **kwargs):
-        """Constructor.
+        """Initializer.
 
         Check if self.file name exists. If not, ask for a new filename.
         User can quit.

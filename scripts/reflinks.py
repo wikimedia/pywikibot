@@ -197,7 +197,7 @@ class RefLink(object):
     """Container to handle a single bare reference."""
 
     def __init__(self, link, name, site=None):
-        """Constructor."""
+        """Initializer."""
         self.refname = name
         self.link = link
         self.site = site or pywikibot.Site()
@@ -281,11 +281,10 @@ class DuplicateReferences(object):
     """
 
     def __init__(self, site=None):
-        """Constructor."""
+        """Initializer."""
         if not site:
             site = pywikibot.Site()
 
-        """Constructor."""
         # Match references
         self.REFS = re.compile(
             r'(?i)<ref(?P<params>[^>/]*)>(?P<content>.*?)</ref>')

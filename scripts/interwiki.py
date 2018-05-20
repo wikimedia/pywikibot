@@ -602,7 +602,7 @@ class StoredPage(pywikibot.Page):
     SPdeleteStore = staticmethod(SPdeleteStore)
 
     def __init__(self, page):
-        """Constructor."""
+        """Initializer."""
         for attr in StoredPage.SPcopy:
             setattr(self, attr, getattr(page, attr))
 
@@ -645,7 +645,7 @@ class PageTree(object):
     """
 
     def __init__(self):
-        """Constructor.
+        """Initializer.
 
         While using dict values would be faster for the remove() operation,
         keeping list values is important, because the order in which the pages
@@ -780,7 +780,7 @@ class Subject(interwiki_graph.Subject):
 
     def __init__(self, originPage=None, hints=None, conf=None):
         """
-        Constructor.
+        Initializer.
 
         Takes as arguments the Page on the home wiki
         plus optionally a list of hints for translation
@@ -2006,7 +2006,7 @@ class InterwikiBot(object):
     """
 
     def __init__(self, conf=None):
-        """Constructor."""
+        """Initializer."""
         self.subjects = []
         # We count how many pages still need to be loaded per site.
         # This allows us to find out from which site to retrieve pages next

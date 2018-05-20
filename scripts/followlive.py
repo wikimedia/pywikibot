@@ -386,7 +386,7 @@ class CleaningBot(SingleSiteBot):
     """Bot meant to facilitate customized cleaning of the page."""
 
     def __init__(self, questions, questionlist, **kwargs):
-        """Constructor."""
+        """Initializer."""
         # The question asked
         self.question = """(multiple numbers delimited with ',')
 

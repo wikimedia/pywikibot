@@ -1227,7 +1227,7 @@ class ISBN13(ISBN):
     """ISBN 13."""
 
     def __init__(self, code, checksumMissing=False):
-        """Constructor."""
+        """Initializer."""
         self.code = code
         if checksumMissing:
             self.code += str(self.calculateChecksum())
@@ -1276,7 +1276,7 @@ class ISBN10(ISBN):
     """ISBN 10."""
 
     def __init__(self, code):
-        """Constructor."""
+        """Initializer."""
         self.code = code
         self.checkValidity()
 
@@ -1484,7 +1484,7 @@ class IsbnBot(Bot):
     """ISBN bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'to13': False,
             'format': False,
@@ -1544,7 +1544,7 @@ class IsbnWikibaseBot(WikidataBot):
     use_from_page = None
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'to13': False,
             'format': False,

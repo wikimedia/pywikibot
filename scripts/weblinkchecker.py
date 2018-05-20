@@ -312,7 +312,7 @@ class LinkChecker(object):
     def __init__(self, url, redirectChain=[], serverEncoding=None,
                  HTTPignore=[]):
         """
-        Constructor.
+        Initializer.
 
         redirectChain is a list of redirects which were resolved by
         resolveRedirect(). This is needed to detect redirect loops.
@@ -572,7 +572,7 @@ class LinkCheckThread(threading.Thread):
     """
 
     def __init__(self, page, url, history, HTTPignore, day):
-        """Constructor."""
+        """Initializer."""
         threading.Thread.__init__(self)
         self.page = page
         self.url = url
@@ -650,7 +650,7 @@ class History(object):
     """
 
     def __init__(self, reportThread, site=None):
-        """Constructor."""
+        """Initializer."""
         self.reportThread = reportThread
         if not site:
             self.site = pywikibot.Site()
@@ -765,7 +765,7 @@ class DeadLinkReportThread(threading.Thread):
     """
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         threading.Thread.__init__(self)
         self.semaphore = threading.Semaphore()
         self.queue = []
@@ -865,7 +865,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
     """
 
     def __init__(self, generator, HTTPignore=None, day=7, site=True):
-        """Constructor."""
+        """Initializer."""
         super(WeblinkCheckerRobot, self).__init__(
             generator=generator, site=site)
 

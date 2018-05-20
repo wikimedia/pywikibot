@@ -23,7 +23,7 @@ Furthermore, the following command line parameters are supported:
 -summary:         Use your own edit summary for cleaning the page.
 """
 
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,7 +52,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
     """The bot for interwiki."""
 
     def __init__(self, **kwargs):
-        """Construct the bot."""
+        """Initialize the bot."""
         self.availableOptions.update({
             'clean': False,
             'create': False,

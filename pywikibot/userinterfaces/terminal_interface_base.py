@@ -535,7 +535,7 @@ class MaxLevelFilter(logging.Filter):
     """
 
     def __init__(self, level=None):
-        """Constructor."""
+        """Initializer."""
         self.level = level
 
     def filter(self, record):

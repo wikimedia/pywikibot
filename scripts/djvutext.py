@@ -28,7 +28,7 @@ The following parameters are supported:
 
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,7 +55,7 @@ class DjVuTextBot(SingleSiteBot):
 
     def __init__(self, djvu, index, pages=None, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param djvu: djvu from where to fetch the text layer
         @type djvu: DjVuFile object

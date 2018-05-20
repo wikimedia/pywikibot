@@ -411,7 +411,7 @@ class GeneratorFactory(object):
 
     def __init__(self, site=None, positional_arg_name=None):
         """
-        Constructor.
+        Initializer.
 
         @param site: Site for generator results.
         @type site: L{pywikibot.site.BaseSite}
@@ -444,7 +444,7 @@ class GeneratorFactory(object):
         arguments have been handled, otherwise the default Site may be changed
         by global arguments, which will cause this cached value to be stale.
 
-        @return: Site given to constructor, otherwise the default Site at the
+        @return: Site given to initializer, otherwise the default Site at the
             time this property is first accessed.
         @rtype: L{pywikibot.site.BaseSite}
         """
@@ -2534,7 +2534,7 @@ class YahooSearchPageGenerator(object):
     @deprecated_args(count='total')
     def __init__(self, query=None, total=100, site=None):
         """
-        Constructor.
+        Initializer.
 
         @param site: Site for generator results.
         @type site: L{pywikibot.site.BaseSite}
@@ -2597,7 +2597,7 @@ class GoogleSearchPageGenerator(object):
 
     def __init__(self, query=None, site=None):
         """
-        Constructor.
+        Initializer.
 
         @param site: Site for generator results.
         @type site: L{pywikibot.site.BaseSite}
@@ -2722,7 +2722,7 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
     @deprecated_args(xmlFilename='filename', xmlStart='start')
     def __init__(self, filename, start=None, namespaces=None, site=None,
                  text_predicate=None):
-        """Constructor."""
+        """Initializer."""
         self.text_predicate = text_predicate
 
         self.skipping = bool(start)
@@ -2915,7 +2915,7 @@ class PetScanPageGenerator(object):
     def __init__(self, categories, subset_combination=True, namespaces=None,
                  site=None, extra_options=None):
         """
-        Constructor.
+        Initializer.
 
         :param categories: List of categories to retrieve pages from
             (as strings)
