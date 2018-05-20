@@ -2130,8 +2130,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return False
 
         if oldCat not in cats:
-            pywikibot.error(u'%s is not in category %s!'
-                            % (self.title(asLink=True), oldCat.title()))
+            if self.namespace() != 10:
+                pywikibot.error('%s is not in category %s!'
+                                % (self.title(asLink=True), oldCat.title()))
+            else:
+                pywikibot.output('%s is not in category %s, skipping...'
+                                 % (self.title(asLink=True), oldCat.title()))
             return False
 
         # This prevents the bot from adding newCat if it is already present.
