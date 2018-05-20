@@ -220,6 +220,7 @@ setup(
     packages=[str(name)] + [package
                             for package in find_packages()
                             if package.startswith('pywikibot.')],
+    python_requires='>=2.7.2, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=dependencies,
     dependency_links=dependency_links,
     extras_require=extra_deps,
@@ -241,6 +242,7 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: Wiki',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'Topic :: Utilities',
