@@ -32,11 +32,13 @@ archive_path = join_root_path('scripts', 'archive')
 script_deps = {
     'script_wui': ['crontab', 'lua'],
     # Note: package 'lunatic-python' provides module 'lua'
-    'flickrripper': ['flickrapi'],
+    'flickrripper': ['flickrapi', 'Pillow'],
     'imageharvest': ['bs4'],
+    'isbn': ['python-stdnum'],
     'match_images': ['PIL.ImageTk'],
     'states_redirect': ['pycountry'],
-    'patrol': ['mwparserfromhell'],
+    'patrol': ['mwparserfromhell>=0.3.3'],
+    'weblinkchecker': ['memento_client>=0.5.1,!=0.6.0'],
 }
 
 if PY2:
@@ -56,15 +58,13 @@ def check_script_deps(script_name):
     return True
 
 
-failed_dep_script_list = [name
-                          for name in script_deps
-                          if not check_script_deps(name)]
+failed_dep_script_set = {name for name in script_deps
+                         if not check_script_deps(name)}
 
-unrunnable_script_list = [
+unrunnable_script_set = {
     'version',  # does not use global args
     'script_wui',  # depends on lua compiling
-    'imageharvest',  # T167726
-]
+}
 
 
 def list_scripts(path, exclude=None):
@@ -81,8 +81,7 @@ script_list = (['login'] +
                list_scripts(archive_path))
 
 runnable_script_list = (
-    ['login'] + sorted(set(script_list)
-                       - {'login'} - set(unrunnable_script_list)))
+    ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
 
 script_input = {
     'catall': 'q\n',  # q for quit
@@ -180,9 +179,9 @@ def collector(loader=unittest.loader.defaultTestLoader):
     # cause the loader to fallback to its own
     # discover() ordering of unit tests.
 
-    if unrunnable_script_list:
-        unittest_print('Skipping execution of unrunnable scripts:\n  %r'
-                       % unrunnable_script_list)
+    if unrunnable_script_set:
+        unittest_print('Skipping execution of unrunnable scripts:\n  {!r}'
+                       .format(unrunnable_script_set))
 
     if not enable_autorun_tests:
         unittest_print('Skipping execution of auto-run scripts '
@@ -193,7 +192,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
              ['test_' + name
               for name in sorted(script_list)
               if name != 'login'
-              and name not in unrunnable_script_list
+              and name not in unrunnable_script_set
               ])
 
     test_list = ['tests.script_tests.TestScriptHelp.' + name
@@ -203,8 +202,8 @@ def collector(loader=unittest.loader.defaultTestLoader):
              ['test_' + name
               for name in sorted(script_list)
               if name != 'login'
-              and name not in failed_dep_script_list
-              and name not in unrunnable_script_list
+              and name not in failed_dep_script_set
+              and name not in unrunnable_script_set
               and (enable_autorun_tests or name not in auto_run_script_list)
               ])
 
@@ -358,7 +357,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 dct[test_name] = allowed_failure(dct[test_name])
 
             # Disable test by default in nosetests
-            if script_name in unrunnable_script_list:
+            if script_name in unrunnable_script_set:
                 # flag them as an expectedFailure due to py.test (T135594)
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
                 dct[test_name].__test__ = False
@@ -378,12 +377,11 @@ class TestScriptHelp(PwbTestCase):
 
     net = False
 
-    _expected_failures = failed_dep_script_list
-    # -help supported not explicitly
-    try:
-        _expected_failures.remove('imageharvest')
-    except ValueError:
-        pass
+    _expected_failures = failed_dep_script_set
+    # -help tests may pass even when packages are required
+    _expected_failures.discard('imageharvest')
+    _expected_failures.discard('isbn')
+    _expected_failures.discard('weblinkchecker')
     _allowed_failures = []
 
     _argument = 'help'
@@ -405,20 +403,18 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
     user = True
 
-    _expected_failures = [
+    _expected_failures = {
         'catall',          # stdout user interaction
         'flickrripper',    # Requires a flickr api key
         'upload',          # raises custom ValueError
-    ] + failed_dep_script_list
+    }.union(failed_dep_script_set)
 
     _allowed_failures = [
         'disambredir',
-        # T94681
-        'misspelling',
-        # T77965
-        'watchlist',
-        # T94680: uses exit code 1
-        'lonelypages',
+        'imageharvest',  # T167726
+        'misspelling',   # T94681
+        'watchlist',     # T77965
+        'lonelypages',   # T94680: uses exit code 1
     ]
 
     _argument = 'simulate'
