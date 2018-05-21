@@ -22,12 +22,11 @@ The following parameters are supported:
 from __future__ import absolute_import, unicode_literals
 
 import datetime
-import sys
 
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, editor
-from pywikibot.bot import SingleSiteBot
+from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt
 
 __metaclass__ = type
 
@@ -385,10 +384,11 @@ class CleaningBot(SingleSiteBot):
 
     """Bot meant to facilitate customized cleaning of the page."""
 
-    def __init__(self, questions, questionlist, **kwargs):
+    def __init__(self, **kwargs):
         """Initializer."""
         # The question asked
-        self.question = """(multiple numbers delimited with ',')
+        self.question = """
+(multiple numbers delimited with ',')
 
 b) blank page
 e) edit page
@@ -397,8 +397,7 @@ q) quit cleaningbot
 Enter) OK
 What is it? """
         super(CleaningBot, self).__init__(**kwargs)
-        self.questionlist = questionlist
-        self.question = questions + self.question
+        self.generator = self.site.newpages()
 
     def show_page_info(self):
         """Display informations about an article."""
@@ -421,7 +420,7 @@ What is it? """
             pywikibot.output(u'Already deleted')
             return
 
-        for d in pywikibot.translate(self.site.lang, done):
+        for d in pywikibot.translate(self.site.code, done):
             if d in self.content:
                 pywikibot.output(
                     u'Found: "%s" in content, nothing necessary' % d)
@@ -436,7 +435,7 @@ What is it? """
             answer = pywikibot.input(self.question)
 
             if answer == 'q':
-                sys.exit("Exiting")
+                raise QuitKeyboardInterrupt
             if answer == 'd':
                 pywikibot.output(u'Trying to delete page [[%s]].'
                                  % self.page.title())
@@ -499,37 +498,41 @@ What is it? """
                 pywikibot.output('appending %s...' % self.questionlist[answer])
                 self.content += '\n' + self.questionlist[answer]
             else:
-                pywikibot.error(
-                    u'"pos" should be "top" or "bottom" for template '
-                    '%s. Contact a developer.' % self.questionlist[answer])
-                sys.exit('Exiting')
+                raise RuntimeError(
+                    '"pos" should be "top" or "bottom" for template {}. '
+                    'Contact a developer.'.format(self.questionlist[answer]))
             summary += tpl['msg'] + ' '
             pywikibot.output('Probably added %s' % self.questionlist[answer])
 #        pywikibot.output(newcontent) bug #2986247
         self.page.put(self.content, summary=summary)
         pywikibot.output(u'with comment %s\n' % summary)
 
-    def handle_page(self, page, date, length, loggedIn, user):
+    def treat(self, args):
         """Process one page."""
+        page, date, length, logged_in, user, comment = args
         self.page = page
         self.date = date
         self.length = length
-        self.loggedIn = loggedIn
+        self.loggedIn = logged_in
         self.user = user
         self.show_page_info()
         if self.could_be_bad():
             pywikibot.output('Integrity of page doubtful...')
-            try:
-                self.handle_bad_page()
-            except pywikibot.NoPage:
-                pywikibot.output('seems already gone')
+            self.handle_bad_page()
         pywikibot.output('----- Current time: %s' % datetime.datetime.now())
 
-    def run(self):
-        """Process all pages in generator."""
-        for (page, date, length, logged_in, username,
-                comment) in self.site.newpages():
-            self.handle_page(page, date, length, logged_in, username)
+    def init_page(self, args):
+        """Init the page tuple before processing."""
+        page, date, length, logged_in, user, comment = args
+        super(CleaningBot, self).init_page(page)
+
+    def setup(self):
+        """Setup bot before running."""
+        self.questionlist = {
+            i: t for i, t in enumerate(templates[self.site.code], start=1)}
+        questions = '\n'.join(('{}) {}'.format(k, v)
+                               for k, v in self.questionlist.items()))
+        self.question = questions + self.question
 
 
 def main(*args):
@@ -542,22 +545,16 @@ def main(*args):
     @type args: list of unicode
     """
     # Generate the question text
-    questions = '\n'
-    questionlist = {}
     pywikibot.handle_args(*args)
     site = pywikibot.Site()
 
-    if (site.lang not in list(templates.keys()) and
-            site.lang not in list(done.keys())):
+    if site.code in templates and site.code in done:
+        bot = CleaningBot(site=site)
+        bot.run()
+    else:
         pywikibot.output(
             '\nScript is not localised for {0}. Terminating program.'
-            ''.format(site))
-    else:
-        for i, t in enumerate(pywikibot.translate(site.lang, templates)):
-            questions += (u'%s) %s\n' % (i, t))
-            questionlist[i] = t
-        bot = CleaningBot(questions, questionlist)
-        bot.run()
+            .format(site))
 
 
 if __name__ == '__main__':
