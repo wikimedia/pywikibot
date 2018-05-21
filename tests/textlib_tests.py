@@ -1193,6 +1193,9 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept(' xA ', 'x', 'y',
                                                ['startspace'], site=self.site),
                          ' xA ')
+        self.assertEqual(textlib.replaceExcept(':xA ', 'x', 'y',
+                                               ['startcolon'], site=self.site),
+                         ':xA ')
         self.assertEqual(textlib.replaceExcept('<table>x</table>', 'x', 'y',
                                                ['table'], site=self.site),
                          '<table>x</table>')

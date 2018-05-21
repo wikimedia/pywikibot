@@ -258,6 +258,8 @@ def _create_default_regexes():
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
         'startspace': re.compile(r'(?m)^ (.*?)$'),
+        # lines that start with a colon or more will be indented
+        'startcolon': re.compile(r'(?m)^:(.*?)$'),
         # tables often have whitespace that is used to improve wiki
         # source code readability.
         # TODO: handle nested tables.
