@@ -87,7 +87,7 @@ from pywikibot import editor as editarticle
 from pywikibot.tools import first_lower, first_upper as firstcap
 from pywikibot import pagegenerators, config, i18n
 from pywikibot.bot import (
-    Bot, QuitKeyboardInterrupt,
+    SingleSiteBot,
     StandardOption, HighlightContextOption, ListOption, OutputProxyOption,
 )
 from pywikibot.tools.formatter import SequenceOutputter
@@ -591,7 +591,7 @@ class AliasOption(StandardOption):
                                                        self).test(value)
 
 
-class DisambiguationRobot(Bot):
+class DisambiguationRobot(SingleSiteBot):
 
     """Disambiguation bot."""
 
@@ -630,7 +630,7 @@ class DisambiguationRobot(Bot):
         self.main_only = main_only
         self.minimum = minimum
 
-        self.site = self.mysite = pywikibot.Site()
+        self.mysite = self.site
         self.mylang = self.mysite.lang
         self.comment = None
 
@@ -701,7 +701,7 @@ class DisambiguationRobot(Bot):
             (?P<linktrail>%s)''' % linktrail,
                                 flags=re.X)
 
-    def treat(self, refPage, disambPage):
+    def treat_links(self, refPage, disambPage):
         """Resolve the links to disambPage or its redirects.
 
         @param disambPage: the disambiguation page or redirect we don't want
@@ -784,7 +784,7 @@ class DisambiguationRobot(Bot):
                     preloadingGen = pagegenerators.PreloadingGenerator(gen)
                     for refPage2 in preloadingGen:
                         # run until the user selected 'quit'
-                        self.treat(refPage2, refPage)
+                        self.treat_links(refPage2, refPage)
                 elif choice == 'c':
                     text = refPage.get(get_redirect=True)
                     include = "redirect"
@@ -1144,42 +1144,36 @@ or press enter to quit:""")
                      'to': targets,
                      'count': len(new_targets)})
 
-    def run(self):
-        """Run the bot."""
-        for disambPage in self.generator:
-            self.primaryIgnoreManager = PrimaryIgnoreManager(
-                disambPage, enabled=self.primary)
+    def treat(self, page):
+        """Work on a single disambiguation page."""
+        self.primaryIgnoreManager = PrimaryIgnoreManager(
+            page, enabled=self.primary)
 
-            if not self.findAlternatives(disambPage):
-                continue
+        if not self.findAlternatives(page):
+            return
 
-            pywikibot.output('\nAlternatives for %s' % disambPage)
-            self.makeAlternativesUnique()
-            # sort possible choices
-            if config.sort_ignore_case:
-                self.alternatives.sort(key=lambda x: x.lower())
-            else:
-                self.alternatives.sort()
-            SequenceOutputter(self.alternatives).output()
+        pywikibot.output('\nAlternatives for {}'.format(page))
+        self.makeAlternativesUnique()
+        # sort possible choices
+        if config.sort_ignore_case:
+            self.alternatives.sort(key=lambda x: x.lower())
+        else:
+            self.alternatives.sort()
+        SequenceOutputter(self.alternatives).output()
 
-            gen = ReferringPageGeneratorWithIgnore(
-                disambPage,
-                self.primary,
-                minimum=self.minimum,
-                main_only=self.main_only
-            )
-            preloadingGen = pagegenerators.PreloadingGenerator(gen)
-            for refPage in preloadingGen:
-                if not self.primaryIgnoreManager.isIgnored(refPage):
-                    try:
-                        self.treat(refPage, disambPage)
-                    except QuitKeyboardInterrupt:
-                        pywikibot.output('\nUser quit %s bot run...' %
-                                         self.__class__.__name__)
-                        return
+        gen = ReferringPageGeneratorWithIgnore(
+            page,
+            self.primary,
+            minimum=self.minimum,
+            main_only=self.main_only
+        )
+        preloadingGen = pagegenerators.PreloadingGenerator(gen)
+        for refPage in preloadingGen:
+            if not self.primaryIgnoreManager.isIgnored(refPage):
+                self.treat_links(refPage, page)
 
-            # clear alternatives before working on next disambiguation page
-            self.alternatives = []
+        # clear alternatives before working on next disambiguation page
+        self.alternatives = []
 
 
 def main(*args):
