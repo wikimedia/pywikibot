@@ -5925,7 +5925,7 @@ class Link(ComparableMixin):
 # Utility functions for parsing page titles
 
 
-def html2unicode(text, ignore=None):
+def html2unicode(text, ignore=None, exceptions=None):
     """
     Replace HTML entities with equivalent unicode.
 
@@ -5977,6 +5977,10 @@ def html2unicode(text, ignore=None):
                       ignore)) | {129, 141, 157})
 
     def handle_entity(match):
+        if textlib.isDisabled(match.string, match.start(), tags=exceptions):
+            # match.string stores original text so we do not need
+            # to pass it to handle_entity, ♥ Python
+            return match.group(0)
         if match.group('decimal'):
             unicodeCodepoint = int(match.group('decimal'))
         elif match.group('hex'):

@@ -254,8 +254,7 @@ class CosmeticChangesToolkit(object):
             self.translateAndCapitalizeNamespaces,
             self.translateMagicWords,
             self.replaceDeprecatedTemplates,
-            # FIXME: fix bugs and re-enable
-            # self.resolveHtmlEntities,
+            self.resolveHtmlEntities,
             self.removeEmptySections,
             self.removeUselessSpaces,
             self.removeNonBreakingSpaceBeforePercent,
@@ -621,9 +620,9 @@ class CosmeticChangesToolkit(object):
         """Replace HTML entities with unicode."""
         ignore = [
             38,     # Ampersand (&amp;)
-            39,     # Single quotation mark (&quot;) - bug T26093
+            39,     # Single quotation mark (&quot;) per T26093
             60,     # Less than (&lt;)
-            62,     # Great than (&gt;)
+            62,     # Greater than (&gt;)
             91,     # Opening square bracket ([)
                     # - sometimes used intentionally inside links
             93,     # Closing square bracket (])
@@ -637,8 +636,8 @@ class CosmeticChangesToolkit(object):
             8207,   # Right-to-left mark (&rtl;)
         ]
         if self.template:
-            ignore += [58]
-        text = pywikibot.html2unicode(text, ignore=ignore)
+            ignore += [58]  # Colon (:)
+        text = pywikibot.html2unicode(text, ignore=ignore, exceptions=['code'])
         return text
 
     def removeEmptySections(self, text):
