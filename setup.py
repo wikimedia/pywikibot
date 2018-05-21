@@ -60,6 +60,23 @@ extra_deps = {
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
+    'flake8': [  # Due to incompatibilities between packages the order matters.
+        'flake8>=3.0.2',
+        'pydocstyle',
+        'hacking',
+        'flake8-coding',
+        'flake8-comprehensions',
+        'flake8-docstrings>=1.1.0',
+        'flake8-future-import',
+        'flake8-invalid-escape-sequences',
+        'flake8-mock>=0.3',
+        'flake8-per-file-ignores',
+        'flake8-print>=2.0.1',
+        'flake8-string-format',
+        'flake8-tuple>=0.2.8',
+        'pep8-naming>=0.7',
+        'pyflakes>=1.1',
+    ]
 }
 
 if PY2:
