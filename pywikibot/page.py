@@ -211,7 +211,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     @property
     def site(self):
-        """Return the Site object for the wiki on which this Page resides."""
+        """Return the Site object for the wiki on which this Page resides.
+
+        @rtype: pywikibot.Site
+        """
         return self._link.site
 
     def version(self):
@@ -5673,7 +5676,7 @@ class Link(ComparableMixin):
         """
         Return the site of the link.
 
-        @rtype: unicode
+        @rtype: pywikibot.Site
         """
         if not hasattr(self, "_site"):
             self.parse()
