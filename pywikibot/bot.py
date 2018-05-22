@@ -95,6 +95,8 @@ import warnings
 from warnings import warn
 import webbrowser
 
+from textwrap import fill
+
 import pywikibot
 from pywikibot import config2 as config
 from pywikibot import daemonize
@@ -115,7 +117,7 @@ from pywikibot.logging import (
 )
 from pywikibot.logging import critical
 from pywikibot.tools import (
-    deprecated, deprecate_arg, deprecated_args, PY2,
+    deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning, PY2,
 )
 from pywikibot.tools._logging import (
     LoggingFormatter as _LoggingFormatter,
@@ -1400,14 +1402,22 @@ class BaseBot(OptionHandler):
             pywikibot.output("Script terminated by exception:\n")
             pywikibot.exception()
 
+    def init_page(self, page):
+        """Initialize a page before treating.
+
+        Also used to set the arrange the current site. This is called before
+        skip_page and treat.
+        """
+        pass
+
+    def skip_page(self, page):
+        """Return whether treat should be skipped for the page."""
+        return False
+
     def treat(self, page):
         """Process one page (Abstract method)."""
         raise NotImplementedError('Method %s.treat() not implemented.'
                                   % self.__class__.__name__)
-
-    def init_page(self, page):
-        """Return whether treat should be executed for the page."""
-        pass
 
     def setup(self):
         """Some inital setup before run operation starts.
@@ -1439,9 +1449,12 @@ class BaseBot(OptionHandler):
         self.setup()
         try:
             for page in self.generator:
+                # preprocessing of the page
                 try:
                     self.init_page(page)
                 except SkipPageError as e:
+                    issue_deprecation_warning('Use of SkipPageError',
+                                              'BaseBot.skip_page() method', 2)
                     pywikibot.warning('Skipped "{0}" due to: {1}'.format(
                                       page, e.reason))
                     if PY2:
@@ -1450,6 +1463,8 @@ class BaseBot(OptionHandler):
                         sys.exc_clear()
                     continue
 
+                if self.skip_page(page):
+                    continue
                 # Process the page
                 self.treat(page)
 
@@ -1598,13 +1613,19 @@ class SingleSiteBot(BaseBot):
         self._site = value
 
     def init_page(self, page):
-        """Set site if not defined and return if it's on the defined site."""
+        """Set site if not defined."""
         if not self._site:
             self.site = page.site
-        elif page.site != self.site:
-            raise SkipPageError(page,
-                                'The bot is on site "{0}" but the page on '
-                                'site "{1}"'.format(self.site, page.site))
+
+    def skip_page(self, page):
+        """Skip page it's site is not on the defined site."""
+        if page.site != self.site:
+            pywikibot.warning(
+                fill('Skipped "{page}" due to: '
+                     'The bot is on site "{site}" but the page on '
+                     'site "{page.site}"'.format(site=self.site, page=page)))
+            return True
+        return super(SingleSiteBot, self).skip_page(page)
 
 
 class MultipleSitesBot(BaseBot):
@@ -1735,20 +1756,14 @@ class ExistingPageBot(CurrentPageBot):
 
     """A CurrentPageBot class which only treats existing pages."""
 
-    def treat(self, page):
+    def skip_page(self, page):
         """Treat page if it exists and handle NoPage from it."""
         if not page.exists():
-            pywikibot.warning('Page "{0}" does not exist on {1}.'.format(
-                page.title(), page.site))
-            return
-        try:
-            super(ExistingPageBot, self).treat(page)
-        except pywikibot.NoPage as e:
-            if e.page != page:
-                raise
             pywikibot.warning(
-                'During handling of page "{0}" on {1} a NoPage exception was '
-                'raised.'.format(page.title(), page.site))
+                'Page "{page.title()}" does not exist on {page.site}.'
+                .format(page=page))
+            return True
+        return super(ExistingPageBot, self).skip_page(page)
 
 
 class FollowRedirectPageBot(CurrentPageBot):
@@ -1766,53 +1781,42 @@ class CreatingPageBot(CurrentPageBot):
 
     """A CurrentPageBot class which only treats nonexistent pages."""
 
-    def treat(self, page):
+    def skip_page(self, page):
         """Treat page if doesn't exist."""
         if page.exists():
-            pywikibot.warning('Page "{0}" does already exist on {1}.'.format(
-                page.title(), page.site))
-            return
-        super(CreatingPageBot, self).treat(page)
+            pywikibot.warning(
+                'Page "{page.title()}" does already exist on {page.site}.'
+                .format(page=page))
+            return True
+        return super(CreatingPageBot, self).skip_page(page)
 
 
 class RedirectPageBot(CurrentPageBot):
 
     """A RedirectPageBot class which only treats redirects."""
 
-    def treat(self, page):
+    def skip_page(self, page):
         """Treat only redirect pages and handle IsNotRedirectPage from it."""
         if not page.isRedirectPage():
-            pywikibot.warning('Page "{0}" on {1} is skipped because it is not '
-                              'a redirect'.format(page.title(), page.site))
-            return
-        try:
-            super(RedirectPageBot, self).treat(page)
-        except pywikibot.IsNotRedirectPage as e:
-            if e.page != page:
-                raise
             pywikibot.warning(
-                'During handling of page "{0}" on {1} a IsNotRedirectPage '
-                'exception was raised.'.format(page.title(), page.site))
+                'Page "{page.title()}" on {page.site} is skipped because it is'
+                'not a redirect'.format(page=page))
+            return True
+        return super(RedirectPageBot, self).skip_page(page)
 
 
 class NoRedirectPageBot(CurrentPageBot):
 
     """A NoRedirectPageBot class which only treats non-redirects."""
 
-    def treat(self, page):
+    def skip_page(self, page):
         """Treat only non-redirect pages and handle IsRedirectPage from it."""
         if page.isRedirectPage():
-            pywikibot.warning('Page "{0}" on {1} is skipped because it is a '
-                              'redirect'.format(page.title(), page.site))
-            return
-        try:
-            super(NoRedirectPageBot, self).treat(page)
-        except pywikibot.IsRedirectPage as e:
-            if e.page != page:
-                raise
             pywikibot.warning(
-                'During handling of page "{0}" on {1} a IsRedirectPage '
-                'exception was raised.'.format(page.title(), page.site))
+                'Page "{page.title()}" on {page.site} is skipped because it is'
+                'a redirect'.format(page=page))
+            return True
+        return super(NoRedirectPageBot, self).skip_page(page)
 
 
 class WikidataBot(Bot, ExistingPageBot):
