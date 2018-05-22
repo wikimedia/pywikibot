@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Pietrodn, it.wiki 2006-2007
 # (C) Filnik, it.wiki 2007
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -168,14 +168,15 @@ class LonelyPagesBot(SingleSiteBot):
             return getenable == 'enable'
         return True
 
-    def run(self):
-        """Run the bot."""
-        # If the enable page is set to disable, turn off the bot
-        # (useful when the bot is run on a server)
+    def setup(self):
+        """Setup the bot.
+
+        If the enable page is set to disable, set an empty generator which
+        turns off the bot (useful when the bot is run on a server).
+        """
         if not self.enable_page():
             pywikibot.output('The bot is disabled')
-            return
-        super(LonelyPagesBot, self).run()
+            self.generator = ()
 
     def treat(self, page):
         """Check if page is applicable and not marked and add template then."""

@@ -1108,12 +1108,11 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 self.move_to_category(member, original_cat,
                                       subcatlist[choice[1]])
 
-    def run(self):
-        """Start bot."""
-        super(CategoryTidyRobot, self).run()
+    def teardown(self):
+        """Cleanups after run operation."""
         if not self._treat_counter:
-            pywikibot.output('There are no pages or files in category %s'
-                             % self.catTitle)
+            pywikibot.output('There are no pages or files in category {}'
+                             .format(self.catTitle))
 
     def treat(self, page):
         """Process page."""
