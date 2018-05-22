@@ -307,7 +307,8 @@ def _get_regexes(keys, site):
             # which may not yet have a site specific re compiled.
             if exc in _regex_cache:
                 if type(_regex_cache[exc]) is tuple:
-                    if not site:
+                    if not site and exc in ('interwiki', 'property', 'invoke',
+                                            'category', 'file'):
                         issue_deprecation_warning(
                             'site=None', 'a valid site', 3)
                         site = pywikibot.Site()
@@ -454,37 +455,37 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     return text
 
 
-def removeDisabledParts(text, tags=['*'], include=[]):
+def removeDisabledParts(text, tags=None, include=[], site=None):
     """
     Return text without portions where wiki markup is disabled.
 
-    Parts that can/will be removed are --
+    Parts that will be removed by default are
     * HTML comments
     * nowiki tags
     * pre tags
     * includeonly tags
+    * source and syntaxhighlight tags
 
-    The exact set of parts which should be removed can be passed as the
-    'tags' parameter, which defaults to all.
-    Or, in alternative, default parts that shall not be removed can be
-    specified in the 'include' param.
+    @param tags: The exact set of parts which should be removed using
+        keywords from textlib._get_regexes().
+    @type tags: list, set, tuple or None
 
+    @param include: Or, in alternative, default parts that shall not
+        be removed.
+    @type include: list, set or tuple
+
+    @param site: Site to be used for site-dependent regexes. Default
+        disabled parts listed above do not need it.
+    @type site: pywikibot.Site
+
+    @return: text stripped from disabled parts.
+    @rtype: str
     """
-    regexes = {
-        'comments':        r'<!--.*?-->',
-        'includeonly':     r'<includeonly\s*>.*?</includeonly\s*>',
-        'nowiki':          r'<nowiki\s*>.*?</nowiki\s*>',
-        'pre':             r'<pre\s*>.*?</pre\s*>',
-        'source':          r'<source[ >].*?</source\s*>',
-        'syntaxhighlight': r'<syntaxhighlight[ >].*?</syntaxhighlight\s*>',
-    }
-    if '*' in tags:
-        tags = list(regexes.keys())
-    # add alias
+    if not tags:
+        tags = ('comment', 'includeonly', 'nowiki', 'pre', 'source')
     tags = set(tags) - set(include)
-    if 'source' in tags:
-        tags.add('syntaxhighlight')
-    toRemoveR = re.compile('|'.join([regexes[tag] for tag in tags]),
+    regexes = _get_regexes(tags, site)
+    toRemoveR = re.compile('|'.join(x.pattern for x in regexes),
                            re.IGNORECASE | re.DOTALL)
     return toRemoveR.sub('', text)
 
@@ -527,7 +528,7 @@ class _GetDataHTML(HTMLParser):
             self.textdata += u"</%s>" % tag
 
 
-def isDisabled(text, index, tags=['*']):
+def isDisabled(text, index, tags=None):
     """
     Return True if text[index] is disabled, e.g. by a comment or nowiki tags.
 
@@ -863,10 +864,10 @@ def getLanguageLinks(text, insite=None, template_subpage=False):
     result = {}
     # Ignore interwiki links within nowiki tags, includeonly tags, pre tags,
     # and HTML comments
-    tags = ['comments', 'nowiki', 'pre', 'source']
-    if not template_subpage:
-        tags += ['includeonly']
-    text = removeDisabledParts(text, tags)
+    include = []
+    if template_subpage:
+        include = ['includeonly']
+    text = removeDisabledParts(text, include=include)
 
     # This regular expression will find every link that is possibly an
     # interwiki link.
