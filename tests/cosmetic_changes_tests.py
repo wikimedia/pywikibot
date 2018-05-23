@@ -55,6 +55,9 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual(
             '&amp;#&nbsp;# #0#&#62;#x',
             self.cct.resolveHtmlEntities('&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
+        self.assertEqual(
+            '<code>&#32;</code>',
+            self.cct.resolveHtmlEntities('<code>&#32;</code>'))
 
     def test_removeEmptySections(self):
         """Test removeEmptySections method."""
