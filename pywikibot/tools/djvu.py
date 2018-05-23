@@ -202,7 +202,9 @@ class DjVuFile(object):
                     if m:
                         key, id = int(m.group('n')), m.group('id')
                     else:
-                        key, id = '', 1
+                        # If djvu doc has only one page,
+                        # FORM:DJVU line in djvudump has no id
+                        key, id = 1, ''
 
                 if 'INFO' in line:
                     m = self._pat_info.search(line)
@@ -332,9 +334,14 @@ class DjVuFile(object):
 
         # Check if page processing is as expected.
         # ref page info.
-        assert self.page_info(new_ref_page, force=True) == info_ref_page
-        if n_tot > 1:
-            assert self.number_of_images() == n_tot - 1
+        if n_tot > 2:
+            assert self.number_of_images(force=True) == n_tot - 1
+            # cahce cleared above
+            assert self.page_info(new_ref_page) == info_ref_page
+        else:
+            # If djvu has only one page, FORM:DJVU line in djvudump has no id
+            _id, (sz, dpi) = info_ref_page
+            assert self.page_info(new_ref_page, force=True) == ('', (sz, dpi))
 
         return True
 
