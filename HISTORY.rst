@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* New rule 'startcolon' was introduced in textlib
+* BaseBot has new methods setup and teardown
 * UploadBot got a filename prefix parameter (T170123)
 * cosmetic_changes is able to remove empty sections (T140570)
 * Pywikibot is following PEP 396 versioning
