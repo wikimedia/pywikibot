@@ -33,14 +33,14 @@ class TestDateMeta(MetaTestCaseClass):
                 except KeyError:
                     return
 
-                for code, convFunc in date.formats[formatname].items():
+                for code, convert in date.formats[formatname].items():
                     for value in range(start, stop, step):
                         self.assertTrue(
                             predicate(value),
                             "date.formats['%s']['%s']:\ninvalid value %d"
                             % (formatname, code, value))
 
-                        new_value = convFunc(convFunc(value))
+                        new_value = convert(convert(value))
                         self.assertEqual(
                             new_value, value,
                             "date.formats['%s']['%s']:\n"

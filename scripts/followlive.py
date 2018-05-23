@@ -527,9 +527,9 @@ What is it? """
 
     def run(self):
         """Process all pages in generator."""
-        for (page, date, length, loggedIn, username,
+        for (page, date, length, logged_in, username,
                 comment) in self.site.newpages():
-            self.handle_page(page, date, length, loggedIn, username)
+            self.handle_page(page, date, length, logged_in, username)
 
 
 def main(*args):

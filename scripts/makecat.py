@@ -100,10 +100,10 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None, summary=''):
                     tocheck.append(page2)
                     checked[page2] = page2
         if checkbackward:
-            for refPage in pl.getReferences():
-                if needcheck(refPage):
-                    tocheck.append(refPage)
-                    checked[refPage] = refPage
+            for ref_page in pl.getReferences():
+                if needcheck(ref_page):
+                    tocheck.append(ref_page)
+                    checked[ref_page] = ref_page
 
 
 def asktoadd(pl, summary):

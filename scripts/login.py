@@ -166,10 +166,10 @@ def main(*args):
     else:
         site = pywikibot.Site()
         namedict = {site.family.name: {site.code: None}}
-    for familyName in namedict:
-        for lang in namedict[familyName]:
+    for family_name in namedict:
+        for lang in namedict[family_name]:
             try:
-                site = pywikibot.Site(code=lang, fam=familyName)
+                site = pywikibot.Site(code=lang, fam=family_name)
                 if oauth:
                     _oauth_login(site)
                     continue
@@ -189,7 +189,7 @@ def main(*args):
                             'Not logged in on {0}.'.format(site))
             except SiteDefinitionError:
                 pywikibot.output(u'%s.%s is not a valid site, please remove it'
-                                 u' from your config' % (lang, familyName))
+                                 ' from your config' % (lang, family_name))
 
 
 if __name__ == "__main__":
