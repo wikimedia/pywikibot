@@ -328,26 +328,22 @@ class CosmeticChangesToolkit(object):
         """
         Standardize page footer.
 
-        Makes sure that interwiki links and categories are put to the correct
-        position and into the right order. This combines the old instances
-        standardizeInterwiki and standardizeCategories.
-        The page footer has the following section in that sequence:
+        Makes sure that interwiki links and categories are put
+        into the correct position and into the right order. This
+        combines the old instances of standardizeInterwiki
+        and standardizeCategories.
+
+        The page footer consists of the following parts
+        in that sequence:
         1. categories
-        2. ## TODO: template beyond categories ##
-        3. additional information depending on local site policy
-        4. interwiki links
-
+        2. additional information depending on the local site policy
+        3. interwiki
         """
-        categories = None
-        interwikiLinks = None
+        categories = []
+        interwiki_links = []
 
-        # Pywikibot is no longer allowed to touch categories on the
-        # German Wikipedia. See
-        # https://de.wikipedia.org/wiki/Hilfe_Diskussion:Personendaten/Archiv/1#Position_der_Personendaten_am_.22Artikelende.22
-        # ignoring nn-wiki of cause of the comment line above iw section
-        if not self.template and '{{Personendaten' not in text and \
-           '{{SORTIERUNG' not in text and '{{DEFAULTSORT' not in text and \
-           self.site.code not in ('et', 'it', 'bg', 'ru'):
+        # get categories
+        if not self.template:
             categories = textlib.getCategoryLinks(text, site=self.site)
 
         if not self.talkpage:
@@ -360,26 +356,34 @@ class CosmeticChangesToolkit(object):
                     loc = None
                 if loc is not None and loc in self.title:
                     subpage = True
-            interwikiLinks = textlib.getLanguageLinks(
+
+            # get interwiki
+            interwiki_links = textlib.getLanguageLinks(
                 text, insite=self.site, template_subpage=subpage)
 
-            # Removing the interwiki
+            # remove interwiki
             text = textlib.removeLanguageLinks(text, site=self.site)
 
-        # Adding categories
+        # add categories, main to top
         if categories:
-            # TODO: Sorting categories in alphabetic order.
-            # e.g. using categories.sort()
-
-            # TODO: Taking main cats to top
+            # TODO: Sort categories in alphabetic order, e.g. using
+            # categories.sort()? (T100265)
+            # TODO: Get main categories from Wikidata?
+            main = pywikibot.Category(self.site, 'Category:' + self.title,
+                                      sortKey=' ')
+            if main in categories:
+                categories.pop(categories.index(main))
+                categories.insert(0, main)
             text = textlib.replaceCategoryLinks(text, categories,
                                                 site=self.site)
-        # Adding the interwiki
-        if interwikiLinks:
-            text = textlib.replaceLanguageLinks(text, interwikiLinks,
+
+        # add interwiki
+        if interwiki_links:
+            text = textlib.replaceLanguageLinks(text, interwiki_links,
                                                 site=self.site,
                                                 template=self.template,
                                                 template_subpage=subpage)
+
         return text
 
     def translateAndCapitalizeNamespaces(self, text):

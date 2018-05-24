@@ -49,6 +49,12 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         self.assertEqual('Foo\n{{any template}}\n\n[[Category:Foo]]',
                          self.cct.standardizePageFooter(
                              'Foo\n[[category:foo]]\n{{any template}}'))
+        self.assertEqual('Foo\n\n[[Category:Test| ]]\n[[Category:Baz]]',
+                         self.cct.standardizePageFooter(
+                             'Foo\n\n[[category:baz]]\n[[category:test]]'))
+        self.assertEqual('Foo\n\n[[Category:Foo]]\n\n{{Personendaten}}',
+                         self.cct.standardizePageFooter(
+                             'Foo\n[[category:foo]]\n{{Personendaten}}'))
 
     def test_resolveHtmlEntities(self):
         """Test resolveHtmlEntities method."""
