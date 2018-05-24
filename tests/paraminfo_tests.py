@@ -220,19 +220,11 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     def test_entities(self):
         """Test known entities."""
-        unsupported = []
-
-        if self.site.sitename in ('test:test', 'wikidata:test'):
-            unsupported = ['form', 'lexeme']  # T194890
-
-        supported = ['item', 'property']
-        known = supported + unsupported
-        if unsupported:
-            self._check_param_superset(
-                self.repo, 'wbsearchentities', 'type', known)
-        else:
-            self._check_param_values(
-                self.repo, 'wbsearchentities', 'type', known)
+        unsupported = {'form', 'lexeme'}  # T195435
+        supported = {'item', 'property'}
+        known = supported | unsupported
+        self._check_param_superset(
+            self.repo, 'wbsearchentities', 'type', known)
 
     # Missing datatypes won't crash pywikibot but should be noted
     def test_datatypes(self):
