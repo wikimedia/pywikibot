@@ -1394,10 +1394,14 @@ class BaseBot(OptionHandler):
 
         # exc_info contains exception from self.run() while terminating
         exc_info = sys.exc_info()
-        if exc_info[0] is None or exc_info[0] is KeyboardInterrupt:
-            pywikibot.output("Script terminated successfully.")
+        pywikibot.output('Script terminated ', newline=False)
+        # Python 2 also needs QuitKeyboardInterrupt
+        # to be compared with exc_info[0] (T195687)
+        if exc_info[0] is None or exc_info[0] in (KeyboardInterrupt,
+                                                  QuitKeyboardInterrupt):
+            pywikibot.output('successfully.')
         else:
-            pywikibot.output("Script terminated by exception:\n")
+            pywikibot.output('by exception:\n')
             pywikibot.exception()
 
     def treat(self, page):
