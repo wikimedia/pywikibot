@@ -636,6 +636,7 @@ class CosmeticChangesToolkit(object):
             8207,   # Right-to-left mark (&rtl;)
         ]
         if self.template:
+            ignore += [32]  # Space ( )
             ignore += [58]  # Colon (:)
         text = pywikibot.html2unicode(text, ignore=ignore, exceptions=['code'])
         return text
