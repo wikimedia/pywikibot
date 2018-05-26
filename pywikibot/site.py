@@ -3981,7 +3981,7 @@ class APISite(BaseSite):
                       endtime=None, rvdir=None, user=None, excludeuser=None,
                       section=None, sysop=False, step=None, total=None,
                       rollback=False):
-        """Retrieve and store revision information.
+        """Retrieve revision information and store it in page object.
 
         By default, retrieves the last (current) revision of the page,
         unless any of the optional parameters revids, startid, endid,
@@ -3993,8 +3993,8 @@ class APISite(BaseSite):
         endid if both are specified; likewise, starttime must be greater
         than endtime. If rvdir is True, these relationships are reversed.
 
-        @param page: retrieve revisions of this Page (required unless ids
-            is specified)
+        @param page: retrieve revisions of this Page and hold the data.
+        @type page: pywikibot.Page
         @param content: if True, retrieve the wiki-text of each revision;
             otherwise, only retrieve the revision metadata (default)
         @type content: bool
@@ -4003,7 +4003,7 @@ class APISite(BaseSite):
             the article is section 0), not name
         @type section: int
         @param revids: retrieve only the specified revision ids (raise
-            Exception if any of revids does not correspond to page
+            Exception if any of revids does not correspond to page)
         @type revids: an int, a str or a list of ints or strings
         @param startid: retrieve revisions starting with this revid
         @param endid: stop upon retrieving this revid
@@ -4015,6 +4015,8 @@ class APISite(BaseSite):
         @param excludeuser: retrieve all revisions not authored by this user
         @param sysop: if True, switch to sysop account (if available) to
             retrieve this page
+        @raises ValueError: invalid startid/endid or starttime/endtime values
+        @raises pywikibot.Error: revids belonging to a different page
         """
         latest = (revids is None and
                   startid is None and
