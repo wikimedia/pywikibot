@@ -39,7 +39,7 @@ class HttpRequest(UnicodeMixin):
     def __init__(self, uri, method="GET", params=None, body=None, headers=None,
                  callbacks=None, charset=None, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         See C{Http.request} for parameters.
         """

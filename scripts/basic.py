@@ -70,7 +70,7 @@ class BasicBot(
 
     def __init__(self, generator, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: the page generator that determines on which pages
             to work
@@ -85,7 +85,7 @@ class BasicBot(
             'top': False,  # append text on top of the page
         })
 
-        # call constructor of the super class
+        # call initializer of the super class
         super(BasicBot, self).__init__(site=True, **kwargs)
 
         # handle old -dry parameter

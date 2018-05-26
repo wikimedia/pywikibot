@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for deprecation tools."""
 #
-# (C) Pywikibot team, 2014-2016
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -258,7 +258,7 @@ class DeprecatedClass(object):
     """Deprecated class."""
 
     def __init__(self, foo=None):
-        """Constructor."""
+        """Initializer."""
         self.foo = foo
 
 

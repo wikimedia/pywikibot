@@ -26,7 +26,7 @@ to show warnings about deprecated methods:
     python pwb.py compat2core <scriptname> -warnonly
 """
 #
-# (C) xqt, 2014-2017
+# (C) xqt, 2014-2018
 # (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
@@ -131,7 +131,7 @@ class ConvertBot(object):
     """Script conversion bot."""
 
     def __init__(self, filename=None, warnonly=False):
-        """Constructor."""
+        """Initializer."""
         self.source = filename
         self.warnonly = warnonly
 

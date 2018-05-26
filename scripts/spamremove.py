@@ -27,7 +27,7 @@ In addition, these arguments can be used to restrict changes to some pages:
 &params;
 """
 #
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,7 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
     summary_key = 'spamremove-remove'
 
     def __init__(self, generator, spam_external_url, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'summary': None,
         })

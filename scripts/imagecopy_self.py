@@ -337,7 +337,7 @@ class imageFetcher(threading.Thread):
     """Tries to fetch information for all images in the generator."""
 
     def __init__(self, pagegenerator, prefetchQueue):
-        """Constructor."""
+        """Initializer."""
         self.pagegenerator = pagegenerator
         self.prefetchQueue = prefetchQueue
         imagerecat.initLists()
@@ -619,7 +619,7 @@ class userInteraction(threading.Thread):
     """Prompt all images to the user."""
 
     def __init__(self, prefetchQueue, uploadQueue):
-        """Constructor."""
+        """Initializer."""
         self.prefetchQueue = prefetchQueue
         self.uploadQueue = uploadQueue
         self.autonomous = False
@@ -683,13 +683,13 @@ class TkdialogICS(Tkdialog):
     """The dialog window for image info."""
 
     def __init__(self, fields):
-        """Constructor.
+        """Initializer.
 
         fields:
             imagepage, description, date, source, author, licensetemplate,
             categories
         """
-        """Constructor."""
+        """Initializer."""
         # Check if `Tkinter` wasn't imported
         if isinstance(Tkinter, ImportError):
             raise Tkinter
@@ -869,7 +869,7 @@ class uploader(threading.Thread):
     """Upload all images."""
 
     def __init__(self, uploadQueue):
-        """Constructor."""
+        """Initializer."""
         self.uploadQueue = uploadQueue
         self.checktemplate = True
         threading.Thread.__init__(self)

@@ -36,7 +36,7 @@ class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):
     """Surnames Bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor.
+        """Initializer.
 
         Parameters:
             @param generator: The page generator that determines on

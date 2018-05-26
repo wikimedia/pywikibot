@@ -96,7 +96,7 @@ class NotImplementedClass(object):
     """No implementation is available."""
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         raise NotImplementedError(
             '%s: %s' % (self.__class__.__name__, self.__doc__))
 
@@ -295,7 +295,7 @@ class FrozenDict(dict):
 
     def __init__(self, data=None, error=None):
         """
-        Constructor.
+        Initializer.
 
         @param data: mapping to freeze
         @type data: mapping
@@ -349,7 +349,7 @@ class LazyRegex(object):
 
     def __init__(self, pattern, flags=0):
         """
-        Constructor.
+        Initializer.
 
         @param pattern: L{re} regex pattern
         @type pattern: str or callable
@@ -406,7 +406,7 @@ class DeprecatedRegex(LazyRegex):
 
     def __init__(self, pattern, flags=0, name=None, instead=None):
         """
-        Constructor.
+        Initializer.
 
         If name is None, the regex pattern will be used as part of
         the deprecation warning.
@@ -572,7 +572,7 @@ class ThreadedGenerator(threading.Thread):
 
     def __init__(self, group=None, target=None, name="GeneratorThread",
                  args=(), kwargs=None, qsize=65536):
-        """Constructor. Takes same keyword arguments as threading.Thread.
+        """Initializer. Takes same keyword arguments as threading.Thread.
 
         target must be a generator function (or other callable that returns
         an iterable object).
@@ -727,7 +727,7 @@ class ThreadList(list):
     _logger = "threadlist"
 
     def __init__(self, limit=128, *args):
-        """Constructor."""
+        """Initializer."""
         self.limit = limit
         super(ThreadList, self).__init__(*args)
         for item in self:

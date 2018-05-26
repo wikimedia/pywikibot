@@ -38,7 +38,7 @@ Please check every article you change.
 """
 #
 # (C) 2003 Thomas R. Koll, <tomk32@tomk32.de>
-# (C) Pywikibot team, 2003-2017
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -70,7 +70,7 @@ class TableXmlDumpPageGenerator(object):
     """Generator to yield all pages that seem to contain an HTML table."""
 
     def __init__(self, xmlfilename):
-        """Constructor."""
+        """Initializer."""
         self.xmldump = xmlreader.XmlDump(xmlfilename)
 
     def __iter__(self):
@@ -90,7 +90,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
     """
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'quiet': False,       # quiet mode, less output
             'skipwarning': False  # on warning skip that page

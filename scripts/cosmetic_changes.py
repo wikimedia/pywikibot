@@ -26,8 +26,8 @@ The following parameters are supported:
 For further information see pywikibot/cosmetic_changes.py
 """
 #
-# (C) xqt, 2009-2017
-# (C) Pywikibot team, 2006-2017
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,7 +56,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
     """Cosmetic changes bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'async': False,
             'summary': u'Robot: Cosmetic changes',

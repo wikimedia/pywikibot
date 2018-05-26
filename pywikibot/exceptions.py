@@ -124,7 +124,7 @@ class Error(UnicodeMixin, Exception):  # noqa
 
     # NOTE: UnicodeMixin must be the first object Error class is derived from.
     def __init__(self, arg):
-        """Constructor."""
+        """Initializer."""
         self.unicode = arg
 
     def __unicode__(self):
@@ -148,7 +148,7 @@ class PageRelatedError(Error):
 
     def __init__(self, page, message=None):
         """
-        Constructor.
+        Initializer.
 
         @param page: Page that caused the exception
         @type page: Page object
@@ -197,7 +197,7 @@ class OtherPageSaveError(PageSaveRelatedError):
     message = "Edit to page %(title)s failed:\n%(reason)s"
 
     def __init__(self, page, reason):
-        """Constructor.
+        """Initializer.
 
         @param reason: Details of the problem
         @type reason: Exception or basestring
@@ -258,7 +258,7 @@ class InconsistentTitleReceived(PageLoadRelatedError):
     """Page receives a title inconsistent with query."""
 
     def __init__(self, page, actual):
-        """Constructor.
+        """Initializer.
 
         @param page: Page that caused the exception
         @type page: Page object
@@ -349,7 +349,7 @@ class InterwikiRedirectPage(PageRelatedError):
                u"Target page: %(target_page)s on %(target_site)s.")
 
     def __init__(self, page, target_page):
-        """Constructor.
+        """Initializer.
 
         @param target_page: Target page of the redirect.
         @type reason: Page
@@ -457,7 +457,7 @@ class SpamfilterError(PageSaveRelatedError):
                'content:\n%(url)s')
 
     def __init__(self, page, url):
-        """Constructor."""
+        """Initializer."""
         self.url = url
         super(SpamfilterError, self).__init__(page)
 

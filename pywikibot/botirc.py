@@ -7,7 +7,7 @@ http://python-irclib.sourceforge.net/
 """
 #
 # (C) Balasyum, 2008
-# (C) Pywikibot team, 2008-2015
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -57,7 +57,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
     }
 
     def __init__(self, site, channel, nickname, server, port=6667, **kwargs):
-        """Constructor."""
+        """Initializer."""
         pywikibot.Bot.__init__(self, **kwargs)
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.channel = channel

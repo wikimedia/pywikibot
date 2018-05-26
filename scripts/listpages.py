@@ -88,7 +88,7 @@ page object:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2017
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -123,7 +123,7 @@ class Formatter(object):
 
     def __init__(self, page, outputlang=None, default='******'):
         """
-        Constructor.
+        Initializer.
 
         @param page: the page to be formatted.
         @type page: Page object.

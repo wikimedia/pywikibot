@@ -15,7 +15,7 @@ PRE-REQUISITE : Need to install python-pycountry library.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -42,7 +42,7 @@ class StatesRedirectBot(pywikibot.Bot):
     """Bot class used for implementation of re-direction norms."""
 
     def __init__(self, start, force):
-        """Constructor.
+        """Initializer.
 
         Parameters:
             @param start:xxx Specify the place in the alphabet to start

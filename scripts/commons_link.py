@@ -24,7 +24,7 @@ and pagegenerator can be one of these:
 """
 #
 # (C) Leonardo Gregianin, 2006
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,7 +49,7 @@ class CommonsLinkBot(Bot):
     """Commons linking bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'action': None,
         })

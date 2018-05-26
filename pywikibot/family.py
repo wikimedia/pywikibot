@@ -1500,7 +1500,7 @@ class SingleSiteFamily(Family):
     """Single site family."""
 
     def __new__(cls):
-        """Constructor."""
+        """Initializer."""
         if not hasattr(cls, 'code'):
             cls.code = cls.name
 
@@ -1525,7 +1525,7 @@ class SubdomainFamily(Family):
     """Multi site wikis that are subdomains of the same top level domain."""
 
     def __new__(cls):
-        """Constructor."""
+        """Initializer."""
         assert cls.domain
         return super(SubdomainFamily, cls).__new__(cls)
 

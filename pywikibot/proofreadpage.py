@@ -62,7 +62,7 @@ class FullHeader(object):
                    '{0.header}')
 
     def __init__(self, text=None):
-        """Constructor."""
+        """Initializer."""
         self._text = text or ''
         self._has_div = True
 
@@ -649,7 +649,7 @@ class PurgeRequest(Request):
     """
 
     def __init__(self, **kwargs):
-        """Monkeypatch action in Request constructor."""
+        """Monkeypatch action in Request initializer."""
         action = kwargs['parameters']['action']
         kwargs['parameters']['action'] = 'dummy'
         super(PurgeRequest, self).__init__(**kwargs)

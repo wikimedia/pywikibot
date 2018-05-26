@@ -39,7 +39,7 @@ class Hunk(object):
 
     def __init__(self, a, b, grouped_opcode):
         """
-        Constructor.
+        Initializer.
 
         @param a: sequence of lines
         @param b: sequence of lines
@@ -254,7 +254,7 @@ class PatchManager(object):
     @deprecated_args(n='context')
     def __init__(self, text_a, text_b, context=0, by_letter=False,
                  replace_invisible=False):
-        """Constructor.
+        """Initializer.
 
         @param text_a: base text
         @type text_a: basestring

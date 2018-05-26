@@ -84,7 +84,7 @@ class PageWithRefs(Page):
     """
 
     def __init__(self, source, title='', ns=0):
-        """Constructor."""
+        """Initializer."""
         super(PageWithRefs, self).__init__(source, title, ns)
         _cache_attrs = list(super(PageWithRefs, self)._cache_attrs)
         _cache_attrs = tuple(_cache_attrs + ['_ref_table'])
@@ -132,7 +132,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     def __init__(self, generator, summary, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: the pages to work on
         @type generator: iterable

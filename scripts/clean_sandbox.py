@@ -29,9 +29,9 @@ Furthermore, the following command line parameters are supported:
 # (C) Wikipedian, 2006-2007
 # (C) Andre Engels, 2007
 # (C) Siebrand Mazeland, 2007
-# (C) xqt, 2009-2017
+# (C) xqt, 2009-2018
 # (C) Dr. Trigon, 2012
-# (C) Pywikibot team, 2012-2017
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -132,7 +132,7 @@ class SandboxBot(Bot):
     }
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(SandboxBot, self).__init__(**kwargs)
         if self.getOption('delay') is None:
             d = min(15, max(5, int(self.getOption('hours') * 60)))

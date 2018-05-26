@@ -206,8 +206,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self._revisions = {}
         else:
             raise pywikibot.Error(
-                "Invalid argument type '%s' in Page constructor: %s"
-                % (type(source), source))
+                "Invalid argument type '{}' in Page initializer: {}"
+                .format(type(source), source))
 
     @property
     def site(self):
@@ -2400,7 +2400,7 @@ class FilePage(Page):
 
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u""):
-        """Constructor."""
+        """Initializer."""
         self._file_revisions = {}  # dictionary to cache File history.
         super(FilePage, self).__init__(source, title, 6)
         if self.namespace() != 6:
@@ -2729,9 +2729,9 @@ class Category(Page):
     @deprecate_arg("insite", None)
     def __init__(self, source, title=u"", sortKey=None):
         """
-        Constructor.
+        Initializer.
 
-        All parameters are the same as for Page() constructor.
+        All parameters are the same as for Page() Initializer.
         """
         self.sortKey = sortKey
         Page.__init__(self, source, title, ns=14)
@@ -3160,7 +3160,7 @@ class User(Page):
         """
         Initializer for a User object.
 
-        All parameters are the same as for Page() constructor.
+        All parameters are the same as for Page() Initializer.
         """
         self._isAutoblock = True
         if title.startswith('#'):
@@ -3642,7 +3642,7 @@ class WikibasePage(BasePage):
 
     def __init__(self, site, title=u"", **kwargs):
         """
-        Constructor.
+        Initializer.
 
         If title is provided, either ns or entity_type must also be provided,
         and will be checked against the title parsed using the Page
@@ -4225,7 +4225,7 @@ class ItemPage(WikibasePage):
 
     def __init__(self, site, title=None, ns=None):
         """
-        Constructor.
+        Initializer.
 
         @param site: data repository
         @type site: pywikibot.site.DataSite
@@ -4648,7 +4648,7 @@ class Property(object):
 
     def __init__(self, site, id, datatype=None):
         """
-        Constructor.
+        Initializer.
 
         @param site: data repository
         @type site: pywikibot.site.DataSite
@@ -4716,7 +4716,7 @@ class PropertyPage(WikibasePage, Property):
 
     def __init__(self, source, title=u""):
         """
-        Constructor.
+        Initializer.
 
         @param source: data repository property is on
         @type source: pywikibot.site.DataSite
@@ -4791,7 +4791,7 @@ class Claim(Property):
     def __init__(self, site, pid, snak=None, hash=None, isReference=False,
                  isQualifier=False, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         Defined by the "snak" value, supplemented by site + pid
 
@@ -5255,7 +5255,7 @@ class Revision(DotReadableDict):
                  text=None, minor=False, rollbacktoken=None, parentid=None,
                  contentmodel=None, sha1=None):
         """
-        Constructor.
+        Initializer.
 
         All parameters correspond to object attributes (e.g., revid
         parameter is stored as self.revid)
@@ -5436,7 +5436,7 @@ class Link(ComparableMixin):
 
     def __init__(self, text, source=None, defaultNamespace=0):
         """
-        Constructor.
+        Initializer.
 
         @param text: the link text (everything appearing between [[ and ]]
             on a wiki page)

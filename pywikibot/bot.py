@@ -147,7 +147,7 @@ class SkipPageError(Exception):
     message = 'Page "{0}" skipped due to {1}.'
 
     def __init__(self, page, reason):
-        """Constructor."""
+        """Initializer."""
         super(SkipPageError, self).__init__(self.message.format(page, reason))
         self.reason = reason
         self.page = page
@@ -158,7 +158,7 @@ class UnhandledAnswer(Exception):
     """The given answer didn't suffice."""
 
     def __init__(self, stop=False):
-        """Constructor."""
+        """Initializer."""
         self.stop = stop
 
 
@@ -167,7 +167,7 @@ class LoggingFormatter(_LoggingFormatter):
     """Logging formatter that uses config.console_encoding."""
 
     def __init__(self, fmt=None, datefmt=None):
-        """Constructor setting underlying encoding to console_encoding."""
+        """Initializer setting underlying encoding to console_encoding."""
         _LoggingFormatter.__init__(self, fmt, datefmt, config.console_encoding)
 
 
@@ -530,7 +530,7 @@ class Choice(StandardOption):
     """A simple choice consisting of a option, shortcut and handler."""
 
     def __init__(self, option, shortcut, replacer):
-        """Constructor."""
+        """Initializer."""
         super(Choice, self).__init__(option, shortcut)
         self._replacer = replacer
 
@@ -568,7 +568,7 @@ class LinkChoice(Choice):
 
     def __init__(self, option, shortcut, replacer, replace_section,
                  replace_label):
-        """Constructor."""
+        """Initializer."""
         super(LinkChoice, self).__init__(option, shortcut, replacer)
         self._section = replace_section
         self._label = replace_label
@@ -605,7 +605,7 @@ class AlwaysChoice(Choice):
     """Add an option to always apply the default."""
 
     def __init__(self, replacer, option='always', shortcut='a'):
-        """Constructor."""
+        """Initializer."""
         super(AlwaysChoice, self).__init__(option, shortcut, replacer)
         self.always = False
 
@@ -651,7 +651,7 @@ class InteractiveReplace(object):
 
     def __init__(self, old_link, new_link, default=None, automatic_quit=True):
         """
-        Constructor.
+        Initializer.
 
         @param old_link: The old link which is searched. The label and section
             are ignored.
@@ -1617,7 +1617,7 @@ class MultipleSitesBot(BaseBot):
     """
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self._site = None
         super(MultipleSitesBot, self).__init__(**kwargs)
 
@@ -1837,7 +1837,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     @ivar create_missing_item: If True, new items will be created if the current
         page doesn't have one. Subclasses should override this in the
-        constructor with a bool value or using self.getOption.
+        initializer with a bool value or using self.getOption.
 
     @type create_missing_item: bool
     """
@@ -1847,7 +1847,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
     @deprecated_args(use_from_page=None)
     def __init__(self, **kwargs):
-        """Constructor of the WikidataBot."""
+        """Initializer of the WikidataBot."""
         self.create_missing_item = False
         super(WikidataBot, self).__init__(**kwargs)
         self.site = pywikibot.Site()

@@ -18,7 +18,7 @@ Syntax example:
 """
 #
 # (C) Dr. Trigon, 2012-2014
-# (C) Pywikibot team, 2014-2017
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -123,7 +123,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
     """WikiUserInterface bot."""
 
     def __init__(self, *arg):
-        """Constructor."""
+        """Initializer."""
         pywikibot.output(color_format(
             '{lightgreen}* Initialization of bot{default}'))
 

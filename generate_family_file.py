@@ -40,7 +40,7 @@ class FamilyFileGenerator(object):
     """Family file creator."""
 
     def __init__(self, url=None, name=None, dointerwiki=None):
-        """Constructor."""
+        """Initializer."""
         if url is None:
             url = raw_input("Please insert URL to wiki: ")
         if name is None:

@@ -82,7 +82,7 @@ class RotatingFileHandler(logging.handlers.RotatingFileHandler):
             record.args = (msg,)
 
         text = logging.handlers.RotatingFileHandler.format(self, record)
-        return text.rstrip("\r\n")
+        return text.rstrip()
 
 
 class LoggingFormatter(logging.Formatter):
@@ -96,7 +96,7 @@ class LoggingFormatter(logging.Formatter):
     """
 
     def __init__(self, fmt=None, datefmt=None, encoding=None):
-        """Constructor with additional encoding parameter."""
+        """Initializer with additional encoding parameter."""
         logging.Formatter.__init__(self, fmt, datefmt)
         self._encoding = encoding
 

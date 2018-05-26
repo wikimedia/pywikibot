@@ -353,7 +353,7 @@ class DiscussionThread(object):
     """
 
     def __init__(self, title, now, timestripper):
-        """Constructor."""
+        """Initializer."""
         self.title = title
         self.now = now
         self.ts = timestripper
@@ -422,7 +422,7 @@ class DiscussionPage(pywikibot.Page):
     """
 
     def __init__(self, source, archiver, params=None):
-        """Constructor."""
+        """Initializer."""
         super(DiscussionPage, self).__init__(source)
         self.threads = []
         self.full = False
@@ -544,7 +544,7 @@ class PageArchiver(object):
     algo = 'none'
 
     def __init__(self, page, tpl, salt, force=False):
-        """Constructor."""
+        """Initializer."""
         self.attributes = {
             'algo': ['old(24h)', False],
             'archive': ['', False],

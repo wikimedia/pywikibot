@@ -230,7 +230,7 @@ class CosmeticChangesToolkit(object):
     @deprecated_args(debug='diff', redirect=None)
     def __init__(self, site, diff=False, namespace=None, pageTitle=None,
                  ignore=CANCEL_ALL):
-        """Constructor."""
+        """Initializer."""
         self.site = site
         self.diff = diff
         try:

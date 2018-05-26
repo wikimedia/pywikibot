@@ -46,7 +46,7 @@ class ArticleEditor(object):
     """Edit a wiki page."""
 
     def __init__(self, *args):
-        """Constructor."""
+        """Initializer."""
         self.set_options(*args)
         self.site = pywikibot.Site()
         self.setpage()

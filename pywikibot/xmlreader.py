@@ -9,7 +9,7 @@ https://dumps.wikimedia.org/backup-index.html) and offers a generator over
 XmlEntry objects which can be used by other bots.
 """
 #
-# (C) Pywikibot team, 2005-2013
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -55,7 +55,7 @@ class XmlEntry(object):
     def __init__(self, title, ns, id, text, username, ipedit, timestamp,
                  editRestriction, moveRestriction, revisionid, comment,
                  redirect):
-        """Constructor."""
+        """Initializer."""
         # TODO: there are more tags we can read.
         self.title = title
         self.ns = ns
@@ -84,7 +84,7 @@ class XmlParserThread(threading.Thread):
     """
 
     def __init__(self, filename, handler):
-        """Constructor."""
+        """Initializer."""
         threading.Thread.__init__(self)
         self.filename = filename
         self.handler = handler
@@ -108,7 +108,7 @@ class XmlDump(object):
     """
 
     def __init__(self, filename, allrevisions=False):
-        """Constructor."""
+        """Initializer."""
         self.filename = filename
         if allrevisions:
             self._parse = self._parse_all

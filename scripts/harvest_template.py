@@ -78,7 +78,7 @@ Examples:
 """
 #
 # (C) Multichill, Amir, 2013
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of MIT License.
 #
@@ -125,7 +125,7 @@ class HarvestRobot(WikidataBot):
 
     def __init__(self, generator, templateTitle, fields, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: A generator that yields Page objects
         @type generator: iterator

@@ -490,7 +490,7 @@ class NoReferencesBot(Bot):
     """References section bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'verbose': True,
         })

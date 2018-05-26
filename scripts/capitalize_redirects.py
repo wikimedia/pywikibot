@@ -22,7 +22,7 @@ Example:
 """
 #
 # (C) Yrithinnd, 2006
-# (C) Pywikibot team, 2007-2017
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,7 +49,7 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
     """Capitalization Bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor.
+        """Initializer.
 
         Parameters:
             @param generator: The page generator that determines on which pages

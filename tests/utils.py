@@ -158,7 +158,7 @@ class WarningSourceSkipContextManager(warnings.catch_warnings):
 
     def __init__(self, skip_list):
         """
-        Constructor.
+        Initializer.
 
         @param skip_list: List of objects to be skipped. The source of any
             warning that matches the skip_list won't be adjusted.
@@ -295,7 +295,7 @@ class DryParamInfo(dict):
     """Dummy class to use instead of L{pywikibot.data.api.ParamInfo}."""
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(DryParamInfo, self).__init__(*args, **kwargs)
         self.modules = set()
         self.action_modules = set()
@@ -324,7 +324,7 @@ class DummySiteinfo(object):
     """Dummy class to use instead of L{pywikibot.site.Siteinfo}."""
 
     def __init__(self, cache):
-        """Constructor."""
+        """Initializer."""
         self._cache = {key: (item, False) for key, item in cache.items()}
 
     def __getitem__(self, key):
@@ -372,7 +372,7 @@ class DryRequest(CachedRequest):
     """Dummy class to use instead of L{pywikibot.data.api.Request}."""
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         _original_Request.__init__(self, *args, **kwargs)
 
     @classmethod
@@ -401,7 +401,7 @@ class DrySite(pywikibot.site.APISite):
     _loginstatus = pywikibot.site.LoginStatus.NOT_ATTEMPTED
 
     def __init__(self, code, fam, user, sysop):
-        """Constructor."""
+        """Initializer."""
         super(DrySite, self).__init__(code, fam, user, sysop)
         self._userinfo = pywikibot.tools.EMPTY_DEFAULT
         self._paraminfo = DryParamInfo()
@@ -517,7 +517,7 @@ class DummyHttp(object):
     """A class simulating the http module."""
 
     def __init__(self, wrapper):
-        """Constructor with the given PatchedHttp instance."""
+        """Initializer with the given PatchedHttp instance."""
         self.__wrapper = wrapper
 
     def request(self, *args, **kwargs):
@@ -579,7 +579,7 @@ class PatchedHttp(object):
 
     def __init__(self, module, data=None):
         """
-        Constructor.
+        Initializer.
 
         @param module: The given module to patch. It must have the http module
             imported as http.

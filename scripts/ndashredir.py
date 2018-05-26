@@ -27,7 +27,7 @@ The following generators and filters are supported:
 """
 #
 # (C) Bináris, 2012
-# (C) Pywikibot team, 2012-2017
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -58,7 +58,7 @@ class DashRedirectBot(
 
     def __init__(self, generator, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: the page generator that determines which pages
             to work on
@@ -70,7 +70,7 @@ class DashRedirectBot(
             'reversed': False,  # switch bot behavior
         })
 
-        # call constructor of the super class
+        # call initializer of the super class
         super(DashRedirectBot, self).__init__(site=True, **kwargs)
 
         # assign the generator to the bot

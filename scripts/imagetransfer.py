@@ -27,7 +27,7 @@ used on a page reachable via interwiki links.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -119,7 +119,7 @@ class ImageTransferBot(object):
 
     def __init__(self, generator, targetSite=None, interwiki=False,
                  keep_name=False, ignore_warning=False):
-        """Constructor."""
+        """Initializer."""
         self.generator = generator
         self.interwiki = interwiki
         self.targetSite = targetSite

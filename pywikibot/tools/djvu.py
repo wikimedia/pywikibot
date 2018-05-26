@@ -74,7 +74,7 @@ class DjVuFile(object):
     @deprecated_args(file_djvu='file')
     def __init__(self, file):
         """
-        Constructor.
+        Initializer.
 
         @param file: filename (including path) to djvu file
         @type file: string/unicode

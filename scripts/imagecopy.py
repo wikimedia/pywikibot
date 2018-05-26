@@ -240,7 +240,7 @@ class imageTransfer(threading.Thread):
     """Facilitate transfer of image/file to commons."""
 
     def __init__(self, imagePage, newname, category, delete_after_done=False):
-        """Constructor."""
+        """Initializer."""
         self.imagePage = imagePage
         self.image_repo = imagePage.site.image_repository()
         self.newname = newname
@@ -393,7 +393,7 @@ class TkdialogIC(Tkdialog):
 
     def __init__(self, image_title, content, uploader, url, templates,
                  commonsconflict=0):
-        """Constructor."""
+        """Initializer."""
         # Check if `Tkinter` wasn't imported
         if isinstance(Tkinter, ImportError):
             raise Tkinter

@@ -174,7 +174,7 @@ class CategoryPreprocess(BaseBot):
 
     def __init__(self, page, follow_redirects=False, edit_redirects=False,
                  create=False):
-        """Constructor."""
+        """Initializer."""
         super(CategoryPreprocess, self).__init__()
         page = page
         self.follow_redirects = follow_redirects
@@ -283,7 +283,7 @@ class CategoryDatabase(object):
     """
 
     def __init__(self, rebuild=False, filename='category.dump.bz2'):
-        """Constructor."""
+        """Initializer."""
         if not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         self.filename = filename
@@ -406,7 +406,7 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
     @deprecated_args(editSummary='comment', dry=None)
     def __init__(self, generator, newcat=None, sort_by_last_name=False,
                  create=False, comment='', follow_redirects=False):
-        """Constructor."""
+        """Initializer."""
         super(CategoryAddBot, self).__init__()
         self.generator = generator
         self.newcat = newcat
@@ -885,7 +885,7 @@ class CategoryRemoveRobot(CategoryMoveRobot):
             self, catTitle, batchMode=False, editSummary='',
             useSummaryForDeletion=CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC,
             titleRegex=None, inPlace=False, pagesonly=False):
-        """Constructor."""
+        """Initializer."""
         super(CategoryRemoveRobot, self).__init__(
             oldcat=catTitle,
             batch=batchMode,
@@ -903,7 +903,7 @@ class CategoryListifyRobot(object):
     def __init__(self, catTitle, listTitle, editSummary, overwrite=False,
                  showImages=False, subCats=False, talkPages=False,
                  recurse=False):
-        """Constructor."""
+        """Initializer."""
         self.editSummary = editSummary
         self.overwrite = overwrite
         self.showImages = showImages
@@ -971,7 +971,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
     """
 
     def __init__(self, catTitle, catDB, namespaces=None):
-        """Constructor."""
+        """Initializer."""
         self.catTitle = catTitle
         self.catDB = catDB
         site = pywikibot.Site()
@@ -999,7 +999,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             """An option to show more and more context."""
 
             def __init__(self):
-                """Constructor."""
+                """Initializer."""
                 super(CatContextOption, self).__init__(
                     'print first part of the page (longer and longer)', '?',
                     full_text, contextLength, 500)
@@ -1136,7 +1136,7 @@ class CategoryTreeRobot(object):
     """
 
     def __init__(self, catTitle, catDB, filename=None, maxDepth=10):
-        """Constructor."""
+        """Initializer."""
         self.catTitle = catTitle
         self.catDB = catDB
         if filename and not os.path.isabs(filename):

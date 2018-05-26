@@ -38,7 +38,7 @@ The image "Flag.svg" has been uploaded, making the old "Flag.jpg" obsolete:
 
 """
 #
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -59,7 +59,7 @@ class ImageRobot(ReplaceBot):
 
     def __init__(self, generator, old_image, new_image=None, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param generator: the pages to work on
         @type generator: iterable

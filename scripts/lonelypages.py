@@ -59,7 +59,7 @@ class OrphanTemplate(object):
     """The orphan template configuration."""
 
     def __init__(self, site, name, parameters, aliases=None, subst=False):
-        """Constructor."""
+        """Initializer."""
         self._name = name
         if not aliases:
             aliases = []
@@ -105,7 +105,7 @@ class LonelyPagesBot(SingleSiteBot):
     """Orphan page tagging bot."""
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'enablePage': None,    # Check if someone set an enablePage or not
             'disambigPage': None,  # If no disambigPage given, not use it.

@@ -419,7 +419,7 @@ class SiteNotPermitted(pywikibot.site.BaseSite):
     """Site interface to prevent sites being loaded."""
 
     def __init__(self, code, fam=None, user=None, sysop=None):
-        """Constructor."""
+        """Initializer."""
         raise pywikibot.SiteDefinitionError(
             'Loading site %s:%s during dry test not permitted'
             % (fam, code))
@@ -1086,7 +1086,7 @@ class TestCase(TestTimerMixin, TestCaseBase):
                 code in usernames['*'] or '*' in usernames['*'])
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(TestCase, self).__init__(*args, **kwargs)
 
         if not hasattr(self, 'sites'):
@@ -1396,7 +1396,7 @@ class WikibaseTestCase(TestCase):
         return cls.repo
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(WikibaseTestCase, self).__init__(*args, **kwargs)
 
         if not hasattr(self, 'sites'):
@@ -1575,7 +1575,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         source_adjustment_skips.append(unittest.case._AssertRaisesBaseContext)
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(DeprecationTestCase, self).__init__(*args, **kwargs)
         self.warning_log = []
 

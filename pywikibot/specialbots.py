@@ -47,7 +47,7 @@ class UploadRobot(BaseBot):
                  ignoreWarning=False, targetSite=None, aborts=[], chunk_size=0,
                  summary=None, filename_prefix=None, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @param url: path to url or local file (deprecated), or list of urls or
             paths to local files.
@@ -490,7 +490,7 @@ class EditReplacement(ChoiceException, UnhandledAnswer):
     """The text should be edited and replacement should be restarted."""
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         super(EditReplacement, self).__init__('edit', 'e')
         self.stop = True
 

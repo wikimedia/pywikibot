@@ -11,7 +11,7 @@ These command line parameters can be used to specify which pages to work on:
                   ATTENTION: Use this with care!
 """
 #
-# (C) Pywikibot team, 2006-2017
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,7 +49,7 @@ class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
     summary_key = 'selflink-remove'
 
     def __init__(self, generator, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(SelflinkBot, self).__init__(**kwargs)
         self.generator = generator
 

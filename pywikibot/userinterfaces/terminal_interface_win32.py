@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2016
+# (C) Pywikibot team, 2003-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -45,7 +45,7 @@ class Win32BaseUI(terminal_interface_base.UI):
     """User interface for Win32 terminals without ctypes."""
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         terminal_interface_base.UI.__init__(self)
         self.encoding = 'ascii'
 
@@ -55,7 +55,7 @@ class Win32CtypesUI(Win32BaseUI):
     """User interface for Win32 terminals using ctypes."""
 
     def __init__(self):
-        """Constructor."""
+        """Initializer."""
         Win32BaseUI.__init__(self)
         (stdin, stdout, stderr, argv) = win32_unicode.get_unicode_console()
         self.stdin = stdin

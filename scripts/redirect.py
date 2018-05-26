@@ -118,7 +118,7 @@ class RedirectGenerator(OptionHandler):
     }
 
     def __init__(self, action, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(RedirectGenerator, self).__init__(**kwargs)
         self.site = pywikibot.Site()
         self.use_api = self.getOption('fullscan')
@@ -405,7 +405,7 @@ class RedirectRobot(SingleSiteBot):
     """Redirect bot."""
 
     def __init__(self, action, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'total': float('inf'),
             'delete': False,

@@ -60,7 +60,7 @@ if not PY2:
         """Workaround for bug in python 3 email handling of CTE binary."""
 
         def __init__(self, *args, **kwargs):
-            """Constructor."""
+            """Initializer."""
             super(CTEBinaryBytesGenerator, self).__init__(*args, **kwargs)
             self._writeBody = self._write_body
 
@@ -194,7 +194,7 @@ class ParamInfo(Container):
 
     def __init__(self, site, preloaded_modules=None, modules_only_mode=None):
         """
-        Constructor.
+        Initializer.
 
         @param preloaded_modules: API modules to preload
         @type preloaded_modules: set of string
@@ -1056,7 +1056,7 @@ class OptionSet(MutableMapping):
 
     def __init__(self, site=None, module=None, param=None, dict=None):
         """
-        Constructor.
+        Initializer.
 
         If a site is given, the module and param must be given too.
 
@@ -1235,7 +1235,7 @@ class EnableSSLSiteWrapper(object):
     """Wrapper to change the site protocol to https."""
 
     def __init__(self, site):
-        """Constructor."""
+        """Initializer."""
         self._site = site
 
     def __repr__(self):
@@ -1498,8 +1498,8 @@ class Request(MutableMapping):
         Convert keyword arguments into new parameters mode.
 
         If there are no other arguments in kwargs apart from the used arguments
-        by the class' constructor it'll just return kwargs and otherwise remove
-        those which aren't in the constructor and put them in a dict which is
+        by the class' initializer it'll just return kwargs and otherwise remove
+        those which aren't in the initializer and put them in a dict which is
         added as a 'parameters' keyword. It will always create a shallow copy.
 
         @param kwargs: The original keyword arguments which is not modified.
@@ -2232,7 +2232,7 @@ class CachedRequest(Request):
     """Cached request."""
 
     def __init__(self, expiry, *args, **kwargs):
-        """Construct a CachedRequest object.
+        """Initialize a CachedRequest object.
 
         @param expiry: either a number of days or a datetime.timedelta object
         """
@@ -2404,7 +2404,7 @@ class APIGenerator(_RequestWrapper):
     def __init__(self, action, continue_name='continue', limit_name='limit',
                  data_name='data', **kwargs):
         """
-        Construct an APIGenerator object.
+        Initialize an APIGenerator object.
 
         kwargs are used to create a Request object; see that object's
         documentation for values.
@@ -2536,7 +2536,7 @@ class QueryGenerator(_RequestWrapper):
 
     def __init__(self, **kwargs):
         """
-        Construct a QueryGenerator object.
+        Initialize a QueryGenerator object.
 
         kwargs are used to create a Request object; see that object's
         documentation for values. 'action'='query' is assumed.
@@ -2911,7 +2911,7 @@ class PageGenerator(QueryGenerator):
 
     def __init__(self, generator, g_content=False, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and generator is required.
@@ -3001,7 +3001,7 @@ class PropertyGenerator(QueryGenerator):
 
     def __init__(self, prop, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and prop is required.
@@ -3039,7 +3039,7 @@ class ListGenerator(QueryGenerator):
 
     def __init__(self, listaction, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         Required and optional parameters are as for C{Request}, except that
         action=query is assumed and listaction is required.
@@ -3061,7 +3061,7 @@ class LogEntryListGenerator(ListGenerator):
     """
 
     def __init__(self, logtype=None, **kwargs):
-        """Constructor."""
+        """Initializer."""
         ListGenerator.__init__(self, "logevents", **kwargs)
 
         from pywikibot import logentries

@@ -14,7 +14,7 @@ Parameters:
 #
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
-# (c) xqt, 2011-2016
+# (c) xqt, 2011-2018
 # (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
@@ -43,7 +43,7 @@ class UnusedFilesBot(Bot):
     """Unused files bot."""
 
     def __init__(self, site, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'nouserwarning': False  # do not warn uploader
         })

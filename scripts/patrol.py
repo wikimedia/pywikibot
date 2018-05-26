@@ -85,7 +85,7 @@ class PatrolBot(SingleSiteBot):
 
     def __init__(self, site=True, **kwargs):
         """
-        Constructor.
+        Initializer.
 
         @kwarg feed: The changes feed to work on (Newpages or Recentchanges)
         @kwarg ask: If True, confirm each patrol action
@@ -395,7 +395,7 @@ class LinkedPagesRule(object):
     """Matches of page site title and linked pages title."""
 
     def __init__(self, page_title):
-        """Constructor.
+        """Initializer.
 
         @param page_title: The page title for this rule
         @type page_title: pywikibot.Page

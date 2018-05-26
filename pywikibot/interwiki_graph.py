@@ -43,7 +43,7 @@ class GraphSavingThread(threading.Thread):
     """
 
     def __init__(self, graph, originPage):
-        """Constructor."""
+        """Initializer."""
         threading.Thread.__init__(self)
         self.graph = graph
         self.originPage = originPage
@@ -64,7 +64,7 @@ class Subject(object):
     """Data about a page with translations on multiple wikis."""
 
     def __init__(self, origin=None):
-        """Constructor.
+        """Initializer.
 
         @param originPage: the page on the 'origin' wiki
         @type originPage: Page
@@ -133,7 +133,7 @@ class GraphDrawer(object):
     """Graphviz (dot) code creator."""
 
     def __init__(self, subject):
-        """Constructor.
+        """Initializer.
 
         @param subject: page data to graph
         @type subject: Subject

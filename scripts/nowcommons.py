@@ -180,7 +180,7 @@ class NowCommonsDeleteBot(Bot):
     """Bot to delete migrated files."""
 
     def __init__(self, **kwargs):
-        """Constructor."""
+        """Initializer."""
         self.availableOptions.update({
             'replace': False,
             'replacealways': False,

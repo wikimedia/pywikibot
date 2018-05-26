@@ -279,7 +279,7 @@ class TestRequest(CachedRequest):
     """Add caching to every Request except logins."""
 
     def __init__(self, *args, **kwargs):
-        """Constructor."""
+        """Initializer."""
         super(TestRequest, self).__init__(0, *args, **kwargs)
 
     @classmethod

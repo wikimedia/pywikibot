@@ -47,7 +47,7 @@ class MWSite(object):
 
     def __init__(self, fromurl):
         """
-        Constructor.
+        Initializer.
 
         @raises ServerError: a server error occurred while loading the site
         @raises Timeout: a timeout occurred while loading the site
@@ -231,7 +231,7 @@ class WikiHTMLPageParser(HTMLParser):
     """Wiki HTML page parser."""
 
     def __init__(self, url):
-        """Constructor."""
+        """Initializer."""
         if PYTHON_VERSION < (3, 4):
             HTMLParser.__init__(self)
         else:

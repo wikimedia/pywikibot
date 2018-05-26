@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing Flow entities, like boards, topics, and posts."""
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,7 +37,7 @@ class FlowPage(BasePage):
     """
 
     def __init__(self, source, title=''):
-        """Constructor.
+        """Initializer.
 
         @param source: A Flow-enabled site or a Link or Page on such a site
         @type source: Site, Link, or Page
@@ -313,7 +313,7 @@ class Post(object):
 
     def __init__(self, page, uuid):
         """
-        Constructor.
+        Initializer.
 
         @param page: Flow topic
         @type page: Topic

@@ -187,7 +187,7 @@ class BlockEntry(LogEntry):
     _expectedType = 'block'
 
     def __init__(self, apidata, site):
-        """Constructor."""
+        """Initializer."""
         super(BlockEntry, self).__init__(apidata, site)
         # When an autoblock is removed, the "title" field is not a page title
         # See bug T19781
@@ -435,7 +435,7 @@ class LogEntryFactory(object):
 
     def __init__(self, site, logtype=None):
         """
-        Constructor.
+        Initializer.
 
         @param site: The site on which the log entries are created.
         @type site: BaseSite
