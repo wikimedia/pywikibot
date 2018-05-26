@@ -17,30 +17,26 @@ class Family(family.WikimediaFamily):
 
     name = 'commons'
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
+    langs = {
+        'commons': 'commons.wikimedia.org',
+        'beta': 'commons.wikimedia.beta.wmflabs.org'
+    }
 
-        self.langs = {
-            'commons': 'commons.wikimedia.org',
-            'beta': 'commons.wikimedia.beta.wmflabs.org'
-        }
+    interwiki_forward = 'wikipedia'
 
-        self.interwiki_forward = 'wikipedia'
+    # Templates that indicate a category redirect
+    # Redirects to these templates are automatically included
+    category_redirect_templates = {
+        '_default': (
+            'Category redirect',
+            'Synonym taxon category redirect',
+            'Invalid taxon category redirect',
+            'Monotypic taxon category redirect',
+            'Endashcatredirect',
+        ),
+    }
 
-        # Templates that indicate a category redirect
-        # Redirects to these templates are automatically included
-        self.category_redirect_templates = {
-            '_default': (
-                u'Category redirect',
-                u'Synonym taxon category redirect',
-                u'Invalid taxon category redirect',
-                u'Monotypic taxon category redirect',
-                'Endashcatredirect',
-            ),
-        }
-
-        # Subpages for documentation.
-        self.doc_subpages = {
-            '_default': ((u'/doc', ), ['commons']),
-        }
+    # Subpages for documentation.
+    doc_subpages = {
+        '_default': (('/doc', ), ['commons']),
+    }

@@ -73,22 +73,22 @@ def update_family(families):
             pywikibot.output(u'The lists match!')
         else:
             pywikibot.output(u"The lists don't match, the new list is:")
-            text = '        self.languages_by_size = [\n'
-            line = ' ' * 11
+            text = '    languages_by_size = [\n'
+            line = ' ' * 7
             for code in new:
                 if len(line) + len(code) < 76:
                     line += u" '%s'," % code
                 else:
                     text += '%s\n' % line
-                    line = ' ' * 11
+                    line = ' ' * 7
                     line += u" '%s'," % code
             text += '%s\n' % line
-            text += u'        ]'
+            text += '    ]'
             pywikibot.output(text)
             family_file_name = 'pywikibot/families/%s_family.py' % family
             with codecs.open(family_file_name, 'r', 'utf8') as family_file:
                 family_text = family_file.read()
-            family_text = re.sub(r'(?msu)^ {8}self.languages_by_size.+?\]',
+            family_text = re.sub(r'(?msu)^ {4}languages_by_size.+?\]',
                                  text, family_text, 1)
             with codecs.open(family_file_name, 'w', 'utf8') as family_file:
                 family_file.write(family_text)

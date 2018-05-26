@@ -8,7 +8,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from pywikibot import family
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, classproperty
 
 
 class Family(family.SubdomainFamily, family.WikiaFamily):
@@ -26,25 +26,38 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
 
     interwiki_removals = ['hr', 'ro', 'sr']
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
-        # Override 'sv'. http://sv.wow.wikia.com is an empty wiki.
-        # The interwikimap in this family map 'sv' to this empty wiki.
-        self.langs['sv'] = 'sv.warcraft.wikia.com'
+    # Override 'sv'. http://sv.wow.wikia.com is an empty wiki.
+    # The interwikimap in this family map 'sv' to this empty wiki.
+    @classproperty
+    def langs(cls):
+        cls.langs = super(Family, cls).langs
+        cls.langs['sv'] = 'sv.warcraft.wikia.com'
+        return cls.langs
 
-        self.disambiguationTemplates['en'] = ['disambig', 'disambig/quest',
-                                              'disambig/quest2',
-                                              'disambig/achievement2']
-        self.disambcatname['en'] = "Disambiguations"
+    @classproperty
+    def disambiguationTemplates(cls):
+        cls.disambiguationTemplates = \
+            super(Family, cls).disambiguationTemplates
+        cls.disambiguationTemplates['en'] = ['disambig', 'disambig/quest',
+                                             'disambig/quest2',
+                                             'disambig/achievement2']
+        return cls.disambiguationTemplates
 
-        # Wikia's default CategorySelect extension always puts categories last
-        self.categories_last = self.langs.keys()
+    @classproperty
+    def disambcatname(cls):
+        cls.disambcatname = super(Family, cls).disambcatname
+        cls.disambcatname['en'] = 'Disambiguations'
+        return cls.disambcatname
 
-    @property
-    def domains(self):
+    # Wikia's default CategorySelect extension always puts categories last
+    @classproperty
+    def categories_last(cls):
+        return cls.langs.keys()
+
+    @classproperty
+    def domains(cls):
         """List of domains used by family wowwiki."""
-        return (self.domain, 'wowwiki.com', 'warcraft.wikia.com')
+        return (cls.domain, 'wowwiki.com', 'warcraft.wikia.com')
 
     @deprecated('APISite.version()')
     def version(self, code):

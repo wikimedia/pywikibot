@@ -17,8 +17,4 @@ class Family(family.WikimediaOrgFamily):
 
     name = 'species'
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
-
-        self.interwiki_forward = 'wikipedia'
+    interwiki_forward = 'wikipedia'

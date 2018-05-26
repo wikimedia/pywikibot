@@ -22,12 +22,8 @@ class Family(family.WikimediaFamily):
         '2014', '2015', '2016', '2017'
     ]
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
+    langs = {
+        '2018': 'wikimania2018.wikimedia.org'
+    }
 
-        self.langs = {
-            '2018': 'wikimania2018.wikimedia.org'
-        }
-
-        self.interwiki_forward = 'wikipedia'
+    interwiki_forward = 'wikipedia'

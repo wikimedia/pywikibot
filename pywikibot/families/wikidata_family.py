@@ -19,31 +19,28 @@ class Family(family.WikimediaFamily):
     name = 'wikidata'
     test_codes = ('test', )
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
-        self.langs = {
-            'wikidata': 'www.wikidata.org',
-            'test': 'test.wikidata.org',
-        }
+    langs = {
+        'wikidata': 'www.wikidata.org',
+        'test': 'test.wikidata.org',
+    }
 
-        self.interwiki_forward = 'wikipedia'
+    interwiki_forward = 'wikipedia'
 
-        self.category_redirect_templates = {
-            'wikidata': (
-                'Category redirect',
-            ),
-        }
+    category_redirect_templates = {
+        'wikidata': (
+            'Category redirect',
+        ),
+    }
 
-        # Subpages for documentation.
-        self.doc_subpages = {
-            '_default': ((u'/doc', ), ['wikidata']),
-        }
+    # Subpages for documentation.
+    doc_subpages = {
+        '_default': (('/doc', ), ['wikidata']),
+    }
 
-        # Disable cosmetic changes
-        config.cosmetic_changes_disable.update({
-            'wikidata': ('wikidata', 'test')
-        })
+    # Disable cosmetic changes
+    config.cosmetic_changes_disable.update({
+        'wikidata': ('wikidata', 'test')
+    })
 
     def interface(self, code):
         """Return 'DataSite'."""

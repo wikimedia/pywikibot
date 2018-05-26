@@ -18,14 +18,9 @@ class Family(family.SingleSiteFamily):
     name = 'omegawiki'
     domain = 'www.omegawiki.org'
 
-    def __init__(self):
-        """Constructor."""
-        super(Family, self).__init__()
-
-        # On most Wikipedias page names must start with a capital letter,
-        # but some languages don't use this.
-
-        self.nocapitalize = list(self.langs.keys())
+    # On most Wikipedias page names must start with a capital letter, but some
+    # languages don't use this.
+    nocapitalize = ['omegawiki']
 
     def scriptpath(self, code):
         """Return the script path for this family."""

@@ -67,22 +67,18 @@ class TestFamily(TestCase):
             Family.load,
             'unknown')
 
-    def test_eq_different_families_by_name(self):
-        """Test that two Family with same name are equal."""
-        family_1 = Family()
-        family_2 = Family()
-        family_1.name = 'a'
-        family_2.name = 'a'
-        self.assertNotEqual(id(family_1), id(family_2))
+    def test_new_same_family_singleton(self):
+        """Test that two same Family are the same object and equal."""
+        family_1 = Family.load('wikipedia')
+        family_2 = Family.load('wikipedia')
+        self.assertIs(family_1, family_2)
         self.assertEqual(family_1, family_2)
 
-    def test_eq_different_families_by_id(self):
-        """Test that two Family with no name attribute are not equal."""
-        family_1 = Family()
-        family_2 = Family()
-        family_1.name = 'a'
-        del family_2.name
-        self.assertNotEqual(id(family_1), id(family_2))
+    def test_new_different_families_ne(self):
+        """Test that two different Family are not same nor equal."""
+        family_1 = Family.load('wikipedia')
+        family_2 = Family.load('wiktionary')
+        self.assertIsNot(family_1, family_2)
         self.assertNotEqual(family_1, family_2)
 
     def test_eq_family_with_string_repr_same_family(self):
@@ -130,7 +126,9 @@ class TestFamily(TestCase):
 
     def test_set_obsolete(self):
         """Test obsolete can be set."""
-        family = Family()
+        # Construct a temporary family and instantiate it
+        family = type(str('TempFamily'), (Family,), {})()
+
         self.assertEqual(family.obsolete, {})
         self.assertEqual(family.interwiki_replacements, {})
         self.assertEqual(family.interwiki_removals, [])
