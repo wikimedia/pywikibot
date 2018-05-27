@@ -31,10 +31,12 @@ PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 
 if not PY2:
+    from itertools import zip_longest
     import queue as Queue
     StringTypes = basestring = (str,)
     UnicodeType = unicode = str
 else:
+    from itertools import izip_longest as zip_longest
     import Queue
     StringTypes = types.StringTypes
     UnicodeType = types.UnicodeType
@@ -839,6 +841,23 @@ def intersect_generators(genlist):
                 # All threads are done.
                 if thrlist.active_count() == 0:
                     return
+
+
+def roundrobin_generators(*iterables):
+    """Yield simultaneous from each iterable.
+
+    Sample:
+    >>> tuple(roundrobin_generators('ABC', range(5)))
+    ('A', 0, 'B', 1, 'C', 2, 3, 4)
+
+    @param iterables: any iterable to combine in roundrobin way
+    @type iterables: iterable
+    @return: the combined generator of iterables
+    @rtype: generator
+    """
+    return (item
+            for item in itertools.chain.from_iterable(zip_longest(*iterables))
+            if item is not None)
 
 
 def filter_unique(iterable, container=None, key=None, add=None):
