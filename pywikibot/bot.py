@@ -1621,7 +1621,7 @@ class SingleSiteBot(BaseBot):
         """Skip page it's site is not on the defined site."""
         if page.site != self.site:
             pywikibot.warning(
-                fill('Skipped "{page}" due to: '
+                fill('Skipped {page} due to: '
                      'The bot is on site "{site}" but the page on '
                      'site "{page.site}"'.format(site=self.site, page=page)))
             return True
@@ -1760,7 +1760,7 @@ class ExistingPageBot(CurrentPageBot):
         """Treat page if it exists and handle NoPage from it."""
         if not page.exists():
             pywikibot.warning(
-                'Page "{page.title()}" does not exist on {page.site}.'
+                'Page {page} does not exist on {page.site}.'
                 .format(page=page))
             return True
         return super(ExistingPageBot, self).skip_page(page)
@@ -1785,7 +1785,7 @@ class CreatingPageBot(CurrentPageBot):
         """Treat page if doesn't exist."""
         if page.exists():
             pywikibot.warning(
-                'Page "{page.title()}" does already exist on {page.site}.'
+                'Page {page} does already exist on {page.site}.'
                 .format(page=page))
             return True
         return super(CreatingPageBot, self).skip_page(page)
@@ -1799,7 +1799,7 @@ class RedirectPageBot(CurrentPageBot):
         """Treat only redirect pages and handle IsNotRedirectPage from it."""
         if not page.isRedirectPage():
             pywikibot.warning(
-                'Page "{page.title()}" on {page.site} is skipped because it is'
+                'Page {page} on {page.site} is skipped because it is'
                 'not a redirect'.format(page=page))
             return True
         return super(RedirectPageBot, self).skip_page(page)
@@ -1813,7 +1813,7 @@ class NoRedirectPageBot(CurrentPageBot):
         """Treat only non-redirect pages and handle IsRedirectPage from it."""
         if page.isRedirectPage():
             pywikibot.warning(
-                'Page "{page.title()}" on {page.site} is skipped because it is'
+                'Page {page} on {page.site} is skipped because it is'
                 'a redirect'.format(page=page))
             return True
         return super(NoRedirectPageBot, self).skip_page(page)
