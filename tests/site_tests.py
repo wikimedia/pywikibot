@@ -3507,11 +3507,11 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
     """Test proofreadinfo information."""
 
     sites = {
-        'en.ws': {
+        'en-ws': {
             'family': 'wikisource',
             'code': 'en',
         },
-        'en.wp': {
+        'en-wp': {
             'family': 'wikipedia',
             'code': 'en',
         },
@@ -3521,7 +3521,7 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
 
     def test_cache_proofreadinfo_on_site_with_proofreadpage(self):
         """Test Site._cache_proofreadinfo()."""
-        site = self.get_site('en.ws')
+        site = self.get_site('en-ws')
         ql_res = {0: u'Without text', 1: u'Not proofread', 2: u'Problematic',
                   3: u'Proofread', 4: u'Validated'}
 
@@ -3535,7 +3535,7 @@ class TestSiteProofreadinfo(DefaultSiteTestCase):
 
     def test_cache_proofreadinfo_on_site_without_proofreadpage(self):
         """Test Site._cache_proofreadinfo()."""
-        site = self.get_site('en.wp')
+        site = self.get_site('en-wp')
         self.assertRaises(pywikibot.UnknownExtension,
                           site._cache_proofreadinfo)
         self.assertRaises(pywikibot.UnknownExtension,
@@ -3551,11 +3551,11 @@ class TestPropertyNames(DefaultSiteTestCase):
     """Test Special:PagesWithProp method."""
 
     sites = {
-        'en.ws': {
+        'en-ws': {
             'family': 'wikisource',
             'code': 'en',
         },
-        'de.wp': {
+        'de-wp': {
             'family': 'wikipedia',
             'code': 'de',
         },
@@ -3582,17 +3582,17 @@ class TestPageFromWikibase(DefaultSiteTestCase):
     """Test page_from_repository method."""
 
     sites = {
-        'it.wb': {
+        'it-wb': {
             'family': 'wikibooks',
             'code': 'it',
             'result': 'Hello world',
         },
-        'de.wp': {
+        'de-wp': {
             'family': 'wikipedia',
             'code': 'de',
             'result': 'Hallo-Welt-Programm',
         },
-        'en.wp': {
+        'en-wp': {
             'family': 'wikipedia',
             'code': 'en',
             'result': '"Hello, World!" program',
@@ -3620,17 +3620,17 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
     """Test page_from_repository method."""
 
     sites = {
-        'it.ws': {
+        'it-ws': {
             'family': 'wikisource',
             'code': 'it',
             'result': 'Categoria:2016',
         },
-        'de.wp': {
+        'de-wp': {
             'family': 'wikipedia',
             'code': 'de',
             'result': 'Kategorie:2016',
         },
-        'en.wp': {
+        'en-wp': {
             'family': 'wikipedia',
             'code': 'en',
             'result': 'Category:2016',

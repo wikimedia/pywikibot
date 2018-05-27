@@ -22,12 +22,12 @@ class TestEventStreamsUrlTests(TestCase):
     """Url tests for eventstreams module."""
 
     sites = {
-        'de.wp': {
+        'de-wp': {
             'family': 'wikipedia',
             'code': 'de',
             'hostname': 'de.wikipedia.org',
         },
-        'en.wq': {
+        'en-wq': {
             'family': 'wikiquote',
             'code': 'en',
             'hostname': 'en.wikiquote.org',
