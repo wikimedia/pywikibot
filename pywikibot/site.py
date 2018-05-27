@@ -3622,8 +3622,8 @@ class APISite(BaseSite):
         bltitle = page.title(withSection=False).encode(self.encoding())
         blargs = {"gbltitle": bltitle}
         if filterRedirects is not None:
-            blargs["gblfilterredir"] = (filterRedirects and "redirects" or
-                                        "nonredirects")
+            blargs['gblfilterredir'] = ('redirects' if filterRedirects
+                                        else 'nonredirects')
         blgen = self._generator(api.PageGenerator, type_arg="backlinks",
                                 namespaces=namespaces, total=total,
                                 g_content=content, **blargs)
@@ -3679,8 +3679,8 @@ class APISite(BaseSite):
         eiargs = {"geititle":
                   page.title(withSection=False).encode(self.encoding())}
         if filterRedirects is not None:
-            eiargs["geifilterredir"] = (filterRedirects and "redirects" or
-                                        "nonredirects")
+            eiargs['geifilterredir'] = ('redirects' if filterRedirects
+                                        else 'nonredirects')
         return self._generator(api.PageGenerator, type_arg='embeddedin',
                                namespaces=namespaces, total=total,
                                g_content=content, **eiargs)
@@ -7020,7 +7020,7 @@ class APISite(BaseSite):
         """
         if offset:
             offset = pywikibot.Timestamp.fromtimestampformat(offset)
-        offset_dir = reverse and 'rev' or 'fwd'
+        offset_dir = 'rev' if reverse else 'fwd'
 
         params = {'action': 'flow', 'submodule': 'view-topiclist',
                   'page': page,
