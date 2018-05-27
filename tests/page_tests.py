@@ -340,7 +340,7 @@ class TestPageObject(DefaultSiteTestCase):
         # Test not valid source.
         self.assertRaisesRegex(pywikibot.Error,
                                'Invalid argument type \'<\\w* \'\\w*\'>\' in '
-                               'Page constructor: dummy',
+                               'Page initializer: dummy',
                                pywikibot.Page, 'dummy')
 
     def testTitle(self):
