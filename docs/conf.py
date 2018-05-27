@@ -22,9 +22,6 @@ from os.path import abspath, dirname, join
 import re
 import sys
 
-from scripts.cosmetic_changes import warning
-
-
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -262,9 +259,10 @@ def pywikibot_env():
     os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '1'
 
 
-def pywikibot_script_docstring_fixups(
-        app, what, name, obj, options, lines):
+def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
+    from scripts.cosmetic_changes import warning
+
     if what != "module":
         return
 
@@ -326,10 +324,35 @@ def pywikibot_skip_members(app, what, name, obj, skip, options):
     return skip or name in exclusions
 
 
+def pywikibot_family_classproperty_getattr(obj, name, *defargs):
+    """Custom getattr() to get classproperty instances."""
+    from sphinx.util.inspect import safe_getattr
+
+    from pywikibot.family import Family
+    from pywikibot.tools import classproperty
+
+    if not isinstance(obj, type) or not issubclass(obj, Family):
+        return safe_getattr(obj, name, *defargs)
+
+    for base_class in obj.__mro__:
+        try:
+            prop = base_class.__dict__[name]
+        except KeyError:
+            continue
+
+        if not isinstance(prop, classproperty):
+            return safe_getattr(obj, name, *defargs)
+
+        return prop
+    else:
+        return safe_getattr(obj, name, *defargs)
+
+
 def setup(app):
     """Implicit Sphinx extension hook."""
     app.connect('autodoc-process-docstring', pywikibot_script_docstring_fixups)
     app.connect('autodoc-skip-member', pywikibot_skip_members)
+    app.add_autodoc_attrgetter(type, pywikibot_family_classproperty_getattr)
 
 
 pywikibot_env()

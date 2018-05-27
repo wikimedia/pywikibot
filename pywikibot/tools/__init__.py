@@ -129,7 +129,7 @@ def py2_encode_utf_8(func):
 class classproperty(object):  # noqa: N801
 
     """
-    Metaclass to accesss a class method as a property.
+    Descriptor class to accesss a class method as a property.
 
     This class may be used as a decorator::
 
@@ -147,6 +147,7 @@ class classproperty(object):  # noqa: N801
     def __init__(self, cls_method):
         """Hold the class method."""
         self.method = cls_method
+        self.__doc__ = self.method.__doc__
 
     def __get__(self, instance, owner):
         """Get the attribute of the owner class by its method."""

@@ -46,9 +46,11 @@ class Family(object):
 
     def __new__(cls):
         """Allocator."""
-        if cls is Family:
-            raise TypeError('Base Family class cannot be instantiated; '
-                            'subclass it instead')
+        # any Family class defined in this file are abstract
+        if cls in globals().values():
+            raise TypeError(
+                'Abstract Family class {0} cannot be instantiated; '
+                'subclass it instead'.format(cls.__name__))
 
         # Override classproperty
         cls.instance = super(Family, cls).__new__(cls)
@@ -1544,7 +1546,7 @@ class SubdomainFamily(Family):
     @classproperty
     def codes(cls):
         """Property listing family codes."""
-        if hasattr(cls, 'languages_by_size'):
+        if cls.languages_by_size:
             return cls.languages_by_size
         raise NotImplementedError(
             'Family %s needs property "languages_by_size" or "codes"'
