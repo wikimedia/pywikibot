@@ -169,8 +169,8 @@ class TestBotTreatExit(object):
                 self.assertIs(exc, exception)
             else:
                 self.assertIsNone(exc)
-                # Cannot use assertRaisesRegex. Python 2.6 issue. See T158519.
-                self.assertRaises(StopIteration, next, self._page_iter)
+                self.assertRaisesRegex(StopIteration, '^$', next,
+                                       self._page_iter)
         return exit
 
 
