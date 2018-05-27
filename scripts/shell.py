@@ -1,7 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Spawns an interactive Python shell.
+Spawns an interactive Python shell and imports the pywikibot library.
+
+The following local option is supported:
+
+-noimport Do not import the pywikibot library. All other arguments are
+          ignored in this case.
 
 Usage:
 
@@ -13,16 +18,25 @@ If no arguments are given, the pywikibot library will not be loaded.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 
 def main(*args):
     """Script entry point."""
-    env = None
-    if args:
+    args = list(args)
+    if '-noimport' in args:
+        args.remove('-noimport')
+        env = None
+        warn_type = 'Ignoring'
+    else:
         import pywikibot
-        pywikibot.handle_args(args)
-        env = locals()
+        args = pywikibot.handle_args(args)
+        env = {'pywikibot': pywikibot}
+        warn_type = 'Unknown'
+
+    if args:
+        print('{} arguments: {}\n'  # noqa: T001
+              .format(warn_type, ', '.join(args)))
 
     import code
     code.interact("""Welcome to the Pywikibot interactive shell!""", local=env)
