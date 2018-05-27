@@ -122,7 +122,7 @@ class DjVuFile(object):
         """Deprecated file_djvu instance variable."""
         return self.file
 
-    def check_cache(fn):  # noqa: N805
+    def check_cache(fn):
         """Decorator to check if cache shall be cleared."""
         cache = ['_page_count', '_has_text', '_page_info']
 
@@ -135,7 +135,7 @@ class DjVuFile(object):
             return _res
         return wrapper
 
-    def check_page_number(fn):  # noqa: N805
+    def check_page_number(fn):
         """Decorator to check if page number is valid.
 
         @raises ValueError

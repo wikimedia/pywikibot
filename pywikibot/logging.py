@@ -135,7 +135,7 @@ def output(text, decoder=None, newline=True, toStdout=False, **kwargs):
     log message to include an exception traceback.
     """
     if toStdout:  # maintained for backwards-compatibity only
-        from pywikibot.tools import issue_deprecation_warning  # noqa
+        from pywikibot.tools import issue_deprecation_warning
         issue_deprecation_warning('"toStdout" parameter',
                                   'pywikibot.stdout()', 2)
         logoutput(text, decoder, newline, STDOUT, **kwargs)

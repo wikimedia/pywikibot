@@ -380,7 +380,7 @@ class SaveError(pywikibot.Error):
     """An attempt to save a page with changed interwiki has failed."""
 
 
-class LinkMustBeRemoved(SaveError):  # noqa
+class LinkMustBeRemoved(SaveError):  # noqa: D205,D400
 
     """
     An interwiki link has to be removed, but this can't be done because of user

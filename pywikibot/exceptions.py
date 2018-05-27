@@ -118,9 +118,9 @@ class FamilyMaintenanceWarning(UserWarning):
     pass
 
 
-class Error(UnicodeMixin, Exception):  # noqa
+class Error(UnicodeMixin, Exception):
 
-    """Pywikibot error"""
+    """Pywikibot error."""
 
     # NOTE: UnicodeMixin must be the first object Error class is derived from.
     def __init__(self, arg):
@@ -174,9 +174,9 @@ class PageRelatedError(Error):
         return self.page
 
 
-class PageSaveRelatedError(PageRelatedError):  # noqa
+class PageSaveRelatedError(PageRelatedError):
 
-    """Saving the page has failed"""
+    """Saving the page has failed."""
 
     message = u"Page %s was not saved."
 
@@ -218,9 +218,9 @@ class NoUsername(Error):
     pass
 
 
-class NoPage(PageRelatedError):  # noqa
+class NoPage(PageRelatedError):
 
-    """Page does not exist"""
+    """Page does not exist."""
 
     message = u"Page %s doesn't exist."
 
@@ -270,9 +270,9 @@ class InconsistentTitleReceived(PageLoadRelatedError):
         super(InconsistentTitleReceived, self).__init__(page)
 
 
-class SiteDefinitionError(Error):  # noqa
+class SiteDefinitionError(Error):
 
-    """Site does not exist"""
+    """Site does not exist."""
 
     pass
 
@@ -283,16 +283,16 @@ class SiteDefinitionError(Error):  # noqa
 NoSuchSite = SiteDefinitionError
 
 
-class UnknownSite(SiteDefinitionError):  # noqa
+class UnknownSite(SiteDefinitionError):
 
-    """Site does not exist in Family"""
+    """Site does not exist in Family."""
 
     pass
 
 
-class UnknownFamily(SiteDefinitionError):  # noqa
+class UnknownFamily(SiteDefinitionError):
 
-    """Family is not registered"""
+    """Family is not registered."""
 
     pass
 
@@ -304,18 +304,18 @@ class UnknownExtension(Error, NotImplementedError):
     pass
 
 
-class IsRedirectPage(PageRelatedError):  # noqa
+class IsRedirectPage(PageRelatedError):
 
-    """Page is a redirect page"""
+    """Page is a redirect page."""
 
     message = u"Page %s is a redirect page."
 
     pass
 
 
-class IsNotRedirectPage(PageRelatedError):  # noqa
+class IsNotRedirectPage(PageRelatedError):
 
-    """Page is not a redirect page"""
+    """Page is not a redirect page."""
 
     message = u"Page %s is not a redirect page."
 
@@ -359,43 +359,43 @@ class InterwikiRedirectPage(PageRelatedError):
         super(InterwikiRedirectPage, self).__init__(page)
 
 
-class InvalidTitle(Error):  # noqa
+class InvalidTitle(Error):
 
-    """Invalid page title"""
+    """Invalid page title."""
 
     pass
 
 
-class LockedPage(PageSaveRelatedError):  # noqa
+class LockedPage(PageSaveRelatedError):
 
-    """Page is locked"""
+    """Page is locked."""
 
     message = u"Page %s is locked."
 
     pass
 
 
-class LockedNoPage(LockedPage):  # noqa
+class LockedNoPage(LockedPage):
 
-    """Title is locked against creation"""
+    """Title is locked against creation."""
 
     message = u"Page %s does not exist and is locked preventing creation."
 
     pass
 
 
-class CascadeLockedPage(LockedPage):  # noqa
+class CascadeLockedPage(LockedPage):
 
-    """Page is locked due to cascading protection"""
+    """Page is locked due to cascading protection."""
 
     message = u"Page %s is locked due to cascading protection."
 
     pass
 
 
-class SectionError(Error):  # noqa
+class SectionError(Error):
 
-    """The section specified by # does not exist"""
+    """The section specified by # does not exist."""
 
     pass
 
@@ -412,27 +412,27 @@ class NoCreateError(PageSaveRelatedError):
     pass
 
 
-class EditConflict(PageSaveRelatedError):  # noqa
+class EditConflict(PageSaveRelatedError):
 
-    """There has been an edit conflict while uploading the page"""
+    """There has been an edit conflict while uploading the page."""
 
     message = u"Page %s could not be saved due to an edit conflict"
 
     pass
 
 
-class PageDeletedConflict(EditConflict):  # noqa
+class PageDeletedConflict(EditConflict):
 
-    """Page was deleted since being retrieved"""
+    """Page was deleted since being retrieved."""
 
     message = u"Page %s has been deleted since last retrieved."
 
     pass
 
 
-class PageCreatedConflict(EditConflict):  # noqa
+class PageCreatedConflict(EditConflict):
 
-    """Page was created by another user"""
+    """Page was created by another user."""
 
     message = u"Page %s has been created since last retrieved."
 
@@ -471,9 +471,9 @@ class TitleblacklistError(PageSaveRelatedError):
     pass
 
 
-class ServerError(Error):  # noqa
+class ServerError(Error):
 
-    """Got unexpected server response"""
+    """Got unexpected server response."""
 
     pass
 
@@ -485,9 +485,9 @@ class FatalServerError(ServerError):
     pass
 
 
-class Server504Error(ServerError):  # noqa
+class Server504Error(ServerError):
 
-    """Server timed out with HTTP 504 code"""
+    """Server timed out with HTTP 504 code."""
 
     pass
 
@@ -509,9 +509,9 @@ class BadTitle(Error):
 # UserBlocked exceptions should in general not be caught. If the bot has
 # been blocked, the bot operator should address the reason for the block
 # before continuing.
-class UserBlocked(Error):  # noqa
+class UserBlocked(Error):
 
-    """Your username or IP has been blocked"""
+    """Your username or IP has been blocked."""
 
     pass
 

@@ -29,7 +29,7 @@ class MementoTestCase(TestCase):
 
     def _get_archive_url(self, url, date_string=None):
         from memento_client.memento_client import \
-            MementoClientException  # noqa: E402
+            MementoClientException
 
         if date_string is None:
             when = datetime.datetime.now()

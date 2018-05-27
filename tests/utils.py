@@ -36,7 +36,7 @@ from tests import unittest
 if not PY2:
     import six
 else:
-    ResourceWarning = None  # flake8: F821
+    ResourceWarning = None
 
 
 OSWIN32 = (sys.platform == 'win32')
