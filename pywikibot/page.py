@@ -1317,7 +1317,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                       % (family, self.site.lang))
         # cc depends on page directly and via several other imports
         from pywikibot.cosmetic_changes import (
-            CANCEL_MATCH, CosmeticChangesToolkit)  # noqa
+            CANCEL_MATCH, CosmeticChangesToolkit)
         ccToolkit = CosmeticChangesToolkit(self.site,
                                            namespace=self.namespace(),
                                            pageTitle=self.title(),
