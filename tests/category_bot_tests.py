@@ -75,20 +75,20 @@ class TestPreprocessingCategory(TestCase):
     def test_determine_type_target(self):
         """Test determining type target."""
         page = pywikibot.Page(self.site, 'Template:Doc')
-        bot = CategoryPreprocess(page, follow_redirects=True)
+        bot = CategoryPreprocess(follow_redirects=True)
         bot.site = self.site
         new_page = bot.determine_type_target(page)
         expected = pywikibot.Page(self.site, 'Template:Documentation')
         self.assertEqual(new_page, expected)
 
         page = pywikibot.Page(self.site, 'Template:Doc')
-        bot = CategoryPreprocess(page)
+        bot = CategoryPreprocess()
         bot.site = self.site
         new_page = bot.determine_type_target(page)
         self.assertEqual(new_page, None)
 
         page = pywikibot.Page(self.site, 'Template:Baz')
-        bot = CategoryPreprocess(page)
+        bot = CategoryPreprocess()
         bot.site = self.site
         new_page = bot.determine_type_target(page)
         self.assertEqual(new_page, None)
@@ -96,7 +96,7 @@ class TestPreprocessingCategory(TestCase):
     def test_determine_template_target(self):
         """Test determining template target."""
         page = pywikibot.Page(self.site, 'Template:Documentation')
-        bot = CategoryPreprocess(page)
+        bot = CategoryPreprocess()
         bot.site = self.site
         new_page = bot.determine_template_target(page)
         expected = pywikibot.Page(self.site, 'Template:Documentation/doc')
@@ -104,7 +104,7 @@ class TestPreprocessingCategory(TestCase):
         self.assertEqual(bot.includeonly, ['includeonly'])
 
         page = pywikibot.Page(self.site, 'Template:Branches of chemistry')
-        bot = CategoryPreprocess(page)
+        bot = CategoryPreprocess()
         bot.site = self.site
         new_page = bot.determine_template_target(page)
         expected = pywikibot.Page(self.site, 'Template:Branches of chemistry')

@@ -175,11 +175,10 @@ class CategoryPreprocess(BaseBot):
 
     """A class to prepare a list of pages for robots."""
 
-    def __init__(self, page, follow_redirects=False, edit_redirects=False,
-                 create=False):
+    def __init__(self, follow_redirects=False, edit_redirects=False,
+                 create=False, **kwargs):
         """Initializer."""
-        super(CategoryPreprocess, self).__init__()
-        page = page
+        super(CategoryPreprocess, self).__init__(**kwargs)
         self.follow_redirects = follow_redirects
         self.edit_redirects = edit_redirects
         self.create = create
@@ -191,7 +190,7 @@ class CategoryPreprocess(BaseBot):
         @param page: Existing, missing or redirect page to be processed
         @type page: pywikibot.Page
         @return: Page to be categorized
-        @rtype: pywikibot.Page
+        @rtype: pywikibot.Page or None
         """
         if page.exists():
             if page.isRedirectPage():
@@ -200,37 +199,33 @@ class CategoryPreprocess(BaseBot):
                 if self.follow_redirects:
                     if redir_target.exists():
                         return redir_target
-                    elif self.create:
+                    if self.create:
                         redir_target.text = ''
                         pywikibot.output('Redirect target %s does not exist '
                                          'yet; creating.'
                                          % redir_target.title(asLink=True))
                         return redir_target
-                    elif self.edit_redirects:
+                    if self.edit_redirects:
                         return page
-                    else:
-                        pywikibot.warning('Redirect target %s can not '
-                                          'be modified; skipping.'
-                                          % redir_target.title(asLink=True))
-                        return
-                elif self.edit_redirects:
+                    pywikibot.warning('Redirect target %s can not '
+                                      'be modified; skipping.'
+                                      % redir_target.title(asLink=True))
+                    return None
+                if self.edit_redirects:
                     return page
-                else:
-                    pywikibot.warning('Page %s is a redirect to %s; skipping.'
-                                      % (page.title(asLink=True),
-                                         redir_target.title(asLink=True)))
-                    return
-            else:
-                return page
-        elif self.create:
+                pywikibot.warning('Page %s is a redirect to %s; skipping.'
+                                  % (page.title(asLink=True),
+                                     redir_target.title(asLink=True)))
+                return None
+            return page
+        if self.create:
             page.text = ''
             pywikibot.output('Page %s does not exist yet; creating.'
                              % page.title(asLink=True))
             return page
-        else:
-            pywikibot.warning('Page %s does not exist; skipping.'
-                              % page.title(asLink=True))
-            return
+        pywikibot.warning('Page %s does not exist; skipping.'
+                          % page.title(asLink=True))
+        return None
 
     def determine_template_target(self, page):
         """
@@ -455,6 +450,8 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
         """Process one page."""
         # find correct categorization target
         page = self.determine_type_target(page)
+        if not page:
+            return
         self.current_page = self.determine_template_target(page)
         # load the page
         text = self.current_page.text
