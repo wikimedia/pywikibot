@@ -1066,7 +1066,29 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                     newtext = s2.replace(marker, '').strip() + separator + s
     else:
         newtext = s2.replace(marker, '')
-    return newtext
+
+    # special parts above interwiki
+    above_interwiki = []
+
+    if site.sitename == 'wikipedia:nn':
+        comment = re.compile(
+            r'<!--interwiki \(no(\/nb)?, *sv, *da first; then other languages '
+            r'alphabetically by name\)-->')
+        above_interwiki.append(comment)
+
+    if above_interwiki:
+        interwiki = _get_regexes(['interwiki'], site)[0]
+        first_interwiki = interwiki.search(newtext)
+        for reg in above_interwiki:
+            special = reg.search(newtext)
+            if special and not isDisabled(newtext, special.start()):
+                newtext = (newtext[:special.start()].strip()
+                           + newtext[special.end():])
+                newtext = (newtext[:first_interwiki.start()].strip()
+                           + special.group() + '\n'
+                           + newtext[first_interwiki.start():])
+
+    return newtext.strip()
 
 
 def interwikiFormat(links, insite=None):
@@ -1299,14 +1321,6 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
     marker = findmarker(oldtext)
     if site is None:
         site = pywikibot.Site()
-    if site.sitename == 'wikipedia:de' and '{{Personendaten' in oldtext:
-        pywikibot.error(
-            'The Pywikibot is no longer allowed to touch categories on the '
-            'German\nWikipedia on pages that contain the Personendaten '
-            'template because of the\nnon-standard placement of that template.'
-            '\nSee https://de.wikipedia.org/wiki/Hilfe:Personendaten'
-            '#Kopiervorlage')
-        return oldtext
     if re.search(r'\{\{ *(' + r'|'.join(site.getmagicwords('defaultsort'))
                  + r')', oldtext, flags=re.I):
         separator = config.line_separator
@@ -1350,6 +1364,27 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
                     langs_removed_text, interwiki, site, addOnly=True)
     else:
         newtext = cats_removed_text.replace(marker, '')
+
+    # special parts under categories
+    under_categories = []
+
+    if site.sitename == 'wikipedia:de':
+        personendaten = re.compile(r'\{\{ *Personendaten.*?\}\}',
+                                   re.I | re.DOTALL)
+        under_categories.append(personendaten)
+
+    if under_categories:
+        category = _get_regexes(['category'], site)[0]
+        for last_category in category.finditer(newtext):
+            pass
+        for reg in under_categories:
+            special = reg.search(newtext)
+            if special and not isDisabled(newtext, special.start()):
+                newtext = (newtext[:special.start()].strip()
+                           + newtext[special.end():])
+                newtext = (newtext[:last_category.end()].strip() + '\n' * 2
+                           + special.group() + newtext[last_category.end():])
+
     return newtext.strip()
 
 
