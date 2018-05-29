@@ -294,6 +294,8 @@ def create_user_config(main_family, main_code, main_username, force=False):
         usernames = '\n'.join(
             "usernames['{user.family}']['{user.code}'] = u'{user.name}'"
             .format(user=user) for user in userlist)
+        # Arbitrarily use the first key as default settings
+        main_family, main_code = userlist[0].family, userlist[0].code
     botpasswords = '\n'.join(
         "('{0}', BotPassword('{1}', '{2}'))".format(*botpassword)
         for botpassword in botpasswords)
