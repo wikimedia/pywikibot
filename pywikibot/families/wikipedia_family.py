@@ -44,7 +44,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'xmf', 'li', 'sah', 'sa', 'vec', 'ilo', 'os', 'mrj', 'eml', 'mhr',
         'sd', 'hif', 'bh', 'roa-tara', 'wuu', 'ps', 'diq', 'hak', 'pam', 'nso',
         'zh-classical', 'bcl', 'se', 'ace', 'szl', 'mi', 'nah', 'frr',
-        'nds-nl', 'rue', 'vls', 'gan', 'km', 'bo', 'crh', 'sc', 'vep', 'glk',
+        'nds-nl', 'rue', 'vls', 'gan', 'km', 'crh', 'bo', 'sc', 'vep', 'glk',
         'co', 'fiu-vro', 'tk', 'lrc', 'kv', 'myv', 'csb', 'gv', 'nv', 'as',
         'so', 'zea', 'udm', 'ay', 'ug', 'ie', 'stq', 'lez', 'nrm', 'kw', 'lad',
         'pcd', 'sn', 'mwl', 'gn', 'rm', 'gom', 'koi', 'ab', 'lij', 'mt', 'fur',
@@ -54,7 +54,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'nov', 'tyv', 'arc', 'jam', 'kbd', 'tpi', 'kbp', 'tet', 'ki', 'ig',
         'na', 'gor', 'jbo', 'lbe', 'roa-rup', 'ty', 'mdf', 'za', 'kg', 'bi',
         'wo', 'lg', 'srn', 'tcy', 'zu', 'chr', 'ltg', 'sm', 'om', 'inh', 'xh',
-        'rmy', 'bm', 'cu', 'tn', 'pih', 'chy', 'rn', 'tw', 'ts', 'tum', 'ak',
+        'rmy', 'cu', 'bm', 'tn', 'pih', 'rn', 'chy', 'tw', 'ts', 'tum', 'ak',
         'got', 'st', 'atj', 'pnt', 'ss', 'ch', 'fj', 'iu', 'ady', 'ny', 'ee',
         'ks', 'ik', 've', 'sg', 'ff', 'dz', 'ti', 'cr', 'din',
     ]
