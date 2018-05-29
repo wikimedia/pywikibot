@@ -659,7 +659,8 @@ class CosmeticChangesToolkit(object):
             for template in skip_templates[self.site.code]:
                 skip_regexes.append(
                     re.compile(r'\{\{\s*%s\s*\}\}' % template, re.I))
-        stripped_text = str(text)
+
+        stripped_text = text
         for reg in skip_regexes:
             stripped_text = reg.sub(r'', stripped_text)
 
