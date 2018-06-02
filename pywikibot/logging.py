@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Logging functions."""
 #
-# (C) Pywikibot team, 2010-2016
+# (C) Pywikibot team, 2010-2018
 #
 # Distributed under the terms of the MIT license.
 #

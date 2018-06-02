@@ -5,7 +5,7 @@ Site upload test.
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2015
 #
 # Distributed under the terms of the MIT license.
 #

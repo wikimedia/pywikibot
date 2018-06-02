@@ -15,7 +15,7 @@ Parameters:
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
 # (c) xqt, 2011-2018
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #

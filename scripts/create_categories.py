@@ -33,7 +33,7 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 #
 # (C) Multichill, 2011
 # (C) xqt, 2011-2018
-# (c) Pywikibot team, 2018
+# (c) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #

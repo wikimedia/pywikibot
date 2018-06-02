@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #

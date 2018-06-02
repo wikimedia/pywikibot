@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Vikidia."""
 #
-# (C) Pywikibot team, 2010-2016
+# (C) Pywikibot team, 2010-2017
 #
 # Distributed under the terms of the MIT license.
 #

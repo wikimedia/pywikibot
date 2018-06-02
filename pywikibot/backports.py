@@ -5,7 +5,7 @@ This module contained backports to support older Python versions.
 Their usage is deprecated and this module could be dropped soon.
 """
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #

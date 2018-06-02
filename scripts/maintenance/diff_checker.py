@@ -19,7 +19,7 @@ Todo: The following rules can be added in the future:
         python release.
 """
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2017-2018
 #
 # Distributed under the terms of the MIT license.
 #

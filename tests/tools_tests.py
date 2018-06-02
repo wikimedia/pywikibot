@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals

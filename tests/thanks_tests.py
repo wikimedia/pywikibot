@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-17
+# (C) Pywikibot team, 2016-2017
 #
 # Distributed under the terms of the MIT license.
 #

@@ -37,7 +37,7 @@ Copy the template "Query service" from the Toolserver wiki to wikitech:
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #

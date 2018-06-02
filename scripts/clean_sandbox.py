@@ -31,7 +31,7 @@ Furthermore, the following command line parameters are supported:
 # (C) Siebrand Mazeland, 2007
 # (C) xqt, 2009-2018
 # (C) Dr. Trigon, 2012
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2010-2018
 #
 # Distributed under the terms of the MIT license.
 #
