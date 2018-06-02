@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2013-2015
+# (C) Pywikibot team, 2013-2017
 #
 # Distributed under the terms of the MIT license.
 #

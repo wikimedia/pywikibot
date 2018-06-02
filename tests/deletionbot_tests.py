@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for scripts/delete.py."""
 #
-# (C) Pywikibot team, 2014
+# (C) Pywikibot team, 2014-2016
 #
 # Distributed under the terms of the MIT license.
 #

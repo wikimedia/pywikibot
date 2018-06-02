@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2014-2017
 #
 # Distributed under the terms of the MIT license.
 #

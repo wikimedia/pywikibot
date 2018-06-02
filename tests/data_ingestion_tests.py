@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Unit tests for data_ingestion.py script."""
 #
-# (C) Pywikibot team, 2012-2015
+# (C) Pywikibot team, 2012-2016
 #
 # Distributed under the terms of the MIT license.
 #

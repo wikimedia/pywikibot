@@ -3,7 +3,7 @@
 """Unit tests for djvu.py."""
 
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2015-2017
 #
 # Distributed under the terms of the MIT license.
 #

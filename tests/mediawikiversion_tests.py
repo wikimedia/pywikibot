@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the tools.MediaWikiVersion class."""
 #
-# (C) Pywikibot team, 2008-2016
+# (C) Pywikibot team, 2008-2017
 #
 # Distributed under the terms of the MIT license.
 #

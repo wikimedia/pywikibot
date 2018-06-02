@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for archivebot scripts."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2014-2018
 #
 # Distributed under the terms of the MIT license.
 #

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Used by pytest to do some preparation work before running tests."""
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2016-2017
 #
 # Distributed under the terms of the MIT license.
 #

@@ -131,7 +131,7 @@ Please type "replace.py -help | more" if you can't read the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #

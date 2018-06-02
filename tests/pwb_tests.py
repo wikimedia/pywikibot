@@ -7,7 +7,7 @@ should be added locally.
 https://bitbucket.org/ned/coveragepy/src/default/tests/test_execfile.py
 """
 #
-# (C) Pywikibot team, 2007-2014
+# (C) Pywikibot team, 2007-2015
 #
 # Distributed under the terms of the MIT license.
 #

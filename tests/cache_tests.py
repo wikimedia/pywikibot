@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API Request cache tests."""
 #
-# (C) Pywikibot team, 2012-2014
+# (C) Pywikibot team, 2012-2015
 #
 # Distributed under the terms of the MIT license.
 #
