@@ -1273,9 +1273,9 @@ def isUncat(page):
             pywikibot.output(u'Got category ' + category.title())
             return False
 
-    for templateWithTrail in page.templates():
+    for template_with_trail in page.templates():
         # Strip of trailing garbage
-        template = templateWithTrail.title().rstrip('\n').rstrip()
+        template = template_with_trail.title().rstrip('\n').rstrip()
         if template in skipTemplates:
             # Already tagged with a template, skip it
             pywikibot.output(u'Already tagged, skip it')
@@ -1340,7 +1340,7 @@ def main(*args):
         elif choice == 'q':
             return False
 
-    genFactory = pagegenerators.GeneratorFactory(site)
+    gen_factory = pagegenerators.GeneratorFactory(site)
 
     for arg in local_args:
         param_arg, sep, param_value = arg.partition(':')
@@ -1359,11 +1359,11 @@ def main(*args):
                     '-recentchanges without parameters',
                     '-recentchanges:offset,duration',
                     2, ArgumentDeprecationWarning)
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    generator = genFactory.getCombinedGenerator(gen=generator, preload=True)
+    generator = gen_factory.getCombinedGenerator(gen=generator, preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False

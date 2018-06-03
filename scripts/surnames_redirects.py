@@ -111,15 +111,15 @@ def main(*args):
     options = {}
 
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg == '-surnames_last':
             options['surnames_last'] = True
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = gen_factory.getCombinedGenerator()
     if gen:
         bot = SurnamesBot(gen, **options)
         bot.run()

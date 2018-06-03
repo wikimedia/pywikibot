@@ -235,7 +235,7 @@ def main(*args):
     options = {}
 
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     site = pywikibot.Site()
 
     for arg in local_args:
@@ -254,13 +254,13 @@ def main(*args):
         elif arg == '-always':
             options['always'] = True
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    generator = genFactory.getCombinedGenerator()
+    generator = gen_factory.getCombinedGenerator()
 
     # If the generator is not given, use the default one
     if not generator:
-        generator = site.lonelypages(total=genFactory.limit)
+        generator = site.lonelypages(total=gen_factory.limit)
 
     bot = LonelyPagesBot(generator, **options)
     bot.run()

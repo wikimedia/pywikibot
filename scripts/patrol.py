@@ -469,7 +469,7 @@ def main(*args):
     recentchanges = False
     newpages = False
     repeat = False
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     options = {}
 
     # Parse command line arguments
@@ -492,7 +492,7 @@ def main(*args):
         elif arg.startswith("-whitelist:"):
             options['whitelist'] = arg[len('-whitelist:'):]
         else:
-            generator = genFactory.handleArg(arg)
+            generator = gen_factory.handleArg(arg)
             if not generator:
                 if ':' in arg:
                     m = arg.split(':')
@@ -523,7 +523,7 @@ def main(*args):
         gen = site.newpages
         feed = api_feed_repeater(gen, delay=60, repeat=repeat,
                                  user=usercontribs,
-                                 namespaces=genFactory.namespaces,
+                                 namespaces=gen_factory.namespaces,
                                  recent_new_gen=False)
         bot.run(feed)
 
@@ -531,7 +531,7 @@ def main(*args):
         pywikibot.output(u'Recentchanges:')
         gen = site.recentchanges
         feed = api_feed_repeater(gen, delay=60, repeat=repeat,
-                                 namespaces=genFactory.namespaces,
+                                 namespaces=gen_factory.namespaces,
                                  user=usercontribs)
         bot.run(feed)
 

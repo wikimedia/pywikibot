@@ -78,19 +78,19 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
     if auto and page:
         # search inside all dictionaries for this link
         sitelang = page.site.lang
-        dictName, value = date.getAutoFormat(sitelang, page.title())
-        if dictName:
+        dict_name, value = date.getAutoFormat(sitelang, page.title())
+        if dict_name:
             pywikibot.output(
                 u'TitleTranslate: %s was recognized as %s with value %d'
-                % (page.title(), dictName, value))
-            for entryLang, entry in date.formats[dictName].items():
-                if entryLang not in site.languages():
+                % (page.title(), dict_name, value))
+            for entry_lang, entry in date.formats[dict_name].items():
+                if entry_lang not in site.languages():
                     continue
-                if entryLang != sitelang:
+                if entry_lang != sitelang:
                     newname = entry(value)
                     x = pywikibot.Link(
                         newname,
-                        pywikibot.Site(code=entryLang,
+                        pywikibot.Site(code=entry_lang,
                                        fam=site.family))
                     result.add(x)
     return list(result)

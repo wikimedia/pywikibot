@@ -70,8 +70,7 @@ class StatesRedirectBot(pywikibot.Bot):
         if so, create a redirect from Something, ST..
         """
         for sn in self.abbrev:
-            R = re.compile(r', %s$' % sn)
-            if R.search(page.title()):
+            if re.search(r', %s$' % sn, page.title()):
                 pl = pywikibot.Page(self.site, page.title().replace(sn,
                                     self.abbrev[sn]))
                 # A bit hacking here - the real work is done in the

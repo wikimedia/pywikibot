@@ -221,10 +221,10 @@ def main(*args):
     @type args: list of unicode
     """
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     options = {}
     for arg in local_args:
-        if genFactory.handleArg(arg):
+        if gen_factory.handleArg(arg):
             continue
         option, sep, value = arg.partition(':')
         option = option[1:] if option.startswith('-') else None
@@ -235,7 +235,7 @@ def main(*args):
 
     site = pywikibot.Site()
 
-    generator = genFactory.getCombinedGenerator(preload=True)
+    generator = gen_factory.getCombinedGenerator(preload=True)
     if generator:
         bot = IWBot(generator=generator, site=site, **options)
         bot.run()

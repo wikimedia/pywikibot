@@ -90,7 +90,7 @@ def main(*args):
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg == '-always':
@@ -100,7 +100,7 @@ def main(*args):
         elif arg.startswith('-basename'):
             basename = arg[len('-basename:'):].strip()
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
     missing = set()
     if not parent:
@@ -108,7 +108,7 @@ def main(*args):
     if not basename:
         missing.add('-basename')
 
-    generator = genFactory.getCombinedGenerator()
+    generator = gen_factory.getCombinedGenerator()
     if generator and missing:
         bot = CreateCategoriesBot(generator, parent, basename, **options)
         bot.run()

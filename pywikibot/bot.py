@@ -139,6 +139,66 @@ uiModule = __import__("pywikibot.userinterfaces.%s_interface"
 ui = uiModule.UI()
 pywikibot.argvu = ui.argvu()
 
+_GLOBAL_HELP = '''
+GLOBAL OPTIONS
+==============
+(Global arguments available for all bots)
+
+-dir:PATH         Read the bot's configuration data from directory given by
+                  PATH, instead of from the default directory.
+
+-lang:xx          Set the language of the wiki you want to work on, overriding
+                  the configuration in user-config.py. xx should be the
+                  language code.
+
+-family:xyz       Set the family of the wiki you want to work on, e.g.
+                  wikipedia, wiktionary, wikitravel, ...
+                  This will override the configuration in user-config.py.
+
+-user:xyz         Log in as user 'xyz' instead of the default username.
+
+-daemonize:xyz    Immediately return control to the terminal and redirect
+                  stdout and stderr to file xyz.
+                  (only use for bots that require no input from stdin).
+
+-help             Show this help text.
+
+-log              Enable the log file, using the default filename
+                  '%s-bot.log'
+                  Logs will be stored in the logs subdirectory.
+
+-log:xyz          Enable the log file, using 'xyz' as the filename.
+
+-nolog            Disable the log file (if it is enabled by default).
+
+-maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
+                  edits during periods of database server lag. Default is set
+                  by config.py
+
+-putthrottle:n    Set the minimum time (in seconds) the bot will wait between
+-pt:n             saving pages.
+-put_throttle:n
+
+-debug:item       Enable the log file and include extensive debugging data
+-debug            for component "item" (for all components if the second form
+                  is used).
+
+-verbose          Have the bot provide additional console output that may be
+-v                useful in debugging.
+
+-cosmeticchanges  Toggles the cosmetic_changes setting made in config.py or
+-cc               user-config.py to its inverse and overrules it. All other
+                  settings and restrictions are untouched.
+
+-simulate         Disables writing to the server. Useful for testing and
+                  debugging of new code (if given, doesn't do any real
+                  changes, but only shows what would have been changed).
+
+-<config var>:n   You may use all given numeric config variables as option and
+                  modify it with command line.
+
+'''
+
 
 # It's not possible to use pywikibot.exceptions.PageRelatedError as that is
 # importing pywikibot.data.api which then needs pywikibot.bot
@@ -228,9 +288,9 @@ def init_handlers(strm=None):
     """
     global _handlers_initialized
 
-    moduleName = calledModuleName()
-    if not moduleName:
-        moduleName = "terminal-interface"
+    module_name = calledModuleName()
+    if not module_name:
+        module_name = 'terminal-interface'
 
     logging.addLevelName(VERBOSE, "VERBOSE")
     # for messages to be displayed on terminal at "verbose" setting
@@ -263,11 +323,11 @@ def init_handlers(strm=None):
     ui.init_handlers(root_logger, **config.userinterface_init_kwargs)
 
     # if user has enabled file logging, configure file handler
-    if moduleName in config.log or '*' in config.log:
+    if module_name in config.log or '*' in config.log:
         if config.logfilename:
             logfile = config.datafilepath("logs", config.logfilename)
         else:
-            logfile = config.datafilepath("logs", "%s-bot.log" % moduleName)
+            logfile = config.datafilepath('logs', '%s-bot.log' % module_name)
         file_handler = RotatingFileHandler(filename=logfile,
                                            maxBytes=1024 * config.logfilesize,
                                            backupCount=config.logfilecount)
@@ -856,10 +916,10 @@ def handle_args(args=None, do_help=True):
     # get the name of the module calling this function. This is
     # required because the -help option loads the module's docstring and
     # because the module name will be used for the filename of the log.
-    moduleName = calledModuleName()
-    if not moduleName:
-        moduleName = "terminal-interface"
-    nonGlobalArgs = []
+    module_name = calledModuleName()
+    if not module_name:
+        module_name = 'terminal-interface'
+    non_global_args = []
     username = None
     do_help = None if do_help else False
     for arg in args:
@@ -877,8 +937,8 @@ def handle_args(args=None, do_help=True):
         elif option in ('-putthrottle', '-pt'):
             config.put_throttle = int(value)
         elif option == '-log':
-            if moduleName not in config.log:
-                config.log.append(moduleName)
+            if module_name not in config.log:
+                config.log.append(module_name)
             if value:
                 config.logfilename = value
         elif option == '-nolog':
@@ -915,8 +975,8 @@ def handle_args(args=None, do_help=True):
         #    other settings.
         #
         elif option == '-debug':
-            if moduleName not in config.log:
-                config.log.append(moduleName)
+            if module_name not in config.log:
+                config.log.append(module_name)
             if value:
                 if value not in config.debug_log:
                     config.debug_log.append(value)
@@ -938,7 +998,7 @@ def handle_args(args=None, do_help=True):
                 setattr(config, _arg, int(value))
             except (ValueError, TypeError, AttributeError):
                 # argument not global -> specific bot script will take care
-                nonGlobalArgs.append(arg)
+                non_global_args.append(arg)
 
     if username:
         config.usernames[config.family][config.mylang] = username
@@ -954,7 +1014,7 @@ def handle_args(args=None, do_help=True):
         sys.exit(0)
 
     debug('handle_args() completed.', _logger)
-    return nonGlobalArgs
+    return non_global_args
 
 
 @deprecated("handle_args")
@@ -973,79 +1033,21 @@ def showHelp(module_name=None):
         except NameError:
             module_name = "no_module"
 
-    globalHelp = u'''
-GLOBAL OPTIONS
-==============
-(Global arguments available for all bots)
-
--dir:PATH         Read the bot's configuration data from directory given by
-                  PATH, instead of from the default directory.
-
--lang:xx          Set the language of the wiki you want to work on, overriding
-                  the configuration in user-config.py. xx should be the
-                  language code.
-
--family:xyz       Set the family of the wiki you want to work on, e.g.
-                  wikipedia, wiktionary, wikitravel, ...
-                  This will override the configuration in user-config.py.
-
--user:xyz         Log in as user 'xyz' instead of the default username.
-
--daemonize:xyz    Immediately return control to the terminal and redirect
-                  stdout and stderr to file xyz.
-                  (only use for bots that require no input from stdin).
-
--help             Show this help text.
-
--log              Enable the log file, using the default filename
-                  '%s-bot.log'
-                  Logs will be stored in the logs subdirectory.
-
--log:xyz          Enable the log file, using 'xyz' as the filename.
-
--nolog            Disable the log file (if it is enabled by default).
-
--maxlag           Sets a new maxlag parameter to a number of seconds. Defer bot
-                  edits during periods of database server lag. Default is set
-                  by config.py
-
--putthrottle:n    Set the minimum time (in seconds) the bot will wait between
--pt:n             saving pages.
--put_throttle:n
-
--debug:item       Enable the log file and include extensive debugging data
--debug            for component "item" (for all components if the second form
-                  is used).
-
--verbose          Have the bot provide additional console output that may be
--v                useful in debugging.
-
--cosmeticchanges  Toggles the cosmetic_changes setting made in config.py or
--cc               user-config.py to its inverse and overrules it. All other
-                  settings and restrictions are untouched.
-
--simulate         Disables writing to the server. Useful for testing and
-                  debugging of new code (if given, doesn't do any real
-                  changes, but only shows what would have been changed).
-
--<config var>:n   You may use all given numeric config variables as option and
-                  modify it with command line.
-
-''' % module_name
+    global_help = _GLOBAL_HELP % module_name
     try:
         module = __import__('%s' % module_name)
-        helpText = module.__doc__
-        if PY2 and isinstance(helpText, bytes):
-            helpText = helpText.decode('utf-8')
+        help_text = module.__doc__
+        if PY2 and isinstance(help_text, bytes):
+            help_text = help_text.decode('utf-8')
         if hasattr(module, 'docuReplacements'):
             for key, value in module.docuReplacements.items():
-                helpText = helpText.replace(key, value.strip('\n\r'))
-        pywikibot.stdout(helpText)  # output to STDOUT
+                help_text = help_text.replace(key, value.strip('\n\r'))
+        pywikibot.stdout(help_text)  # output to STDOUT
     except Exception:
         if module_name:
             pywikibot.stdout(u'Sorry, no help available for %s' % module_name)
         pywikibot.log('showHelp:', exc_info=True)
-    pywikibot.stdout(globalHelp)
+    pywikibot.stdout(global_help)
 
 
 def suggest_help(missing_parameters=[], missing_generator=False,
@@ -1101,9 +1103,9 @@ def writeToCommandLogFile():
     except IOError:
         command_log_file = codecs.open(command_log_filename, 'w', 'utf-8')
     # add a timestamp in ISO 8601 formulation
-    isoDate = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    iso_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
     command_log_file.write('%s r%s Python %s '
-                           % (isoDate, version.getversiondict()['rev'],
+                           % (iso_date, version.getversiondict()['rev'],
                               sys.version.split()[0]))
     s = u' '.join(args)
     command_log_file.write(s + os.linesep)
@@ -1143,16 +1145,14 @@ class OptionHandler(object):
         @param kwargs: options
         @type kwargs: dict
         """
+        valid_options = set(self.availableOptions)
+        received_options = set(kwargs)
+
         # contains the options overridden from defaults
-        self.options = {}
+        self.options = {
+            opt: kwargs[opt] for opt in received_options & valid_options}
 
-        validOptions = set(self.availableOptions)
-        receivedOptions = set(kwargs)
-
-        for opt in receivedOptions & validOptions:
-            self.options[opt] = kwargs[opt]
-
-        for opt in receivedOptions - validOptions:
+        for opt in received_options - valid_options:
             pywikibot.warning(u'%s is not a valid option. It was ignored.'
                               % opt)
 

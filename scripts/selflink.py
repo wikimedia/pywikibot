@@ -82,25 +82,23 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    # Page generator
-    gen = None
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = GeneratorFactory()
-    botArgs = {}
+    gen_factory = GeneratorFactory()
+    bot_args = {}
 
     for arg in local_args:
         if arg == '-always':
-            botArgs['always'] = True
+            bot_args['always'] = True
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if not gen:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
 
-    bot = SelflinkBot(gen, **botArgs)
+    bot = SelflinkBot(gen, **bot_args)
     bot.run()
     return True
 

@@ -131,7 +131,7 @@ def main(*args):
     protocol = 'http'
     options = {}
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
         if arg == '-always':
             options['always'] = True
@@ -139,7 +139,7 @@ def main(*args):
             protocol = arg.partition(':')[2]
         elif arg.startswith('-summary:'):
             options['summary'] = arg.partition(':')[2]
-        elif genFactory.handleArg(arg):
+        elif gen_factory.handleArg(arg):
             continue
         else:
             spam_external_url = arg
@@ -150,7 +150,7 @@ def main(*args):
 
     link_search = pagegenerators.LinksearchPageGenerator(spam_external_url,
                                                          protocol=protocol)
-    generator = genFactory.getCombinedGenerator(gen=link_search)
+    generator = gen_factory.getCombinedGenerator(gen=link_search)
     generator = pagegenerators.PreloadingGenerator(generator)
 
     bot = SpamRemoveBot(generator, spam_external_url, **options)

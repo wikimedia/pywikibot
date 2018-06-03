@@ -90,18 +90,18 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
         pipe.append(str(program), '--')  # py2-py3 compatibility
 
         # Create a temporary filename to save the piped stuff to
-        tempFilename = '%s.%s' % (tempfile.mktemp(), 'txt')
-        with pipe.open(tempFilename, 'w') as file:
+        temp_filename = '%s.%s' % (tempfile.mktemp(), 'txt')
+        with pipe.open(temp_filename, 'w') as file:
             file.write(text)
 
         # Now retrieve the munged text
-        with open(tempFilename, 'r') as file:
+        with open(temp_filename, 'r') as file:
             unicode_text = file.read()
         if not isinstance(unicode_text, UnicodeType):  # py2-py3 compatibility
             unicode_text = unicode_text.decode('utf-8')
 
         # clean up
-        os.unlink(tempFilename)
+        os.unlink(temp_filename)
         return unicode_text
 
     def treat_page(self):
@@ -124,7 +124,7 @@ def main(*args):
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     # The program to pipe stuff through
     filters = []
     options = {}
@@ -139,11 +139,11 @@ def main(*args):
         else:
             # check if a standard argument like
             # -start:XYZ or -ref:Asdf was given.
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
     options['filters'] = filters
 
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.

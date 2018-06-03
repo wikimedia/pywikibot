@@ -98,10 +98,10 @@ def main(*args):
     overwrite = False
     gen_args = []
 
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if genFactory.handleArg(arg):
+        if gen_factory.handleArg(arg):
             gen_args.append(arg)
             continue
         if arg.startswith('-tofamily'):
@@ -117,7 +117,7 @@ def main(*args):
     if fromsite == tosite:
         raise TargetSiteMissing('Target site not different from source site')
 
-    gen = genFactory.getCombinedGenerator()
+    gen = gen_factory.getCombinedGenerator()
     if not gen:
         raise TargetPagesMissing('Target pages not specified')
 

@@ -68,11 +68,11 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
 
     def treat_page(self):
         """Treat page with the cosmetic toolkit."""
-        ccToolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
+        cc_toolkit = cosmetic_changes.CosmeticChangesToolkit.from_page(
             self.current_page, False, self.getOption('ignore'))
-        changedText = ccToolkit.change(self.current_page.get())
-        if changedText is not False:
-            self.put_current(new_text=changedText,
+        changed_text = cc_toolkit.change(self.current_page.get())
+        if changed_text is not False:
+            self.put_current(new_text=changed_text,
                              summary=self.getOption('summary'),
                              asynchronous=self.getOption('async'))
 
@@ -90,7 +90,7 @@ def main(*args):
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg.startswith('-summary:'):
@@ -111,7 +111,7 @@ def main(*args):
                 raise ValueError(
                     'Unknown ignore mode "{0}"!'.format(ignore_mode))
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
     site = pywikibot.Site()
 
@@ -120,7 +120,7 @@ def main(*args):
         options['summary'] = i18n.twtranslate(site,
                                               'cosmetic_changes-standalone')
 
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         if options.get('always') or config.simulate or pywikibot.input_yn(
                 warning + '\nDo you really want to continue?',

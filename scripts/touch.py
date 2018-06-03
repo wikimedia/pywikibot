@@ -81,7 +81,7 @@ def main(*args):
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     bot_class = TouchBot
     for arg in local_args:
@@ -90,11 +90,11 @@ def main(*args):
         elif arg == '-redir':
             pywikibot.output(u'-redirect option is deprecated, '
                              'do not use it anymore.')
-        elif not genFactory.handleArg(arg) and arg.startswith("-"):
+        elif not gen_factory.handleArg(arg) and arg.startswith('-'):
             # -botflag
             options[arg[1:].lower()] = True
 
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         bot = bot_class(generator=gen, **options)
         pywikibot.Site().login()

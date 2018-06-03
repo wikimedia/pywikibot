@@ -104,7 +104,7 @@ class WikiStats(object):
             path = '/{format}/{table}.{format}'
         else:
             path = '/api.php?action=dump&table={table}&format={format}'
-        URL = self.url + path
+        url = self.url + path
 
         if table not in self.ALL_KEYS:
             pywikibot.warning('WikiStats unknown table %s' % table)
@@ -112,7 +112,7 @@ class WikiStats(object):
         if table in self.FAMILY_MAPPING:
             table = self.FAMILY_MAPPING[table]
 
-        r = http.fetch(URL.format(table=table, format=format))
+        r = http.fetch(url.format(table=table, format=format))
         return r.raw
 
     def raw_cached(self, table, format):
