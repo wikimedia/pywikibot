@@ -3110,13 +3110,14 @@ class APISite(BaseSite):
                                 )
         self._update_page(page, query)
 
+    @deprecated('page.exists()')
     def page_exists(self, page):
         """Return True if and only if page is an existing page on site."""
         return page.pageid > 0
 
     def page_restrictions(self, page):
         """Return a dictionary reflecting page protections."""
-        if not self.page_exists(page):
+        if not page.exists():
             raise NoPage(page)
         if not hasattr(page, "_protection"):
             self.loadpageinfo(page)
