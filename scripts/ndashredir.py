@@ -137,13 +137,13 @@ def main(*args):
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     # Parse command line arguments
     for arg in local_args:
 
         # Catch the pagegenerators options
-        if genFactory.handleArg(arg):
+        if gen_factory.handleArg(arg):
             continue  # nothing to do here
 
         # Now pick up custom options
@@ -158,7 +158,7 @@ def main(*args):
 
     # The preloading option is responsible for downloading multiple pages
     # from the wiki simultaneously.
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         # pass generator and private options to the bot
         bot = DashRedirectBot(gen, **options)

@@ -129,8 +129,7 @@ def run_bot(give_url, image_url, desc):
                                       % (mysite.namespace(14), cat))
             desc += "\r\n\r\n" + basicdesc + "\r\n\r\n" + \
                     "\r\n".join(categories)
-            uploadBot = UploadRobot(image, description=desc)
-            uploadBot.run()
+            UploadRobot(image, description=desc).run()
         elif answer == 's':
             break
 

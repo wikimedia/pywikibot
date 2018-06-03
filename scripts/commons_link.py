@@ -76,8 +76,8 @@ class CommonsLinkBot(Bot):
                     commonspage.get(get_redirect=True)
                     pagetitle = commonspage.title(withNamespace=not catmode)
                     if page.title() == pagetitle:
-                        oldText = page.get()
-                        text = oldText
+                        old_text = page.get()
+                        text = old_text
 
                         # for Commons/Commonscat template
                         s = self.findTemplate.search(text)
@@ -96,7 +96,7 @@ class CommonsLinkBot(Bot):
                                 page.site, 'commons_link%s-template-added'
                                 % ('', '-cat')[catmode])
                             try:
-                                self.userPut(page, oldText, text,
+                                self.userPut(page, old_text, text,
                                              summary=comment)
                             except pywikibot.EditConflict:
                                 pywikibot.output(
@@ -128,7 +128,7 @@ def main(*args):
     options = {}
 
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg in ('pages', 'categories'):
@@ -136,9 +136,9 @@ def main(*args):
         elif arg == '-always':
             options['always'] = True
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if 'action' in options and gen:
         bot = CommonsLinkBot(gen, **options)
         bot.run()

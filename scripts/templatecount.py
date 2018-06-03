@@ -63,16 +63,16 @@ class TemplateCountRobot(object):
         @param namespaces: list of namespace numbers
         @type namespaces: list
         """
-        FORMAT = '{0:<10}: {1:>5}'
-        templateDict = cls.template_dict(templates, namespaces)
+        format = '{0:<10}: {1:>5}'
+        template_dict = cls.template_dict(templates, namespaces)
         pywikibot.stdout('\nNumber of transclusions per template')
         pywikibot.stdout('-' * 36)
         total = 0
-        for key in templateDict:
-            count = len(templateDict[key])
-            pywikibot.stdout(FORMAT.format(key, count))
+        for key in template_dict:
+            count = len(template_dict[key])
+            pywikibot.stdout(format.format(key, count))
             total += count
-        pywikibot.stdout(FORMAT.format('TOTAL', total))
+        pywikibot.stdout(format.format('TOTAL', total))
         pywikibot.stdout('Report generated on {0}'
                          ''.format(datetime.datetime.utcnow().isoformat()))
 
@@ -89,14 +89,14 @@ class TemplateCountRobot(object):
         @param namespaces: list of namespace numbers
         @type namespaces: list
         """
-        templateDict = cls.template_dict(templates, namespaces)
+        template_dict = cls.template_dict(templates, namespaces)
         pywikibot.stdout('\nList of pages transcluding templates:')
         for key in templates:
             pywikibot.output(u'* %s' % key)
         pywikibot.stdout('-' * 36)
         total = 0
-        for key in templateDict:
-            for page in templateDict[key]:
+        for key in template_dict:
+            for page in template_dict[key]:
                 pywikibot.stdout(page.title())
                 total += 1
         pywikibot.output(u'Total page count: %d' % total)
@@ -118,11 +118,7 @@ class TemplateCountRobot(object):
 
         @rtype: dict
         """
-        gen = cls.template_dict_generator(templates, namespaces)
-        templateDict = {}
-        for template, transcludingArray in gen:
-            templateDict[template] = transcludingArray
-        return templateDict
+        return dict(cls.template_dict_generator(templates, namespaces))
 
     @staticmethod
     def template_dict_generator(templates, namespaces):
@@ -143,12 +139,12 @@ class TemplateCountRobot(object):
         mysite = pywikibot.Site()
         mytpl = mysite.namespaces.TEMPLATE
         for template in templates:
-            transcludingArray = []
+            transcluding_array = []
             gen = pywikibot.Page(mysite, template, ns=mytpl).getReferences(
                 namespaces=namespaces, onlyTemplateInclusion=True)
             for page in gen:
-                transcludingArray.append(page)
-            yield template, transcludingArray
+                transcluding_array.append(page)
+            yield template, transcluding_array
 
 
 def main(*args):
@@ -161,7 +157,7 @@ def main(*args):
     @type args: list of unicode
     """
     operation = None
-    argsList = []
+    args_list = []
     namespaces = []
 
     for arg in pywikibot.handle_args(args):
@@ -173,17 +169,17 @@ def main(*args):
             except ValueError:
                 namespaces.append(arg[len('-namespace:'):])
         else:
-            argsList.append(arg)
+            args_list.append(arg)
 
     if not operation:
         pywikibot.bot.suggest_help(missing_parameters=['operation'])
         return False
 
     robot = TemplateCountRobot()
-    if not argsList:
-        argsList = templates
+    if not args_list:
+        args_list = templates
 
-    if 'reflist' in argsList:
+    if 'reflist' in args_list:
         pywikibot.output(
             u'NOTE: it will take a long time to count "reflist".')
         choice = pywikibot.input_choice(
@@ -191,14 +187,14 @@ def main(*args):
             [('yes', 'y'), ('no', 'n'), ('skip', 's')], 'y',
             automatic_quit=False)
         if choice == 's':
-            argsList.remove('reflist')
+            args_list.remove('reflist')
         elif choice == 'n':
             return
 
     if operation == "count":
-        robot.countTemplates(argsList, namespaces)
+        robot.countTemplates(args_list, namespaces)
     elif operation == "list":
-        robot.listTemplates(argsList, namespaces)
+        robot.listTemplates(args_list, namespaces)
 
 
 if __name__ == "__main__":

@@ -113,9 +113,9 @@ class LoggingFormatter(logging.Formatter):
 
         Formatter.formatException also strips the trailing \n, which we need.
         """
-        strExc = logging.Formatter.formatException(self, ei)
+        exception_string = logging.Formatter.formatException(self, ei)
 
-        if PY2 and isinstance(strExc, bytes):
-            return strExc.decode(self._encoding) + '\n'
+        if PY2 and isinstance(exception_string, bytes):
+            return exception_string.decode(self._encoding) + '\n'
         else:
-            return strExc + '\n'
+            return exception_string + '\n'

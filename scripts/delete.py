@@ -224,14 +224,13 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    pageName = ''
+    page_name = ''
     summary = None
-    generator = None
     options = {}
 
     # read command line parameters
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     mysite = pywikibot.Site()
 
     for arg in local_args:
@@ -260,31 +259,31 @@ def main(*args):
                 namespaces = mysite.namespaces
             options['orphansonly'] = namespaces
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
             found = arg.find(':') + 1
             if found:
-                pageName = arg[found:]
+                page_name = arg[found:]
 
         if not summary:
             un = 'un' if 'undelete' in options else ''
-            if pageName:
+            if page_name:
                 if arg.startswith(('-cat', '-subcats')):
                     summary = i18n.twtranslate(mysite, 'delete-from-category',
-                                               {'page': pageName})
+                                               {'page': page_name})
                 elif arg.startswith('-links'):
                     summary = i18n.twtranslate(mysite,
                                                un + 'delete-linked-pages',
-                                               {'page': pageName})
+                                               {'page': page_name})
                 elif arg.startswith('-ref'):
                     summary = i18n.twtranslate(mysite, 'delete-referring-pages',
-                                               {'page': pageName})
+                                               {'page': page_name})
                 elif arg.startswith('-imageused'):
                     summary = i18n.twtranslate(mysite, un + 'delete-images',
-                                               {'page': pageName})
+                                               {'page': page_name})
             elif arg.startswith('-file'):
                 summary = i18n.twtranslate(mysite, un + 'delete-from-file')
 
-    generator = genFactory.getCombinedGenerator()
+    generator = gen_factory.getCombinedGenerator()
     # We are just deleting pages, so we have no need of using a preloading
     # page generator to actually get the text of those pages.
     if generator:

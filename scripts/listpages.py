@@ -190,7 +190,7 @@ def main(*args):
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = GeneratorFactory()
+    gen_factory = GeneratorFactory()
 
     for arg in local_args:
         option, sep, value = arg.partition(':')
@@ -215,7 +215,7 @@ def main(*args):
         elif option == '-summary':
             summary = value
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
     if base_dir:
         base_dir = os.path.expanduser(base_dir)
@@ -250,7 +250,7 @@ def main(*args):
         if re.match('^[a-z_-]+$', summary):
             summary = i18n.twtranslate(site, summary)
 
-    gen = genFactory.getCombinedGenerator()
+    gen = gen_factory.getCombinedGenerator()
     if gen:
         i = 0
         output_list = []

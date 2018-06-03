@@ -103,11 +103,11 @@ def main(*args):
     url = u''
     description = []
     summary = None
-    keepFilename = False
+    keep_filename = False
     always = False
-    useFilename = None
+    use_filename = None
     filename_prefix = None
-    verifyDescription = True
+    verify_description = True
     aborts = set()
     ignorewarn = set()
     chunk_size = 0
@@ -121,21 +121,21 @@ def main(*args):
     for option in local_args:
         arg, _, value = option.partition(':')
         if arg == '-always':
-            keepFilename = True
+            keep_filename = True
             always = True
-            verifyDescription = False
+            verify_description = False
         elif arg == '-recursive':
             recursive = True
         elif arg == '-keep':
-            keepFilename = True
+            keep_filename = True
         elif arg == '-filename':
-            useFilename = value
+            use_filename = value
         elif arg == '-prefix':
             filename_prefix = value
         elif arg == '-summary':
             summary = value
         elif arg == '-noverify':
-            verifyDescription = False
+            verify_description = False
         elif arg == '-abortonwarn':
             if value and aborts is not True:
                 aborts.add(value)
@@ -198,9 +198,9 @@ def main(*args):
     else:
         url = [url]
 
-    bot = UploadRobot(url, description=description, useFilename=useFilename,
-                      keepFilename=keepFilename,
-                      verifyDescription=verifyDescription, aborts=aborts,
+    bot = UploadRobot(url, description=description, useFilename=use_filename,
+                      keepFilename=keep_filename,
+                      verifyDescription=verify_description, aborts=aborts,
                       ignoreWarning=ignorewarn, chunk_size=chunk_size,
                       always=always, summary=summary,
                       filename_prefix=filename_prefix)

@@ -169,7 +169,7 @@ def main(*args):
 
     # read command line parameters
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     site = pywikibot.Site()
 
     generator_type = None
@@ -215,7 +215,7 @@ def main(*args):
                         protections[p_type_arg] = level
                         is_p_type = True
             if not is_p_type:
-                if not genFactory.handleArg(arg):
+                if not gen_factory.handleArg(arg):
                     raise ValueError('Unknown parameter "{0}"'.format(arg))
                 found = arg.find(':')
                 if found:
@@ -237,7 +237,7 @@ def main(*args):
                     site, 'protect-{0}'.format(message_type),
                     message_properties)
 
-    generator = genFactory.getCombinedGenerator()
+    generator = gen_factory.getCombinedGenerator()
     # We are just protecting pages, so we have no need of using a preloading
     # page generator to actually get the text of those pages.
     if generator:

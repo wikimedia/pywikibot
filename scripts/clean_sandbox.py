@@ -162,45 +162,46 @@ class SandboxBot(Bot):
         while True:
             wait = False
             now = time.strftime("%d %b %Y %H:%M:%S (UTC)", time.gmtime())
-            for sandboxPage in self.generator:
+            for sandbox_page in self.generator:
                 pywikibot.output(u'Preparing to process sandbox page %s'
-                                 % sandboxPage.title(asLink=True))
-                if sandboxPage.isRedirectPage():
+                                 % sandbox_page.title(asLink=True))
+                if sandbox_page.isRedirectPage():
                     pywikibot.warning(
                         u'%s is a redirect page, cleaning it anyway'
-                        % sandboxPage.title(asLink=True))
+                        % sandbox_page.title(asLink=True))
                 try:
-                    text = sandboxPage.text
+                    text = sandbox_page.text
                     if not self.getOption('text'):
-                        translatedContent = i18n.translate(self.site, content)
+                        translated_content = i18n.translate(self.site, content)
                     else:
-                        translatedContent = self.getOption('text')
+                        translated_content = self.getOption('text')
                     if self.getOption('summary'):
-                        translatedMsg = self.getOption('summary')
+                        translated_msg = self.getOption('summary')
                     else:
-                        translatedMsg = i18n.twtranslate(
+                        translated_msg = i18n.twtranslate(
                             self.site, 'clean_sandbox-cleaned')
-                    subst = 'subst:' in translatedContent
-                    pos = text.find(translatedContent.strip())
-                    if text.strip() == translatedContent.strip():
+                    subst = 'subst:' in translated_content
+                    pos = text.find(translated_content.strip())
+                    if text.strip() == translated_content.strip():
                         pywikibot.output(
                             u'The sandbox is still clean, no change necessary.')
-                    elif subst and sandboxPage.userName() == self.site.user():
+                    elif subst and sandbox_page.userName() == self.site.user():
                         pywikibot.output(
                             u'The sandbox might be clean, no change necessary.')
                     elif pos != 0 and not subst:
-                        sandboxPage.put(translatedContent, translatedMsg)
-                        pywikibot.showDiff(text, translatedContent)
+                        sandbox_page.put(translated_content, translated_msg)
+                        pywikibot.showDiff(text, translated_content)
                         pywikibot.output(u'Standard content was changed, '
                                          u'sandbox cleaned.')
                     else:
                         edit_delta = (datetime.datetime.utcnow() -
-                                      sandboxPage.editTime())
+                                      sandbox_page.editTime())
                         delta = self.getOption('delay_td') - edit_delta
                         # Is the last edit more than 'delay' minutes ago?
                         if delta <= datetime.timedelta(0):
-                            sandboxPage.put(translatedContent, translatedMsg)
-                            pywikibot.showDiff(text, translatedContent)
+                            sandbox_page.put(
+                                translated_content, translated_msg)
+                            pywikibot.showDiff(text, translated_content)
                             pywikibot.output(u'Standard content was changed, '
                                              u'sandbox cleaned.')
                         else:  # wait for the rest

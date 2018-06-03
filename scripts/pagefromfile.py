@@ -253,21 +253,23 @@ class PageFromFileReader(OptionHandler):
 
     def findpage(self, text):
         """Find page to work on."""
-        pageR = re.compile(re.escape(self.pageStartMarker) + "(.*?)" +
-                           re.escape(self.pageEndMarker), re.DOTALL)
-        titleR = re.compile(re.escape(self.titleStartMarker) + "(.*?)" +
-                            re.escape(self.titleEndMarker))
+        page_regex = re.compile(
+            re.escape(self.pageStartMarker) + '(.*?)'
+            + re.escape(self.pageEndMarker), re.DOTALL)
+        title_regex = re.compile(
+            re.escape(self.titleStartMarker) + '(.*?)'
+            + re.escape(self.titleEndMarker))
 
-        location = pageR.search(text)
+        location = page_regex.search(text)
         if self.include:
             contents = location.group()
         else:
             contents = location.group(1)
         try:
-            title = titleR.search(contents).group(1)
+            title = title_regex.search(contents).group(1)
             if self.notitle:
                 # Remove title (to allow creation of redirects)
-                contents = titleR.sub('', contents, count=1)
+                contents = title_regex.sub('', contents, count=1)
         except AttributeError:
             raise NoTitle(location.end())
         else:
