@@ -987,9 +987,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
         """Initializer."""
         self.cat_title = cat_title
         self.cat_db = cat_db
-        if comment:
-            self.edit_summary = comment
-        else:
+        self.edit_summary = comment
+        if not comment:
             self.template_vars = {'oldcat': cat_title}
 
         site = pywikibot.Site()
