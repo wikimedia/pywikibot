@@ -7,6 +7,7 @@
 #
 from __future__ import absolute_import, unicode_literals
 
+from collections import defaultdict
 import datetime
 import types
 
@@ -24,6 +25,7 @@ from pywikibot.tools import (
     UnicodeType,
 )
 
+from tests import patch
 from tests.aspects import (
     unittest,
     TestCase,
@@ -81,6 +83,25 @@ class TestAPIMWException(DefaultSiteTestCase):
                     self.assertLessEqual(set(value), parameters[param])
         return self.data
 
+    def setUp(self):
+        """Mock warning and error."""
+        super(TestAPIMWException, self).setUp()
+        self._original_warning = pywikibot.warning
+        pywikibot.warning = patch.object(pywikibot, 'warning').start()
+        self._original_error = pywikibot.error
+        pywikibot.error = patch.object(pywikibot, 'error').start()
+
+    def tearDown(self):
+        """Check warning and error calls."""
+        pywikibot.warning.assert_called_once_with(
+            'API error internal_api_error_fake: Fake error message')
+        pywikibot.warning.stop()
+        pywikibot.error.assert_called_once_with(
+            'Detected MediaWiki API exception internal_api_error_fake: '
+            'Fake error message [servedby:unittest]; raising')
+        pywikibot.error.stop()
+        super(TestAPIMWException, self).tearDown()
+
     def test_API_error(self):
         """Test a static request."""
         req = api.Request(site=self.site, parameters={'action': 'query',
@@ -113,6 +134,7 @@ class TestApiFunctions(DefaultSiteTestCase):
 
     """API Request object test class."""
 
+    @suppress_warnings(r'Request\(\) invoked without a site', RuntimeWarning)
     def testObjectCreation(self):
         """Test api.Request() constructor with implicit site creation."""
         req = api.Request(parameters={'action': 'test', 'foo': '',
@@ -329,11 +351,14 @@ class TestParamInfo(DefaultSiteTestCase):
         site = self.get_site()
         pi = api.ParamInfo(site)
         self.assertEqual(len(pi), 0)
-        pi.fetch('foobar')
+        with patch.object(pywikibot, 'warning') as w:
+            pi.fetch('foobar')
+            self.assertRaises(KeyError, pi.__getitem__, 'foobar')
+            self.assertRaises(KeyError, pi.__getitem__, 'foobar+foobar')
+        w.assert_called_with(
+            'API warning (paraminfo): '
+            'The module "main" does not have a submodule "foobar".')
         self.assertNotIn('foobar', pi._paraminfo)
-
-        self.assertRaises(KeyError, pi.__getitem__, 'foobar')
-        self.assertRaises(KeyError, pi.__getitem__, 'foobar+foobar')
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
@@ -358,9 +383,15 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod[6:], pi[mod]['name'])
             self.assertEqual(mod, pi[mod]['path'])
 
-        self.assertRaises(KeyError, pi.__getitem__, 'query+foobar')
+        with patch.object(pywikibot, 'warning') as w:
+            self.assertRaises(KeyError, pi.__getitem__, 'query+foobar')
+        w.assert_called_with(
+            'API warning (paraminfo): '
+            'The module "query" does not have a submodule "foobar".')
         self.assertRaises(KeyError, pi.submodules, 'edit')
 
+    @suppress_warnings(
+        'pywikibot.data.api.ParamInfo.query_modules_with_limits is deprecated')
     def test_query_modules_with_limits(self):
         """Test query_modules_with_limits property."""
         site = self.get_site()
@@ -372,11 +403,15 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test v1.8 modules exist."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertIn('revisions', pi.modules)
-        self.assertIn('help', pi.modules)
-        self.assertIn('allpages', pi.modules)
-        for mod in pi.modules:
-            self.assertNotIn('+', mod)
+        with suppress_warnings(
+            r'pywikibot\.data\.api\.ParamInfo.modules is deprecated; '
+            r'use submodules\(\) or module_paths instead\.', DeprecationWarning
+        ):
+            self.assertIn('revisions', pi.modules)
+            self.assertIn('help', pi.modules)
+            self.assertIn('allpages', pi.modules)
+            for mod in pi.modules:
+                self.assertNotIn('+', mod)
 
     def test_module_paths(self):
         """Test module paths use the complete paths."""
@@ -391,9 +426,15 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test v1.8 module prefixes exist."""
         site = self.get_site()
         pi = api.ParamInfo(site)
-        self.assertIn('revisions', pi.prefixes)
-        self.assertIn('login', pi.prefixes)
-        self.assertIn('allpages', pi.prefixes)
+        with suppress_warnings(
+            r'pywikibot.data.api.ParamInfo.prefixes is deprecated; '
+            r'|pywikibot.data.api.ParamInfo.module_attribute_map is deprecated'
+            r'|pywikibot.data.api.ParamInfo.modules is deprecated',
+            DeprecationWarning,
+        ):
+            self.assertIn('revisions', pi.prefixes)
+            self.assertIn('login', pi.prefixes)
+            self.assertIn('allpages', pi.prefixes)
 
     def test_prefix_map(self):
         """Test module prefixes use the path."""
@@ -413,7 +454,8 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(mod, pi[mod]['path'])
             self.assertEqual(value, '')
 
-    def test_old_mode(self):
+    @patch.object(pywikibot, 'warning')  # ignore several warnings
+    def test_old_mode(self, _):
         """Test the old mode explicitly."""
         site = self.get_site()
         pi = api.ParamInfo(site, modules_only_mode=False)
@@ -427,7 +469,7 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(len(pi),
                              1 + len(pi.preloaded_modules))
 
-        self.assertIn('revisions', pi.prefixes)
+        self.assertIn('query+revisions', pi.prefix_map)
 
     def test_new_mode(self):
         """Test the new modules-only mode explicitly."""
@@ -446,7 +488,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertEqual(len(pi),
                          1 + len(pi.preloaded_modules))
 
-        self.assertIn('revisions', pi.prefixes)
+        self.assertIn('query+revisions', pi.prefix_map)
 
 
 class TestOtherSubmodule(TestCase):
@@ -473,7 +515,11 @@ class TestOtherSubmodule(TestCase):
         other_modules -= pi.query_modules
         self.assertLessEqual(other_modules & pi.submodules('flow'),
                              pi.submodules('flow'))
-        self.assertFalse(other_modules & pi.modules)
+        with suppress_warnings(
+            r'pywikibot.data.api.ParamInfo.modules is deprecated; '
+            r'use submodules\(\) or module_paths instead.'
+        ):
+            self.assertFalse(other_modules & pi.modules)
 
 
 class TestParaminfoModules(DefaultSiteTestCase):
@@ -945,34 +991,52 @@ class TestLazyLoginNotExistUsername(TestLazyLoginBase):
         pywikibot.data.api.LoginManager = self.orig_login_manager
         super(TestLazyLoginNotExistUsername, self).tearDown()
 
-    def test_access_denied_notexist_username(self):
+    # When there is no API access the deprecated family.version is used.
+    @suppress_warnings('pywikibot.family.Family.version is deprecated')
+    @patch.object(pywikibot, 'output')
+    @patch.object(pywikibot, 'exception')
+    @patch.object(pywikibot, 'warning')
+    @patch.object(pywikibot, 'error')
+    def test_access_denied_notexist_username(
+        self, error, warning, exception, output
+    ):
         """Test the query with a username which does not exist."""
         self.site._username = ['Not registered username', None]
         req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
+        error.assert_called_with('Login failed (Failed).')
+        warning.assert_called_with(
+            'API error readapidenied: '
+            'You need read permission to use this module.')
+        exception.assert_called_with(
+            'You have no API read permissions. Seems you are not logged in')
+        self.assertIn(
+            'Logging in to steward:steward as ', output.call_args[0][0])
 
 
 class TestLazyLoginNoUsername(TestLazyLoginBase):
 
     """Test no username."""
 
-    def test_access_denied_no_username(self):
+    # When there is no API access the deprecated family.version is used.
+    @suppress_warnings('pywikibot.family.Family.version is deprecated')
+    @patch.object(pywikibot, 'warning')
+    @patch.object(pywikibot, 'exception')
+    @patch.object(pywikibot.config, 'usernames', defaultdict(dict))
+    def test_access_denied_no_username(self, exception, warning):
         """Test the query without a username."""
         self.site._username = [None, None]
-
-        # FIXME: The following prevents LoginManager
-        # from loading the username from the config when the site
-        # username is None. i.e. site.login(user=None) means load
-        # username from the configuration.
-        if 'steward' in pywikibot.config.usernames:
-            del pywikibot.config.usernames['steward']
-
         req = api.Request(site=self.site, parameters={'action': 'query'})
         self.assertRaises(pywikibot.NoUsername, req.submit)
         # FIXME: T100965
         self.assertRaises(api.APIError, req.submit)
+        warning.assert_called_with(
+            'API error readapidenied: '
+            'You need read permission to use this module.')
+        exception.assert_called_with(
+            'You have no API read permissions. Seems you are not logged in')
 
 
 class TestBadTokenRecovery(TestCase):
