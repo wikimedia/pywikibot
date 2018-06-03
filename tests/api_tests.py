@@ -86,21 +86,23 @@ class TestAPIMWException(DefaultSiteTestCase):
     def setUp(self):
         """Mock warning and error."""
         super(TestAPIMWException, self).setUp()
-        self._original_warning = pywikibot.warning
-        pywikibot.warning = patch.object(pywikibot, 'warning').start()
-        self._original_error = pywikibot.error
-        pywikibot.error = patch.object(pywikibot, 'error').start()
+        self.warning_patcher = patch.object(pywikibot, 'warning')
+        self.error_patcher = patch.object(pywikibot, 'error')
+        self.warning_patcher.start()
+        self.error_patcher.start()
 
     def tearDown(self):
         """Check warning and error calls."""
-        pywikibot.warning.assert_called_once_with(
-            'API error internal_api_error_fake: Fake error message')
-        pywikibot.warning.stop()
-        pywikibot.error.assert_called_once_with(
-            'Detected MediaWiki API exception internal_api_error_fake: '
-            'Fake error message [servedby:unittest]; raising')
-        pywikibot.error.stop()
-        super(TestAPIMWException, self).tearDown()
+        try:
+            pywikibot.warning.assert_called_with(
+                'API error internal_api_error_fake: Fake error message')
+            pywikibot.error.assert_called_with(
+                'Detected MediaWiki API exception internal_api_error_fake: '
+                'Fake error message [servedby:unittest]; raising')
+        finally:
+            self.warning_patcher.stop()
+            self.error_patcher.stop()
+            super(TestAPIMWException, self).tearDown()
 
     def test_API_error(self):
         """Test a static request."""
@@ -351,15 +353,18 @@ class TestParamInfo(DefaultSiteTestCase):
         site = self.get_site()
         pi = api.ParamInfo(site)
         self.assertEqual(len(pi), 0)
+
         with patch.object(pywikibot, 'warning') as w:
             pi.fetch('foobar')
             self.assertRaises(KeyError, pi.__getitem__, 'foobar')
             self.assertRaises(KeyError, pi.__getitem__, 'foobar+foobar')
-        w.assert_called_with(
+        # The warning message does not end with a '.' in older MW versions.
+        self.assertIn(
             'API warning (paraminfo): '
-            'The module "main" does not have a submodule "foobar".')
-        self.assertNotIn('foobar', pi._paraminfo)
+            'The module "main" does not have a submodule "foobar"',
+            w.call_args[0][0])
 
+        self.assertNotIn('foobar', pi._paraminfo)
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
@@ -385,9 +390,12 @@ class TestParamInfo(DefaultSiteTestCase):
 
         with patch.object(pywikibot, 'warning') as w:
             self.assertRaises(KeyError, pi.__getitem__, 'query+foobar')
-        w.assert_called_with(
+        # The warning message does not end with a '.' in older MW versions.
+        self.assertIn(
             'API warning (paraminfo): '
-            'The module "query" does not have a submodule "foobar".')
+            'The module "query" does not have a submodule "foobar"',
+            w.call_args[0][0])
+
         self.assertRaises(KeyError, pi.submodules, 'edit')
 
     @suppress_warnings(
