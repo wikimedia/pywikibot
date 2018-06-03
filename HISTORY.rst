@@ -4,6 +4,11 @@ Release history
 Current release
 ---------------
 
+* Move main categories to top in cosmetic_changes
+* shell.py always imports pywikibot as default
+* New roundrobin_generators in tools
+* New BaseBot method "skip_page" to adjust page counting
+* Family class is made a singleton class
 * New rule 'startcolon' was introduced in textlib
 * BaseBot has new methods setup and teardown
 * UploadBot got a filename prefix parameter (T170123)
