@@ -41,6 +41,8 @@ class Throttle(object):
                  multiplydelay=True):
         """Initializer."""
         self.lock = threading.RLock()
+        self.lock_write = threading.RLock()
+        self.lock_read = threading.RLock()
         self.mysite = str(site)
         self.ctrlfilename = config.datafilepath('throttle.ctrl')
         self.mindelay = mindelay
@@ -260,7 +262,8 @@ class Throttle(object):
         thread from writing to the same site until the wait expires.
 
         """
-        with self.lock:
+        lock = self.lock_write if write else self.lock_read
+        with lock:
             wait = self.waittime(write=write)
             # Calculate the multiplicity of the next delay based on how
             # big the request is that is being posted now.
