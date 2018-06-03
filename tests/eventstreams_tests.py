@@ -10,7 +10,7 @@ from __future__ import absolute_import, unicode_literals
 from tests import mock
 
 from pywikibot.comms.eventstreams import EventStreams
-from pywikibot import config, Site
+from pywikibot import config
 from pywikibot.family import WikimediaFamily
 
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
@@ -42,9 +42,6 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertIsNone(e._stream)
-        self.assertEqual(repr(e),
-                         "EventStreams(url='{}')"
-                         .format(self.sites[key]['hostname']))
 
     def test_url_from_site(self, key):
         """Test EventStreams with url from site."""
@@ -57,10 +54,6 @@ class TestEventStreamsUrlTests(TestCase):
         self.assertEqual(e._url, e.sse_kwargs.get('url'))
         self.assertIsNone(e._total)
         self.assertEqual(e._stream, stream)
-        site_repr = 'site={}, '.format(repr(site)) if site != Site() else ''
-        self.assertEqual(repr(e),
-                         "EventStreams({}stream='{}')"
-                         .format(site_repr, stream))
 
 
 @mock.patch('pywikibot.comms.eventstreams.EventSource', new=mock.MagicMock())
