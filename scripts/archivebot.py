@@ -59,6 +59,7 @@ Variables below can be used in the value for "archive" in the template above:
 %(year)d             year of the thread being archived
 %(isoyear)d          ISO year of the thread being archived
 %(isoweek)d          ISO week number of the thread being archived
+%(semester)d         semester term of the year of the thread being archived
 %(quarter)d          quarter of the year of the thread being archived
 %(month)d            month (as a number 1-12) of the thread being archived
 %(monthname)s        localized name of the month above
@@ -659,6 +660,8 @@ class PageArchiver(object):
                                                lang),
                     'isoweek': to_local_digits(t.timestamp.isocalendar()[1],
                                                lang),
+                    'semester': to_local_digits(
+                        int(ceil(float(t.timestamp.month) / 6)), lang),
                     'quarter': to_local_digits(
                         int(ceil(float(t.timestamp.month) / 3)), lang),
                     'month': to_local_digits(t.timestamp.month, lang),
