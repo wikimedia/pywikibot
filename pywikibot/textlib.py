@@ -1076,6 +1076,10 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
             r'alphabetically by name\)-->')
         above_interwiki.append(comment)
 
+    if site.family.name == 'wikipedia' and site.code in ('ba', 'crh', 'krc'):
+        comment = re.compile(r'<!-- [Ii]nterwikis -->')
+        above_interwiki.append(comment)
+
     if above_interwiki:
         interwiki = _get_regexes(['interwiki'], site)[0]
         first_interwiki = interwiki.search(newtext)
@@ -1372,6 +1376,14 @@ def replaceCategoryLinks(oldtext, new, site=None, addOnly=False):
         personendaten = re.compile(r'\{\{ *Personendaten.*?\}\}',
                                    re.I | re.DOTALL)
         under_categories.append(personendaten)
+
+    if site.sitename == 'wikipedia:yi':
+        stub = re.compile(r'\{\{.*?שטומף *\}\}', re.I)
+        under_categories.append(stub)
+
+    if site.family.name == 'wikipedia' and site.code in ('simple', 'en'):
+        stub = re.compile(r'\{\{.*?stub *\}\}', re.I)
+        under_categories.append(stub)
 
     if under_categories:
         category = _get_regexes(['category'], site)[0]
