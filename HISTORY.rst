@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180603
+------------
+
 * Move main categories to top in cosmetic_changes
 * shell.py always imports pywikibot as default
 * New roundrobin_generators in tools
