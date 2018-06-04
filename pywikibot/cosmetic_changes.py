@@ -647,11 +647,13 @@ class CosmeticChangesToolkit(object):
 
     def removeEmptySections(self, text):
         """Cleanup empty sections."""
-        exceptions = ['comment', 'pre', 'source', 'nowiki', 'code',
-                      'startspace']
-
-        skippings = ['comment']
+        # comments, categories, and interwikis
+        skippings = ['comment', 'category', 'interwiki']
         skip_regexes = _get_regexes(skippings, self.site)
+        # we want only interwikis, not interlanguage links
+        skip_regexes[1] = re.compile(
+            skip_regexes[1].pattern.replace(':?', ''))
+        # site defined templates
         skip_templates = {
             'cs': ('Pahýl[ _]část',),  # stub section
         }
@@ -659,25 +661,33 @@ class CosmeticChangesToolkit(object):
             for template in skip_templates[self.site.code]:
                 skip_regexes.append(
                     re.compile(r'\{\{\s*%s\s*\}\}' % template, re.I))
+        # empty lists
+        skip_regexes.append(re.compile(r'(?m)^[\*#] *$'))
 
+        # get stripped sections
         stripped_text = text
         for reg in skip_regexes:
             stripped_text = reg.sub(r'', stripped_text)
+        strip_sections = textlib.extract_sections(
+            stripped_text, self.site)[1]
 
-        stripped_pattern = re.compile(
-            r'\n((=+) *[^\n=]+? *\2) *\n\s*(?=(\2 *[^\n=]+? *\2))')
-        pos = 0
-        while True:
-            match = stripped_pattern.search(stripped_text[pos:])
-            if not match:
-                break
-            pattern = re.compile(r'\n{}.+?(?={})'.format(
-                match.group(1), match.group(3)), re.DOTALL)
-            text = textlib.replaceExcept(text, pattern, r'\n',
-                                         exceptions=exceptions)
-            pos = match.end()
+        # get proper sections
+        header, sections, footer = textlib.extract_sections(text, self.site)
 
-        return text
+        # iterate stripped sections and create a new page body
+        new_body = []
+        for i, strip_section in enumerate(strip_sections):
+            current_heading = sections[i][0]
+            try:
+                next_heading = sections[i + 1][0]
+            except IndexError:
+                next_heading = ''
+            current_dep = (len(current_heading)
+                           - len(current_heading.lstrip('=')))
+            next_dep = len(next_heading) - len(next_heading.lstrip('='))
+            if strip_section[1].strip() or current_dep < next_dep:
+                new_body = new_body + list(sections[i])
+        return header + ''.join(new_body) + footer
 
     def removeUselessSpaces(self, text):
         """Cleanup multiple or trailing spaces."""

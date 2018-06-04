@@ -37,6 +37,7 @@ if sys.version_info[0] > 2:
     unicode = str
 else:
     from HTMLParser import HTMLParser
+    from itertools import izip as zip
 
 try:
     import mwparserfromhell
@@ -818,6 +819,99 @@ def replace_links(text, replace, site=None):
         # Make sure that next time around we will not find this same hit.
         curpos = rng[0] + len(newlink)
     return text
+
+
+# -------------------------------
+# Functions dealing with sections
+# -------------------------------
+def extract_sections(text, site=None):
+    """
+    Return section headings and contents found in text.
+
+    @return: The returned tuple contains the text parsed into three
+        parts: The first part is a string containing header part above
+        the first heading. The last part is also a string containing
+        footer part after the last section. The middle part is a list
+        of tuples, each tuple containing a string with section heading
+        and a string with section content. Example article::
+
+            '''A''' is a thing.
+
+            == History of A ==
+            Some history...
+
+            == Usage of A ==
+            Some usage...
+
+            [[Category:Things starting with A]]
+
+        ...is parsed into the following tuple::
+
+            (header, body, footer)
+            header = "'''A''' is a thing."
+            body = [('== History of A ==', 'Some history...'),
+                    ('== Usage of A ==', 'Some usage...')]
+            footer = '[[Category:Things starting with A]]'
+
+    @rtype: tuple of (str, list of tuples, str)
+    """
+    headings = []
+    contents = []
+    body = []
+
+    # Find valid headings
+    heading_regex = _get_regexes(['header'], site)[0]
+    pos = 0
+    while True:
+        match = heading_regex.search(text[pos:])
+        if not match:
+            break
+        start = pos + match.start()
+        end = pos + match.end()
+        if not (isDisabled(text, start)
+                or isDisabled(text, end)):
+            headings += [(match.group(), start, end)]
+        pos = end
+
+    if headings:
+        # Assign them their contents
+        for i, current in enumerate(headings):
+            try:
+                following = headings[i + 1]
+            except IndexError:
+                following = None
+            if following:
+                contents.append(text[current[2]:following[1]])
+            else:
+                contents.append(text[current[2]:])
+        body = [(heading[0], section)
+                for heading, section in zip(headings, contents)]
+
+    # Find header and footer contents
+    header = text[:headings[0][1]] if headings else text
+
+    last_section = body[-1][1] if body else header
+    skippings = ['category', 'interwiki']
+    footer_regexes = _get_regexes(skippings, site)
+    # we want only interwikis, not interlanguage links
+    footer_regexes[1] = re.compile(
+        footer_regexes[1].pattern.replace(':?', ''))
+    # find where to cut
+    positions = []
+    for reg in footer_regexes:
+        match = reg.search(last_section)
+        if match:
+            positions.append(match.start())
+    pos = min(pos for pos in positions) if positions else len(last_section)
+
+    # Strip footer from last section content
+    last_section, footer = last_section[:pos], last_section[pos:]
+    if body:
+        body[-1] = (body[-1][0], last_section)
+    else:
+        header = last_section
+
+    return header, body, footer
 
 
 # -----------------------------------------------

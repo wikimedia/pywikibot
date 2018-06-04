@@ -65,31 +65,6 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
             '<code>&#32;</code>',
             self.cct.resolveHtmlEntities('<code>&#32;</code>'))
 
-    def test_removeEmptySections(self):
-        """Test removeEmptySections method."""
-        # same level
-        self.assertEqual(
-            '\n==Bar==',
-            self.cct.removeEmptySections('\n== Foo ==\n\n==Bar=='))
-        # different level
-        self.assertEqual(
-            '\n===Foo===\n\n==Bar==',
-            self.cct.removeEmptySections('\n===Foo===\n\n==Bar=='))
-        self.assertEqual(
-            '\n==Foo==\n\n===Bar===',
-            self.cct.removeEmptySections('\n==Foo==\n\n===Bar==='))
-        # comment inside
-        self.assertEqual(
-            '\n==Bar==',
-            self.cct.removeEmptySections('\n==Foo==\n<!-- Baz -->\n==Bar=='))
-        # comments and content between
-        testcase = '\n== Foo ==\n<!-- Baz -->\nBaz\n<!-- Foo -->\n== Bar =='
-        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
-        # inside comment
-        self.assertEqual(
-            '<!--\n==Foo==\n\n==Bar==\n-->',
-            self.cct.removeEmptySections('<!--\n==Foo==\n\n==Bar==\n-->'))
-
     def test_removeUselessSpaces(self):
         """Test removeUselessSpaces method."""
         self.assertEqual('Foo bar',
@@ -293,6 +268,69 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
 class TestLiveCosmeticChanges(TestCosmeticChanges):
 
     """Test cosmetic_changes requiring a live wiki."""
+
+    def test_removeEmptySections(self):
+        """Test removeEmptySections method."""
+        content = '\nSome content'
+        # same level
+        self.assertEqual(
+            '\n==Bar==' + content,
+            self.cct.removeEmptySections('\n== Foo ==\n\n==Bar==' + content))
+        # different level
+        self.assertEqual(
+            '\n==Bar==' + content,
+            self.cct.removeEmptySections('\n===Foo===\n\n==Bar==' + content))
+        testcase = '\n==Foo==\n\n===Bar===' + content
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
+        # multiple empty sections
+        self.assertEqual(
+            '\n==Baz==' + content,
+            self.cct.removeEmptySections('\n==Foo==\n==Bar==\n==Baz=='
+                                         + content))
+        # comment inside
+        self.assertEqual(
+            '\n==Bar==' + content,
+            self.cct.removeEmptySections('\n==Foo==\n<!-- Baz -->\n==Bar=='
+                                         + content))
+        # comments and content between
+        testcase = ('\n== Foo ==\n<!-- Baz -->\nBaz\n<!-- Foo -->\n== Bar =='
+                    + content)
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
+        # inside comment
+        testcase = '<!--\n==Foo==\n\n==Bar==\n-->' + content
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
+        testcase = '\n==Foo==\n<!--\n==Bar==\n-->' + content
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
+        testcase = '<!--\n==Foo==\n-->\n==Bar==' + content
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
+        # empty list item
+        self.assertEqual(
+            '\n==Baz==' + content,
+            self.cct.removeEmptySections('\n==Foo==\n*\n==Bar==\n#\n==Baz=='
+                                         + content))
+        self.assertEqual(
+            '\n==Baz==' + content,
+            self.cct.removeEmptySections('\n==Foo==\n* <!--item-->\n==Baz=='
+                                         + content))
+        testcase = '\n==Foo==\n* item\n==Bar==' + content
+        self.assertEqual(testcase, self.cct.removeEmptySections(testcase))
+        # empty first section
+        self.assertEqual(
+            '==Bar==' + content,
+            self.cct.removeEmptySections('==Foo==\n==Bar==' + content))
+        # empty last section
+        self.assertEqual(
+            '\n[[Category:Baz]]',
+            self.cct.removeEmptySections('\n==Bar==\n[[Category:Baz]]'))
+        # complicated
+        self.assertEqual(
+            '\n[[Category:Baz]]',
+            self.cct.removeEmptySections('\n==Bar==\n* <!--item-->'
+                                         '\n[[Category:Baz]]'))
+        self.assertEqual(
+            '\n[[cs:Foo]]\n[[Category:Baz]]',
+            self.cct.removeEmptySections('\n==Bar==\n[[cs:Foo]]'
+                                         '\n[[Category:Baz]]'))
 
     def test_translateAndCapitalizeNamespaces(self):
         """Test translateAndCapitalizeNamespaces method."""
