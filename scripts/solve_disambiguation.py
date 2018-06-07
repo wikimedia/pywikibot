@@ -667,13 +667,6 @@ class DisambiguationRobot(SingleSiteBot):
             i for i in self.alternatives if i not in seen and not seen.add(i)
         ]
 
-    def listAlternatives(self):
-        """Show a list of alternatives."""
-        list = u'\n'
-        for i in range(len(self.alternatives)):
-            list += (u"%3i - %s\n" % (i, self.alternatives[i]))
-        pywikibot.output(list)
-
     def setupRegexes(self):
         """Compile regular expressions."""
         self.ignore_contents_regexes = []
