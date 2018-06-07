@@ -35,7 +35,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'hr', 'nn', 'id', 'zh', 'ar', 'su', 'hu', 'li', 'az', 'ko', 'nl', 'ja',
         'gu', 'sv', 'sr', 'gl', 'ur', 'te', 'ta', 'cy', 'la', 'no', 'et', 'ml',
         'vi', 'be', 'kn', 'ku', 'eu', 'ro', 'hi', 'ka', 'da', 'sa', 'is', 'sq',
-        'mr', 'br', 'af', 'uz', 'wo', 'ky',
+        'mr', 'br', 'af', 'uz', 'wo', 'ky', 'sah'
     ]
 
     category_redirect_templates = {
