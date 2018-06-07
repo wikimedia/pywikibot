@@ -958,8 +958,8 @@ class DisambiguationRobot(SingleSiteBot):
                         (len(new_page_title) <= len(link_text)) and
                         (firstcap(link_text[:len(new_page_title)]) ==
                          firstcap(new_page_title)) and
-                        (re.sub(self.trailR, '',
-                                link_text[len(new_page_title):]) == '') and
+                        (self.trailR.sub(
+                            '', link_text[len(new_page_title):]) == '') and
                         (not section)
                     ):
                         newlink = "[[%s]]%s" \
