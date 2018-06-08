@@ -279,6 +279,9 @@ netext = {
         'fr': u'{{Bienvenue}} %s',
         'it': u'{{subst:Benvenuto}} %s',
     },
+    'wikivoyage': {
+        'bn': '{{subst:স্বাগতম}} %s',
+    },
 }
 # The page where the bot will report users with a possibly bad username.
 report_page = {
