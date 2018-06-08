@@ -22,8 +22,8 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     codes = [
         'am', 'ar', 'bd', 'be', 'br', 'ca', 'cn', 'co', 'dk', 'ec', 'et', 'fi',
-        'il', 'mai', 'mk', 'mx', 'nl', 'no', 'nyc', 'pl', 'pt', 'rs', 'ru',
-        'se', 'tr', 'ua', 'uk', 've', 'wb',
+        'id', 'il', 'mai', 'mk', 'mx', 'nl', 'no', 'nyc', 'pl', 'pt', 'rs',
+        'ru', 'se', 'tr', 'ua', 'uk', 've', 'wb',
     ]
 
     @classproperty
