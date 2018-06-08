@@ -24,6 +24,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     category_redirect_templates = {
         '_default': (),
+        'bn': ('বিষয়শ্রেণী পুনর্নির্দেশ',),
         'zh': ('分类重定向',),
     }
 
