@@ -250,6 +250,9 @@ netext = {
         'zh': u'{{subst:welcome|sign=%s}}',
         'zh-yue': u'{{歡迎}}--%s',
     },
+    'wikibooks': {
+        'es': '{{subst:bienivenido usuario}} %s',
+    },
     'wikinews': {
         'ar': '{{subst:ترحيب}} %s',
         'fa': u'{{خوشامد۲|%s}}',
