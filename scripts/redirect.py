@@ -85,10 +85,10 @@ import sys
 import pywikibot
 
 from pywikibot import i18n, xmlreader
-from pywikibot.bot import OptionHandler, SingleSiteBot
+from pywikibot.bot import (OptionHandler, SingleSiteBot, ExistingPageBot,
+                           RedirectPageBot)
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-from pywikibot.tools.formatter import color_format
 from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
@@ -400,7 +400,7 @@ class RedirectGenerator(OptionHandler):
                 continue
 
 
-class RedirectRobot(SingleSiteBot):
+class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
 
     """Redirect bot."""
 
@@ -490,19 +490,11 @@ class RedirectRobot(SingleSiteBot):
 
     def delete_1_broken_redirect(self, redir_page):
         """Treat one broken redirect."""
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
         done = not self.getOption('delete')
-        pywikibot.output(color_format(
-            '\n\n>>> {lightpurple}{0}{default} <<<', redir_page.title()))
         try:
             targetPage = redir_page.getRedirectTarget()
-        except pywikibot.IsNotRedirectPage:
-            pywikibot.output(u'%s is not a redirect.' % redir_page.title())
         except pywikibot.CircularRedirect:
             pywikibot.output('%s is a circular redirect.' % redir_page.title())
-        except pywikibot.NoPage:
-            pywikibot.output(u'%s doesn\'t exist.' % redir_page.title())
         except pywikibot.InvalidTitle:
             pywikibot.exception()
         except pywikibot.InterwikiRedirectPage:
@@ -585,10 +577,6 @@ class RedirectRobot(SingleSiteBot):
 
     def fix_1_double_redirect(self, redir):
         """Treat one double redirect."""
-        # Show the title of the page we're working on.
-        # Highlight the title in purple.
-        pywikibot.output(color_format(
-            '\n\n>>> {lightpurple}{0}{default} <<<', redir.title()))
         newRedir = redir
         redirList = []  # bookkeeping to detect loops
         while True:
@@ -597,11 +585,7 @@ class RedirectRobot(SingleSiteBot):
             try:
                 targetPage = newRedir.getRedirectTarget()
             except pywikibot.IsNotRedirectPage:
-                if len(redirList) == 1:
-                    pywikibot.output(u'Skipping: Page %s is not a redirect.'
-                                     % redir.title(asLink=True))
-                    break  # do nothing
-                elif len(redirList) == 2:
+                if len(redirList) == 2:
                     pywikibot.output(
                         u'Skipping: Redirect target %s is not a redirect.'
                         % newRedir.title(asLink=True))
@@ -624,20 +608,15 @@ class RedirectRobot(SingleSiteBot):
                     % str(e)[10:])
                 break
             except pywikibot.NoPage:
-                if len(redirList) == 1:
-                    pywikibot.output(u'Skipping: Page %s does not exist.'
-                                     % redir.title(asLink=True))
-                    break
+                if self.getOption('always'):
+                    pywikibot.output(
+                        "Skipping: Redirect target {} doesn't exist."
+                        .format(newRedir.title(asLink=True)))
+                    break  # skip if automatic
                 else:
-                    if self.getOption('always'):
-                        pywikibot.output(
-                            u"Skipping: Redirect target %s doesn't exist."
-                            % newRedir.title(asLink=True))
-                        break  # skip if automatic
-                    else:
-                        pywikibot.warning(
-                            u"Redirect target %s doesn't exist."
-                            % newRedir.title(asLink=True))
+                    pywikibot.warning(
+                        "Redirect target {} doesn't exist."
+                        .format(newRedir.title(asLink=True)))
             except pywikibot.ServerError:
                 pywikibot.output(u'Skipping due to server error: '
                                  u'No textarea found')
@@ -728,13 +707,13 @@ class RedirectRobot(SingleSiteBot):
         else:
             self.fix_1_double_redirect(page)
 
-    def treat(self, page):
-        """Treat a single page."""
+    def treat_page(self):
+        """Treat current page."""
         if self._treat_counter >= self.getOption('total'):
             pywikibot.output('\nNumber of pages reached the total limit. '
                              'Script terminated.')
             self.quit()
-        self.action_treat(page)
+        self.action_treat(self.current_page)
 
 
 def main(*args):
