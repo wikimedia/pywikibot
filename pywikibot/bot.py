@@ -1839,7 +1839,7 @@ class RedirectPageBot(CurrentPageBot):
         """Treat only redirect pages and handle IsNotRedirectPage from it."""
         if not page.isRedirectPage():
             pywikibot.warning(
-                'Page {page} on {page.site} is skipped because it is'
+                'Page {page} on {page.site} is skipped because it is '
                 'not a redirect'.format(page=page))
             return True
         return super(RedirectPageBot, self).skip_page(page)
@@ -1853,7 +1853,7 @@ class NoRedirectPageBot(CurrentPageBot):
         """Treat only non-redirect pages and handle IsRedirectPage from it."""
         if page.isRedirectPage():
             pywikibot.warning(
-                'Page {page} on {page.site} is skipped because it is'
+                'Page {page} on {page.site} is skipped because it is '
                 'a redirect'.format(page=page))
             return True
         return super(NoRedirectPageBot, self).skip_page(page)
