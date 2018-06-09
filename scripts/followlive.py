@@ -26,7 +26,7 @@ import datetime
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, editor
-from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt
+from pywikibot.bot import SingleSiteBot, CurrentPageBot, QuitKeyboardInterrupt
 
 __metaclass__ = type
 
@@ -380,7 +380,7 @@ done = {
 # TODO: merge 'done' with 'templates' above
 
 
-class CleaningBot(SingleSiteBot):
+class CleaningBot(SingleSiteBot, CurrentPageBot):
 
     """Bot meant to facilitate customized cleaning of the page."""
 
@@ -401,9 +401,10 @@ What is it? """
 
     def show_page_info(self):
         """Display informations about an article."""
-        pywikibot.output(u'[[%s]] %s ' % (self.page.title(), self.date))
-        pywikibot.output('Length: %i bytes' % self.length)
-        pywikibot.output(u'User  : %s' % self.user)
+        pywikibot.output('Date:   {info.date}\n'
+                         'Length: {info.length} bytes\n'
+                         'User:   {info.user}'
+                         .format(info=self))
 
     def could_be_bad(self):
         """Check whether the page could be bad."""
@@ -507,24 +508,18 @@ What is it? """
         self.page.put(self.content, summary=summary)
         pywikibot.output(u'with comment %s\n' % summary)
 
-    def treat(self, args):
+    def treat_page(self):
         """Process one page."""
-        page, date, length, logged_in, user, comment = args
-        self.page = page
-        self.date = date
-        self.length = length
-        self.loggedIn = logged_in
-        self.user = user
         self.show_page_info()
         if self.could_be_bad():
             pywikibot.output('Integrity of page doubtful...')
             self.handle_bad_page()
         pywikibot.output('----- Current time: %s' % datetime.datetime.now())
 
-    def init_page(self, args):
-        """Init the page tuple before processing."""
-        page, date, length, logged_in, user, comment = args
-        super(CleaningBot, self).init_page(page)
+    def init_page(self, item):
+        """Init the page tuple before processing and return a page object."""
+        self.page, self.date, self.length, self.loggedIn, self.user, _ = item
+        return super(CleaningBot, self).init_page(self.page)
 
     def setup(self):
         """Setup bot before running."""

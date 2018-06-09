@@ -1406,20 +1406,37 @@ class BaseBot(OptionHandler):
             pywikibot.output('by exception:\n')
             pywikibot.exception()
 
-    def init_page(self, page):
-        """Initialize a page before treating.
+    def init_page(self, item):
+        """Initialize a generator item before treating.
+
+        Ensure that the result of init_page is always a pywikibot.Page object
+        even when the generator returns something else.
 
         Also used to set the arrange the current site. This is called before
         skip_page and treat.
+
+        @param item: any item from self.generator
+        @return: return the page object to be processed further or None if
+            page is a pywikibot.Page already and superclass' init_page isn't
+            to be called
+        @rtype: pywikibot.Page or None
         """
-        pass
+        return item
 
     def skip_page(self, page):
-        """Return whether treat should be skipped for the page."""
+        """Return whether treat should be skipped for the page.
+
+        @param page: Page object to be processed
+        @type page: pywikibot.Page
+        """
         return False
 
     def treat(self, page):
-        """Process one page (Abstract method)."""
+        """Process one page (abstract method).
+
+        @param page: Page object to be processed
+        @type page: pywikibot.Page
+        """
         raise NotImplementedError('Method %s.treat() not implemented.'
                                   % self.__class__.__name__)
 
@@ -1437,7 +1454,10 @@ class BaseBot(OptionHandler):
         pass
 
     def run(self):
-        """Process all pages in generator."""
+        """Process all pages in generator.
+
+        @raise AssertionError: "page" is not a pywikibot.Page object
+        """
         self._start_ts = pywikibot.Timestamp.now()
         if not hasattr(self, 'generator'):
             raise NotImplementedError('Variable %s.generator not set.'
@@ -1452,23 +1472,33 @@ class BaseBot(OptionHandler):
             sys.exc_clear()
         self.setup()
         try:
-            for page in self.generator:
+            for item in self.generator:
                 # preprocessing of the page
                 try:
-                    self.init_page(page)
+                    initialized_page = self.init_page(item)
                 except SkipPageError as e:
                     issue_deprecation_warning('Use of SkipPageError',
                                               'BaseBot.skip_page() method', 2)
                     pywikibot.warning('Skipped "{0}" due to: {1}'.format(
-                                      page, e.reason))
+                                      item, e.reason))
                     if PY2:
                         # Python 2 does not clear the exception and it may seem
                         # that the generator stopped due to an exception
                         sys.exc_clear()
                     continue
+                else:
+                    if initialized_page is None:
+                        page = item
+                    else:
+                        page = initialized_page
+
+                assert isinstance(page, pywikibot.Page), \
+                    '"page" is not a pywikibot.Page object but {}.'.format(
+                        page.__class__)
 
                 if self.skip_page(page):
                     continue
+
                 # Process the page
                 self.treat(page)
 
@@ -1563,13 +1593,15 @@ class Bot(BaseBot):
                 % self.__class__.__name__)
         super(Bot, self).run()
 
-    def init_page(self, page):
+    def init_page(self, item):
         """Update site before calling treat."""
         # When in auto update mode, set the site when it changes,
         # so subclasses can hook onto changes to site.
+        page = super(Bot, self).init_page(item)
         if (self._auto_update_site and
                 (not self._site or page.site != self.site)):
             self.site = page.site
+        return page
 
 
 class SingleSiteBot(BaseBot):
@@ -1616,10 +1648,12 @@ class SingleSiteBot(BaseBot):
                                   '"{1}"'.format(self._site, value))
         self._site = value
 
-    def init_page(self, page):
+    def init_page(self, item):
         """Set site if not defined."""
+        page = super(SingleSiteBot, self).init_page(item)
         if not self._site:
             self.site = page.site
+        return page
 
     def skip_page(self, page):
         """Skip page it's site is not on the defined site."""
@@ -1665,9 +1699,11 @@ class MultipleSitesBot(BaseBot):
         super(MultipleSitesBot, self).run()
         self._site = None
 
-    def init_page(self, page):
+    def init_page(self, item):
         """Define the site for this page."""
+        page = super(MultipleSitesBot, self).init_page(item)
         self._site = page.site
+        return page
 
 
 class CurrentPageBot(BaseBot):
