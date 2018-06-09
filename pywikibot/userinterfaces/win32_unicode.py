@@ -337,6 +337,10 @@ def get_unicode_console():
         _complain('exception {!r} while fixing up sys.stdout and sys.stderr'
                   .format(e))
 
+    if PY3:
+        # no need to work around issue2128 since it's a Python 2 only issue
+        return stdin, stdout, stderr, argv
+
     # While we're at it, let's unmangle the command-line arguments:
 
     # This works around <http://bugs.python.org/issue2128>.
