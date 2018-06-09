@@ -108,7 +108,7 @@ class RedirectGenerator(OptionHandler):
     availableOptions = {
         'fullscan': False,
         'moves': False,
-        'namespaces': [0],
+        'namespaces': {0},
         'offset': -1,
         'page': None,
         'start': None,
@@ -226,6 +226,7 @@ class RedirectGenerator(OptionHandler):
         for page in self.get_redirect_pages_via_api():
             apiQ.append(str(page.pageid))
             if len(apiQ) >= 500:
+                pywikibot.output('.', newline=False)
                 yield apiQ
                 apiQ = []
         if apiQ:
@@ -325,9 +326,8 @@ class RedirectGenerator(OptionHandler):
     def retrieve_double_redirects(self):
         """Retrieve double redirects."""
         if self.use_move_log:
-            gen = self.get_moved_pages_redirects()
-            for redir_page in gen:
-                yield redir_page.title()
+            for redir_page in self.get_moved_pages_redirects():
+                yield redir_page
         elif self.use_api:
             count = 0
             for (pagetitle, type, target, final) \
@@ -412,7 +412,6 @@ class RedirectRobot(SingleSiteBot):
             'sdtemplate': None,
         })
         super(RedirectRobot, self).__init__(**kwargs)
-        self.site = pywikibot.Site()
         self.repo = self.site.data_repository()
         self.is_repo = self.repo if self.repo == self.site else None
         self.exiting = False
@@ -457,9 +456,15 @@ class RedirectRobot(SingleSiteBot):
                 ''.format('"{0}" '.format(title) if title else ''))
         return None
 
-    def init_page(self, page):
-        """Overwrite super class method."""
-        pass
+    def init_page(self, item):
+        """Ensure that we process page objects."""
+        if isinstance(item, basestring):
+            item = pywikibot.Page(self.site, item)
+        elif isinstance(item, tuple):
+            redir_name, code, target, final = item
+            item = pywikibot.Page(self.site, redir_name)
+            item._redirect_type = code
+        return super(RedirectRobot, self).init_page(item)
 
     def delete_redirect(self, page, summary_key):
         """Delete the redirect page."""
@@ -483,12 +488,8 @@ class RedirectRobot(SingleSiteBot):
             except pywikibot.PageSaveRelatedError as e:
                 pywikibot.error(e)
 
-    def delete_1_broken_redirect(self, redir_name):
+    def delete_1_broken_redirect(self, redir_page):
         """Treat one broken redirect."""
-        if isinstance(redir_name, basestring):
-            redir_page = pywikibot.Page(self.site, redir_name)
-        else:
-            redir_page = redir_name
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         done = not self.getOption('delete')
@@ -582,12 +583,8 @@ class RedirectRobot(SingleSiteBot):
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))
 
-    def fix_1_double_redirect(self, redir_name):
+    def fix_1_double_redirect(self, redir):
         """Treat one double redirect."""
-        if isinstance(redir_name, basestring):
-            redir = pywikibot.Page(self.site, redir_name)
-        else:
-            redir = redir_name
         # Show the title of the page we're working on.
         # Highlight the title in purple.
         pywikibot.output(color_format(
@@ -724,13 +721,12 @@ class RedirectRobot(SingleSiteBot):
 
     def fix_double_or_delete_broken_redirect(self, page):
         """Treat one broken or double redirect."""
-        redir_name, code, target, final = page
-        if code == 1:
+        if page._redirect_type == 1:
             return
-        elif code == 0:
-            self.delete_1_broken_redirect(redir_name)
+        if page._redirect_type == 0:
+            self.delete_1_broken_redirect(page)
         else:
-            self.fix_1_double_redirect(redir_name)
+            self.fix_1_double_redirect(page)
 
     def treat(self, page):
         """Treat a single page."""
@@ -755,7 +751,7 @@ def main(*args):
     # what the bot should do (either resolve double redirs, or process broken
     # redirs)
     action = None
-    namespaces = []
+    namespaces = set()
     source = set()
 
     for arg in pywikibot.handle_args(args):
@@ -796,8 +792,8 @@ def main(*args):
                 # -namespace:all Process all namespaces.
                 # Only works with the API read interface.
                 pass
-            if ns not in namespaces:
-                namespaces.append(ns)
+            else:
+                namespaces.add(ns)
         elif option == 'offset':
             gen_options[option] = int(value)
         elif option in ('page', 'start', 'until'):
@@ -809,7 +805,8 @@ def main(*args):
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 
-    gen_options['namespaces'] = namespaces
+    if namespaces:
+        gen_options['namespaces'] = namespaces
 
     if len(source) > 1:
         problem = 'You can only use one of {0} options.'.format(

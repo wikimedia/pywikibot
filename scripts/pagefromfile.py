@@ -114,16 +114,12 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
         self.availableOptions.update(
             {'always': False if self.getOption('showdiff') else True})
 
-    def init_page(self, page):
-        """Do not try to update site before calling treat."""
-        pass
-
-    def treat(self, page_tuple):
-        """Process page tuple, set page to current page and treat it."""
-        title, content = page_tuple
+    def init_page(self, item):
+        """Get the tuple and return the page object to be processed."""
+        title, content = item
         page = pywikibot.Page(self.site, title)
         page.text = content.strip()
-        super(PageFromFileRobot, self).treat(page)
+        return super(PageFromFileRobot, self).init_page(page)
 
     def treat_page(self):
         """Upload page content."""
