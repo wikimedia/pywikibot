@@ -1506,9 +1506,7 @@ class Subject(interwiki_graph.Subject):
             if len(pages) > 1:
                 pywikibot.output(u"=" * 30)
                 pywikibot.output(u"Links to %s" % site)
-                i = 0
-                for page2 in pages:
-                    i += 1
+                for i, page2 in enumerate(pages, 1):
                     pywikibot.output(u"  (%d) Found link to %s in:"
                                      % (i, page2))
                     self.whereReport(page2, indent=8)
