@@ -1,18 +1,18 @@
-.. image:: https://secure.travis-ci.org/wikimedia/pywikibot.png?branch=master
+.. image:: https://travis-ci.org/wikimedia/pywikibot.svg?branch=master
    :alt: Travis Build Status
    :target: https://travis-ci.org/wikimedia/pywikibot
 .. image:: https://img.shields.io/appveyor/ci/ladsgroup/pywikibot-g4xqx/master.svg?style=flat-square&label=AppVeyor%20CI
    :alt: AppVeyor Build Status
    :target: https://ci.appveyor.com/project/ladsgroup/pywikibot-g4xqx
-.. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graphs/badge.svg?branch=master
+.. image:: https://codecov.io/gh/wikimedia/pywikibot/branch/master/graph/badge.svg
    :alt: Code coverage
-   :target: http://codecov.io/github/wikimedia/pywikibot?branch=master
-.. image:: https://codeclimate.com/github/wikimedia/pywikibot-core/badges/gpa.svg
+   :target: https://codecov.io/gh/wikimedia/pywikibot
+.. image:: https://api.codeclimate.com/v1/badges/de6ca4c66e7c7bee4156/maintainability
    :alt: Maintainability
-   :target: https://codeclimate.com/github/wikimedia/pywikibot-core
+   :target: https://codeclimate.com/github/wikimedia/pywikibot/maintainability
 .. image:: https://img.shields.io/pypi/v/pywikibot.svg
    :alt: Pywikibot release
-   :target: https://pypi.python.org/pypi/pywikibot
+   :target: https://pypi.org/project/pywikibot/
 
 Pywikibot
 =========
