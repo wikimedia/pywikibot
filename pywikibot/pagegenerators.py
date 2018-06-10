@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,7 +48,7 @@ from pywikibot.tools import (
 )
 
 from pywikibot import date, config, i18n, xmlreader
-from pywikibot.bot import ListOption
+from pywikibot.bot import ShowingListOption
 from pywikibot.comms import http
 from pywikibot.exceptions import (
     ArgumentDeprecationWarning,
@@ -804,12 +804,8 @@ class GeneratorFactory(object):
             pnames = self.site.get_property_names()
             # also use the default by <enter> key
             if value in '?' or value not in pnames:
-                for i, item in enumerate(pnames, start=1):
-                    pywikibot.output(
-                        '{0:{1}}: {2}'.format(i, len(str(len(pnames))),
-                                              item))
                 prefix, value = pywikibot.input_choice(
-                    question, ListOption(self.site.get_property_names()))
+                    question, ShowingListOption(pnames))
         return page_with_property_generator(value, site=self.site)
 
     def _handle_usercontribs(self, value):
