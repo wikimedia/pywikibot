@@ -403,12 +403,13 @@ What is it? """
         """Display informations about an article."""
         pywikibot.output('Date:   {info.date}\n'
                          'Length: {info.length} bytes\n'
-                         'User:   {info.user}'
+                         'User:   {info.user.username}'
                          .format(info=self))
 
     def could_be_bad(self):
         """Check whether the page could be bad."""
-        return self.length < 250 or not self.loggedIn
+        return (self.length < 250 or not self.user.isRegistered()
+                or 'autoconfirmed' not in self.user.groups())
 
     def handle_bad_page(self, *values):
         """Process one bad page."""
@@ -504,7 +505,7 @@ What is it? """
                     'Contact a developer.'.format(self.questionlist[answer]))
             summary += tpl['msg'] + ' '
             pywikibot.output('Probably added %s' % self.questionlist[answer])
-#        pywikibot.output(newcontent) bug #2986247
+
         self.page.put(self.content, summary=summary)
         pywikibot.output(u'with comment %s\n' % summary)
 
@@ -517,8 +518,20 @@ What is it? """
         pywikibot.output('----- Current time: %s' % datetime.datetime.now())
 
     def init_page(self, item):
-        """Init the page tuple before processing and return a page object."""
-        self.page, self.date, self.length, self.loggedIn, self.user, _ = item
+        """Init the page tuple before processing and return a page object.
+
+        Set newpages generator result as instance properties.
+        @ivar page: new page
+        @type page: pywikibot.Page
+        @ivar date: creation date
+        @type date: str in ISO8601 format
+        @ivar length: content lenght
+        @type length: int
+        @ivar user: creator of page
+        @type user: pywikibot.User
+        """
+        self.page, self.date, self.length, _, user, comment = item
+        self.user = pywikibot.User(self.site, user)
         return super(CleaningBot, self).init_page(self.page)
 
     def setup(self):
