@@ -126,7 +126,8 @@ class FamilyFileGenerator(object):
 
     def writefile(self):
         """Write the family file."""
-        fn = "pywikibot/families/%s_family.py" % self.name
+        fn = os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                          'pywikibot/families/%s_family.py' % self.name)
         print("Writing %s... " % fn)
         try:
             open(fn)
