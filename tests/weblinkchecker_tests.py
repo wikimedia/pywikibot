@@ -84,6 +84,10 @@ class TestMementoDefault(MementoTestCase):
 
     def test_newest(self):
         """Test getting memento for newest https://google.com."""
+        # Temporary increase the debug level for T196304
+        import logging
+        logging.basicConfig()
+        logging.getLogger().setLevel(logging.DEBUG)
         archivedversion = self._get_archive_url('https://google.com')
         self.assertIsNotNone(archivedversion)
 
