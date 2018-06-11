@@ -1055,7 +1055,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
                 # can we can output in two columns?
                 count = len(cat_list)
                 if count > 1 and len(max(cat_list, key=len)) <= 31:
-                    new_column = math.ceil(count / 2)
+                    new_column = int(math.ceil(count / 2.0))
                 else:
                     new_column = 0
 
