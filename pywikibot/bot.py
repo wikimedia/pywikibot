@@ -1210,6 +1210,7 @@ class BaseBot(OptionHandler):
 
         self._treat_counter = 0
         self._save_counter = 0
+        self._generator_completed = False
 
     @property
     def current_page(self):
@@ -1509,6 +1510,8 @@ class BaseBot(OptionHandler):
                         '\n%s: page count reached Python 2 sys.maxint (%d).\n'
                         'Python 3 should be used to process very large batches'
                         % (self.__class__.__name__, sys.maxint))
+            else:
+                self._generator_completed = True
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit %s bot run...' %
                              self.__class__.__name__)
