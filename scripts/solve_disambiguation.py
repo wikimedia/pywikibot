@@ -713,9 +713,7 @@ class DisambiguationRobot(SingleSiteBot):
             treat_result = self.treat_disamb_only(refPage, page)
             if treat_result == 'nextpage':
                 return
-            elif treat_result in ('nochange', 'done'):
-                continue
-            elif nochange:
+            if treat_result == 'done':
                 nochange = False
 
         if nochange:
