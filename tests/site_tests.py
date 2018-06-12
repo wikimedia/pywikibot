@@ -31,7 +31,7 @@ from pywikibot.tools import (
     UnicodeType as unicode,
 )
 
-from tests import unittest_print
+from tests import patch, unittest_print
 from tests.aspects import (
     unittest, TestCase, DeprecationTestCase,
     TestCaseBase,
@@ -3319,6 +3319,15 @@ class TestObsoleteSite(TestCase):
             'code': 'ja',
         },
     }
+
+    @classmethod
+    def setUpClass(cls):
+        """Setup the class."""
+        with patch.object(pywikibot, 'warn') as warn_mock:
+            super(TestObsoleteSite, cls).setUpClass()
+        warn_mock.assert_called_once_with(
+            'Site wikipedia:ja instantiated using different code "jp"',
+            UserWarning, 2)
 
     def test_locked_site(self):
         """Test Wikimedia closed/locked site."""
