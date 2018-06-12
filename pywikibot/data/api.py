@@ -2750,7 +2750,7 @@ class QueryGenerator(_RequestWrapper):
                 value = str(value)
             self.request[key] = value
 
-    def _handle_query_limit(self, prev_limit, new_limit, count, had_data):
+    def _handle_query_limit(self, prev_limit, new_limit, had_data):
         """Handle query limit."""
         if self.query_limit is None:
             return prev_limit, new_limit
@@ -2761,7 +2761,7 @@ class QueryGenerator(_RequestWrapper):
         elif self.limit > 0:
             if had_data:
                 # self.resultkey in data in last request.submit()
-                new_limit = min(self.query_limit, self.limit - count)
+                new_limit = min(self.query_limit, self.limit - self._count)
             else:
                 # only "(query-)continue" returned. See Bug T74209.
                 # increase new_limit to advance faster until new
@@ -2791,7 +2791,7 @@ class QueryGenerator(_RequestWrapper):
                         api=self.api_limit,
                         limit=self.limit,
                         new=new_limit,
-                        count=count,
+                        count=self._count,
                         prefix=self.prefix,
                         value=self.request[self.prefix + 'limit']),
                 _logger)
@@ -2818,6 +2818,30 @@ class QueryGenerator(_RequestWrapper):
                         _logger)
         return resultdata
 
+    def _extract_results(self, resultdata):
+        """Extract results from resultdata."""
+        for item in resultdata:
+            result = self.result(item)
+            if self._namespaces:
+                if not self._check_result_namespace(result):
+                    continue
+            yield result
+            if isinstance(item, dict) \
+                    and set(self.continuekey) & set(item.keys()):
+                # if we need to count elements contained in items in
+                # self.data["query"]["pages"], we want to count
+                # item[self.continuekey] (e.g. 'revisions') and not
+                # self.resultkey (i.e. 'pages')
+                for key in set(self.continuekey) & set(item.keys()):
+                    self._count += len(item[key])
+            # otherwise we proceed as usual
+            else:
+                self._count += 1
+            # note: self.limit could be -1
+            if self.limit and 0 < self.limit <= self._count:
+                raise RuntimeError(
+                    'QueryGenerator._extract_results reached the limit')
+
     def __iter__(self):
         """Submit request and iterate the response based on self.resultkey.
 
@@ -2827,10 +2851,10 @@ class QueryGenerator(_RequestWrapper):
         previous_result_had_data = True
         prev_limit = new_limit = None
 
-        count = 0
+        self._count = 0
         while True:
             prev_limit, new_limit = self._handle_query_limit(
-                prev_limit, new_limit, count, previous_result_had_data)
+                prev_limit, new_limit, previous_result_had_data)
             if not hasattr(self, "data"):
                 self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
@@ -2847,26 +2871,11 @@ class QueryGenerator(_RequestWrapper):
                         for item in self.data['query']['normalized']}
                 else:
                     self.normalized = {}
-                for item in resultdata:
-                    result = self.result(item)
-                    if self._namespaces:
-                        if not self._check_result_namespace(result):
-                            continue
-                    yield result
-                    if isinstance(item, dict) \
-                       and set(self.continuekey) & set(item.keys()):
-                        # if we need to count elements contained in items in
-                        # self.data["query"]["pages"], we want to count
-                        # item[self.continuekey] (e.g. 'revisions') and not
-                        # self.resultkey (i.e. 'pages')
-                        for key in set(self.continuekey) & set(item.keys()):
-                            count += len(item[key])
-                    # otherwise we proceed as usual
-                    else:
-                        count += 1
-                    # note: self.limit could be -1
-                    if self.limit and self.limit > 0 and count >= self.limit:
-                        return
+                try:
+                    for result in self._extract_results(resultdata):
+                        yield result
+                except RuntimeError:
+                    return
                 # self.resultkey in data in last request.submit()
                 previous_result_had_data = True
             else:
@@ -3019,6 +3028,46 @@ class PropertyGenerator(QueryGenerator):
     def props(self):
         """The requested property names."""
         return self._props
+
+    def __iter__(self):
+        """Yield results."""
+        self._previous_dicts = {}
+        for result in super(PropertyGenerator, self).__iter__():
+            yield result
+        for result in self._previous_dicts.values():
+            yield result
+
+    def _extract_results(self, resultdata):
+        """Yield completed page_data of consecutive API requests."""
+        for d in self._fully_retrieved_data_dicts(resultdata):
+            yield d
+        for data_dict in super(PropertyGenerator, self)._extract_results(
+            resultdata
+        ):
+            d = self._previous_dicts.setdefault(data_dict['title'], data_dict)
+            if d is not data_dict:
+                self._update_old_result_dict(d, data_dict)
+
+    def _fully_retrieved_data_dicts(self, resultdata):
+        """Yield items of self._previous_dicts that are not in resultdata."""
+        resuldata_titles = {d['title'] for d in resultdata}
+        for prev_title, prev_dict in self._previous_dicts.copy().items():
+            if prev_title not in resuldata_titles:
+                yield prev_dict
+                del self._previous_dicts[prev_title]
+
+    @staticmethod
+    def _update_old_result_dict(old_dict, new_dict):
+        """Update old result dict with new_dict."""
+        for k, v in new_dict.items():
+            if k not in old_dict:
+                old_dict[k] = v
+                continue
+            if isinstance(v, list):
+                old_dict[k].extend(v)
+                continue
+            assert isinstance(v, (UnicodeType, int)), (
+                'continued API result had an unexpected type: %s' % type(v))
 
 
 class ListGenerator(QueryGenerator):

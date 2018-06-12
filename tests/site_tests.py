@@ -3060,16 +3060,14 @@ class TestPagePreloading(DefaultSiteTestCase):
             if count >= 6:
                 break
 
-    @allowed_failure
-    def test_preload_langlinks_count(self):
+    @patch.object(pywikibot, 'output')
+    def test_preload_langlinks_count(self, output_mock):
         """Test preloading continuation works."""
-        # FIXME: test fails
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        count = 0
-        links = mysite.pagelinks(mainpage, total=20)
-        pages = list(mysite.preloadpages(links, groupsize=5,
-                                         langlinks=True))
+        links = list(mysite.pagelinks(mainpage, total=20))
+        pages = list(mysite.preloadpages(links, groupsize=5, langlinks=True))
+        self.assertEqual(len(links), len(pages))
         for page in pages:
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
@@ -3077,9 +3075,9 @@ class TestPagePreloading(DefaultSiteTestCase):
                 self.assertEqual(len(page._revisions), 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
-            count += 1
-
-        self.assertEqual(len(list(links)), count)
+        if pages:
+            self.assertRegex(
+                output_mock.call_args[0][0], r'Retrieving \d pages from ')
 
     def _test_preload_langlinks_long(self):
         """Test preloading continuation works."""
