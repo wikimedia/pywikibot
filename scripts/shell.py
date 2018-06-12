@@ -20,6 +20,9 @@ If no arguments are given, the pywikibot library will not be loaded.
 #
 from __future__ import absolute_import, print_function, unicode_literals
 
+import code
+import sys
+
 
 def main(*args):
     """Script entry point."""
@@ -38,12 +41,16 @@ def main(*args):
         print('{} arguments: {}\n'  # noqa: T001
               .format(warn_type, ', '.join(args)))
 
-    import code
+    # Various stuffs in Python 3.4+, such as history file.
+    # This is defined in the site module of the Python Standard Library,
+    # and usually called by the built-in CPython interactive shell.
+    if hasattr(sys, '__interactivehook__'):
+        sys.__interactivehook__()
+
     code.interact("""Welcome to the Pywikibot interactive shell!""", local=env)
 
 
 if __name__ == "__main__":
-    import sys
     if sys.platform == 'win32':
         import os
         os.system('title Python {} Shell'.format(*sys.version.split(' ', 1)))
@@ -51,5 +58,4 @@ if __name__ == "__main__":
     args = []
     if sys.argv and sys.argv[0].endswith(('shell', 'shell.py')):
         args = sys.argv[1:]
-    del sys
     main(*args)
