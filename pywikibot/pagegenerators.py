@@ -675,6 +675,483 @@ class GeneratorFactory(object):
         return LogeventsPageGenerator(logtype, user or None, total=total,
                                       start=start, end=end)
 
+    def _handle_filelinks(self, value):
+        """Handle `-filelinks` argument."""
+        if not value:
+            value = i18n.input(
+                'pywikibot-enter-file-links-processing',
+                fallback_prompt='Links to which file page should be '
+                                'processed?')
+        if not value.startswith(self.site.namespace(6) + ':'):
+            value = 'Image:' + value
+        page = pywikibot.FilePage(self.site, value)
+        return FileLinksGenerator(page)
+
+    def _handle_linter(self, value):
+        """Handle `-linter` argument."""
+        if not self.site.has_extension('Linter'):
+            raise UnknownExtension(
+                '-linter needs a site with Linter extension.')
+        cats = self.site.siteinfo.get('linter')  # Get linter categories.
+        valid_cats = [c for _list in cats.values() for c in _list]
+
+        value = '' if value is None else value
+        cat, sep, lint_from = value.partition('/')
+        if not lint_from:
+            lint_from = None
+
+        if cat == 'show':  # Display categories of lint errors.
+            _i = ' ' * 4
+            txt = 'Available categories of lint errors:\n'
+            for prio, _list in cats.items():
+                txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
+                for c in _list:
+                    txt += '{indent}{cat}\n'.format(indent=2 * _i, cat=c)
+            pywikibot.output('%s' % txt)
+            return True
+
+        if not cat:
+            lint_cats = valid_cats
+        elif cat in ['low', 'medium', 'high']:
+            lint_cats = cats[cat]
+        else:
+            lint_cats = cat.split(',')
+            for lint_cat in lint_cats:
+                if lint_cat not in valid_cats:
+                    raise ValueError('Invalid category of lint errors: %s'
+                                     % cat)
+
+        return self.site.linter_pages(
+            lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
+            lint_from=lint_from)
+
+    def _handle_unusedfiles(self, value):
+        """Handle `-unusedfiles` argument."""
+        return UnusedFilesGenerator(total=_int_none(value), site=self.site)
+
+    def _handle_lonelypages(self, value):
+        """Handle `-lonelypages` argument."""
+        return LonelyPagesPageGenerator(total=_int_none(value), site=self.site)
+
+    def _handle_unwatched(self, value):
+        """Handle `-unwatched` argument."""
+        return UnwatchedPagesPageGenerator(
+            total=_int_none(value), site=self.site)
+
+    def _handle_property(self, value):
+        """Handle `-property` argument."""
+        if not value:
+            question = 'Which property name to be used?'
+            value = pywikibot.input(question + ' (List [?])')
+            pnames = self.site.get_property_names()
+            # also use the default by <enter> key
+            if value in '?' or value not in pnames:
+                for i, item in enumerate(pnames, start=1):
+                    pywikibot.output(
+                        '{0:{1}}: {2}'.format(i, len(str(len(pnames))),
+                                              item))
+                prefix, value = pywikibot.input_choice(
+                    question, ListOption(self.site.get_property_names()))
+        return page_with_property_generator(value, site=self.site)
+
+    def _handle_usercontribs(self, value):
+        """Handle `-usercontribs` argument."""
+        return UserContributionsGenerator(value, site=self.site)
+
+    def _handle_withoutinterwiki(self, value):
+        """Handle `-withoutinterwiki` argument."""
+        return WithoutInterwikiPageGenerator(
+            total=_int_none(value), site=self.site)
+
+    def _handle_interwiki(self, value):
+        """Handle `-interwiki` argument."""
+        if not value:
+            value = i18n.input(
+                'pywikibot-enter-page-processing',
+                fallback_prompt='Which page should be processed?')
+        page = pywikibot.Page(pywikibot.Link(value, self.site))
+        return InterwikiPageGenerator(page)
+
+    def _handle_randomredirect(self, value):
+        """Handle `-randomredirect` argument."""
+        # partial workaround for bug T119940
+        # to use -namespace/ns with -randomredirect, -ns must be given
+        # before -randomredirect
+        # otherwise default namespace is 0
+        namespaces = self.namespaces or 0
+        return RandomRedirectPageGenerator(
+            total=_int_none(value), site=self.site, namespaces=namespaces)
+
+    def _handle_random(self, value):
+        """Handle `-random` argument."""
+        # partial workaround for bug T119940
+        # to use -namespace/ns with -random, -ns must be given
+        # before -random
+        # otherwise default namespace is 0
+        namespaces = self.namespaces or 0
+        return RandomPageGenerator(
+            total=_int_none(value), site=self.site, namespaces=namespaces)
+
+    def _handle_recentchanges(self, value):
+        """Handle `-recentchanges` argument."""
+        rcstart = None
+        rcend = None
+        rctag = None
+        total = None
+        params = value.split(',') if value else []
+        if params and not params[0].isdigit():
+            rctag = params.pop(0)
+        if len(params) == 2:
+            offset = float(params[0])
+            duration = float(params[1])
+            if offset < 0 or duration < 0:
+                raise ValueError('Negative valued parameters passed.')
+        elif len(params) > 2:
+            raise ValueError('More than two parameters passed.')
+        else:
+            total = int(params[0]) if params else 60
+        if len(params) == 2:
+            ts_time = self.site.server_time()
+            rcstart = ts_time + timedelta(minutes=-(offset + duration))
+            rcend = ts_time + timedelta(minutes=-offset)
+        return RecentChangesPageGenerator(
+            namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
+            site=self.site, reverse=True, tag=rctag,
+            _filter_unique=self._filter_unique)
+
+    def _handle_liverecentchanges(self, value):
+        """Handle `-liverecentchanges` argument."""
+        self.nopreload = True
+        return LiveRCPageGenerator(site=self.site, total=_int_none(value))
+
+    def _handle_file(self, value):
+        """Handle `-file` argument."""
+        if not value:
+            value = pywikibot.input('Please enter the local file name:')
+        return TextfilePageGenerator(value, site=self.site)
+
+    def _handle_namespaces(self, value):
+        """Handle `-namespaces` argument."""
+        if isinstance(self._namespaces, frozenset):
+            warn('Cannot handle arg -namespaces as namespaces can not '
+                 'be altered after a generator is created.',
+                 ArgumentDeprecationWarning, 2)
+            return True
+        if not value:
+            value = pywikibot.input('What namespace are you filtering on?')
+        NOT_KEY = 'not:'
+        if value.startswith(NOT_KEY):
+            value = value[len(NOT_KEY):]
+            resolve = self.site.namespaces.resolve
+            not_ns = set(resolve(value.split(',')))
+            if not self._namespaces:
+                self._namespaces = list(
+                    set(self.site.namespaces.values()) - not_ns)
+            else:
+                self._namespaces = list(
+                    set(resolve(self._namespaces)) - not_ns)
+        else:
+            self._namespaces += value.split(',')
+        return True
+
+    _handle_ns = _handle_namespaces
+    _handle_namespace = _handle_namespaces
+
+    def _handle_limit(self, value):
+        """Handle `-limit` argument."""
+        if not value:
+            value = pywikibot.input('What is the limit value?')
+        self.limit = _int_none(value)
+        return True
+
+    def _handle_category(self, value):
+        """Handle `-category` argument."""
+        return self.getCategoryGen(
+            value, recurse=False, gen_func=CategorizedPageGenerator)
+
+    _handle_cat = _handle_category
+
+    def _handle_catr(self, value):
+        """Handle `-catr` argument."""
+        return self.getCategoryGen(
+            value, recurse=True, gen_func=CategorizedPageGenerator)
+
+    def _handle_subcats(self, value):
+        """Handle `-subcats` argument."""
+        return self.getCategoryGen(
+            value, recurse=False, gen_func=SubCategoriesPageGenerator)
+
+    def _handle_subcatsr(self, value):
+        """Handle `-subcatsr` argument."""
+        return self.getCategoryGen(
+            value, recurse=True, gen_func=SubCategoriesPageGenerator)
+
+    def _handle_catfilter(self, value):
+        """Handle `-catfilter` argument."""
+        cat, _ = self.getCategory(value)
+        self.catfilter_list.append(cat)
+        return True
+
+    def _handle_page(self, value):
+        """Handle `-page` argument."""
+        if not value:
+            value = pywikibot.input('What page do you want to use?')
+        return [pywikibot.Page(pywikibot.Link(value, self.site))]
+
+    def _handle_pageid(self, value):
+        """Handle `-pageid` argument."""
+        if not value:
+            value = pywikibot.input('What pageid do you want to use?')
+        return PagesFromPageidGenerator(value, site=self.site)
+
+    def _handle_uncatfiles(self, value):
+        """Handle `-uncatfiles` argument."""
+        return UnCategorizedImageGenerator(site=self.site)
+
+    def _handle_uncatcat(self, value):
+        """Handle `-uncatcat` argument."""
+        return UnCategorizedCategoryGenerator(site=self.site)
+
+    def _handle_uncat(self, value):
+        """Handle `-uncat` argument."""
+        return UnCategorizedPageGenerator(site=self.site)
+
+    def _handle_ref(self, value):
+        """Handle `-ref` argument."""
+        if not value:
+            value = pywikibot.input(
+                'Links to which page should be processed?')
+        page = pywikibot.Page(pywikibot.Link(value, self.site))
+        return ReferringPageGenerator(page)
+
+    def _handle_links(self, value):
+        """Handle `-links` argument."""
+        if not value:
+            value = pywikibot.input(
+                'Links from which page should be processed?')
+        page = pywikibot.Page(pywikibot.Link(value, self.site))
+        return LinkedPageGenerator(page)
+
+    def _handle_weblink(self, value):
+        """Handle `-weblink` argument."""
+        if not value:
+            value = pywikibot.input(
+                'Pages with which weblink should be processed?')
+        # If url is * we make it None in order to search for every page
+        # with any URL.
+        if value == '*':
+            value = None
+        return LinksearchPageGenerator(value, site=self.site)
+
+    def _handle_transcludes(self, value):
+        """Handle `-transcludes` argument."""
+        if not value:
+            value = pywikibot.input(
+                'Pages that transclude which page should be processed?')
+        page = pywikibot.Page(pywikibot.Link(value,
+                                             defaultNamespace=10,
+                                             source=self.site))
+        return ReferringPageGenerator(page, onlyTemplateInclusion=True)
+
+    def _handle_start(self, value):
+        """Handle `-start` argument."""
+        if not value:
+            value = '!'
+        firstpagelink = pywikibot.Link(value, self.site)
+        return self.site.allpages(
+            start=firstpagelink.title, namespace=firstpagelink.namespace,
+            filterredir=False)
+
+    def _handle_prefixindex(self, value):
+        """Handle `-prefixindex` argument."""
+        if not value:
+            value = pywikibot.input('What page names are you looking for?')
+        return PrefixingPageGenerator(prefix=value, site=self.site)
+
+    def _handle_newimages(self, value):
+        """Handle `-newimages` argument."""
+        return NewimagesPageGenerator(total=_int_none(value), site=self.site)
+
+    def _handle_newpages(self, value):
+        """Handle `-newpages` argument."""
+        # partial workaround for bug T69249
+        # to use -namespace/ns with -newpages, -ns must be given
+        # before -newpages
+        # otherwise default namespace is 0
+        namespaces = self.namespaces or 0
+        return NewpagesPageGenerator(
+            namespaces=namespaces, total=_int_none(value), site=self.site)
+
+    def _handle_unconnectedpages(self, value):
+        """Handle `-unconnectedpages` argument."""
+        return self.site.unconnected_pages(total=_int_none(value))
+
+    def _handle_imagesused(self, value):
+        """Handle `-imagesused` argument."""
+        if not value:
+            value = pywikibot.input(
+                'Images on which page should be processed?')
+        page = pywikibot.Page(pywikibot.Link(value, self.site))
+        return ImagesPageGenerator(page)
+
+    def _handle_searchitem(self, value):
+        """Handle `-searchitem` argument."""
+        if not value:
+            value = pywikibot.input('Text to look for:')
+        params = value.split(':')
+        value = params[-1]
+        lang = params[0] if len(params) == 2 else None
+        return WikibaseSearchItemPageGenerator(
+            value, language=lang, site=self.site)
+
+    def _handle_search(self, value):
+        """Handle `-search` argument."""
+        if not value:
+            value = pywikibot.input('What do you want to search for?')
+        # In order to be useful, all namespaces are required
+        return SearchPageGenerator(value, namespaces=[], site=self.site)
+
+    @staticmethod
+    def _handle_google(value):
+        """Handle `-google` argument."""
+        return GoogleSearchPageGenerator(value)
+
+    def _handle_titleregex(self, value):
+        """Handle `-titleregex` argument."""
+        if not value:
+            value = pywikibot.input(
+                'What page names are you looking for?')
+        self.titlefilter_list.append(value)
+        return True
+
+    def _handle_titleregexnot(self, value):
+        """Handle `-titleregexnot` argument."""
+        if not value:
+            value = pywikibot.input(
+                'All pages except which ones?')
+        self.titlenotfilter_list.append(value)
+        return True
+
+    def _handle_grep(self, value):
+        """Handle `-grep` argument."""
+        if not value:
+            value = pywikibot.input('Which pattern do you want to grep?')
+        self.articlefilter_list.append(value)
+        return True
+
+    def _handle_ql(self, value):
+        """Handle `-ql` argument."""
+        if not self.site.has_extension('ProofreadPage'):
+            raise UnknownExtension(
+                'Ql filtering needs a site with ProofreadPage extension.')
+        value = [int(_) for _ in value.split(',')]
+        if min(value) < 0 or max(value) > 4:  # Invalid input ql.
+            valid_ql = [
+                '{0}: {1}'.format(*i)
+                for i in self.site.proofread_levels.items()]
+            valid_ql = ', '.join(valid_ql)
+            pywikibot.warning('Acceptable values for -ql are:\n    %s'
+                              % valid_ql)
+        self.qualityfilter_list = value
+        return True
+
+    def _handle_onlyif(self, value):
+        """Handle `-onlyif` argument."""
+        return self._onlyif_onlyifnot_handler(value, False)
+
+    def _handle_onlyifnot(self, value):
+        """Handle `-onlyifnot` argument."""
+        return self._onlyif_onlyifnot_handler(value, True)
+
+    def _onlyif_onlyifnot_handler(self, value, ifnot):
+        """Handle `-onlyif` and `-onlyifnot` arguments."""
+        if not value:
+            value = pywikibot.input('Which claim do you want to filter?')
+        p = re.compile(r'(?<!\\),')  # Match "," only if there no "\" before
+        temp = []  # Array to store split argument
+        for arg in p.split(value):
+            temp.append(arg.replace(r'\,', ',').split('='))
+        self.claimfilter_list.append(
+            (temp[0][0], temp[0][1], dict(temp[1:]), ifnot))
+        return True
+
+    def _handle_yahoo(self, value):
+        """Handle `-yahoo` argument."""
+        return YahooSearchPageGenerator(value, site=self.site)
+
+    @staticmethod
+    def _handle_untagged(value):
+        """Handle `-untagged` argument."""
+        issue_deprecation_warning('-untagged', None, 3)
+
+    @staticmethod
+    def _handle_wikidataquery(value):
+        """Handle `-wikidataquery` argument."""
+        issue_deprecation_warning('-wikidataquery', None, 3)
+
+    def _handle_sparqlendpoint(self, value):
+        """Handle `-sparqlendpoint` argument."""
+        if not value:
+            value = pywikibot.input('SPARQL endpoint:')
+        self._sparql = value
+
+    def _handle_sparql(self, value):
+        """Handle `-sparql` argument."""
+        if not value:
+            value = pywikibot.input('SPARQL query:')
+        return WikidataSPARQLPageGenerator(
+            value, site=self.site, endpoint=self._sparql)
+
+    def _handle_mysqlquery(self, value):
+        """Handle `-mysqlquery` argument."""
+        if not value:
+            value = pywikibot.input('Mysql query string:')
+        return MySQLPageGenerator(value, site=self.site)
+
+    def _handle_intersect(self, value):
+        """Handle `-intersect` argument."""
+        self.intersect = True
+        return True
+
+    def _handle_subpage(self, value):
+        """Handle `-subpage` argument."""
+        if not value:
+            value = pywikibot.input(
+                'Maximum subpage depth:')
+        self.subpage_max_depth = int(value)
+        return True
+
+    def _handle_logevents(self, value):
+        """Handle `-logevents` argument."""
+        params = value.split(',')
+        if params[0] not in LogEntryFactory.logtypes:
+            raise NotImplementedError(
+                'Invalid -logevents parameter "{0}"'.format(params[0]))
+        return self._parse_log_events(*params)
+
+    def _old_eventlog_handler(self, logtype, value):
+        """Help in handling arguments LogEntryFactory.logtypes."""
+        total = 500
+        if value:
+            try:
+                total = int(value)
+            except ValueError:
+                params = value.split(';')
+                if len(params) == 2:
+                    value, total = params
+                else:
+                    value = params[0]
+            else:
+                value = None
+        else:
+            value = None
+        issue_deprecation_warning(
+            'The usage of "{0}"'.format('-%slog' % logtype),
+            '-logevents:"{0}"'.format(
+                ','.join((logtype, value or '', str(total)))),
+            4, ArgumentDeprecationWarning)
+        return self._parse_log_events(logtype, value, total)
+
     def handleArg(self, arg):
         """Parse one argument at a time.
 
@@ -689,11 +1166,6 @@ class GeneratorFactory(object):
         @return: True if the argument supplied was recognised by the factory
         @rtype: bool
         """
-        def intNone(v):
-            """Return None if v is None or '' else return int(v)."""
-            return v if (v is None or v is '') else int(v)
-
-        gen = None
         if not arg.startswith('-') and self._positional_arg_name:
             value = arg
             arg = '-' + self._positional_arg_name
@@ -703,382 +1175,36 @@ class GeneratorFactory(object):
         if value == '':
             value = None
 
-        if arg == '-filelinks':
-            if not value:
-                value = i18n.input(
-                    'pywikibot-enter-file-links-processing',
-                    fallback_prompt='Links to which file page should be '
-                                    'processed?')
-            if not value.startswith(self.site.namespace(6) + ':'):
-                value = 'Image:' + value
-            page = pywikibot.FilePage(self.site, value)
-            gen = FileLinksGenerator(page)
-        elif arg == '-linter':
-            if not self.site.has_extension('Linter'):
-                raise UnknownExtension(
-                    '-linter needs a site with Linter extension.')
-            cats = self.site.siteinfo.get('linter')  # Get linter categories.
-            valid_cats = [c for _list in cats.values() for c in _list]
-
-            value = '' if value is None else value
-            cat, sep, lint_from = value.partition('/')
-            if not lint_from:
-                lint_from = None
-
-            if cat == 'show':  # Display categories of lint errors.
-                _i = ' ' * 4
-                txt = 'Available categories of lint errors:\n'
-                for prio, _list in cats.items():
-                    txt += '{indent}{prio}\n'.format(indent=_i, prio=prio)
-                    for c in _list:
-                        txt += '{indent}{cat}\n'.format(indent=2 * _i, cat=c)
-                pywikibot.output('%s' % txt)
+        handler = getattr(self, '_handle_' + arg[1:], None)
+        if handler:
+            handler_result = handler(value)
+            if isinstance(handler_result, bool):
+                return handler_result
+            if handler_result:
+                self.gens.append(handler_result)
                 return True
+        return False
 
-            if not cat:
-                lint_cats = valid_cats
-            elif cat in ['low', 'medium', 'high']:
-                lint_cats = cats[cat]
-            else:
-                lint_cats = cat.split(',')
-                for lint_cat in lint_cats:
-                    if lint_cat not in valid_cats:
-                        raise ValueError('Invalid category of lint errors: %s'
-                                         % cat)
 
-            gen = self.site.linter_pages(lint_categories='|'.join(lint_cats),
-                                         namespaces=self.namespaces,
-                                         lint_from=lint_from)
-        elif arg == '-unusedfiles':
-            gen = UnusedFilesGenerator(total=intNone(value), site=self.site)
-        elif arg == '-lonelypages':
-            gen = LonelyPagesPageGenerator(total=intNone(value),
-                                           site=self.site)
-        elif arg == '-unwatched':
-            gen = UnwatchedPagesPageGenerator(total=intNone(value),
-                                              site=self.site)
-        elif arg == '-property':
-            if not value:
-                question = 'Which property name to be used?'
-                value = pywikibot.input(question + ' (List [?])')
-                pnames = self.site.get_property_names()
-                # also use the default by <enter> key
-                if value in '?' or value not in pnames:
-                    for i, item in enumerate(pnames, start=1):
-                        pywikibot.output(
-                            '{0:{1}}: {2}'.format(i, len(str(len(pnames))),
-                                                  item))
-                    prefix, value = pywikibot.input_choice(
-                        question, ListOption(self.site.get_property_names()))
-            gen = page_with_property_generator(value, site=self.site)
-        elif arg == '-usercontribs':
-            gen = UserContributionsGenerator(value, site=self.site)
-        elif arg == '-withoutinterwiki':
-            gen = WithoutInterwikiPageGenerator(total=intNone(value),
-                                                site=self.site)
-        elif arg == '-interwiki':
-            if not value:
-                value = i18n.input(
-                    'pywikibot-enter-page-processing',
-                    fallback_prompt='Which page should be processed?')
-            page = pywikibot.Page(pywikibot.Link(value, self.site))
-            gen = InterwikiPageGenerator(page)
-        elif arg == '-randomredirect':
-            # partial workaround for bug T119940
-            # to use -namespace/ns with -randomredirect, -ns must be given
-            # before -randomredirect
-            # otherwise default namespace is 0
-            namespaces = self.namespaces or 0
-            gen = RandomRedirectPageGenerator(total=intNone(value),
-                                              site=self.site,
-                                              namespaces=namespaces)
-        elif arg == '-random':
-            # partial workaround for bug T119940
-            # to use -namespace/ns with -random, -ns must be given
-            # before -random
-            # otherwise default namespace is 0
-            namespaces = self.namespaces or 0
-            gen = RandomPageGenerator(total=intNone(value),
-                                      site=self.site,
-                                      namespaces=namespaces)
-        elif arg == '-recentchanges':
-            rcstart = None
-            rcend = None
-            rctag = None
-            total = None
-            params = value.split(',') if value else []
-            if params and not params[0].isdigit():
-                rctag = params.pop(0)
-            if len(params) == 2:
-                offset = float(params[0])
-                duration = float(params[1])
-                if offset < 0 or duration < 0:
-                    raise ValueError('Negative valued parameters passed.')
-            elif len(params) > 2:
-                raise ValueError('More than two parameters passed.')
-            else:
-                total = int(params[0]) if params else 60
-            if len(params) == 2:
-                ts_time = self.site.server_time()
-                rcstart = ts_time + timedelta(minutes=-(offset + duration))
-                rcend = ts_time + timedelta(minutes=-offset)
-            gen = RecentChangesPageGenerator(namespaces=self.namespaces,
-                                             total=total,
-                                             start=rcstart,
-                                             end=rcend,
-                                             site=self.site,
-                                             reverse=True,
-                                             tag=rctag,
-                                             _filter_unique=self._filter_unique)
+def _old_eventlog_handler_method_factory(log_type):
+    """Return an old type handler method to be assigned to LogEntryFactory."""
+    # Using closure is a workaround for the lack of functools.partialmethod in
+    # Python 2.7.
+    def method(self, vaule):
+        return self._old_eventlog_handler(log_type, vaule)
+    return method
 
-        elif arg == '-liverecentchanges':
-            self.nopreload = True
-            gen = LiveRCPageGenerator(site=self.site, total=intNone(value))
 
-        elif arg == '-file':
-            if not value:
-                value = pywikibot.input('Please enter the local file name:')
-            gen = TextfilePageGenerator(value, site=self.site)
-        elif arg in ['-namespace', '-ns', '-namespaces']:
-            if isinstance(self._namespaces, frozenset):
-                warn('Cannot handle arg %s as namespaces can not '
-                     'be altered after a generator is created.'
-                     % arg,
-                     ArgumentDeprecationWarning, 2)
-                return True
-            if not value:
-                value = pywikibot.input(
-                    u'What namespace are you filtering on?')
-            NOT_KEY = 'not:'
-            if value.startswith(NOT_KEY):
-                value = value[len(NOT_KEY):]
-                resolve = self.site.namespaces.resolve
-                not_ns = set(resolve(value.split(',')))
-                if not self._namespaces:
-                    self._namespaces = list(
-                        set(self.site.namespaces.values()) - not_ns)
-                else:
-                    self._namespaces = list(
-                        set(resolve(self._namespaces)) - not_ns)
-            else:
-                self._namespaces += value.split(",")
-            return True
-        elif arg == '-limit':
-            if not value:
-                value = pywikibot.input('What is the limit value?')
-            self.limit = intNone(value)
-            return True
-        elif arg in ['-cat', '-category', '-catr', '-subcats', '-subcatsr']:
-            arg_dict = {'-cat': (False, CategorizedPageGenerator),
-                        '-category': (False, CategorizedPageGenerator),
-                        '-catr': (True, CategorizedPageGenerator),
-                        '-subcats': (False, SubCategoriesPageGenerator),
-                        '-subcatsr': (True, SubCategoriesPageGenerator),
-                        }
-            recurse, gen_func = arg_dict[arg]
-            gen = self.getCategoryGen(value, recurse=recurse, gen_func=gen_func)
-        elif arg == '-catfilter':
-            cat, _ = self.getCategory(value)
-            self.catfilter_list.append(cat)
-            return True
-        elif arg == '-page':
-            if not value:
-                value = pywikibot.input(u'What page do you want to use?')
-            gen = [pywikibot.Page(pywikibot.Link(value, self.site))]
-        elif arg == '-pageid':
-            if not value:
-                value = pywikibot.input(u'What pageid do you want to use?')
-            gen = PagesFromPageidGenerator(value, site=self.site)
-        elif arg == '-uncatfiles':
-            gen = UnCategorizedImageGenerator(site=self.site)
-        elif arg == '-uncatcat':
-            gen = UnCategorizedCategoryGenerator(site=self.site)
-        elif arg == '-uncat':
-            gen = UnCategorizedPageGenerator(site=self.site)
-        elif arg == '-ref':
-            if not value:
-                value = pywikibot.input(
-                    u'Links to which page should be processed?')
-            page = pywikibot.Page(pywikibot.Link(value, self.site))
-            gen = ReferringPageGenerator(page)
-        elif arg == '-links':
-            if not value:
-                value = pywikibot.input(
-                    u'Links from which page should be processed?')
-            page = pywikibot.Page(pywikibot.Link(value, self.site))
-            gen = LinkedPageGenerator(page)
-        elif arg == '-weblink':
-            if not value:
-                value = pywikibot.input(
-                    u'Pages with which weblink should be processed?')
-            # If url is * we make it None in order to search for every page
-            # with any URL.
-            if value == "*":
-                value = None
-            gen = LinksearchPageGenerator(value, site=self.site)
-        elif arg == '-transcludes':
-            if not value:
-                value = pywikibot.input(
-                    u'Pages that transclude which page should be processed?')
-            page = pywikibot.Page(pywikibot.Link(value,
-                                                 defaultNamespace=10,
-                                                 source=self.site))
-            gen = ReferringPageGenerator(page, onlyTemplateInclusion=True)
-        elif arg == '-start':
-            if not value:
-                value = '!'
-            firstpagelink = pywikibot.Link(value, self.site)
-            gen = self.site.allpages(start=firstpagelink.title,
-                                     namespace=firstpagelink.namespace,
-                                     filterredir=False)
-        elif arg == '-prefixindex':
-            if not value:
-                value = pywikibot.input(
-                    u'What page names are you looking for?')
-            gen = PrefixingPageGenerator(prefix=value, site=self.site)
-        elif arg == '-newimages':
-            gen = NewimagesPageGenerator(total=intNone(value), site=self.site)
-        elif arg == '-newpages':
-            # partial workaround for bug T69249
-            # to use -namespace/ns with -newpages, -ns must be given
-            # before -newpages
-            # otherwise default namespace is 0
-            namespaces = self.namespaces or 0
-            gen = NewpagesPageGenerator(namespaces=namespaces,
-                                        total=intNone(value),
-                                        site=self.site)
-        elif arg == '-unconnectedpages':
-            gen = self.site.unconnected_pages(total=intNone(value))
-        elif arg == '-imagesused':
-            if not value:
-                value = pywikibot.input(
-                    u'Images on which page should be processed?')
-            page = pywikibot.Page(pywikibot.Link(value, self.site))
-            gen = ImagesPageGenerator(page)
-        elif arg == '-searchitem':
-            if not value:
-                value = pywikibot.input('Text to look for:')
-            params = value.split(':')
-            value = params[-1]
-            lang = params[0] if len(params) == 2 else None
-            gen = WikibaseSearchItemPageGenerator(value, language=lang,
-                                                  site=self.site)
-        elif arg == '-search':
-            if not value:
-                value = pywikibot.input('What do you want to search for?')
-            # In order to be useful, all namespaces are required
-            gen = SearchPageGenerator(value, namespaces=[], site=self.site)
-        elif arg == '-google':
-            gen = GoogleSearchPageGenerator(value)
-        elif arg == '-titleregex':
-            if not value:
-                value = pywikibot.input(
-                    'What page names are you looking for?')
-            self.titlefilter_list.append(value)
-            return True
-        elif arg == '-titleregexnot':
-            if not value:
-                value = pywikibot.input(
-                    'All pages except which ones?')
-            self.titlenotfilter_list.append(value)
-            return True
-        elif arg == '-grep':
-            if not value:
-                value = pywikibot.input('Which pattern do you want to grep?')
-            self.articlefilter_list.append(value)
-            return True
-        elif arg == '-ql':
-            if not self.site.has_extension('ProofreadPage'):
-                raise UnknownExtension(
-                    'Ql filtering needs a site with ProofreadPage extension.')
-            value = [int(_) for _ in value.split(',')]
-            if min(value) < 0 or max(value) > 4:  # Invalid input ql.
-                valid_ql = ['{0}: {1}'.format(*i) for
-                            i in self.site.proofread_levels.items()]
-                valid_ql = ', '.join(valid_ql)
-                pywikibot.warning('Acceptable values for -ql are:\n    %s'
-                                  % valid_ql)
-            self.qualityfilter_list = value
-            return True
-        elif arg in ('-onlyif', '-onlyifnot'):
-            ifnot = arg == '-onlyifnot'
-            if not value:
-                value = pywikibot.input('Which claim do you want to filter?')
+for _log_type in LogEntryFactory.logtypes:
+    setattr(
+        GeneratorFactory,
+        '_handle_' + _log_type + 'log',
+        _old_eventlog_handler_method_factory(_log_type))
 
-            p = re.compile(r'(?<!\\),')  # Match "," only if there no "\" before
-            temp = []  # Array to store split argument
-            for arg in p.split(value):
-                temp.append(arg.replace(r'\,', ',').split('='))
-            self.claimfilter_list.append((temp[0][0], temp[0][1],
-                                          dict(temp[1:]), ifnot))
-            return True
-        elif arg == '-yahoo':
-            gen = YahooSearchPageGenerator(value, site=self.site)
-        elif arg == '-untagged':
-            issue_deprecation_warning(arg, None, 2)
-        elif arg == '-wikidataquery':
-            issue_deprecation_warning(arg, None, 2)
-        elif arg == '-sparqlendpoint':
-            if not value:
-                value = pywikibot.input('SPARQL endpoint:')
-            self._sparql = value
-        elif arg == '-sparql':
-            if not value:
-                value = pywikibot.input('SPARQL query:')
-            gen = WikidataSPARQLPageGenerator(value, site=self.site, endpoint=self._sparql)
-        elif arg == '-mysqlquery':
-            if not value:
-                value = pywikibot.input('Mysql query string:')
-            gen = MySQLPageGenerator(value, site=self.site)
-        elif arg == '-intersect':
-            self.intersect = True
-            return True
-        elif arg == '-subpage':
-            if not value:
-                value = pywikibot.input(
-                    'Maximum subpage depth:')
-            self.subpage_max_depth = int(value)
-            return True
-        elif arg == '-logevents':
-            params = value.split(',')
-            if params[0] not in LogEntryFactory.logtypes:
-                raise NotImplementedError(
-                    'Invalid -logevents parameter "{0}"'.format(params[0]))
-            gen = self._parse_log_events(*params)
-        elif arg.startswith('-'):
-            mode, log, tail = arg.partition('log')
-            # exclude -log, -nolog
-            if log == 'log' and mode not in ['-', '-no'] and not tail:
-                logtype = mode[1:]
-                if logtype not in LogEntryFactory.logtypes:
-                    raise NotImplementedError(
-                        'Invalid logevent option "{0}log"'.format(mode))
-                total = 500
-                if value:
-                    try:
-                        total = int(value)
-                    except ValueError:
-                        params = value.split(';')
-                        if len(params) == 2:
-                            value, total = params
-                        else:
-                            value = params[0]
-                    else:
-                        value = None
-                else:
-                    value = None
-                issue_deprecation_warning(
-                    'The usage of "{0}"'.format(arg),
-                    '-logevents:"{0}"'.format(
-                        ','.join((logtype, value or '', str(total)))),
-                    2, ArgumentDeprecationWarning)
-                gen = self._parse_log_events(logtype, value, total)
 
-        if gen:
-            self.gens.append(gen)
-            return True
-        else:
-            return False
+def _int_none(v):
+    """Return None if v is None or '' else return int(v)."""
+    return v if (v is None or v is '') else int(v)
 
 
 @deprecated('Site.allpages()')
