@@ -94,8 +94,9 @@ class ClaimRobot(WikidataBot):
         """Treat each page."""
         for claim in self.claims:
             # The generator might yield pages from multiple sites
+            site = page.site if page is not None else None
             self.user_add_claim_unless_exists(
-                item, claim, self.exists_arg, page.site)
+                item, claim, self.exists_arg, site)
 
 
 def main(*args):
