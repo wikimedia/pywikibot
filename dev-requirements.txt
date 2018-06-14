@@ -2,7 +2,7 @@
 #
 unittest2==0.8.0 ; python_full_version == '2.7.2'
 
-pytest>=2.8.0
+pytest>=3.6.0
 pytest-timeout
 pytest-runner
 pytest-cov
