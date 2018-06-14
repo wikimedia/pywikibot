@@ -10,10 +10,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os
 import sys
 
-from pywikibot.tools import (
-    PY2,
-    StringTypes,
-)
+from pywikibot.tools import has_module, PY2, StringTypes
 
 from tests import join_root_path, unittest_print
 from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
@@ -49,11 +46,10 @@ def check_script_deps(script_name):
     """Detect whether all dependencies are installed."""
     if script_name in script_deps:
         for package_name in script_deps[script_name]:
-            try:
-                __import__(package_name)
-            except ImportError as e:
-                unittest_print('%s depends on %s, which isnt available:\n%s'
-                               % (script_name, package_name, e))
+            if not has_module(package_name):
+                unittest_print(
+                    "{} depends on {}, which isn't available"
+                    .format(script_name, package_name))
                 return False
     return True
 
