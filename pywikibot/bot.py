@@ -1457,7 +1457,7 @@ class BaseBot(OptionHandler):
     def run(self):
         """Process all pages in generator.
 
-        @raise AssertionError: "page" is not a pywikibot.Page object
+        @raise AssertionError: "page" is not a pywikibot.page.BasePage object
         """
         self._start_ts = pywikibot.Timestamp.now()
         if not hasattr(self, 'generator'):
@@ -1493,9 +1493,9 @@ class BaseBot(OptionHandler):
                     else:
                         page = initialized_page
 
-                assert isinstance(page, pywikibot.Page), \
-                    '"page" is not a pywikibot.Page object but {}.'.format(
-                        page.__class__)
+                assert isinstance(page, pywikibot.page.BasePage), (
+                    '"page" is not a pywikibot.page.BasePage object but {}.'
+                    .format(page.__class__))
 
                 if self.skip_page(page):
                     continue
