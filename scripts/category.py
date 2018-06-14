@@ -1215,7 +1215,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
     def teardown(self):
         """Cleanups after run operation."""
-        if not self._treat_counter:
+        if self._generator_completed and not self._treat_counter:
             pywikibot.output('There are no pages or files in category {}'
                              .format(self.cat_title))
 
