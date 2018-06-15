@@ -123,14 +123,14 @@ class HarvestRobot(WikidataBot):
 
     """A bot to add Wikidata claims."""
 
-    def __init__(self, generator, templateTitle, fields, **kwargs):
+    def __init__(self, generator, template_title, fields, **kwargs):
         """
         Initializer.
 
         @param generator: A generator that yields Page objects
         @type generator: iterator
-        @param templateTitle: The template to work on
-        @type templateTitle: str
+        @param template_title: The template to work on
+        @type template_title: str
         @param fields: A dictionary of fields that are of use to us
         @type fields: dict
         @keyword islink: Whether non-linked values should be treated as links
@@ -149,7 +149,6 @@ class HarvestRobot(WikidataBot):
         })
         super(HarvestRobot, self).__init__(**kwargs)
         self.generator = generator
-        self.templateTitle = templateTitle.replace(u'_', u' ')
         # TODO: Make it a list which also includes the redirects to the template
         self.fields = {}
         for key, value in fields.items():
@@ -158,7 +157,8 @@ class HarvestRobot(WikidataBot):
             else:  # backwards compatibility
                 self.fields[key] = (value, PropertyOptionHandler())
         self.cacheSources()
-        self.templateTitles = self.getTemplateSynonyms(self.templateTitle)
+        template_title = template_title.replace('_', ' ')
+        self.templateTitles = self.getTemplateSynonyms(template_title)
         self.linkR = textlib.compileLinkR()
         self.create_missing_item = self.getOption('create')
 
