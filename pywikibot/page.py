@@ -3106,9 +3106,10 @@ class Category(Page):
         # checked before the total amount of new pages was found. In worst case
         # all pages of a category need to be checked.
         for member in pywikibot.data.api.QueryGenerator(
-                site=self.site, list='categorymembers', cmsort='timestamp',
-                cmdir='older', cmprop='timestamp|title',
-                cmtitle=self.title()):
+            site=self.site, parameters={
+                'list': 'categorymembers', 'cmsort': 'timestamp',
+                'cmdir': 'older', 'cmprop': 'timestamp|title',
+                'cmtitle': self.title()}):
             # TODO: Upcast to suitable class
             page = pywikibot.Page(self.site, member['title'])
             assert page.namespace() == member['ns'], \
