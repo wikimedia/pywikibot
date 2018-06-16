@@ -6,14 +6,12 @@ Currently the script checks the following code style issues:
     - Line lengths: Newly added lines longer than 79 chars are not allowed.
     - Unicode literal notations: They are not allowed since we instead import
         unicode_literals from __future__.
-    - Any added double quoted string should contain a single quote.
+    - Single-quoted strings are preferred, but when a string contains single
+      quote characters, use double quotes to avoid backslashes in the string.
 
 See [[Manual:Pywikibot/Development/Guidelines]] for more info.
 
 Todo: The following rules can be added in the future:
-    - For any changes or new lines use single quotes for strings, or double
-        quotes  if the string contains a single quote. But keep older code
-        unchanged. (partially implemented)
     - Prefer string.format() instead of modulo operator % for string
         formatting. The modulo operator might be deprecated by a future
         python release.
@@ -46,7 +44,7 @@ else:
 IGNORABLE_LONG_LINE = re_compile(r'\s*(# )?<?https?://\S+>?$').match
 
 STRING_MATCH = re_compile(
-    r'(?P<unicode_literal>u)?[bfr]*(?P<quote>\'+|"+)', IGNORECASE,
+    r'(?P<prefix>[bfru]*)?(?P<quote>\'+|"+)', IGNORECASE,
 ).match
 
 
@@ -64,9 +62,33 @@ def print_error(path, line_no, col_no, error):
     print('{0}:{1}:{2}: {3}'.format(path, line_no, col_no, error))
 
 
+def check_quotes(match, file_path, start):
+    """Check string quotes and return True if there are no errors."""
+    string = match.string
+    quote = match.group('quote')
+    if quote == '"':
+        if "'" not in string:
+            print_error(
+                file_path, start[0], start[1] + 1,
+                "use 'single-quoted' strings "
+                '(unless the string contains single quote characters)')
+            return False
+    elif quote == "'":
+        if (
+            'r' not in match.group('prefix')
+            and r'\'' in string
+            and '"' not in string
+        ):
+            print_error(
+                file_path, start[0], start[1] + 1,
+                r'use a "double-quoted" string to avoid \' escape sequence')
+            return False
+    return True
+
+
 def check_tokens(file_path, line_nos):
     """Check the style of lines in the given file_path."""
-    error = False
+    no_errors = True
     max_line = max(line_nos)
     with open(file_path, 'rb') as f:
         token_generator = tokenize(f.readline)
@@ -78,31 +100,24 @@ def check_tokens(file_path, line_nos):
             if PY2:
                 string = string.decode('utf-8')
             match = STRING_MATCH(string)
-            if match.group('unicode_literal'):
-                error = True
+            if 'u' in match.group('prefix'):
+                no_errors = False
                 print_error(
                     file_path, start[0], start[1] + 1,
                     'newly-added/modified line with u"" prefixed string '
                     'literal',
                 )
-            if match.group('quote') == '"' and "'" not in string:
-                error = True
-                print_error(
-                    file_path, start[0], start[1] + 1,
-                    'newly-added/modified line with "double quoted string" not'
-                    ' containing any single quotes; use a \'single quoted '
-                    'string\' instead',
-                )
-    return not error
+            no_errors = check_quotes(match, file_path, start) and no_errors
+    return no_errors
 
 
 def check(latest_patchset):
     """Check that the added/modified lines do not violate the guideline.
 
-    @return: True if line added/modified OK. False otherwise.
+    @return: True if there are no error, False otherwise.
     @rtype: bool
     """
-    error = False
+    no_errors = True
     for patched_file in latest_patchset:
         path = patched_file.path
         if not (path.endswith('.py') or patched_file.is_removed_file):
@@ -121,10 +136,10 @@ def check(latest_patchset):
                         path, line_no, len(line_val),
                         'newly-added/modified line longer than 79 characters',
                     )
-                    error = True
+                    no_errors = False
         if added_lines:
-            error = not check_tokens(path, added_lines) or error
-    return not error
+            no_errors = check_tokens(path, added_lines) and no_errors
+    return no_errors
 
 
 def main():
