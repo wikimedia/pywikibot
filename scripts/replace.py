@@ -12,9 +12,14 @@ These command line parameters can be used to specify which pages to work on:
 
 Furthermore, the following command line parameters are supported:
 
--xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see https://dumps.wikimedia.org).
-                  Argument can also be given as "-xml:filename".
+-mysqlquery       Retrieve information from a local database mirror.
+                  If no query specified, bot searches for pages with
+                  given replacements.
+
+-xml              Retrieve information from a local XML dump
+                  (pages-articles or pages-meta-current, see
+                  https://dumps.wikimedia.org). Argument can also
+                  be given as "-xml:filename".
 
 -regex            Make replacements using regular expressions. If this argument
                   isn't given, the bot will make simple text replacements.
@@ -890,6 +895,7 @@ def main(*args):
     # if -xml flag is present
     xmlFilename = None
     useSql = False
+    sql_query = None
     # will become True when the user presses a ('yes to all') or uses the
     # -always flag.
     acceptall = False
@@ -933,8 +939,12 @@ def main(*args):
                 xmlFilename = i18n.input('pywikibot-enter-xml-filename')
             else:
                 xmlFilename = arg[5:]
-        elif arg == '-sql':
+        elif arg.startswith(('-sql', '-mysqlquery')):
+            if arg.startswith('-sql'):
+                issue_deprecation_warning('The usage of "-sql"', '-mysqlquery',
+                                          1, ArgumentDeprecationWarning)
             useSql = True
+            sql_query = arg.partition(':')[2]
         elif arg.startswith('-excepttitle:'):
             exceptions['title'].append(arg[13:])
         elif arg.startswith('-requiretitle:'):
@@ -1155,16 +1165,18 @@ def main(*args):
         gen = XmlDumpReplacePageGenerator(xmlFilename, xmlStart,
                                           replacements, exceptions, site)
     elif useSql:
-        whereClause = 'WHERE (%s)' % ' OR '.join(
-            ["old_text RLIKE '%s'" % prepareRegexForMySQL(old_regexp.pattern)
-             for (old_regexp, new_text) in replacements])
-        if exceptions:
-            exceptClause = 'AND NOT (%s)' % ' OR '.join(
-                ["old_text RLIKE '%s'" % prepareRegexForMySQL(exc.pattern)
-                 for exc in exceptions])
-        else:
-            exceptClause = ''
-        query = u"""
+        if not sql_query:
+            whereClause = 'WHERE (%s)' % ' OR '.join(
+                ["old_text RLIKE '%s'" % prepareRegexForMySQL(
+                 old_regexp.pattern) for (old_regexp, new_text)
+                 in replacements])
+            if exceptions:
+                exceptClause = 'AND NOT (%s)' % ' OR '.join(
+                    ["old_text RLIKE '%s'" % prepareRegexForMySQL(exc.pattern)
+                     for exc in exceptions])
+            else:
+                exceptClause = ''
+        query = sql_query or """
 SELECT page_namespace, page_title
 FROM page
 JOIN text ON (page_id = old_id)

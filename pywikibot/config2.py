@@ -685,7 +685,7 @@ weblink_dead_days = 7
 # Setting to connect the database or replica of the database of the wiki.
 # db_name_format can be used to manipulate the dbName of site.
 # Example for a pywikibot running on wmflabs:
-# db_hostname = 'enwiki.labsdb'
+# db_hostname = 'enwiki.analytics.db.svc.eqiad.wmflabs'
 # db_name_format = '{0}_p'
 # db_connect_file = user_home_path('replica.my.cnf')
 db_hostname = 'localhost'
@@ -694,7 +694,8 @@ db_password = ''
 db_name_format = '{0}'
 db_connect_file = user_home_path('.my.cnf')
 # local port for mysql server
-# ssh -L 4711:enwiki.labsdb:3306 user@tools-login.wmflabs.org
+# ssh -L 4711:enwiki.analytics.db.svc.eqiad.wmflabs:3306 \
+#     user@login.tools.wmflabs.org
 db_port = 3306
 
 # ############# SEARCH ENGINE SETTINGS ##############

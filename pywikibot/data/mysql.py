@@ -14,9 +14,14 @@ import pywikibot
 try:
     import pymysql as mysqldb
 except ImportError:
-    import MySQLdb as mysqldb
-    pywikibot.warning('PyMySql not found.')
-    pywikibot.warning('MySQLdb is deprecated. Use PyMySql instead.')
+    try:
+        import MySQLdb as mysqldb
+    except ImportError:
+        raise ImportError('No supported MySQL library installed. '
+                          'Please install PyMySQL.')
+    else:
+        pywikibot.warning("PyMySQL not found. It'll fallback "
+                          'on the deprecated library MySQLdb.')
 else:
     mysqldb.install_as_MySQLdb()
 

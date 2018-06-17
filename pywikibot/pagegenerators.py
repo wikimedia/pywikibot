@@ -234,9 +234,12 @@ GENERATOR OPTIONS
                     Argument can be given as "-withoutinterwiki:n" where
                     n is the total to fetch.
 
--mysqlquery         Takes a Mysql query string like
-                    "SELECT page_namespace, page_title, FROM page
-                    WHERE page_namespace = 0" and works on the resulting pages.
+-mysqlquery         Takes a MySQL query string like
+                    "SELECT page_namespace, page_title FROM page
+                    WHERE page_namespace = 0" and treats
+                    the resulting pages. See
+                    https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL
+                    for more details.
 
 -sparql             Takes a SPARQL SELECT query string including ?item
                     and works on the resulting pages.
