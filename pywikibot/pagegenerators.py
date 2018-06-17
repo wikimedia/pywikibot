@@ -835,7 +835,7 @@ class GeneratorFactory(object):
         if isinstance(self._namespaces, frozenset):
             warn('Cannot handle arg -namespaces as namespaces can not '
                  'be altered after a generator is created.',
-                 ArgumentDeprecationWarning, 2)
+                 ArgumentDeprecationWarning, 3)
             return True
         if not value:
             value = pywikibot.input('What namespace are you filtering on?')
