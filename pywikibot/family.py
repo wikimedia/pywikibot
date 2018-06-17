@@ -60,8 +60,10 @@ class Family(object):
         # don't use hasattr() here. consider only the class itself
         if '__init__' in cls.__dict__:
             # Initializer deprecated. Families should be immutable and any
-            # instance / class modification should go to allocator (__new__)
-            cls.__init__ = deprecated(cls.__init__)
+            # instance / class modification should go to allocator (__new__).
+            # The function is read from __dict__ because deprecated expect a
+            # function and python 2.7 binds the method to the class.
+            cls.__init__ = deprecated(cls.__dict__['__init__'])
 
             # Invoke initializer immediately and make initializer no-op.
             # This is to avoid repeated initializer invokation on repeated
