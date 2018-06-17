@@ -90,6 +90,8 @@ class TestLogentriesBase(TestCase):
         if 'title' in logentry.data:  # title may be missing
             self.assertIsInstance(logentry.ns(), int)
             self.assertIsInstance(logentry.pageid(), int)
+            self.assertGreaterEqual(logentry.ns(), -2)
+            self.assertGreaterEqual(logentry.pageid(), 0)
             if logtype == 'block' and logentry.isAutoblockRemoval:
                 self.assertIsInstance(logentry.page(), int)
             elif isinstance(logentry, UserTargetLogEntry):
@@ -103,8 +105,6 @@ class TestLogentriesBase(TestCase):
         self.assertEqual(logentry.type(), logtype)
         self.assertIsInstance(logentry.user(), unicode)
         self.assertGreaterEqual(logentry.logid(), 0)
-        self.assertGreaterEqual(logentry.ns(), -2)
-        self.assertGreaterEqual(logentry.pageid(), 0)
 
 
 class TestLogentriesMeta(MetaTestCaseClass):
