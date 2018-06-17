@@ -127,7 +127,8 @@ class FamilyFileGenerator(object):
     def writefile(self):
         """Write the family file."""
         fn = os.path.join(os.path.dirname(os.path.realpath(__file__)),
-                          'pywikibot/families/%s_family.py' % self.name)
+                          'pywikibot', 'families',
+                          '{}_family.py'.format(self.name))
         print("Writing %s... " % fn)
         try:
             open(fn)
@@ -198,9 +199,11 @@ class Family(family.Family):  # noqa: D101
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: %s <url> <short name>" % sys.argv[0])
-        print("Example: %s https://www.mywiki.bogus/wiki/Main_Page mywiki"
-              % sys.argv[0])
-        print("This will create the file families/mywiki_family.py")
+        print("""
+Usage: {module} <url> <short name>
+Example: {module} https://www.mywiki.bogus/wiki/Main_Page mywiki
+This will create the file families{sep}mywiki_family.py"""
+              .format(module=sys.argv[0].strip('.' + os.sep),
+                      sep=os.sep))
 
     FamilyFileGenerator(*sys.argv[1:]).run()
