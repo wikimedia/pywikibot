@@ -2780,14 +2780,17 @@ def MySQLPageGenerator(query, site=None, verbose=None):
     """
     Yield a list of pages based on a MySQL query.
 
-    Each query should provide the page namespace and page title. An example
-    query that yields all ns0 pages might look like::
+    The query should return two columns, page namespace and page title pairs
+    from some table. An example query that yields all ns0 pages might look
+    like::
 
         SELECT
          page_namespace,
          page_title,
         FROM page
         WHERE page_namespace = 0;
+
+    See https://www.mediawiki.org/wiki/Manual:Pywikibot/MySQL.
 
     @param query: MySQL query to execute
     @param site: Site object
