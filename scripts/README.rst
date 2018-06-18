@@ -289,4 +289,4 @@ More precise information, and a list of the options that are available for
 the various programs, can be retrieved by running the bot with the -help
 parameter, e.g.
 
-    python pwb.py interwiki.py -help
+    python pwb.py interwiki -help

@@ -12,15 +12,15 @@ Examples
 
 Work on a single file:
 
-    python pwb.py imagecopy.py -page:file:<filename>
+    python pwb.py imagecopy -page:file:<filename>
 
 Work on all images in a category:<cat>:
 
-    python pwb.py imagecopy.py -cat:<cat>
+    python pwb.py imagecopy -cat:<cat>
 
 Work on all images which transclude a template:
 
-    python pwb.py imagecopy.py -transcludes:<template>
+    python pwb.py imagecopy -transcludes:<template>
 
 See pagegenerators.py for more ways to get a list of images.
 By default the bot works on your home wiki (set in user-config)

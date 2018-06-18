@@ -13,7 +13,7 @@ These command line parameters can be used to specify which pages to work on:
 Furthermore, the following command line parameters are supported:
 
 -xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see https://download.wikimedia.org).
+                  or pages-meta-current, see https://dumps.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
 -regex            Make replacements using regular expressions. If this argument
@@ -104,7 +104,7 @@ Examples
 
 If you want to change templates from the old syntax, e.g. {{msg:Stub}}, to the
 new syntax, e.g. {{Stub}}, download an XML dump file (pages-articles) from
-https://download.wikimedia.org, then use this command:
+https://dumps.wikimedia.org, then use this command:
 
     python pwb.py replace -xml -regex "{{msg:(.*?)}}" "{{\1}}"
 
@@ -127,7 +127,8 @@ talk about HTTP, where the typo has become part of the standard:
 
     python pwb.py replace referer referrer -file:typos.txt -excepttext:HTTP
 
-Please type "replace.py -help | more" if you can't read the top of the help.
+Please type "python pwb.py replace -help | more" if you can't read
+the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012

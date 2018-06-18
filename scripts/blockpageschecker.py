@@ -15,7 +15,7 @@ These command line parameters can be used to specify which pages to work on:
 &params;
 
 -xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see https://download.wikimedia.org).
+                  or pages-meta-current, see https://dumps.wikimedia.org).
                   Argument can also be given as "-xml:filename".
 
 -protectedpages:  Check all the blocked pages; useful when you have not

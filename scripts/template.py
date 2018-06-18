@@ -5,7 +5,8 @@ Very simple script to replace a template with another one.
 
 It also converts the old MediaWiki boilerplate format to the new format.
 
-Syntax: python template.py [-remove] [xml[:filename]] oldTemplate [newTemplate]
+Syntax: python pwb.py template [-remove] [xml[:filename]] oldTemplate \
+            [newTemplate]
 
 Specify the template on the command line. The program will pick up the template
 page, and look for all pages using it. It will then automatically loop over
@@ -28,7 +29,7 @@ Command line options:
              the same effect.
 
 -xml         retrieve information from a local dump
-             (https://download.wikimedia.org). If this argument isn't given,
+             (https://dumps.wikimedia.org). If this argument isn't given,
              info will be loaded from the maintenance page of the live wiki.
              argument can also be given as "-xml:filename.xml".
 
