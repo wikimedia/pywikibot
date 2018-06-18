@@ -8,7 +8,7 @@
 from __future__ import absolute_import, unicode_literals
 
 __version__ = __release__ = '3.1.dev0'
-__url__ = 'https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot'
+__url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'
 
 import atexit
 import datetime

@@ -30,7 +30,7 @@ Syntax example:
 #  @section FRAMEWORK
 #
 #  Python wikipedia bot framework, DrTrigonBot.
-#  @see https://www.mediawiki.org/wiki/Pywikibot
+#  @see https://www.mediawiki.org/wiki/Manual:Pywikibot
 #  @see https://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
 #
 #  @section LICENSE
@@ -85,7 +85,7 @@ import lua
 import crontab
 
 import pywikibot
-# pywikibot.botirc depends on https://pypi.python.org/pypi/irc
+# pywikibot.botirc depends on https://pypi.org/project/irc
 import pywikibot.botirc
 
 from pywikibot.tools.formatter import color_format

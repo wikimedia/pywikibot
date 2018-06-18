@@ -24,7 +24,7 @@ except ImportError as e:
 
 import pywikibot
 
-from pywikibot import config
+from pywikibot import config, __url__
 from pywikibot.exceptions import NoUsername
 from pywikibot.tools import deprecated_args, normalize_username, PY2
 
@@ -135,10 +135,10 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         main_username = self.username
         if '@' in self.username:
             warn(
-                'When using BotPasswords it is recommended that you store your '
-                'login credentials in a password_file instead. '
-                'See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords '
-                'for instructions and more information.')
+                'When using BotPasswords it is recommended that you store '
+                'your login credentials in a password_file instead. See '
+                '{}/BotPasswords for instructions and more information.'
+                .format(__url__))
             main_username = self.username.partition('@')[0]
 
         try:

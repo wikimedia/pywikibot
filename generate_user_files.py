@@ -21,7 +21,7 @@ from warnings import warn
 _orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
 os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
 import pywikibot  # noqa: E402
-from pywikibot import config  # noqa: E402
+from pywikibot import config, __url__  # noqa: E402
 
 # Reset this flag in case another script is run by pwb after this script
 if not _orig_no_user_config:
@@ -263,11 +263,10 @@ def create_user_config(main_family, main_code, main_username, force=False):
 
     # For each different username entered, ask if user wants to save a
     # BotPassword (username, BotPassword name, BotPassword pass)
-    msg = fill('See https://www.mediawiki.org/wiki/'
-               'Manual:Pywikibot/BotPasswords to know how to get codes.'
+    msg = fill('See {}/BotPasswords to know how to get codes.'
                'Please note that plain text in {} and anyone with read '
                'access to that directory will be able read the file.'
-               .format(_fncpass))
+               .format(__url__, _fncpass))
     botpasswords = []
     userset = {user.name for user in userlist}
     for username in userset:
