@@ -329,7 +329,7 @@ fixes = {
     },
 
     # some disambiguation stuff for de:
-    # python replace.py -fix:music -subcat:Album
+    # python pwb.py replace -fix:music -subcat:Album
     'music': {
         'regex': False,
         'msg': {
@@ -350,7 +350,7 @@ fixes = {
     },
 
     # format of dates of birth and death, for de:
-    # python replace.py -fix:datum -ref:Vorlage:Personendaten
+    # python pwb.py replace -fix:datum -ref:Vorlage:Personendaten
     'datum': {
         'regex': True,
         'msg': {
@@ -441,7 +441,7 @@ fixes = {
     },
 
     # Corrections for Arabic Wikipedia and any Arabic wiki.
-    #   python replace.py -fix:correct-ar -start:! -always
+    #   python pwb.py replace -fix:correct-ar -start:! -always
 
     'correct-ar': {
         'regex': True,

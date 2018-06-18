@@ -33,25 +33,25 @@ Examples
 
 Work on a single image::
 
-    python pwb.py imagecopy.py -page:Image:<imagename>
+    python pwb.py imagecopy -page:Image:<imagename>
 
 Work on the 100 newest images::
 
-    python pwb.py imagecopy.py -newimages:100
+    python pwb.py imagecopy -newimages:100
 
 Work on all images in a category:<cat>::
 
-    python pwb.py imagecopy.py -cat:<cat>
+    python pwb.py imagecopy -cat:<cat>
 
 Work on all images which transclude a template::
 
-    python pwb.py imagecopy.py -transcludes:<template>
+    python pwb.py imagecopy -transcludes:<template>
 
 Work on a single image and deletes the image when the transfer is complete
 (only works if the user has sysops privilege, otherwise it will be marked for
 deletion)::
 
-    python pwb.py imagecopy.py -page:Image:<imagename> -delete
+    python pwb.py imagecopy -page:Image:<imagename> -delete
 
 By default the bot works on your home wiki (set in user-config)
 """

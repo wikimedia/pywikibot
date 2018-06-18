@@ -6,7 +6,7 @@ Display the list of pages transcluding a given list of templates.
 It can also be used to simply count the number of pages (rather than
 listing each individually).
 
-Syntax: python templatecount.py command [arguments]
+Syntax: python pwb.py templatecount options templates
 
 Command line options:
 

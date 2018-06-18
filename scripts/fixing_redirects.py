@@ -8,7 +8,7 @@ Can be using with:
 
 -featured         Run over featured pages (for some wikimedia wikis only)
 
-Run fixing_redirects.py -help to see all the command-line
+Run python pwb.py fixing_redirects -help to see all the command-line
 options -file, -ref, -links, ...
 
 """

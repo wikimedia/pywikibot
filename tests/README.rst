@@ -101,9 +101,9 @@ pwb
 
 ::
 
-    python pwb.py tests/api_tests.py -v
-    python pwb.py tests/site_tests.py -v
-    python pwb.py tests/api_tests.py -v TestParamInfo.test_init
+    python pwb.py tests/api_tests -v
+    python pwb.py tests/site_tests -v
+    python pwb.py tests/api_tests -v TestParamInfo.test_init
 
 env
 ~~~
