@@ -2262,6 +2262,7 @@ class CachedRequest(Request):
         path = os.path.join(pywikibot.config2.base_dir,
                             'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
         cls._make_dir(path)
+        cls._get_cache_dir = classmethod(lambda c: path)  # cache the result
         return path
 
     @staticmethod
