@@ -32,7 +32,7 @@ try:
     import pycountry
 except ImportError:
     pywikibot.error('This script requires the python-pycountry module')
-    pywikibot.error('See: https://pypi.python.org/pypi/pycountry')
+    pywikibot.error('See: https://pypi.org/project/pycountry')
     pywikibot.exception()
     sys.exit(1)
 

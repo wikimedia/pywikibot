@@ -2652,7 +2652,7 @@ class YahooSearchPageGenerator(object):
     Page generator using Yahoo! search results.
 
     To use this generator, you need to install the package 'pYsearch'.
-    https://pypi.python.org/pypi/pYsearch
+    https://pypi.org/project/pYsearch
 
     To use this generator, install pYsearch
     """
@@ -2712,7 +2712,7 @@ class GoogleSearchPageGenerator(object):
 
     To use this generator, you need to install the package 'google':
 
-        L{https://pypi.python.org/pypi/google}
+        L{https://pypi.org/project/google}
 
     This package has been available since 2010, hosted on github
     since 2012, and provided by pypi since 2013.

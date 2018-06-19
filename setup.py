@@ -121,9 +121,9 @@ if PY2:
     # tools.ip does not have a hard dependency on an IP address module,
     # as it falls back to using regexes if one is not available.
     # The functional backport of py3 ipaddress is acceptable:
-    # https://pypi.python.org/pypi/ipaddress
+    # https://pypi.org/project/ipaddress
     # However the Debian package python-ipaddr is also supported:
-    # https://pypi.python.org/pypi/ipaddr
+    # https://pypi.org/project/ipaddr
     # Other backports are likely broken.
     # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
@@ -242,7 +242,7 @@ setup(
     install_requires=dependencies,
     dependency_links=dependency_links,
     extras_require=extra_deps,
-    url='https://www.mediawiki.org/wiki/Pywikibot',
+    url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
     download_url='https://tools.wmflabs.org/pywikibot/',
     test_suite="tests.collector",
     tests_require=test_deps,

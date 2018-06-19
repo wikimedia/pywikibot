@@ -30,6 +30,8 @@ from sys import version_info
 
 from unidiff import PatchSet
 
+from pywikibot import __url__
+
 if version_info.major == 3:
     PY2 = False
     from tokenize import tokenize, STRING
@@ -148,10 +150,8 @@ def main():
     if not check(latest_patchset):
         raise SystemExit(
             'diff-checker failed.\n'
-            'Please review '
-            '<https://www.mediawiki.org/wiki/'
-            'Manual:Pywikibot/Development/Guidelines#Miscellaneous> '
-            'and update your patch-set accordingly.'
+            'Please review <{}/Development/Guidelines#Miscellaneous> '
+            'and update your patch-set accordingly.'.format(__url__)
         )
 
 

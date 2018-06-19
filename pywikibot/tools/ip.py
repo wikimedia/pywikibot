@@ -38,7 +38,7 @@ if not ip_address or sys.version_info[0] < 3:
 if ip_address and ip_address.__module__ == 'ipaddress':
     if sys.version_info[0] < 3:
         # This backport fails many tests
-        # https://pypi.python.org/pypi/py2-ipaddress
+        # https://pypi.org/project/py2-ipaddress
         # It accepts u'1111' as a valid IP address.
         try:
             ip_address(u'1111')
@@ -48,7 +48,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
             pass
 
         # This backport only fails a few tests if given a unicode object
-        # https://pypi.python.org/pypi/ipaddress
+        # https://pypi.org/project/ipaddress
         # However while it rejects u'1111', it will consider '1111' valid
         try:
             ip_address(b'1111')

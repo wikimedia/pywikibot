@@ -18,7 +18,7 @@ Pywikibot
 =========
 
 The Pywikibot framework is a Python library that interfaces with the
-`MediaWiki API <https://www.mediawiki.org/wiki/Special:MyLanguage/API:Main_page>`_
+`MediaWiki API <https://www.mediawiki.org/wiki/API:Main_page>`_
 version 1.14 or higher.
 
 Also included are various general function scripts that can be adapted for
@@ -44,7 +44,7 @@ Or to install using PyPI (excluding scripts)
     pip install pywikibot
 
 Our `installation
-guide <https://www.mediawiki.org/wiki/Special:MyLanguage/Manual:Pywikibot/Installation>`_
+guide <https://www.mediawiki.org/wiki/Manual:Pywikibot/Installation>`_
 has more details for advanced usage.
 
 Basic Usage
@@ -79,7 +79,7 @@ Contributing
 ------------
 
 Our code is maintained on Wikimedia's `Gerrit installation <https://gerrit.wikimedia.org/>`_,
-`learn <https://www.mediawiki.org/wiki/Special:MyLanguage/Developer_access>`_ how to get
+`learn <https://www.mediawiki.org/wiki/Developer_access>`_ how to get
 started.
 
 .. include:: CODE_OF_CONDUCT.rst

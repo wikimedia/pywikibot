@@ -29,10 +29,9 @@ from warnings import warn
 
 import requests
 
-from pywikibot import __version__
+from pywikibot import __version__, __url__, config
 from pywikibot.bot import calledModuleName
 from pywikibot.comms import threadedhttp
-from pywikibot import config
 from pywikibot.exceptions import (
     FatalServerError, Server504Error, Server414Error
 )
@@ -338,9 +337,9 @@ def get_authentication(uri):
                 return config.authenticate[path]
             warn('config.authenticate["{path}"] has invalid value.\n'
                  'It should contain 2 or 4 items, not {length}.\n'
-                 'See https://www.mediawiki.org/wiki/Manual:Pywikibot/OAuth '
-                 'for more info.'
-                 .format(path=path, length=len(config.authenticate[path])))
+                 'See {url}/OAuth for more info.'
+                 .format(path=path, length=len(config.authenticate[path]),
+                         url=__url__))
     return None
 
 

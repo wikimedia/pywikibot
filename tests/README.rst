@@ -120,8 +120,8 @@ After changes are published into a github repository, tests may be run on
 travis-ci.org according to the configuration in .travis.yml .
 
 When changes are merged into the main repository, they are replicated to
-https://github.com/wikimedia/pywikibot-core , and travis tests are run and
-published at travis-ci.org/wikimedia/pywikibot-core/builds .  These tests
+https://github.com/wikimedia/pywikibot , and travis tests are run and
+published at https://travis-ci.org/wikimedia/pywikibot/builds .  These tests
 use the Wikimedia global (SUL) account 'Pywikibot-test', which has a password
 securely stored in .travis.yml . See section env:global:secure.
 
@@ -129,10 +129,10 @@ Anyone can run these tests on travis-ci.org using their own github account, with
 code changes that have not been merged into the main repository.  To do this:
 
 1. create a github and travis-ci account
-2. fork the main github repository https://github.com/wikimedia/pywikibot-core
+2. fork the main github repository https://github.com/wikimedia/pywikibot
 3. enable builds from the travis profile page: https://travis-ci.org/profile
 4. push changes into the forked git repository
-5. watch the build at https://travis-ci.org/<username>/pywikibot-core/builds
+5. watch the build at https://travis-ci.org/<username>/pywikibot/builds
 
 Only travis-ci builds from the main repository can access the password for the
 Wikimedia account 'Pywikibot-test'.  All tests which require a logged in user
@@ -141,7 +141,7 @@ are skipped if the travis-ci build environment does not have a password.
 To enable 'user' tests on travis-ci builds for a different repository, add
 a username and password to travis:
 
-1. Go to https://travis-ci.org/<username>/pywikibot-core/settings/env_vars
+1. Go to https://travis-ci.org/<username>/pywikibot/settings
 2. Add a new variable named PYWIKIBOT2_USERNAME and a value of a valid
    Wikimedia SUL username
 3. Add another variable named USER_PASSWORD, with the private password for
@@ -171,10 +171,10 @@ configuration in .appveyor.yml .  To do this:
 1. create a github and appveyor account
 2. fork the main github repository
 3. create a project in ci.appveyor.com
-4. go to https://ci.appveyor.com/project/<username>/pywikibot-core/settings
+4. go to https://ci.appveyor.com/project/<username>/pywikibot/settings
    and enter the custom configuration .yml filename: .appveyor.yml
 5. push changes into the forked git repository
-6. watch the build at https://ci.appveyor.com/<username>/pywikibot-core/history
+6. watch the build at https://ci.appveyor.com/<username>/pywikibot/history
 
 The 'user' tests are not yet enabled on appveyor builds.
 
@@ -187,14 +187,14 @@ CircleCI Ubuntu servers.
 1. create a github and circleci account
 2. fork the main github repository
 3. create a project in circleci.com
-4. go to https://circleci.com/gh/<username>/pywikibot-core/edit#env-vars
+4. go to https://circleci.com/gh/<username>/pywikibot/edit#env-vars
    and add the following variables:
 
      - PYWIKIBOT2_NO_USER_CONFIG=2
      - TOXENV=py27,py34
 
 5. push changes into the forked git repository
-6. watch the build at https://circleci.com/gh/<username>/pywikibot-core
+6. watch the build at https://circleci.com/gh/<username>/pywikibot
 
 PYWIKIBOT2_NO_USER_CONFIG=2 is needed because 'python setup.py test' is run.
 

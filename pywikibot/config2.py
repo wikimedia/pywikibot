@@ -193,7 +193,7 @@ solve_captcha = True
 #    one site
 #
 # Pywikibot also support OAuth 1.0a via mwoauth
-# https://pypi.python.org/pypi/mwoauth
+# https://pypi.org/project/mwoauth
 #
 # You can add OAuth tokens to your user-config.py of the following form:
 #
@@ -565,7 +565,7 @@ interwiki_shownew = True
 
 # Should interwiki.py output a graph PNG file on conflicts?
 # You need pydot for this:
-# https://pypi.python.org/pypi/pydot/1.0.2
+# https://pypi.org/project/pydot/1.0.2
 # https://code.google.com/p/pydot/
 interwiki_graph = False
 

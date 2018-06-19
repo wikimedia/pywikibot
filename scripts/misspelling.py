@@ -46,7 +46,7 @@ mispelling.py does not support site {site}.
 
 Help Pywikibot team to provide support for your wiki by submitting
 a bug to:
-https://phabricator.wikimedia.org/maniphest/task/create/?projects=pywikibot-core
+https://phabricator.wikimedia.org/maniphest/task/edit/form/1/?tags=pywikibot-core
 with category containing misspelling pages or a template for
 these misspellings.\n"""
 

@@ -703,7 +703,7 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
         raise TranslationError(
             'Unable to load messages package %s for bundle %s'
             '\nIt can happen due to lack of i18n submodule or files. '
-            'Read %s/i18n'
+            'See %s/i18n'
             % (_messages_package_name, twtitle, __url__))
 
     source_needed = False
@@ -733,11 +733,11 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
             break
     else:
         raise TranslationError(
-            'No %s translation has been defined for TranslateWiki key'
-            ' %r\nIt can happen due to lack of i18n submodule or files. '
-            'Read https://mediawiki.org/wiki/PWB/i18n'
+            'No %s translation has been defined for TranslateWiki key %r\n'
+            'It can happen due to lack of i18n submodule or files. See '
+            '%s/i18n'
             % ('English' if 'en' in langs else "'%s'" % lang,
-               twtitle))
+               twtitle, __url__))
     # send the language code back via the given mutable list parameter
     if source_needed:
         source.append(alt)
