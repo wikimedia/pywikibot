@@ -1046,10 +1046,10 @@ class _DifferentTypeError(UserWarning, TypeError):
 
     def __init__(self, name, actual_type, allowed_types):
         super(_DifferentTypeError, self).__init__(
-            'Configuration variable "{0}" is defined as "{1.__name__}" but '
-            'expected "{2}".'.format(
-                name, actual_type,
-                '", "'.join(t.__name__ for t in allowed_types)))
+            'Configuration variable "{0}" is defined as "{1.__name__}" in '
+            'your user-config.py but expected "{2}".'
+            .format(name, actual_type, '", "'.join(t.__name__
+                                                   for t in allowed_types)))
 
 
 def _assert_default_type(name, value, default_value):
@@ -1086,8 +1086,10 @@ def _check_user_config_types(user_config, default_values, skipped):
             else:
                 user_config[name] = value
         elif not name.startswith('_') and name not in skipped:
-            warn('Configuration variable {0} is defined but unknown. '
-                 'Misspelled?'.format(name), UserWarning)
+            warn('Configuration variable "{0}" is defined in your '
+                 'user-config.py but unknown. It can be a misspelled one or a '
+                 'variable that is no longer supported.'
+                 .format(name), UserWarning)
 
 
 _check_user_config_types(_uc, _glv, _imports)
@@ -1112,9 +1114,9 @@ for _key in _modified:
     globals()[_key] = _uc[_key]
 
     if _key in _deprecated_variables:
-        warn("'%s' is no longer a supported configuration variable.\n"
-             "Please inform the maintainers if you depend on it." % _key,
-             _ConfigurationDeprecationWarning)
+        warn('"{0}" present in our user-config.py is no longer a supported '
+             'configuration variable. Please inform the maintainers if you '
+             'depend on it.'.format(_key), _ConfigurationDeprecationWarning)
 
 # If we cannot auto-detect the console encoding (e.g. when piping data)
 # assume utf-8. On Linux, this will typically be correct; on windows,
