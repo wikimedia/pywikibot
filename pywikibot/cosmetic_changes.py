@@ -391,19 +391,16 @@ class CosmeticChangesToolkit(object):
         # arz uses english stylish codes
         if self.site.sitename == 'wikipedia:arz':
             return text
-        family = self.site.family
         # wiki links aren't parsed here.
         exceptions = ['nowiki', 'comment', 'math', 'pre']
 
         for namespace in self.site.namespaces.values():
-            if namespace.id in (0, 2, 3):
+            if namespace == 0:
                 # skip main (article) namespace
-                # skip user namespace, maybe gender is used
                 continue
             # a clone is needed. Won't change the namespace dict
             namespaces = list(namespace)
-            thisNs = namespaces.pop(0)
-            if namespace.id == 6 and family.name == 'wikipedia':
+            if namespace == 6 and self.site.family.name == 'wikipedia':
                 if self.site.code in ('en', 'fr') and MediaWikiVersion(
                         self.site.version()) >= MediaWikiVersion('1.14'):
                     # do not change "Image" on en-wiki and fr-wiki
@@ -414,21 +411,40 @@ class CosmeticChangesToolkit(object):
                     assert u'Kép' in namespaces
                     namespaces.remove(u'Kép')
                 elif self.site.code == 'pt':
-                    # TODO: bug T57242
-                    continue
+                    # use "Imagem" by default on pt-wiki (per T57242)
+                    assert 'Imagem' in namespaces
+                    namespaces.insert(
+                        0, namespaces.pop(namespaces.index('Imagem')))
+            # final namespace variant
+            final_ns = namespaces.pop(0)
+            if namespace in (2, 3):
+                # skip localized user namespace, maybe gender is used
+                namespaces = ['User' if namespace == 2 else 'User talk']
             # lowerspaced and underscored namespaces
             for i in range(len(namespaces)):
                 item = namespaces[i].replace(' ', '[ _]')
                 item = u'[%s%s]' % (item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
-            namespaces.append(first_lower(thisNs))
-            if thisNs and namespaces:
-                text = textlib.replaceExcept(
-                    text,
-                    r'\[\[\s*(%s) *:(?P<nameAndLabel>.*?)\]\]'
-                    % '|'.join(namespaces),
-                    r'[[%s:\g<nameAndLabel>]]' % thisNs,
-                    exceptions)
+            namespaces.append(first_lower(final_ns))
+            if final_ns and namespaces:
+                if self.site.sitename == 'wikipedia:pt' and namespace == 6:
+                    # only change on these file extensions (per T57242)
+                    extensions = ('png', 'gif', 'jpg', 'jpeg', 'svg', 'tiff',
+                                  'tif')
+                    text = textlib.replaceExcept(
+                        text,
+                        r'\[\[\s*({}) *:(?P<name>[^\|\]]*?\.({}))'
+                        r'(?P<label>.*?)\]\]'
+                        .format('|'.join(namespaces), '|'.join(extensions)),
+                        r'[[{}:\g<name>\g<label>]]'.format(final_ns),
+                        exceptions)
+                else:
+                    text = textlib.replaceExcept(
+                        text,
+                        r'\[\[\s*(%s) *:(?P<nameAndLabel>.*?)\]\]'
+                        % '|'.join(namespaces),
+                        r'[[%s:\g<nameAndLabel>]]' % final_ns,
+                        exceptions)
         return text
 
     def translateMagicWords(self, text):
