@@ -7,7 +7,11 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, unicode_literals
 
-import collections
+try:
+    from collections.abc import Mapping
+except ImportError:  # Python 2.7
+    from collections import Mapping
+from collections import OrderedDict
 import decimal
 import inspect
 import os.path
@@ -449,9 +453,9 @@ class TestFilterUnique(TestCase):
         self.assertEqual(next(deduper), 3)
 
         if key in (hash, passthrough):
-            if isinstance(deduped, collections.OrderedDict):
+            if isinstance(deduped, OrderedDict):
                 self.assertEqual(list(deduped.keys()), [1, 3])
-            elif isinstance(deduped, collections.Mapping):
+            elif isinstance(deduped, Mapping):
                 self.assertCountEqual(list(deduped.keys()), [1, 3])
             else:
                 self.assertEqual(deduped, {1, 3})
@@ -460,9 +464,9 @@ class TestFilterUnique(TestCase):
         self.assertEqual(next(deduper), 4)
 
         if key in (hash, passthrough):
-            if isinstance(deduped, collections.OrderedDict):
+            if isinstance(deduped, OrderedDict):
                 self.assertEqual(list(deduped.keys()), [1, 3, 2, 4])
-            elif isinstance(deduped, collections.Mapping):
+            elif isinstance(deduped, Mapping):
                 self.assertCountEqual(list(deduped.keys()), [1, 2, 3, 4])
             else:
                 self.assertEqual(deduped, {1, 2, 3, 4})
@@ -480,7 +484,7 @@ class TestFilterUnique(TestCase):
         self.assertEqual(next(deduper), '3')
 
         if key in (hash, passthrough):
-            if isinstance(deduped, collections.Mapping):
+            if isinstance(deduped, Mapping):
                 self.assertEqual(deduped.keys(), [key('1'), key('3')])
             else:
                 self.assertEqual(deduped, {key('1'), key('3')})
@@ -489,7 +493,7 @@ class TestFilterUnique(TestCase):
         self.assertEqual(next(deduper), '4')
 
         if key in (hash, passthrough):
-            if isinstance(deduped, collections.Mapping):
+            if isinstance(deduped, Mapping):
                 self.assertEqual(deduped.keys(), [key(i) for i in self.strs])
             else:
                 self.assertEqual(deduped, {key(i) for i in self.strs})
@@ -510,7 +514,7 @@ class TestFilterUnique(TestCase):
 
     def test_OrderedDict(self):
         """Test filter_unique with a OrderedDict."""
-        deduped = collections.OrderedDict()
+        deduped = OrderedDict()
         deduper = tools.filter_unique(self.ints, container=deduped)
         self._test_dedup_int(deduped, deduper)
 

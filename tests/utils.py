@@ -17,7 +17,10 @@ import time
 import traceback
 import warnings
 
-from collections import Mapping
+try:
+    from collections.abc import Mapping
+except ImportError:  # Python 2.7
+    from collections import Mapping
 from types import ModuleType
 
 import pywikibot

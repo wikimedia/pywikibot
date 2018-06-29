@@ -13,7 +13,11 @@ and return a unicode string.
 #
 from __future__ import absolute_import, unicode_literals
 
-from collections import OrderedDict, Sequence
+from collections import OrderedDict
+try:
+    from collections.abc import Sequence
+except ImportError:  # Python 2.7
+    from collections import Sequence
 import datetime
 import re
 import sys

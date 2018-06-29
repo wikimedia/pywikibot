@@ -28,7 +28,11 @@ import os
 import pkgutil
 import re
 
-from collections import defaultdict, Mapping
+from collections import defaultdict
+try:
+    from collections.abc import Mapping
+except ImportError:  # Python 2.7
+    from collections import Mapping
 from warnings import warn
 
 import pywikibot
