@@ -21,6 +21,10 @@ import threading
 import time
 import types
 
+try:
+    from collections.abc import Iterator, Mapping
+except ImportError:  # Python 2.7
+    from collections import Iterator, Mapping
 from distutils.version import Version
 from functools import wraps
 from warnings import catch_warnings, showwarning, warn
@@ -888,7 +892,7 @@ def filter_unique(iterable, container=None, key=None, add=None):
     Note: This is not thread safe.
 
     @param iterable: the source iterable
-    @type iterable: collections.Iterable
+    @type iterable: collections.abc.Iterable
     @param container: storage of seen items
     @type container: type
     @param key: function to convert the item to a key
@@ -926,7 +930,7 @@ class CombinedError(KeyError, IndexError):
     """An error that gets caught by both KeyError and IndexError."""
 
 
-class EmptyDefault(str, collections.Mapping):
+class EmptyDefault(str, Mapping):
 
     """
     A default for a not existing siteinfo property.
@@ -984,7 +988,7 @@ class SelfCallString(SelfCallMixin, str):
     """Unicode string with SelfCallMixin."""
 
 
-class IteratorNextMixin(collections.Iterator):
+class IteratorNextMixin(Iterator):
 
     """Backwards compatibility for Iterators."""
 

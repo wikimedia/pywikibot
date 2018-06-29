@@ -12,7 +12,10 @@ import pickle
 import re
 import sys
 
-from collections import Iterable, Mapping
+try:
+    from collections.abc import Iterable, Mapping
+except ImportError:  # Python 2.7
+    from collections import Iterable, Mapping
 from datetime import datetime
 
 import pywikibot

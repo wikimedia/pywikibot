@@ -7,7 +7,10 @@
 #
 from __future__ import absolute_import, unicode_literals
 
-from collections import Iterable
+try:
+    from collections.abc import Iterable
+except ImportError:  # Python 2.7
+    from collections import Iterable
 
 from pywikibot.site import Namespace, NamespacesDict
 from pywikibot.tools import (

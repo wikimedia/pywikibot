@@ -11,7 +11,10 @@ import difflib
 import math
 import sys
 
-from collections import Sequence
+try:
+    from collections.abc import Sequence
+except ImportError:  # Python 2.7
+    from collections import Sequence
 from difflib import _format_range_unified as format_range_unified
 
 import pywikibot

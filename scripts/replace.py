@@ -139,7 +139,10 @@ the top of the help.
 from __future__ import absolute_import, unicode_literals
 
 import codecs
-import collections
+try:
+    from collections.abc import Sequence
+except ImportError:  # Python 2.7
+    from collections import Sequence
 import re
 import sys
 import time
@@ -553,7 +556,7 @@ class ReplaceRobot(Bot):
                                            **kwargs)
 
         for i, replacement in enumerate(replacements):
-            if isinstance(replacement, collections.Sequence):
+            if isinstance(replacement, Sequence):
                 if len(replacement) != 2:
                     raise ValueError('Replacement number {0} does not have '
                                      'exactly two elements: {1}'.format(

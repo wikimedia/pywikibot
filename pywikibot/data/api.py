@@ -16,7 +16,10 @@ import pprint
 import re
 import traceback
 
-from collections import Container, MutableMapping
+try:
+    from collections.abc import Container, MutableMapping
+except ImportError:  # Python 2.7
+    from collections import Container, MutableMapping
 from email.mime.nonmultipart import MIMENonMultipart
 from warnings import warn
 

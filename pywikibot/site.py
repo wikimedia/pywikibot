@@ -25,7 +25,11 @@ import sys
 import threading
 import time
 
-from collections import Iterable, Container, namedtuple, Mapping
+try:
+    from collections.abc import Iterable, Container, Mapping
+except ImportError:  # Python 2.7
+    from collections import Iterable, Container, Mapping
+from collections import namedtuple
 from warnings import warn
 
 import pywikibot
