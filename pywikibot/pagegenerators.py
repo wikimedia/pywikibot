@@ -984,7 +984,8 @@ class GeneratorFactory(object):
 
     def _handle_unconnectedpages(self, value):
         """Handle `-unconnectedpages` argument."""
-        return self.site.unconnected_pages(total=_int_none(value))
+        # T196619 don't use QueryGenerator due to namespace filtering
+        return (p for p in self.site.unconnected_pages(total=_int_none(value)))
 
     def _handle_imagesused(self, value):
         """Handle `-imagesused` argument."""
