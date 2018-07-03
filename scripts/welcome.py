@@ -235,6 +235,7 @@ netext = {
         'ka': u'{{ახალი მომხმარებელი}}--%s',
         'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'ml': u'{{ബദൽ:സ്വാഗതം/bot}} %s',
+        'my': '{{subst:welcome}} %s',
         'nap': u'{{Bemmenuto}}%s',
         'nl': u'{{hola|bot|%s}}',
         'no': u'{{subst:bruker:jhs/vk}} %s',
