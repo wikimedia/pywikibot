@@ -85,7 +85,7 @@ script:
       fi ;
       oauth_token_var="OAUTH_TOKENS_${FAMILY^^}_${LANGUAGE^^}" ;
       if [[ -n "${!oauth_token_var}" ]]; then
-        printf "authenticate['${OAUTH_DOMAIN}'] = ('%s')\n" "${!oauth_token_var//:/', '}" >> ~/.pywikibot/user-config.py ;
+        printf "authenticate['${OAUTH_DOMAIN}'] = ('%s')\n" "${!oauth_token_var//:/\', \'}" >> ~/.pywikibot/user-config.py ;
       fi ;
     fi
   - echo "authenticate['wiki.musicbrainz.org'] = ('NOTSPAM', 'NOTSPAM')" >> ~/.pywikibot/user-config.py ;
