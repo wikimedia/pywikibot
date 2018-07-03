@@ -4,6 +4,13 @@ Release history
 Current release
 ---------------
 
+* Fix occasional failure of TestLogentries due to hidden namespace (T197506)
+* Remove multiple empty sections at once in cosmetic_changes (T196324)
+* Fix stub template position by putting it above interwiki comment (T57034)
+* Fix handling of API continuation in PropertyGenerator (T196876)
+* Use PyMySql as pure-Python MySQL client library instead of oursql, deprecate MySQLdb (T89976, T142021)
+* Ensure that BaseBot.treat is always processing a Page object (T196562, T196813)
+* New mediawiki projects were provided
 * Bugfixes and improvements
 * Localisation updates
 
@@ -23,7 +30,7 @@ Current release
 * pagegenerators AllpagesPageGenerator, CombinedPageGenerator, UnconnectedPageGenerator are deprecated
 * Some DayPageGenerator parameters has been renamed
 * unicodedata2, httpbin and Flask dependency was removed (T102461, T108068, T178864, T193383)
-* new projects where provided
+* New projects were provided
 * Bugfixes and improvements
 * Documentation updates
 * Localisation updates (T194893)
@@ -39,7 +46,7 @@ Current release
 * pagegenerators.RepeatingGenerator is marked as deprecated (T192229)
 * Deprecate requests-requirements.txt (T193476)
 * Bugfixes and improvements
-* new mediawiki projects where provided
+* New mediawiki projects were provided
 * Localisation updates
 
 3.0.20180403
@@ -185,9 +192,9 @@ Current release
 1.0 rv 2007-06-19
 -----------------
 * BeautifulSoup becomes mandatory
-* new scripts where added
-* new family files where supported
-* some scripts where archived
+* new scripts were added
+* new family files were supported
+* some scripts were archived
 
 1.0
 ---
