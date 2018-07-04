@@ -149,7 +149,7 @@ class TestCaseBase(unittest.TestCase):
         Assert that Pages is in namespaces.
 
         @param page: Page
-        @type page: Page
+        @type page: pywikibot.BasePage
         @param namespaces: expected namespaces
         @type namespaces: int or set of int
         """
@@ -168,11 +168,11 @@ class TestCaseBase(unittest.TestCase):
         if additional items are in the iterator.
 
         @param gen: Page generator
-        @type gen: generator of Page
+        @type gen: Iterable[pywikibot.BasePage]
         @param count: number of pages to get
-        @type titles: int
+        @type count: int
         @param site: Site of expected pages
-        @type site: APISite
+        @type site: pywikibot.APISite
         """
         original_iter = iter(gen)
 
@@ -232,8 +232,6 @@ class TestCaseBase(unittest.TestCase):
         @type gen: generator
         @param namespaces: expected namespaces
         @type namespaces: int or set of int
-        @param count: maximum results to process
-        @type count: int
         @param skip: skip test if not all namespaces found
         @param skip: bool
         """
@@ -257,11 +255,11 @@ class TestCaseBase(unittest.TestCase):
         Only iterates to the length of titles plus two.
 
         @param gen: Page generator
-        @type gen: generator of Page
+        @type gen: Iterable[pywikibot.BasePage]
         @param titles: Expected titles
         @type titles: iterator
         @param site: Site of expected pages
-        @type site: APISite
+        @type site: pywikibot.APISite
         """
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
@@ -274,11 +272,11 @@ class TestCaseBase(unittest.TestCase):
         Only iterates to the length of titles plus two.
 
         @param gen: Page generator
-        @type gen: generator of Page
+        @type gen: Iterable[pywikibot.BasePage]
         @param titles: Expected titles
         @type titles: iterator
         @param site: Site of expected pages
-        @type site: APISite
+        @type site: pywikibot.APISite
         """
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
@@ -1099,10 +1097,10 @@ class TestCase(TestTimerMixin, TestCaseBase):
         """Create a Page object for the sites main page.
 
         @param site: Override current site, obtained using L{get_site}.
-        @type site: APISite or None
+        @type site: pywikibot.APISite or None
         @param force: Get an unused Page object
         @type force: bool
-        @rtype: Page
+        @rtype: pywikibot.Page
         """
         if not site:
             site = self.get_site()
@@ -1125,7 +1123,11 @@ class TestCase(TestTimerMixin, TestCaseBase):
         return mainpage
 
     def get_missing_article(self, site=None):
-        """Get a Page which refers to a missing page on the site."""
+        """Get a Page which refers to a missing page on the site.
+
+        @type site: pywikibot.Site or None
+        @rtype: pywikibot.Page
+        """
         if not site:
             site = self.get_site()
         page = pywikibot.Page(pywikibot.page.Link(
