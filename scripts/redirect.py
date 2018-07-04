@@ -417,13 +417,13 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         self.exiting = False
         self.sdtemplate = self.get_sd_template()
 
-        # connect the action treat
+        # connect the action treat to treat_page method called by treat
         if action == 'double':
-            self.action_treat = self.fix_1_double_redirect
+            self.treat_page = self.fix_1_double_redirect
         elif action == 'broken':
-            self.action_treat = self.delete_1_broken_redirect
+            self.treat_page = self.delete_1_broken_redirect
         elif action == 'both':
-            self.action_treat = self.fix_double_or_delete_broken_redirect
+            self.treat_page = self.fix_double_or_delete_broken_redirect
         else:
             raise NotImplementedError('No valid action "{0}" found.'
                                       ''.format(action))
@@ -488,8 +488,9 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             except pywikibot.PageSaveRelatedError as e:
                 pywikibot.error(e)
 
-    def delete_1_broken_redirect(self, redir_page):
+    def delete_1_broken_redirect(self):
         """Treat one broken redirect."""
+        redir_page = self.current_page
         done = not self.getOption('delete')
         try:
             targetPage = redir_page.getRedirectTarget()
@@ -575,9 +576,9 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))
 
-    def fix_1_double_redirect(self, redir):
+    def fix_1_double_redirect(self):
         """Treat one double redirect."""
-        newRedir = redir
+        newRedir = redir = self.current_page
         redirList = []  # bookkeeping to detect loops
         while True:
             redirList.append(u'%s:%s' % (newRedir.site.lang,
@@ -698,22 +699,20 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                         % (redir.title(), error))
             break
 
-    def fix_double_or_delete_broken_redirect(self, page):
+    def fix_double_or_delete_broken_redirect(self):
         """Treat one broken or double redirect."""
-        if page._redirect_type == 1:
-            return
-        if page._redirect_type == 0:
-            self.delete_1_broken_redirect(page)
-        else:
-            self.fix_1_double_redirect(page)
+        if self.current_page._redirect_type == 0:
+            self.delete_1_broken_redirect()
+        elif self.current_page._redirect_type != 1:
+            self.fix_1_double_redirect()
 
-    def treat_page(self):
-        """Treat current page."""
+    def treat(self, page):
+        """Treat a page."""
         if self._treat_counter >= self.getOption('total'):
             pywikibot.output('\nNumber of pages reached the total limit. '
                              'Script terminated.')
             self.quit()
-        self.action_treat(self.current_page)
+        super(RedirectRobot, self).treat(page)
 
 
 def main(*args):
