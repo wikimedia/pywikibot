@@ -944,8 +944,10 @@ class CategoryListifyRobot(object):
                 else:
                     listString += "*[[:%s]]\n" % article.title()
         if self.list.exists() and not self.overwrite:
-            pywikibot.output(u'Page %s already exists, aborting.'
-                             % self.list.title())
+            pywikibot.output(
+                'Page {} already exists, aborting.\n'
+                'Use -overwrite option to overwrite the output page.'
+                .format(self.list.title()))
         else:
             self.list.put(listString, summary=self.editSummary)
 
