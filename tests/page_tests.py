@@ -456,7 +456,7 @@ class TestPageObject(DefaultSiteTestCase):
         if not maintalk.exists():
             raise unittest.SkipTest("No talk page for %s's main page"
                                     % self.get_site())
-        self.assertIsInstance(maintalk.get(), unicode)
+        self.assertIsInstance(maintalk.get(get_redirect=True), unicode)
         self.assertEqual(mainpage.toggleTalkPage(), maintalk)
         self.assertEqual(maintalk.toggleTalkPage(), mainpage)
 
