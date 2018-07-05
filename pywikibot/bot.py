@@ -330,7 +330,8 @@ def init_handlers(strm=None):
             logfile = config.datafilepath('logs', '%s-bot.log' % module_name)
         file_handler = RotatingFileHandler(filename=logfile,
                                            maxBytes=1024 * config.logfilesize,
-                                           backupCount=config.logfilecount)
+                                           backupCount=config.logfilecount,
+                                           encoding='utf-8')
 
         file_handler.setLevel(DEBUG)
         form = LoggingFormatter(
