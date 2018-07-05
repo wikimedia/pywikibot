@@ -24,6 +24,8 @@ Specific arguments:
 -end:xxx        The text that marks the end of the page,
                 the default value is "{{-stop-}}"
 -include        Include the beginning and end markers to the page
+-textonly       Text is given without markers. Only one page text is given.
+                -begin and -end options are ignored.
 -titlestart:xxx The text used in place of ''' for identifying
                 the beginning of a page title
 -titleend:xxx   The text used in place of ''' for identifying
@@ -31,6 +33,8 @@ Specific arguments:
 -notitle        Do not include the page title, including titlestart
                 and titleend, to the page. Can be used to specify unique
                 page title above the page content
+-title:xxx      The page title is given directly. Ignores -titlestart,
+                -titleend and -notitle options
 -nocontent:xxx  If the existing page contains specified statement,
                 the page is skipped from editing
 -noredirect     Do not upload on redirect pages
@@ -198,6 +202,8 @@ class PageFromFileReader(OptionHandler):
         'titleend': "'''",
         'include': False,
         'notitle': False,
+        'textonly': False,
+        'title': None,
     }
 
     def __init__(self, filename, **kwargs):
@@ -243,33 +249,39 @@ class PageFromFileReader(OptionHandler):
                 pywikibot.output(u'\nNo title found - skipping a page.')
                 position += err.offset
                 continue
-
+            if length == 0:
+                break
             position += length
             yield title, contents
 
     def findpage(self, text):
         """Find page to work on."""
-        page_regex = re.compile(
-            re.escape(self.pageStartMarker) + '(.*?)'
-            + re.escape(self.pageEndMarker), re.DOTALL)
+        if self.getOption('textonly'):
+            pattern = '^(.*)$'
+        else:
+            pattern = (re.escape(self.pageStartMarker) + '(.*?)'
+                       + re.escape(self.pageEndMarker))
+        page_regex = re.compile(pattern, re.DOTALL)
         title_regex = re.compile(
             re.escape(self.titleStartMarker) + '(.*?)'
             + re.escape(self.titleEndMarker))
-
         location = page_regex.search(text)
         if self.include:
             contents = location.group()
         else:
             contents = location.group(1)
-        try:
-            title = title_regex.search(contents).group(1)
-            if self.notitle:
-                # Remove title (to allow creation of redirects)
-                contents = title_regex.sub('', contents, count=1)
-        except AttributeError:
-            raise NoTitle(location.end())
-        else:
-            return location.end(), title, contents
+
+        title = self.getOption('title')
+        if not title:
+            try:
+                title = title_regex.search(contents).group(1)
+                if self.notitle:
+                    # Remove title (to allow creation of redirects)
+                    contents = title_regex.sub('', contents, count=1)
+            except AttributeError:
+                raise NoTitle(location.end())
+
+        return location.end(), title, contents
 
 
 def main(*args):
@@ -294,11 +306,11 @@ def main(*args):
             warn('-start param (text that marks the beginning) of a page has '
                  'been deprecated in favor of begin; make sure to use the '
                  'updated param.', ArgumentDeprecationWarning)
-        elif option in ('begin', 'end', 'titlestart', 'titleend'):
+        elif option in ('begin', 'end', 'titlestart', 'titleend', 'title'):
             r_options[option] = value
         elif option == 'file':
             filename = value
-        elif option in ('include', 'notitle'):
+        elif option in ('include', 'notitle', 'textonly'):
             r_options[option] = True
         # bot options
         elif option == 'appendbottom':
