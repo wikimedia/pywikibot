@@ -17,11 +17,12 @@ class Family(family.WikimediaFamily):
     """Family class for Wikidata."""
 
     name = 'wikidata'
-    test_codes = ('test', )
+    test_codes = ('test', 'beta')
 
     langs = {
         'wikidata': 'www.wikidata.org',
         'test': 'test.wikidata.org',
+        'beta': 'wikidata.beta.wmflabs.org',
     }
 
     interwiki_forward = 'wikipedia'
@@ -39,7 +40,7 @@ class Family(family.WikimediaFamily):
 
     # Disable cosmetic changes
     config.cosmetic_changes_disable.update({
-        'wikidata': ('wikidata', 'test')
+        'wikidata': ('wikidata', 'test', 'beta')
     })
 
     def interface(self, code):
