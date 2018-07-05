@@ -1125,7 +1125,7 @@ class BaseSite(ComparableMixin):
         @param title: Title of the page to link to
         @type title: unicode
         @param othersite: Generate a interwiki link for use on this site.
-        @type othersite: Site (optional)
+        @type othersite: BaseSite or None
 
         @rtype: unicode
         """
@@ -1925,7 +1925,7 @@ class APISite(BaseSite):
             items in total
         @type total: int
         @return: iterable with parameters set
-        @rtype: QueryGenerator
+        @rtype: api.QueryGenerator
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
@@ -2988,7 +2988,7 @@ class APISite(BaseSite):
         Load [[mw:Extension:PageImages]] info.
 
         @param page: The page for which to obtain the image
-        @type page: Page class
+        @type page: pywikibot.Page
 
         @raises APIError: PageImages extension is not installed
         """
@@ -3013,7 +3013,7 @@ class APISite(BaseSite):
         """Iterate global image usage for a given FilePage.
 
         @param page: the page to return global image usage for.
-        @type image: FilePage
+        @type image: pywikibot.FilePage
         @param total: iterate no more than this number of pages in total.
         @raises TypeError: input page is not a FilePage.
         @raises SiteDefinitionError: Site could not be defined for a returned
@@ -3157,9 +3157,9 @@ class APISite(BaseSite):
         Return page object for the redirect target of page.
 
         @param page: page to search redirects for
-        @type page: BasePage
+        @type page: pywikibot.page.BasePage
         @return: redirect target of page
-        @rtype: BasePage
+        @rtype: pywikibot.Page
 
         @raises IsNotRedirectPage: page is not a redirect
         @raises RuntimeError: no redirects found
@@ -4518,7 +4518,7 @@ class APISite(BaseSite):
 
         @param image: the image to search for (FilePage need not exist on
             the wiki)
-        @type image: FilePage
+        @type image: pywikibot.FilePage
         @param namespaces: If present, only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
@@ -5605,7 +5605,7 @@ class APISite(BaseSite):
         """Undelete page from the wiki. Requires appropriate privilege level.
 
         @param page: Page to be deleted.
-        @type page: Page
+        @type page: pywikibot.BasePage
         @param revisions: List of timestamps to restore.
             If None, restores all revisions.
         @type revisions: list
@@ -6793,7 +6793,7 @@ class APISite(BaseSite):
             shows all protection levels.
         @type level: str or False
         @return: The pages which are protected.
-        @rtype: generator of Page
+        @rtype: Iterable[pywikibot.Page]
         """
         namespaces = self.namespaces.resolve(namespace)
         # always assert that, so we are be sure that type could be 'create'
@@ -6910,7 +6910,7 @@ class APISite(BaseSite):
         @type lint_from: str representing digit or integer
 
         @return: pages with Linter errors.
-        @rtype: generator of Page
+        @rtype: Iterable[pywikibot.Page]
 
         """
         query = self._generator(api.ListGenerator, type_arg='linterrors',
@@ -7712,7 +7712,7 @@ class DataSite(APISite):
         @param item: Entity to modify
         @type item: WikibasePage
         @param claim: Claim to be added
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary
@@ -7744,7 +7744,7 @@ class DataSite(APISite):
         Set the claim target to the value of the provided claim target.
 
         @param claim: The source of the claim target value
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param snaktype: An optional snaktype. Default: 'value'
         @type snaktype: str ('value', 'novalue' or 'somevalue')
         @param bot: Whether to mark the edit as a bot edit
@@ -7775,7 +7775,7 @@ class DataSite(APISite):
         Save the whole claim to the wikibase site.
 
         @param claim: The claim to save
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary
@@ -7806,9 +7806,9 @@ class DataSite(APISite):
         Create/Edit a source.
 
         @param claim: A Claim object to add the source to
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param source: A Claim object to be used as a source
-        @type source: Claim
+        @type source: pywikibot.Claim
         @param new: Whether to create a new one if the "source" already exists
         @type new: bool
         @param bot: Whether to mark the edit as a bot edit
@@ -7861,9 +7861,9 @@ class DataSite(APISite):
         Create/Edit a qualifier.
 
         @param claim: A Claim object to add the qualifier to
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param qualifier: A Claim object to be used as a qualifier
-        @type qualifier: Claim
+        @type qualifier: pywikibot.Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary
@@ -7899,7 +7899,7 @@ class DataSite(APISite):
         Remove claims.
 
         @param claims: Claims to be removed
-        @type claims: list of Claim
+        @type claims: List[pywikibot.Claim]
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary
@@ -7934,9 +7934,9 @@ class DataSite(APISite):
         Remove sources.
 
         @param claim: A Claim object to remove the sources from
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param sources: A list of Claim objects that are sources
-        @type sources: Claim
+        @type sources: pywikibot.Claim
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary
@@ -7965,9 +7965,9 @@ class DataSite(APISite):
         Remove qualifiers.
 
         @param claim: A Claim object to remove the qualifier from
-        @type claim: Claim
+        @type claim: pywikibot.Claim
         @param qualifiers: Claim objects currently used as a qualifiers
-        @type qualifiers: list of Claim
+        @type qualifiers: List[pywikibot.Claim]
         @param bot: Whether to mark the edit as a bot edit
         @type bot: bool
         @param summary: Edit summary
