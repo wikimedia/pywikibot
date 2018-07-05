@@ -721,6 +721,14 @@ class DryFactoryGeneratorTest(TestCase):
         gf.handleArg('-ns:not:User')
         self.assertEqual(gf.namespaces, {1, 3, 4, 5})
 
+    def test_invalid_arg(self):
+        """Test invalid / non-generator arguments."""
+        gf = pagegenerators.GeneratorFactory(site=self.get_site())
+        self.assertFalse(gf.handleArg('-foobar'))
+        self.assertFalse(gf.handleArg('barbaz'))
+        self.assertFalse(gf.handleArg('-ì'))
+        self.assertFalse(gf.handleArg('ì'))
+
 
 class TestItemClaimFilterPageGenerator(WikidataTestCase):
 

@@ -1176,7 +1176,11 @@ class GeneratorFactory(object):
         if value == '':
             value = None
 
-        handler = getattr(self, '_handle_' + arg[1:], None)
+        try:
+            handler = getattr(self, '_handle_' + arg[1:], None)
+        except UnicodeEncodeError:
+            # getattr() on py2 does implicit unicode -> str
+            return False
         if handler:
             handler_result = handler(value)
             if isinstance(handler_result, bool):
