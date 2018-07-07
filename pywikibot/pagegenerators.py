@@ -2338,7 +2338,7 @@ def UnusedFilesGenerator(total=None, site=None):
     if site is None:
         site = pywikibot.Site()
     for page in site.unusedfiles(total=total):
-        yield pywikibot.FilePage(page.site, page.title())
+        yield page
 
 
 @deprecated_args(number="total", repeat=None)
