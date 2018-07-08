@@ -266,7 +266,7 @@ class ProofreadPage(pywikibot.Page):
 
         """
         if self.content_model == 'proofread-page' and hasattr(self, '_quality'):
-            return self._quality
+            return int(self._quality)
         return self.ql
 
     def decompose(fn):  # noqa: N805
