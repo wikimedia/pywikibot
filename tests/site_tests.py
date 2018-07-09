@@ -672,6 +672,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_allpages_langlinks_enabled(self):
         """Test allpages with langlinks enabled."""
         mysite = self.get_site()
+        if mysite.family.name in ('wpbeta', 'wsbeta'):
+            raise unittest.SkipTest('Test fails on betawikis; T199085')
         for page in mysite.allpages(
                 filterlanglinks=True, total=3, namespace=4):
             self.assertIsInstance(page, pywikibot.Page)
