@@ -4,12 +4,14 @@ Release history
 Current release
 ---------------
 
+* Open RotatingFileHandler with utf-8 encoding (T188231)
 * Fix occasional failure of TestLogentries due to hidden namespace (T197506)
 * Remove multiple empty sections at once in cosmetic_changes (T196324)
 * Fix stub template position by putting it above interwiki comment (T57034)
 * Fix handling of API continuation in PropertyGenerator (T196876)
 * Use PyMySql as pure-Python MySQL client library instead of oursql, deprecate MySQLdb (T89976, T142021)
 * Ensure that BaseBot.treat is always processing a Page object (T196562, T196813)
+* Update global bot settings
 * New mediawiki projects were provided
 * Bugfixes and improvements
 * Localisation updates
