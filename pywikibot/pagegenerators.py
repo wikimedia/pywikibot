@@ -801,19 +801,18 @@ class GeneratorFactory(object):
         params = value.split(',') if value else []
         if params and not params[0].isdigit():
             rctag = params.pop(0)
-        if len(params) == 2:
+        if len(params) > 2:
+            raise ValueError('More than two parameters passed.')
+        elif len(params) == 2:
             offset = float(params[0])
             duration = float(params[1])
             if offset < 0 or duration < 0:
                 raise ValueError('Negative valued parameters passed.')
-        elif len(params) > 2:
-            raise ValueError('More than two parameters passed.')
-        else:
-            total = int(params[0]) if params else 60
-        if len(params) == 2:
             ts_time = self.site.server_time()
             rcstart = ts_time + timedelta(minutes=-(offset + duration))
             rcend = ts_time + timedelta(minutes=-offset)
+        else:
+            total = int(params[0]) if params else 60
         return RecentChangesPageGenerator(
             namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
             site=self.site, reverse=True, tag=rctag,
