@@ -3121,7 +3121,7 @@ class LogEntryListGenerator(ListGenerator):
         self.entryFactory = logentries.LogEntryFactory(self.site, logtype)
 
     def result(self, pagedata):
-        """Instatiate LogEntry from data from api."""
+        """Instantiate LogEntry from data from api."""
         return self.entryFactory.create(pagedata)
 
     def _check_result_namespace(self, result):

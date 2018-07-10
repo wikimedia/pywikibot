@@ -53,7 +53,6 @@ from pywikibot.exceptions import (
     ServerError,
     UnknownExtension,
 )
-from pywikibot.logentries import LogEntryFactory
 from pywikibot.proofreadpage import ProofreadPage
 from pywikibot.tools import MediaWikiVersion
 
@@ -1124,33 +1123,10 @@ class GeneratorFactory(object):
     def _handle_logevents(self, value):
         """Handle `-logevents` argument."""
         params = value.split(',')
-        if params[0] not in LogEntryFactory.logtypes:
+        if params[0] not in self.site.logtypes:
             raise NotImplementedError(
                 'Invalid -logevents parameter "{0}"'.format(params[0]))
         return self._parse_log_events(*params)
-
-    def _old_eventlog_handler(self, logtype, value):
-        """Help in handling arguments LogEntryFactory.logtypes."""
-        total = 500
-        if value:
-            try:
-                total = int(value)
-            except ValueError:
-                params = value.split(';')
-                if len(params) == 2:
-                    value, total = params
-                else:
-                    value = params[0]
-            else:
-                value = None
-        else:
-            value = None
-        issue_deprecation_warning(
-            'The usage of "{0}"'.format('-%slog' % logtype),
-            '-logevents:"{0}"'.format(
-                ','.join((logtype, value or '', str(total)))),
-            4, ArgumentDeprecationWarning)
-        return self._parse_log_events(logtype, value, total)
 
     def handleArg(self, arg):
         """Parse one argument at a time.
@@ -1188,22 +1164,6 @@ class GeneratorFactory(object):
                 self.gens.append(handler_result)
                 return True
         return False
-
-
-def _old_eventlog_handler_method_factory(log_type):
-    """Return an old type handler method to be assigned to LogEntryFactory."""
-    # Using closure is a workaround for the lack of functools.partialmethod in
-    # Python 2.7.
-    def method(self, vaule):
-        return self._old_eventlog_handler(log_type, vaule)
-    return method
-
-
-for _log_type in LogEntryFactory.logtypes:
-    setattr(
-        GeneratorFactory,
-        '_handle_' + _log_type + 'log',
-        _old_eventlog_handler_method_factory(_log_type))
 
 
 def _int_none(v):
