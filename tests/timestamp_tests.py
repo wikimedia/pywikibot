@@ -43,6 +43,8 @@ class TestTimestamp(TestCase):
         """Test conversion from and to ISO format."""
         sep = 'T'
         t1 = Timestamp.utcnow()
+        if not t1.microsecond:  # T199179: ensure microsecond is not 0
+            t1 = t1.replace(microsecond=1)
         ts1 = t1.isoformat()
         t2 = Timestamp.fromISOformat(ts1)
         ts2 = t2.isoformat()
