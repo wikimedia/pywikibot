@@ -811,8 +811,8 @@ class GeneratorFactory(object):
             ts_time = self.site.server_time()
             rcstart = ts_time + timedelta(minutes=-(offset + duration))
             rcend = ts_time + timedelta(minutes=-offset)
-        else:
-            total = int(params[0]) if params else 60
+        elif len(params) == 1:
+            total = int(params[0])
         return RecentChangesPageGenerator(
             namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
             site=self.site, reverse=True, tag=rctag,
