@@ -241,15 +241,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Return the number of the namespace of the page.
 
         @return: namespace of the page
-        @rtype: int
+        @rtype: Namespace
         """
         return self._link.namespace
-
-    @property
-    def _namespace_obj(self):
-        """Return the namespace object of the page."""
-        # TODO: T104864: Temporary until Page.namespace() is consistent
-        return self.site.namespaces[self.namespace()]
 
     @property
     def content_model(self):
@@ -269,7 +263,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return the depth/subpage level of the page."""
         if not hasattr(self, '_depth'):
             # Check if the namespace allows subpages
-            if self._namespace_obj.subpages:
+            if self.namespace().subpages:
                 self._depth = self.title().count('/')
             else:
                 # Does not allow subpages, which means depth is always 0
@@ -5692,7 +5686,7 @@ class Link(ComparableMixin):
         """
         Return the namespace of the link.
 
-        @rtype: unicode
+        @rtype: Namespace
         """
         if not hasattr(self, "_namespace"):
             self.parse()
