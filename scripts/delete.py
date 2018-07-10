@@ -152,7 +152,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
     def display_references(self):
         """
-        Display pages which links the current page, sorted per namespace.
+        Display pages that link to the current page, sorted per namespace.
 
         Number of pages to display per namespace is provided by:
         - self.getOption('isorphan')
@@ -160,8 +160,12 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         refs = self.current_page.ref_table
         if refs:
             total = sum(len(v) for v in refs.values())
-            pywikibot.warning('There are %d pages who link to %s.'
-                              % (total, self.current_page))
+            if total > 1:
+                pywikibot.warning('There are {} pages that link to {}.'
+                                  .format(total, self.current_page))
+            else:
+                pywikibot.warning('There is a page that links to {}.'
+                                  .format(self.current_page))
         else:
             return
 
