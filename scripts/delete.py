@@ -158,16 +158,16 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         - self.getOption('isorphan')
         """
         refs = self.current_page.ref_table
-        if refs:
-            total = sum(len(v) for v in refs.values())
-            if total > 1:
-                pywikibot.warning('There are {} pages that link to {}.'
-                                  .format(total, self.current_page))
-            else:
-                pywikibot.warning('There is a page that links to {}.'
-                                  .format(self.current_page))
-        else:
+        if not refs:
             return
+
+        total = sum(len(v) for v in refs.values())
+        if total > 1:
+            pywikibot.warning('There are {} pages that link to {}.'
+                              .format(total, self.current_page))
+        else:
+            pywikibot.warning('There is a page that links to {}.'
+                              .format(self.current_page))
 
         show_n_pages = self.getOption('isorphan')
         width = len(max((ns.canonical_prefix() for ns in refs), key=len))
