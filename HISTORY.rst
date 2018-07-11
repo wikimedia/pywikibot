@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180710
+------------
+
 * Enable any LogEntry subclass for each logevent type (T199013)
 * Deprecated pagegenerators options -<logtype>log aren't supported any longer (T199013)
 * Open RotatingFileHandler with utf-8 encoding (T188231)
