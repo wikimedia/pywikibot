@@ -106,7 +106,7 @@ class ProtectionRobot(SingleSiteBot):
         self.current_page = page
         if not self.user_confirm(
                 'Do you want to change the protection level of %s?'
-                % page.title(asLink=True, forceInterwiki=True)):
+                % page.title(as_link=True, force_interwiki=True)):
             return
         applicable = page.applicable_protections()
         protections = dict(

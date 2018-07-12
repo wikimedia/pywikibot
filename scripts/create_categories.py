@@ -57,7 +57,7 @@ class CreateCategoriesBot(Bot):
 
     def treat(self, page):
         """Create category in commons for that page."""
-        title = page.title(withNamespace=False)
+        title = page.title(with_ns=False)
 
         newpage = pywikibot.Category(pywikibot.Site('commons', 'commons'),
                                      '%s %s' % (self.basename, title))

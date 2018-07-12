@@ -159,7 +159,7 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
         # The old syntax, {{msg:vfd}}, will also be found.
         templatePatterns = []
         for template in self.templates:
-            templatePattern = template.title(withNamespace=False)
+            templatePattern = template.title(with_ns=False)
             if mysite.namespaces[10].case == 'first-letter':
                 templatePattern = '[%s%s]%s' % (templatePattern[0].upper(),
                                                 templatePattern[0].lower(),
@@ -320,7 +320,7 @@ def main(*args):
         else:
             if not genFactory.handleArg(arg):
                 templateName = pywikibot.Page(site, arg, ns=10)
-                templateNames.append(templateName.title(withNamespace=False))
+                templateNames.append(templateName.title(with_ns=False))
 
     if not templateNames:
         pywikibot.bot.suggest_help(missing_parameters=['templates'])

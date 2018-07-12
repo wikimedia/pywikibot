@@ -97,7 +97,7 @@ class Photo(pywikibot.FilePage):
         """
         hashObject = hashlib.sha1()
         hashObject.update(self.downloadPhoto().getvalue())
-        return [page.title(withNamespace=False) for page in
+        return [page.title(with_ns=False) for page in
                 self.site.allimages(sha1=base64.b16encode(hashObject.digest()))]
 
     def getTitle(self, fmt):
@@ -228,7 +228,7 @@ class DataIngestionBot(pywikibot.Bot):
 
         templates = configurationPage.templatesWithParams()
         for (template, params) in templates:
-            if template.title(withNamespace=False) == u'Data ingestion':
+            if template.title(with_ns=False) == 'Data ingestion':
                 for param in params:
                     (field, sep, value) = param.partition(u'=')
 

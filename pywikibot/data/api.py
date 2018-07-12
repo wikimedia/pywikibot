@@ -1563,7 +1563,7 @@ class Request(MutableMapping):
             return value.strftime(pywikibot.Timestamp.ISO8601Format)
         elif isinstance(value, pywikibot.page.BasePage):
             assert(value.site == self.site)
-            return value.title(withSection=False)
+            return value.title(with_section=False)
         else:
             return unicode(value)
 

@@ -1070,9 +1070,9 @@ class Family(object):
             cr_page = pywikibot.Page(site, cr_template, ns=tpl_ns)
             # retrieve all redirects to primary template from API,
             # add any that are not already on the list
-            for t in cr_page.backlinks(filterRedirects=True,
+            for t in cr_page.backlinks(filter_redirects=True,
                                        namespaces=tpl_ns):
-                newtitle = t.title(withNamespace=False)
+                newtitle = t.title(with_ns=False)
                 if newtitle not in cr_template_tuple:
                     cr_set.add(newtitle)
         self._catredirtemplates[code] = list(cr_template_tuple) + list(cr_set)

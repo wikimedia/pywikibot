@@ -200,7 +200,7 @@ def main(*args):
 
     gen = itertools.chain(*gen_list)
 
-    pywikibot.output('\nUploading text to %s\n' % index.title(asLink=True))
+    pywikibot.output('\nUploading text to %s\n' % index.title(as_link=True))
 
     bot = UploadTextBot(gen, site=index.site, **options)
     bot.run()

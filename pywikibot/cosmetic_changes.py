@@ -370,7 +370,7 @@ class CosmeticChangesToolkit(object):
             # categories.sort()? (T100265)
             # TODO: Get main categories from Wikidata?
             main = pywikibot.Category(self.site, 'Category:' + self.title,
-                                      sortKey=' ')
+                                      sort_key=' ')
             if main in categories:
                 categories.pop(categories.index(main))
                 categories.insert(0, main)

@@ -47,7 +47,7 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
             # we're currently working on ...
             if page is None:
                 continue
-            newname = page.title(withNamespace=False)
+            newname = page.title(with_ns=False)
             # ... unless we do want brackets
             if removebrackets:
                 newname = re.sub(re.compile(r'\W*?\(.*?\)\W*?',
@@ -67,7 +67,7 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
                     ns = page.namespace() if page else 0
                     x = pywikibot.Link(newname,
                                        site.getSite(code=newcode),
-                                       defaultNamespace=ns)
+                                       default_namespace=ns)
                     result.add(x)
             elif config.verbose_output:
                 pywikibot.output('Ignoring unknown language code {}'

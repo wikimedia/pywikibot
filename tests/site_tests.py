@@ -746,7 +746,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for page in mysite.alllinks(start="From", namespace=4, fromids=True,
                                     total=5):
             self.assertIsInstance(page, pywikibot.Page)
-            self.assertGreaterEqual(page.title(withNamespace=False), "From")
+            self.assertGreaterEqual(page.title(with_ns=False), 'From')
             self.assertTrue(hasattr(page, "_fromid"))
         errgen = mysite.alllinks(unique=True, fromids=True)
         self.assertRaises(pywikibot.Error, next, errgen)
@@ -760,14 +760,14 @@ class TestSiteGenerators(DefaultSiteTestCase):
                             for cat in ac))
         for cat in mysite.allcategories(total=5, start="Abc"):
             self.assertIsInstance(cat, pywikibot.Category)
-            self.assertGreaterEqual(cat.title(withNamespace=False), "Abc")
+            self.assertGreaterEqual(cat.title(with_ns=False), 'Abc')
         for cat in mysite.allcategories(total=5, prefix="Def"):
             self.assertIsInstance(cat, pywikibot.Category)
-            self.assertTrue(cat.title(withNamespace=False).startswith("Def"))
+            self.assertTrue(cat.title(with_ns=False).startswith('Def'))
         # Bug T17985 - reverse and start combined; fixed in v 1.14
         for cat in mysite.allcategories(total=5, start="Hij", reverse=True):
             self.assertIsInstance(cat, pywikibot.Category)
-            self.assertLessEqual(cat.title(withNamespace=False), "Hij")
+            self.assertLessEqual(cat.title(with_ns=False), 'Hij')
 
     def test_botusers(self):
         """Test the site.botusers() method."""
@@ -836,16 +836,16 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for impage in mysite.allimages(start="Ba", total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
-            self.assertGreaterEqual(impage.title(withNamespace=False), "Ba")
+            self.assertGreaterEqual(impage.title(with_ns=False), 'Ba')
         # Bug T17985 - reverse and start combined; fixed in v 1.14
         for impage in mysite.allimages(start="Da", reverse=True, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
-            self.assertLessEqual(impage.title(withNamespace=False), "Da")
+            self.assertLessEqual(impage.title(with_ns=False), 'Da')
         for impage in mysite.allimages(prefix="Ch", total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
-            self.assertTrue(impage.title(withNamespace=False).startswith("Ch"))
+            self.assertTrue(impage.title(with_ns=False).startswith('Ch'))
         for impage in mysite.allimages(minsize=100, total=5):
             self.assertIsInstance(impage, pywikibot.FilePage)
             self.assertTrue(impage.exists())
@@ -1591,7 +1591,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 if 'wiki' not in hit.title().lower():
                     self.assertTrue(
                         any('wiki' in r.title().lower()
-                            for r in hit.getReferences(redirectsOnly=True)),
+                            for r in hit.getReferences(filter_redirects=True)),
                         "'wiki' neither found in '{0}'.lower() "
                         'nor in its redirects'.format(hit.title()))
         except pywikibot.data.api.APIError as e:
@@ -2604,14 +2604,14 @@ class TestBacklinks(TestCase):
         self.page = pywikibot.Page(
             self.site,
             'File:Băieţi de Cartier - La Familia cover.jpg')
-        self.backlinks = list(self.page.backlinks(followRedirects=False,
-                                                  filterRedirects=True,
+        self.backlinks = list(self.page.backlinks(follow_redirects=False,
+                                                  filter_redirects=True,
                                                   total=5))
         self.references = list(self.page.getReferences(follow_redirects=True,
-                                                       redirectsOnly=True,
+                                                       filter_redirects=True,
                                                        total=5))
         self.nofollow = list(self.page.getReferences(follow_redirects=False,
-                                                     redirectsOnly=True,
+                                                     filter_redirects=True,
                                                      total=5))
 
     def test_backlinks_redirects_length(self):

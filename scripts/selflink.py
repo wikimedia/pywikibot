@@ -39,7 +39,7 @@ class _BoldChoice(Choice):
         self._page = page
 
     def handle(self):
-        return "'''{0}'''".format(self._page.title(withSection=False))
+        return "'''{0}'''".format(self._page.title(with_section=False))
 
 
 class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
@@ -68,7 +68,7 @@ class SelflinkBot(MultipleSitesBot, BaseUnlinkBot):
         if '<imagemap>' in self.current_page.text:
             pywikibot.output(
                 u'Skipping page %s because it contains an image map.'
-                % self.current_page.title(asLink=True))
+                % self.current_page.title(as_link=True))
             return
         self.unlink(self.current_page)
 

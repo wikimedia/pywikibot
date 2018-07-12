@@ -76,13 +76,13 @@ class IWBot(ExistingPageBot, SingleSiteBot):
                 not self.getOption('ignore_ns')):
             output('{page} is not in allowed namespaces, skipping'
                    .format(page=self.current_page.title(
-                       asLink=True)))
+                       as_link=True)))
             return False
         self.iwlangs = pywikibot.textlib.getLanguageLinks(
             self.current_page.text, insite=self.current_page.site)
         if not self.iwlangs:
             output('No interlanguagelinks on {page}'.format(
-                page=self.current_page.title(asLink=True)))
+                page=self.current_page.title(as_link=True)))
             return False
         try:
             item = pywikibot.ItemPage.fromPage(self.current_page)
@@ -122,7 +122,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             data['sitelinks'][dbname] = {'site': dbname, 'title': title}
             data['labels'][site.lang] = {'language': site.lang, 'value': title}
         summary = ('Bot: New item with sitelink(s) from %s'
-                   % self.current_page.title(asLink=True, insite=self.repo))
+                   % self.current_page.title(as_link=True, insite=self.repo))
 
         item = pywikibot.ItemPage(self.repo)
         item.editEntity(data, new='item', summary=summary)
@@ -148,7 +148,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         if set(dbnames) - set(self.current_item.sitelinks.keys()):
             if not self.handle_complicated():
                 warning('Interwiki conflict in %s, skipping...' %
-                        self.current_page.title(asLink=True))
+                        self.current_page.title(as_link=True))
                 return False
         output('Cleaning up the page')
         new_text = pywikibot.textlib.removeLanguageLinks(
@@ -161,13 +161,13 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         for iw_page in self.iwlangs.values():
             if not iw_page.exists():
                 warning('Interwiki %s does not exist, skipping...' %
-                        iw_page.title(asLink=True))
+                        iw_page.title(as_link=True))
                 continue
             try:
                 wd_data.add(pywikibot.ItemPage.fromPage(iw_page))
             except pywikibot.NoPage:
                 output('Interwiki %s does not have an item' %
-                       iw_page.title(asLink=True))
+                       iw_page.title(as_link=True))
         return wd_data
 
     def try_to_add(self):
@@ -178,7 +178,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             return None
         if len(wd_data) > 1:
             warning('Interwiki conflict in %s, skipping...' %
-                    self.current_page.title(asLink=True))
+                    self.current_page.title(as_link=True))
             return False
         item = list(wd_data).pop()
         if self.current_page.site.dbName() in item.sitelinks:
@@ -187,7 +187,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             return False
         output('Adding link to %s' % item.title())
         item.setSitelink(self.current_page, summary='Added %s' % (
-            self.current_page.title(asLink=True, insite=item.site)))
+            self.current_page.title(as_link=True, insite=item.site)))
         return item
 
     def try_to_merge(self, item):
@@ -198,7 +198,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
             return None
         if len(wd_data) > 1:
             warning('Interwiki conflict in %s, skipping...' %
-                    self.current_page.title(asLink=True))
+                    self.current_page.title(as_link=True))
             return False
         target_item = list(wd_data).pop()
         try:

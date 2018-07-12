@@ -215,7 +215,7 @@ class RedirectGenerator(OptionHandler):
                 gen.set_maximum_items(self.api_number)
             for p in gen:
                 done = (self.api_until and
-                        p.title(withNamespace=False) >= self.api_until)
+                        p.title(with_ns=False) >= self.api_until)
                 if done:
                     return
                 yield p
@@ -389,7 +389,7 @@ class RedirectGenerator(OptionHandler):
             # to it need to be changed
             try:
                 for page in moved_page.getReferences(follow_redirects=True,
-                                                     redirectsOnly=True):
+                                                     filter_redirects=True):
                     yield page
             except pywikibot.NoPage:
                 # original title must have been deleted after move
@@ -480,7 +480,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 content = page.get(get_redirect=True)
             except pywikibot.SectionError:
                 content_page = pywikibot.Page(page.site,
-                                              page.title(withSection=False))
+                                              page.title(with_section=False))
                 content = content_page.get(get_redirect=True)
             content = self.sdtemplate + '\n' + content
             try:
@@ -554,8 +554,8 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 if not done and self.user_confirm(
                         u'Redirect target %s does not exist.\n'
                         u'Do you want to delete %s?'
-                        % (targetPage.title(asLink=True),
-                           redir_page.title(asLink=True))):
+                        % (targetPage.title(as_link=True),
+                           redir_page.title(as_link=True))):
                     self.delete_redirect(redir_page, 'redirect-remove-broken')
                 elif not (self.getOption('delete') or movedTarget):
                     pywikibot.output(
@@ -563,7 +563,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             except pywikibot.IsRedirectPage:
                 pywikibot.output(
                     "Redirect target {0} is also a redirect! {1}".format(
-                        targetPage.title(asLink=True),
+                        targetPage.title(as_link=True),
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))
             else:
@@ -571,7 +571,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 # it exists and is not a redirect: no reason to touch it.
                 pywikibot.output(
                     "Redirect target {0} does exist! {1}".format(
-                        targetPage.title(asLink=True),
+                        targetPage.title(as_link=True),
                         "Won't delete anything."
                         if self.getOption('delete') else "Skipping."))
 
@@ -624,7 +624,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             else:
                 pywikibot.output(
                     u'   Links to: %s.'
-                    % targetPage.title(asLink=True))
+                    % targetPage.title(as_link=True))
                 try:
                     mw_msg = targetPage.site.mediawiki_message(
                         'wikieditor-toolbar-tool-redirect-example')
@@ -639,10 +639,10 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 # watch out for redirect loops
                 if redirList.count(u'%s:%s'
                                    % (targetPage.site.lang,
-                                      targetPage.title(withSection=False))):
+                                      targetPage.title(with_section=False))):
                     pywikibot.warning(
                         u'Redirect target %s forms a redirect loop.'
-                        % targetPage.title(asLink=True))
+                        % targetPage.title(as_link=True))
                     break  # FIXME: doesn't work. edits twice!
                     if self.getOption('delete'):
                         # Delete the two redirects
@@ -673,7 +673,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             redir.set_redirect_target(targetPage, keep_section=True,
                                       save=False)
             summary = i18n.twtranslate(self.site, 'redirect-fix-double',
-                                       {'to': targetPage.title(asLink=True)}
+                                       {'to': targetPage.title(as_link=True)}
                                        )
             pywikibot.showDiff(oldText, redir.text)
             if self.user_confirm(u'Do you want to accept the changes?'):

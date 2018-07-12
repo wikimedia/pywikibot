@@ -213,7 +213,7 @@ class _MultiTemplateMatchBuilder(object):
         namespace = self.site.namespaces[10]
         if isinstance(template, pywikibot.Page):
             if template.namespace() == 10:
-                old = template.title(withNamespace=False)
+                old = template.title(with_ns=False)
             else:
                 raise ValueError(
                     '{0} is not a template Page object'.format(template))
@@ -1217,7 +1217,7 @@ def interwikiFormat(links, insite=None):
         if isinstance(links[site], pywikibot.Link):
             links[site] = pywikibot.Page(links[site])
         if isinstance(links[site], pywikibot.Page):
-            title = links[site].title(asLink=True, forceInterwiki=True,
+            title = links[site].title(as_link=True, force_interwiki=True,
                                       insite=insite)
             link = title.replace('[[:', '[[')
             s.append(link)
@@ -1290,7 +1290,7 @@ def getCategoryLinks(text, site=None, include=[], expand_text=False):
             cat = pywikibot.Category(pywikibot.Link(
                                      '%s:%s' % (match.group('namespace'), title),
                                      site),
-                                     sortKey=sortKey)
+                                     sort_key=sortKey)
         except InvalidTitle:
             # Category title extracted contains invalid characters
             # Likely due to on-the-fly category name creation, see T154309
@@ -1363,7 +1363,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
         site = pywikibot.Site()
 
     catNamespace = '|'.join(site.namespaces.CATEGORY)
-    title = oldcat.title(withNamespace=False)
+    title = oldcat.title(with_ns=False)
     if not title:
         return
     # title might contain regex special characters
@@ -1390,14 +1390,15 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     elif add_only:
         text = replaceExcept(
             oldtext, categoryR,
-            '{0}\n{1}'.format(oldcat.title(asLink=True, allowInterwiki=False),
-                              newcat.title(asLink=True, allowInterwiki=False)),
+            '{0}\n{1}'.format(
+                oldcat.title(as_link=True, allow_interwiki=False),
+                newcat.title(as_link=True, allow_interwiki=False)),
             exceptions, site=site)
     else:
         text = replaceExcept(oldtext, categoryR,
                              '[[{0}:{1}\\2'
                              .format(site.namespace(14),
-                                     newcat.title(withNamespace=False)),
+                                     newcat.title(with_ns=False)),
                              exceptions, site=site)
     return text
 
@@ -1525,8 +1526,8 @@ def categoryFormat(categories, insite=None):
                 category = u'{0}:{1}'.format(insite.namespace(14), category)
             category = pywikibot.Category(pywikibot.Link(category,
                                                          insite,
-                                                         defaultNamespace=14),
-                                          sortKey=sortKey)
+                                                         default_namespace=14),
+                                          sort_key=sortKey)
         # Make sure a category is casted from Page to Category.
         elif not isinstance(category, pywikibot.Category):
             category = pywikibot.Category(category)

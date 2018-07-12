@@ -403,7 +403,7 @@ class ReferringPageGeneratorWithIgnore(object):
         # TODO: start yielding before all referring pages have been found
         refs = [
             page for page in self.disambPage.getReferences(
-                withTemplateInclusion=False,
+                with_template_inclusion=False,
                 namespaces=0 if self.main_only else None
             )
         ]
@@ -486,7 +486,7 @@ class PrimaryIgnoreManager(object):
         @rtype: bool
 
         """
-        return self.enabled and refPage.title(asUrl=True) in self.ignorelist
+        return self.enabled and refPage.title(as_url=True) in self.ignorelist
 
     def ignore(self, refPage):
         """Write page to ignorelist.
@@ -499,11 +499,11 @@ class PrimaryIgnoreManager(object):
             # Skip this occurrence next time.
             filename = config.datafilepath(
                 'disambiguations',
-                self.disambPage.title(asUrl=True) + '.txt')
+                self.disambPage.title(as_url=True) + '.txt')
             try:
                 # Open file for appending. If none exists, create a new one.
                 with codecs.open(filename, 'a', 'utf-8') as f:
-                    f.write(refPage.title(asUrl=True) + '\n')
+                    f.write(refPage.title(as_url=True) + '\n')
             except IOError:
                 pass
 
@@ -708,7 +708,7 @@ class DisambiguationRobot(SingleSiteBot):
         nochange = True
 
         for page in chain(
-            (disambPage,), disambPage.getReferences(redirectsOnly=True)
+            (disambPage,), disambPage.getReferences(filter_redirects=True)
         ):
             treat_result = self.treat_disamb_only(refPage, page)
             if treat_result == 'nextpage':

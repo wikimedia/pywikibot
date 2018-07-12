@@ -72,7 +72,7 @@ class UnusedFilesBot(Bot):
                 u'http://' not in image.text):
             if self.template_image in image.text:
                 pywikibot.output(u"%s done already"
-                                 % image.title(asLink=True))
+                                 % image.title(as_link=True))
                 return
 
             self.append_text(image, '\n\n' + self.template_image)

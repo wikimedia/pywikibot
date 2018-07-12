@@ -71,7 +71,7 @@ class DjVuTextBot(SingleSiteBot):
         super(DjVuTextBot, self).__init__(site=index.site, **kwargs)
         self._djvu = djvu
         self._index = index
-        self._prefix = self._index.title(withNamespace=False)
+        self._prefix = self._index.title(with_ns=False)
         self._page_ns = self.site._proofread_page_ns.custom_name
 
         if not pages:
@@ -198,7 +198,7 @@ def main(*args):
         raise pywikibot.NoPage(index)
 
     pywikibot.output('uploading text from %s to %s'
-                     % (djvu.file_djvu, index_page.title(asLink=True)))
+                     % (djvu.file_djvu, index_page.title(as_link=True)))
 
     bot = DjVuTextBot(djvu, index_page, pages, **options)
     bot.run()

@@ -218,7 +218,7 @@ class NowCommonsDeleteBot(Bot):
     def generator(self):
         """Generator method."""
         gens = (t.getReferences(follow_redirects=True, namespaces=[6],
-                                onlyTemplateInclusion=True)
+                                only_template_inclusion=True)
                 for t in self.nc_templates)
         gen = chain(*gens)
         gen = pg.DuplicateFilterPageGenerator(gen)
@@ -231,7 +231,7 @@ class NowCommonsDeleteBot(Bot):
         for templateName, params in localImagePage.templatesWithParams():
             if templateName in self.nc_templates:
                 if params == []:
-                    filenameOnCommons = localImagePage.title(withNamespace=False)
+                    filenameOnCommons = localImagePage.title(with_ns=False)
                 elif self.site.lang in namespaceInTemplate:
                     skip = False
                     filenameOnCommons = None
@@ -245,7 +245,7 @@ class NowCommonsDeleteBot(Bot):
                             break
                         skip = True
                     if not filenameOnCommons:
-                        filenameOnCommons = localImagePage.title(withNamespace=False)
+                        filenameOnCommons = localImagePage.title(with_ns=False)
                 else:
                     val = params[0].split('=')
                     if len(val) == 1:
@@ -273,24 +273,24 @@ class NowCommonsDeleteBot(Bot):
                     continue
                 commonsImagePage = pywikibot.FilePage(commons, 'Image:%s'
                                                       % filenameOnCommons)
-                if (localImagePage.title(withNamespace=False) !=
-                        commonsImagePage.title(withNamespace=False)):
+                if (localImagePage.title(with_ns=False) !=
+                        commonsImagePage.title(with_ns=False)):
                     usingPages = list(localImagePage.usingPages())
                     if usingPages and usingPages != [localImagePage]:
                         pywikibot.output(color_format(
                             '"{lightred}{0}{default}" is still used in {1} pages.',
-                            localImagePage.title(withNamespace=False),
+                            localImagePage.title(with_ns=False),
                             len(usingPages)))
                         if self.getOption('replace') is True:
                                 pywikibot.output(color_format(
                                     'Replacing "{lightred}{0}{default}" by '
                                     '"{lightgreen}{1}{default}\".',
-                                    localImagePage.title(withNamespace=False),
-                                    commonsImagePage.title(withNamespace=False)))
+                                    localImagePage.title(with_ns=False),
+                                    commonsImagePage.title(with_ns=False)))
                                 bot = ImageBot(
                                     pg.FileLinksGenerator(localImagePage),
-                                    localImagePage.title(withNamespace=False),
-                                    commonsImagePage.title(withNamespace=False),
+                                    localImagePage.title(with_ns=False),
+                                    commonsImagePage.title(with_ns=False),
                                     '', self.getOption('replacealways'),
                                     self.getOption('replaceloose'))
                                 bot.run()
@@ -303,9 +303,8 @@ class NowCommonsDeleteBot(Bot):
                                         pg.FileLinksGenerator(
                                             localImagePage),
                                         localImagePage.title(
-                                            withNamespace=False, asUrl=True),
-                                        commonsImagePage.title(
-                                            withNamespace=False),
+                                            with_ns=False, as_url=True),
+                                        commonsImagePage.title(with_ns=False),
                                         '', self.getOption('replacealways'),
                                         self.getOption('replaceloose'))
                                     bot.run()
@@ -320,7 +319,7 @@ class NowCommonsDeleteBot(Bot):
                         pywikibot.output(color_format(
                             'No page is using "{lightgreen}{0}{default}" '
                             'anymore.',
-                            localImagePage.title(withNamespace=False)))
+                            localImagePage.title(with_ns=False)))
                 commonsText = commonsImagePage.get()
                 if self.getOption('replaceonly') is False:
                     if sha1 == commonsImagePage.latest_file_info.sha1:

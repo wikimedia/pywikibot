@@ -106,7 +106,7 @@ class BaseRevertBot(object):
             comment += ': ' + self.comment
         pywikibot.output(color_format(
             '\n\n>>> {lightpurple}{0}{default} <<<',
-            page.title(asLink=True, forceInterwiki=True, textlink=True)))
+            page.title(as_link=True, force_interwiki=True, textlink=True)))
         if not self.rollback:
             old = page.text
             page.text = page.getOldVersion(rev.revid)

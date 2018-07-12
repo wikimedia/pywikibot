@@ -92,7 +92,7 @@ def CAT(site, name, hide):
 def BACK(site, name, hide):  # pylint: disable=unused-argument
     p = pywikibot.Page(site, name, ns=10)
     return [page for page in p.getReferences(follow_redirects=False,
-                                             onlyTemplateInclusion=True)]
+                                             only_template_inclusion=True)]
 
 
 def DATA(site, name, hide):
@@ -384,7 +384,7 @@ class FeaturedBot(pywikibot.Bot):
             # Article talk (like in English)
             elif p.namespace() == 1 and site.code != 'el':
                 articles.append(pywikibot.Page(p.site,
-                                p.title(withNamespace=False)))
+                                               p.title(with_ns=False)))
         pywikibot.output(color_format(
             '{lightred}** {0} has {1} {2} articles{default}',
             site, len(articles), task))

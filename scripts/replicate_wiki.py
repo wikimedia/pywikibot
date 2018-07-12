@@ -205,7 +205,7 @@ class SyncSites(object):
 
         for site in self.sites:
             if dest_ns is not None:
-                page2 = Page(site, page1.title(withNamespace=False), dest_ns)
+                page2 = Page(site, page1.title(with_ns=False), dest_ns)
                 pywikibot.output("\nCross namespace, new title: %s"
                                  % page2.title())
             else:

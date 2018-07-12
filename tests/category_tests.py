@@ -169,19 +169,19 @@ class TestCategoryDryObject(TestCase):
         """Test the category's __init__."""
         site = self.get_site()
         cat_normal = pywikibot.Category(site, 'Category:Foo')
-        self.assertEqual(cat_normal.title(withNamespace=False), 'Foo')
+        self.assertEqual(cat_normal.title(with_ns=False), 'Foo')
         self.assertEqual(cat_normal.namespace(), 14)
 
         cat_missing = pywikibot.Category(site, 'Foo')
-        self.assertEqual(cat_missing.title(withNamespace=False), 'Foo')
+        self.assertEqual(cat_missing.title(with_ns=False), 'Foo')
         self.assertEqual(cat_missing.namespace(), 14)
 
         cat_duplicate = pywikibot.Category(site, 'Category:Category:Foo')
-        self.assertEqual(cat_duplicate.title(withNamespace=False), 'Category:Foo')
+        self.assertEqual(cat_duplicate.title(with_ns=False), 'Category:Foo')
         self.assertEqual(cat_duplicate.namespace(), 14)
 
         cat_dup_ns = pywikibot.Category(site, 'Category:Wikipedia:Test')
-        self.assertTrue(cat_dup_ns.title(withNamespace=False), 'Page:Foo')
+        self.assertTrue(cat_dup_ns.title(with_ns=False), 'Page:Foo')
         self.assertTrue(cat_dup_ns.namespace(), 14)
 
         self.assertRaisesRegex(ValueError, self.NOCATEGORYNAMESPACE_RE,
@@ -199,13 +199,14 @@ class TestCategoryDryObject(TestCase):
         """Test the title method with asLink=True."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia Categories')
-        self.assertEqual(cat.title(asLink=True, insite=cat.site),
+        self.assertEqual(cat.title(as_link=True, insite=cat.site),
                          u'[[Category:Wikipedia Categories]]')
         cat_section = pywikibot.Category(site, 'Category:Wikipedia Categories#Foo')
-        self.assertEqual(cat_section.title(asLink=True, insite=cat_section.site),
-                         u'[[Category:Wikipedia Categories#Foo]]')
+        self.assertEqual(
+            cat_section.title(as_link=True, insite=cat_section.site),
+            '[[Category:Wikipedia Categories#Foo]]')
         cat_dup = pywikibot.Category(site, 'Category:Wikipedia:Test')
-        self.assertEqual(cat_dup.title(asLink=True, insite=cat_dup.site),
+        self.assertEqual(cat_dup.title(as_link=True, insite=cat_dup.site),
                          u'[[Category:Wikipedia:Test]]')
 
     def test_sortkey(self):
@@ -213,7 +214,8 @@ class TestCategoryDryObject(TestCase):
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia categories', 'Example')
         self.assertEqual(cat.aslink(), '[[Category:Wikipedia categories|Example]]')
-        self.assertEqual(cat.aslink(sortKey='Foo'), '[[Category:Wikipedia categories|Foo]]')
+        self.assertEqual(cat.aslink(sort_key='Foo'),
+                         '[[Category:Wikipedia categories|Foo]]')
 
 
 class CategoryNewestPages(TestCase):
