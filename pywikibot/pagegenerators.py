@@ -287,7 +287,7 @@ GENERATOR OPTIONS
                     Single categories can be selected with commas as in
                     -linter:cat1,cat2,cat3
 
-                    Adding '/int' indentifies Lint ID to start querying from:
+                    Adding '/int' identifies Lint ID to start querying from:
                     e.g. -linter:high/10000
 
                     -linter:show just shows available categories.
