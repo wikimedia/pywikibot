@@ -1022,10 +1022,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # split up the results for the others.
         return self.site.pagereferences(
             self,
-            followRedirects=follow_redirects,
-            filterRedirects=redirectsOnly,
-            withTemplateInclusion=withTemplateInclusion,
-            onlyTemplateInclusion=onlyTemplateInclusion,
+            follow_redirects=follow_redirects,
+            filter_redirects=redirectsOnly,
+            with_template_inclusion=withTemplateInclusion,
+            only_template_inclusion=onlyTemplateInclusion,
             namespaces=namespaces,
             total=total,
             content=content
@@ -1048,8 +1048,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.pagebacklinks(
             self,
-            followRedirects=followRedirects,
-            filterRedirects=filterRedirects,
+            follow_redirects=followRedirects,
+            filter_redirects=filterRedirects,
             namespaces=namespaces,
             total=total,
             content=content
@@ -1070,7 +1070,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.page_embeddedin(
             self,
-            filterRedirects=filter_redirects,
+            filter_redirects=filter_redirects,
             namespaces=namespaces,
             total=total,
             content=content
@@ -4555,7 +4555,7 @@ class ItemPage(WikibasePage):
         @param item: The item to merge into
         @type item: ItemPage
         """
-        data = self.repo.mergeItems(fromItem=self, toItem=item, **kwargs)
+        data = self.repo.mergeItems(from_item=self, to_item=item, **kwargs)
         if not data.get('success', 0):
             return
         self.latest_revision_id = data['from']['lastrevid']

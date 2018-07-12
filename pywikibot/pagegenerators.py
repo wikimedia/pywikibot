@@ -1381,11 +1381,11 @@ def RecentChangesPageGenerator(start=None, end=None, reverse=False,
 
     gen = site.recentchanges(start=start, end=end, reverse=reverse,
                              namespaces=namespaces, pagelist=pagelist,
-                             changetype=changetype, showMinor=showMinor,
-                             showBot=showBot, showAnon=showAnon,
-                             showRedirects=showRedirects,
-                             showPatrolled=showPatrolled,
-                             topOnly=topOnly, total=total,
+                             changetype=changetype, minor=showMinor,
+                             bot=showBot, anon=showAnon,
+                             redirect=showRedirects,
+                             patrolled=showPatrolled,
+                             top_only=topOnly, total=total,
                              user=user, excludeuser=excludeuser, tag=tag)
 
     gen.request['rcprop'] = 'title'

@@ -1283,7 +1283,8 @@ class BaseSite(ComparableMixin):
         return self.getUrl(address, data=predata)
 
     @deprecated
-    def postData(self, address, data, contentType=None, sysop=False,
+    @deprecated_args(contentType=None)
+    def postData(self, address, data, sysop=False,
                  compress=True, cookies=None):
         """DEPRECATED."""
         return self.getUrl(address, data=data)
@@ -2089,10 +2090,10 @@ class APISite(BaseSite):
                                              right=self._username[sysop]))
             else:
                 raise NoUsername('Logging in on %s via OAuth failed' % self)
-        loginMan = api.LoginManager(site=self, sysop=sysop,
-                                    user=self._username[sysop])
-        if loginMan.login(retry=True, autocreate=autocreate):
-            self._username[sysop] = loginMan.username
+        login_manager = api.LoginManager(
+            site=self, sysop=sysop, user=self._username[sysop])
+        if login_manager.login(retry=True, autocreate=autocreate):
+            self._username[sysop] = login_manager.username
             self.getuserinfo(force=True)
             self._loginstatus = (LoginStatus.AS_SYSOP
                                  if sysop else LoginStatus.AS_USER)
@@ -2466,7 +2467,7 @@ class APISite(BaseSite):
 
         @rtype: unicode
         """
-        NEEDED_MW_MESSAGES = ('and', 'comma-separator', 'word-separator')
+        needed_mw_messages = ('and', 'comma-separator', 'word-separator')
         if not args:
             return u''
         if PY2 and any(isinstance(arg, str) for arg in args):
@@ -2474,10 +2475,10 @@ class APISite(BaseSite):
 
         args = [unicode(e) for e in args]
         try:
-            msgs = self.mediawiki_messages(NEEDED_MW_MESSAGES)
+            msgs = self.mediawiki_messages(needed_mw_messages)
         except KeyError:
             raise NotImplementedError(
-                'MediaWiki messages missing: {0}'.format(NEEDED_MW_MESSAGES))
+                'MediaWiki messages missing: {0}'.format(needed_mw_messages))
 
         if MediaWikiVersion(self.version()) < MediaWikiVersion('1.16'):
             for key, value in msgs.items():
@@ -3602,14 +3603,18 @@ class APISite(BaseSite):
 
     # following group of methods map more-or-less directly to API queries
 
-    def pagebacklinks(self, page, followRedirects=False, filterRedirects=None,
-                      namespaces=None, total=None, content=False):
+    @deprecated_args(
+        followRedirects='follow_redirects', filterRedirects='filter_redirects')
+    def pagebacklinks(
+        self, page, follow_redirects=False, filter_redirects=None,
+        namespaces=None, total=None, content=False
+    ):
         """Iterate all pages that link to the given page.
 
         @param page: The Page to get links to.
-        @param followRedirects: Also return links to redirects pointing to
+        @param follow_redirects: Also return links to redirects pointing to
             the given page.
-        @param filterRedirects: If True, only return redirects to the given
+        @param filter_redirects: If True, only return redirects to the given
             page. If False, only return non-redirect links. If None, return
             both (no filtering).
         @param namespaces: If present, only return links from the namespaces
@@ -3626,13 +3631,13 @@ class APISite(BaseSite):
         """
         bltitle = page.title(withSection=False).encode(self.encoding())
         blargs = {"gbltitle": bltitle}
-        if filterRedirects is not None:
-            blargs['gblfilterredir'] = ('redirects' if filterRedirects
+        if filter_redirects is not None:
+            blargs['gblfilterredir'] = ('redirects' if filter_redirects
                                         else 'nonredirects')
         blgen = self._generator(api.PageGenerator, type_arg="backlinks",
                                 namespaces=namespaces, total=total,
                                 g_content=content, **blargs)
-        if followRedirects:
+        if follow_redirects:
             # links identified by MediaWiki as redirects may not really be,
             # so we have to check each "redirect" page and see if it
             # really redirects to this page
@@ -3653,21 +3658,21 @@ class APISite(BaseSite):
                     continue
                 if redir.getRedirectTarget() == page:
                     genlist[redir.title()] = self.pagebacklinks(
-                        redir, followRedirects=True,
-                        filterRedirects=filterRedirects,
+                        redir, follow_redirects=True,
+                        filter_redirects=filter_redirects,
                         namespaces=namespaces,
                         content=content
                     )
             return itertools.chain(*list(genlist.values()))
         return blgen
 
-    @deprecated_args(step=None)
-    def page_embeddedin(self, page, filterRedirects=None, namespaces=None,
+    @deprecated_args(step=None, filterRedirects='filter_redirects')
+    def page_embeddedin(self, page, filter_redirects=None, namespaces=None,
                         total=None, content=False):
         """Iterate all pages that embedded the given page as a template.
 
         @param page: The Page to get inclusions for.
-        @param filterRedirects: If True, only return redirects that embed
+        @param filter_redirects: If True, only return redirects that embed
             the given page. If False, only return non-redirect links. If
             None, return both (no filtering).
         @param namespaces: If present, only return links from the namespaces
@@ -3683,17 +3688,23 @@ class APISite(BaseSite):
         """
         eiargs = {"geititle":
                   page.title(withSection=False).encode(self.encoding())}
-        if filterRedirects is not None:
-            eiargs['geifilterredir'] = ('redirects' if filterRedirects
+        if filter_redirects is not None:
+            eiargs['geifilterredir'] = ('redirects' if filter_redirects
                                         else 'nonredirects')
         return self._generator(api.PageGenerator, type_arg='embeddedin',
                                namespaces=namespaces, total=total,
                                g_content=content, **eiargs)
 
-    @deprecated_args(step=None)
-    def pagereferences(self, page, followRedirects=False, filterRedirects=None,
-                       withTemplateInclusion=True, onlyTemplateInclusion=False,
-                       namespaces=None, total=None, content=False):
+    @deprecated_args(
+        step=None, followRedirects='follow_redirects',
+        filterRedirects='filter_redirects',
+        onlyTemplateInclusion='only_template_inclusion',
+        withTemplateInclusion='with_template_inclusion')
+    def pagereferences(
+        self, page, follow_redirects=False, filter_redirects=None,
+        with_template_inclusion=True, only_template_inclusion=False,
+        namespaces=None, total=None, content=False
+    ):
         """
         Convenience method combining pagebacklinks and page_embeddedin.
 
@@ -3706,22 +3717,19 @@ class APISite(BaseSite):
         @raises TypeError: a namespace identifier has an inappropriate
             type such as NoneType or bool
         """
-        if onlyTemplateInclusion:
-            return self.page_embeddedin(page, namespaces=namespaces,
-                                        filterRedirects=filterRedirects,
+        if only_template_inclusion:
+            return self.page_embeddedin(page, filter_redirects, namespaces,
                                         total=total, content=content)
-        if not withTemplateInclusion:
-            return self.pagebacklinks(page, followRedirects=followRedirects,
-                                      filterRedirects=filterRedirects,
-                                      namespaces=namespaces,
-                                      total=total, content=content)
+        if not with_template_inclusion:
+            return self.pagebacklinks(page, follow_redirects, filter_redirects,
+                                      namespaces, total=total, content=content)
         return itertools.islice(
             itertools.chain(
                 self.pagebacklinks(
-                    page, followRedirects, filterRedirects,
+                    page, follow_redirects, filter_redirects,
                     namespaces=namespaces, content=content),
                 self.page_embeddedin(
-                    page, filterRedirects, namespaces=namespaces,
+                    page, filter_redirects, namespaces=namespaces,
                     content=content)
             ), total)
 
@@ -4641,12 +4649,15 @@ class APISite(BaseSite):
     @deprecated_args(returndict=None, nobots=None, rcshow=None, rcprop=None,
                      rctype='changetype', revision=None, repeat=None,
                      rcstart='start', rcend='end', rcdir=None, step=None,
-                     includeredirects='showRedirects', namespace='namespaces',
-                     rcnamespace='namespaces', number='total', rclimit='total')
+                     includeredirects='redirect', namespace='namespaces',
+                     rcnamespace='namespaces', number='total', rclimit='total',
+                     showMinor='minor', showBot='bot', showAnon='anon',
+                     showRedirects='redirect', showPatrolled='patrolled',
+                     topOnly='top_only')
     def recentchanges(self, start=None, end=None, reverse=False,
                       namespaces=None, pagelist=None, changetype=None,
-                      showMinor=None, showBot=None, showAnon=None,
-                      showRedirects=None, showPatrolled=None, topOnly=False,
+                      minor=None, bot=None, anon=None,
+                      redirect=None, patrolled=None, top_only=False,
                       total=None, user=None, excludeuser=None, tag=None):
         """Iterate recent changes.
 
@@ -4666,24 +4677,25 @@ class APISite(BaseSite):
             edits to existing pages, "new" for new pages, "log" for log
             entries)
         @type changetype: basestring
-        @param showMinor: if True, only list minor edits; if False, only list
+        @param minor: if True, only list minor edits; if False, only list
             non-minor edits; if None, list all
-        @type showMinor: bool or None
-        @param showBot: if True, only list bot edits; if False, only list
+        @type minor: bool or None
+        @param bot: if True, only list bot edits; if False, only list
             non-bot edits; if None, list all
-        @type showBot: bool or None
-        @param showAnon: if True, only list anon edits; if False, only list
+        @type bot: bool or None
+        @param anon: if True, only list anon edits; if False, only list
             non-anon edits; if None, list all
-        @type showAnon: bool or None
-        @param showRedirects: if True, only list edits to redirect pages; if
+        @type anon: bool or None
+        @param redirect: if True, only list edits to redirect pages; if
             False, only list edits to non-redirect pages; if None, list all
-        @type showRedirects: bool or None
-        @param showPatrolled: if True, only list patrolled edits; if False,
+        @type redirect: bool or None
+        @param patrolled: if True, only list patrolled edits; if False,
             only list non-patrolled edits; if None, list all
-        @type showPatrolled: bool or None
-        @param topOnly: if True, only list changes that are the latest revision
+        @type patrolled: bool or None
+        @param top_only: if True, only list changes that are the latest
+        revision
             (default False)
-        @type topOnly: bool
+        @type top_only: bool
         @param user: if not None, only list edits by this user or users
         @type user: basestring|list
         @param excludeuser: if not None, exclude edits by this user or users
@@ -4701,7 +4713,7 @@ class APISite(BaseSite):
                                 rcprop="user|comment|timestamp|title|ids"
                                        '|sizes|redirect|loginfo|flags|tags',
                                 namespaces=namespaces,
-                                total=total, rctoponly=topOnly)
+                                total=total, rctoponly=top_only)
         if start is not None:
             rcgen.request["rcstart"] = start
         if end is not None:
@@ -4717,15 +4729,15 @@ class APISite(BaseSite):
                                              for p in pagelist)
         if changetype:
             rcgen.request["rctype"] = changetype
-        filters = {'minor': showMinor,
-                   'bot': showBot,
-                   'anon': showAnon,
-                   'redirect': showRedirects,
+        filters = {'minor': minor,
+                   'bot': bot,
+                   'anon': anon,
+                   'redirect': redirect,
                    }
-        if showPatrolled is not None and (
+        if patrolled is not None and (
                 self.has_right('patrol') or self.has_right('patrolmarks')):
             rcgen.request['rcprop'] += ['patrolled']
-            filters['patrolled'] = showPatrolled
+            filters['patrolled'] = patrolled
         rcgen.request['rcshow'] = api.OptionSet(self, 'recentchanges', 'show',
                                                 filters)
 
@@ -4795,9 +4807,9 @@ class APISite(BaseSite):
             srgen.request['gsrredirects'] = get_redirects
         return srgen
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=None, showMinor='minor')
     def usercontribs(self, user=None, userprefix=None, start=None, end=None,
-                     reverse=False, namespaces=None, showMinor=None,
+                     reverse=False, namespaces=None, minor=None,
                      total=None, top_only=False):
         """Iterate contributions by a particular user.
 
@@ -4813,7 +4825,7 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param showMinor: if True, iterate only minor edits; if False and
+        @param minor: if True, iterate only minor edits; if False and
             not None, iterate only non-minor edits (default: iterate both)
         @param total: limit result to this number of pages
         @type total: int
@@ -4846,14 +4858,15 @@ class APISite(BaseSite):
         if reverse:
             ucgen.request["ucdir"] = "newer"
         option_set = api.OptionSet(self, 'usercontribs', 'show')
-        option_set['minor'] = showMinor
+        option_set['minor'] = minor
         ucgen.request['ucshow'] = option_set
         return ucgen
 
-    @deprecated_args(step=None)
+    @deprecated_args(step=None, showMinor='minor', showAnon='anon',
+                     showBot='bot')
     def watchlist_revs(self, start=None, end=None, reverse=False,
-                       namespaces=None, showMinor=None, showBot=None,
-                       showAnon=None, total=None):
+                       namespaces=None, minor=None, bot=None,
+                       anon=None, total=None):
         """Iterate revisions to pages on the bot user's watchlist.
 
         Iterated values will be in same format as recentchanges.
@@ -4865,11 +4878,11 @@ class APISite(BaseSite):
         @type namespaces: iterable of basestring or Namespace key,
             or a single instance of those types. May be a '|' separated
             list of namespace identifiers.
-        @param showMinor: if True, only list minor edits; if False (and not
+        @param minor: if True, only list minor edits; if False (and not
             None), only list non-minor edits
-        @param showBot: if True, only list bot edits; if False (and not
+        @param bot: if True, only list bot edits; if False (and not
             None), only list non-bot edits
-        @param showAnon: if True, only list anon edits; if False (and not
+        @param anon: if True, only list anon edits; if False (and not
             None), only list non-anon edits
         @raises KeyError: a namespace identifier was not resolved
         @raises TypeError: a namespace identifier has an inappropriate
@@ -4890,9 +4903,7 @@ class APISite(BaseSite):
             wlgen.request["wlend"] = end
         if reverse:
             wlgen.request["wldir"] = "newer"
-        filters = {'minor': showMinor,
-                   'bot': showBot,
-                   'anon': showAnon}
+        filters = {'minor': minor, 'bot': bot, 'anon': anon}
         wlgen.request['wlshow'] = api.OptionSet(self, 'watchlist', 'show',
                                                 filters)
         return wlgen
@@ -5698,12 +5709,12 @@ class APISite(BaseSite):
         token = self.tokens['protect']
         self.lock_page(page)
 
-        protectList = [ptype + '=' + level
+        protections = [ptype + '=' + level
                        for ptype, level in protections.items()
                        if level is not None]
         parameters = merge_unique_dicts(kwargs, action='protect', title=page,
                                         token=token,
-                                        protections=protectList, reason=reason,
+                                        protections=protections, reason=reason,
                                         expiry=expiry)
 
         req = self._simple_request(**parameters)
@@ -6470,17 +6481,14 @@ class APISite(BaseSite):
                 filepage._load_file_revisions([result["imageinfo"]])
         return result['result'] == 'Success'
 
-    @deprecated_args(number='total',
-                     repeat=None,
-                     namespace="namespaces",
-                     rcshow=None,
-                     rc_show=None,
-                     get_redirect=None)
-    @deprecated_args(step=None)
+    @deprecated_args(number='total', repeat=None, namespace='namespaces',
+                     rcshow=None, rc_show=None, get_redirect=None, step=None,
+                     showBot='bot', showRedirects='redirect',
+                     showPatrolled='patrolled')
     def newpages(self, user=None, returndict=False,
-                 start=None, end=None, reverse=False, showBot=False,
-                 showRedirects=False, excludeuser=None,
-                 showPatrolled=None, namespaces=None, total=None):
+                 start=None, end=None, reverse=False, bot=False,
+                 redirect=False, excludeuser=None,
+                 patrolled=None, namespaces=None, total=None):
         """Yield new articles (as Page objects) from recent changes.
 
         Starts with the newest article and fetches the number of articles
@@ -6509,8 +6517,8 @@ class APISite(BaseSite):
         gen = self.recentchanges(
             start=start, end=end, reverse=reverse,
             namespaces=namespaces, changetype="new", user=user,
-            excludeuser=excludeuser, showBot=showBot,
-            showRedirects=showRedirects, showPatrolled=showPatrolled,
+            excludeuser=excludeuser, bot=bot,
+            redirect=redirect, patrolled=patrolled,
             total=total
         )
         for pageitem in gen:
@@ -8025,16 +8033,17 @@ class DataSite(APISite):
         return data
 
     @must_be(group='user')
-    @deprecated_args(ignoreconflicts='ignore_conflicts')
-    def mergeItems(self, fromItem, toItem, ignore_conflicts=None,
+    @deprecated_args(ignoreconflicts='ignore_conflicts', fromItem='from_item',
+                     toItem='to_item')
+    def mergeItems(self, from_item, to_item, ignore_conflicts=None,
                    summary=None, bot=True):
         """
         Merge two items together.
 
-        @param fromItem: Item to merge from
-        @type fromItem: pywikibot.ItemPage
-        @param toItem: Item to merge into
-        @type toItem: pywikibot.ItemPage
+        @param from_item: Item to merge from
+        @type from_item: pywikibot.ItemPage
+        @param to_item: Item to merge into
+        @type to_item: pywikibot.ItemPage
         @param ignore_conflicts: Which type of conflicts
             ('description', 'sitelink', and 'statement')
             should be ignored
@@ -8048,8 +8057,8 @@ class DataSite(APISite):
         """
         params = {
             'action': 'wbmergeitems',
-            'fromid': fromItem.getID(),
-            'toid': toItem.getID(),
+            'fromid': from_item.getID(),
+            'toid': to_item.getID(),
             'ignoreconflicts': ignore_conflicts,
             'token': self.tokens['edit'],
             'summary': summary,

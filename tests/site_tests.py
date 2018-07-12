@@ -510,15 +510,15 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         # only non-redirects:
         filtered = set(self.site.pagebacklinks(
-            self.mainpage, namespaces=0, filterRedirects=False))
+            self.mainpage, namespaces=0, filter_redirects=False))
         # only redirects:
         redirs = set(self.site.pagebacklinks(
-            self.mainpage, namespaces=0, filterRedirects=True))
+            self.mainpage, namespaces=0, filter_redirects=True))
         # including links to redirect pages (but not the redirects):
         indirect = set(
             self.site.pagebacklinks(self.mainpage, namespaces=[0],
-                                    followRedirects=True,
-                                    filterRedirects=False))
+                                    follow_redirects=True,
+                                    filter_redirects=False))
 
         for bl in backlinks_ns_0:
             self.assertIsInstance(bl, pywikibot.Page)
@@ -537,9 +537,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
         embedded_ns_0_2 = set(self.site.page_embeddedin(
             self.mainpage, namespaces=[0, 2]))
         redirs = set(self.site.page_embeddedin(
-            self.mainpage, filterRedirects=True, namespaces=[0]))
+            self.mainpage, filter_redirects=True, namespaces=[0]))
         no_redirs = set(self.site.page_embeddedin(
-            self.mainpage, filterRedirects=False, namespaces=[0]))
+            self.mainpage, filter_redirects=False, namespaces=[0]))
 
         for ei in embedded_ns_0:
             self.assertIsInstance(ei, pywikibot.Page)
@@ -1461,26 +1461,26 @@ class TestRecentChanges(DefaultSiteTestCase):
     def test_flags(self):
         """Test the site.recentchanges() with boolean flags."""
         mysite = self.site
-        for change in mysite.recentchanges(showMinor=True, total=5):
+        for change in mysite.recentchanges(minor=True, total=5):
             self.assertIsInstance(change, dict)
             self.assertIn("minor", change)
-        for change in mysite.recentchanges(showMinor=False, total=5):
+        for change in mysite.recentchanges(minor=False, total=5):
             self.assertIsInstance(change, dict)
             self.assertNotIn("minor", change)
-        for change in mysite.recentchanges(showBot=True, total=5):
+        for change in mysite.recentchanges(bot=True, total=5):
             self.assertIsInstance(change, dict)
             self.assertIn("bot", change)
-        for change in mysite.recentchanges(showBot=False, total=5):
+        for change in mysite.recentchanges(bot=False, total=5):
             self.assertIsInstance(change, dict)
             self.assertNotIn("bot", change)
-        for change in mysite.recentchanges(showAnon=True, total=5):
+        for change in mysite.recentchanges(anon=True, total=5):
             self.assertIsInstance(change, dict)
-        for change in mysite.recentchanges(showAnon=False, total=5):
+        for change in mysite.recentchanges(anon=False, total=5):
             self.assertIsInstance(change, dict)
-        for change in mysite.recentchanges(showRedirects=True, total=5):
+        for change in mysite.recentchanges(redirect=True, total=5):
             self.assertIsInstance(change, dict)
             self.assertIn("redirect", change)
-        for change in mysite.recentchanges(showRedirects=False, total=5):
+        for change in mysite.recentchanges(redirect=False, total=5):
             self.assertIsInstance(change, dict)
             self.assertNotIn("redirect", change)
 
@@ -1504,11 +1504,11 @@ class TestUserRecentChanges(DefaultSiteTestCase):
     def test_patrolled(self):
         """Test the site.recentchanges() with patrolled boolean flags."""
         mysite = self.site
-        for change in mysite.recentchanges(showPatrolled=True, total=5):
+        for change in mysite.recentchanges(patrolled=True, total=5):
             self.assertIsInstance(change, dict)
             if mysite.has_right('patrol'):
                 self.assertIn("patrolled", change)
-        for change in mysite.recentchanges(showPatrolled=False, total=5):
+        for change in mysite.recentchanges(patrolled=False, total=5):
             self.assertIsInstance(change, dict)
             if mysite.has_right('patrol'):
                 self.assertNotIn("patrolled", change)
@@ -1637,12 +1637,12 @@ class TestUserContribsAsUser(DefaultSiteTestCase):
         """Test the site.usercontribs() method using showMinor."""
         mysite = self.get_site()
         for contrib in mysite.usercontribs(user=mysite.user(),
-                                           showMinor=True, total=5):
+                                           minor=True, total=5):
             self.assertIsInstance(contrib, dict)
             self.assertIn("minor", contrib)
 
         for contrib in mysite.usercontribs(user=mysite.user(),
-                                           showMinor=False, total=5):
+                                           minor=False, total=5):
             self.assertIsInstance(contrib, dict)
             self.assertNotIn("minor", contrib)
 
@@ -1786,21 +1786,21 @@ class SiteWatchlistRevsTestCase(DefaultSiteTestCase):
             prefix = title[:title.index(":")]
             self.assertIn(self.site.namespaces.lookup_name(prefix).id, [6, 7])
             self.assertIn(rev["ns"], [6, 7])
-        for rev in mysite.watchlist_revs(showMinor=True, total=5):
+        for rev in mysite.watchlist_revs(minor=True, total=5):
             self.assertIsInstance(rev, dict)
             self.assertIn("minor", rev)
-        for rev in mysite.watchlist_revs(showMinor=False, total=5):
+        for rev in mysite.watchlist_revs(minor=False, total=5):
             self.assertIsInstance(rev, dict)
             self.assertNotIn("minor", rev)
-        for rev in mysite.watchlist_revs(showBot=True, total=5):
+        for rev in mysite.watchlist_revs(bot=True, total=5):
             self.assertIsInstance(rev, dict)
             self.assertIn("bot", rev)
-        for rev in mysite.watchlist_revs(showBot=False, total=5):
+        for rev in mysite.watchlist_revs(bot=False, total=5):
             self.assertIsInstance(rev, dict)
             self.assertNotIn("bot", rev)
-        for rev in mysite.watchlist_revs(showAnon=True, total=5):
+        for rev in mysite.watchlist_revs(anon=True, total=5):
             self.assertIsInstance(rev, dict)
-        for rev in mysite.watchlist_revs(showAnon=False, total=5):
+        for rev in mysite.watchlist_revs(anon=False, total=5):
             self.assertIsInstance(rev, dict)
 
 
