@@ -7,22 +7,24 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
--always           The bot won't ask for confirmation when putting a page
+-always           The bot won't ask for confirmation when putting
+                  a page.
 
 -skipwarning      Skip processing a page when a warning occurred.
                   Only used when -always is or becomes True.
 
--quiet            Don't show diffs in -always mode
+-quiet            Don't show diffs in -always mode.
 
--mysqlquery       Retrieve information from a local mirror.
-                  Searches for pages with HTML tables, and tries to convert
-                  them on the live wiki.
+-mysqlquery       Retrieve information from a local database mirror.
+                  If no query specified, bot searches for pages with
+                  HTML tables, and tries to convert them on the live
+                  wiki.
 
 -xml              Retrieve information from a local XML dump
                   (pages_current, see https://dumps.wikimedia.org).
                   Argument can also be given as "-xml:filename".
-                  Searches for pages with HTML tables, and tries to convert
-                  them on the live wiki.
+                  Searches for pages with HTML tables, and tries
+                  to convert them on the live wiki.
 
 Example:
 
@@ -57,7 +59,7 @@ from pywikibot import xmlreader
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                            suggest_help, input_yn)
 from pywikibot.exceptions import ArgumentDeprecationWarning
-from pywikibot.tools import has_module, issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -539,10 +541,7 @@ def main(*args):
         elif option in ['-always', '-quiet', '-skipwarning']:
             options[option[1:]] = True
         else:
-            if option in ['-sql', '-mysqlquery']:
-                if not (has_module('oursql') or has_module('MySQLdb')):
-                    raise NotImplementedError(
-                        'Neither "oursql" nor "MySQLdb" library is installed.')
+            if option in ('-sql', '-mysqlquery'):
                 if option == '-sql':
                     issue_deprecation_warning(
                         'The usage of "-sql"', '-mysqlquery',
