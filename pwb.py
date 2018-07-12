@@ -214,7 +214,9 @@ def main():
                     filename = testpath
                     break
             else:
-                raise OSError("%s not found!" % filename)
+                print('ERROR: {} not found! Misspelling?'.format(filename),
+                      file=sys.stderr)
+                return True
 
         # When both pwb.py and the filename to run are within the current
         # working directory:
