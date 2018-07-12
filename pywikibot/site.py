@@ -4909,7 +4909,7 @@ class APISite(BaseSite):
         return wlgen
 
     # TODO: T75370
-    @deprecated_args(step=None)
+    @deprecated_args(step=None, get_text='content')
     def deletedrevs(self, page, start=None, end=None, reverse=None,
                     content=False, total=None):
         """Iterate deleted revisions.

@@ -3009,6 +3009,7 @@ class Category(Page):
             target_cat.put(self.get(), creation_summary)
             return True
 
+    @deprecated_args(cfdTemplates='cfd_templates')
     def copyAndKeep(self, catname, cfd_templates, message):
         """
         Copy partial category page text (not contents) to a new title.
