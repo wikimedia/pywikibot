@@ -811,14 +811,13 @@ class GeneratorFactory(object):
             if offset < 0 or duration < 0:
                 raise ValueError('Negative valued parameters passed.')
             ts_time = self.site.server_time()
-            rcstart = ts_time + timedelta(minutes=-(offset + duration))
-            rcend = ts_time + timedelta(minutes=-offset)
+            rcstart = ts_time - timedelta(minutes=offset)
+            rcend = rcstart - timedelta(minutes=duration)
         elif len(params) == 1:
             total = int(params[0])
         return RecentChangesPageGenerator(
             namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
-            site=self.site, reverse=True, tag=rctag,
-            _filter_unique=self._filter_unique)
+            site=self.site, tag=rctag, _filter_unique=self._filter_unique)
 
     def _handle_liverecentchanges(self, value):
         """Handle `-liverecentchanges` argument."""
