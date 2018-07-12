@@ -814,7 +814,7 @@ class GeneratorFactory(object):
             total = int(params[0])
         return RecentChangesPageGenerator(
             namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
-            site=self.site, reverse=True, tag=rctag,
+            site=self.site, reverse=False, tag=rctag,
             _filter_unique=self._filter_unique)
 
     def _handle_liverecentchanges(self, value):
