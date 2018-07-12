@@ -604,7 +604,7 @@ class GeneratorFactory(object):
                                              categoryname)
         cat = pywikibot.Category(pywikibot.Link(categoryname,
                                                 source=self.site,
-                                                defaultNamespace=14))
+                                                default_namespace=14))
         return cat, startfrom
 
     @deprecated_args(arg='category')
@@ -947,7 +947,7 @@ class GeneratorFactory(object):
             value = pywikibot.input(
                 'Pages that transclude which page should be processed?')
         page = pywikibot.Page(pywikibot.Link(value,
-                                             defaultNamespace=10,
+                                             default_namespace=10,
                                              source=self.site))
         return ReferringPageGenerator(page, onlyTemplateInclusion=True)
 
@@ -1448,8 +1448,8 @@ def ReferringPageGenerator(referredPage, followRedirects=False,
     """Yield all pages referring to a specific page."""
     return referredPage.getReferences(
         follow_redirects=followRedirects,
-        withTemplateInclusion=withTemplateInclusion,
-        onlyTemplateInclusion=onlyTemplateInclusion,
+        with_template_inclusion=withTemplateInclusion,
+        only_template_inclusion=onlyTemplateInclusion,
         total=total, content=content)
 
 
@@ -1511,7 +1511,7 @@ def SubCategoriesPageGenerator(category, recurse=False, start=None,
     # TODO: page generator could be modified to use cmstartsortkey ...
     for s in category.subcategories(recurse=recurse,
                                     total=total, content=content):
-        if start is None or s.title(withNamespace=False) >= start:
+        if start is None or s.title(with_ns=False) >= start:
             yield s
 
 
@@ -1750,7 +1750,7 @@ class ItemClaimFilter(object):
                     cls = pywikibot.PropertyPage
                 else:
                     cls = pywikibot.ItemPage
-                page = cls(page.site, page.title(withNamespace=False))
+                page = cls(page.site, page.title(with_ns=False))
             else:
                 try:
                     page = pywikibot.ItemPage.fromPage(page)
@@ -1883,7 +1883,7 @@ class RegexFilter(object):
             quantifier = 'none'
         reg = cls.__precompile(regex, re.I)
         for page in generator:
-            title = page.title(withNamespace=not ignore_namespace)
+            title = page.title(with_ns=not ignore_namespace)
             if cls.__filter_match(reg, title, quantifier):
                 yield page
 
@@ -2045,7 +2045,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
         if bool(contribs[username]) is not bool(skip):  # xor operation
             yield page
         elif show_filtered:
-            pywikibot.output(u'Skipping %s' % page.title(asLink=True))
+            pywikibot.output('Skipping %s' % page.title(as_link=True))
 
 
 @deprecated('itertools.chain(*iterables)')
@@ -2908,7 +2908,7 @@ def DayPageGenerator(start_month=1, end_month=12, site=None, year=2000):
         site = pywikibot.Site()
     fd = date.FormatDate(site)
     firstPage = pywikibot.Page(site, fd(start_month, 1))
-    pywikibot.output(u"Starting with %s" % firstPage.title(asLink=True))
+    pywikibot.output('Starting with %s' % firstPage.title(as_link=True))
     for month in range(start_month, end_month + 1):
         for day in range(1, calendar.monthrange(year, month)[1] + 1):
             yield pywikibot.Page(pywikibot.Link(fd(month, day), site))

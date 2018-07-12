@@ -590,7 +590,7 @@ class checkImagesBot(object):
         """Set parameters."""
         # ensure we have a FilePage
         self.image = pywikibot.FilePage(image)
-        self.imageName = image.title(withNamespace=False)
+        self.imageName = image.title(with_ns=False)
         self.timestamp = None
         self.uploader = None
 
@@ -680,7 +680,7 @@ class checkImagesBot(object):
             return False
         upBots = i18n.translate(self.site, uploadBots)
         user = pywikibot.User(self.site, nick)
-        luser = user.title(asUrl=True)
+        luser = user.title(as_url=True)
 
         if upBots:
             for upBot in upBots:
@@ -870,7 +870,7 @@ class checkImagesBot(object):
                      % (self.imageName,
                         commons_image_with_this_hash.title(
                             withNamespace=False)))
-            if (self.image.title(asUrl=True) ==
+            if (self.image.title(as_url=True) ==
                     commons_image_with_this_hash.title(asUrl=True)):
                 repme += " (same name)"
             self.report_image(self.imageName, self.rep_page, self.com, repme,
@@ -907,7 +907,8 @@ class checkImagesBot(object):
                 time_image_list = []
 
                 for dup_page in duplicates:
-                    if (dup_page.title(asUrl=True) != self.image.title(asUrl=True) or
+                    if (dup_page.title(as_url=True) != self.image.title(
+                        as_url=True) or
                             self.timestamp is None):
                         try:
                             self.timestamp = dup_page.latest_file_info.timestamp
@@ -939,7 +940,7 @@ class checkImagesBot(object):
                             % dup_page)
                         images_to_tag_list.append(dup_page.title())
                         string += '* {0}\n'.format(
-                            dup_page.title(asLink=True, textlink=True))
+                            dup_page.title(as_link=True, textlink=True))
                     else:
                         pywikibot.output(
                             u"Already put the dupe-template in the files's page"
@@ -955,11 +956,12 @@ class checkImagesBot(object):
                         '__images__',
                         '\n{0}* {1}\n'.format(
                             string,
-                            Page_older_image.title(asLink=True, textlink=True)))
+                            Page_older_image.title(
+                                as_link=True, textlink=True)))
                 else:
                     text_for_the_report = dupText.replace(
                         '__image__',
-                        Page_older_image.title(asLink=True, textlink=True))
+                        Page_older_image.title(as_link=True, textlink=True))
 
                 # Two iteration: report the "problem" to the user only once
                 # (the last)
@@ -985,7 +987,7 @@ class checkImagesBot(object):
                     already_reported_in_past = fp.revision_count(self.bots)
                     from_regex = (r'\n\*\[\[:%s%s\]\]'
                                   % (self.image_namespace,
-                                     re.escape(self.image.title(asUrl=True))))
+                                     re.escape(self.image.title(as_url=True))))
                     # Delete the image in the list where we're write on
                     text_for_the_report = re.sub(from_regex, '',
                                                  text_for_the_report)
@@ -998,7 +1000,7 @@ class checkImagesBot(object):
                         self.report(
                             text_for_the_report, images_to_tag_list[-1],
                             dupTalkText
-                            % (Page_older_image.title(withNamespace=True),
+                            % (Page_older_image.title(with_ns=True),
                                string),
                             dupTalkHead, commTalk=dupComment_talk,
                             commImage=dupComment_image, unver=True)
@@ -1007,17 +1009,20 @@ class checkImagesBot(object):
                 if only_report:
                     repme = ((self.list_entry + 'has the following duplicates '
                               "('''forced mode'''):")
-                             % self.image.title(asUrl=True))
+                             % self.image.title(as_url=True))
                 else:
                     repme = ((self.list_entry + 'has the following duplicates:')
-                             % self.image.title(asUrl=True))
+                             % self.image.title(as_url=True))
 
                 for dup_page in duplicates:
-                    if dup_page.title(asUrl=True) == self.image.title(asUrl=True):
+                    if (
+                        dup_page.title(as_url=True) ==
+                        self.image.title(as_url=True)
+                    ):
                         # the image itself, not report also this as duplicate
                         continue
                     repme += '\n** [[:%s%s]]' % (self.image_namespace,
-                                                 dup_page.title(asUrl=True))
+                                                 dup_page.title(as_url=True))
 
                 result = self.report_image(self.imageName, self.rep_page,
                                            self.com, repme, addings=False)
@@ -1167,7 +1172,7 @@ class checkImagesBot(object):
         # the list_licenses are loaded in the __init__
         # (not to load them multimple times)
         if template in self.list_licenses:
-            self.license_selected = template.title(withNamespace=False)
+            self.license_selected = template.title(with_ns=False)
             self.seems_ok = True
             # let the last "fake" license normally detected
             self.license_found = self.license_selected
@@ -1244,9 +1249,9 @@ class checkImagesBot(object):
             for template_selected in templatesInTheImageRaw:
                 tp = pywikibot.Page(self.site, template_selected)
                 for templateReal in self.licenses_found:
-                    if (tp.title(asUrl=True, withNamespace=False).lower() ==
-                            templateReal.title(asUrl=True,
-                                               withNamespace=False).lower()):
+                    if (tp.title(as_url=True, with_ns=False).lower() ==
+                            templateReal.title(as_url=True,
+                                               with_ns=False).lower()):
                         if templateReal not in self.allLicenses:
                             self.allLicenses.append(templateReal)
             break
@@ -1519,7 +1524,7 @@ class checkImagesBot(object):
             # Modify summary text
             pywikibot.setAction(dels)
             canctext = di % extension
-            notification = din % {'file': self.image.title(asLink=True,
+            notification = din % {'file': self.image.title(as_link=True,
                                                            textlink=True)}
             head = dih
             self.report(canctext, self.imageName, notification, head)

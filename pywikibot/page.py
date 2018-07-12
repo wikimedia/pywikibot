@@ -110,7 +110,7 @@ def allow_asynchronous(func):
         # TODO: other "expected" error types to catch?
         except pywikibot.Error as edit_err:
             err = edit_err  # edit_err will be deleted in the end of the scope
-            link = self.title(asLink=True)
+            link = self.title(as_link=True)
             pywikibot.log('Error saving page %s (%s)\n' % (link, err),
                           exc_info=True)
             if not callback and not do_async:
@@ -189,7 +189,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             raise ValueError(u'Title cannot be None.')
 
         if isinstance(source, pywikibot.site.BaseSite):
-            self._link = Link(title, source=source, defaultNamespace=ns)
+            self._link = Link(title, source=source, default_namespace=ns)
             self._revisions = {}
         elif isinstance(source, Page):
             # copy all of source's attributes to this object
@@ -200,7 +200,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if title:
                 # overwrite title
                 self._link = Link(title, source=source.site,
-                                  defaultNamespace=ns)
+                                  default_namespace=ns)
         elif isinstance(source, Link):
             self._link = source
             self._revisions = {}
@@ -283,26 +283,29 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self.site.loadpageinfo(self)
         return self._pageid
 
-    @deprecated_args(decode=None, savetitle="asUrl")
-    def title(self, underscore=False, withNamespace=True,
-              withSection=True, asUrl=False, asLink=False,
-              allowInterwiki=True, forceInterwiki=False, textlink=False,
+    @deprecated_args(
+        decode=None, savetitle='as_url', withNamespace='with_ns',
+        withSection='with_section', forceInterwiki='force_interwiki',
+        asUrl='as_url', asLink='as_link', allowInterwiki='allow_interwiki')
+    def title(self, underscore=False, with_ns=True,
+              with_section=True, as_url=False, as_link=False,
+              allow_interwiki=True, force_interwiki=False, textlink=False,
               as_filename=False, insite=None):
         """
         Return the title of this Page, as a Unicode string.
 
         @param underscore: (not used with asLink) if true, replace all ' '
             characters with '_'
-        @param withNamespace: if false, omit the namespace prefix. If this
+        @param with_ns: if false, omit the namespace prefix. If this
             option is false and used together with asLink return a labeled
             link like [[link|label]]
-        @param withSection: if false, omit the section
-        @param asUrl: (not used with asLink) if true, quote title as if in an
+        @param with_section: if false, omit the section
+        @param as_url: (not used with asLink) if true, quote title as if in an
             URL
-        @param asLink: if true, return the title in the form of a wikilink
-        @param allowInterwiki: (only used if asLink is true) if true, format
+        @param as_link: if true, return the title in the form of a wikilink
+        @param allow_interwiki: (only used if asLink is true) if true, format
             the link as an interwiki link if necessary
-        @param forceInterwiki: (only used if asLink is true) if true, always
+        @param force_interwiki: (only used if asLink is true) if true, always
             format the link as an interwiki link
         @param textlink: (only used if asLink is true) if true, place a ':'
             before Category: and Image: links
@@ -315,19 +318,19 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         title = self._link.canonical_title()
         label = self._link.title
-        if withSection and self._link.section:
+        if with_section and self._link.section:
             section = u"#" + self._link.section
         else:
             section = u''
-        if asLink:
+        if as_link:
             if insite:
                 target_code = insite.code
                 target_family = insite.family.name
             else:
                 target_code = config.mylang
                 target_family = config.family
-            if forceInterwiki or \
-               (allowInterwiki and
+            if force_interwiki or \
+               (allow_interwiki and
                 (self.site.family.name != target_family
                  or self.site.code != target_code)):
                 if self.site.family.name != target_family \
@@ -342,20 +345,20 @@ class BasePage(UnicodeMixin, ComparableMixin):
             elif textlink and (self.is_filepage() or self.is_categorypage()):
                 title = u':%s' % title
             elif self.namespace() == 0 and not section:
-                withNamespace = True
-            if withNamespace:
+                with_ns = True
+            if with_ns:
                 return u'[[%s%s]]' % (title, section)
             else:
                 return u'[[%s%s|%s]]' % (title, section, label)
-        if not withNamespace and self.namespace() != 0:
+        if not with_ns and self.namespace() != 0:
             title = label + section
         else:
             title += section
-        if underscore or asUrl:
+        if underscore or as_url:
             title = title.replace(u' ', u'_')
-        if asUrl:
-            encodedTitle = title.encode(self.site.encoding())
-            title = quote_from_bytes(encodedTitle, safe='')
+        if as_url:
+            encoded_title = title.encode(self.site.encoding())
+            title = quote_from_bytes(encoded_title, safe='')
         if as_filename:
             # Replace characters that are not possible in file names on some
             # systems.
@@ -378,7 +381,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def __unicode__(self):
         """Return a unicode string representation."""
-        return self.title(asLink=True, forceInterwiki=True)
+        return self.title(as_link=True, force_interwiki=True)
 
     def __repr__(self):
         """Return a more complete string representation."""
@@ -415,7 +418,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def full_url(self):
         """Return the full URL."""
         return self.site.base_url(self.site.article_path +
-                                  self.title(asUrl=True))
+                                  self.title(as_url=True))
 
     def autoFormat(self):
         """
@@ -431,7 +434,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             from pywikibot import date
             self._autoFormat = date.getAutoFormat(
                 self.site.lang,
-                self.title(withNamespace=False)
+                self.title(with_ns=False)
             )
         return self._autoFormat
 
@@ -537,9 +540,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @rtype: unicode
         """
         if percent_encoded:
-            title = self.title(asUrl=True)
+            title = self.title(as_url=True)
         else:
-            title = self.title(asUrl=False).replace(' ', '_')
+            title = self.title(as_url=False).replace(' ', '_')
         return '{0}//{1}{2}/index.php?title={3}&oldid={4}'.format(
             self.site.protocol() + ':' if with_protocol else '',
             self.site.hostname(),
@@ -703,7 +706,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
             self._expanded_text = self.site.expand_text(
                 self.text,
-                title=self.title(withSection=False),
+                title=self.title(with_section=False),
                 includecomments=includecomments)
         return self._expanded_text
 
@@ -819,10 +822,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         found = False
         if self.isRedirectPage():
-            staticKeys = self.site.getmagicwords('staticredirect')
+            static_keys = self.site.getmagicwords('staticredirect')
             text = self.get(get_redirect=True, force=force)
-            if staticKeys:
-                for key in staticKeys:
+            if static_keys:
+                for key in static_keys:
                     if key in text:
                         found = True
                         break
@@ -840,7 +843,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self._catredirect = False
             catredirs = self.site.category_redirects()
             for template, args in self.templatesWithParams():
-                if template.title(withNamespace=False) in catredirs:
+                if template.title(with_ns=False) in catredirs:
                     if args:
                         # Get target (first template argument)
                         p = pywikibot.Page(
@@ -850,12 +853,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
                         else:
                             pywikibot.warning(
                                 'Category redirect target {0} on {1} is not a '
-                                'category'.format(p.title(asLink=True),
-                                                  self.title(asLink=True)))
+                                'category'.format(p.title(as_link=True),
+                                                  self.title(as_link=True)))
                     else:
                         pywikibot.warning(
                             'No target found for category redirect on '
-                            + self.title(asLink=True))
+                            + self.title(as_link=True))
                     break
         return bool(self._catredirect)
 
@@ -905,15 +908,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return
         if self.isTalkPage():
             if self.namespace() == 1:
-                return Page(self.site, self.title(withNamespace=False))
+                return Page(self.site, self.title(with_ns=False))
             else:
                 return Page(self.site,
                             "%s:%s" % (self.site.namespace(ns - 1),
-                                       self.title(withNamespace=False)))
+                                       self.title(with_ns=False)))
         else:
             return Page(self.site,
                         "%s:%s" % (self.site.namespace(ns + 1),
-                                   self.title(withNamespace=False)))
+                                   self.title(with_ns=False)))
 
     def is_categorypage(self):
         """Return True if the page is a Category, False otherwise."""
@@ -970,7 +973,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 disambigpages = Page(self.site,
                                      "MediaWiki:Disambiguationspage")
                 if disambigpages.exists():
-                    disambigs = {link.title(withNamespace=False)
+                    disambigs = {link.title(with_ns=False)
                                  for link in disambigpages.linkedPages()
                                  if link.namespace() == 10}
                 elif self.site.has_mediawiki_message('disambiguationspage'):
@@ -985,18 +988,23 @@ class BasePage(UnicodeMixin, ComparableMixin):
             else:
                 # Normalize template capitalization
                 self.site._disambigtemplates = {first_upper(t) for t in distl}
-        templates = {tl.title(withNamespace=False) for tl in self.templates()}
+        templates = {tl.title(with_ns=False) for tl in self.templates()}
         disambigs = set()
         # always use cached disambig templates
         disambigs.update(self.site._disambigtemplates)
         # see if any template on this page is in the set of disambigs
-        disambigInPage = disambigs.intersection(templates)
-        return self.namespace() != 10 and len(disambigInPage) > 0
+        disambig_in_page = disambigs.intersection(templates)
+        return self.namespace() != 10 and len(disambig_in_page) > 0
 
-    @deprecated_args(step=None)
-    def getReferences(self, follow_redirects=True, withTemplateInclusion=True,
-                      onlyTemplateInclusion=False, redirectsOnly=False,
-                      namespaces=None, total=None, content=False):
+    @deprecated_args(
+        step=None, withTemplateInclusion='with_template_inclusion',
+        onlyTemplateInclusion='only_template_inclusion',
+        redirectsOnly='filter_redirects')
+    def getReferences(
+        self, follow_redirects=True, with_template_inclusion=True,
+        only_template_inclusion=False, filter_redirects=False,
+        namespaces=None, total=None, content=False
+    ):
         """
         Return an iterator all pages that refer to or embed the page.
 
@@ -1005,11 +1013,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param follow_redirects: if True, also iterate pages that link to a
             redirect pointing to the page.
-        @param withTemplateInclusion: if True, also iterate pages where self
+        @param with_template_inclusion: if True, also iterate pages where self
             is used as a template.
-        @param onlyTemplateInclusion: if True, only iterate pages where self
+        @param only_template_inclusion: if True, only iterate pages where self
             is used as a template.
-        @param redirectsOnly: if True, only iterate redirects to self.
+        @param filter_redirects: if True, only iterate redirects to self.
         @param namespaces: only iterate pages in these namespaces
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
@@ -1023,23 +1031,24 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.site.pagereferences(
             self,
             follow_redirects=follow_redirects,
-            filter_redirects=redirectsOnly,
-            with_template_inclusion=withTemplateInclusion,
-            only_template_inclusion=onlyTemplateInclusion,
+            filter_redirects=filter_redirects,
+            with_template_inclusion=with_template_inclusion,
+            only_template_inclusion=only_template_inclusion,
             namespaces=namespaces,
             total=total,
             content=content
         )
 
-    @deprecated_args(step=None)
-    def backlinks(self, followRedirects=True, filterRedirects=None,
+    @deprecated_args(step=None, followRedirects='follow_redirects',
+                     filterRedirects='filter_redirects')
+    def backlinks(self, follow_redirects=True, filter_redirects=None,
                   namespaces=None, total=None, content=False):
         """
         Return an iterator for pages that link to this page.
 
-        @param followRedirects: if True, also iterate pages that link to a
+        @param follow_redirects: if True, also iterate pages that link to a
             redirect pointing to the page.
-        @param filterRedirects: if True, only iterate redirects; if False,
+        @param filter_redirects: if True, only iterate redirects; if False,
             omit redirects; if None, do not filter
         @param namespaces: only iterate pages in these namespaces
         @param total: iterate no more than this number of pages in total
@@ -1048,8 +1057,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.pagebacklinks(
             self,
-            follow_redirects=followRedirects,
-            filter_redirects=filterRedirects,
+            follow_redirects=follow_redirects,
+            filter_redirects=filter_redirects,
             namespaces=namespaces,
             total=total,
             content=content
@@ -1171,7 +1180,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 restrictions = archived
 
         for template, params in templates:
-            title = template.title(withNamespace=False)
+            title = template.title(with_ns=False)
             if restrictions:
                 if title in restrictions:
                     return False
@@ -1267,7 +1276,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def _save(self, summary=None, watch=None, minor=True, botflag=None,
               cc=None, quiet=False, **kwargs):
         """Helper function for save()."""
-        link = self.title(asLink=True)
+        link = self.title(as_link=True)
         if cc or cc is None and config.cosmetic_changes:
             summary = self._cosmetic_changes_hook(summary)
 
@@ -1312,11 +1321,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         # cc depends on page directly and via several other imports
         from pywikibot.cosmetic_changes import (
             CANCEL_MATCH, CosmeticChangesToolkit)
-        ccToolkit = CosmeticChangesToolkit(self.site,
-                                           namespace=self.namespace(),
-                                           pageTitle=self.title(),
-                                           ignore=CANCEL_MATCH)
-        self.text = ccToolkit.change(old)
+        cc_toolkit = CosmeticChangesToolkit(
+            self.site, namespace=self.namespace(), pageTitle=self.title(),
+            ignore=CANCEL_MATCH)
+        self.text = cc_toolkit.change(old)
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
             from pywikibot import i18n
@@ -1582,21 +1590,22 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.pageimages(self, total=total, content=content)
 
-    @deprecated_args(nofollow_redirects=None, get_redirect=None, step=None)
-    def categories(self, withSortKey=False, total=None, content=False):
+    @deprecated_args(nofollow_redirects=None, get_redirect=None, step=None,
+                     withSortKey='with_sort_key')
+    def categories(self, with_sort_key=False, total=None, content=False):
         """
         Iterate categories that the article is in.
 
-        @param withSortKey: if True, include the sort key in each Category.
+        @param with_sort_key: if True, include the sort key in each Category.
         @param total: iterate no more than this number of pages in total
         @param content: if True, retrieve the content of the current version
             of each category description page (default False)
         @return: a generator that yields Category objects.
         @rtype: generator
         """
-        # FIXME: bug T75561: withSortKey is ignored by Site.pagecategories
-        if withSortKey:
-            raise NotImplementedError('withSortKey is not implemented')
+        # FIXME: bug T75561: with_sort_key is ignored by Site.pagecategories
+        if with_sort_key:
+            raise NotImplementedError('with_sort_key is not implemented')
 
         return self.site.pagecategories(self, total=total, content=content)
 
@@ -1836,30 +1845,31 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         self.site.merge_history(self, dest, timestamp, reason)
 
-    @deprecate_arg("throttle", None)
-    def move(self, newtitle, reason=None, movetalkpage=True, sysop=False,
-             deleteAndMove=False, safe=True):
+    @deprecated_args(
+        throttle=None, deleteAndMove='noredirect', movetalkpage='movetalk')
+    def move(self, newtitle, reason=None, movetalk=True, sysop=False,
+             noredirect=False, safe=True):
         """
         Move this page to a new title.
 
         @param newtitle: The new page title.
         @param reason: The edit summary for the move.
-        @param movetalkpage: If true, move this page's talk page (if it exists)
+        @param movetalk: If true, move this page's talk page (if it exists)
         @param sysop: Try to move using sysop account, if available
-        @param deleteAndMove: if move succeeds, delete the old page
+        @param noredirect: if move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
         @param safe: If false, attempt to delete existing page at newtitle
             (if there is one) and then move this page to that title
         """
         if reason is None:
             pywikibot.output(u'Moving %s to [[%s]].'
-                             % (self.title(asLink=True), newtitle))
+                             % (self.title(as_link=True), newtitle))
             reason = pywikibot.input(u'Please enter a reason for the move:')
         # TODO: implement "safe" parameter (Is this necessary ?)
         # TODO: implement "sysop" parameter
         return self.site.movepage(self, newtitle, reason,
-                                  movetalk=movetalkpage,
-                                  noredirect=deleteAndMove)
+                                  movetalk=movetalk,
+                                  noredirect=noredirect)
 
     @deprecate_arg("throttle", None)
     def delete(self, reason=None, prompt=True, mark=False, quit=False):
@@ -1875,7 +1885,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param quit: show also the quit option, when asking for confirmation.
         """
         if reason is None:
-            pywikibot.output(u'Deleting %s.' % (self.title(asLink=True)))
+            pywikibot.output('Deleting %s.' % (self.title(as_link=True)))
             reason = pywikibot.input(u'Please enter a reason for the deletion:')
 
         # If user is a sysop, delete the page
@@ -1884,7 +1894,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             if prompt and not hasattr(self.site, '_noDeletePrompt'):
                 answer = pywikibot.input_choice(
                     u'Do you want to delete %s?' % self.title(
-                        asLink=True, forceInterwiki=True),
+                        as_link=True, force_interwiki=True),
                     [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                     'n', automatic_quit=quit)
                 if answer == 'a':
@@ -1898,8 +1908,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             else:
                 answer = pywikibot.input_choice(
                     u"Can't delete %s; do you want to mark it "
-                    "for deletion instead?" % self.title(asLink=True,
-                                                         forceInterwiki=True),
+                    'for deletion instead?' % self.title(as_link=True,
+                                                         force_interwiki=True),
                     [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                     'n', automatic_quit=False)
                 if answer == 'a':
@@ -1936,23 +1946,24 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 self._deletedRevs[rev['timestamp']] = rev
                 yield rev['timestamp']
 
-    def getDeletedRevision(self, timestamp, retrieveText=False):
+    @deprecated_args(retrieveText='content')
+    def getDeletedRevision(self, timestamp, content=False):
         """
         Return a particular deleted revision by timestamp.
 
         @return: a list of [date, editor, comment, text, restoration
-            marker]. text will be None, unless retrieveText is True (or has
+            marker]. text will be None, unless content is True (or has
             been retrieved earlier). If timestamp is not found, returns
             None.
         @rtype: list
         """
         if hasattr(self, "_deletedRevs"):
             if timestamp in self._deletedRevs and (
-                    (not retrieveText)
+                    not content
                     or 'content' in self._deletedRevs[timestamp]):
                 return self._deletedRevs[timestamp]
         for item in self.site.deletedrevs(self, start=timestamp,
-                                          get_text=retrieveText, total=1):
+                                          content=content, total=1):
             # should only be one item with one revision
             if item['title'] == self.title:
                 if "revisions" in item:
@@ -2003,7 +2014,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if reason is None:
             warn('Not passing a reason for undelete() is deprecated.',
                  DeprecationWarning)
-            pywikibot.output(u'Undeleting %s.' % (self.title(asLink=True)))
+            pywikibot.output('Undeleting %s.' % (self.title(as_link=True)))
             reason = pywikibot.input(u'Please enter a reason for the undeletion:')
         self.site.undelete_page(self, reason, undelete_revs)
 
@@ -2058,7 +2069,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         if reason is None:
             pywikibot.output(u'Preparing to protection change of %s.'
-                             % (self.title(asLink=True)))
+                             % (self.title(as_link=True)))
             reason = pywikibot.input(u'Please enter a reason for the action:')
         if unprotect:
             warn(u'"unprotect" argument of protect() is deprecated',
@@ -2074,7 +2085,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if prompt and not hasattr(self.site, '_noProtectPrompt'):
             answer = pywikibot.input_choice(
                 u'Do you want to change the protection level of %s?'
-                % self.title(asLink=True, forceInterwiki=True),
+                % self.title(as_link=True, force_interwiki=True),
                 [('Yes', 'y'), ('No', 'n'), ('All', 'a')],
                 'n', automatic_quit=False)
             if answer == 'a':
@@ -2083,24 +2094,28 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if answer == 'y':
             return self.site.protect(self, protections, reason, **kwargs)
 
-    @deprecated_args(comment='summary')
-    def change_category(self, oldCat, newCat, summary=None, sortKey=None,
-                        inPlace=True, include=[]):
+    @deprecated_args(
+        comment='summary', oldCat='old_cat', newCat='new_cat',
+        sortKey='sort_key', inPlace='in_place')
+    def change_category(
+        self, old_cat, new_cat, summary=None, sort_key=None, in_place=True,
+        include=[]
+    ):
         """
         Remove page from oldCat and add it to newCat.
 
-        @param oldCat: category to be removed
-        @type oldCat: Category
-        @param newCat: category to be added, if any
-        @type newCat: Category or None
+        @param old_cat: category to be removed
+        @type old_cat: Category
+        @param new_cat: category to be added, if any
+        @type new_cat: Category or None
 
         @param summary: string to use as an edit summary
 
-        @param sortKey: sortKey to use for the added category.
+        @param sort_key: sortKey to use for the added category.
             Unused if newCat is None, or if inPlace=True
             If sortKey=True, the sortKey used for oldCat will be used.
 
-        @param inPlace: if True, change categories in place rather than
+        @param in_place: if True, change categories in place rather than
                       rearranging them.
 
         @param include: list of tags not to be disabled by default in relevant
@@ -2120,34 +2135,34 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         if not self.canBeEdited():
             pywikibot.output(u"Can't edit %s, skipping it..."
-                             % self.title(asLink=True))
+                             % self.title(as_link=True))
             return False
 
-        if oldCat not in cats:
+        if old_cat not in cats:
             if self.namespace() != 10:
                 pywikibot.error('%s is not in category %s!'
-                                % (self.title(asLink=True), oldCat.title()))
+                                % (self.title(as_link=True), old_cat.title()))
             else:
                 pywikibot.output('%s is not in category %s, skipping...'
-                                 % (self.title(asLink=True), oldCat.title()))
+                                 % (self.title(as_link=True), old_cat.title()))
             return False
 
-        # This prevents the bot from adding newCat if it is already present.
-        if newCat in cats:
-            newCat = None
+        # This prevents the bot from adding new_cat if it is already present.
+        if new_cat in cats:
+            new_cat = None
 
         oldtext = self.text
-        if inPlace or self.namespace() == 10:
-            newtext = textlib.replaceCategoryInPlace(oldtext, oldCat, newCat,
+        if in_place or self.namespace() == 10:
+            newtext = textlib.replaceCategoryInPlace(oldtext, old_cat, new_cat,
                                                      site=self.site)
         else:
-            old_cat_pos = cats.index(oldCat)
-            if newCat:
-                if sortKey is True:
-                    # Fetch sortKey from oldCat in current page.
-                    sortKey = cats[old_cat_pos].sortKey
-                cats[old_cat_pos] = Category(self.site, newCat.title(),
-                                             sortKey=sortKey)
+            old_cat_pos = cats.index(old_cat)
+            if new_cat:
+                if sort_key is True:
+                    # Fetch sort_key from old_cat in current page.
+                    sort_key = cats[old_cat_pos].sortKey
+                cats[old_cat_pos] = Category(self.site, new_cat.title(),
+                                             sort_key=sort_key)
             else:
                 cats.pop(old_cat_pos)
 
@@ -2166,11 +2181,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 return True
             except pywikibot.PageSaveRelatedError as error:
                 pywikibot.output(u'Page %s not saved: %s'
-                                 % (self.title(asLink=True),
+                                 % (self.title(as_link=True),
                                     error))
             except pywikibot.NoUsername:
                 pywikibot.output(u'Page %s not saved; sysop privileges '
-                                 u'required.' % self.title(asLink=True))
+                                 'required.' % self.title(as_link=True))
         return False
 
     @deprecated('Page.is_flow_page()')
@@ -2196,8 +2211,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @deprecated("Page.title(withNamespace=False)")
     def titleWithoutNamespace(self, underscore=False):
         """DEPRECATED: use self.title(withNamespace=False) instead."""
-        return self.title(underscore=underscore, withNamespace=False,
-                          withSection=False)
+        return self.title(underscore=underscore, with_ns=False,
+                          with_section=False)
 
     @deprecated("Page.title(as_filename=True)")
     def titleForFilename(self):
@@ -2207,13 +2222,17 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @deprecated("Page.title(withSection=False)")
     def sectionFreeTitle(self, underscore=False):
         """DEPRECATED: use self.title(withSection=False) instead."""
-        return self.title(underscore=underscore, withSection=False)
+        return self.title(underscore=underscore, with_section=False)
 
     @deprecated("Page.title(asLink=True)")
-    def aslink(self, forceInterwiki=False, textlink=False, noInterwiki=False):
+    @deprecated_args(
+        forceInterwiki='force_interwiki', noInterwiki='no_interwiki')
+    def aslink(
+        self, force_interwiki=False, textlink=False, no_interwiki=False
+    ):
         """DEPRECATED: use self.title(asLink=True) instead."""
-        return self.title(asLink=True, forceInterwiki=forceInterwiki,
-                          allowInterwiki=not noInterwiki, textlink=textlink)
+        return self.title(as_link=True, force_interwiki=force_interwiki,
+                          allow_interwiki=not no_interwiki, textlink=textlink)
 
     @deprecated("Page.title(asUrl=True)")
     def urlname(self):
@@ -2221,7 +2240,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         DEPRECATED: use self.title(asUrl=True) instead.
         """
-        return self.title(asUrl=True)
+        return self.title(as_url=True)
 
     @deprecated('Page.protection()')
     def getRestrictions(self):
@@ -2298,7 +2317,7 @@ class Page(BasePage):
         for template in templates:
             try:
                 link = pywikibot.Link(template[0], self.site,
-                                      defaultNamespace=10)
+                                      default_namespace=10)
                 if link.canonical_title() not in titles:
                     continue
             except pywikibot.Error:
@@ -2380,8 +2399,8 @@ class Page(BasePage):
             prefix = ''
             suffix = ''
 
-        target_link = target_page.title(asLink=True, textlink=True,
-                                        allowInterwiki=False)
+        target_link = target_page.title(as_link=True, textlink=True,
+                                        allow_interwiki=False)
         target_link = u'#{0} {1}'.format(self.site.redirect(), target_link)
         self.text = prefix + target_link + suffix
         if save:
@@ -2461,7 +2480,7 @@ class FilePage(Page):
         """
         if not hasattr(self, '_imagePageHtml'):
             path = "%s/index.php?title=%s" \
-                   % (self.site.scriptpath(), self.title(asUrl=True))
+                   % (self.site.scriptpath(), self.title(as_url=True))
             self._imagePageHtml = http.request(self.site, path)
         return self._imagePageHtml
 
@@ -2536,8 +2555,7 @@ class FilePage(Page):
         req = http.fetch(self.fileUrl())
         h = hashlib.md5()
         h.update(req.raw)
-        md5Checksum = h.hexdigest()
-        return md5Checksum
+        return h.hexdigest()
 
     @deprecated("FilePage.latest_file_info.sha1")
     def getFileSHA1Sum(self):
@@ -2682,7 +2700,7 @@ class FilePage(Page):
         @raise: IOError if filename cannot be written for any reason.
         """
         if filename is None:
-            filename = self.title(as_filename=True, withNamespace=False)
+            filename = self.title(as_filename=True, with_ns=False)
 
         filename = os.path.expanduser(filename)
 
@@ -2724,38 +2742,39 @@ class Category(Page):
 
     """A page in the Category: namespace."""
 
-    @deprecate_arg("insite", None)
-    def __init__(self, source, title=u"", sortKey=None):
+    @deprecated_args(insite=None, sortKey='sort_key')
+    def __init__(self, source, title='', sort_key=None):
         """
         Initializer.
 
         All parameters are the same as for Page() Initializer.
         """
-        self.sortKey = sortKey
+        self.sortKey = sort_key
         Page.__init__(self, source, title, ns=14)
         if self.namespace() != 14:
             raise ValueError(u"'%s' is not in the category namespace!"
                              % title)
 
-    @deprecated_args(forceInterwiki=None, textlink=None, noInterwiki=None)
-    def aslink(self, sortKey=None):
+    @deprecated_args(
+        forceInterwiki=None, textlink=None, noInterwiki=None,
+        sortKey='sort_key')
+    def aslink(self, sort_key=None):
         """
         Return a link to place a page in this Category.
 
         Use this only to generate a "true" category link, not for interwikis
         or text links to category pages.
 
-        @param sortKey: The sort key for the article to be placed in this
+        @param sort_key: The sort key for the article to be placed in this
             Category; if omitted, default sort key is used.
-        @type sortKey: (optional) unicode
+        @type sort_key: (optional) unicode
         """
-        key = sortKey or self.sortKey
+        key = sort_key or self.sortKey
         if key is not None:
-            titleWithSortKey = '%s|%s' % (self.title(withSection=False),
-                                          key)
+            title_with_sort_key = self.title(with_section=False) + '|' + key
         else:
-            titleWithSortKey = self.title(withSection=False)
-        return '[[%s]]' % titleWithSortKey
+            title_with_sort_key = self.title(with_section=False)
+        return '[[%s]]' % title_with_sort_key
 
     @deprecated_args(startFrom=None, cacheResults=None, step=None)
     def subcategories(self, recurse=False, total=None, content=False):
@@ -2971,26 +2990,26 @@ class Category(Page):
         # either)
         if not isinstance(cat, Category):
             cat = self.site.namespaces.CATEGORY + ':' + cat
-            targetCat = Category(self.site, cat)
+            target_cat = Category(self.site, cat)
         else:
-            targetCat = cat
-        if targetCat.exists():
+            target_cat = cat
+        if target_cat.exists():
             pywikibot.output(u'Target page %s already exists!'
-                             % targetCat.title(),
+                             % target_cat.title(),
                              level=pywikibot.logging.WARNING)
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
-                             % (self.title(), targetCat.title()))
+                             % (self.title(), target_cat.title()))
             authors = ', '.join(self.contributingUsers())
             try:
-                creationSummary = message % (self.title(), authors)
+                creation_summary = message % (self.title(), authors)
             except TypeError:
-                creationSummary = message
-            targetCat.put(self.get(), creationSummary)
+                creation_summary = message
+            target_cat.put(self.get(), creation_summary)
             return True
 
-    def copyAndKeep(self, catname, cfdTemplates, message):
+    def copyAndKeep(self, catname, cfd_templates, message):
         """
         Copy partial category page text (not contents) to a new title.
 
@@ -3004,7 +3023,7 @@ class Category(Page):
         existed.
 
         @param catname: New category title (without namespace)
-        @param cfdTemplates: A list (or iterator) of templates to be removed
+        @param cfd_templates: A list (or iterator) of templates to be removed
             from the page text
         @return: True if copying was successful, False if target page
             already existed.
@@ -3013,19 +3032,19 @@ class Category(Page):
         # I don't see why we need this as part of the framework either
         # move to scripts/category.py?
         catname = self.site.namespaces.CATEGORY + ':' + catname
-        targetCat = Category(self.site, catname)
-        if targetCat.exists():
+        target_cat = Category(self.site, catname)
+        if target_cat.exists():
             pywikibot.warning(u'Target page %s already exists!'
-                              % targetCat.title())
+                              % target_cat.title())
             return False
         else:
             pywikibot.output(
                 'Moving text from %s to %s.'
-                % (self.title(), targetCat.title()))
+                % (self.title(), target_cat.title()))
             authors = ', '.join(self.contributingUsers())
-            creationSummary = message % (self.title(), authors)
+            creation_summary = message % (self.title(), authors)
             newtext = self.get()
-        for regexName in cfdTemplates:
+        for regexName in cfd_templates:
             matchcfd = re.compile(r"{{%s.*?}}" % regexName, re.IGNORECASE)
             newtext = matchcfd.sub('', newtext)
             matchcomment = re.compile(
@@ -3036,7 +3055,7 @@ class Category(Page):
             while (newtext[pos:pos + 1] == "\n"):
                 pos = pos + 1
             newtext = newtext[pos:]
-            targetCat.put(newtext, creationSummary)
+            target_cat.put(newtext, creation_summary)
             return True
 
     @property
@@ -3200,9 +3219,9 @@ class User(Page):
         @rtype: unicode
         """
         if self._isAutoblock:
-            return u'#' + self.title(withNamespace=False)
+            return '#' + self.title(with_ns=False)
         else:
-            return self.title(withNamespace=False)
+            return self.title(with_ns=False)
 
     def isRegistered(self, force=False):
         """
@@ -3389,7 +3408,7 @@ class User(Page):
         if subpage:
             subpage = u'/' + subpage
         return Page(Link(self.username + subpage,
-                         self.site, defaultNamespace=3))
+                         self.site, default_namespace=3))
 
     def send_email(self, subject, text, ccme=False):
         """
@@ -4319,7 +4338,7 @@ class ItemPage(WikibasePage):
         # clear id, and temporarily store data needed to lazy loading the item
         del i.id
         i._site = page.site
-        i._title = page.title(withSection=False)
+        i._title = page.title(with_section=False)
         if not lazy_load and not i.exists():
             raise pywikibot.NoPage(i)
         page._item = i
@@ -4500,12 +4519,12 @@ class ItemPage(WikibasePage):
         data = {}
         for obj in sitelinks:
             if isinstance(obj, Page):
-                dbName = self.getdbName(obj.site)
-                data[dbName] = {'site': dbName, 'title': obj.title()}
+                db_name = self.getdbName(obj.site)
+                data[db_name] = {'site': db_name, 'title': obj.title()}
             else:
                 # TODO: Do some verification here
-                dbName = obj['site']
-                data[dbName] = obj
+                db_name = obj['site']
+                data[db_name] = obj
         data = {'sitelinks': data}
         self.editEntity(data, **kwargs)
 
@@ -4787,8 +4806,9 @@ class Claim(Property):
 
     SNAK_TYPES = ('value', 'somevalue', 'novalue')
 
-    def __init__(self, site, pid, snak=None, hash=None, isReference=False,
-                 isQualifier=False, **kwargs):
+    @deprecated_args(isReference='is_reference', isQualifier='is_qualifier')
+    def __init__(self, site, pid, snak=None, hash=None, is_reference=False,
+                 is_qualifier=False, **kwargs):
         """
         Initializer.
 
@@ -4799,14 +4819,14 @@ class Claim(Property):
         @param pid: property id, with "P" prefix
         @param snak: snak identifier for claim
         @param hash: hash identifier for references
-        @param isReference: whether specified claim is a reference
-        @param isQualifier: whether specified claim is a qualifier
+        @param is_reference: whether specified claim is a reference
+        @param is_qualifier: whether specified claim is a qualifier
         """
         Property.__init__(self, site, pid, **kwargs)
         self.snak = snak
         self.hash = hash
-        self.isReference = isReference
-        self.isQualifier = isQualifier
+        self.isReference = is_reference
+        self.isQualifier = is_qualifier
         if self.isQualifier and self.isReference:
             raise ValueError(u'Claim cannot be both a qualifier and reference.')
         self.sources = []
@@ -5212,7 +5232,7 @@ class Claim(Property):
         elif self.type in ('string', 'url', 'math', 'external-id'):
             value = self.getTarget()
         elif self.type == 'commonsMedia':
-            value = self.getTarget().title(withNamespace=False)
+            value = self.getTarget().title(with_ns=False)
         elif self.type in ('globe-coordinate', 'time',
                            'quantity', 'monolingualtext',
                            'geo-shape', 'tabular-data'):
@@ -5433,7 +5453,8 @@ class Link(ComparableMixin):
         u'|&#x[0-9A-Fa-f]+;'
     )
 
-    def __init__(self, text, source=None, defaultNamespace=0):
+    @deprecated_args(defaultNamespace='default_namespace')
+    def __init__(self, text, source=None, default_namespace=0):
         """
         Initializer.
 
@@ -5443,9 +5464,9 @@ class Link(ComparableMixin):
         @param source: the Site on which the link was found (not necessarily
             the site to which the link refers)
         @type source: Site or BasePage
-        @param defaultNamespace: a namespace to use if the link does not
+        @param default_namespace: a namespace to use if the link does not
             contain one (defaults to 0)
-        @type defaultNamespace: int
+        @type default_namespace: int
 
         @raises UnicodeError: text could not be converted to unicode.
         """
@@ -5460,11 +5481,11 @@ class Link(ComparableMixin):
             "source parameter should be either a Site or Page object"
 
         self._text = text
-        # See bug T104864, defaultNamespace might have been deleted.
+        # See bug T104864, default_namespace might have been deleted.
         try:
-            self._defaultns = self._source.namespaces[defaultNamespace]
+            self._defaultns = self._source.namespaces[default_namespace]
         except KeyError:
-            self._defaultns = defaultNamespace
+            self._defaultns = default_namespace
 
         # preprocess text (these changes aren't site-dependent)
         # First remove anchor, which is stored unchanged, if there is one
@@ -5503,7 +5524,7 @@ class Link(ComparableMixin):
         self._text = t
 
         if source_is_page:
-            self._text = source.title(withSection=False) + self._text
+            self._text = source.title(with_section=False) + self._text
 
     def __repr__(self):
         """Return a more complete string representation."""
@@ -5842,9 +5863,9 @@ class Link(ComparableMixin):
         link._site = page.site
         link._section = page.section()
         link._namespace = page.namespace()
-        link._title = page.title(withNamespace=False,
-                                 allowInterwiki=False,
-                                 withSection=False)
+        link._title = page.title(with_ns=False,
+                                 allow_interwiki=False,
+                                 with_section=False)
         link._anchor = None
         link._source = source or pywikibot.Site()
 
@@ -5926,6 +5947,42 @@ class Link(ComparableMixin):
 
 # Utility functions for parsing page titles
 
+# This regular expression will match any decimal and hexadecimal entity and
+# also entities that might be named entities.
+_ENTITY_SUB = re.compile(
+    r'&(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));').sub
+# These characters are Html-illegal, but sadly you *can* find some of
+# these and converting them to chr(decimal) is unsuitable
+_ILLEGAL_HTML_ENTITIES_MAPPING = {
+    128: 8364,  # €
+    130: 8218,  # ‚
+    131: 402,   # ƒ
+    132: 8222,  # „
+    133: 8230,  # …
+    134: 8224,  # †
+    135: 8225,  # ‡
+    136: 710,   # ˆ
+    137: 8240,  # ‰
+    138: 352,   # Š
+    139: 8249,  # ‹
+    140: 338,   # Œ
+    142: 381,   # Ž
+    145: 8216,  # ‘
+    146: 8217,  # ’
+    147: 8220,  # “
+    148: 8221,  # ”
+    149: 8226,  # •
+    150: 8211,  # –
+    151: 8212,  # —
+    152: 732,   # ˜
+    153: 8482,  # ™
+    154: 353,   # š
+    155: 8250,  # ›
+    156: 339,   # œ
+    158: 382,   # ž
+    159: 376    # Ÿ
+}
+
 
 def html2unicode(text, ignore=None, exceptions=None):
     """
@@ -5938,44 +5995,9 @@ def html2unicode(text, ignore=None, exceptions=None):
     """
     if ignore is None:
         ignore = []
-    # This regular expression will match any decimal and hexadecimal entity and
-    # also entities that might be named entities.
-    entityR = re.compile(
-        r'&(#(?P<decimal>\d+)|#x(?P<hex>[0-9a-fA-F]+)|(?P<name>[A-Za-z]+));')
-    # These characters are Html-illegal, but sadly you *can* find some of
-    # these and converting them to chr(decimal) is unsuitable
-    convertIllegalHtmlEntities = {
-        128: 8364,  # €
-        130: 8218,  # ‚
-        131: 402,   # ƒ
-        132: 8222,  # „
-        133: 8230,  # …
-        134: 8224,  # †
-        135: 8225,  # ‡
-        136: 710,   # ˆ
-        137: 8240,  # ‰
-        138: 352,   # Š
-        139: 8249,  # ‹
-        140: 338,   # Œ
-        142: 381,   # Ž
-        145: 8216,  # ‘
-        146: 8217,  # ’
-        147: 8220,  # “
-        148: 8221,  # ”
-        149: 8226,  # •
-        150: 8211,  # –
-        151: 8212,  # —
-        152: 732,   # ˜
-        153: 8482,  # ™
-        154: 353,   # š
-        155: 8250,  # ›
-        156: 339,   # œ
-        158: 382,   # ž
-        159: 376    # Ÿ
-    }
     # ensuring that illegal &#129; &#141; and &#157, which have no known
     # values, don't get converted to chr(129), chr(141) or chr(157)
-    ignore = (set(map(lambda x: convertIllegalHtmlEntities.get(x, x),
+    ignore = (set(map(lambda x: _ILLEGAL_HTML_ENTITIES_MAPPING.get(x, x),
                       ignore)) | {129, 141, 157})
 
     def handle_entity(match):
@@ -5984,30 +6006,30 @@ def html2unicode(text, ignore=None, exceptions=None):
             # to pass it to handle_entity, ♥ Python
             return match.group(0)
         if match.group('decimal'):
-            unicodeCodepoint = int(match.group('decimal'))
+            unicode_codepoint = int(match.group('decimal'))
         elif match.group('hex'):
-            unicodeCodepoint = int(match.group('hex'), 16)
+            unicode_codepoint = int(match.group('hex'), 16)
         elif match.group('name'):
             name = match.group('name')
             if name in htmlentitydefs.name2codepoint:
                 # We found a known HTML entity.
-                unicodeCodepoint = htmlentitydefs.name2codepoint[name]
+                unicode_codepoint = htmlentitydefs.name2codepoint[name]
             else:
-                unicodeCodepoint = False
+                unicode_codepoint = False
 
-        if unicodeCodepoint in convertIllegalHtmlEntities:
-            unicodeCodepoint = convertIllegalHtmlEntities[unicodeCodepoint]
+        unicode_codepoint = _ILLEGAL_HTML_ENTITIES_MAPPING.get(
+            unicode_codepoint, unicode_codepoint)
 
-        if unicodeCodepoint and unicodeCodepoint not in ignore:
-            if unicodeCodepoint > sys.maxunicode:
+        if unicode_codepoint and unicode_codepoint not in ignore:
+            if unicode_codepoint > sys.maxunicode:
                 # solve narrow Python 2 build exception (UTF-16)
-                return eval("'\\U{0:08x}'".format(unicodeCodepoint))
+                return eval("'\\U{0:08x}'".format(unicode_codepoint))
             else:
-                return chr(unicodeCodepoint)
+                return chr(unicode_codepoint)
         else:
             # Leave the entity unchanged
             return match.group(0)
-    return entityR.sub(handle_entity, text)
+    return _ENTITY_SUB(handle_entity, text)
 
 
 def UnicodeToAsciiHtml(s):
@@ -6066,14 +6088,14 @@ def url2unicode(title, encodings='utf-8'):
         site = encodings
         encodings = [site.encoding()] + list(site.encodings())
 
-    firstException = None
+    first_exception = None
     for enc in encodings:
         try:
             t = title.encode(enc)
             t = unquote_to_bytes(t)
             return t.decode(enc)
         except UnicodeError as ex:
-            if not firstException:
-                firstException = ex
+            if not first_exception:
+                first_exception = ex
     # Couldn't convert, raise the original exception
-    raise firstException
+    raise first_exception

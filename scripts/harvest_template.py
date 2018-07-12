@@ -173,11 +173,11 @@ class HarvestRobot(WikidataBot):
         pywikibot.output('Finding redirects...')
         if temp.isRedirectPage():
             temp = temp.getRedirectTarget()
-        titles = [page.title(withNamespace=False)
-                  for page in temp.getReferences(redirectsOnly=True,
+        titles = [page.title(with_ns=False)
+                  for page in temp.getReferences(filter_redirects=True,
                                                  namespaces=[10],
                                                  follow_redirects=False)]
-        titles.append(temp.title(withNamespace=False))
+        titles.append(temp.title(with_ns=False))
         return titles
 
     def _template_link_target(self, item, link_text):
@@ -236,7 +236,7 @@ class HarvestRobot(WikidataBot):
             # Clean up template
             try:
                 template = pywikibot.Page(page.site, template,
-                                          ns=10).title(withNamespace=False)
+                                          ns=10).title(with_ns=False)
             except pywikibot.exceptions.InvalidTitle:
                 pywikibot.error(
                     "Failed parsing template; '%s' should be the template name."
@@ -287,14 +287,14 @@ class HarvestRobot(WikidataBot):
                 elif claim.type == 'commonsMedia':
                     commonssite = pywikibot.Site('commons', 'commons')
                     imagelink = pywikibot.Link(
-                        value, source=commonssite, defaultNamespace=6)
+                        value, source=commonssite, default_namespace=6)
                     image = pywikibot.FilePage(imagelink)
                     if image.isRedirectPage():
                         image = pywikibot.FilePage(image.getRedirectTarget())
                     if not image.exists():
                         pywikibot.output(
                             "{0} doesn't exist. I can't link to it"
-                            ''.format(image.title(asLink=True)))
+                            ''.format(image.title(as_link=True)))
                         continue
                     claim.setTarget(image)
                 else:

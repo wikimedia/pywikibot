@@ -330,7 +330,7 @@ class CaseChecker(object):
                             if 'redirect' in page:
                                 src = self.Page(title)
                                 redir = src.getRedirectTarget()
-                                redirTitle = redir.title(asLink=True,
+                                redirTitle = redir.title(as_link=True,
                                                          textlink=True)
 
                                 if not dst.exists():
@@ -367,8 +367,8 @@ class CaseChecker(object):
                                 if page['ns'] == 14:
                                     dst = self.Page(newTitle)
                                     bot = CategoryMoveBot(
-                                        src.title(withNamespace=False),
-                                        dst.title(withNamespace=False),
+                                        src.title(with_ns=False),
+                                        dst.title(with_ns=False),
                                         self.autonomous,
                                         editSummary + u' ' +
                                         self.MakeMoveSummary(title, newTitle),
@@ -706,7 +706,7 @@ class CaseChecker(object):
 
     def PutNewPage(self, pageObj, pageTxt, msg):
         """Save new page."""
-        title = pageObj.title(asLink=True, textlink=True)
+        title = pageObj.title(as_link=True, textlink=True)
         coloredMsg = u', '.join([self.ColorCodeWord(m) for m in msg])
         if pageObj.text == pageTxt:
             self.WikiLog(u"* Error: Text replacement failed in %s (%s)"

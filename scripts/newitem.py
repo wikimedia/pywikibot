@@ -70,13 +70,13 @@ class NewItemRobot(WikidataBot):
             page.touch()
         except NoPage:
             pywikibot.error('Page {0} does not exist.'.format(
-                page.title(asLink=True)))
+                page.title(as_link=True)))
         except LockedPage:
             pywikibot.error('Page {0} is locked.'.format(
-                page.title(asLink=True)))
+                page.title(as_link=True)))
         except PageNotSaved:
             pywikibot.error('Page {0} not saved.'.format(
-                page.title(asLink=True)))
+                page.title(as_link=True)))
 
     def _callback(self, page, exc):
         if exc is None:

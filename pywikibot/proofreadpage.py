@@ -173,7 +173,7 @@ class ProofreadPage(pywikibot.Page):
         @return: (base, ext, num).
         @rtype: tuple
         """
-        left, sep, right = self.title(withNamespace=False).rpartition('/')
+        left, sep, right = self.title(with_ns=False).rpartition('/')
         if sep:
             base = left
             num = int(right)
@@ -217,7 +217,7 @@ class ProofreadPage(pywikibot.Page):
                 # Try to infer names from page titles.
                 if self._num is not None:
                     for page in what_links_here:
-                        if page.title(withNamespace=False) == self._base:
+                        if page.title(with_ns=False) == self._base:
                             what_links_here.remove(page)
                             self._index = (page, what_links_here)
                             break
@@ -319,7 +319,7 @@ class ProofreadPage(pywikibot.Page):
             return self.site.proofread_levels[self.ql]
         except KeyError:
             pywikibot.warning('Not valid status set for %s: quality level = %s'
-                              % (self.title(asLink=True), self.ql))
+                              % (self.title(as_link=True), self.ql))
             return None
 
     def without_text(self):
@@ -450,7 +450,7 @@ class ProofreadPage(pywikibot.Page):
         len_cq = len(close_queue)
         if (len_oq != len_cq) or (len_oq < 2 or len_cq < 2):
             raise pywikibot.Error('ProofreadPage %s: invalid format'
-                                  % self.title(asLink=True))
+                                  % self.title(as_link=True))
 
         f_open, f_close = open_queue[0], close_queue[0]
         self._full_header = FullHeader(self._text[f_open.end():f_close.start()])
@@ -519,7 +519,7 @@ class ProofreadPage(pywikibot.Page):
                 url = self.full_url()
             else:
                 path = 'w/index.php?title={0}&action=edit&redlink=1'
-                url = self.site.base_url(path.format(self.title(asUrl=True)))
+                url = self.site.base_url(path.format(self.title(as_url=True)))
 
             try:
                 response = http.fetch(url, charset='utf-8')
@@ -593,7 +593,7 @@ class ProofreadPage(pywikibot.Page):
                         res.append('\n')
             return ''.join(res)
 
-        params = {'book': self.title(asUrl=True, withNamespace=False),
+        params = {'book': self.title(as_url=True, with_ns=False),
                   'lang': self.site.lang,
                   'user': self.site.user(),
                   }

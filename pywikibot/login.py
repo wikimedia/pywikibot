@@ -175,7 +175,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                         return True
             else:
                 for linked_page in botlist_page.linkedPages():
-                    if linked_page.title(withNamespace=False) == self.username:
+                    if linked_page.title(with_ns=False) == self.username:
                         return True
             return False
         else:

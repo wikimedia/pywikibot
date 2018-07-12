@@ -73,10 +73,10 @@ class CapitalizeBot(MultipleSitesBot, FollowRedirectPageBot, ExistingPageBot):
             page_cap = pywikibot.Page(site, page_t.capitalize())
         if page_cap.exists():
             pywikibot.output(u'%s already exists, skipping...\n'
-                             % page_cap.title(asLink=True))
+                             % page_cap.title(as_link=True))
         else:
             pywikibot.output(u'%s doesn\'t exist'
-                             % page_cap.title(asLink=True))
+                             % page_cap.title(as_link=True))
             if self.user_confirm('Do you want to create a redirect?'):
                 comment = i18n.twtranslate(
                     site,

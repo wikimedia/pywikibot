@@ -65,12 +65,12 @@ def initLists():
     blacklistPage = pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
                                    u'User:Multichill/Category_blacklist')
     for cat in blacklistPage.linkedPages():
-        category_blacklist.append(cat.title(withNamespace=False))
+        category_blacklist.append(cat.title(with_ns=False))
 
     countryPage = pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
                                  u'User:Multichill/Countries')
     for country in countryPage.linkedPages():
-        countries.append(country.title(withNamespace=False))
+        countries.append(country.title(with_ns=False))
     return
 
 
@@ -109,7 +109,7 @@ def getCurrentCats(imagepage):
     """Get the categories currently on the image."""
     result = []
     for cat in imagepage.categories():
-        result.append(cat.title(withNamespace=False))
+        result.append(cat.title(with_ns=False))
     return list(set(result))
 
 
@@ -130,14 +130,14 @@ def getCommonshelperCats(imagepage):
     family = site.family.name
     if lang == u'commons' and family == u'commons':
         parameters = urlencode(
-            {'i': imagepage.title(withNamespace=False).encode('utf-8'),
+            {'i': imagepage.title(with_ns=False).encode('utf-8'),
              'r': 'on',
              'go-clean': 'Find+Categories',
              'p': search_wikis,
              'cl': hint_wiki})
     elif family == u'wikipedia':
         parameters = urlencode(
-            {'i': imagepage.title(withNamespace=False).encode('utf-8'),
+            {'i': imagepage.title(with_ns=False).encode('utf-8'),
              'r': 'on',
              'go-move': 'Find+Categories',
              'p': search_wikis,
@@ -329,7 +329,7 @@ def followRedirects(categories):
         if categoryPage.isCategoryRedirect():
             result.append(
                 categoryPage.getCategoryRedirectTarget().title(
-                    withNamespace=False))
+                    with_ns=False))
         else:
             result.append(cat)
     return result
@@ -363,8 +363,8 @@ def filterCountries(categories):
                 pywikibot.Site(u'commons', u'commons'), u'Category:' + bc)
             for subcategory in category.subcategories():
                 for country in listCountries:
-                    if subcategory.title(withNamespace=False).endswith(country):
-                        result.append(subcategory.title(withNamespace=False))
+                    if subcategory.title(with_ns=False).endswith(country):
+                        result.append(subcategory.title(with_ns=False))
     return list(set(result))
 
 

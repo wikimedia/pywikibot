@@ -166,7 +166,7 @@ class GraphDrawer(object):
         node = pydot.Node(self.getLabel(page), shape='rectangle')
         node.set_URL("\"http://%s%s\""
                      % (page.site.hostname(),
-                        page.site.get_address(page.title(asUrl=True))))
+                        page.site.get_address(page.title(as_url=True))))
         node.set_style('filled')
         node.set_fillcolor('white')
         node.set_fontsize('11')
@@ -204,7 +204,7 @@ class GraphDrawer(object):
             elif self.graph.get_edge(sourceLabel, targetLabel):
                 pywikibot.output(
                     u'BUG: Tried to create duplicate edge from %s to %s'
-                    % (refPage.title(asLink=True), page.title(asLink=True)))
+                    % (refPage.title(as_link=True), page.title(as_link=True)))
                 # duplicate edges would be bad because then get_edge() would
                 # give a list of edges, not a single edge when we handle the
                 # opposite edge.

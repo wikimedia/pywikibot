@@ -2110,7 +2110,7 @@ class InterwikiBot(object):
                     page.site.namespaces[int(page.namespace())])
                 if page_namespace.case == 'first-letter':
                     until = first_upper(until)
-                if page.title(withNamespace=False) > until:
+                if page.title(with_ns=False) > until:
                     break
 
             self.add(page, hints=self.conf.hints)
@@ -2333,7 +2333,7 @@ def botMayEdit(page):
     if tmpl != []:
         templates = page.templatesWithParams()
         for template in templates:
-            if template[0].title(withNamespace=False).lower() in tmpl:
+            if template[0].title(with_ns=False).lower() in tmpl:
                 return False
     return True
 
@@ -2508,7 +2508,7 @@ def main(*args):
         if optContinue:
             if pages:
                 last = pages[-1]
-                nextPage = last.title(withNamespace=False) + '!'
+                nextPage = last.title(with_ns=False) + '!'
                 namespace = last.namespace()
             else:
                 pywikibot.output(

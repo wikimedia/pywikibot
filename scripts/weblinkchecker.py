@@ -803,14 +803,14 @@ class DeadLinkReportThread(threading.Thread):
                     pywikibot.output(color_format(
                         '{lightaqua}** Reporting dead link on '
                         '{0}...{default}',
-                        talkPage.title(asLink=True)))
+                        talkPage.title(as_link=True)))
                     try:
                         content = talkPage.get() + '\n\n\n'
                         if url in content:
                             pywikibot.output(color_format(
                                 '{lightaqua}** Dead link seems to have '
                                 'already been reported on {0}{default}',
-                                talkPage.title(asLink=True)))
+                                talkPage.title(as_link=True)))
                             continue
                     except (pywikibot.NoPage, pywikibot.IsRedirectPage):
                         content = ''
@@ -853,7 +853,7 @@ class DeadLinkReportThread(threading.Thread):
                         pywikibot.output(color_format(
                             '{lightaqua}** SpamfilterError while trying to '
                             'change {0}: {1}{default}',
-                            talkPage.title(asLink=True), error.url))
+                            talkPage.title(as_link=True), error.url))
 
 
 class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):

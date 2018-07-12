@@ -29,7 +29,7 @@ class TestUserClass(TestCase):
         user = User(self.site, 'Xqt')
         with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
             self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(withNamespace=False), user.username)
+        self.assertEqual(user.title(with_ns=False), user.username)
         self.assertTrue(user.isRegistered())
         self.assertFalse(user.isAnonymous())
         self.assertIsInstance(user.registration(), pywikibot.Timestamp)
@@ -87,7 +87,7 @@ class TestUserClass(TestCase):
         user = User(self.site, '123.45.67.89')
         with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
             self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(withNamespace=False), user.username)
+        self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())
         self.assertTrue(user.isAnonymous())
         self.assertIsNone(user.registration())
@@ -101,7 +101,7 @@ class TestUserClass(TestCase):
         user = User(self.site, 'This user name is not registered yet')
         with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
             self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(withNamespace=False), user.username)
+        self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
         self.assertIsNone(user.registration())
@@ -115,7 +115,7 @@ class TestUserClass(TestCase):
         user = User(self.site, 'Invalid char\x9f in Name')
         with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
             self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(withNamespace=False), user.username)
+        self.assertEqual(user.title(with_ns=False), user.username)
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
         self.assertIsNone(user.registration())
@@ -139,7 +139,7 @@ class TestUserClass(TestCase):
         self.assertEqual('#1242976', user.username)
         with suppress_warnings('pywikibot.page.User.name is deprecated'):
             self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(withNamespace=False), user.username[1:])
+        self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
         self.assertIsNone(user.registration())
@@ -159,7 +159,7 @@ class TestUserClass(TestCase):
         self.assertEqual('#1242976', user.username)
         with suppress_warnings('pywikibot.page.User.name is deprecated'):
             self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(withNamespace=False), user.username[1:])
+        self.assertEqual(user.title(with_ns=False), user.username[1:])
         self.assertFalse(user.isRegistered())
         self.assertFalse(user.isAnonymous())
         self.assertIsNone(user.registration())

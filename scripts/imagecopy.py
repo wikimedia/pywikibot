@@ -252,7 +252,7 @@ class imageTransfer(threading.Thread):
         """Run the bot."""
         tosend = {'language': self.imagePage.site.lang.encode('utf-8'),
                   'image': self.imagePage.title(
-                      withNamespace=False).encode('utf-8'),
+                      with_ns=False).encode('utf-8'),
                   'newname': self.newname.encode('utf-8'),
                   'project': self.imagePage.site.family.name.encode('utf-8'),
                   'username': '',
@@ -315,7 +315,7 @@ class imageTransfer(threading.Thread):
             commentText = i18n.twtranslate(
                 self.imagePage.site,
                 'commons-file-now-available',
-                {'localfile': self.imagePage.title(withNamespace=False),
+                {'localfile': self.imagePage.title(with_ns=False),
                  'commonsfile': self.newname})
 
             pywikibot.showDiff(self.imagePage.get(), imtxt + addTemplate)
@@ -327,15 +327,15 @@ class imageTransfer(threading.Thread):
             moveSummary = i18n.twtranslate(
                 self.imagePage.site,
                 'commons-file-moved',
-                {'localfile': self.imagePage.title(withNamespace=False),
+                {'localfile': self.imagePage.title(with_ns=False),
                  'commonsfile': self.newname})
 
             # If the image is uploaded under a different name, replace all
             # instances
-            if self.imagePage.title(withNamespace=False) != self.newname:
+            if self.imagePage.title(with_ns=False) != self.newname:
                 imagebot = ImageRobot(
                     generator=self.preloadingGen,
-                    oldImage=self.imagePage.title(withNamespace=False),
+                    oldImage=self.imagePage.title(with_ns=False),
                     newImage=self.newname,
                     summary=moveSummary, always=True, loose=True)
                 imagebot.run()
@@ -535,7 +535,7 @@ def main(*args):
                     (datetime, username, resolution, size,
                      comment) = imagepage.getFileVersionHistory().pop()
                 if always:
-                    newname = imagepage.title(withNamespace=False)
+                    newname = imagepage.title(with_ns=False)
                     CommonsPage = pywikibot.Page(pywikibot.Site('commons',
                                                                 'commons'),
                                                  u'File:%s' % newname)
@@ -545,7 +545,7 @@ def main(*args):
                     while True:
                         # Do the TkdialogIC to accept/reject and change te name
                         (newname, skip) = TkdialogIC(
-                            imagepage.title(withNamespace=False),
+                            imagepage.title(with_ns=False),
                             imagepage.get(), username,
                             imagepage.permalink(with_protocol=True),
                             imagepage.templates()).getnewname()
@@ -557,7 +557,7 @@ def main(*args):
                         # Did we enter a new name?
                         if len(newname) == 0:
                             # Take the old name
-                            newname = imagepage.title(withNamespace=False)
+                            newname = imagepage.title(with_ns=False)
                         else:
                             newname = newname.decode('utf-8')
 

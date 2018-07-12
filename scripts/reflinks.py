@@ -438,7 +438,7 @@ class ReferencesRobot(Bot):
                 self.stop_page_rev_id = self.stop_page.latest_revision_id
             else:
                 pywikibot.warning('The stop page %s does not exist'
-                                  % self.stop_page.title(asLink=True))
+                                  % self.stop_page.title(as_link=True))
 
         # Regex to grasp content-type meta HTML tag in HTML source
         self.META_CONTENT = re.compile(br'(?i)<meta[^>]*content\-type[^>]*>')
@@ -513,15 +513,15 @@ class ReferencesRobot(Bot):
                 new_text = page.get()
                 if not page.canBeEdited():
                     pywikibot.output(u"You can't edit page %s"
-                                     % page.title(asLink=True))
+                                     % page.title(as_link=True))
                     continue
             except pywikibot.NoPage:
                 pywikibot.output('Page {} not found'
-                                 .format(page.title(asLink=True)))
+                                 .format(page.title(as_link=True)))
                 continue
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u'Page %s is a redirect'
-                                 % page.title(asLink=True))
+                                 % page.title(as_link=True))
                 continue
 
             # for each link to change
@@ -589,7 +589,7 @@ class ReferencesRobot(Bot):
                     if f.status != requests.codes.ok:
                         pywikibot.output(u'HTTP error (%s) for %s on %s'
                                          % (f.status, ref.url,
-                                            page.title(asLink=True)),
+                                            page.title(as_link=True)),
                                          toStdout=True)
                         # 410 Gone, indicates that the resource has been
                         # purposely removed
@@ -607,7 +607,7 @@ class ReferencesRobot(Bot):
                     # in [[fr:Cyanure]]
                     pywikibot.output(color_format(
                         '{lightred}Bad link{default} : {0} in {1}',
-                        ref.url, page.title(asLink=True)))
+                        ref.url, page.title(as_link=True)))
                     continue
                 except (URLError,
                         socket.error,
@@ -756,7 +756,7 @@ class ReferencesRobot(Bot):
                     if actual_rev != self.stop_page_rev_id:
                         pywikibot.output(
                             '%s has been edited : Someone wants us to stop.'
-                            % self.stop_page.title(asLink=True))
+                            % self.stop_page.title(as_link=True))
                         return
 
 

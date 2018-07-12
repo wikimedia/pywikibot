@@ -281,7 +281,7 @@ def generate_transclusions(site, template, namespaces=[]):
     """
     pywikibot.output(u'Fetching template transclusions...')
     transclusion_page = pywikibot.Page(site, template, ns=10)
-    return transclusion_page.getReferences(onlyTemplateInclusion=True,
+    return transclusion_page.getReferences(only_template_inclusion=True,
                                            follow_redirects=False,
                                            namespaces=namespaces)
 
@@ -298,7 +298,7 @@ def template_title_regex(tpl_page):
     """
     ns = tpl_page.site.namespaces[tpl_page.namespace()]
     marker = '?' if ns.id == 10 else ''
-    title = tpl_page.title(withNamespace=False)
+    title = tpl_page.title(with_ns=False)
     if ns.case != 'case-sensitive':
         title = '[%s%s]%s' % (re.escape(title[0].upper()),
                               re.escape(title[0].lower()),
@@ -587,7 +587,7 @@ class PageArchiver(object):
     def attr2text(self):
         """Return a template with archiver saveable attributes."""
         return '{{%s\n%s\n}}' \
-               % (self.tpl.title(withNamespace=(self.tpl.namespace() != 10)),
+               % (self.tpl.title(with_ns=(self.tpl.namespace() != 10)),
                   '\n'.join('|%s = %s' % (a, self.get_attr(a))
                             for a in self.saveables()))
 
@@ -721,7 +721,7 @@ class PageArchiver(object):
             self.comment_params['count'] = self.archived_threads
             comma = self.site.mediawiki_message('comma-separator')
             self.comment_params['archives'] \
-                = comma.join(a.title(asLink=True)
+                = comma.join(a.title(as_link=True)
                              for a in self.archives.values())
             self.comment_params['why'] = comma.join(whys)
             comment = i18n.twtranslate(self.site.code,

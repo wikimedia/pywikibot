@@ -47,13 +47,13 @@ class TouchBot(MultipleSitesBot):
             page.touch(botflag=self.getOption('botflag'))
         except pywikibot.NoPage:
             pywikibot.error(u"Page %s does not exist."
-                            % page.title(asLink=True))
+                            % page.title(as_link=True))
         except pywikibot.LockedPage:
             pywikibot.error(u"Page %s is locked."
-                            % page.title(asLink=True))
+                            % page.title(as_link=True))
         except pywikibot.PageNotSaved:
             pywikibot.error(u"Page %s not saved."
-                            % page.title(asLink=True))
+                            % page.title(as_link=True))
 
 
 class PurgeBot(MultipleSitesBot):
@@ -63,7 +63,7 @@ class PurgeBot(MultipleSitesBot):
     def treat(self, page):
         """Purge the given page."""
         pywikibot.output(u'Page %s%s purged'
-                         % (page.title(asLink=True),
+                         % (page.title(as_link=True),
                             "" if page.purge() else " not"))
 
 

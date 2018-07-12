@@ -242,16 +242,16 @@ class CommonscatBot(Bot):
         """Load the given page, do some changes, and save it."""
         if not page.exists():
             pywikibot.output(u'Page %s does not exist. Skipping.'
-                             % page.title(asLink=True))
+                             % page.title(as_link=True))
         elif page.isRedirectPage():
             pywikibot.output(u'Page %s is a redirect. Skipping.'
-                             % page.title(asLink=True))
+                             % page.title(as_link=True))
         elif page.isCategoryRedirect():
             pywikibot.output(u'Page %s is a category redirect. Skipping.'
-                             % page.title(asLink=True))
+                             % page.title(as_link=True))
         elif page.isDisambig():
             pywikibot.output(u'Page %s is a disambiguation. Skipping.'
-                             % page.title(asLink=True))
+                             % page.title(as_link=True))
         else:
             self.addCommonscat(page)
 
@@ -275,11 +275,11 @@ class CommonscatBot(Bot):
             for template in ignoreTemplates[page.site.code]:
                 if not isinstance(template, tuple):
                     for pageTemplate in templatesInThePage:
-                        if pageTemplate.title(withNamespace=False) == template:
+                        if pageTemplate.title(with_ns=False) == template:
                             return True
                 else:
                     for (inPageTemplate, param) in templatesWithParams:
-                        if inPageTemplate.title(withNamespace=False) == template[0] \
+                        if inPageTemplate.title(with_ns=False) == template[0] \
                            and template[1] in param[0].replace(' ', ''):
                             return True
         return False
@@ -353,12 +353,12 @@ class CommonscatBot(Bot):
         if not linktitle and (page.title().lower() in oldcat.lower() or
                               oldcat.lower() in page.title().lower()):
             linktitle = oldcat
-        if linktitle and newcat != page.title(withNamespace=False):
+        if linktitle and newcat != page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s|%s|%s}}' % (newtemplate, newcat, linktitle),
                              page.get())
-        elif newcat == page.title(withNamespace=False):
+        elif newcat == page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'
                              % oldtemplate,
                              u'{{%s}}' % newtemplate,
@@ -425,7 +425,7 @@ class CommonscatBot(Bot):
         commonscatNote = u''
         # See if commonscat is present
         for template in wikipediaPage.templatesWithParams():
-            templateTitle = template[0].title(withNamespace=False)
+            templateTitle = template[0].title(with_ns=False)
             if templateTitle == primaryCommonscat \
                or templateTitle in commonscatAlternatives:
                 commonscatTemplate = templateTitle
@@ -436,7 +436,7 @@ class CommonscatBot(Bot):
                     if len(template[1]) > 2:
                         commonscatNote = template[1][2]
                 else:
-                    commonscatTarget = wikipediaPage.title(withNamespace=False)
+                    commonscatTarget = wikipediaPage.title(with_ns=False)
                 return (commonscatTemplate, commonscatTarget,
                         commonscatLinktext, commonscatNote)
         return None
@@ -480,18 +480,20 @@ class CommonscatBot(Bot):
             elif commonsPage.isRedirectPage():
                 pywikibot.log(u"getCommonscat: The category is a redirect")
                 return self.checkCommonscatLink(
-                    commonsPage.getRedirectTarget().title(withNamespace=False))
+                    commonsPage.getRedirectTarget().title(with_ns=False))
             elif "Category redirect" in commonsPage.templates():
                 pywikibot.log(u"getCommonscat: The category is a category redirect")
                 for template in commonsPage.templatesWithParams():
-                    if (template[0].title(withNamespace=False) == "Category redirect" and
-                            len(template[1]) > 0):
+                    if (
+                        template[0].title(with_ns=False) == 'Category redirect'
+                        and len(template[1]) > 0
+                    ):
                         return self.checkCommonscatLink(template[1][0])
             elif commonsPage.isDisambig():
                 pywikibot.log(u"getCommonscat: The category is disambiguation")
                 return u''
             else:
-                return commonsPage.title(withNamespace=False)
+                return commonsPage.title(with_ns=False)
         except pywikibot.BadTitle:
             # Funky title so not correct
             return u''
@@ -533,7 +535,7 @@ def main(*args):
                 site.code)
         template_page = pywikibot.Page(site, u'Template:' + primaryCommonscat)
         generator = template_page.getReferences(namespaces=14,
-                                                onlyTemplateInclusion=True)
+                                                only_template_inclusion=True)
     else:
         generator = genFactory.getCombinedGenerator()
 

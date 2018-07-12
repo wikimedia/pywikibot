@@ -113,13 +113,13 @@ class TestDeletionBot(ScriptMainTestCase):
 
 def delete_dummy(self, reason, prompt, mark, quit):
     """Dummy delete method."""
-    TestDeletionBot.delete_args = [self.title(asLink=True), reason, prompt,
+    TestDeletionBot.delete_args = [self.title(as_link=True), reason, prompt,
                                    mark, quit]
 
 
 def undelete_dummy(self, reason):
     """Dummy undelete method."""
-    TestDeletionBot.undelete_args = [self.title(asLink=True), reason]
+    TestDeletionBot.undelete_args = [self.title(as_link=True), reason]
 
 
 if __name__ == '__main__':  # pragma: no cover

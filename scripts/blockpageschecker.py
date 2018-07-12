@@ -291,7 +291,7 @@ def main(*args):
         generator = pagegenerators.PreloadingGenerator(generator,
                                                        groupsize=60)
     for page in generator:
-        pagename = page.title(asLink=True)
+        pagename = page.title(as_link=True)
         pywikibot.output('Loading %s...' % pagename)
         try:
             text = page.text

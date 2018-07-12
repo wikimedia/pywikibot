@@ -152,8 +152,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                                                                  section):
                         pywikibot.warning(
                             'Section #{0} not found on page {1}'.format(
-                                section, target.title(asLink=True,
-                                                      withSection=False)))
+                                section, target.title(as_link=True,
+                                                      with_section=False)))
                         continue
             else:
                 continue

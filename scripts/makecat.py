@@ -69,7 +69,7 @@ def include(pl, checklinks=True, realinclude=True, linkterm=None, summary=''):
     cl = checklinks
     if linkterm:
         actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
-                                              sortKey=linkterm)
+                                              sort_key=linkterm)
     else:
         actualworkingcat = workingcat
     if realinclude:

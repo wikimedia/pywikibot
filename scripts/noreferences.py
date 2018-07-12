@@ -689,24 +689,24 @@ class NoReferencesBot(Bot):
                 text = page.text
             except pywikibot.NoPage:
                 pywikibot.warning('Page %s does not exist?!'
-                                  % page.title(asLink=True))
+                                  % page.title(as_link=True))
                 continue
             except pywikibot.IsRedirectPage:
                 pywikibot.output(u"Page %s is a redirect; skipping."
-                                 % page.title(asLink=True))
+                                 % page.title(as_link=True))
                 continue
             except pywikibot.LockedPage:
                 pywikibot.warning('Page %s is locked?!'
-                                  % page.title(asLink=True))
+                                  % page.title(as_link=True))
                 continue
             if page.isDisambig():
                 pywikibot.output(u"Page %s is a disambig; skipping."
-                                 % page.title(asLink=True))
+                                 % page.title(as_link=True))
                 continue
             if self.site.sitename == 'wikipedia:en' and page.isIpEdit():
                 pywikibot.warning(
                     u"Page %s is edited by IP. Possible vandalized"
-                    % page.title(asLink=True))
+                    % page.title(as_link=True))
                 continue
             if self.lacksReferences(text):
                 newText = self.addReferences(text)
@@ -714,14 +714,14 @@ class NoReferencesBot(Bot):
                     self.userPut(page, page.text, newText, summary=self.comment)
                 except pywikibot.EditConflict:
                     pywikibot.warning('Skipping %s because of edit conflict'
-                                      % page.title(asLink=True))
+                                      % page.title(as_link=True))
                 except pywikibot.SpamfilterError as e:
                     pywikibot.warning(
                         u'Cannot change %s because of blacklist entry %s'
-                        % (page.title(asLink=True), e.url))
+                        % (page.title(as_link=True), e.url))
                 except pywikibot.LockedPage:
                     pywikibot.warning('Skipping %s (locked page)' %
-                                      page.title(asLink=True))
+                                      page.title(as_link=True))
 
 
 def main(*args):

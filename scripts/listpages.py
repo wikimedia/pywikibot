@@ -245,7 +245,7 @@ def main(*args):
                 additional_text='Page {0} already exists.\n'
                                 'You can use the -overwrite argument to '
                                 'replace the content of this page.'
-                                .format(page_target.title(asLink=True)))
+                                .format(page_target.title(as_link=True)))
             return False
         if re.match('^[a-z_-]+$', summary):
             summary = i18n.twtranslate(site, summary)

@@ -82,7 +82,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
 
         item.get(force=True)
 
-        end_date = pywikibot.page.Claim(testsite, 'P88', isQualifier=True)
+        end_date = pywikibot.page.Claim(testsite, 'P88', is_qualifier=True)
         end_date.setTarget(pywikibot.WbTime(year=2012))
         item.claims['P115'][0].addQualifier(end_date)
 
@@ -102,7 +102,7 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
 
         item.get(force=True)
 
-        end_date = pywikibot.page.Claim(testsite, 'P88', isQualifier=True)
+        end_date = pywikibot.page.Claim(testsite, 'P88', is_qualifier=True)
         end_date.setTarget(pywikibot.WbTime(year=2012))
         item.claims['P115'][0].addQualifier(end_date)
 
@@ -389,11 +389,11 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
 
         item.get(force=True)
 
-        qual_1 = pywikibot.page.Claim(testsite, 'P88', isQualifier=True)
+        qual_1 = pywikibot.page.Claim(testsite, 'P88', is_qualifier=True)
         qual_1.setTarget(pywikibot.WbTime(year=2012))
         item.claims['P115'][0].addQualifier(qual_1)
 
-        qual_2 = pywikibot.page.Claim(testsite, 'P580', isQualifier=True)
+        qual_2 = pywikibot.page.Claim(testsite, 'P580', is_qualifier=True)
         qual_2.setTarget(pywikibot.ItemPage(testsite, 'Q67'))
         item.claims['P115'][0].addQualifier(qual_2)
 

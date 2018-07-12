@@ -194,7 +194,7 @@ class TestProofreadPageValidSite(TestCase):
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid['title'])
         fixed_source = pywikibot.Page(self.site,
-                                      source.title(withNamespace=False),
+                                      source.title(with_ns=False),
                                       ns=self.site.proofread_page_ns)
         page = ProofreadPage(fixed_source)
         self.assertEqual(page.title(), fixed_source.title())
@@ -216,9 +216,9 @@ class TestProofreadPageValidSite(TestCase):
         source = pywikibot.Link(
             self.valid['title'],
             source=self.site,
-            defaultNamespace=self.site.proofread_page_ns)
+            default_namespace=self.site.proofread_page_ns)
         page = ProofreadPage(source)
-        self.assertEqual(page.title(withNamespace=False), source.title)
+        self.assertEqual(page.title(with_ns=False), source.title)
         self.assertEqual(page.namespace(), source.namespace)
 
     def test_valid_parsing(self):
@@ -435,9 +435,9 @@ class TestIndexPageValidSite(IndexPageTestCase):
         """Test IndexPage from valid Link as source."""
         source = pywikibot.Link(self.valid_index_title,
                                 source=self.site,
-                                defaultNamespace=self.site.proofread_page_ns)
+                                default_namespace=self.site.proofread_page_ns)
         page = IndexPage(source)
-        self.assertEqual(page.title(withNamespace=False), source.title)
+        self.assertEqual(page.title(with_ns=False), source.title)
         self.assertEqual(page.namespace(), source.namespace)
 
 

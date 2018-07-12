@@ -161,7 +161,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
                 self.refs[item].get(force=True)   # load all page contents
             except pywikibot.NoPage:
                 pywikibot.error("The configuation page %s doesn't exists"
-                                % self.refs[item].title(asLink=True))
+                                % self.refs[item].title(as_link=True))
                 raise
         # init background timer
         pywikibot.output(u'** Starting crontab background timer thread')
