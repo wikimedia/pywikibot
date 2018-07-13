@@ -571,24 +571,24 @@ def cherry_pick(oldtext, newtext, n=0, by_letter=False):
     by_letter: if text_a and text_b are single lines, comparison can be done
 
     """
-    FORMAT = '{2}{lightpurple}{0:{1}^50}{default}{2}'
+    template = '{2}{lightpurple}{0:{1}^50}{default}{2}'
 
     patch = PatchManager(oldtext, newtext, context=n, by_letter=by_letter)
-    pywikibot.output(color_format(FORMAT, '  ALL CHANGES  ', '*', '\n'))
+    pywikibot.output(color_format(template, '  ALL CHANGES  ', '*', '\n'))
 
     for hunk in patch.hunks:
         pywikibot.output(hunk.diff_text)
-    pywikibot.output(color_format(FORMAT, '  REVIEW CHANGES  ', '*', '\n'))
+    pywikibot.output(color_format(template, '  REVIEW CHANGES  ', '*', '\n'))
 
     text_list = patch.apply()
-    pywikibot.output(color_format(FORMAT, '  APPROVED CHANGES  ', '*', '\n'))
+    pywikibot.output(color_format(template, '  APPROVED CHANGES  ', '*', '\n'))
 
     if any(hunk.reviewed == hunk.APPR for hunk in patch.hunks):
         for hunk in patch.hunks:
             if hunk.reviewed == hunk.APPR:
                 pywikibot.output(hunk.diff_text)
     else:
-        pywikibot.output(color_format(FORMAT, 'None.', '', ''))
+        pywikibot.output(color_format(template, 'None.', '', ''))
 
     text = ''.join(text_list)
 

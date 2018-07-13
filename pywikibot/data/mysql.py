@@ -57,8 +57,6 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
     @type verbose: None or bool
     @return: generator which yield tuples
     """
-    CHARSET = 'utf8'
-
     # These are specified in config2.py or user-config.py
     if verbose is None:
         verbose = config.verbose_output
@@ -72,7 +70,7 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
     conn = mysqldb.connect(config.db_hostname,
                            db=config.db_name_format.format(dbname),
                            port=config.db_port,
-                           charset=CHARSET,
+                           charset='utf8',
                            **credentials)
 
     cursor = conn.cursor()
