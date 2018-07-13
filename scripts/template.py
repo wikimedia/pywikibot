@@ -157,21 +157,21 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
         # regular expression to find the original template.
         # {{vfd}} does the same thing as {{Vfd}}, so both will be found.
         # The old syntax, {{msg:vfd}}, will also be found.
-        templatePatterns = []
+        template_patterns = []
         for template in self.templates:
-            templatePattern = template.title(with_ns=False)
+            template_pattern = template.title(with_ns=False)
             if mysite.namespaces[10].case == 'first-letter':
-                templatePattern = '[%s%s]%s' % (templatePattern[0].upper(),
-                                                templatePattern[0].lower(),
-                                                templatePattern[1:])
-            templatePattern = re.sub(' ', '[_ ]', templatePattern)
-            templatePatterns.append(templatePattern)
-        templateRegex = re.compile(
+                template_pattern = '[%s%s]%s' % (
+                    template_pattern[0].upper(), template_pattern[0].lower(),
+                    template_pattern[1:])
+            template_pattern = re.sub(' ', '[_ ]', template_pattern)
+            template_patterns.append(template_pattern)
+        template_regex = re.compile(
             r'\{\{ *([mM][sS][gG]:)?(?:%s) *(?P<parameters>\|[^}]+|) *}}'
-            % '|'.join(templatePatterns))
+            % '|'.join(template_patterns))
 
         super(XmlDumpTemplatePageGenerator, self).__init__(
-            xmlfilename, site=mysite, text_predicate=templateRegex.search)
+            xmlfilename, site=mysite, text_predicate=template_regex.search)
 
 
 class TemplateRobot(ReplaceBot):
@@ -220,30 +220,30 @@ class TemplateRobot(ReplaceBot):
         exceptions = {}
         builder = textlib._MultiTemplateMatchBuilder(self.site)
         for old, new in self.templates.items():
-            templateRegex = builder.pattern(old)
+            template_regex = builder.pattern(old)
 
             if self.getOption('subst') and self.getOption('remove'):
-                replacements.append((templateRegex,
+                replacements.append((template_regex,
                                      r'{{subst:%s\g<parameters>}}' % new))
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
             elif self.getOption('subst'):
-                replacements.append((templateRegex,
+                replacements.append((template_regex,
                                      r'{{subst:%s\g<parameters>}}' % old))
                 exceptions['inside-tags'] = ['ref', 'gallery', 'poem',
                                              'pagelist', ]
             elif self.getOption('remove'):
                 separate_line_regex = re.compile(
-                    r'^[*#:]* *{0} *\n'.format(templateRegex.pattern),
+                    r'^[*#:]* *{0} *\n'.format(template_regex.pattern),
                     re.DOTALL | re.MULTILINE)
                 replacements.append((separate_line_regex, ''))
 
                 spaced_regex = re.compile(
-                    r' +{0} +'.format(templateRegex.pattern),
+                    r' +{0} +'.format(template_regex.pattern),
                     re.DOTALL)
                 replacements.append((spaced_regex, ' '))
 
-                replacements.append((templateRegex, ''))
+                replacements.append((template_regex, ''))
             else:
                 template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
@@ -252,7 +252,7 @@ class TemplateRobot(ReplaceBot):
                                               default=False,
                                               automatic_quit=False):
                         continue
-                replacements.append((templateRegex,
+                replacements.append((template_regex,
                                      r'{{%s\g<parameters>}}' % new))
 
         super(TemplateRobot, self).__init__(
@@ -271,7 +271,7 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    templateNames = []
+    template_names = []
     templates = {}
     options = {}
     # If xmlfilename is None, references will be loaded from the live wiki.
@@ -290,7 +290,7 @@ def main(*args):
              ArgumentDeprecationWarning)
 
     site = pywikibot.Site()
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
     for arg in local_args:
         if arg == '-remove':
             options['remove'] = True
@@ -318,45 +318,45 @@ def main(*args):
         elif arg.startswith('-timestamp:'):
             timestamp = arg[len('-timestamp:'):]
         else:
-            if not genFactory.handleArg(arg):
-                templateName = pywikibot.Page(site, arg, ns=10)
-                templateNames.append(templateName.title(with_ns=False))
+            if not gen_factory.handleArg(arg):
+                template_name = pywikibot.Page(site, arg, ns=10)
+                template_names.append(template_name.title(with_ns=False))
 
-    if not templateNames:
+    if not template_names:
         pywikibot.bot.suggest_help(missing_parameters=['templates'])
         return False
 
     if options.get('subst', False) ^ options.get('remove', False):
-        for templateName in templateNames:
-            templates[templateName] = None
+        for template_name in template_names:
+            templates[template_name] = None
     else:
         try:
-            for i in range(0, len(templateNames), 2):
-                templates[templateNames[i]] = templateNames[i + 1]
+            for i in range(0, len(template_names), 2):
+                templates[template_names[i]] = template_names[i + 1]
         except IndexError:
             pywikibot.output('Unless using solely -subst or -remove, '
                              'you must give an even number of template names.')
             return
 
-    oldTemplates = []
-    for templateName in templates.keys():
-        oldTemplate = pywikibot.Page(site, templateName, ns=10)
-        oldTemplates.append(oldTemplate)
+    old_templates = []
+    for template_name in templates.keys():
+        old_template = pywikibot.Page(site, template_name, ns=10)
+        old_templates.append(old_template)
 
     if xmlfilename:
         builder = textlib._MultiTemplateMatchBuilder(site)
-        predicate = builder.search_any_predicate(oldTemplates)
+        predicate = builder.search_any_predicate(old_templates)
 
         gen = XMLDumpPageGenerator(
             xmlfilename, site=site, text_predicate=predicate)
     else:
-        gen = genFactory.getCombinedGenerator()
+        gen = gen_factory.getCombinedGenerator()
 
     if not gen:
         gens = (
             pagegenerators.ReferringPageGenerator(t,
                                                   onlyTemplateInclusion=True)
-            for t in oldTemplates
+            for t in old_templates
         )
         gen = chain(*gens)
         gen = pagegenerators.DuplicateFilterPageGenerator(gen)
@@ -366,11 +366,11 @@ def main(*args):
                                                      max_revision_depth=100,
                                                      show_filtered=True)
 
-    if not genFactory.gens:
+    if not gen_factory.gens:
         # make sure that proper namespace filtering etc. is handled
-        gen = genFactory.getCombinedGenerator(gen)
+        gen = gen_factory.getCombinedGenerator(gen)
 
-    if not genFactory.nopreload:
+    if not gen_factory.nopreload:
         gen = pagegenerators.PreloadingGenerator(gen)
 
     bot = TemplateRobot(gen, templates, site=site, **options)
