@@ -12,7 +12,7 @@ If no starting name is provided, the bot starts at '!'.
 """
 #
 # (C) André Engels, 2006-2009
-# (C) Pywikibot team, 2006-2017
+# (C) Pywikibot team, 2006-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,15 +41,16 @@ class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):
         return replace_callback
 
     def treat_page(self):
-        """Iterate over the linked pages and replace redirects conditionally."""
+        """Iterate over linked pages and replace redirects conditionally."""
         text = self.current_page.text
         for linked_page in self.current_page.linkedPages():
             try:
                 target = linked_page.getRedirectTarget()
             except (pywikibot.Error, pywikibot.SectionError):
                 continue
-            # TODO: Work on all links at the same time (would mean that the user
-            # doesn't get them ordered like in links but how they appear in the page)
+            # TODO: Work on all links at the same time (would mean that the
+            # user doesn't get them ordered like in links but how they appear
+            # in the page)
             text = textlib.replace_links(
                 text, self._create_callback(linked_page, target),
                 self.current_page.site)
@@ -85,5 +86,5 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

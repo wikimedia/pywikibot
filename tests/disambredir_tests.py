@@ -5,7 +5,7 @@ DisambigurationRedirectBot test.
 These tests write to the wiki.
 """
 #
-# (C) Pywikibot team, 2015
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,9 +25,9 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
     """
     Test cases for DisambigurationRedirectBot.
 
-    It patches the bot instances in such a way that there is no user interaction
-    required and it can be run autonomously. It also does not actually write to
-    the wiki.
+    It patches the bot instances in such a way that there is no user
+    interaction required and it can be run autonomously. It also does not
+    actually write to the wiki.
     """
 
     family = 'wikipedia'
@@ -133,12 +133,13 @@ class TestDisambigurationRedirectBot(FakeSaveBotTestCase, TWNBotTestCase):
         """Test replacing target including section."""
         self._patch_create_callback('s')
         self.bot.run()
-        self.assertEqual(self.page.text,
-                         '[[Main Page|Bar]]\n'
-                         '[[Main Page|Baz]]\n'
-                         '[[Main Page#What we do on this wiki|User:BobBot/Redir2]]\n'
-                         '[[Main Page#What we do on this wiki|user:BobBot/Redir2]]\n'
-                         '[[Main Page|Label]]\n')
+        self.assertEqual(
+            self.page.text,
+            '[[Main Page|Bar]]\n'
+            '[[Main Page|Baz]]\n'
+            '[[Main Page#What we do on this wiki|User:BobBot/Redir2]]\n'
+            '[[Main Page#What we do on this wiki|user:BobBot/Redir2]]\n'
+            '[[Main Page|Label]]\n')
 
     def test_replace_all(self):
         """Test replacing target including section and label."""

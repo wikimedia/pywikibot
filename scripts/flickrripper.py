@@ -90,7 +90,7 @@ def getPhoto(flickr, photo_id):
             # xml.etree.ElementTree.dump(photoSizes)
             return photoInfo, photoSizes
         except flickrapi.exceptions.FlickrError:
-            pywikibot.output(u'Flickr api problem, sleeping')
+            pywikibot.output('Flickr api problem, sleeping')
             pywikibot.sleep(30)
 
 
@@ -169,14 +169,14 @@ def getFlinfoDescription(photo_id):
         'http://wikipedia.ramselehof.de/flinfo.php?%s' % parameters).text
 
 
-def getFilename(photoInfo, site=None, project=u'Flickr'):
+def getFilename(photoInfo, site=None, project='Flickr'):
     """Build a good filename for the upload based on the username and title.
 
     Prevents naming collisions.
 
     """
     if not site:
-        site = pywikibot.Site(u'commons', u'commons')
+        site = pywikibot.Site('commons', 'commons')
     username = photoInfo.find('photo').find('owner').attrib['username']
     title = photoInfo.find('photo').find('title').text
     if title:
@@ -196,10 +196,10 @@ def getFilename(photoInfo, site=None, project=u'Flickr'):
                 description = description[:items]
             title = cleanUpTitle(description)
         else:
-            title = u''
+            title = ''
             # Should probably have the id of the photo as last resort.
 
-    if pywikibot.Page(site, u'File:%s - %s - %s.jpg'
+    if pywikibot.Page(site, 'File:%s - %s - %s.jpg'
                       % (title, project, username)).exists():
         i = 1
         while True:
@@ -209,7 +209,7 @@ def getFilename(photoInfo, site=None, project=u'Flickr'):
             else:
                 return name
     else:
-        return u'%s - %s - %s.jpg' % (title, project, username)
+        return '{} - {} - {}.jpg'.format(title, project, username)
 
 
 def cleanUpTitle(title):
@@ -239,43 +239,44 @@ def cleanUpTitle(title):
     return title
 
 
-def buildDescription(flinfoDescription=u'', flickrreview=False, reviewer=u'',
-                     override=u'', addCategory=u'', removeCategories=False):
+def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
+                     override='', addCategory='', removeCategories=False):
     """Build the final description for the image.
 
     The description is based on the info from flickrinfo and improved.
 
     """
-    description = u'== {{int:filedesc}} ==\n%s' % flinfoDescription
+    description = '== {{int:filedesc}} ==\n%s' % flinfoDescription
     if removeCategories:
         description = textlib.removeCategoryLinks(description,
                                                   pywikibot.Site(
                                                       'commons', 'commons'))
     if override:
-        description = description.replace(u'{{cc-by-sa-2.0}}\n', u'')
-        description = description.replace(u'{{cc-by-2.0}}\n', u'')
-        description = description.replace(u'{{flickrreview}}\n', u'')
+        description = description.replace('{{cc-by-sa-2.0}}\n', '')
+        description = description.replace('{{cc-by-2.0}}\n', '')
+        description = description.replace('{{flickrreview}}\n', '')
         description = description.replace(
             '{{copyvio|Flickr, licensed as "All Rights Reserved" which is not '
             'a free license --~~~~}}\n',
             '')
-        description = description.replace(u'=={{int:license}}==',
-                                          u'=={{int:license}}==\n' + override)
+        description = description.replace('=={{int:license}}==',
+                                          '=={{int:license}}==\n' + override)
     elif flickrreview:
         if reviewer:
             description = description.replace(
                 '{{flickrreview}}',
                 '{{flickrreview|' + reviewer +
-                '|{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-{{subst:CURRENTDAY2}}}}')
+                '|{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}'
+                '-{{subst:CURRENTDAY2}}}}')
     if addCategory:
-        description = description.replace(u'{{subst:unc}}\n', u'')
-        description = description + u'\n[[Category:' + addCategory + ']]\n'
-    description = description.replace(u'\r\n', u'\n')
+        description = description.replace('{{subst:unc}}\n', '')
+        description = description + '\n[[Category:' + addCategory + ']]\n'
+    description = description.replace('\r\n', '\n')
     return description
 
 
-def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
-                 override=u'', addCategory=u'', removeCategories=False,
+def processPhoto(flickr, photo_id='', flickrreview=False, reviewer='',
+                 override='', addCategory='', removeCategories=False,
                  autonomous=False):
     """Process a single Flickr photo."""
     if photo_id:
@@ -290,7 +291,8 @@ def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
         # Don't upload duplicate images, should add override option
         duplicates = findDuplicateImages(photo)
         if duplicates:
-            pywikibot.output(u'Found duplicate image at %s' % duplicates.pop())
+            pywikibot.output('Found duplicate image at {}'
+                             .format(duplicates.pop()))
         else:
             filename = getFilename(photoInfo)
             flinfoDescription = getFlinfoDescription(photo_id)
@@ -316,14 +318,11 @@ def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
                 newPhotoDescription = photoDescription
                 newFilename = filename
                 skip = False
-        # pywikibot.output(newPhotoDescription)
-        # if (pywikibot.Page(title=u'File:'+ filename, site=pywikibot.Site()).exists()):
-        # TODO: Check if the hash is the same and if not upload it under a different name
-        # pywikibot.output(u'File:' + filename + u' already exists!')
-        # else:
+
             # Do the actual upload
-            # Would be nice to check before I upload if the file is already at Commons
-            # Not that important for this program, but maybe for derived programs
+            # Would be nice to check before I upload if the file is already at
+            # Commons. Not that important for this program, but maybe for
+            # derived programs
             if not skip:
                 bot = UploadRobot(photoUrl,
                                   description=newPhotoDescription,
@@ -333,12 +332,12 @@ def processPhoto(flickr, photo_id=u'', flickrreview=False, reviewer=u'',
                 bot.upload_image(debug=False)
                 return 1
     else:
-        pywikibot.output(u'Invalid license')
+        pywikibot.output('Invalid license')
     return 0
 
 
-def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
-              start_id='', end_id='', tags=u''):
+def getPhotos(flickr, user_id='', group_id='', photoset_id='',
+              start_id='', end_id='', tags=''):
     """Loop over a set of Flickr photos."""
     found_start_id = not start_id
 
@@ -388,7 +387,7 @@ def getPhotos(flickr, user_id=u'', group_id=u'', photoset_id=u'',
                             yield photo.attrib['id']
             except flickrapi.exceptions.FlickrError:
                 gotPhotos = False
-                pywikibot.output(u'Flickr api problem, sleeping')
+                pywikibot.output('Flickr api problem, sleeping')
                 pywikibot.sleep(30)
 
     return
@@ -400,12 +399,12 @@ def usage():
 
     TODO : Need more.
     """
-    pywikibot.output(
-        u"Flickrripper is a tool to transfer flickr photos to Wikimedia Commons")
-    pywikibot.output(u"-group_id:<group_id>\n")
-    pywikibot.output(u"-photoset_id:<photoset_id>\n")
-    pywikibot.output(u"-user_id:<user_id>\n")
-    pywikibot.output(u"-tags:<tag>\n")
+    pywikibot.output('Flickrripper is a tool to transfer flickr photos to '
+                     'Wikimedia Commons')
+    pywikibot.output('-group_id:<group_id>\n')
+    pywikibot.output('-photoset_id:<photoset_id>\n')
+    pywikibot.output('-user_id:<user_id>\n')
+    pywikibot.output('-tags:<tag>\n')
     return
 
 
@@ -424,22 +423,24 @@ def main(*args):
     if not config.flickr['api_key']:
         pywikibot.output('Flickr api key not found! Get yourself an api key')
         pywikibot.output(
-            'Any flickr user can get a key at https://www.flickr.com/services/api/keys/apply/')
+            'Any flickr user can get a key at '
+            'https://www.flickr.com/services/api/keys/apply/')
         return
 
     if 'api_secret' in config.flickr and config.flickr['api_secret']:
-        flickr = flickrapi.FlickrAPI(config.flickr['api_key'], config.flickr['api_secret'])
+        flickr = flickrapi.FlickrAPI(config.flickr['api_key'],
+                                     config.flickr['api_secret'])
     else:
         pywikibot.output('Accessing public content only')
         flickr = flickrapi.FlickrAPI(config.flickr['api_key'])
 
-    group_id = u''
-    photoset_id = u''
-    user_id = u''
-    start_id = u''
-    end_id = u''
-    tags = u''
-    addCategory = u''
+    group_id = ''
+    photoset_id = ''
+    user_id = ''
+    start_id = ''
+    end_id = ''
+    tags = ''
+    addCategory = ''
     removeCategories = False
     autonomous = False
     totalPhotos = 0
@@ -460,61 +461,62 @@ def main(*args):
     elif 'commons' in config.usernames['commons']:
         reviewer = config.usernames['commons']['commons']
     else:
-        reviewer = u''
+        reviewer = ''
 
     # Should be renamed to overrideLicense or something like that
-    override = u''
+    override = ''
     for arg in local_args:
         if arg.startswith('-group_id'):
             if len(arg) == 9:
-                group_id = pywikibot.input(u'What is the group_id of the pool?')
+                group_id = pywikibot.input('What is the group_id of the pool?')
             else:
                 group_id = arg[10:]
         elif arg.startswith('-photoset_id'):
             if len(arg) == 12:
-                photoset_id = pywikibot.input(u'What is the photoset_id?')
+                photoset_id = pywikibot.input('What is the photoset_id?')
             else:
                 photoset_id = arg[13:]
         elif arg.startswith('-user_id'):
             if len(arg) == 8:
                 user_id = pywikibot.input(
-                    u'What is the user_id of the flickr user?')
+                    'What is the user_id of the flickr user?')
             else:
                 user_id = arg[9:]
         elif arg.startswith('-start_id'):
             if len(arg) == 9:
                 start_id = pywikibot.input(
-                    u'What is the id of the photo you want to start at?')
+                    'What is the id of the photo you want to start at?')
             else:
                 start_id = arg[10:]
         elif arg.startswith('-end_id'):
             if len(arg) == 7:
                 end_id = pywikibot.input(
-                    u'What is the id of the photo you want to end at?')
+                    'What is the id of the photo you want to end at?')
             else:
                 end_id = arg[8:]
         elif arg.startswith('-tags'):
             if len(arg) == 5:
                 tags = pywikibot.input(
-                    u'What is the tag you want to filter out (currently only one supported)?')
+                    'What is the tag you want to filter out (currently only '
+                    'one supported)?')
             else:
                 tags = arg[6:]
         elif arg == '-flickrreview':
             flickrreview = True
         elif arg.startswith('-reviewer'):
             if len(arg) == 9:
-                reviewer = pywikibot.input(u'Who is the reviewer?')
+                reviewer = pywikibot.input('Who is the reviewer?')
             else:
                 reviewer = arg[10:]
         elif arg.startswith('-override'):
             if len(arg) == 9:
-                override = pywikibot.input(u'What is the override text?')
+                override = pywikibot.input('What is the override text?')
             else:
                 override = arg[10:]
         elif arg.startswith('-addcategory'):
             if len(arg) == 12:
                 addCategory = pywikibot.input(
-                    u'What category do you want to add?')
+                    'What category do you want to add?')
             else:
                 addCategory = arg[13:]
         elif arg == '-removecategories':
@@ -531,10 +533,10 @@ def main(*args):
             totalPhotos += 1
     else:
         usage()
-    pywikibot.output(u'Finished running')
-    pywikibot.output(u'Total photos: ' + str(totalPhotos))
-    pywikibot.output(u'Uploaded photos: ' + str(uploadedPhotos))
+    pywikibot.output('Finished running')
+    pywikibot.output('Total photos: ' + str(totalPhotos))
+    pywikibot.output('Uploaded photos: ' + str(uploadedPhotos))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
