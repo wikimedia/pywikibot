@@ -111,8 +111,8 @@ import pywikibot
 
 from pywikibot.date import apply_month_delta
 from pywikibot import i18n
-from pywikibot.textlib import TimeStripper, _get_regexes
-from pywikibot.textlib import to_local_digits
+from pywikibot.textlib import (extract_sections, findmarker, TimeStripper,
+                               to_local_digits)
 from pywikibot.tools import issue_deprecation_warning, FrozenDict
 
 ZERO = datetime.timedelta(0)
@@ -455,46 +455,28 @@ class DiscussionPage(pywikibot.Page):
         self.threads = []
         self.archives = {}
         self.archived_threads = 0
+
+        # Exclude non-thread headings
         text = self.get()
+        marker = findmarker(text)
+        text = re.sub(r'^===', marker + r'===', text, flags=re.M)
 
-        # Replace text in following exceptions by spaces, but don't change line
-        # numbers and character positions
-        exceptions = ['comment', 'code', 'pre', 'source', 'nowiki']
-        exc_regexes = _get_regexes(exceptions, self.site)
-        stripped_text = text
-        for regex in exc_regexes:
-            for match in re.finditer(regex, stripped_text):
-                before = stripped_text[:match.start()]
-                restricted = stripped_text[match.start():match.end()]
-                after = stripped_text[match.end():]
-                restricted = re.sub(r'[^\n]', ' ', restricted)
-                stripped_text = before + restricted + after
-
-        # Find thread headers in stripped text and return their line numbers
-        stripped_lines = stripped_text.split('\n')
-        thread_headers = []
-        for line_number, line in enumerate(stripped_lines, start=1):
-            if re.search(r'^== *[^=].*? *== *$', line):
-                thread_headers.append(line_number)
-        # Fill self by original thread headers on returned line numbers
-        lines = text.split('\n')
-        found = False  # Reading header
-        cur_thread = None
-        for line_number, line in enumerate(lines, start=1):
-            if line_number in thread_headers:
-                thread_header = re.search('^== *([^=].*?) *== *$', line)
-                found = True  # Reading threads now
-                if cur_thread:
-                    self.threads.append(cur_thread)
-                cur_thread = DiscussionThread(thread_header.group(1), self.now,
-                                              self.timestripper)
-            else:
-                if found:
-                    cur_thread.feed_line(line)
-                else:
-                    self.header += line + '\n'
-        if cur_thread:
+        # Find threads, avoid archiving categories or interwiki
+        header, threads, footer = extract_sections(text)
+        header = header.replace(marker, '')
+        if header and footer:
+            self.header = '\n\n'.join((header.rstrip(), footer, ''))
+        else:
+            self.header = header + footer
+        for thread_heading, thread_content in threads:
+            cur_thread = DiscussionThread(thread_heading.strip('= '), self.now,
+                                          self.timestripper)
+            lines = thread_content.replace(marker, '').splitlines()
+            lines = lines[1:]  # remove heading line
+            for line in lines:
+                cur_thread.feed_line(line)
             self.threads.append(cur_thread)
+
         # This extra info is not desirable when run under the unittest
         # framework, which may be run either directly or via setup.py
         if pywikibot.calledModuleName() not in ['archivebot_tests', 'setup']:
