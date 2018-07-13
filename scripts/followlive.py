@@ -107,37 +107,37 @@ templates = {
             'pos': 'top'},
     },
     'fr': {
-        u'{{suppression}}': {
-            'msg': u'à l\'aide du robot: cet article devrait être supprimé',
+        '{{suppression}}': {
+            'msg': "à l'aide du robot: cet article devrait être supprimé",
             'pos': 'top'},
 
-        u'{{à vérifier}}': {
-            'msg': u'à l\'aide du robot: cet article est à vérifier',
+        '{{à vérifier}}': {
+            'msg': "à l'aide du robot: cet article est à vérifier",
             'pos': 'top'},
 
-        u'{{ébauche}}': {
-            'msg': u'à l\'aide du robot: cet article est une ébauche',
+        '{{ébauche}}': {
+            'msg': "à l'aide du robot: cet article est une ébauche",
             'pos': 'top'},
     },
     'he': {
-        u'{{מחק}}': {
-            'msg': u'יש למחוק ערך זה',
+        '{{מחק}}': {
+            'msg': 'יש למחוק ערך זה',
             'pos': 'top'
         },
-        u'{{לשכתב}}': {
-            'msg': u'ערך זה דורש שכתוב',
+        '{{לשכתב}}': {
+            'msg': 'ערך זה דורש שכתוב',
             'pos': 'top'
         },
-        u'{{קצרמר}}': {
-            'msg': u'ערך זה הוא קצרמר',
+        '{{קצרמר}}': {
+            'msg': 'ערך זה הוא קצרמר',
             'pos': 'bottom'
         },
-        u'{{הבהרת חשיבות}}': {
-            'msg': u'חשיבותו של ערך זה אינה ברורה.',
+        '{{הבהרת חשיבות}}': {
+            'msg': 'חשיבותו של ערך זה אינה ברורה.',
             'pos': 'top'
         },
-        u'{{עריכה}}': {
-            'msg': u'ערך זה דורש עריכה',
+        '{{עריכה}}': {
+            'msg': 'ערך זה דורש עריכה',
             'pos': 'top'},
     },
     'ia': {
@@ -154,110 +154,110 @@ templates = {
             'pos': 'bottom'},
     },
     'nl': {
-        u'{{weg}}': {
+        '{{weg}}': {
             'msg': '{weg}',
             'pos': 'top'
         },
-        u'{{nuweg}}': {
+        '{{nuweg}}': {
             'msg': '{nuweg}',
             'pos': 'top'
         },
-        u'{{wiu}}': {
+        '{{wiu}}': {
             'msg': '{wiu}',
             'pos': 'top'
         },
-        u'{{beg}}': {
+        '{{beg}}': {
             'msg': '{beg}',
             'pos': 'bottom'
         },
-        u'{{wikify}}': {
+        '{{wikify}}': {
             'msg': '{wikify}',
             'pos': 'top'
         },
-        u'{{wb}}': {
+        '{{wb}}': {
             'msg': '{wb}',
             'pos': 'top'
         },
     },
     'pl': {
-        u'{{ek}}': {
-            'msg': u'[[Kategoria:Ekspresowe kasowanko|ek]]',
+        '{{ek}}': {
+            'msg': '[[Kategoria:Ekspresowe kasowanko|ek]]',
             'pos': 'top'
         },
-        u'{{dopracować}}': {
-            'msg': u'Dopracować',
+        '{{dopracować}}': {
+            'msg': 'Dopracować',
             'pos': 'top'
         },
-        u'{{linki}}': {
-            'msg': u'Linki wewnętrzne do dodania',
+        '{{linki}}': {
+            'msg': 'Linki wewnętrzne do dodania',
             'pos': 'top'
         },
-        u'{{źródła}}': {
-            'msg': u'W artykule brakuje źródeł',
+        '{{źródła}}': {
+            'msg': 'W artykule brakuje źródeł',
             'pos': 'top'
         },
-        u'{{stub}}': {
-            'msg': u'stub (zalążek)',
+        '{{stub}}': {
+            'msg': 'stub (zalążek)',
             'pos': 'bottom'
         },
     },
     'pt': {
-        u'{{wikificar}}': {
+        '{{wikificar}}': {
             'msg': 'Assistida por bot: {{wikificar}}',
             'pos': 'top'},
 
-        u'{{reciclar}}': {
+        '{{reciclar}}': {
             'msg': 'Assistida por bot: {{reciclar}}',
             'pos': 'top'},
 
-        u'{{lixo|~~~~}}': {
+        '{{lixo|~~~~}}': {
             'msg': 'Assistida por bot: {{lixo}}',
             'pos': 'top'},
 
-        u'{{revisão}}': {
+        '{{revisão}}': {
             'msg': 'Assistida por bot: {{revisão}}',
             'pos': 'top'},
 
-        u'{{impróprio}}': {
+        '{{impróprio}}': {
             'msg': 'Assistida por bot: {{impróprio}}',
             'pos': 'top'},
 
-        u'{{apagar vaidade}}': {
+        '{{apagar vaidade}}': {
             'msg': 'Assistida por bot: {{apagar vaidade}}',
             'pos': 'top'},
     },
     'sv': {
-        u'{{radera}}': {
-            'msg': u'Robotkoll: Artikeln bör raderas',
+        '{{radera}}': {
+            'msg': 'Robotkoll: Artikeln bör raderas',
             'pos': 'top'},
 
-        u'{{städa}}': {
-            'msg': u'Robotkoll: Artikeln bör städas',
+        '{{städa}}': {
+            'msg': 'Robotkoll: Artikeln bör städas',
             'pos': 'top'},
 
-        u'{{stub}}': {
-            'msg': u'Robotkoll: Artikeln är en stubbe',
+        '{{stub}}': {
+            'msg': 'Robotkoll: Artikeln är en stubbe',
             'pos': 'bottom'},
 
-        u'{{subst:relevanskontroll}}': {
+        '{{subst:relevanskontroll}}': {
             'msg': 'Robotkoll: Artikeln bör kollas mot '
                    '[[WP:REL|Wikipedias relevanskriterier]].',
             'pos': 'top'},
 
-        u'{{verifieras}}': {
-            'msg': u'Robotkoll: Artikeln bör verifieras',
+        '{{verifieras}}': {
+            'msg': 'Robotkoll: Artikeln bör verifieras',
             'pos': 'top'},
 
-        u'{{språkvård}}': {
-            'msg': u'Robotkoll: Artikeln bör språkvårdas',
+        '{{språkvård}}': {
+            'msg': 'Robotkoll: Artikeln bör språkvårdas',
             'pos': 'top'},
 
-        u'{{Källor}}': {
-            'msg': u'Robotkoll: Artikeln behöver källor',
+        '{{Källor}}': {
+            'msg': 'Robotkoll: Artikeln behöver källor',
             'pos': 'bottom'},
 
-        u'{{wikify}}': {
-            'msg': u'Robotkoll: Artikeln behöver wikifieras',
+        '{{wikify}}': {
+            'msg': 'Robotkoll: Artikeln behöver wikifieras',
             'pos': 'top'},
     },
     'ur': {
@@ -278,57 +278,57 @@ templates = {
             'pos': 'top'},
     },
     'zh': {
-        u'{{Delete}}': {
-            'msg': u'機器人掛上模板: 本文應被刪除。',
+        '{{Delete}}': {
+            'msg': '機器人掛上模板: 本文應被刪除。',
             'pos': 'top'},
 
-        u'{{subst:Cleanup/auto}}': {
-            'msg': u'機器人掛上模板: 本文需清理',
+        '{{subst:Cleanup/auto}}': {
+            'msg': '機器人掛上模板: 本文需清理',
             'pos': 'top'},
 
-        u'{{subst:Uncategorized/auto}}': {
-            'msg': u'機器人掛上模板:  本頁需要適當的頁面分類',
-            'pos': u'bottom'},
-
-        u'{{subst:Notability/auto}}': {
-            'msg': u'機器人掛上模板:  本條目主題未突顯其知名度或顯著性',
-            'pos': 'top'},
-
-        u'{{subst:refimprove/auto}}': {
-            'msg': u'機器人掛上模板:  本條目参考文献不足',
-            'pos': 'top'},
-
-        u'{{copyedit}}': {
-            'msg': u'機器人掛上模板:  本條目或段落需要校對',
-            'pos': 'top'},
-
-        u'{{subst:Unreferenced/auto}}': {
-            'msg': u'機器人掛上模板:  本條目沒有列出任何參考或來源',
-            'pos': 'top'},
-
-        u'{{subst:wikify/auto}}': {
-            'msg': u'機器人掛上模板:  本條目需要維基化',
-            'pos': 'top'},
-
-        u'{{subst:Notchinese/auto}}': {
-            'msg': u'機器人掛上模板: 本条目没有翻译',
-            'pos': 'top'},
-
-        u'{{subst:Substub/auto}}': {
-            'msg': u'機器人掛上模板:  小小作品',
-            'pos': 'top'},
-
-        u'{{stub}}': {
-            'msg': u'機器人掛上模板: 本文是小作品',
+        '{{subst:Uncategorized/auto}}': {
+            'msg': '機器人掛上模板:  本頁需要適當的頁面分類',
             'pos': 'bottom'},
-        u'{{notchinesetitle}}': {
-            'msg': u'機器人掛上模板: 本条目名称需要翻译成中文',
+
+        '{{subst:Notability/auto}}': {
+            'msg': '機器人掛上模板:  本條目主題未突顯其知名度或顯著性',
             'pos': 'top'},
-        u'{{subst:Translating/auto}}': {
-            'msg': u'機器人掛上模板: 本条目没有翻译完成',
+
+        '{{subst:refimprove/auto}}': {
+            'msg': '機器人掛上模板:  本條目参考文献不足',
             'pos': 'top'},
-        u'{{fansite}}': {
-            'msg': u'機器人掛上模板: 本条目內容類似愛好者網站',
+
+        '{{copyedit}}': {
+            'msg': '機器人掛上模板:  本條目或段落需要校對',
+            'pos': 'top'},
+
+        '{{subst:Unreferenced/auto}}': {
+            'msg': '機器人掛上模板:  本條目沒有列出任何參考或來源',
+            'pos': 'top'},
+
+        '{{subst:wikify/auto}}': {
+            'msg': '機器人掛上模板:  本條目需要維基化',
+            'pos': 'top'},
+
+        '{{subst:Notchinese/auto}}': {
+            'msg': '機器人掛上模板: 本条目没有翻译',
+            'pos': 'top'},
+
+        '{{subst:Substub/auto}}': {
+            'msg': '機器人掛上模板:  小小作品',
+            'pos': 'top'},
+
+        '{{stub}}': {
+            'msg': '機器人掛上模板: 本文是小作品',
+            'pos': 'bottom'},
+        '{{notchinesetitle}}': {
+            'msg': '機器人掛上模板: 本条目名称需要翻译成中文',
+            'pos': 'top'},
+        '{{subst:Translating/auto}}': {
+            'msg': '機器人掛上模板: 本条目没有翻译完成',
+            'pos': 'top'},
+        '{{fansite}}': {
+            'msg': '機器人掛上模板: 本条目內容類似愛好者網站',
             'pos': 'top'},
 
     },
@@ -336,7 +336,7 @@ templates = {
 
 # do nothing if this is in it
 done = {
-    'ar': (u'{{شطب}}', u'{{حذف}}', u'{{خرق}}'),
+    'ar': ('{{شطب}}', '{{حذف}}', '{{خرق}}'),
     'en': ('{{VfD}}', '{{AfD}}', '{{AfD1}}', '{{cleanup}}', '{{nonsense}}',
            '{{deletedpage}}', '{{db-reason}}', '{{notability}}',
            '{{not verified}}', '{{unreferenced}}', '{{db-empty}}',
@@ -360,21 +360,21 @@ done = {
            '{{db-contact}}', '{{db-i2}}', '{{db-i1}}', '{{communityuseonly}}',
            '{{db-disparage}}', '{{db-web}}', '{{db-userreq}}', '{{db-nouser}}',
            '{{db-u3}}', '{{db-unfree}}'),
-    'fr': (u'{{suppression}}', u'{{à vérifier}}', u'{{ébauche}}'),
-    'ia': (u'{{Eliminar}}', u'{{Revision}}', u'{{Stub}}'),
-    'he': (u'{{מחק}}', u'{{פירושונים}}', u'{{הצבעת מחיקה}}'),
+    'fr': ('{{suppression}}', '{{à vérifier}}', '{{ébauche}}'),
+    'ia': ('{{Eliminar}}', '{{Revision}}', '{{Stub}}'),
+    'he': ('{{מחק}}', '{{פירושונים}}', '{{הצבעת מחיקה}}'),
     'nl': ('{{nuweg}}', '{{weg}}', '{{wb}}', '{{wiu}}', '{{nocat}}'),
-    'pl': ('{{ek}}', u'{{dopracować}}', '{{linki}}', u'{{źródła}}',
-           u'{{stub}}'),
-    'pt': ('{{wikificar}}', '{{reciclar}}', '{{lixo}}', u'{{revisão}}',
-           u'{{impróprio}}', u'{{apagar vaidade}}'),
-    'sv': (u'{{radera', u'{{Radera', u'{{städa}}', u'{{stub}}',
-           u'{{verifieras}}', u'{{språkvård}}', u'{{Källor', u'{{källor',
-           u'{{wikify}}', u'{{Ickewiki}}', u'{{ickewiki}}', u'{{Wikify}}'),
-    'zh': (u'{{VfD}}', u'{{AfD}}', u'{{unreferenced}}', u'{{db-reason}}',
+    'pl': ('{{ek}}', '{{dopracować}}', '{{linki}}', '{{źródła}}',
+           '{{stub}}'),
+    'pt': ('{{wikificar}}', '{{reciclar}}', '{{lixo}}', '{{revisão}}',
+           '{{impróprio}}', '{{apagar vaidade}}'),
+    'sv': ('{{radera', '{{Radera', '{{städa}}', '{{stub}}',
+           '{{verifieras}}', '{{språkvård}}', '{{Källor', '{{källor',
+           '{{wikify}}', '{{Ickewiki}}', '{{ickewiki}}', '{{Wikify}}'),
+    'zh': ('{{VfD}}', '{{AfD}}', '{{unreferenced}}', '{{db-reason}}',
            '{{cleanup}}', '{{stub}}', '{{uncategorized}}', '{{notability}}',
-           u'{{copyedit}}', u'{{unreferenced}}', u'{{wikify}}',
-           u'{{Translating}}', u'{{copyvio}}', u'{{Notchinese}}'),
+           '{{copyedit}}', '{{unreferenced}}', '{{wikify}}',
+           '{{Translating}}', '{{copyvio}}', '{{Notchinese}}'),
 }
 
 # TODO: merge 'done' with 'templates' above
@@ -416,16 +416,16 @@ What is it? """
         try:
             self.content = self.page.get()
         except pywikibot.IsRedirectPage:
-            pywikibot.output(u'Already redirected, skipping.')
+            pywikibot.output('Already redirected, skipping.')
             return
         except pywikibot.NoPage:
-            pywikibot.output(u'Already deleted')
+            pywikibot.output('Already deleted')
             return
 
         for d in pywikibot.translate(self.site.code, done):
             if d in self.content:
                 pywikibot.output(
-                    u'Found: "%s" in content, nothing necessary' % d)
+                    'Found: "{}" in content, nothing necessary'.format(d))
                 return
         pywikibot.output('---- Start content ----------------')
         pywikibot.output(self.content)
@@ -439,7 +439,7 @@ What is it? """
             if answer == 'q':
                 raise QuitKeyboardInterrupt
             if answer == 'd':
-                pywikibot.output(u'Trying to delete page [[%s]].'
+                pywikibot.output('Trying to delete page [[%s]].'
                                  % self.page.title())
                 self.page.delete()
                 return
@@ -450,7 +450,8 @@ What is it? """
                 self.userPut(self.page, old, new, summary=msg)
                 return
             if answer == 'b':
-                pywikibot.output(u'Blanking page [[%s]].' % self.page.title())
+                pywikibot.output('Blanking page [[{}]].'
+                                 .format(self.page.title()))
                 try:
                     self.page.put('',
                                   summary=i18n.twtranslate(
@@ -466,14 +467,14 @@ What is it? """
                 pywikibot.output('Page correct ! Proceeding with next pages.')
                 return
             # Check user input:
-            if answer[0] == 'u':
+            if answer[0] == '':
                 # Answer entered as an utf8 string
                 answer = answer[1:]
             try:
                 choices = answer.split(',')
             except ValueError:
                     # User entered wrong value
-                    pywikibot.error(u'"%s" is not valid' % answer)
+                    pywikibot.error('"{}" is not valid'.format(answer))
                     continue
             # test input
             for choice in choices:
@@ -484,9 +485,9 @@ What is it? """
                 else:
                     answered = (x >= 1 and x <= len(self.questionlist))
             if not answered:
-                pywikibot.error(u'"%s" is not valid' % answer)
+                pywikibot.error('"{}" is not valid'.format(answer))
                 continue
-        summary = u''
+        summary = ''
         for choice in choices:
             answer = int(choice)
             # grab the template parameters
@@ -507,7 +508,7 @@ What is it? """
             pywikibot.output('Probably added %s' % self.questionlist[answer])
 
         self.page.put(self.content, summary=summary)
-        pywikibot.output(u'with comment %s\n' % summary)
+        pywikibot.output('with comment {}\n'.format(summary))
 
     def treat_page(self):
         """Process one page."""

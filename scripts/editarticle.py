@@ -56,18 +56,18 @@ class ArticleEditor(object):
         my_args = pywikibot.handle_args(args)
 
         parser = argparse.ArgumentParser(add_help=False)
-        parser.add_argument("-r", "--edit_redirect", "--edit-redirect",
-                            action="store_true", help="Ignore/edit redirects")
-        parser.add_argument("-p", "--page", help="Page to edit")
-        parser.add_argument("-w", "--watch", action="store_true",
-                            help="Watch article after edit")
+        parser.add_argument('-r', '--edit_redirect', '--edit-redirect',
+                            action='store_true', help='Ignore/edit redirects')
+        parser.add_argument('-p', '--page', help='Page to edit')
+        parser.add_argument('-w', '--watch', action='store_true',
+                            help='Watch article after edit')
         # convenience positional argument so we can act like a normal editor
-        parser.add_argument("wikipage", nargs="?", help="Page to edit")
+        parser.add_argument('wikipage', nargs='?', help='Page to edit')
         self.options = parser.parse_args(my_args)
 
         if self.options.page and self.options.wikipage:
-            pywikibot.error("Multiple pages passed. Please specify a single "
-                            "page to edit.")
+            pywikibot.error('Multiple pages passed. Please specify a single '
+                            'page to edit.')
             sys.exit(1)
         self.options.page = self.options.page or self.options.wikipage
 
@@ -84,8 +84,8 @@ class ArticleEditor(object):
         with open(fn, 'w') as fp:
             fp.write(new)
         pywikibot.output(
-            "An edit conflict has arisen. Your edit has been saved to %s. "
-            "Please try again." % fn)
+            'An edit conflict has arisen. Your edit has been saved to {}. '
+            'Please try again.'.format(fn))
 
     def run(self):
         """Run the bot."""
@@ -93,12 +93,12 @@ class ArticleEditor(object):
         try:
             old = self.page.get(get_redirect=self.options.edit_redirect)
         except pywikibot.NoPage:
-            old = ""
+            old = ''
         text_editor = TextEditor()
         new = text_editor.edit(old)
         if new and old != new:
             pywikibot.showDiff(old, new)
-            changes = pywikibot.input("What did you change?")
+            changes = pywikibot.input('What did you change?')
             comment = i18n.twtranslate(self.site, 'editarticle-edit',
                                        {'description': changes})
             try:
@@ -107,7 +107,7 @@ class ArticleEditor(object):
             except pywikibot.EditConflict:
                 self.handle_edit_conflict(new)
         else:
-            pywikibot.output("Nothing changed")
+            pywikibot.output('Nothing changed')
 
 
 def main(*args):
@@ -123,5 +123,5 @@ def main(*args):
     app.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
