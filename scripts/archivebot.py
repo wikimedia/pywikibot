@@ -269,24 +269,6 @@ def str2size(string):
     return val, unit
 
 
-def generate_transclusions(site, template, namespaces=[]):
-    """
-    Generate transclusions.
-
-    @param site: the site for the template transclusions
-    @type site: Site
-    @param template: normalized title of the template
-    @type template: unicode
-    @param namespace: namespace filter for transcluded pages
-    @type ns: list
-    """
-    pywikibot.output(u'Fetching template transclusions...')
-    transclusion_page = pywikibot.Page(site, template, ns=10)
-    return transclusion_page.getReferences(only_template_inclusion=True,
-                                           follow_redirects=False,
-                                           namespaces=namespaces)
-
-
 def template_title_regex(tpl_page):
     """
     Return a regex that matches to variations of the template title.
@@ -518,17 +500,22 @@ class DiscussionPage(pywikibot.Page):
 
 class PageArchiver(object):
 
-    """
-    A class that encapsulates all archiving methods.
-
-    __init__ expects a pywikibot.Page object.
-    Execute by running the .run() method.
-    """
+    """A class that encapsulates all archiving methods."""
 
     algo = 'none'
 
-    def __init__(self, page, tpl, salt, force=False):
-        """Initializer."""
+    def __init__(self, page, template, salt, force=False):
+        """Initializer.
+
+        param page: a page object to be archived
+        type page: pywikibot.Page
+        param template: a template with configuration settings
+        type template: pywikibot.Page
+        param salt: salt value
+        type salt: str
+        param force: override security value
+        type force: bool
+        """
         self.attributes = {
             'algo': ['old(24h)', False],
             'archive': ['', False],
@@ -539,7 +526,7 @@ class PageArchiver(object):
         self.salt = salt
         self.force = force
         self.site = page.site
-        self.tpl = pywikibot.Page(self.site, tpl)
+        self.tpl = template
         self.timestripper = TimeStripper(site=self.site)
         self.page = DiscussionPage(page, self)
         self.load_config()
@@ -667,7 +654,7 @@ class PageArchiver(object):
         return set(whys)
 
     def run(self):
-        """Run the bot."""
+        """Process a single DiscussionPage object."""
         if not self.page.botMayEdit():
             return
         whys = self.analyze_page()
@@ -779,15 +766,18 @@ def main(*args):
             additional_text='No template was specified.')
         return False
 
-    for a in templates:
+    for template_name in templates:
         pagelist = []
-        a = pywikibot.Page(site, a, ns=10).title()
+        tmpl = pywikibot.Page(site, template_name, ns=10)
         if not filename and not pagename:
             if namespace is not None:
                 ns = [str(namespace)]
             else:
                 ns = []
-            for pg in generate_transclusions(site, a, ns):
+            pywikibot.output('Fetching template transclusions...')
+            for pg in tmpl.getReferences(only_template_inclusion=True,
+                                         follow_redirects=False,
+                                         namespaces=ns):
                 pagelist.append(pg)
         if filename:
             for pg in open(filename, 'r').readlines():
@@ -800,7 +790,7 @@ def main(*args):
             # Catching exceptions, so that errors in one page do not bail out
             # the entire process
             try:
-                archiver = PageArchiver(pg, a, salt, force)
+                archiver = PageArchiver(pg, tmpl, salt, force)
                 archiver.run()
             except ArchiveBotSiteConfigError as e:
                 # no stack trace for errors originated by pages on-site

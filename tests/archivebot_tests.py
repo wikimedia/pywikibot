@@ -257,9 +257,11 @@ class TestDiscussionPageObject(TestCase):
          == B ==
          foo bar bar bar
         """
-        page = pywikibot.Page(self.get_site(), 'Talk:For-pywikibot-archivebot')
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot')
+        tmpl = pywikibot.Page(site, 'User:MiszaBot/config')
         archiver = archivebot.PageArchiver(
-            page=page, tpl='User:MiszaBot/config', salt='', force=False)
+            page=page, template=tmpl, salt='', force=False)
         page = archivebot.DiscussionPage(page, archiver)
         page.load_page()
         self.assertEqual([x.title for x in page.threads], ['A', 'B'])
