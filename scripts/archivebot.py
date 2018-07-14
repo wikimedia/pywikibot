@@ -462,7 +462,7 @@ class DiscussionPage(pywikibot.Page):
         text = re.sub(r'^===', marker + r'===', text, flags=re.M)
 
         # Find threads, avoid archiving categories or interwiki
-        header, threads, footer = extract_sections(text)
+        header, threads, footer = extract_sections(text, self.site)
         header = header.replace(marker, '')
         if header and footer:
             self.header = '\n\n'.join((header.rstrip(), footer, ''))

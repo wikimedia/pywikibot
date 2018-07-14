@@ -315,7 +315,8 @@ def _get_regexes(keys, site):
                     if not site and exc in ('interwiki', 'property', 'invoke',
                                             'category', 'file'):
                         issue_deprecation_warning(
-                            'site=None', 'a valid site', 3)
+                            'site=None',
+                            "a valid site for '{}' regex".format(exc), 2)
                         site = pywikibot.Site()
 
                     if (exc, site) not in _regex_cache:
