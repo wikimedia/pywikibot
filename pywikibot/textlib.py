@@ -13,7 +13,7 @@ and return a unicode string.
 #
 from __future__ import absolute_import, unicode_literals
 
-from collections import OrderedDict
+from collections import OrderedDict, namedtuple
 try:
     from collections.abc import Sequence
 except ImportError:  # Python 2.7
@@ -828,6 +828,38 @@ def replace_links(text, replace, site=None):
 # -------------------------------
 # Functions dealing with sections
 # -------------------------------
+_Heading = namedtuple('_Heading', ('text', 'start', 'end'))
+_Section = namedtuple('_Section', ('title', 'content'))
+
+
+def _extract_headings(text, site):
+    """Return _Heading objects."""
+    headings = []
+    heading_regex = _get_regexes(['header'], site)[0]
+    for match in heading_regex.finditer(text):
+        start, end = match.span()
+        if not isDisabled(text, start) and not isDisabled(text, end):
+            headings.append(_Heading(match.group(), start, end))
+    return headings
+
+
+def _extract_sections(text, headings):
+    """Return _Section objects."""
+    if headings:
+        # Assign them their contents
+        contents = []
+        for i, heading in enumerate(headings):
+            try:
+                next_heading = headings[i + 1]
+            except IndexError:
+                contents.append(text[heading.end:])
+            else:
+                contents.append(text[heading.end:next_heading.start])
+        return [_Section(heading.text, content)
+                for heading, content in zip(headings, contents)]
+    return []
+
+
 def extract_sections(text, site=None):
     """
     Return section headings and contents found in text.
@@ -859,63 +891,17 @@ def extract_sections(text, site=None):
 
     @rtype: tuple of (str, list of tuples, str)
     """
-    headings = []
-    contents = []
-    body = []
-
-    # Find valid headings
-    heading_regex = _get_regexes(['header'], site)[0]
-    pos = 0
-    while True:
-        match = heading_regex.search(text[pos:])
-        if not match:
-            break
-        start = pos + match.start()
-        end = pos + match.end()
-        if not (isDisabled(text, start)
-                or isDisabled(text, end)):
-            headings += [(match.group(), start, end)]
-        pos = end
-
-    if headings:
-        # Assign them their contents
-        for i, current in enumerate(headings):
-            try:
-                following = headings[i + 1]
-            except IndexError:
-                following = None
-            if following:
-                contents.append(text[current[2]:following[1]])
-            else:
-                contents.append(text[current[2]:])
-        body = [(heading[0], section)
-                for heading, section in zip(headings, contents)]
-
+    headings = _extract_headings(text, site)
+    sections = _extract_sections(text, headings)
     # Find header and footer contents
-    header = text[:headings[0][1]] if headings else text
-
-    last_section = body[-1][1] if body else header
-    skippings = ['category', 'interwiki']
-    footer_regexes = _get_regexes(skippings, site)
-    # we want only interwikis, not interlanguage links
-    footer_regexes[1] = re.compile(
-        footer_regexes[1].pattern.replace(':?', ''))
-    # find where to cut
-    positions = []
-    for reg in footer_regexes:
-        match = reg.search(last_section)
-        if match:
-            positions.append(match.start())
-    pos = min(pos for pos in positions) if positions else len(last_section)
-
-    # Strip footer from last section content
-    last_section, footer = last_section[:pos], last_section[pos:]
-    if body:
-        body[-1] = (body[-1][0], last_section)
-    else:
-        header = last_section
-
-    return header, body, footer
+    header = text[:headings[0].start] if headings else text
+    last_section_contents = sections[-1].content if sections else header
+    cat_regex, interwiki_regex = _get_regexes(('category', 'interwiki'), site)
+    langlink_pattern = interwiki_regex.pattern.replace(':?', '')
+    footer = re.search(
+        r'(%s)*\Z' % r'|'.join((langlink_pattern, cat_regex.pattern, r'\s+')),
+        last_section_contents).group().strip()
+    return header, sections, footer
 
 
 # -----------------------------------------------
@@ -2006,7 +1992,7 @@ def does_text_contain_section(pagetext, section):
     It does not care whether a section string may contain spaces or
     underlines. Both will match.
 
-    If a section parameter contains a internal link, it will match the
+    If a section parameter contains an internal link, it will match the
     section with or without a preceding colon which is required for a
     text link e.g. for categories and files.
 
