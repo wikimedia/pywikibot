@@ -2017,7 +2017,7 @@ def does_text_contain_section(pagetext, section):
 
     """
     # match preceding colon for text links
-    section = re.sub(r'\\\[\\\[(\\:)?', r'\[\[\:?', re.escape(section))
+    section = re.sub(r'\\\[\\\[(\\?:)?', r'\[\[\:?', re.escape(section))
     # match underscores and white spaces
     section = re.sub(r'\\?[ _]', '[ _]', section)
     m = re.search("=+[ ']*%s[ ']*=+" % section, pagetext)
