@@ -7,6 +7,7 @@
 #
 from __future__ import absolute_import, unicode_literals
 
+import re
 from textwrap import fill
 
 import pywikibot
@@ -42,8 +43,11 @@ class Option(object):
         formatted_options = []
         for option in options:
             formatted_options.append(option.format(default=default))
-        return fill('{0} ({1})'.format(text, ', '.join(formatted_options)),
-                    width=77)
+        # remove color highlights before fill function
+        text = '{0} ({1})'.format(text, ', '.join(formatted_options))
+        pattern = '\03{[a-z]+}'
+        highlights = re.findall(pattern, text)
+        return fill(re.sub(pattern, '{}', text), width=77).format(*highlights)
 
     @property
     def stop(self):
