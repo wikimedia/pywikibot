@@ -3659,6 +3659,10 @@ class WikibasePage(BasePage):
     There should be no need to instantiate this directly.
     """
 
+    _cache_attrs = BasePage._cache_attrs + (
+        '_content', 'labels', 'descriptions', 'aliases', 'claims',
+    )
+
     def __init__(self, site, title=u"", **kwargs):
         """
         Initializer.
@@ -4239,6 +4243,7 @@ class ItemPage(WikibasePage):
     been looked up, the item is then defined by the qid.
     """
 
+    _cache_attrs = WikibasePage._cache_attrs + ('sitelinks',)
     entity_type = 'item'
     title_pattern = r'^(Q[1-9]\d*|-1)$'
 
@@ -4730,6 +4735,7 @@ class PropertyPage(WikibasePage, Property):
         PropertyPage(DataSite, 'P21')
     """
 
+    _cache_attrs = WikibasePage._cache_attrs + ('_type',)
     entity_type = 'property'
     title_pattern = r'^P[1-9]\d*$'
 
