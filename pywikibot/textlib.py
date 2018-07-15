@@ -247,53 +247,66 @@ class _MultiTemplateMatchBuilder(object):
         return lambda text: any(predicate(text) for predicate in predicates)
 
 
+def _ignore_case(string):
+    """Return a case-insensitive pattern for the string."""
+    return ''.join('[' + c.upper() + c.lower() + ']' for c in string)
+
+
+def _tag_pattern(tag_name):
+    """Return a tag pattern for the given tag name."""
+    return r'<{0}[ >][\s\S]*?</{0}\s*>'.format(_ignore_case(tag_name))
+
+
+def _tag_regex(tag_name):
+    """Return a compiled tag regex for the given tag name."""
+    return re.compile(_tag_pattern(tag_name))
+
+
 def _create_default_regexes():
     """Fill (and possibly overwrite) _regex_cache with default regexes."""
     _regex_cache.update({
-        'comment':    re.compile(r'(?s)<!--.*?-->'),
+        # categories
+        'category': (r'\[\[ *(?:%s)\s*:.*?\]\]',
+                     lambda site: '|'.join(site.namespaces[14])),
+        'comment': re.compile(r'<!--[\s\S]*?-->'),
+        # files
+        'file': (FILE_LINK_REGEX, lambda site: '|'.join(site.namespaces[6])),
         # section headers
-        'header':     re.compile(r'(?m)^=+.+=+ *$'),
-        # preformatted text
-        'pre':        re.compile(r'(?is)<pre[ >].*?</pre\s*>'),
-        'source':     re.compile(r'(?is)<source[ >].*?</source\s*>'),
-        'score':      re.compile(r'(?is)<score[ >].*?</score\s*>'),
-        # inline references
-        'ref':        re.compile(r'(?is)<ref[ >].*?</ref>'),
-        'template':   NESTED_TEMPLATE_REGEX,
+        'header': re.compile(r'(?:(?<=\n)|\A)=+.+=+ *(?=\n|\Z)'),
+        # external links
+        'hyperlink': compileLinkR(),
+        # also finds links to foreign sites with preleading ":"
+        'interwiki': (
+            r'\[\[:?(%s)\s?:[^\]]*\]\][\s]*',
+            lambda site: '|'.join(
+                _ignore_case(i) for i in site.validLanguageLinks()
+                + list(site.family.obsolete.keys()))),
+        # Module invocations (currently only Lua)
+        'invoke': (
+            r'\{\{\s*\#(?:%s):[\s\S]*?\}\}',
+            lambda site: '|'.join(
+                _ignore_case(mw) for mw in site.getmagicwords('invoke'))),
+        # this matches internal wikilinks, but also interwiki, categories, and
+        # images.
+        'link': re.compile(r'\[\[[^\]|]*(\|[^\]]*)?\]\]'),
+        # pagelist tag (used in Proofread extension).
+        'pagelist': re.compile(r'<%s[\s\S]*?/>' % _ignore_case('pagelist')),
+        # Wikibase property inclusions
+        'property': (
+            r'\{\{\s*\#(?:%s):\s*[Pp]\d+.*?\}\}',
+            lambda site: '|'.join(
+                _ignore_case(mw) for mw in site.getmagicwords('property'))),
+        # lines that start with a colon or more will be indented
+        'startcolon': re.compile(r'(?:(?<=\n)|\A):(.*?)(?=\n|\Z)'),
         # lines that start with a space are shown in a monospace font and
         # have whitespace preserved.
-        'startspace': re.compile(r'(?m)^ (.*?)$'),
-        # lines that start with a colon or more will be indented
-        'startcolon': re.compile(r'(?m)^:(.*?)$'),
+        'startspace': re.compile(r'(?:(?<=\n)|\A) (.*?)(?=\n|\Z)'),
         # tables often have whitespace that is used to improve wiki
         # source code readability.
         # TODO: handle nested tables.
-        'table':      re.compile(r'(?ims)'
-                                 r'^{\|.*?^\|}|<table[ >].*?</table\s*>'),
-        'hyperlink':  compileLinkR(),
-        'gallery':    re.compile(r'(?is)<gallery.*?>.*?</gallery\s*>'),
-        # this matches internal wikilinks, but also interwiki, categories, and
-        # images.
-        'link':       re.compile(r'\[\[[^\]\|]*(\|[^\]]*)?\]\]'),
-        # also finds links to foreign sites with preleading ":"
-        'interwiki':  (r'(?i)\[\[:?(%s)\s?:[^\]]*\]\][\s]*',
-                       lambda site: '|'.join(
-                           site.validLanguageLinks()
-                           + list(site.family.obsolete.keys()))),
-        # Wikibase property inclusions
-        'property':   (r'(?i)\{\{\s*\#(?:%s):\s*p\d+.*?\}\}',
-                       lambda site: '|'.join(site.getmagicwords('property'))),
-        # Module invocations (currently only Lua)
-        'invoke':     (r'(?is)\{\{\s*\#(?:%s):.*?\}\}',
-                       lambda site: '|'.join(site.getmagicwords('invoke'))),
-        # categories
-        'category':   (r'\[\[ *(?:%s)\s*:.*?\]\]',
-                       lambda site: '|'.join(site.namespaces[14])),
-        # files
-        'file':       (FILE_LINK_REGEX,
-                       lambda site: '|'.join(site.namespaces[6])),
-        # pagelist tag (used in Proofread extension).
-        'pagelist':   re.compile(r'(?is)<pagelist.*?/>'),
+        'table': re.compile(
+            r'(?:(?<=\n)|\A){\|[\S\s]*?\n\|}|%s' % _tag_pattern('table')),
+        'template': NESTED_TEMPLATE_REGEX,
     })
 
 
@@ -330,13 +343,11 @@ def _get_regexes(keys, site):
             else:
                 # nowiki, noinclude, includeonly, timeline, math and other
                 # extensions
-                _regex_cache[exc] = re.compile(
-                    r'(?is)<{0}\s*>.*?</{0}\s*>'.format(exc))
+                _regex_cache[exc] = _tag_regex(exc)
                 result.append(_regex_cache[exc])
             # handle alias
             if exc == 'source':
-                dontTouchRegexes.append(re.compile(
-                    r'(?is)<syntaxhighlight[ >].*?</syntaxhighlight\s*>'))
+                dontTouchRegexes.append(_tag_regex('syntaxhighlight'))
         else:
             # assume it's a regular expression
             dontTouchRegexes.append(exc)
