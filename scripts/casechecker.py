@@ -558,7 +558,7 @@ class CaseChecker(object):
                 # combinations from the bad words list, and convert just the
                 # picked words to cyrilic, whereas making all other words as
                 # latin character.
-                for itemCntToPick in xrange(0, len(ambigBadWords) + 1):
+                for itemCntToPick in xrange(len(ambigBadWords) + 1):
                     title2 = title
                     for uc in itertools.combinations(list(ambigBadWords),
                                                      itemCntToPick):
@@ -771,14 +771,12 @@ class CaseChecker(object):
 
         if len(frmParts) != len(toParts):
             raise ValueError('Splitting parts do not match counts')
-        for i in xrange(0, len(frmParts)):
-            if len(frmParts[i]) != len(toParts[i]):
+        for i, part in enumerate(frmParts):
+            if part != len(toParts[i]):
                 raise ValueError('Splitting parts do not match word length')
-            if len(frmParts[i]) > 0:
-                text = text.replace(first_lower(frmParts[i]),
-                                    first_lower(toParts[i]))
-                text = text.replace(first_upper(frmParts[i]),
-                                    first_upper(toParts[i]))
+            if part:
+                text = text.replace(first_lower(part), first_lower(toParts[i]))
+                text = text.replace(first_upper(part), first_upper(toParts[i]))
         return text
 
 

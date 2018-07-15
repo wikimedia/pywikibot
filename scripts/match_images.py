@@ -128,9 +128,9 @@ def match_images(imageA, imageB):
     if len(histogramA) != len(histogramB):
         return 0
 
-    for i in range(0, len(histogramA)):
-        totalMatch = totalMatch + min(histogramA[i], histogramB[i])
-        totalPixels = totalPixels + max(histogramA[i], histogramB[i])
+    for i, hist_a in enumerate(histogramA):
+        totalMatch = totalMatch + min(hist_a, histogramB[i])
+        totalPixels = totalPixels + max(hist_a, histogramB[i])
 
     if totalPixels == 0:
         return 0

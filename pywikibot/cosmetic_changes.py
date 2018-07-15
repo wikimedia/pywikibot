@@ -421,8 +421,8 @@ class CosmeticChangesToolkit(object):
                 # skip localized user namespace, maybe gender is used
                 namespaces = ['User' if namespace == 2 else 'User talk']
             # lowerspaced and underscored namespaces
-            for i in range(len(namespaces)):
-                item = namespaces[i].replace(' ', '[ _]')
+            for i, item in enumerate(namespaces):
+                item = item.replace(' ', '[ _]')
                 item = u'[%s%s]' % (item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
             namespaces.append(first_lower(final_ns))
