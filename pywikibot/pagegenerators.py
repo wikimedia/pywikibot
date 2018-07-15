@@ -1726,9 +1726,6 @@ def RedirectFilterPageGenerator(generator, no_redirects=True,
                                  % page)
 
 
-DuplicateFilterPageGenerator = filter_unique
-
-
 class ItemClaimFilter(object):
 
     """Item claim filter."""
@@ -3089,6 +3086,8 @@ class PetScanPageGenerator(object):
             yield page
 
 
+DuplicateFilterPageGenerator = redirect_func(
+    filter_unique, old_name='DuplicateFilterPageGenerator')
 PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         old_name='PreloadingItemGenerator')
 # Deprecated old names available for compatibility with compat.

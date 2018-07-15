@@ -62,6 +62,7 @@ import pywikibot
 
 from pywikibot import i18n, Bot
 from pywikibot import pagegenerators as pg
+from pywikibot.tools import filter_unique
 from pywikibot.tools.formatter import color_format
 
 from scripts.image import ImageRobot as ImageBot
@@ -221,7 +222,7 @@ class NowCommonsDeleteBot(Bot):
                                 only_template_inclusion=True)
                 for t in self.nc_templates)
         gen = chain(*gens)
-        gen = pg.DuplicateFilterPageGenerator(gen)
+        gen = filter_unique(gen)
         gen = pg.PreloadingGenerator(gen)
         return gen
 

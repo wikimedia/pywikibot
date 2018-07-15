@@ -125,7 +125,7 @@ from pywikibot import i18n, pagegenerators, textlib, Bot
 
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.pagegenerators import XMLDumpPageGenerator
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, filter_unique
 
 from scripts.replace import ReplaceRobot as ReplaceBot
 
@@ -359,7 +359,7 @@ def main(*args):
             for t in old_templates
         )
         gen = chain(*gens)
-        gen = pagegenerators.DuplicateFilterPageGenerator(gen)
+        gen = filter_unique(gen)
     if user:
         gen = pagegenerators.UserEditFilterGenerator(gen, user, timestamp,
                                                      skip,
