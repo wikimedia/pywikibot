@@ -79,6 +79,7 @@ def check_quotes(match, file_path, start):
         if (
             'r' not in match.group('prefix')
             and r'\'' in string
+            and not string.endswith(r'\'')
             and '"' not in string
         ):
             print_error(
