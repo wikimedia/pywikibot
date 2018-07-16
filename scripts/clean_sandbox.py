@@ -143,7 +143,9 @@ class SandboxBot(Bot):
             self.availableOptions['delay_td'] = datetime.timedelta(minutes=d)
 
         self.site = pywikibot.Site()
-        if not content.get(self.site.code) and not self.getOption('text'):
+        self.translated_content = self.getOption('text') or i18n.translate(
+            self.site, content)
+        if not self.translated_content:
             pywikibot.error(u'No content is given for pages, exiting.')
             raise RuntimeError
         if not self.generator:
@@ -172,26 +174,23 @@ class SandboxBot(Bot):
                         % sandbox_page.title(as_link=True))
                 try:
                     text = sandbox_page.text
-                    if not self.getOption('text'):
-                        translated_content = i18n.translate(self.site, content)
-                    else:
-                        translated_content = self.getOption('text')
                     if self.getOption('summary'):
                         translated_msg = self.getOption('summary')
                     else:
                         translated_msg = i18n.twtranslate(
                             self.site, 'clean_sandbox-cleaned')
-                    subst = 'subst:' in translated_content
-                    pos = text.find(translated_content.strip())
-                    if text.strip() == translated_content.strip():
+                    subst = 'subst:' in self.translated_content
+                    pos = text.find(self.translated_content.strip())
+                    if text.strip() == self.translated_content.strip():
                         pywikibot.output(
                             u'The sandbox is still clean, no change necessary.')
                     elif subst and sandbox_page.userName() == self.site.user():
                         pywikibot.output(
                             u'The sandbox might be clean, no change necessary.')
                     elif pos != 0 and not subst:
-                        sandbox_page.put(translated_content, translated_msg)
-                        pywikibot.showDiff(text, translated_content)
+                        sandbox_page.put(self.translated_content,
+                                         translated_msg)
+                        pywikibot.showDiff(text, self.translated_content)
                         pywikibot.output(u'Standard content was changed, '
                                          u'sandbox cleaned.')
                     else:
@@ -201,8 +200,8 @@ class SandboxBot(Bot):
                         # Is the last edit more than 'delay' minutes ago?
                         if delta <= datetime.timedelta(0):
                             sandbox_page.put(
-                                translated_content, translated_msg)
-                            pywikibot.showDiff(text, translated_content)
+                                self.translated_content, translated_msg)
+                            pywikibot.showDiff(text, self.translated_content)
                             pywikibot.output(u'Standard content was changed, '
                                              u'sandbox cleaned.')
                         else:  # wait for the rest
