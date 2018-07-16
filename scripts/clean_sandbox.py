@@ -47,6 +47,12 @@ from pywikibot import i18n, Bot, pagegenerators
 content = {
     'commons': u'{{Sandbox}}\n<!-- Please edit only below this line. -->',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
+    'wikivoyage': {
+        'es': '<!--No borres este mensaje-->'
+              '{{Zona de pruebas}}'
+              '<!--Haz las pruebas debajo. Gracias-->\n\n'
+              '== Las pruebas en esta sección ==\n',
+    },
     'als': u'{{subst:/Vorlage}}',
     'ar': u'{{عنوان الملعب}}\n<!-- مرحبا! خذ راحتك في تجربة مهارتك في التنسيق '
           u'والتحرير أسفل هذا السطر. هذه الصفحة لتجارب التعديل ، سيتم تفريغ '
