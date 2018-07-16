@@ -410,6 +410,23 @@ logpage_header = {
 # and it will run correctly in your project ;)
 ############################################################################
 
+_COLORS = {
+    0: 'lightpurple',
+    1: 'lightaqua',
+    2: 'lightgreen',
+    3: 'lightyellow',
+    4: 'lightred',
+    5: 'lightblue'
+}
+_MSGS = {
+    0: 'MSG',
+    1: 'NoAct',
+    2: 'Match',
+    3: 'Skip',
+    4: 'Warning',
+    5: 'Done',
+}
+
 
 class FilenameNotSet(pywikibot.Error):
 
@@ -646,9 +663,9 @@ class WelcomeBot(object):
             target = logg + '/' + time.strftime('%d/%m/%Y',
                                                 time.localtime(time.time()))
 
-        logPage = pywikibot.Page(self.site, target)
-        if logPage.exists():
-            text = logPage.get()
+        log_page = pywikibot.Page(self.site, target)
+        if log_page.exists():
+            text = log_page.get()
         else:
             # make new log page
             showStatus()
@@ -668,8 +685,8 @@ class WelcomeBot(object):
         # update log page.
         while True:
             try:
-                logPage.put(text, i18n.twtranslate(self.site,
-                                                   'welcome-updating'))
+                log_page.put(text, i18n.twtranslate(
+                    self.site, 'welcome-updating'))
                 return True
             except pywikibot.EditConflict:
                 pywikibot.output(u'An edit conflict has occurred. Pausing for '
@@ -694,11 +711,11 @@ class WelcomeBot(object):
         if hasattr(self, '_randomSignature') and not force:
             return self._randomSignature
 
-        signText = u''
+        sign_text = ''
         creg = re.compile(r"^\* ?(.*?)$", re.M)
         if not globalvar.signFileName:
-            signPageName = i18n.translate(self.site, random_sign)
-            if not signPageName:
+            sign_page_name = i18n.translate(self.site, random_sign)
+            if not sign_page_name:
                 showStatus(4)
                 pywikibot.output(
                     "%s doesn't allow random signature, force disable."
@@ -706,10 +723,10 @@ class WelcomeBot(object):
                 globalvar.randomSign = False
                 return
 
-            signPage = pywikibot.Page(self.site, signPageName)
-            if signPage.exists():
+            sign_page = pywikibot.Page(self.site, sign_page_name)
+            if sign_page.exists():
                 pywikibot.output('Loading signature list...')
-                signText = signPage.get()
+                sign_text = sign_page.get()
             else:
                 pywikibot.output('The signature list page does not exist, '
                                  'random signature will be disabled.')
@@ -726,9 +743,9 @@ class WelcomeBot(object):
                 pywikibot.error(u'No fileName!')
                 raise FilenameNotSet("No signature filename specified.")
 
-            signText = f.read()
+            sign_text = f.read()
             f.close()
-        self._randomSignature = creg.findall(signText)
+        self._randomSignature = creg.findall(sign_text)
         return self._randomSignature
 
     def run(self):
@@ -861,24 +878,8 @@ class WelcomeBot(object):
 
 def showStatus(n=0):
     """Output colorized status."""
-    staColor = {
-        0: 'lightpurple',
-        1: 'lightaqua',
-        2: 'lightgreen',
-        3: 'lightyellow',
-        4: 'lightred',
-        5: 'lightblue'
-    }
-    staMsg = {
-        0: 'MSG',
-        1: 'NoAct',
-        2: 'Match',
-        3: 'Skip',
-        4: 'Warning',
-        5: 'Done',
-    }
     pywikibot.output(color_format('{color}[{0:5}]{default} ',
-                                  staMsg[n], color=staColor[n]), newline=False)
+                                  _MSGS[n], color=_COLORS[n]), newline=False)
 
 
 def load_word_function(raw):
