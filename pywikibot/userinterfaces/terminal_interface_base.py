@@ -210,10 +210,10 @@ class UI(object):
             # Note: A transliteration replacement might be longer than the
             # original character, e.g. ч is transliterated to ch.
             prev = "-"
-            for i in range(len(codecedText)):
+            for i, char in enumerate(codecedText):
                 # work on characters that couldn't be encoded, but not on
                 # original question marks.
-                if codecedText[i] == '?' and text[i] != u'?':
+                if char == '?' and text[i] != '?':
                     try:
                         transliterated = transliterator.transliterate(
                             text[i], default='?', prev=prev, next=text[i + 1])
@@ -231,8 +231,8 @@ class UI(object):
                         prev = transliterated[-1]
                 else:
                     # no need to try to transliterate.
-                    transliteratedText += codecedText[i]
-                    prev = codecedText[i]
+                    transliteratedText += char
+                    prev = char
             text = transliteratedText
 
         if not targetStream:

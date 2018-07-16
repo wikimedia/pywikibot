@@ -447,8 +447,8 @@ def dh(value, pattern, encf, decf, filter=None):
         m = compPattern.match(value)
         if m:
             # decode each found value using provided decoder
-            values = [decoders[i][2](m.group(i + 1))
-                      for i in range(len(decoders))]
+            values = [decoder[2](m.group(i + 1))
+                      for i, decoder in enumerate(decoders)]
             decValue = decf(values)
 
             assert not isinstance(decValue, basestring), \
@@ -477,8 +477,8 @@ def dh(value, pattern, encf, decf, filter=None):
                 'parameter count ({0}) does not match decoder count ({1})'
                 .format(len(params), len(decoders)))
             # convert integer parameters into their textual representation
-            params = [MakeParameter(decoders[i], params[i])
-                      for i in range(len(params))]
+            params = [MakeParameter(decoders[i], param)
+                      for i, param in enumerate(params)]
             return strPattern % tuple(params)
         else:
             assert len(decoders) == 1, (

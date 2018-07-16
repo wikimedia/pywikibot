@@ -198,8 +198,7 @@ class ImageTransferBot(object):
 
     def showImageList(self, imagelist):
         """Print image list."""
-        for i in range(len(imagelist)):
-            image = imagelist[i]
+        for i, image in enumerate(imagelist):
             pywikibot.output('-' * 60)
             pywikibot.output(u"%s. Found image: %s"
                              % (i, image.title(as_link=True)))
@@ -248,7 +247,7 @@ class ImageTransferBot(object):
             else:
                 imagelist = list(page.imagelinks(followRedirects=True))
 
-            while len(imagelist) > 0:
+            while imagelist:
                 self.showImageList(imagelist)
                 if len(imagelist) == 1:
                     # no need to query the user, only one possibility
