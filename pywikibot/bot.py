@@ -1939,7 +1939,9 @@ class WikidataBot(Bot, ExistingPageBot):
                                u'property ID (e.g. P123) of it:'
                                % property_name).upper()
 
-    def user_edit_entity(self, item, data=None, **kwargs):
+    def user_edit_entity(self, item, data=None,
+                         ignore_save_related_errors=None,
+                         ignore_server_errors=None, **kwargs):
         """
         Edit entity with data provided, with user confirmation as required.
 
@@ -1947,20 +1949,24 @@ class WikidataBot(Bot, ExistingPageBot):
         @type item: ItemPage
         @param data: data to be saved, or None if the diff should be created
           automatically
+        @param ignore_save_related_errors: Ignore save related errors and
+            automatically print a message. If None uses this instances default.
+        @type ignore_save_related_errors: bool or None
+        @param ignore_server_errors: Ignore server errors and automatically
+            print a message. If None uses this instances default.
+        @type ignore_server_errors: bool or None
         @kwarg summary: revision comment, passed to ItemPage.editEntity
         @type summary: str
         @kwarg show_diff: show changes between oldtext and newtext (default:
           True)
         @type show_diff: bool
-        @kwarg ignore_server_errors: if True, server errors will be reported
-          and ignored (default: False)
-        @type ignore_server_errors: bool
-        @kwarg ignore_save_related_errors: if True, errors related to
-          page save will be reported and ignored (default: False)
-        @type ignore_save_related_errors: bool
         @return: whether the item was saved successfully
         @rtype: bool
         """
+        if ignore_save_related_errors is None:
+            ignore_save_related_errors = self.ignore_save_related_errors
+        if ignore_server_errors is None:
+            ignore_server_errors = self.ignore_server_errors
         show_diff = kwargs.pop('show_diff', True)
         if show_diff:
             if data is None:
@@ -1975,7 +1981,10 @@ class WikidataBot(Bot, ExistingPageBot):
 
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
-        return self._save_page(item, item.editEntity, data, **kwargs)
+        return self._save_page(
+            item, item.editEntity, data,
+            ignore_save_related_errors=ignore_save_related_errors,
+            ignore_server_errors=ignore_server_errors, **kwargs)
 
     def _add_source_callback(self, claim, source, **kwargs):
         """
