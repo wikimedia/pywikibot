@@ -76,9 +76,8 @@ class TableXmlDumpPageGenerator(object):
         self.xmldump = xmlreader.XmlDump(xmlfilename)
 
     def __iter__(self):
-        tableTagR = re.compile('<table', re.IGNORECASE)
         for entry in self.xmldump.parse():
-            if tableTagR.search(entry.text):
+            if _table_start_regex.search(entry.text):
                 yield pywikibot.Page(pywikibot.Site(), entry.title)
 
 
@@ -117,13 +116,13 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # possible errors, before the user is asked if he wants to accept the
         # changes.
         warning_messages = []
-        newTable = table
+        new_table = table
         ##################
         # bring every <tag> into one single line.
         num = 1
         while num != 0:
-            newTable, num = re.subn(r'([^\r\n]{1})(<[tT]{1}[dDhHrR]{1})',
-                                    r'\1\r\n\2', newTable)
+            new_table, num = re.subn(
+                r'([^\r\n]{1})(<[tT]{1}[dDhHrR]{1})', r'\1\r\n\2', new_table)
 
         ##################
         # every open-tag gets a new line.
@@ -131,58 +130,62 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         ##################
         # Note that we added the ## characters in markActiveTables().
         # <table> tag with attributes, with more text on the same line
-        newTable = re.sub(
+        new_table = re.sub(
             r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>'
             r'(?P<more>[\w\W]*?)[\r\n ]*',
-            r'\r\n{| \g<attr>\r\n\g<more>', newTable)
+            r'\r\n{| \g<attr>\r\n\g<more>', new_table)
         # <table> tag without attributes, with more text on the same line
-        newTable = re.sub(r'(?i)[\r\n]*?<##table##>(?P<more>[\w\W]*?)[\r\n ]*',
-                          r'\r\n{|\n\g<more>\r\n', newTable)
+        new_table = re.sub(
+            r'(?i)[\r\n]*?<##table##>(?P<more>[\w\W]*?)[\r\n ]*',
+            r'\r\n{|\n\g<more>\r\n', new_table)
         # <table> tag with attributes, without more text on the same line
-        newTable = re.sub(
+        new_table = re.sub(
             r'(?i)[\r\n]*?<##table## (?P<attr>[\w\W]*?)>[\r\n ]*',
-            r'\r\n{| \g<attr>\r\n', newTable)
+            r'\r\n{| \g<attr>\r\n', new_table)
         # <table> tag without attributes, without more text on the same line
-        newTable = re.sub(r'(?i)[\r\n]*?<##table##>[\r\n ]*',
-                          '\r\n{|\r\n', newTable)
+        new_table = re.sub(
+            r'(?i)[\r\n]*?<##table##>[\r\n ]*', '\r\n{|\r\n', new_table)
         # end </table>
-        newTable = re.sub(r'(?i)[\s]*<\/##table##>',
-                          '\r\n|}', newTable)
+        new_table = re.sub(
+            r'(?i)[\s]*<\/##table##>', '\r\n|}', new_table)
 
         ##################
         # caption with attributes
-        newTable = re.sub(
+        new_table = re.sub(
             r'(?i)<caption (?P<attr>[\w\W]*?)>'
             r'(?P<caption>[\w\W]*?)<\/caption>',
-            r'\r\n|+\g<attr> | \g<caption>', newTable)
+            r'\r\n|+\g<attr> | \g<caption>', new_table)
         # caption without attributes
-        newTable = re.sub(r'(?i)<caption>(?P<caption>[\w\W]*?)<\/caption>',
-                          r'\r\n|+ \g<caption>', newTable)
+        new_table = re.sub(
+            r'(?i)<caption>(?P<caption>[\w\W]*?)<\/caption>',
+            r'\r\n|+ \g<caption>', new_table)
 
         ##################
         # <th> often people don't write them within <tr>, be warned!
         # <th> with attributes
-        newTable = re.sub(
+        new_table = re.sub(
             r"(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)<\/th>",
-            r"\r\n!\g<attr> | \g<header>\r\n", newTable)
+            r'\r\n!\g<attr> | \g<header>\r\n', new_table)
 
         # <th> without attributes
-        newTable = re.sub(r"(?i)[\r\n]+<th>(?P<header>[\w\W]*?)<\/th>",
-                          r'\r\n! \g<header>\r\n', newTable)
+        new_table = re.sub(
+            r'(?i)[\r\n]+<th>(?P<header>[\w\W]*?)</th>',
+            r'\r\n! \g<header>\r\n', new_table)
 
         # fail save. sometimes people forget </th>
         # <th> without attributes, without closing </th>
-        newTable, n = re.subn(r'(?i)[\r\n]+<th>(?P<header>[\w\W]*?)[\r\n]+',
-                              r'\r\n! \g<header>\r\n', newTable)
+        new_table, n = re.subn(
+            r'(?i)[\r\n]+<th>(?P<header>[\w\W]*?)[\r\n]+',
+            r'\r\n! \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
                 u'WARNING: found <th> without </th>. (%d occurences)\n' % n)
             warnings += n
 
         # <th> with attributes, without closing </th>
-        newTable, n = re.subn(
+        new_table, n = re.subn(
             r'(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)[\r\n]+',
-            r'\n!\g<attr> | \g<header>\r\n', newTable)
+            r'\n!\g<attr> | \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
                 'WARNING: found <th ...> without </th>. (%d occurences\n)' % n)
@@ -190,38 +193,42 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
         ##################
         # <tr> with attributes
-        newTable = re.sub("(?i)[\r\n]*<tr(?P<attr> [^>]*?)>[\r\n]*",
-                          r"\r\n|-\g<attr>\r\n", newTable)
+        new_table = re.sub(
+            '(?i)[\r\n]*<tr(?P<attr> [^>]*?)>[\r\n]*',
+            r'\r\n|-\g<attr>\r\n', new_table)
 
         # <tr> without attributes
-        newTable = re.sub("(?i)[\r\n]*<tr>[\r\n]*",
-                          r"\r\n|-\r\n", newTable)
+        new_table = re.sub(
+            '(?i)[\r\n]*<tr>[\r\n]*',
+            r'\r\n|-\r\n', new_table)
 
         ##################
         # normal <td> without arguments
-        newTable = re.sub(r'(?i)[\r\n]+<td>(?P<cell>[\w\W]*?)<\/td>',
-                          r'\r\n| \g<cell>\r\n', newTable)
+        new_table = re.sub(
+            r'(?i)[\r\n]+<td>(?P<cell>[\w\W]*?)<\/td>',
+            r'\r\n| \g<cell>\r\n', new_table)
 
         ##################
         # normal <td> with arguments
-        newTable = re.sub(
+        new_table = re.sub(
             r'(?i)[\r\n]+<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)<\/td>',
-            r'\r\n|\g<attr> | \g<cell>', newTable)
+            r'\r\n|\g<attr> | \g<cell>', new_table)
 
         # WARNING: this sub might eat cells of bad HTML, but most likely it
         # will correct errors
         # TODO: some more docu please
-        newTable, n = re.subn("(?i)[\r\n]+<td>(?P<cell>[^\r\n]*?)<td>",
-                              r"\r\n| \g<cell>\r\n", newTable)
+        new_table, n = re.subn(
+            '(?i)[\r\n]+<td>(?P<cell>[^\r\n]*?)<td>',
+            r'\r\n| \g<cell>\r\n', new_table)
         if n > 0:
             warning_messages.append(
                 u'<td> used where </td> was expected. (%d occurences)\n' % n)
             warnings += n
 
         # what is this for?
-        newTable, n = re.subn(
+        new_table, n = re.subn(
             r'[\r\n]+<(td|TD)([^>]+?)>([^\r\n]*?)</(td|TD)>',
-            r'\r\n|\2 | \3\r\n', newTable)
+            r'\r\n|\2 | \3\r\n', new_table)
         if n > 0:
             warning_messages.append(
                 u"WARNING: (sorry, bot code unreadable (1). I don't know why "
@@ -229,25 +236,26 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
         # fail save. sometimes people forget </td>
         # <td> without arguments, with missing </td>
-        newTable, n = re.subn(r'(?i)<td>(?P<cell>[^<]*?)[\r\n]+',
-                              r'\r\n| \g<cell>\r\n', newTable)
+        new_table, n = re.subn(
+            r'(?i)<td>(?P<cell>[^<]*?)[\r\n]+',
+            r'\r\n| \g<cell>\r\n', new_table)
         if n > 0:
             warning_messages.append(u"NOTE: Found <td> without </td>. This "
                                     u"shouldn't cause problems.\n")
 
         # <td> with attributes, with missing </td>
-        newTable, n = re.subn(
+        new_table, n = re.subn(
             r'(?i)[\r\n]*<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)[\r\n]+',
-            r'\r\n|\g<attr> | \g<cell>\r\n', newTable)
+            r'\r\n|\g<attr> | \g<cell>\r\n', new_table)
         if n > 0:
             warning_messages.append(u"NOTE: Found <td> without </td>. This "
                                     u"shouldn't cause problems.\n")
 
         ##################
         # Garbage collecting ;-)
-        newTable = re.sub(r'(?i)<td>[\r\n]*<\/tr>', '', newTable)
+        new_table = re.sub(r'(?i)<td>[\r\n]*</tr>', '', new_table)
         # delete closing tags
-        newTable = re.sub(r'(?i)[\r\n]*<\/t[rdh]>', '', newTable)
+        new_table = re.sub(r'(?i)[\r\n]*</t[rdh]>', '', new_table)
 
         ##################
         # OK, that's only theory but works most times.
@@ -263,8 +271,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         ##################
         # most <th> come with '''title'''. Senseless in my eyes cuz
         # <th> should be bold anyways.
-        newTable = re.sub(r"[\r\n]+\!([^'\n\r]*)'''([^'\r\n]*)'''",
-                          r'\r\n!\1\2', newTable)
+        new_table = re.sub(
+            r"[\r\n]+\!([^'\n\r]*)'''([^'\r\n]*)'''",
+            r'\r\n!\1\2', new_table)
 
         ##################
         # kills indention within tables. Be warned, it might seldom bring
@@ -273,30 +282,29 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         if config.deIndentTables:
             num = 1
             while num != 0:
-                newTable, num = re.subn(
+                new_table, num = re.subn(
                     r'(\{\|[\w\W]*?)\n[ \t]+([\w\W]*?\|\})',
-                    r'\1\r\n\2', newTable)
+                    r'\1\r\n\2', new_table)
 
         ##################
         # kills additional spaces after | or ! or {|
         # This line was creating problems, so I commented it out --Daniel
         # newTable = re.sub("[\r\n]+\|[\t ]+?[\r\n]+", "\r\n| ", newTable)
         # kills trailing spaces and tabs
-        newTable = re.sub(r'\r\n(.*)[\t\ ]+[\r\n]+',
-                          r'\r\n\1\r\n', newTable)
+        new_table = re.sub(
+            r'\r\n(.*)[\t ]+[\r\n]+', r'\r\n\1\r\n', new_table)
         # kill extra new-lines
-        newTable = re.sub(r'[\r\n]{4,}(\!|\|)',
-                          r'\r\n\1', newTable)
+        new_table = re.sub(r'[\r\n]{4,}[!|]', r'\r\n\1', new_table)
 
         ##################
         # shortening if <table> had no arguments/parameters
-        newTable = re.sub(r'[\r\n]+\{\|[\ ]+\| ', r'\r\n{| ', newTable)
+        new_table = re.sub(r'[\r\n]+{\| +\| ', r'\r\n{| ', new_table)
         # shortening if <td> had no articles
-        newTable = re.sub(r'[\r\n]+\|[\ ]+\| ', '\r\n| ', newTable)
+        new_table = re.sub(r'[\r\n]+\| +\| ', '\r\n| ', new_table)
         # shortening if <th> had no articles
-        newTable = re.sub(r'\n\|\+[\ ]+\|', '\n|+ ', newTable)
+        new_table = re.sub(r'\n\|\+ +\|', '\n|+ ', new_table)
         # shortening of <caption> had no articles
-        newTable = re.sub(r'[\r\n]+\![\ ]+\| ', '\r\n! ', newTable)
+        new_table = re.sub(r'[\r\n]+! +\| ', '\r\n! ', new_table)
 
         ##################
         # proper attributes. attribute values need to be in quotation marks.
@@ -310,9 +318,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             # We recognize it by searching for a string of non-whitespace
             # characters
             # - [^\s]+? - which is not embraced by quotation marks - [^"]
-            newTable, num = re.subn(
+            new_table, num = re.subn(
                 r'([\r\n]+(?:\|-|\{\|)[^\r\n\|]+) *= *([^"\s>]+)',
-                r'\1="\2"', newTable, 1)
+                r'\1="\2"', new_table, 1)
 
         num = 1
         while num != 0:
@@ -321,44 +329,44 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             # change cell contents which accidentially contain an equal sign.
             # Group 1 and 2 are anologously to the previous regular expression,
             # group 3 are the remaining attribute key - value pairs.
-            newTable, num = re.subn(
+            new_table, num = re.subn(
                 r'([\r\n]+(?:!|\|)[^\r\n\|]+) *= *([^"\s>]+)([^\|\r\n]*)\|',
-                r'\1="\2"\3|', newTable, 1)
+                r'\1="\2"\3|', new_table, 1)
 
         ##################
         # merge two short <td>s
         num = 1
         while num != 0:
-            newTable, num = re.subn(
+            new_table, num = re.subn(
                 r'[\r\n]+(\|[^\|\-\}]{1}[^\n\r]{0,35})'
                 r'[\r\n]+(\|[^\|\-\}]{1}[^\r\n]{0,35})[\r\n]+',
-                r'\r\n\1 |\2\r\n', newTable)
+                r'\r\n\1 |\2\r\n', new_table)
         ####
         # add a new line if first is * or #
-        newTable = re.sub(r'[\r\n]+\| ([*#]{1})',
-                          r'\r\n|\r\n\1', newTable)
+        new_table = re.sub(r'[\r\n]+\| ([*#]{1})', r'\r\n|\r\n\1', new_table)
 
         ##################
         # strip <center> from <th>
-        newTable = re.sub(r'([\r\n]+\![^\r\n]+?)<center>([\w\W]+?)<\/center>',
-                          r'\1 \2', newTable)
+        new_table = re.sub(
+            r'([\r\n]+![^\r\n]+?)<center>([\w\W]+?)</center>',
+            r'\1 \2', new_table)
         # strip align="center" from <th> because the .css does it
         # if there are no other attributes than align, we don't need
         # that | either
-        newTable = re.sub(r'([\r\n]+\! +)align\=\"center\" +\|',
-                          r'\1', newTable)
+        new_table = re.sub(
+            r'([\r\n]+! +)align=\"center\" +\|', r'\1', new_table)
         # if there are other attributes, simply strip the align="center"
-        newTable = re.sub(
-            r'([\r\n]+\![^\r\n\|]+?)align\=\"center\"([^\n\r\|]+?\|)',
-            r'\1 \2', newTable)
+        new_table = re.sub(
+            r'([\r\n]+![^\r\n|]+?)align=\"center\"([^\n\r|]+?\|)',
+            r'\1 \2', new_table)
 
         ##################
         # kill additional spaces within arguments
         num = 1
         while num != 0:
-            newTable, num = re.subn(
+            new_table, num = re.subn(
                 r'[\r\n]+(\||\!)([^|\r\n]*?)[ \t]{2,}([^\r\n]+?)',
-                r'\r\n\1\2 \3', newTable)
+                r'\r\n\1\2 \3', new_table)
 
         ##################
         # I hate those long lines because they make a wall of letters
@@ -368,11 +376,11 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             while num != 0:
                 # TODO: how does this work? docu please.
                 # why are only äöüß used, but not other special characters?
-                newTable, num = re.subn(
+                new_table, num = re.subn(
                     r'(\r\n[A-Z]{1}[^\n\r]{200,}?[a-zäöüß]\.)'
                     r'\ ([A-ZÄÖÜ]{1}[^\n\r]{200,})',
-                    r'\1\r\n\2', newTable)
-        return newTable, warnings, warning_messages
+                    r'\1\r\n\2', new_table)
+        return new_table, warnings, warning_messages
 
     def markActiveTables(self, text):
         """
@@ -381,13 +389,10 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Mark all table start and end tags that are not disabled by nowiki tags,
         comments etc. We will then later only work on these marked tags.
         """
-        tableStartTagR = re.compile("<table", re.IGNORECASE)
-        tableEndTagR = re.compile("</table>", re.IGNORECASE)
-
-        text = pywikibot.replaceExcept(text, tableStartTagR, "<##table##",
+        text = pywikibot.replaceExcept(text, _table_start_regex, '<##table##',
                                        exceptions=['comment', 'math',
                                                    'nowiki', 'pre', 'source'])
-        text = pywikibot.replaceExcept(text, tableEndTagR, "</##table##>",
+        text = pywikibot.replaceExcept(text, _table_end_regex, '</##table##>',
                                        exceptions=['comment', 'math',
                                                    'nowiki', 'pre', 'source'])
         return text
@@ -399,38 +404,36 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Returns the table and the start and end position inside the text.
         """
         # Note that we added the ## characters in markActiveTables().
-        markedTableStartTagR = re.compile("<##table##", re.IGNORECASE)
-        markedTableEndTagR = re.compile("</##table##>", re.IGNORECASE)
-        m = markedTableStartTagR.search(text)
+        m = _marked_table_start_search(text)
         if not m:
             return None, 0, 0
         else:
             start = m.start()
             offset = m.end()
-            originalText = text
+            original_text = text
             text = text[m.end():]
             # depth level of table nesting
             depth = 1
             # i = start + 1
             while depth > 0:
-                nextStarting = markedTableStartTagR.search(text)
-                nextEnding = markedTableEndTagR.search(text)
-                if not nextEnding:
+                next_starting = _marked_table_start_search(text)
+                next_ending = _marked_table_end_search(text)
+                if not next_ending:
                     pywikibot.output(
                         'More opening than closing table tags. Skipping.')
                     return None, 0, 0
                 # if another table tag is opened before one is closed
-                elif (nextStarting and
-                      nextStarting.start() < nextEnding.start()):
-                    offset += nextStarting.end()
-                    text = text[nextStarting.end():]
+                elif (next_starting and
+                      next_starting.start() < next_ending.start()):
+                    offset += next_starting.end()
+                    text = text[next_starting.end():]
                     depth += 1
                 else:
-                    offset += nextEnding.end()
-                    text = text[nextEnding.end():]
+                    offset += next_ending.end()
+                    text = text[next_ending.end():]
                     depth -= 1
             end = offset
-            return originalText[start:end], start, end
+            return original_text[start:end], start, end
 
     def convertAllHTMLTables(self, text):
         """
@@ -441,9 +444,9 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         """
         text = self.markActiveTables(text)
 
-        convertedTables = 0
-        warningSum = 0
-        warningMessages = u''
+        converted_tables = 0
+        warning_sum = 0
+        warning_messages = ''
 
         while True:
             table, start, end = self.findTable(text)
@@ -452,31 +455,29 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 break
 
             # convert the current table
-            newTable, warningsThisTable, warnMsgsThisTable = self.convertTable(
-                table)
-            warningSum += warningsThisTable
-            for msg in warnMsgsThisTable:
-                warningMessages += 'In table %i: %s' % (convertedTables + 1,
-                                                        msg)
-            text = text[:start] + newTable + text[end:]
-            convertedTables += 1
+            new_table, table_warns_num, table_warns = self.convertTable(table)
+            warning_sum += table_warns_num
+            for msg in table_warns:
+                warning_messages += 'In table %i: %s' % (
+                    converted_tables + 1, msg)
+            text = text[:start] + new_table + text[end:]
+            converted_tables += 1
 
-        pywikibot.output(warningMessages)
-        return text, convertedTables, warningSum
+        pywikibot.output(warning_messages)
+        return text, converted_tables, warning_sum
 
     def treat_page(self):
         """Convert all HTML tables in text to wiki syntax and save it."""
         text = self.current_page.text
-        newText, convertedTables, warnings = self.convertAllHTMLTables(text)
+        new_text, converted_tables, warnings = self.convertAllHTMLTables(text)
 
         # Check if there are any marked tags left
-        markedTableTagR = re.compile("<##table##|</##table##>", re.IGNORECASE)
-        if markedTableTagR.search(newText):
+        if re.search('<##table##|</##table##>', new_text, re.IGNORECASE):
             pywikibot.error(
                 u'not all marked table start or end tags processed!')
             return
 
-        if convertedTables == 0:
+        if converted_tables == 0:
             pywikibot.output(u"No changes were necessary.")
             return
 
@@ -495,17 +496,23 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
         # get edit summary message
         if warnings == 0:
-            editSummaryMessage = i18n.twtranslate(
+            edit_summary = i18n.twtranslate(
                 self.site.code, 'table2wiki-no-warning')
         else:
-            editSummaryMessage = i18n.twntranslate(
+            edit_summary = i18n.twntranslate(
                 self.site.code,
                 'table2wiki-warnings',
                 {'count': warnings}
             )
-        self.put_current(newText, summary=editSummaryMessage,
+        self.put_current(new_text, summary=edit_summary,
                          show_diff=not (self.getOption('quiet') and
                                         self.getOption('always')))
+
+
+_marked_table_start_search = re.compile('<##table##', re.IGNORECASE).search
+_marked_table_end_search = re.compile('</##table##>', re.IGNORECASE).search
+_table_start_regex = re.compile('<table', re.IGNORECASE)
+_table_end_regex = re.compile('</table>', re.IGNORECASE)
 
 
 def main(*args):
@@ -525,7 +532,7 @@ def main(*args):
     # This factory is responsible for processing command line arguments
     # that are also used by other scripts and that determine on which pages
     # to work on.
-    genFactory = pagegenerators.GeneratorFactory(positional_arg_name='page')
+    gen_factory = pagegenerators.GeneratorFactory(positional_arg_name='page')
 
     for arg in local_args:
         option, sep, value = arg.partition(':')
@@ -553,16 +560,16 @@ FROM page JOIN text ON (page_id = old_id)
 WHERE old_text LIKE '%<table%'
 """
                 arg = '-mysqlquery:' + query
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
     if gen:
         gen = pagegenerators.NamespaceFilterPageGenerator(
-            gen, genFactory.namespaces)
+            gen, gen_factory.namespaces)
     else:
-        gen = genFactory.getCombinedGenerator()
+        gen = gen_factory.getCombinedGenerator()
 
     if gen:
-        if not genFactory.nopreload:
+        if not gen_factory.nopreload:
             gen = pagegenerators.PreloadingGenerator(gen)
         bot = Table2WikiRobot(generator=gen, **options)
         bot.run()

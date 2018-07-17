@@ -309,10 +309,6 @@ def get_base_dir(test_directory=None):
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
 
-    DIRNAME_WIN = u"Pywikibot"
-    DIRNAME_WIN_FBCK = u"pywikibot"
-    DIRNAME_UNIX = u".pywikibot"
-
     base_dir = ""
     for arg in sys.argv[1:]:
         if arg.startswith(str('-dir:')):
@@ -340,10 +336,10 @@ def get_base_dir(test_directory=None):
                 else:
                     raise WindowsError(u'Windows version %s not supported yet.'
                                        % win_version)
-                base_dir_cand.extend([[home] + sub_dir + [DIRNAME_WIN],
-                                     [home] + sub_dir + [DIRNAME_WIN_FBCK]])
+                base_dir_cand.extend([[home] + sub_dir + ['Pywikibot'],
+                                     [home] + sub_dir + ['pywikibot']])
             else:
-                base_dir_cand.append([home, DIRNAME_UNIX])
+                base_dir_cand.append([home, '.pywikibot'])
 
             for dir in base_dir_cand:
                 dir = os.path.join(*dir)

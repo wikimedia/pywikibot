@@ -98,7 +98,7 @@ def main(*args):
     options = {}
 
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg == '-always':
@@ -106,9 +106,9 @@ def main(*args):
         elif arg == '-titlecase':
             options['titlecase'] = True
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    gen = genFactory.getCombinedGenerator(preload=True)
+    gen = gen_factory.getCombinedGenerator(preload=True)
     if gen:
         bot = CapitalizeBot(gen, **options)
         bot.run()
