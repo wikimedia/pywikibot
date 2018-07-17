@@ -35,6 +35,7 @@ except ImportError:   # py2
         import os
 
         def replace(src, dst):
+            """Rename a file or directory, overwriting the destination."""
             try:
                 os.rename(src, dst)
             except OSError:

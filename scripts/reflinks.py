@@ -301,10 +301,10 @@ class DuplicateReferences(object):
         #   keys are ref content
         #   values are [name, [list of full ref matches],
         #               quoted, need_to_change]
-        foundRefs = {}
-        foundRefNames = {}
+        found_refs = {}
+        found_ref_names = {}
         # Replace key by [value, quoted]
-        namedRepl = {}
+        named_repl = {}
 
         for match in self.REFS.finditer(text):
             content = match.group('content')
@@ -313,10 +313,10 @@ class DuplicateReferences(object):
 
             params = match.group('params')
             group = self.GROUPS.match(params)
-            if group not in foundRefs:
-                foundRefs[group] = {}
+            if group not in found_refs:
+                found_refs[group] = {}
 
-            groupdict = foundRefs[group]
+            groupdict = found_refs[group]
             if content in groupdict:
                 v = groupdict[content]
                 v[1].append(match.group())
@@ -328,13 +328,13 @@ class DuplicateReferences(object):
                 name = name.group('name')
                 if v[0]:
                     if v[0] != name:
-                        namedRepl[name] = [v[0], v[2]]
+                        named_repl[name] = [v[0], v[2]]
                 else:
                     # First name associated with this content
 
                     if name == 'population':
                         pywikibot.output(content)
-                    if name not in foundRefNames:
+                    if name not in found_ref_names:
                         # first time ever we meet this name
                         if name == 'population':
                             pywikibot.output("in")
@@ -344,13 +344,13 @@ class DuplicateReferences(object):
                         # if has_key, means that this name is used
                         # with another content. We'll need to change it
                         v[3] = True
-                foundRefNames[name] = 1
+                found_ref_names[name] = 1
             groupdict[content] = v
 
         id = 1
-        while self.autogen + str(id) in foundRefNames:
+        while self.autogen + str(id) in found_ref_names:
             id += 1
-        for (g, d) in foundRefs.items():
+        for (g, d) in found_refs.items():
             if g:
                 group = u"group=\"%s\" " % group
             else:
@@ -379,7 +379,7 @@ class DuplicateReferences(object):
                     end = end.replace(ref, unnamed)
                 text = header + end
 
-        for (k, v) in namedRepl.items():
+        for (k, v) in named_repl.items():
             # TODO : Support ref groups
             name = v[0]
             if v[1]:
@@ -498,7 +498,7 @@ class ReferencesRobot(Bot):
     def run(self):
         """Run the Bot."""
         try:
-            deadLinks = codecs.open(listof404pages, 'r', 'latin_1').read()
+            dead_links = codecs.open(listof404pages, 'r', 'latin_1').read()
         except IOError:
             raise NotImplementedError(
                 '404-links.txt is required for reflinks.py\n'
@@ -543,8 +543,8 @@ class ReferencesRobot(Bot):
                         ref.url, use_fake_user_agent=self._use_fake_user_agent)
 
                     # Try to get Content-Type from server
-                    contentType = f.response_headers.get('content-type')
-                    if contentType and not self.MIME.search(contentType):
+                    content_type = f.response_headers.get('content-type')
+                    if content_type and not self.MIME.search(content_type):
                         if ref.link.lower().endswith('.pdf') and \
                            not self.getOption('ignorepdf'):
                             # If file has a PDF suffix
@@ -595,7 +595,7 @@ class ReferencesRobot(Bot):
                         # purposely removed
                         if f.status == 410 or \
                            (f.status == 404 and ('\t{}\t'.format(ref.url)
-                                                 in deadLinks)):
+                                                 in dead_links)):
                             repl = ref.refDead()
                             new_text = new_text.replace(match.group(), repl)
                         continue
@@ -625,14 +625,14 @@ class ReferencesRobot(Bot):
                 meta_content = self.META_CONTENT.search(linkedpagetext)
                 enc = []
                 s = None
-                if contentType:
+                if content_type:
                     # use charset from http header
-                    s = self.CHARSET.search(contentType)
+                    s = self.CHARSET.search(content_type)
                 if meta_content:
                     tag = meta_content.group()
                     # Prefer the contentType from the HTTP header :
-                    if not contentType:
-                        contentType = tag
+                    if not content_type:
+                        content_type = tag
                     if not s:
                         # use charset from html
                         s = self.CHARSET.search(str(tag))
@@ -651,10 +651,10 @@ class ReferencesRobot(Bot):
                         enc.append(tmp)
                 else:
                     pywikibot.output(u'No charset found for %s' % ref.link)
-                if not contentType:
+                if not content_type:
                     pywikibot.output('No content-type found for %s' % ref.link)
                     continue
-                elif not self.MIME.search(contentType):
+                elif not self.MIME.search(content_type):
                     pywikibot.output(color_format(
                         '{lightyellow}WARNING{default} : media : {0} ',
                         ref.link))
@@ -769,14 +769,14 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    xmlFilename = None
-    xmlStart = None
+    xml_filename = None
+    xml_start = None
     options = {}
     generator = None
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
         if arg.startswith('-summary:'):
@@ -789,28 +789,28 @@ def main(*args):
             options['limit'] = int(arg[7:])
         elif arg.startswith('-xmlstart'):
             if len(arg) == 9:
-                xmlStart = pywikibot.input(
+                xml_start = pywikibot.input(
                     u'Please enter the dumped article to start with:')
             else:
-                xmlStart = arg[10:]
+                xml_start = arg[10:]
         elif arg.startswith('-xml'):
             if len(arg) == 4:
-                xmlFilename = pywikibot.input(
+                xml_filename = pywikibot.input(
                     u'Please enter the XML dump\'s filename:')
             else:
-                xmlFilename = arg[5:]
+                xml_filename = arg[5:]
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    if xmlFilename:
-        generator = XmlDumpPageGenerator(xmlFilename, xmlStart,
-                                         genFactory.namespaces)
+    if xml_filename:
+        generator = XmlDumpPageGenerator(xml_filename, xml_start,
+                                         gen_factory.namespaces)
     if not generator:
-        generator = genFactory.getCombinedGenerator()
+        generator = gen_factory.getCombinedGenerator()
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
-    if not genFactory.nopreload:
+    if not gen_factory.nopreload:
         generator = pagegenerators.PreloadingGenerator(generator)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
     bot = ReferencesRobot(generator, **options)
