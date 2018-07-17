@@ -15,7 +15,7 @@ import re
 
 import pywikibot
 import pywikibot.textlib as textlib
-from pywikibot.textlib import _MultiTemplateMatchBuilder
+from pywikibot.textlib import _MultiTemplateMatchBuilder, extract_sections
 
 from pywikibot import config, UnknownSite
 from pywikibot.site import _IWEntry
@@ -143,8 +143,6 @@ class TestFormatCategory(DefaultDrySiteTestCase):
 
     """Test category formatting."""
 
-    dry = True
-
     catresult = ('[[Category:Cat1]]%(LS)s[[Category:Cat2]]%(LS)s'
                  % {'LS': config.LS})
 
@@ -183,8 +181,6 @@ class TestCategoryRearrangement(DefaultDrySiteTestCase):
     Tests .getCategoryLinks() and .replaceCategoryLinks(),
     with both a newline and an empty string as separators.
     """
-
-    dry = True
 
     old = ('[[Category:Cat1]]%(LS)s[[Category:Cat2|]]%(LS)s'
            '[[Category:Cat1| ]]%(LS)s[[Category:Cat2|key]]'
@@ -1411,8 +1407,6 @@ class TestMultiTemplateMatchBuilder(DefaultDrySiteTestCase):
 
     """Test _MultiTemplateMatchBuilder."""
 
-    dry = True
-
     @classmethod
     def setUpClass(cls):
         """Cache namespace 10 (Template) case sensitivity."""
@@ -1573,6 +1567,48 @@ class TestStarList(TestCase):
             textlib.append_stars(
                 'foo', ['{{linkfa|en}}\n', '{{linkfa|de}}\n',
                         '{{linkfa|fr}}\n', '{{linkfa|bar}}']))
+
+
+class TestExtractSections(DefaultDrySiteTestCase):
+
+    """Test the extract_sections function."""
+
+    def test_no_sections_no_footer(self):
+        """Test for text having no sections or footer."""
+        self.assertEqual(
+            extract_sections('text', self.site),
+            ('text', [], '')
+        )
+
+    def test_no_sections_with_footer(self):
+        """Test for text having footer but no section."""
+        self.assertEqual(
+            extract_sections('text\n\n[[Category:A]]', self.site),
+            ('text\n\n', [], '[[Category:A]]')
+        )
+
+    def test_with_section_no_footer(self):
+        """Test for text having sections but no footer."""
+        self.assertEqual(
+            extract_sections(
+                'text\n\n'
+                '==title==\n'
+                'content',
+                self.site),
+            ('text\n\n', [('==title==', '\ncontent')], '')
+        )
+
+    def test_with_section_with_footer(self):
+        """Test for text having sections and footer."""
+        self.assertEqual(
+            extract_sections(
+                'text\n\n'
+                '==title==\n'
+                'content\n'
+                '[[Category:A]]\n',
+                self.site),
+            ('text\n\n', [('==title==', '\ncontent\n')], '[[Category:A]]\n')
+        )
 
 
 if __name__ == '__main__':  # pragma: no cover
