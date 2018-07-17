@@ -907,12 +907,18 @@ def extract_sections(text, site=None):
     sections = _extract_sections(text, headings)
     # Find header and footer contents
     header = text[:headings[0].start] if headings else text
-    last_section_contents = sections[-1].content if sections else header
     cat_regex, interwiki_regex = _get_regexes(('category', 'interwiki'), site)
     langlink_pattern = interwiki_regex.pattern.replace(':?', '')
+    last_section_content = sections[-1].content if sections else header
     footer = re.search(
         r'(%s)*\Z' % r'|'.join((langlink_pattern, cat_regex.pattern, r'\s+')),
-        last_section_contents).group().strip()
+        last_section_content).group().lstrip()
+    if footer:
+        if sections:
+            sections[-1] = _Section(
+                sections[-1].title, last_section_content[:-len(footer)])
+        else:
+            header = header[:-len(footer)]
     return header, sections, footer
 
 

@@ -702,7 +702,7 @@ class CosmeticChangesToolkit(object):
                            - len(current_heading.lstrip('=')))
             next_dep = len(next_heading) - len(next_heading.lstrip('='))
             if strip_section[1].strip() or current_dep < next_dep:
-                new_body = new_body + list(sections[i])
+                new_body.extend(sections[i])
         return header + ''.join(new_body) + footer
 
     def removeUselessSpaces(self, text):
