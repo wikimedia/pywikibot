@@ -16,6 +16,8 @@ This script understands various command-line arguments:
                   created.
 
 -touch            Do a null edit on every page which has a wikibase item.
+                  Be careful, this option can trigger edit rates or captachas
+                  if your account is not autoconfirmed.
 
 """
 #
@@ -27,6 +29,7 @@ This script understands various command-line arguments:
 from __future__ import absolute_import, division, unicode_literals
 
 from datetime import timedelta
+from textwrap import fill
 
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
@@ -46,7 +49,8 @@ class NewItemRobot(WikidataBot):
             'always': True,
             'lastedit': 7,
             'pageage': 21,
-            'touch': False,
+            'touch': 'newly',  # Can be False, newly (pages linked to newly
+                               # created items) or True (touch all pages)
         })
 
         super(NewItemRobot, self).__init__(**kwargs)
@@ -68,6 +72,7 @@ class NewItemRobot(WikidataBot):
     @staticmethod
     def _touch_page(page):
         try:
+            pywikibot.output('Doing a null edit on the page.')
             page.touch()
         except (NoCreateError, NoPage):
             pywikibot.error('Page {0} does not exist.'.format(
@@ -80,7 +85,7 @@ class NewItemRobot(WikidataBot):
                 page.title(as_link=True)))
 
     def _callback(self, page, exc):
-        if exc is None:
+        if exc is None and self.getOption('touch'):
             self._touch_page(page)
 
     def treat_page_and_item(self, page, item):
@@ -88,8 +93,7 @@ class NewItemRobot(WikidataBot):
         if item and item.exists():
             pywikibot.output('{0} already has an item: {1}.'
                              .format(page, item))
-            if self.getOption('touch'):
-                pywikibot.output('Doing a null edit on the page.')
+            if self.getOption('touch') is True:
                 self._touch_page(page)
             return
 
@@ -152,6 +156,17 @@ def main(*args):
         return False
 
     bot = NewItemRobot(generator, **options)
+    user = pywikibot.User(bot.site, bot.site.username)
+    if bot.getOption('touch') == 'newly' \
+            and 'autoconfirmed' not in user.groups():
+        pywikibot.warning(fill(
+            'You are logged in as {}, an account that is '
+            'not in the autoconfirmed group on {}. Script '
+            'will not touch pages linked to newly created '
+            'items to avoid triggering edit rates or '
+            'captachas. Use -touch param to force this.'
+            .format(user.username, bot.site.sitename)))
+        bot.options['touch'] = False
     bot.run()
     return True
 
