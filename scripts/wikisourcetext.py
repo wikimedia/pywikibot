@@ -18,32 +18,40 @@ can be treated. '-force' will override existing page in this case.
 
 The following parameters are supported:
 
-    -index:...     name of the index page
+    -index:...  name of the index page.
 
     -pages:<start>-<end>,...<start>-<end>,<start>-<end>
-                   Page range to upload;
-                   optional, start=1, end=djvu file number of images.
-                   Page ranges can be specified as:
+                Page range to upload;
+                optional, start=1, end=djvu file number of images.
+                Page ranges can be specified as:
 
-                   | A-B -> pages A until B
-                   | A-  -> pages A until number of images
-                   | A   -> just page A
-                   | -B  -> pages 1 until B
+                | A-B -> pages A until B
+                | A-  -> pages A until number of images
+                | A   -> just page A
+                | -B  -> pages 1 until B
 
-    -showdiff:     show difference between curent text and new text when
-                   saving the page
+    -showdiff:  show difference between current text and new text when
+                saving the page.
 
-    -ocr:          use https://tools.wmflabs.org/phetools OCR tool to get text;
-                   default is False, i.e. only not-(yet)-existing pages in Page
-                   ns will be treated and text will be fetched via preload.
+    -ocr:       use OCR tools hosted on https://tools.wmflabs.org.
+                By default no OCR is done, i.e. only not-(yet)-existing
+                pages in Page ns will be treated and text will be fetched
+                via preload.
+                If -ocr is provided, default OCR method is:
+                 - https://tools.wmflabs.org/phetools
+                If ocr:googleOCR is given, OCR method is:
+                 - https://tools.wmflabs.org/ws-google-ocr
 
-    -force:        overwrite existing pages;
-                   default is False; valid only if '-ocr' is selected.
+    -threads:n  number of threads used to fetch OCR from OCR tools.
+                default is 5; valid only if '-ocr' is selected.
 
-    -summary:      custom edit summary.
-                   Use quotes if edit summary contains spaces.
+    -force:     overwrite existing pages;
+                default is False; valid only if '-ocr' is selected.
 
-    -always        don't bother asking to confirm any of the changes.
+    -summary:   custom edit summary.
+                Use quotes if edit summary contains spaces.
+
+    -always     don't bother asking to confirm any of the changes.
 """
 #
 # (C) Pywikibot team, 2016-2018
@@ -52,7 +60,11 @@ The following parameters are supported:
 #
 from __future__ import absolute_import, division, unicode_literals
 
+import collections
 import itertools
+import sys
+import threading
+import time
 
 import pywikibot
 
@@ -60,6 +72,11 @@ from pywikibot import i18n
 
 from pywikibot.bot import SingleSiteBot
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
+
+if sys.version_info[0] > 2:
+    import queue
+else:
+    import Queue as queue
 
 
 class UploadTextBot(SingleSiteBot):
@@ -77,6 +94,13 @@ class UploadTextBot(SingleSiteBot):
         """
         Initializer.
 
+        If OCR is requested, spawns worker threads, and, if no "force" option
+        is set, filter for existing pages.
+
+        Queues are used for communication to/from threads.
+        A PriorityQueue is used to process pages in the same order as
+        they are generated.
+
         @param generator: page generator
         @type generator: generator
         """
@@ -84,7 +108,8 @@ class UploadTextBot(SingleSiteBot):
             'showdiff': False,
             'force': False,
             'ocr': False,
-            'summary': 'Bot: uploading text'
+            'summary': 'Bot: uploading text',
+            'threads': 5
         })
         super(UploadTextBot, self).__init__(**kwargs)
         self.generator = generator
@@ -94,6 +119,59 @@ class UploadTextBot(SingleSiteBot):
         if not self.getOption('summary'):
             self.options['summary'] = i18n.twtranslate(
                 self.site, 'djvutext-creating')
+
+        if self.getOption('ocr'):
+            self._num_threads = self.getOption('threads')
+            self._queue_in = queue.Queue()
+            self._queue_out = queue.PriorityQueue()
+
+            # If not "-force", no reason to get OCR for existing pages
+            # and to process them in Bot.run().
+            if not self.getOption('force'):
+                self.generator = (p for p in self.generator if not p.exists())
+            self._spawn_ocr_threads()
+
+    def _spawn_ocr_threads(self):
+        """Spawn threads for _ocr_worker workers."""
+        for i in range(self._num_threads):
+            worker = threading.Thread(target=self._ocr_worker)
+            worker.setDaemon(True)
+            worker.start()
+
+        self._pages = collections.OrderedDict()
+        for idx, p in enumerate(self.generator):
+            self._pages.setdefault(p, idx)
+        self.generator = (p for p in self._pages)  # recreate gen for run()
+
+        for p, idx in self._pages.items():
+            self._queue_in.put((p, idx))  # idx to preserve order later
+
+    def _ocr_worker(self):
+        """Fetch OCR content from ocr_tool and queue it."""
+        while True:
+            page, idx = self._queue_in.get()
+            try:
+                text_body = page.ocr(ocr_tool=self.getOption('ocr'))
+            except ValueError as e:
+                # TODO: is it a problem in PY2?
+                pywikibot.error(str(e))
+                text_body = None  # Sentinel: signal exception to self.treat()
+
+            self._queue_out.put((idx, text_body))
+            self._queue_in.task_done()
+
+    def _get_ocr(self, page):
+        """Get OCR content for page from PriorityQueue."""
+        # blocks until OCR for expected idx is available
+        expected_idx = self._pages.get(page)
+        while True:
+            if self._queue_out.empty():
+                time.sleep(0.2)  # some pause
+                continue
+            idx, text_body = self._queue_out.queue[0]  # peek first element
+            if idx == expected_idx:
+                idx, text_body = self._queue_out.get()
+                return text_body
 
     def treat(self, page):
         """Process one ProofreadPage page.
@@ -114,7 +192,12 @@ class UploadTextBot(SingleSiteBot):
             old_text = ''
 
         if self.getOption('ocr'):
-            page.body = page.ocr()
+            _body = self._get_ocr(page)
+            if _body is None:
+                pywikibot.output('No OCR found. Skipping {}'
+                                 .format(page.title(as_link=True)))
+                return
+            page.body = _body
 
         if (page.exists() and
                 not (self.getOption('ocr') and self.getOption('force'))):
@@ -151,7 +234,9 @@ def main(*args):
         elif arg == '-summary':
             options['summary'] = value
         elif arg == '-ocr':
-            options['ocr'] = True
+            options['ocr'] = value or 'phetools'
+        elif arg == '-threads':
+            options['threads'] = int(value)
         elif arg == '-force':
             options['force'] = True
         elif arg == '-always':
@@ -197,7 +282,7 @@ def main(*args):
     gen_list = []
     for start, end in sorted(pages):
         gen = index.page_gen(start=start, end=end,
-                             filter_ql=[1], content=False)
+                             filter_ql=[1], content=True)
         gen_list.append(gen)
 
     gen = itertools.chain(*gen_list)

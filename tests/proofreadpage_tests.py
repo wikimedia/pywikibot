@@ -320,6 +320,69 @@ class TestPageQuality(TestCase):
         self.assertEqual(page.quality_level, 0)
 
 
+class TestPageOCR(TestCase):
+
+    """Test page ocr functions."""
+
+    family = 'wikisource'
+    code = 'en'
+
+    cached = True
+
+    data = {'title': 'Page:Popular Science Monthly Volume 1.djvu/10',
+            'hocr': (False, 'ENTERED, according to Act of Congress, in the '
+                            'year 1872,\nBY D. APPLETON & CO.,\nIn the Ofﬁce '
+                            'of the Librarian of Congress, at '
+                            'Washington.\n\n'),
+            'ocr': (False, 'lam-mam, according to Act of Congress, in the '
+                           'year 157-2,\nBY D. APPLEION Av CO.,\nIn the '
+                           'Of\ufb01ce or the Librarian of '
+                           'Congress, at Washington.\n\n'),
+            'googleOCR': (False, 'ENTERED, according to Act of Congress, in '
+                                 'the year 1572,\nBY D. APPLETON & CO.\n'
+                                 'In the Office of the Librarian of '
+                                 'Congress, at Washington.\n4 334\n'),
+            }
+
+    def setUp(self):
+        """Test setUp."""
+        site = self.get_site()
+        title = self.data['title']
+        self.page = ProofreadPage(site, title)
+        super(TestPageOCR, self).setUp()
+
+    def test_ocr_exceptions(self):
+        """Test page.ocr() exceptions."""
+        self.assertRaises(TypeError, self.page.ocr, ocr_tool='dummy')
+
+    def test_do_hocr(self):
+        """Test page._do_hocr()."""
+        error, text = self.page._do_hocr()
+        ref_error, ref_text = self.data['hocr']
+        self.assertEqual(error, ref_error)
+        self.assertEqual(text, ref_text)
+
+    def test_do_ocr_phetools(self):
+        """Test page._do_ocr(ocr_tool='phetools')."""
+        error, text = self.page._do_ocr(ocr_tool='phetools')
+        ref_error, ref_text = self.data['ocr']
+        self.assertEqual(error, ref_error)
+        self.assertEqual(text, ref_text)
+
+    def test_do_ocr_googleocr(self):
+        """Test page._do_ocr(ocr_tool='googleOCR')."""
+        error, text = self.page._do_ocr(ocr_tool='googleOCR')
+        ref_error, ref_text = self.data['googleOCR']
+        self.assertEqual(error, ref_error)
+        self.assertEqual(text, ref_text)
+
+    def test_ocr_googleocr(self):
+        """Test page.ocr(ocr_tool='googleOCR')."""
+        text = self.page.ocr(ocr_tool='googleOCR')
+        ref_error, ref_text = self.data['googleOCR']
+        self.assertEqual(text, ref_text)
+
+
 @require_modules('bs4')
 class TestProofreadPageIndexProperty(TestCase):
 
