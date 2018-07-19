@@ -420,7 +420,7 @@ class LogEntryFactory(object):
 
     @classproperty
     @deprecated('Site.logtypes or LogEntryFactory.get_entry_class(logtype)')
-    def logtypes(cls):  # noqa: N805
+    def logtypes(cls):
         """DEPRECATED LogEntryFactory class attribute of log types."""
         return cls._logtypes
 

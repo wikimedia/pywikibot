@@ -170,7 +170,7 @@ class Timestamp(datetime.datetime):
         return self.replace(microsecond=self.microsecond)
 
     @classproperty
-    def ISO8601Format(cls):  # noqa: N805
+    def ISO8601Format(cls):
         """ISO8601 format string class property for compatibility purpose."""
         return cls._ISO8601Format()
 
