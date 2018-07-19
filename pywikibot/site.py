@@ -884,7 +884,7 @@ class BaseSite(ComparableMixin):
         self._pagemutex = threading.Lock()
 
     def user(self):
-        """Return the currently-logged in bot user, or None."""
+        """Return the currently-logged in bot username, or None."""
         if self.logged_in(True):
             return self._username[True]
         elif self.logged_in(False):
