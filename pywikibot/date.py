@@ -180,7 +180,7 @@ def decSinglVal(v):
     return v[0]
 
 
-@deprecated
+@deprecated(since='20151014')
 def encNoConv(i):
     """Return i."""
     return i
@@ -498,7 +498,7 @@ def _make_parameter(decoder, param):
     return newValue
 
 
-@deprecated
+@deprecated(since='20151014')
 def MakeParameter(decoder, param):
     """DEPRECATED."""
     return _make_parameter(decoder, param)
@@ -2302,7 +2302,7 @@ for monthId in range(12):
         formatLimits[dayMnthFmts[monthId]] = _formatLimit_DayOfMonth30
 
 
-@deprecated("calendar.monthrange")
+@deprecated('calendar.monthrange', since='20150707')
 def getNumberOfDaysInMonth(month):
     """
     Return the maximum number of days in a given month, 1 being January, etc.

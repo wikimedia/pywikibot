@@ -25,6 +25,7 @@ try:
     from collections.abc import Iterator, Mapping
 except ImportError:  # Python 2.7
     from collections import Iterator, Mapping
+from datetime import datetime
 from distutils.version import Version
 from functools import wraps
 from warnings import catch_warnings, showwarning, warn
@@ -429,7 +430,7 @@ class DeprecatedRegex(LazyRegex):
     def __getattr__(self, attr):
         """Issue deprecation warning."""
         issue_deprecation_warning(
-            self._name, self._instead, 2)
+            self._name, self._instead, 2, since='20150212')
         return super(DeprecatedRegex, self).__getattr__(attr)
 
 
@@ -972,7 +973,7 @@ class SelfCallMixin(object):
         """Do nothing and just return itself."""
         if hasattr(self, '_own_desc'):
             issue_deprecation_warning('Calling {0}'.format(self._own_desc),
-                                      'it directly', 2)
+                                      'it directly', 2, since='20150515')
         return self
 
 
@@ -1271,7 +1272,43 @@ def add_full_name(obj):
     return outer_wrapper
 
 
-def issue_deprecation_warning(name, instead, depth, warning_class=None):
+def _build_msg_string(instead, since):
+    """Build a deprecation warning message format string."""
+    if not since:
+        since = ''
+    elif '.' in since:
+        since = ' since release ' + since
+    else:
+        year_str = month_str = day_str = ''
+        days = (datetime.utcnow() - datetime.strptime(since, '%Y%m%d')).days
+        years = days // 365
+        days = days % 365
+        months = days // 30
+        days = days % 30
+        if years == 1:
+            years = 0
+            months += 12
+        if years:
+            year_str = '{0} years'.format(years)
+        else:
+            day_str = '{0} day{1}'.format(days, 's' if days != 1 else '')
+        if months:
+            month_str = '{0} month{1}'.format(
+                months, 's' if months != 1 else '')
+        if year_str and month_str:
+            year_str += ' and '
+        if month_str and day_str:
+            month_str += ' and '
+        since = ' for {0}{1}{2}'.format(year_str, month_str, day_str)
+    if instead:
+        msg = '{{0}} is deprecated{since}; use {{1}} instead.'
+    else:
+        msg = '{{0}} is deprecated{since}.'
+    return msg.format(since=since)
+
+
+def issue_deprecation_warning(name, instead, depth, warning_class=None,
+                              since=None):
     """Issue a deprecation warning.
 
     @param name: the name of the deprecated object
@@ -1283,16 +1320,15 @@ def issue_deprecation_warning(name, instead, depth, warning_class=None):
     @param warning_class: a warning class (category) to be used, defaults to
         DeprecationWarning
     @type warning_class: type
+    @param since: a timestamp string of the date when the method was
+        deprecated (form 'YYYYMMDD') or a version string.
+    @type since: str
     """
-    if instead:
-        if warning_class is None:
-            warning_class = DeprecationWarning
-        warn(u'{0} is deprecated; use {1} instead.'.format(name, instead),
-             warning_class, depth + 1)
-    else:
-        if warning_class is None:
-            warning_class = _NotImplementedWarning
-        warn('{0} is deprecated.'.format(name), warning_class, depth + 1)
+    msg = _build_msg_string(instead, since)
+    if warning_class is None:
+        warning_class = (DeprecationWarning
+                         if instead else _NotImplementedWarning)
+    warn(msg.format(name, instead), warning_class, depth + 1)
 
 
 @add_full_name
@@ -1301,6 +1337,9 @@ def deprecated(*args, **kwargs):
 
     @kwarg instead: if provided, will be used to specify the replacement
     @type instead: string
+    @kwarg since: a timestamp string of the date when the method was
+        deprecated (form 'YYYYMMDD') or a version string.
+    @type since: string
     """
     def decorator(obj):
         """Outer wrapper.
@@ -1322,7 +1361,7 @@ def deprecated(*args, **kwargs):
             """
             name = obj.__full_name__
             depth = get_wrapper_depth(wrapper) + 1
-            issue_deprecation_warning(name, instead, depth)
+            issue_deprecation_warning(name, instead, depth, since=since)
             return obj(*args, **kwargs)
 
         def add_docstring(wrapper):
@@ -1362,6 +1401,7 @@ def deprecated(*args, **kwargs):
 
         return wrapper
 
+    since = kwargs.pop('since', None)
     without_parameters = (len(args) == 1 and len(kwargs) == 0
                           and callable(args[0]))
     if 'instead' in kwargs:
@@ -1539,7 +1579,7 @@ def remove_last_args(arg_names):
 
 
 def redirect_func(target, source_module=None, target_module=None,
-                  old_name=None, class_name=None):
+                  old_name=None, class_name=None, since=None):
     """
     Return a function which can be used to redirect to 'target'.
 
@@ -1562,11 +1602,14 @@ def redirect_func(target, source_module=None, target_module=None,
     @param class_name: The name of the class. It's added to the target and
         source module (separated by a '.').
     @type class_name: basestring
+    @param since: a timestamp string of the date when the method was
+        deprecated (form 'YYYYMMDD') or a version string.
+    @type since: str
     @return: A new function which adds a warning prior to each execution.
     @rtype: callable
     """
     def call(*a, **kw):
-        issue_deprecation_warning(old_name, new_name, 2)
+        issue_deprecation_warning(old_name, new_name, 2, since=since)
         return target(*a, **kw)
     if target_module is None:
         target_module = target.__module__
@@ -1614,7 +1657,8 @@ class ModuleDeprecationWrapper(types.ModuleType):
             sys.modules[module.__name__] = self
 
     def _add_deprecated_attr(self, name, replacement=None,
-                             replacement_name=None, warning_message=None):
+                             replacement_name=None, warning_message=None,
+                             since=None):
         """
         Add the name to the local deprecated names dict.
 
@@ -1633,6 +1677,9 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @param warning_message: The warning to display, with positional
             variables: {0} = module, {1} = attribute name, {2} = replacement.
         @type warning_message: basestring
+        @param since: a timestamp string of the date when the method was
+            deprecated (form 'YYYYMMDD') or a version string.
+        @type since: str
         """
         if '.' in name:
             raise ValueError('Deprecated name "{0}" may not contain '
@@ -1656,11 +1703,8 @@ class ModuleDeprecationWrapper(types.ModuleType):
                                 'specifically.')
 
         if not warning_message:
-            if replacement_name:
-                warning_message = '{0}.{1} is deprecated; use {2} instead.'
-            else:
-                warning_message = u"{0}.{1} is deprecated."
-
+            warning_message = _build_msg_string(
+                replacement_name, since).format('{0}.{1}', '{2}')
         if hasattr(self, name):
             # __getattr__ will only be invoked if self.<name> does not exist.
             delattr(self, name)
@@ -1697,7 +1741,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
         return getattr(self._module, attr)
 
 
-@deprecated('open_archive()')
+@deprecated('open_archive()', since='20150915')
 def open_compressed(filename, use_extension=False):
     """DEPRECATED: Open a file and uncompress it if needed."""
     return open_archive(filename, use_extension=use_extension)
@@ -1804,7 +1848,9 @@ class ContextManagerWrapper(object):
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('Counter', collections.Counter)
-wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict)
-wrapper._add_deprecated_attr('count', itertools.count)
-wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='')
+wrapper._add_deprecated_attr('Counter', collections.Counter, since='20160111')
+wrapper._add_deprecated_attr('OrderedDict', collections.OrderedDict,
+                             since='20160111')
+wrapper._add_deprecated_attr('count', itertools.count, since='20160111')
+wrapper._add_deprecated_attr('ContextManagerWrapper', replacement_name='',
+                             since='20180402')

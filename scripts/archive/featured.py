@@ -56,8 +56,8 @@ This script understands various command-line arguments:
 #
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
-# (C) xqt, 2009-2014
-# (C) Pywikibot team, 2005-2016
+# (C) xqt, 2009-2018
+# (C) Pywikibot team, 2005-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -622,7 +622,7 @@ def main(*args):
 
     issue_deprecation_warning(
         'featured.py script', 'Wikibase Client extension',
-        0, UserWarning)
+        0, UserWarning, since='20160307')
 
     for arg in local_args:
         if arg.startswith('-fromlang:'):

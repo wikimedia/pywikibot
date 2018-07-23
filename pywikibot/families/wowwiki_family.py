@@ -59,7 +59,7 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
         """List of domains used by family wowwiki."""
         return (cls.domain, 'wowwiki.com', 'warcraft.wikia.com')
 
-    @deprecated('APISite.version()')
+    @deprecated('APISite.version()', since='20141225')
     def version(self, code):
         """Return the version for this family."""
         return '1.19.20'

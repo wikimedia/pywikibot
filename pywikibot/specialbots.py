@@ -121,7 +121,7 @@ class UploadRobot(BaseBot):
             self.targetSite = targetSite or pywikibot.Site()
         self.targetSite.login()
 
-    @deprecated()
+    @deprecated(since='20141211')
     def urlOK(self):
         """Return True if self.url is a URL or an existing local file."""
         return "://" in self.url or os.path.exists(self.url)
@@ -392,7 +392,7 @@ class UploadRobot(BaseBot):
         else:
             return warn_code in self.ignoreWarning
 
-    @deprecated('UploadRobot.upload_file()')
+    @deprecated('UploadRobot.upload_file()', since='20141211')
     @deprecated_args(debug=None)
     def upload_image(self):
         """Upload image."""

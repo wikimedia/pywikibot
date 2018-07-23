@@ -125,7 +125,7 @@ if PY2:
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)
-    wrapped_func = redirect_func(target)
+    wrapped_func = redirect_func(target, since='20140820')
     globals()[_name] = wrapped_func
 
 
@@ -223,7 +223,7 @@ class Timestamp(datetime.datetime):
         return self.strftime(self._ISO8601Format(sep))
 
     toISOformat = redirect_func(isoformat, old_name='toISOformat',
-                                class_name='Timestamp')
+                                class_name='Timestamp', since='20141219')
 
     def totimestampformat(self):
         """Convert object to a MediaWiki internal timestamp."""
@@ -1284,7 +1284,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
 
 
 # alias for backwards-compability
-getSite = redirect_func(Site, old_name='getSite')
+getSite = redirect_func(Site, old_name='getSite', since='20150924')
 
 
 # These imports depend on Wb* classes above.
@@ -1305,7 +1305,7 @@ from pywikibot.page import (  # noqa: E402
 link_regex = re.compile(r'\[\[(?P<title>[^\]|[<>{}]*)(\|.*?)?\]\]')
 
 
-@__deprecated('comment parameter for page saving method')
+@__deprecated('comment parameter for page saving method', since='20140604')
 def setAction(s):
     """Set a summary to use for changed page submissions."""
     config.default_edit_summary = s
@@ -1433,22 +1433,27 @@ _putthread.setName('Put-Thread')
 _putthread.setDaemon(True)
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage)
+wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924')
 wrapper._add_deprecated_attr(
-    'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar')
+    'cookie_jar', replacement_name='pywikibot.comms.http.cookie_jar',
+    since='20150921')
 wrapper._add_deprecated_attr(
     'PageNotFound', _DeprecatedPageNotFoundError,
     warning_message=('{0}.{1} is deprecated, and no longer '
-                     'used by pywikibot; use http.fetch() instead.'))
+                     'used by pywikibot; use http.fetch() instead.'),
+    since='20140924')
 wrapper._add_deprecated_attr(
     'UserActionRefuse', _EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
-                    'use UserRightsError and/or NotEmailableError instead.')
+                    'use UserRightsError and/or NotEmailableError instead.',
+    since='20141218')
 wrapper._add_deprecated_attr(
     'QuitKeyboardInterrupt', _QuitKeyboardInterrupt,
     warning_message='pywikibot.QuitKeyboardInterrupt is deprecated; '
-                    'use pywikibot.bot.QuitKeyboardInterrupt instead.')
+                    'use pywikibot.bot.QuitKeyboardInterrupt instead.',
+    since='20150619')
 wrapper._add_deprecated_attr(
     'UploadWarning', _UploadWarning,
     warning_message='pywikibot.UploadWarning is deprecated; '
-                    'use APISite.upload with a warning handler instead.')
+                    'use APISite.upload with a warning handler instead.',
+    since='20150921')

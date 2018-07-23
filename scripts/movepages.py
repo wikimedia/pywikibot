@@ -195,7 +195,7 @@ def main(*args):
             issue_deprecation_warning(
                 '-pairs',
                 '-pairsfile',
-                2, ArgumentDeprecationWarning)
+                2, ArgumentDeprecationWarning, since='20160304')
         elif arg.startswith('-pairsfile'):
             if len(arg) == len('-pairsfile'):
                 filename = pywikibot.input(

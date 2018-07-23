@@ -12,7 +12,7 @@ the site commons should be given and not a Wikipedia or similar.
 """
 #
 # (C) Multichill, 2008
-# (C) Pywikibot team, 2009-2017
+# (C) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1351,14 +1351,14 @@ def main(*args):
             issue_deprecation_warning(
                 'The usage of "-yesterday"',
                 '-logevents:"upload,,YYYYMMDD,YYYYMMDD"',
-                2, ArgumentDeprecationWarning)
+                2, ArgumentDeprecationWarning, since='20160305')
         elif arg.startswith('-recentchanges'):
             if param_value is None:
                 arg = arg + ':120,70'
                 issue_deprecation_warning(
                     '-recentchanges without parameters',
                     '-recentchanges:offset,duration',
-                    2, ArgumentDeprecationWarning)
+                    2, ArgumentDeprecationWarning, since='20160320')
             gen_factory.handleArg(arg)
         else:
             gen_factory.handleArg(arg)

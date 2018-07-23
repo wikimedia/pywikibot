@@ -394,7 +394,7 @@ class UI(object):
         else:
             return answer
 
-    @deprecated('input_choice')
+    @deprecated('input_choice', since='20140825')
     def inputChoice(self, question, options, hotkeys, default=None):
         """
         Ask the user a question with a predefined list of acceptable answers.

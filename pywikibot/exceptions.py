@@ -607,12 +607,15 @@ wrapper._add_deprecated_attr(
     'UploadWarning',
     replacement_name='pywikibot.data.api.UploadWarning',
     warning_message='pywikibot.exceptions.UploadWarning is deprecated; '
-                    'use APISite.upload with a warning handler instead.')
+                    'use APISite.upload with a warning handler instead.',
+    since='20150921')
 wrapper._add_deprecated_attr('PageNotFound', DeprecatedPageNotFoundError,
                              warning_message='{0}.{1} is deprecated, and no '
                                              'longer used by pywikibot; use '
-                                             'http.fetch() instead.')
+                                             'http.fetch() instead.',
+                             since='20141214')
 wrapper._add_deprecated_attr(
     'UserActionRefuse', _EmailUserError,
     warning_message='UserActionRefuse is deprecated; '
-                    'use UserRightsError and/or NotEmailableError')
+                    'use UserRightsError and/or NotEmailableError',
+    since='20141218')

@@ -238,7 +238,8 @@ def checkstr(string):
         key = 's'
         duration = string
         issue_deprecation_warning('Time period without qualifier',
-                                  string + key, 1, UserWarning)
+                                  string + key, 1, UserWarning,
+                                  since='20161009')
     else:
         duration = string[:-1]
     return key, duration

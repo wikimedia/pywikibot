@@ -780,7 +780,8 @@ def main(*args):
         # deprecated or unknown options
         elif option == 'step':
             issue_deprecation_warning('The usage of "{0}"'.format(arg),
-                                      2, ArgumentDeprecationWarning)
+                                      2, ArgumentDeprecationWarning,
+                                      since='20160210')
         else:
             pywikibot.output(u'Unknown argument: %s' % arg)
 

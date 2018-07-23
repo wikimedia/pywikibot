@@ -586,12 +586,12 @@ class BasePage(UnicodeMixin, ComparableMixin):
         del self.latest_revision_id
         self._revid = value
 
-    @deprecated('latest_revision_id')
+    @deprecated('latest_revision_id', since='20150727')
     def latestRevision(self):
         """Return the current revision id for this page."""
         return self.latest_revision_id
 
-    @deprecated('latest_revision_id')
+    @deprecated('latest_revision_id', since='20150407')
     def pageAPInfo(self):
         """Return the current revision id for this page."""
         if self.isRedirectPage():
@@ -759,7 +759,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.latest_revision.timestamp
 
     @property
-    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)')
+    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
+                since='20150609')
     def previous_revision_id(self):
         """
         Return the revision id for the previous revision of this Page.
@@ -772,7 +773,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.latest_revision.parent_id or -1
 
-    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)')
+    @deprecated('latest_revision.parent_id (0 instead of -1 when no parent)',
+                since='20150609')
     def previousRevision(self):
         """
         Return the revision id for the previous revision.
@@ -872,7 +874,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return Category(Link(self._catredirect, self.site))
         raise pywikibot.IsNotRedirectPage(self)
 
-    @deprecated("interwiki.page_empty_check(page)")
+    @deprecated('interwiki.page_empty_check(page)', since='20151207')
     def isEmpty(self):
         """
         Return True if the page text has less than 4 characters.
@@ -922,7 +924,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return True if the page is a Category, False otherwise."""
         return self.namespace() == 14
 
-    @deprecated('is_categorypage')
+    @deprecated('is_categorypage', since='20140819')
     def isCategory(self):
         """DEPRECATED: use is_categorypage instead."""
         return self.is_categorypage()
@@ -931,7 +933,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """Return True if this is an file description page, False otherwise."""
         return self.namespace() == 6
 
-    @deprecated('is_filepage')
+    @deprecated('is_filepage', since='20140819')
     def isImage(self):
         """DEPRECATED: use is_filepage instead."""
         return self.is_filepage()
@@ -1536,7 +1538,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return ItemPage.fromPage(self)
 
     @deprecate_arg('tllimit', None)
-    @deprecated("Page.templates()")
+    @deprecated('Page.templates()', since='20140421')
     def getTemplates(self):
         """DEPRECATED. Use templates()."""
         return self.templates()
@@ -1665,7 +1667,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.site.getredirtarget(self)
 
-    @deprecated('moved_target()')
+    @deprecated('moved_target()', since='20150524')
     def getMovedTarget(self):
         """
         Return a Page object for the target this Page was moved to.
@@ -1715,7 +1717,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     # BREAKING CHANGE: in old framework, default value for getVersionHistory
     #                  returned no more than 500 revisions; now, it iterates
     #                  all revisions unless 'total' argument is used
-    @deprecated('Page.revisions()')
+    @deprecated('Page.revisions()', since='20150206')
     @deprecated_args(forceReload=None, revCount='total', step=None,
                      getAll=None, reverseOrder='reverse')
     def getVersionHistory(self, reverse=False, total=None):
@@ -1745,7 +1747,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         result += '|}\n'
         return result
 
-    @deprecated("Page.revisions(content=True)")
+    @deprecated('Page.revisions(content=True)', since='20150206')
     @deprecated_args(reverseOrder='reverse', rollback=None, step=None)
     def fullVersionHistory(self, reverse=False, total=None):
         """Iterate previous versions including wikitext.
@@ -1773,7 +1775,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                        self.revisions(total=total,
                                       starttime=starttime, endtime=endtime))
 
-    @deprecated('contributors()')
+    @deprecated('contributors()', since='20150206')
     @deprecated_args(step=None)
     def contributingUsers(self, total=None):
         """
@@ -1801,7 +1803,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         cnt = self.contributors()
         return sum(cnt[username] for username in contributors)
 
-    @deprecated('oldest_revision')
+    @deprecated('oldest_revision', since='20140421')
     def getCreator(self):
         """
         Get the first revision of the page.
@@ -1813,7 +1815,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         result = self.oldest_revision
         return result.user, unicode(result.timestamp.isoformat())
 
-    @deprecated('contributors() or revisions()')
+    @deprecated('contributors() or revisions()', since='20150206')
     @deprecated_args(limit="total")
     def getLatestEditors(self, total=1):
         """
@@ -2188,7 +2190,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
                                  'required.' % self.title(as_link=True))
         return False
 
-    @deprecated('Page.is_flow_page()')
+    @deprecated('Page.is_flow_page()', since='20150128')
     def isFlowPage(self):
         """DEPRECATED: use self.is_flow_page instead."""
         return self.is_flow_page()
@@ -2203,28 +2205,28 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
 # ####### DEPRECATED METHODS ########
 
-    @deprecated("Site.encoding()")
+    @deprecated('Site.encoding()', since='20090307')
     def encoding(self):
         """DEPRECATED: use self.site.encoding instead."""
         return self.site.encoding()
 
-    @deprecated("Page.title(withNamespace=False)")
+    @deprecated('Page.title(withNamespace=False)', since='20090307')
     def titleWithoutNamespace(self, underscore=False):
         """DEPRECATED: use self.title(withNamespace=False) instead."""
         return self.title(underscore=underscore, with_ns=False,
                           with_section=False)
 
-    @deprecated("Page.title(as_filename=True)")
+    @deprecated('Page.title(as_filename=True)', since='20090307')
     def titleForFilename(self):
         """DEPRECATED: use self.title(as_filename=True) instead."""
         return self.title(as_filename=True)
 
-    @deprecated("Page.title(withSection=False)")
+    @deprecated('Page.title(withSection=False)', since='20090307')
     def sectionFreeTitle(self, underscore=False):
         """DEPRECATED: use self.title(withSection=False) instead."""
         return self.title(underscore=underscore, with_section=False)
 
-    @deprecated("Page.title(asLink=True)")
+    @deprecated('Page.title(asLink=True)', since='20090307')
     @deprecated_args(
         forceInterwiki='force_interwiki', noInterwiki='no_interwiki')
     def aslink(
@@ -2234,7 +2236,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         return self.title(as_link=True, force_interwiki=force_interwiki,
                           allow_interwiki=not no_interwiki, textlink=textlink)
 
-    @deprecated("Page.title(asUrl=True)")
+    @deprecated('Page.title(asUrl=True)', since='20090307')
     def urlname(self):
         """Return the Page title encoded for use in an URL.
 
@@ -2242,7 +2244,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.title(as_url=True)
 
-    @deprecated('Page.protection()')
+    @deprecated('Page.protection()', since='20150725')
     def getRestrictions(self):
         """DEPRECATED. Use self.protection() instead."""
         restrictions = self.protection()
@@ -2484,7 +2486,7 @@ class FilePage(Page):
             self._imagePageHtml = http.request(self.site, path)
         return self._imagePageHtml
 
-    @deprecated('get_file_url')
+    @deprecated('get_file_url', since='20160609')
     def fileUrl(self):
         """Return the URL for the file described on this page."""
         return self.latest_file_info.url
@@ -2522,7 +2524,7 @@ class FilePage(Page):
                                 url_param=url_param)
         return self.latest_file_info.thumburl
 
-    @deprecated("fileIsShared")
+    @deprecated('fileIsShared', since='20121101')
     def fileIsOnCommons(self):
         """
         DEPRECATED. Check if the image is stored on Wikimedia Commons.
@@ -2548,7 +2550,7 @@ class FilePage(Page):
             return self.latest_file_info.url.startswith(
                 'https://upload.wikimedia.org/wikipedia/commons/')
 
-    @deprecated("FilePage.latest_file_info.sha1")
+    @deprecated('FilePage.latest_file_info.sha1', since='20141106')
     def getFileMd5Sum(self):
         """Return image file's MD5 checksum."""
         # TODO: check whether this needs a User-Agent header added
@@ -2557,12 +2559,12 @@ class FilePage(Page):
         h.update(req.raw)
         return h.hexdigest()
 
-    @deprecated("FilePage.latest_file_info.sha1")
+    @deprecated('FilePage.latest_file_info.sha1', since='20141106')
     def getFileSHA1Sum(self):
         """Return the file's SHA1 checksum."""
         return self.latest_file_info.sha1
 
-    @deprecated("FilePage.oldest_file_info.user")
+    @deprecated('FilePage.oldest_file_info.user', since='20150206')
     def getFirstUploader(self):
         """
         Return a list with first uploader of the FilePage and timestamp.
@@ -2572,7 +2574,7 @@ class FilePage(Page):
         return [self.oldest_file_info.user,
                 unicode(self.oldest_file_info.timestamp.isoformat())]
 
-    @deprecated("FilePage.latest_file_info.user")
+    @deprecated('FilePage.latest_file_info.user', since='20141106')
     def getLatestUploader(self):
         """
         Return a list with latest uploader of the FilePage and timestamp.
@@ -2582,7 +2584,7 @@ class FilePage(Page):
         return [self.latest_file_info.user,
                 unicode(self.latest_file_info.timestamp.isoformat())]
 
-    @deprecated('FilePage.get_file_history()')
+    @deprecated('FilePage.get_file_history()', since='20141106')
     def getFileVersionHistory(self):
         """
         Return the file's version history.
@@ -2735,7 +2737,7 @@ class FilePage(Page):
 
 
 wrapper = _ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('ImagePage', FilePage)
+wrapper._add_deprecated_attr('ImagePage', FilePage, since='20140924')
 
 
 class Category(Page):
@@ -3145,22 +3147,22 @@ class Category(Page):
                 yield cached_page
 
 # ### DEPRECATED METHODS ####
-    @deprecated("list(Category.subcategories(...))")
+    @deprecated('list(Category.subcategories(...))', since='20090307')
     def subcategoriesList(self, recurse=False):
         """DEPRECATED: Equivalent to list(self.subcategories(...))."""
         return sorted(list(set(self.subcategories(recurse))))
 
-    @deprecated("list(Category.articles(...))")
+    @deprecated('list(Category.articles(...))', since='20090307')
     def articlesList(self, recurse=False):
         """DEPRECATED: equivalent to list(self.articles(...))."""
         return sorted(list(set(self.articles(recurse))))
 
-    @deprecated("Category.categories()")
+    @deprecated('Category.categories()', since='20090307')
     def supercategories(self):
         """DEPRECATED: equivalent to self.categories()."""
         return self.categories()
 
-    @deprecated("list(Category.categories(...))")
+    @deprecated('list(Category.categories(...))', since='20090307')
     def supercategoriesList(self):
         """DEPRECATED: equivalent to list(self.categories(...))."""
         return sorted(list(set(self.categories())))
@@ -3198,7 +3200,7 @@ class User(Page):
             pywikibot.output(
                 "This is an autoblock ID, you can only use to unblock it.")
 
-    @deprecated('User.username')
+    @deprecated('User.username', since='20160504')
     def name(self):
         """
         The username.
@@ -3271,7 +3273,7 @@ class User(Page):
                     self._userprops['blockreason'] = r[0]['reason']
         return self._userprops
 
-    @deprecated('User.registration()')
+    @deprecated('User.registration()', since='20100609')
     def registrationTime(self, force=False):
         """
         DEPRECATED. Fetch registration date for this user.
@@ -3449,7 +3451,7 @@ class User(Page):
                 return True
         return False
 
-    @deprecated('send_email')
+    @deprecated('send_email', since='20141218')
     def sendMail(self, subject, text, ccme=False):
         """
         Send an email to this user via MediaWiki's email interface.
@@ -3545,7 +3547,7 @@ class User(Page):
         """
         return next(iter(self.logevents(total=1)), None)
 
-    @deprecated("contributions")
+    @deprecated('contributions', since='20091130')
     @deprecate_arg("limit", "total")  # To be consistent with rest of framework
     def editedPages(self, total=500):
         """
@@ -3818,7 +3820,8 @@ class WikibasePage(BasePage):
         """Low-level attribute getter. Deprecates lastrevid."""
         if name == 'lastrevid':
             issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id', 2)
+                'WikibasePage.lastrevid', 'latest_revision_id', 2,
+                since='20150607')
             name = '_revid'
         return super(WikibasePage, self).__getattribute__(name)
 
@@ -3826,7 +3829,8 @@ class WikibasePage(BasePage):
         """Attribute setter. Deprecates lastrevid."""
         if attr == 'lastrevid':
             issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id', 2)
+                'WikibasePage.lastrevid', 'latest_revision_id', 2,
+                since='20150607')
             attr = '_revid'
         return super(WikibasePage, self).__setattr__(attr, value)
 
@@ -3834,7 +3838,8 @@ class WikibasePage(BasePage):
         """Attribute deleter. Deprecates lastrevid."""
         if attr == 'lastrevid':
             issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id', 2)
+                'WikibasePage.lastrevid', 'latest_revision_id', 2,
+                since='20150607')
             attr = '_revid'
         return super(WikibasePage, self).__delattr__(attr)
 
@@ -4626,7 +4631,7 @@ class ItemPage(WikibasePage):
 
     # alias for backwards compatibility
     concept_url = redirect_func(concept_uri, old_name='concept_url',
-                                class_name='ItemPage')
+                                class_name='ItemPage', since='20170222')
 
 
 class Property(object):
@@ -4698,7 +4703,7 @@ class Property(object):
             self._type = self.repo.getPropertyType(self)
         return self._type
 
-    @deprecated("Property.type")
+    @deprecated('Property.type', since='20140607')
     def getType(self):
         """
         Return the type of this property.

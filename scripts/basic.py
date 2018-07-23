@@ -113,7 +113,8 @@ class BasicBot(
         """
         if 'dry' in kwargs:
             issue_deprecation_warning('dry argument',
-                                      'pywikibot.config.simulate', 1)
+                                      'pywikibot.config.simulate', 1,
+                                      since='20160124')
             # use simulate variable instead
             pywikibot.config.simulate = True
             pywikibot.output('config.simulate was set to True')

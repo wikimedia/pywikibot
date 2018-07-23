@@ -26,6 +26,9 @@ def change_category(article, oldCat, newCat, comment=None, sortKey=None,
 __all__ = ('Category', 'change_category',)
 
 wrapper = ModuleDeprecationWrapper(__name__)
-wrapper._add_deprecated_attr('Category', replacement_name='pywikibot.Category')
+wrapper._add_deprecated_attr('Category',
+                             replacement_name='pywikibot.Category',
+                             since='20141209')
 wrapper._add_deprecated_attr('change_category',
-                             replacement_name='Page.change_category')
+                             replacement_name='Page.change_category',
+                             since='20141209')

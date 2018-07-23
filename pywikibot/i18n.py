@@ -466,8 +466,9 @@ def _extract_plural(code, message, parameters):
         num = parameters[selector]
         if not isinstance(num, int):
             issue_deprecation_warning(
-                'type {0} for value {1} ({2})'.format(type(num), selector, num),
-                'an int', 1)
+                'type {0} for value {1} ({2})'
+                .format(type(num), selector, num),
+                'an int', 1, since='20151009')
             num = int(num)
 
         plural_entries = []
@@ -623,7 +624,8 @@ def translate(code, xdict, parameters=None, fallback=False):
         return trans
 
     if not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a mapping', None, 2)
+        issue_deprecation_warning('parameters not being a mapping', None, 2,
+                                  since='20151008')
         plural_parameters = _PluralMappingAlias(parameters)
     else:
         plural_parameters = parameters
@@ -766,7 +768,8 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
         parameters = None
 
     if parameters is not None and not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a Mapping', None, 2)
+        issue_deprecation_warning('parameters not being a Mapping', None, 2,
+                                  since='20151008')
 
     if not only_plural and parameters:
         return trans % parameters
@@ -774,7 +777,7 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
         return trans
 
 
-@deprecated('twtranslate')
+@deprecated('twtranslate', since='20151009')
 @deprecated_args(code='source')
 def twntranslate(source, twtitle, parameters=None):
     """DEPRECATED: Get translated string for the key."""

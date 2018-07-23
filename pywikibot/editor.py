@@ -5,7 +5,7 @@ from __future__ import absolute_import, unicode_literals
 
 #
 # (C) Gerrit Holl, 2004
-# (C) Pywikibot team, 2004-2017
+# (C) Pywikibot team, 2004-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +71,8 @@ class TextEditor(object):
         return ' '.join("'{0}'".format(part) if ' ' in part else part
                         for part in command)
 
-    @deprecated('_command (should not be used from the outside)')
+    @deprecated('_command (should not be used from the outside)',
+                since='20150111')
     def command(self, tempFilename, text, jumpIndex=None):
         """Return editor selected in user-config.py."""
         return TextEditor._concat(self._command(tempFilename, text, jumpIndex))
