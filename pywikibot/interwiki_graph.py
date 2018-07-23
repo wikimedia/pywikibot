@@ -93,7 +93,6 @@ class Subject(object):
 
     @origin.setter
     def origin(self, value):
-        """Page on the origin wiki."""
         self._origin = value
 
     @property
@@ -107,10 +106,6 @@ class Subject(object):
 
     @originPage.setter
     def originPage(self, value):
-        """Deprecated property for the origin page.
-
-        DEPRECATED. Use origin.
-        """
         self.origin = value
 
     @property

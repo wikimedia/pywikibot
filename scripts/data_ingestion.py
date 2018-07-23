@@ -176,13 +176,12 @@ class DataIngestionBot(pywikibot.Bot):
     @property
     @deprecated('generator')
     def reader(self):
-        """Get generator. Deprecated."""
+        """Deprecated generator."""
         return self.generator
 
     @reader.setter
     @deprecated('generator')
     def reader(self, value):
-        """Set generator. Deprecated."""
         self.generator = value
 
     def treat(self, photo):

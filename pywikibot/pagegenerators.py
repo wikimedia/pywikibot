@@ -2839,13 +2839,12 @@ class XMLDumpOldPageGenerator(IteratorNextMixin):
     @property
     @deprecated('self.start')
     def xmlStart(self):
-        """Getter for deprecated xmlStart instance variable."""
+        """Deprecated xmlStart instance variable."""
         return self.start
 
     @xmlStart.setter
     @deprecated('self.start')
     def xmlStart(self, value):
-        """Setter for deprecated xmlStart instance variable."""
         self.start = value
 
     def __next__(self):

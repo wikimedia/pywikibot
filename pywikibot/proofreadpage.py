@@ -291,7 +291,6 @@ class ProofreadPage(pywikibot.Page):
     @ql.setter
     @decompose
     def ql(self, value):
-        """Set page quality level."""
         if value not in self.site.proofread_levels:
             raise ValueError('Not valid QL value: %s (legal values: %s)'
                              % (value, self.site.proofread_levels))
@@ -308,7 +307,6 @@ class ProofreadPage(pywikibot.Page):
     @user.setter
     @decompose
     def user(self, value):
-        """Set user in page header."""
         self._full_header.user = value
 
     @property
@@ -353,7 +351,6 @@ class ProofreadPage(pywikibot.Page):
     @header.setter
     @decompose
     def header(self, value):
-        """Set editable part of Page header."""
         self._full_header.header = value
 
     @property
@@ -365,7 +362,6 @@ class ProofreadPage(pywikibot.Page):
     @body.setter
     @decompose
     def body(self, value):
-        """Set Page body."""
         self._body = value
 
     @property
@@ -377,7 +373,6 @@ class ProofreadPage(pywikibot.Page):
     @footer.setter
     @decompose
     def footer(self, value):
-        """Set Page footer."""
         self._footer = value
 
     def _create_empty_page(self):
@@ -428,7 +423,6 @@ class ProofreadPage(pywikibot.Page):
 
     @text.deleter
     def text(self):
-        """Delete current text."""
         if hasattr(self, '_text'):
             del self._text
 
