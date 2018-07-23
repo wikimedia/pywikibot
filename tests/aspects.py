@@ -817,8 +817,6 @@ class MetaTestCaseClass(type):
                         'sites', 'family', 'code', 'dry', 'hostname', 'oauth',
                         'hostnames', 'cached', 'cacheinfo', 'wikibase'):
                 if hasattr(base, key) and key not in dct:
-                    # print('%s has %s; copying to %s'
-                    #       % (base.__name__, key, name))
                     dct[key] = getattr(base, key)
 
         # Will be inserted into dct[sites] later
@@ -967,7 +965,7 @@ class MetaTestCaseClass(type):
 
     @staticmethod
     def add_method(dct, test_name, method, doc=None, doc_suffix=None):
-        """Add a method to a dictionary and set its name and documention."""
+        """Set method's __name__ and __doc__ and add it to dct."""
         dct[test_name] = method
         # it's explicitly using str() because __name__ must be str
         dct[test_name].__name__ = str(test_name)

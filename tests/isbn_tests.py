@@ -23,6 +23,7 @@ from scripts.isbn import (
     main
 )
 
+from tests import patch, Mock
 from tests.aspects import (
     unittest, TestCase, DefaultDrySiteTestCase,
     WikibaseTestCase, ScriptMainTestCase,
@@ -35,6 +36,8 @@ else:
     AnyIsbnValidationException = IsbnExc
 
 
+# Suppress ImportWarning: package stdnum.isbn not found; using scripts.isbn
+@patch('pywikibot.cosmetic_changes.warn', Mock())
 class TestCosmeticChangesISBN(DefaultDrySiteTestCase):
 
     """Test CosmeticChanges ISBN fix."""
