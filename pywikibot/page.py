@@ -4266,6 +4266,13 @@ class WikibasePage(BasePage):
         """
         self.repo.addClaim(self, claim, bot=bot, **kwargs)
         claim.on_item = self
+        for snaks in claim.qualifiers.values():
+            for snak in snaks:
+                snak.on_item = self
+        for source in claim.sources:
+            for snaks in source.values():
+                for snak in snaks:
+                    snak.on_item = self
 
     def removeClaims(self, claims, **kwargs):
         """
@@ -5113,11 +5120,14 @@ class Claim(Property):
         @param claims: the claims to add
         @type claims: list of pywikibot.Claim
         """
-        data = self.repo.editSource(self, claims, new=True, **kwargs)
-        self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+        if self.on_item is not None:
+            data = self.repo.editSource(self, claims, new=True, **kwargs)
+            self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+            for claim in claims:
+                claim.hash = data['reference']['hash']
         source = defaultdict(list)
         for claim in claims:
-            claim.hash = data['reference']['hash']
+            claim.isReference = True
             source[claim.getID()].append(claim)
         self.sources.append(source)
 
@@ -5150,9 +5160,10 @@ class Claim(Property):
         @param qualifier: the qualifier to add
         @type qualifier: Claim
         """
-        data = self.repo.editQualifier(self, qualifier, **kwargs)
+        if self.on_item is not None:
+            data = self.repo.editQualifier(self, qualifier, **kwargs)
+            self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         qualifier.isQualifier = True
-        self.on_item.latest_revision_id = data['pageinfo']['lastrevid']
         if qualifier.getID() in self.qualifiers:
             self.qualifiers[qualifier.getID()].append(qualifier)
         else:

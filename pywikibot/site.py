@@ -24,6 +24,7 @@ import re
 import sys
 import threading
 import time
+import uuid
 
 try:
     from collections.abc import Iterable, Container, Mapping
@@ -7780,18 +7781,16 @@ class DataSite(APISite):
         @param summary: Edit summary
         @type summary: str
         """
-        params = {'action': 'wbcreateclaim', 'entity': entity.getID(),
+        claim.snak = entity.getID() + '$' + str(uuid.uuid4())
+        params = {'action': 'wbsetclaim',
+                  'claim': json.dumps(claim.toJSON()),
                   'baserevid': entity.latest_revision_id,
-                  'snaktype': claim.getSnakType(), 'property': claim.getID(),
-                  'summary': summary, 'bot': bot}
-
-        if claim.getSnakType() == 'value':
-            params['value'] = json.dumps(claim._formatValue())
-
-        params['token'] = self.tokens['edit']
+                  'summary': summary,
+                  'token': self.tokens['edit'],
+                  'bot': bot,
+                  }
         req = self._simple_request(**params)
         data = req.submit()
-        claim.snak = data['claim']['id']
         # Update the item
         if claim.getID() in entity.claims:
             entity.claims[claim.getID()].append(claim)
