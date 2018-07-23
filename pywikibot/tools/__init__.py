@@ -369,7 +369,7 @@ class LazyRegex(object):
 
     @property
     def raw(self):
-        """Get raw property."""
+        """The raw property."""
         if callable(self._raw):
             self._raw = self._raw()
 
@@ -377,18 +377,16 @@ class LazyRegex(object):
 
     @raw.setter
     def raw(self, value):
-        """Set raw property."""
         self._raw = value
         self._compiled = None
 
     @property
     def flags(self):
-        """Get flags property."""
+        """The flags property."""
         return self._flags
 
     @flags.setter
     def flags(self, value):
-        """Set flags property."""
         self._flags = value
         self._compiled = None
 
