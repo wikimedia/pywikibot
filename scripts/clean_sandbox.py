@@ -63,6 +63,7 @@ content = {
     'az': u'<!--- LÜTFƏN, BU SƏTRƏ TOXUNMAYIN --->\n{{Qaralama dəftəri}}\n'
           u'<!-- AŞAĞIDAKI XƏTTİN ALTINDAN YAZA BİLƏRSİNİZ --->',
     'bar': '{{Bitte erst NACH dieser Zeile schreiben! (Begrüßungskasten)}}\n',
+    'bn': '{{খেলাঘর}}<!-- অনুগ্রহপূর্বক এই লাইনটি অপসারণ করবেন না -->',
     'cs': '{{Tento řádek neměňte}}\n<!-- ************  Prosíme, '
           'NEMĚŇTE nic nad tímto řádkem.  Díky.  ************ -->\n\n'
           "== Bábovičky ==\n#'''první'''\n#''druhá''\n*třetí\n"
