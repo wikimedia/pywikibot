@@ -47,7 +47,7 @@ from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     add_full_name, manage_wrapping,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
-    first_upper, redirect_func, remove_last_args, _NotImplementedWarning,
+    first_upper, redirect_func, remove_last_args,
 )
 from pywikibot.tools.ip import ip_regexp
 from pywikibot.tools.ip import is_IP
@@ -2210,9 +2210,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """DEPRECATED: use self.site.encoding instead."""
         return self.site.encoding()
 
-    @deprecated('Page.title(withNamespace=False)', since='20090307')
+    @deprecated('Page.title(with_ns=False)', since='20090307')
     def titleWithoutNamespace(self, underscore=False):
-        """DEPRECATED: use self.title(withNamespace=False) instead."""
+        """DEPRECATED: use self.title(with_ns=False) instead."""
         return self.title(underscore=underscore, with_ns=False,
                           with_section=False)
 
@@ -2221,26 +2221,26 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """DEPRECATED: use self.title(as_filename=True) instead."""
         return self.title(as_filename=True)
 
-    @deprecated('Page.title(withSection=False)', since='20090307')
+    @deprecated('Page.title(with_section=False)', since='20090307')
     def sectionFreeTitle(self, underscore=False):
-        """DEPRECATED: use self.title(withSection=False) instead."""
+        """DEPRECATED: use self.title(with_section=False) instead."""
         return self.title(underscore=underscore, with_section=False)
 
-    @deprecated('Page.title(asLink=True)', since='20090307')
+    @deprecated('Page.title(as_link=True)', since='20090307')
     @deprecated_args(
         forceInterwiki='force_interwiki', noInterwiki='no_interwiki')
     def aslink(
         self, force_interwiki=False, textlink=False, no_interwiki=False
     ):
-        """DEPRECATED: use self.title(asLink=True) instead."""
+        """DEPRECATED: use self.title(as_link=True) instead."""
         return self.title(as_link=True, force_interwiki=force_interwiki,
                           allow_interwiki=not no_interwiki, textlink=textlink)
 
-    @deprecated('Page.title(asUrl=True)', since='20090307')
+    @deprecated('Page.title(as_url=True)', since='20090307')
     def urlname(self):
         """Return the Page title encoded for use in an URL.
 
-        DEPRECATED: use self.title(asUrl=True) instead.
+        DEPRECATED: use self.title(as_url=True) instead.
         """
         return self.title(as_url=True)
 
@@ -2253,8 +2253,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def __getattr__(self, name):
         """Generic disabled method warnings."""
         if name in ('removeImage', 'replaceImage'):
-            warn('Page.{0}() is no longer supported.'.format(name),
-                 _NotImplementedWarning, 2)
+            issue_deprecation_warning(name, None, 2, since='20080227')
             return lambda x: None
         raise AttributeError("'{0}' object has no attribute '{1}'"
                              .format(self.__class__.__name__, name))
