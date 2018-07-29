@@ -220,7 +220,7 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     def test_entities(self):
         """Test known entities."""
-        unsupported = {'form', 'lexeme'}  # T195435
+        unsupported = {'form', 'lexeme', 'sense'}  # T195435
         supported = {'item', 'property'}
         known = supported | unsupported
         self._check_param_superset(
