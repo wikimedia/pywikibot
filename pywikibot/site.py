@@ -3600,13 +3600,6 @@ class APISite(BaseSite):
                                  self.username(sysop), self.user()))
         return self.tokens['patrol']
 
-    def getParsedString(self, string, keeptags=None):
-        """Deprecated.
-
-        compat defined keeptags as ['*'].
-        """
-        return NotImplementedError
-
     # following group of methods map more-or-less directly to API queries
 
     @deprecated_args(
