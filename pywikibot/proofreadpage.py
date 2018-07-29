@@ -870,16 +870,16 @@ class IndexPage(pywikibot.Page):
         gen = (self.get_page(i) for i in range(start, end + 1))
         if content:
             gen = self.site.preloadpages(gen)
-        # Decorate and sort by page number because preloadpages does not
-        # guarantee order.
-        # TODO: remove if preloadpages will guarantee order.
-        gen = ((p, self.get_number(p)) for p in gen)
-        gen = (p[0] for p in sorted(gen, key=lambda x: x[1]))
         # Filter by QL.
         gen = (p for p in gen if p.ql in filter_ql)
         # Yield only existing.
         if only_existing:
             gen = (p for p in gen if p.exists())
+        # Decorate and sort by page number because preloadpages does not
+        # guarantee order.
+        # TODO: remove if preloadpages will guarantee order.
+        gen = ((p, self.get_number(p)) for p in gen)
+        gen = (p[0] for p in sorted(gen, key=lambda x: x[1]))
 
         return gen
 
