@@ -183,7 +183,7 @@ class IWBot(ExistingPageBot, SingleSiteBot):
         item = list(wd_data).pop()
         if self.current_page.site.dbName() in item.sitelinks:
             warning('Interwiki conflict in %s, skipping...' %
-                    item.title(asLink=True))
+                    item.title(as_link=True))
             return False
         output('Adding link to %s' % item.title())
         item.setSitelink(self.current_page, summary='Added %s' % (

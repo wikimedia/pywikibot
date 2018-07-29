@@ -196,7 +196,7 @@ class TestCategoryDryObject(TestCase):
         self.assertEqual(cat2.section(), None)
 
     def test_aslink(self):
-        """Test the title method with asLink=True."""
+        """Test the title method with as_link=True."""
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia Categories')
         self.assertEqual(cat.title(as_link=True, insite=cat.site),

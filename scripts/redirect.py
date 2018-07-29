@@ -528,7 +528,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                         reason = i18n.twtranslate(self.site,
                                                   'redirect-fix-broken-moved',
                                                   {'to': movedTarget.title(
-                                                      asLink=True)})
+                                                      as_link=True)})
                         content = redir_page.get(get_redirect=True)
                         redir_page.set_redirect_target(
                             movedTarget, keep_section=True, save=False)
@@ -581,20 +581,20 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         redirList = []  # bookkeeping to detect loops
         while True:
             redirList.append(u'%s:%s' % (newRedir.site.lang,
-                                         newRedir.title(withSection=False)))
+                                         newRedir.title(with_section=False)))
             try:
                 targetPage = newRedir.getRedirectTarget()
             except pywikibot.IsNotRedirectPage:
                 if len(redirList) == 2:
                     pywikibot.output(
                         u'Skipping: Redirect target %s is not a redirect.'
-                        % newRedir.title(asLink=True))
+                        % newRedir.title(as_link=True))
                     break  # do nothing
                 # else target found
             except pywikibot.SectionError:
                 pywikibot.warning(
                     u"Redirect target section %s doesn't exist."
-                    % newRedir.title(asLink=True))
+                    % newRedir.title(as_link=True))
             except (pywikibot.CircularRedirect,
                     pywikibot.InterwikiRedirectPage,
                     pywikibot.UnsupportedPage) as e:
@@ -611,12 +611,12 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                 if self.getOption('always'):
                     pywikibot.output(
                         "Skipping: Redirect target {} doesn't exist."
-                        .format(newRedir.title(asLink=True)))
+                        .format(newRedir.title(as_link=True)))
                     break  # skip if automatic
                 else:
                     pywikibot.warning(
                         "Redirect target {} doesn't exist."
-                        .format(newRedir.title(asLink=True)))
+                        .format(newRedir.title(as_link=True)))
             except pywikibot.ServerError:
                 pywikibot.output(u'Skipping due to server error: '
                                  u'No textarea found')

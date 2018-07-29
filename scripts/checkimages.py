@@ -876,9 +876,9 @@ class checkImagesBot(object):
                       "is also on '''Commons''': [[commons:File:%s]]")
                      % (self.imageName,
                         commons_image_with_this_hash.title(
-                            withNamespace=False)))
+                            with_ns=False)))
             if (self.image.title(as_url=True) ==
-                    commons_image_with_this_hash.title(asUrl=True)):
+                    commons_image_with_this_hash.title(as_url=True)):
                 repme += ' (same name)'
             self.report_image(self.imageName, self.rep_page, self.com, repme,
                               addings=False)

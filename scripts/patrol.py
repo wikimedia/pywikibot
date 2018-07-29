@@ -373,10 +373,10 @@ class PatrolBot(SingleSiteBot):
 
         except pywikibot.NoPage:
             pywikibot.output(u'Page %s does not exist; skipping.'
-                             % title(asLink=True))
+                             % title(as_link=True))
         except pywikibot.IsRedirectPage:
             pywikibot.output(u'Page %s is a redirect; skipping.'
-                             % title(asLink=True))
+                             % title(as_link=True))
 
 
 def title_match(prefix, title):

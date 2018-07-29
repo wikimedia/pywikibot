@@ -69,12 +69,12 @@ replacements = (
     # change ImagePage to FilePage
     (r'pywikibot\.ImagePage\s*\(\s*', 'pywikibot.FilePage('),
     # deprecated title methods
-    (r'\.urlname\s*\(\s*\)', '.title(asUrl=True)'),
+    (r'\.urlname\s*\(\s*\)', '.title(as_url=True)'),
     (r'\.urlname\s*\(\s*(?:withNamespace\s*=\s*)?(True|False)+\s*\)',
-     r'.title(asUrl=True, withNamespace=\1)'),
-    (r'\.titleWithoutNamespace\s*\(\s*\)', '.title(withNamespace=False)'),
-    (r'\.sectionFreeTitle\s*\(\s*\)', '.title(withSection=False)'),
-    (r'\.aslink\s*\(\s*\)', '.title(asLink=True)'),
+     r'.title(as_url=True, with_ns=\1)'),
+    (r'\.titleWithoutNamespace\s*\(\s*\)', '.title(with_ns=False)'),
+    (r'\.sectionFreeTitle\s*\(\s*\)', '.title(with_section=False)'),
+    (r'\.aslink\s*\(\s*\)', '.title(as_link=True)'),
     # other deprecated methods
     (r'(?<!site)\.encoding\s*\(\s*\)', '.site.encoding()'),
     (r'\.newimages\s*\(\)', ".logevents(logtype='upload')"),

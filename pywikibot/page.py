@@ -294,24 +294,24 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Return the title of this Page, as a Unicode string.
 
-        @param underscore: (not used with asLink) if true, replace all ' '
+        @param underscore: (not used with as_link) if true, replace all ' '
             characters with '_'
         @param with_ns: if false, omit the namespace prefix. If this
-            option is false and used together with asLink return a labeled
+            option is false and used together with as_link return a labeled
             link like [[link|label]]
         @param with_section: if false, omit the section
-        @param as_url: (not used with asLink) if true, quote title as if in an
+        @param as_url: (not used with as_link) if true, quote title as if in an
             URL
         @param as_link: if true, return the title in the form of a wikilink
-        @param allow_interwiki: (only used if asLink is true) if true, format
+        @param allow_interwiki: (only used if as_link is true) if true, format
             the link as an interwiki link if necessary
-        @param force_interwiki: (only used if asLink is true) if true, always
+        @param force_interwiki: (only used if as_link is true) if true, always
             format the link as an interwiki link
-        @param textlink: (only used if asLink is true) if true, place a ':'
+        @param textlink: (only used if as_link is true) if true, place a ':'
             before Category: and Image: links
-        @param as_filename: (not used with asLink) if true, replace any
+        @param as_filename: (not used with as_link) if true, replace any
             characters that are unsafe in filenames
-        @param insite: (only used if asLink is true) a site object where the
+        @param insite: (only used if as_link is true) a site object where the
             title is to be shown. default is the current family/lang given by
             -family and -lang option i.e. config.family and config.mylang
         @rtype: unicode
@@ -2686,7 +2686,7 @@ class FilePage(Page):
         Download to filename file of FilePage.
 
         @param filename: filename where to save file:
-            None: self.title(as_filename=True, withNamespace=False)
+            None: self.title(as_filename=True, with_ns=False)
             will be used
             str: provided filename will be used.
         @type filename: None or str

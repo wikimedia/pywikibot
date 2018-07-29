@@ -72,10 +72,10 @@ Category, as long as the page is in the category namespace.
 The following methods of the Page object have been deprecated (deprecated
 methods still work, but print a warning message in debug mode):
 
-- urlname(): replaced by Page.title(asUrl=True)
-- titleWithoutNamespace(): replaced by Page.title(withNamespace=False)
-- sectionFreeTitle(): replaced by Page.title(withSection=False)
-- aslink(): replaced by Page.title(asLink=True)
+- urlname(): replaced by Page.title(as_url=True)
+- titleWithoutNamespace(): replaced by Page.title(with_ns=False)
+- sectionFreeTitle(): replaced by Page.title(with_section=False)
+- aslink(): replaced by Page.title(as_link=True)
 - encoding(): replaced by Page.site.encoding()
 - put_async(): replaced by Page.put(asynchronous=True)
 
