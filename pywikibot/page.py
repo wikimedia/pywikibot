@@ -2250,14 +2250,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         restrictions = self.protection()
         return {k: list(restrictions[k]) for k in restrictions}
 
-    def __getattr__(self, name):
-        """Generic disabled method warnings."""
-        if name in ('removeImage', 'replaceImage'):
-            issue_deprecation_warning(name, None, 2, since='20080227')
-            return lambda x: None
-        raise AttributeError("'{0}' object has no attribute '{1}'"
-                             .format(self.__class__.__name__, name))
-
 
 class Page(BasePage):
 
