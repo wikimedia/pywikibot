@@ -14,7 +14,7 @@ from pywikibot.tools import PY2
 from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 
-if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') == '1':
+if os.environ.get('PYWIKIBOT_TEST_GUI', '0') == '1':
     if not PY2:
         import tkinter as Tkinter
     else:
@@ -31,7 +31,7 @@ class TestTkdialog(TestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test class."""
-        if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') != '1':
+        if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
             raise unittest.SkipTest('Tkdialog tests are disabled on Travis-CI')
         super(TestTkdialog, cls).setUpClass()
 
@@ -53,7 +53,7 @@ class TestTkinter(DefaultSiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test class."""
-        if os.environ.get('PYWIKIBOT2_TEST_GUI', '0') != '1':
+        if os.environ.get('PYWIKIBOT_TEST_GUI', '0') != '1':
             raise unittest.SkipTest('Tkinter tests are disabled on Travis-CI')
         super(TestTkinter, cls).setUpClass()
 

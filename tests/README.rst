@@ -142,7 +142,7 @@ To enable 'user' tests on travis-ci builds for a different repository, add
 a username and password to travis:
 
 1. Go to https://travis-ci.org/<username>/pywikibot/settings
-2. Add a new variable named PYWIKIBOT2_USERNAME and a value of a valid
+2. Add a new variable named PYWIKIBOT_USERNAME and a value of a valid
    Wikimedia SUL username
 3. Add another variable named USER_PASSWORD, with the private password for
    the Wikimedia SUL username used in step 2.  Check that this
@@ -213,7 +213,7 @@ tests **may** actually perform a write operation.
 These 'edit failure' tests are disabled by default. On Travis they are enabled
 by default on builds by any other github account except 'wikimedia'.
 
-To disable 'edit failure' tests, set PYWIKIBOT2_TEST_WRITE_FAIL=0
+To disable 'edit failure' tests, set PYWIKIBOT_TEST_WRITE_FAIL=0
 
 There are also several other 'write' tests which also attempt to perform
 write operations successfully.  These **will** write to the wikis, and they
@@ -223,7 +223,7 @@ These 'write' tests are disabled by default, and currently can not be
 run on travis or appveyor as they require interaction using a terminal. Also
 enabling them won't enable 'edit failure' tests.
 
-To enable 'write' tests, set PYWIKIBOT2_TEST_WRITE=1
+To enable 'write' tests, set PYWIKIBOT_TEST_WRITE=1
 
 Enabling only 'edit failure' tests or 'write' tests won't enable the other tests
 automatically.
