@@ -581,10 +581,10 @@ class SiteWriteMixin(TestCaseBase):
         Prevent test classes from writing to the site by default.
 
         If class attribute 'write' is -1, the test class is skipped unless
-        environment variable PYWIKIBOT2_TEST_WRITE_FAIL is set to 1.
+        environment variable PYWIKIBOT_TEST_WRITE_FAIL is set to 1.
 
         Otherwise the test class is skipped unless environment variable
-        PYWIKIBOT2_TEST_WRITE is set to 1.
+        PYWIKIBOT_TEST_WRITE is set to 1.
         """
         if issubclass(cls, ForceCacheMixin):
             raise Exception(
@@ -597,9 +597,9 @@ class SiteWriteMixin(TestCaseBase):
         site = cls.get_site()
 
         if cls.write == -1:
-            env_var = 'PYWIKIBOT2_TEST_WRITE_FAIL'
+            env_var = 'PYWIKIBOT_TEST_WRITE_FAIL'
         else:
-            env_var = 'PYWIKIBOT2_TEST_WRITE'
+            env_var = 'PYWIKIBOT_TEST_WRITE'
 
         if os.environ.get(env_var, '0') != '1':
             raise unittest.SkipTest(
@@ -1014,9 +1014,9 @@ class TestCase(TestTimerMixin, TestCaseBase):
 
         for data in cls.sites.values():
             if ('code' in data and data['code'] in ('test', 'mediawiki') and
-                    'PYWIKIBOT2_TEST_PROD_ONLY' in os.environ and not dry):
+                    'PYWIKIBOT_TEST_PROD_ONLY' in os.environ and not dry):
                 raise unittest.SkipTest(
-                    'Site code "%s" and PYWIKIBOT2_TEST_PROD_ONLY is set.'
+                    'Site code "%s" and PYWIKIBOT_TEST_PROD_ONLY is set.'
                     % data['code'])
 
             if 'site' not in data and 'code' in data and 'family' in data:
@@ -1530,7 +1530,7 @@ class RecentChangesTestCase(WikimediaDefaultSiteTestCase):
     @classmethod
     def setUpClass(cls):
         """Set up test class."""
-        if os.environ.get('PYWIKIBOT2_TEST_NO_RC', '0') == '1':
+        if os.environ.get('PYWIKIBOT_TEST_NO_RC', '0') == '1':
             raise unittest.SkipTest('RecentChanges tests disabled.')
 
         super(RecentChangesTestCase, cls).setUpClass()

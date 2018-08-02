@@ -166,7 +166,7 @@ else:
 
 
 enable_autorun_tests = (
-    os.environ.get('PYWIKIBOT2_TEST_AUTORUN', '0') == '1')
+    os.environ.get('PYWIKIBOT_TEST_AUTORUN', '0') == '1')
 
 
 def collector(loader=unittest.loader.defaultTestLoader):
@@ -181,7 +181,7 @@ def collector(loader=unittest.loader.defaultTestLoader):
 
     if not enable_autorun_tests:
         unittest_print('Skipping execution of auto-run scripts '
-                       '(set PYWIKIBOT2_TEST_AUTORUN=1 to enable):\n  %r'
+                       '(set PYWIKIBOT_TEST_AUTORUN=1 to enable):\n  %r'
                        % auto_run_script_list)
 
     tests = (['test__login'] +
@@ -231,7 +231,7 @@ class TestScriptMeta(MetaTestCaseClass):
             def test_skip_script(self):
                 raise unittest.SkipTest(
                     'Skipping execution of auto-run scripts (set '
-                    'PYWIKIBOT2_TEST_AUTORUN=1 to enable) "{0}"'
+                    'PYWIKIBOT_TEST_AUTORUN=1 to enable) "{0}"'
                     .format(script_name))
 
             def testScript(self):
