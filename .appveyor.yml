@@ -9,8 +9,8 @@ environment:
     # See: http://stackoverflow.com/a/13751649/163740
     CMD_IN_ENV: "cmd /E:ON /V:ON /C .\\appveyor\\run_with_env.cmd"
 
-    PYWIKIBOT2_DIR: "%appdata%\\Pywikibot"
-    PYWIKIBOT2_USER_CONFIG: "%appdata%\\Pywikibot\\user-config.py"
+    PYWIKIBOT_DIR: "%appdata%\\Pywikibot"
+    PYWIKIBOT_USER_CONFIG: "%appdata%\\Pywikibot\\user-config.py"
 
     PYSETUP_TEST_EXTRAS: "1"
 
@@ -93,9 +93,9 @@ test_script:
   - chcp 65001
   - set PYTHONIOENCODING=utf8
 
-  - "mkdir %PYWIKIBOT2_DIR%"
-  - "python -Werror::UserWarning -m generate_user_files -dir:%PYWIKIBOT2_DIR% -family:wikipedia -lang:en -v -debug"
-  - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT2_USER_CONFIG, 'max_retries = 2; maximum_GET_length = 5000; transliteration_target = None;')"
+  - "mkdir %PYWIKIBOT_DIR%"
+  - "python -Werror::UserWarning -m generate_user_files -dir:%PYWIKIBOT_DIR% -family:wikipedia -lang:en -v -debug"
+  - ps: "[IO.File]::AppendAllText($env:PYWIKIBOT_USER_CONFIG, 'max_retries = 2; maximum_GET_length = 5000; transliteration_target = None;')"
 
   - set PYSETUP_TEST_NO_UI=1
   - "%CMD_IN_ENV% coverage run setup.py test"

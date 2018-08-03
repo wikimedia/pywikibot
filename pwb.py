@@ -71,7 +71,7 @@ def tryimport_pwb():
         import pywikibot
     except RuntimeError:
         remove_modules()
-        os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
+        os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
         import pywikibot
     pwb = pywikibot
 
@@ -169,7 +169,7 @@ try:
     _pwb_dir = os.path.split(__file__)[0]
     if sys.platform == 'win32' and sys.version_info[0] < 3:
         _pwb_dir = str(_pwb_dir)
-    os.environ[str('PYWIKIBOT2_DIR_PWB')] = _pwb_dir
+    os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
     import pywikibot
     pwb = pywikibot
 except RuntimeError:

@@ -72,9 +72,9 @@ def main(*args):
         pywikibot.output('Toolforge hostname: {0}'.format(
             toolforge_env_hostname))
 
-    check_environ('PYWIKIBOT2_DIR')
-    check_environ('PYWIKIBOT2_DIR_PWB')
-    check_environ('PYWIKIBOT2_NO_USER_CONFIG')
+    check_environ('PYWIKIBOT_DIR')
+    check_environ('PYWIKIBOT_DIR_PWB')
+    check_environ('PYWIKIBOT_NO_USER_CONFIG')
     pywikibot.output('Config base dir: {0}'.format(pywikibot.config2.base_dir))
     for family, usernames in pywikibot.config2.usernames.items():
         if usernames:

@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Drop the '2' from PYWIKIBOT2_DIR, PYWIKIBOT2_DIR_PWB, and PYWIKIBOT2_NO_USER_CONFIG environment variables. The old names are now deprecated. The other PYWIKIBOT2_* variables which were used only for testing purposes have been renamed without deprecation. (T184674)
 * Bugfixes and improvements
 * Localisation updates
 

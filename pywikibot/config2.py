@@ -4,15 +4,15 @@ Module to define and load pywikibot configuration default and user preferences.
 
 User preferences are loaded from a python file called user-config.py, which
 may be located in directory specified by the environment variable
-PYWIKIBOT2_DIR, or the same directory as pwb.py, or in a directory within
+PYWIKIBOT_DIR, or the same directory as pwb.py, or in a directory within
 the users home. See get_base_dir for more information.
 
 If user-config.py can not be found in any of those locations, this module
-will fail to load unless the environment variable PYWIKIBOT2_NO_USER_CONFIG
-is set to a value other than '0'. i.e. PYWIKIBOT2_NO_USER_CONFIG=1 will
+will fail to load unless the environment variable PYWIKIBOT_NO_USER_CONFIG
+is set to a value other than '0'. i.e. PYWIKIBOT_NO_USER_CONFIG=1 will
 allow config to load without a user-config.py. However, warnings will be
 shown if user-config.py was not loaded.
-To prevent these warnings, set PYWIKIBOT2_NO_USER_CONFIG=2.
+To prevent these warnings, set PYWIKIBOT_NO_USER_CONFIG=2.
 
 Provides two functions to register family classes which can be used in
 the user-config:
@@ -49,12 +49,13 @@ import types
 
 from distutils.version import StrictVersion
 from locale import getdefaultlocale
+from os import getenv, environ
 from warnings import warn
 
 from requests import __version__ as requests_version
 
 from pywikibot.logging import error, output, warning
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, issue_deprecation_warning
 
 OSWIN32 = (sys.platform == 'win32')
 
@@ -65,12 +66,27 @@ if OSWIN32:
         import _winreg as winreg
 
 
+# Normalize old PYWIKIBOT2 environment variables and issue a deprecation warn.
+for env_name in (
+    'PYWIKIBOT2_DIR', 'PYWIKIBOT2_DIR_PWB', 'PYWIKIBOT2_NO_USER_CONFIG',
+):
+    if env_name not in environ:
+        continue
+    env_value = environ[env_name]
+    new_env_name = env_name.replace('PYWIKIBOT2_', 'PYWIKIBOT_')
+    del environ[env_name]
+    if new_env_name not in environ:
+        environ[new_env_name] = env_value
+    issue_deprecation_warning(
+        env_name + ' environment variable', new_env_name, 0, since='20180803')
+
+
 # This frozen set should contain all imported modules/variables, so it must
 # occur directly after the imports. At that point globals() only contains the
 # names and some magic variables (like __name__)
 _imports = frozenset(name for name in globals() if not name.startswith('_'))
 
-__no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
+__no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG')
 if __no_user_config == '0':
     __no_user_config = None
 
@@ -281,7 +297,7 @@ def get_base_dir(test_directory=None):
     This is determined in the following order:
      1.  If the script was called with a -dir: argument, use the directory
          provided in this argument.
-     2.  If the user has a PYWIKIBOT2_DIR environment variable, use the value
+     2.  If the user has a PYWIKIBOT_DIR environment variable, use the value
          of it.
      3.  If user-config is present in current directory, use the current
          directory.
@@ -291,7 +307,7 @@ def get_base_dir(test_directory=None):
          '.pywikibot' directory (Unix and similar) under the user's home
          directory.
 
-    Set PYWIKIBOT2_NO_USER_CONFIG=1 to disable loading user-config.py
+    Set PYWIKIBOT_NO_USER_CONFIG=1 to disable loading user-config.py
 
     @param test_directory: Assume that a user config file exists in this
         directory. Used to test whether placing a user config file in this
@@ -316,14 +332,14 @@ def get_base_dir(test_directory=None):
             base_dir = os.path.expanduser(base_dir)
             break
     else:
-        if ('PYWIKIBOT2_DIR' in os.environ and
-                exists(os.path.abspath(os.environ['PYWIKIBOT2_DIR']))):
-            base_dir = os.path.abspath(os.environ['PYWIKIBOT2_DIR'])
+        if ('PYWIKIBOT_DIR' in environ and
+                exists(os.path.abspath(environ['PYWIKIBOT_DIR']))):
+            base_dir = os.path.abspath(environ['PYWIKIBOT_DIR'])
         elif exists('.'):
             base_dir = os.path.abspath('.')
-        elif ('PYWIKIBOT2_DIR_PWB' in os.environ and
-                exists(os.path.abspath(os.environ['PYWIKIBOT2_DIR_PWB']))):
-            base_dir = os.path.abspath(os.environ['PYWIKIBOT2_DIR_PWB'])
+        elif ('PYWIKIBOT_DIR_PWB' in environ and
+                exists(os.path.abspath(environ['PYWIKIBOT_DIR_PWB']))):
+            base_dir = os.path.abspath(environ['PYWIKIBOT_DIR_PWB'])
         else:
             base_dir_cand = []
             home = os.path.expanduser("~")

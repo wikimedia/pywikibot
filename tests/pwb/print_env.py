@@ -23,7 +23,7 @@ for k, v in sorted(os.environ.items()):
     if k == 'USER_PASSWORD':
         continue
     # This only appears in subprocesses
-    if k in ['PYWIKIBOT2_DIR_PWB']:
+    if k == 'PYWIKIBOT_DIR_PWB':
         continue
     print("%r: %r" % (k, v))
 

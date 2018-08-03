@@ -256,7 +256,7 @@ texinfo_documents = [
 
 def pywikibot_env():
     """Allow pywikibot modules to be imported without a user-config.py."""
-    os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '1'
+    os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '1'
 
 
 def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):

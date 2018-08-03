@@ -8,7 +8,7 @@
 # NOTE FOR RUNNING WINDOWS UI TESTS
 #
 # Windows UI tests have to be run using the tests\ui_tests.bat helper script.
-# This will set PYTHONPATH and PYWIKIBOT2_DIR, and then run the tests. Do not
+# This will set PYTHONPATH and PYWIKIBOT_DIR, and then run the tests. Do not
 # touch mouse or keyboard while the tests are running, as this might disturb the
 # interaction tests.
 #

@@ -15,24 +15,13 @@ import codecs
 import os
 import sys
 
+from os import environ, getenv
 # creating & retrieving urls
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
     raw_input = input
 else:
     from urlparse import urlparse
-
-# Disable user-config checks so the family can be created first,
-# and then used when generating the user-config
-_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
-os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
-from pywikibot.site_detect import MWSite as Wiki  # noqa: E402
-
-# Reset this flag in case another script is run by pwb after this script
-if not _orig_no_user_config:
-    del os.environ['PYWIKIBOT2_NO_USER_CONFIG']
-else:
-    os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = _orig_no_user_config
 
 
 class FamilyFileGenerator(object):
@@ -197,7 +186,25 @@ class Family(family.Family):  # noqa: D101
         f.write("        }[code]\n")
 
 
+def _import_with_no_user_config(*import_args):
+    """Return __import__(*import_args) without loading user-config.py."""
+    orig_no_user_config = getenv('PYWIKIBOT_NO_USER_CONFIG') or getenv(
+        'PYWIKIBOT2_NO_USER_CONFIG')
+    environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
+    result = __import__(*import_args)
+    # Reset this flag
+    if not orig_no_user_config:
+        del environ['PYWIKIBOT_NO_USER_CONFIG']
+    else:
+        environ['PYWIKIBOT_NO_USER_CONFIG'] = orig_no_user_config
+    return result
+
+
 if __name__ == "__main__":
+    # Disable user-config checks so the family can be created first,
+    # and then used when generating the user-config
+    Wiki = _import_with_no_user_config(
+        'pywikibot.site_detect').site_detect.MWSite
     if len(sys.argv) != 3:
         print("""
 Usage: {module} <url> <short name>

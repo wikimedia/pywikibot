@@ -17,18 +17,11 @@ import sys
 from textwrap import fill
 from warnings import warn
 
+from generate_family_file import _import_with_no_user_config
+
 # Disable user-config usage as we are creating it here
-_orig_no_user_config = os.environ.get('PYWIKIBOT2_NO_USER_CONFIG')
-os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = '2'
-import pywikibot  # noqa: E402
-from pywikibot import config, __url__  # noqa: E402
-
-# Reset this flag in case another script is run by pwb after this script
-if not _orig_no_user_config:
-    del os.environ['PYWIKIBOT2_NO_USER_CONFIG']
-else:
-    os.environ['PYWIKIBOT2_NO_USER_CONFIG'] = _orig_no_user_config
-
+pywikibot = _import_with_no_user_config('pywikibot')
+config, __url__ = pywikibot.config2, pywikibot.__url__
 base_dir = pywikibot.config2.base_dir
 
 try:
@@ -77,7 +70,7 @@ def change_base_dir():
     msg = fill("""WARNING: Your user files will be created in the directory
 '%(new_base)s' you have chosen. To access these files, you will either have
 to use the argument "-dir:%(new_base)s" every time you run the bot, or set
-the environment variable "PYWIKIBOT2_DIR" equal to this directory name in
+the environment variable "PYWIKIBOT_DIR" equal to this directory name in
 your operating system. See your operating system documentation for how to
 set environment variables.""" % {'new_base': new_base}, width=76)
     pywikibot.output(msg)
