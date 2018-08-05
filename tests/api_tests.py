@@ -783,12 +783,15 @@ class TestPropertyGenerator(TestCase):
         links = list(self.site.pagelinks(mainpage, total=30))
         titles = [l.title(with_section=False)
                   for l in links]
+        params = {
+            'rvprop': 'ids|flags|timestamp|user|comment|content',
+            'titles': '|'.join(titles)}
+        if self.site.version() >= MediaWikiVersion('1.32'):
+            params['rvslots'] = 'main'
         gen = api.PropertyGenerator(
             site=self.site,
             prop='revisions|info|categoryinfo|langlinks|templates',
-            parameters={
-                'rvprop': 'ids|flags|timestamp|user|comment|content',
-                'titles': '|'.join(titles)})
+            parameters=params)
 
         # An APIError is raised if set_maximum_items is not called.
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter

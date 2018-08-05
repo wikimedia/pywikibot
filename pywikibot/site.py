@@ -3371,6 +3371,8 @@ class APISite(BaseSite):
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = rvprop
+            if self.version() >= MediaWikiVersion('1.32'):
+                rvgen.request['rvslots'] = '*'
             pywikibot.output(u"Retrieving %s pages from %s."
                              % (len(cache), self))
 
@@ -4064,6 +4066,10 @@ class APISite(BaseSite):
         rvargs = {'type_arg': 'info|revisions'}
 
         rvargs['rvprop'] = ['ids', 'timestamp', 'flags', 'comment', 'user']
+        if self.version() >= MediaWikiVersion('1.32'):
+            rvargs['rvslots'] = '*'
+            # 'roles' is not implemented in Revision class yet.
+            # rvargs['rvprop'].append('roles')
         if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.21'):
             rvargs['rvprop'].append('contentmodel')
         if MediaWikiVersion(self.version()) >= MediaWikiVersion('1.19'):
