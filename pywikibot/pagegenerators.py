@@ -3086,7 +3086,7 @@ class PetScanPageGenerator(object):
 
 
 DuplicateFilterPageGenerator = redirect_func(
-    filter_unique, old_name='DuplicateFilterPageGenerator')
+    filter_unique, old_name='DuplicateFilterPageGenerator', since='20180715')
 PreloadingItemGenerator = redirect_func(PreloadingEntityGenerator,
                                         old_name='PreloadingItemGenerator',
                                         since='20170314')
