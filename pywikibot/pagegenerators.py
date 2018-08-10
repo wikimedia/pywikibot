@@ -29,6 +29,7 @@ import re
 import sys
 
 from datetime import timedelta
+from functools import partial
 from warnings import warn
 
 import pywikibot
@@ -403,13 +404,12 @@ class GeneratorFactory(object):
     """
 
     # This is the function that will be used to de-duplicate iterators.
-    # See the documentation in L{pywikibot.tools.filter_unique} for reasons
-    # why this should be changed to improve space and time of execution.
-    _filter_unique = staticmethod(filter_unique)
+    _filter_unique = staticmethod(partial(
+        filter_unique, key=lambda p: '{}:{}:{}'.format(*p._cmpkey())))
     # The seen list can not yet be shared at present, due to `intersect` mode
     # not being known until after all generators have been created.
     # When not in intersect mode, _filter_unique could be:
-    #   functools.partial(filter_unique, container=global_seen_list)
+    # functools.partial(filter_unique, container=global_seen_list, key=...)
 
     def __init__(self, site=None, positional_arg_name=None):
         """
@@ -1619,7 +1619,6 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
     @type namespaces: list of int
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
-
     """
     if site is None:
         site = pywikibot.Site()
@@ -1630,9 +1629,9 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
                               .format(user.username, site))
 
     return _filter_unique(
-        contrib[0]
-        for contrib in user.contributions(namespaces=namespaces, total=total)
-    )
+        (contrib[0] for contrib in user.contributions(
+            namespaces=namespaces, total=total)),
+        key=lambda p: '{}:{}:{}'.format(*p._cmpkey()))
 
 
 def NamespaceFilterPageGenerator(generator, namespaces, site=None):
