@@ -83,6 +83,7 @@ class CategoryRedirectBot(pywikibot.Bot):
             'hi': 'श्रेणी:विकिपीडिया श्रेणी अनुप्रेषित',
             'hu': "Kategória:Kategóriaátirányítások",
             'ja': "Category:移行中のカテゴリ",
+            'ko': '분류:비어 있지 않은 분류 넘겨주기',
             'no': "Kategori:Wikipedia omdirigertekategorier",
             'pl': "Kategoria:Przekierowania kategorii",
             'pt': "Categoria:!Redirecionamentos de categorias",
