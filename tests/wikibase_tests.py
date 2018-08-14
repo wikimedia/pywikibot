@@ -729,7 +729,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
     def test_WbGeoShape_error_on_wrong_page_type(self):
         """Test WbGeoShape error handling of a non-map page."""
         non_data_page = Page(self.commons, 'File:Foo.jpg')
-        non_map_page = Page(self.commons, 'Data:Templatedata/Graph:Lines.tab')
+        non_map_page = Page(self.commons, 'Data:TemplateData/TemplateData.tab')
         regex = r"^Page must be in 'Data:' namespace and end in '\.map' " + \
                 r"for geo-shape\.$"
         with self.assertRaisesRegex(ValueError, regex):
