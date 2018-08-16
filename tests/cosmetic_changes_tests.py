@@ -332,6 +332,18 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             self.cct.removeEmptySections('\n==Bar==\n[[cs:Foo]]'
                                          '\n[[Category:Baz]]'))
 
+    def test_remove_empty_sections_with_heading_comments(self):
+        """Test removeEmptySections with comments in the section headings."""
+        self.assertEqual(
+            '==2==<!--c--> <!--\n-->\nt',
+            self.cct.removeEmptySections('==1==\n==2==<!--c--> <!--\n-->\nt'))
+        self.assertEqual(
+            '==2== <!--c-->\nt',
+            self.cct.removeEmptySections('==1==\n==2== <!--c-->\nt'))
+        self.assertEqual(
+            '==2<!--\n-->==\nt',
+            self.cct.removeEmptySections('==1==\n==2<!--\n-->==\nt'))
+
     def test_translateAndCapitalizeNamespaces(self):
         """Test translateAndCapitalizeNamespaces method."""
         self.assertEqual(
