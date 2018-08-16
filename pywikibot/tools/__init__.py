@@ -410,7 +410,7 @@ class DeprecatedRegex(LazyRegex):
 
     """Regex object that issues a deprecation notice."""
 
-    def __init__(self, pattern, flags=0, name=None, instead=None):
+    def __init__(self, pattern, flags=0, name=None, instead=None, since=None):
         """
         Initializer.
 
@@ -426,11 +426,12 @@ class DeprecatedRegex(LazyRegex):
         super(DeprecatedRegex, self).__init__(pattern, flags)
         self._name = name or self.raw
         self._instead = instead
+        self._since = since
 
     def __getattr__(self, attr):
         """Issue deprecation warning."""
         issue_deprecation_warning(
-            self._name, self._instead, 2, since='20150212')
+            self._name, self._instead, 2, since=self._since)
         return super(DeprecatedRegex, self).__getattr__(attr)
 
 

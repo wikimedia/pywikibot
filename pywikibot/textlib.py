@@ -63,15 +63,17 @@ _ETP_REGEX = re.compile(
 # that allows system variables, but does not match nested templates.
 # It exists for backwards compatibility to the old 'TEMP_REGEX'
 # which was the _ETP_REGEX.
-TEMP_REGEX = DeprecatedRegex(r"""
-{{\s*(?:msg:\s*)?
-  (?P<name>[^{\|]+?)\s*
-  (?:\|(?P<params>[^{]*
-        (?:(?:{}|{{[A-Z]+(?:\:[^}])?}}|{{{[^}]+}}}) [^{]*)*
-       )?
-  )?
-}}
-""", re.VERBOSE, 'textlib.TEMP_REGEX', 'textlib.NESTED_TEMPLATE_REGEX')
+TEMP_REGEX = DeprecatedRegex(
+    r"""
+    {{\s*(?:msg:\s*)?
+      (?P<name>[^{\|]+?)\s*
+      (?:\|(?P<params>[^{]*
+            (?:(?:{}|{{[A-Z]+(?:\:[^}])?}}|{{{[^}]+}}}) [^{]*)*
+           )?
+      )?
+    }}
+    """, re.VERBOSE, 'textlib.TEMP_REGEX', 'textlib.NESTED_TEMPLATE_REGEX',
+    since='20150212')
 
 # The regex below collects nested templates, providing simpler
 # identification of templates used at the top-level of wikitext.

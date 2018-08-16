@@ -88,7 +88,7 @@ ip_regexp = DeprecatedRegex(
     r'(([\dA-F]{1,4}(\4|:\b|$)|\2){2}|'
     r'(((2[0-4]|1\d|[1-9])?\d|25[0-5])\.?\b){4}))\Z',
     re.IGNORECASE,
-    'page.ip_regexp', 'tools.ip.is_IP')
+    'page.ip_regexp', 'tools.ip.is_IP', since='20150212')
 
 
 def is_IP(IP):
