@@ -134,8 +134,9 @@ import pywikibot
 from pywikibot import config, pagegenerators
 from pywikibot import i18n, textlib
 from pywikibot.bot import (
-    MultipleSitesBot, IntegerOption, StandardOption, ContextOption, BaseBot,
-    Bot,
+    suggest_help,
+    IntegerOption, StandardOption, ContextOption,
+    BaseBot, Bot, MultipleSitesBot,
 )
 from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import (
@@ -1326,19 +1327,19 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    fromGiven = False
-    toGiven = False
-    batchMode = False
-    editSummary = ''
-    inPlace = False
+    from_given = False
+    to_given = False
+    batch = False
+    summary = ''
+    inplace = False
     overwrite = False
-    showImages = False
-    talkPages = False
+    showimages = False
+    talkpages = False
     recurse = False
-    titleRegex = None
+    title_regex = None
     pagesonly = False
     wikibase = True
-    withHistory = False
+    history = False
     rebuild = False
     allow_split = False
     move_together = False
@@ -1347,7 +1348,7 @@ def main(*args):
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
-    genFactory = pagegenerators.GeneratorFactory()
+    gen_factory = pagegenerators.GeneratorFactory()
 
     # The generator gives the pages that should be worked upon.
     gen = None
@@ -1355,125 +1356,130 @@ def main(*args):
     # When this is True then the custom edit summary given for removing
     # categories from articles will also be used as the deletion reason.
     # Otherwise it will generate deletion specific comments.
-    useSummaryForDeletion = True
+    use_deletion_summary = True
     action = None
     sort_by_last_name = False
     create_pages = False
     follow_redirects = False
-    deleteEmptySourceCat = True
+    delete_empty_cat = True
+    unknown = []
     for arg in local_args:
         if arg in ('add', 'remove', 'move', 'tidy', 'tree', 'listify'):
             action = arg
-        elif arg == '-nodelete':
-            deleteEmptySourceCat = False
-        elif arg == '-person':
+            continue
+
+        if arg[0] != '-':
+            unknown.append(arg)
+            continue
+
+        option, _, value = arg[1:].partition(':')
+        if option == 'nodelete':
+            delete_empty_cat = False
+        elif option == 'person':
             sort_by_last_name = True
-        elif arg == '-rebuild':
+        elif option == 'rebuild':
             rebuild = True
-        elif arg.startswith('-from:'):
-            oldCatTitle = arg[len('-from:'):].replace('_', ' ')
-            fromGiven = True
-        elif arg.startswith('-to:'):
-            newCatTitle = arg[len('-to:'):].replace('_', ' ')
-            toGiven = True
-        elif arg == '-batch':
-            batchMode = True
-        elif arg == '-inplace':
-            inPlace = True
-        elif arg == '-nodelsum':
-            useSummaryForDeletion = False
-        elif arg == '-overwrite':
+        elif option == 'from':
+            old_cat_title = value.replace('_', ' ')
+            from_given = True
+        elif option == 'to':
+            new_cat_title = value.replace('_', ' ')
+            to_given = True
+        elif option == 'batch':
+            batch = True
+        elif option == 'inplace':
+            inplace = True
+        elif option == 'nodelsum':
+            use_deletion_summary = False
+        elif option == 'overwrite':
             overwrite = True
-        elif arg == '-showimages':
-            showImages = True
-        elif arg.startswith('-summary:'):
-            editSummary = arg[len('-summary:'):]
-        elif arg.startswith('-match'):
-            if len(arg) == len('-match'):
-                titleRegex = pywikibot.input(
-                    u'Which regular expression should affected objects match?')
-            else:
-                titleRegex = arg[len('-match:'):]
-        elif arg == '-talkpages':
-            talkPages = True
-        elif arg == '-recurse':
+        elif option == 'showimages':
+            showimages = True
+        elif option == 'summary':
+            summary = value
+        elif option == '-match':
+            title_regex = value or pywikibot.input(
+                'Which regular expression should affected objects match?')
+        elif option == 'talkpages':
+            talkpages = True
+        elif option == 'recurse':
             recurse = True
-        elif arg == '-pagesonly':
+        elif option == 'pagesonly':
             pagesonly = True
-        elif arg == '-nowb':
+        elif option == 'nowb':
             wikibase = False
-        elif arg == '-allowsplit':
+        elif option == 'allowsplit':
             allow_split = True
-        elif arg == '-mvtogether':
+        elif option == 'mvtogether':
             move_together = True
-        elif arg == '-create':
+        elif option == 'create':
             create_pages = True
-        elif arg == '-redirect':
+        elif option == 'redirect':
             follow_redirects = True
-        elif arg == '-hist':
-            withHistory = True
-        elif arg.startswith('-depth:'):
-            depth = int(arg[len('-depth:'):])
-        elif arg == '-keepsortkey':
+        elif option == 'hist':
+            history = True
+        elif option == 'depth':
+            depth = int(value)
+        elif option == 'keepsortkey':
             keep_sortkey = True
         else:
-            genFactory.handleArg(arg)
+            gen_factory.handleArg(arg)
 
-    catDB = None
+    cat_db = None
     bot = None
 
-    catDB = CategoryDatabase(rebuild=rebuild)
-    gen = genFactory.getCombinedGenerator()
+    cat_db = CategoryDatabase(rebuild=rebuild)
+    gen = gen_factory.getCombinedGenerator()
 
     if action == 'add':
-        if not toGiven:
-            newCatTitle = pywikibot.input(
+        if not to_given:
+            new_cat_title = pywikibot.input(
                 u'Category to add (do not give namespace):')
         if not gen:
             # default for backwards compatibility
-            genFactory.handleArg('-links')
-            gen = genFactory.getCombinedGenerator()
+            gen_factory.handleArg('-links')
+            gen = gen_factory.getCombinedGenerator()
         # The preloading generator is responsible for downloading multiple
         # pages from the wiki simultaneously.
         gen = pagegenerators.PreloadingGenerator(gen)
         bot = CategoryAddBot(gen,
-                             newcat=newCatTitle,
+                             newcat=new_cat_title,
                              sort_by_last_name=sort_by_last_name,
                              create=create_pages,
-                             comment=editSummary,
+                             comment=summary,
                              follow_redirects=follow_redirects)
     elif action == 'remove':
-        if not fromGiven:
-            oldCatTitle = pywikibot.input(u'Please enter the name of the '
-                                          u'category that should be removed:')
-        bot = CategoryMoveRobot(oldcat=oldCatTitle,
-                                batch=batchMode,
-                                comment=editSummary,
-                                inplace=inPlace,
-                                delete_oldcat=deleteEmptySourceCat,
-                                title_regex=titleRegex,
-                                history=withHistory,
+        if not from_given:
+            old_cat_title = pywikibot.input('Please enter the name of the '
+                                            'category that should be removed:')
+        bot = CategoryMoveRobot(oldcat=old_cat_title,
+                                batch=batch,
+                                comment=summary,
+                                inplace=inplace,
+                                delete_oldcat=delete_empty_cat,
+                                title_regex=title_regex,
+                                history=history,
                                 pagesonly=pagesonly,
-                                deletion_comment=useSummaryForDeletion)
+                                deletion_comment=use_deletion_summary)
     elif action == 'move':
-        if not fromGiven:
-            oldCatTitle = pywikibot.input(
+        if not from_given:
+            old_cat_title = pywikibot.input(
                 u'Please enter the old name of the category:')
-        if not toGiven:
-            newCatTitle = pywikibot.input(
+        if not to_given:
+            new_cat_title = pywikibot.input(
                 u'Please enter the new name of the category:')
-        if useSummaryForDeletion:
+        if use_deletion_summary:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
         else:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC
-        bot = CategoryMoveRobot(oldcat=oldCatTitle,
-                                newcat=newCatTitle,
-                                batch=batchMode,
-                                comment=editSummary,
-                                inplace=inPlace,
-                                delete_oldcat=deleteEmptySourceCat,
-                                title_regex=titleRegex,
-                                history=withHistory,
+        bot = CategoryMoveRobot(oldcat=old_cat_title,
+                                newcat=new_cat_title,
+                                batch=batch,
+                                comment=summary,
+                                inplace=inplace,
+                                delete_oldcat=delete_empty_cat,
+                                title_regex=title_regex,
+                                history=history,
                                 pagesonly=pagesonly,
                                 deletion_comment=deletion_comment,
                                 wikibase=wikibase,
@@ -1482,39 +1488,39 @@ def main(*args):
                                 keep_sortkey=keep_sortkey)
     elif action == 'tidy':
         cat_title = pywikibot.input('Which category do you want to tidy up?')
-        bot = CategoryTidyRobot(cat_title, catDB, genFactory.namespaces,
-                                editSummary)
+        bot = CategoryTidyRobot(cat_title, cat_db, gen_factory.namespaces,
+                                summary)
     elif action == 'tree':
         catTitle = pywikibot.input(
             u'For which category do you want to create a tree view?')
         filename = pywikibot.input(
             'Please enter the name of the file where the tree should be saved,'
             '\nor press enter to simply show the tree:')
-        bot = CategoryTreeRobot(catTitle, catDB, filename, depth)
+        bot = CategoryTreeRobot(catTitle, cat_db, filename, depth)
     elif action == 'listify':
-        if not fromGiven:
-            oldCatTitle = pywikibot.input(
+        if not from_given:
+            old_cat_title = pywikibot.input(
                 u'Please enter the name of the category to listify:')
-        if not toGiven:
-            newCatTitle = pywikibot.input(
+        if not to_given:
+            new_cat_title = pywikibot.input(
                 u'Please enter the name of the list to create:')
-        bot = CategoryListifyRobot(oldCatTitle, newCatTitle, editSummary,
-                                   overwrite, showImages, subCats=True,
-                                   talkPages=talkPages, recurse=recurse)
+        bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
+                                   overwrite, showimages, subCats=True,
+                                   talkPages=talkpages, recurse=recurse)
 
     if bot:
         pywikibot.Site().login()
-
+        suggest_help(unknown_parameters=unknown)
         try:
             bot.run()
         except pywikibot.Error:
             pywikibot.error("Fatal error:", exc_info=True)
         finally:
-            if catDB:
-                catDB.dump()
+            if cat_db:
+                cat_db.dump()
         return True
     else:
-        pywikibot.bot.suggest_help(missing_action=True)
+        suggest_help(missing_action=True, unknown_parameters=unknown)
         return False
 
 
