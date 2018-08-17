@@ -7,6 +7,7 @@
 #
 from __future__ import absolute_import, unicode_literals
 
+from pywikibot import config
 from pywikibot.family import WikimediaFamily
 from pywikibot.page import Claim, Property
 from pywikibot.site import DataSite
@@ -213,6 +214,7 @@ class EchoKnownTypesTestCase(KnownTypesTestBase,
         self._check_param_values(self.site, 'echomarkseen', 'type', known)
 
 
+@unittest.skipIf(config.family in {'wpbeta', 'wsbeta'}, 'T201981')
 class WikibaseKnownTypesTests(KnownTypesTestBase,
                               DefaultWikibaseClientTestCase):
 
