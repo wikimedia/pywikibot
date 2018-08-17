@@ -2982,14 +2982,12 @@ class Category(Page):
         # move to category.py? (Although it doesn't seem to be used there,
         # either)
         if not isinstance(cat, Category):
-            cat = self.site.namespaces.CATEGORY + ':' + cat
-            target_cat = Category(self.site, cat)
+            target_cat = Category(self.site, 'Category:' + cat)
         else:
             target_cat = cat
         if target_cat.exists():
-            pywikibot.output(u'Target page %s already exists!'
-                             % target_cat.title(),
-                             level=pywikibot.logging.WARNING)
+            pywikibot.warning(
+                'Target page %s already exists!' % target_cat.title())
             return False
         else:
             pywikibot.output('Moving text from %s to %s.'
@@ -3025,8 +3023,7 @@ class Category(Page):
         """
         # I don't see why we need this as part of the framework either
         # move to scripts/category.py?
-        catname = self.site.namespaces.CATEGORY + ':' + catname
-        target_cat = Category(self.site, catname)
+        target_cat = Category(self.site, 'Category:' + catname)
         if target_cat.exists():
             pywikibot.warning(u'Target page %s already exists!'
                               % target_cat.title())
