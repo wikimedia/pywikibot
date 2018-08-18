@@ -222,7 +222,7 @@ class NowCommonsDeleteBot(Bot):
                                 only_template_inclusion=True)
                 for t in self.nc_templates)
         gen = chain(*gens)
-        gen = filter_unique(gen)
+        gen = filter_unique(gen, key=lambda p: '{}:{}:{}'.format(*p._cmpkey()))
         gen = pg.PreloadingGenerator(gen)
         return gen
 
