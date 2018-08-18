@@ -213,8 +213,7 @@ class ImageTransferBot(object):
                 # to upload anyway, using another name.
                 try:
                     # Maybe the image is on the target site already
-                    targetTitle = '%s:%s' % (self.targetSite.namespaces.FILE,
-                                             image.title().split(':', 1)[1])
+                    targetTitle = 'File:' + image.title().split(':', 1)[1]
                     targetImage = pywikibot.Page(self.targetSite, targetTitle)
                     targetImage.get()
                     pywikibot.output('Image with this name is already on %s.'

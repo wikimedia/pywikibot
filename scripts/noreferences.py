@@ -762,8 +762,7 @@ def main(*args):
         except Exception:
             pass
         else:
-            cat = pywikibot.Category(site, "%s:%s" % (
-                site.namespaces.CATEGORY, cat))
+            cat = pywikibot.Category(site, 'Category:' + cat)
             gen = cat.articles(namespaces=genFactory.namespaces or [0])
     if gen:
         bot = NoReferencesBot(gen, **options)
