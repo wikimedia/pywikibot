@@ -274,7 +274,10 @@ def _create_default_regexes():
         # files
         'file': (FILE_LINK_REGEX, lambda site: '|'.join(site.namespaces[6])),
         # section headers
-        'header': re.compile(r'(?:(?<=\n)|\A)=+.+=+ *(?=\n|\Z)'),
+        'header': re.compile(
+            r'(?:(?<=\n)|\A)'
+            r'=(?:.|<!--[\s\S]*?-->)+='
+            r' *(?:<!--[\s\S]*?--> *)*(?=\n|\Z)'),
         # external links
         'hyperlink': compileLinkR(),
         # also finds links to foreign sites with preleading ":"
