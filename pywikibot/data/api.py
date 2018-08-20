@@ -1844,6 +1844,32 @@ class Request(MutableMapping):
         submsg.set_payload(content)
         return submsg
 
+    def _use_get(self):
+        """Verify whether 'get' is to be used."""
+        if (not config.enable_GET_without_SSL
+                and self.site.protocol() != 'https'
+                or self.site.is_oauth_token_available()):  # T108182 workaround
+            use_get = False
+        elif self.use_get is None:
+            if self.action == 'query':
+                # for queries check the query module
+                modules = set()
+                for mod_type_name in ('list', 'prop', 'generator'):
+                    modules.update(self._params.get(mod_type_name, []))
+            else:
+                modules = {self.action}
+            if modules:
+                self.site._paraminfo.fetch(modules)
+                use_get = all('mustbeposted' not in self.site._paraminfo[mod]
+                              for mod in modules)
+            else:
+                # If modules is empty, just 'meta' was given, which doesn't
+                # require POSTs, and is required for ParamInfo
+                use_get = True
+        else:
+            use_get = self.use_get
+        return use_get
+
     @classmethod
     def _build_mime_request(cls, params, mime_params):
         """
@@ -1877,6 +1903,124 @@ class Request(MutableMapping):
         headers = dict(container.items())
         return headers, body
 
+    def _get_request_params(self, use_get, paramstring):
+        """Get request parameters."""
+        uri = self.site.apipath()
+        if self.mime:
+            (headers, body) = Request._build_mime_request(
+                self._encoded_items(), self.mime_params)
+            use_get = False  # MIME requests require HTTP POST
+        else:
+            headers = {'Content-Type': 'application/x-www-form-urlencoded'}
+            if (not self.site.maximum_GET_length()
+                    or self.site.maximum_GET_length() < len(paramstring)):
+                use_get = False
+            if use_get:
+                uri = '{0}?{1}'.format(uri, paramstring)
+                body = None
+            else:
+                body = paramstring
+
+        pywikibot.debug('API request to {0} (uses get: {1}):\n'
+                        'Headers: {2!r}\nURI: {3!r}\nBody: {4!r}'
+                        .format(self.site, use_get, headers, uri, body),
+                        _logger)
+        return use_get, uri, body, headers
+
+    def _http_request(self, use_get, uri, body, headers, paramstring):
+        """Get or post a http request with exception handling.
+
+        @return: a tuple containing data from request and use_get value
+        @rtype: tuple
+        """
+        try:
+            data = http.request(
+                site=self.site, uri=uri,
+                method='GET' if use_get else 'POST',
+                body=body, headers=headers)
+        except Server504Error:
+            pywikibot.log('Caught HTTP 504 error; retrying')
+        except Server414Error:
+            if use_get:
+                pywikibot.log('Caught HTTP 414 error; retrying')
+                use_get = False
+            else:
+                pywikibot.warning('Caught HTTP 414 error, although not '
+                                  'using GET.')
+                raise
+        except FatalServerError:
+            # This error is not going to be fixed by just waiting
+            pywikibot.error(traceback.format_exc())
+            raise
+        # TODO: what other exceptions can occur here?
+        except Exception:
+            # for any other error on the http request, wait and retry
+            pywikibot.error(traceback.format_exc())
+            pywikibot.log('{}, {}'.format(uri, paramstring))
+        else:
+            return data, use_get
+        self.wait()
+        return None, use_get
+
+    def _json_loads(self, data):
+        """Read source text and return a dict.
+
+        @param data: raw data string
+        @type data: str
+        @return: a data dict
+        @rtype: dict
+        @raises APIError: unknown action found
+        @raises APIError: unknown query result type
+        """
+        if not isinstance(data, unicode):
+            data = data.decode(self.site.encoding())
+        pywikibot.debug(('API response received from {}:\n'
+                         .format(self.site)) + data, _logger)
+        if data.startswith('unknown_action'):
+            raise APIError(data[:14], data[16:])
+        try:
+            result = json.loads(data)
+        except ValueError:
+            # if the result isn't valid JSON, there must be a server
+            # problem. Wait a few seconds and try again
+            pywikibot.warning(
+                'Non-JSON response received from server {}; '
+                'the server may be down.'.format(self.site))
+            # there might also be an overflow, so try a smaller limit
+            for param in self._params:
+                if param.endswith('limit'):
+                    # param values are stored a list of str
+                    value = self._params[param][0]
+                    if value.isdigit():
+                        self._params[param] = [str(int(value) // 2)]
+                        pywikibot.output('Set {} = {}'
+                                         .format(param, self._params[param]))
+        else:
+            if result and not isinstance(result, dict):
+                raise APIError('Unknown',
+                               'Unable to process query response of type {}.'
+                               .format(type(result)),
+                               data=result)
+            return result or {}
+        self.wait()
+        return None
+
+    def _userinfo_query(self, result):
+        """Handle userinfo query."""
+        if self.action == 'query' and 'userinfo' in result.get('query', ()):
+            # if we get passed userinfo in the query result, we can confirm
+            # that we are logged in as the correct user. If this is not the
+            # case, force a re-login.
+            username = result['query']['userinfo']['name']
+            if self.site.user() is not None and self.site.user() != username:
+                pywikibot.error(
+                    "Logged in as '{actual}' instead of '{expected}'.\n"
+                    'Forcing re-login.'.format(actual=username,
+                                               expected=self.site.user()))
+                self.site._relogin()
+                return True
+        return False
+
     def _handle_warnings(self, result):
         if 'warnings' in result:
             for mod, warning in result['warnings'].items():
@@ -1899,6 +2043,115 @@ class Request(MutableMapping):
                         pywikibot.warning('API warning ({}): {}'
                                           .format(mod, single_warning))
 
+    def _logged_in(self, code):
+        """Check whether user is logged in.
+
+        Older wikis returned an error instead of a warning when the request
+        asked for too many values. If we get this error, assume we are not
+        logged in (we can't check this because the userinfo data is not
+        present) and force a re-login
+        """
+        if code.endswith('limit'):
+            message = 'Received API limit error.'
+
+        # If the user assertion failed, we're probably logged out as well.
+        elif code == 'assertuserfailed':
+            message = 'User assertion failed.'
+
+        # Lastly, the purge module require a POST if used as anonymous user,
+        # but we normally send a GET request. If the API tells us the request
+        # has to be POSTed, we're probably logged out.
+        elif code == 'mustbeposted' and self.action == 'purge':
+            message = "Received unexpected 'mustbeposted' error."
+
+        else:
+            return True
+
+        pywikibot.error(message + ' Forcing re-login.')
+        self.site._relogin()
+        return False
+
+    def _internal_api_error(self, code, error, result):
+        """Check for internal_api_error_ or readonly and retry.
+
+        @raises APIMWException: internal_api_error or readonly
+        """
+        IAE = 'internal_api_error_'
+        if not (code.startswith(IAE) or code == 'readonly'):
+            return False
+
+        # T154011
+        class_name = code if code == 'readonly' else code[len(IAE):]
+
+        del error['code']  # is added via class_name
+        e = APIMWException(class_name, **error)
+
+        # If the error key is in this table, it is probably a temporary
+        # problem, so we will retry the edit.
+        # TODO: T154011: 'ReadOnlyError' seems replaced by 'readonly'
+        retry = class_name in ['DBConnectionError',  # T64974
+                               'DBQueryError',  # T60158
+                               'ReadOnlyError',  # T61227
+                               'readonly',  # T154011
+                               ]
+
+        pywikibot.error('Detected MediaWiki API exception {}{}'
+                        .format(e, '; retrying' if retry else '; raising'))
+        # Due to bug T66958, Page's repr may return non ASCII bytes
+        # Get as bytes in PY2 and decode with the console encoding as
+        # the rest should be ASCII anyway.
+        param_repr = str(self._params)
+        if PY2:
+            param_repr = param_repr.decode(config.console_encoding)
+        pywikibot.log('MediaWiki exception {} details:\n'
+                      '          query=\n{}\n'
+                      '          response=\n{}'
+                      .format(class_name,
+                              pprint.pformat(param_repr),
+                              result))
+        if not retry:
+            raise e
+
+        self.wait()
+        return True
+
+    def _bad_token(self, code):
+        """Check for bad token."""
+        if code != 'badtoken':
+            return False
+
+        user_tokens = self.site.tokens._tokens[self.site.user()]
+        # all token values mapped to their type
+        tokens = {token: t_type for t_type, token in user_tokens.items()}
+        # determine which tokens are bad
+        invalid_param = {name: tokens[param[0]]
+                         for name, param in self._params.items()
+                         if len(param) == 1 and param[0] in tokens}
+        # doesn't care about the cache so can directly load them
+        if invalid_param:
+            pywikibot.log(
+                'Bad token error for {}. Tokens for "{}" used in request; '
+                'invalidated them.'
+                .format(self.site.user(),
+                        '", "'.join(sorted(set(invalid_param.values())))))
+            self.site.tokens.load_tokens(set(invalid_param.values()))
+            # fix parameters; lets hope that it doesn't mistake actual
+            # parameters as tokens
+            for name, t_type in invalid_param.items():
+                self[name] = self.site.tokens[t_type]
+            return True
+        else:
+            # otherwise couldn't find any … weird there is nothing what
+            # can be done here because it doesn't know which parameters
+            # to fix
+            pywikibot.log(
+                'Bad token error for {} but no parameter is using a '
+                'token. Current tokens: {}'
+                .format(self.site.user(),
+                        ', '.join('{}: {}'.format(*e)
+                                  for e in user_tokens.items())))
+        return False
+
     def submit(self):
         """
         Submit a query and parse the response.
@@ -1907,143 +2160,34 @@ class Request(MutableMapping):
         @rtype: dict
         """
         self._add_defaults()
-        if (not config.enable_GET_without_SSL and
-                self.site.protocol() != 'https' or
-                self.site.is_oauth_token_available()):  # work around T108182
-            use_get = False
-        elif self.use_get is None:
-            if self.action == 'query':
-                # for queries check the query module
-                modules = set()
-                for mod_type_name in ('list', 'prop', 'generator'):
-                    modules.update(self._params.get(mod_type_name, []))
-            else:
-                modules = {self.action}
-            if modules:
-                self.site._paraminfo.fetch(modules)
-                use_get = all('mustbeposted' not in self.site._paraminfo[mod]
-                              for mod in modules)
-            else:
-                # If modules is empty, just 'meta' was given, which doesn't
-                # require POSTs, and is required for ParamInfo
-                use_get = True
-        else:
-            use_get = self.use_get
+        use_get = self._use_get()
+
         while True:
             paramstring = self._http_param_string()
+
             simulate = self._simulate(self.action)
             if simulate:
                 return simulate
+
             if self.throttle:
                 self.site.throttle(write=self.write)
             else:
                 pywikibot.log(
                     "Submitting unthrottled action '{0}'.".format(self.action))
-            uri = self.site.scriptpath() + "/api.php"
-            try:
-                if self.mime:
-                    (headers, body) = Request._build_mime_request(
-                        self._encoded_items(), self.mime_params)
-                    use_get = False  # MIME requests require HTTP POST
-                else:
-                    headers = {
-                        'Content-Type': 'application/x-www-form-urlencoded'}
-                    if (not self.site.maximum_GET_length() or
-                            self.site.maximum_GET_length() < len(paramstring)):
-                        use_get = False
-                    if use_get:
-                        uri = '{0}?{1}'.format(uri, paramstring)
-                        body = None
-                    else:
-                        body = paramstring
 
-                pywikibot.debug('API request to {0} (uses get: {1}):\n'
-                                'Headers: {2!r}\nURI: {3!r}\n'
-                                'Body: {4!r}'.format(self.site, use_get,
-                                                     headers, uri, body),
-                                _logger)
+            use_get, uri, body, headers = self._get_request_params(use_get,
+                                                                   paramstring)
+            rawdata, use_get = self._http_request(use_get, uri, body, headers,
+                                                  paramstring)
+            if rawdata is None:
+                continue
 
-                rawdata = http.request(
-                    site=self.site, uri=uri,
-                    method='GET' if use_get else 'POST',
-                    body=body, headers=headers)
-            except Server504Error:
-                pywikibot.log(u"Caught HTTP 504 error; retrying")
-                self.wait()
+            result = self._json_loads(rawdata)
+            if result is None:
                 continue
-            except Server414Error:
-                if use_get:
-                    pywikibot.log('Caught HTTP 414 error; retrying')
-                    use_get = False
-                    self.wait()
-                    continue
-                else:
-                    pywikibot.warning('Caught HTTP 414 error, although not '
-                                      'using GET.')
-                    raise
-            except FatalServerError:
-                # This error is not going to be fixed by just waiting
-                pywikibot.error(traceback.format_exc())
-                raise
-            # TODO: what other exceptions can occur here?
-            except Exception:
-                # for any other error on the http request, wait and retry
-                pywikibot.error(traceback.format_exc())
-                pywikibot.log(u"%s, %s" % (uri, paramstring))
-                self.wait()
-                continue
-            if not isinstance(rawdata, unicode):
-                rawdata = rawdata.decode(self.site.encoding())
-            pywikibot.debug((u"API response received from %s:\n" % self.site) +
-                            rawdata, _logger)
-            if rawdata.startswith(u"unknown_action"):
-                raise APIError(rawdata[:14], rawdata[16:])
-            try:
-                result = json.loads(rawdata)
-            except ValueError:
-                # if the result isn't valid JSON, there must be a server
-                # problem. Wait a few seconds and try again
-                pywikibot.warning(
-                    'Non-JSON response received from server {}; '
-                    'the server may be down.'.format(self.site))
-                # there might also be an overflow, so try a smaller limit
-                for param in self._params:
-                    if param.endswith("limit"):
-                        # param values are stored a list of str
-                        value = self._params[param][0]
-                        try:
-                            self._params[param] = [str(int(value) // 2)]
-                            pywikibot.output(u"Set %s = %s"
-                                             % (param, self._params[param]))
-                        except ValueError:
-                            pass
-                self.wait()
-                continue
-            if not result:
-                result = {}
-            if not isinstance(result, dict):
-                raise APIError("Unknown",
-                               "Unable to process query response of type %s."
-                               % type(result),
-                               data=result)
 
-            if self.action == 'query' \
-               and 'userinfo' in result.get('query', ()):
-                # if we get passed userinfo in the query result, we can confirm
-                # that we are logged in as the correct user. If this is not the
-                # case, force a re-login.
-                username = result['query']['userinfo']['name']
-                if self.site.user() is not None \
-                   and self.site.user() != username:
-                    pywikibot.error(
-                        "Logged in as '{actual}' instead of '{expected}'. "
-                        "Forcing re-login.".format(
-                            actual=username,
-                            expected=self.site.user()
-                        )
-                    )
-                    self.site._relogin()
-                    continue
+            if self._userinfo_query(result):
+                continue
 
             self._handle_warnings(result)
 
@@ -2065,29 +2209,7 @@ class Request(MutableMapping):
             code = result['error'].setdefault('code', 'Unknown')
             info = result['error'].setdefault('info', None)
 
-            # Older wikis returned an error instead of a warning when
-            # the request asked for too many values. If we get this
-            # error, assume we are not logged in (we can't check this
-            # because the userinfo data is not present) and force
-            # a re-login
-            if code.endswith('limit'):
-                pywikibot.error("Received API limit error. Forcing re-login")
-                self.site._relogin()
-                continue
-
-            # If the user assertion failed, we're probably logged out as well.
-            if code == 'assertuserfailed':
-                pywikibot.error("User assertion failed. Forcing re-login.")
-                self.site._relogin()
-                continue
-
-            # Lastly, the purge module require a POST if used as anonymous
-            # user, but we normally send a GET request. If the API tells us the
-            # request has to be POSTed, we're probably logged out.
-            if code == 'mustbeposted' and self.action == 'purge':
-                pywikibot.error("Received unexpected 'mustbeposted' error. "
-                                "Forcing re-login.")
-                self.site._relogin()
+            if not self._logged_in(code):
                 continue
 
             if code == "maxlag":
@@ -2107,45 +2229,8 @@ class Request(MutableMapping):
 
             pywikibot.warning('API error %s: %s' % (code, info))
 
-            if code.startswith('internal_api_error_') or code == 'readonly':
-                if code == 'readonly':  # T154011
-                    class_name = code
-                else:
-                    class_name = code[len(u'internal_api_error_'):]
-
-                del error['code']  # is added via class_name
-                e = APIMWException(class_name, **error)
-
-                # If the error key is in this table, it is probably a temporary problem,
-                # so we will retry the edit.
-                # TODO: T154011: 'ReadOnlyError' seems replaced by 'readonly'
-                retry = class_name in ['DBConnectionError',  # T64974
-                                       'DBQueryError',  # T60158
-                                       'ReadOnlyError',  # T61227
-                                       'readonly',  # T154011
-                                       ]
-
-                pywikibot.error("Detected MediaWiki API exception %s%s"
-                                % (e,
-                                   "; retrying" if retry else "; raising"))
-                # Due to bug T66958, Page's repr may return non ASCII bytes
-                # Get as bytes in PY2 and decode with the console encoding as
-                # the rest should be ASCII anyway.
-                param_repr = str(self._params)
-                if PY2:
-                    param_repr = param_repr.decode(config.console_encoding)
-                pywikibot.log(u"MediaWiki exception %s details:\n"
-                              u"          query=\n%s\n"
-                              u"          response=\n%s"
-                              % (class_name,
-                                 pprint.pformat(param_repr),
-                                 result))
-
-                if retry:
-                    self.wait()
-                    continue
-
-                raise e
+            if self._internal_api_error(code, error, result):
+                continue
 
             # Phab. tickets T48535, T64126, T68494, T68619
             if code == "failed-save" and \
@@ -2153,43 +2238,15 @@ class Request(MutableMapping):
                self._is_wikibase_error_retryable(result["error"]):
                 self.wait()
                 continue
+
             # If readapidenied is returned try to login
             if code == 'readapidenied' and self.site._loginstatus in (-3, -1):
                 self.site.login()
                 continue
-            if code == 'badtoken':
-                user_tokens = self.site.tokens._tokens[self.site.user()]
-                # all token values mapped to their type
-                tokens = {token: t_type
-                          for t_type, token in user_tokens.items()}
-                # determine which tokens are bad
-                invalid_param = {}
-                for name, param in self._params.items():
-                    if len(param) == 1 and param[0] in tokens:
-                        invalid_param[name] = tokens[param[0]]
-                # doesn't care about the cache so can directly load them
-                if invalid_param:
-                    pywikibot.log(
-                        u'Bad token error for {0}. Tokens for "{1}" used in '
-                        u'request; invalidated them.'.format(
-                            self.site.user(),
-                            '", "'.join(sorted(set(invalid_param.values())))))
-                    self.site.tokens.load_tokens(set(invalid_param.values()))
-                    # fix parameters; lets hope that it doesn't mistake actual
-                    # parameters as tokens
-                    for name, t_type in invalid_param.items():
-                        self[name] = self.site.tokens[t_type]
-                    continue
-                else:
-                    # otherwise couldn't find any … weird there is nothing what
-                    # can be done here because it doesn't know which parameters
-                    # to fix
-                    pywikibot.log(
-                        u'Bad token error for {0} but no parameter is using a '
-                        u'token. Current tokens: {1}'.format(
-                            self.site.user(),
-                            ', '.join('{0}: {1}'.format(*e)
-                                      for e in user_tokens.items())))
+
+            if self._bad_token(code):
+                continue
+
             if 'mwoauth-invalid-authorization' in code:
                 if 'Nonce already used' in info:
                     pywikibot.error(
@@ -2201,6 +2258,7 @@ class Request(MutableMapping):
             if code == 'cirrussearch-too-busy-error':  # T170647
                 self.wait()
                 continue
+
             # raise error
             try:
                 # Due to bug T66958, Page's repr may return non ASCII bytes
