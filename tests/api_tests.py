@@ -933,7 +933,7 @@ class TestCachedRequestNonVCR(DefaultSiteTestCase):
         mysite = self.get_site()
         # Run tests on a missing page unique to this test run so it can
         # not be cached the first request, but will be cached after.
-        now = datetime.datetime.now()
+        now = datetime.datetime.utcnow()
         params = {'action': 'query',
                   'prop': 'info',
                   'titles': 'TestCachedRequest_test_internals ' + str(now),

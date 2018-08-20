@@ -2389,7 +2389,7 @@ class CachedRequest(Request):
                             self._create_file_name())
 
     def _expired(self, dt):
-        return dt + self.expiry < datetime.datetime.now()
+        return dt + self.expiry < datetime.datetime.utcnow()
 
     def _load_cache(self):
         """Load cache entry for request, if available.
@@ -2419,7 +2419,7 @@ class CachedRequest(Request):
 
     def _write_cache(self, data):
         """Write data to self._cachefile_path()."""
-        data = [self._uniquedescriptionstr(), data, datetime.datetime.now()]
+        data = (self._uniquedescriptionstr(), data, datetime.datetime.utcnow())
         with open(self._cachefile_path(), 'wb') as f:
             pickle.dump(data, f, protocol=config.pickle_protocol)
 

@@ -348,13 +348,13 @@ def incorrect_hash(entry):
 
 def older_than(entry, interval):
     """Find older entries."""
-    if entry._cachetime + interval < datetime.datetime.now():
+    if entry._cachetime + interval < datetime.datetime.utcnow():
         return entry
 
 
 def newer_than(entry, interval):
     """Find newer entries."""
-    if entry._cachetime + interval >= datetime.datetime.now():
+    if entry._cachetime + interval >= datetime.datetime.utcnow():
         return entry
 
 

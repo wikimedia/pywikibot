@@ -73,8 +73,9 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     def test_expired(self):
         """Test if the request is expired."""
-        self.assertFalse(self.req._expired(datetime.datetime.now()))
-        self.assertTrue(self.req._expired(datetime.datetime.now() - datetime.timedelta(days=2)))
+        self.assertFalse(self.req._expired(datetime.datetime.utcnow()))
+        self.assertTrue(self.req._expired(
+            datetime.datetime.utcnow() - datetime.timedelta(days=2)))
 
     def test_parameter_types(self):
         """Test _uniquedescriptionstr is identical using different ways."""

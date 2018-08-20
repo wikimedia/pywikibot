@@ -1456,7 +1456,8 @@ class Siteinfo(Container):
         else:
             return pywikibot.tools.EMPTY_DEFAULT
 
-    def _post_process(self, prop, data):
+    @staticmethod
+    def _post_process(prop, data):
         """Do some default handling of data. Directly modifies data."""
         # Be careful with version tests inside this here as it might need to
         # query this method to actually get the version number
@@ -1523,19 +1524,19 @@ class Siteinfo(Container):
         if len(props) == 0:
             raise ValueError('At least one property name must be provided.')
         invalid_properties = []
+        request = self._site._request(
+            expiry=pywikibot.config.API_config_expiry
+            if expiry is False else expiry,
+            parameters={
+                'action': 'query', 'meta': 'siteinfo', 'siprop': props,
+            }
+        )
+        # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
+        # continue anyway we just always use continue.
+        request['continue'] = True
+        # warnings are handled later
+        request._warning_handler = warn_handler
         try:
-            request = self._site._request(
-                expiry=pywikibot.config.API_config_expiry
-                if expiry is False else expiry,
-                parameters={
-                    'action': 'query', 'meta': 'siteinfo', 'siprop': props,
-                }
-            )
-            # With 1.25wmf5 it'll require continue or rawcontinue. As we don't
-            # continue anyway we just always use continue.
-            request['continue'] = True
-            # warnings are handled later
-            request._warning_handler = warn_handler
             data = request.submit()
         except api.APIError as e:
             if e.code == 'siunknown_siprop':
@@ -1561,7 +1562,9 @@ class Siteinfo(Container):
                 pywikibot.log(u"Unable to get siprop(s) '{0}'".format(
                     u"', '".join(invalid_properties)))
             if 'query' in data:
-                cache_time = datetime.datetime.utcnow()
+                # If the request is a CachedRequest, use the _cachetime attr.
+                cache_time = getattr(
+                    request, '_cachetime', None) or datetime.datetime.utcnow()
                 for prop in props:
                     if prop in data['query']:
                         self._post_process(prop, data['query'][prop])
@@ -1658,7 +1661,7 @@ class Siteinfo(Container):
             try:
                 cached = self._get_cached(key)
             except KeyError:
-                cached = None
+                pass
             else:  # cached value available
                 # is a default value, but isn't accepted
                 if not cached[1] and not get_default:

@@ -34,7 +34,7 @@ from pywikibot.tools import (
     UnicodeType as unicode,
 )
 
-from tests import patch, unittest_print
+from tests import patch, unittest_print, MagicMock
 from tests.aspects import (
     unittest, TestCase, DeprecationTestCase,
     TestCaseBase,
@@ -2412,6 +2412,22 @@ class TestSiteInfo(DefaultSiteTestCase):
         self.assertFalse(
             entered_loop(mysite.siteinfo.get(not_exists).values()))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists).keys()))
+
+
+class TestSiteinfoDry(DefaultDrySiteTestCase):
+
+    """Test Siteinfo in dry mode."""
+
+    def test_siteinfo_timestamps(self):
+        """Test that cache has the timestamp of CachedRequest."""
+        site = self.get_site()
+        request_mock = MagicMock()
+        request_mock.submit = lambda: {'query': {'_prop': '_value'}}
+        request_mock._cachetime = '_cache_time'
+        with patch.object(site, '_request', return_value=request_mock):
+            siteinfo = pywikibot.site.Siteinfo(site)
+            result = siteinfo._get_siteinfo('_prop', False)
+        self.assertEqual(result, {'_prop': ('_value', '_cache_time')})
 
 
 class TestSiteinfoAsync(DefaultSiteTestCase):

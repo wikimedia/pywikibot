@@ -7,8 +7,9 @@
 #
 from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ('requests', 'unittest', 'TestRequest',
-           'patch_request', 'unpatch_request', 'mock', 'Mock', 'patch')
+__all__ = (
+    'requests', 'unittest', 'TestRequest', 'patch_request', 'unpatch_request',
+    'mock', 'Mock', 'MagicMock', 'patch')
 
 import functools
 import os
@@ -35,10 +36,10 @@ else:
     import unittest
 try:
     import unittest.mock as mock
-    from unittest.mock import Mock, patch
+    from unittest.mock import MagicMock, Mock, patch
 except ImportError:
     import mock
-    from mock import Mock, patch
+    from mock import MagicMock, Mock, patch
 
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
