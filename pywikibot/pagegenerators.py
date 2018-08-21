@@ -395,6 +395,11 @@ docuReplacements = {'&params;': parameterHelp}
 __doc__ = __doc__.replace("&params;", parameterHelp)
 
 
+# This is the function that will be used to de-duplicate page iterators.
+_filter_unique_pages = partial(
+    filter_unique, key=lambda page: '{}:{}:{}'.format(*page._cmpkey()))
+
+
 class GeneratorFactory(object):
 
     """Process command line arguments and return appropriate page generator.
@@ -402,14 +407,6 @@ class GeneratorFactory(object):
     This factory is responsible for processing command line arguments
     that are used by many scripts and that determine which pages to work on.
     """
-
-    # This is the function that will be used to de-duplicate iterators.
-    _filter_unique = staticmethod(partial(
-        filter_unique, key=lambda p: '{}:{}:{}'.format(*p._cmpkey())))
-    # The seen list can not yet be shared at present, due to `intersect` mode
-    # not being known until after all generators have been created.
-    # When not in intersect mode, _filter_unique could be:
-    # functools.partial(filter_unique, container=global_seen_list, key=...)
 
     def __init__(self, site=None, positional_arg_name=None):
         """
@@ -517,19 +514,19 @@ class GeneratorFactory(object):
                     'filter(s) specified but no generators.')
             return None
         elif len(self.gens) == 1:
-            gensList = self.gens[0]
-            dupfiltergen = gensList
+            dupfiltergen = self.gens[0]
+            if hasattr(self, '_single_gen_filter_unique'):
+                dupfiltergen = _filter_unique_pages(dupfiltergen)
             if self.intersect:
                 pywikibot.warning(
                     '"-intersect" ignored as only one generator is specified.')
         else:
             if self.intersect:
-                gensList = intersect_generators(self.gens)
                 # By definition no duplicates are possible.
-                dupfiltergen = gensList
+                dupfiltergen = intersect_generators(self.gens)
             else:
-                gensList = itertools.chain(*self.gens)
-                dupfiltergen = self._filter_unique(gensList)
+                dupfiltergen = _filter_unique_pages(itertools.chain(
+                    *self.gens))
 
         # Add on subpage filter generator
         if self.subpage_max_depth is not None:
@@ -627,7 +624,8 @@ class GeneratorFactory(object):
                         recurse=recurse,
                         content=content)
 
-    def _parse_log_events(self, logtype, user=None, start=None, end=None):
+    @staticmethod
+    def _parse_log_events(logtype, user=None, start=None, end=None):
         """
         Parse the -logevent argument information.
 
@@ -758,7 +756,9 @@ class GeneratorFactory(object):
 
     def _handle_usercontribs(self, value):
         """Handle `-usercontribs` argument."""
-        return UserContributionsGenerator(value, site=self.site)
+        self._single_gen_filter_unique = True
+        return UserContributionsGenerator(
+            value, site=self.site, _filter_unique=None)
 
     def _handle_withoutinterwiki(self, value):
         """Handle `-withoutinterwiki` argument."""
@@ -815,9 +815,10 @@ class GeneratorFactory(object):
             rcend = rcstart - timedelta(minutes=duration)
         elif len(params) == 1:
             total = int(params[0])
+        self._single_gen_filter_unique = True
         return RecentChangesPageGenerator(
             namespaces=self.namespaces, total=total, start=rcstart, end=rcend,
-            site=self.site, tag=rctag, _filter_unique=self._filter_unique)
+            site=self.site, tag=rctag)
 
     def _handle_liverecentchanges(self, value):
         """Handle `-liverecentchanges` argument."""
@@ -1609,7 +1610,8 @@ def PagesFromPageidGenerator(pageids, site=None):
 
 @deprecated_args(number='total', step=None)
 def UserContributionsGenerator(username, namespaces=None, site=None,
-                               total=None, _filter_unique=filter_unique):
+                               total=None,
+                               _filter_unique=_filter_unique_pages):
     """Yield unique pages edited by user:username.
 
     @param total: Maximum number of pages to retrieve in total
@@ -1627,10 +1629,11 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
             pywikibot.warning('User "{}" does not exist on site "{}".'
                               .format(user.username, site))
 
-    return _filter_unique(
-        (contrib[0] for contrib in user.contributions(
-            namespaces=namespaces, total=total)),
-        key=lambda p: '{}:{}:{}'.format(*p._cmpkey()))
+    gen = (contrib[0] for contrib in user.contributions(
+        namespaces=namespaces, total=total))
+    if _filter_unique:
+        return _filter_unique(gen)
+    return gen
 
 
 def NamespaceFilterPageGenerator(generator, namespaces, site=None):
