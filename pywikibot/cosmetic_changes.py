@@ -663,12 +663,8 @@ class CosmeticChangesToolkit(object):
 
     def removeEmptySections(self, text):
         """Cleanup empty sections."""
-        # comments, categories, and interwikis
-        skippings = ['comment', 'category', 'interwiki']
+        skippings = ['comment', 'category']
         skip_regexes = _get_regexes(skippings, self.site)
-        # we want only interwikis, not interlanguage links
-        skip_regexes[1] = re.compile(
-            skip_regexes[1].pattern.replace(':?', ''))
         # site defined templates
         skip_templates = {
             'cs': ('Pahýl[ _]část',),  # stub section
@@ -681,7 +677,7 @@ class CosmeticChangesToolkit(object):
         skip_regexes.append(re.compile(r'(?m)^[\*#] *$'))
 
         # get stripped sections
-        stripped_text = text
+        stripped_text = textlib.removeLanguageLinks(text, self.site, '\n')
         for reg in skip_regexes:
             stripped_text = reg.sub(r'', stripped_text)
         strip_sections = textlib.extract_sections(
