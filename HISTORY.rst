@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Don't reset Bot._site to None if we have already a site object (T125046)
 * pywikibot.site.Siteinfo: Fix the bug in cache_time when loading a CachedRequest (T202227)
 * pagegenerators._handle_recentchanges: Do not request for reversed results (T199199)
 * Use a key for filter_unique where appropriate (T199615)
