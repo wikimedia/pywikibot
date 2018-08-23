@@ -4,7 +4,24 @@ Release history
 Current release
 ---------------
 
+* pywikibot.site.Siteinfo: Fix the bug in cache_time when loading a CachedRequest (T202227)
+* pagegenerators._handle_recentchanges: Do not request for reversed results (T199199)
+* Use a key for filter_unique where appropriate (T199615)
+* pywikibot.tools: Add exceptions for first_upper (T200357)
+* Fix usages of site.namespaces.NAMESPACE_NAME (T201969)
+* pywikibot/textlib.py: Fix header regex to allow comments
+* Use 'rvslots' when fetching revisions on MW 1.32+ (T200955)
 * Drop the '2' from PYWIKIBOT2_DIR, PYWIKIBOT2_DIR_PWB, and PYWIKIBOT2_NO_USER_CONFIG environment variables. The old names are now deprecated. The other PYWIKIBOT2_* variables which were used only for testing purposes have been renamed without deprecation. (T184674)
+* Introduce a timestamp in deprecated decorator (T106121)
+* textlib.extract_sections: Remove footer from the last section (T199751)
+* Don't let WikidataBot crash on save related errors (T199642)
+* Allow different projects to have different L10N entries (T198889)
+* remove color highlights before fill function (T196874)
+* Fix Portuguese file namespace translation in cc (T57242)
+* textlib._create_default_regexes: Avoid using inline flags (T195538)
+* Not everything after a language link is footer (T199539)
+* code cleanups
+* New mediawiki projects were provided
 * Bugfixes and improvements
 * Localisation updates
 
