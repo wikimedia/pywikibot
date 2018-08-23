@@ -1537,11 +1537,15 @@ class Bot(BaseBot):
     instead which specifically handle multiple or single sites.
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, site=None, **kwargs):
         """Create a Bot instance and initalize cached sites."""
         # TODO: add warning if site is specified and generator
         # contains pages from a different site.
-        self._site = kwargs.pop('site', None)
+        # Do not set self._site to None if we already have it
+        if site is not None:
+            self._site = site
+        elif not hasattr(self, '_site'):
+            self._site = None
         self._sites = set([self._site] if self._site else [])
 
         super(Bot, self).__init__(**kwargs)
