@@ -519,6 +519,7 @@ editor_filename_extension = 'wiki'
 
 # Defines for which scripts a logfile should be enabled. Logfiles will be
 # saved in the 'logs' subdirectory.
+#
 # Example:
 #     log = ['interwiki', 'weblinkchecker', 'table2wiki']
 # It is also possible to enable logging for all scripts, using this line:
@@ -550,9 +551,10 @@ log_pywiki_repo_version = False
 # (overrides log setting above)
 debug_log = []
 
-# ############# EXTERNAL SCRIPT PATH SETTING ##############
-# set your own script path to lookup for your script files.
-# your private script path must be located inside the
+# ############# EXTERNAL SCRIPT PATH SETTINGS ##############
+# Set your own script path to lookup for your script files.
+#
+# Your private script path must be located inside the
 # framework folder, subfolders must be delimited by '.'.
 # every folder must contain an (empty) __init__.py file.
 #
@@ -619,6 +621,7 @@ interwiki_contents_on_disk = False
 #
 # Set disambiguation_comment[FAMILY][LANG] to a non-empty string to override
 # the default edit comment for the solve_disambiguation bot.
+#
 # Use %s to represent the name of the disambiguation page being treated.
 # Example:
 #
@@ -639,6 +642,7 @@ upload_to_commons = False
 # 'minthrottle' seconds. This can be lengthened if the server is slow,
 # but never more than 'maxthrottle' seconds. However - if you are running
 # more than one bot in parallel the times are lengthened.
+#
 # By default, the get_throttle is turned off, and 'maxlag' is used to
 # control the rate of server access. Set minthrottle to non-zero to use a
 # throttle on read access.
@@ -674,8 +678,8 @@ retry_wait = 5
 
 # ############# TABLE CONVERSION BOT SETTINGS ##############
 
-# will split long paragraphs for better reading the source.
-# only table2wiki.py use it by now
+# Will split long paragraphs for better reading the source.
+# Only table2wiki.py use it by now.
 splitLongParagraphs = False
 # sometimes HTML-tables are indented for better reading.
 # That can do very ugly results.
@@ -696,6 +700,7 @@ weblink_dead_days = 7
 # ############# DATABASE SETTINGS ##############
 # Setting to connect the database or replica of the database of the wiki.
 # db_name_format can be used to manipulate the dbName of site.
+#
 # Example for a pywikibot running on wmflabs:
 # db_hostname = 'enwiki.analytics.db.svc.eqiad.wmflabs'
 # db_name_format = '{0}_p'
@@ -711,7 +716,8 @@ db_connect_file = user_home_path('.my.cnf')
 db_port = 3306
 
 # ############# SEARCH ENGINE SETTINGS ##############
-
+# Live search web service appid settings.
+#
 # Yahoo! Search Web Services are not operational.
 # See https://phabricator.wikimedia.org/T106085
 yahoo_appid = ''
@@ -838,9 +844,10 @@ cosmetic_changes_disable = {}
 cosmetic_changes_deny_script = ['category_redirect', 'cosmetic_changes',
                                 'newitem', 'touch']
 
-# ############# REPLICATION BOT ################
-# You can add replicate_replace to your user-config.py, which has the following
-# format:
+# ############# REPLICATION BOT SETTINGS ################
+# You can add replicate_replace to your user-config.py.
+#
+# Use has the following format:
 #
 # replicate_replace = {
 #            'wikipedia:li': {'Hoofdpagina': 'Veurblaad'}
