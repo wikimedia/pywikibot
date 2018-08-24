@@ -413,7 +413,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         This relies on the fact that the string
         representation of an instance can not change after the construction.
         """
-        return hash(unicode(self))
+        return hash(self._cmpkey())
 
     def full_url(self):
         """Return the full URL."""
@@ -5843,9 +5843,7 @@ class Link(ComparableMixin):
 
     def __hash__(self):
         """A stable identifier to be used as a key in hash-tables."""
-        return hash(u'%s:%s:%s' % (self.site.family.name,
-                                   self.site.code,
-                                   self.title))
+        return hash((self.site.sitename, self.canonical_title()))
 
     @classmethod
     def fromPage(cls, page, source=None):
