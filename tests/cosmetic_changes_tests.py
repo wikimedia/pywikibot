@@ -332,6 +332,20 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
             self.cct.removeEmptySections('\n==Bar==\n[[cs:Foo]]'
                                          '\n[[Category:Baz]]'))
 
+    def test_remove_empty_sections_interlanguage_links(self):
+        """Test removeEmptySections with edge cases of language links."""
+        # When removing language links, do not remove the \n after them,
+        # otherwise the sections won't be detected correctly.
+        text = 'text [[:en:link]]\n=== title1 ===\ncontent1'
+        self.assertEqual(text, self.cct.removeEmptySections(text))
+        self.assertEqual(
+            't [[en:link]]\n=== 1 ===\nc',
+            self.cct.removeEmptySections('t [[en:link]]\n=== 1 ===\nc'))
+        # Treat sections that only contain language links as empty sections.
+        self.assertEqual(
+            't\n[[en:link]]',
+            self.cct.removeEmptySections('t\n=== 1 ===\n[[en:link]]'))
+
     def test_remove_empty_sections_with_heading_comments(self):
         """Test removeEmptySections with comments in the section headings."""
         self.assertEqual(

@@ -251,7 +251,9 @@ class _MultiTemplateMatchBuilder(object):
 
 def _ignore_case(string):
     """Return a case-insensitive pattern for the string."""
-    return ''.join('[' + c.upper() + c.lower() + ']' for c in string)
+    return ''.join(
+        '[' + c + s + ']' if c != s else c
+        for s, c in zip(string, string.swapcase()))
 
 
 def _tag_pattern(tag_name):
@@ -282,7 +284,7 @@ def _create_default_regexes():
         'hyperlink': compileLinkR(),
         # also finds links to foreign sites with preleading ":"
         'interwiki': (
-            r'\[\[:?(%s)\s?:[^\]]*\]\][\s]*',
+            r'\[\[:?(%s)\s?:[^\]]*\]\]\s*',
             lambda site: '|'.join(
                 _ignore_case(i) for i in site.validLanguageLinks()
                 + list(site.family.obsolete.keys()))),
