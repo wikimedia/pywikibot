@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 import re
 
 from tests.aspects import unittest, TestCase
+from unittest import expectedFailure
 
 import generate_user_files as guf
 
@@ -66,6 +67,37 @@ class TestGenerateUserFiles(TestCase):
         self.assertEqual(family, 'test')
         self.assertEqual(code, 'test')
         self.assertEqual(user, 'bar')
+
+    @expectedFailure  # T145371
+    def test_copy_sections_fail(self):
+        """Test copy_sections function for sections not in config text."""
+        config_text = guf.copy_sections()
+        for section in ('HTTP SETTINGS',
+                        'REPLICATION BOT SETTINGS',
+                        ):
+            self.assertNotIn(section, config_text)
+
+    def test_copy_sections_not_found(self):
+        """Test copy_sections function for sections not in config text."""
+        config_text = guf.copy_sections()
+        for section in ('ACCOUNT SETTINGS',
+                        'OBSOLETE SETTINGS',
+                        'EXTERNAL EDITOR SETTINGS',
+                        ):
+            self.assertNotIn(section, config_text)
+
+    def test_copy_sections_found(self):
+        """Test copy_sections function for sections found in config text."""
+        config_text = guf.copy_sections()
+        self.assertIsNotNone(config_text)
+        for section in ('LOGFILE SETTINGS',
+                        'EXTERNAL SCRIPT PATH SETTINGS',
+                        'INTERWIKI SETTINGS',
+                        'FURTHER SETTINGS',
+                        ):
+            self.assertIn(section, config_text)
+        lines = config_text.splitlines()
+        self.assertGreater(len(lines), 350)
 
 
 if __name__ == '__main__':  # pragma: no cover
