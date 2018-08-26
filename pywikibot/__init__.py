@@ -63,7 +63,7 @@ from pywikibot.tools import (
     deprecated as __deprecated,
     deprecate_arg as _deprecate_arg,
     normalize_username,
-    MediaWikiVersion,
+    MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     PY2,
@@ -740,8 +740,7 @@ class WbQuantity(_WbRepresentation):
                 "WbQuantity now expects a 'site' parameter. This is needed to "
                 "ensure correct handling of error bounds.")
             return False
-        return MediaWikiVersion(
-            site.version()) < MediaWikiVersion('1.29.0-wmf.2')
+        return site.mw_version < '1.29.0-wmf.2'
 
     @staticmethod
     def _todecimal(value):
@@ -1457,3 +1456,8 @@ wrapper._add_deprecated_attr(
     warning_message='pywikibot.UploadWarning is deprecated; '
                     'use APISite.upload with a warning handler instead.',
     since='20150921')
+wrapper._add_deprecated_attr(
+    'MediaWikiVersion', _MediaWikiVersion,
+    warning_message='pywikibot.MediaWikiVersion is deprecated; '
+                    'use pywikibot.tools.MediaWikiVersion instead.',
+    since='20180827')

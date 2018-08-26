@@ -74,7 +74,6 @@ from pywikibot import config, textlib
 from pywikibot.textlib import (_MultiTemplateMatchBuilder, FILE_LINK_REGEX,
                                _get_regexes)
 from pywikibot.tools import deprecated_args, first_lower, first_upper
-from pywikibot.tools import MediaWikiVersion
 
 
 # Subpage templates. Must be in lower case,
@@ -401,8 +400,8 @@ class CosmeticChangesToolkit(object):
             # a clone is needed. Won't change the namespace dict
             namespaces = list(namespace)
             if namespace == 6 and self.site.family.name == 'wikipedia':
-                if self.site.code in ('en', 'fr') and MediaWikiVersion(
-                        self.site.version()) >= MediaWikiVersion('1.14'):
+                if self.site.code in ('en', 'fr') \
+                        and self.site.mw_version >= '1.14':
                     # do not change "Image" on en-wiki and fr-wiki
                     assert u'Image' in namespaces
                     namespaces.remove(u'Image')

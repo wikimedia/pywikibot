@@ -20,7 +20,6 @@ import pywikibot.site
 from pywikibot.throttle import Throttle
 from pywikibot.tools import (
     suppress_warnings,
-    MediaWikiVersion,
     PY2,
     UnicodeType,
 )
@@ -195,7 +194,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+        if self.site.mw_version >= '1.12':
             self.assertEqual(len(pi),
                              len(pi.preloaded_modules))
 
@@ -235,7 +234,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('paraminfo', pi._paraminfo)
         self.assertIn('pageset', pi._paraminfo)
 
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+        if self.site.mw_version < '1.12':
             return
 
         if 'query' in pi.preloaded_modules:
@@ -248,7 +247,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertEqual(len(pi),
                          len(pi.preloaded_modules))
 
-        if MediaWikiVersion(site.version()) >= MediaWikiVersion("1.21"):
+        if site.mw_version >= '1.21':
             # 'generator' was added to 'pageset' in 1.21
             generators_param = pi.parameter('pageset', 'generator')
             self.assertGreater(len(generators_param['type']), 1)
@@ -265,7 +264,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('pageset', pi._paraminfo)
         self.assertIn('query', pi._paraminfo)
 
-        if MediaWikiVersion(site.version()) >= MediaWikiVersion("1.21"):
+        if site.mw_version >= '1.21':
             # 'generator' was added to 'pageset' in 1.21
             pageset_generators_param = pi.parameter('pageset', 'generator')
             query_generators_param = pi.parameter('query', 'generator')
@@ -282,7 +281,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+        if self.site.mw_version >= '1.12':
             self.assertEqual(len(pi),
                              1 + len(pi.preloaded_modules))
 
@@ -296,7 +295,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIsInstance(param['type'], list)
 
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+        if self.site.mw_version < '1.12':
             return
 
         self.assertIn('protection', param['type'])
@@ -311,7 +310,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+        if self.site.mw_version >= '1.12':
             self.assertEqual(len(pi),
                              1 + len(pi.preloaded_modules))
 
@@ -325,7 +324,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIsInstance(param['type'], list)
 
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+        if self.site.mw_version < '1.12':
             return
 
         self.assertIn('user', param['type'])
@@ -342,7 +341,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+        if self.site.mw_version < '1.12':
             return
 
         self.assertEqual(len(pi),
@@ -368,7 +367,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+        if self.site.mw_version < '1.12':
             return
 
         self.assertEqual(len(pi),
@@ -473,7 +472,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion("1.12"):
+        if self.site.mw_version >= '1.12':
             self.assertEqual(len(pi),
                              1 + len(pi.preloaded_modules))
 
@@ -482,10 +481,10 @@ class TestParamInfo(DefaultSiteTestCase):
     def test_new_mode(self):
         """Test the new modules-only mode explicitly."""
         site = self.get_site()
-        if MediaWikiVersion(site.version()) < MediaWikiVersion('1.25wmf4'):
+        if site.mw_version < '1.25wmf4':
             raise unittest.SkipTest(
                 "version %s doesn't support the new paraminfo api"
-                % site.version())
+                % site.mw_version)
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
         self.assertIn('query+info', pi._paraminfo)
@@ -786,7 +785,7 @@ class TestPropertyGenerator(TestCase):
         params = {
             'rvprop': 'ids|flags|timestamp|user|comment|content',
             'titles': '|'.join(titles)}
-        if self.site.version() >= MediaWikiVersion('1.32'):
+        if self.site.mw_version >= '1.32':
             params['rvslots'] = 'main'
         gen = api.PropertyGenerator(
             site=self.site,

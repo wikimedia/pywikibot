@@ -249,23 +249,22 @@ class ParamInfo(Container):
         assert ('query' in self._modules) is ('main' in self._paraminfo)
         if 'query' in self._modules:
             return
-        _mw_ver = MediaWikiVersion(self.site.version())
+        mw_ver = self.site.mw_version
 
-        if _mw_ver < MediaWikiVersion('1.15'):
-            self._parse_help(_mw_ver)
+        if mw_ver < '1.15':
+            self._parse_help(mw_ver)
 
         # The paraminfo api deprecated the old request syntax of
         # querymodules='info'; to avoid warnings sites with 1.25wmf4+
         # must only use 'modules' parameter.
         if self.modules_only_mode is None:
-            self.modules_only_mode = _mw_ver >= MediaWikiVersion('1.25wmf4')
+            self.modules_only_mode = mw_ver >= '1.25wmf4'
             if self.modules_only_mode:
                 self.paraminfo_keys = frozenset(['modules'])
 
         # v1.18 and earlier paraminfo doesnt include modules; must use 'query'
         # Assume that by v1.26, it will be desirable to prefetch 'query'
-        if _mw_ver > MediaWikiVersion('1.26') \
-           or _mw_ver < MediaWikiVersion('1.19'):
+        if mw_ver > '1.26' or mw_ver < '1.19':
             self.preloaded_modules |= {'query'}
 
         self._fetch(self.preloaded_modules)
@@ -593,7 +592,7 @@ class ParamInfo(Container):
 
         assert 'query' in self._modules or 'paraminfo' not in self._paraminfo
 
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion("1.12"):
+        if self.site.mw_version < '1.12':
             # When the help is parsed, all paraminfo should already be loaded
             # and the caller is responsible for detecting missing modules.
             pywikibot.log('ParamInfo did not detect modules: %s'
@@ -691,7 +690,7 @@ class ParamInfo(Container):
             parameters = self._paraminfo[module].get('parameters', [])
             submodules = set()
             # Advanced submodule into added to MW API in df80f1ea
-            if self.site.version() >= MediaWikiVersion('1.26wmf9'):
+            if self.site.mw_version >= '1.26wmf9':
                 # This is supplying submodules even if they aren't submodules
                 # of the given module so skip those
                 for param in parameters:
@@ -708,7 +707,7 @@ class ParamInfo(Container):
                             submodules.add(child)
             else:
                 # Boolean submodule info added to MW API in afa153ae
-                if self.site.version() < MediaWikiVersion('1.24wmf18'):
+                if self.site.mw_version < '1.24wmf18':
                     if module == 'main':
                         params = {'action'}
                     elif module == 'query':
@@ -1458,8 +1457,7 @@ class Request(MutableMapping):
         # otherwise be a problem.
         # This situation is only tripped when one of the first actions
         # on the site is a write action and the extension isn't installed.
-        if (self.write and MediaWikiVersion(
-            self.site.version()) >= MediaWikiVersion('1.23')
+        if (self.write and self.site.mw_version >= '1.23'
             or self.action == 'edit'
                 and self.site.has_extension('AssertEdit')):
             pywikibot.debug(u"Adding user assertion", _logger)
@@ -2622,7 +2620,7 @@ class QueryGenerator(_RequestWrapper):
                         % self.__class__.__name__)
 
         parameters['indexpageids'] = True  # always ask for list of pageids
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
+        if self.site.mw_version < '1.21':
             self.continue_name = 'query-continue'
             self.continue_update = self._query_continue
         else:
@@ -3225,7 +3223,7 @@ class LoginManager(login.LoginManager):
             login_request['lgdomain'] = self.site.family.ldapDomain
 
         # get token using meta=tokens if supported
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.27'):
+        if self.site.mw_version >= '1.27':
             login_request["lgtoken"] = self.get_login_token()
 
         self.site._loginstatus = -2  # IN_PROGRESS
@@ -3262,7 +3260,7 @@ class LoginManager(login.LoginManager):
         @return: login token
         @rtype: str
         """
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.27'):
+        if self.site.mw_version < '1.27':
             raise NotImplementedError('The method get_login_token() requires '
                                       'at least MediaWiki version 1.27.')
         login_token_request = self.site._request(

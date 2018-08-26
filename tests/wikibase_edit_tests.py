@@ -15,7 +15,6 @@ from __future__ import absolute_import, unicode_literals
 import time
 
 import pywikibot
-from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, WikibaseTestCase
 
@@ -242,8 +241,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         item = self._clean_item(testsite, 'P20480')
 
         # Make sure the wiki supports wikibase-conceptbaseuri
-        version = testsite.version()
-        if MediaWikiVersion(version) < MediaWikiVersion('1.29.0-wmf.2'):
+        if testsite.mw_version < '1.29.0-wmf.2':
             raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
                                     'newer to support unbound uncertainties.')
 
@@ -267,8 +265,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         item = self._clean_item(testsite, 'P69')
 
         # Make sure the wiki supports unbound uncertainties
-        version = testsite.version()
-        if MediaWikiVersion(version) < MediaWikiVersion('1.29.0-wmf.2'):
+        if testsite.mw_version < '1.29.0-wmf.2':
             raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
                                     'newer to support unbound uncertainties.')
 
@@ -290,8 +287,7 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         item = self._clean_item(testsite, 'P69')
 
         # Make sure the wiki supports wikibase-conceptbaseuri
-        version = testsite.version()
-        if MediaWikiVersion(version) < MediaWikiVersion('1.28-wmf.23'):
+        if testsite.mw_version < '1.28-wmf.23':
             raise unittest.SkipTest('Wiki version must be 1.28-wmf.23 or '
                                     'newer to expose wikibase-conceptbaseuri.')
 

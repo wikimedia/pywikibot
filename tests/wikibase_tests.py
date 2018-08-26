@@ -511,7 +511,7 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         """Override setup to store repo and it's version."""
         super(WikidataTestCase, self).setUp()
         self.repo = self.get_repo()
-        self.version = MediaWikiVersion(self.repo.version())
+        self.version = self.repo.mw_version
 
     def test_WbQuantity_unbound(self):
         """Test WbQuantity for value without bounds."""

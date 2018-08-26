@@ -13,7 +13,6 @@ import pywikibot
 
 from pywikibot import config
 from pywikibot import page_put_queue
-from pywikibot.tools import MediaWikiVersion
 
 from tests.aspects import unittest, TestCase
 from tests.oauth_tests import OAuthSiteTestCase
@@ -88,7 +87,7 @@ class TestSiteMergeHistory(TestCase):
         dest = pywikibot.Page(site, 'User:Sn1per/MergeTest2')
 
         # Make sure the wiki supports action=mergehistory
-        if MediaWikiVersion(site.version()) < MediaWikiVersion('1.27.0-wmf.13'):
+        if site.mw_version < '1.27.0-wmf.13':
             raise unittest.SkipTest('Wiki version must be 1.27.0-wmf.13 or '
                                     'newer to support the history merge API.')
 

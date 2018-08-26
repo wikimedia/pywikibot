@@ -114,7 +114,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
 
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.16'):
+        if self.site.mw_version < '1.16':
             raise unittest.SkipTest('requires v1.16+')
 
         old = self.site.siteinfo('general')
@@ -317,7 +317,7 @@ class TestSiteObject(DefaultSiteTestCase):
         # first-letter (== only first non-namespace letter is case insensitive)
         # See also: https://www.mediawiki.org/wiki/Manual:$wgCapitalLinks
         self.assertTrue(mysite.sametitle("Special:Always", "Special:always"))
-        if MediaWikiVersion(mysite.version()) >= MediaWikiVersion('1.16'):
+        if mysite.mw_version >= '1.16':
             self.assertTrue(mysite.sametitle('User:Always', 'User:always'))
             self.assertTrue(mysite.sametitle('MediaWiki:Always',
                                              'MediaWiki:always'))
@@ -1031,7 +1031,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.15'):
+        if self.site.mw_version < '1.15':
             raise unittest.SkipTest('requires v1.15+')
 
         pages = list(self.get_site().protectedpages(type='create', total=10))
@@ -1075,7 +1075,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
     def test_pages_with_property(self):
         """Test pages_with_property method."""
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.21'):
+        if self.site.mw_version < '1.21':
             raise unittest.SkipTest('requires v1.21+')
         mysite = self.get_site()
         pnames = mysite.get_property_names()
@@ -1440,7 +1440,7 @@ class TestRecentChanges(DefaultSiteTestCase):
         mysite = self.site
         mainpage = self.get_mainpage()
         imagepage = self.imagepage
-        if MediaWikiVersion(mysite.version()) <= MediaWikiVersion("1.14"):
+        if mysite.mw_version <= '1.14':
             pagelist = [mainpage]
             if imagepage:
                 pagelist += [imagepage]
@@ -2067,7 +2067,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
         self.assertIsInstance(result, dict)
 
         params = {'rcid': 0}
-        if mysite.version() >= MediaWikiVersion('1.22'):
+        if mysite.mw_version >= '1.22':
             params['revid'] = [0, 1]
 
         try:
@@ -2149,7 +2149,7 @@ class TestSiteTokens(DefaultSiteTestCase):
         """Store version."""
         super(TestSiteTokens, self).setUp()
         self.mysite = self.get_site()
-        self._version = MediaWikiVersion(self.mysite.version())
+        self._version = self.mysite.mw_version
         self.orig_version = self.mysite.version
 
     def tearDown(self):
@@ -2360,7 +2360,7 @@ class TestSiteInfo(DefaultSiteTestCase):
 
     def test_siteinfo_v1_16(self):
         """Test v.16+ siteinfo values."""
-        if MediaWikiVersion(self.site.version()) < MediaWikiVersion('1.16'):
+        if self.site.mw_version < '1.16':
             raise unittest.SkipTest('requires v1.16+')
 
         mysite = self.get_site()

@@ -43,7 +43,7 @@ from pywikibot.site import DataSite, Namespace, need_version
 from pywikibot import textlib
 from pywikibot.tools import (
     compute_file_hash,
-    MediaWikiVersion, UnicodeMixin, ComparableMixin, DotReadableDict,
+    UnicodeMixin, ComparableMixin, DotReadableDict,
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     add_full_name, manage_wrapping,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
@@ -1110,7 +1110,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @rtype: set
         """
         # New API since commit 32083235eb332c419df2063cf966b3400be7ee8a
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.25wmf14'):
+        if self.site.mw_version >= '1.25wmf14':
             self.site.loadpageinfo(self)
             return self._applicable_protections
 

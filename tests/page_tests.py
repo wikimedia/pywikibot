@@ -18,7 +18,6 @@ from pywikibot import config
 from pywikibot import InvalidTitle
 
 from pywikibot.tools import (
-    MediaWikiVersion,
     PY2,
     StringTypes as basestring,
     suppress_warnings,
@@ -579,7 +578,7 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         image = pywikibot.FilePage(site, 'File:Jean-Léon Gérôme 003.jpg')
 
-        if MediaWikiVersion(site.version()) < MediaWikiVersion('1.20'):
+        if site.mw_version < '1.20':
             self.assertRaises(NotImplementedError, mainpage.page_image)
         elif site.has_extension('PageImages'):
             mainpage_image = mainpage.page_image()
@@ -611,7 +610,7 @@ class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
         self.assertDeprecation()
 
         self._reset_messages()
-        if MediaWikiVersion(self.site.version()) >= MediaWikiVersion('1.16'):
+        if self.site.mw_version >= '1.16':
             self.assertIsInstance(mainpage.previous_revision_id, int)
             self.assertEqual(mainpage.previous_revision_id,
                              mainpage.latest_revision.parent_id)

@@ -15,7 +15,6 @@ from pywikibot.exceptions import HiddenKeyError
 from pywikibot.logentries import (
     LogEntryFactory, OtherLogEntry, UserTargetLogEntry)
 from pywikibot.tools import (
-    MediaWikiVersion,
     UnicodeType as unicode,
 )
 
@@ -61,8 +60,7 @@ class TestLogentriesBase(TestCase):
             # This is an assertion as the tests don't make sense with newer
             # MW versions and otherwise it might not be visible that the test
             # isn't run on an older wiki.
-            self.assertLess(MediaWikiVersion(self.site.version()),
-                            MediaWikiVersion('1.20'))
+            self.assertLess(self.site.mw_version, '1.20')
         return next(iter(self.site.logevents(logtype=logtype, total=1)))
 
     def _test_logevent(self, logtype):
