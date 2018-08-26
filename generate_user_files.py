@@ -18,6 +18,14 @@ from textwrap import fill
 
 from generate_family_file import _import_with_no_user_config
 
+# DISABLED_SECTIONS cannot be copied; variables must be set manually
+DISABLED_SECTIONS = {'USER INTERFACE SETTINGS',  # uses sys
+                     'EXTERNAL EDITOR SETTINGS',  # uses os
+                     }
+OBSOLETE_SECTIONS = {'ACCOUNT SETTINGS',  # already set
+                     'OBSOLETE SETTINGS',  # obsolete
+                     }
+
 # Disable user-config usage as we are creating it here
 pywikibot = _import_with_no_user_config('pywikibot')
 config, __url__ = pywikibot.config2, pywikibot.__url__
@@ -230,40 +238,51 @@ PASSFILE_CONFIG = """# This is an automatically generated file used to store
 {botpasswords}"""
 
 
-def copy_sections():
-    """Take config sections and copying them to user-config.py.
+def parse_sections():
+    """Parse sections from config2.py file.
 
     config2.py will be in the pywikibot/ directory relative to this
     generate_user_files script.
 
-    @return: config text of all sections.
-    @rtype: str
+    @return: a list of ConfigSection named tuples.
+    @rtype: list
     """
+    data = []
+    ConfigSection = namedtuple('ConfigSection', 'head, info, section')
+
     install = os.path.dirname(os.path.abspath(__file__))
     with codecs.open(os.path.join(install, 'pywikibot', 'config2.py'),
                      'r', 'utf-8') as config_f:
         config_file = config_f.read()
 
     result = re.findall(
-        '^(# ############# (?:'
-        'LOGFILE|'
-        'EXTERNAL SCRIPT PATH|'
-        'INTERWIKI|'
-        'SOLVE_DISAMBIGUATION|'
-        'IMAGE RELATED|'
-        'TABLE CONVERSION BOT|'
-        'WEBLINK CHECKER|'
-        'DATABASE|'
-        'SEARCH ENGINE|'
-        'COPYRIGHT|'
-        'FURTHER'
-        ') SETTINGS .*)^(?=#####|# =====)',
+        '^(?P<section># #{5,} (?P<head>[A-Z][A-Z_ ]+[A-Z]) #{5,}\r?\n'
+        '(?:^#?\r?\n)?'  # There may be an empty or short line after header
+        '(?P<comment>(?:^# .+?)+)'  # first comment is used as help string
+        '^.*?)'  # catch the remaining text
+        '^(?=# #{5,}|# ={5,})',  # until section end marker
         config_file, re.MULTILINE | re.DOTALL)
 
-    if not result:  # Something is wrong with the regex
-        return None
+    for section, head, comment in result:
+        info = ' '.join(text.strip('# ') for text in comment.splitlines())
+        data.append(ConfigSection(head, info, section))
+    return data
 
-    return '\n'.join(result)
+
+def copy_sections():
+    """Take config sections and copy them to user-config.py.
+
+    @return: config text of all selected sections.
+    @rtype: str
+    """
+    result = []
+    sections = parse_sections()
+    # copy settings
+    for section in filter(lambda x: x.head not in (DISABLED_SECTIONS
+                                                   | OBSOLETE_SECTIONS),
+                          sections):
+        result.append(section.section)
+    return ''.join(result)
 
 
 def create_user_config(main_family, main_code, main_username, force=False):
