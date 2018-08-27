@@ -15,7 +15,6 @@ import re
 import sys
 
 from textwrap import fill
-from warnings import warn
 
 from generate_family_file import _import_with_no_user_config
 
@@ -231,6 +230,42 @@ PASSFILE_CONFIG = """# This is an automatically generated file used to store
 {botpasswords}"""
 
 
+def copy_sections():
+    """Take config sections and copying them to user-config.py.
+
+    config2.py will be in the pywikibot/ directory relative to this
+    generate_user_files script.
+
+    @return: config text of all sections.
+    @rtype: str
+    """
+    install = os.path.dirname(os.path.abspath(__file__))
+    with codecs.open(os.path.join(install, 'pywikibot', 'config2.py'),
+                     'r', 'utf-8') as config_f:
+        config_file = config_f.read()
+
+    result = re.findall(
+        '^(# ############# (?:'
+        'LOGFILE|'
+        'EXTERNAL SCRIPT PATH|'
+        'INTERWIKI|'
+        'SOLVE_DISAMBIGUATION|'
+        'IMAGE RELATED|'
+        'TABLE CONVERSION BOT|'
+        'WEBLINK CHECKER|'
+        'DATABASE|'
+        'SEARCH ENGINE|'
+        'COPYRIGHT|'
+        'FURTHER'
+        ') SETTINGS .*)^(?=#####|# =====)',
+        config_file, re.MULTILINE | re.DOTALL)
+
+    if not result:  # Something is wrong with the regex
+        return None
+
+    return '\n'.join(result)
+
+
 def create_user_config(main_family, main_code, main_username, force=False):
     """
     Create a user-config.py in base_dir.
@@ -292,49 +327,12 @@ def create_user_config(main_family, main_code, main_username, force=False):
         "('{0}', BotPassword('{1}', '{2}'))".format(*botpassword)
         for botpassword in botpasswords)
 
-    config_text = ''
-    config_content = SMALL_CONFIG
-
-    try:
-        # config2.py will be in the pywikibot/ directory relative to this
-        # script (generate_user_files)
-        install = os.path.dirname(os.path.abspath(__file__))
-        with codecs.open(os.path.join(install, "pywikibot", "config2.py"),
-                         "r", "utf-8") as config_f:
-            config_file = config_f.read()
-
-        res = re.findall("^(# ############# (?:"
-                         "LOGFILE|"
-                         'EXTERNAL SCRIPT PATH|'
-                         "INTERWIKI|"
-                         "SOLVE_DISAMBIGUATION|"
-                         "IMAGE RELATED|"
-                         "TABLE CONVERSION BOT|"
-                         "WEBLINK CHECKER|"
-                         "DATABASE|"
-                         "SEARCH ENGINE|"
-                         "COPYRIGHT|"
-                         "FURTHER"
-                         ") SETTINGS .*)^(?=#####|# =====)",
-                         config_file, re.MULTILINE | re.DOTALL)
-
-        if not res:
-            warn('Extended config extraction failed', UserWarning)
-
-        config_text = '\n'.join(res)
-        if len(config_text.splitlines()) < 350:
-            warn('Extended config extraction too short: %d'
-                 % len(config_text.splitlines()),
-                 UserWarning)
-
+    config_text = copy_sections()
+    if config_text:
         config_content = EXTENDED_CONFIG
-    except Exception as e:
-        # If the warning was explicitly enabled, raise
-        if isinstance(e, UserWarning):
-            raise
-        pywikibot.output('Exception while creating extended user-config; '
-                         'falling back to simple user-config.')
-        pywikibot.exception()
+    else:
+        pywikibot.output('Creating a small variant of user-config.py')
+        config_content = SMALL_CONFIG
 
     try:
         # Finally save user-config.py
