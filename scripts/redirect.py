@@ -482,10 +482,9 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                                               page.title(with_section=False))
                 content = content_page.get(get_redirect=True)
             content = self.sdtemplate + '\n' + content
-            try:
-                page.put(content, reason)
-            except pywikibot.PageSaveRelatedError as e:
-                pywikibot.error(e)
+            self.userPut(page, content, page.text, summary=reason,
+                         ignore_save_related_errors=True,
+                         ignore_server_errors=True)
 
     def delete_1_broken_redirect(self):
         """Treat one broken redirect."""
@@ -532,25 +531,11 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                         content = redir_page.get(get_redirect=True)
                         redir_page.set_redirect_target(
                             movedTarget, keep_section=True, save=False)
-                        pywikibot.showDiff(content, redir_page.text)
-                        pywikibot.output(u'Summary - %s' % reason)
-                        if self.user_confirm(
-                                u'Redirect target %s has been moved to %s.\n'
-                                u'Do you want to fix %s?'
-                                % (targetPage, movedTarget, redir_page)):
-                            try:
-                                redir_page.save(reason)
-                            except pywikibot.NoUsername:
-                                pywikibot.output(u"Page [[%s]] not saved; "
-                                                 u"sysop privileges required."
-                                                 % redir_page.title())
-                            except pywikibot.LockedPage:
-                                pywikibot.output(u'%s is locked.'
-                                                 % redir_page.title())
-                            except pywikibot.PageSaveRelatedError:
-                                pywikibot.exception()
-                            else:
-                                done = True
+                        pywikibot.output('Summary - ' + reason)
+                        done = self.userPut(redir_page, content,
+                                            redir_page.text, summary=reason,
+                                            ignore_save_related_errors=True,
+                                            ignore_server_errors=True)
                 if not done and self.user_confirm(
                         u'Redirect target %s does not exist.\n'
                         u'Do you want to delete %s?'
@@ -675,27 +660,9 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
             summary = i18n.twtranslate(self.site, 'redirect-fix-double',
                                        {'to': targetPage.title(as_link=True)}
                                        )
-            pywikibot.showDiff(oldText, redir.text)
-            if self.user_confirm(u'Do you want to accept the changes?'):
-                try:
-                    redir.save(summary)
-                except pywikibot.LockedPage:
-                    pywikibot.output(u'%s is locked.' % redir.title())
-                except pywikibot.SpamfilterError as error:
-                    pywikibot.output(
-                        u"Saving page [[%s]] prevented by spam filter: %s"
-                        % (redir.title(), error.url))
-                except pywikibot.PageNotSaved as error:
-                    pywikibot.output(u"Saving page [[%s]] failed: %s"
-                                     % (redir.title(), error))
-                except pywikibot.NoUsername:
-                    pywikibot.output(
-                        u"Page [[%s]] not saved; sysop privileges required."
-                        % redir.title())
-                except pywikibot.Error as error:
-                    pywikibot.output(
-                        u"Unexpected error occurred trying to save [[%s]]: %s"
-                        % (redir.title(), error))
+            self.userPut(redir, oldText, redir.text, summary=summary,
+                         ignore_save_related_errors=True,
+                         ignore_server_errors=True)
             break
 
     def fix_double_or_delete_broken_redirect(self):
