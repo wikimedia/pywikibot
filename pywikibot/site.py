@@ -6796,7 +6796,7 @@ class APISite(BaseSite):
                                total=total)
 
     @deprecated_args(step=None)
-    # @need_extension('WikibaseClient') T198454
+    @need_extension('WikibaseClient')
     def unconnected_pages(self, total=None):
         """Yield Page objects from Special:UnconnectedPages.
 
