@@ -414,7 +414,6 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         super(RedirectRobot, self).__init__(**kwargs)
         self.repo = self.site.data_repository()
         self.is_repo = self.repo if self.repo == self.site else None
-        self.exiting = False
         self.sdtemplate = self.get_sd_template()
 
         # connect the action treat
