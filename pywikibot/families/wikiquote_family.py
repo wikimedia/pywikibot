@@ -31,11 +31,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'en', 'it', 'pl', 'ru', 'cs', 'fa', 'de', 'pt', 'es', 'uk', 'sk', 'fr',
-        'bs', 'he', 'fi', 'tr', 'ca', 'lt', 'th', 'bg', 'sl', 'eo', 'hy', 'el',
-        'hr', 'zh', 'nn', 'id', 'ar', 'az', 'su', 'hu', 'li', 'ko', 'nl', 'ja',
-        'gu', 'sr', 'sv', 'gl', 'ur', 'la', 'te', 'ta', 'cy', 'et', 'no', 'ml',
-        'vi', 'be', 'kn', 'ku', 'eu', 'ro', 'hi', 'ka', 'da', 'sa', 'is', 'sq',
-        'sah', 'mr', 'br', 'af', 'uz', 'wo', 'ky',
+        'bs', 'he', 'fi', 'tr', 'ca', 'lt', 'th', 'bg', 'sl', 'eo', 'hy', 'zh',
+        'el', 'hr', 'nn', 'id', 'az', 'ar', 'su', 'hu', 'li', 'ko', 'nl', 'ja',
+        'gu', 'sr', 'sv', 'gl', 'la', 'ur', 'te', 'ta', 'cy', 'et', 'no', 'ml',
+        'vi', 'be', 'kn', 'ku', 'eu', 'ro', 'hi', 'ka', 'da', 'sa', 'is',
+        'sah', 'sq', 'mr', 'br', 'af', 'uz', 'wo', 'ky',
     ]
 
     category_redirect_templates = {

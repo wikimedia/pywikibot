@@ -19,7 +19,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
 
     languages_by_size = [
         'de', 'en', 'fr', 'ru', 'it', 'cs', 'beta', 'pt', 'es', 'ar', 'sv',
-        'fi', 'sl', 'el', 'hi', 'ko', 'ja', 'zh',
+        'fi', 'zh', 'sl', 'el', 'hi', 'ko', 'ja',
     ]
 
     category_redirect_templates = {
