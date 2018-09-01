@@ -243,6 +243,7 @@ netext = {
         'pt': u'{{subst:bem vindo}} %s',
         'roa-tara': u'{{Bovègne}} %s',
         'ru': u'{{Hello}} %s',
+        'sd': '{{subst:ڀليڪار}} %s',
         'sq': u'{{subst:tung}} %s',
         'sr': u'{{Добродошлица}} %s',
         'ur': '{{نقل:خوش آمدید}}%s',
