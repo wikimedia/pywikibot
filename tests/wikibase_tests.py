@@ -1863,8 +1863,6 @@ class TestOwnClient(TestCase):
         },
     }
 
-    vcr = True
-
     def test_own_client(self, key):
         """Test that a data repository family can be its own client."""
         site = self.get_site(key)

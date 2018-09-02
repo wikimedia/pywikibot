@@ -55,15 +55,6 @@ from tests.utils import (
 )
 
 try:
-    import vcr_unittest
-    VCRUnittestMixin = vcr_unittest.VCRMixin
-except ImportError:
-    class VCRUnittestMixin(object):
-        """Empty mixin class in case vcr_unittest is not installed."""
-
-        pass
-
-try:
     import pytest_httpbin
     optional_pytest_httpbin_cls_decorator = pytest_httpbin.use_class_based_httpbin
 except ImportError:
@@ -713,59 +704,6 @@ class RequireUserMixin(TestCaseBase):
         return userpage
 
 
-class VCRMixin(VCRUnittestMixin):
-
-    """Run dry tests using vcrpy to record and mock requests."""
-
-    def _get_vcr(self, **kwargs):
-        """Configure VCR."""
-        vcr = super(VCRMixin, self)._get_vcr(**kwargs)
-        vcr.record_mode = 'once'
-        vcr.decode_compressed_response = True
-        vcr.before_record_request = self.before_record_request
-        vcr.before_record_response = self.before_record_response
-        return vcr
-
-    def _get_cassette_name(self):
-        """Get name of VCR cassette."""
-        if hasattr(self, 'sites'):
-            # Multiple sites are used in this class
-            # Let's guess which of them is used for this test method by name
-            for name in self.sites:
-                if self._testMethodName.endswith('_' + name.replace('-', '_')):
-                    break
-            family = self.sites[name]['family']
-            code = self.sites[name]['code']
-            return '{0}.{1}/{2}.{3}.yaml'.format(family, code,
-                                                 self.__class__.__name__,
-                                                 self._testMethodName)
-        else:
-            return '{0}/{1}.{2}.yaml'.format(str(self.site).replace(':', '.'),
-                                             self.__class__.__name__,
-                                             self._testMethodName)
-
-    def before_record_request(self, request):
-        """Remove headers containing sensitive data from request."""
-        # TODO: custom cookie processing if user=True
-        if 'Cookie' in request.headers:
-            del request.headers['Cookie']
-        if 'user-agent' in request.headers:
-            del request.headers['user-agent']
-
-        return request
-
-    def before_record_response(self, response):
-        """Remove headers containing sensitive data from response."""
-        # TODO: custom cookie processing if user=True
-        for header in ['Set-Cookie', 'X-Client-IP']:
-            if header in response['headers']:
-                del response['headers'][header]
-            if header.lower() in response['headers']:
-                del response['headers'][header.lower()]
-
-        return response
-
-
 class MetaTestCaseClass(type):
 
     """Test meta class."""
@@ -907,11 +845,7 @@ class MetaTestCaseClass(type):
         if 'cached' in dct and dct['cached']:
             bases = cls.add_base(bases, ForceCacheMixin)
 
-        if ('vcr' in dct and dct['vcr'] and
-                'PYWIKIBOT_LIVE_TESTS' not in os.environ):
-            bases = cls.add_base(bases, VCRMixin)
-            del dct['net']
-        elif 'net' in dct and dct['net']:
+        if 'net' in dct and dct['net']:
             bases = cls.add_base(bases, CheckHostnameMixin)
         else:
             assert not hostnames, 'net must be True with hostnames defined'

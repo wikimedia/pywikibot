@@ -883,11 +883,9 @@ class TestCachedRequest(DefaultSiteTestCase):
     """Test API Request caching.
 
     This test class does not use the forced test caching.
-    This class contains test cases with requests which are mocked with VCR.
     """
 
     cached = False
-    vcr = True
 
     def test_normal_use(self):
         """Test the caching of CachedRequest with an ordinary request."""
@@ -914,18 +912,6 @@ class TestCachedRequest(DefaultSiteTestCase):
         self.assertIsNotNone(req2._cachetime)
         self.assertIsNotNone(req3._cachetime)
         self.assertEqual(req2._cachetime, req3._cachetime)
-
-
-class TestCachedRequestNonVCR(DefaultSiteTestCase):
-
-    """Test API Request caching (live without VCR).
-
-    This test class does not use the forced test caching.
-    This class contains test cases with requests which can't be mocked
-    with VCR.
-    """
-
-    cached = False
 
     def test_internals(self):
         """Test the caching of CachedRequest by faking a unique request."""
