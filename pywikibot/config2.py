@@ -1033,7 +1033,6 @@ for _key, _val in _glv.items():
         _uc[_key] = _val
 
 # Get the user files
-_thislevel = 0
 if __no_user_config:
     if __no_user_config != '2':
         warning('Skipping loading of user-config.py.')
@@ -1041,7 +1040,6 @@ if __no_user_config:
 else:
     _fns = [os.path.join(base_dir, 'user-config.py')]
 for _filename in _fns:
-    _thislevel += 1
     if os.path.exists(_filename):
         _filestatus = os.stat(_filename)
         _filemode = _filestatus[0]
