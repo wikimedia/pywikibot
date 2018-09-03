@@ -3204,8 +3204,8 @@ class APISite(BaseSite):
         result = query.submit()
         if "query" not in result or "redirects" not in result["query"]:
             raise RuntimeError(
-                "getredirtarget: No 'redirects' found for page %s."
-                % title.encode(self.encoding()))
+                "getredirtarget: No 'redirects' found for page {}."
+                .format(title))
 
         redirmap = {item['from']: {'title': item['to'],
                                    'section': '#'
@@ -3223,8 +3223,8 @@ class APISite(BaseSite):
 
         if title not in redirmap:
             raise RuntimeError(
-                "getredirtarget: 'redirects' contains no key for page %s."
-                % title.encode(self.encoding()))
+                "getredirtarget: 'redirects' contains no key for page {}."
+                .format(title))
         target_title = u'%(title)s%(section)s' % redirmap[title]
 
         if self.sametitle(title, target_title):
