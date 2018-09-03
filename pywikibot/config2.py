@@ -233,7 +233,7 @@ use_SSL_always = False   # if available, use SSL for all API queries
 available_ssl_project = []
 
 # By default you are asked for a password on the terminal.
-# A password file may be used, e.g. password_file = ".passwd".
+# A password file may be used, e.g. password_file = '.passwd'
 # The path to the password file is relative to that of the user_config file.
 # The password file should consist of lines containing Python tuples of any
 # of the following formats:
@@ -252,7 +252,7 @@ password_file = None
 # edit summary to use if not supplied by bot script
 # WARNING: this should NEVER be used in practice, ALWAYS supply a more
 #          relevant summary for bot edits
-default_edit_summary = u'Pywikibot 3.0-dev'
+default_edit_summary = 'Pywikibot 3.0-dev'
 
 # What permissions to use to set private files to it
 # such as password file.
@@ -342,16 +342,16 @@ def get_base_dir(test_directory=None):
             base_dir = os.path.abspath(environ['PYWIKIBOT_DIR_PWB'])
         else:
             base_dir_cand = []
-            home = os.path.expanduser("~")
+            home = os.path.expanduser('~')
             if OSWIN32:
-                win_version = int(platform.version().split(".")[0])
+                win_version = int(platform.version().split('.')[0])
                 if win_version == 5:
-                    sub_dir = ["Application Data"]
+                    sub_dir = ['Application Data']
                 elif win_version in (6, 10):
-                    sub_dir = ["AppData", "Roaming"]
+                    sub_dir = ['AppData', 'Roaming']
                 else:
-                    raise WindowsError(u'Windows version %s not supported yet.'
-                                       % win_version)
+                    raise WindowsError('Windows version {} not supported yet.'
+                                       .format(win_version))
                 base_dir_cand.extend([[home] + sub_dir + ['Pywikibot'],
                                      [home] + sub_dir + ['pywikibot']])
             else:
@@ -393,7 +393,7 @@ base_dir = get_base_dir()
 
 for arg in sys.argv[1:]:
     if arg.startswith(str('-verbose')) or arg == str('-v'):
-        output('The base directory is {0}'.format(base_dir))
+        output('The base directory is ' + base_dir)
         break
 family_files = {}
 
@@ -409,8 +409,8 @@ def register_family_file(family_name, file_path):
 def register_families_folder(folder_path):
     """Register all family class files contained in a directory."""
     for file_name in os.listdir(folder_path):
-        if file_name.endswith("_family.py"):
-            family_name = file_name[:-len("_family.py")]
+        if file_name.endswith('_family.py'):
+            family_name = file_name[:-len('_family.py')]
             register_family_file(family_name, os.path.join(folder_path,
                                                            file_name))
 
@@ -455,8 +455,8 @@ except AttributeError:
 transliteration_target = None
 
 # The encoding in which textfiles are stored, which contain lists of page
-# titles. The most used is: 'utf-8'. 'utf-8-sig' recognizes BOM but it is
-# available on Python 2.5 or higher. For a complete list please see:
+# titles. The most used is 'utf-8'; 'utf-8-sig' recognizes BOM.
+# For a complete list please see:
 # https://docs.python.org/2/library/codecs.html#standard-encodings
 textfile_encoding = 'utf-8'
 
@@ -484,9 +484,7 @@ ring_bell = False
 
 # Colorization can be used to markup important text parts of the output.
 # On Linux/Unix terminals, ANSI escape codes are used for this. On Windows,
-# it is done by a DLL call via ctypes. ctypes is only available since
-# Python 2.5, so if you're using Python 2.4 or lower on Windows, you should
-# upgrade.
+# it is done by a DLL call via ctypes.
 # Set this to False if you're using Linux and your tty doesn't support
 # ANSI colors.
 try:
@@ -626,7 +624,7 @@ interwiki_contents_on_disk = False
 # Example:
 #
 # disambiguation_comment['wikipedia']['en'] = \
-#    "Robot-assisted disambiguation ([[WP:DPL|you can help!]]): %s"
+#    'Robot-assisted disambiguation ([[WP:DPL|you can help!]]): %s'
 
 # Sorting order for alternatives. Set to True to ignore case for sorting order.
 sort_ignore_case = False
@@ -730,10 +728,10 @@ msn_appid = ''
 
 # Using the Flickr api
 flickr = {
-    'api_key': u'',  # Provide your key!
-    'api_secret': u'',  # Api secret of your key (optional)
+    'api_key': '',  # Provide your key!
+    'api_secret': '',  # Api secret of your key (optional)
     'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': u'',  # If so, under what reviewer name?
+    'reviewer': '',  # If so, under what reviewer name?
 }
 
 # ############# COPYRIGHT SETTINGS ##############
@@ -885,7 +883,7 @@ max_queue_size = 64
 # pages fetched from screen (mostly) have "\r\n". Interwiki and category
 # separator settings in family files should use multiplied of this.
 # LS is a shortcut alias.
-line_separator = LS = u'\n'
+line_separator = LS = '\n'
 
 # Settings to enable mwparserfromhell
 # <https://mwparserfromhell.readthedocs.org/en/latest/>
@@ -910,7 +908,7 @@ pickle_protocol = 2
 
 panoramio = {
     'review': False,  # Do we use automatically make our uploads reviewed?
-    'reviewer': u'',  # If so, under what reviewer name?
+    'reviewer': '',  # If so, under what reviewer name?
 }
 
 special_page_limit = 500
@@ -1156,9 +1154,9 @@ if OSWIN32 and editor:
     if set(editor) & set('\a\b\f\n\r\t\v'):
         warning(
             'The editor path contains probably invalid escaped '
-            'characters. Make sure to use a raw-string (r"..." or r\'...\'), '
-            'forward slashs as a path delimiter or to escape the normal '
-            'path delimiter.')
+            'characters. Make sure to use a raw-string (r"..." or '
+            "r'...'), forward slashs as a path delimiter or to escape the "
+            'normal path delimiter.')
 
 if userinterface_lang is None:
     userinterface_lang = os.getenv('PYWIKIBOT_USERINTERFACE_LANG') \
@@ -1196,11 +1194,11 @@ if (not ignore_file_security_warnings and
 #
 # When called as main program, list all configuration variables
 #
-if __name__ == "__main__":
-    _all = 1
+if __name__ == '__main__':
+    _all = True
     for _arg in sys.argv[1:]:
-        if _arg == "modified":
-            _all = 0
+        if _arg == 'modified':
+            _all = False
         else:
             warning('Unknown arg {0} ignored'.format(_arg))
     _k = list(globals().keys())
@@ -1215,8 +1213,8 @@ if __name__ == "__main__":
                         if isinstance(_value, dict):
                             _value = '{ ...xxxxxxxx... }'
                         elif hasattr(_value, '__dict__'):
-                            _value = '%s( ...xxxxxxxx... )' % \
-                                     _value.__class__.__name__
+                            _value = (_value.__class__.__name__
+                                      + '( ...xxxxxxxx... )')
                         else:
                             _value = repr('xxxxxxxx')
                     else:
@@ -1225,7 +1223,7 @@ if __name__ == "__main__":
 
 # cleanup all locally-defined variables
 for __var in list(globals().keys()):
-    if __var.startswith("_") and not __var.startswith("__"):
+    if __var.startswith('_') and not __var.startswith('__'):
         del sys.modules[__name__].__dict__[__var]
 
 del __var
