@@ -10,7 +10,6 @@ from __future__ import absolute_import, unicode_literals
 import re
 
 from tests.aspects import unittest, TestCase
-from unittest import expectedFailure
 
 import generate_user_files as guf
 
@@ -68,22 +67,23 @@ class TestGenerateUserFiles(TestCase):
         self.assertEqual(code, 'test')
         self.assertEqual(user, 'bar')
 
-    @expectedFailure  # T145371
-    def test_copy_sections_fail(self):
-        """Test copy_sections function for sections not in config text."""
-        config_text = guf.copy_sections()
-        for section in ('HTTP SETTINGS',
-                        'REPLICATION BOT SETTINGS',
-                        ):
-            self.assertNotIn(section, config_text)
+    def test_parse_sections(self):
+        """Test parse_sections regex."""
+        sections = guf.parse_sections()
+        self.assertGreater(len(sections), 10)
+        first = sections[0]
+        last = sections[-1]
+        self.assertEqual('ACCOUNT SETTINGS', first.head)
+        self.assertIn(first.head, first.section)
+        self.assertIn(first.info[:10], first.section)
+        self.assertEqual('OBSOLETE SETTINGS', last.head)
+        self.assertIn(last.head, last.section)
+        self.assertIn(last.info[:10], last.section)
 
     def test_copy_sections_not_found(self):
         """Test copy_sections function for sections not in config text."""
         config_text = guf.copy_sections()
-        for section in ('ACCOUNT SETTINGS',
-                        'OBSOLETE SETTINGS',
-                        'EXTERNAL EDITOR SETTINGS',
-                        ):
+        for section in guf.DISABLED_SECTIONS | guf.OBSOLETE_SECTIONS:
             self.assertNotIn(section, config_text)
 
     def test_copy_sections_found(self):
@@ -94,6 +94,8 @@ class TestGenerateUserFiles(TestCase):
                         'EXTERNAL SCRIPT PATH SETTINGS',
                         'INTERWIKI SETTINGS',
                         'FURTHER SETTINGS',
+                        'HTTP SETTINGS',
+                        'REPLICATION BOT SETTINGS',
                         ):
             self.assertIn(section, config_text)
         lines = config_text.splitlines()

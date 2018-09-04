@@ -899,6 +899,7 @@ use_mwparserfromhell = True
 # Version 4 is only available for Python 3.4
 pickle_protocol = 2
 
+# ============================
 # End of configuration section
 # ============================
 
