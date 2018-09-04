@@ -111,6 +111,9 @@ def allow_asynchronous(func):
         except pywikibot.Error as edit_err:
             err = edit_err  # edit_err will be deleted in the end of the scope
             link = self.title(as_link=True)
+            if do_async:
+                pywikibot.error('page {} not saved due to {}\n'
+                                .format(link, err))
             pywikibot.log('Error saving page %s (%s)\n' % (link, err),
                           exc_info=True)
             if not callback and not do_async:
