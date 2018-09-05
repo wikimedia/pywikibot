@@ -2648,6 +2648,9 @@ class APISite(BaseSite):
                 if is_mw114:
                     canonical_name = nsdata.pop('canonical')
 
+            if 'content' not in nsdata:  # mw < 1.16
+                nsdata['content'] = ns == 0
+
             default_case = Namespace.default_case(ns)
             if 'case' not in nsdata:
                 nsdata['case'] = default_case or self.siteinfo['case']
