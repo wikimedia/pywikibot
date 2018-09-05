@@ -1084,9 +1084,10 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     if unknown_parameters:
         additional_text = 'Unknown parameter(s) "{0}"\n'.format(
             '", "'.join(unknown_parameters)) + additional_text
-    if not additional_text.endswith('\n'):
-        additional_text += '\n'
-    error(additional_text + 'Use -help for further information.')
+    if additional_text:
+        if not additional_text.endswith('\n'):
+            additional_text += '\n'
+        error(additional_text + 'Use -help for further information.')
 
 
 def writeToCommandLogFile():
