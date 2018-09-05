@@ -1365,6 +1365,10 @@ class BaseBot(OptionHandler):
             return True
         return False
 
+    def stop(self):
+        """Stop iterating."""
+        raise GeneratorExit
+
     def quit(self):
         """Cleanup and quit processing."""
         raise QuitKeyboardInterrupt
@@ -1514,6 +1518,8 @@ class BaseBot(OptionHandler):
                         % (self.__class__.__name__, sys.maxint))
             else:
                 self._generator_completed = True
+        except GeneratorExit:
+            pywikibot.output('Generator has been stopped.')
         except QuitKeyboardInterrupt:
             pywikibot.output('\nUser quit %s bot run...' %
                              self.__class__.__name__)

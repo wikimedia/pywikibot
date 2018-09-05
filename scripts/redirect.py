@@ -710,7 +710,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
         if self._treat_counter >= self.getOption('total'):
             pywikibot.output('\nNumber of pages reached the total limit. '
                              'Script terminated.')
-            self.quit()
+            self.stop()
         super(RedirectRobot, self).treat(page)
 
 
