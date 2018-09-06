@@ -48,140 +48,157 @@ import sys
 
 import pywikibot
 
+from pywikibot.bot import NoRedirectPageBot, SingleSiteBot
 from pywikibot import pagegenerators, i18n, textlib
 
 from pywikibot.tools import DequeGenerator
 
 
-def needcheck(pl):
-    if main:
-        if pl.namespace() != 0:
-            return False
-    if pl in checked:
-        return False
-    if skipdates:
-        if pl.autoFormat()[0] is not None:
-            return False
-    return True
+class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
 
+    """Bot tries to find new articles for a given category."""
 
-def include(pl, checklinks=True, realinclude=True, linkterm=None, summary=''):
-    cl = checklinks
-    if linkterm:
-        actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
-                                              sort_key=linkterm)
-    else:
-        actualworkingcat = workingcat
-    if realinclude:
-        try:
-            text = pl.get()
-        except pywikibot.NoPage:
-            pass
-        except pywikibot.IsRedirectPage:
-            cl = True
+    @classmethod
+    def needcheck(cls, pl):
+        """Verify whether the current page may be processed."""
+        if main:
+            if pl.namespace() != 0:
+                return False
+        if pl in checked:
+            return False
+        if skipdates:
+            if pl.autoFormat()[0] is not None:
+                return False
+        return True
+
+    def change_category(self, page, catlist):
+        """Change the category of page."""
+        pass
+
+    @classmethod
+    def include(cls, pl, checklinks=True, realinclude=True, linkterm=None,
+                summary=''):
+        """Include the current page to the working category."""
+        cl = checklinks
+        if linkterm:
+            actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
+                                                  sort_key=linkterm)
         else:
-            cats = [x for x in pl.categories()]
-            if workingcat not in cats:
-                cats = [x for x in pl.categories()]
-                for c in cats:
-                    if c in parentcats:
-                        if removeparent:
-                            pl.change_category(actualworkingcat,
-                                               summary=summary)
-                            break
-                else:
-                    pl.put(textlib.replaceCategoryLinks(
-                        text, cats + [actualworkingcat], site=pl.site),
-                        summary=summary)
-    if cl:
-        if checkforward:
-            for page2 in pl.linkedPages():
-                if needcheck(page2):
-                    tocheck.append(page2)
-                    checked[page2] = page2
-        if checkbackward:
-            for ref_page in pl.getReferences():
-                if needcheck(ref_page):
-                    tocheck.append(ref_page)
-                    checked[ref_page] = ref_page
-
-
-def asktoadd(pl, summary):
-    if pl.site != mysite:
-        return
-    if pl.isRedirectPage():
-        pl2 = pl.getRedirectTarget()
-        if needcheck(pl2):
-            tocheck.append(pl2)
-            checked[pl2] = pl2
-        return
-    ctoshow = 500
-    pywikibot.output('')
-    pywikibot.output('== {} =='.format(pl.title()))
-    while True:
-        # TODO: Use pywikibot.inputChoice?
-        # (needs the support for 'other options')
-        answer = pywikibot.input('[y]es/[n]o/[i]gnore/[o]ther options?')
-        if answer == 'y':
-            include(pl, summary=summary)
-            break
-        if answer == 'c':
-            include(pl, realinclude=False)
-            break
-        if answer == 'z':
-            if pl.exists():
-                if not pl.isRedirectPage():
-                    linkterm = pywikibot.input(
-                        'In what manner should it be alphabetized?')
-                    include(pl, linkterm=linkterm, summary=summary)
-                    break
-            include(pl, summary=summary)
-            break
-        elif answer == 'n':
-            excludefile.write('%s\n' % pl.title())
-            break
-        elif answer == 'i':
-            break
-        elif answer == 'o':
-            pywikibot.output('t: Give the beginning of the text of the page')
-            pywikibot.output(
-                'z: Add under another title (as [[Category|Title]])')
-            pywikibot.output(
-                'x: Add the page, but do not check links to and from it')
-            pywikibot.output('c: Do not add the page, but do check links')
-            pywikibot.output('a: Add another page')
-            pywikibot.output('l: Give a list of the pages to check')
-        elif answer == 'a':
-            pagetitle = pywikibot.input('Specify page to add:')
-            page = pywikibot.Page(pywikibot.Site(), pagetitle)
-            if page not in checked.keys():
-                include(page, summary=summary)
-        elif answer == 'x':
-            if pl.exists():
-                if pl.isRedirectPage():
-                    pywikibot.output(
-                        'Redirect page. Will be included normally.')
-                    include(pl, realinclude=False)
-                else:
-                    include(pl, checklinks=False, summary=summary)
-            else:
-                pywikibot.output('Page does not exist; not added.')
-            break
-        elif answer == 'l':
-            pywikibot.output('Number of pages still to check: {}'
-                             .format(len(tocheck)))
-            pywikibot.output('Pages to be checked:')
-            pywikibot.output(' - '.join(page.title() for page in tocheck))
-            pywikibot.output('== {} =='.format(pl.title()))
-        elif answer == 't':
-            pywikibot.output('== {} =='.format(pl.title()))
+            actualworkingcat = workingcat
+        if realinclude:
             try:
-                pywikibot.output('' + pl.get(get_redirect=True)[0:ctoshow])
+                text = pl.get()
             except pywikibot.NoPage:
-                pywikibot.output('Page does not exist.')
-            ctoshow += 500
-        else:
-            pywikibot.output('Not understood.')
+                pass
+            except pywikibot.IsRedirectPage:
+                cl = True
+            else:
+                cats = [x for x in pl.categories()]
+                if workingcat not in cats:
+                    cats = [x for x in pl.categories()]
+                    for c in cats:
+                        if c in parentcats:
+                            if removeparent:
+                                pl.change_category(actualworkingcat,
+                                                   summary=summary)
+                                break
+                    else:
+                        pl.put(textlib.replaceCategoryLinks(
+                            text, cats + [actualworkingcat], site=pl.site),
+                            summary=summary)
+        if cl:
+            if checkforward:
+                for page2 in pl.linkedPages():
+                    if cls.needcheck(page2):
+                        tocheck.append(page2)
+                        checked[page2] = page2
+            if checkbackward:
+                for ref_page in pl.getReferences():
+                    if cls.needcheck(ref_page):
+                        tocheck.append(ref_page)
+                        checked[ref_page] = ref_page
+
+    def skip_page(self, page):
+        """Check whether the page is to be skipped."""
+        pass
+
+    @classmethod
+    def asktoadd(cls, pl, summary):
+        """Work on current page and ask to add article to category."""
+        if pl.site != mysite:
+            return
+        if pl.isRedirectPage():
+            pl2 = pl.getRedirectTarget()
+            if cls.needcheck(pl2):
+                tocheck.append(pl2)
+                checked[pl2] = pl2
+            return
+        ctoshow = 500
+        pywikibot.output('')
+        pywikibot.output('== {} =='.format(pl.title()))
+        while True:
+            answer = pywikibot.input('[y]es/[n]o/[i]gnore/[o]ther options?')
+            if answer == 'y':
+                cls.include(pl, summary=summary)
+                break
+            if answer == 'c':
+                cls.include(pl, realinclude=False)
+                break
+            if answer == 'z':
+                if pl.exists():
+                    if not pl.isRedirectPage():
+                        linkterm = pywikibot.input(
+                            'In what manner should it be alphabetized?')
+                        cls.include(pl, linkterm=linkterm, summary=summary)
+                        break
+                cls.include(pl, summary=summary)
+                break
+            elif answer == 'n':
+                excludefile.write('%s\n' % pl.title())
+                break
+            elif answer == 'i':
+                break
+            elif answer == 'o':
+                pywikibot.output(
+                    't: Give the beginning of the text of the page')
+                pywikibot.output(
+                    'z: Add under another title (as [[Category|Title]])')
+                pywikibot.output(
+                    'x: Add the page, but do not check links to and from it')
+                pywikibot.output('c: Do not add the page, but do check links')
+                pywikibot.output('a: Add another page')
+                pywikibot.output('l: Give a list of the pages to check')
+            elif answer == 'a':
+                pagetitle = pywikibot.input('Specify page to add:')
+                page = pywikibot.Page(pywikibot.Site(), pagetitle)
+                if page not in checked.keys():
+                    cls.include(page, summary=summary)
+            elif answer == 'x':
+                if pl.exists():
+                    if pl.isRedirectPage():
+                        pywikibot.output(
+                            'Redirect page. Will be included normally.')
+                        cls.include(pl, realinclude=False)
+                    else:
+                        cls.include(pl, checklinks=False, summary=summary)
+                else:
+                    pywikibot.output('Page does not exist; not added.')
+                break
+            elif answer == 'l':
+                pywikibot.output('Number of pages still to check: {}'
+                                 .format(len(tocheck)))
+                pywikibot.output('Pages to be checked:')
+                pywikibot.output(' - '.join(page.title() for page in tocheck))
+                pywikibot.output('== {} =='.format(pl.title()))
+            elif answer == 't':
+                pywikibot.output('== {} =='.format(pl.title()))
+                try:
+                    pywikibot.output('' + pl.get(get_redirect=True)[0:ctoshow])
+                except pywikibot.NoPage:
+                    pywikibot.output('Page does not exist.')
+                ctoshow += 500
+            else:
+                pywikibot.output('Not understood.')
 
 
 try:
@@ -271,13 +288,13 @@ try:
 
     for pl in articles:
         checked[pl] = pl
-        include(pl, summary=summary)
+        MakeCatBot.include(pl, summary=summary)
 
     gen = pagegenerators.DequePreloadingGenerator(tocheck)
 
     for page in gen:
         if checkbroken or page.exists():
-            asktoadd(page, summary)
+            MakeCatBot.asktoadd(page, summary)
 
 finally:
     try:
