@@ -1,40 +1,45 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 """
-This bot takes as its argument the name of a new or existing category.
+Bot to add new or existing categories to pages.
 
-It will then try to find new articles for this category
-(pages linked to and from pages already in the category),
+This bot takes as its argument the name of a new or existing category.
+Multiple categories may be given. It will then try to find new articles
+for these categories (pages linked to and from pages already in the category),
 asking the user which pages to include and which not.
 
 The following command line parameters are supported:
 
--nodates    Automatically skip all pages that are years or dates
-            (years only work AD, dates only for certain languages).
+-nodates     Automatically skip all pages that are years or dates
+             (years only work AD, dates only for certain languages).
 
--forward    Only check pages linked from pages already in the category,
-            not pages linking to them. Is less precise but quite a bit faster.
+-forward     Only check pages linked from pages already in the category,
+             not pages linking to them. Is less precise but quite a bit faster.
 
--exist      Only ask about pages that do actually exist;
-            drop any titles of non-existing pages silently.
-            If -forward is chosen, -exist is automatically implied.
+-exist       Only ask about pages that do actually exist;
+             drop any titles of non-existing pages silently.
+             If -forward is chosen, -exist is automatically implied.
 
--keepparent Do not remove parent categories of the category to be worked on.
+-keepparent  Do not remove parent categories of the category to be worked on.
 
--all        Work on all pages (default: only main namespace)
+-all         Work on all pages (default: only main namespace)
 
-When running the bot, you will get one by one a number by pages. You can
-choose:
-Y(es) - include the page
-N(o) - do not include the page or
-I(gnore) - do not include the page, but if you meet it again, ask again.
-X - add the page, but do not check links to and from it
+When running the bot, you will get one by one a number by pages.
+You can choose:
 
-Other possiblities:
-A(dd) - add another page, which may have been one that was included before
-C(heck) - check links to and from the page, but do not add the page itself
-R(emove) - remove a page that is already in the list
-L(ist) - show current list of pages to include or to check
+* Y(es)      - include the page
+* N(o)       - do not include the page or
+* I(gnore)   - do not include the page, but if you meet it again, ask again.
+
+Other possibilities:
+
+* T(ext)     - show the beginning of the page text
+* Z(ap)      - add under another title (as [[Category|Title]])
+* eX(cept)   - add the page, but do not check links to and from it
+* C(heck)    - check links to and from the page, but do not add the page itself
+* A(dd)      - add another page, which may have been included before
+* L(ist)     - show current list of pages to include or to check
+
 """
 # (C) Andre Engels, 2004
 # (C) Pywikibot team, 2005-2018
