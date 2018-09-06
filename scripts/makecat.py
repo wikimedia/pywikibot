@@ -116,12 +116,12 @@ def asktoadd(pl, summary):
             checked[pl2] = pl2
         return
     ctoshow = 500
-    pywikibot.output(u'')
-    pywikibot.output(u"==%s==" % pl.title())
+    pywikibot.output('')
+    pywikibot.output('== {} =='.format(pl.title()))
     while True:
         # TODO: Use pywikibot.inputChoice?
         # (needs the support for 'other options')
-        answer = pywikibot.input("[y]es/[n]o/[i]gnore/[o]ther options?")
+        answer = pywikibot.input('[y]es/[n]o/[i]gnore/[o]ther options?')
         if answer == 'y':
             include(pl, summary=summary)
             break
@@ -132,7 +132,7 @@ def asktoadd(pl, summary):
             if pl.exists():
                 if not pl.isRedirectPage():
                     linkterm = pywikibot.input(
-                        u"In what manner should it be alphabetized?")
+                        'In what manner should it be alphabetized?')
                     include(pl, linkterm=linkterm, summary=summary)
                     break
             include(pl, summary=summary)
@@ -143,16 +143,16 @@ def asktoadd(pl, summary):
         elif answer == 'i':
             break
         elif answer == 'o':
-            pywikibot.output(u"t: Give the beginning of the text of the page")
+            pywikibot.output('t: Give the beginning of the text of the page')
             pywikibot.output(
-                u"z: Add under another title (as [[Category|Title]])")
+                'z: Add under another title (as [[Category|Title]])')
             pywikibot.output(
-                u"x: Add the page, but do not check links to and from it")
-            pywikibot.output(u"c: Do not add the page, but do check links")
-            pywikibot.output(u"a: Add another page")
-            pywikibot.output(u"l: Give a list of the pages to check")
+                'x: Add the page, but do not check links to and from it')
+            pywikibot.output('c: Do not add the page, but do check links')
+            pywikibot.output('a: Add another page')
+            pywikibot.output('l: Give a list of the pages to check')
         elif answer == 'a':
-            pagetitle = pywikibot.input("Specify page to add:")
+            pagetitle = pywikibot.input('Specify page to add:')
             page = pywikibot.Page(pywikibot.Site(), pagetitle)
             if page not in checked.keys():
                 include(page, summary=summary)
@@ -160,28 +160,28 @@ def asktoadd(pl, summary):
             if pl.exists():
                 if pl.isRedirectPage():
                     pywikibot.output(
-                        u"Redirect page. Will be included normally.")
+                        'Redirect page. Will be included normally.')
                     include(pl, realinclude=False)
                 else:
                     include(pl, checklinks=False, summary=summary)
             else:
-                pywikibot.output(u"Page does not exist; not added.")
+                pywikibot.output('Page does not exist; not added.')
             break
         elif answer == 'l':
-            pywikibot.output(u"Number of pages still to check: %s"
-                             % len(tocheck))
-            pywikibot.output(u"Pages to be checked:")
-            pywikibot.output(u" - ".join(page.title() for page in tocheck))
-            pywikibot.output(u"==%s==" % pl.title())
+            pywikibot.output('Number of pages still to check: {}'
+                             .format(len(tocheck)))
+            pywikibot.output('Pages to be checked:')
+            pywikibot.output(' - '.join(page.title() for page in tocheck))
+            pywikibot.output('== {} =='.format(pl.title()))
         elif answer == 't':
-            pywikibot.output(u"==%s==" % pl.title())
+            pywikibot.output('== {} =='.format(pl.title()))
             try:
-                pywikibot.output(u'' + pl.get(get_redirect=True)[0:ctoshow])
+                pywikibot.output('' + pl.get(get_redirect=True)[0:ctoshow])
             except pywikibot.NoPage:
-                pywikibot.output(u"Page does not exist.")
+                pywikibot.output('Page does not exist.')
             ctoshow += 500
         else:
-            pywikibot.output(u"Not understood.")
+            pywikibot.output('Not understood.')
 
 
 try:
@@ -259,13 +259,13 @@ try:
     # in a diferent category.
     articles = list(workingcat.articles(content=True))
     if not articles:
-        pywikibot.output(
-            u"Category %s does not exist or is empty. Which page to start with?"
-            % workingcatname)
-        answer = pywikibot.input(u"(Default is [[%s]]):" % workingcatname)
+        pywikibot.output('Category {} does not exist or is empty. '
+                         'Which page to start with?'
+                         .format(workingcatname))
+        answer = pywikibot.input('(Default is [[{}]]):'.format(workingcatname))
         if not answer:
             answer = workingcatname
-        pywikibot.output(u'' + answer)
+        pywikibot.output('' + answer)
         pl = pywikibot.Page(mysite, answer)
         articles = [pl]
 
