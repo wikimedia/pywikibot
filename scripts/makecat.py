@@ -59,18 +59,12 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
     """Bot tries to find new articles for a given category."""
 
     @staticmethod
-    def needcheck(pl):
+    def needcheck(page):
         """Verify whether the current page may be processed."""
         global main_ns, checked, skipdates
-        if main_ns:
-            if pl.namespace() != 0:
-                return False
-        if pl in checked:
-            return False
-        if skipdates:
-            if pl.autoFormat()[0] is not None:
-                return False
-        return True
+        return not (main_ns and page.namespace() != 0
+                    or page in checked
+                    or skipdates and page.autoFormat()[0] is not None)
 
     def change_category(self, page, catlist):
         """Change the category of page."""
