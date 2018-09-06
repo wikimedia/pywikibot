@@ -543,8 +543,8 @@ class NamespacesDict(Mapping, SelfCallMixin):
         """
         Get the namespace with the given key.
 
-        @param key: namespace key
-        @type key: Namespace, int or str
+        @param attr: namespace key
+        @type attr: Namespace, int or str
         @rtype: Namespace
         """
         # lookup_name access _namespaces

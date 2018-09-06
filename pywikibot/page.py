@@ -5897,14 +5897,14 @@ class Link(ComparableMixin):
         link._section = None
         link._source = source
 
-        link._namespace = 0
-
+        link._namespace = link._site.namespaces[0]
         if ':' in title:
             ns, t = title.split(':', 1)
             ns = link._site.namespaces.lookup_name(ns)
             if ns:
                 link._namespace = ns
                 title = t
+
         if u"#" in title:
             t, sec = title.split(u'#', 1)
             title, link._section = t.rstrip(), sec.lstrip()
