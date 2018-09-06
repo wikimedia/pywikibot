@@ -643,9 +643,17 @@ class QueryStringParamsTestCase(HttpbinTestCase):
     urldecoded query string parameters.
     """
 
+    def setUp(self):
+        """Set up tests."""
+        super(QueryStringParamsTestCase, self).setUp()
+        self.url = self.get_httpbin_url('/get')
+
     def test_no_params(self):
         """Test fetch method with no parameters."""
-        r = http.fetch(uri=self.get_httpbin_url('/get'), params={})
+        r = http.fetch(uri=self.url, params={})
+        if r.status == 503:  # T203637
+            unittest.skipTest('503: Service currently not available for '
+                              + self.url)
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.text)
@@ -658,7 +666,10 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in should be
         the same as what we get out.
         """
-        r = http.fetch(uri=self.get_httpbin_url('/get'), params={'fish&chips': 'delicious'})
+        r = http.fetch(uri=self.url, params={'fish&chips': 'delicious'})
+        if r.status == 503:  # T203637
+            unittest.skipTest('503: Service currently not available for '
+                              + self.url)
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.text)
@@ -671,8 +682,10 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         HTTPBin returns the args in their urldecoded form, so what we put in should be
         the same as what we get out.
         """
-        r = http.fetch(uri=self.get_httpbin_url('/get'),
-                       params={'fish%26chips': 'delicious'})
+        r = http.fetch(uri=self.url, params={'fish%26chips': 'delicious'})
+        if r.status == 503:  # T203637
+            unittest.skipTest('503: Service currently not available for '
+                              + self.url)
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.text)
