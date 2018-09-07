@@ -49,7 +49,6 @@ Other possibilities:
 from __future__ import absolute_import, unicode_literals
 
 import codecs
-import sys
 
 import pywikibot
 
@@ -63,27 +62,42 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
 
     """Bot tries to find new articles for a given category."""
 
-    @staticmethod
-    def needcheck(page):
+    def __init__(self, **kwargs):
+        """Initializer."""
+        self.availableOptions.update({
+            'all': False,
+            'exist': False,
+            'forward': False,
+            'keepparent': False,
+            'nodate': False,
+        })
+        super(MakeCatBot, self).__init__(**kwargs)
+        self.skipdates = self.getOption('nodate')
+        self.checkforward = True
+        self.checkbackward = not self.getOption('forward')
+        self.checkbroken = not (self.getOption('forward')
+                                and self.getOption('exist'))
+        self.removeparent = not self.getOption('keepparent')
+        self.main = not self.getOption('all')
+
+    def needcheck(self, page):
         """Verify whether the current page may be processed."""
-        global main_ns, checked, skipdates
-        return not (main_ns and page.namespace() != 0
+        global checked
+        return not (self.main and page.namespace() != 0
                     or page in checked
-                    or skipdates and page.autoFormat()[0] is not None)
+                    or self.skipdates and page.autoFormat()[0] is not None)
 
     def change_category(self, page, catlist):
         """Change the category of page."""
         pass
 
-    @classmethod
-    def include(cls, pl, checklinks=True, realinclude=True, linkterm=None,
+    def include(self, pl, checklinks=True, realinclude=True, linkterm=None,
                 summary=''):
         """Include the current page to the working category."""
-        global mysite
-        global workingcat, parentcats, removeparent
-        global checkforward, checkbackward
+        global workingcat, parentcats
         global checked, tocheck
         cl = checklinks
+        mysite = self.site
         if linkterm:
             actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
                                                   sort_key=linkterm)
@@ -102,7 +116,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                     cats = [x for x in pl.categories()]
                     for c in cats:
                         if c in parentcats:
-                            if removeparent:
+                            if self.removeparent:
                                 pl.change_category(actualworkingcat,
                                                    summary=summary)
                                 break
@@ -111,14 +125,14 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                             text, cats + [actualworkingcat], site=pl.site),
                             summary=summary)
         if cl:
-            if checkforward:
+            if self.checkforward:
                 for page2 in pl.linkedPages():
-                    if cls.needcheck(page2):
+                    if self.needcheck(page2):
                         tocheck.append(page2)
                         checked[page2] = page2
-            if checkbackward:
+            if self.checkbackward:
                 for ref_page in pl.getReferences():
-                    if cls.needcheck(ref_page):
+                    if self.needcheck(ref_page):
                         tocheck.append(ref_page)
                         checked[ref_page] = ref_page
 
@@ -126,17 +140,16 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
         """Check whether the page is to be skipped."""
         pass
 
-    @classmethod
-    def asktoadd(cls, pl, summary):
+    def asktoadd(self, pl, summary):
         """Work on current page and ask to add article to category."""
-        global mysite
         global checked, tocheck
         global excludefile
+        mysite = self.site
         if pl.site != mysite:
             return
         if pl.isRedirectPage():
             pl2 = pl.getRedirectTarget()
-            if cls.needcheck(pl2):
+            if self.needcheck(pl2):
                 tocheck.append(pl2)
                 checked[pl2] = pl2
             return
@@ -146,18 +159,18 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
         while True:
             answer = pywikibot.input('[y]es/[n]o/[i]gnore/[h]elp for options?')
             if answer == 'y':
-                cls.include(pl, summary=summary)
+                self.include(pl, summary=summary)
                 break
             if answer == 'c':
-                cls.include(pl, realinclude=False)
+                self.include(pl, realinclude=False)
                 break
             if answer == 'k':
                 if pl.exists() and not pl.isRedirectPage():
                     linkterm = pywikibot.input(
                         'In what manner should it be alphabetized?')
-                    cls.include(pl, linkterm=linkterm, summary=summary)
+                    self.include(pl, linkterm=linkterm, summary=summary)
                     break
-                cls.include(pl, summary=summary)
+                self.include(pl, summary=summary)
                 break
             elif answer == 'n':
                 excludefile.write('%s\n' % pl.title())
@@ -166,7 +179,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                 break
             elif answer == 'h':
                 pywikibot.output("""
-[m]ore:     Show the beginning of the page text
+[m]ore:     show more content of the page starting from the beginning
 sort [k]ey: Add with sort key like [[Category|Title]]
 [s]kip:     Add the page, but skip checking links
 [c]heck:    Do not add the page, but do check links
@@ -177,16 +190,16 @@ sort [k]ey: Add with sort key like [[Category|Title]]
                 pagetitle = pywikibot.input('Specify page to add:')
                 page = pywikibot.Page(pywikibot.Site(), pagetitle)
                 if page not in checked.keys():
-                    cls.include(page, summary=summary)
+                    self.include(page, summary=summary)
             elif answer == 's':
                 if not pl.exists():
                     pywikibot.output('Page does not exist; not added.')
                 elif pl.isRedirectPage():
                     pywikibot.output(
                         'Redirect page. Will be included normally.')
-                    cls.include(pl, realinclude=False)
+                    self.include(pl, realinclude=False)
                 else:
-                    cls.include(pl, checklinks=False, summary=summary)
+                    self.include(pl, checklinks=False, summary=summary)
                 break
             elif answer == 'l':
                 pywikibot.output('Number of pages still to check: {}'
@@ -214,47 +227,38 @@ def main(*args):
     @param args: command line arguments
     @type args: list of unicode
     """
-    global main_ns, skipdates
-    global mysite
-    global workingcat, parentcats, removeparent
-    global checkforward, checkbackward
+    global workingcat, parentcats
     global checked, tocheck
     global excludefile
 
-    main_ns = True
-    skipdates = False
-    removeparent = True
-    checkforward = True
-    checkbackward = True
     checked = {}
     tocheck = DequeGenerator()
 
-    checkbroken = True
     workingcatname = ''
 
+    options = {}
     local_args = pywikibot.handle_args(args)
     for arg in local_args:
-        if arg.startswith('-nodate'):
-            skipdates = True
-        elif arg.startswith('-forward'):
-            checkbackward = False
-            checkbroken = False
-        elif arg.startswith('-exist'):
-            checkbroken = False
-        elif arg.startswith('-keepparent'):
-            removeparent = False
-        elif arg.startswith('-all'):
-            main_ns = False
-        elif not workingcatname:
-            workingcatname = arg
+        option = arg[1:]
+        if not arg.startswith('-'):
+            if not workingcatname:
+                workingcatname = arg
+            else:
+                pywikibot.warning('Working category "{}" is already given.'
+                                  .format(workingcatname))
+        else:
+            options[option] = True
 
     if not workingcatname:
         pywikibot.bot.suggest_help(missing_parameters=['working category'])
-        sys.exit(0)
+        return
 
     mysite = pywikibot.Site()
     summary = i18n.twtranslate(mysite, 'makecat-create',
                                {'cat': workingcatname})
+
+    bot = MakeCatBot(site=mysite, **options)
+
     workingcat = pywikibot.Category(mysite,
                                     '%s%s'
                                     % (mysite.namespaces.CATEGORY,
@@ -310,13 +314,13 @@ def main(*args):
 
     for pl in articles:
         checked[pl] = pl
-        MakeCatBot.include(pl, summary=summary)
+        bot.include(pl, summary=summary)
 
     gen = pagegenerators.DequePreloadingGenerator(tocheck)
 
     for page in gen:
-        if checkbroken or page.exists():
-            MakeCatBot.asktoadd(page, summary)
+        if bot.checkbroken or page.exists():
+            bot.asktoadd(page, summary)
 
 
 if __name__ == '__main__':
