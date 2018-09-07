@@ -1216,6 +1216,15 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept('{{#invoke:x}}', 'x', 'y',
                                                ['invoke'], site=self.site),
                          '{{#invoke:x}}')
+        self.assertEqual(
+            textlib.replaceExcept(
+                '<ref name=etwa /> not_in_ref <ref> in_ref </ref>',
+                'not_in_ref', 'text', ['ref'], site=self.site),
+            '<ref name=etwa /> text <ref> in_ref </ref>')
+        self.assertEqual(
+            textlib.replaceExcept(
+                '<ab> content </a>', 'content', 'text', ['a'], site=self.site),
+            '<ab> text </a>')
 
     def test_replace_with_count(self):
         """Test replacing with count argument."""
