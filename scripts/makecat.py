@@ -25,13 +25,16 @@ The following command line parameters are supported:
 -all         Work on all pages (default: only main namespace)
 
 When running the bot, you will get one by one a number by pages.
-You can choose
+You can choose with small menu bar:
 
 * [y]es      - include the page
 * [n]o       - do not include the page or
 * [i]gnore   - do not include the page, but if you meet it again, ask again.
+* [e]xtend   - extend menu bar
+* [h]elp     - show options to be choosed
+* [q]uit     - leave the bot
 
-Other possibilities
+Other possibilities with extended menu bar:
 
 * [m]ore     - show more content of the page starting from the beginning
 * sort [k]ey - add with sort key like [[Category|Title]]
@@ -39,6 +42,7 @@ Other possibilities
 * [c]heck    - check links to and from the page, but do not add the page itself
 * [o]ther    - add another page, which may have been included before
 * [l]ist     - show current list of pages to include or to check
+* [r]educe   - reduce menu bar
 
 """
 # (C) Pywikibot team, 2004-2020
@@ -46,6 +50,7 @@ Other possibilities
 # Distributed under the terms of the MIT license.
 #
 import codecs
+from textwrap import fill
 
 import pywikibot
 
@@ -53,6 +58,7 @@ from pywikibot.bot import NoRedirectPageBot, SingleSiteBot
 from pywikibot import pagegenerators, i18n, textlib
 
 from pywikibot.tools import DequeGenerator
+from pywikibot.tools.formatter import color_format
 
 
 class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
@@ -63,6 +69,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
         """Initializer."""
         self.available_options.update({
             'all': False,
+            'catnames': None,
             'exist': False,
             'forward': False,
             'keepparent': False,
@@ -76,6 +83,29 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                                 and self.opt.exist)
         self.removeparent = not self.opt.keepparent
         self.main = not self.opt.all
+
+        self.workingcatname = self.getOption('catnames')
+        self._setup_menubar()
+
+    @classmethod
+    def _setup_menubar(cls):
+        """Setup treat_page option bar."""
+        small = [
+            ('yes', 'y'), ('no', 'n'), ('ignore', 'i'),
+            ('extend', 'e'), ('help', 'h')]
+        extended = small[:3] + [
+            ('more', 'm'), ('sort key', 'k'), ('skip', 's'), ('check', 'c'),
+            ('other', 'o'), ('list', 'l'), ('reduce', 'r'), ('help', 'h')]
+        cls.option_bar = {'e': extended, 'r': small}
+        cls.treat_options = cls.option_bar['r']
+
+    @staticmethod
+    def highlight_title(page, condition=True):
+        """Highlight a page title if conditon is True."""
+        if condition:
+            pywikibot.output(
+                color_format('\n>>> {lightpurple}{0}{default} <<<',
+                             page.title()))
 
     def needcheck(self, page):
         """Verify whether the current page may be processed."""
@@ -153,7 +183,9 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
         pywikibot.output('')
         pywikibot.output('== {} =='.format(pl.title()))
         while True:
-            answer = pywikibot.input('[y]es/[n]o/[i]gnore/[h]elp for options?')
+            answer = pywikibot.input_choice(
+                'Add to category {}?'.format(self.workingcatname),
+                self.treat_options, default='i')
             if answer == 'y':
                 self.include(pl, summary=summary)
                 break
@@ -173,14 +205,22 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                 break
             elif answer == 'i':
                 break
+            if answer in 'er':
+                self.treat_options = self.option_bar[answer]
             elif answer == 'h':
                 pywikibot.output("""
+[y]es:      Add the page and check links')
+[n]o:       Never add the page, saved to exclusion list
+[i]gnore:   Neither do not add the page not check links
 [m]ore:     show more content of the page starting from the beginning
 sort [k]ey: Add with sort key like [[Category|Title]]
 [s]kip:     Add the page, but skip checking links
 [c]heck:    Do not add the page, but do check links
 [o]ther:    Add another page
 [l]ist:     Show a list of the pages to check
+[e]xtend:   A more extended option list
+[r]educe:   Reduce option list
+[q]uit:     Save exclusion list and exit this script
 """)
             elif answer == 'o':
                 pagetitle = pywikibot.input('Specify page to add:')
@@ -198,20 +238,21 @@ sort [k]ey: Add with sort key like [[Category|Title]]
                     self.include(pl, checklinks=False, summary=summary)
                 break
             elif answer == 'l':
+                length = len(tocheck)
                 pywikibot.output('Number of pages still to check: {}'
-                                 .format(len(tocheck)))
-                pywikibot.output('Pages to be checked:')
-                pywikibot.output(' - '.join(page.title() for page in tocheck))
-                pywikibot.output('== {} =='.format(pl.title()))
+                                 .format(length))
+                if length:
+                    pywikibot.output('Pages to be checked:')
+                    pywikibot.output(
+                        fill(' - '.join(page.title() for page in tocheck)))
+                self.highlight_title(page)
             elif answer == 'm':
-                pywikibot.output('== {} =='.format(pl.title()))
-                try:
-                    pywikibot.output('' + pl.get(get_redirect=True)[0:ctoshow])
-                except pywikibot.NoPage:
+                self.highlight_title(pl, ctoshow > 500)
+                if pl.exists():
+                    pywikibot.output(pl.text[0:ctoshow])
+                else:
                     pywikibot.output('Page does not exist.')
                 ctoshow += 500
-            else:
-                pywikibot.output('Not understood.')
 
 
 def main(*args):
@@ -238,7 +279,7 @@ def main(*args):
         option = arg[1:]
         if not arg.startswith('-'):
             if not workingcatname:
-                workingcatname = arg
+                options['catnames'] = workingcatname = arg
             else:
                 pywikibot.warning('Working category "{}" is already given.'
                                   .format(workingcatname))
