@@ -58,10 +58,11 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
 
     """Bot tries to find new articles for a given category."""
 
-    @classmethod
-    def needcheck(cls, pl):
+    @staticmethod
+    def needcheck(pl):
         """Verify whether the current page may be processed."""
-        if main:
+        global main_ns, checked, skipdates
+        if main_ns:
             if pl.namespace() != 0:
                 return False
         if pl in checked:
@@ -79,6 +80,10 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
     def include(cls, pl, checklinks=True, realinclude=True, linkterm=None,
                 summary=''):
         """Include the current page to the working category."""
+        global mysite
+        global workingcat, parentcats, removeparent
+        global checkforward, checkbackward
+        global checked, tocheck
         cl = checklinks
         if linkterm:
             actualworkingcat = pywikibot.Category(mysite, workingcat.title(),
@@ -125,6 +130,9 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
     @classmethod
     def asktoadd(cls, pl, summary):
         """Work on current page and ask to add article to category."""
+        global mysite
+        global checked, tocheck
+        global excludefile
         if pl.site != mysite:
             return
         if pl.isRedirectPage():
@@ -201,17 +209,35 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                 pywikibot.output('Not understood.')
 
 
-try:
-    checked = {}
+def main(*args):
+    """
+    Process command line arguments and invoke bot.
+
+    If args is an empty list, sys.argv is used.
+
+    @param args: command line arguments
+    @type args: list of unicode
+    """
+    global main_ns, skipdates
+    global mysite
+    global workingcat, parentcats, removeparent
+    global checkforward, checkbackward
+    global checked, tocheck
+    global excludefile
+
+    main_ns = True
     skipdates = False
+    removeparent = True
     checkforward = True
     checkbackward = True
-    checkbroken = True
-    removeparent = True
-    main = True
-    workingcatname = ''
+    checked = {}
     tocheck = DequeGenerator()
-    for arg in pywikibot.handle_args():
+
+    checkbroken = True
+    workingcatname = ''
+
+    local_args = pywikibot.handle_args(args)
+    for arg in local_args:
         if arg.startswith('-nodate'):
             skipdates = True
         elif arg.startswith('-forward'):
@@ -222,7 +248,7 @@ try:
         elif arg.startswith('-keepparent'):
             removeparent = False
         elif arg.startswith('-all'):
-            main = False
+            main_ns = False
         elif not workingcatname:
             workingcatname = arg
 
@@ -296,8 +322,12 @@ try:
         if checkbroken or page.exists():
             MakeCatBot.asktoadd(page, summary)
 
-finally:
+
+if __name__ == '__main__':
     try:
-        excludefile.close()
-    except Exception:
-        pass
+        main()
+    finally:
+        try:
+            excludefile.close()
+        except Exception:
+            pass
