@@ -27,18 +27,18 @@ The following command line parameters are supported:
 When running the bot, you will get one by one a number by pages.
 You can choose:
 
-* Y(es)      - include the page
-* N(o)       - do not include the page or
-* I(gnore)   - do not include the page, but if you meet it again, ask again.
+* [y]es      - include the page
+* [n]o       - do not include the page or
+* [i]gnore   - do not include the page, but if you meet it again, ask again.
 
 Other possibilities:
 
-* T(ext)     - show the beginning of the page text
-* Z(ap)      - add under another title (as [[Category|Title]])
-* eX(cept)   - add the page, but do not check links to and from it
-* C(heck)    - check links to and from the page, but do not add the page itself
-* A(dd)      - add another page, which may have been included before
-* L(ist)     - show current list of pages to include or to check
+* [m]ore     - show more content of the page starting from the beginning
+* sort [k]ey - add with sort key like [[Category|Title]]
+* [s]kip     - add the page, but skip checking links to and from it
+* [c]heck    - check links to and from the page, but do not add the page itself
+* [o]ther    - add another page, which may have been included before
+* [l]ist     - show current list of pages to include or to check
 
 """
 # (C) Andre Engels, 2004
@@ -144,20 +144,19 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
         pywikibot.output('')
         pywikibot.output('== {} =='.format(pl.title()))
         while True:
-            answer = pywikibot.input('[y]es/[n]o/[i]gnore/[o]ther options?')
+            answer = pywikibot.input('[y]es/[n]o/[i]gnore/[h]elp for options?')
             if answer == 'y':
                 cls.include(pl, summary=summary)
                 break
             if answer == 'c':
                 cls.include(pl, realinclude=False)
                 break
-            if answer == 'z':
-                if pl.exists():
-                    if not pl.isRedirectPage():
-                        linkterm = pywikibot.input(
-                            'In what manner should it be alphabetized?')
-                        cls.include(pl, linkterm=linkterm, summary=summary)
-                        break
+            if answer == 'k':
+                if pl.exists() and not pl.isRedirectPage():
+                    linkterm = pywikibot.input(
+                        'In what manner should it be alphabetized?')
+                    cls.include(pl, linkterm=linkterm, summary=summary)
+                    break
                 cls.include(pl, summary=summary)
                 break
             elif answer == 'n':
@@ -165,31 +164,29 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                 break
             elif answer == 'i':
                 break
+            elif answer == 'h':
+                pywikibot.output("""
+[m]ore:     Show the beginning of the page text
+sort [k]ey: Add with sort key like [[Category|Title]]
+[s]kip:     Add the page, but skip checking links
+[c]heck:    Do not add the page, but do check links
+[o]ther:    Add another page
+[l]ist:     Show a list of the pages to check
+""")
             elif answer == 'o':
-                pywikibot.output(
-                    't: Give the beginning of the text of the page')
-                pywikibot.output(
-                    'z: Add under another title (as [[Category|Title]])')
-                pywikibot.output(
-                    'x: Add the page, but do not check links to and from it')
-                pywikibot.output('c: Do not add the page, but do check links')
-                pywikibot.output('a: Add another page')
-                pywikibot.output('l: Give a list of the pages to check')
-            elif answer == 'a':
                 pagetitle = pywikibot.input('Specify page to add:')
                 page = pywikibot.Page(pywikibot.Site(), pagetitle)
                 if page not in checked.keys():
                     cls.include(page, summary=summary)
-            elif answer == 'x':
-                if pl.exists():
-                    if pl.isRedirectPage():
-                        pywikibot.output(
-                            'Redirect page. Will be included normally.')
-                        cls.include(pl, realinclude=False)
-                    else:
-                        cls.include(pl, checklinks=False, summary=summary)
-                else:
+            elif answer == 's':
+                if not pl.exists():
                     pywikibot.output('Page does not exist; not added.')
+                elif pl.isRedirectPage():
+                    pywikibot.output(
+                        'Redirect page. Will be included normally.')
+                    cls.include(pl, realinclude=False)
+                else:
+                    cls.include(pl, checklinks=False, summary=summary)
                 break
             elif answer == 'l':
                 pywikibot.output('Number of pages still to check: {}'
@@ -197,7 +194,7 @@ class MakeCatBot(SingleSiteBot, NoRedirectPageBot):
                 pywikibot.output('Pages to be checked:')
                 pywikibot.output(' - '.join(page.title() for page in tocheck))
                 pywikibot.output('== {} =='.format(pl.title()))
-            elif answer == 't':
+            elif answer == 'm':
                 pywikibot.output('== {} =='.format(pl.title()))
                 try:
                     pywikibot.output('' + pl.get(get_redirect=True)[0:ctoshow])
