@@ -4714,8 +4714,7 @@ class APISite(BaseSite):
             only list non-patrolled edits; if None, list all
         @type patrolled: bool or None
         @param top_only: if True, only list changes that are the latest
-        revision
-            (default False)
+            revision (default False)
         @type top_only: bool
         @param user: if not None, only list edits by this user or users
         @type user: basestring|list
