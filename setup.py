@@ -131,13 +131,14 @@ if PY2:
     if PYTHON_VERSION == (2, 7, 2):
         dependencies.append('future>=0.15.0')  # Bug fixes for HTMLParser
 
-    if PYTHON_VERSION < (2, 7, 9):
+    if (2, 7, 6) < PYTHON_VERSION < (2, 7, 9):
         # Python versions before 2.7.9 will cause urllib3 to trigger
         # InsecurePlatformWarning warnings for all HTTPS requests. By
         # installing with security extras, requests will automatically set
         # them up and the warnings will stop. See
         # <https://urllib3.readthedocs.org/en/latest/security.html#insecureplatformwarning>
         # for more details.
+        # There is no secure version of cryptography for Python 2.7.6 or older.
         dependencies += extra_deps['security']
 
     script_deps['data_ingestion.py'] = extra_deps['csv']
