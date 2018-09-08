@@ -11,6 +11,7 @@ from pywikibot.exceptions import NoPage
 from pywikibot.flow import Board, Topic, Post
 from pywikibot.tools import UnicodeType as unicode
 
+from tests import unittest
 from tests.aspects import (
     TestCase,
 )
@@ -242,3 +243,10 @@ class TestFlowTopic(TestCase):
         topic_hidden = Topic(self.site, 'Topic:U5y53rn0dp6h70nw')
         self.assertFalse(topic_hidden.is_locked)
         self.assertTrue(topic_hidden.is_moderated)
+
+
+if __name__ == '__main__':  # pragma: no cover
+    try:
+        unittest.main()
+    except SystemExit:
+        pass

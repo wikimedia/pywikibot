@@ -33,8 +33,7 @@ from pywikibot.tools import (
     PY2, PYTHON_VERSION,
     UnicodeType as unicode,
 )
-from tests import _pwb_py
-from tests import unittest
+from tests import _pwb_py, unittest
 
 if not PY2:
     import six
