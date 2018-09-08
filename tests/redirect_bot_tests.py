@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the redirect.py script."""
 #
-# (C) Pywikibot team, 2017
+# (C) Pywikibot team, 2017-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -12,7 +12,7 @@ from pywikibot import site, Page, i18n
 
 from scripts.redirect import RedirectRobot
 
-from tests import Mock, patch
+from tests import Mock, patch, unittest
 from tests.aspects import DefaultSiteTestCase
 
 
@@ -52,3 +52,10 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
                 bot = RedirectRobot('broken', **options)
         w.assert_called_with('No speedy deletion template "n" available.')
         self.assertEqual(bot.sdtemplate, None)
+
+
+if __name__ == '__main__':  # pragma: no cover
+    try:
+        unittest.main()
+    except SystemExit:
+        pass
