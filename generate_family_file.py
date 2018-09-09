@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """This script generates a family file from a given URL."""
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
 #
 # (C) Merlijn van Deen, 2010-2013
 # (C) Pywikibot team, 2010-2018
 #
 # Distributed under the terms of the MIT license
 #
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 
 # system imports
 import codecs

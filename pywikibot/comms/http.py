@@ -11,13 +11,13 @@ This module is responsible for
     - URL-encoding all data
     - Basic HTTP error handling
 """
-from __future__ import absolute_import, print_function, unicode_literals
-
 #
 # (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import absolute_import, print_function, unicode_literals
+
 
 __docformat__ = 'epytext'
 
