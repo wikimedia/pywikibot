@@ -427,7 +427,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: list of unicode
+    @type args: unicode
     """
     # set the config family and mylang values to an invalid state so that
     # the script can detect that the command line arguments -family & -lang

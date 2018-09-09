@@ -144,7 +144,7 @@ class _ColorFormatter(Formatter):
         @param format_string: The format template string
         @type format_string: unicode
         @param args: The positional field values
-        @type args: sequence
+        @type args: typing.Sequence
         @param kwargs: The named field values
         @type kwargs: dict
         @return: The formatted string

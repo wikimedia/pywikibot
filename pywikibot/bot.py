@@ -899,7 +899,7 @@ def handle_args(args=None, do_help=True):
     args may be passed as an argument, thereby overriding sys.argv
 
     @param args: Command line arguments
-    @type args: list of unicode
+    @type args: typing.Iterable
     @param do_help: Handle parameter '-help' to show help and invoke sys.exit
     @type do_help: bool
     @return: list of arguments not recognised globally
@@ -1136,7 +1136,6 @@ class OptionHandler(object):
         Only accept options defined in availableOptions.
 
         @param kwargs: bot options
-        @type kwargs: dict
         """
         self.setOptions(**kwargs)
 
@@ -1145,7 +1144,6 @@ class OptionHandler(object):
         Set the instance options.
 
         @param kwargs: options
-        @type kwargs: dict
         """
         valid_options = set(self.availableOptions)
         received_options = set(kwargs)
@@ -1203,7 +1201,6 @@ class BaseBot(OptionHandler):
         Only accept options defined in availableOptions.
 
         @param kwargs: bot options
-        @type kwargs: dict
         """
         if 'generator' in kwargs:
             self.generator = kwargs.pop('generator')
@@ -1760,7 +1757,6 @@ class CurrentPageBot(BaseBot):
             print a message. If None uses this instances default.
         @type ignore_server_errors: bool or None
         @param kwargs: Additional parameters directly given to L{Bot.userPut}.
-        @type kwargs: dict
         @return: whether the page was saved successfully
         @rtype: bool
         """

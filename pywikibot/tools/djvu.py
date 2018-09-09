@@ -27,7 +27,7 @@ def _call_cmd(args, lib='djvulibre'):
     Tiny wrapper around subprocess.Popen().
 
     @param args: same as Popen()
-    @type args: sequence or string
+    @type args: typing.Sequence[string]
 
     @param library: library to be logged in logging messages
     @type library: string

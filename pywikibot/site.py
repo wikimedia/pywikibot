@@ -2470,7 +2470,7 @@ class APISite(BaseSite):
         joined using MediaWiki message 'comma-separator'.
 
         @param args: text to be expanded
-        @type args: iterable of unicode
+        @type args: typing.Iterable[unicode]
 
         @rtype: unicode
         """

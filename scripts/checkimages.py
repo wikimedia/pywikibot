@@ -1570,7 +1570,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: list of unicode
+    @type args: unicode
     """
     # Command line configurable parameters
     repeat = True  # Restart after having check all the images?

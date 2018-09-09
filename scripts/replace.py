@@ -871,7 +871,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: list of unicode
+    @type args: unicode
     """
     add_cat = None
     gen = None

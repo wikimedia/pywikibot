@@ -89,7 +89,6 @@ class EventStreams(object):
             default url using _site.family settings and streamtype
         @type url: str
         @param kwargs: keyword arguments passed to SSEClient and requests lib
-        @type kwargs: dict
         @raises ImportError: sseclient is not installed
         """
         if isinstance(EventSource, Exception):

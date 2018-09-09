@@ -727,7 +727,7 @@ def execute_pwb(args, data_in=None, timeout=0, error=None, overrides=None):
     Execute the pwb.py script and capture outputs.
 
     @param args: list of arguments for pwb.py
-    @type args: list of unicode
+    @type args: typing.Sequence[unicode]
     @param overrides: mapping of pywikibot symbols to test replacements
     @type overrides: dict
     """

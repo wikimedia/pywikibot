@@ -1493,9 +1493,7 @@ def add_full_name(obj):
         if the decorated decorator was called without arguments.
 
         @param outer_args: args
-        @type outer_args: list
         @param outer_kwargs: kwargs
-        @type outer_kwargs: dict
         """
         def inner_wrapper(*args, **kwargs):
             """Replacement function.
@@ -1611,9 +1609,7 @@ def deprecated(*args, **kwargs):
             """Replacement function.
 
             @param args: args passed to the decorated function.
-            @type args: list
             @param kwargs: kwargs passed to the decorated function.
-            @type kwargs: dict
             @return: the value returned by the decorated function
             @rtype: any
             """
@@ -1705,9 +1701,7 @@ def deprecated_args(**arg_pairs):
             """Replacement function.
 
             @param __args: args passed to the decorated function
-            @type __args: list
-            @param __kwargs: kwargs passed to the decorated function
-            @type __kwargs: dict
+            @param __kw: kwargs passed to the decorated function
             @return: the value returned by the decorated function
             @rtype: any
             """
@@ -1798,9 +1792,7 @@ def remove_last_args(arg_names):
             """Replacement function.
 
             @param __args: args passed to the decorated function
-            @type __args: list
-            @param __kwargs: kwargs passed to the decorated function
-            @type __kwargs: dict
+            @param __kw: kwargs passed to the decorated function
             @return: the value returned by the decorated function
             @rtype: any
             """
