@@ -54,10 +54,6 @@ used.
 #
 from __future__ import absolute_import, unicode_literals
 
-# Note: the intention is to develop this module (at some point) into a Bot
-# class definition that can be subclassed to create new, functional bot
-# scripts, instead of writing each one from scratch.
-
 __all__ = (
     'CRITICAL', 'ERROR', 'INFO', 'WARNING', 'DEBUG', 'INPUT', 'STDOUT',
     'VERBOSE', 'critical', 'debug', 'error', 'exception', 'log', 'warning',
@@ -81,7 +77,6 @@ __all__ = (
     'WikidataBot',
 )
 
-# Note: all output goes thru python std library "logging" module
 
 import codecs
 import datetime
@@ -126,6 +121,7 @@ from pywikibot.tools._logging import (
 from pywikibot.tools.formatter import color_format
 
 
+# Note: all output goes thru python std library "logging" module
 _logger = 'bot'
 
 if not PY2:

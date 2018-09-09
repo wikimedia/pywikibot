@@ -15,13 +15,6 @@ search paths so the package does not need to be installed, etc.
 #
 from __future__ import absolute_import, print_function, unicode_literals
 
-# The following snippet was developed by Ned Batchelder (and others)
-# for coverage [1], with python 3 support [2] added later,
-# and is available under the BSD license (see [3])
-# [1] https://bitbucket.org/ned/coveragepy/src/b5abcee50dbe/coverage/execfile.py
-# [2] https://bitbucket.org/ned/coveragepy/src/fd5363090034/coverage/execfile.py
-# [3] https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
-
 import os
 import sys
 import types
@@ -75,6 +68,16 @@ def tryimport_pwb():
         import pywikibot
     pwb = pywikibot
 
+
+# The following snippet was developed by Ned Batchelder (and others)
+# for coverage [1], with python 3 support [2] added later,
+# and is available under the BSD license (see [3])
+# [1]
+# https://bitbucket.org/ned/coveragepy/src/b5abcee50dbe/coverage/execfile.py
+# [2]
+# https://bitbucket.org/ned/coveragepy/src/fd5363090034/coverage/execfile.py
+# [3]
+# https://bitbucket.org/ned/coveragepy/src/2c5fb3a8b81c/setup.py?at=default#cl-31
 
 def run_python_file(filename, argv, argvu, package=None):
     """Run a python file as if it were the main program on the command line.
