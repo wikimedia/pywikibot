@@ -442,11 +442,10 @@ def api_feed_repeater(gen, delay=0, repeat=False, namespaces=None,
     """Generator which loads pages details to be processed."""
     while True:
         if recent_new_gen:
-            generator = gen(namespaces=namespaces, user=user,
-                            showPatrolled=False)
+            generator = gen(namespaces=namespaces, user=user, patrolled=False)
         else:
             generator = gen(namespaces=namespaces, user=user,
-                            returndict=True, showPatrolled=False)
+                            returndict=True, patrolled=False)
         for page in generator:
             if recent_new_gen:
                 yield page
