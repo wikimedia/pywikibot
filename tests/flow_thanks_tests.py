@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2017
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,6 +10,7 @@ from __future__ import absolute_import, unicode_literals
 from pywikibot.flow import Topic
 
 from tests.aspects import TestCase
+from tests import unittest
 
 
 NO_THANKABLE_POSTS = 'There is no recent post which can be test thanked.'
@@ -58,3 +59,10 @@ class TestThankFlowPost(TestCase):
         topic = Topic(site, self._topic_title)
         my_reply = topic.reply('My attempt to thank myself.')
         self.assertAPIError('invalidrecipient', None, my_reply.thank)
+
+
+if __name__ == '__main__':  # pragma: no cover
+    try:
+        unittest.main()
+    except SystemExit:
+        pass
