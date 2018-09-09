@@ -4049,14 +4049,14 @@ class APISite(BaseSite):
 
         return legen
 
-    @deprecated_args(returndict=True, nobots=True, rcshow=True,
-                     rctype='changetype', revision=True, repeat=True,
-                     rcstart='start', rcend='end', rcdir=True, step=True,
-                     includeredirects='redirect', namespace='namespaces',
-                     rcnamespace='namespaces', number='total', rclimit='total',
-                     showMinor='minor', showBot='bot', showAnon='anon',
-                     showRedirects='redirect', showPatrolled='patrolled',
-                     topOnly='top_only', pagelist=True)
+    @deprecated_args(nobots=True, includeredirects='redirect',
+                     namespace='namespaces', number='total', pagelist=True,
+                     rcdir=True, rcend='end', rclimit='total',
+                     rcnamespace='namespaces', rcshow=True, rcstart='start',
+                     rctype='changetype', repeat=True, returndict=True,
+                     revision=True, showAnon='anon', showBot='bot',
+                     showMinor='minor', showPatrolled='patrolled',
+                     showRedirects='redirect', step=True, topOnly='top_only')
     def recentchanges(self, *,
                       start=None,
                       end=None,
