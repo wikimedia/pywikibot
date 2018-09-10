@@ -4,8 +4,6 @@ A window with a unicode textfield where the user can edit.
 
 Useful for editing the contents of an article.
 """
-from __future__ import absolute_import, unicode_literals
-
 #
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
@@ -14,6 +12,7 @@ from __future__ import absolute_import, unicode_literals
 #
 # Distributed under the terms of the MIT license.
 #
+from __future__ import absolute_import, unicode_literals
 
 import sys
 
