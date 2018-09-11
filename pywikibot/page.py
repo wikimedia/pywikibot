@@ -2500,13 +2500,11 @@ class FilePage(Page):
 
         Parameters validation and error handling left to the API call.
 
-        @param width: see iiurlwidth in [1]
-        @param height: see iiurlheigth in [1]
-        @param param: see iiurlparam in [1]
-
+        @param url_width: see iiurlwidth in [1]
+        @param url_height: see iiurlheigth in [1]
+        @param url_param: see iiurlparam in [1]
         @return: latest file url or thumburl
         @rtype: unicode
-
         """
         # Plain url is requested.
         if url_width is None and url_height is None and url_param is None:
@@ -5413,12 +5411,7 @@ class FileInfo(DotReadableDict):
     """
 
     def __init__(self, file_revision):
-        """
-        Create class with the dictionary returned by site.loadimageinfo().
-
-        @param page: FilePage containing the image.
-        @type page: FilePage object
-        """
+        """Initiate the class using the dict from L{APISite.loadimageinfo}."""
         self.__dict__.update(file_revision)
         self.timestamp = pywikibot.Timestamp.fromISOformat(self.timestamp)
 
