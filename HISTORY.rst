@@ -4,6 +4,21 @@ Release history
 Current release
 ---------------
 
+* Remove cryptography support from python<=2.7.6 requirements (T203435)
+* textlib._tag_pattern: Do not mistake self-closing tags with start tag (T203568)
+* page.Link.langlinkUnsafe: Always set _namespace to a Namespace object (T203491)
+* Enable Namespace.content for mw < 1.16
+* Allow terminating the bot generator by BaseBot.stop() method (T198801)
+* Allow bot parameter in set_redirect_target
+* Do not show empty error messages (T203462)
+* Show the exception message in async mode (T203448)
+* Fix the extended user-config extraction regex (T145371)
+* Solve UnicodeDecodeError in site.getredirtarget (T126192)
+* Introduce a new APISite property: mw_version
+* Improve hash method for BasePage and Link
+* Avoid applying two uniquifying filters (T199615)
+* Fix skipping of language links in CosmeticChangesToolkit.removeEmptySections (T202629)
+* New mediawiki projects were provided
 * Bugfixes and improvements
 * Localisation updates
 
