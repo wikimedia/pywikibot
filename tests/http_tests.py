@@ -652,8 +652,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         """Test fetch method with no parameters."""
         r = http.fetch(uri=self.url, params={})
         if r.status == 503:  # T203637
-            unittest.skipTest('503: Service currently not available for '
-                              + self.url)
+            self.skipTest(
+                '503: Service currently not available for ' + self.url)
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.text)
@@ -668,8 +668,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         """
         r = http.fetch(uri=self.url, params={'fish&chips': 'delicious'})
         if r.status == 503:  # T203637
-            unittest.skipTest('503: Service currently not available for '
-                              + self.url)
+            self.skipTest(
+                '503: Service currently not available for ' + self.url)
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.text)
@@ -684,8 +684,8 @@ class QueryStringParamsTestCase(HttpbinTestCase):
         """
         r = http.fetch(uri=self.url, params={'fish%26chips': 'delicious'})
         if r.status == 503:  # T203637
-            unittest.skipTest('503: Service currently not available for '
-                              + self.url)
+            self.skipTest(
+                '503: Service currently not available for ' + self.url)
         self.assertEqual(r.status, 200)
 
         content = json.loads(r.text)
