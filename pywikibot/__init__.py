@@ -806,7 +806,7 @@ class WbQuantity(_WbRepresentation):
             self.upperBound = self.lowerBound = None
         else:
             if error is None:
-                self.upperBound = self.lowerBound = Decimal(0)
+                upperError = lowerError = Decimal(0)
             elif isinstance(error, tuple):
                 upperError = self._todecimal(error[0])
                 lowerError = self._todecimal(error[1])
