@@ -312,14 +312,12 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['page'])
         return False
 
+    site = pywikibot.Site()
     if not targetLang and not targetFamily:
-        targetSite = pywikibot.Site('commons', 'commons')
+        targetSite = site.image_repository()
     else:
-        if not targetLang:
-            targetLang = pywikibot.Site().language
-        if not targetFamily:
-            targetFamily = pywikibot.Site().family
-        targetSite = pywikibot.Site(targetLang, targetFamily)
+        targetSite = pywikibot.Site(targetLang or site.lang,
+                                    targetFamily or site.family)
     bot = ImageTransferBot(gen, interwiki=interwiki, targetSite=targetSite,
                            keep_name=keep_name)
     bot.run()
