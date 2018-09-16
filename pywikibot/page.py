@@ -3983,19 +3983,23 @@ class WikibasePage(BasePage):
         self._diff_to('descriptions', 'language', 'value', diffto, data)
 
         aliases = self._normalizeLanguages(self.aliases).copy()
-        if diffto and 'aliases' in diffto:
-            for lang in set(diffto['aliases'].keys()) - set(aliases.keys()):
-                aliases[lang] = []
-        for lang, strings in list(aliases.items()):
-            if diffto and 'aliases' in diffto and lang in diffto['aliases']:
-                empty = len(diffto['aliases'][lang]) - len(strings)
-                if empty > 0:
-                    strings += [''] * empty
-                elif Counter(val['value'] for val
-                             in diffto['aliases'][lang]) == Counter(strings):
-                    del aliases[lang]
-            if lang in aliases:
-                aliases[lang] = [{'language': lang, 'value': i} for i in strings]
+        if diffto:
+            for lang, strings in diffto.get('aliases', {}).items():
+                if len(aliases.get(lang, [])) > 0:
+                    if tuple(sorted(val['value'] for val in strings)) != tuple(
+                            sorted(aliases[lang])):
+                        aliases[lang] = [{'language': lang, 'value': i}
+                                         for i in aliases[lang]]
+                    else:
+                        del aliases[lang]
+                else:
+                    aliases[lang] = [
+                        {'language': lang, 'value': i['value'], 'remove': ''}
+                        for i in strings]
+        else:
+            for lang, values in aliases.items():
+                aliases[lang] = [{'language': lang, 'value': i}
+                                 for i in values]
 
         if aliases:
             data['aliases'] = aliases
@@ -4117,11 +4121,16 @@ class WikibasePage(BasePage):
                     data[prop][key] = {'language': key, 'value': value}
 
         if 'aliases' in data:
+            data['aliases'] = cls._normalizeLanguages(data['aliases'])
             for key, values in data['aliases'].items():
-                if (isinstance(values, list) and
-                        isinstance(values[0], basestring)):
-                    data['aliases'][key] = [{'language': key, 'value': value}
-                                            for value in values]
+                if isinstance(values, list):
+                    strings = []
+                    for value in values:
+                        if isinstance(value, basestring):
+                            strings.append({'language': key, 'value': value})
+                        else:
+                            strings.append(value)
+                    data['aliases'][key] = strings
 
         return data
 

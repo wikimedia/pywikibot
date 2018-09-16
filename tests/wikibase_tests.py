@@ -1626,14 +1626,20 @@ class TestWriteNormalizeData(TestCase):
         """Setup tests."""
         super(TestWriteNormalizeData, self).setUp()
         self.data_out = {
-            'aliases': {'en': [{'language': 'en', 'value': 'Bah'}]},
+            'aliases': {'en': [
+                {'language': 'en', 'value': 'Bah'},
+                {'language': 'en', 'value': 'Bar', 'remove': ''},
+            ]},
             'labels': {'en': {'language': 'en', 'value': 'Foo'}},
         }
 
     def test_normalize_data(self):
         """Test _normalizeData() method."""
         data_in = {
-            'aliases': {'en': ['Bah']},
+            'aliases': {'en': [
+                'Bah',
+                {'language': 'en', 'value': 'Bar', 'remove': ''},
+            ]},
             'labels': {'en': 'Foo'},
         }
 
@@ -1957,6 +1963,10 @@ class TestJSON(WikidataTestCase):
     def test_json_diff(self):
         """Test json diff."""
         del self.wdp.labels['en']
+        self.wdp.aliases['de'].append('New York')
+        self.wdp.aliases['de'].append('foo')
+        self.wdp.aliases['de'].remove('NYC')
+        del self.wdp.aliases['nl']
         del self.wdp.claims['P213']
         expected = {
             'labels': {
@@ -1964,6 +1974,18 @@ class TestJSON(WikidataTestCase):
                     'language': 'en',
                     'value': ''
                 }
+            },
+            'aliases': {
+                'de': [
+                    {'language': 'de', 'value': 'City of New York'},
+                    {'language': 'de', 'value': 'The Big Apple'},
+                    {'language': 'de', 'value': 'New York'},
+                    {'language': 'de', 'value': 'New York'},
+                    {'language': 'de', 'value': 'foo'},
+                ],
+                'nl': [
+                    {'language': 'nl', 'value': 'New York', 'remove': ''},
+                ],
             },
             'claims': {
                 'P213': [
