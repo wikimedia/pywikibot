@@ -460,7 +460,7 @@ class PrimaryIgnoreManager(object):
         """
         self.disambPage = disambPage
         self.enabled = enabled
-        self.ignorelist = []
+        self.ignorelist = set()
 
         folder = config.datafilepath('disambiguations')
         if os.path.exists(folder):
@@ -484,7 +484,7 @@ class PrimaryIgnoreManager(object):
                     line = line.rstrip('\r\n')
                     # skip empty lines
                     if line:
-                        self.ignorelist.append(line)
+                        self.ignorelist.add(line)
         except IOError:
             pass
 
