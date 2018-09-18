@@ -485,13 +485,15 @@ class PrimaryIgnoreManager:
         """
         return self.enabled and refPage.title(as_url=True) in self.ignorelist
 
-    def ignore(self, refPage):
-        """Write page to ignorelist.
+    def ignore(self, page_titles):
+        """Write pages to ignorelist.
 
-        @type refPage: pywikibot.Page
-        @rtype: None
-
+        @param page_titles: page titles to be ignored
+        @type page_titles: iterable
         """
+        # backward compatibility
+        if isinstance(page_titles, pywikibot.Page):
+            page_titles = [page_titles.title(as_url=True)]
         if self.enabled:
             # Skip this occurrence next time.
             filename = config.datafilepath(
@@ -500,7 +502,7 @@ class PrimaryIgnoreManager:
             with suppress(IOError):
                 # Open file for appending. If none exists, create a new one.
                 with codecs.open(filename, 'a', 'utf-8') as f:
-                    f.write(refPage.title(as_url=True) + '\n')
+                    f.write('\n'.join(page_titles) + '\n')
 
 
 class AddAlternativeOption(OutputProxyOption):
@@ -617,6 +619,7 @@ class DisambiguationRobot(SingleSiteBot):
         if generator:
             self.generator = generator
         self.primary = primary
+        self.ignores = set()
         self.main_only = main_only
         self.first_only = first_only
         self.minimum = minimum
@@ -917,7 +920,7 @@ class DisambiguationRobot(SingleSiteBot):
                     if self.primary:
                         # If run with the -primary argument, skip this
                         # occurrence next time.
-                        self.primaryIgnoreManager.ignore(refPage)
+                        self.ignores.add(refPage.title(as_url=True))
                     return 'nextpage'
 
                 if answer == 'g':
@@ -1188,6 +1191,10 @@ or press enter to quit:""")
                     {'from': disambPage.title(),
                      'to': targets,
                      'count': len(new_targets)})
+
+    def teardown(self):
+        """Write ignoring pages to a file."""
+        self.primaryIgnoreManager.ignore(self.ignores)
 
     def treat(self, page) -> None:
         """Work on a single disambiguation page."""
