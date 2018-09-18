@@ -53,6 +53,15 @@ Command line options:
    -main       only check pages in the main namespace, not in the talk,
                wikipedia, user, etc. namespaces.
 
+   -first      Uses only the first link of every line on the disambiguation
+               page that begins with an asterisk. Useful if the page is full
+               of irrelevant links that are not subject to disambiguation.
+               You won't get all af them as options, just the first on each
+               line. For a moderated example see
+               http://en.wikipedia.org/wiki/Szerdahely
+               A really exotic one is
+               http://hu.wikipedia.org/wiki/Brabant_(egyértelműsítő lap)
+
    -start:XY   goes through all disambiguation pages in the category on your
                wiki that is defined (to the bot) as the category containing
                disambiguation pages, starting at XY. If only '-start' or
@@ -618,7 +627,7 @@ class DisambiguationRobot(SingleSiteBot):
     }
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip,
-                 generator, primary, main_only, minimum=0):
+                 generator, primary, main_only, first_only, minimum=0):
         """Initializer."""
         super(DisambiguationRobot, self).__init__()
         self.always = always
@@ -628,6 +637,7 @@ class DisambiguationRobot(SingleSiteBot):
         self.generator = generator
         self.primary = primary
         self.main_only = main_only
+        self.first_only = first_only
         self.minimum = minimum
 
         self.mysite = self.site
@@ -693,6 +703,40 @@ class DisambiguationRobot(SingleSiteBot):
                (\|(?P<label>     [^\]]*))?  \]\]
             (?P<linktrail>%s)''' % linktrail,
                                 flags=re.X)
+
+    @staticmethod
+    def firstlinks(page):
+        """Return a list of first links of every line beginning with *.
+
+        When a disambpage is full of unnecessary links, this may be useful
+        to sort out the relevant links. E.g. from line
+        *[[Jim Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]
+        it returns only 'Jim Smith (smith)'
+        Lines without an asterisk at the beginning will be disregarded.
+        No check for page existence, it has already been done.
+        """
+        links = []
+        reg = re.compile(r'\*.*?\[\[(.*?)(?:\||\]\])')
+        for line in page.get().splitlines():
+            found = reg.match(line)
+            if found:
+                links.append(found.group(1))
+        return links
+
+    def firstize(self, page, links):
+        """Call firstlinks and remove extra links.
+
+        This will remove a lot of silly redundant links from overdecorated
+        disambiguation pages and leave the first link of each asterisked
+        line only. This must be done if -first is used in command line.
+
+        """
+        titles = [firstcap(t) for t in self.firstlinks(page)]
+        links = list(links)
+        for l in links[:]:  # uses a copy because of remove!
+            if l.title() not in titles:
+                links.remove(l)
+        return links
 
     def treat_links(self, refPage, disambPage):
         """Resolve the links to disambPage or its redirects.
@@ -1011,6 +1055,8 @@ class DisambiguationRobot(SingleSiteBot):
                     disambPage2 = pywikibot.Page(
                         pywikibot.Link(disambTitle, self.mysite))
                     links = disambPage2.linkedPages()
+                    if self.first_only:
+                        links = self.firstize(disambPage2, links)
                     links = [correctcap(l, disambPage2.get()) for l in links]
                 except pywikibot.NoPage:
                     pywikibot.output(u"No page at %s, using redirect target."
@@ -1047,6 +1093,8 @@ or press enter to quit:""")
                                 % disambPage.title(),
                                 self.mysite))
                         links = disambPage2.linkedPages()
+                        if self.first_only:
+                            links = self.firstize(disambPage2, links)
                         links = [correctcap(l, disambPage2.get())
                                  for l in links]
                     except pywikibot.NoPage:
@@ -1059,6 +1107,8 @@ or press enter to quit:""")
                 else:
                     try:
                         links = disambPage.linkedPages()
+                        if self.first_only:
+                            links = self.firstize(disambPage, links)
                         links = [correctcap(l, disambPage.get())
                                  for l in links]
                     except pywikibot.NoPage:
@@ -1184,6 +1234,7 @@ def main(*args):
     dnSkip = False
     generator = None
     primary = False
+    first_only = False
     main_only = False
 
     # For sorting the linked pages, case can be ignored
@@ -1222,6 +1273,8 @@ def main(*args):
             dnSkip = True
         elif arg == '-main':
             main_only = True
+        elif arg == '-first':
+            first_only = True
         elif arg.startswith('-min:'):
             minimum = int(arg[5:])
         elif arg.startswith('-start'):
@@ -1247,7 +1300,7 @@ def main(*args):
     site.login()
 
     bot = DisambiguationRobot(always, alternatives, getAlternatives, dnSkip,
-                              generator, primary, main_only,
+                              generator, primary, main_only, first_only,
                               minimum=minimum)
     bot.run()
 
