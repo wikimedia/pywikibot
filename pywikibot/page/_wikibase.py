@@ -40,6 +40,7 @@ from pywikibot.page._collections import (
     ClaimCollection,
     LanguageDict,
     SiteLinkCollection,
+    SubEntityCollection,
 )
 from pywikibot.page._decorators import allow_asynchronous
 from pywikibot.page._pages import BasePage, FilePage
@@ -1854,3 +1855,373 @@ class Claim(Property):
             'value': self._formatValue(),
             'type': self.value_types.get(self.type, self.type)
         }
+
+
+class LexemePage(WikibasePage):
+
+    """Wikibase entity of type 'lexeme'."""
+
+    _cache_attrs = WikibasePage._cache_attrs + (
+        'lemmas', 'language', 'lexicalCategory', 'forms', 'senses',
+    )
+    entity_type = 'lexeme'
+    title_pattern = r'L[1-9]\d*'
+    DATA_ATTRIBUTES = {
+        'lemmas': LanguageDict,
+        'claims': ClaimCollection,
+        # added when defined
+        # 'forms': LexemeFormCollection,
+        # 'senses': LexemeSenseCollection,
+    }
+
+    def __init__(self, site, title=None) -> None:
+        """
+        Initializer.
+
+        :param site: data repository
+        :type site: pywikibot.site.DataSite
+        :param title: identifier of lexeme, "L###",
+            -1 or None for an empty lexeme.
+        :type title: str or None
+        """
+        # Special case for empty lexeme.
+        if title is None or title == '-1':
+            super().__init__(site, '-1', entity_type='lexeme')
+            assert self.id == '-1'
+            return
+
+        # we don't want empty titles
+        if not title:
+            raise InvalidTitleError("Lexeme's title cannot be empty")
+
+        super().__init__(site, title, entity_type='lexeme')
+        assert self.id == self._link.title
+
+    def get_data_for_new_entity(self):
+        """Return data required for creation of a new lexeme."""
+        raise NotImplementedError  # todo
+
+    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+        """
+        Create JSON suitable for Wikibase API.
+
+        When diffto is provided, JSON representing differences
+        to the provided data is created.
+
+        :param diffto: JSON containing entity data
+        """
+        data = super().toJSON(diffto=diffto)
+
+        for prop in ('language', 'lexicalCategory'):
+            value = getattr(self, prop, None)
+            if not value:
+                continue
+            if not diffto or diffto.get(prop) != value.getID():
+                data[prop] = value.getID()
+
+        return data
+
+    def get(self, force=False, get_redirect=False, *args, **kwargs):
+        """
+        Fetch all lexeme data, and cache it.
+
+        :param force: override caching
+        :type force: bool
+        :param get_redirect: return the lexeme content, do not follow the
+            redirect, do not raise an exception.
+        :type get_redirect: bool
+        :raise NotImplementedError: a value in args or kwargs
+        :note: dicts returned by this method are references to content
+            of this entity and their modifying may indirectly cause
+            unwanted change to the live content
+        """
+        data = super().get(force, *args, **kwargs)
+
+        if self.isRedirectPage() and not get_redirect:
+            raise IsRedirectPageError(self)
+
+        # language
+        self.language = None
+        if 'language' in self._content:
+            self.language = ItemPage(self.site, self._content['language'])
+
+        # lexicalCategory
+        self.lexicalCategory = None
+        if 'lexicalCategory' in self._content:
+            self.lexicalCategory = ItemPage(
+                self.site, self._content['lexicalCategory'])
+
+        data['language'] = self.language
+        data['lexicalCategory'] = self.lexicalCategory
+
+        return data
+
+    @classmethod
+    def _normalizeData(cls, data: dict) -> dict:
+        """
+        Helper function to expand data into the Wikibase API structure.
+
+        :param data: The dict to normalize
+        :return: the altered dict from parameter data.
+        """
+        new_data = WikibasePage._normalizeData(data)
+        for prop in ('language', 'lexicalCategory'):
+            value = new_data.get(prop)
+            if value:
+                if isinstance(value, ItemPage):
+                    new_data[prop] = value.getID()
+                else:
+                    new_data[prop] = value
+        return new_data
+
+    @allow_asynchronous
+    def add_form(self, form, **kwargs):
+        """
+        Add a form to the lexeme.
+
+        :param form: The form to add
+        :type form: Form
+        :keyword bot: Whether to flag as bot (if possible)
+        :type bot: bool
+        :keyword asynchronous: if True, launch a separate thread to add form
+            asynchronously
+        :type asynchronous: bool
+        :keyword callback: a callable object that will be called after the
+            claim has been added. It must take two arguments:
+            (1) a LexemePage object, and
+            (2) an exception instance, which will be None if the entity was
+            saved successfully. This is intended for use by bots that need to
+            keep track of which saves were successful.
+        :type callback: callable
+        """
+        if form.on_lexeme is not None:
+            raise ValueError('The provided LexemeForm instance is already '
+                             'used in an entity')
+        data = self.repo.add_form(self, form, **kwargs)
+        form.id = data['form']['id']
+        form.on_lexeme = self
+        form._content = data['form']
+        form.get()
+        self.forms.append(form)
+        self.latest_revision_id = data['lastrevid']
+
+    def remove_form(self, form, **kwargs) -> None:
+        """
+        Remove a form from the lexeme.
+
+        :param form: The form to remove
+        :type form: pywikibot.LexemeForm
+        """
+        data = self.repo.remove_form(form, **kwargs)
+        form.on_lexeme.latest_revision_id = data['lastrevid']
+        form.on_lexeme.forms.remove(form)
+        form.on_lexeme = None
+        form.id = '-1'
+
+    # todo: senses
+
+    def mergeInto(self, lexeme, **kwargs):
+        """
+        Merge the lexeme into another lexeme.
+
+        :param lexeme: The lexeme to merge into
+        :type lexeme: LexemePage
+        """
+        data = self.repo.mergeLexemes(from_lexeme=self, to_lexeme=lexeme,
+                                      **kwargs)
+        if not data.get('success', 0):
+            return
+        self.latest_revision_id = data['from']['lastrevid']
+        lexeme.latest_revision_id = data['to']['lastrevid']
+        if data.get('redirected', 0):
+            self._isredir = True
+            self._redirtarget = lexeme
+
+    def isRedirectPage(self):
+        """Return True if lexeme is redirect, False if not or not existing."""
+        if hasattr(self, '_content') and not hasattr(self, '_isredir'):
+            self._isredir = self.id != self._content.get('id', self.id)
+            return self._isredir
+        return super().isRedirectPage()
+
+
+class LexemeSubEntity(WikibaseEntity):
+
+    """Common super class for LexemeForm and LexemeSense."""
+
+    def __init__(self, repo, id_=None) -> None:
+        """Initializer."""
+        super().__init__(repo, id_)
+        self._on_lexeme = None
+
+    @classmethod
+    def fromJSON(cls, repo, data):
+        new = cls(repo, data['id'])
+        new._content = data
+        return new
+
+    def toJSON(self, diffto=None) -> dict:
+        data = super().toJSON(diffto)
+        if self.id != '-1':
+            data['id'] = self.id
+        return data
+
+    @property
+    def on_lexeme(self) -> LexemePage:
+        if self._on_lexeme is None:
+            lexeme_id = self.id.partition('-')[0]
+            self._on_lexeme = LexemePage(self.repo, lexeme_id)
+        return self._on_lexeme
+
+    @on_lexeme.setter
+    def on_lexeme(self, lexeme):
+        self._on_lexeme = lexeme
+
+    @on_lexeme.deleter
+    def on_lexeme(self):
+        self._on_lexeme = None
+
+    @allow_asynchronous
+    def addClaim(self, claim, **kwargs):
+        """
+        Add a claim to the form.
+
+        :param claim: The claim to add
+        :type claim: Claim
+        :keyword bot: Whether to flag as bot (if possible)
+        :type bot: bool
+        :keyword asynchronous: if True, launch a separate thread to add claim
+            asynchronously
+        :type asynchronous: bool
+        :keyword callback: a callable object that will be called after the
+            claim has been added. It must take two arguments: (1) a Form
+            object, and (2) an exception instance, which will be None if the
+            form was saved successfully. This is intended for use by bots that
+            need to keep track of which saves were successful.
+        :type callback: callable
+        """
+        self.repo.addClaim(self, claim, **kwargs)
+        claim.on_item = self
+
+    def removeClaims(self, claims, **kwargs) -> None:
+        """
+        Remove the claims from the form.
+
+        :param claims: list of claims to be removed
+        :type claims: list or pywikibot.Claim
+        """
+        # this check allows single claims to be removed by pushing them into a
+        # list of length one.
+        if isinstance(claims, pywikibot.Claim):
+            claims = [claims]
+        data = self.repo.removeClaims(claims, **kwargs)
+        for claim in claims:
+            claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+            claim.on_item = None
+            claim.snak = None
+
+
+class LexemeForm(LexemeSubEntity):
+
+    """Wikibase lexeme form."""
+
+    entity_type = 'form'
+    title_pattern = LexemePage.title_pattern + r'-F[1-9]\d*'
+    DATA_ATTRIBUTES = {
+        'representations': LanguageDict,
+        'claims': ClaimCollection,
+    }
+
+    def toJSON(self, diffto: Optional[dict] = None) -> dict:
+        """Create dict suitable for the MediaWiki API."""
+        data = super().toJSON(diffto=diffto)
+
+        key = 'grammaticalFeatures'
+        if getattr(self, key, None):
+            # could also avoid if no change wrt. diffto
+            data[key] = [value.getID() for value in self.grammaticalFeatures]
+
+        return data
+
+    @classmethod
+    def _normalizeData(cls, data):
+        new_data = LexemeSubEntity._normalizeData(data)
+        if 'grammaticalFeatures' in data:
+            value = []
+            for feat in data['grammaticalFeatures']:
+                if isinstance(feat, ItemPage):
+                    value.append(feat.getID())
+                else:
+                    value.append(feat)
+            new_data['grammaticalFeatures'] = value
+        return new_data
+
+    def get(self, force: bool = False) -> dict:
+        """
+        Fetch all form data, and cache it.
+
+        :param force: override caching
+        :note: dicts returned by this method are references to content
+            of this entity and their modifying may indirectly cause
+            unwanted change to the live content
+        """
+        data = super().get(force=force)
+
+        # grammaticalFeatures
+        self.grammaticalFeatures = set()
+        for value in self._content.get('grammaticalFeatures', []):
+            self.grammaticalFeatures.add(ItemPage(self.repo, value))
+
+        data['grammaticalFeatures'] = self.grammaticalFeatures
+
+        return data
+
+    def edit_elements(self, data: dict, **kwargs) -> None:
+        """
+        Update form elements.
+
+        :param data: Data to be saved
+        """
+        if self.id == '-1':
+            # Update only locally
+            if 'representations' in data:
+                self.representations = LanguageDict(data['representations'])
+
+            if 'grammaticalFeatures' in data:
+                self.grammaticalFeatures = set()
+                for value in data['grammaticalFeatures']:
+                    if not isinstance(value, ItemPage):
+                        value = ItemPage(self.repo, value)
+                    self.grammaticalFeatures.add(value)
+        else:
+            data = self._normalizeData(data)
+            updates = self.repo.edit_form_elements(self, data, **kwargs)
+            self._content = updates['form']
+
+
+class LexemeSense(LexemeSubEntity):
+
+    """Wikibase lexeme sense."""
+
+    entity_type = 'sense'
+    title_pattern = LexemePage.title_pattern + r'-S[1-9]\d*'
+    DATA_ATTRIBUTES = {
+        'glosses': LanguageDict,
+        'claims': ClaimCollection,
+    }
+
+
+class LexemeFormCollection(SubEntityCollection):
+
+    type_class = LexemeForm
+
+
+class LexemeSenseCollection(SubEntityCollection):
+
+    type_class = LexemeSense
+
+
+LexemePage.DATA_ATTRIBUTES.update({
+    'forms': LexemeFormCollection,
+    'senses': LexemeSenseCollection,
+})
