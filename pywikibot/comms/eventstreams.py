@@ -30,7 +30,7 @@ except ImportError as e:
     EventSource = e
 
 from pywikibot import config, debug, Site, warning
-from pywikibot.tools import StringTypes
+from pywikibot.tools import deprecated_args, StringTypes
 
 # requests >= 2.9 is required for eventstreams (T184713)
 if LooseVersion(requests.__version__) < LooseVersion('2.9'):
@@ -75,21 +75,27 @@ class EventStreams(object):
     >>> del stream
     """
 
+    @deprecated_args(stream='streams')
     def __init__(self, **kwargs):
         """Initializer.
 
         @keyword site: a project site object. Used when no url is given
         @type site: APISite
-        @keyword stream: event stream type. Used when no url is given.
-        @type stream: str
+        @keyword streams: event stream types. Mandatory when no url is given.
+            Multiple streams may be given as a string with comma separated
+            stream types or an iterable of strings
+            Refer https://stream.wikimedia.org/?doc for available
+            wikimedia stream types.
+        @type streams: str or iterable
         @keyword timeout: a timeout value indication how long to wait to send
             data before giving up
         @type timeout: int, float or a tuple of two values of int or float
         @keyword url: an url retrieving events from. Will be set up to a
-            default url using _site.family settings and streamtype
+            default url using _site.family settings and stream types
         @type url: str
         @param kwargs: keyword arguments passed to SSEClient and requests lib
         @raises ImportError: sseclient is not installed
+        @raises NotImplementedError: no stream types specified
         """
         if isinstance(EventSource, Exception):
             raise ImportError('sseclient is required for EventStreams;\n'
@@ -97,7 +103,9 @@ class EventStreams(object):
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
         self._site = kwargs.pop('site', Site())
-        self._stream = kwargs.pop('stream', None)
+        self._streams = kwargs.pop('streams', None)
+        if self._streams and not isinstance(self._streams, StringTypes):
+            self._streams = ','.join(self._streams)
         self._url = kwargs.get('url') or self.url
         kwargs.setdefault('url', self._url)
         kwargs.setdefault('timeout', config.socket_timeout)
@@ -108,8 +116,8 @@ class EventStreams(object):
         kwargs = self.sse_kwargs.copy()
         if self._site != Site():
             kwargs['site'] = self._site
-        if self._stream:
-            kwargs['stream'] = self._stream
+        if self._streams:
+            kwargs['streams'] = self._streams
             kwargs.pop('url')
         if kwargs['timeout'] == config.socket_timeout:
             kwargs.pop('timeout')
@@ -120,16 +128,16 @@ class EventStreams(object):
     def url(self):
         """Get the EventStream's url.
 
-        @raises NotImplementedError: streamtype is not specified
+        @raises NotImplementedError: no stream types specified
         """
         if not hasattr(self, '_url'):
-            if self._stream is None:
+            if self._streams is None:
                 raise NotImplementedError(
-                    'No stream specified for class {0}'
+                    'No streams specified for class {0}'
                     .format(self.__class__.__name__))
             self._url = ('{0}{1}/{2}'.format(self._site.eventstreams_host(),
                                              self._site.eventstreams_path(),
-                                             self._stream))
+                                             self._streams))
         return self._url
 
     def set_maximum_items(self, value):
