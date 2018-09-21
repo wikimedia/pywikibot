@@ -715,13 +715,11 @@ class DisambiguationRobot(SingleSiteBot):
         Lines without an asterisk at the beginning will be disregarded.
         No check for page existence, it has already been done.
         """
-        links = []
         reg = re.compile(r'\*.*?\[\[(.*?)(?:\||\]\])')
-        for line in page.get().splitlines():
+        for line in page.text.splitlines():
             found = reg.match(line)
             if found:
-                links.append(found.group(1))
-        return links
+                yield found.group(1)
 
     def firstize(self, page, links):
         """Call firstlinks and remove extra links.
@@ -729,9 +727,8 @@ class DisambiguationRobot(SingleSiteBot):
         This will remove a lot of silly redundant links from overdecorated
         disambiguation pages and leave the first link of each asterisked
         line only. This must be done if -first is used in command line.
-
         """
-        titles = [firstcap(t) for t in self.firstlinks(page)]
+        titles = {firstcap(t) for t in self.firstlinks(page)}
         links = list(links)
         for l in links[:]:  # uses a copy because of remove!
             if l.title() not in titles:
