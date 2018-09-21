@@ -5,7 +5,7 @@ Script to copy images to Wikimedia Commons, or to another wiki.
 
 Syntax:
 
-    python pwb.py imagetransfer pagename [-interwiki] [-tolang:x] [-tofamily:y]
+    python pwb.py imagetransfer {<pagename>|<generator>} [<options>]
 
 Arguments:
 
@@ -24,6 +24,8 @@ If pagename is an image description page, offers to copy the image to the
 target site. If it is a normal page, it will offer to copy any of the images
 used on that page, or if the -interwiki argument is used, any of the images
 used on a page reachable via interwiki links.
+
+&params;
 """
 #
 # (C) Andre Engels, 2004
@@ -40,6 +42,11 @@ import pywikibot
 
 from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.specialbots import UploadRobot
+
+
+docuReplacements = {
+    '&params;': pagegenerators.parameterHelp
+}
 
 
 nowCommonsTemplate = {
@@ -309,7 +316,9 @@ def main(*args):
 
     gen = generator_factory.getCombinedGenerator()
     if not gen:
-        pywikibot.bot.suggest_help(missing_parameters=['page'])
+        pywikibot.bot.suggest_help(
+            missing_parameters=['page'],
+            additional_text='and no other generator was defined.')
         return False
 
     site = pywikibot.Site()
