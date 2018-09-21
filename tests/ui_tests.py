@@ -24,7 +24,7 @@
 #     easy_install --upgrade https://pywinauto.googlecode.com/files/pywinauto-0.4.2.zip
 #
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import inspect
 import io

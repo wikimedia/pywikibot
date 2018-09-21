@@ -34,7 +34,8 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 
 import codecs
 import json

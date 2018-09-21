@@ -22,7 +22,7 @@ Todo: The following rules can be added in the future:
 # Distributed under the terms of the MIT license.
 #
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from re import compile as re_compile, IGNORECASE
 from subprocess import check_output

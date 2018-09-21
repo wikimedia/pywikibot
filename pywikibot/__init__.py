@@ -5,7 +5,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 __version__ = __release__ = '3.1.dev0'
 __url__ = 'https://www.mediawiki.org/wiki/Manual:Pywikibot'

@@ -15,7 +15,7 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import os
 from os.path import abspath, dirname, join

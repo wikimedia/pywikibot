@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Tests for scripts/interwikidata.py."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 

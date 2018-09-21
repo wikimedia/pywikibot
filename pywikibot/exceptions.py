@@ -85,7 +85,7 @@ UserWarning: warnings targetted at users
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from pywikibot.tools import (
     # __ to avoid conflict with ModuleDeprecationWrapper._deprecated

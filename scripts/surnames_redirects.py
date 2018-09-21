@@ -20,7 +20,7 @@ Example: "python pwb.py surnames_redirects -start:B"
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from difflib import SequenceMatcher
 

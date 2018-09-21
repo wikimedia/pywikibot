@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Bot tests for input_choice options."""
 #
-# (C) Pywikibot team, 2015-2017
+# (C) Pywikibot team, 2015-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from pywikibot import bot, bot_choice
 
