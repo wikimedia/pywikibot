@@ -1066,24 +1066,27 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     @param additional_text: Additional text added to the end.
     @type additional_text: str
     """
+    messages = []
     if exception:
-        additional_text = ('An error occured: "{0}"'.format(exception) +
-                           additional_text)
+        messages.append('An error occured: "{}".'.format(exception))
     if missing_generator:
-        additional_text = ('Unable to execute script because no generator was '
-                           'defined.\n' + additional_text)
+        messages.append(
+            'Unable to execute script because no generator was defined.')
     if missing_parameters:
-        additional_text = 'Missing parameter(s) "{0}"\n'.format(
-            '", "'.join(missing_parameters)) + additional_text
+        messages.append('Missing parameter{s} "{params}".'
+                        .format(s='s' if len(missing_parameters) > 1 else '',
+                                params='", "'.join(missing_parameters)))
     if missing_action:
-        additional_text = 'No action defined.\n' + additional_text
+        messages.append('No action defined.')
     if unknown_parameters:
-        additional_text = 'Unknown parameter(s) "{0}"\n'.format(
-            '", "'.join(unknown_parameters)) + additional_text
+        messages.append('Unknown parameter{s} "{params}".'
+                        .format(s='s' if len(unknown_parameters) > 1 else '',
+                                params='", "'.join(unknown_parameters)))
     if additional_text:
-        if not additional_text.endswith('\n'):
-            additional_text += '\n'
-        error(additional_text + 'Use -help for further information.')
+        messages.append(additional_text.strip())
+    if messages:
+        messages.append('Use -help for further information.')
+        error('\n'.join(messages))
 
 
 def writeToCommandLogFile():
