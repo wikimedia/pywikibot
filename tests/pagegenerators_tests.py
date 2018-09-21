@@ -959,40 +959,6 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         self.assertIsNotNone(gen)
         self.assertPagesInNamespaces(gen, 1)
 
-    def test_newpages_default(self):
-        """Test newpages generator."""
-        gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-newpages:60')
-        gen = gf.getCombinedGenerator()
-        self.assertIsNotNone(gen)
-        pages = set(gen)
-        self.assertLessEqual(len(pages), 60)
-
-        newpages_url = self.site.base_url(self.site.path() + '?title=Special:NewPages&uselang=en')
-        failure_message = 'No new pages returned by -newpages. ' \
-            'If this is the only failure, check whether {url} contains any pages. ' \
-            'If not, create a new page on the site to make the test pass again.' \
-            .format(url=newpages_url)
-
-        self.assertGreater(len(pages), 0, failure_message)
-
-    def test_newpages_ns_default(self):
-        """Test newpages generator with limit argument."""
-        gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-newpages:10')
-        gen = gf.getCombinedGenerator()
-        self.assertIsNotNone(gen)
-        self.assertPagesInNamespaces(gen, 0)
-
-    def test_newpages_ns(self):
-        """Test newpages generator with limit argument and namespace filter."""
-        gf = pagegenerators.GeneratorFactory(site=self.site)
-        gf.handleArg('-ns:1')
-        gf.handleArg('-newpages:10')
-        gen = gf.getCombinedGenerator()
-        self.assertIsNotNone(gen)
-        self.assertPagesInNamespaces(gen, 1)
-
     def test_recentchanges_timespan(self):
         """Test recentchanges generator with offset and duration params."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
@@ -1216,6 +1182,78 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 'The site {0} does not use Linter extension'.format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
+
+
+class TestFactoryGeneratorNewpages(TestCase):
+
+    """Test pagegenerators.GeneratorFactory for newpages."""
+
+    # Detached from TestFactoryGenerator due to T159029
+
+    sites = {
+        'eswiki': {
+            'family': 'wikipedia',
+            'code': 'es',
+        },
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+        },
+        'ruwikt': {
+            'family': 'wiktionary',
+            'code': 'ru',
+        },
+        'meta': {
+            'family': 'meta',
+            'code': 'meta',
+        },
+        'frsource': {
+            'family': 'wikisource',
+            'code': 'fr',
+        },
+        'devoy': {
+            'family': 'wikivoyage',
+            'code': 'de',
+        },
+    }
+
+    def test_newpages_default(self, key):
+        """Test newpages generator."""
+        site = self.get_site(key)
+        gf = pagegenerators.GeneratorFactory(site=site)
+        gf.handleArg('-newpages:60')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = set(gen)
+        self.assertLessEqual(len(pages), 60)
+
+        newpages_url = self.site.base_url(
+            self.site.path() + '?title=Special:NewPages&uselang=en')
+        failure_message = 'No new pages returned by -newpages. ' \
+            'If this is the only failure, check whether {url} contains any ' \
+            'pages. If not, create a new page on the site to make the test ' \
+            'pass again.'.format(url=newpages_url)
+
+        self.assertGreater(len(pages), 0, failure_message)
+
+    def test_newpages_ns_default(self, key):
+        """Test newpages generator with limit argument."""
+        site = self.get_site(key)
+        gf = pagegenerators.GeneratorFactory(site=site)
+        gf.handleArg('-newpages:10')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespaces(gen, 0)
+
+    def test_newpages_ns(self, key):
+        """Test newpages generator with limit argument and namespace filter."""
+        site = self.get_site(key)
+        gf = pagegenerators.GeneratorFactory(site=site)
+        gf.handleArg('-ns:1')
+        gf.handleArg('-newpages:10')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        self.assertPagesInNamespaces(gen, 1)
 
 
 class TestFactoryGeneratorWikibase(WikidataTestCase):
