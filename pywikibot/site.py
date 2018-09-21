@@ -901,6 +901,8 @@ class BaseSite(ComparableMixin):
             return getattr(self.__class__, attr)
         try:
             method = getattr(self.family, attr)
+            if not callable(method):
+                raise AttributeError
             f = functools.partial(method, self.code)
             if hasattr(method, "__doc__"):
                 f.__doc__ = method.__doc__
