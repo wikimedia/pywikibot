@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """Wikibase data type classes."""
 #
-# (C) Pywikibot team, 2013-2017
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import json
 

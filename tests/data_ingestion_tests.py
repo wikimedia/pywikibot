@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 """Unit tests for data_ingestion.py script."""
 #
-# (C) Pywikibot team, 2012-2016
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from scripts import data_ingestion
 

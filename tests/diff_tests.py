@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 """Test diff module."""
 #
-# (C) Pywikibot team, 2016-2017
+# (C) Pywikibot team, 2016-2018
 #
 # Distributed under the terms of the MIT license.
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from pywikibot.diff import cherry_pick, html_comparator, PatchManager
 from pywikibot.tools import PY2

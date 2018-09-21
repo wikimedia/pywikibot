@@ -46,7 +46,7 @@ Please check every article you change.
 #
 # Automatically ported from compat branch by compat2core.py script
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import re
 

@@ -11,7 +11,7 @@ http://python-irclib.sourceforge.net/
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 # Note: the intention is to develop this module (at some point) into a Bot
 # class definition that can be subclassed to create new, functional bot

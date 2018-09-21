@@ -32,12 +32,12 @@ Lists all the category pages that transclude {{cfd}} and {{cfdu}}:
 
 """
 #
-# (C) Pywikibot team, 2006-2017
-# (C) xqt, 2009-2016
+# (C) Pywikibot team, 2006-2018
+# (C) xqt, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import datetime
 

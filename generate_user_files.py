@@ -6,7 +6,7 @@
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import codecs
 from collections import namedtuple
@@ -168,7 +168,7 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
 
 
 EXTENDED_CONFIG = """# -*- coding: utf-8 -*-
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 # This is an automatically generated file. You can find more configuration
 # parameters in 'config.py' file.
@@ -218,12 +218,13 @@ mylang = '{main_code}'
 
 {config_text}"""
 
-SMALL_CONFIG = ('# -*- coding: utf-8 -*-\n'
-                'from __future__ import absolute_import, unicode_literals\n'
-                "family = '{main_family}'\n"
-                "mylang = '{main_code}'\n"
-                '{usernames}\n'
-                '{botpasswords}\n')
+SMALL_CONFIG = """# -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, unicode_literals
+family = '{main_family}'
+mylang = '{main_code}'
+{usernames}
+{botpasswords}
+"""
 
 PASSFILE_CONFIG = """# This is an automatically generated file used to store
 # BotPasswords.

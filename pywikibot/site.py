@@ -10,7 +10,7 @@ groups of wikis on the same topic in different languages.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import copy
 import datetime

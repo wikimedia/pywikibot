@@ -22,7 +22,7 @@ inspired by https://en.wikisource.org/wiki/MediaWiki:Gadget-ocr.js
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from functools import partial
 import json

@@ -27,7 +27,7 @@ Furthermore, the following command line parameters are supported:
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import unicode_literals, absolute_import
+from __future__ import unicode_literals, division, absolute_import
 
 import pywikibot
 

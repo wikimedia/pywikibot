@@ -140,7 +140,7 @@ Configuration parameters:
 
 Please do not commit this to the Git repository!
 \"\"\"
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from pywikibot import family
 from pywikibot.tools import deprecated

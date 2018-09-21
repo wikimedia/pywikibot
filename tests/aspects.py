@@ -11,7 +11,8 @@ mixin to show cache usage is included.
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, print_function, unicode_literals
+from __future__ import (absolute_import, division,
+                        print_function, unicode_literals)
 import inspect
 import itertools
 import os

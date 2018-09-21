@@ -10,7 +10,7 @@ Their usage is deprecated and this module could be dropped soon.
 # Distributed under the terms of the MIT license.
 #
 
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from difflib import _format_range_unified
 import logging

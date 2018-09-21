@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """CGI user interface."""
 #
-# (C) Pywikibot team, 2007-2015
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 import sys
 

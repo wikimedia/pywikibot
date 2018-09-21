@@ -5,11 +5,11 @@ Tests for LoginManager classes.
 e.g. used to test password-file based login.
 """
 #
-# (C) Pywikibot team, 2012-2017
+# (C) Pywikibot team, 2012-2018
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import, division, unicode_literals
 
 from collections import defaultdict
 from io import StringIO
