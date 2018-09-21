@@ -812,6 +812,20 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     """Test pagegenerators.GeneratorFactory."""
 
+    def test_combined_generator(self):
+        """Test getCombinedGenerator with generator parameter."""
+        gf = pagegenerators.GeneratorFactory()
+        gen = gf.getCombinedGenerator(gen='ABC')
+        self.assertEqual(tuple(gen), ('A', 'B', 'C'))
+
+    def test_intersect_generator(self):
+        """Test getCombinedGenerator with generator parameter."""
+        gf = pagegenerators.GeneratorFactory()
+        gf.handleArg('-intersect')
+        gf.gens = ['Python 3.7-dev']
+        gen = gf.getCombinedGenerator(gen='Pywikibot 3.0.dev')
+        self.assertEqual(''.join(gen), 'Pyot 3.dev')
+
     def test_ns(self):
         """Test namespace option."""
         gf = pagegenerators.GeneratorFactory()
