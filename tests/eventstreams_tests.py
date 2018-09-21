@@ -46,7 +46,7 @@ class TestEventStreamsUrlTests(TestCase):
     def test_url_from_site(self, key):
         """Test EventStreams with url from site."""
         site = self.get_site(key)
-        stream = 'recentchanges'
+        stream = 'recentchange'
         e = EventStreams(site=site, stream=stream)
         self.assertEqual(
             e._url, 'https://stream.wikimedia.org/v2/stream/' + stream)
@@ -70,7 +70,7 @@ class TestEventStreamsStreamTests(DefaultSiteTestCase):
                 "Family '{0}' of site '{1}' is not a WikimediaFamily."
                 .format(fam, site))
 
-        stream = 'recentchanges'
+        stream = 'recentchange'
         e = EventStreams(stream=stream)
         self.assertEqual(
             e._url, 'https://stream.wikimedia.org/v2/stream/' + stream)
