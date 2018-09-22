@@ -255,7 +255,7 @@ def init_handlers(strm=None):
     This function must be called before using pywikibot.output(); and must
     be called again if the destination stream is changed.
 
-    Note: this function is called by handleArgs(), so it should normally
+    Note: this function is called by handle_args(), so it should normally
     not need to be called explicitly
 
     All user output is routed through the logging module.
@@ -375,7 +375,7 @@ def writelogheader():
     # script call time stamp
     log(u'DATE: %s UTC' % str(datetime.datetime.utcnow()))
 
-    # new framework release/revision? (handleArgs needs to be called first)
+    # new framework release/revision? (handle_args needs to be called first)
     try:
         log(u'VERSION: %s' %
             version.getversion(online=config.log_pywiki_repo_version).strip())
