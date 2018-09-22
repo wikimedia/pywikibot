@@ -28,6 +28,8 @@ If action is "add", the following options are supported:
 
 Options for "listify" action:
 
+ * -append      - This appends the list to the current page that is already
+                  existing (appending to the bottom by default).
  * -overwrite   - This overwrites the current page with the list even if
                   something is already there.
  * -showimages  - This displays images rather than linking them in the list.
@@ -903,11 +905,12 @@ class CategoryListifyRobot(object):
 
     """Create a list containing all of the members in a category."""
 
-    def __init__(self, catTitle, listTitle, editSummary, overwrite=False,
-                 showImages=False, subCats=False, talkPages=False,
-                 recurse=False):
+    def __init__(self, catTitle, listTitle, editSummary, append=False,
+                 overwrite=False, showImages=False, subCats=False,
+                 talkPages=False, recurse=False):
         """Initializer."""
         self.editSummary = editSummary
+        self.append = append
         self.overwrite = overwrite
         self.showImages = showImages
         self.site = pywikibot.Site()
@@ -945,13 +948,18 @@ class CategoryListifyRobot(object):
                                      article.toggleTalkPage().title())
                 else:
                     listString += "*[[:%s]]\n" % article.title()
-        if self.list.exists() and not self.overwrite:
-            pywikibot.output(
-                'Page {} already exists, aborting.\n'
-                'Use -overwrite option to overwrite the output page.'
-                .format(self.list.title()))
-        else:
-            self.list.put(listString, summary=self.editSummary)
+        if self.list.exists():
+            if self.append:
+                # append content by default at the bottom
+                listString = self.list.text + '\n' + listString
+                pywikibot.output('Category list appending...')
+            elif not self.overwrite:
+                pywikibot.output(
+                    'Page {} already exists, aborting.\n'
+                    'Use -overwrite option to overwrite the output page.'
+                    .format(self.list.title()))
+                return
+        self.list.put(listString, summary=self.editSummary)
 
 
 class CategoryTidyRobot(Bot, CategoryPreprocess):
@@ -1332,6 +1340,7 @@ def main(*args):
     batch = False
     summary = ''
     inplace = False
+    append = False
     overwrite = False
     showimages = False
     talkpages = False
@@ -1391,6 +1400,8 @@ def main(*args):
             inplace = True
         elif option == 'nodelsum':
             use_deletion_summary = False
+        elif option == 'append':
+            append = True
         elif option == 'overwrite':
             overwrite = True
         elif option == 'showimages':
@@ -1505,7 +1516,7 @@ def main(*args):
             new_cat_title = pywikibot.input(
                 u'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
-                                   overwrite, showimages, subCats=True,
+                                   append, overwrite, showimages, subCats=True,
                                    talkPages=talkpages, recurse=recurse)
 
     if bot:
