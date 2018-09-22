@@ -4002,6 +4002,8 @@ class APISite(BaseSite):
         elif endsort:
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'endsort'")
+        if content and self.mw_version >= '1.32':
+            cmargs['rvslots'] = '*'
 
         return self._generator(api.PageGenerator, namespaces=namespaces,
                                total=total, g_content=content, **cmargs)
