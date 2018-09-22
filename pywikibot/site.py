@@ -2321,16 +2321,23 @@ class APISite(BaseSite):
 
     @need_extension('Echo')
     def notifications(self, **kwargs):
-        """Yield Notification objects from the Echo extension."""
+        """Yield Notification objects from the Echo extension.
+
+        keyword format: If specified, notifications will be returned formatted
+            this way. Its value is either 'model', 'special' or None. Default
+            is 'special'.
+        type format: str or None
+
+        Refer API reference for other keywords.
+        """
         params = {
             'action': 'query',
             'meta': 'notifications',
-            'notprop': 'list',
-            'notformat': 'text',
+            'notformat': 'special',
         }
 
-        for key in kwargs:
-            params['not' + key] = kwargs[key]
+        for key, value in kwargs.items():
+            params['not' + key] = value
 
         data = self._simple_request(**params).submit()
         notifications = data['query']['notifications']['list']
