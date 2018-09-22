@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20180922
+------------
+
 * Enable multiple streams for EventStreams (T205114)
 * Fix Wikibase aliases handling (T194512)
 * Remove cryptography support from python<=2.7.6 requirements (T203435)
