@@ -312,6 +312,7 @@ def init_handlers(strm=None):
             warnings.filterwarnings("always")
         elif config.verbose_output:
             warnings.filterwarnings("module")
+        warnings.filterwarnings('once', category=FutureWarning)
 
     root_logger.handlers = []  # remove any old handlers
 
