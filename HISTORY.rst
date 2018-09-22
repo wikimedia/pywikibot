@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* Enable multiple streams for EventStreams (T205114)
+* Fix Wikibase aliases handling (T194512)
 * Remove cryptography support from python<=2.7.6 requirements (T203435)
 * textlib._tag_pattern: Do not mistake self-closing tags with start tag (T203568)
 * page.Link.langlinkUnsafe: Always set _namespace to a Namespace object (T203491)
