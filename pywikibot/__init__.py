@@ -306,7 +306,7 @@ class Coordinate(_WbRepresentation):
         if globe:
             globe = globe.lower()
         elif not globe_item:
-            globe = site.default_globe()
+            globe = self.site.default_globe()
         self.globe = globe
 
     @property
