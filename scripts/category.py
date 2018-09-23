@@ -159,17 +159,17 @@ cfd_templates = {
     'wikipedia': {
         'cs': ['přesunout', 'přejmenovat', 'přejmenovat kategorii',
                'přesunout kategorii', 'přejmenování kategorie'],
-        'en': [u'cfd', u'cfr', u'cfru', u'cfr-speedy', u'cfm', u'cfdu'],
-        'fi': [u'roskaa', u'poistettava', u'korjattava/nimi',
-               u'yhdistettäväLuokka'],
+        'en': ['cfd', 'cfr', 'cfru', 'cfr-speedy', 'cfm', 'cfdu'],
+        'fi': ['roskaa', 'poistettava', 'korjattava/nimi',
+               'yhdistettäväLuokka'],
         'fr': ['renommage de catégorie demandé'],
-        'he': [u'הצבעת מחיקה', u'למחוק'],
-        'nl': [u'categorieweg', u'catweg', u'wegcat', u'weg2'],
+        'he': ['הצבעת מחיקה', 'למחוק'],
+        'nl': ['categorieweg', 'catweg', 'wegcat', 'weg2'],
         # For testing purposes
-        'test': [u'delete']
+        'test': ['delete']
     },
     'commons': {
-        'commons': [u'cfd', u'move']
+        'commons': ['cfd', 'move']
     }
 }
 
@@ -379,8 +379,8 @@ class CategoryDatabase(object):
         elif not os.path.isabs(filename):
             filename = config.datafilepath(filename)
         if self.is_loaded and (self.catContentDB or self.superclassDB):
-            pywikibot.output(u'Dumping to %s, please wait...'
-                             % config.shortpath(filename))
+            pywikibot.output('Dumping to {}, please wait...'
+                             .format(config.shortpath(filename)))
             databases = {
                 'catContentDB': self.catContentDB,
                 'superclassDB': self.superclassDB
@@ -397,8 +397,8 @@ class CategoryDatabase(object):
             except EnvironmentError:
                 pass
             else:
-                pywikibot.output(u'Database is empty. %s removed'
-                                 % config.shortpath(filename))
+                pywikibot.output('Database is empty. {} removed'
+                                 .format(config.shortpath(filename)))
 
 
 class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
@@ -462,13 +462,13 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
         old_text = text
         cats = textlib.getCategoryLinks(
             text, self.current_page.site, include=self.includeonly)
-        pywikibot.output(u"Current categories:")
+        pywikibot.output('Current categories:')
         for cat in cats:
-            pywikibot.output(u"* %s" % cat.title())
+            pywikibot.output('* ' + cat.title())
         catpl = pywikibot.Category(self.current_page.site, self.newcat)
         if catpl in cats:
-            pywikibot.output(u"%s is already in %s."
-                             % (self.current_page.title(), catpl.title()))
+            pywikibot.output('{} is already in {}.'
+                             .format(self.current_page.title(), catpl.title()))
         else:
             if self.sort:
                 catpl = self.sorted_by_last_name(catpl, self.current_page)
@@ -509,9 +509,9 @@ class CategoryAddBot(MultipleSitesBot, CategoryPreprocess):
                 self.userPut(self.current_page, old_text, text,
                              summary=comment)
             except pywikibot.PageSaveRelatedError as error:
-                pywikibot.output(u'Page %s not saved: %s'
-                                 % (self.current_page.title(as_link=True),
-                                    error))
+                pywikibot.output('Page {} not saved: {}'
+                                 .format(self.current_page.title(as_link=True),
+                                         error))
 
 
 class CategoryMoveRobot(CategoryPreprocess):
@@ -755,15 +755,15 @@ class CategoryMoveRobot(CategoryPreprocess):
         """Return if the old page can be safely moved to the new page."""
         move_possible = True
         if new_page and new_page.exists():
-            pywikibot.warning(u"The {0} target '{1}' already "
-                              u"exists.".format(name, new_page.title()))
+            pywikibot.warning("The {0} target '{1}' already exists."
+                              .format(name, new_page.title()))
             move_possible = False
         if not old_page.exists():
             # only warn if not a talk page
             log = (pywikibot.log if old_page.namespace() % 2 else
                    pywikibot.warning)
-            log(u"Moving {0} '{1}' requested, but the page doesn't "
-                u"exist.".format(name, old_page.title()))
+            log("Moving {0} '{1}' requested, but the page doesn't exist."
+                .format(name, old_page.title()))
             move_possible = False
         return move_possible
 
@@ -804,7 +804,7 @@ class CategoryMoveRobot(CategoryPreprocess):
         # Remove all language-specified, non substed CFD templates
         site_templates = i18n.translate(self.site, cfd_templates) or ()
         for template_name in site_templates:
-            match = re.compile(r"{{%s.*?}}" % template_name, re.IGNORECASE)
+            match = re.compile(r'{{%s.*?}}' % template_name, re.IGNORECASE)
             self.newcat.text = match.sub('', self.newcat.text)
         # Remove leading whitespace
         self.newcat.text = self.newcat.text.lstrip()
@@ -851,8 +851,8 @@ class CategoryMoveRobot(CategoryPreprocess):
         history = self.oldcat.getVersionHistoryTable()
         title = i18n.twtranslate(self.site, 'category-section-title',
                                  {'oldcat': self.oldcat.title()})
-        self.newtalk.text = "%s\n== %s ==\n%s" % (self.newtalk.text,
-                                                  title, history)
+        self.newtalk.text = '{}\n== {} ==\n{}'.format(self.newtalk.text,
+                                                      title, history)
         comment = i18n.twtranslate(self.site, 'category-version-history',
                                    {'oldcat': self.oldcat.title()})
         self.newtalk.save(comment)
@@ -936,18 +936,16 @@ class CategoryListifyRobot(object):
             if (not article.is_filepage() or
                     self.showImages) and not article.is_categorypage():
                 if self.talkPages and not article.isTalkPage():
-                    listString += "*[[%s]] -- [[%s|talk]]\n" \
-                                  % (article.title(),
-                                     article.toggleTalkPage().title())
+                    listString += '* [[{0}]] -- [[{1}|talk]]\n'.format(
+                        article.title(), article.toggleTalkPage().title())
                 else:
-                    listString += "*[[%s]]\n" % article.title()
+                    listString += '* [[{0}]]\n'.format(article.title())
             else:
                 if self.talkPages and not article.isTalkPage():
-                    listString += "*[[:%s]] -- [[%s|talk]]\n" \
-                                  % (article.title(),
-                                     article.toggleTalkPage().title())
+                    listString += '* [[:{0}]] -- [[{1}|talk]]\n'.format(
+                        article.title(), article.toggleTalkPage().title())
                 else:
-                    listString += "*[[:%s]]\n" % article.title()
+                    listString += '* [[:{0}]]\n'.format(article.title())
         if self.list.exists():
             if self.append:
                 # append content by default at the bottom
@@ -1275,9 +1273,9 @@ class CategoryTreeRobot(object):
             * parent - the Category of the category we're coming from
 
         """
-        result = u'#' * currentDepth
+        result = '#' * currentDepth
         if currentDepth > 0:
-            result += u' '
+            result += ' '
         result += cat.title(as_link=True, textlink=True, with_ns=False)
         result += ' (%d)' % cat.categoryinfo['pages']
         if currentDepth < self.maxDepth // 2:
@@ -1319,7 +1317,7 @@ class CategoryTreeRobot(object):
         tree = self.treeview(cat)
         pywikibot.output(u'')
         if self.filename:
-            pywikibot.output(u'Saving results in %s' % self.filename)
+            pywikibot.output('Saving results in ' + self.filename)
             with codecs.open(self.filename, 'a', 'utf-8') as f:
                 f.write(tree)
         else:
@@ -1445,7 +1443,7 @@ def main(*args):
     if action == 'add':
         if not to_given:
             new_cat_title = pywikibot.input(
-                u'Category to add (do not give namespace):')
+                'Category to add (do not give namespace):')
         if not gen:
             # default for backwards compatibility
             gen_factory.handleArg('-links')
@@ -1475,10 +1473,10 @@ def main(*args):
     elif action == 'move':
         if not from_given:
             old_cat_title = pywikibot.input(
-                u'Please enter the old name of the category:')
+                'Please enter the old name of the category:')
         if not to_given:
             new_cat_title = pywikibot.input(
-                u'Please enter the new name of the category:')
+                'Please enter the new name of the category:')
         if use_deletion_summary:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
         else:
@@ -1503,7 +1501,7 @@ def main(*args):
                                 summary)
     elif action == 'tree':
         catTitle = pywikibot.input(
-            u'For which category do you want to create a tree view?')
+            'For which category do you want to create a tree view?')
         filename = pywikibot.input(
             'Please enter the name of the file where the tree should be saved,'
             '\nor press enter to simply show the tree:')
@@ -1511,10 +1509,10 @@ def main(*args):
     elif action == 'listify':
         if not from_given:
             old_cat_title = pywikibot.input(
-                u'Please enter the name of the category to listify:')
+                'Please enter the name of the category to listify:')
         if not to_given:
             new_cat_title = pywikibot.input(
-                u'Please enter the name of the list to create:')
+                'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
                                    append, overwrite, showimages, subCats=True,
                                    talkPages=talkpages, recurse=recurse)
@@ -1525,7 +1523,7 @@ def main(*args):
         try:
             bot.run()
         except pywikibot.Error:
-            pywikibot.error("Fatal error:", exc_info=True)
+            pywikibot.error('Fatal error:', exc_info=True)
         finally:
             if cat_db:
                 cat_db.dump()
@@ -1535,7 +1533,7 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
 
 wrapper = ModuleDeprecationWrapper(__name__)
