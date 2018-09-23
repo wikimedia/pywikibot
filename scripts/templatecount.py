@@ -92,14 +92,14 @@ class TemplateCountRobot(object):
         template_dict = cls.template_dict(templates, namespaces)
         pywikibot.stdout('\nList of pages transcluding templates:')
         for key in templates:
-            pywikibot.output(u'* %s' % key)
+            pywikibot.output('* ' + key)
         pywikibot.stdout('-' * 36)
         total = 0
         for key in template_dict:
             for page in template_dict[key]:
                 pywikibot.stdout(page.title())
                 total += 1
-        pywikibot.output(u'Total page count: %d' % total)
+        pywikibot.output('Total page count: {0}'.format(total))
         pywikibot.stdout('Report generated on {0}'
                          ''.format(datetime.datetime.utcnow().isoformat()))
 
@@ -181,9 +181,9 @@ def main(*args):
 
     if 'reflist' in args_list:
         pywikibot.output(
-            u'NOTE: it will take a long time to count "reflist".')
+            'NOTE: it will take a long time to count "reflist".')
         choice = pywikibot.input_choice(
-            u'Proceed anyway?',
+            'Proceed anyway?',
             [('yes', 'y'), ('no', 'n'), ('skip', 's')], 'y',
             automatic_quit=False)
         if choice == 's':
@@ -191,11 +191,11 @@ def main(*args):
         elif choice == 'n':
             return
 
-    if operation == "count":
+    if operation == 'count':
         robot.countTemplates(args_list, namespaces)
-    elif operation == "list":
+    elif operation == 'list':
         robot.listTemplates(args_list, namespaces)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
