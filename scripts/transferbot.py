@@ -110,7 +110,7 @@ def main(*args):
             tolang = arg[len('-tolang:'):]
         elif arg.startswith('-prefix'):
             prefix = arg[len('-prefix:'):]
-        elif arg == "-overwrite":
+        elif arg == '-overwrite':
             overwrite = True
 
     tosite = pywikibot.Site(tolang, tofamily)
@@ -122,7 +122,7 @@ def main(*args):
         raise TargetPagesMissing('Target pages not specified')
 
     gen_args = ' '.join(gen_args)
-    pywikibot.output(u"""
+    pywikibot.output("""
     Page transfer configuration
     ---------------------------
     Source: %(fromsite)r
@@ -146,42 +146,43 @@ def main(*args):
 
         if targetpage.exists() and not overwrite:
             pywikibot.output(
-                u"Skipped %s (target page %s exists)" % (
+                'Skipped {0} (target page {1} exists)'.format(
                     page.title(as_link=True),
                     targetpage.title(as_link=True)
                 )
             )
             continue
 
-        pywikibot.output(u"Moving %s to %s..."
-                         % (page.title(as_link=True),
-                            targetpage.title(as_link=True)))
+        pywikibot.output('Moving {0} to {1}...'
+                         .format(page.title(as_link=True),
+                                 targetpage.title(as_link=True)))
 
-        pywikibot.log("Getting page text.")
+        pywikibot.log('Getting page text.')
         text = page.get(get_redirect=True)
-        text += ("<noinclude>\n\n<small>This page was moved from %s. It's "
-                 "edit history can be viewed at %s</small></noinclude>"
-                 % (page.title(as_link=True, insite=targetpage.site),
-                    edithistpage.title(as_link=True, insite=targetpage.site)))
+        text += ("<noinclude>\n\n<small>This page was moved from {0}. It's "
+                 'edit history can be viewed at {1}</small></noinclude>'
+                 .format(page.title(as_link=True, insite=targetpage.site),
+                         edithistpage.title(as_link=True,
+                                            insite=targetpage.site)))
 
-        pywikibot.log("Getting edit history.")
+        pywikibot.log('Getting edit history.')
         historytable = page.getVersionHistoryTable()
 
-        pywikibot.log("Putting page text.")
+        pywikibot.log('Putting page text.')
         targetpage.put(text, summary=summary)
 
-        pywikibot.log("Putting edit history.")
+        pywikibot.log('Putting edit history.')
         edithistpage.put(historytable, summary=summary)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         main()
     except TargetSiteMissing:
-        pywikibot.error(u'Need to specify a target site and/or language')
-        pywikibot.error(u'Try running this script with -help for help/usage')
+        pywikibot.error('Need to specify a target site and/or language')
+        pywikibot.error('Try running this script with -help for help/usage')
         pywikibot.exception()
     except TargetPagesMissing:
-        pywikibot.error(u'Need to specify a page range')
-        pywikibot.error(u'Try running this script with -help for help/usage')
+        pywikibot.error('Need to specify a page range')
+        pywikibot.error('Try running this script with -help for help/usage')
         pywikibot.exception()
