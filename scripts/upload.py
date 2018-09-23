@@ -102,7 +102,7 @@ def main(*args):
     @param args: command line arguments
     @type args: unicode
     """
-    url = u''
+    url = ''
     description = []
     summary = None
     keep_filename = False
@@ -171,7 +171,7 @@ def main(*args):
                          encoding=pywikibot.config.textfile_encoding) as f:
             description = f.read().replace('\r\n', '\n')
 
-    while not ("://" in url or os.path.exists(url)):
+    while not ('://' in url or os.path.exists(url)):
         if not url:
             error = 'No input filename given.'
         else:
@@ -183,7 +183,7 @@ def main(*args):
             break
         else:
             pywikibot.output(error)
-        url = pywikibot.input(u'URL, file or directory where files are now:')
+        url = pywikibot.input('URL, file or directory where files are now:')
 
     if always and ((aborts is not True and ignorewarn is not True) or
                    not description or url is None):
@@ -222,5 +222,5 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
