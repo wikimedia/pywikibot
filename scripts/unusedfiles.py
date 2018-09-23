@@ -26,8 +26,8 @@ from pywikibot import i18n, pagegenerators, Bot
 
 template_to_the_image = {
     'meta': '{{Orphan file}}',
-    'it': u'{{immagine orfana}}',
-    'fa': u'{{تصاویر بدون استفاده}}',
+    'it': '{{immagine orfana}}',
+    'fa': '{{تصاویر بدون استفاده}}',
     'ur': '{{غیر مستعمل تصاویر}}',
 }
 
@@ -57,22 +57,22 @@ class UnusedFilesBot(Bot):
         self.summary = i18n.twtranslate(self.site, 'unusedfiles-comment')
         if not (self.template_image and
                 (self.template_user or self.getOption('nouserwarning'))):
-            raise pywikibot.Error(u'This script is not localized for %s site.'
-                                  % self.site)
+            raise pywikibot.Error('This script is not localized for {0} site.'
+                                  .format(self.site))
 
     def treat(self, image):
         """Process one image page."""
         if not image.exists():
-            pywikibot.output("File '%s' does not exist (see bug T71133)."
-                             % image.title())
+            pywikibot.output("File '{0}' does not exist (see bug T71133)."
+                             .format(image.title()))
             return
         # Use fileUrl() and fileIsShared() to confirm it is local media
         # rather than a local page with the same name as shared media.
         if (image.fileUrl() and not image.fileIsShared() and
-                u'http://' not in image.text):
+                'http://' not in image.text):
             if self.template_image in image.text:
-                pywikibot.output(u"%s done already"
-                                 % image.title(as_link=True))
+                pywikibot.output('{0} done already'
+                                 .format(image.title(as_link=True)))
                 return
 
             self.append_text(image, '\n\n' + self.template_image)
@@ -92,7 +92,7 @@ class UnusedFilesBot(Bot):
             text = page.text
         else:
             if page.isTalkPage():
-                text = u''
+                text = ''
             else:
                 raise pywikibot.NoPage(page)
 
@@ -136,5 +136,5 @@ def main(*args):
         return True
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
