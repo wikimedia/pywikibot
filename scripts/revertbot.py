@@ -79,11 +79,11 @@ class BaseRevertBot(object):
             if callback(item):
                 result = self.revert(item)
                 if result:
-                    self.log(u'%s: %s' % (item['title'], result))
+                    self.log('{0}: {1}'.format(item['title'], result))
                 else:
-                    self.log(u'Skipped %s' % item['title'])
+                    self.log('Skipped {0}'.format(item['title']))
             else:
-                self.log(u'Skipped %s by callback' % item['title'])
+                self.log('Skipped {0} by callback'.format(item['title']))
 
     def callback(self, item):
         """Callback function."""
@@ -127,8 +127,8 @@ class BaseRevertBot(object):
             else:
                 pywikibot.exception()
             return False
-        return 'The edit(s) made in %s by %s was rollbacked' % (page.title(),
-                                                                self.user)
+        return 'The edit(s) made in {0} by {1} was rollbacked'.format(
+            page.title(), self.user)
 
     def log(self, msg):
         """Log the message msg."""
@@ -153,7 +153,7 @@ def main(*args):
         if arg.startswith('-username'):
             if len(arg) == 9:
                 user = pywikibot.input(
-                    u'Please enter username of the person you want to revert:')
+                    'Please enter username of the person you want to revert:')
             else:
                 user = arg[10:]
         elif arg == '-rollback':
@@ -162,5 +162,5 @@ def main(*args):
     bot.revert_contribs()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
