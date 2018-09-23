@@ -161,7 +161,7 @@ class XmlDumpTemplatePageGenerator(XMLDumpPageGenerator):
         for template in self.templates:
             template_pattern = template.title(with_ns=False)
             if mysite.namespaces[10].case == 'first-letter':
-                template_pattern = '[%s%s]%s' % (
+                template_pattern = '[{0}{1}]{2}'.format(
                     template_pattern[0].upper(), template_pattern[0].lower(),
                     template_pattern[1:])
             template_pattern = re.sub(' ', '[_ ]', template_pattern)
@@ -247,7 +247,8 @@ class TemplateRobot(ReplaceBot):
             else:
                 template = pywikibot.Page(self.site, new, ns=10)
                 if not template.exists():
-                    pywikibot.warning(u'Template "%s" does not exist.' % new)
+                    pywikibot.warning('Template "{0}" does not exist.'
+                                      .format(new))
                     if not pywikibot.input_yn('Do you want to proceed anyway?',
                                               default=False,
                                               automatic_quit=False):
@@ -303,7 +304,7 @@ def main(*args):
         elif arg.startswith('-xml'):
             if len(arg) == 4:
                 xmlfilename = pywikibot.input(
-                    u'Please enter the XML dump\'s filename: ')
+                    "Please enter the XML dump's filename: ")
             else:
                 xmlfilename = arg[5:]
         elif arg.startswith('-addcat:'):
@@ -377,8 +378,8 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         main()
     except Exception:
-        pywikibot.error("Fatal error:", exc_info=True)
+        pywikibot.error('Fatal error:', exc_info=True)
