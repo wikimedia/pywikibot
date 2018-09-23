@@ -21,24 +21,24 @@ from pywikibot import textlib
 
 # The summary that the Bot will use.
 comment = {
-    'ar': u'روبوت: توحيد قياسي للإنترويكي',
+    'ar': 'روبوت: توحيد قياسي للإنترويكي',
     'cs': 'Robot: standardizace interwiki',
-    'de': u'Bot: Interwikilinks standardisieren',
-    'en': u'Robot: Interwiki standardization',
-    'fa': u'ربات: تصحیح جایگذاری میان‌ویکی‌ها',
-    'fr': u'Robot : Standardisation des interwikis',
-    'he': u'בוט: מסדר את האינטרוויקי',
+    'de': 'Bot: Interwikilinks standardisieren',
+    'en': 'Robot: Interwiki standardization',
+    'fa': 'ربات: تصحیح جایگذاری میان‌ویکی‌ها',
+    'fr': 'Robot : Standardisation des interwikis',
+    'he': 'בוט: מסדר את האינטרוויקי',
     'hi': 'बॉट: अंतरविकि मानकीकरण',
-    'it': u'Bot: Standardizzo interwiki',
-    'ja': u'ロボットによる: 言語間リンクを標準化',
+    'it': 'Bot: Standardizzo interwiki',
+    'ja': 'ロボットによる: 言語間リンクを標準化',
     'ksh': 'Bot: Engerwiki Lengks opprüühme',
-    'ml': u'യന്ത്രം: അന്തർവിക്കി ക്രമവൽക്കരണം',
+    'ml': 'യന്ത്രം: അന്തർവിക്കി ക്രമവൽക്കരണം',
     'nds': 'Bot: Links twüschen Wikis standardisseern',
-    'nl': u'Bot: standaardisatie interwikiverwijzingen',
-    'no': u'bot: Språklenkestandardisering',
+    'nl': 'Bot: standaardisatie interwikiverwijzingen',
+    'no': 'bot: Språklenkestandardisering',
     'ro': 'Robot: Standardizare interwiki',
     'ur': 'خودکار: بین الویکی روابط کی معیار بندی',
-    'zh': u'機器人: 跨語連結標準化',
+    'zh': '機器人: 跨語連結標準化',
 }
 
 
@@ -57,11 +57,11 @@ def main(*args):
     comm = pywikibot.translate(site, comment)
     for pl in site.allpages(start):
         plname = pl.title()
-        pywikibot.output(u'\nLoading %s...' % plname)
+        pywikibot.output('\nLoading {0}...'.format(plname))
         try:
             oldtext = pl.get()
         except pywikibot.IsRedirectPage:
-            pywikibot.output(u"%s is a redirect!" % plname)
+            pywikibot.output('{0} is a redirect!'.format(plname))
             continue
         old = pl.interwiki()
         new = {}
@@ -75,13 +75,13 @@ def main(*args):
                 try:
                     pl.put(newtext, comment=comm)
                 except pywikibot.LockedPage:
-                    pywikibot.output(u"%s is locked" % plname)
+                    pywikibot.output('{0} is locked'.format(plname))
                     continue
             else:
-                pywikibot.output(u'No changes needed.')
+                pywikibot.output('No changes needed.')
                 continue
         else:
-            pywikibot.output(u'No interwiki found.')
+            pywikibot.output('No interwiki found.')
             continue
 
 
