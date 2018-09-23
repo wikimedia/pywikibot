@@ -46,14 +46,14 @@ class TouchBot(MultipleSitesBot):
         try:
             page.touch(botflag=self.getOption('botflag'))
         except pywikibot.NoPage:
-            pywikibot.error(u"Page %s does not exist."
-                            % page.title(as_link=True))
+            pywikibot.error('Page {0} does not exist.'
+                            .format(page.title(as_link=True)))
         except pywikibot.LockedPage:
-            pywikibot.error(u"Page %s is locked."
-                            % page.title(as_link=True))
+            pywikibot.error('Page {0} is locked.'
+                            .format(page.title(as_link=True)))
         except pywikibot.PageNotSaved:
-            pywikibot.error(u"Page %s not saved."
-                            % page.title(as_link=True))
+            pywikibot.error('Page {0} not saved.'
+                            .format(page.title(as_link=True)))
 
 
 class PurgeBot(MultipleSitesBot):
@@ -62,9 +62,8 @@ class PurgeBot(MultipleSitesBot):
 
     def treat(self, page):
         """Purge the given page."""
-        pywikibot.output(u'Page %s%s purged'
-                         % (page.title(as_link=True),
-                            "" if page.purge() else " not"))
+        pywikibot.output('Page {0}{1} purged'.format(
+            page.title(as_link=True), '' if page.purge() else ' not'))
 
 
 def main(*args):
@@ -88,7 +87,7 @@ def main(*args):
         if arg == '-purge':
             bot_class = PurgeBot
         elif arg == '-redir':
-            pywikibot.output(u'-redirect option is deprecated, '
+            pywikibot.output('-redirect option is deprecated, '
                              'do not use it anymore.')
         elif not gen_factory.handleArg(arg) and arg.startswith('-'):
             # -botflag
@@ -105,5 +104,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
