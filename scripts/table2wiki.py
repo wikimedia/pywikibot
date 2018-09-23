@@ -179,7 +179,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n! \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                u'WARNING: found <th> without </th>. (%d occurences)\n' % n)
+                'WARNING: found <th> without </th>. ({0} occurences)\n'
+                .format(n))
             warnings += n
 
         # <th> with attributes, without closing </th>
@@ -188,7 +189,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\n!\g<attr> | \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                'WARNING: found <th ...> without </th>. (%d occurences\n)' % n)
+                'WARNING: found <th ...> without </th>. ({0} occurences\n)'
+                .format(n))
             warnings += n
 
         ##################
@@ -222,7 +224,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n| \g<cell>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                u'<td> used where </td> was expected. (%d occurences)\n' % n)
+                '<td> used where </td> was expected. ({0} occurences)\n'
+                .format(n))
             warnings += n
 
         # what is this for?
@@ -231,8 +234,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n|\2 | \3\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                u"WARNING: (sorry, bot code unreadable (1). I don't know why "
-                u"this warning is given.) (%d occurences)\n" % n)
+                "WARNING: (sorry, bot code unreadable (1). I don't know why "
+                'this warning is given.) ({0} occurences)\n'.format(n))
 
         # fail save. sometimes people forget </td>
         # <td> without arguments, with missing </td>
@@ -240,16 +243,16 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'(?i)<td>(?P<cell>[^<]*?)[\r\n]+',
             r'\r\n| \g<cell>\r\n', new_table)
         if n > 0:
-            warning_messages.append(u"NOTE: Found <td> without </td>. This "
-                                    u"shouldn't cause problems.\n")
+            warning_messages.append('NOTE: Found <td> without </td>. This '
+                                    "shouldn't cause problems.\n")
 
         # <td> with attributes, with missing </td>
         new_table, n = re.subn(
             r'(?i)[\r\n]*<td(?P<attr> [^>]*?)>(?P<cell>[\w\W]*?)[\r\n]+',
             r'\r\n|\g<attr> | \g<cell>\r\n', new_table)
         if n > 0:
-            warning_messages.append(u"NOTE: Found <td> without </td>. This "
-                                    u"shouldn't cause problems.\n")
+            warning_messages.append('NOTE: Found <td> without </td>. This '
+                                    "shouldn't cause problems.\n")
 
         ##################
         # Garbage collecting ;-)
@@ -474,23 +477,23 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # Check if there are any marked tags left
         if re.search('<##table##|</##table##>', new_text, re.IGNORECASE):
             pywikibot.error(
-                u'not all marked table start or end tags processed!')
+                'not all marked table start or end tags processed!')
             return
 
         if converted_tables == 0:
-            pywikibot.output(u"No changes were necessary.")
+            pywikibot.output('No changes were necessary.')
             return
 
         if warnings:
             if self.getOption('always') and self.getOption('skipwarning'):
                 pywikibot.output(
-                    'There were %i replacements that might lead to bad '
-                    'output. Skipping.' % warnings)
+                    'There were {0} replacements that might lead to bad '
+                    'output. Skipping.'.format(warnings))
                 return
             if not self.getOption('always'):
                 pywikibot.output(
-                    'There were %i replacements that might lead to bad '
-                    'output.' % warnings)
+                    'There were {0} replacements that might lead to bad '
+                    'output.'.format(warnings))
                 if not input_yn('Do you want to change the page anyway'):
                     return
 
@@ -579,5 +582,5 @@ WHERE old_text LIKE '%<table%'
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
