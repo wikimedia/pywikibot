@@ -101,11 +101,11 @@ except ImportError:
     resource = None
 
 bot_config = {
-    'BotName': "{username}",
+    'BotName': '{username}',
 
-    'ConfCSSshell': u'User:{username}/script_wui-shell.css',
-    'ConfCSScrontab': u'User:{username}/script_wui-crontab.css',
-    'ConfCSSoutput': u'User:{username}/Simulation',
+    'ConfCSSshell': 'User:{username}/script_wui-shell.css',
+    'ConfCSScrontab': 'User:{username}/script_wui-crontab.css',
+    'ConfCSSoutput': 'User:{username}/Simulation',
 
     'CRONMaxDelay': 5 * 60.0,       # check all ~5 minutes
 
@@ -131,7 +131,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
         # init environment with minimal changes (try to do as less as possible)
         # - Lua -
-        pywikibot.output(u'** Redirecting Lua print in order to catch it')
+        pywikibot.output('** Redirecting Lua print in order to catch it')
         lua.execute('__print = print')
         lua.execute('print = python.globals().pywikibot.output')
         # It may be useful in debugging to install the 'print' builtin
@@ -147,24 +147,24 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         self.refs = {self.templ: templ,
                      self.cron: cron,
                      }
-        pywikibot.output(u'** Pre-loading all relevant page contents')
+        pywikibot.output('** Pre-loading all relevant page contents')
         for item in self.refs:
             # First check if page is protected, reject any data if not
             parts = self.refs[item].title().lower().rsplit('.')
             if len(parts) == 1 or parts[1] not in ['.css', '.js']:
-                raise ValueError('%s config %s = %s is not a secure page; '
+                raise ValueError('{0} config {1} = {2} is not a secure page; '
                                  'it should be a css or js userpage which are '
                                  'automatically semi-protected.'
-                                 % (self.__class__.__name__, item,
-                                    self.refs[item]))
+                                 .format(self.__class__.__name__, item,
+                                         self.refs[item]))
             try:
                 self.refs[item].get(force=True)   # load all page contents
             except pywikibot.NoPage:
-                pywikibot.error("The configuation page %s doesn't exists"
-                                % self.refs[item].title(as_link=True))
+                pywikibot.error("The configuation page {0} doesn't exists"
+                                .format(self.refs[item].title(as_link=True)))
                 raise
         # init background timer
-        pywikibot.output(u'** Starting crontab background timer thread')
+        pywikibot.output('** Starting crontab background timer thread')
         self.on_timer()
 
     def on_pubmsg(self, c, e):
@@ -177,10 +177,10 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         # test actual page against (template incl.) list
         page = match.group('page').decode(self.site.encoding())
         if page in self.refs:
-            pywikibot.output(u"RELOAD: %s" % page)
+            pywikibot.output('RELOAD: ' + page)
             self.refs[page].get(force=True)   # re-load (refresh) page content
         if page == self.templ:
-            pywikibot.output(u"SHELL: %s" % page)
+            pywikibot.output('SHELL: ' + page)
             self.do_check(page)
 
     def on_timer(self):
@@ -227,7 +227,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
             # secure traceback print (from api.py submit)
             pywikibot.exception(tb=True)
-            pywikibot.warning(u"Unable to start thread")
+            pywikibot.warning('Unable to start thread')
 
             wiki_logger(traceback.format_exc(), self.refs[page_title], rev)
 
@@ -242,7 +242,7 @@ def main_script(page, rev=None, params=NotImplemented):
     # safety; default mode is safe (no writing)
     pywikibot.config.simulate = True
 
-    pywikibot.output(u'--- ' * 20)
+    pywikibot.output('--- ' * 20)
 
     buffer = StringIO()
     rootLogger = logging.getLogger()
