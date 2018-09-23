@@ -137,7 +137,7 @@ if sys.version_info[:2] == (2, 7) and sys.version_info[2] in (2, 3):
     warn(
         'Pywikibot will soon drop support for Python 2.7.2 and 2.7.3, '
         'please update your Python.',
-        DeprecationWarning,
+        FutureWarning,
     )
 
 
