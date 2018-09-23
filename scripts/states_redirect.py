@@ -81,23 +81,24 @@ class StatesRedirectBot(pywikibot.Bot):
                     goal = pl.getRedirectTarget().title()
                     if pywikibot.Page(self.site, goal).exists():
                         pywikibot.output(
-                            u"Not creating %s - redirect already exists."
-                            % goal)
+                            'Not creating {0} - redirect already exists.'
+                            .format(goal))
                     else:
                         pywikibot.warning(
-                            u"%s already exists but redirects elsewhere!"
-                            % goal)
+                            '{0} already exists but redirects elsewhere!'
+                            .format(goal))
                 except pywikibot.IsNotRedirectPage:
                     pywikibot.warning(
-                        u"Page %s already exists and is not a redirect "
-                        u"Please check page!"
-                        % pl.title())
+                        'Page {0} already exists and is not a redirect '
+                        'Please check page!'
+                        .format(pl.title()))
                 except pywikibot.NoPage:
                     if page.isRedirectPage():
                         p2 = page.getRedirectTarget()
                         pywikibot.output(
-                            u'Note: goal page is redirect.\nCreating redirect '
-                            u'to "%s" to avoid double redirect.' % p2.title())
+                            'Note: goal page is redirect.\nCreating redirect '
+                            'to "{0}" to avoid double redirect.'
+                            .format(p2.title()))
                     else:
                         p2 = page
                     if self.force or pywikibot.input_yn('Create redirect {0}?'
@@ -129,11 +130,11 @@ def main(*args):
             force = True
         else:
             pywikibot.warning(
-                u'argument "%s" not understood; ignoring.' % arg)
+                'argument "{0}" not understood; ignoring.'.format(arg))
 
     bot = StatesRedirectBot(start, force)
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
