@@ -110,7 +110,7 @@ def main(*args):
     else:
         site = pywikibot.Site()
         watchlist = refresh(site, sysop=sysop)
-        pywikibot.output(u'%i pages in the watchlist.' % len(watchlist))
+        pywikibot.output('{} pages in the watchlist.'.format(len(watchlist)))
         for page in watchlist:
             try:
                 pywikibot.stdout(page.title())
@@ -118,5 +118,5 @@ def main(*args):
                 pywikibot.exception()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
