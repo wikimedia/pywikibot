@@ -1466,13 +1466,11 @@ class BaseBot(OptionHandler):
             raise NotImplementedError('Variable %s.generator not set.'
                                       % self.__class__.__name__)
 
-        maxint = 0
         if PY2:
-            maxint = sys.maxint
-
             # Python 2 does not clear previous exceptions and method `exit`
             # relies on sys.exc_info returning exceptions occurring in `run`.
             sys.exc_clear()
+
         self.setup()
         try:
             for item in self.generator:
@@ -1504,14 +1502,7 @@ class BaseBot(OptionHandler):
 
                 # Process the page
                 self.treat(page)
-
                 self._treat_counter += 1
-                if maxint and self._treat_counter == maxint:
-                    # Warn the user that the bot may not function correctly
-                    pywikibot.error(
-                        '\n%s: page count reached Python 2 sys.maxint (%d).\n'
-                        'Python 3 should be used to process very large batches'
-                        % (self.__class__.__name__, sys.maxint))
             else:
                 self._generator_completed = True
         except GeneratorExit:
