@@ -51,7 +51,7 @@ def main(*args):
     code.interact("""Welcome to the Pywikibot interactive shell!""", local=env)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     if sys.platform == 'win32':
         import os
         os.system('title Python {} Shell'.format(*sys.version.split(' ', 1)))
