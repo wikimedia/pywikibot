@@ -86,7 +86,7 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
             return
         lines = text.split('\n')
         newpage = []
-        lastok = ""
+        lastok = ''
         for line in lines:
             if self.spam_external_url in line:
                 if lastok:
@@ -100,20 +100,20 @@ class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                         pywikibot.output(line)
                     lastok = line
         if self.getOption('always'):
-            answer = "y"
+            answer = 'y'
         else:
             answer = pywikibot.input_choice(
-                u'\nDelete the red lines?',
+                '\nDelete the red lines?',
                 [('yes', 'y'), ('no', 'n'), ('edit', 'e')],
                 'n', automatic_quit=False)
-        if answer == "n":
+        if answer == 'n':
             return
-        elif answer == "e":
+        elif answer == 'e':
             editor = TextEditor()
             newtext = editor.edit(text, highlight=self.spam_external_url,
                                   jumpIndex=text.find(self.spam_external_url))
         else:
-            newtext = "\n".join(newpage)
+            newtext = '\n'.join(newpage)
         if newtext != text:
             self.put_current(newtext, summary=self.getOption('summary'))
 
