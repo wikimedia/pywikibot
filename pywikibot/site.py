@@ -6649,6 +6649,7 @@ class APISite(BaseSite):
                                type_arg='querypage', gqppage='Unwatchedpages',
                                total=total)
 
+    @need_version('1.18')
     @deprecated_args(step=None)
     def wantedpages(self, total=None):
         """Yield Pages from Special:Wantedpages.
@@ -6659,6 +6660,27 @@ class APISite(BaseSite):
                                type_arg='querypage', gqppage='Wantedpages',
                                total=total)
 
+    @need_version('1.18')
+    def wantedfiles(self, total=None):
+        """Yield Pages from Special:Wantedfiles.
+
+        @param total: number of pages to return
+        """
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Wantedfiles',
+                               total=total)
+
+    @need_version('1.18')
+    def wantedtemplates(self, total=None):
+        """Yield Pages from Special:Wantedtemplates.
+
+        @param total: number of pages to return
+        """
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage='Wantedtemplates',
+                               total=total)
+
+    @need_version('1.18')
     @deprecated_args(number='total', step=None, repeat=None)
     def wantedcategories(self, total=None):
         """Yield Pages from Special:Wantedcategories.

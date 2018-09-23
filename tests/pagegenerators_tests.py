@@ -1270,6 +1270,50 @@ class TestFactoryGeneratorNewpages(TestCase):
         self.assertPagesInNamespaces(gen, 1)
 
 
+class TestWantedFactoryGenerator(DefaultSiteTestCase):
+
+    """Test pagegenerators.GeneratorFactory for wanted pages."""
+
+    def setUp(self):
+        """Setup tests."""
+        super(TestWantedFactoryGenerator, self).setUp()
+        self.gf = pagegenerators.GeneratorFactory(site=self.site)
+
+    def _generator_with_tests(self):
+        """Test generator."""
+        gen = self.gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 5)
+        for page in pages:
+            yield page
+
+    def test_wanted_pages(self):
+        """Test wantedpages generator."""
+        self.gf.handleArg('-wantedpages:5')
+        for page in self._generator_with_tests():
+            self.assertIsInstance(page, pywikibot.Page)
+
+    def test_wanted_files(self):
+        """Test wantedfiles generator."""
+        self.gf.handleArg('-wantedfiles:5')
+        for page in self._generator_with_tests():
+            self.assertIsInstance(page, pywikibot.FilePage)
+
+    def test_wanted_templates(self):
+        """Test wantedtemplates generator."""
+        self.gf.handleArg('-wantedtemplates:5')
+        for page in self._generator_with_tests():
+            self.assertIsInstance(page, pywikibot.Page)
+            self.assertEqual(page.namespace(), 10)
+
+    def test_wanted_categories(self):
+        """Test wantedcategories generator."""
+        self.gf.handleArg('-wantedcategories:5')
+        for page in self._generator_with_tests():
+            self.assertIsInstance(page, pywikibot.Category)
+
+
 class TestFactoryGeneratorWikibase(WikidataTestCase):
 
     """Test pagegenerators.GeneratorFactory on Wikibase site."""
