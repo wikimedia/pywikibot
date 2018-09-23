@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-u"""
+"""
 Script to help a human solve disambiguations by presenting a set of options.
 
 Specify the disambiguation page on the command line.
@@ -103,36 +103,36 @@ from pywikibot.tools.formatter import SequenceOutputter
 
 # Disambiguation Needed template
 dn_template = {
-    'en': u'{{dn}}',
-    'fr': u'{{Lien vers un homonyme}}',
+    'en': '{{dn}}',
+    'fr': '{{Lien vers un homonyme}}',
 }
 
 # disambiguation page name format for "primary topic" disambiguations
 # (Begriffsklärungen nach Modell 2)
 primary_topic_format = {
-    'ar': u'%s_(توضيح)',
-    'ca': u'%s_(desambiguació)',
-    'cs': u'%s_(rozcestník)',
-    'de': u'%s_(Begriffsklärung)',
-    'en': u'%s_(disambiguation)',
-    'fa': u'%s_(ابهام‌زدایی)',
-    'fi': u'%s_(täsmennyssivu)',
-    'hu': u'%s_(egyértelműsítő lap)',
-    'ia': u'%s_(disambiguation)',
-    'it': u'%s_(disambigua)',
-    'lt': u'%s_(reikšmės)',
-    'kk': u'%s_(айрық)',
-    'ko': u'%s_(동음이의)',
-    'nl': u'%s_(doorverwijspagina)',
-    'no': u'%s_(peker)',
-    'pl': u'%s_(ujednoznacznienie)',
-    'pt': u'%s_(desambiguação)',
-    'pfl': u'%s_BKL',
-    'he': u'%s_(פירושונים)',
-    'ru': u'%s_(значения)',
-    'sr': u'%s_(вишезначна одредница)',
-    'sv': u'%s_(olika betydelser)',
-    'uk': u'%s_(значення)',
+    'ar': '%s_(توضيح)',
+    'ca': '%s_(desambiguació)',
+    'cs': '%s_(rozcestník)',
+    'de': '%s_(Begriffsklärung)',
+    'en': '%s_(disambiguation)',
+    'fa': '%s_(ابهام‌زدایی)',
+    'fi': '%s_(täsmennyssivu)',
+    'hu': '%s_(egyértelműsítő lap)',
+    'ia': '%s_(disambiguation)',
+    'it': '%s_(disambigua)',
+    'lt': '%s_(reikšmės)',
+    'kk': '%s_(айрық)',
+    'ko': '%s_(동음이의)',
+    'nl': '%s_(doorverwijspagina)',
+    'no': '%s_(peker)',
+    'pl': '%s_(ujednoznacznienie)',
+    'pt': '%s_(desambiguação)',
+    'pfl': '%s_BKL',
+    'he': '%s_(פירושונים)',
+    'ru': '%s_(значения)',
+    'sr': '%s_(вишезначна одредница)',
+    'sv': '%s_(olika betydelser)',
+    'uk': '%s_(значення)',
     'ur': '%s_(ضد ابہام)',
 }
 
@@ -144,209 +144,209 @@ primary_topic_format = {
 ignore_title = {
     'wikipedia': {
         'ar': [
-            u'تصنيف:صفحات توضيح',
+            'تصنيف:صفحات توضيح',
         ],
         'ca': [
-            u'Viquipèdia:Enllaços incorrectes a pàgines de desambiguació',
-            u'Viquipèdia:Registre de pàgines de desambiguació òrfenes',
-            u'.*Discussió:.+',
-            u'.*Usuari:.+',
-            u'.+/[aA]rxiu.*',
+            'Viquipèdia:Enllaços incorrectes a pàgines de desambiguació',
+            'Viquipèdia:Registre de pàgines de desambiguació òrfenes',
+            '.*Discussió:.+',
+            '.*Usuari:.+',
+            '.+/[aA]rxiu.*',
         ],
         'cs': [
-            u'Wikipedie:Chybějící interwiki/.+',
-            u'Wikipedie:Rozcestníky',
-            u'Wikipedie diskuse:Rozcestníky',
-            u'Wikipedie:Seznam nejvíce odkazovaných rozcestníků',
-            u'Wikipedie:Seznam rozcestníků/první typ',
-            u'Wikipedie:Seznam rozcestníků/druhý typ',
-            u'Wikipedista:Zirland/okres',
+            'Wikipedie:Chybějící interwiki/.+',
+            'Wikipedie:Rozcestníky',
+            'Wikipedie diskuse:Rozcestníky',
+            'Wikipedie:Seznam nejvíce odkazovaných rozcestníků',
+            'Wikipedie:Seznam rozcestníků/první typ',
+            'Wikipedie:Seznam rozcestníků/druhý typ',
+            'Wikipedista:Zirland/okres',
         ],
         'da': [
-            u'Wikipedia:Links til sider med flertydige titler'
+            'Wikipedia:Links til sider med flertydige titler'
         ],
         'de': [
-            u'.+/[aA]rchiv.*',
-            u'.+/Baustelle.*',
-            u'.+/Index',
-            u'.+/Spielwiese',
-            u'.+/[tT]est.*',
-            u'.*Diskussion:.+',
-            u'Benutzer:.+/[Ll]og.*',
-            u'Benutzer:C.Löser/.+',
-            u'Benutzer:Katharina/Begriffsklärungen',
-            u'Benutzer:Kirschblut/.+buchstabenkürzel',
-            u'Benutzer:Mathias Schindler/.+',
-            u'Benutzer:Noisper/Dingliste/[A-Z]',
-            u'Benutzer:Professor Einstein.*',
-            u'Benutzer:Sebbot/.+',
-            u'Benutzer:SirJective/.+',
-            u'Benutzer:Srbauer.*',
-            u'Benutzer:SteEis.',
-            u'Benutzer:Steindy.*',
-            u'Benutzer:SrbBot.*',
-            u'Benutzer:PortalBot/.+',
-            u'Benutzer:Xqbot/.+',
-            u'Lehnwort',
-            u'Liste griechischer Wortstämme in deutschen Fremdwörtern',
-            u'Liste von Gräzismen',
-            u'Portal:Abkürzungen/.+',
-            u'Portal:Astronomie/Moves',
-            u'Portal:Astronomie/Index/.+',
-            u'Portal:Hund',
-            u'Portal:Hund/Beobachtungsliste',
-            u'Portal:Marxismus',
-            u'Portal:Täuferbewegung/Seitenindex',
-            u'Wikipedia:Administratoren/Anfragen',
-            u'Wikipedia:Archiv/.+',
-            u'Wikipedia:Artikelwünsche/Ding-Liste/[A-Z]',
-            u'Wikipedia:Begriffsklärung.*',
-            u'Wikipedia:Bots/.+',
-            u'Wikipedia:Interwiki-Konflikte',
-            u'Wikipedia:ISBN-Suche',
-            u'Wikipedia:Liste mathematischer Themen/BKS',
-            u'Wikipedia:Liste mathematischer Themen/Redirects',
-            u'Wikipedia:Meinungsbilder/.+',
-            u'Wikipedia:Löschkandidaten/.+',
-            u'Wikipedia:WikiProjekt Altertumswissenschaft/.+',
-            u'Wikipedia:WikiProjekt Verwaiste Seiten/Begriffsklärungen',
-            u'Wikipedia:Qualitätssicherung/.+',
-            u'Vorlage:Infobox Weltraum',
-            u'Vorlage:Navigationsleiste Raumfahrt',
+            '.+/[aA]rchiv.*',
+            '.+/Baustelle.*',
+            '.+/Index',
+            '.+/Spielwiese',
+            '.+/[tT]est.*',
+            '.*Diskussion:.+',
+            'Benutzer:.+/[Ll]og.*',
+            'Benutzer:C.Löser/.+',
+            'Benutzer:Katharina/Begriffsklärungen',
+            'Benutzer:Kirschblut/.+buchstabenkürzel',
+            'Benutzer:Mathias Schindler/.+',
+            'Benutzer:Noisper/Dingliste/[A-Z]',
+            'Benutzer:Professor Einstein.*',
+            'Benutzer:Sebbot/.+',
+            'Benutzer:SirJective/.+',
+            'Benutzer:Srbauer.*',
+            'Benutzer:SteEis.',
+            'Benutzer:Steindy.*',
+            'Benutzer:SrbBot.*',
+            'Benutzer:PortalBot/.+',
+            'Benutzer:Xqbot/.+',
+            'Lehnwort',
+            'Liste griechischer Wortstämme in deutschen Fremdwörtern',
+            'Liste von Gräzismen',
+            'Portal:Abkürzungen/.+',
+            'Portal:Astronomie/Moves',
+            'Portal:Astronomie/Index/.+',
+            'Portal:Hund',
+            'Portal:Hund/Beobachtungsliste',
+            'Portal:Marxismus',
+            'Portal:Täuferbewegung/Seitenindex',
+            'Wikipedia:Administratoren/Anfragen',
+            'Wikipedia:Archiv/.+',
+            'Wikipedia:Artikelwünsche/Ding-Liste/[A-Z]',
+            'Wikipedia:Begriffsklärung.*',
+            'Wikipedia:Bots/.+',
+            'Wikipedia:Interwiki-Konflikte',
+            'Wikipedia:ISBN-Suche',
+            'Wikipedia:Liste mathematischer Themen/BKS',
+            'Wikipedia:Liste mathematischer Themen/Redirects',
+            'Wikipedia:Meinungsbilder/.+',
+            'Wikipedia:Löschkandidaten/.+',
+            'Wikipedia:WikiProjekt Altertumswissenschaft/.+',
+            'Wikipedia:WikiProjekt Verwaiste Seiten/Begriffsklärungen',
+            'Wikipedia:Qualitätssicherung/.+',
+            'Vorlage:Infobox Weltraum',
+            'Vorlage:Navigationsleiste Raumfahrt',
         ],
         'en': [
-            u'Wikipedia:Links to disambiguating pages',
-            u'Wikipedia:Disambiguation pages with links',
-            u'Wikipedia:Multiple-place names \\([A-Z]\\)',
-            u'Wikipedia:Non-unique personal name',
-            u"User:Jerzy/Disambiguation Pages i've Editted",
-            u'User:Gareth Owen/inprogress',
-            u'TLAs from [A-Z][A-Z][A-Z] to [A-Z][A-Z][A-Z]',
-            u'List of all two-letter combinations',
-            u'User:Daniel Quinlan/redirects.+',
-            u'User:Oliver Pereira/stuff',
-            u'Wikipedia:French Wikipedia language links',
-            u'Wikipedia:Polish language links',
-            u'Wikipedia:Undisambiguated abbreviations/.+',
-            u'List of acronyms and initialisms',
-            u'Wikipedia:Usemod article histories',
-            u'User:Pizza Puzzle/stuff',
-            u'List of generic names of political parties',
-            u'Talk:List of initialisms/marked',
-            u'Talk:List of initialisms/sorted',
-            u'Talk:Programming language',
-            u'Talk:SAMPA/To do',
-            u"Wikipedia:Outline of Roget's Thesaurus",
-            u'User:Wik/Articles',
-            u'User:Egil/Sandbox',
-            u'Wikipedia talk:Make only links relevant to the context',
-            u'Wikipedia:Common words, searching for which is not possible',
+            'Wikipedia:Links to disambiguating pages',
+            'Wikipedia:Disambiguation pages with links',
+            'Wikipedia:Multiple-place names \\([A-Z]\\)',
+            'Wikipedia:Non-unique personal name',
+            "User:Jerzy/Disambiguation Pages i've Editted",
+            'User:Gareth Owen/inprogress',
+            'TLAs from [A-Z][A-Z][A-Z] to [A-Z][A-Z][A-Z]',
+            'List of all two-letter combinations',
+            'User:Daniel Quinlan/redirects.+',
+            'User:Oliver Pereira/stuff',
+            'Wikipedia:French Wikipedia language links',
+            'Wikipedia:Polish language links',
+            'Wikipedia:Undisambiguated abbreviations/.+',
+            'List of acronyms and initialisms',
+            'Wikipedia:Usemod article histories',
+            'User:Pizza Puzzle/stuff',
+            'List of generic names of political parties',
+            'Talk:List of initialisms/marked',
+            'Talk:List of initialisms/sorted',
+            'Talk:Programming language',
+            'Talk:SAMPA/To do',
+            "Wikipedia:Outline of Roget's Thesaurus",
+            'User:Wik/Articles',
+            'User:Egil/Sandbox',
+            'Wikipedia talk:Make only links relevant to the context',
+            'Wikipedia:Common words, searching for which is not possible',
         ],
         'fa': [
-            u'ویکی‌پدیا:فهرست صفحات ابهام‌زدایی',
+            'ویکی‌پدیا:فهرست صفحات ابهام‌زدایی',
         ],
         'fi': [
-            u'Wikipedia:Luettelo täsmennyssivuista',
-            u'Wikipedia:Luettelo (täsmennyssivuista)',
-            u'Wikipedia:Täsmennyssivu',
+            'Wikipedia:Luettelo täsmennyssivuista',
+            'Wikipedia:Luettelo (täsmennyssivuista)',
+            'Wikipedia:Täsmennyssivu',
         ],
         'fr': [
-            u'Wikipédia:Liens aux pages d’homonymie',
-            u'Wikipédia:Homonymie',
-            u'Wikipédia:Homonymie/Homonymes dynastiques',
+            'Wikipédia:Liens aux pages d’homonymie',
+            'Wikipédia:Homonymie',
+            'Wikipédia:Homonymie/Homonymes dynastiques',
             'Wikipédia:Prise de décision, noms des membres '
             'de dynasties/liste des dynastiens',
-            u'Liste de toutes les combinaisons de deux lettres',
-            u'Wikipédia:Log d’upload/.*',
-            u'Sigles de trois lettres de [A-Z]AA à [A-Z]ZZ',
-            u'Wikipédia:Pages sans interwiki,.'
+            'Liste de toutes les combinaisons de deux lettres',
+            'Wikipédia:Log d’upload/.*',
+            'Sigles de trois lettres de [A-Z]AA à [A-Z]ZZ',
+            'Wikipédia:Pages sans interwiki,.'
         ],
         'fy': [
-            u'Wikipedy:Fangnet',
+            'Wikipedy:Fangnet',
         ],
         'hu': [
             # hu:Wikipédia:Kocsmafal (egyéb)#Hol nem kell egyértelműsíteni?
             # 2012-02-08
-            u'Wikipédia:(?!Sportműhely/Eddigi cikkeink).*',
-            u'.*\\(egyértelműsítő lap\\)$',
-            u'.*[Vv]ita:.*',
-            u'Szerkesztő:[^/]+$',
+            'Wikipédia:(?!Sportműhely/Eddigi cikkeink).*',
+            '.*\\(egyértelműsítő lap\\)$',
+            '.*[Vv]ita:.*',
+            'Szerkesztő:[^/]+$',
         ],
         'ia': [
-            u'Categoria:Disambiguation',
-            u'Wikipedia:.+',
-            u'Usator:.+',
-            u'Discussion Usator:.+',
+            'Categoria:Disambiguation',
+            'Wikipedia:.+',
+            'Usator:.+',
+            'Discussion Usator:.+',
         ],
         'it': [
-            u'Aiuto:Disambigua/Disorfanamento',
-            u'Discussioni utente:.+',
-            u'Utente:Civvì/disorfanamento',
+            'Aiuto:Disambigua/Disorfanamento',
+            'Discussioni utente:.+',
+            'Utente:Civvì/disorfanamento',
         ],
         'kk': [
-            u'Санат:Айрықты бет',
+            'Санат:Айрықты бет',
         ],
         'ko': [
-            u'위키백과:(동음이의) 문서의 목록',
-            u'위키백과:동음이의어 문서의 목록',
+            '위키백과:(동음이의) 문서의 목록',
+            '위키백과:동음이의어 문서의 목록',
         ],
         'lt': [
-            u'Wikipedia:Rodomi nukreipiamieji straipsniai',
+            'Wikipedia:Rodomi nukreipiamieji straipsniai',
         ],
         'nl': [
-            u"Gebruiker:.*",
-            u"Overleg gebruiker:.+[aA]rchief.*",
-            u"Overleg gebruiker:Pven",
-            u"Portaal:.+[aA]rchief.*",
-            u"Wikipedia:Humor en onzin.*",
-            u"Wikipedia:Links naar doorverwijspagina's/Winkeldochters.*",
-            u"Wikipedia:Project aanmelding bij startpagina's",
-            u"Wikipedia:Wikiproject Roemeense gemeenten/Doorverwijspagina's",
-            u'Categorie:Doorverwijspagina',
-            u'Lijst van Nederlandse namen van pausen',
-            u'Overleg Wikipedia:Discussie spelling 2005',
-            u'Overleg Wikipedia:Doorverwijspagina',
-            u'Overleg Wikipedia:Logboek.*',
-            u'Wikipedia:Logboek.*',
-            u'Overleg gebruiker:Sybren/test.*',
-            u'Overleg gebruiker:([0-9][0-9]?[0-9]?\\.){3}[0-9][0-9]?[0-9]?',
-            u'Overleg:Lage Landen (staatkunde)',
-            u'Wikipedia:.*[aA]rchief.*',
-            u'Wikipedia:Doorverwijspagina',
-            u'Wikipedia:Lijst van alle tweeletter-combinaties',
-            u'Wikipedia:Onderhoudspagina',
-            u'Wikipedia:Ongelijke redirects',
-            u'Wikipedia:Protection log',
-            u'Wikipedia:Te verwijderen.*',
-            u'Wikipedia:Top 1000 van meest bekeken artikelen',
-            u'Wikipedia:Wikipedianen met een encyclopedisch artikel',
-            u'Wikipedia:Woorden die niet als zoekterm gebruikt kunnen worden',
-            u'Overleg gebruiker:Taka(/.*)?',
-            u"Wikipedia:Links naar doorverwijspagina's/Artikelen",
-            u"Wikipedia:Wikiproject/Redirects/.*",
-            u"Wikipedia:Wikiproject/Muziek/Overzicht/.*",
-            u"Wikipedia:Wikiproject/Roemeense gemeenten/Doorverwijspagina's",
-            u"Overleg Wikipedia:Wikiproject/Redirects.*",
-            u"Wikipedia:Links naar doorverwijspagina's/Amsterdamconstructie",
+            'Gebruiker:.*',
+            'Overleg gebruiker:.+[aA]rchief.*',
+            'Overleg gebruiker:Pven',
+            'Portaal:.+[aA]rchief.*',
+            'Wikipedia:Humor en onzin.*',
+            "Wikipedia:Links naar doorverwijspagina's/Winkeldochters.*",
+            "Wikipedia:Project aanmelding bij startpagina's",
+            "Wikipedia:Wikiproject Roemeense gemeenten/Doorverwijspagina's",
+            'Categorie:Doorverwijspagina',
+            'Lijst van Nederlandse namen van pausen',
+            'Overleg Wikipedia:Discussie spelling 2005',
+            'Overleg Wikipedia:Doorverwijspagina',
+            'Overleg Wikipedia:Logboek.*',
+            'Wikipedia:Logboek.*',
+            'Overleg gebruiker:Sybren/test.*',
+            'Overleg gebruiker:([0-9][0-9]?[0-9]?\\.){3}[0-9][0-9]?[0-9]?',
+            'Overleg:Lage Landen (staatkunde)',
+            'Wikipedia:.*[aA]rchief.*',
+            'Wikipedia:Doorverwijspagina',
+            'Wikipedia:Lijst van alle tweeletter-combinaties',
+            'Wikipedia:Onderhoudspagina',
+            'Wikipedia:Ongelijke redirects',
+            'Wikipedia:Protection log',
+            'Wikipedia:Te verwijderen.*',
+            'Wikipedia:Top 1000 van meest bekeken artikelen',
+            'Wikipedia:Wikipedianen met een encyclopedisch artikel',
+            'Wikipedia:Woorden die niet als zoekterm gebruikt kunnen worden',
+            'Overleg gebruiker:Taka(/.*)?',
+            "Wikipedia:Links naar doorverwijspagina's/Artikelen",
+            'Wikipedia:Wikiproject/Redirects/.*',
+            'Wikipedia:Wikiproject/Muziek/Overzicht/.*',
+            "Wikipedia:Wikiproject/Roemeense gemeenten/Doorverwijspagina's",
+            'Overleg Wikipedia:Wikiproject/Redirects.*',
+            "Wikipedia:Links naar doorverwijspagina's/Amsterdamconstructie",
         ],
         'pl': [
-            u'Wikipedysta:.+',
-            u'Dyskusja.+:.+',
+            'Wikipedysta:.+',
+            'Dyskusja.+:.+',
         ],
         'pt': [
-            u'Usuário:.+',
-            u'Usuário Discussão:.+',
-            u'Discussão:.+',
-            u'Lista de combinações de duas letras',
-            u'Wikipedia:Lista de páginas de desambiguação.+',
-            u'Wikipedia:Páginas para eliminar/.+',
+            'Usuário:.+',
+            'Usuário Discussão:.+',
+            'Discussão:.+',
+            'Lista de combinações de duas letras',
+            'Wikipedia:Lista de páginas de desambiguação.+',
+            'Wikipedia:Páginas para eliminar/.+',
         ],
         'ru': [
-            u'Категория:Disambig',
-            u'Википедия:Страницы разрешения неоднозначностей',
-            u'Википедия:Вики-уборка/Статьи без языковых ссылок',
-            u'Википедия:Страницы с пометкой «(значения)»',
-            u'Список общерусских фамилий',
+            'Категория:Disambig',
+            'Википедия:Страницы разрешения неоднозначностей',
+            'Википедия:Вики-уборка/Статьи без языковых ссылок',
+            'Википедия:Страницы с пометкой «(значения)»',
+            'Список общерусских фамилий',
         ],
         'sr': [
             'Википедија:Вишезначна одредница',
@@ -357,10 +357,10 @@ ignore_title = {
     },
     'memoryalpha': {
         'en': [
-            u'Memory Alpha:Links to disambiguating pages'
+            'Memory Alpha:Links to disambiguating pages'
         ],
         'de': [
-            u'Memory Alpha:Liste der Wortklärungsseiten'
+            'Memory Alpha:Liste der Wortklärungsseiten'
         ],
     },
 }
@@ -380,7 +380,7 @@ def correctcap(link, text):
     """
     linkupper = link.title()
     linklower = first_lower(linkupper)
-    if "[[%s]]" % linklower in text or "[[%s|" % linklower in text:
+    if '[[%s]]' % linklower in text or '[[%s|' % linklower in text:
         return linklower
     else:
         return linkupper
@@ -416,7 +416,7 @@ class ReferringPageGeneratorWithIgnore(object):
                 namespaces=0 if self.main_only else None
             )
         ]
-        pywikibot.output(u"Found %d references." % len(refs))
+        pywikibot.output('Found {0} references.'.format(len(refs)))
         # Remove ignorables
         if self.disambPage.site.family.name in ignore_title and \
            self.disambPage.site.lang in ignore_title[
@@ -425,16 +425,15 @@ class ReferringPageGeneratorWithIgnore(object):
                                    ][self.disambPage.site.lang]:
                 for i in range(len(refs) - 1, -1, -1):
                     if re.match(ig, refs[i].title()):
-                        pywikibot.log(u'Ignoring page %s'
-                                      % refs[i].title())
+                        pywikibot.log('Ignoring page ' + refs[i].title())
                         del refs[i]
                     elif self.primaryIgnoreManager.isIgnored(refs[i]):
                         del refs[i]
         if len(refs) < self.minimum:
-            pywikibot.output(u"Found only %d pages to work on; skipping."
-                             % len(refs))
+            pywikibot.output('Found only {0} pages to work on; skipping.'
+                             .format(len(refs)))
             return
-        pywikibot.output(u"Will work on %d pages." % len(refs))
+        pywikibot.output('Will work on {} pages.'.format(len(refs)))
         for ref in refs:
             yield ref
 
@@ -605,25 +604,25 @@ class DisambiguationRobot(SingleSiteBot):
     """Disambiguation bot."""
 
     ignore_contents = {
-        'de': (u'{{[Ii]nuse}}',
-               u'{{[Ll]öschen}}',
+        'de': ('{{[Ii]nuse}}',
+               '{{[Ll]öschen}}',
                ),
-        'fi': (u'{{[Tt]yöstetään}}',
+        'fi': ('{{[Tt]yöstetään}}',
                ),
-        'kk': (u'{{[Ii]nuse}}',
-               u'{{[Pp]rocessing}}',
+        'kk': ('{{[Ii]nuse}}',
+               '{{[Pp]rocessing}}',
                ),
-        'nl': (u'{{wiu2}}',
-               u'{{nuweg}}',
+        'nl': ('{{wiu2}}',
+               '{{nuweg}}',
                ),
-        'ru': (u'{{[Ii]nuse}}',
-               u'{{[Pp]rocessing}}',
+        'ru': ('{{[Ii]nuse}}',
+               '{{[Pp]rocessing}}',
                ),
     }
 
     primary_redir_template = {
         # First letter uppercase
-        'hu': u'Egyért-redir',
+        'hu': 'Egyért-redir',
     }
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip,
@@ -784,29 +783,32 @@ class DisambiguationRobot(SingleSiteBot):
             text = refPage.get()
             ignoreReason = self.checkContents(text)
             if ignoreReason:
-                pywikibot.output('\n\nSkipping %s because it contains %s.\n\n'
-                                 % (refPage.title(), ignoreReason))
+                pywikibot.output(
+                    '\n\nSkipping {0} because it contains {1}.\n\n'
+                    .format(refPage.title(), ignoreReason))
             else:
                 include = True
         except pywikibot.IsRedirectPage:
-            pywikibot.output(u'%s is a redirect to %s'
-                             % (refPage.title(), disambPage.title()))
+            pywikibot.output('{0} is a redirect to {1}'
+                             .format(refPage.title(), disambPage.title()))
             if disambPage.isRedirectPage():
                 target = self.alternatives[0]
-                if pywikibot.input_yn(u'Do you want to make redirect %s point '
-                                      'to %s?' % (refPage.title(), target),
-                                      default=False, automatic_quit=False):
-                    redir_text = '#%s [[%s]]' \
-                                 % (self.mysite.redirect(), target)
+                if pywikibot.input_yn(
+                    'Do you want to make redirect {0} point to {1}?'
+                    .format(refPage.title(), target),
+                        default=False, automatic_quit=False):
+                    redir_text = '#{0} [[{1}]]' \
+                                 .format(self.mysite.redirect(), target)
                     try:
                         refPage.put(redir_text, summary=self.comment,
                                     asynchronous=True)
                     except pywikibot.PageNotSaved as error:
-                        pywikibot.output(u'Page not saved: %s' % error.args)
+                        pywikibot.output('Page not saved: {0}'
+                                         .format(error.args))
             else:
                 choice = pywikibot.input_choice(
-                    u'Do you want to work on pages linking to %s?'
-                    % refPage.title(),
+                    'Do you want to work on pages linking to {0}?'
+                    .format(refPage.title()),
                     [('yes', 'y'), ('no', 'n'), ('change redirect', 'c')], 'n',
                     automatic_quit=False)
                 if choice == 'y':
@@ -819,13 +821,13 @@ class DisambiguationRobot(SingleSiteBot):
                         self.treat_links(refPage2, refPage)
                 elif choice == 'c':
                     text = refPage.get(get_redirect=True)
-                    include = "redirect"
+                    include = 'redirect'
         except pywikibot.NoPage:
             pywikibot.output(
-                u'Page [[%s]] does not seem to exist?! Skipping.'
-                % refPage.title())
+                'Page [[{0}]] does not seem to exist?! Skipping.'
+                .format(refPage.title()))
             include = False
-        if include in (True, "redirect"):
+        if include in (True, 'redirect'):
             # save the original text so we can show the changes later
             original_text = text
             n = 0
@@ -859,7 +861,7 @@ class DisambiguationRobot(SingleSiteBot):
                         continue
                 except pywikibot.Error:
                     # must be a broken link
-                    pywikibot.log(u"Invalid link [[%s]] in page [[%s]]"
+                    pywikibot.log('Invalid link [[%s]] in page [[%s]]'
                                   % (m.group('title'), refPage.title()))
                     continue
                 n += 1
@@ -968,7 +970,7 @@ class DisambiguationRobot(SingleSiteBot):
                     if answer[0] == 'r':
                         # we want to throw away the original link text
                         replaceit = link_text == page_title
-                    elif include == "redirect":
+                    elif include == 'redirect':
                         replaceit = True
                     else:
                         replaceit = False
@@ -985,12 +987,12 @@ class DisambiguationRobot(SingleSiteBot):
                     if new_page_title not in new_targets:
                         new_targets.append(new_page_title)
                     if replaceit and trailing_chars:
-                        newlink = "[[%s%s]]%s" % (new_page_title,
-                                                  section,
-                                                  trailing_chars)
+                        newlink = '[[{0}{1}]]{2}'.format(new_page_title,
+                                                         section,
+                                                         trailing_chars)
                     elif replaceit or (new_page_title == link_text
                                        and not section):
-                        newlink = "[[%s]]" % new_page_title
+                        newlink = '[[{0}]]'.format(new_page_title)
                     # check if we can create a link with trailing characters
                     # instead of a pipelink
                     elif (
@@ -1001,31 +1003,31 @@ class DisambiguationRobot(SingleSiteBot):
                             '', link_text[len(new_page_title):]) == '') and
                         (not section)
                     ):
-                        newlink = "[[%s]]%s" \
-                                  % (link_text[:len(new_page_title)],
-                                     link_text[len(new_page_title):])
+                        newlink = '[[{0}]]{1}'.format(
+                            link_text[:len(new_page_title)],
+                            link_text[len(new_page_title):])
                     else:
-                        newlink = "[[%s%s|%s]]" \
-                                  % (new_page_title, section, link_text)
+                        newlink = '[[{0}{1}|{2}]]'.format(new_page_title,
+                                                          section, link_text)
                     text = text[:m.start()] + newlink + text[m.end():]
                     continue
                 # Todo: This line is unreachable (T155337)
                 pywikibot.output(text[max(0, m.start() - 30):m.end() + 30])
             if text == original_text:
-                pywikibot.output(u'\nNo changes have been made:\n')
+                pywikibot.output('\nNo changes have been made:\n')
             else:
-                pywikibot.output(u'\nThe following changes have been made:\n')
+                pywikibot.output('\nThe following changes have been made:\n')
                 pywikibot.showDiff(original_text, text)
-                pywikibot.output(u'')
+                pywikibot.output('')
                 # save the page
                 self.setSummaryMessage(disambPage, new_targets, unlink_counter,
                                        dn)
                 try:
                     refPage.put(text, summary=self.comment, asynchronous=True)
                 except pywikibot.LockedPage:
-                    pywikibot.output(u'Page not saved: page is locked')
+                    pywikibot.output('Page not saved: page is locked')
                 except pywikibot.PageNotSaved as error:
-                    pywikibot.output(u'Page not saved: %s' % error.args)
+                    pywikibot.output('Page not saved: {0}'.format(error.args))
         return 'done'
 
     def findAlternatives(self, disambPage):
@@ -1056,8 +1058,8 @@ class DisambiguationRobot(SingleSiteBot):
                         links = self.firstize(disambPage2, links)
                     links = [correctcap(l, disambPage2.get()) for l in links]
                 except pywikibot.NoPage:
-                    pywikibot.output(u"No page at %s, using redirect target."
-                                     % disambTitle)
+                    pywikibot.output('No page at {0}, using redirect target.'
+                                     .format(disambTitle))
                     links = disambPage.linkedPages()[:1]
                     links = [correctcap(l, disambPage.get(get_redirect=True))
                              for l in links]
@@ -1067,17 +1069,17 @@ class DisambiguationRobot(SingleSiteBot):
                     target = disambPage.getRedirectTarget().title()
                     self.alternatives.append(target)
                 except pywikibot.NoPage:
-                    pywikibot.output(u"The specified page was not found.")
-                    user_input = pywikibot.input(u"""\
+                    pywikibot.output('The specified page was not found.')
+                    user_input = pywikibot.input("""\
 Please enter the name of the page where the redirect should have pointed at,
 or press enter to quit:""")
-                    if user_input == "":
+                    if user_input == '':
                         self.quit()
                     else:
                         self.alternatives.append(user_input)
                 except pywikibot.IsNotRedirectPage:
                     pywikibot.output(
-                        u"The specified page is not a redirect. Skipping.")
+                        'The specified page is not a redirect. Skipping.')
                     return False
         elif self.getAlternatives:
             # not disambPage.isRedirectPage() or self.primary
@@ -1096,8 +1098,8 @@ or press enter to quit:""")
                                  for l in links]
                     except pywikibot.NoPage:
                         pywikibot.output(
-                            'Page does not exist; using first link in page %s.'
-                            % disambPage.title())
+                            'Page does not exist; using first '
+                            'link in page {0}.'.format(disambPage.title()))
                         links = disambPage.linkedPages()[:1]
                         links = [correctcap(l, disambPage.get())
                                  for l in links]
@@ -1109,10 +1111,10 @@ or press enter to quit:""")
                         links = [correctcap(l, disambPage.get())
                                  for l in links]
                     except pywikibot.NoPage:
-                        pywikibot.output(u"Page does not exist, skipping.")
+                        pywikibot.output('Page does not exist, skipping.')
                         return False
             except pywikibot.IsRedirectPage:
-                pywikibot.output(u"Page is a redirect, skipping.")
+                pywikibot.output('Page is a redirect, skipping.')
                 return False
             self.alternatives += links
         return True
@@ -1121,8 +1123,8 @@ or press enter to quit:""")
                           dn=False):
         """Setup i18n summary message."""
         # make list of new targets
-        comma = self.mysite.mediawiki_message(u"comma-separator")
-        targets = comma.join(u'[[%s]]' % page_title
+        comma = self.mysite.mediawiki_message('comma-separator')
+        targets = comma.join('[[{0}]]'.format(page_title)
                              for page_title in new_targets)
 
         if not targets:
@@ -1258,8 +1260,8 @@ def main(*args):
                     alternatives.append(page.title())
                 else:
                     if pywikibot.input_yn(
-                            u'Possibility %s does not actually exist. Use it '
-                            'anyway?' % page.title(),
+                            'Possibility {0} does not actually exist. Use it '
+                            'anyway?'.format(page.title()),
                             default=False, automatic_quit=False):
                         alternatives.append(page.title())
             else:
@@ -1302,5 +1304,5 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
