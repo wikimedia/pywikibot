@@ -3391,8 +3391,6 @@ class APISite(BaseSite):
             else:
                 rvgen.request['titles'] = list(cache.keys())
             rvgen.request['rvprop'] = rvprop
-            if self.mw_version >= '1.32':
-                rvgen.request['rvslots'] = '*'
             pywikibot.output(u"Retrieving %s pages from %s."
                              % (len(cache), self))
 
@@ -4002,8 +4000,6 @@ class APISite(BaseSite):
         elif endsort:
             raise ValueError("categorymembers: "
                              "invalid combination of 'sortby' and 'endsort'")
-        if content and self.mw_version >= '1.32':
-            cmargs['rvslots'] = '*'
 
         return self._generator(api.PageGenerator, namespaces=namespaces,
                                total=total, g_content=content, **cmargs)
@@ -4085,10 +4081,6 @@ class APISite(BaseSite):
         rvargs = {'type_arg': 'info|revisions'}
 
         rvargs['rvprop'] = ['ids', 'timestamp', 'flags', 'comment', 'user']
-        if self.mw_version >= '1.32':
-            rvargs['rvslots'] = '*'
-            # 'roles' is not implemented in Revision class yet.
-            # rvargs['rvprop'].append('roles')
         if self.mw_version >= '1.21':
             rvargs['rvprop'].append('contentmodel')
         if self.mw_version >= '1.19':

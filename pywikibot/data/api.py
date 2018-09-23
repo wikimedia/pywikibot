@@ -1412,7 +1412,7 @@ class Request(MutableMapping):
         if "action" not in parameters:
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
-        self.update(parameters)
+        self.update(parameters)  # also convert all parameter values to lists
         self._warning_handler = None
         # Actions that imply database updates on the server, used for various
         # things like throttling or skipping actions when we're in simulation
@@ -1612,11 +1612,11 @@ class Request(MutableMapping):
 
     def __contains__(self, key):
         """Implement dict interface."""
-        return self._params.__contains__(key)
+        return key in self._params
 
     def __iter__(self):
         """Implement dict interface."""
-        return self._params.__iter__()
+        return iter(self._params)
 
     def __len__(self):
         """Implement dict interface."""
@@ -2697,6 +2697,37 @@ class QueryGenerator(_RequestWrapper):
         #     "templates":{"tlcontinue":"310820|828|Namespace_detect"}}
         # self.continuekey is a list
         self.continuekey = self.modules
+        self._add_slots()
+
+    def _add_slots(self):
+        """Add slots to params if the site supports multi-content revisions.
+
+        On MW 1.32+ the following query parameters require slots to be given
+        when content or contentmodel is requested.
+
+        * prop=revisions
+        * prop=deletedrevisions or
+        * list=allrevisions
+        * list=alldeletedrevisions
+
+        More info:
+        https://lists.wikimedia.org/pipermail/mediawiki-api-announce/2018-August/000140.html
+        """
+        if self.site.mw_version < '1.32':
+            return
+        request = self.request
+        props = request.get('prop')
+        if props:
+            if 'revisions' in props:
+                request['rvslots'] = '*'
+            if 'deletedrevisions' in props:
+                request['drvslots'] = '*'
+        lists = request.get('list')
+        if lists:
+            if 'allrevisions' in lists:
+                request['arvslots'] = '*'
+            if 'deletedrevisions' in lists:
+                request['adrslots'] = '*'
 
     def set_query_increment(self, value):
         """Set the maximum number of items to be retrieved per API query.
