@@ -103,8 +103,8 @@ class UploadTextBot(SingleSiteBot):
         @raises: pywikibot.Error
         """
         if not isinstance(page, ProofreadPage):
-            raise pywikibot.Error('Page %s must be a ProofreadPage object.'
-                                  % page)
+            raise pywikibot.Error('Page {} must be a ProofreadPage object.'
+                                  .format(page))
 
         summary = self.getOption('summary')
 
@@ -118,7 +118,8 @@ class UploadTextBot(SingleSiteBot):
 
         if (page.exists() and
                 not (self.getOption('ocr') and self.getOption('force'))):
-            pywikibot.output('Page %s already exists, not adding!' % page)
+            pywikibot.output('Page {} already exists, not adding!'
+                             .format(page))
         else:
             self.userPut(page, old_text, page.text, summary=summary,
                          show_diff=self.getOption('showdiff'))
@@ -156,7 +157,7 @@ def main(*args):
         elif arg == '-always':
             options['always'] = True
         else:
-            pywikibot.output('Unknown argument %s' % arg)
+            pywikibot.output('Unknown argument ' + arg)
 
     # index is mandatory.
     if not index:
@@ -170,13 +171,14 @@ def main(*args):
 
     site = pywikibot.Site()
     if not site.has_extension('ProofreadPage'):
-        pywikibot.error('Site %s must have ProofreadPage extension.' % site)
+        pywikibot.error('Site {} must have ProofreadPage extension.'
+                        .format(site))
         return False
 
     index = IndexPage(site, index)
 
     if not index.exists():
-        pywikibot.error("Page %s doesn't exist." % index)
+        pywikibot.error("Page {} doesn't exist.".format(index))
         return False
 
     # Parse pages param.
@@ -200,7 +202,8 @@ def main(*args):
 
     gen = itertools.chain(*gen_list)
 
-    pywikibot.output('\nUploading text to %s\n' % index.title(as_link=True))
+    pywikibot.output('\nUploading text to {}\n'
+                     .format(index.title(as_link=True)))
 
     bot = UploadTextBot(gen, site=index.site, **options)
     bot.run()
