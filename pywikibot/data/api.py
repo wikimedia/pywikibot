@@ -2716,18 +2716,40 @@ class QueryGenerator(_RequestWrapper):
         if self.site.mw_version < '1.32':
             return
         request = self.request
+        # If using any deprecated_params, do not add slots. Usage of
+        # these parameters together with slots is forbidden and the user will
+        # get an API warning anyway.
         props = request.get('prop')
         if props:
             if 'revisions' in props:
-                request['rvslots'] = '*'
+                deprecated_params = {
+                    'rvexpandtemplates', 'rvparse', 'rvdiffto', 'rvdifftotext',
+                    'rvdifftotextpst', 'rvcontentformat', 'parsetree'}
+                if not set(request) & deprecated_params:
+                    request['rvslots'] = '*'
             if 'deletedrevisions' in props:
-                request['drvslots'] = '*'
+                deprecated_params = {
+                    'drvexpandtemplates', 'drvparse', 'drvdiffto',
+                    'drvdifftotext', 'drvdifftotextpst', 'drvcontentformat',
+                    'parsetree'}
+                if not set(request) & deprecated_params:
+                    request['drvslots'] = '*'
         lists = request.get('list')
         if lists:
             if 'allrevisions' in lists:
-                request['arvslots'] = '*'
-            if 'deletedrevisions' in lists:
-                request['adrslots'] = '*'
+                deprecated_params = {
+                    'arvexpandtemplates', 'arvparse', 'arvdiffto',
+                    'arvdifftotext', 'arvdifftotextpst', 'arvcontentformat',
+                    'parsetree'}
+                if not set(request) & deprecated_params:
+                    request['arvslots'] = '*'
+            if 'alldeletedrevisions' in lists:
+                deprecated_params = {
+                    'adrexpandtemplates', 'adrparse', 'adrdiffto',
+                    'adrdifftotext', 'adrdifftotextpst', 'adrcontentformat',
+                    'parsetree'}
+                if not set(request) & deprecated_params:
+                    request['adrslots'] = '*'
 
     def set_query_increment(self, value):
         """Set the maximum number of items to be retrieved per API query.
