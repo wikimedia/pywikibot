@@ -29,7 +29,7 @@ try:
 except ImportError as e:
     EventSource = e
 
-from pywikibot import config, debug, Site, warning
+from pywikibot import config, debug, Timestamp, Site, warning
 from pywikibot.tools import deprecated_args, StringTypes
 
 # requests >= 2.9 is required for eventstreams (T184713)
@@ -81,6 +81,11 @@ class EventStreams(object):
 
         @keyword site: a project site object. Used when no url is given
         @type site: APISite
+        @keyword since: a timestamp for older events; there will likely be
+            between 7 and 31 days of history available but is not guaranteed.
+            It may be given as a pywikibot.Timestamp, an ISO 8601 string
+            or a mediawiki timestamp string.
+        @type since: pywikibot.Timestamp or str
         @keyword streams: event stream types. Mandatory when no url is given.
             Multiple streams may be given as a string with comma separated
             stream types or an iterable of strings
@@ -91,7 +96,7 @@ class EventStreams(object):
             data before giving up
         @type timeout: int, float or a tuple of two values of int or float
         @keyword url: an url retrieving events from. Will be set up to a
-            default url using _site.family settings and stream types
+            default url using _site.family settings, stream types and timestamp
         @type url: str
         @param kwargs: keyword arguments passed to SSEClient and requests lib
         @raises ImportError: sseclient is not installed
@@ -103,9 +108,20 @@ class EventStreams(object):
         self.filter = {'all': [], 'any': [], 'none': []}
         self._total = None
         self._site = kwargs.pop('site', Site())
+
         self._streams = kwargs.pop('streams', None)
         if self._streams and not isinstance(self._streams, StringTypes):
             self._streams = ','.join(self._streams)
+
+        self._since = kwargs.pop('since', None)
+        if self._since:
+            # assume this is a mw timestamp, convert it to a Timestamp object
+            if isinstance(self._streams, StringTypes) \
+               and '-' not in self._since:
+                self._since = Timestamp.fromtimestampformat(self._since)
+            if isinstance(self._streams, Timestamp):
+                self._since = self._since.isoformat
+
         self._url = kwargs.get('url') or self.url
         kwargs.setdefault('url', self._url)
         kwargs.setdefault('timeout', config.socket_timeout)
@@ -119,6 +135,8 @@ class EventStreams(object):
         if self._streams:
             kwargs['streams'] = self._streams
             kwargs.pop('url')
+        if self._since:
+            kwargs['since'] = self._since
         if kwargs['timeout'] == config.socket_timeout:
             kwargs.pop('timeout')
         return '{0}({1})'.format(self.__class__.__name__, ', '.join(
@@ -135,9 +153,12 @@ class EventStreams(object):
                 raise NotImplementedError(
                     'No streams specified for class {0}'
                     .format(self.__class__.__name__))
-            self._url = ('{0}{1}/{2}'.format(self._site.eventstreams_host(),
-                                             self._site.eventstreams_path(),
-                                             self._streams))
+            self._url = ('{host}{path}/{streams}{since}'
+                         .format(host=self._site.eventstreams_host(),
+                                 path=self._site.eventstreams_path(),
+                                 streams=self._streams,
+                                 since=('?since=' + self._since)
+                                 if self._since else ''))
         return self._url
 
     def set_maximum_items(self, value):
