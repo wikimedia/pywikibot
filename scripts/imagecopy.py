@@ -412,7 +412,8 @@ class TkdialogIC(Tkdialog):
         # uploader.decode('utf-8')
         scrollbar = Tkinter.Scrollbar(self.root, orient=Tkinter.VERTICAL)
         label = Tkinter.Label(self.root, text='Enter new name or leave blank.')
-        imageinfo = Tkinter.Label(self.root, text='Uploaded by %s.' % uploader)
+        imageinfo = Tkinter.Label(self.root, text='Uploaded by {}.'.format(
+            uploader))
         textarea = Tkinter.Text(self.root)
         textarea.insert(Tkinter.END, content.encode('utf-8'))
         textarea.config(state=Tkinter.DISABLED,
