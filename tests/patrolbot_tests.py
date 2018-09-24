@@ -54,30 +54,30 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         for gen_user in (1, 2):
             user = 'Test {0}'.format(gen_user)
             self.assertIn(user, tuples)
-            self.assertEqual(tuples[user], ['Page {0}'.format(i * gen_user)
-                                            for i in range(1, 4)])
+            self.assertEqual(tuples[user], {'Page {0}'.format(i * gen_user)
+                                            for i in range(1, 4)})
         self.assertIn('Prefixed', tuples)
-        self.assertEqual(tuples['Prefixed'], ['Page 1', 'Page 2'])
+        self.assertEqual(tuples['Prefixed'], {'Page 1', 'Page 2'})
         self.assertEqual(self.bot.parse_page_tuples('[[link]]'), {})
 
     def test_in_list(self):
-        """Test the method which returns whether a page is in the list."""
+        """Test the method which returns whether a page is in the set."""
         # Return True if there is an exact match
-        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foo'))
-        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foobar'))
-        self.assertFalse(self.bot.in_list(['Foo', 'Foobar'], 'Bar'))
+        self.assertTrue(self.bot.in_list({'Foo', 'Foobar'}, 'Foo'))
+        self.assertTrue(self.bot.in_list({'Foo', 'Foobar'}, 'Foobar'))
+        self.assertFalse(self.bot.in_list({'Foo', 'Foobar'}, 'Bar'))
 
         # Return True if an entry starts with the title if there is no
         # exact match
-        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foob'))
-        self.assertTrue(self.bot.in_list(['Foo', 'Foobar'], 'Foobarz'))
-        self.assertTrue(self.bot.in_list(['Foo', 'Foobar', 'Bar'], 'Barz'))
-        self.assertFalse(self.bot.in_list(['Foobar', 'Bar'], 'Foo'))
+        self.assertTrue(self.bot.in_list({'Foo', 'Foobar'}, 'Foob'))
+        self.assertTrue(self.bot.in_list({'Foo', 'Foobar'}, 'Foobarz'))
+        self.assertTrue(self.bot.in_list({'Foo', 'Foobar', 'Bar'}, 'Barz'))
+        self.assertFalse(self.bot.in_list({'Foobar', 'Bar'}, 'Foo'))
 
         # '' returns True if there is no exact match
-        self.assertTrue(self.bot.in_list([''], 'Foo'))
-        self.assertTrue(self.bot.in_list(['', 'Foobar'], 'Foo'))
-        self.assertTrue(self.bot.in_list(['', 'Foo'], 'Foo'))
+        self.assertTrue(self.bot.in_list({''}, 'Foo'))
+        self.assertTrue(self.bot.in_list({'', 'Foobar'}, 'Foo'))
+        self.assertTrue(self.bot.in_list({'', 'Foo'}, 'Foo'))
 
 
 if __name__ == '__main__':  # pragma: no cover

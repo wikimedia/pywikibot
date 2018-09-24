@@ -199,7 +199,7 @@ class PatrolBot(SingleSiteBot):
 
     def parse_page_tuples(self, wikitext, user=None):
         """Parse page details apart from 'user:' for use."""
-        whitelist = defaultdict(list)
+        whitelist = defaultdict(set)
 
         current_user = False
         parsed = mwparserfromhell.parse(wikitext)
@@ -253,7 +253,7 @@ class PatrolBot(SingleSiteBot):
                             verbose_output('Whitelist page: ' + page)
                         verbose_output('Adding {0}:{1}'
                                        .format(current_user, page))
-                        whitelist[current_user].append(page)
+                        whitelist[current_user].add(page)
                     else:
                         verbose_output(
                             'Discarding whitelist page for another user: '
