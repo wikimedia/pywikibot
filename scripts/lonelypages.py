@@ -128,7 +128,7 @@ class LonelyPagesBot(SingleSiteBot):
             except ValueError as e:
                 orphan_template = e
         if orphan_template is None or isinstance(orphan_template, ValueError):
-            err_message = 'Missing configuration for site %s' % self.site
+            err_message = 'Missing configuration for site {}'.format(self.site)
             suggest_help(exception=orphan_template, additional_text=err_message)
             sys.exit(err_message)
         else:
@@ -139,11 +139,12 @@ class LonelyPagesBot(SingleSiteBot):
             try:
                 self.disambigtext = self.disambigpage.get()
             except pywikibot.NoPage:
-                pywikibot.output(u"%s doesn't esist, skip!" % self.disambigpage.title())
+                pywikibot.output("{0} doesn't esist, skip!"
+                                 .format(self.disambigpage.title()))
                 self.disambigtext = ''
             except pywikibot.IsRedirectPage:
-                pywikibot.output(u"%s is a redirect, don't use it!"
-                                 % self.disambigpage.title())
+                pywikibot.output("{0} is a redirect, don't use it!"
+                                 .format(self.disambigpage.title()))
                 self.options['disambigPage'] = None
 
     @property
@@ -159,11 +160,12 @@ class LonelyPagesBot(SingleSiteBot):
                 getenable = enable.get()
             except pywikibot.NoPage:
                 pywikibot.output(
-                    u"%s doesn't esist, I use the page as if it was blank!"
-                    % enable.title())
+                    "{0} doesn't esist, I use the page as if it was blank!"
+                    .format(enable.title()))
                 getenable = ''
             except pywikibot.IsRedirectPage:
-                pywikibot.output(u"%s is a redirect, skip!" % enable.title())
+                pywikibot.output('{0} is a redirect, skip!'
+                                 .format(enable.title()))
                 getenable = ''
             return getenable == 'enable'
         return True
@@ -180,46 +182,51 @@ class LonelyPagesBot(SingleSiteBot):
 
     def treat(self, page):
         """Check if page is applicable and not marked and add template then."""
-        pywikibot.output(u"Checking %s..." % page.title())
+        pywikibot.output('Checking {0}...'.format(page.title()))
         if page.isRedirectPage():  # If redirect, skip!
-            pywikibot.output(u'%s is a redirect! Skip...' % page.title())
+            pywikibot.output('{0} is a redirect! Skip...'
+                             .format(page.title()))
             return
         refs = list(page.getReferences(total=1))
         if len(refs) > 0:
-            pywikibot.output(u"%s isn't orphan! Skip..." % page.title())
+            pywikibot.output("{0} isn't orphan! Skip..."
+                             .format(page.title()))
             return
         else:
             # no refs, no redirect; check if there's already the template
             try:
                 oldtxt = page.get()
             except pywikibot.NoPage:
-                pywikibot.output(u"%s doesn't exist! Skip..." % page.title())
+                pywikibot.output("{0} doesn't exist! Skip..."
+                                 .format(page.title()))
                 return
             except pywikibot.IsRedirectPage:
-                pywikibot.output(u"%s is a redirect! Skip..." % page.title())
+                pywikibot.output('{0} is a redirect! Skip...'
+                                 .format(page.title()))
                 return
             if self.settings.regex.search(oldtxt):
                 pywikibot.output(
-                    u'Your regex has found something in %s, skipping...'
-                    % page.title())
+                    'Your regex has found something in {0}, skipping...'
+                    .format(page.title()))
                 return
             if page.isDisambig() and self.getOption('disambigPage') is not None:
-                pywikibot.output(u'%s is a disambig page, report..'
-                                 % page.title())
+                pywikibot.output('{0} is a disambig page, report..'
+                                 .format(page.title()))
                 if not page.title().lower() in self.disambigtext.lower():
-                    self.disambigtext = u"%s\n*[[%s]]" % (self.disambigtext, page.title())
+                    self.disambigtext = '{0}\n*[[{1}]]'.format(
+                        self.disambigtext, page.title())
                     self.disambigpage.text = self.disambigtext
                     self.disambigpage.save(self.commentdisambig)
                     return
             # Is the page a disambig but there's not disambigPage? Skip!
             elif page.isDisambig():
-                pywikibot.output(u'%s is a disambig page, skip...'
-                                 % page.title())
+                pywikibot.output('{0} is a disambig page, skip...'
+                                 .format(page.title()))
                 return
             else:
                 # Ok, the page need the template. Let's put it there!
                 # Adding the template in the text
-                newtxt = '%s\n%s' % (self.settings.template, oldtxt)
+                newtxt = '{0}\n{1}'.format(self.settings.template, oldtxt)
                 self.userPut(page, oldtxt, newtxt, summary=self.comment)
 
 
@@ -242,13 +249,13 @@ def main(*args):
         if arg.startswith('-enable'):
             if len(arg) == 7:
                 options['enablePage'] = pywikibot.input(
-                    u'Would you like to check if the bot should run or not?')
+                    'Would you like to check if the bot should run or not?')
             else:
                 options['enablePage'] = arg[8:]
         elif arg.startswith('-disambig'):
             if len(arg) == 9:
                 options['disambigPage'] = pywikibot.input(
-                    u'In which page should the bot save the disambig pages?')
+                    'In which page should the bot save the disambig pages?')
             else:
                 options['disambigPage'] = arg[10:]
         elif arg == '-always':
