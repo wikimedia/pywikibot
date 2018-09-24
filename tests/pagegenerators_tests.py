@@ -1286,7 +1286,6 @@ class TestWantedFactoryGenerator(DefaultSiteTestCase):
         pages = list(gen)
         self.assertLessEqual(len(pages), 5)
         for page in pages:
-            self.assertFalse(page.exists())
             yield page
 
     def test_wanted_pages(self):
