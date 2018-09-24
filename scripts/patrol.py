@@ -87,7 +87,6 @@ class PatrolBot(SingleSiteBot):
         """
         Initializer.
 
-        @kwarg feed: The changes feed to work on (Newpages or Recentchanges)
         @kwarg ask: If True, confirm each patrol action
         @kwarg whitelist: page title for whitelist (optional)
         @kwarg autopatroluserns: Takes user consent to automatically patrol
@@ -95,7 +94,6 @@ class PatrolBot(SingleSiteBot):
         """
         self.availableOptions.update({
             'ask': False,
-            'feed': None,
             'whitelist': None,
             'versionchecktime': 300,
             'autopatroluserns': False
@@ -296,12 +294,10 @@ class PatrolBot(SingleSiteBot):
                 pywikibot.output('Found author ' + author_page_name)
             return True
 
-    def run(self, feed=None):
+    def run(self, feed):
         """Process 'whitelist' page absent in generator."""
         if self.whitelist is None:
             self.load_whitelist()
-        if not feed:
-            feed = self.getOption('feed')
         try:
             for page in feed:
                 self.treat(page)
