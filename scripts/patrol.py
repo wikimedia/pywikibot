@@ -66,6 +66,12 @@ from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt
 _logger = 'patrol'
 
 
+def verbose_output(string):
+    """Verbose output."""
+    if pywikibot.config.verbose_output:
+        pywikibot.output(string)
+
+
 class PatrolBot(SingleSiteBot):
 
     """Bot marks the edits as patrolled based on info obtained by whitelist."""
@@ -126,8 +132,7 @@ class PatrolBot(SingleSiteBot):
         # Check for a more recent version after versionchecktime in sec.
         if (self.whitelist_load_ts and (time.time() - self.whitelist_load_ts <
                                         self.getOption('versionchecktime'))):
-            if pywikibot.config.verbose_output:
-                pywikibot.output('Whitelist not stale yet')
+            verbose_output('Whitelist not stale yet')
             return
 
         whitelist_page = pywikibot.Page(self.site,
@@ -145,8 +150,7 @@ class PatrolBot(SingleSiteBot):
                     # As there hasn't been any change to the whitelist
                     # it has been effectively reloaded 'now'
                     self.whitelist_load_ts = time.time()
-                    if pywikibot.config.verbose_output:
-                        pywikibot.output('Whitelist not modified')
+                    verbose_output('Whitelist not modified')
                     return
 
             if self.whitelist:
@@ -167,8 +171,7 @@ class PatrolBot(SingleSiteBot):
 
     def in_list(self, pagelist, title):
         """Check if title present in pagelist."""
-        if pywikibot.config.verbose_output:
-            pywikibot.output('Checking whitelist for: ' + title)
+        verbose_output('Checking whitelist for: ' + title)
 
         # quick check for exact match
         if title in pagelist:
@@ -176,25 +179,21 @@ class PatrolBot(SingleSiteBot):
 
         # quick check for wildcard
         if '' in pagelist:
-            if pywikibot.config.verbose_output:
-                pywikibot.output('wildcarded')
+            verbose_output('wildcarded')
             return '.*'
 
         for item in pagelist:
-            if pywikibot.config.verbose_output:
-                pywikibot.output('checking against whitelist item = ' + item)
+            verbose_output('checking against whitelist item = ' + item)
 
             if isinstance(item, LinkedPagesRule):
-                if pywikibot.config.verbose_output:
-                    pywikibot.output('invoking programmed rule')
+                verbose_output('invoking programmed rule')
                 if item.match(title):
                     return item
 
             elif title_match(item, title):
                 return item
 
-        if pywikibot.config.verbose_output:
-            pywikibot.output('not found')
+        verbose_output('not found')
 
     def parse_page_tuples(self, wikitext, user=None):
         """Parse page details apart from 'user:' for use."""
@@ -224,14 +223,12 @@ class PatrolBot(SingleSiteBot):
                     name, sep, prefix = obj.title.partition('/')
                     if name.lower() in self._prefixindex_aliases:
                         if not prefix:
-                            if pywikibot.config.verbose_output:
-                                pywikibot.output('Whitelist everything')
+                            verbose_output('Whitelist everything')
                             page = ''
                         else:
                             page = prefix
-                            if pywikibot.config.verbose_output:
-                                pywikibot.output('Whitelist prefixindex hack '
-                                                 'for: ' + page)
+                            verbose_output('Whitelist prefixindex hack for: '
+                                           + page)
                             # p = pywikibot.Page(self.site, obj.target[20:])
                             # obj.namespace = p.namespace
                             # obj.target = p.title()
@@ -241,8 +238,7 @@ class PatrolBot(SingleSiteBot):
                     # 'user:'
                     # the user will be the target of subsequent rules
                     current_user = obj.title
-                    if pywikibot.config.verbose_output:
-                        pywikibot.output('Whitelist user: ' + current_user)
+                    verbose_output('Whitelist user: ' + current_user)
                     continue
                 else:
                     page = obj.canonical_title()
@@ -250,19 +246,17 @@ class PatrolBot(SingleSiteBot):
                 if current_user:
                     if not user or current_user == user:
                         if self.is_wikisource_author_page(page):
-                            if pywikibot.config.verbose_output:
-                                pywikibot.output('Whitelist author: ' + page)
+                            verbose_output('Whitelist author: ' + page)
                             page = LinkedPagesRule(page)
                         else:
-                            if pywikibot.config.verbose_output:
-                                pywikibot.output('Whitelist page: ' + page)
-                        if pywikibot.config.verbose_output:
-                            pywikibot.output('Adding {0}:{1}'
-                                             .format(current_user, page))
+                            verbose_output('Whitelist page: ' + page)
+                        verbose_output('Adding {0}:{1}'
+                                       .format(current_user, page))
                         whitelist[current_user].append(page)
-                    elif pywikibot.config.verbose_output:
-                        pywikibot.output('Discarding whitelist page for '
-                                         'another user: ' + page)
+                    else:
+                        verbose_output(
+                            'Discarding whitelist page for another user: '
+                            + page)
                 else:
                     raise Exception('No user set for page ' + page)
 
@@ -283,9 +277,8 @@ class PatrolBot(SingleSiteBot):
         pywikibot.debug('Author ns: {0}; name: {1}'
                         .format(author_ns, author_ns_prefix), _logger)
         if title.find(author_ns_prefix + ':') == 0:
-            if pywikibot.config.verbose_output:
-                author_page_name = title[len(author_ns_prefix) + 1:]
-                pywikibot.output('Found author ' + author_page_name)
+            author_page_name = title[len(author_ns_prefix) + 1:]
+            verbose_output('Found author ' + author_page_name)
             return True
 
     def run(self, feed=None):
@@ -322,24 +315,22 @@ class PatrolBot(SingleSiteBot):
                 self.load_whitelist()
                 self.repeat_start_ts = time.time()
 
-            if pywikibot.config.verbose_output or self.getOption('ask'):
-                pywikibot.output('User {0} has created or modified page {1}'
-                                 .format(username, title))
+            if self.getOption('ask'):
+                verbose_output('User {0} has created or modified page {1}'
+                               .format(username, title))
 
             if self.getOption('autopatroluserns') and (page['ns'] == 2 or
                                                        page['ns'] == 3):
                 # simple rule to whitelist any user editing their own userspace
                 if title.partition(':')[2].split('/')[0].startswith(username):
-                    if pywikibot.config.verbose_output:
-                        pywikibot.output('{0} is whitelisted to modify {1}'
-                                         .format(username, title))
+                    verbose_output('{0} is whitelisted to modify {1}'
+                                   .format(username, title))
                     choice = True
 
             if not choice and username in self.whitelist:
                 if self.in_list(self.whitelist[username], title):
-                    if pywikibot.config.verbose_output:
-                        pywikibot.output('{0} is whitelisted to modify {1}'
-                                         .format(username, title))
+                    verbose_output('{0} is whitelisted to modify {1}'
+                                   .format(username, title))
                     choice = True
 
             if self.getOption('ask'):
