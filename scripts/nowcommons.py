@@ -59,10 +59,10 @@ from itertools import chain
 import sys
 
 import pywikibot
-
-from pywikibot import i18n, Bot
+from pywikibot import Bot, i18n
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot import pagegenerators as pg
-from pywikibot.tools import filter_unique
+from pywikibot.tools import filter_unique, issue_deprecation_warning
 from pywikibot.tools.formatter import color_format
 
 from scripts.image import ImageRobot as ImageBot
@@ -391,8 +391,9 @@ def main(*args):
             raise NotImplementedError(
                 "The '-hash' argument is not implemented anymore.")
         elif arg == '-autonomous':
-            pywikibot.warning("The '-autonomous' argument is DEPRECATED,"
-                              " use '-always' instead.")
+            issue_deprecation_warning('-autonomous', '-always', 2,
+                                      ArgumentDeprecationWarning,
+                                      since='20140724')
             options['always'] = True
         elif arg.startswith('-'):
             if arg[1:] in ('always', 'replace', 'replaceloose', 'replaceonly'):
