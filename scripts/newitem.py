@@ -56,9 +56,9 @@ class NewItemRobot(WikidataBot):
             days=self.pageAge)
         self.lastEditBefore = self.repo.getcurrenttime() - timedelta(
             days=self.lastEdit)
-        pywikibot.output('Page age is set to %s days so only pages created'
-                         '\nbefore %s will be considered.'
-                         % (self.pageAge, self.pageAgeBefore.isoformat()))
+        pywikibot.output('Page age is set to {0} days so only pages created'
+                         '\nbefore {1} will be considered.'
+                         .format(self.pageAge, self.pageAgeBefore.isoformat()))
         pywikibot.output(
             'Last edit is set to {0} days so only pages last edited'
             '\nbefore {1} will be considered.'.format(
@@ -85,34 +85,36 @@ class NewItemRobot(WikidataBot):
     def treat_page_and_item(self, page, item):
         """Treat page/item."""
         if item and item.exists():
-            pywikibot.output(u'%s already has an item: %s.' % (page, item))
+            pywikibot.output('{0} already has an item: {1}.'
+                             .format(page, item))
             if self.getOption('touch'):
-                pywikibot.output(u'Doing a null edit on the page.')
+                pywikibot.output('Doing a null edit on the page.')
                 self._touch_page(page)
             return
 
         if page.isRedirectPage():
-            pywikibot.output(u'%s is a redirect page. Skipping.' % page)
+            pywikibot.output('{0} is a redirect page. Skipping.'.format(page))
             return
         if page.editTime() > self.lastEditBefore:
             pywikibot.output(
-                u'Last edit on %s was on %s.\nToo recent. Skipping.'
-                % (page, page.editTime().isoformat()))
+                'Last edit on {0} was on {1}.\nToo recent. Skipping.'
+                .format(page, page.editTime().isoformat()))
             return
 
         if page.oldest_revision.timestamp > self.pageAgeBefore:
             pywikibot.output(
-                u'Page creation of %s on %s is too recent. Skipping.'
-                % (page, page.editTime().isoformat()))
+                'Page creation of {0} on {1} is too recent. Skipping.'
+                .format(page, page.editTime().isoformat()))
             return
         if page.isCategoryRedirect():
-            pywikibot.output('%s is a category redirect. Skipping.' % page)
+            pywikibot.output('{0} is a category redirect. Skipping.'
+                             .format(page))
             return
 
         if page.langlinks():
             # FIXME: Implement this
             pywikibot.output(
-                "Found language links (interwiki links).\n"
+                'Found language links (interwiki links).\n'
                 "Haven't implemented that yet so skipping.")
             return
 
@@ -155,5 +157,5 @@ def main(*args):
     return True
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
