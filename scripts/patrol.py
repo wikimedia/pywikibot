@@ -27,8 +27,6 @@ An example can be found at:
 
 https://en.wikisource.org/wiki/User:Wikisource-bot/patrol_whitelist
 
-&params;
-
 Commandline parameters
 ======================
 
@@ -66,12 +64,6 @@ from pywikibot import pagegenerators
 from pywikibot.bot import SingleSiteBot, QuitKeyboardInterrupt
 
 _logger = 'patrol'
-
-# This is required for the text that is shown when you run this script
-# with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
 
 
 class PatrolBot(SingleSiteBot):
