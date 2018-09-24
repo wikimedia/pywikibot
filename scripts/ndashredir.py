@@ -91,8 +91,8 @@ class DashRedirectBot(
 
         # skip unchanged
         if redir.title() == origin:
-            pywikibot.output('No need to process %s, skipping…'
-                             % redir.title())
+            pywikibot.output('No need to process {0}, skipping...'
+                             .format(redir.title()))
             # suggest -reversed parameter
             if '-' in origin and not self.getOption('reversed'):
                 pywikibot.output('Consider using -reversed parameter '
@@ -100,13 +100,13 @@ class DashRedirectBot(
         else:
             # skip existing
             if redir.exists():
-                pywikibot.output('%s already exists, skipping…'
-                                 % redir.title())
+                pywikibot.output('{0} already exists, skipping...'
+                                 .format(redir.title()))
             else:
                 # confirm and save redirect
                 if self.user_confirm(
                     color_format(
-                        'Redirect from {lightblue}{0}{default} doesn\'t exist '
+                        "Redirect from {lightblue}{0}{default} doesn't exist "
                         'yet.\nDo you want to create it?',
                         redir.title())):
                     # If summary option is None, it takes the default
