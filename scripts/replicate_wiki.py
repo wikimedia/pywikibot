@@ -82,7 +82,7 @@ class SyncSites(object):
         else:
             original_wiki = config.mylang
 
-        pywikibot.output("Syncing from " + original_wiki)
+        pywikibot.output('Syncing from ' + original_wiki)
 
         family = config.family
 
@@ -138,14 +138,15 @@ class SyncSites(object):
         if self.options.namespace:
             pywikibot.output(str(self.options.namespace))
             namespaces = [int(self.options.namespace)]
-        pywikibot.output("Checking these namespaces: %s\n" % (namespaces,))
+        pywikibot.output('Checking these namespaces: {0}\n'
+                         .format((namespaces,)))
 
         for ns in namespaces:
             self.check_namespace(ns)
 
     def check_namespace(self, namespace):
         """Check an entire namespace."""
-        pywikibot.output("\nCHECKING NAMESPACE %s" % namespace)
+        pywikibot.output('\nCHECKING NAMESPACE {0}'.format(namespace))
         pages = (p.title() for p in self.original.allpages(
             '!', namespace=namespace))
         for p in pages:
@@ -165,18 +166,19 @@ class SyncSites(object):
         """Create page on wikis with overview of bot results."""
         for site in self.sites:
             sync_overview_page = Page(site,
-                                      'User:%s/sync.py overview' % site.user())
-            output = "== Pages that differ from original ==\n\n"
+                                      'User:{0}/sync.py overview'
+                                      .format(site.user()))
+            output = '== Pages that differ from original ==\n\n'
             if self.differences[site]:
-                output += "".join('* [[:%s]]\n' % l for l in
+                output += ''.join('* [[:%s]]\n' % l for l in
                                   self.differences[site])
             else:
-                output += "All important pages are the same"
+                output += 'All important pages are the same'
 
             output += (
                 '\n\n== Admins from original that are missing here ==\n\n')
             if self.user_diff[site]:
-                output += "".join('* %s\n' % l.replace('_', ' ') for l in
+                output += ''.join('* %s\n' % l.replace('_', ' ') for l in
                                   self.user_diff[site])
             else:
                 output += (
@@ -188,12 +190,12 @@ class SyncSites(object):
 
     def put_message(self, site):
         """Return synchonization message."""
-        return ('%s replicate_wiki.py synchronization from %s'
-                % (site.user(), str(self.original)))
+        return ('{0} replicate_wiki.py synchronization from {1}'
+                .format(site.user(), str(self.original)))
 
     def check_page(self, pagename):
         """Check one page."""
-        pywikibot.output("\nChecking %s" % pagename)
+        pywikibot.output('\nChecking ' + pagename)
         sys.stdout.flush()
         page1 = Page(self.original, pagename)
         txt1 = page1.text
@@ -206,8 +208,8 @@ class SyncSites(object):
         for site in self.sites:
             if dest_ns is not None:
                 page2 = Page(site, page1.title(with_ns=False), dest_ns)
-                pywikibot.output("\nCross namespace, new title: %s"
-                                 % page2.title())
+                pywikibot.output('\nCross namespace, new title: '
+                                 + page2.title())
             else:
                 page2 = Page(site, pagename)
 
@@ -222,11 +224,11 @@ class SyncSites(object):
                 if txt1 != txt_new:
                     pywikibot.output(
                         'NOTE: text replaced using config.sync_replace')
-                    pywikibot.output('%s %s %s' % (txt1, txt_new, txt2))
+                    pywikibot.output('{0} {1} {2}'.format(txt1, txt_new, txt2))
                     txt1 = txt_new
 
             if txt1 != txt2:
-                pywikibot.output("\n %s DIFFERS" % site)
+                pywikibot.output('\n {0} DIFFERS'.format(site))
                 self.differences[site].append(pagename)
 
         if self.options.replace:
@@ -249,17 +251,17 @@ def main(*args):
     my_args = pywikibot.handle_args(args)
 
     parser = ArgumentParser(add_help=False)
-    parser.add_argument("-r", "--replace", action="store_true",
-                        help="actually replace pages (without this "
-                             "option you will only get an overview page)")
-    parser.add_argument("-o", "--original", dest="original_wiki",
-                        help="original wiki")
+    parser.add_argument('-r', '--replace', action='store_true',
+                        help='actually replace pages (without this '
+                             'option you will only get an overview page)')
+    parser.add_argument('-o', '--original', dest='original_wiki',
+                        help='original wiki')
     parser.add_argument('destination_wiki', metavar='destination',
                         type=str, nargs='+', help='destination wiki(s)')
-    parser.add_argument("-ns", "--namespace", dest="namespace",
-                        help="specify namespace")
-    parser.add_argument("-dns", "--dest-namespace", dest="dest_namespace",
-                        help="destination namespace (if different)")
+    parser.add_argument('-ns', '--namespace', dest='namespace',
+                        help='specify namespace')
+    parser.add_argument('-dns', '--dest-namespace', dest='dest_namespace',
+                        help='destination namespace (if different)')
 
     options = parser.parse_args(my_args)
 
