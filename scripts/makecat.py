@@ -259,10 +259,9 @@ def main(*args):
 
     bot = MakeCatBot(site=mysite, **options)
 
-    workingcat = pywikibot.Category(mysite,
-                                    '%s%s'
-                                    % (mysite.namespaces.CATEGORY,
-                                       workingcatname))
+    workingcat = pywikibot.Category(mysite, '{0}{1}'
+                                            .format(mysite.namespaces.CATEGORY,
+                                                    workingcatname))
     filename = pywikibot.config.datafilepath(
         'category',
         workingcatname.encode('ascii', 'xmlcharrefreplace').decode('ascii') +
