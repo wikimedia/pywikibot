@@ -113,7 +113,7 @@ def run_bot(give_url, image_url, desc):
         ilinks = get_imagelinks(url)
 
     for image in ilinks:
-        if pywikibot.input_yn('Include image %s?' % image, default=False,
+        if pywikibot.input_yn('Include image {}?'.format(image), default=False,
                               automatic_quit=False):
             desc = pywikibot.input('Give the description of this image:')
             categories = []
@@ -125,8 +125,8 @@ def run_bot(give_url, image_url, desc):
                 if ':' in cat:
                     categories.append('[[{}]]'.format(cat))
                 else:
-                    categories.append('[[%s:%s]]'
-                                      % (mysite.namespace(14), cat))
+                    categories.append('[[{}:{}]]'
+                                      .format(mysite.namespace(14), cat))
             desc += '\n\n' + basicdesc + '\n\n' + '\n'.join(categories)
             UploadRobot(image, description=desc).run()
         elif answer == 's':
