@@ -126,21 +126,22 @@ def main(*args):
     autocreate = False
     unknown_args = []
     for arg in pywikibot.handle_args(args):
-        if arg.startswith("-pass"):
+        if arg.startswith('-pass'):
             if len(arg) == 5:
                 password = pywikibot.input(
                     'Password for all accounts (no characters will be shown):',
                     password=True)
             else:
                 password = arg[6:]
-        elif arg == "-sysop":
+        elif arg == '-sysop':
             sysop = True
-        elif arg == "-all":
+        elif arg == '-all':
             logall = True
-        elif arg == "-force":
-            pywikibot.output(u"To force a re-login, please delete the revelant "
-                             u"lines from '%s' (or the entire file) and try again." %
-                             join(config.base_dir, 'pywikibot.lwp'))
+        elif arg == '-force':
+            pywikibot.output('To force a re-login, please delete the '
+                             "revelant lines from '{0}' (or the entire file) "
+                             'and try again.'
+                             .format(join(config.base_dir, 'pywikibot.lwp')))
         elif arg == "-logout":
             logout = True
         elif arg == '-oauth':
@@ -188,9 +189,10 @@ def main(*args):
                         pywikibot.output(
                             'Not logged in on {0}.'.format(site))
             except SiteDefinitionError:
-                pywikibot.output(u'%s.%s is not a valid site, please remove it'
-                                 ' from your config' % (lang, family_name))
+                pywikibot.output('{0}.{1} is not a valid site, '
+                                 'please remove it from your config'
+                                 .format(lang, family_name))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
