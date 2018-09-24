@@ -141,8 +141,8 @@ def match_images(imageA, imageB):
 def main(*args):
     """Extracting file page information of images to work on and initiate matching."""
     images = []
-    other_family = u''
-    other_lang = u''
+    other_family = ''
+    other_lang = ''
     imagePageA = None
     imagePageB = None
 
@@ -152,12 +152,14 @@ def main(*args):
     for arg in local_args:
         if arg.startswith('-otherfamily:'):
             if len(arg) == len('-otherfamily:'):
-                other_family = pywikibot.input(u'What family do you want to use?')
+                other_family = pywikibot.input(
+                    'What family do you want to use?')
             else:
                 other_family = arg[len('-otherfamily:'):]
         elif arg.startswith('-otherlang:'):
             if len(arg) == len('-otherlang:'):
-                other_lang = pywikibot.input(u'What language do you want to use?')
+                other_lang = pywikibot.input(
+                    'What language do you want to use?')
             else:
                 other_lang = arg[len('otherlang:'):]
         else:
@@ -187,5 +189,5 @@ def main(*args):
     match_image_pages(imagePageA, imagePageB)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
