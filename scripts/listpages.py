@@ -13,26 +13,26 @@ These parameters are supported to specify which pages titles to print:
             Can be a custom string according to python string.format() notation
             or can be selected by a number from following list
             (1 is default format):
-            1 - u'{num:4d} {page.title}'
+            1 - '{num:4d} {page.title}'
                 --> 10 PageTitle
 
-            2 - u'{num:4d} [[{page.title}]]'
+            2 - '{num:4d} [[{page.title}]]'
                 --> 10 [[PageTitle]]
 
-            3 - u'{page.title}'
+            3 - '{page.title}'
                 --> PageTitle
 
-            4 - u'[[{page.title}]]'
+            4 - '[[{page.title}]]'
                 --> [[PageTitle]]
 
-            5 - u'{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
+            5 - '{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}'
                 --> 10 localised_Namespace:PageTitle (colorised in lightred)
 
-            6 - u'{num:4d} {page.loc_title:<40} {page.can_title:<40}'
+            6 - '{num:4d} {page.loc_title:<40} {page.can_title:<40}'
                 --> 10 localised_Namespace:PageTitle
                        canonical_Namespace:PageTitle
 
-            7 - u'{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
+            7 - '{num:4d} {page.loc_title:<40} {page.trs_title:<40}'
                 --> 10 localised_Namespace:PageTitle
                        outputlang_Namespace:PageTitle
                 (*) requires "outputlang:lang" set.
@@ -109,13 +109,13 @@ class Formatter(object):
     """Structure with Page attributes exposed for formatting from cmd line."""
 
     fmt_options = {
-        '1': u"{num:4d} {page.title}",
-        '2': u"{num:4d} [[{page.title}]]",
-        '3': u"{page.title}",
-        '4': u"[[{page.title}]]",
-        '5': u"{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}",
-        '6': u"{num:4d} {page.loc_title:<40} {page.can_title:<40}",
-        '7': u"{num:4d} {page.loc_title:<40} {page.trs_title:<40}",
+        '1': '{num:4d} {page.title}',
+        '2': '{num:4d} [[{page.title}]]',
+        '3': '{page.title}',
+        '4': '[[{page.title}]]',
+        '5': '{num:4d} \03{{lightred}}{page.loc_title:<40}\03{{default}}',
+        '6': '{num:4d} {page.loc_title:<40} {page.can_title:<40}',
+        '7': '{num:4d} {page.loc_title:<40} {page.trs_title:<40}',
     }
 
     # Identify which formats need outputlang
@@ -145,13 +145,13 @@ class Formatter(object):
         self.outputlang = outputlang
         if outputlang is not None:
             # Cache onsite in case of translations.
-            if not hasattr(self, "onsite"):
+            if not hasattr(self, 'onsite'):
                 self.onsite = pywikibot.Site(outputlang, self.site.family)
             try:
                 self.trs_title = page._link.ns_title(onsite=self.onsite)
             # Fallback if no corresponding namespace is found in onsite.
             except pywikibot.Error:
-                self.trs_title = u'%s:%s' % (default, page._link.title)
+                self.trs_title = '{0}:{1}'.format(default, page._link.title)
 
     def output(self, num=None, fmt=1):
         """Output formatted string."""
@@ -161,7 +161,7 @@ class Formatter(object):
                 'trs_title' in fmt and
                 self.outputlang is None):
             raise ValueError(
-                u"Required format code needs 'outputlang' parameter set.")
+                "Required format code needs 'outputlang' parameter set.")
         if num is None:
             return fmt.format(page=self)
         else:
@@ -223,18 +223,19 @@ def main(*args):
             base_dir = os.path.normpath(os.path.join(os.getcwd(), base_dir))
 
         if not os.path.exists(base_dir):
-            pywikibot.output(u'Directory "%s" does not exist.' % base_dir)
+            pywikibot.output('Directory "{0}" does not exist.'
+                             .format(base_dir))
             choice = pywikibot.input_yn(
-                u'Do you want to create it ("No" to continue without saving)?')
+                'Do you want to create it ("No" to continue without saving)?')
             if choice:
                 os.makedirs(base_dir, mode=0o744)
             else:
                 base_dir = None
         elif not os.path.isdir(base_dir):
             # base_dir is a file.
-            pywikibot.warning(u'Not a directory: "%s"\n'
-                              u'Skipping saving ...'
-                              % base_dir)
+            pywikibot.warning('Not a directory: "{0}"\n'
+                              'Skipping saving ...'
+                              .format(base_dir))
             base_dir = None
 
     if page_target:
@@ -266,10 +267,11 @@ def main(*args):
                     pywikibot.output(err)
             if base_dir:
                 filename = os.path.join(base_dir, page.title(as_filename=True))
-                pywikibot.output(u'Saving %s to %s' % (page.title(), filename))
+                pywikibot.output('Saving {0} to {1}'
+                                 .format(page.title(), filename))
                 with open(filename, mode='wb') as f:
                     f.write(page.text.encode(encoding))
-        pywikibot.output(u"%i page(s) found" % i)
+        pywikibot.output('{0} page(s) found'.format(i))
         if page_target:
             page_target.text = '\n'.join(output_list)
             page_target.save(summary=summary)
@@ -279,5 +281,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
