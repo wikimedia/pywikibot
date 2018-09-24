@@ -4233,6 +4233,46 @@ class WikibasePage(BasePage):
         """
         raise NotImplementedError
 
+    @allow_asynchronous
+    def addClaim(self, claim, bot=True, **kwargs):
+        """
+        Add a claim to the entity.
+
+        @param claim: The claim to add
+        @type claim: Claim
+        @param bot: Whether to flag as bot (if possible)
+        @type bot: bool
+        @keyword asynchronous: if True, launch a separate thread to add claim
+            asynchronously
+        @type asynchronous: bool
+        @keyword callback: a callable object that will be called after the
+            claim has been added. It must take two arguments:
+            (1) a WikibasePage object, and (2) an exception instance,
+            which will be None if the entity was saved successfully. This is
+            intended for use by bots that need to keep track of which saves
+            were successful.
+        @type callback: callable
+        """
+        self.repo.addClaim(self, claim, bot=bot, **kwargs)
+        claim.on_item = self
+
+    def removeClaims(self, claims, **kwargs):
+        """
+        Remove the claims from the entity.
+
+        @param claims: list of claims to be removed
+        @type claims: list or pywikibot.Claim
+        """
+        # this check allows single claims to be removed by pushing them into a
+        # list of length one.
+        if isinstance(claims, pywikibot.Claim):
+            claims = [claims]
+        data = self.repo.removeClaims(claims, **kwargs)
+        for claim in claims:
+            claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
+            claim.on_item = None
+            claim.snak = None
+
 
 class ItemPage(WikibasePage):
 
@@ -4536,45 +4576,6 @@ class ItemPage(WikibasePage):
                 data[db_name] = obj
         data = {'sitelinks': data}
         self.editEntity(data, **kwargs)
-
-    @allow_asynchronous
-    def addClaim(self, claim, bot=True, **kwargs):
-        """
-        Add a claim to the item.
-
-        @param claim: The claim to add
-        @type claim: Claim
-        @param bot: Whether to flag as bot (if possible)
-        @type bot: bool
-        @keyword asynchronous: if True, launch a separate thread to add claim
-            asynchronously
-        @type asynchronous: bool
-        @keyword callback: a callable object that will be called after the
-            claim has been added. It must take two arguments: (1) an ItemPage
-            object, and (2) an exception instance, which will be None if the
-            item was saved successfully. This is intended for use by bots that
-            need to keep track of which saves were successful.
-        @type callback: callable
-        """
-        self.repo.addClaim(self, claim, bot=bot, **kwargs)
-        claim.on_item = self
-
-    def removeClaims(self, claims, **kwargs):
-        """
-        Remove the claims from the item.
-
-        @param claims: list of claims to be removed
-        @type claims: list or pywikibot.Claim
-        """
-        # this check allows single claims to be removed by pushing them into a
-        # list of length one.
-        if isinstance(claims, pywikibot.Claim):
-            claims = [claims]
-        data = self.repo.removeClaims(claims, **kwargs)
-        for claim in claims:
-            claim.on_item.latest_revision_id = data['pageinfo']['lastrevid']
-            claim.on_item = None
-            claim.snak = None
 
     def mergeInto(self, item, **kwargs):
         """

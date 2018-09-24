@@ -7764,12 +7764,12 @@ class DataSite(APISite):
         return data
 
     @must_be(group='user')
-    def addClaim(self, item, claim, bot=True, summary=None):
+    def addClaim(self, entity, claim, bot=True, summary=None):
         """
         Add a claim.
 
-        @param item: Entity to modify
-        @type item: WikibasePage
+        @param entity: Entity to modify
+        @type entity: WikibasePage
         @param claim: Claim to be added
         @type claim: pywikibot.Claim
         @param bot: Whether to mark the edit as a bot edit
@@ -7777,8 +7777,8 @@ class DataSite(APISite):
         @param summary: Edit summary
         @type summary: str
         """
-        params = {'action': 'wbcreateclaim', 'entity': item.getID(),
-                  'baserevid': item.latest_revision_id,
+        params = {'action': 'wbcreateclaim', 'entity': entity.getID(),
+                  'baserevid': entity.latest_revision_id,
                   'snaktype': claim.getSnakType(), 'property': claim.getID(),
                   'summary': summary, 'bot': bot}
 
@@ -7790,11 +7790,11 @@ class DataSite(APISite):
         data = req.submit()
         claim.snak = data['claim']['id']
         # Update the item
-        if claim.getID() in item.claims:
-            item.claims[claim.getID()].append(claim)
+        if claim.getID() in entity.claims:
+            entity.claims[claim.getID()].append(claim)
         else:
-            item.claims[claim.getID()] = [claim]
-        item.latest_revision_id = data['pageinfo']['lastrevid']
+            entity.claims[claim.getID()] = [claim]
+        entity.latest_revision_id = data['pageinfo']['lastrevid']
 
     @must_be(group='user')
     def changeClaimTarget(self, claim, snaktype='value',
