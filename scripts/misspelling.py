@@ -66,9 +66,9 @@ class MisspellingRobot(DisambiguationRobot):
         'da': 'Omdirigeringer af fejlstavninger',
         'de': ('Kategorie:Wikipedia:Falschschreibung',
                'Kategorie:Wikipedia:Obsolete Schreibung'),
-        'en': u'Redirects from misspellings',
-        'hu': u'Átirányítások hibás névről',
-        'nl': u'Categorie:Wikipedia:Redirect voor spelfout',
+        'en': 'Redirects from misspellings',
+        'hu': 'Átirányítások hibás névről',
+        'nl': 'Categorie:Wikipedia:Redirect voor spelfout',
     }
 
     def __init__(self, always, firstPageTitle, main_only):
@@ -104,8 +104,8 @@ class MisspellingRobot(DisambiguationRobot):
                 for misspellingTemplateName in templates)
             if firstPageTitle:
                 pywikibot.output(
-                    u'-start parameter unsupported on this wiki because there '
-                    u'is no category for misspellings.')
+                    '-start parameter unsupported on this wiki because there '
+                    'is no category for misspellings.')
         else:
             pywikibot.output(HELP_MSG.format(site=self.site))
 
@@ -188,5 +188,5 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
