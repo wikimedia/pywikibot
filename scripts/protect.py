@@ -105,8 +105,8 @@ class ProtectionRobot(SingleSiteBot):
         """
         self.current_page = page
         if not self.user_confirm(
-                'Do you want to change the protection level of %s?'
-                % page.title(as_link=True, force_interwiki=True)):
+                'Do you want to change the protection level of {0}?'
+                .format(page.title(as_link=True, force_interwiki=True))):
             return
         applicable = page.applicable_protections()
         protections = dict(
@@ -136,8 +136,9 @@ def check_protection_level(operation, level, levels, default=None):
                 num += 1
             if level == default:
                 default_char = first_char[-1]
-        choice = pywikibot.input_choice('Choice a protection level to %s:'
-                                        % operation, zip(levels, first_char),
+        choice = pywikibot.input_choice('Choice a protection level to {0}:'
+                                        .format(operation),
+                                        zip(levels, first_char),
                                         default=default_char)
 
         return levels[first_char.index(choice)]
@@ -258,7 +259,7 @@ def main(*args):
             combined_protections[p_type] = level
         if not options.get('summary'):
             options['summary'] = pywikibot.input(
-                u'Enter a reason for the protection change:')
+                'Enter a reason for the protection change:')
         bot = ProtectionRobot(generator, combined_protections, site, **options)
         bot.run()
         return True
