@@ -59,7 +59,7 @@ class CosmeticChangesBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot):
         """Initializer."""
         self.availableOptions.update({
             'async': False,
-            'summary': u'Robot: Cosmetic changes',
+            'summary': 'Robot: Cosmetic changes',
             'ignore': cosmetic_changes.CANCEL_ALL,
         })
         super(CosmeticChangesBot, self).__init__(**kwargs)
@@ -134,5 +134,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
