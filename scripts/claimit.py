@@ -88,7 +88,8 @@ class ClaimRobot(WikidataBot):
         self.exists_arg = ''.join(x for x in exists_arg.lower() if x in 'pqst')
         self.cacheSources()
         if self.exists_arg:
-            pywikibot.output("'exists' argument set to '%s'" % self.exists_arg)
+            pywikibot.output("'exists' argument set to '{}'"
+                             .format(self.exists_arg))
 
     def treat_page_and_item(self, page, item):
         """Treat each page."""
@@ -146,8 +147,8 @@ def main(*args):
             target = pywikibot.Coordinate(coord_args[0], coord_args[1], precision=precision)
         else:
             raise NotImplementedError(
-                "%s datatype is not yet supported by claimit.py"
-                % claim.type)
+                '{} datatype is not yet supported by claimit.py'
+                .format(claim.type))
         claim.setTarget(target)
         claims.append(claim)
 
@@ -161,5 +162,5 @@ def main(*args):
     return True
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
