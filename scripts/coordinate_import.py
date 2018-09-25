@@ -84,22 +84,22 @@ class CoordImportRobot(WikidataBot):
 
         claims = item.get().get('claims')
         if self.prop in claims:
-            pywikibot.output(u'Item %s already contains coordinates (%s)'
-                             % (item.title(), self.prop))
+            pywikibot.output('Item {} already contains coordinates ({})'
+                             .format(item.title(), self.prop))
             return
 
         prop = self.has_coord_qualifier(claims)
         if prop:
-            pywikibot.output(u'Item %s already contains coordinates'
-                             u' (%s) as qualifier for %s'
-                             % (item.title(), self.prop, prop))
+            pywikibot.output('Item {} already contains coordinates'
+                             ' ({}) as qualifier for {}'
+                             .format(item.title(), self.prop, prop))
             return
 
         newclaim = pywikibot.Claim(self.repo, self.prop)
         newclaim.setTarget(coordinate)
-        pywikibot.output(u'Adding %s, %s to %s' % (coordinate.lat,
-                                                   coordinate.lon,
-                                                   item.title()))
+        pywikibot.output('Adding {}, {} to {}'.format(coordinate.lat,
+                                                      coordinate.lon,
+                                                      item.title()))
         try:
             item.addClaim(newclaim)
 
@@ -107,7 +107,7 @@ class CoordImportRobot(WikidataBot):
             if source:
                 newclaim.addSource(source, bot=True)
         except CoordinateGlobeUnknownException as e:
-            pywikibot.output(u'Skipping unsupported globe: %s' % e.args)
+            pywikibot.output('Skipping unsupported globe: {}'.format(e.args))
 
 
 def main(*args):
@@ -141,5 +141,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
