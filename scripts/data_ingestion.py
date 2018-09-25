@@ -59,12 +59,12 @@ class Photo(pywikibot.FilePage):
         """
         self.URL = URL
         self.metadata = metadata
-        self.metadata["_url"] = URL
-        self.metadata["_filename"] = filename = posixpath.split(
+        self.metadata['_url'] = URL
+        self.metadata['_filename'] = filename = posixpath.split(
             urlparse(URL)[2])[1]
-        self.metadata["_ext"] = ext = filename.split(".")[-1]
+        self.metadata['_ext'] = ext = filename.split('.')[-1]
         if ext == filename:
-            self.metadata["_ext"] = ext = None
+            self.metadata['_ext'] = ext = None
         self.contents = None
 
         if not site:
@@ -120,19 +120,19 @@ class Photo(pywikibot.FilePage):
         params = {}
         params.update(self.metadata)
         params.update(extraparams)
-        description = u'{{%s\n' % template
+        description = '{{%s\n' % template
         for key in sorted(params.keys()):
             value = params[key]
-            if not key.startswith("_"):
-                description = description + (
-                    u'|%s=%s' % (key, self._safeTemplateValue(value))) + "\n"
-        description = description + u'}}'
+            if not key.startswith('_'):
+                description += ('|{}={}\n'.format(
+                    key, self._safeTemplateValue(value)))
+        description += '}}'
 
         return description
 
     def _safeTemplateValue(self, value):
         """Replace pipe (|) with {{!}}."""
-        return value.replace("|", "{{!}}")
+        return value.replace('|', '{{!}}')
 
 
 def CSVReader(fileobj, urlcolumn, site=None, *args, **kwargs):
@@ -188,7 +188,8 @@ class DataIngestionBot(pywikibot.Bot):
         """Process each page."""
         duplicates = photo.findDuplicateImages()
         if duplicates:
-            pywikibot.output(u"Skipping duplicate of %r" % duplicates)
+            pywikibot.output('Skipping duplicate of {!r}'
+                             .format(duplicates))
             return duplicates[0]
 
         title = photo.getTitle(self.titlefmt)
@@ -221,15 +222,15 @@ class DataIngestionBot(pywikibot.Bot):
         """
         configuration = {}
         # Set a bunch of defaults
-        configuration['csvDialect'] = u'excel'
+        configuration['csvDialect'] = 'excel'
         configuration['csvDelimiter'] = ';'
-        configuration['csvEncoding'] = u'Windows-1252'  # FIXME: Encoding hell
+        configuration['csvEncoding'] = 'Windows-1252'  # FIXME: Encoding hell
 
         templates = configurationPage.templatesWithParams()
         for (template, params) in templates:
             if template.title(with_ns=False) == 'Data ingestion':
                 for param in params:
-                    (field, sep, value) = param.partition(u'=')
+                    (field, sep, value) = param.partition('=')
 
                     # Remove leading or trailing spaces
                     field = field.strip()
@@ -273,7 +274,7 @@ def main(*args):
         try:
             config_page.get()
         except pywikibot.NoPage:
-            pywikibot.error('%s does not exist' % config_page)
+            pywikibot.error('{} does not exist'.format(config_page))
             continue
 
         configuration = DataIngestionBot.parseConfigurationPage(config_page)
@@ -282,7 +283,7 @@ def main(*args):
         try:
             f = codecs.open(filename, 'r', configuration['csvEncoding'])
         except (IOError, OSError) as e:
-            pywikibot.error('%s could not be opened: %s' % (filename, e))
+            pywikibot.error('{} could not be opened: {}'.format(filename, e))
         else:
             with f:
                 files = CSVReader(f, urlcolumn='url',
@@ -297,5 +298,5 @@ def main(*args):
                 bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
