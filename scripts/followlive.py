@@ -7,8 +7,8 @@ Periodically grab list of new articles and analyze to blank or flag them.
 Script to follow new articles on a wikipedia and flag them
 with a template or eventually blank them.
 
-There must be A LOT of bugs ! Use with caution and verify what
-it is doing !
+There must be A LOT of bugs! Use with caution and verify what
+it is doing!
 
 The following parameters are supported:
 
@@ -439,8 +439,8 @@ What is it? """
             if answer == 'q':
                 raise QuitKeyboardInterrupt
             if answer == 'd':
-                pywikibot.output('Trying to delete page [[%s]].'
-                                 % self.page.title())
+                pywikibot.output('Trying to delete page [[{}]].'
+                                 .format(self.page.title()))
                 self.page.delete()
                 return
             if answer == 'e':
@@ -460,11 +460,11 @@ What is it? """
                                       {'content': self.content}))
                 except pywikibot.EditConflict:
                     pywikibot.output(
-                        'An edit conflict occured ! Automatically retrying')
+                        'An edit conflict occured! Automatically retrying')
                     self.handle_bad_page(self)
                 return
             if answer == '':
-                pywikibot.output('Page correct ! Proceeding with next pages.')
+                pywikibot.output('Page correct! Proceeding with next pages.')
                 return
             # Check user input:
             if answer[0] == '':
@@ -495,17 +495,18 @@ What is it? """
                                       templates)[self.questionlist[answer]]
             if tpl['pos'] == 'top':
                 pywikibot.output(
-                    'prepending %s...' % self.questionlist[answer])
+                    'prepending {}...'.format(self.questionlist[answer]))
                 self.content = self.questionlist[answer] + '\n' + self.content
             elif tpl['pos'] == 'bottom':
-                pywikibot.output('appending %s...' % self.questionlist[answer])
+                pywikibot.output('appending {}...'
+                                 .format(self.questionlist[answer]))
                 self.content += '\n' + self.questionlist[answer]
             else:
                 raise RuntimeError(
                     '"pos" should be "top" or "bottom" for template {}. '
                     'Contact a developer.'.format(self.questionlist[answer]))
             summary += tpl['msg'] + ' '
-            pywikibot.output('Probably added %s' % self.questionlist[answer])
+            pywikibot.output('Probably added ' + self.questionlist[answer])
 
         self.page.put(self.content, summary=summary)
         pywikibot.output('with comment {}\n'.format(summary))
@@ -516,7 +517,8 @@ What is it? """
         if self.could_be_bad():
             pywikibot.output('Integrity of page doubtful...')
             self.handle_bad_page()
-        pywikibot.output('----- Current time: %s' % datetime.datetime.now())
+        pywikibot.output('----- Current time: {}'
+                         .format(datetime.datetime.now()))
 
     def init_page(self, item):
         """Init the page tuple before processing and return a page object.
