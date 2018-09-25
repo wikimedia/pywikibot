@@ -253,8 +253,8 @@ def getOpenStreetMap(latitude, longitude):
             pywikibot.output('Dropping {}, {}'
                              .format(addresspart.tag, addresspart.text))
         else:
-            pywikibot.warning('%s, %s is not in addressparts lists'
-                              % (addresspart.tag, addresspart.text))
+            pywikibot.warning('{}, {} is not in addressparts lists'
+                              .format(addresspart.tag, addresspart.text))
     return result
 
 
@@ -324,7 +324,7 @@ def filterDisambiguation(categories):
     """Filter out disambiguation categories."""
     result = []
     for cat in categories:
-        if (not pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
+        if (not pywikibot.Page(pywikibot.Site('commons', 'commons'),
                                cat, ns=14).isDisambig()):
             result.append(cat)
     return result
@@ -334,7 +334,7 @@ def followRedirects(categories):
     """If a category is a redirect, replace the category with the target."""
     result = []
     for cat in categories:
-        categoryPage = pywikibot.Page(pywikibot.Site(u'commons', u'commons'),
+        categoryPage = pywikibot.Page(pywikibot.Site('commons', 'commons'),
                                       cat, ns=14)
         if categoryPage.isCategoryRedirect():
             result.append(
@@ -358,7 +358,7 @@ def filterCountries(categories):
     listByCountry = []
     listCountries = []
     for cat in categories:
-        if cat.endswith(u'by country'):
+        if cat.endswith('by country'):
             listByCountry.append(cat)
 
         # If cat contains 'by country' add it to the list
@@ -370,7 +370,7 @@ def filterCountries(categories):
     if len(listByCountry) > 0:
         for bc in listByCountry:
             category = pywikibot.Category(
-                pywikibot.Site(u'commons', u'commons'), u'Category:' + bc)
+                pywikibot.Site('commons', 'commons'), 'Category:' + bc)
             for subcategory in category.subcategories():
                 for country in listCountries:
                     if subcategory.title(with_ns=False).endswith(country):
