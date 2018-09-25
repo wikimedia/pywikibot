@@ -141,7 +141,7 @@ class ImageTransferBot(object):
         """
         sourceSite = sourceImagePage.site
         url = sourceImagePage.fileUrl().encode('utf-8')
-        pywikibot.output(u"URL should be: %s" % url)
+        pywikibot.output('URL should be: ' + url)
         # localize the text that should be printed on image description page
         try:
             description = sourceImagePage.get()
@@ -209,8 +209,8 @@ class ImageTransferBot(object):
         """Print image list."""
         for i, image in enumerate(imagelist):
             pywikibot.output('-' * 60)
-            pywikibot.output('%s. Found image: %s'
-                             % (i, image.title(as_link=True)))
+            pywikibot.output('{}. Found image: {}'
+                             .format(i, image.title(as_link=True)))
             try:
                 # Show the image description page's contents
                 pywikibot.output(image.get())
@@ -223,8 +223,8 @@ class ImageTransferBot(object):
                     targetTitle = 'File:' + image.title().split(':', 1)[1]
                     targetImage = pywikibot.Page(self.targetSite, targetTitle)
                     targetImage.get()
-                    pywikibot.output('Image with this name is already on %s.'
-                                     % self.targetSite)
+                    pywikibot.output('Image with this name is already on {}.'
+                                     .format(self.targetSite))
                     pywikibot.output('-' * 60)
                     pywikibot.output(targetImage.get())
                     sys.exit()
@@ -332,5 +332,5 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
