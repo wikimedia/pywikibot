@@ -199,11 +199,11 @@ def getFilename(photoInfo, site=None, project='Flickr'):
             title = ''
             # Should probably have the id of the photo as last resort.
 
-    if pywikibot.Page(site, 'File:%s - %s - %s.jpg'
-                      % (title, project, username)).exists():
+    if pywikibot.Page(site, 'File:{} - {} - {}.jpg'
+                      .format(title, project, username)).exists():
         i = 1
         while True:
-            name = '%s - %s - %s (%d).jpg' % (title, project, username, i)
+            name = '{} - {} - {} ({}).jpg'.format(title, project, username, i)
             if pywikibot.Page(site, 'File:' + name).exists():
                 i += 1
             else:
@@ -246,7 +246,7 @@ def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
     The description is based on the info from flickrinfo and improved.
 
     """
-    description = '== {{int:filedesc}} ==\n%s' % flinfoDescription
+    description = '== {{int:filedesc}} ==\n{}'.format(flinfoDescription)
     if removeCategories:
         description = textlib.removeCategoryLinks(description,
                                                   pywikibot.Site(
