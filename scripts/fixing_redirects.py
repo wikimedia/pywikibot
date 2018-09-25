@@ -110,7 +110,7 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 new_page_title = new_page_title[1:]
 
             if (new_page_title == link_text and not section):
-                newlink = "[[%s]]" % new_page_title
+                newlink = '[[{}]]'.format(new_page_title)
             # check if we can create a link with trailing characters instead of a
             # pipelink
             elif (len(new_page_title) <= len(link_text) and
@@ -119,10 +119,11 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                   re.sub(re.compile(linktrail), '',
                          link_text[len(new_page_title):]) == '' and
                   not section):
-                newlink = "[[%s]]%s" % (link_text[:len(new_page_title)],
-                                        link_text[len(new_page_title):])
+                newlink = '[[{}]]{}'.format(link_text[:len(new_page_title)],
+                                            link_text[len(new_page_title):])
             else:
-                newlink = "[[%s%s|%s]]" % (new_page_title, section, link_text)
+                newlink = '[[{}{}|{}]]'.format(new_page_title,
+                                               section, link_text)
             text = text[:m.start()] + newlink + text[m.end():]
             continue
         return text
@@ -219,5 +220,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
