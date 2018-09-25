@@ -166,7 +166,8 @@ class HarvestRobot(WikidataBot):
         """Fetch redirects of the title, so we can check against them."""
         temp = pywikibot.Page(pywikibot.Site(), title, ns=10)
         if not temp.exists():
-            pywikibot.error(u'Template %s does not exist.' % temp.title())
+            pywikibot.error('Template {} does not exist.'
+                            .format(temp.title()))
             exit()
 
         # Put some output here since it can take a while
@@ -186,13 +187,13 @@ class HarvestRobot(WikidataBot):
         try:
             exists = linked_page.exists()
         except pywikibot.exceptions.InvalidTitle:
-            pywikibot.error('"%s" is not a valid title so it cannot be linked.'
-                            ' Skipping.' % link_text)
+            pywikibot.error('"{}" is not a valid title so it cannot be linked.'
+                            ' Skipping.'.format(link_text))
             return None
 
         if not exists:
-            pywikibot.output('%s does not exist so it cannot be linked. '
-                             'Skipping.' % (linked_page))
+            pywikibot.output('{} does not exist so it cannot be linked. '
+                             'Skipping.'.format(linked_page))
             return None
 
         if linked_page.isRedirectPage():
@@ -204,12 +205,13 @@ class HarvestRobot(WikidataBot):
             linked_item = None
 
         if not linked_item or not linked_item.exists():
-            pywikibot.output('%s does not have a wikidata item to link with. '
-                             'Skipping.' % (linked_page))
+            pywikibot.output('{} does not have a wikidata item to link with. '
+                             'Skipping.'.format(linked_page))
             return None
 
         if linked_item.title() == item.title():
-            pywikibot.output('%s links to itself. Skipping.' % (linked_page))
+            pywikibot.output('{} links to itself. Skipping.'
+                             .format(linked_page))
             return None
 
         return linked_item
@@ -240,8 +242,8 @@ class HarvestRobot(WikidataBot):
                                           ns=10).title(with_ns=False)
             except pywikibot.exceptions.InvalidTitle:
                 pywikibot.error(
-                    "Failed parsing template; '%s' should be the template name."
-                    % template)
+                    "Failed parsing template; '{}' should be "
+                    'the template name.'.format(template))
                 continue
 
             if template not in self.templateTitles:
@@ -269,8 +271,9 @@ class HarvestRobot(WikidataBot):
                             link_text = value
                         else:
                             pywikibot.output(
-                                '%s field %s value %s is not a wikilink. '
-                                'Skipping.' % (claim.getID(), field, value))
+                                '{} field {} value {} is not a wikilink. '
+                                'Skipping.'
+                                .format(claim.getID(), field, value))
                             continue
 
                     linked_item = self._template_link_target(item, link_text)
@@ -299,8 +302,8 @@ class HarvestRobot(WikidataBot):
                         continue
                     claim.setTarget(image)
                 else:
-                    pywikibot.output('%s is not a supported datatype.'
-                                     % claim.type)
+                    pywikibot.output('{} is not a supported datatype.'
+                                     .format(claim.type))
                     continue
 
                 # A generator might yield pages from multiple sites
@@ -332,13 +335,13 @@ def main(*args):
         if arg.startswith('-template'):
             if len(arg) == 9:
                 template_title = pywikibot.input(
-                    u'Please enter the template to work on:')
+                    'Please enter the template to work on:')
             else:
                 template_title = arg[10:]
         elif arg.startswith('-create'):
             options['create'] = True
         elif gen.handleArg(arg):
-            if arg.startswith(u'-transcludes:'):
+            if arg.startswith('-transcludes:'):
                 template_title = arg[13:]
         else:
             optional = arg.startswith('-')
@@ -379,12 +382,12 @@ def main(*args):
 
     generator = gen.getCombinedGenerator(preload=True)
     if not generator:
-        gen.handleArg(u'-transcludes:' + template_title)
+        gen.handleArg('-transcludes:' + template_title)
         generator = gen.getCombinedGenerator(preload=True)
 
     bot = HarvestRobot(generator, template_title, fields, **options)
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
