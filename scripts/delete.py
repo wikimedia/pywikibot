@@ -187,7 +187,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         """Process one page from the generator."""
         if self.getOption('undelete'):
             if self.current_page.exists():
-                pywikibot.output(u'Skipping: {0} already exists.'.format(
+                pywikibot.output('Skipping: {0} already exists.'.format(
                     self.current_page))
             else:
                 self.current_page.undelete(self.summary)
@@ -215,7 +215,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                                          self.getOption('always'),
                                          quit=True)
             else:
-                pywikibot.output(u'Skipping: {0} does not exist.'.format(
+                pywikibot.output('Skipping: {0} does not exist.'.format(
                     self.current_page))
 
 
@@ -243,7 +243,7 @@ def main(*args):
             options['always'] = True
         elif arg.startswith('-summary'):
             if len(arg) == len('-summary'):
-                summary = pywikibot.input(u'Enter a reason for the deletion:')
+                summary = pywikibot.input('Enter a reason for the deletion:')
             else:
                 summary = arg[len('-summary:'):]
         elif arg.startswith('-images'):
@@ -292,9 +292,9 @@ def main(*args):
     # page generator to actually get the text of those pages.
     if generator:
         if summary is None:
-            summary = pywikibot.input(u'Enter a reason for the %sdeletion:'
-                                      % ['', 'un'][options.get('undelete',
-                                                               False)])
+            summary = pywikibot.input('Enter a reason for the {}deletion:'
+                                      .format(['', 'un'][options
+                                              .get('undelete', False)]))
         bot = DeletionRobot(generator, summary, **options)
         bot.run()
         return True
@@ -303,5 +303,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
