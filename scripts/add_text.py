@@ -143,7 +143,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
         summary = i18n.twtranslate(site, 'add_text-adding',
                                    {'adding': addText[:200]})
     if putText:
-        pywikibot.output(u'Loading %s...' % page.title())
+        pywikibot.output('Loading {}...'.format(page.title()))
 
     text = get_text(page, oldTextGiven, create)
     if text is None:
@@ -158,7 +158,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
             pywikibot.output(
                 'Exception! regex (or word) used with -exceptUrl '
                 'is in the page. Skip!\n'
-                'Match was: %s' % result)
+                'Match was: {}'.format(result))
             return (False, False, always)
     if regexSkip is not None:
         result = re.findall(regexSkip, text)
@@ -166,7 +166,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
             pywikibot.output(
                 'Exception! regex (or word) used with -except '
                 'is in the page. Skip!\n'
-                'Match was: %s' % result)
+                'Match was: {}'.format(result))
             return (False, False, always)
     # If not up, text put below
     if not up:
@@ -184,7 +184,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext = textlib.removeLanguageLinks(newtext, site)
 
             # Adding the text
-            newtext += u"%s%s" % (config.line_separator, addText)
+            newtext += '{}{}'.format(config.line_separator, addText)
             # Reputting the categories
             newtext = textlib.replaceCategoryLinks(newtext,
                                                    categoriesInside, site,
@@ -193,7 +193,7 @@ def add_text(page, addText, summary=None, regexSkip=None,
             newtext = textlib.replaceLanguageLinks(newtext, interwikiInside,
                                                    site)
         else:
-            newtext += u"%s%s" % (config.line_separator, addText)
+            newtext += '{}{}'.format(config.line_separator, addText)
     else:
         newtext = addText + config.line_separator + text
 
@@ -305,5 +305,5 @@ def main(*args):
                                            create=talkPage)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
