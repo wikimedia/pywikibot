@@ -53,16 +53,16 @@ class CreateCategoriesBot(Bot):
         self.generator = generator
         self.parent = parent
         self.basename = basename
-        self.comment = u'Creating new category'
+        self.comment = 'Creating new category'
 
     def treat(self, page):
         """Create category in commons for that page."""
         title = page.title(with_ns=False)
 
         newpage = pywikibot.Category(pywikibot.Site('commons', 'commons'),
-                                     '%s %s' % (self.basename, title))
-        newtext = (u'[[Category:%(parent)s|%(title)s]]\n'
-                   u'[[Category:%(title)s]]\n'
+                                     '{} {}'.format(self.basename, title))
+        newtext = ('[[Category:%(parent)s|%(title)s]]\n'
+                   '[[Category:%(title)s]]\n'
                    % {'parent': self.parent, 'title': title})
 
         if not newpage.exists():
@@ -72,7 +72,8 @@ class CreateCategoriesBot(Bot):
                          ignore_server_errors=True)
         else:
             # FIXME: Add overwrite option
-            pywikibot.output(u'%s already exists, skipping' % newpage.title())
+            pywikibot.output('{} already exists, skipping'
+                             .format(newpage.title()))
 
 
 def main(*args):
@@ -120,5 +121,5 @@ def main(*args):
         return False
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
