@@ -49,7 +49,7 @@ from pywikibot.userinterfaces import (
 from tests.aspects import TestCase, TestCaseBase
 from tests.utils import unittest, FakeModule
 
-if os.name == "nt":
+if os.name == 'nt':
     from multiprocessing.managers import BaseManager
     import threading
 
@@ -89,7 +89,7 @@ class Stream(object):
         patched_streams[self._original] = self._stream
 
     def __repr__(self):
-        return '<patched %s %r wrapping %r>' % (
+        return '<patched {} {!r} wrapping {!r}>'.format(
             self._name, self._stream, self._original)
 
     def reset(self):
@@ -98,7 +98,7 @@ class Stream(object):
         self._stream.seek(0)
 
 
-if os.name == "nt":
+if os.name == 'nt':
 
     class pywikibotWrapper(object):
 
@@ -141,7 +141,7 @@ if os.name == "nt":
     _manager = pywikibotManager(
         address=('127.0.0.1', 47228),
         authkey=b'4DJSchgwy5L5JxueZEWbxyeG')
-    if len(sys.argv) > 1 and sys.argv[1] == "--run-as-slave-interpreter":
+    if len(sys.argv) > 1 and sys.argv[1] == '--run-as-slave-interpreter':
         s = _manager.get_server()
         s.serve_forever()
 
@@ -336,7 +336,8 @@ class TestTerminalOutput(UITestCase):
         except TestException:
             pywikibot.exception('exception')
         self.assertEqual(newstdout.getvalue(), '')
-        self.assertEqual(newstderr.getvalue(), 'ERROR: TestException: Testing Exception\n')
+        self.assertEqual(newstderr.getvalue(),
+                         'ERROR: TestException: Testing Exception\n')
 
     def test_exception_tb(self):
         class TestException(Exception):
@@ -349,9 +350,11 @@ class TestTerminalOutput(UITestCase):
             pywikibot.exception('exception', tb=True)
         self.assertEqual(newstdout.getvalue(), '')
         stderrlines = newstderr.getvalue().split('\n')
-        self.assertEqual(stderrlines[0], 'ERROR: TestException: Testing Exception')
+        self.assertEqual(stderrlines[0],
+                         'ERROR: TestException: Testing Exception')
         self.assertEqual(stderrlines[1], 'Traceback (most recent call last):')
-        self.assertEqual(stderrlines[3], "    raise TestException('Testing Exception')")
+        self.assertEqual(stderrlines[3],
+                         "    raise TestException('Testing Exception')")
         self.assertTrue(stderrlines[4].endswith(': Testing Exception'))
 
         self.assertNotEqual(stderrlines[-1], '\n')
@@ -373,15 +376,15 @@ class TestTerminalInput(UITestCase):
         self.assertEqual(newstderr.getvalue(), 'question: ')
 
         self.assertIsInstance(returned, unicode)
-        self.assertEqual(returned, u'input to read')
+        self.assertEqual(returned, 'input to read')
 
     def _call_input_choice(self):
         rv = pywikibot.input_choice(
             'question',
-            (('answer 1', u'A'),
-             ('answer 2', u'N'),
-             ('answer 3', u'S')),
-            u'A',
+            (('answer 1', 'A'),
+             ('answer 2', 'N'),
+             ('answer 3', 'S')),
+            'A',
             automatic_quit=False)
 
         self.assertEqual(newstdout.getvalue(), '')
@@ -473,25 +476,25 @@ class TestTerminalUnicodeUnix(UITestCase):
     """Terminal output tests for unix."""
 
     def testOutputUnicodeText(self):
-        pywikibot.output(u'Заглавная_страница')
+        pywikibot.output('Заглавная_страница')
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(
             newstderr.getvalue(),
-            self._encode(u'Заглавная_страница\n', 'utf-8'))
+            self._encode('Заглавная_страница\n', 'utf-8'))
 
     def testInputUnicodeText(self):
-        newstdin.write(self._encode(u'Заглавная_страница\n', 'utf-8'))
+        newstdin.write(self._encode('Заглавная_страница\n', 'utf-8'))
         newstdin.seek(0)
 
-        returned = pywikibot.input(u'Википедию? ')
+        returned = pywikibot.input('Википедию? ')
 
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(
             newstderr.getvalue(),
-            self._encode(u'Википедию? ', 'utf-8'))
+            self._encode('Википедию? ', 'utf-8'))
 
         self.assertIsInstance(returned, unicode)
-        self.assertEqual(returned, u'Заглавная_страница')
+        self.assertEqual(returned, 'Заглавная_страница')
 
 
 @unittest.skipUnless(os.name == 'posix', 'requires Unix console')
@@ -502,7 +505,7 @@ class TestTransliterationUnix(UITestCase):
     def testOutputTransliteratedUnicodeText(self):
         pywikibot.ui.encoding = 'latin-1'
         pywikibot.config.transliterate = True
-        pywikibot.output(u'abcd АБГД αβγδ あいうえお')
+        pywikibot.output('abcd АБГД αβγδ あいうえお')
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(
             newstderr.getvalue(),
@@ -534,16 +537,16 @@ class WindowsTerminalTestCase(UITestCase):
             try:
                 cls._app = pywinauto.application.Application()
             except AttributeError as e2:
-                raise unittest.SkipTest('pywinauto Application failed: %s\n%s'
-                                        % (e1, e2))
+                raise unittest.SkipTest('pywinauto Application failed: {}\n{}'
+                                        .format(e1, e2))
         super(WindowsTerminalTestCase, cls).setUpClass()
 
     @classmethod
     def setUpProcess(cls, command):
         si = subprocess.STARTUPINFO()
         si.dwFlags = subprocess.STARTF_USESTDHANDLES
-        cls._process = subprocess.Popen(command,
-                                        creationflags=subprocess.CREATE_NEW_CONSOLE)
+        cls._process = subprocess.Popen(
+            command, creationflags=subprocess.CREATE_NEW_CONSOLE)
 
         cls._app.connect_(process=cls._process.pid)
 
@@ -552,15 +555,17 @@ class WindowsTerminalTestCase(UITestCase):
             window = cls._app.window_()
         except Exception as e:
             cls.tearDownProcess()
-            raise unittest.SkipTest('Windows package pywinauto could not locate window: %r'
-                                    % e)
+            raise unittest.SkipTest(
+                'Windows package pywinauto could not locate window: {!r}'
+                .format(e))
 
         try:
             window.TypeKeys('% {UP}{ENTER}%L{HOME}L{ENTER}', with_spaces=True)
         except Exception as e:
             cls.tearDownProcess()
-            raise unittest.SkipTest('Windows package pywinauto could not use window TypeKeys: %r'
-                                    % e)
+            raise unittest.SkipTest(
+                'Windows package pywinauto could not use window TypeKeys: {!r}'
+                .format(e))
 
     @classmethod
     def tearDownProcess(cls):
@@ -568,19 +573,20 @@ class WindowsTerminalTestCase(UITestCase):
 
     def setUp(self):
         super(WindowsTerminalTestCase, self).setUp()
-        self.setclip(u'')
+        self.setclip('')
 
     def waitForWindow(self):
         while not self._app.window_().IsEnabled():
             time.sleep(0.01)
 
     def getstdouterr(self):
-        sentinel = u'~~~~SENTINEL~~~~cedcfc9f-7eed-44e2-a176-d8c73136c185'
+        sentinel = '~~~~SENTINEL~~~~cedcfc9f-7eed-44e2-a176-d8c73136c185'
         # select all and copy to clipboard
         self._app.window_().SetFocus()
         self.waitForWindow()
-        self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}',
-                                     with_spaces=True)
+        self._app.window_().TypeKeys(
+            '% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{DOWN}{ENTER}{ENTER}',
+            with_spaces=True)
 
         while True:
             data = self.getclip()
@@ -590,22 +596,25 @@ class WindowsTerminalTestCase(UITestCase):
 
     def setclip(self, text):
         win32clipboard.OpenClipboard()
-        win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT, unicode(text))
+        win32clipboard.SetClipboardData(win32clipboard.CF_UNICODETEXT,
+                                        unicode(text))
         win32clipboard.CloseClipboard()
 
     def getclip(self):
         win32clipboard.OpenClipboard()
         data = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
         win32clipboard.CloseClipboard()
-        data = data.split(u'\x00')[0]
-        data = data.replace(u'\r\n', u'\n')
+        data = data.split('\x00')[0]
+        data = data.replace('\r\n', '\n')
         return data
 
     def sendstdin(self, text):
-        self.setclip(text.replace(u'\n', u'\r\n'))
+        self.setclip(text.replace('\n', '\r\n'))
         self._app.window_().SetFocus()
         self.waitForWindow()
-        self._app.window_().TypeKeys('% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}', with_spaces=True)
+        self._app.window_().TypeKeys(
+            '% {UP}{UP}{UP}{RIGHT}{DOWN}{DOWN}{ENTER}',
+            with_spaces=True)
 
 
 class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
@@ -616,7 +625,8 @@ class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
     def setUpClass(cls):
         super(TestWindowsTerminalUnicode, cls).setUpClass()
         fn = inspect.getfile(inspect.currentframe())
-        cls.setUpProcess(['python', 'pwb.py', fn, '--run-as-slave-interpreter'])
+        cls.setUpProcess(['python', 'pwb.py', fn,
+                          '--run-as-slave-interpreter'])
 
         _manager.connect()
         cls.pywikibot = _manager.pywikibot()
@@ -638,24 +648,24 @@ class TestWindowsTerminalUnicode(WindowsTerminalTestCase):
         self.pywikibot.cls()
 
     def testOutputUnicodeText_no_transliterate(self):
-        self.pywikibot.output(u'Заглавная_страница')
-        self.assertEqual(self.getstdouterr(), u'Заглавная_страница\n')
+        self.pywikibot.output('Заглавная_страница')
+        self.assertEqual(self.getstdouterr(), 'Заглавная_страница\n')
 
     def testOutputUnicodeText_transliterate(self):
         self.pywikibot.set_config('transliterate', True)
         self.pywikibot.set_ui('transliteration_target', 'latin-1')
-        self.pywikibot.output(u'Заглавная_страница')
+        self.pywikibot.output('Заглавная_страница')
         self.assertEqual(self.getstdouterr(), 'Zaglavnaya_stranica\n')
 
     def testInputUnicodeText(self):
         self.pywikibot.set_config('transliterate', True)
 
-        self.pywikibot.request_input(u'Википедию? ')
-        self.assertEqual(self.getstdouterr(), u'Википедию?')
-        self.sendstdin(u'Заглавная_страница\n')
+        self.pywikibot.request_input('Википедию? ')
+        self.assertEqual(self.getstdouterr(), 'Википедию?')
+        self.sendstdin('Заглавная_страница\n')
         returned = self.pywikibot.get_input()
 
-        self.assertEqual(returned, u'Заглавная_страница')
+        self.assertEqual(returned, 'Заглавная_страница')
 
 
 class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
@@ -673,9 +683,9 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
 
     def testOutputUnicodeText_no_transliterate(self):
         self.sendstdin(
-            u"python -c \"import os, pywikibot; os.system('cls'); "
-            u"pywikibot.output(u'\\n'.join(pywikibot.handleArgs()))\" "
-            u"Alpha Bετα Гамма دلتا\n")
+            "python -c \"import os, pywikibot; os.system('cls'); "
+            "pywikibot.output('\\n'.join(pywikibot.handleArgs()))\" "
+            'Alpha Bετα Гамма دلتا\n')
         lines = []
 
         for i in range(3):
@@ -690,7 +700,7 @@ class TestWindowsTerminalUnicodeArguments(WindowsTerminalTestCase):
             time.sleep(1)
 
         # empty line is the new command line
-        self.assertEqual(lines, [u'Alpha', u'Bετα', u'Гамма', u'دلتا', u''])
+        self.assertEqual(lines, ['Alpha', 'Bετα', 'Гамма', 'دلتا', ''])
 
 
 # TODO: add tests for background colors.
@@ -748,7 +758,8 @@ class FakeUITest(TestCase):
 
     def test_flat_color(self):
         """Test using colors with defaulting in between."""
-        self._colors = (('red', 6), ('default', 6), ('yellow', 3), ('default', 1))
+        self._colors = (('red', 6), ('default', 6), ('yellow', 3),
+                        ('default', 1))
         self.ui_obj._print('Hello \03{red}world \03{default}you\03{yellow}!',
                            self.stream)
         self.assertEqual(self._getvalue(), self.expected)
@@ -815,9 +826,9 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
     """
     Test case to allow doing colorized Win32 tests in any environment.
 
-    This only patches the ctypes import in the terminal_interface_win32 module.
-    As the Win32CtypesUI is using the std-streams from another import these will
-    be unpatched.
+    This only patches the ctypes import in the terminal_interface_win32
+    module. As the Win32CtypesUI is using the std-streams from another
+    import these will be unpatched.
     """
 
     net = False

@@ -35,26 +35,30 @@ class TestUploadbot(TestCase):
             for dir_file in directory_info[2]:
                 image_list.append(os.path.join(directory_info[0], dir_file))
         bot = upload.UploadRobot(url=image_list,
-                                 description="pywikibot upload.py script test",
+                                 description='pywikibot upload.py script test',
                                  useFilename=None, keepFilename=True,
                                  verifyDescription=True, aborts=set(),
-                                 ignoreWarning=True, targetSite=self.get_site())
+                                 ignoreWarning=True,
+                                 targetSite=self.get_site())
         bot.run()
 
     def test_png(self):
         """Test uploading a png using upload.py."""
-        bot = upload.UploadRobot(url=[join_images_path("MP_sounds.png")],
-                                 description="pywikibot upload.py script test",
+        bot = upload.UploadRobot(url=[join_images_path('MP_sounds.png')],
+                                 description='pywikibot upload.py script test',
                                  useFilename=None, keepFilename=True,
                                  verifyDescription=True, aborts=set(),
-                                 ignoreWarning=True, targetSite=self.get_site())
+                                 ignoreWarning=True,
+                                 targetSite=self.get_site())
         bot.run()
 
     def test_png_url(self):
         """Test uploading a png from url using upload.py."""
+        link = 'https://upload.wikimedia.org/'
+        link += 'wikipedia/commons/f/fc/MP_sounds.png'
         bot = upload.UploadRobot(
-            url=['https://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png'],
-            description="pywikibot upload.py script test",
+            url=[link],
+            description='pywikibot upload.py script test',
             useFilename=None, keepFilename=True,
             verifyDescription=True, aborts=set(),
             ignoreWarning=True, targetSite=self.get_site())
