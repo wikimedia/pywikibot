@@ -61,11 +61,11 @@ class TestTkinter(DefaultSiteTestCase):
         """Test Tkinter window."""
         root = Tkinter.Tk()
         root.resizable(width=Tkinter.FALSE, height=Tkinter.FALSE)
-        root.title("pywikibot GUI")
-        page = pywikibot.Page(pywikibot.Site(), u'Main Page')
+        root.title('pywikibot GUI')
+        page = pywikibot.Page(pywikibot.Site(), 'Main Page')
         content = page.get()
         myapp = EditBoxWindow(root)
-        myapp.bind("<Control-d>", myapp.debug)
+        myapp.bind('<Control-d>', myapp.debug)
         v = myapp.edit(content, highlight=page.title())
         assert v is None
 
