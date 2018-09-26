@@ -20,12 +20,10 @@ from datetime import datetime
 
 import pywikibot
 
-from pywikibot import config
-
+from pywikibot import async_request, config, page_put_queue
 from pywikibot.comms import http
 from pywikibot.data import api
-
-from pywikibot import async_request, page_put_queue
+from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools import (
     MediaWikiVersion,
     PY2,
@@ -1325,7 +1323,12 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
         """Test the deprecated site.logpages() when namespace is a list."""
         le = list(self.site.logpages(namespace=[2, 3], number=10))
         for entry in le:
-            self.assertIn(entry[0].namespace(), [2, 3])
+            try:
+                self.assertIn(entry[0].namespace(), [2, 3])
+            except HiddenKeyError as e:
+                raise unittest.SkipTest(
+                    'Log entry {entry} is hidden:\n{entry.data}\n{error!r}'
+                    .format(entry=entry, error=e))
 
     def test_logpages_dump(self):
         """Test the deprecated site.logpages() method using dump mode."""
