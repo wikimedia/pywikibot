@@ -204,30 +204,30 @@ class CategoryPreprocess(BaseBot):
                         return redir_target
                     if self.create:
                         redir_target.text = ''
-                        pywikibot.output('Redirect target %s does not exist '
-                                         'yet; creating.'
-                                         % redir_target.title(as_link=True))
+                        pywikibot.output('Redirect target {} does not exist '
+                                         'yet; creating.'.format(
+                                             redir_target.title(as_link=True)))
                         return redir_target
                     if self.edit_redirects:
                         return page
-                    pywikibot.warning('Redirect target %s can not '
-                                      'be modified; skipping.'
-                                      % redir_target.title(as_link=True))
+                    pywikibot.warning('Redirect target {} can not '
+                                      'be modified; skipping.'.format(
+                                          redir_target.title(as_link=True)))
                     return None
                 if self.edit_redirects:
                     return page
-                pywikibot.warning('Page %s is a redirect to %s; skipping.'
-                                  % (page.title(as_link=True),
-                                     redir_target.title(as_link=True)))
+                pywikibot.warning('Page {} is a redirect to {}; skipping.'
+                                  .format(page.title(as_link=True),
+                                          redir_target.title(as_link=True)))
                 return None
             return page
         if self.create:
             page.text = ''
-            pywikibot.output('Page %s does not exist yet; creating.'
-                             % page.title(as_link=True))
+            pywikibot.output('Page {} does not exist yet; creating.'
+                             .format(page.title(as_link=True)))
             return page
-        pywikibot.warning('Page %s does not exist; skipping.'
-                          % page.title(as_link=True))
+        pywikibot.warning('Page {} does not exist; skipping.'
+                          .format(page.title(as_link=True)))
         return None
 
     def determine_template_target(self, page):
@@ -300,8 +300,8 @@ class CategoryDatabase(object):
         if not self.is_loaded:
             try:
                 if config.verbose_output:
-                    pywikibot.output('Reading dump from %s'
-                                     % config.shortpath(self.filename))
+                    pywikibot.output('Reading dump from '
+                                     + config.shortpath(self.filename))
                 with open_archive(self.filename, 'rb') as f:
                     databases = pickle.load(f)
                 # keys are categories, values are 2-tuples with lists as
@@ -778,8 +778,8 @@ class CategoryMoveRobot(CategoryPreprocess):
         Do not use this function from outside the class.
         """
         # Some preparing
-        pywikibot.output('Moving text from %s to %s.' % (
-                         self.oldcat.title(), self.newcat.title()))
+        pywikibot.output('Moving text from {} to {}.'.format(
+            self.oldcat.title(), self.newcat.title()))
         comma = self.site.mediawiki_message('comma-separator')
         authors = comma.join(self.oldcat.contributingUsers())
         template_vars = {'oldcat': self.oldcat.title(), 'authors': authors}
@@ -1032,7 +1032,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
 
             def output_range(self, start, end):
                 """Output a section and categories from the text."""
-                pywikibot.output(self.text[start:end] + '…')
+                pywikibot.output(self.text[start:end] + '...')
 
                 # if categories weren't visible, show them additionally
                 if len(self.text) > end:
@@ -1315,7 +1315,7 @@ class CategoryTreeRobot(object):
         cat = pywikibot.Category(self.site, self.catTitle)
         pywikibot.output('Generating tree...', newline=False)
         tree = self.treeview(cat)
-        pywikibot.output(u'')
+        pywikibot.output('')
         if self.filename:
             pywikibot.output('Saving results in ' + self.filename)
             with codecs.open(self.filename, 'a', 'utf-8') as f:
