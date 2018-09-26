@@ -255,10 +255,10 @@ class AssertAPIErrorContextManager(object):
     """
     Context manager to assert certain APIError exceptions.
 
-    This is build similar to the L{unittest.TestCase.assertError} implementation
-    which creates an context manager. It then calls L{handle} which either
-    returns this manager if no executing object given or calls the callable
-    object.
+    This is build similar to the L{unittest.TestCase.assertError}
+    implementation which creates an context manager. It then calls L{handle}
+    which either returns this manager if no executing object given or calls
+    the callable object.
     """
 
     def __init__(self, code, info, msg, test_case):
@@ -392,8 +392,8 @@ class DryRequest(CachedRequest):
 
     def submit(self):
         """Prevented method."""
-        raise Exception(u'DryRequest rejecting request: %r'
-                        % self._params)
+        raise Exception('DryRequest rejecting request: {!r}'
+                        .format(self._params))
 
 
 class DrySite(pywikibot.site.APISite):
@@ -558,9 +558,9 @@ class PatchedHttp(object):
 
     This patches the C{http} import in the given module to a class simulating
     C{request} and C{fetch}. It has a C{data} attribute which is either a
-    static value which the requests will return or it's a callable returning the
-    data. If it's a callable it'll be called with the same parameters as the
-    original function in the L{http} module. For fine grained control it's
+    static value which the requests will return or it's a callable returning
+    the data. If it's a callable it'll be called with the same parameters as
+    the original function in the L{http} module. For fine grained control it's
     possible to override/monkey patch the C{before_request} and C{before_fetch}
     methods. By default they just return C{data} directory or call it if it's
     callable.
@@ -680,14 +680,15 @@ def execute(command, data_in=None, timeout=0, error=None):
                            not isinstance(v, str)]
             if unicode_env:
                 raise TypeError(
-                    '%s: unicode in os.environ: %r' % (e, unicode_env))
+                    '{}: unicode in os.environ: {!r}'.format(e, unicode_env))
 
             child_unicode_env = [(k, v) for k, v in env.items()
                                  if not isinstance(k, str) or
                                  not isinstance(v, str)]
             if child_unicode_env:
                 raise TypeError(
-                    '%s: unicode in child env: %r' % (e, child_unicode_env))
+                    '{}: unicode in child env: {!r}'
+                    .format(e, child_unicode_env))
         raise
 
     if data_in is not None:
@@ -718,7 +719,8 @@ def execute(command, data_in=None, timeout=0, error=None):
     data_out = p.communicate()
     return {'exit_code': p.returncode,
             'stdout': data_out[0].decode(config.console_encoding),
-            'stderr': (stderr_lines + data_out[1]).decode(config.console_encoding)}
+            'stderr': (stderr_lines + data_out[1])
+            .decode(config.console_encoding)}
 
 
 def execute_pwb(args, data_in=None, timeout=0, error=None, overrides=None):
@@ -735,10 +737,10 @@ def execute_pwb(args, data_in=None, timeout=0, error=None, overrides=None):
     if overrides:
         command.append('-c')
         overrides = '; '.join(
-            '%s = %s' % (key, value) for key, value in overrides.items())
+            '{} = {}'.format(key, value) for key, value in overrides.items())
         command.append(
-            'import pwb; import pywikibot; %s; pwb.main()'
-            % overrides)
+            'import pwb; import pywikibot; {}; pwb.main()'
+            .format(overrides))
     else:
         command.append(_pwb_py)
 

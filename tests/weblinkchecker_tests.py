@@ -42,7 +42,8 @@ class MementoTestCase(TestCase):
             self.skipTest(e)
 
 
-class WeblibTestMementoInternetArchive(MementoTestCase, weblib_tests.TestInternetArchive):
+class WeblibTestMementoInternetArchive(MementoTestCase,
+                                       weblib_tests.TestInternetArchive):
 
     """Test InternetArchive Memento using old weblib tests."""
 

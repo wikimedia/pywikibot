@@ -402,7 +402,7 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
 
         # Remove qualifier
         claim = item.claims['P115'][0]
-        qual_3 = claim.qualifiers[u'P580'][0]
+        qual_3 = claim.qualifiers['P580'][0]
         claim.removeQualifier(qual_3)
 
         # Check P580 qualifier removed but P88 qualifier remains
@@ -422,8 +422,8 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
         # Remove qualifiers
         item.get(force=True)
         claim = item.claims['P115'][0]
-        qual_3 = claim.qualifiers[u'P580'][0]
-        qual_4 = claim.qualifiers[u'P88'][0]
+        qual_3 = claim.qualifiers['P580'][0]
+        qual_4 = claim.qualifiers['P88'][0]
         claim.removeQualifiers([qual_3, qual_4])
 
         # Check P580 and P88 qualifiers are removed
