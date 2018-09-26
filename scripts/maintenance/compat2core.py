@@ -56,7 +56,7 @@ replacements = (
     ('import catlib\r?\n', ''),
     ('import userlib\r?\n', ''),
     # change wikipedia to pywikibot, exclude URLs
-    (r'(?<!\.)wikipedia\.', u'pywikibot.'),
+    (r'(?<!\.)wikipedia\.', 'pywikibot.'),
     # site instance call
     (r'pywikibot\.getSite\s*\(\s*', 'pywikibot.Site('),
     # lang is different from code. We should use code in core
@@ -152,21 +152,22 @@ class ConvertBot(object):
                     '(no input to leave):')
             if not self.source:
                 exit()
-            if not self.source.endswith(u'.py'):
+            if not self.source.endswith('.py'):
                 self.source += '.py'
             if os.path.exists(self.source):
                 break
             self.source = os.path.join('scripts', self.source)
             if os.path.exists(self.source):
                 break
-            pywikibot.output(u'%s does not exist. Please retry.' % self.source)
+            pywikibot.output('{} does not exist. Please retry.'
+                             .format(self.source))
             self.source = None
 
     def get_dest(self):
         """Ask for destination script name."""
-        self.dest = u'%s-core.%s' % tuple(self.source.rsplit(u'.', 1))
+        self.dest = '%s-core.%s' % tuple(self.source.rsplit('.', 1))
         if not self.warnonly and not pywikibot.input_yn(
-                u'Destination file is %s.' % self.dest,
+                'Destination file is {}.'.format(self.dest),
                 default=True, automatic_quit=False):
             pywikibot.output('Quitting...')
             exit()
@@ -209,6 +210,6 @@ def main():
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pywikibot.stopme()  # we do not work on any site
     main()
