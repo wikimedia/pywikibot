@@ -37,7 +37,7 @@ def main():
                 line += ' '
                 line += color_format('{color}{0}{default}',
                                      fg_col.ljust(max_len_fg_colors),
-                                     color='%s;%s' % (fg_col, bg_col))
+                                     color='{};{}'.format(fg_col, bg_col))
 
             line = '{0} {1}'.format(bg_col.ljust(max_len_bc_color), line)
             pywikibot.output(line)
