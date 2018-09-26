@@ -80,17 +80,17 @@ class i18nBot(object):  # noqa: N801
             keys.remove('en')
             keys.insert(0, 'en')
 
-        print("# -*- coding: utf-8 -*-")
-        print("msg = {")
+        print('# -*- coding: utf-8 -*-')
+        print('msg = {')
         for code in keys:
             print("    '%s': {" % code)
             for msg in sorted(self.messages.values()):
-                label = "%s-%s" % (self.scriptname, msg)
+                label = '{}-{}'.format(self.scriptname, msg)
                 if label in self.dict[code]:
                     print("        '%s': u'%s'," % (label,
                                                     self.dict[code][label]))
-            print("    },")
-        print("};")
+            print('    },')
+        print('};')
 
     def read(self, oldmsg, newmsg=None):
         """Read a single message from source script."""
@@ -100,19 +100,19 @@ class i18nBot(object):  # noqa: N801
         if newmsg is None:
             newmsg = oldmsg
         for code in keys:
-            label = "%s-%s" % (self.scriptname, newmsg)
+            label = '{}-{}'.format(self.scriptname, newmsg)
             if code == 'qqq':
                 if code not in self.dict:
                     self.dict[code] = {}
                 self.dict[code][label] = (
-                    u'Edit summary for message %s of %s report'
-                    % (newmsg, self.scriptname))
+                    'Edit summary for message {} of {} report'
+                    .format(newmsg, self.scriptname))
             elif code != 'commons':
                 if code not in self.dict:
                     self.dict[code] = {}
                 self.dict[code][label] = msg[code]
         if 'en' not in keys:
-            print('WARNING: "en" key missing for message %s' % newmsg)
+            print('WARNING: "en" key missing for message ' + newmsg)
 
     def run(self, quiet=False):
         """
@@ -142,7 +142,7 @@ class i18nBot(object):  # noqa: N801
         if not os.path.exists(json_dir):
             os.makedirs(json_dir)
         for lang in self.dict:
-            file_name = os.path.join(json_dir, '%s.json' % lang)
+            file_name = os.path.join(json_dir, '{}.json'.format(lang))
             if os.path.isfile(file_name):
                 with codecs.open(file_name, 'r', 'utf-8') as json_file:
                     new_dict = json.loads(json_file.read())
