@@ -97,7 +97,8 @@ class TestColorFormat(TestCase):
     def test_bytes_format(self):
         """Test that using `bytes` is not allowed."""
         self.assertRaises(TypeError, formatter.color_format, b'{0}', 'a')
-        self.assertRaises(TypeError, formatter.color_format, b'{black}{0}', 'a')
+        self.assertRaises(TypeError, formatter.color_format, b'{black}{0}',
+                          'a')
 
     def test_variant_colors(self):
         """Test variant colors with {color} parameter."""
