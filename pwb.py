@@ -115,7 +115,7 @@ def run_python_file(filename, argv, argvu, package=None):
     try:
         with open(filename, 'rb') as f:
             source = f.read()
-        exec(compile(source, filename, "exec", dont_inherit=True),
+        exec(compile(source, filename, 'exec', dont_inherit=True),
              main_mod.__dict__)
     finally:
         # Restore the old __main__
@@ -181,7 +181,7 @@ except RuntimeError:
     if filename is not None and not (filename.startswith('generate_')
                                      or filename == 'version.py'):
         print("NOTE: 'user-config.py' was not found!")
-        print("Please follow the prompts to create it:")
+        print('Please follow the prompts to create it:')
         run_python_file(os.path.join(_pwb_dir, 'generate_user_files.py'),
                         ['generate_user_files.py'],
                         ['generate_user_files.py'])

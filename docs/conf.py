@@ -263,7 +263,7 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
     """Pywikibot specific conversions."""
     from scripts.cosmetic_changes import warning
 
-    if what != "module":
+    if what != 'module':
         return
 
     if not name.startswith('scripts.'):

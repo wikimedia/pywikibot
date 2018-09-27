@@ -696,12 +696,11 @@ class DisambiguationRobot(SingleSiteBot):
         # group linktrail is the link trail, that's letters after ]] which
         # are part of the word.
         # note: the definition of 'letter' varies from language to language.
-        self.linkR = re.compile(r'''
+        self.linkR = re.compile(r"""
             \[\[  (?P<title>     [^\[\]\|#]*)
                   (?P<section> \#[^\]\|]*)?
                (\|(?P<label>     [^\]]*))?  \]\]
-            (?P<linktrail>%s)''' % linktrail,
-                                flags=re.X)
+            (?P<linktrail>{})""".format(linktrail), flags=re.X)
 
     @staticmethod
     def firstlinks(page):

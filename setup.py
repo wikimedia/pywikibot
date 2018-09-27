@@ -72,6 +72,7 @@ extra_deps = {
         'flake8-mock>=0.3',
         'flake8-per-file-ignores',
         'flake8-print>=2.0.1',
+        'flake8-quotes',
         'flake8-string-format',
         'flake8-tuple>=0.2.8',
         'pep8-naming>=0.7',
@@ -246,7 +247,7 @@ setup(
     extras_require=extra_deps,
     url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
     download_url='https://tools.wmflabs.org/pywikibot/',
-    test_suite="tests.collector",
+    test_suite='tests.collector',
     tests_require=test_deps,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
