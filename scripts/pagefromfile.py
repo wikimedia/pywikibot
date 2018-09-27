@@ -296,7 +296,7 @@ def main(*args):
     @param args: command line arguments
     @type args: unicode
     """
-    filename = "dict.txt"
+    filename = 'dict.txt'
     options = {}
     r_options = {}
 

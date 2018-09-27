@@ -54,8 +54,9 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
         linktrail = mysite.linktrail()
 
         # make a backup of the original text so we can show the changes later
-        linkR = re.compile(r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?'
-                           r'(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
+        linkR = re.compile(
+            r'\[\[(?P<title>[^\]\|#]*)(?P<section>#[^\]\|]*)?'
+            r'(\|(?P<label>[^\]]*))?\]\](?P<linktrail>' + linktrail + ')')
         curpos = 0
         # This loop will run until we have finished the current page
         while True:
@@ -71,7 +72,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                     or isDisabled(text, m.start())):
                 continue
             else:
-                actualLinkPage = pywikibot.Page(targetPage.site, m.group('title'))
+                actualLinkPage = pywikibot.Page(
+                    targetPage.site, m.group('title'))
                 # Check whether the link found is to page.
                 if actualLinkPage != linkedPage:
                     continue
@@ -111,8 +113,8 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
 
             if (new_page_title == link_text and not section):
                 newlink = '[[{}]]'.format(new_page_title)
-            # check if we can create a link with trailing characters instead of a
-            # pipelink
+            # check if we can create a link with trailing characters instead of
+            # a pipelink
             elif (len(new_page_title) <= len(link_text) and
                   firstcap(link_text[:len(new_page_title)]) ==
                   firstcap(new_page_title) and

@@ -271,7 +271,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
         try:
             entry.parse_key()
         except ParseError:
-            pywikibot.error(u'Problems parsing %s with key %s'
+            pywikibot.error('Problems parsing %s with key %s'
                             % (entry.filename, entry.key))
             pywikibot.exception()
             continue
@@ -279,7 +279,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
         try:
             entry._rebuild()
         except Exception as e:
-            pywikibot.error(u'Problems loading %s with key %s, %r'
+            pywikibot.error('Problems loading %s with key %s, %r'
                             % (entry.filename, entry.key, entry._parsed_key))
             pywikibot.exception(e, tb=True)
             continue
@@ -452,7 +452,7 @@ def main():
 
     for cache_path in cache_paths:
         if len(cache_paths) > 1:
-            pywikibot.output(u'Processing %s' % cache_path)
+            pywikibot.output('Processing %s' % cache_path)
         process_entries(cache_path, filter_func, output_func=output_func,
                         action_func=action_func)
 

@@ -325,7 +325,7 @@ class CaseChecker(object):
                         if len(err[1]) == 1:
                             newTitle = err[1][0]
                             editSummary = i18n.twtranslate(
-                                self.site, "casechecker-rename")
+                                self.site, 'casechecker-rename')
                             dst = self.Page(newTitle)
 
                             if 'redirect' in page:
@@ -744,7 +744,7 @@ class CaseChecker(object):
         prf = '' if self.Page(title).namespace() == 0 else ':'
         cc = '|««« {} »»»'.format(
             self.ColorCodeWord(title) if colorcode else '')
-        return u"[[%s%s%s]]" % (prf, title, cc)
+        return '[[%s%s%s]]' % (prf, title, cc)
 
     def OpenLogFile(self, filename):
         """Open logfile."""
@@ -780,6 +780,6 @@ class CaseChecker(object):
         return text
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     bot = CaseChecker()
     bot.Run()

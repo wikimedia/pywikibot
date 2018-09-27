@@ -73,7 +73,8 @@ class CategoryRedirectBot(pywikibot.Bot):
         # Category that contains all redirected category pages
         self.cat_redirect_cat = {
             'commons': 'Category:Category redirects',
-            'meta': 'Category:Maintenance of categories/Soft redirected categories',
+            'meta': 'Category:Maintenance of categories/Soft redirected '
+                    'categories',
             'ar': 'تصنيف:تحويلات تصنيفات ويكيبيديا',
             'cs': 'Kategorie:Údržba:Zastaralé kategorie',
             'da': 'Kategori:Omdirigeringskategorier',

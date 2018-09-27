@@ -98,7 +98,8 @@ class Photo(pywikibot.FilePage):
         hashObject = hashlib.sha1()
         hashObject.update(self.downloadPhoto().getvalue())
         return [page.title(with_ns=False) for page in
-                self.site.allimages(sha1=base64.b16encode(hashObject.digest()))]
+                self.site.allimages(
+                    sha1=base64.b16encode(hashObject.digest()))]
 
     def getTitle(self, fmt):
         """
@@ -164,7 +165,7 @@ class DataIngestionBot(pywikibot.Bot):
         @type site: APISite, 'deprecated_default_commons' or None
         """
         if site == 'deprecated_default_commons':
-            warn('site=\'deprecated_default_commons\' is deprecated; '
+            warn("site='deprecated_default_commons' is deprecated; "
                  'please specify a site or use site=None',
                  DeprecationWarning, 2)
             site = pywikibot.Site('commons', 'commons')

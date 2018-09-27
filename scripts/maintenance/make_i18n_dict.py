@@ -4,28 +4,24 @@
 Generate a i18n file from a given script.
 
 run IDLE at topmost level:
-
 >>> import pwb
 >>> from scripts.maintenance.make_i18n_dict import i18nBot
 >>> bot = i18nBot('<scriptname>', '<msg dict>')
 >>> bot.run()
 
 If you have more than one message dictionary, give all these names to the bot:
-
 >>> bot = i18nBot('<scriptname>', '<msg dict1>', '<msg dict2>', '<msg dict3>')
 
 If you want to rename the message index use keyword arguments. This may be
 mixed with preleading positonal argumens:
-
 >>> bot = i18nBot('<scriptname>', '<msg dict1>', the_other_msg='<msg dict2>')
 
 If you have the messages as instance constants you may call the bot as follows:
-
->>> bot = i18nBot('<scriptname>.<class instance>', '<msg dict1>', '<msg dict2>')
+>>> bot = i18nBot(
+...   '<scriptname>.<class instance>', '<msg dict1>', '<msg dict2>')
 
 It's also possible to make json files too by using to_json method after
 instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
-
 >>> bot.to_json()
 """
 #

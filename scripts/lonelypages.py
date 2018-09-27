@@ -89,11 +89,14 @@ class OrphanTemplate(object):
 
 # The orphan template names in the different languages.
 _templates = {
-    'af': ('Weesbladsy', 'datum={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}', ['wi']),
+    'af': ('Weesbladsy', 'datum={{subst:CURRENTMONTHNAME}} '
+                         '{{subst:CURRENTYEAR}}', ['wi']),
     'ar': ('يتيمة', 'تاريخ={{نسخ:اسم_شهر}} {{نسخ:عام}}'),
     'ca': ('Orfe', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}'),
-    'en': ('Orphan', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}', ['wi']),
-    'it': ('O', '||mese={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}', ['a']),
+    'en': ('Orphan', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}',
+           ['wi']),
+    'it': ('O', '||mese={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}',
+           ['a']),
     'ja': ('孤立', '{{subst:DATE}}'),
     'ko': ('외톨이', '{{{{{|안전풀기:}}}#timel:Y-m-d|now}}'),
     'zh': ('Orphan/auto', '', ['orphan'], True),
@@ -129,13 +132,15 @@ class LonelyPagesBot(SingleSiteBot):
                 orphan_template = e
         if orphan_template is None or isinstance(orphan_template, ValueError):
             err_message = 'Missing configuration for site {}'.format(self.site)
-            suggest_help(exception=orphan_template, additional_text=err_message)
+            suggest_help(
+                exception=orphan_template, additional_text=err_message)
             sys.exit(err_message)
         else:
             self._settings = orphan_template
         # DisambigPage part
         if self.getOption('disambigPage') is not None:
-            self.disambigpage = pywikibot.Page(self.site, self.getOption('disambigPage'))
+            self.disambigpage = pywikibot.Page(
+                self.site, self.getOption('disambigPage'))
             try:
                 self.disambigtext = self.disambigpage.get()
             except pywikibot.NoPage:
@@ -209,7 +214,8 @@ class LonelyPagesBot(SingleSiteBot):
                     'Your regex has found something in {0}, skipping...'
                     .format(page.title()))
                 return
-            if page.isDisambig() and self.getOption('disambigPage') is not None:
+            if (page.isDisambig()
+                    and self.getOption('disambigPage') is not None):
                 pywikibot.output('{0} is a disambig page, report..'
                                  .format(page.title()))
                 if not page.title().lower() in self.disambigtext.lower():

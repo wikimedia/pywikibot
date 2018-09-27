@@ -200,8 +200,9 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
 
                 if self.getOption('orphansonly'):
                     namespaces = self.getOption('orphansonly')
-                    ns_with_ref = self.current_page.namespaces_with_ref_to_page(
-                        namespaces)
+                    ns_with_ref = \
+                        self.current_page.namespaces_with_ref_to_page(
+                            namespaces)
                     ns_with_ref = sorted(list(ns_with_ref))
                     if ns_with_ref:
                         ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
@@ -258,7 +259,7 @@ def main(*args):
                 options['isorphan'] = False
         elif arg.startswith('-orphansonly'):
             if arg[13:]:
-                namespaces = mysite.namespaces.resolve(arg[13:].split(","))
+                namespaces = mysite.namespaces.resolve(arg[13:].split(','))
             else:
                 namespaces = mysite.namespaces
             options['orphansonly'] = namespaces
@@ -279,8 +280,8 @@ def main(*args):
                                                un + 'delete-linked-pages',
                                                {'page': page_name})
                 elif arg.startswith('-ref'):
-                    summary = i18n.twtranslate(mysite, 'delete-referring-pages',
-                                               {'page': page_name})
+                    summary = i18n.twtranslate(
+                        mysite, 'delete-referring-pages', {'page': page_name})
                 elif arg.startswith('-imageused'):
                     summary = i18n.twtranslate(mysite, un + 'delete-images',
                                                {'page': page_name})

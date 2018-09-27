@@ -32,7 +32,7 @@ class IllustrateRobot(WikidataBot):
 
     """A bot to add Wikidata image claims."""
 
-    def __init__(self, generator, wdproperty=u'P18'):
+    def __init__(self, generator, wdproperty='P18'):
         """
         Initializer.
 

@@ -288,7 +288,7 @@ netext = {
 # The page where the bot will report users with a possibly bad username.
 report_page = {
     'commons': ("Project:Administrators'noticeboard/User problems/Usernames"
-                "to be checked"),
+                'to be checked'),
     'wikipedia': {
         'am': 'User:Beria/Report',
         'ar': 'Project:إخطار الإداريين/أسماء مستخدمين للفحص',
@@ -517,8 +517,8 @@ class WelcomeBot(object):
                 'zoccola',
             ]
             elenco_others = [
-                '@', ".com", ".sex", ".org", ".uk", ".en", ".it", "admin",
-                "administrator", "amministratore", '@yahoo.com', '@alice.com',
+                '@', '.com', '.sex', '.org', '.uk', '.en', '.it', 'admin',
+                'administrator', 'amministratore', '@yahoo.com', '@alice.com',
                 'amministratrice', 'burocrate', 'checkuser', 'developer',
                 'http://', 'jimbo', 'mediawiki', 'on wheals', 'on wheal',
                 'on wheel', 'planante', 'razinger', 'sysop', 'troll', 'vandal',
@@ -653,7 +653,7 @@ class WelcomeBot(object):
         if not globalvar.makeWelcomeLog or len(queue) == 0:
             return
 
-        text = u''
+        text = ''
         logg = i18n.translate(self.site, logbook)
         if not logg:
             return
@@ -713,7 +713,7 @@ class WelcomeBot(object):
             return self._randomSignature
 
         sign_text = ''
-        creg = re.compile(r"^\* ?(.*?)$", re.M)
+        creg = re.compile(r'^\* ?(.*?)$', re.M)
         if not globalvar.signFileName:
             sign_page_name = i18n.translate(self.site, random_sign)
             if not sign_page_name:
@@ -931,10 +931,10 @@ def main(*args):
             except ValueError:
                 # upon request, we could check for software version here
                 raise ValueError(
-                    "Mediawiki has changed, -offset:# is not supported "
-                    "anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP "
-                    "is yyyymmddhhmmss. -timeoffset is now also supported. "
-                    "Please read this script source header for documentation.")
+                    'Mediawiki has changed, -offset:# is not supported '
+                    'anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP '
+                    'is yyyymmddhhmmss. -timeoffset is now also supported. '
+                    'Please read this script source header for documentation.')
         elif arg == '-file':
             globalvar.randomSign = True
             globalvar.signFileName = val or pywikibot.input(

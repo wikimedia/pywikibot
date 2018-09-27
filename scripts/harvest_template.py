@@ -149,7 +149,7 @@ class HarvestRobot(WikidataBot):
         })
         super(HarvestRobot, self).__init__(**kwargs)
         self.generator = generator
-        # TODO: Make it a list which also includes the redirects to the template
+        # TODO: Make it a list including the redirects to the template
         self.fields = {}
         for key, value in fields.items():
             if isinstance(value, tuple):

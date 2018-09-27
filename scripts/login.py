@@ -104,7 +104,7 @@ def _oauth_login(site):
                             'consumer': consumer_key})
         pywikibot.output('NOTE: To use OAuth, you need to copy the '
                          'following line to your user-config.py:')
-        pywikibot.output('authenticate[\'%(hostname)s\'] = %(oauth_token)s' %
+        pywikibot.output("authenticate['%(hostname)s'] = %(oauth_token)s" %
                          {'hostname': site.hostname(),
                           'oauth_token': oauth_token})
 
@@ -142,7 +142,7 @@ def main(*args):
                              "revelant lines from '{0}' (or the entire file) "
                              'and try again.'
                              .format(join(config.base_dir, 'pywikibot.lwp')))
-        elif arg == "-logout":
+        elif arg == '-logout':
             logout = True
         elif arg == '-oauth':
             oauth = True

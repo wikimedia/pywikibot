@@ -242,7 +242,8 @@ class NowCommonsDeleteBot(Bot):
                             filenameOnCommons = par[par.index(':') + 1:]
                             break
                         if val[0].strip() == '1':
-                            filenameOnCommons = val[1].strip()[val[1].strip().index(':') + 1:]
+                            filenameOnCommons = \
+                                val[1].strip()[val[1].strip().index(':') + 1:]
                             break
                         skip = True
                     if not filenameOnCommons:
@@ -279,7 +280,8 @@ class NowCommonsDeleteBot(Bot):
                     usingPages = list(localImagePage.usingPages())
                     if usingPages and usingPages != [localImagePage]:
                         pywikibot.output(color_format(
-                            '"{lightred}{0}{default}" is still used in {1} pages.',
+                            '"{lightred}{0}{default}" '
+                            'is still used in {1} pages.',
                             localImagePage.title(with_ns=False),
                             len(usingPages)))
                         if self.getOption('replace') is True:
@@ -298,7 +300,8 @@ class NowCommonsDeleteBot(Bot):
                                 # If the image is used with the urlname the
                                 # previous function won't work
                                 is_used = bool(list(pywikibot.FilePage(
-                                    self.site, page.title()).usingPages(total=1)))
+                                    self.site,
+                                    page.title()).usingPages(total=1)))
                                 if is_used and self.getOption('replaceloose'):
                                     bot = ImageBot(
                                         pg.FileLinksGenerator(
@@ -329,8 +332,8 @@ class NowCommonsDeleteBot(Bot):
                         if len(localImagePage.getFileVersionHistory()) > 1:
                             pywikibot.output(
                                 'This image has a version history. Please '
-                                'delete it manually after making sure that the '
-                                'old versions are not worth keeping.')
+                                'delete it manually after making sure that '
+                                'the old versions are not worth keeping.')
                             continue
                         if self.getOption('always') is False:
                             format_str = color_format(

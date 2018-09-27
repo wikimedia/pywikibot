@@ -1019,8 +1019,9 @@ class checkImagesBot(object):
                               "('''forced mode'''):")
                              % self.image.title(as_url=True))
                 else:
-                    repme = ((self.list_entry + 'has the following duplicates:')
-                             % self.image.title(as_url=True))
+                    repme = (
+                        (self.list_entry + 'has the following duplicates:')
+                        % self.image.title(as_url=True))
 
                 for dup_page in duplicates:
                     if (

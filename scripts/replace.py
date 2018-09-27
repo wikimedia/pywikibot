@@ -859,7 +859,7 @@ def prepareRegexForMySQL(pattern):
     pattern = pattern.replace(r'\d', '[:digit:]')
     pattern = pattern.replace(r'\w', '[:alnum:]')
 
-    pattern = pattern.replace("'", "\\" + "'")
+    pattern = pattern.replace("'", '\\' + "'")
     # pattern = pattern.replace('\\', '\\\\')
     # for char in ['[', ']', "'"]:
     #    pattern = pattern.replace(char, '\%s' % char)

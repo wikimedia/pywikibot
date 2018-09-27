@@ -139,12 +139,14 @@ def main(*args):
         elif claim.type == 'string':
             target = commandline_claims[i + 1]
         elif claim.type == 'globe-coordinate':
-            coord_args = [float(c) for c in commandline_claims[i + 1].split(',')]
+            coord_args = [
+                float(c) for c in commandline_claims[i + 1].split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
             else:
                 precision = 0.0001  # Default value (~10 m at equator)
-            target = pywikibot.Coordinate(coord_args[0], coord_args[1], precision=precision)
+            target = pywikibot.Coordinate(
+                coord_args[0], coord_args[1], precision=precision)
         else:
             raise NotImplementedError(
                 '{} datatype is not yet supported by claimit.py'

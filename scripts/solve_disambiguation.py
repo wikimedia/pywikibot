@@ -522,7 +522,7 @@ class AddAlternativeOption(OutputProxyOption):
 
     def result(self, value):
         """Add the alternative and then list them."""
-        newAlternative = pywikibot.input(u'New alternative:')
+        newAlternative = pywikibot.input('New alternative:')
         self._outputter.sequence.append(newAlternative)
         super(AddAlternativeOption, self).result(value)
 

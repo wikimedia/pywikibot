@@ -143,7 +143,8 @@ globalbadtitles = r"""
 # anywhere
     |.*(
             403[ ]forbidden
-            |(404|page|file|information|resource).*not([ ]*be)?[ ]*(available|found)
+            |(404|page|file|information|resource).*not([ ]*be)?[ ]*
+            (available|found)
             |site.*disabled
             |error[ ]404
             |error.+not[ ]found
@@ -247,7 +248,7 @@ class RefLink(object):
         # avoid multiple } being interpreted as a template inclusion
         self.title = self.title.replace('}}', '}&#125;')
         # prevent multiple quotes being interpreted as '' or '''
-        self.title = self.title.replace('\'\'', '\'&#39;')
+        self.title = self.title.replace("''", "'&#39;")
         self.title = pywikibot.unicode2html(self.title, self.site.encoding())
         # TODO : remove HTML when both opening and closing tags are included
 
@@ -640,13 +641,13 @@ class ReferencesRobot(Bot):
                     tmp = s.group('enc').strip("\"' ").lower()
                     naked = re.sub(r'[ _\-]', '', tmp)
                     # Convert to python correct encoding names
-                    if naked == "gb2312":
-                        enc.append("gbk")
-                    elif naked == "shiftjis":
-                        enc.append("shift jis 2004")
-                        enc.append("cp932")
-                    elif naked == "xeucjp":
-                        enc.append("euc-jp")
+                    if naked == 'gb2312':
+                        enc.append('gbk')
+                    elif naked == 'shiftjis':
+                        enc.append('shift jis 2004')
+                        enc.append('cp932')
+                    elif naked == 'xeucjp':
+                        enc.append('euc-jp')
                     else:
                         enc.append(tmp)
                 else:

@@ -512,7 +512,7 @@ class imageFetcher(threading.Thread):
         text = imagepage.get()
         # text = re.sub(u'== Summary ==', u'', text, re.IGNORECASE)
         # text = re.sub(u'== Licensing ==', u'', text, re.IGNORECASE)
-        # text = re.sub('\{\{(self|self2)\|[^\}]+\}\}', '', text, re.IGNORECASE)
+        # text = re.sub('\{\{(self|self2)\|[^\}]+\}\}', '', text, re.I)
 
         for toRemove in sourceGarbage[imagepage.site.lang]:
             text = re.sub(toRemove, '', text, flags=re.IGNORECASE)
@@ -718,7 +718,7 @@ class TkdialogICS(Tkdialog):
         self.skip = False
 
         # Start building the page
-        self.root.geometry("1500x400+100-100")
+        self.root.geometry('1500x400+100-100')
         self.root.title(self.filename)
 
         self.url = self.imagepage.permalink()
@@ -738,10 +738,10 @@ class TkdialogICS(Tkdialog):
             self.root, text='The old description was : ')
         self.new_description_label = Tkinter.Label(
             self.root, text='The new fields are : ')
-        self.filename_label = Tkinter.Label(self.root, text=u'Filename : ')
+        self.filename_label = Tkinter.Label(self.root, text='Filename : ')
         self.information_description_label = Tkinter.Label(
             self.root, text='Description : ')
-        self.information_date_label = Tkinter.Label(self.root, text=u'Date : ')
+        self.information_date_label = Tkinter.Label(self.root, text='Date : ')
         self.information_source_label = Tkinter.Label(self.root,
                                                       text='Source : ')
         self.information_author_label = Tkinter.Label(self.root,

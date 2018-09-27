@@ -139,7 +139,7 @@ def main(*args):
                         + page.title(with_ns=False))
         targetpage = pywikibot.Page(tosite, target_title)
         edithistpage = pywikibot.Page(tosite, target_title + '/edithistory')
-        summary = 'Moved page from {old} ([[{new}/edithistory|history]])'\
+        summary = 'Moved page from {old} ([[{new}/edithistory|history]])' \
                   .format(old=page.title(as_link=True, insite=tosite),
                           new=targetpage.title() if not
                           targetpage.namespace().subpages else '')

@@ -30,11 +30,13 @@ from scripts.category import CategoryMoveRobot as CategoryMoveBot
 DEFAULT_CFD_PAGE = 'Wikipedia:Categories for discussion/Working'
 
 # A list of templates that are used on category pages as part of the CFD
-# process that contain information such as the link to the per-day discussion page.
+# process that contain information such as the link to the per-day discussion
+#  page.
 cfdTemplates = ['Cfd full', 'Cfr full']
 
 # Regular expression declarations
-# See the en-wiki CFD working page at [[Wikipedia:Categories for discussion/Working]]
+# See the en-wiki CFD working page at
+# [[Wikipedia:Categories for discussion/Working]]
 # to see how these work in context. To get this bot working on other wikis you
 # will need to adjust these regular expressions at the very least.
 nobots = re.compile(r'NO\s*BOTS', re.IGNORECASE)
@@ -88,7 +90,8 @@ def main(*args):
     for arg in local_args:
         if arg.startswith('-page'):
             if len(arg) == len('-page'):
-                cfd_page = pywikibot.input('Enter the CFD working page to use:')
+                cfd_page = pywikibot.input(
+                    'Enter the CFD working page to use:')
             else:
                 cfd_page = arg[len('-page:'):]
 
@@ -128,7 +131,8 @@ def main(*args):
             mode = 'Delete'
             day = 'None'
         elif maintenance.search(line):
-            # It's probably best not to try to handle these in an automated fashion.
+            # It's probably best not to try to handle these in an automated
+            # fashion.
             mode = 'None'
             day = 'None'
         elif m.check(dateheader, line):
@@ -142,8 +146,9 @@ def main(*args):
                 summary = (
                     'Robot - Moving category ' + src + ' to [[:Category:' +
                     dest + ']] per [[WP:CFD|CFD]] at ' + thisDay + '.')
-                action_summary = 'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
-            elif mode == "Speedy":
+                action_summary = \
+                    'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
+            elif mode == 'Speedy':
                 summary = (
                     'Robot - Speedily moving category ' + src +
                     ' to [[:Category:' + dest + ']] per [[WP:CFDS|CFDS]].')
@@ -177,7 +182,8 @@ def main(*args):
                 summary = (
                     'Robot - Removing category {0} per [[WP:CFD|CFD]] '
                     'at {1}.'.format(src, thisDay))
-                action_summary = 'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
+                action_summary = \
+                    'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
             else:
                 continue
             robot = CategoryMoveBot(oldcat=src, batch=True, comment=summary,

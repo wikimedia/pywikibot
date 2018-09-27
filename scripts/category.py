@@ -931,7 +931,7 @@ class CategoryListifyRobot(object):
                                                 {'fromcat': self.cat.title(),
                                                  'num': len(setOfArticles)})
 
-        listString = ""
+        listString = ''
         for article in setOfArticles:
             if (not article.is_filepage() or
                     self.showImages) and not article.is_categorypage():
@@ -1478,7 +1478,8 @@ def main(*args):
             new_cat_title = pywikibot.input(
                 'Please enter the new name of the category:')
         if use_deletion_summary:
-            deletion_comment = CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
+            deletion_comment = \
+                CategoryMoveRobot.DELETION_COMMENT_SAME_AS_EDIT_COMMENT
         else:
             deletion_comment = CategoryMoveRobot.DELETION_COMMENT_AUTOMATIC
         bot = CategoryMoveRobot(oldcat=old_cat_title,

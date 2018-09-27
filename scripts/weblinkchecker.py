@@ -910,9 +910,9 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
                 except threading.ThreadError:
                     pywikibot.warning(
                         "Can't start a new thread.\nPlease decrease "
-                        "max_external_links in your user-config.py or use\n"
+                        'max_external_links in your user-config.py or use\n'
                         "'-max_external_links:' option with a smaller value. "
-                        "Default is 50.")
+                        'Default is 50.')
                     raise
 
 

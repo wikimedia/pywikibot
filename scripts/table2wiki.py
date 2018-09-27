@@ -164,7 +164,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         # <th> often people don't write them within <tr>, be warned!
         # <th> with attributes
         new_table = re.sub(
-            r"(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)<\/th>",
+            r'(?i)[\r\n]+<th(?P<attr> [^>]*?)>(?P<header>[\w\W]*?)<\/th>',
             r'\r\n!\g<attr> | \g<header>\r\n', new_table)
 
         # <th> without attributes

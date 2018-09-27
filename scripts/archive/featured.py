@@ -122,11 +122,11 @@ template = {
     '_default': ['Link FA'],
     'als': ['LinkFA'],
     'an': ['Destacato', 'Destacau'],
-    'ar': [u'وصلة مقالة مختارة'],
+    'ar': ['وصلة مقالة مختارة'],
     'ast': ['Enllaz AD'],
     'az': ['Link FM'],
     'br': ['Liamm PuB', 'Lien AdQ'],
-    'ca': [u'Enllaç AD', 'Destacat'],
+    'ca': ['Enllaç AD', 'Destacat'],
     'cy': ['Cyswllt erthygl ddethol', 'Dolen ED'],
     'eo': ['LigoElstara'],
     'en': ['Link FA', 'FA link'],
@@ -135,36 +135,36 @@ template = {
     'fr': ['Lien AdQ'],
     'fur': ['Leam VdC'],
     'ga': ['Nasc AR'],
-    'gl': [u'Ligazón AD', 'Destacado'],
+    'gl': ['Ligazón AD', 'Destacado'],
     'hi': ['Link FA', 'Lien AdQ'],
-    'is': [u'Tengill ÚG'],
+    'is': ['Tengill ÚG'],
     'it': ['Link V', 'Link AdQ'],
     'no': ['Link UA'],
     'oc': ['Ligam AdQ', 'Lien AdQ'],
-    'ro': [u'Legătură AC', u'Legătură AF'],
+    'ro': ['Legătură AC', 'Legătură AF'],
     'sv': ['UA', 'Link UA'],
     'tr': ['Link SM'],
-    'vi': [u'Liên kết chọn lọc'],
-    'vo': [u'Yüm YG'],
-    'yi': [u'רא'],
+    'vi': ['Liên kết chọn lọc'],
+    'vo': ['Yüm YG'],
+    'yi': ['רא'],
 }
 
 template_good = {
     '_default': ['Link GA'],
-    'ar': [u'وصلة مقالة جيدة'],
-    'ca': [u'Enllaç AB', 'Lien BA', 'Abo'],
+    'ar': ['وصلة مقالة جيدة'],
+    'ca': ['Enllaç AB', 'Lien BA', 'Abo'],
     'da': ['Link GA', 'Link AA'],
     'eo': ['LigoLeginda'],
     'es': ['Bueno'],
     'fr': ['Lien BA'],
-    'gl': [u'Ligazón AB'],
+    'gl': ['Ligazón AB'],
     'is': ['Tengill GG'],
     'it': ['Link VdQ'],
     'nn': ['Link AA'],
     'no': ['Link AA'],
     'pt': ['Bom interwiki'],
     # 'tr': ['Link GA', 'Link KM'],
-    'vi': [u'Liên kết bài chất lượng tốt'],
+    'vi': ['Liên kết bài chất lượng tốt'],
     'wo': ['Lien BA'],
 }
 
@@ -174,7 +174,7 @@ template_lists = {
 }
 
 featured_name = {
-    'wikidata': (DATA, u'Q4387444'),
+    'wikidata': (DATA, 'Q4387444'),
 }
 
 good_name = {
@@ -183,23 +183,23 @@ good_name = {
 
 lists_name = {
     'wikidata': (TMPL, 'Q5857568'),
-    'ar': (BACK, u'قائمة مختارة'),
-    'da': (BACK, u'FremragendeListe'),
-    'de': (BACK, u'Informativ'),
-    'en': (BACK, u'Featured list'),
-    'fa': (BACK, u"فهرست برگزیده"),
-    'id': (BACK, u'Featured list'),
-    'ja': (BACK, u'Featured List'),
+    'ar': (BACK, 'قائمة مختارة'),
+    'da': (BACK, 'FremragendeListe'),
+    'de': (BACK, 'Informativ'),
+    'en': (BACK, 'Featured list'),
+    'fa': (BACK, 'فهرست برگزیده'),
+    'id': (BACK, 'Featured list'),
+    'ja': (BACK, 'Featured List'),
     'ksh': (CAT, 'Joode Leß'),
-    'no': (BACK, u'God liste'),
-    'pl': (BACK, u'Medalista'),
-    'pt': (BACK, u'Anexo destacado'),
-    'ro': (BACK, u'Listă de calitate'),
-    'ru': (BACK, u'Избранный список или портал'),
-    'tr': (BACK, u'Seçkin liste'),
-    'uk': (BACK, u'Вибраний список'),
-    'vi': (BACK, u'Sao danh sách chọn lọc'),
-    'zh': (BACK, u'特色列表'),
+    'no': (BACK, 'God liste'),
+    'pl': (BACK, 'Medalista'),
+    'pt': (BACK, 'Anexo destacado'),
+    'ro': (BACK, 'Listă de calitate'),
+    'ru': (BACK, 'Избранный список или портал'),
+    'tr': (BACK, 'Seçkin liste'),
+    'uk': (BACK, 'Вибраний список'),
+    'vi': (BACK, 'Sao danh sách chọn lọc'),
+    'zh': (BACK, '特色列表'),
 }
 
 # Third parameter is the sort key indicating articles to hide from the given
@@ -221,7 +221,7 @@ class FeaturedBot(pywikibot.Bot):
         """Only accepts options defined in availableOptions."""
         self.availableOptions.update({
             'async': False,  # True for asynchronously putting a page
-            'afterpage': u"!",
+            'afterpage': '!',
             'count': False,   # featuredcount
             'featured': False,
             'former': False,
@@ -280,19 +280,19 @@ class FeaturedBot(pywikibot.Bot):
             return generator
         elif self.getOption('fromlang'):
             fromlang = self.getOption('fromlang')
-            if len(fromlang) == 1 and fromlang[0].find("--") >= 0:
-                start, end = fromlang[0].split("--", 1)
+            if len(fromlang) == 1 and fromlang[0].find('--') >= 0:
+                start, end = fromlang[0].split('--', 1)
                 if not start:
-                    start = ""
+                    start = ''
                 if not end:
-                    end = "zzzzzzz"
+                    end = 'zzzzzzz'
                 return (site for site in generator
                         if site.code >= start and site.code <= end)
             else:
                 return (site for site in generator if site.code in fromlang)
         else:
-            pywikibot.warning(u'No sites given to verify %s articles.\n'
-                              u'Please use -fromlang: or fromall option\n'
+            pywikibot.warning('No sites given to verify %s articles.\n'
+                              'Please use -fromlang: or fromall option\n'
                               % task)
             return ()
 
@@ -314,34 +314,34 @@ class FeaturedBot(pywikibot.Bot):
     def readcache(self, task):
         if self.getOption('count') or self.getOption('nocache') is True:
             return
-        self.filename = pywikibot.config.datafilepath("cache", task)
+        self.filename = pywikibot.config.datafilepath('cache', task)
         try:
-            f = open(self.filename, "rb")
+            f = open(self.filename, 'rb')
             self.cache = pickle.load(f)
             f.close()
-            pywikibot.output(u'Cache file %s found with %d items.'
+            pywikibot.output('Cache file %s found with %d items.'
                              % (self.filename, len(self.cache)))
         except IOError:
-            pywikibot.output(u'Cache file %s not found.' % self.filename)
+            pywikibot.output('Cache file %s not found.' % self.filename)
 
     def writecache(self):
         if self.getOption('count'):
             return
         if not self.getOption('nocache') is True:
-            pywikibot.output(u'Writing %d items to cache file %s.'
+            pywikibot.output('Writing %d items to cache file %s.'
                              % (len(self.cache), self.filename))
-            with open(self.filename, "wb") as f:
+            with open(self.filename, 'wb') as f:
                 pickle.dump(self.cache, f, protocol=config.pickle_protocol)
         self.cache = {}
 
     def run(self):
         for task in self.tasks:
             self.run_task(task)
-        pywikibot.output(u'%d pages written.' % self._save_counter)
+        pywikibot.output('%d pages written.' % self._save_counter)
 
     def run_task(self, task):
         if not self.hastemplate(task):
-            pywikibot.output(u'\nNOTE: %s articles are not implemented at %s.'
+            pywikibot.output('\nNOTE: %s articles are not implemented at %s.'
                              % (task, self.site))
             return
 
@@ -369,7 +369,7 @@ class FeaturedBot(pywikibot.Bot):
             method = info[code][0]
         except KeyError:
             pywikibot.error(
-                u'language %s doesn\'t has %s category source.'
+                "language %s doesn't has %s category source."
                 % (code, task))
             return
         name = info[code][1]
@@ -393,13 +393,13 @@ class FeaturedBot(pywikibot.Bot):
             if p.title() < self.getOption('afterpage'):
                 continue
 
-            if u"/" in p.title() and p.namespace() != 0:
-                pywikibot.output(u"%s is a subpage" % p.title())
+            if '/' in p.title() and p.namespace() != 0:
+                pywikibot.output('%s is a subpage' % p.title())
                 continue
 
             if p.title() in cache:
-                pywikibot.output(u"(cached) %s -> %s" % (p.title(),
-                                                         cache[p.title()]))
+                pywikibot.output('(cached) %s -> %s' % (
+                    p.title(), cache[p.title()]))
                 continue
             yield p
 
@@ -418,27 +418,28 @@ class FeaturedBot(pywikibot.Bot):
 
         if not ourpage:
             if not quiet:
-                pywikibot.output(u"%s -> no corresponding page in %s"
+                pywikibot.output('%s -> no corresponding page in %s'
                                  % (page.title(), oursite))
         elif ourpage.section():
-            pywikibot.output(u"%s -> our page is a section link: %s"
+            pywikibot.output('%s -> our page is a section link: %s'
                              % (page.title(), ourpage.title()))
         elif not ourpage.exists():
-            pywikibot.output(u"%s -> our page doesn't exist: %s"
+            pywikibot.output("%s -> our page doesn't exist: %s"
                              % (page.title(), ourpage.title()))
         else:
             if ourpage.isRedirectPage():
                 ourpage = ourpage.getRedirectTarget()
 
-            pywikibot.output(u"%s -> corresponding page is %s"
+            pywikibot.output('%s -> corresponding page is %s'
                              % (page.title(), ourpage.title()))
             if ourpage.namespace() != 0:
-                pywikibot.output(u"%s -> not in the main namespace, skipping"
+                pywikibot.output('%s -> not in the main namespace, skipping'
                                  % page.title())
             elif ourpage.isRedirectPage():
-                pywikibot.output(u"%s -> double redirect, skipping" % page.title())
+                pywikibot.output(
+                    '%s -> double redirect, skipping' % page.title())
             elif not ourpage.exists():
-                pywikibot.output(u"%s -> page doesn't exist, skipping"
+                pywikibot.output("%s -> page doesn't exist, skipping"
                                  % ourpage.title())
             else:
                 backpage = None
@@ -447,7 +448,8 @@ class FeaturedBot(pywikibot.Bot):
                         backpage = pywikibot.Page(link)
                         break
                 if not backpage:
-                    pywikibot.output(u"%s -> no back interwiki ref" % page.title())
+                    pywikibot.output(
+                        '%s -> no back interwiki ref' % page.title())
                 elif backpage == page:
                     # everything is ok
                     yield ourpage
@@ -458,10 +460,10 @@ class FeaturedBot(pywikibot.Bot):
                         yield ourpage
                     else:
                         pywikibot.output(
-                            u"%s -> back interwiki ref target is redirect to %s"
+                            '%s -> back interwiki ref target is redirect to %s'
                             % (page.title(), backpage.title()))
                 else:
-                    pywikibot.output(u"%s -> back interwiki ref target is %s"
+                    pywikibot.output('%s -> back interwiki ref target is %s'
                                      % (page.title(), backpage.title()))
 
     def getTemplateList(self, code, task):
@@ -531,7 +533,7 @@ class FeaturedBot(pywikibot.Bot):
                 source = source.getRedirectTarget()
 
             if not source.exists():
-                pywikibot.output(u"source page doesn't exist: %s"
+                pywikibot.output("source page doesn't exist: %s"
                                  % source)
                 continue
 
@@ -544,8 +546,8 @@ class FeaturedBot(pywikibot.Bot):
         def compile_link(site, templates):
             """Compile one link template list."""
             findtemplate = '(%s)' % '|'.join(templates)
-            return re.compile(r"\{\{%s\|%s\}\}"
-                              % (findtemplate.replace(u' ', u'[ _]'),
+            return re.compile(r'\{\{%s\|%s\}\}'
+                              % (findtemplate.replace(' ', '[ _]'),
                                  site.code), re.IGNORECASE)
 
         tosite = dest.site
@@ -560,26 +562,26 @@ class FeaturedBot(pywikibot.Bot):
         interactive = self.getOption('interactive')
         if add_tl:
             if m1:
-                pywikibot.output(u"(already added)")
+                pywikibot.output('(already added)')
             else:
                 # insert just before interwiki
                 if (not interactive or
                     pywikibot.input_yn(
-                        u'Connecting %s -> %s. Proceed?'
+                        'Connecting %s -> %s. Proceed?'
                         % (source.title(), dest.title()),
                         default=False, automatic_quit=False)):
                     if self.getOption('side'):
                         # Placing {{Link FA|xx}} right next to
                         # corresponding interwiki
                         text = (text[:m1.end()] +
-                                u" {{%s|%s}}" % (add_tl[0], fromsite.code) +
+                                ' {{%s|%s}}' % (add_tl[0], fromsite.code) +
                                 text[m1.end():])
                     else:
                         # Moving {{Link FA|xx}} to top of interwikis
                         iw = textlib.getLanguageLinks(text, tosite)
                         text = textlib.removeLanguageLinks(text, tosite)
-                        text += u"%s{{%s|%s}}%s" % (config.LS, add_tl[0],
-                                                    fromsite.code, config.LS)
+                        text += '%s{{%s|%s}}%s' % (
+                            config.LS, add_tl[0], fromsite.code, config.LS)
                         text = textlib.replaceLanguageLinks(text,
                                                             iw, tosite)
                     changed = True
@@ -588,13 +590,13 @@ class FeaturedBot(pywikibot.Bot):
                 if (changed or  # Don't force the user to say "Y" twice
                     not interactive or
                     pywikibot.input_yn(
-                        u'Connecting %s -> %s. Proceed?'
+                        'Connecting %s -> %s. Proceed?'
                         % (source.title(), dest.title()),
                         default=False, automatic_quit=False)):
                     text = re.sub(re_link_remove, '', text)
                     changed = True
             elif task == 'former':
-                pywikibot.output(u"(already removed)")
+                pywikibot.output('(already removed)')
         if changed:
             comment = i18n.twtranslate(tosite, 'featured-' + task,
                                        {'page': source})
@@ -602,10 +604,10 @@ class FeaturedBot(pywikibot.Bot):
                 dest.put(text, comment)
                 self._save_counter += 1
             except pywikibot.LockedPage:
-                pywikibot.output(u'Page %s is locked!'
+                pywikibot.output('Page %s is locked!'
                                  % dest.title())
             except pywikibot.PageNotSaved:
-                pywikibot.output(u"Page not saved")
+                pywikibot.output('Page not saved')
 
 
 def main(*args):
@@ -626,11 +628,11 @@ def main(*args):
 
     for arg in local_args:
         if arg.startswith('-fromlang:'):
-            options[arg[1:9]] = arg[10:].split(",")
+            options[arg[1:9]] = arg[10:].split(',')
         elif arg.startswith('-after:'):
             options['afterpage'] = arg[7:]
         elif arg.startswith('-nocache:'):
-            options[arg[1:8]] = arg[9:].split(",")
+            options[arg[1:8]] = arg[9:].split(',')
         else:
             options[arg[1:].lower()] = True
 
@@ -638,5 +640,5 @@ def main(*args):
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

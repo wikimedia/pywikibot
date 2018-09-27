@@ -345,9 +345,10 @@ class CommonscatBot(Bot):
                 return True
         return True
 
-    def changeCommonscat(self, page=None, oldtemplate='', oldcat='',
-                         newtemplate='', newcat='', linktitle='',
-                         description=NotImplemented):  # pylint: disable=unused-argument
+    def changeCommonscat(
+            self, page=None, oldtemplate='', oldcat='',
+            newtemplate='', newcat='', linktitle='',
+            description=NotImplemented):  # pylint: disable=unused-argument
         """Change the current commonscat template and target."""
         if oldcat == '3=S' or linktitle == '3=S':
             return  # TODO: handle additional param on de-wiki

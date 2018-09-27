@@ -70,18 +70,18 @@ def update_family(families):
                 i -= 1
 
         if original == new:
-            pywikibot.output(u'The lists match!')
+            pywikibot.output('The lists match!')
         else:
-            pywikibot.output(u"The lists don't match, the new list is:")
+            pywikibot.output("The lists don't match, the new list is:")
             text = '    languages_by_size = [\n'
             line = ' ' * 7
             for code in new:
                 if len(line) + len(code) < 76:
-                    line += u" '%s'," % code
+                    line += " '%s'," % code
                 else:
                     text += '%s\n' % line
                     line = ' ' * 7
-                    line += u" '%s'," % code
+                    line += " '%s'," % code
             text += '%s\n' % line
             text += '    ]'
             pywikibot.output(text)

@@ -139,7 +139,7 @@ def match_images(imageA, imageB):
 
 
 def main(*args):
-    """Extracting file page information of images to work on and initiate matching."""
+    """Extracting file page information and initiate matching."""
     images = []
     other_family = ''
     other_lang = ''

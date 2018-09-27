@@ -1254,7 +1254,9 @@ def uploadedYesterday(site):
     today = pywikibot.Timestamp.utcnow()
     yesterday = today + timedelta(days=-1)
 
-    for logentry in site.logevents(logtype='upload', start=yesterday, end=today, reverse=True):
+    for logentry in site.logevents(
+        logtype='upload', start=yesterday, end=today, reverse=True
+    ):
         yield logentry.page()
 
 

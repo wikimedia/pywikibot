@@ -485,7 +485,7 @@ class DiscussionPage(pywikibot.Page):
     def update(self, summary, sort_threads=False):
         """Recombine threads and save page."""
         if sort_threads:
-            pywikibot.output(u'Sorting threads...')
+            pywikibot.output('Sorting threads...')
             self.threads.sort(key=lambda t: t.timestamp)
         newtext = re.sub('\n*$', '\n\n', self.header)  # Fix trailing newlines
         for t in self.threads:

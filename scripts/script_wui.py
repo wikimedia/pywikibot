@@ -279,21 +279,21 @@ def main_script(page, rev=None, params=NotImplemented):
     logHandler.flush()
     buffer.flush()
 
-    pywikibot.output(u'--- ' * 20)
+    pywikibot.output('--- ' * 20)
 
     # safety; restore settings
     pywikibot.config.simulate = __simulate
     sys.argv = __sys_argv
     if resource:
         pywikibot.output(
-            u'environment: garbage; %s / memory; %s / members; %s' % (
+            'environment: garbage; %s / memory; %s / members; %s' % (
                 gc.collect(),
                 resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
                 resource.getpagesize(),
                 len(dir())))
     else:
         pywikibot.output(
-            u'environment: garbage; %s / members; %s' % (
+            'environment: garbage; %s / members; %s' % (
                 gc.collect(), len(dir())))
     # 'len(dir())' is equivalent to 'len(inspect.getmembers(__main__))'
 
@@ -352,7 +352,7 @@ def main(*args):
         if hasattr(value, 'format'):
             bot_config[key] = value.format(username=bot_user_name)
 
-    bot = ScriptWUIBot(site, chan, site.user() + "_WUI", "irc.wikimedia.org")
+    bot = ScriptWUIBot(site, chan, site.user() + '_WUI', 'irc.wikimedia.org')
     try:
         bot.start()
     except BaseException:
@@ -360,5 +360,5 @@ def main(*args):
         raise
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

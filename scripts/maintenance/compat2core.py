@@ -99,8 +99,8 @@ warnings = (
     ('.replaceImage(',
      'Page.replaceImage() is deprecated and does not work at core'),
     ('.getVersionHistory(',
-     'Page.getVersionHistory() returns a pywikibot.Timestamp object instead of\n'
-     'a MediaWiki one'),
+     'Page.getVersionHistory() returns a pywikibot.Timestamp object instead of'
+     '\na MediaWiki one'),
     ('.contributions(',
      'User.contributions() returns a pywikibot.Timestamp object instead of a\n'
      'MediaWiki one'),
