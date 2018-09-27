@@ -116,7 +116,7 @@ class TestGeneral(WikidataTestCase):
         """Setup test class."""
         super(TestGeneral, cls).setUpClass()
         enwiki = pywikibot.Site('en', 'wikipedia')
-        cls.mainpage = pywikibot.Page(pywikibot.page.Link("Main Page", enwiki))
+        cls.mainpage = pywikibot.Page(pywikibot.page.Link('Main Page', enwiki))
 
     def testWikibase(self):
         """Wikibase tests."""
@@ -459,10 +459,10 @@ class TestWbQuantity(WbRepresentationTestCase):
     def test_WbQuantity_fromWikibase(self):
         """Test WbQuantity.fromWikibase() instantiating."""
         repo = self.get_repo()
-        q = pywikibot.WbQuantity.fromWikibase({u'amount': u'+0.0229',
-                                               u'lowerBound': u'0',
-                                               u'upperBound': u'1',
-                                               u'unit': u'1'},
+        q = pywikibot.WbQuantity.fromWikibase({'amount': '+0.0229',
+                                               'lowerBound': '0',
+                                               'upperBound': '1',
+                                               'unit': '1'},
                                               site=repo)
         # note that the bounds are inputted as INT but are returned as FLOAT
         self.assertEqual(q.toWikibase(),
@@ -546,8 +546,8 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
         if self.version < MediaWikiVersion('1.29.0-wmf.2'):
             raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
                                     'newer to support unbound uncertainties.')
-        q = pywikibot.WbQuantity.fromWikibase({u'amount': u'+0.0229',
-                                               u'unit': u'1'},
+        q = pywikibot.WbQuantity.fromWikibase({'amount': '+0.0229',
+                                               'unit': '1'},
                                               site=self.repo)
         self.assertEqual(q.toWikibase(),
                          {'amount': '+0.0229', 'lowerBound': None,
@@ -647,7 +647,7 @@ class TestWbMonolingualText(WbRepresentationTestCase):
     def test_WbMonolingualText_fromWikibase(self):
         """Test WbMonolingualText.fromWikibase() instantiating."""
         q = pywikibot.WbMonolingualText.fromWikibase({'text': 'Test this!',
-                                                      'language': u'en'})
+                                                      'language': 'en'})
         self.assertEqual(q.toWikibase(),
                          {'text': 'Test this!', 'language': 'en'})
 
@@ -684,13 +684,13 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
     def test_WbGeoShape_page(self):
         """Test WbGeoShape page."""
         q = pywikibot.WbGeoShape(self.page)
-        q_val = u'Data:Lyngby Hovedgade.map'
+        q_val = 'Data:Lyngby Hovedgade.map'
         self.assertEqual(q.toWikibase(), q_val)
 
     def test_WbGeoShape_page_and_site(self):
         """Test WbGeoShape from page and site."""
         q = pywikibot.WbGeoShape(self.page, self.get_repo())
-        q_val = u'Data:Lyngby Hovedgade.map'
+        q_val = 'Data:Lyngby Hovedgade.map'
         self.assertEqual(q.toWikibase(), q_val)
 
     def test_WbGeoShape_equality(self):
@@ -760,13 +760,13 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
     def test_WbTabularData_page(self):
         """Test WbTabularData page."""
         q = pywikibot.WbTabularData(self.page)
-        q_val = u'Data:Bea.gov/GDP by state.tab'
+        q_val = 'Data:Bea.gov/GDP by state.tab'
         self.assertEqual(q.toWikibase(), q_val)
 
     def test_WbTabularData_page_and_site(self):
         """Test WbTabularData from page and site."""
         q = pywikibot.WbTabularData(self.page, self.get_repo())
-        q_val = u'Data:Bea.gov/GDP by state.tab'
+        q_val = 'Data:Bea.gov/GDP by state.tab'
         self.assertEqual(q.toWikibase(), q_val)
 
     def test_WbTabularData_equality(self):
@@ -807,7 +807,7 @@ class TestWbTabularDataNonDry(WbRepresentationTestCase):
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:Lyngby Hovedgade.map')
         regex = r"^Page must be in 'Data:' namespace and end in '\.tab' " + \
-                r"for tabular-data\.$"
+                r'for tabular-data\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbTabularData(non_data_page, self.get_repo())
         with self.assertRaisesRegex(ValueError, regex):
@@ -938,7 +938,7 @@ class TestItemLoad(WikidataTestCase):
         wikidata = self.get_repo()
         item = ItemPage(wikidata, 'Q60')
         self.assertEqual(item._link._title, 'Q60')
-        self.assertEqual(item._defined_by(), {u'ids': u'Q60'})
+        self.assertEqual(item._defined_by(), {'ids': 'Q60'})
         self.assertEqual(item.id, 'Q60')
         self.assertFalse(hasattr(item, '_title'))
         self.assertFalse(hasattr(item, '_site'))
@@ -1119,10 +1119,10 @@ class TestItemLoad(WikidataTestCase):
 
     def test_fromPage_lazy(self):
         """Test item from page with lazy_load."""
-        page = pywikibot.Page(pywikibot.page.Link("New York City", self.site))
+        page = pywikibot.Page(pywikibot.page.Link('New York City', self.site))
         item = ItemPage.fromPage(page, lazy_load=True)
         self.assertEqual(item._defined_by(),
-                         {'sites': u'enwiki', 'titles': u'New York City'})
+                         {'sites': 'enwiki', 'titles': 'New York City'})
         self.assertEqual(item._link._title, '-1')
         self.assertFalse(hasattr(item, 'id'))
         self.assertFalse(hasattr(item, '_content'))
@@ -1136,7 +1136,7 @@ class TestItemLoad(WikidataTestCase):
 
     def test_fromPage_invalid_title(self):
         """Test item from page with invalid title."""
-        page = pywikibot.Page(pywikibot.page.Link("[]", self.site))
+        page = pywikibot.Page(pywikibot.page.Link('[]', self.site))
         regex = r' contains illegal char\(s\) '
         with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
             ItemPage.fromPage(page)
@@ -1202,7 +1202,7 @@ class TestItemLoad(WikidataTestCase):
 
         A redirect should not have a wikidata item.
         """
-        link = pywikibot.page.Link("Main page", self.site)
+        link = pywikibot.page.Link('Main page', self.site)
         self._test_fromPage_noitem(link)
 
     def test_fromPage_missing(self):
@@ -1211,7 +1211,7 @@ class TestItemLoad(WikidataTestCase):
 
         A deleted page should not have a wikidata item.
         """
-        link = pywikibot.page.Link("Test page", self.site)
+        link = pywikibot.page.Link('Test page', self.site)
         self._test_fromPage_noitem(link)
 
     def test_fromPage_noitem(self):
@@ -1227,7 +1227,7 @@ class TestItemLoad(WikidataTestCase):
     def test_fromPage_missing_lazy(self):
         """Test lazy loading of item from nonexistent source page."""
         # this is a deleted page, and should not have a wikidata item
-        link = pywikibot.page.Link("Test page", self.site)
+        link = pywikibot.page.Link('Test page', self.site)
         page = pywikibot.Page(link)
         # ItemPage.fromPage should raise an exception when not lazy loading
         # and that exception should refer to the source title 'Test page'
@@ -1568,7 +1568,8 @@ class TestLinks(WikidataTestCase):
     def test_iterlinks_page_object(self):
         """Test iterlinks for page objects."""
         page = [pg for pg in self.wdp.iterlinks() if pg.site.code == 'af'][0]
-        self.assertEqual(page, pywikibot.Page(self.get_site('afwiki'), u'New York Stad'))
+        self.assertEqual(page, pywikibot.Page(self.get_site('afwiki'),
+                         'New York Stad'))
 
     def test_iterlinks_filtering(self):
         """Test iterlinks for a given family."""
