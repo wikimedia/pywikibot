@@ -111,7 +111,8 @@ class TestReplacementsMain(TWNBotTestCase):
         if not callable(replacement.new):
             self.assertEqual(replacement.new, str(offset * 2 + 2))
 
-    def _test_fix_replacement(self, replacement, length=1, offset=0, msg=False):
+    def _test_fix_replacement(self, replacement,
+                              length=1, offset=0, msg=False):
         """Test a replacement from a fix."""
         assert length > offset
         self._test_replacement(replacement, replace.ReplacementListEntry,
