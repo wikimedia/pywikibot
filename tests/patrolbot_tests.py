@@ -24,7 +24,8 @@ This is some text above the entries:
 * [[User:Test_2]]: [[Page 2]], [[Page 4]], [[Page 6]]
 
 == Others ==
-* [[User:Prefixed]]: [[Special:PrefixIndex/Page 1]], [[Special:PREFIXINDEX/Page 2]]
+* [[User:Prefixed]]: [[Special:PrefixIndex/Page 1]],
+                     [[Special:PREFIXINDEX/Page 2]]
 
 == More test 1 ==
 * [[User:Test_1]]: [[Page 3]]
@@ -57,13 +58,16 @@ class TestPatrolBot(DefaultDrySiteTestCase):
         """Test the method which returns whether a page is in the list."""
         # Return the title if there is an exact match
         self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foo'), 'Foo')
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foobar'), 'Foobar')
+        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foobar'),
+                         'Foobar')
 
         # Return the first entry which starts with the title if there is no
         # exact match
         self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foob'), 'Foo')
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foobarz'), 'Foo')
-        self.assertEqual(self.bot.in_list(['Foo', 'Foobar', 'Bar'], 'Barz'), 'Bar')
+        self.assertEqual(self.bot.in_list(['Foo', 'Foobar'], 'Foobarz'),
+                         'Foo')
+        self.assertEqual(self.bot.in_list(['Foo', 'Foobar', 'Bar'], 'Barz'),
+                         'Bar')
 
         # '' returns .* if there is no exact match
         self.assertEqual(self.bot.in_list([''], 'Foo'), '.*')
