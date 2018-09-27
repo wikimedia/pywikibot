@@ -18,7 +18,7 @@ class TestChoiceOptions(TestCase):
 
     """Test cases for input_choice Option."""
 
-    TEST_RE = '\'int\' object has no attribute \'lower\''
+    TEST_RE = "'int' object has no attribute 'lower'"
     SEQ_EMPTY_RE = 'The sequence is empty.'
     net = False
 
@@ -74,20 +74,22 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(option.format(default='r2'), 'r<number> [1-[2]-5]')
         self.assertEqual(option.format(), 'r<number> [1-5]')
         self.assertEqual(message('?', [option], None), '? (r<number> [1-5])')
-        self.assertEqual(message('?', [option], 'r3'), '? (r<number> [1-[3]-5])')
+        self.assertEqual(message('?', [option], 'r3'),
+                         '? (r<number> [1-[3]-5])')
         self.assertRaisesRegex(AttributeError, self.TEST_RE, option.test, 1)
         self.assertFalse(option.test('0'))
         self.assertFalse(option.test('r0'))
         self.assertFalse(option.test('r6'))
         self.assertIsNone(option.handled('r6'))
         for i in range(1, 6):
-            self.assertTrue(option.test('r%d' % i))
-            self.assertEqual(option.handled('r%d' % i), option)
-            self.assertEqual(option.result('r%d' % i), ('r', i))
+            self.assertTrue(option.test('r{}'.format(i)))
+            self.assertEqual(option.handled('r{}'.format(i)), option)
+            self.assertEqual(option.result('r{}'.format(i)), ('r', i))
 
     def test_List(self):
         """Test ListOption."""
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, bot.ListOption, [])
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE,
+                               bot.ListOption, [])
         options = ['foo', 'bar']
         option = bot.ListOption(options)
         self.assertEqual(message('?', [option], None), '? (<number> [1-2])')
@@ -99,7 +101,8 @@ class TestChoiceOptions(TestCase):
         self.assertEqual(message('?', [option], None), '? (<number> [1])')
         self.assertEqual(message('?', [option], '1'), '? (<number> [[1]])')
         options.pop()
-        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format, None)
+        self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format,
+                               None)
         self.assertRaisesRegex(ValueError, self.SEQ_EMPTY_RE, option.format)
         self.assertFalse(option.test('0'))
         options += ['baz', 'quux', 'norf']
@@ -107,15 +110,17 @@ class TestChoiceOptions(TestCase):
         for prefix in ('', 'r', 'st'):
             option = bot.ListOption(options, prefix=prefix)
             self.assertEqual(message('?', [option]),
-                             '? (%s<number> [1-3])' % prefix)
+                             '? ({}<number> [1-3])'.format(prefix))
             for i, elem in enumerate(options, 1):
-                self.assertTrue(option.test('%s%d' % (prefix, i)))
-                self.assertIs(option.handled('%s%d' % (prefix, i)), option)
-                self.assertEqual(option.result('%s%d' % (prefix, i)),
+                self.assertTrue(option.test('{}{}'.format(prefix, i)))
+                self.assertIs(option.handled('{}{}'
+                                             .format(prefix, i)), option)
+                self.assertEqual(option.result('{}{}'.format(prefix, i)),
                                  (prefix, elem))
-            self.assertFalse(option.test('%s%d' % (prefix, len(options) + 1)))
-            self.assertIsNone(option.handled('%s%d'
-                                             % (prefix, len(options) + 1)))
+            self.assertFalse(option.test('{}{}'
+                                         .format(prefix, len(options) + 1)))
+            self.assertIsNone(option.handled('{}{}'.format(
+                prefix, len(options) + 1)))
 
 
 if __name__ == '__main__':  # pragma: no cover
