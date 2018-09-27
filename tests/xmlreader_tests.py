@@ -35,20 +35,20 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
         """Test loading all revisions."""
         pages = self._get_entries('article-pear.xml', allrevisions=True)
         self.assertEqual(4, len(pages))
-        self.assertEqual(u"Automated conversion", pages[0].comment)
-        self.assertEqual(u"Pear", pages[0].title)
-        self.assertEqual(u"24278", pages[0].id)
+        self.assertEqual('Automated conversion', pages[0].comment)
+        self.assertEqual('Pear', pages[0].title)
+        self.assertEqual('24278', pages[0].id)
         self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
-        self.assertEqual(u"Quercusrobur", pages[1].username)
-        self.assertEqual(u"Pear", pages[0].title)
+        self.assertEqual('Quercusrobur', pages[1].username)
+        self.assertEqual('Pear', pages[0].title)
 
     def test_XmlDumpFirstRev(self):
         """Test loading the first revision."""
-        pages = self._get_entries("article-pear.xml", allrevisions=False)
+        pages = self._get_entries('article-pear.xml', allrevisions=False)
         self.assertEqual(1, len(pages))
-        self.assertEqual(u"Automated conversion", pages[0].comment)
-        self.assertEqual(u"Pear", pages[0].title)
-        self.assertEqual(u"24278", pages[0].id)
+        self.assertEqual('Automated conversion', pages[0].comment)
+        self.assertEqual('Pear', pages[0].title)
+        self.assertEqual('24278', pages[0].id)
         self.assertTrue(pages[0].text.startswith('Pears are [[tree]]s of'))
         self.assertTrue(not pages[0].isredirect)
 
