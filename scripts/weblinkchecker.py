@@ -642,7 +642,7 @@ class History(object):
     We assume that the first element in the list represents the first time we
     found this dead link, and the last element represents the last time.
 
-    Example:
+    Example::
 
      dict = {
          'https://www.example.org/page': [

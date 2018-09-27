@@ -2323,10 +2323,10 @@ class APISite(BaseSite):
     def notifications(self, **kwargs):
         """Yield Notification objects from the Echo extension.
 
-        keyword format: If specified, notifications will be returned formatted
+        @keyword format: If specified, notifications will be returned formatted
             this way. Its value is either 'model', 'special' or None. Default
             is 'special'.
-        type format: str or None
+        @type format: str or None
 
         Refer API reference for other keywords.
         """
