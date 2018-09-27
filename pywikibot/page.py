@@ -5450,14 +5450,14 @@ class Link(ComparableMixin):
 
     illegal_titles_pattern = re.compile(
         # Matching titles will be held as illegal.
-        r'''[\x00-\x1f\x23\x3c\x3e\x5b\x5d\x7b\x7c\x7d\x7f]'''
+        r'[\x00-\x1f\x23\x3c\x3e\x5b\x5d\x7b\x7c\x7d\x7f]'
         # URL percent encoding sequences interfere with the ability
         # to round-trip titles -- you can't link to them consistently.
-        u'|%[0-9A-Fa-f]{2}'
+        '|%[0-9A-Fa-f]{2}'
         # XML/HTML character references produce similar issues.
-        u'|&[A-Za-z0-9\x80-\xff]+;'
-        u'|&#[0-9]+;'
-        u'|&#x[0-9A-Fa-f]+;'
+        '|&[A-Za-z0-9\x80-\xff]+;'
+        '|&#[0-9]+;'
+        '|&#x[0-9A-Fa-f]+;'
     )
 
     @deprecated_args(defaultNamespace='default_namespace')

@@ -135,7 +135,7 @@ uiModule = __import__("pywikibot.userinterfaces.%s_interface"
 ui = uiModule.UI()
 pywikibot.argvu = ui.argvu()
 
-_GLOBAL_HELP = '''
+_GLOBAL_HELP = """
 GLOBAL OPTIONS
 ==============
 (Global arguments available for all bots)
@@ -193,7 +193,7 @@ GLOBAL OPTIONS
 -<config var>:n   You may use all given numeric config variables as option and
                   modify it with command line.
 
-'''
+"""
 
 
 # It's not possible to use pywikibot.exceptions.PageRelatedError as that is

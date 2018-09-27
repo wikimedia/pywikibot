@@ -23,7 +23,7 @@ class TestDryHTMLComparator(TestCase):
 
     def test_added_context(self):
         """Test html_comparator's detection of added-context."""
-        output = html_comparator('''
+        output = html_comparator("""
 <tr>
   <td class="diff-addedline">line 1a</td>
   <td class="diff-addedline">line \n2a</td>
@@ -31,13 +31,13 @@ class TestDryHTMLComparator(TestCase):
 <tr>
   <td class="diff-addedline"><span>line 1b</span></td>
   <td class="diff-addedline">line 2b<i><span></i></span></td>
-</tr>''')
+</tr>""")
         self.assertEqual(output['added-context'],
                          ['line 1a', 'line \n2a', 'line 1b', 'line 2b'])
 
     def test_deleted_context(self):
         """Test html_comparator's detection of deleted-context."""
-        output = html_comparator('''
+        output = html_comparator("""
 <tr>
   <td class="diff-deletedline">line 1a</td>
   <td class="diff-deletedline">line \n2a</td>
@@ -45,7 +45,7 @@ class TestDryHTMLComparator(TestCase):
 <tr>
   <td class="diff-deletedline"><span>line 1b</span></td>
   <td class="diff-deletedline">line 2b<i><span></i></span></td>
-</tr>''')
+</tr>""")
         self.assertEqual(output['deleted-context'],
                          ['line 1a', 'line \n2a', 'line 1b', 'line 2b'])
 
