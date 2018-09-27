@@ -46,23 +46,23 @@ Empty line: if the first, don't change. Otherwise: Ready.
 xx: if the first, remove all categories and add no new.
 q: quit.""")
     while not done:
-        choice = pywikibot.input(u"?")
-        if choice == "":
+        choice = pywikibot.input('?')
+        if choice == '':
             done = True
-        elif choice == "-":
+        elif choice == '-':
             chosen = choosecats(pagetext)
             done = True
-        elif choice == "?":
+        elif choice == '?':
             from pywikibot import editor as editarticle
             editor = editarticle.TextEditor()
             editor.edit(pagetext)
-        elif choice == "??":
+        elif choice == '??':
             pywikibot.output(pagetext[0:length])
             length = length + 500
-        elif choice == "xx" and chosen == []:
+        elif choice == 'xx' and chosen == []:
             chosen = None
             done = True
-        elif choice == "q":
+        elif choice == 'q':
             raise QuitKeyboardInterrupt
         else:
             chosen.append(choice)
@@ -108,14 +108,14 @@ def main(*args):
             text = p.get()
             cats = p.categories()
             if not cats:
-                pywikibot.output(u"========== %s ==========" % p.title())
+                pywikibot.output('========== {} =========='.format(p.title()))
                 pywikibot.output('No categories')
                 pywikibot.output('-' * 40)
                 newcats = choosecats(text)
                 if newcats != [] and newcats is not None:
                     make_categories(p, newcats, mysite)
             elif docorrections:
-                pywikibot.output(u"========== %s ==========" % p.title())
+                pywikibot.output('========== {} =========='.format(p.title()))
                 for c in cats:
                     pywikibot.output(c.title())
                 pywikibot.output('-' * 40)
@@ -125,10 +125,10 @@ def main(*args):
                 elif newcats != []:
                     make_categories(p, newcats, mysite)
         except pywikibot.IsRedirectPage:
-            pywikibot.output(u'%s is a redirect' % p.title())
+            pywikibot.output('{} is a redirect'.format(p.title()))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
