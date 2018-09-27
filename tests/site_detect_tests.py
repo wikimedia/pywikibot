@@ -71,8 +71,8 @@ class StandardVersionSiteTestCase(SiteDetectionTestCase):
     def test_wikichristian(self):
         """Test detection of MediaWiki sites for www.wikichristian.org.
 
-        Server that hosts www.wikichristian.org is unreliable - it occasionally
-        responding with 500 error (see: T151368).
+        Server that hosts www.wikichristian.org is unreliable - it
+        occasionally responding with 500 error (see: T151368).
         """
         self.assertSite('http://www.wikichristian.org/index.php?title=$1')
 

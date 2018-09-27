@@ -181,8 +181,8 @@ def collector(loader=unittest.loader.defaultTestLoader):
 
     if not enable_autorun_tests:
         unittest_print('Skipping execution of auto-run scripts '
-                       '(set PYWIKIBOT_TEST_AUTORUN=1 to enable):\n  %r'
-                       % auto_run_script_list)
+                       '(set PYWIKIBOT_TEST_AUTORUN=1 to enable):\n  {!r}'
+                       .format(auto_run_script_list))
 
     tests = (['test__login'] +
              ['test_' + name
@@ -297,14 +297,14 @@ class TestScriptMeta(MetaTestCaseClass):
 
                     if (not result['stdout'] and not result['stderr']):
                         unittest_print(' auto-run script unresponsive after '
-                                       '%d seconds' % timeout, end=' ')
+                                       '{} seconds'.format(timeout), end=' ')
                     elif 'SIMULATION: edit action blocked' in result['stderr']:
                         unittest_print(' auto-run script simulated edit '
                                        'blocked', end='  ')
                     else:
                         unittest_print(
-                            ' auto-run script stderr within %d seconds: %r'
-                            % (timeout, result['stderr']), end='  ')
+                            ' auto-run script stderr within {} seconds: {!r}'
+                            .format(timeout, result['stderr']), end='  ')
 
                 self.assertNotIn('Traceback (most recent call last)',
                                  result['stderr'])
@@ -345,7 +345,8 @@ class TestScriptMeta(MetaTestCaseClass):
 
             cls.add_method(dct, test_name,
                            test_execution(script_name, [argument]),
-                           'Test running %s %s.' % (script_name, argument))
+                           'Test running {} {}.'
+                           .format(script_name, argument))
 
             if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
