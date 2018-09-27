@@ -167,35 +167,40 @@ class TestTimeStripperLanguage(TestCase):
         'cswiki': {
             'family': 'wikipedia',
             'code': 'cs',
-            'match': u'3. 2. 2011, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
+            'match': '3. 2. 2011, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
         },
         'enwiki': {
             'family': 'wikipedia',
             'code': 'en',
-            'match': u'3 February 2011 19:48 (UTC) 7 February 2010 19:48 (UTC)',
-            'nomatch': u'3. 2. 2011, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
+            'match': '3 February 2011 19:48 (UTC) '
+                     '7 February 2010 19:48 (UTC)',
+            'nomatch': '3. 2. 2011, 19:48 (UTC) 7. 2. 2010 19:48 (UTC)',
         },
         'fawiki': {
             'family': 'wikipedia',
             'code': 'fa',
-            'match': u'۳ فوریهٔ  ۲۰۱۱، ساعت ۱۹:۴۸ (UTC) ۷ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC)',
-            'nomatch': u'۳ ۲ ۲۰۱۴ ۱۹:۴۸ (UTC) ۷ ۲ ۲۰۱۰ ۱۹:۴۸ (UTC)',
+            'match': '۳ فوریهٔ  ۲۰۱۱، ساعت ۱۹:۴۸ (UTC) '
+                     '۷ فوریهٔ  ۲۰۱۰، ساعت ۱۹:۴۸ (UTC)',
+            'nomatch': '۳ ۲ ۲۰۱۴ ۱۹:۴۸ (UTC) ۷ ۲ ۲۰۱۰ ۱۹:۴۸ (UTC)',
         },
         'frwiki': {
             'family': 'wikipedia',
             'code': 'fr',
-            'match': u'3 février 2011 à 19:48 (CET) 7 février 2010 à 19:48 (CET)',
-            'nomatch': u'3 March 2011 19:48 (CET) 7 March 2010 19:48 (CET)',
+            'match': '3 février 2011 à 19:48 (CET) '
+                     '7 février 2010 à 19:48 (CET)',
+            'nomatch': '3 March 2011 19:48 (CET) 7 March 2010 19:48 (CET)',
         },
         'kowiki': {
             'family': 'wikipedia',
             'code': 'ko',
-            'match': u'2011년 2월 3일 (수) 19:48 (KST) 2010년 2월 7일 (수) 19:48 (KST)',
+            'match': '2011년 2월 3일 (수) 19:48 (KST) '
+                     '2010년 2월 7일 (수) 19:48 (KST)',
         },
         'nowiki': {
             'family': 'wikipedia',
             'code': 'no',
-            'match': u'3. feb 2011 kl. 19:48 (CET) 7. feb 2010 kl. 19:48 (UTC)',
+            'match': '3. feb 2011 kl. 19:48 (CET) '
+                     '7. feb 2010 kl. 19:48 (UTC)',
         },
         'ptwiki': {
             'family': 'wikipedia',
@@ -206,7 +211,8 @@ class TestTimeStripperLanguage(TestCase):
         'viwiki': {
             'family': 'wikipedia',
             'code': 'vi',
-            'match': '19:48, ngày 3 tháng 2 năm 2011 (UTC) 19:48, ngày 7 tháng 2 năm 2010 (UTC)',
+            'match': '19:48, ngày 3 tháng 2 năm 2011 (UTC) '
+                     '19:48, ngày 7 tháng 2 năm 2010 (UTC)',
             'match2': '16:41, ngày 15 tháng 9 năm 2001 (UTC) 16:41, '
                       'ngày 12 tháng 9 năm 2008 (UTC)',
             'match3': '21:18, ngày 13 tháng 8 năm 2011 (UTC) 21:18, '
@@ -335,8 +341,8 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         txt_match = '[http://' + self.fake_date + ']' + self.date
         self.assertEqual(ts(txt_match), self.expected_date)
 
-        txt_match = ('%s [http://www.org | link with date %s]'
-                     % (self.date, self.fake_date))
+        txt_match = ('{} [http://www.org | link with date {}]'
+                     .format(self.date, self.fake_date))
         self.assertEqual(ts(txt_match), self.expected_date)
 
         txt_match = '[http://' + self.fake_date + ']' + self.date
@@ -346,8 +352,8 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         """Test that skipping hyperlinks will not make gaps shorter."""
         ts = self.ts.timestripper
 
-        txt_match = ('%s[http://example.com Here is long enough text]%s'
-                     % (self.date[:9], self.date[9:]))
+        txt_match = ('{}[http://example.com Here is long enough text]{}'
+                     .format(self.date[:9], self.date[9:]))
         self.assertEqual(ts(txt_match), None)
 
     def test_timestripper_match_wikilink_with_date(self):
@@ -370,8 +376,8 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
         """Test that skipping wikilinks will not make gaps shorter."""
         ts = self.ts.timestripper
 
-        txt_match = ('%s[[Here is long enough text]]%s'
-                     % (self.date[:9], self.date[9:]))
+        txt_match = ('{}[[Here is long enough text]]{}'
+                     .format(self.date[:9], self.date[9:]))
         self.assertEqual(ts(txt_match), None)
 
         txt_match = self.date[:9] + '[[foo]]' + self.date[9:]

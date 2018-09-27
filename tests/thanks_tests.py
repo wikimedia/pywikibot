@@ -56,8 +56,8 @@ class TestThankRevision(TestCase):
         """Test that thanking oneself causes an error.
 
         This test is not in TestThankRevisionErrors because it may require
-        making a successful edit in order to test the API call thanking the user
-        running the test.
+        making a successful edit in order to test the API call thanking
+        the user running the test.
         """
         site = self.get_site()
         my_name = self.get_userpage().username
