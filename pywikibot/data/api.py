@@ -1579,7 +1579,7 @@ class Request(MutableMapping):
         @param value: param value(s)
 
         @type value: unicode or str in site encoding
-            (string types may be a |-separated list)
+            (string types may be a `|`-separated list)
             iterable, where items are converted to unicode
             with special handling for datetime.datetime to convert it to a
             string using the ISO 8601 format accepted by the MediaWiki API.

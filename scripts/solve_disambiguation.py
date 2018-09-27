@@ -705,11 +705,11 @@ class DisambiguationRobot(SingleSiteBot):
 
     @staticmethod
     def firstlinks(page):
-        """Return a list of first links of every line beginning with *.
+        """Return a list of first links of every line beginning with `*`.
 
         When a disambpage is full of unnecessary links, this may be useful
         to sort out the relevant links. E.g. from line
-        *[[Jim Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]
+        `* [[Jim Smith (smith)|Jim Smith]] ([[1832]]-[[1932]]) [[English]]`
         it returns only 'Jim Smith (smith)'
         Lines without an asterisk at the beginning will be disregarded.
         No check for page existence, it has already been done.

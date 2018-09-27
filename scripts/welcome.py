@@ -84,7 +84,7 @@ This script understands the following command-line arguments:
 
 ********************************* GUIDE ***********************************
 
-Report, Bad and white list guide:
+*** Report, Bad and white list guide: ***
 
 1)  Set in the code which page it will use to load the badword, the
     whitelist and the report
@@ -118,7 +118,7 @@ Report, Bad and white list guide:
             * Search if he's in the report page, if yes he will be skipped
             * If no, he will be reported.
 
-Random signature guide:
+*** Random signature guide: ***
 
 Some welcomed users will answer to the one who has signed the welcome message.
 When you welcome many new users, you might be overwhelmed with such answers.

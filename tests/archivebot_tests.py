@@ -241,7 +241,7 @@ class TestDiscussionPageObject(TestCase):
     def testTwoThreadsWithCommentedOutThread(self):
         """Test recognizing two threads and ignoring a commented out thread.
 
-        Talk:For-pywikibot-archivebot must have:
+        Talk:For-pywikibot-archivebot must have::
 
          {{User:MiszaBot/config
          |archive = Talk:Main_Page/archive

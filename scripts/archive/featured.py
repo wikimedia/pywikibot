@@ -3,54 +3,54 @@
 """
 Manage featured/good article/list status template.
 
-This script understands various command-line arguments:
+*** This script understands various command-line arguments: ***
 
- Task commands:
+Task commands:
 
--featured         use this script for featured articles. Default task if no task
-                  command is specified
+ -featured         use this script for featured articles. Default task
+                   if no task command is specified
 
--good             use this script for good articles.
+ -good             use this script for good articles.
 
--lists            use this script for featured lists.
+ -lists            use this script for featured lists.
 
--former           use this script for removing {{Link FA|xx}} from former
-                  fearured articles
+ -former           use this script for removing {{Link FA|xx}} from former
+                   fearured articles
 
-                  NOTE: you may have all of these commands in one run
+                   NOTE: you may have all of these commands in one run
 
- Option commands:
+Option commands:
 
--interactive:     ask before changing each page
+ -interactive:     ask before changing each page
 
--nocache          doesn't include cache files file to remember if the article
-                  already was verified.
+ -nocache          doesn't include cache files file to remember if the article
+                   already was verified.
 
--nocache:xx,yy    you may ignore language codes xx,yy,... from cache file
+ -nocache:xx,yy    you may ignore language codes xx,yy,... from cache file
 
--fromlang:xx,yy   xx,yy,zz,.. are the languages to be verified.
--fromlang:ar--fi  Another possible with range the languages
+ -fromlang:xx,yy   xx,yy,zz,.. are the languages to be verified.
+ -fromlang:ar--fi  Another possible with range the languages
 
--fromall          to verify all languages.
+ -fromall          to verify all languages.
 
--tolang:xx,yy     xx,yy,zz,.. are the languages to be updated
+ -tolang:xx,yy     xx,yy,zz,.. are the languages to be updated
 
--after:zzzz       process pages after and including page zzzz
-                  (sorry, not implemented yet)
+ -after:zzzz       process pages after and including page zzzz
+                   (sorry, not implemented yet)
 
--side             use -side if you want to move all {{Link FA|lang}} next to the
-                  corresponding interwiki links. Default is placing
-                  {{Link FA|lang}} on top of the interwiki links.
-                  (This option is deprecated with wikidata)
+ -side             use -side if you want to move all {{Link FA|lang}} next
+                   to the corresponding interwiki links. Default is placing
+                   {{Link FA|lang}} on top of the interwiki links.
+                   (This option is deprecated with wikidata)
 
--count            Only counts how many featured/good articles exist
-                  on all wikis (given with the "-fromlang" argument) or
-                  on several language(s) (when using the "-fromall" argument).
-                  Example: python pwb.py featured -fromlang:en,he -count
-                  counts how many featured articles exist in the en and he
-                  wikipedias.
+ -count            Only counts how many featured/good articles exist
+                   on all wikis (given with the "-fromlang" argument) or
+                   on several language(s) (when using the "-fromall" argument).
+                   Example: python pwb.py featured -fromlang:en,he -count
+                   counts how many featured articles exist in the en and he
+                   wikipedias.
 
--quiet            no corresponding pages are displayed.
+ -quiet            no corresponding pages are displayed.
 
 """
 #

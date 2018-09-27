@@ -23,8 +23,7 @@ be used then.
 On Wikisource, it'll also check if the page is on the author namespace in which
 case it'll also patrol pages which are linked from that page.
 
-An example can be found at:
-
+An example can be found at
 https://en.wikisource.org/wiki/User:Wikisource-bot/patrol_whitelist
 
 Commandline parameters
