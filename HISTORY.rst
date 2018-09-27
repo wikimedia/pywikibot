@@ -4,6 +4,11 @@ Release history
 Current release
 ---------------
 
+* Enable start timestamp for EventStreams (T205121)
+* Re-enable notifications (T205184)
+* Use FutureWarning for warnings intended for end users (T191192)
+* Provide new -wanted... page generators (T56557, T150222)
+* api.QueryGenerator: Handle slots during initialization (T200955, T205210)
 * Bugfixes and improvements
 * Localisation updates
 
