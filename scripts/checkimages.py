@@ -635,7 +635,7 @@ class checkImagesBot(object):
                 except Exception:
                     pywikibot.exception()
                     pywikibot.output(
-                        'Another error... skipping the user..')
+                        'Another error... skipping the user...')
 
     def uploadBotChangeFunction(self, reportPageText, upBotArray):
         """Detect the user that has uploaded the file through upload bot."""
@@ -679,8 +679,8 @@ class checkImagesBot(object):
                 nick = reportPageObject.latest_file_info.user
         except pywikibot.PageRelatedError:
             pywikibot.output(
-                'Seems that %s has only the description and not the file...'
-                % self.image_to_report)
+                'Seems that {} has only the description and not the file...'
+                .format(self.image_to_report))
             repme = self.list_entry + "problems '''with the APIs'''"
             self.report_image(self.image_to_report, self.rep_page, self.com,
                               repme)
@@ -716,8 +716,8 @@ class checkImagesBot(object):
             history = self.talk_page.getLatestEditors(limit=10)
             latest_user = history[0]['user']
             pywikibot.output(
-                'The latest user that has written something is: %s'
-                % latest_user)
+                'The latest user that has written something is: '
+                + latest_user)
             if latest_user in self.bots:
                 second_text = True
                 # A block to prevent the second message if the bot also
@@ -769,8 +769,8 @@ class checkImagesBot(object):
             except (pywikibot.NoPage, pywikibot.IsRedirectPage):
                 return
             if self.sendemailActive:
-                text_to_send = re.sub(r'__user-nickname__', r'%s'
-                                      % self.luser, emailText)
+                text_to_send = re.sub(r'__user-nickname__', r'{}'
+                                      .format(self.luser), emailText)
                 emailClass = pywikibot.User(self.site, self.luser)
                 try:
                     emailClass.send_email(emailSubj, text_to_send)
@@ -780,7 +780,7 @@ class checkImagesBot(object):
 
     def regexGenerator(self, regexp, textrun):
         """Find page to yield using regex to parse text."""
-        regex = re.compile(r'%s' % regexp, re.UNICODE | re.DOTALL)
+        regex = re.compile(r'{}'.format(regexp), re.UNICODE | re.DOTALL)
         results = regex.findall(textrun)
         for image in results:
             yield pywikibot.FilePage(self.site, image)
@@ -831,8 +831,8 @@ class checkImagesBot(object):
 
     def checkImageOnCommons(self):
         """Checking if the file is on commons."""
-        pywikibot.output('Checking if [[%s]] is on commons...'
-                         % self.imageName)
+        pywikibot.output('Checking if [[{}]] is on commons...'
+                         .format(self.imageName))
         try:
             hash_found = self.image.latest_file_info.sha1
         except pywikibot.NoPage:
@@ -849,8 +849,8 @@ class checkImagesBot(object):
                     if pywikibot.Page(self.site,
                                       template) in templatesInTheImage:
                         pywikibot.output(
-                            "%s is on commons but it's a service image."
-                            % self.imageName)
+                            "{} is on commons but it's a service image."
+                            .format(self.imageName))
                         return True  # continue with the check-part
 
             pywikibot.output(self.imageName + ' is on commons!')
@@ -865,8 +865,8 @@ class checkImagesBot(object):
             if re.findall(r'\bstemma\b', self.imageName.lower()) and \
                self.site.code == 'it':
                 pywikibot.output(
-                    '%s has "stemma" inside, means that it\'s ok.'
-                    % self.imageName)
+                    "{} has 'stemma' inside, means that it's ok."
+                    .format(self.imageName))
                 return True
 
             # It's not only on commons but the image needs a check
@@ -944,8 +944,8 @@ class checkImagesBot(object):
                     if not (re.findall(dupRegex, DupPageText) or
                             re.findall(dupRegex, older_page_text)):
                         pywikibot.output(
-                            '%s is a duplicate and has to be tagged...'
-                            % dup_page)
+                            '{} is a duplicate and has to be tagged...'
+                            .format(dup_page))
                         images_to_tag_list.append(dup_page.title())
                         string += '* {0}\n'.format(
                             dup_page.title(as_link=True, textlink=True))
@@ -1029,8 +1029,8 @@ class checkImagesBot(object):
                     ):
                         # the image itself, not report also this as duplicate
                         continue
-                    repme += '\n** [[:%s%s]]' % (self.image_namespace,
-                                                 dup_page.title(as_url=True))
+                    repme += '\n** [[:{}{}]]'.format(
+                        self.image_namespace, dup_page.title(as_url=True))
 
                 result = self.report_image(self.imageName, self.rep_page,
                                            self.com, repme, addings=False)
@@ -1071,8 +1071,8 @@ class checkImagesBot(object):
         reported = True
         # Skip if the message is already there.
         if short_text in text_get:
-            pywikibot.output('%s is already in the report page.'
-                             % image_to_report)
+            pywikibot.output('{} is already in the report page.'
+                             .format(image_to_report))
             reported = False
         elif len(text_get) >= self.logFulNumber:
             if self.logFullError:
@@ -1246,7 +1246,7 @@ class checkImagesBot(object):
                 if not self.licenses_found and licenses_TEST:
                     raise pywikibot.Error(
                         "Invalid or broken templates found in the image's "
-                        'page %s!' % self.image)
+                        'page {}!'.format(self.image))
             self.allLicenses = []
 
             if not self.list_licenses:
@@ -1289,8 +1289,8 @@ class checkImagesBot(object):
                 pywikibot.output('File already fixed. Skipping.')
             else:
                 pywikibot.output(
-                    "The file's description for %s contains %s..."
-                    % (self.imageName, self.name_used))
+                    "The file's description for {} contains {}..."
+                    .format(self.imageName, self.name_used))
                 if self.mex_used.lower() == 'default':
                     self.mex_used = self.unvertext
                 if self.imagestatus_used:
@@ -1312,8 +1312,8 @@ class checkImagesBot(object):
                                           '<nowiki>%s</nowiki>') %
                                          (self.imageName, self.license_found))
                 printWithTimeZone(
-                    '%s seems to have a fake license: %s, reporting...'
-                    % (self.imageName, self.license_found))
+                    '{} seems to have a fake license: {}, reporting...'
+                    .format(self.imageName, self.license_found))
                 self.report_image(self.imageName,
                                   rep_text=rep_text_license_fake,
                                   addings=False)
@@ -1369,8 +1369,8 @@ class checkImagesBot(object):
         Let the users to fix the image's problem alone in the first x seconds.
         """
         printWithTimeZone(
-            'Skipping the files uploaded less than %s seconds ago..'
-            % wait_time)
+            'Skipping the files uploaded less than {} seconds ago..'
+            .format(wait_time))
         for page in generator:
             image = pywikibot.FilePage(page)
             try:
@@ -1383,10 +1383,10 @@ class checkImagesBot(object):
                 yield image
             else:
                 pywikibot.warning(
-                    'Skipping %s, uploaded %d %s ago..'
-                    % ((image.title(), delta.days, 'days')
-                       if delta.days > 0
-                       else (image.title(), delta.seconds, 'seconds')))
+                    'Skipping {}, uploaded {} {} ago..'
+                    .format(image.title(), delta.days, 'days')
+                    if delta.days > 0
+                    else (image.title(), delta.seconds, 'seconds'))
 
     def isTagged(self):
         """Understand if a file is already tagged or not."""
@@ -1430,7 +1430,7 @@ class checkImagesBot(object):
             mexCatched = tupla[8]
             for k in find_list:
                 if find_tipe.lower() == 'findonly':
-                    searchResults = re.findall(r'%s' % k.lower(),
+                    searchResults = re.findall(r'{}'.format(k.lower()),
                                                self.imageCheckText.lower())
                     if searchResults:
                         if searchResults[0] == self.imageCheckText.lower():
@@ -1443,7 +1443,7 @@ class checkImagesBot(object):
                             self.mex_used = mexCatched
                             break
                 elif find_tipe.lower() == 'find':
-                    if re.findall(r'%s' % k.lower(),
+                    if re.findall(r'{}'.format(k.lower()),
                                   self.imageCheckText.lower()):
                         self.some_problem = True
                         self.text_used = text
@@ -1491,20 +1491,20 @@ class checkImagesBot(object):
         try:
             self.imageCheckText = self.image.get()
         except pywikibot.NoPage:
-            pywikibot.output('Skipping %s because it has been deleted.'
-                             % self.imageName)
+            pywikibot.output('Skipping {} because it has been deleted.'
+                             .format(self.imageName))
             return
         except pywikibot.IsRedirectPage:
-            pywikibot.output("Skipping %s because it's a redirect."
-                             % self.imageName)
+            pywikibot.output("Skipping {} because it's a redirect."
+                             .format(self.imageName))
             return
         # Delete the fields where the templates cannot be loaded
         regex_nowiki = re.compile(r'<nowiki>(.*?)</nowiki>', re.DOTALL)
         regex_pre = re.compile(r'<pre>(.*?)</pre>', re.DOTALL)
         self.imageCheckText = regex_nowiki.sub('', self.imageCheckText)
         self.imageCheckText = regex_pre.sub('', self.imageCheckText)
-        # Deleting the useless template from the description (before adding sth
-        # in the image the original text will be reloaded, don't worry).
+        # Deleting the useless template from the description (before adding
+        # sth in the image the original text will be reloaded, don't worry).
         if self.isTagged():
             printWithTimeZone('{} is already tagged...'.format(self.imageName))
             return
@@ -1551,8 +1551,8 @@ class checkImagesBot(object):
                         smwl)
             return
         else:
-            pywikibot.output('%s has only text and not the specific license...'
-                             % self.imageName)
+            pywikibot.output('{} has only text and not the specific '
+                             'license...'.format(self.imageName))
             if hiddenTemplateFound and HiddenTN:
                 notification = HiddenTN % self.imageName
             elif nn:
@@ -1692,7 +1692,7 @@ def main(*args):
             elif len(arg) > 4:
                 catName = str(arg[5:])
             catSelected = pywikibot.Category(pywikibot.Site(),
-                                             'Category:%s' % catName)
+                                             'Category:{}'.format(catName))
             generator = catSelected.articles(namespaces=[6])
             repeat = False
         elif arg.startswith('-ref'):
@@ -1723,8 +1723,8 @@ def main(*args):
         if limit == 1:
             pywikibot.output('Retrieving the latest file for checking...')
         else:
-            pywikibot.output('Retrieving the latest %d files for checking...'
-                             % limit)
+            pywikibot.output('Retrieving the latest {} files for checking...'
+                             .format(limit))
     while True:
         # Defing the Main Class.
         Bot = checkImagesBot(site, sendemailActive=sendemailActive,
