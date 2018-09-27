@@ -46,7 +46,7 @@ else:
 IGNORABLE_LONG_LINE = re_compile(r'\s*(# )?<?https?://\S+>?$').match
 
 STRING_MATCH = re_compile(
-    r'(?P<prefix>[bfru]*)?(?P<quote>\'+|"+)', IGNORECASE,
+    r'(?P<prefix>[bfru]*)?(?P<quote>\'+|"+).', IGNORECASE,
 ).match
 
 
