@@ -98,8 +98,8 @@ def _signal_handler(signal, frame):
     global willstop
     if not willstop:
         willstop = True
-        print('Received ctrl-c. Finishing current item; '
-              'press ctrl-c again to abort.')
+        pywikibot.output('Received ctrl-c. Finishing current item; '
+                         'press ctrl-c again to abort.')
     else:
         raise KeyboardInterrupt
 
