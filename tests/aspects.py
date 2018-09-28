@@ -869,7 +869,8 @@ class MetaTestCaseClass(type):
 
             # create test methods processed by unittest
             for (key, sitedata) in dct['sites'].items():
-                test_name = test + '_' + key.replace('-', '_')
+                test_name = (test + '_'
+                             + key.replace('-', '_').replace(':', '_'))
                 cls.add_method(dct, test_name,
                                wrap_method(key, sitedata, dct[test]))
 
