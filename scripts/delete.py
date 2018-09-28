@@ -183,41 +183,41 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
                 for page in islice_with_ellipsis(refs[ns], show_n_pages):
                     pywikibot.output('      {0!s}'.format(page.title()))
 
+    def skip_page(self, page):
+        """Skip the page under some conditions."""
+        if self.getOption('undelete') and page.exists():
+            pywikibot.output('Skipping: {0} already exists.'.format(page))
+            return True
+        if not self.getOption('undelete') and not page.exists():
+            pywikibot.output('Skipping: {0} does not exist.'.format(page))
+            return True
+        return super(DeletionRobot, self).skip_page(page)
+
     def treat_page(self):
         """Process one page from the generator."""
         if self.getOption('undelete'):
-            if self.current_page.exists():
-                pywikibot.output('Skipping: {0} already exists.'.format(
-                    self.current_page))
-            else:
-                self.current_page.undelete(self.summary)
+            self.current_page.undelete(self.summary)
         else:
-            if self.current_page.exists():
+            if (self.getOption('isorphan') is not False and
+                    not self.getOption('always')):
+                self.display_references()
 
-                if (self.getOption('isorphan') is not False and
-                        not self.getOption('always')):
-                    self.display_references()
+            if self.getOption('orphansonly'):
+                namespaces = self.getOption('orphansonly')
+                ns_with_ref = self.current_page.namespaces_with_ref_to_page(
+                    namespaces)
+                ns_with_ref = sorted(list(ns_with_ref))
+                if ns_with_ref:
+                    ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
+                    pywikibot.output(
+                        'Skipping: {0} is not orphan in ns: {1}.'.format(
+                            self.current_page, ns_names))
+                    return  # Not an orphan, do not delete.
 
-                if self.getOption('orphansonly'):
-                    namespaces = self.getOption('orphansonly')
-                    ns_with_ref = \
-                        self.current_page.namespaces_with_ref_to_page(
-                            namespaces)
-                    ns_with_ref = sorted(list(ns_with_ref))
-                    if ns_with_ref:
-                        ns_names = ', '.join(str(ns.id) for ns in ns_with_ref)
-                        pywikibot.output(
-                            'Skipping: {0} is not orphan in ns: {1}.'.format(
-                                self.current_page, ns_names))
-                        return  # Not an orphan, do not delete.
-
-                self.current_page.delete(self.summary,
-                                         not self.getOption('always'),
-                                         self.getOption('always'),
-                                         quit=True)
-            else:
-                pywikibot.output('Skipping: {0} does not exist.'.format(
-                    self.current_page))
+            self.current_page.delete(self.summary,
+                                     not self.getOption('always'),
+                                     self.getOption('always'),
+                                     quit=True)
 
 
 def main(*args):
