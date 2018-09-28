@@ -376,6 +376,7 @@ class TestScriptHelp(PwbTestCase):
 
     _expected_failures = failed_dep_script_set
     # -help tests may pass even when packages are required
+    _expected_failures.discard('flickrripper')
     _expected_failures.discard('imageharvest')
     _expected_failures.discard('isbn')
     _expected_failures.discard('weblinkchecker')
@@ -402,7 +403,6 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
     _expected_failures = {
         'catall',          # stdout user interaction
-        'flickrripper',    # Requires a flickr api key
         'upload',          # raises custom ValueError
     }.union(failed_dep_script_set)
 
