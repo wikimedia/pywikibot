@@ -99,7 +99,7 @@ class UI(object):
         # this handler ignores levels above INPUT
         default_handler.addFilter(MaxLevelFilter(INPUT))
         default_handler.setFormatter(
-            TerminalFormatter(fmt="%(message)s%(newline)s"))
+            TerminalFormatter(fmt='%(message)s%(newline)s'))
         root_logger.addHandler(default_handler)
 
         # handler for level STDOUT
@@ -107,17 +107,17 @@ class UI(object):
         output_handler.setLevel(STDOUT)
         output_handler.addFilter(MaxLevelFilter(STDOUT))
         output_handler.setFormatter(
-            TerminalFormatter(fmt="%(message)s%(newline)s"))
+            TerminalFormatter(fmt='%(message)s%(newline)s'))
         root_logger.addHandler(output_handler)
 
         # handler for levels WARNING and higher
         warning_handler = TerminalHandler(self, strm=self.stderr)
         warning_handler.setLevel(WARNING)
         warning_handler.setFormatter(
-            TerminalFormatter(fmt="%(levelname)s: %(message)s%(newline)s"))
+            TerminalFormatter(fmt='%(levelname)s: %(message)s%(newline)s'))
         root_logger.addHandler(warning_handler)
 
-        warnings_logger = logging.getLogger("py.warnings")
+        warnings_logger = logging.getLogger('py.warnings')
         warnings_logger.addHandler(warning_handler)
 
     def encounter_color(self, color, target_stream):
@@ -209,7 +209,7 @@ class UI(object):
             transliteratedText = ''
             # Note: A transliteration replacement might be longer than the
             # original character, e.g. ч is transliterated to ch.
-            prev = "-"
+            prev = '-'
             for i, char in enumerate(codecedText):
                 # work on characters that couldn't be encoded, but not on
                 # original question marks.
@@ -355,7 +355,7 @@ class UI(object):
         else:  # make a copy
             options = list(options)
         if len(options) == 0:
-            raise ValueError(u'No options are given.')
+            raise ValueError('No options are given.')
         if automatic_quit:
             options += [QuitKeyboardInterrupt()]
         if default:
@@ -363,8 +363,8 @@ class UI(object):
         for i, option in enumerate(options):
             if not isinstance(option, Option):
                 if len(option) != 2:
-                    raise ValueError(u'Option #{0} does not consist of an '
-                                     u'option and shortcut.'.format(i))
+                    raise ValueError('Option #{0} does not consist of an '
+                                     'option and shortcut.'.format(i))
                 options[i] = StandardOption(*option)
             # TODO: Test for uniquity
 
@@ -415,7 +415,8 @@ class UI(object):
         message = question
         clist = answers
 
-        line_template = u"{{0: >{0}}}: {{1}}".format(int(math.log10(len(clist)) + 1))
+        line_template = '{{0: >{0}}}: {{1}}'.format(
+            int(math.log10(len(clist)) + 1))
         for n, i in enumerate(clist):
             pywikibot.output(line_template.format(n + 1, i))
 
@@ -433,7 +434,7 @@ class UI(object):
             if 0 <= choice < len(clist):
                 return clist[choice]
             else:
-                pywikibot.error("Invalid response")
+                pywikibot.error('Invalid response')
 
     def editText(self, text, jumpIndex=None, highlight=None):
         """Return the text as edited by the user.

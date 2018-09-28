@@ -150,14 +150,14 @@ else:
     """
 
 NON_LATIN_DIGITS = {
-    'ckb': u'٠١٢٣٤٥٦٧٨٩',
-    'fa': u'۰۱۲۳۴۵۶۷۸۹',
+    'ckb': '٠١٢٣٤٥٦٧٨٩',
+    'fa': '۰۱۲۳۴۵۶۷۸۹',
     'hi': '०१२३४५६७८९',
-    'km': u'០១២៣៤៥៦៧៨៩',
-    'kn': u'೦೧೨೩೪೫೬೭೮೯',
-    'bn': u'০১২৩৪৫৬৭৮৯',
-    'gu': u'૦૧૨૩૪૫૬૭૮૯',
-    'or': u'୦୧୨୩୪୫୬୭୮୯',
+    'km': '០១២៣៤៥៦៧៨៩',
+    'kn': '೦೧೨೩೪೫೬೭೮೯',
+    'bn': '০১২৩৪৫৬৭৮৯',
+    'gu': '૦૧૨૩૪૫૬૭૮૯',
+    'or': '୦୧୨୩୪୫୬୭୮୯',
 }
 
 # Used in TimeStripper. When a timestamp-like line has longer gaps
@@ -181,7 +181,7 @@ def to_local_digits(phrase, lang):
     digits = NON_LATIN_DIGITS.get(lang)
     if not digits:
         return phrase
-    phrase = u"%s" % phrase
+    phrase = '%s' % phrase
     for i in range(10):
         phrase = phrase.replace(str(i), digits[i])
     return phrase
@@ -191,11 +191,11 @@ def unescape(s):
     """Replace escaped HTML-special characters by their originals."""
     if '&' not in s:
         return s
-    s = s.replace("&lt;", "<")
-    s = s.replace("&gt;", ">")
-    s = s.replace("&apos;", "'")
-    s = s.replace("&quot;", '"')
-    s = s.replace("&amp;", "&")  # Must be last
+    s = s.replace('&lt;', '<')
+    s = s.replace('&gt;', '>')
+    s = s.replace('&apos;', "'")
+    s = s.replace('&quot;', '"')
+    s = s.replace('&amp;', '&')  # Must be last
     return s
 
 
@@ -542,7 +542,7 @@ def removeHTMLParts(text, keeptags=['tt', 'nowiki', 'small', 'sup']):
 
 # thanks to https://docs.python.org/2/library/htmlparser.html
 class _GetDataHTML(HTMLParser):
-    textdata = u''
+    textdata = ''
     keeptags = []
 
     def handle_data(self, data):
@@ -550,11 +550,11 @@ class _GetDataHTML(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         if tag in self.keeptags:
-            self.textdata += u"<%s>" % tag
+            self.textdata += '<%s>' % tag
 
     def handle_endtag(self, tag):
         if tag in self.keeptags:
-            self.textdata += u"</%s>" % tag
+            self.textdata += '</%s>' % tag
 
 
 def isDisabled(text, index, tags=None):
@@ -570,10 +570,10 @@ def isDisabled(text, index, tags=None):
     return (marker not in text)
 
 
-def findmarker(text, startwith=u'@@', append=None):
+def findmarker(text, startwith='@@', append=None):
     """Find a string which is not part of text."""
     if not append:
-        append = u'@'
+        append = '@'
     mymarker = startwith
     while mymarker in text:
         mymarker += append
@@ -956,7 +956,7 @@ def extract_sections(text, site=None):
 #        do not find or change links of other kinds, nor any that are formatted
 #        as in-line interwiki links (e.g., "[[:es:Articulo]]".
 
-@deprecate_arg("pageLink", None)
+@deprecate_arg('pageLink', None)
 def getLanguageLinks(text, insite=None, template_subpage=False):
     """
     Return a dict of inter-language links found in text.
@@ -1074,7 +1074,7 @@ def removeLanguageLinksAndSeparator(text, site=None, marker='', separator=''):
     @rtype: str
     """
     if separator:
-        mymarker = findmarker(text, u'@L@')
+        mymarker = findmarker(text, '@L@')
         newtext = removeLanguageLinks(text, site, mymarker)
         mymarker = expandmarker(newtext, mymarker, separator)
         return newtext.replace(mymarker, marker)
@@ -1121,9 +1121,9 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
     s = interwikiFormat(new, insite=site)
     if s:
         if site.code in site.family.interwiki_attop or \
-           u'<!-- interwiki at top -->' in oldtext:
+           '<!-- interwiki at top -->' in oldtext:
             # do not add separator if interwiki links are on one line
-            newtext = s + (u'' if site.code
+            newtext = s + ('' if site.code
                            in site.family.interwiki_on_one_line
                            else separator) + s2.replace(marker, '').strip()
         else:
@@ -1134,7 +1134,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
             else:
                 firstafter += len(marker)
             # Any text in 'after' part that means we should keep it after?
-            if "</noinclude>" in s2[firstafter:]:
+            if '</noinclude>' in s2[firstafter:]:
                 if separatorstripped:
                     s = separator + s
                 newtext = (s2[:firstafter].replace(marker, '') +
@@ -1174,7 +1174,7 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                         # Put the langlinks at the end, inside noinclude's
                         newtext = (s2.replace(marker, '').strip() +
                                    separator +
-                                   u'%s\n%s%s\n' % (includeOn, s, includeOff)
+                                   '%s\n%s%s\n' % (includeOn, s, includeOff)
                                    )
                 else:
                     newtext = s2.replace(marker, '').strip() + separator + s
@@ -1240,7 +1240,7 @@ def interwikiFormat(links, insite=None):
         else:
             raise ValueError('links dict must contain Page or Link objects')
     if insite.code in insite.family.interwiki_on_one_line:
-        sep = u' '
+        sep = ' '
     else:
         sep = config.line_separator
     s = sep.join(s) + config.line_separator
@@ -1304,7 +1304,8 @@ def getCategoryLinks(text, site=None, include=[], expand_text=False):
             title, sortKey = rest, None
         try:
             cat = pywikibot.Category(pywikibot.Link(
-                                     '%s:%s' % (match.group('namespace'), title),
+                                     '%s:%s' %
+                                     (match.group('namespace'), title),
                                      site),
                                      sort_key=sortKey)
         except InvalidTitle:
@@ -1354,7 +1355,7 @@ def removeCategoryLinksAndSeparator(text, site=None, marker='', separator=''):
     if site is None:
         site = pywikibot.Site()
     if separator:
-        mymarker = findmarker(text, u'@C@')
+        mymarker = findmarker(text, '@C@')
         newtext = removeCategoryLinks(text, site, mymarker)
         mymarker = expandmarker(newtext, mymarker, separator)
         return newtext.replace(mymarker, marker)
@@ -1386,9 +1387,9 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     title = re.escape(title)
     # title might not be capitalized correctly on the wiki
     if title[0].isalpha() and site.namespaces[14].case == 'first-letter':
-        title = "[%s%s]" % (title[0].upper(), title[0].lower()) + title[1:]
+        title = '[%s%s]' % (title[0].upper(), title[0].lower()) + title[1:]
     # spaces and underscores in page titles are interchangeable and collapsible
-    title = title.replace(r"\ ", "[ _]+").replace(r"\_", "[ _]+")
+    title = title.replace(r'\ ', '[ _]+').replace(r'\_', '[ _]+')
     categoryR = re.compile(r'\[\[\s*(%s)\s*:\s*%s\s*((?:\|[^]]+)?\]\])'
                            % (catNamespace, title), re.I)
     categoryRN = re.compile(
@@ -1539,7 +1540,7 @@ def categoryFormat(categories, insite=None):
             # whole word if no ":" is present
             prefix = category.split(':', 1)[0]
             if prefix not in insite.namespaces[14]:
-                category = u'{0}:{1}'.format(insite.namespace(14), category)
+                category = '{0}:{1}'.format(insite.namespace(14), category)
             category = pywikibot.Category(pywikibot.Link(category,
                                                          insite,
                                                          default_namespace=14),
@@ -1724,13 +1725,13 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
     marker1 = findmarker(thistxt)
 
     # marker for links
-    marker2 = findmarker(thistxt, u'##', u'#')
+    marker2 = findmarker(thistxt, '##', '#')
 
     # marker for math
-    marker3 = findmarker(thistxt, u'%%', u'%')
+    marker3 = findmarker(thistxt, '%%', '%')
 
     # marker for value parameter
-    marker4 = findmarker(thistxt, u'§§', u'§')
+    marker4 = findmarker(thistxt, '§§', '§')
 
     result = []
     Rmath = re.compile(r'<math>[^<]+</math>')
@@ -1755,7 +1756,7 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
         count += 1
         # If we have digits between brackets, restoring from dict may fail.
         # So we need to change the index. We have to search in the origin text.
-        while u'}}}%d{{{' % count in text:
+        while '}}}%d{{{' % count in text:
             count += 1
         item = m.group()
         thistxt = thistxt.replace(item, '%s%d%s' % (marker4, count, marker4))
@@ -1772,7 +1773,7 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
                 continue  # speed up
             seen.add(item)
             count += 1
-            while u'}}%d{{' % count in text:
+            while '}}%d{{' % count in text:
                 count += 1
             thistxt = thistxt.replace(item,
                                       '%s%d%s' % (marker1, count, marker1))
@@ -1816,8 +1817,8 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
                 markedParams = paramString.split('|')
                 # Replace markers
                 for param in markedParams:
-                    if "=" in param:
-                        param_name, param_val = param.split("=", 1)
+                    if '=' in param:
+                        param_name, param_val = param.split('=', 1)
                         implicit_parameter = False
                     else:
                         param_name = unicode(numbered_param)
@@ -1902,11 +1903,11 @@ def glue_template_and_params(template_and_params):
     of the params changes).
     """
     (template, params) = template_and_params
-    text = u''
+    text = ''
     for item in params:
-        text += u'|%s=%s\n' % (item, params[item])
+        text += '|%s=%s\n' % (item, params[item])
 
-    return u'{{%s\n%s}}' % (template, text)
+    return '{{%s\n%s}}' % (template, text)
 
 
 # ---------------------------------
@@ -2087,7 +2088,7 @@ class tzoneFixedOffset(datetime.tzinfo):
 
     def __repr__(self):
         """Return the internal representation of the timezone."""
-        return "%s(%s, %s)" % (
+        return '%s(%s, %s)' % (
             self.__class__.__name__,
             self.__offset.days * 86400 + self.__offset.seconds,
             self.__name
@@ -2120,7 +2121,7 @@ class TimeStripper(object):
         timeR = (r'(?P<time>(?P<hour>([0-1]\d|2[0-3]))[:\.h]'
                  r'(?P<minute>[0-5]\d))')
         timeznR = r'\((?P<tzinfo>[A-Z]+)\)'
-        yearR = r'(?P<year>(19|20)\d\d)(?:%s)?' % u'\ub144'
+        yearR = r'(?P<year>(19|20)\d\d)(?:%s)?' % '\ub144'
         # if months have 'digits' as names, they need to be
         # removed; will be handled as digits in regex, adding d+{1,2}\.?
         escaped_months = [_ for _ in self.origNames2monthNum if
@@ -2134,13 +2135,13 @@ class TimeStripper(object):
         if any(_.isdigit() for _ in self.origNames2monthNum):
             self.is_digit_month = True
             monthR = r'(?P<month>(%s)|(?:1[012]|0?[1-9])\.)' \
-                % u'|'.join(escaped_months)
+                % '|'.join(escaped_months)
             dayR = (
                 r'(?P<day>(3[01]|[12]\d|0?[1-9]))(?:{0})?\.?\s*(?:[01]?\d\.)?'
                 .format('\uc77c'))
         else:
             self.is_digit_month = False
-            monthR = r'(?P<month>(%s))' % u'|'.join(escaped_months)
+            monthR = r'(?P<month>(%s))' % '|'.join(escaped_months)
             dayR = r'(?P<day>(3[01]|[12]\d|0?[1-9]))\.?'
 
         self.ptimeR = re.compile(timeR)
@@ -2179,7 +2180,7 @@ class TimeStripper(object):
         return self._comment_pat
 
     @deprecated('module function', since='20151118')
-    def findmarker(self, text, base=u'@@', delta='@'):
+    def findmarker(self, text, base='@@', delta='@'):
         """Find a string which is not part of text."""
         return findmarker(text, base, delta)
 

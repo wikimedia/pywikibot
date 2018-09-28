@@ -44,7 +44,7 @@ class _PasswordFileWarning(UserWarning):
     pass
 
 
-_logger = "wiki.login"
+_logger = 'wiki.login'
 
 
 # On some wikis you are only allowed to run a bot if there is a link to
@@ -53,7 +53,7 @@ _logger = "wiki.login"
 # second parameter, otherwise it must be None
 botList = {
     'wikipedia': {
-        'simple': [u'Wikipedia:Bots', '/links']
+        'simple': ['Wikipedia:Bots', '/links']
     },
 }
 
@@ -62,7 +62,7 @@ class LoginManager(object):
 
     """Site login manager."""
 
-    @deprecated_args(username="user", verbose=None)
+    @deprecated_args(username='user', verbose=None)
     def __init__(self, password=None, sysop=False, site=None, user=None):
         """
         Initializer.
@@ -97,7 +97,7 @@ class LoginManager(object):
             try:
                 self.username = self.username or family_sysopnames['*']
             except KeyError:
-                raise NoUsername(u"""\
+                raise NoUsername(""" \
 ERROR: Sysop username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have a sysop account for that site, please add a line to user-config.py:
 
@@ -113,7 +113,7 @@ sysopnames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             try:
                 self.username = self.username or family_usernames['*']
             except KeyError:
-                raise NoUsername(u"""\
+                raise NoUsername(""" \
 ERROR: Username for %(fam_name)s:%(wiki_code)s is undefined.
 If you have an account for that site, please add a line to user-config.py:
 
@@ -154,7 +154,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         if user['name'] != main_username:
             # Report the same error as server error code NotExists
-            raise NoUsername('Username \'%s\' does not exist on %s'
+            raise NoUsername("Username '%s' does not exist on %s"
                              % (main_username, self.site))
 
     def botAllowed(self):
@@ -205,7 +205,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         # THIS IS OVERRIDDEN IN data/api.py
         filename = config.datafilepath('pywikibot.lwp')
-        pywikibot.debug(u"Storing cookies to %s" % filename,
+        pywikibot.debug('Storing cookies to %s' % filename,
                         _logger)
         with open(filename, 'w') as f:
             f.write(data)
@@ -228,13 +228,14 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         The file must be either encoded in ASCII or UTF-8.
 
-        Example:
+        Example::
 
-        (u"my_username", u"my_default_password")
-        (u"my_sysop_user", u"my_sysop_password")
-        (u"wikipedia", u"my_wikipedia_user", u"my_wikipedia_pass")
-        (u"en", u"wikipedia", u"my_en_wikipedia_user", u"my_en_wikipedia_pass")
-        (u"my_username", BotPassword(u"my_BotPassword_suffix", u"my_BotPassword_password"))
+         ("my_username", "my_default_password")
+         ("my_sysop_user", "my_sysop_password")
+         ("wikipedia", "my_wikipedia_user", "my_wikipedia_pass")
+         ("en", "wikipedia", "my_en_wikipedia_user", "my_en_wikipedia_pass")
+         ("my_username", BotPassword(
+          "my_BotPassword_suffix", "my_BotPassword_password"))
         """
         # Set path to password file relative to the user_config
         # but fall back on absolute path for backwards compatibility
@@ -302,21 +303,21 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             # As we don't want the password to appear on the screen, we set
             # password = True
             self.password = pywikibot.input(
-                u'Password for user %(name)s on %(site)s (no characters will '
-                u'be shown):' % {'name': self.login_name, 'site': self.site},
+                'Password for user %(name)s on %(site)s (no characters will '
+                'be shown):' % {'name': self.login_name, 'site': self.site},
                 password=True)
 
-        pywikibot.output(u"Logging in to %(site)s as %(name)s"
+        pywikibot.output('Logging in to %(site)s as %(name)s'
                          % {'name': self.login_name, 'site': self.site})
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError as e:
-            pywikibot.error(u"Login failed (%s)." % e.code)
+            pywikibot.error('Login failed (%s).' % e.code)
             if e.code == 'NotExists':
-                raise NoUsername(u"Username '%s' does not exist on %s"
+                raise NoUsername("Username '%s' does not exist on %s"
                                  % (self.login_name, self.site))
             elif e.code == 'Illegal':
-                raise NoUsername(u"Username '%s' is invalid on %s"
+                raise NoUsername("Username '%s' is invalid on %s"
                                  % (self.login_name, self.site))
             elif e.code == 'readapidenied':
                 raise NoUsername(
@@ -333,17 +334,18 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             else:
                 return False
         self.storecookiedata(cookiedata)
-        pywikibot.log(u"Should be logged in now")
+        pywikibot.log('Should be logged in now')
 #        # Show a warning according to the local bot policy
-#   FIXME: disabled due to recursion; need to move this to the Site object after
-#   login
+#   FIXME: disabled due to recursion; need to move this to the Site object
+#   after login
 #        if not self.botAllowed():
 #            logger.error(
 #                u"Username '%(name)s' is not listed on [[%(page)s]]."
 #                 % {'name': self.username,
 #                    'page': botList[self.site.family.name][self.site.code]})
 #            logger.error(
-# "Please make sure you are allowed to use the robot before actually using it!")
+# "Please make sure you are allowed to use the robot before actually using it!"
+# )
 #            return False
         return True
 
@@ -360,8 +362,8 @@ class BotPassword(object):
         """
         Initializer.
 
-        BotPassword function by using a separate password paired with a suffixed
-        username of the form <username>@<suffix>.
+        BotPassword function by using a separate password paired with a
+        suffixed username of the form <username>@<suffix>.
 
         @param suffix: Suffix of the login name
         @type suffix: basestring
@@ -429,15 +431,16 @@ class OauthLoginManager(LoginManager):
         """
         Attempt to log into the server.
 
-        @param retry: infinitely retry if exception occurs during authentication.
+        @param retry: infinitely retry if exception occurs during
+            authentication.
         @type retry: bool
         @param force: force to re-authenticate
         @type force: bool
         """
         if self.access_token is None or force:
-            pywikibot.output('Logging in to %(site)s via OAuth consumer %(key)s'
-                             % {'key': self.consumer_token[0],
-                                'site': self.site})
+            pywikibot.output(
+                'Logging in to %(site)s via OAuth consumer %(key)s'
+                % {'key': self.consumer_token[0], 'site': self.site})
             consumer_token = mwoauth.ConsumerToken(self.consumer_token[0],
                                                    self.consumer_token[1])
             handshaker = mwoauth.Handshaker(

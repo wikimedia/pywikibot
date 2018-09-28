@@ -81,7 +81,7 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
         dict_name, value = date.getAutoFormat(sitelang, page.title())
         if dict_name:
             pywikibot.output(
-                u'TitleTranslate: %s was recognized as %s with value %d'
+                'TitleTranslate: %s was recognized as %s with value %d'
                 % (page.title(), dict_name, value))
             for entry_lang, entry in date.formats[dict_name].items():
                 if entry_lang not in site.languages():

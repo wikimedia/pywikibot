@@ -84,14 +84,14 @@ moved_links = {
     'ar': (['documentation', 'template documentation', 'شرح', 'توثيق'],
            '/doc'),
     'bn': ('documentation', '/doc'),
-    'ca': (u'ús de la plantilla', u'/ús'),
+    'ca': ('ús de la plantilla', '/ús'),
     'cs': ('dokumentace', '/doc'),
     'da': ('dokumentation', '/doc'),
-    'de': (u'dokumentation', u'/Meta'),
+    'de': ('dokumentation', '/Meta'),
     'dsb': (['dokumentacija', 'doc'], '/Dokumentacija'),
     'en': (['documentation', 'template documentation', 'template doc',
             'doc', 'documentation, template'], '/doc'),
-    'es': ([u'documentación', u'documentación de plantilla'], u'/doc'),
+    'es': (['documentación', 'documentación de plantilla'], '/doc'),
     'eu': ('txantiloi dokumentazioa', '/dok'),
     'fa': (['documentation', 'template documentation', 'template doc',
             'doc', 'توضیحات', 'زیرصفحه توضیحات'], '/doc'),
@@ -105,32 +105,32 @@ moved_links = {
             ],
            '/Documentation'),
     'hsb': (['dokumentacija', 'doc'], '/Dokumentacija'),
-    'hu': (u'sablondokumentáció', u'/doc'),
+    'hu': ('sablondokumentáció', '/doc'),
     'id': ('template doc', '/doc'),
     'ilo': ('documentation', '/doc'),
-    'ja': (u'documentation', u'/doc'),
+    'ja': ('documentation', '/doc'),
     'ka': ('თარგის ინფო', '/ინფო'),
-    'ko': (u'documentation', u'/설명문서'),
-    'ms': (u'documentation', u'/doc'),
+    'ko': ('documentation', '/설명문서'),
+    'ms': ('documentation', '/doc'),
     'no': ('dokumentasjon', '/dok'),
     'nn': ('dokumentasjon', '/dok'),
     'pl': ('dokumentacja', '/opis'),
-    'pt': ([u'documentação', u'/doc'], u'/doc'),
+    'pt': (['documentação', '/doc'], '/doc'),
     'ro': ('documentaţie', '/doc'),
-    'ru': (u'doc', u'/doc'),
+    'ru': ('doc', '/doc'),
     'simple': (['documentation',
                 'template documentation',
                 'template doc',
                 'doc',
                 'documentation, template'], '/doc'),
     'sk': ('dokumentácia', '/Dokumentácia'),
-    'sv': (u'dokumentation', u'/dok'),
+    'sv': ('dokumentation', '/dok'),
     'uk': (['документація', 'doc', 'documentation'], '/Документація'),
     'ur': (['دستاویز', 'توثيق', 'شرح', 'توضیحات',
             'documentation', 'template doc', 'doc',
             'documentation, template'], '/doc'),
-    'vi': (u'documentation', u'/doc'),
-    'zh': ([u'documentation', u'doc'], u'/doc'),
+    'vi': ('documentation', '/doc'),
+    'zh': (['documentation', 'doc'], '/doc'),
 }
 
 # Template which should be replaced or removed.
@@ -153,10 +153,10 @@ moved_links = {
 deprecatedTemplates = {
     'wikipedia': {
         'de': [
-            (u'Belege', u'Belege fehlen\\g<parameters>'),
-            (u'Quelle', u'Belege fehlen\\g<parameters>'),
-            (u'Quellen', u'Belege fehlen\\g<parameters>'),
-            (u'Quellen fehlen', u'Belege fehlen\\g<parameters>'),
+            ('Belege', 'Belege fehlen\\g<parameters>'),
+            ('Quelle', 'Belege fehlen\\g<parameters>'),
+            ('Quellen', 'Belege fehlen\\g<parameters>'),
+            ('Quellen fehlen', 'Belege fehlen\\g<parameters>'),
         ],
     }
 }
@@ -281,7 +281,7 @@ class CosmeticChangesToolkit(object):
             result = method(text)
         except Exception as e:
             if self.ignore == CANCEL_METHOD:
-                pywikibot.warning(u'Unable to perform "{0}" on "{1}"!'.format(
+                pywikibot.warning('Unable to perform "{0}" on "{1}"!'.format(
                     method.__name__, self.title))
                 pywikibot.exception(e)
             else:
@@ -403,12 +403,12 @@ class CosmeticChangesToolkit(object):
                 if self.site.code in ('en', 'fr') \
                         and self.site.mw_version >= '1.14':
                     # do not change "Image" on en-wiki and fr-wiki
-                    assert u'Image' in namespaces
-                    namespaces.remove(u'Image')
+                    assert 'Image' in namespaces
+                    namespaces.remove('Image')
                 if self.site.code == 'hu':
                     # do not change "Kép" on hu-wiki
-                    assert u'Kép' in namespaces
-                    namespaces.remove(u'Kép')
+                    assert 'Kép' in namespaces
+                    namespaces.remove('Kép')
                 elif self.site.code == 'pt':
                     # use "Imagem" by default on pt-wiki (per T57242)
                     assert 'Imagem' in namespaces
@@ -422,7 +422,7 @@ class CosmeticChangesToolkit(object):
             # lowerspaced and underscored namespaces
             for i, item in enumerate(namespaces):
                 item = item.replace(' ', '[ _]')
-                item = u'[%s%s]' % (item[0], item[0].lower()) + item[1:]
+                item = '[%s%s]' % (item[0], item[0].lower()) + item[1:]
                 namespaces[i] = item
             namespaces.append(first_lower(final_ns))
             if final_ns and namespaces:
@@ -600,7 +600,7 @@ class CosmeticChangesToolkit(object):
                         # uppercase
                         if self.site.sitename == 'wikipedia:de':
                             titleWithSection = first_upper(titleWithSection)
-                        newLink = "[[%s|%s]]" % (titleWithSection, label)
+                        newLink = '[[%s|%s]]' % (titleWithSection, label)
                     # re-add spaces that were pulled out of the link.
                     # Examples:
                     #   text[[ title ]]text        -> text [[title]] text
@@ -922,12 +922,12 @@ class CosmeticChangesToolkit(object):
                                      site=self.site)
         # Solve wrong Nº sign with °C or °F
         # additional exception requested on fr-wiki for this stuff
-        pattern = re.compile(u'«.*?»', re.UNICODE)
+        pattern = re.compile('«.*?»', re.UNICODE)
         exceptions.append(pattern)
         text = textlib.replaceExcept(text, r'(\d)\s*(?:&nbsp;)?[º°]([CF])',
                                      r'\1&nbsp;°\2', exceptions,
                                      site=self.site)
-        text = textlib.replaceExcept(text, u'º([CF])', u'°' + r'\1',
+        text = textlib.replaceExcept(text, 'º([CF])', '°' + r'\1',
                                      exceptions,
                                      site=self.site)
         return text
@@ -955,15 +955,15 @@ class CosmeticChangesToolkit(object):
         # FIXME: use textlib.NON_LATIN_DIGITS
         # valid digits
         digits = {
-            'ckb': u'٠١٢٣٤٥٦٧٨٩',
-            'fa': u'۰۱۲۳۴۵۶۷۸۹',
+            'ckb': '٠١٢٣٤٥٦٧٨٩',
+            'fa': '۰۱۲۳۴۵۶۷۸۹',
         }
-        faChrs = u'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
+        faChrs = 'ءاآأإئؤبپتثجچحخدذرزژسشصضطظعغفقکگلمنوهیةيك' + digits['fa']
         new = digits.pop(self.site.code)
         # This only works if there are only two items in digits dict
         old = digits[list(digits.keys())[0]]
         # not to let bot edits in latin content
-        exceptions.append(re.compile(u"[^%(fa)s] *?\"*? *?, *?[^%(fa)s]"
+        exceptions.append(re.compile('[^%(fa)s] *?\"*? *?, *?[^%(fa)s]'
                                      % {'fa': faChrs}))
         text = textlib.replaceExcept(text, ',', '،', exceptions,
                                      site=self.site)
@@ -992,7 +992,7 @@ class CosmeticChangesToolkit(object):
         pattern = re.compile(r'\w+=(".+?"|\d+)', re.UNICODE)
         exceptions.append(pattern)
         # do not change digits inside html-tags
-        pattern = re.compile(u'<[/]*?[^</]+?[/]*?>', re.UNICODE)
+        pattern = re.compile('<[/]*?[^</]+?[/]*?>', re.UNICODE)
         exceptions.append(pattern)
         exceptions.append('table')  # exclude tables for now
         # replace digits
@@ -1016,18 +1016,18 @@ class CosmeticChangesToolkit(object):
         exceptions = ['comment', 'includeonly', 'math', 'noinclude', 'nowiki',
                       'pre', 'source', 'ref', 'timeline']
         text = textlib.replaceExcept(text,
-                                     r"([\r\n]|^)\=\= *Summary *\=\=",
-                                     r"\1== {{int:filedesc}} ==",
+                                     r'([\r\n]|^)\=\= *Summary *\=\=',
+                                     r'\1== {{int:filedesc}} ==',
                                      exceptions, True)
         text = textlib.replaceExcept(
             text,
-            r"([\r\n])\=\= *\[\[Commons:Copyright tags\|Licensing\]\]: *\=\=",
-            r"\1== {{int:license-header}} ==", exceptions, True)
+            r'([\r\n])\=\= *\[\[Commons:Copyright tags\|Licensing\]\]: *\=\=',
+            r'\1== {{int:license-header}} ==', exceptions, True)
         text = textlib.replaceExcept(
             text,
             r'([\r\n])'
             r'\=\= *(Licensing|License information|{{int:license}}) *\=\=',
-            r"\1== {{int:license-header}} ==", exceptions, True)
+            r'\1== {{int:license-header}} ==', exceptions, True)
 
         # frequent field values to {{int:}} versions
         text = textlib.replaceExcept(

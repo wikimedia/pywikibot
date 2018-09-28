@@ -46,14 +46,13 @@ class Hunk(object):
 
         @param a: sequence of lines
         @param b: sequence of lines
-        @param grouped_opcode: list of 5-tuples describing how to turn a into b.
-            it has the same format as returned by difflib.get_opcodes().
-
+        @param grouped_opcode: list of 5-tuples describing how to turn a into
+            b. It has the same format as returned by difflib.get_opcodes().
         """
         self.a = a
         self.b = b
         self.group = grouped_opcode
-        self.header = u''
+        self.header = ''
         self.colors = {
             '+': 'lightgreen',
             '-': 'lightred',
@@ -64,16 +63,16 @@ class Hunk(object):
         }
 
         self.diff = list(self.create_diff())
-        self.diff_plain_text = u''.join(self.diff)
-        self.diff_text = u''.join(self.format_diff())
+        self.diff_plain_text = ''.join(self.diff)
+        self.diff_text = ''.join(self.format_diff())
 
         first, last = self.group[0], self.group[-1]
         self.a_rng = (first[1], last[2])
         self.b_rng = (first[3], last[4])
 
         self.header = self.get_header()
-        self.diff_plain_text = u'%s\n%s' % (self.header, self.diff_plain_text)
-        self.diff_text = u'%s' % self.diff_text
+        self.diff_plain_text = '%s\n%s' % (self.header, self.diff_plain_text)
+        self.diff_text = '%s' % self.diff_text
 
         self.reviewed = self.PENDING
 
@@ -178,9 +177,11 @@ class Hunk(object):
             else:
                 return line
 
-        colored_line = u''
+        colored_line = ''
         color_closed = True
-        for char, char_ref in zip_longest(line, line_ref.strip(), fillvalue=' '):
+        for char, char_ref in zip_longest(
+            line, line_ref.strip(), fillvalue=' '
+        ):
             char_tagged = char
             if color_closed:
                 if char_ref != ' ':
@@ -208,7 +209,7 @@ class Hunk(object):
 
     def __str__(self):
         """Return the diff as plain text."""
-        return u''.join(self.diff_plain_text)
+        return ''.join(self.diff_plain_text)
 
     def __repr__(self):
         """Return a reconstructable representation."""
@@ -265,8 +266,8 @@ class PatchManager(object):
         @type text_b: basestring
         @param context: number of lines which are context
         @type context: int
-        @param by_letter: if text_a and text_b are single lines, comparison can be done
-            letter by letter.
+        @param by_letter: if text_a and text_b are single lines, comparison can
+            be done letter by letter.
         @type by_letter: bool
         @param replace_invisible: Replace invisible characters like U+200e with
             the charnumber in brackets (e.g. <200e>).
@@ -306,12 +307,12 @@ class PatchManager(object):
         self._replace_invisible = replace_invisible
 
     def get_blocks(self):
-        """Return list with blocks of indexes which compose a and, where applicable, b.
+        """Return list with blocks of indexes.
 
         Format of each block::
 
-            [-1, (i1, i2), (-1, -1)] -> block a[i1:i2] does not change from a to b
-                then is there is no corresponding hunk.
+            [-1, (i1, i2), (-1, -1)] -> block a[i1:i2] does not change from
+                a to b then is there is no corresponding hunk.
             [hunk index, (i1, i2), (j1, j2)] -> block a[i1:i2] becomes b[j1:j2]
         """
         blocks = []
@@ -350,9 +351,9 @@ class PatchManager(object):
             super_hunk = []
             super_hunks = [super_hunk]
             for hunk in hunks:
-                # self.context * 2, because if self.context is 2 the hunks would be
-                # directly adjacent when 4 lines in between and for anything
-                # below 4 they share lines.
+                # self.context * 2, because if self.context is 2 the hunks
+                # would be directly adjacent when 4 lines in between and for
+                # anything below 4 they share lines.
                 # not super_hunk == first hunk as any other super_hunk is
                 # created with one hunk
                 if (not super_hunk or
@@ -368,10 +369,12 @@ class PatchManager(object):
 
     def _get_context_range(self, super_hunk):
         """Dynamically determine context range for a super hunk."""
-        return ((super_hunk.a_rng[0] - min(super_hunk.pre_context, self.context),
-                 super_hunk.a_rng[1] + min(super_hunk.post_context, self.context)),
-                (super_hunk.b_rng[0] - min(super_hunk.pre_context, self.context),
-                 super_hunk.b_rng[1] + min(super_hunk.post_context, self.context)))
+        a0, a1 = super_hunk.a_rng
+        b0, b1 = super_hunk.b_rng
+        return ((a0 - min(super_hunk.pre_context, self.context),
+                 a1 + min(super_hunk.post_context, self.context)),
+                (b0 - min(super_hunk.pre_context, self.context),
+                 b1 + min(super_hunk.post_context, self.context)))
 
     def _generate_diff(self, hunks):
         """Generate a diff text for the given hunks."""
@@ -410,11 +413,13 @@ class PatchManager(object):
                     'n': 'do not accept this hunk',
                     'q': 'do not accept this hunk and quit reviewing',
                     'a': 'accept this hunk and all other pending',
-                    'd': 'do not apply this hunk or any of the later hunks in the file',
+                    'd': 'do not apply this hunk or any of the later hunks in '
+                         'the file',
                     'g': 'select a hunk to go to',
                     'j': 'leave this hunk undecided, see next undecided hunk',
                     'J': 'leave this hunk undecided, see next hunk',
-                    'k': 'leave this hunk undecided, see previous undecided hunk',
+                    'k': 'leave this hunk undecided, see previous undecided '
+                         'hunk',
                     'K': 'leave this hunk undecided, see previous hunk',
                     's': 'split this hunk into smaller ones',
                     '?': 'help',
@@ -452,7 +457,8 @@ class PatchManager(object):
                 choice = '?'
 
             if choice == 'y' or choice == 'n':
-                super_hunk.reviewed = Hunk.APPR if choice == 'y' else Hunk.NOT_APPR
+                super_hunk.reviewed = \
+                    Hunk.APPR if choice == 'y' else Hunk.NOT_APPR
                 if next_pending is not None:
                     position = next_pending
                 else:
@@ -466,7 +472,8 @@ class PatchManager(object):
                 for super_hunk in super_hunks[position:]:
                     for hunk in super_hunk:
                         if hunk.reviewed == Hunk.PENDING:
-                            hunk.reviewed = Hunk.APPR if choice == 'a' else Hunk.NOT_APPR
+                            hunk.reviewed = \
+                                Hunk.APPR if choice == 'a' else Hunk.NOT_APPR
                 position = find_pending(0, position)
             elif choice == 'g':
                 hunk_list = []
@@ -480,7 +487,7 @@ class PatchManager(object):
                         status = '-'
                     else:
                         assert False, "The super hunk's review status is " \
-                                      "unknown."
+                                      'unknown.'
                     if super_hunk[0].a_rng[1] - super_hunk[0].a_rng[0] > 0:
                         mode = '-'
                         first = self.a[super_hunk[0].a_rng[0]]
@@ -501,7 +508,8 @@ class PatchManager(object):
                 # if-condition following this block)
                 hunk_list = ''.join(
                     line_template.format(
-                        '*' if hunk_entry[1] == position + 1 else ' ', *hunk_entry)
+                        '*' if hunk_entry[1] == position + 1 else
+                        ' ', *hunk_entry)
                     for hunk_entry in hunk_list)
                 if hunk_list.endswith('\n'):
                     hunk_list = hunk_list[:-1]
@@ -515,7 +523,8 @@ class PatchManager(object):
                         0 <= next_hunk_position < len(super_hunks)):
                     position = next_hunk_position
                 elif next_hunk:  # nothing entered is silently ignored
-                    pywikibot.error('Invalid hunk number "{0}"'.format(next_hunk))
+                    pywikibot.error(
+                        'Invalid hunk number "{0}"'.format(next_hunk))
             elif choice == 'j':
                 position = next_pending
             elif choice == 'J':
@@ -528,7 +537,8 @@ class PatchManager(object):
                 super_hunks = (super_hunks[:position] +
                                super_hunks[position].split() +
                                super_hunks[position + 1:])
-                pywikibot.output('Split into {0} hunks'.format(len(super_hunk._hunks)))
+                pywikibot.output(
+                    'Split into {0} hunks'.format(len(super_hunk._hunks)))
             elif choice == '?':
                 pywikibot.output(color_format(
                     '{purple}{0}{default}', '\n'.join(
@@ -540,8 +550,8 @@ class PatchManager(object):
     def apply(self):
         """Apply changes. If there are undecided changes, ask to review."""
         if any(h.reviewed == h.PENDING for h in self.hunks):
-            pywikibot.output("There are unreviewed hunks.\n"
-                             "Please review them before proceeding.\n")
+            pywikibot.output('There are unreviewed hunks.\n'
+                             'Please review them before proceeding.\n')
             self.review_hunks()
 
         l_text = []
@@ -559,7 +569,7 @@ class PatchManager(object):
 
         # Make a sanity check in case all are approved.
         if all(h.reviewed == h.APPR for h in self.hunks):
-            assert u''.join(l_text) == u''.join(self.b)
+            assert ''.join(l_text) == ''.join(self.b)
         return l_text
 
 

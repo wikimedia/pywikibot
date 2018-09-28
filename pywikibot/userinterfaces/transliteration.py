@@ -1113,7 +1113,7 @@ class transliterator(object):
             trans[char] = value
         self.trans = trans
 
-    def transliterate(self, char, default="?", prev="-", next="-"):
+    def transliterate(self, char, default='?', prev='-', next='-'):
         """
         Transliterate the character.
 
@@ -1141,7 +1141,7 @@ class transliterator(object):
         # Lao
         if char == 'ຫ':
             if next in 'ງຍນຣລຼຼວ':
-                return ""
+                return ''
             else:
                 return 'h'
         return default

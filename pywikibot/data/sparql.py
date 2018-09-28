@@ -272,7 +272,7 @@ class Bnode(SparqlNode):
 
     @py2_encode_utf_8
     def __repr__(self):
-        return "_:" + self.value
+        return '_:' + self.value
 
 
 VALUE_TYPES = {'uri': URI, 'literal': Literal, 'bnode': Bnode}

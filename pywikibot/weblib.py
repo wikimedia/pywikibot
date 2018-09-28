@@ -36,7 +36,7 @@ def getInternetArchiveURL(url, timestamp=None):
         moment is returned. Format: YYYYMMDDhhmmss or part thereof.
 
     """
-    uri = u'https://archive.org/wayback/available?'
+    uri = 'https://archive.org/wayback/available?'
 
     query = {'url': url}
 
@@ -57,7 +57,7 @@ def getInternetArchiveURL(url, timestamp=None):
     else:
         raise error
 
-    if "closest" in jsontext:
+    if 'closest' in jsontext:
         data = json.loads(jsontext)
         return data['archived_snapshots']['closest']['url']
     else:
@@ -76,7 +76,7 @@ def getWebCitationURL(url, timestamp=None):
         moment is returned. Format: YYYYMMDDhhmmss or part thereof.
 
     """
-    uri = u'http://www.webcitation.org/query?'
+    uri = 'http://www.webcitation.org/query?'
 
     query = {'returnxml': 'true',
              'url': url}
@@ -86,7 +86,7 @@ def getWebCitationURL(url, timestamp=None):
 
     uri = uri + urlencode(query)
     xmltext = http.fetch(uri).text
-    if "success" in xmltext:
+    if 'success' in xmltext:
         data = ET.fromstring(xmltext)
         return data.find('.//webcite_url').text
     else:

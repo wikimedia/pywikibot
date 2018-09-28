@@ -16,7 +16,7 @@ from pywikibot.tools import deprecated, classproperty
 if sys.version_info[0] > 2:
     basestring = (str, )
 
-_logger = "wiki"
+_logger = 'wiki'
 
 
 class LogDict(dict):
@@ -32,7 +32,7 @@ class LogDict(dict):
 
     def __missing__(self, key):
         """Debug when the key is missing."""
-        pywikibot.debug(u"API log entry received:\n" + repr(self),
+        pywikibot.debug('API log entry received:\n' + repr(self),
                         _logger)
         if ((key in ('ns', 'title', 'pageid', 'logpage', 'params', 'action')
              and 'actionhidden' in self)
@@ -57,9 +57,10 @@ class LogEntry(object):
         """Initialize object from a logevent dict returned by MW API."""
         self.data = LogDict(apidata)
         self.site = site
-        if self._expectedType is not None and self._expectedType != self.type():
-            raise Error("Wrong log type! Expecting %s, received %s instead."
-                        % (self._expectedType, self.type()))
+        expected_type = self._expectedType
+        if expected_type is not None and expected_type != self.type():
+            raise Error('Wrong log type! Expecting %s, received %s instead.'
+                        % (expected_type, self.type()))
         self.data._type = self.type()
 
     def __repr__(self):
@@ -276,16 +277,18 @@ class RightsEntry(LogEntry):
     @property
     def oldgroups(self):
         """Return old rights groups."""
-        if 'old' in self._params:  # old mw style
-            return self._params['old'].split(',') if self._params['old'] else []
-        return self._params['oldgroups']
+        params = self._params
+        if 'old' in params:  # old mw style
+            return params['old'].split(',') if params['old'] else []
+        return params['oldgroups']
 
     @property
     def newgroups(self):
         """Return new rights groups."""
-        if 'new' in self._params:  # old mw style
-            return self._params['new'].split(',') if self._params['new'] else []
-        return self._params['newgroups']
+        params = self._params
+        if 'new' in params:  # old mw style
+            return params['new'].split(',') if params['new'] else []
+        return params['newgroups']
 
 
 class UploadEntry(LogEntry):

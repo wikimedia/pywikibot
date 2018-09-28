@@ -90,7 +90,7 @@ class WikiStats(object):
         self._raw = {}
         self._data = {}
 
-    def fetch(self, table, format="xml"):
+    def fetch(self, table, format='xml'):
         """
         Fetch data from WikiStats.
 

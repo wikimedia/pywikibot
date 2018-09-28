@@ -11,7 +11,7 @@ import os.path
 
 from pywikibot import config
 
-parameter_help = u"""
+parameter_help = """
                   Currently available predefined fixes are:
 
                   * HTML        - Convert HTML tags to wiki syntax, and
@@ -93,7 +93,7 @@ fixes = {
     'grammar-de': {
         'regex': True,
         'msg': {
-            'de': u'Bot: korrigiere Grammatik',
+            'de': 'Bot: korrigiere Grammatik',
         },
         'replacements': [
             #   (u'([Ss]owohl) ([^,\.]+?), als auch', r'\1 \2 als auch'),
@@ -281,7 +281,7 @@ fixes = {
     'case-de': {  # German upper / lower case issues
         'regex': True,
         'msg': {
-            'de': u'Bot: Korrigiere Groß-/Kleinschreibung',
+            'de': 'Bot: Korrigiere Groß-/Kleinschreibung',
         },
         'replacements': [
             (r'\batlantische(r|n|) Ozean', r'Atlantische\1 Ozean'),
@@ -319,7 +319,7 @@ fixes = {
     'vonbis': {
         'regex': True,
         'msg': {
-            'de': u'Bot: Ersetze Binde-/Gedankenstrich durch "bis"',
+            'de': 'Bot: Ersetze Binde-/Gedankenstrich durch "bis"',
         },
         'replacements': [
             # Bindestrich, Gedankenstrich, Geviertstrich
@@ -333,14 +333,14 @@ fixes = {
     'music': {
         'regex': False,
         'msg': {
-            'de': u'Bot: korrigiere Links auf Begriffsklärungen',
+            'de': 'Bot: korrigiere Links auf Begriffsklärungen',
         },
         'replacements': [
-            (u'[[CD]]', u'[[Audio-CD|CD]]'),
-            (u'[[LP]]', u'[[Langspielplatte|LP]]'),
-            (u'[[EP]]', u'[[Extended Play|EP]]'),
-            (u'[[MC]]', u'[[Musikkassette|MC]]'),
-            (u'[[Single]]', u'[[Single (Musik)|Single]]'),
+            ('[[CD]]', '[[Audio-CD|CD]]'),
+            ('[[LP]]', '[[Langspielplatte|LP]]'),
+            ('[[EP]]', '[[Extended Play|EP]]'),
+            ('[[MC]]', '[[Musikkassette|MC]]'),
+            ('[[Single]]', '[[Single (Musik)|Single]]'),
         ],
         'exceptions': {
             'inside-tags': [
@@ -354,7 +354,7 @@ fixes = {
     'datum': {
         'regex': True,
         'msg': {
-            'de': u'Bot: Korrigiere Datumsformat',
+            'de': 'Bot: Korrigiere Datumsformat',
         },
         'replacements': [
             # space after birth sign w/ year
@@ -446,7 +446,7 @@ fixes = {
     'correct-ar': {
         'regex': True,
         'msg': {
-            'ar': u'تدقيق إملائي',
+            'ar': 'تدقيق إملائي',
         },
         'replacements': [
             # FIXME: Do not replace comma in non-Arabic text,
@@ -546,9 +546,11 @@ fixes = {
             (r'\b(ال|)ا(سرائيل|يران|مارات|نكليز|نجليز)'
              r'(ي|ية|يتان|يان|يين|يي|يون|يو|يات|)\b',
              r'\1إ\2\3'),
-            (r'\b(ال|)(ا|أ)(رثوذكس|رثوذوكس)(ي|ية|يتان|يان|يين|يي|يون|يو|يات|)\b',
+            (r'\b(ال|)(ا|أ)(رثوذكس|رثوذوكس)(ي|ية|يتان|يان|يين|يي|يون|يو|يات|)'
+             r'\b',
              r'\1أرثوذكس\4'),
-            (r'\bإست(عمل|خدم|مر|مد|مال|عاض|قام|حال|جاب|قال|زاد|عان|طال)(ت|ا|وا|)\b',
+            (r'\bإست(عمل|خدم|مر|مد|مال|عاض|قام|حال|جاب|قال|زاد|عان|طال)'
+             r'(ت|ا|وا|)\b',
              r'است\1\2'),
             (r'\bإست(حال|قال|طال|زاد|عان|قام|راح|جاب|عاض|مال)ة\b', r'است\1ة'),
         ],
@@ -564,28 +566,28 @@ fixes = {
     'specialpages': {
         'regex': False,
         'msg': {
-            'en': u'Robot: Fixing special page capitalisation',
-            'fa': u'ربات: تصحیح بزرگی و کوچکی حروف صفحه‌های ویژه',
+            'en': 'Robot: Fixing special page capitalisation',
+            'fa': 'ربات: تصحیح بزرگی و کوچکی حروف صفحه‌های ویژه',
         },
         'replacements': [
-            (u'Special:Allpages',        u'Special:AllPages'),
-            (u'Special:Blockip',         u'Special:BlockIP'),
-            (u'Special:Blankpage',       u'Special:BlankPage'),
-            (u'Special:Filepath',        u'Special:FilePath'),
-            (u'Special:Globalusers',     u'Special:GlobalUsers'),
-            (u'Special:Imagelist',       u'Special:ImageList'),
-            (u'Special:Ipblocklist',     u'Special:IPBlockList'),
-            (u'Special:Listgrouprights', u'Special:ListGroupRights'),
-            (u'Special:Listusers',       u'Special:ListUsers'),
-            (u'Special:Newimages',       u'Special:NewImages'),
-            (u'Special:Prefixindex',     u'Special:PrefixIndex'),
-            (u'Special:Protectedpages',  u'Special:ProtectedPages'),
-            (u'Special:Recentchanges',   u'Special:RecentChanges'),
-            (u'Special:Specialpages',    u'Special:SpecialPages'),
-            (u'Special:Unlockdb',        u'Special:UnlockDB'),
-            (u'Special:Userlogin',       u'Special:UserLogin'),
-            (u'Special:Userlogout',      u'Special:UserLogout'),
-            (u'Special:Whatlinkshere',   u'Special:WhatLinksHere'),
+            ('Special:Allpages',        'Special:AllPages'),
+            ('Special:Blockip',         'Special:BlockIP'),
+            ('Special:Blankpage',       'Special:BlankPage'),
+            ('Special:Filepath',        'Special:FilePath'),
+            ('Special:Globalusers',     'Special:GlobalUsers'),
+            ('Special:Imagelist',       'Special:ImageList'),
+            ('Special:Ipblocklist',     'Special:IPBlockList'),
+            ('Special:Listgrouprights', 'Special:ListGroupRights'),
+            ('Special:Listusers',       'Special:ListUsers'),
+            ('Special:Newimages',       'Special:NewImages'),
+            ('Special:Prefixindex',     'Special:PrefixIndex'),
+            ('Special:Protectedpages',  'Special:ProtectedPages'),
+            ('Special:Recentchanges',   'Special:RecentChanges'),
+            ('Special:Specialpages',    'Special:SpecialPages'),
+            ('Special:Unlockdb',        'Special:UnlockDB'),
+            ('Special:Userlogin',       'Special:UserLogin'),
+            ('Special:Userlogout',      'Special:UserLogout'),
+            ('Special:Whatlinkshere',   'Special:WhatLinksHere'),
         ],
     },
     # yu top-level domain will soon be disabled, see
@@ -595,58 +597,58 @@ fixes = {
         'regex': False,
         'nocase': True,
         'msg': {
-            'de':  u'Bot: Ersetze Links auf .yu-Domains',
-            'en':  u'Robot: Replacing links to .yu domains',
-            'fa':  u'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',
+            'de':  'Bot: Ersetze Links auf .yu-Domains',
+            'en':  'Robot: Replacing links to .yu domains',
+            'fa':  'ربات: جایگزینی پیوندها به دامنه‌ها با پسوند yu',
             'fr':  ('Robot: Correction des liens pointant vers le domaine '
                     '.yu, qui expire en 2009'),
-            'ksh': u'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
+            'ksh': 'Bot: de ahle .yu-Domains loufe us, dröm ußjetuusch',
             'sr': 'Бот: Исправљање линкова ка .yu домену',
         },
         'replacements': [
-            (u'www.budva.cg.yu',             u'www.budva.rs'),
-            (u'spc.org.yu',                  u'spc.rs'),
-            (u'www.oks.org.yu',              u'www.oks.org.rs'),
-            (u'www.kikinda.org.yu',          u'www.kikinda.rs'),
-            (u'www.ds.org.yu',               u'www.ds.org.rs'),
-            (u'www.nbs.yu',                  u'www.nbs.rs'),
-            (u'www.serbia.sr.gov.yu',        u'www.srbija.gov.rs'),
-            (u'eunet.yu',                    u'eunet.rs'),
-            (u'www.zastava-arms.co.yu',      u'www.zastava-arms.co.rs'),
-            (u'www.airportnis.co.yu',        u'www.airportnis.rs'),
+            ('www.budva.cg.yu',             'www.budva.rs'),
+            ('spc.org.yu',                  'spc.rs'),
+            ('www.oks.org.yu',              'www.oks.org.rs'),
+            ('www.kikinda.org.yu',          'www.kikinda.rs'),
+            ('www.ds.org.yu',               'www.ds.org.rs'),
+            ('www.nbs.yu',                  'www.nbs.rs'),
+            ('www.serbia.sr.gov.yu',        'www.srbija.gov.rs'),
+            ('eunet.yu',                    'eunet.rs'),
+            ('www.zastava-arms.co.yu',      'www.zastava-arms.co.rs'),
+            ('www.airportnis.co.yu',        'www.airportnis.rs'),
             # Archive links don't seem to work
             # (u'www.danas.co.yu',             u'www.danas.rs'),
-            (u'www.belex.co.yu',             u'www.belex.rs'),
-            (u'beograd.org.yu',              u'beograd.rs'),
-            (u'www.vlada.cg.yu',             u'www.vlada.me'),
-            (u'webrzs.statserb.sr.gov.yu',   u'webrzs.stat.gov.rs'),
-            (u'www.statserb.sr.gov.yu',      u'webrzs.stat.gov.rs'),
-            (u'www.rastko.org.yu',           u'www.rastko.org.rs'),
-            (u'www.reprezentacija.co.yu',    u'www.reprezentacija.rs'),
-            (u'www.blic.co.yu',              u'www.blic.co.rs'),
-            (u'www.beograd.org.yu',          u'www.beograd.org.rs'),
-            (u'arhiva.glas-javnosti.co.yu',  u'arhiva.glas-javnosti.rs'),
-            (u'www.srpsko-nasledje.co.yu',   u'www.srpsko-nasledje.co.rs'),
-            (u'www.dnevnik.co.yu',           u'www.dnevnik.rs'),
-            (u'www.srbija.sr.gov.yu',        u'www.srbija.gov.rs'),
-            (u'www.kurir-info.co.yu/Arhiva', u'arhiva.kurir-info.rs/Arhiva'),
-            (u'www.kurir-info.co.yu/arhiva', u'arhiva.kurir-info.rs/arhiva'),
-            (u'www.kurir-info.co.yu',        u'www.kurir-info.rs'),
-            (u'arhiva.kurir-info.co.yu',     u'arhiva.kurir-info.rs'),
-            (u'www.prvaliga.co.yu',          u'www.prvaliga.rs'),
-            (u'www.mitropolija.cg.yu',       u'www.mitropolija.me'),
-            (u'www.spc.yu/sr',               u'www.spc.rs/sr'),
-            (u'www.sk.co.yu',                u'www.sk.co.rs'),
-            (u'www.ekoforum.org.yu',         u'www.ekoforum.org'),
-            (u'www.svevlad.org.yu',          u'www.svevlad.org.rs'),
-            (u'www.posta.co.yu',             u'www.posta.rs'),
-            (u'www.glas-javnosti.co.yu',     u'www.glas-javnosti.rs'),
-            (u'www.fscg.cg.yu',              u'www.fscg.co.me'),
-            (u'ww1.rts.co.yu/euro',          u'ww1.rts.co.rs/euro'),
-            (u'www.rtv.co.yu',               u'www.rtv.rs'),
-            (u'www.politika.co.yu',          u'www.politika.rs'),
-            (u'www.mfa.gov.yu',              u'www.mfa.gov.rs'),
-            (u'www.drzavnauprava.sr.gov.yu', u'www.drzavnauprava.gov.rs'),
+            ('www.belex.co.yu',             'www.belex.rs'),
+            ('beograd.org.yu',              'beograd.rs'),
+            ('www.vlada.cg.yu',             'www.vlada.me'),
+            ('webrzs.statserb.sr.gov.yu',   'webrzs.stat.gov.rs'),
+            ('www.statserb.sr.gov.yu',      'webrzs.stat.gov.rs'),
+            ('www.rastko.org.yu',           'www.rastko.org.rs'),
+            ('www.reprezentacija.co.yu',    'www.reprezentacija.rs'),
+            ('www.blic.co.yu',              'www.blic.co.rs'),
+            ('www.beograd.org.yu',          'www.beograd.org.rs'),
+            ('arhiva.glas-javnosti.co.yu',  'arhiva.glas-javnosti.rs'),
+            ('www.srpsko-nasledje.co.yu',   'www.srpsko-nasledje.co.rs'),
+            ('www.dnevnik.co.yu',           'www.dnevnik.rs'),
+            ('www.srbija.sr.gov.yu',        'www.srbija.gov.rs'),
+            ('www.kurir-info.co.yu/Arhiva', 'arhiva.kurir-info.rs/Arhiva'),
+            ('www.kurir-info.co.yu/arhiva', 'arhiva.kurir-info.rs/arhiva'),
+            ('www.kurir-info.co.yu',        'www.kurir-info.rs'),
+            ('arhiva.kurir-info.co.yu',     'arhiva.kurir-info.rs'),
+            ('www.prvaliga.co.yu',          'www.prvaliga.rs'),
+            ('www.mitropolija.cg.yu',       'www.mitropolija.me'),
+            ('www.spc.yu/sr',               'www.spc.rs/sr'),
+            ('www.sk.co.yu',                'www.sk.co.rs'),
+            ('www.ekoforum.org.yu',         'www.ekoforum.org'),
+            ('www.svevlad.org.yu',          'www.svevlad.org.rs'),
+            ('www.posta.co.yu',             'www.posta.rs'),
+            ('www.glas-javnosti.co.yu',     'www.glas-javnosti.rs'),
+            ('www.fscg.cg.yu',              'www.fscg.co.me'),
+            ('ww1.rts.co.yu/euro',          'ww1.rts.co.rs/euro'),
+            ('www.rtv.co.yu',               'www.rtv.rs'),
+            ('www.politika.co.yu',          'www.politika.rs'),
+            ('www.mfa.gov.yu',              'www.mfa.gov.rs'),
+            ('www.drzavnauprava.sr.gov.yu', 'www.drzavnauprava.gov.rs'),
         ],
     },
     # These replacements will convert HTML tag from FCK-editor to wiki syntax.

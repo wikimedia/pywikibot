@@ -90,7 +90,7 @@ else:
     from urllib import urlencode, unquote
     from email.mime.multipart import MIMEMultipart
 
-_logger = "data.api"
+_logger = 'data.api'
 
 lagpattern = re.compile(
     r'Waiting for [\w.: ]+: (?P<lag>\d+)(?:\.\d+)? seconds? lagged')
@@ -354,7 +354,7 @@ class ParamInfo(Container):
             'helpurls': [],
             'parameters': [
                 {
-                    "name": "action",
+                    'name': 'action',
                     'type': action_modules,
                     'submodules': '',
                 },
@@ -1118,8 +1118,8 @@ class OptionSet(MutableMapping):
             invalid_names = ((self._enabled - self._valid_enable) |
                              (self._disabled - self._valid_disable))
             if invalid_names:
-                raise KeyError(u'OptionSet already contains invalid name(s) '
-                               u'"{0}"'.format('", "'.join(invalid_names)))
+                raise KeyError('OptionSet already contains invalid name(s) '
+                               '"{0}"'.format('", "'.join(invalid_names)))
         self._site_set = True
 
     def from_dict(self, dict):
@@ -1147,14 +1147,14 @@ class OptionSet(MutableMapping):
             elif value is None:
                 removed.add(name)
             else:
-                raise ValueError(u'Dict contains invalid value "{0}"'.format(
+                raise ValueError('Dict contains invalid value "{0}"'.format(
                     value))
         invalid_names = (
             (enabled - self._valid_enable) | (disabled - self._valid_disable) |
             (removed - self._valid_enable - self._valid_disable)
         )
         if invalid_names and self._site_set:
-            raise ValueError(u'Dict contains invalid name(s) "{0}"'.format(
+            raise ValueError('Dict contains invalid name(s) "{0}"'.format(
                 '", "'.join(invalid_names)))
         self._enabled = enabled | (self._enabled - disabled - removed)
         self._disabled = disabled | (self._disabled - enabled - removed)
@@ -1168,22 +1168,22 @@ class OptionSet(MutableMapping):
         """Set option to enabled, disabled or neither."""
         if value is True:
             if self._site_set and name not in self._valid_enable:
-                raise KeyError(u'Invalid name "{0}"'.format(name))
+                raise KeyError('Invalid name "{0}"'.format(name))
             self._enabled.add(name)
             self._disabled.discard(name)
         elif value is False:
             if self._site_set and name not in self._valid_disable:
-                raise KeyError(u'Invalid name "{0}"'.format(name))
+                raise KeyError('Invalid name "{0}"'.format(name))
             self._disabled.add(name)
             self._enabled.discard(name)
         elif value is None:
             if self._site_set and (name not in self._valid_enable or
                                    name not in self._valid_disable):
-                raise KeyError(u'Invalid name "{0}"'.format(name))
+                raise KeyError('Invalid name "{0}"'.format(name))
             self._enabled.discard(name)
             self._disabled.discard(name)
         else:
-            raise ValueError(u'Invalid value "{0}"'.format(value))
+            raise ValueError('Invalid value "{0}"'.format(value))
 
     def __getitem__(self, name):
         """
@@ -1203,7 +1203,7 @@ class OptionSet(MutableMapping):
                 name in self._valid_disable):
             return None
         else:
-            raise KeyError(u'Invalid name "{0}"'.format(name))
+            raise KeyError('Invalid name "{0}"'.format(name))
 
     def __delitem__(self, name):
         """Remove the item by setting it to None."""
@@ -1409,7 +1409,7 @@ class Request(MutableMapping):
         elif parameters is self._PARAM_DEFAULT:
             parameters = {}
         self._params = {}
-        if "action" not in parameters:
+        if 'action' not in parameters:
             raise ValueError("'action' specification missing from Request.")
         self.action = parameters['action']
         self.update(parameters)  # also convert all parameter values to lists
@@ -1418,33 +1418,33 @@ class Request(MutableMapping):
         # things like throttling or skipping actions when we're in simulation
         # mode
         self.write = self.action in (
-            "edit", "move", "rollback", "delete", "undelete",
-            "protect", "block", "unblock", "watch", "patrol",
-            "import", "userrights", "upload", "emailuser",
-            "createaccount", "setnotificationtimestamp",
-            "filerevert", "options", "purge", "revisiondelete",
-            "wbeditentity", "wbsetlabel", "wbsetdescription",
-            "wbsetaliases", "wblinktitles", "wbsetsitelink",
-            "wbcreateclaim", "wbremoveclaims", "wbsetclaimvalue",
-            "wbsetreference", "wbremovereferences", "wbsetclaim",
+            'edit', 'move', 'rollback', 'delete', 'undelete',
+            'protect', 'block', 'unblock', 'watch', 'patrol',
+            'import', 'userrights', 'upload', 'emailuser',
+            'createaccount', 'setnotificationtimestamp',
+            'filerevert', 'options', 'purge', 'revisiondelete',
+            'wbeditentity', 'wbsetlabel', 'wbsetdescription',
+            'wbsetaliases', 'wblinktitles', 'wbsetsitelink',
+            'wbcreateclaim', 'wbremoveclaims', 'wbsetclaimvalue',
+            'wbsetreference', 'wbremovereferences', 'wbsetclaim',
             'wbcreateredirect',
             'thank', 'flowthank'
         )
         # Client side verification that the request is being performed
         # by a logged in user, and warn if it isn't a config username.
         if self.write:
-            if not hasattr(self.site, "_userinfo"):
-                raise Error(u"API write action attempted without userinfo")
+            if not hasattr(self.site, '_userinfo'):
+                raise Error('API write action attempted without userinfo')
             assert('name' in self.site._userinfo)
 
             if ip.is_IP(self.site._userinfo['name']):
-                raise Error(u"API write action attempted as IP %r"
+                raise Error('API write action attempted as IP %r'
                             % self.site._userinfo['name'])
 
             if not self.site.user():
                 pywikibot.warning(
-                    u"API write action by unexpected username commenced.\n"
-                    u"userinfo: %r" % self.site._userinfo)
+                    'API write action by unexpected username commenced.\n'
+                    'userinfo: %r' % self.site._userinfo)
 
         # MediaWiki 1.23 allows assertion for any action,
         # whereas earlier WMF wikis and others used an extension which
@@ -1460,8 +1460,8 @@ class Request(MutableMapping):
         if (self.write and self.site.mw_version >= '1.23'
             or self.action == 'edit'
                 and self.site.has_extension('AssertEdit')):
-            pywikibot.debug(u"Adding user assertion", _logger)
-            self["assert"] = 'user'  # make sure user is logged in
+            pywikibot.debug('Adding user assertion', _logger)
+            self['assert'] = 'user'  # make sure user is logged in
 
         if (self.site.protocol() == 'http' and (config.use_SSL_always or (
                 self.action == 'login' and config.use_SSL_onlogin))
@@ -1589,7 +1589,7 @@ class Request(MutableMapping):
             value = value.decode(self.site.encoding())
 
         if isinstance(value, unicode):
-            value = value.split("|")
+            value = value.split('|')
 
         if hasattr(value, 'api_iter'):
             self._params[key] = value
@@ -1671,7 +1671,7 @@ class Request(MutableMapping):
                              'same keys.')
 
         if self.action == 'query':
-            meta = self._params.get("meta", [])
+            meta = self._params.get('meta', [])
             # Special logic for private wikis (T153903).
             # If the wiki requires login privileges to read articles, pywikibot
             # will be blocked from accessing the userinfo.
@@ -1682,8 +1682,8 @@ class Request(MutableMapping):
                 if 'userinfo' not in meta:
                     meta = set(meta + ['userinfo'])
                     self._params['meta'] = sorted(meta)
-                uiprop = self._params.get("uiprop", [])
-                uiprop = set(uiprop + ["blockinfo", "hasmsg"])
+                uiprop = self._params.get('uiprop', [])
+                uiprop = set(uiprop + ['blockinfo', 'hasmsg'])
                 self._params['uiprop'] = sorted(uiprop)
             if 'prop' in self._params:
                 if self.site.has_extension('ProofreadPage'):
@@ -1702,11 +1702,11 @@ class Request(MutableMapping):
                 > MediaWikiVersion('1.24')):
             self._params['wrap'] = ['']
 
-        if "maxlag" not in self._params and config.maxlag:
-            self._params["maxlag"] = [str(config.maxlag)]
-        if "format" not in self._params:
-            self._params["format"] = ["json"]
-        elif self._params['format'] != ["json"]:
+        if 'maxlag' not in self._params and config.maxlag:
+            self._params['maxlag'] = [str(config.maxlag)]
+        if 'format' not in self._params:
+            self._params['format'] = ['json']
+        elif self._params['format'] != ['json']:
             raise TypeError("Query format '%s' cannot be parsed."
                             % self._params['format'])
 
@@ -1741,7 +1741,7 @@ class Request(MutableMapping):
                         # False and None are not included in the http URI
                         continue
                 iterator = iter(values)
-            value = u'|'.join(self._format_value(value) for value in iterator)
+            value = '|'.join(self._format_value(value) for value in iterator)
             # If the value is encodable as ascii, do not encode it.
             # This means that any value which can be encoded as ascii
             # is presumed to be ascii, and servers using a site encoding
@@ -1757,8 +1757,8 @@ class Request(MutableMapping):
                     value = value.encode(self.site.encoding())
                 except Exception:
                     pywikibot.error(
-                        u"_encoded_items: '%s' could not be encoded as '%s':"
-                        u" %r" % (key, self.site.encoding(), value))
+                        "_encoded_items: '%s' could not be encoded as '%s':"
+                        ' %r' % (key, self.site.encoding(), value))
             if PY2:
                 key = key.encode('ascii')
             else:
@@ -1801,22 +1801,22 @@ class Request(MutableMapping):
             return {action: {'result': 'Success', 'nochange': ''}}
 
     def _is_wikibase_error_retryable(self, error):
-        ERR_MSG = u'edit-already-exists'
-        messages = error.pop("messages", None)
+        ERR_MSG = 'edit-already-exists'
+        messages = error.pop('messages', None)
         # bug T68619; after Wikibase breaking change 1ca9cee change we have a
         # list of messages
         if isinstance(messages, list):
             for item in messages:
-                message = item["name"]
+                message = item['name']
                 if message == ERR_MSG:
                     break
             else:  # no break
                 message = None
         elif isinstance(messages, dict):
             try:  # behaviour before gerrit 124323 braking change
-                message = messages["0"]["name"]
+                message = messages['0']['name']
             except KeyError:  # unsure the new output is always a list
-                message = messages["name"]
+                message = messages['name']
         else:
             message = None
         return message == ERR_MSG
@@ -1825,18 +1825,18 @@ class Request(MutableMapping):
     def _generate_MIME_part(key, content, keytype=None, headers=None):
         if not keytype:
             try:
-                content.encode("ascii")
-                keytype = ("text", "plain")
+                content.encode('ascii')
+                keytype = ('text', 'plain')
             except (UnicodeError, AttributeError):
-                keytype = ("application", "octet-stream")
+                keytype = ('application', 'octet-stream')
         submsg = MIMENonMultipart(*keytype)
         content_headers = {'name': key}
         if headers:
             content_headers.update(headers)
-        submsg.add_header("Content-disposition", "form-data",
+        submsg.add_header('Content-disposition', 'form-data',
                           **content_headers)
 
-        if keytype != ("text", "plain"):
+        if keytype != ('text', 'plain'):
             submsg['Content-Transfer-Encoding'] = 'binary'
 
         submsg.set_payload(content)
@@ -2031,7 +2031,7 @@ class Request(MutableMapping):
                     text = warning['html']['*']
                 else:
                     pywikibot.warning(
-                        u'API warning ({0}) of unknown format: {1}'.
+                        'API warning ({0}) of unknown format: {1}'.
                         format(mod, warning))
                     continue
                 # multiple warnings are in text separated by a newline
@@ -2189,7 +2189,7 @@ class Request(MutableMapping):
 
             self._handle_warnings(result)
 
-            if "error" not in result:
+            if 'error' not in result:
                 return result
 
             error = result['error'].copy()
@@ -2201,16 +2201,16 @@ class Request(MutableMapping):
                     'Unexpected %s: %r' % (key, result[key])
                 error[key] = result[key]
 
-            if "*" in result["error"]:
+            if '*' in result['error']:
                 # help text returned
-                result['error']['help'] = result['error'].pop("*")
+                result['error']['help'] = result['error'].pop('*')
             code = result['error'].setdefault('code', 'Unknown')
             info = result['error'].setdefault('info', None)
 
             if not self._logged_in(code):
                 continue
 
-            if code == "maxlag":
+            if code == 'maxlag':
                 lag = lagpattern.search(info)
                 pywikibot.log('Pausing due to database lag: ' + info)
                 if lag:
@@ -2231,9 +2231,9 @@ class Request(MutableMapping):
                 continue
 
             # Phab. tickets T48535, T64126, T68494, T68619
-            if code == "failed-save" and \
+            if code == 'failed-save' and \
                self.action == 'wbeditentity' and \
-               self._is_wikibase_error_retryable(result["error"]):
+               self._is_wikibase_error_retryable(result['error']):
                 self.wait()
                 continue
 
@@ -2265,9 +2265,9 @@ class Request(MutableMapping):
                 param_repr = str(self._params)
                 if PY2:
                     param_repr = param_repr.decode(config.console_encoding)
-                pywikibot.log(u"API Error: query=\n%s"
+                pywikibot.log('API Error: query=\n%s'
                               % pprint.pformat(param_repr))
-                pywikibot.log(u"           response=\n%s"
+                pywikibot.log('           response=\n%s'
                               % result)
 
                 raise APIError(**result['error'])
@@ -2278,8 +2278,8 @@ class Request(MutableMapping):
         """Determine how long to wait after a failed request."""
         self.max_retries -= 1
         if self.max_retries < 0:
-            raise TimeoutError("Maximum retries attempted without success.")
-        pywikibot.warning(u"Waiting %s seconds before retrying."
+            raise TimeoutError('Maximum retries attempted without success.')
+        pywikibot.warning('Waiting %s seconds before retrying.'
                           % self.retry_wait)
         pywikibot.sleep(self.retry_wait)
         # double the next wait, but do not exceed 120 seconds
@@ -2363,7 +2363,7 @@ class CachedRequest(Request):
             # The returned value cant be encoded to anything other than
             # ascii otherwise it creates an exception when _create_file_name()
             # tries to encode it as utf-8.
-            user_key = u'User(User:%s)' % self.site._userinfo['name']
+            user_key = 'User(User:%s)' % self.site._userinfo['name']
         else:
             user_key = pywikibot.site.LoginStatus(
                 max(login_status, pywikibot.site.LoginStatus.NOT_LOGGED_IN))
@@ -2404,7 +2404,7 @@ class CachedRequest(Request):
             if self._expired(self._cachetime):
                 self._data = None
                 return False
-            pywikibot.debug(u"%s: cache hit (%s) for API request: %s"
+            pywikibot.debug('%s: cache hit (%s) for API request: %s'
                             % (self.__class__.__name__, filename, uniquedescr),
                             _logger)
             return True
@@ -2412,7 +2412,7 @@ class CachedRequest(Request):
             # file not found
             return False
         except Exception as e:
-            pywikibot.output("Could not load cache: %r" % e)
+            pywikibot.output('Could not load cache: %r' % e)
             return False
 
     def _write_cache(self, data):
@@ -2505,7 +2505,7 @@ class APIGenerator(_RequestWrapper):
         """
         self.query_increment = int(value)
         self.request[self.limit_name] = self.query_increment
-        pywikibot.debug(u"%s: Set query_increment to %i."
+        pywikibot.debug('%s: Set query_increment to %i.'
                         % (self.__class__.__name__, self.query_increment),
                         _logger)
 
@@ -2541,20 +2541,20 @@ class APIGenerator(_RequestWrapper):
         n = 0
         while True:
             self.request[self.continue_name] = offset
-            pywikibot.debug(u"%s: Request: %s" % (self.__class__.__name__,
-                                                  self.request), _logger)
+            pywikibot.debug('%s: Request: %s' % (
+                self.__class__.__name__, self.request), _logger)
             data = self.request.submit()
 
             n_items = len(data[self.data_name])
-            pywikibot.debug(u"%s: Retrieved %d items" % (
+            pywikibot.debug('%s: Retrieved %d items' % (
                 self.__class__.__name__, n_items), _logger)
             if n_items > 0:
                 for item in data[self.data_name]:
                     yield item
                     n += 1
                     if self.limit is not None and n >= self.limit:
-                        pywikibot.debug(u"%s: Stopped iterating due to "
-                                        u"exceeding item limit." %
+                        pywikibot.debug('%s: Stopped iterating due to '
+                                        'exceeding item limit.' %
                                         self.__class__.__name__, _logger)
                         return
                 offset += n_items
@@ -2607,16 +2607,16 @@ class QueryGenerator(_RequestWrapper):
         parameters = kwargs['parameters']
         if 'action' in parameters and parameters['action'] != 'query':
             raise Error("%s: 'action' must be 'query', not %s"
-                        % (self.__class__.__name__, kwargs["action"]))
+                        % (self.__class__.__name__, kwargs['action']))
         else:
             parameters['action'] = 'query'
         # make sure request type is valid, and get limit key if any
-        for modtype in ("generator", "list", "prop", "meta"):
+        for modtype in ('generator', 'list', 'prop', 'meta'):
             if modtype in parameters:
                 self.modules = parameters[modtype].split('|')
                 break
         else:
-            raise Error("%s: No query module name found in arguments."
+            raise Error('%s: No query module name found in arguments.'
                         % self.__class__.__name__)
 
         parameters['indexpageids'] = True  # always ask for list of pageids
@@ -2665,7 +2665,7 @@ class QueryGenerator(_RequestWrapper):
                    and self.site.has_right('apihighlimits'):
                     self.request[prefix + 'limit'] = int(param['highmax'])
                 else:
-                    self.request[prefix + 'limit'] = int(param["max"])
+                    self.request[prefix + 'limit'] = int(param['max'])
 
         if config.step > 0:
             self.api_limit = config.step
@@ -2678,7 +2678,7 @@ class QueryGenerator(_RequestWrapper):
             self._update_limit()
 
         if self.api_limit is not None and 'generator' in parameters:
-            self.prefix = "g" + self.prefix
+            self.prefix = 'g' + self.prefix
 
         self.limit = None
         self.query_limit = self.api_limit
@@ -2765,7 +2765,7 @@ class QueryGenerator(_RequestWrapper):
             self.query_limit = limit
         else:
             self.query_limit = min(self.api_limit, limit)
-        pywikibot.debug(u"%s: Set query_limit to %i."
+        pywikibot.debug('%s: Set query_limit to %i.'
                         % (self.__class__.__name__, self.query_limit),
                         _logger)
 
@@ -2819,7 +2819,7 @@ class QueryGenerator(_RequestWrapper):
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
                                                'namespace')
         if not param:
-            pywikibot.warning(u'{0} module does not support a namespace '
+            pywikibot.warning('{0} module does not support a namespace '
                               'parameter'.format(self.limited_module))
             return
 
@@ -2847,7 +2847,7 @@ class QueryGenerator(_RequestWrapper):
         if all(key not in self.data[self.continue_name]
                for key in self.continuekey):
             pywikibot.log(
-                u"Missing '%s' key(s) in ['%s'] value."
+                "Missing '%s' key(s) in ['%s'] value."
                 % (self.continuekey, self.continue_name))
             return True
         for query_continue_pair in self.data['query-continue'].values():
@@ -2968,7 +2968,7 @@ class QueryGenerator(_RequestWrapper):
         while True:
             prev_limit, new_limit = self._handle_query_limit(
                 prev_limit, new_limit, previous_result_had_data)
-            if not hasattr(self, "data"):
+            if not hasattr(self, 'data'):
                 self.data = self.request.submit()
             if not self.data or not isinstance(self.data, dict):
                 pywikibot.debug(
@@ -2976,9 +2976,9 @@ class QueryGenerator(_RequestWrapper):
                     .format(self.__class__.__name__),
                     _logger)
                 return
-            if 'query' in self.data and self.resultkey in self.data["query"]:
+            if 'query' in self.data and self.resultkey in self.data['query']:
                 resultdata = self._get_resultdata()
-                if "normalized" in self.data["query"]:
+                if 'normalized' in self.data['query']:
                     self.normalized = {
                         item['to']: item['from']
                         for item in self.data['query']['normalized']}
@@ -3004,7 +3004,7 @@ class QueryGenerator(_RequestWrapper):
                 # self.resultkey not in data in last request.submit()
                 # only "(query-)continue" was retrieved.
                 previous_result_had_data = False
-            if self.modules[0] == "random":
+            if self.modules[0] == 'random':
                 # "random" module does not return "(query-)continue"
                 # now we loop for a new random query
                 del self.data  # a new request is needed
@@ -3067,7 +3067,7 @@ class PageGenerator(QueryGenerator):
         appendParams(parameters, 'iilimit', 'max')  # T194233
         parameters['generator'] = generator
         QueryGenerator.__init__(self, **kwargs)
-        self.resultkey = "pages"  # element to look for in result
+        self.resultkey = 'pages'  # element to look for in result
         self.props = self.request['prop']
 
     def result(self, pagedata):
@@ -3135,7 +3135,7 @@ class PropertyGenerator(QueryGenerator):
         kwargs = self._clean_kwargs(kwargs, prop=prop)
         QueryGenerator.__init__(self, **kwargs)
         self._props = frozenset(prop.split('|'))
-        self.resultkey = "pages"
+        self.resultkey = 'pages'
 
     @property
     def props(self):
@@ -3224,7 +3224,7 @@ class LogEntryListGenerator(ListGenerator):
 
     def __init__(self, logtype=None, **kwargs):
         """Initializer."""
-        ListGenerator.__init__(self, "logevents", **kwargs)
+        ListGenerator.__init__(self, 'logevents', **kwargs)
 
         from pywikibot import logentries
         self.entryFactory = logentries.LogEntryFactory(self.site, logtype)
@@ -3277,24 +3277,24 @@ class LoginManager(login.LoginManager):
 
         # get token using meta=tokens if supported
         if self.site.mw_version >= '1.27':
-            login_request["lgtoken"] = self.get_login_token()
+            login_request['lgtoken'] = self.get_login_token()
 
         self.site._loginstatus = -2  # IN_PROGRESS
         while True:
             login_result = login_request.submit()
-            if u"login" not in login_result:
+            if 'login' not in login_result:
                 raise RuntimeError(
                     "API login response does not have 'login' key.")
-            if login_result['login']['result'] == "Success":
+            if login_result['login']['result'] == 'Success':
                 return ''
-            elif login_result['login']['result'] == "NeedToken":
+            elif login_result['login']['result'] == 'NeedToken':
                 # Kept for backwards compatibility
                 token = login_result['login']['token']
-                login_request["lgtoken"] = token
+                login_request['lgtoken'] = token
                 continue
-            elif login_result['login']['result'] == "Throttled":
+            elif login_result['login']['result'] == 'Throttled':
                 self._waituntil = datetime.datetime.now() + datetime.timedelta(
-                    seconds=int(login_result["login"]["wait"]))
+                    seconds=int(login_result['login']['wait']))
                 break
             else:
                 break
@@ -3492,28 +3492,28 @@ def update_page(page, pagedict, props=[]):
         assert(isinstance(page, pywikibot.FilePage))
         page._load_file_revisions(pagedict['imageinfo'])
 
-    if "categoryinfo" in pagedict:
-        page._catinfo = pagedict["categoryinfo"]
+    if 'categoryinfo' in pagedict:
+        page._catinfo = pagedict['categoryinfo']
 
-    if "templates" in pagedict:
+    if 'templates' in pagedict:
         _update_templates(page, pagedict['templates'])
 
-    if "langlinks" in pagedict:
+    if 'langlinks' in pagedict:
         _update_langlinks(page, pagedict['langlinks'])
 
-    if "coordinates" in pagedict:
+    if 'coordinates' in pagedict:
         _update_coordinates(page, pagedict['coordinates'])
 
     if 'pageimage' in pagedict:
         page._pageimage = pywikibot.FilePage(page.site, pagedict['pageimage'])
 
-    if "pageprops" in pagedict:
+    if 'pageprops' in pagedict:
         page._pageprops = pagedict['pageprops']
 
     if 'preload' in pagedict:
         page._preloadedtext = pagedict['preload']
 
-    if "flowinfo" in pagedict:
+    if 'flowinfo' in pagedict:
         page._flowinfo = pagedict['flowinfo']['flow']
 
     if 'lintId' in pagedict:

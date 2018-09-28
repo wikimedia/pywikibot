@@ -94,18 +94,18 @@ class TextEditor(ScrolledText):
         """Assign key and events bindings to methods."""
         # due to IDLE dependencies, this can't be called from __init__
         # add key and event bindings
-        self.bind("<<cut>>", self.cut)
-        self.bind("<<copy>>", self.copy)
-        self.bind("<<paste>>", self.paste)
-        self.bind("<<select-all>>", self.select_all)
-        self.bind("<<remove-selection>>", self.remove_selection)
-        self.bind("<<find>>", self.find_event)
-        self.bind("<<find-again>>", self.find_again_event)
-        self.bind("<<find-selection>>", self.find_selection_event)
-        self.bind("<<replace>>", self.replace_event)
-        self.bind("<<goto-line>>", self.goto_line_event)
-        self.bind("<<del-word-left>>", self.del_word_left)
-        self.bind("<<del-word-right>>", self.del_word_right)
+        self.bind('<<cut>>', self.cut)
+        self.bind('<<copy>>', self.copy)
+        self.bind('<<paste>>', self.paste)
+        self.bind('<<select-all>>', self.select_all)
+        self.bind('<<remove-selection>>', self.remove_selection)
+        self.bind('<<find>>', self.find_event)
+        self.bind('<<find-again>>', self.find_again_event)
+        self.bind('<<find-selection>>', self.find_selection_event)
+        self.bind('<<replace>>', self.replace_event)
+        self.bind('<<goto-line>>', self.goto_line_event)
+        self.bind('<<del-word-left>>', self.del_word_left)
+        self.bind('<<del-word-right>>', self.del_word_right)
         keydefs = {'<<copy>>': ['<Control-Key-c>', '<Control-Key-C>'],
                    '<<cut>>': ['<Control-Key-x>', '<Control-Key-X>'],
                    '<<del-word-left>>': ['<Control-Key-BackSpace>'],
@@ -129,68 +129,68 @@ class TextEditor(ScrolledText):
 
     def cut(self, event):
         """Perform cut operation."""
-        if self.tag_ranges("sel"):
-            self.event_generate("<<Cut>>")
-        return "break"
+        if self.tag_ranges('sel'):
+            self.event_generate('<<Cut>>')
+        return 'break'
 
     def copy(self, event):
         """Perform copy operation."""
-        if self.tag_ranges("sel"):
-            self.event_generate("<<Copy>>")
-        return "break"
+        if self.tag_ranges('sel'):
+            self.event_generate('<<Copy>>')
+        return 'break'
 
     def paste(self, event):
         """Perform paste operation."""
-        self.event_generate("<<Paste>>")
-        return "break"
+        self.event_generate('<<Paste>>')
+        return 'break'
 
     def select_all(self, event=None):
         """Perform select all operation."""
-        self.tag_add("sel", "1.0", "end-1c")
-        self.mark_set("insert", "1.0")
-        self.see("insert")
-        return "break"
+        self.tag_add('sel', '1.0', 'end-1c')
+        self.mark_set('insert', '1.0')
+        self.see('insert')
+        return 'break'
 
     def remove_selection(self, event=None):
         """Perform remove operation."""
-        self.tag_remove("sel", "1.0", "end")
-        self.see("insert")
+        self.tag_remove('sel', '1.0', 'end')
+        self.see('insert')
 
     def del_word_left(self, event):
         """Perform delete word (left) operation."""
         self.event_generate('<Meta-Delete>')
-        return "break"
+        return 'break'
 
     def del_word_right(self, event=None):
         """Perform delete word (right) operation."""
         self.event_generate('<Meta-d>')
-        return "break"
+        return 'break'
 
     def find_event(self, event=None):
         """Perform find operation."""
-        if not self.tag_ranges("sel"):
-            found = self.tag_ranges("found")
+        if not self.tag_ranges('sel'):
+            found = self.tag_ranges('found')
             if found:
-                self.tag_add("sel", found[0], found[1])
+                self.tag_add('sel', found[0], found[1])
             else:
-                self.tag_add("sel", "1.0", "1.0+1c")
+                self.tag_add('sel', '1.0', '1.0+1c')
         SearchDialog.find(self)
-        return "break"
+        return 'break'
 
     def find_again_event(self, event=None):
         """Perform find again operation."""
         SearchDialog.find_again(self)
-        return "break"
+        return 'break'
 
     def find_selection_event(self, event=None):
         """Perform find selection operation."""
         SearchDialog.find_selection(self)
-        return "break"
+        return 'break'
 
     def replace_event(self, event=None):
         """Perform replace operation."""
         ReplaceDialog.replace(self)
-        return "break"
+        return 'break'
 
     def find_all(self, s):
         """
@@ -202,7 +202,7 @@ class TextEditor(ScrolledText):
         document to start searching from that point.)
 
         """
-        if hasattr(self, "_highlight") and self._highlight == s:
+        if hasattr(self, '_highlight') and self._highlight == s:
             try:
                 if self.get(Tkinter.SEL_FIRST, Tkinter.SEL_LAST) == s:
                     return self.find_selection_event(None)
@@ -252,15 +252,15 @@ class TextEditor(ScrolledText):
 
     def goto_line_event(self, event):
         """Perform goto line operation."""
-        lineno = tkSimpleDialog.askinteger("Goto", "Go to line number:",
+        lineno = tkSimpleDialog.askinteger('Goto', 'Go to line number:',
                                            parent=self)
         if lineno is None:
-            return "break"
+            return 'break'
         if lineno <= 0:
             self.bell()
-            return "break"
-        self.mark_set("insert", "%d.0" % lineno)
-        self.see("insert")
+            return 'break'
+        self.mark_set('insert', '%d.0' % lineno)
+        self.see('insert')
 
 
 class EditBoxWindow(Tkinter.Frame):
@@ -277,7 +277,7 @@ class EditBoxWindow(Tkinter.Frame):
         self.editbox = MultiCallCreator(TextEditor)(self, **kwargs)
         self.editbox.pack(side=Tkinter.TOP)
         self.editbox.add_bindings()
-        self.bind("<<open-config-dialog>>", self.config_dialog)
+        self.bind('<<open-config-dialog>>', self.config_dialog)
 
         bottom = Tkinter.Frame(parent)
         # lower left subframe with a textfield and a Search button
@@ -307,55 +307,55 @@ class EditBoxWindow(Tkinter.Frame):
         menubar = Tkinter.Menu(self.parent)
 
         findmenu = Tkinter.Menu(menubar)
-        findmenu.add_command(label="Find",
+        findmenu.add_command(label='Find',
                              command=self.editbox.find_event,
-                             accelerator="Ctrl+F",
+                             accelerator='Ctrl+F',
                              underline=0)
-        findmenu.add_command(label="Find again",
+        findmenu.add_command(label='Find again',
                              command=self.editbox.find_again_event,
-                             accelerator="Ctrl+G",
+                             accelerator='Ctrl+G',
                              underline=6)
-        findmenu.add_command(label="Find all",
+        findmenu.add_command(label='Find all',
                              command=self.find_all,
                              underline=5)
-        findmenu.add_command(label="Find selection",
+        findmenu.add_command(label='Find selection',
                              command=self.editbox.find_selection_event,
-                             accelerator="Ctrl+F3",
+                             accelerator='Ctrl+F3',
                              underline=5)
-        findmenu.add_command(label="Replace",
+        findmenu.add_command(label='Replace',
                              command=self.editbox.replace_event,
-                             accelerator="Ctrl+H",
+                             accelerator='Ctrl+H',
                              underline=0)
-        menubar.add_cascade(label="Find", menu=findmenu, underline=0)
+        menubar.add_cascade(label='Find', menu=findmenu, underline=0)
 
         editmenu = Tkinter.Menu(menubar)
-        editmenu.add_command(label="Cut",
+        editmenu.add_command(label='Cut',
                              command=self.editbox.cut,
-                             accelerator="Ctrl+X",
+                             accelerator='Ctrl+X',
                              underline=2)
-        editmenu.add_command(label="Copy",
+        editmenu.add_command(label='Copy',
                              command=self.editbox.copy,
-                             accelerator="Ctrl+C",
+                             accelerator='Ctrl+C',
                              underline=0)
-        editmenu.add_command(label="Paste",
+        editmenu.add_command(label='Paste',
                              command=self.editbox.paste,
-                             accelerator="Ctrl+V",
+                             accelerator='Ctrl+V',
                              underline=0)
         editmenu.add_separator()
-        editmenu.add_command(label="Select all",
+        editmenu.add_command(label='Select all',
                              command=self.editbox.select_all,
-                             accelerator="Ctrl+A",
+                             accelerator='Ctrl+A',
                              underline=7)
-        editmenu.add_command(label="Clear selection",
+        editmenu.add_command(label='Clear selection',
                              command=self.editbox.remove_selection,
-                             accelerator="Esc")
-        menubar.add_cascade(label="Edit", menu=editmenu, underline=0)
+                             accelerator='Esc')
+        menubar.add_cascade(label='Edit', menu=editmenu, underline=0)
 
         optmenu = Tkinter.Menu(menubar)
-        optmenu.add_command(label="Settings...",
+        optmenu.add_command(label='Settings...',
                             command=self.config_dialog,
                             underline=0)
-        menubar.add_cascade(label="Options", menu=optmenu, underline=0)
+        menubar.add_cascade(label='Options', menu=optmenu, underline=0)
 
         # display the menu
         self.parent.config(menu=menubar)
@@ -430,7 +430,7 @@ class EditBoxWindow(Tkinter.Frame):
     def debug(self, event=None):
         """Call quit() and return 'break'."""
         self.quit()
-        return "break"
+        return 'break'
 
 
 # the following class isn't used anywhere in the framework: ####
@@ -495,7 +495,7 @@ class Tkdialog(object):
         """Initializer."""
         self.root = Tkinter.Tk()
         # "%dx%d%+d%+d" % (width, height, xoffset, yoffset)
-        self.root.geometry("%ix%i+10-10" % (pywikibot.config.tkhorsize,
+        self.root.geometry('%ix%i+10-10' % (pywikibot.config.tkhorsize,
                                             pywikibot.config.tkvertsize))
 
         self.root.title(filename)
@@ -520,7 +520,7 @@ class Tkdialog(object):
 
         # The description
         self.description_label = Tkinter.Label(self.root,
-                                               text=u"Suggested description")
+                                               text='Suggested description')
         self.description_scrollbar = Tkinter.Scrollbar(self.root,
                                                        orient=Tkinter.VERTICAL)
         self.description_field = Tkinter.Text(self.root)
@@ -531,9 +531,9 @@ class Tkdialog(object):
         self.description_scrollbar.config(command=self.description_field.yview)
 
         # The buttons
-        self.ok_button = Tkinter.Button(self.root, text="OK",
+        self.ok_button = Tkinter.Button(self.root, text='OK',
                                         command=self.ok_file)
-        self.skip_button = Tkinter.Button(self.root, text="Skip",
+        self.skip_button = Tkinter.Button(self.root, text='Skip',
                                           command=self.skip_file)
 
         # --Start grid

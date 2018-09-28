@@ -162,7 +162,7 @@ class Timestamp(datetime.datetime):
 
     """
 
-    mediawikiTSFormat = "%Y%m%d%H%M%S"
+    mediawikiTSFormat = '%Y%m%d%H%M%S'
     _ISO8601Format_new = '{0:+05d}-{1:02d}-{2:02d}T{3:02d}:{4:02d}:{5:02d}Z'
 
     def clone(self):
@@ -315,7 +315,7 @@ class Coordinate(_WbRepresentation):
         if not self._entity:
             if self.globe not in self.site.globes():
                 raise CoordinateGlobeUnknownException(
-                    u"%s is not supported in Wikibase yet."
+                    '%s is not supported in Wikibase yet.'
                     % self.globe)
             return self.site.globes()[self.globe]
 
@@ -366,7 +366,7 @@ class Coordinate(_WbRepresentation):
 
     @property
     def precision(self):
-        u"""
+        """
         Return the precision of the geo coordinate.
 
         The precision is calculated if the Coordinate does not have a
@@ -617,7 +617,7 @@ class WbTime(_WbRepresentation):
         match = re.match(r'([-+]?\d+)-(\d+)-(\d+)T(\d+):(\d+):(\d+)Z',
                          datetimestr)
         if not match:
-            raise ValueError(u"Invalid format: '%s'" % datetimestr)
+            raise ValueError("Invalid format: '%s'" % datetimestr)
         t = match.groups()
         return cls(long(t[0]), int(t[1]), int(t[2]),
                    int(t[3]), int(t[4]), int(t[5]),
@@ -738,7 +738,7 @@ class WbQuantity(_WbRepresentation):
         if not site:
             warning(
                 "WbQuantity now expects a 'site' parameter. This is needed to "
-                "ensure correct handling of error bounds.")
+                'ensure correct handling of error bounds.')
             return False
         return site.mw_version < '1.29.0-wmf.2'
 
@@ -772,10 +772,10 @@ class WbQuantity(_WbRepresentation):
         """
         if value is None:
             return None
-        return format(value, "+g")
+        return format(value, '+g')
 
     def __init__(self, amount, unit=None, error=None, site=None):
-        u"""
+        """
         Create a new WbQuantity object.
 
         @param amount: number representing this quantity
@@ -1012,7 +1012,7 @@ class _WbDataPage(_WbRepresentation):
                 not page.title().endswith(ending):
             raise ValueError(
                 "Page must be in 'Data:' namespace and end in '{0}' "
-                "for {1}.".format(ending, label))
+                'for {1}.'.format(ending, label))
 
     def __init__(self, page, site=None):
         """
@@ -1226,7 +1226,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     @raises ValueError: Invalid interface name
     @raises SiteDefinitionError: Unknown URL
     """
-    _logger = "wiki"
+    _logger = 'wiki'
 
     if url:
         # Either code and fam or only url
@@ -1272,7 +1272,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     key = '%s:%s:%s:%s' % (interface.__name__, fam, code, user)
     if key not in _sites or not isinstance(_sites[key], interface):
         _sites[key] = interface(code=code, fam=fam, user=user, sysop=sysop)
-        debug(u"Instantiated %s object '%s'"
+        debug("Instantiated %s object '%s'"
               % (interface.__name__, _sites[key]), _logger)
 
         if _sites[key].code != code:
@@ -1353,7 +1353,7 @@ def _flush(stop=True):
     Wait for the page-putter to flush its queue. Also drop this process from
     the throttle log. Called automatically at Python exit.
     """
-    _logger = "wiki"
+    _logger = 'wiki'
 
     debug('_flush() called', _logger)
 
@@ -1390,7 +1390,7 @@ def _flush(stop=True):
     # only need one drop() call because all throttles use the same global pid
     try:
         list(_sites.values())[0].throttle.drop()
-        log(u"Dropped throttle(s).")
+        log('Dropped throttle(s).')
     except IndexError:
         pass
 

@@ -62,7 +62,7 @@ class TextEditor(object):
 
         # See T102465 for problems relating to using config.editor unparsed.
         command = [config.editor] + command + [file_name]
-        pywikibot.log(u'Running editor: %s' % TextEditor._concat(command))
+        pywikibot.log('Running editor: %s' % TextEditor._concat(command))
         return command
 
     @staticmethod
@@ -107,8 +107,9 @@ class TextEditor(object):
                     # Nothing changed
                     return None
                 else:
-                    with codecs.open(tempFilename, 'r',
-                                     encoding=config.editor_encoding) as temp_file:
+                    with codecs.open(
+                        tempFilename, 'r', encoding=config.editor_encoding
+                    ) as temp_file:
                         newcontent = temp_file.read()
                     return newcontent
             finally:
@@ -123,4 +124,5 @@ class TextEditor(object):
                 'are typically part of Python but may be packaged separately '
                 'on your platform.\n' % gui)
 
-        return pywikibot.ui.editText(text, jumpIndex=jumpIndex, highlight=highlight)
+        return pywikibot.ui.editText(
+            text, jumpIndex=jumpIndex, highlight=highlight)

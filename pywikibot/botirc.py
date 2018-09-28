@@ -36,7 +36,7 @@ except ImportError as e:
             raise ircbot_import_error
 
 
-_logger = "botirc"
+_logger = 'botirc'
 
 
 class IRCBot(pywikibot.Bot, SingleServerIRCBot):
@@ -63,11 +63,12 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
         self.channel = channel
         self.site = site
         self.other_ns = re.compile(
-            u'\x0314\\[\\[\x0307(%s)'
-            % u'|'.join(item.custom_name for item in site.namespaces.values()
-                        if item != 0))
-        self.api_url = self.site.apipath()
-        self.api_url += '?action=query&meta=siteinfo&siprop=statistics&format=xml'
+            '\x0314\\[\\[\x0307(%s)'
+            % '|'.join(item.custom_name for item in site.namespaces.values()
+                       if item != 0))
+        self.api_url = (
+            self.site.apipath()
+            + '?action=query&meta=siteinfo&siprop=statistics&format=xml')
         self.api_found = re.compile(r'articles="(.*?)"')
         self.re_edit = re.compile(
             r'^C14\[\[^C07(?P<page>.+?)^C14\]\]^C4 (?P<flags>.*?)^C10 ^C02'
@@ -77,7 +78,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
 
     def on_nicknameinuse(self, c, e):
         """Provide an alternative nickname."""
-        c.nick(c.get_nickname() + "_")
+        c.nick(c.get_nickname() + '_')
 
     def on_welcome(self, c, e):
         """Join channel."""
@@ -100,7 +101,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
             return
         if self.other_ns.match(msg):
             return
-        name = msg[8:msg.find(u'14', 9)]
+        name = msg[8:msg.find('14', 9)]
         text = pywikibot.comms.http.request(self.site, self.api_url)
         entry = self.api_found.findall(text)
         page = pywikibot.Page(self.site, name)

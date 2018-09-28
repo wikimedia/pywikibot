@@ -53,7 +53,7 @@ class MWSite(object):
         @raises Timeout: a timeout occurred while loading the site
         @raises RuntimeError: Version not found or version less than 1.14
         """
-        if fromurl.endswith("$1"):
+        if fromurl.endswith('$1'):
             fromurl = fromurl[:-2]
         r = fetch(fromurl)
         check_response(r)
@@ -118,13 +118,14 @@ class MWSite(object):
         """Build interwikimap."""
         response = fetch(
             self.api +
-            "?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local&format=json")
+            '?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local'
+            '&format=json')
         iw = json.loads(response.text)
         if 'error' in iw:
             raise RuntimeError('%s - %s' % (iw['error']['code'],
                                             iw['error']['info']))
         return [wiki for wiki in iw['query']['interwikimap']
-                if u'language' in wiki]
+                if 'language' in wiki]
 
     def _parse_pre_117(self, data):
         """Parse HTML."""
@@ -155,9 +156,9 @@ class MWSite(object):
                     d = {'error': {'*': d}}
 
                 self.version = list(filter(
-                    lambda x: x.startswith("MediaWiki"),
+                    lambda x: x.startswith('MediaWiki'),
                     [l.strip()
-                     for l in d['error']['*'].split("\n")]))[0].split()[1]
+                     for l in d['error']['*'].split('\n')]))[0].split()[1]
             except Exception:
                 pass
             else:
@@ -218,7 +219,7 @@ class MWSite(object):
         if self.server is None or self.scriptpath is None:
             return
 
-        return self.server + self.scriptpath + "/api.php"
+        return self.server + self.scriptpath + '/api.php'
 
     @property
     def iwpath(self):
@@ -299,9 +300,9 @@ class WikiHTMLPageParser(HTMLParser):
     def handle_starttag(self, tag, attrs):
         """Handle an opening tag."""
         attrs = dict(attrs)
-        if tag == "meta":
+        if tag == 'meta':
             if attrs.get('name') == 'generator':
-                self.generator = attrs["content"]
+                self.generator = attrs['content']
                 try:
                     self.version = MediaWikiVersion.from_generator(
                         self.generator)

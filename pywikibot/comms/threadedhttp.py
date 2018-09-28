@@ -24,7 +24,7 @@ else:
     from urlparse import urlparse
 
 
-_logger = "comm.threadedhttp"
+_logger = 'comm.threadedhttp'
 
 
 class HttpRequest(UnicodeMixin):
@@ -36,7 +36,7 @@ class HttpRequest(UnicodeMixin):
     * an exception
     """
 
-    def __init__(self, uri, method="GET", params=None, body=None, headers=None,
+    def __init__(self, uri, method='GET', params=None, body=None, headers=None,
                  callbacks=None, charset=None, **kwargs):
         """
         Initializer.
@@ -149,7 +149,7 @@ class HttpRequest(UnicodeMixin):
         """Detect the response encoding."""
         if not hasattr(self, '_encoding'):
             if not self.charset and not self.header_encoding:
-                pywikibot.log(u"Http response doesn't contain a charset.")
+                pywikibot.log("Http response doesn't contain a charset.")
                 charset = 'latin1'
             else:
                 charset = self.charset

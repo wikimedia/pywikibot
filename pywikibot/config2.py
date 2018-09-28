@@ -162,8 +162,8 @@ user_agent_format = ('{script_product} ({script_comments}) {pwb} ({revision}) '
 # It is recommended to default this to False and use on an as-needed basis.
 #
 # Default behaviours in modules that can utilize fake UAs.
-# True for enabling fake UA, False for disabling / using pywikibot's own UA, str
-# to specify custom UA.
+# True for enabling fake UA, False for disabling / using pywikibot's own UA,
+# str to specify custom UA.
 fake_user_agent_default = {'reflinks': False, 'weblinkchecker': False}
 # Website domains excepted to the default behaviour.
 # True for enabling, False for disabling, str to hardcode a UA.
@@ -325,7 +325,7 @@ def get_base_dir(test_directory=None):
     if test_directory is not None:
         test_directory = os.path.abspath(test_directory)
 
-    base_dir = ""
+    base_dir = ''
     for arg in sys.argv[1:]:
         if arg.startswith(str('-dir:')):
             base_dir = arg[5:]
@@ -796,7 +796,8 @@ copyright_economize_query = True
 persistent_http = False
 
 # Default socket timeout in seconds.
-# DO NOT set to None to disable timeouts. Otherwise this may freeze your script.
+# DO NOT set to None to disable timeouts. Otherwise this may freeze your
+# script.
 # You may assign either a tuple of two int or float values for connection and
 # read timeout, or a single value for both in a tuple (since requests 2.4.0).
 socket_timeout = (6.05, 45)
@@ -870,7 +871,8 @@ proxy = None
 # in user-config.py for wikis with extra write actions.
 actions_to_block = []
 
-# Set simulate to True or use -simulate option to block all actions given above.
+# Set simulate to True or use -simulate option to block all actions given
+# above.
 simulate = False
 
 # How many pages should be put to a queue in asynchronous mode.
@@ -1183,9 +1185,9 @@ if (isinstance(socket_timeout, tuple) and
 if (not ignore_file_security_warnings and
         private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
     error("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
-          " to allow access from the group/others which"
-          " could give them access to the sensitive files."
-          " To avoid giving others access to sensitive files, pywikibot"
+          ' to allow access from the group/others which'
+          ' could give them access to the sensitive files.'
+          ' To avoid giving others access to sensitive files, pywikibot'
           " won't run with this setting. Choose a more restrictive"
           " permission or set 'ignore_file_security_warnings' to true.")
     sys.exit(1)

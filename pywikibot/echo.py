@@ -30,7 +30,8 @@ class Notification(object):
         notif.id = data['id']  # TODO: use numeric id ?
         notif.type = data['type']
         notif.category = data['category']
-        notif.timestamp = pywikibot.Timestamp.fromtimestampformat(data['timestamp']['mw'])
+        notif.timestamp = pywikibot.Timestamp.fromtimestampformat(
+            data['timestamp']['mw'])
 
         if 'title' in data and 'full' in data['title']:
             notif.page = pywikibot.Page(site, data['title']['full'])

@@ -475,13 +475,15 @@ def _extract_plural(code, message, parameters):
         specific_entries = {}
         # A plural entry can not start at the end of the variants list,
         # and must end with | or the end of the variants list.
-        for number, plural in re.findall(r'(?!$)(?: *(\d+) *= *)?(.*?)(?:\||$)',
-                                         variants):
+        for number, plural in re.findall(
+            r'(?!$)(?: *(\d+) *= *)?(.*?)(?:\||$)', variants
+        ):
             if number:
                 specific_entries[int(number)] = plural
             else:
-                assert not specific_entries, \
-                    'generic entries defined after specific in "{0}"'.format(variants)
+                assert not specific_entries, (
+                    'generic entries defined after specific in "{0}"'
+                    .format(variants))
                 plural_entries += [plural]
 
         if num in specific_entries:
@@ -560,9 +562,9 @@ def translate(code, xdict, parameters=None, fallback=False):
 
     The language itself is always checked first, then languages that
     have been defined to be alternatives, and finally English. If none of
-    the options gives result, we just take the one language from xdict which may
-    not be always the same. When fallback is iterable it'll return None if no
-    code applies (instead of returning one).
+    the options gives result, we just take the one language from xdict which
+    may not be always the same. When fallback is iterable it'll return None if
+    no code applies (instead of returning one).
 
     For PLURAL support have a look at the twtranslate method.
 
@@ -642,9 +644,10 @@ def translate(code, xdict, parameters=None, fallback=False):
 
 
 @deprecated_args(code='source')
-def twtranslate(source, twtitle, parameters=None, fallback=True,
-                only_plural=False):
-    """
+def twtranslate(
+    source, twtitle, parameters=None, fallback=True, only_plural=False
+):
+    r"""
     Translate a message using JSON files in messages_package_name.
 
     fallback parameter must be True for i18n and False for L10N or testing
@@ -655,21 +658,22 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
 
         {{PLURAL:<number>|<variant1>|<variant2>[|<variantn>]}}
 
-    it takes that variant calculated by the plural_rules depending on the number
-    value. Multiple plurals are allowed.
+    it takes that variant calculated by the plural_rules depending on the
+    number value. Multiple plurals are allowed.
 
     As an examples, if we had several json dictionaries in test folder like:
 
     en.json::
 
       {
-          "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
+         "test-plural": "Bot: Changing %(num)s {{PLURAL:%(num)d|page|pages}}.",
       }
 
     fr.json::
 
       {
-          "test-plural": "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
+         "test-plural": \
+         "Robot: Changer %(descr)s {{PLURAL:num|une page|quelques pages}}.",
       }
 
     and so on.
@@ -680,11 +684,13 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
     >>> str(i18n.twtranslate('en', 'test-plural', {'num':2}))
     'Bot: Changing 2 pages.'
     >>> # use additional format strings
-    >>> str(i18n.twtranslate('fr', 'test-plural', {'num': 1, 'descr': 'seulement'}))
+    >>> str(i18n.twtranslate(
+    ...    'fr', 'test-plural', {'num': 1, 'descr': 'seulement'}))
     'Robot: Changer seulement une page.'
     >>> # use format strings also outside
-    >>> str(i18n.twtranslate('fr', 'test-plural', {'num': 10}, only_plural=True)
-    ...     % {'descr': 'seulement'})
+    >>> str(i18n.twtranslate(
+    ...    'fr', 'test-plural', {'num': 10}, only_plural=True
+    ... ) % {'descr': 'seulement'})
     'Robot: Changer seulement quelques pages.'
 
     @param source: When it's a site it's using the lang attribute and otherwise
@@ -719,7 +725,8 @@ def twtranslate(source, twtitle, parameters=None, fallback=True,
     # check whether we need the language code back
     elif isinstance(source, list):
         # For backwards compatibility still support lists, when twntranslate
-        # was not deprecated and needed a way to get the used language code back
+        # was not deprecated and needed a way to get the used language code
+        # back.
         warn('The source argument should not be a list but either a BaseSite '
              'or a str/unicode.', DeprecationWarning, 2)
         lang = source.pop()
@@ -816,7 +823,7 @@ def twget_keys(twtitle):
     @raises OSError: the package i18n can not be loaded
     """
     # obtain the directory containing all the json files for this package
-    package = twtitle.split("-")[0]
+    package = twtitle.split('-')[0]
     mod = __import__(_messages_package_name, fromlist=[str('__file__')])
     pathname = os.path.join(next(iter(mod.__path__)), package)
 

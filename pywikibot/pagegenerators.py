@@ -6,8 +6,8 @@ A page generator is an
 object that is iterable (see http://legacy.python.org/dev/peps/pep-0255/ ) and
 that yields page objects on which other scripts can then work.
 
-Pagegenerators.py cannot be run as script. For testing purposes listpages.py can
-be used instead, to print page titles to standard output.
+Pagegenerators.py cannot be run as script. For testing purposes listpages.py
+can be used instead, to print page titles to standard output.
 
 These parameters are supported to specify which pages titles to print:
 
@@ -59,13 +59,13 @@ from pywikibot.proofreadpage import ProofreadPage
 if sys.version_info[0] > 2:
     basestring = (str, )
 
-_logger = "pagegenerators"
+_logger = 'pagegenerators'
 
 # ported from version 1 for backwards-compatibility
 # most of these functions just wrap a Site or Page method that returns
 # a generator
 
-parameterHelp = """\
+parameterHelp = """ \
 GENERATOR OPTIONS
 =================
 
@@ -292,7 +292,8 @@ GENERATOR OPTIONS
                     multiple pages.
 
 -pageid             Work on a single pageid. Argument can also be given as
-                    "-pageid:pageid1,pageid2,." or "-pageid:'pageid1|pageid2|..'"
+                    "-pageid:pageid1,pageid2,." or
+                    "-pageid:'pageid1|pageid2|..'"
                     and supplied multiple times for multiple pages.
 
 -linter             Work on pages that contain lint errors. Extension Linter
@@ -407,7 +408,7 @@ docuReplacements = {'&params;': parameterHelp}
 # We manually include it so the parameters show up in the auto-generated
 # module documentation:
 
-__doc__ = __doc__.replace("&params;", parameterHelp)
+__doc__ = __doc__.replace('&params;', parameterHelp)
 
 
 # This is the function that will be used to de-duplicate page iterators.
@@ -512,9 +513,8 @@ class GeneratorFactory(object):
                     self.gens[i].set_maximum_items(self.limit)
             else:
                 if self.namespaces:
-                    self.gens[i] = NamespaceFilterPageGenerator(self.gens[i],
-                                                                self.namespaces,
-                                                                self.site)
+                    self.gens[i] = NamespaceFilterPageGenerator(
+                        self.gens[i], self.namespaces, self.site)
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
@@ -613,10 +613,10 @@ class GeneratorFactory(object):
         # Insert Category: before category name to avoid parsing problems in
         # Link.parse() when categoryname contains ":";
         # Part before ":" might be interpreted as an interwiki prefix
-        prefix = categoryname.split(":", 1)[0]  # whole word if ":" not present
+        prefix = categoryname.split(':', 1)[0]  # whole word if ":" not present
         if prefix not in self.site.namespaces[14]:
-            categoryname = u'{0}:{1}'.format(self.site.namespace(14),
-                                             categoryname)
+            categoryname = '{0}:{1}'.format(
+                self.site.namespace(14), categoryname)
         cat = pywikibot.Category(pywikibot.Link(categoryname,
                                                 source=self.site,
                                                 default_namespace=14))
@@ -674,7 +674,7 @@ class GeneratorFactory(object):
                 if total <= 0:
                     raise ValueError
             except ValueError:
-                pywikibot.error(u'Total number of log ({0}) events must be a '
+                pywikibot.error('Total number of log ({0}) events must be a '
                                 'positive int.'.format(total))
                 return None
             start = None
@@ -1276,7 +1276,7 @@ def PrefixingPageGenerator(prefix, namespace=None, includeredirects=True,
                          filterredir=filterredir, total=total, content=content)
 
 
-@deprecated_args(number="total", mode="logtype", repeat=None)
+@deprecated_args(number='total', mode='logtype', repeat=None)
 def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
                            total=None, start=None, end=None, reverse=False):
     """
@@ -1307,14 +1307,14 @@ def LogeventsPageGenerator(logtype=None, user=None, site=None, namespace=None,
         try:
             yield entry.page()
         except KeyError as e:
-            pywikibot.warning(u'LogeventsPageGenerator: '
-                              u'failed to load page for %r; skipping'
+            pywikibot.warning('LogeventsPageGenerator: '
+                              'failed to load page for %r; skipping'
                               % entry.data)
             pywikibot.exception(e)
 
 
 @deprecated('LogeventsPageGenerator', since='20141210')
-@deprecated_args(number="total", mode="logtype", repeat=None)
+@deprecated_args(number='total', mode='logtype', repeat=None)
 def LogpagesPageGenerator(total=500, logtype='', user=None,
                           site=None, namespace=[]):
     """
@@ -1561,7 +1561,8 @@ def LinkedPageGenerator(linkingPage, total=None, content=False):
     @type total: int
     @param content: if True, retrieve the current content of each linked page
     @type content: bool
-    @return: a generator that yields Page objects of pages linked to linkingPage
+    @return: a generator that yields Page objects of pages linked to
+        linkingPage
     @rtype: generator
     """
     return linkingPage.linkedPages(total=total, content=content)
@@ -1582,7 +1583,7 @@ def TextfilePageGenerator(filename=None, site=None):
 
     """
     if filename is None:
-        filename = pywikibot.input(u'Please enter the filename:')
+        filename = pywikibot.input('Please enter the filename:')
     if site is None:
         site = pywikibot.Site()
     with codecs.open(filename, 'r', config.textfile_encoding) as f:
@@ -1748,13 +1749,13 @@ def RedirectFilterPageGenerator(generator, no_redirects=True,
             if not page.isRedirectPage():
                 yield page
             elif show_filtered:
-                pywikibot.output(u'%s is a redirect page. Skipping.' % page)
+                pywikibot.output('%s is a redirect page. Skipping.' % page)
 
         else:
             if page.isRedirectPage():
                 yield page
             elif show_filtered:
-                pywikibot.output(u'%s is not a redirect page. Skipping.'
+                pywikibot.output('%s is not a redirect page. Skipping.'
                                  % page)
 
 
@@ -1882,7 +1883,7 @@ class RegexFilter(object):
         return regex
 
     @classmethod
-    @deprecated_args(inverse="quantifier")
+    @deprecated_args(inverse='quantifier')
     def titlefilter(cls, generator, regex, quantifier='any',
                     ignore_namespace=True):
         """Yield pages from another generator whose title matches regex.
@@ -2013,14 +2014,14 @@ def EdittimeFilterPageGenerator(generator,
             if last_edit < last_edit_start:
                 if show_filtered:
                     pywikibot.output(
-                        u'Last edit on %s was on %s.\nToo old. Skipping.'
+                        'Last edit on %s was on %s.\nToo old. Skipping.'
                         % (page, last_edit.isoformat()))
                 continue
 
             if last_edit > last_edit_end:
                 if show_filtered:
                     pywikibot.output(
-                        u'Last edit on %s was on %s.\nToo recent. Skipping.'
+                        'Last edit on %s was on %s.\nToo recent. Skipping.'
                         % (page, last_edit.isoformat()))
                 continue
 
@@ -2030,13 +2031,13 @@ def EdittimeFilterPageGenerator(generator,
             if first_edit < first_edit_start:
                 if show_filtered:
                     pywikibot.output(
-                        u'First edit on %s was on %s.\nToo old. Skipping.'
+                        'First edit on %s was on %s.\nToo old. Skipping.'
                         % (page, first_edit.isoformat()))
 
             if first_edit > first_edit_end:
                 if show_filtered:
                     pywikibot.output(
-                        u'First edit on %s was on %s.\nToo recent. Skipping.'
+                        'First edit on %s was on %s.\nToo recent. Skipping.'
                         % (page, first_edit.isoformat()))
                 continue
 
@@ -2310,13 +2311,13 @@ def WikibaseItemFilterPageGenerator(generator, has_item=True,
             if has_item:
                 if show_filtered:
                     pywikibot.output(
-                        '%s doesn\'t have a wikidata item. Skipping.' % page)
+                        "%s doesn't have a wikidata item. Skipping." % page)
                 continue
 
         yield page
 
 
-@deprecated_args(extension=None, number="total", repeat=None)
+@deprecated_args(extension=None, number='total', repeat=None)
 def UnusedFilesGenerator(total=None, site=None):
     """
     Unused files generator.
@@ -2332,7 +2333,7 @@ def UnusedFilesGenerator(total=None, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def WithoutInterwikiPageGenerator(total=None, site=None):
     """
     Page lacking interwikis generator.
@@ -2347,7 +2348,7 @@ def WithoutInterwikiPageGenerator(total=None, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def UnCategorizedCategoryGenerator(total=100, site=None):
     """
     Uncategorized category generator.
@@ -2363,7 +2364,7 @@ def UnCategorizedCategoryGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def UnCategorizedImageGenerator(total=100, site=None):
     """
     Uncategorized file generator.
@@ -2379,7 +2380,7 @@ def UnCategorizedImageGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def UnCategorizedPageGenerator(total=100, site=None):
     """
     Uncategorized page generator.
@@ -2411,7 +2412,7 @@ def UnCategorizedTemplateGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def LonelyPagesPageGenerator(total=None, site=None):
     """
     Lonely page generator.
@@ -2427,7 +2428,7 @@ def LonelyPagesPageGenerator(total=None, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def UnwatchedPagesPageGenerator(total=None, site=None):
     """
     Unwatched page generator.
@@ -2474,7 +2475,7 @@ def WantedPagesPageGenerator(total=100, site=None):
     return site.wantedpages(total=total)
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def AncientPagesPageGenerator(total=100, site=None):
     """
     Ancient page generator.
@@ -2490,7 +2491,7 @@ def AncientPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def DeadendPagesPageGenerator(total=100, site=None):
     """
     Dead-end page generator.
@@ -2506,7 +2507,7 @@ def DeadendPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def LongPagesPageGenerator(total=100, site=None):
     """
     Long page generator.
@@ -2522,7 +2523,7 @@ def LongPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total", repeat=None)
+@deprecated_args(number='total', repeat=None)
 def ShortPagesPageGenerator(total=100, site=None):
     """
     Short page generator.
@@ -2538,7 +2539,7 @@ def ShortPagesPageGenerator(total=100, site=None):
         yield page
 
 
-@deprecated_args(number="total")
+@deprecated_args(number='total')
 def RandomPageGenerator(total=None, site=None, namespaces=None):
     """
     Random page generator.
@@ -2554,7 +2555,7 @@ def RandomPageGenerator(total=None, site=None, namespaces=None):
         yield page
 
 
-@deprecated_args(number="total")
+@deprecated_args(number='total')
 def RandomRedirectPageGenerator(total=None, site=None, namespaces=None):
     """
     Random redirect generator.
@@ -2665,7 +2666,7 @@ class YahooSearchPageGenerator(object):
             'pagegenerator YahooSearchPageGenerator is not functional.\n'
             'See https://phabricator.wikimedia.org/T106085')
 
-        self.query = query or pywikibot.input(u'Please enter the search query:')
+        self.query = query or pywikibot.input('Please enter the search query:')
         self.total = total
         if site is None:
             site = pywikibot.Site()
@@ -2676,9 +2677,9 @@ class YahooSearchPageGenerator(object):
         try:
             from yahoo.search.web import WebSearch
         except ImportError:
-            pywikibot.error("ERROR: generator YahooSearchPageGenerator "
+            pywikibot.error('ERROR: generator YahooSearchPageGenerator '
                             "depends on package 'pYsearch'.\n"
-                            "To install, please run: pip install pYsearch")
+                            'To install, please run: pip install pYsearch')
             exit(1)
 
         srch = WebSearch(config.yahoo_appid, query=query, results=self.total)
@@ -2724,7 +2725,7 @@ class GoogleSearchPageGenerator(object):
         @param site: Site for generator results.
         @type site: L{pywikibot.site.BaseSite}
         """
-        self.query = query or pywikibot.input(u'Please enter the search query:')
+        self.query = query or pywikibot.input('Please enter the search query:')
         if site is None:
             site = pywikibot.Site()
         self.site = site
@@ -2748,9 +2749,9 @@ class GoogleSearchPageGenerator(object):
         try:
             import google
         except ImportError:
-            pywikibot.error("ERROR: generator GoogleSearchPageGenerator "
+            pywikibot.error('ERROR: generator GoogleSearchPageGenerator '
                             "depends on package 'google'.\n"
-                            "To install, please run: pip install google.")
+                            'To install, please run: pip install google.')
             exit(1)
         pywikibot.warning('Please read http://www.google.com/accounts/TOS')
         for url in google.search(query):
@@ -2915,10 +2916,10 @@ def YearPageGenerator(start=1, end=2050, site=None):
     """
     if site is None:
         site = pywikibot.Site()
-    pywikibot.output(u"Starting with year %i" % start)
+    pywikibot.output('Starting with year %i' % start)
     for i in range(start, end + 1):
         if i % 100 == 0:
-            pywikibot.output(u'Preparing %i...' % i)
+            pywikibot.output('Preparing %i...' % i)
         # There is no year 0
         if i != 0:
             current_year = date.formatYear(site.lang, i)
@@ -3007,7 +3008,9 @@ def WikidataSPARQLPageGenerator(query, site=None,
     return WikidataPageFromItemGenerator(items_pages, site)
 
 
-def WikibaseSearchItemPageGenerator(text, language=None, total=None, site=None):
+def WikibaseSearchItemPageGenerator(
+    text, language=None, total=None, site=None
+):
     """
     Generate pages that contain the provided text.
 
@@ -3140,6 +3143,6 @@ WikidataItemGenerator = redirect_func(
     WikibaseItemGenerator, old_name='WikidataItemGenerator', since='20141225')
 
 
-if __name__ == "__main__":
-    pywikibot.output(u'Pagegenerators cannot be run as script - are you '
-                     u'looking for listpages.py?')
+if __name__ == '__main__':
+    pywikibot.output('Pagegenerators cannot be run as script - are you '
+                     'looking for listpages.py?')

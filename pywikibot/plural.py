@@ -25,14 +25,14 @@ plural_rules = {
     'ay': {'nplurals': 1, 'plural': 0},
     'be': {'nplurals': 3, 'plural': lambda n:
            0 if (n % 10 == 1 and n % 100 != 11) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'bo': {'nplurals': 1, 'plural': 0},
     'br': {'nplurals': 2, 'plural': lambda n: (n > 1)},
     'bs': {'nplurals': 3, 'plural': lambda n:
            0 if (n % 10 == 1 and n % 100 != 11) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'cgg': {'nplurals': 1, 'plural': 0},
     'cs': {'nplurals': 3, 'plural': lambda n:
            0 if (n == 1) else
@@ -65,8 +65,8 @@ plural_rules = {
     'gun': {'nplurals': 2, 'plural': lambda n: (n > 1)},
     'hr': {'nplurals': 3, 'plural': lambda n:
            0 if (n % 10 == 1 and n % 100 != 11) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'id': {'nplurals': 1, 'plural': 0},
     'is': {'nplurals': 2, 'plural': lambda n: (n % 10 != 1 or n % 100 == 11)},
     'ja': {'nplurals': 1, 'plural': 0},
@@ -111,8 +111,8 @@ plural_rules = {
     'oc': {'nplurals': 2, 'plural': lambda n: (n > 1)},
     'pl': {'nplurals': 3, 'plural': lambda n:
            0 if (n == 1) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'pt-br': {'nplurals': 2, 'plural': lambda n: (n > 1)},
     'ro': {'nplurals': 3, 'plural': lambda n:
            0 if (n == 1) else
@@ -120,8 +120,8 @@ plural_rules = {
            2},
     'ru': {'nplurals': 3, 'plural': lambda n:
            0 if (n % 10 == 1 and n % 100 != 11) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'sah': {'nplurals': 1, 'plural': 0},
     'sk': {'nplurals': 3, 'plural': lambda n:
            0 if (n == 1) else
@@ -134,8 +134,8 @@ plural_rules = {
            3},
     'sr': {'nplurals': 3, 'plural': lambda n:
            0 if (n % 10 == 1 and n % 100 != 11) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'su': {'nplurals': 1, 'plural': 0},
     'th': {'nplurals': 1, 'plural': 0},
     'ti': {'nplurals': 2, 'plural': lambda n: (n > 1)},
@@ -144,8 +144,8 @@ plural_rules = {
     'ug': {'nplurals': 1, 'plural': 0},
     'uk': {'nplurals': 3, 'plural': lambda n:
            0 if (n % 10 == 1 and n % 100 != 11) else
-           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20)) else
-           2},
+           1 if (n % 10 in range(2, 5) and (n % 100 < 10 or n % 100 >= 20))
+           else 2},
     'uz': {'nplurals': 2, 'plural': lambda n: (n > 1)},
     'vi': {'nplurals': 1, 'plural': 0},
     'wa': {'nplurals': 2, 'plural': lambda n: (n > 1)},

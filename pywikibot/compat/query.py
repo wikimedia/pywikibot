@@ -21,9 +21,9 @@ import io
 
 
 @deprecated('pywikibot.data.api.Request', since='20120603')
-@deprecate_arg("useAPI", None)
-@deprecate_arg("retryCount", None)
-@deprecate_arg("encodeTitle", None)
+@deprecate_arg('useAPI', None)
+@deprecate_arg('retryCount', None)
+@deprecate_arg('encodeTitle', None)
 def GetData(request, site=None, back_response=False):
     """
     Query the server with the given request dict.
@@ -37,9 +37,9 @@ def GetData(request, site=None, back_response=False):
     result = req.submit()
 
     if back_response:
-        pywikibot.warning(u"back_response is no longer supported; an empty "
-                          u"response object will be returned")
+        pywikibot.warning('back_response is no longer supported; an empty '
+                          'response object will be returned')
         res_dummy = io.StringIO()
-        res_dummy.__dict__.update({u'code': 0, u'msg': u''})
+        res_dummy.__dict__.update({'code': 0, 'msg': ''})
         return res_dummy, result
     return result

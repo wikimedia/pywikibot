@@ -75,7 +75,7 @@ def multi(value, tuplst):
             if pred(value):
                 return func(value)
 
-    raise ValueError("could not find a matching function")
+    raise ValueError('could not find a matching function')
 
 
 #
@@ -300,7 +300,7 @@ def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
     if tmp == value:
         return int(value.translate(localToDigitsDict))    # Convert
     else:
-        raise ValueError("string contains regular digits")
+        raise ValueError('string contains regular digits')
 
 
 # Decimal digits used for various matchings

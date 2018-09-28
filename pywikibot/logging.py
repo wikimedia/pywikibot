@@ -62,7 +62,7 @@ def _init():
 # string indicating the debugging layer.
 
 
-def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
+def logoutput(text, decoder=None, newline=True, _level=INFO, _logger='',
               **kwargs):
     """Format output and send to the logging module.
 
@@ -70,9 +70,9 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
 
     """
     if _logger:
-        logger = logging.getLogger("pywiki." + _logger)
+        logger = logging.getLogger('pywiki.' + _logger)
     else:
-        logger = logging.getLogger("pywiki")
+        logger = logging.getLogger('pywiki')
 
     if not logger.handlers:  # lastResort for Python 2 (T188417)
         logger.handlers.append(StreamHandler())
@@ -90,7 +90,7 @@ def logoutput(text, decoder=None, newline=True, _level=INFO, _logger="",
     context = {'caller_name': frame.f_code.co_name,
                'caller_file': module,
                'caller_line': frame.f_lineno,
-               'newline': ("\n" if newline else "")}
+               'newline': ('\n' if newline else '')}
 
     if decoder:
         text = text.decode(decoder)
@@ -199,8 +199,8 @@ def exception(msg=None, decoder=None, newline=True, tb=False, **kwargs):
         exc_info = 1
     else:
         exc_info = sys.exc_info()
-        msg = u'%s: %s' % (repr(exc_info[1]).split('(')[0],
-                           unicode(exc_info[1]).strip())
+        msg = '%s: %s' % (
+            repr(exc_info[1]).split('(')[0], unicode(exc_info[1]).strip())
     if tb:
         kwargs['exc_info'] = exc_info
     logoutput(msg, decoder, newline, ERROR, **kwargs)

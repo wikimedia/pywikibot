@@ -228,7 +228,8 @@ class ProofreadPage(pywikibot.Page):
             pywikibot.output('{0}{1!s}'.format(' ' * 9, [page] + others))
 
             if page:
-                pywikibot.output('{0}Selected Index: {1}'.format(' ' * 9, page))
+                pywikibot.output(
+                    '{0}Selected Index: {1}'.format(' ' * 9, page))
                 pywikibot.output('{0}remaining: {1!s}'.format(' ' * 9, others))
 
         if not page:
@@ -246,7 +247,7 @@ class ProofreadPage(pywikibot.Page):
 
     @index.deleter
     def index(self):
-        if hasattr(self, "_index"):
+        if hasattr(self, '_index'):
             del self._index
 
     @property
@@ -265,7 +266,8 @@ class ProofreadPage(pywikibot.Page):
         # TODO: align this value with ProofreadPage.ql
 
         """
-        if self.content_model == 'proofread-page' and hasattr(self, '_quality'):
+        if (self.content_model == 'proofread-page'
+                and hasattr(self, '_quality')):
             return int(self._quality)
         return self.ql
 
@@ -399,7 +401,7 @@ class ProofreadPage(pywikibot.Page):
             super(ProofreadPage, self).text
         else:
             self._text = self.preloadText()
-            self.user = self.site.username()  # Fill user field in empty header.
+            self.user = self.site.username()  # Fill user field in empty header
         return self._text
 
     @text.setter
@@ -447,7 +449,8 @@ class ProofreadPage(pywikibot.Page):
                                   % self.title(as_link=True))
 
         f_open, f_close = open_queue[0], close_queue[0]
-        self._full_header = FullHeader(self._text[f_open.end():f_close.start()])
+        self._full_header = FullHeader(
+            self._text[f_open.end():f_close.start()])
 
         l_open, l_close = open_queue[-1], close_queue[-1]
         self._footer = self._text[l_open.end():l_close.start()]
@@ -706,7 +709,8 @@ class IndexPage(pywikibot.Page):
 
     def _parse_redlink(self, href):
         """Parse page title when link in Index is a redlink."""
-        p_href = re.compile(r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
+        p_href = re.compile(
+            r'/w/index\.php\?title=(.+?)&action=edit&redlink=1')
         title = p_href.search(href)
         if title:
             return title.group(1)
@@ -815,7 +819,8 @@ class IndexPage(pywikibot.Page):
             self._labels_from_page_number[page_cnt] = label
             self._labels_from_page[page] = label
             # Reverse mapping: labels as keys, numbers/pages as values.
-            self._page_numbers_from_label.setdefault(label, set()).add(page_cnt)
+            self._page_numbers_from_label.setdefault(
+                label, set()).add(page_cnt)
             self._pages_from_label.setdefault(label, set()).add(page)
 
         # Sanity check: all links to Page: ns must have been considered.
@@ -962,7 +967,8 @@ class IndexPage(pywikibot.Page):
         @return: list of pages
         @rtype: list
         """
-        return [self._page_from_numbers[i] for i in range(1, self.num_pages + 1)]
+        return [
+            self._page_from_numbers[i] for i in range(1, self.num_pages + 1)]
 
     @check_if_cached
     def get_number(self, page):

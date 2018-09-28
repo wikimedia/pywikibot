@@ -125,10 +125,10 @@ class XmlDump(object):
             self.root = None
 
             for event, elem in context:
-                if event == "start-ns" and elem[0] == "":
+                if event == 'start-ns' and elem[0] == '':
                     self.uri = elem[1]
                     continue
-                if event == "start" and self.root is None:
+                if event == 'start' and self.root is None:
                     self.root = elem
                     continue
                 for rev in self._parse(event, elem):
@@ -136,47 +136,47 @@ class XmlDump(object):
 
     def _parse_only_latest(self, event, elem):
         """Parser that yields only the latest revision."""
-        if event == "end" and elem.tag == "{%s}page" % self.uri:
+        if event == 'end' and elem.tag == '{%s}page' % self.uri:
             self._headers(elem)
-            revision = elem.find("{%s}revision" % self.uri)
+            revision = elem.find('{%s}revision' % self.uri)
             yield self._create_revision(revision)
             elem.clear()
             self.root.clear()
 
     def _parse_all(self, event, elem):
         """Parser that yields all revisions."""
-        if event == "start" and elem.tag == "{%s}page" % self.uri:
+        if event == 'start' and elem.tag == '{%s}page' % self.uri:
             self._headers(elem)
-        if event == "end" and elem.tag == "{%s}revision" % self.uri:
+        if event == 'end' and elem.tag == '{%s}revision' % self.uri:
             yield self._create_revision(elem)
             elem.clear()
             self.root.clear()
 
     def _headers(self, elem):
         """Extract headers from XML chunk."""
-        self.title = elem.findtext("{%s}title" % self.uri)
-        self.ns = elem.findtext("{%s}ns" % self.uri)
-        self.pageid = elem.findtext("{%s}id" % self.uri)
-        self.restrictions = elem.findtext("{%s}restrictions" % self.uri)
-        self.isredirect = elem.findtext("{%s}redirect" % self.uri) is not None
+        self.title = elem.findtext('{%s}title' % self.uri)
+        self.ns = elem.findtext('{%s}ns' % self.uri)
+        self.pageid = elem.findtext('{%s}id' % self.uri)
+        self.restrictions = elem.findtext('{%s}restrictions' % self.uri)
+        self.isredirect = elem.findtext('{%s}redirect' % self.uri) is not None
         self.editRestriction, self.moveRestriction = parseRestrictions(
             self.restrictions)
 
     def _create_revision(self, revision):
         """Create a Single revision."""
-        revisionid = revision.findtext("{%s}id" % self.uri)
-        timestamp = revision.findtext("{%s}timestamp" % self.uri)
-        comment = revision.findtext("{%s}comment" % self.uri)
-        contributor = revision.find("{%s}contributor" % self.uri)
-        ipeditor = contributor.findtext("{%s}ip" % self.uri)
-        username = ipeditor or contributor.findtext("{%s}username" % self.uri)
+        revisionid = revision.findtext('{%s}id' % self.uri)
+        timestamp = revision.findtext('{%s}timestamp' % self.uri)
+        comment = revision.findtext('{%s}comment' % self.uri)
+        contributor = revision.find('{%s}contributor' % self.uri)
+        ipeditor = contributor.findtext('{%s}ip' % self.uri)
+        username = ipeditor or contributor.findtext('{%s}username' % self.uri)
         # could get comment, minor as well
-        text = revision.findtext("{%s}text" % self.uri)
+        text = revision.findtext('{%s}text' % self.uri)
         return XmlEntry(title=self.title,
                         ns=self.ns,
                         id=self.pageid,
-                        text=text or u'',
-                        username=username or u'',  # username might be deleted
+                        text=text or '',
+                        username=username or '',  # username might be deleted
                         ipedit=bool(ipeditor),
                         timestamp=timestamp,
                         editRestriction=self.editRestriction,

@@ -50,7 +50,8 @@ class ParseError(Exception):
 
 
 def _get_program_dir():
-    _program_dir = os.path.normpath(os.path.split(os.path.dirname(__file__))[0])
+    _program_dir = os.path.normpath(
+        os.path.split(os.path.dirname(__file__))[0])
     return _program_dir
 
 
@@ -179,13 +180,13 @@ def svn_rev_info(path):
     # We haven't found the information in entries file.
     # Use sqlite table for new entries format
     from sqlite3 import dbapi2 as sqlite
-    con = sqlite.connect(os.path.join(_program_dir, ".svn/wc.db"))
+    con = sqlite.connect(os.path.join(_program_dir, '.svn/wc.db'))
     cur = con.cursor()
     cur.execute("""select
 local_relpath, repos_path, revision, changed_date, checksum from nodes
 order by revision desc, changed_date desc""")
     name, tag, rev, date, checksum = cur.fetchone()
-    cur.execute("select root from repository")
+    cur.execute('select root from repository')
     tag, = cur.fetchone()
     con.close()
     tag = os.path.split(tag)[1]
@@ -206,13 +207,13 @@ def github_svn_rev2hash(tag, rev):
     uri = 'https://github.com/wikimedia/%s/!svn/vcc/default' % tag
     request = http.fetch(uri=uri, method='PROPFIND',
                          body="<?xml version='1.0' encoding='utf-8'?>"
-                              "<propfind xmlns=\"DAV:\"><allprop/></propfind>",
+                              '<propfind xmlns=\"DAV:\"><allprop/></propfind>',
                          headers={'label': str(rev),
                                   'user-agent': 'SVN/1.7.5 {pwb}'})
 
     dom = xml.dom.minidom.parse(BytesIO(request.raw))
-    hsh = dom.getElementsByTagName("C:git-commit")[0].firstChild.nodeValue
-    date = dom.getElementsByTagName("S:date")[0].firstChild.nodeValue
+    hsh = dom.getElementsByTagName('C:git-commit')[0].firstChild.nodeValue
+    date = dom.getElementsByTagName('S:date')[0].firstChild.nodeValue
     date = time.strptime(date[:19], '%Y-%m-%dT%H:%M:%S')
     return hsh, date
 
@@ -379,12 +380,12 @@ def getversion_package(path=None):  # pylint: disable=unused-argument
 def getversion_onlinerepo():
     """Retrieve current framework git hash from Gerrit."""
     from pywikibot.comms import http
-
-    url = 'https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/branches/master'
-    # Gerrit API responses include )]}' at the beginning, make sure to strip it out
-    buf = http.fetch(uri=url,
-                     headers={'user-agent': '{pwb}'}).text[4:]
-
+    # Gerrit API responses include )]}' at the beginning,
+    # make sure to strip it out
+    buf = http.fetch(
+        uri='https://gerrit.wikimedia.org/r/projects/pywikibot%2Fcore/'
+            'branches/master',
+        headers={'user-agent': '{pwb}'}).text[4:]
     try:
         hsh = json.loads(buf)['revision']
         return hsh
@@ -411,7 +412,7 @@ def getfileversion(filename):
     mtime = None
     fn = os.path.join(_program_dir, filename)
     if os.path.exists(fn):
-        with codecs.open(fn, 'r', "utf-8") as f:
+        with codecs.open(fn, 'r', 'utf-8') as f:
             for line in f.readlines():
                 if line.find('__version__') == 0:
                     try:
@@ -422,7 +423,7 @@ def getfileversion(filename):
         stat = os.stat(fn)
         mtime = datetime.datetime.fromtimestamp(stat.st_mtime).isoformat(' ')
     if mtime and __version__:
-        return u'%s %s %s' % (filename, __version__[5:-1][:7], mtime)
+        return '%s %s %s' % (filename, __version__[5:-1][:7], mtime)
     else:
         return None
 
@@ -433,7 +434,8 @@ def get_module_version(module):
 
     @param module: The module instance.
     @type module: module
-    @return: The version hash without the surrounding text. If not present None.
+    @return: The version hash without the surrounding text. If not present
+        return None.
     @rtype: str or None
     """
     if hasattr(module, '__version__'):

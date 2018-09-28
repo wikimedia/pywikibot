@@ -129,7 +129,7 @@ if not PY2:
 
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory
-uiModule = __import__("pywikibot.userinterfaces.%s_interface"
+uiModule = __import__('pywikibot.userinterfaces.%s_interface'
                       % config.userinterface,
                       fromlist=['UI'])
 ui = uiModule.UI()
@@ -288,20 +288,20 @@ def init_handlers(strm=None):
     if not module_name:
         module_name = 'terminal-interface'
 
-    logging.addLevelName(VERBOSE, "VERBOSE")
+    logging.addLevelName(VERBOSE, 'VERBOSE')
     # for messages to be displayed on terminal at "verbose" setting
     # use INFO for messages to be displayed even on non-verbose setting
 
-    logging.addLevelName(STDOUT, "STDOUT")
+    logging.addLevelName(STDOUT, 'STDOUT')
     # for messages to be displayed to stdout
 
-    logging.addLevelName(INPUT, "INPUT")
+    logging.addLevelName(INPUT, 'INPUT')
     # for prompts requiring user response
 
-    root_logger = logging.getLogger("pywiki")
+    root_logger = logging.getLogger('pywiki')
     root_logger.setLevel(DEBUG + 1)  # all records except DEBUG go to logger
 
-    warnings_logger = logging.getLogger("py.warnings")
+    warnings_logger = logging.getLogger('py.warnings')
     warnings_logger.setLevel(DEBUG)
 
     # If there are command line warnings options, do not override them
@@ -309,9 +309,9 @@ def init_handlers(strm=None):
         logging.captureWarnings(True)
 
         if config.debug_log or 'deprecation' in config.log:
-            warnings.filterwarnings("always")
+            warnings.filterwarnings('always')
         elif config.verbose_output:
-            warnings.filterwarnings("module")
+            warnings.filterwarnings('module')
         warnings.filterwarnings('once', category=FutureWarning)
 
     root_logger.handlers = []  # remove any old handlers
@@ -322,7 +322,7 @@ def init_handlers(strm=None):
     # if user has enabled file logging, configure file handler
     if module_name in config.log or '*' in config.log:
         if config.logfilename:
-            logfile = config.datafilepath("logs", config.logfilename)
+            logfile = config.datafilepath('logs', config.logfilename)
         else:
             logfile = config.datafilepath('logs', '%s-bot.log' % module_name)
         file_handler = RotatingFileHandler(filename=logfile,
@@ -332,9 +332,9 @@ def init_handlers(strm=None):
 
         file_handler.setLevel(DEBUG)
         form = LoggingFormatter(
-            fmt="%(asctime)s %(caller_file)18s, %(caller_line)4s "
-                "in %(caller_name)18s: %(levelname)-8s %(message)s",
-            datefmt="%Y-%m-%d %H:%M:%S"
+            fmt='%(asctime)s %(caller_file)18s, %(caller_line)4s '
+                'in %(caller_name)18s: %(levelname)-8s %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S'
         )
         file_handler.setFormatter(form)
         root_logger.addHandler(file_handler)
@@ -342,9 +342,9 @@ def init_handlers(strm=None):
         # or for all components if nothing was specified
         for component in config.debug_log:
             if component:
-                debuglogger = logging.getLogger("pywiki." + component)
+                debuglogger = logging.getLogger('pywiki.' + component)
             else:
-                debuglogger = logging.getLogger("pywiki")
+                debuglogger = logging.getLogger('pywiki')
             debuglogger.setLevel(DEBUG)
             debuglogger.addHandler(file_handler)
 
@@ -368,27 +368,27 @@ def writelogheader():
     if not http or not hasattr(http, 'threads') or not len(http.threads):
         return
 
-    log(u'=== Pywikibot framework v3.0 -- Logging header ===')
+    log('=== Pywikibot framework v3.0 -- Logging header ===')
 
     # script call
-    log(u'COMMAND: {0}'.format(sys.argv))
+    log('COMMAND: {0}'.format(sys.argv))
 
     # script call time stamp
-    log(u'DATE: %s UTC' % str(datetime.datetime.utcnow()))
+    log('DATE: %s UTC' % str(datetime.datetime.utcnow()))
 
     # new framework release/revision? (handle_args needs to be called first)
     try:
-        log(u'VERSION: %s' %
+        log('VERSION: %s' %
             version.getversion(online=config.log_pywiki_repo_version).strip())
     except version.ParseError:
         exception()
 
     # system
     if hasattr(os, 'uname'):
-        log(u'SYSTEM: {0}'.format(os.uname()))
+        log('SYSTEM: {0}'.format(os.uname()))
 
     # config file dir
-    log(u'CONFIG FILE DIR: %s' % pywikibot.config2.base_dir)
+    log('CONFIG FILE DIR: %s' % pywikibot.config2.base_dir)
 
     all_modules = sys.modules.keys()
 
@@ -404,7 +404,7 @@ def writelogheader():
 
     packages = version.package_versions(check_package_list)
 
-    log(u'PACKAGES:')
+    log('PACKAGES:')
     for name in sorted(packages.keys()):
         info = packages[name]
         if 'path' not in info:
@@ -415,12 +415,12 @@ def writelogheader():
         if 'ver' not in info:
             info['ver'] = '??'
         if 'err' in info:
-            log(u'  %(name)s: %(err)s' % info)
+            log('  %(name)s: %(err)s' % info)
         else:
-            log(u'  %(name)s (%(path)s) = %(ver)s' % info)
+            log('  %(name)s (%(path)s) = %(ver)s' % info)
 
     # imported modules
-    log(u'MODULES:')
+    log('MODULES:')
     for module in sys.modules.values():
         filename = version.get_module_filename(module)
         ver = version.get_module_version(module)
@@ -428,13 +428,13 @@ def writelogheader():
         if filename and ver and mtime:
             # it's explicitly using str() to bypass unicode_literals in py2
             # isoformat expects a char not a unicode in Python 2
-            log(u'  {0} {1} {2}'.format(filename, ver[:7],
-                                        mtime.isoformat(str(' '))))
+            log('  {0} {1} {2}'.format(
+                filename, ver[:7], mtime.isoformat(str(' '))))
 
     if config.log_pywiki_repo_version:
-        log(u'PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
+        log('PYWIKI REPO VERSION: %s' % version.getversion_onlinerepo())
 
-    log(u'=== ' * 14)
+    log('=== ' * 14)
 
 
 add_init_routine(init_handlers)
@@ -876,7 +876,7 @@ def calledModuleName():
     """
     # get commandline arguments
     called = pywikibot.argvu[0].strip()
-    if ".py" in called:  # could end with .pyc, .pyw, etc. on some platforms
+    if '.py' in called:  # could end with .pyc, .pyw, etc. on some platforms
         # clip off the '.py?' filename extension
         called = called[:called.rindex('.py')]
     return os.path.basename(called)
@@ -943,7 +943,7 @@ def handle_args(args=None, do_help=True):
             config.log = []
         elif option in ('-cosmeticchanges', '-cc'):
             config.cosmetic_changes = not config.cosmetic_changes
-            output(u'NOTE: option cosmetic_changes is %s\n'
+            output('NOTE: option cosmetic_changes is %s\n'
                    % config.cosmetic_changes)
         elif option == '-simulate':
             config.simulate = True
@@ -979,7 +979,7 @@ def handle_args(args=None, do_help=True):
                 if value not in config.debug_log:
                     config.debug_log.append(value)
             elif '' not in config.debug_log:
-                config.debug_log.append("")
+                config.debug_log.append('')
         elif option in ('-verbose', '-v'):
             config.verbose_output += 1
         elif option == '-daemonize':
@@ -1005,7 +1005,7 @@ def handle_args(args=None, do_help=True):
     writeToCommandLogFile()
 
     if config.verbose_output:
-        pywikibot.output(u'Python %s' % sys.version)
+        pywikibot.output('Python %s' % sys.version)
 
     if do_help:
         showHelp()
@@ -1029,7 +1029,7 @@ def showHelp(module_name=None):
         try:
             module_name = sys.modules['__main__'].main.__module__
         except NameError:
-            module_name = "no_module"
+            module_name = 'no_module'
 
     global_help = _GLOBAL_HELP % module_name
     try:
@@ -1043,7 +1043,7 @@ def showHelp(module_name=None):
         pywikibot.stdout(help_text)  # output to STDOUT
     except Exception:
         if module_name:
-            pywikibot.stdout(u'Sorry, no help available for %s' % module_name)
+            pywikibot.stdout('Sorry, no help available for %s' % module_name)
         pywikibot.log('showHelp:', exc_info=True)
     pywikibot.stdout(global_help)
 
@@ -1098,7 +1098,7 @@ def writeToCommandLogFile():
     """
     modname = calledModuleName()
     # put quotation marks around all parameters
-    args = [modname] + [u'"%s"' % s for s in pywikibot.argvu[1:]]
+    args = [modname] + ['"%s"' % s for s in pywikibot.argvu[1:]]
     command_log_filename = config.datafilepath('logs', 'commands.log')
     try:
         command_log_file = codecs.open(command_log_filename, 'a', 'utf-8')
@@ -1109,7 +1109,7 @@ def writeToCommandLogFile():
     command_log_file.write('%s r%s Python %s '
                            % (iso_date, version.getversiondict()['rev'],
                               sys.version.split()[0]))
-    s = u' '.join(args)
+    s = ' '.join(args)
     command_log_file.write(s + os.linesep)
     command_log_file.close()
 
@@ -1153,7 +1153,7 @@ class OptionHandler(object):
             opt: kwargs[opt] for opt in received_options & valid_options}
 
         for opt in received_options - valid_options:
-            pywikibot.warning(u'%s is not a valid option. It was ignored.'
+            pywikibot.warning('%s is not a valid option. It was ignored.'
                               % opt)
 
     def getOption(self, option):
@@ -1231,7 +1231,7 @@ class BaseBot(OptionHandler):
         """
         if page != self._current_page:
             self._current_page = page
-            msg = u'Working on %r' % page.title()
+            msg = 'Working on %r' % page.title()
             if config.colorized_output:
                 log(msg)
                 stdout(color_format('\n\n>>> {lightpurple}{0}{default} <<<',
@@ -1289,7 +1289,7 @@ class BaseBot(OptionHandler):
         @rtype: bool
         """
         if oldtext.rstrip() == newtext.rstrip():
-            pywikibot.output(u'No changes were needed on %s'
+            pywikibot.output('No changes were needed on %s'
                              % page.title(as_link=True))
             return
 
@@ -1301,7 +1301,7 @@ class BaseBot(OptionHandler):
             pywikibot.showDiff(oldtext, newtext)
 
         if 'summary' in kwargs:
-            pywikibot.output(u'Edit summary: %s' % kwargs['summary'])
+            pywikibot.output('Edit summary: %s' % kwargs['summary'])
 
         page.text = newtext
         return self._save_page(page, page.save, **kwargs)
@@ -1340,23 +1340,23 @@ class BaseBot(OptionHandler):
             if not ignore_save_related_errors:
                 raise
             if isinstance(e, pywikibot.EditConflict):
-                pywikibot.output(u'Skipping %s because of edit conflict'
+                pywikibot.output('Skipping %s because of edit conflict'
                                  % page.title())
             elif isinstance(e, pywikibot.SpamfilterError):
                 pywikibot.output(
-                    u'Cannot change %s because of blacklist entry %s'
+                    'Cannot change %s because of blacklist entry %s'
                     % (page.title(), e.url))
             elif isinstance(e, pywikibot.LockedPage):
-                pywikibot.output(u'Skipping %s (locked page)'
+                pywikibot.output('Skipping %s (locked page)'
                                  % page.title())
             else:
                 pywikibot.error(
-                    u'Skipping %s because of a save related error: %s'
+                    'Skipping %s because of a save related error: %s'
                     % (page.title(), e))
         except pywikibot.ServerError as e:
             if not ignore_server_errors:
                 raise
-            pywikibot.error(u'Server Error while processing %s: %s'
+            pywikibot.error('Server Error while processing %s: %s'
                             % (page.title(), e))
         else:
             return True
@@ -1380,22 +1380,22 @@ class BaseBot(OptionHandler):
         May be overridden by subclasses.
         """
         self.teardown()
-        pywikibot.output("\n%i pages read"
-                         "\n%i pages written"
+        pywikibot.output('\n%i pages read'
+                         '\n%i pages written'
                          % (self._treat_counter, self._save_counter))
         if hasattr(self, '_start_ts'):
             delta = (pywikibot.Timestamp.now() - self._start_ts)
             seconds = int(delta.total_seconds())
             if delta.days:
-                pywikibot.output("Execution time: %d days, %d seconds"
+                pywikibot.output('Execution time: %d days, %d seconds'
                                  % (delta.days, delta.seconds))
             else:
-                pywikibot.output("Execution time: %d seconds" % delta.seconds)
+                pywikibot.output('Execution time: %d seconds' % delta.seconds)
             if self._treat_counter:
-                pywikibot.output("Read operation time: %d seconds"
+                pywikibot.output('Read operation time: %d seconds'
                                  % (seconds / self._treat_counter))
             if self._save_counter:
-                pywikibot.output("Write operation time: %d seconds"
+                pywikibot.output('Write operation time: %d seconds'
                                  % (seconds / self._save_counter))
 
         # exc_info contains exception from self.run() while terminating
@@ -1567,7 +1567,7 @@ class Bot(BaseBot):
             return
 
         if site not in self._sites:
-            log(u'LOADING SITE %s VERSION: %s'
+            log('LOADING SITE %s VERSION: %s'
                 % (site, site.version()))
 
             self._sites.add(site)
@@ -1881,8 +1881,8 @@ class WikidataBot(Bot, ExistingPageBot):
 
     @type treat_missing_item: bool
 
-    @ivar create_missing_item: If True, new items will be created if the current
-        page doesn't have one. Subclasses should override this in the
+    @ivar create_missing_item: If True, new items will be created if the
+        current page doesn't have one. Subclasses should override this in the
         initializer with a bool value or using self.getOption.
 
     @type create_missing_item: bool
@@ -1908,7 +1908,7 @@ class WikidataBot(Bot, ExistingPageBot):
 
         It is stored internally and reused by getSource()
         """
-        page = pywikibot.Page(self.repo, u'List of wikis/python', ns=4)
+        page = pywikibot.Page(self.repo, 'List of wikis/python', ns=4)
         self.source_values = json.loads(page.get())
         for family_code, family in self.source_values.items():
             for source_lang in family:
@@ -1930,11 +1930,11 @@ class WikidataBot(Bot, ExistingPageBot):
         for page in self.site.search(property_name, total=1, namespaces=ns):
             page = pywikibot.PropertyPage(self.site.data_repository(),
                                           page.title())
-            pywikibot.output(u"Assuming that %s property is %s." %
+            pywikibot.output('Assuming that %s property is %s.' %
                              (property_name, page.id))
             return page.id
-        return pywikibot.input(u'Property %s was not found. Please enter the '
-                               u'property ID (e.g. P123) of it:'
+        return pywikibot.input('Property %s was not found. Please enter the '
+                               'property ID (e.g. P123) of it:'
                                % property_name).upper()
 
     def user_edit_entity(self, item, data=None,
@@ -1975,7 +1975,7 @@ class WikidataBot(Bot, ExistingPageBot):
             pywikibot.output(json.dumps(diff, indent=4, sort_keys=True))
 
         if 'summary' in kwargs:
-            pywikibot.output(u'Change summary: %s' % kwargs['summary'])
+            pywikibot.output('Change summary: %s' % kwargs['summary'])
 
         # TODO PageSaveRelatedErrors should be actually raised in editEntity
         # (bug T86083)
@@ -2070,8 +2070,8 @@ class WikidataBot(Bot, ExistingPageBot):
             # If claim with same property already exists...
             if 'p' not in exists_arg:
                 logger_callback(
-                    'Skipping %s because claim with same property already exists'
-                    % (claim.getID(),))
+                    'Skipping %s because claim with same property '
+                    'already exists' % (claim.getID(),))
                 log('Use -exists:p option to override this behavior')
                 return False
             if not existing.target_equals(claim.getTarget()):
@@ -2088,8 +2088,8 @@ class WikidataBot(Bot, ExistingPageBot):
                 return False
             if 'q' not in exists_arg and not existing.qualifiers:
                 logger_callback(
-                    'Skipping %s because claim without qualifiers already exists'
-                    % (claim.getID(),))
+                    'Skipping %s because claim without qualifiers already '
+                    'exists' % (claim.getID(),))
                 log("Append 'q' to -exists argument to override this behavior")
                 return False
             if ('s' not in exists_arg or not source) and not existing.sources:
@@ -2104,8 +2104,8 @@ class WikidataBot(Bot, ExistingPageBot):
                             for snak in ref[source.getID()])
                         for ref in existing.sources)):
                 logger_callback(
-                    'Skipping %s because claim with the same source already exists'
-                    % (claim.getID(),))
+                    'Skipping %s because claim with the same source already '
+                    'exists' % (claim.getID(),))
                 log("Append 's' to -exists argument to override this behavior")
                 return False
 
@@ -2191,7 +2191,7 @@ class WikidataBot(Bot, ExistingPageBot):
             item = self.create_item_for_page(page, asynchronous=False)
 
         if not item and not self.treat_missing_item:
-            pywikibot.output('%s doesn\'t have a Wikidata item.' % page)
+            pywikibot.output("%s doesn't have a Wikidata item." % page)
             return
 
         self.treat_page_and_item(page, item)

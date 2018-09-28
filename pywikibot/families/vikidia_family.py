@@ -24,4 +24,4 @@ class Family(family.SubdomainFamily):
 
     def protocol(self, code):
         """Return https as the protocol for this family."""
-        return "https"
+        return 'https'

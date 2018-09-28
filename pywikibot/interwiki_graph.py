@@ -54,9 +54,9 @@ class GraphSavingThread(threading.Thread):
             filename = config.datafilepath(
                 'interwiki-graphs/' + getFilename(self.originPage, format))
             if self.graph.write(filename, prog='dot', format=format):
-                pywikibot.output(u'Graph saved as %s' % filename)
+                pywikibot.output('Graph saved as %s' % filename)
             else:
-                pywikibot.output(u'Graph could not be saved as %s' % filename)
+                pywikibot.output('Graph could not be saved as %s' % filename)
 
 
 class Subject(object):
@@ -159,7 +159,7 @@ class GraphDrawer(object):
     def addNode(self, page):
         """Add a node for page."""
         node = pydot.Node(self.getLabel(page), shape='rectangle')
-        node.set_URL("\"http://%s%s\""
+        node.set_URL('"http://%s%s"'
                      % (page.site.hostname(),
                         page.site.get_address(page.title(as_url=True))))
         node.set_style('filled')
@@ -198,7 +198,7 @@ class GraphDrawer(object):
             # https://sourceforge.net/p/pywikipediabot/bugs/401/
             elif self.graph.get_edge(sourceLabel, targetLabel):
                 pywikibot.output(
-                    u'BUG: Tried to create duplicate edge from %s to %s'
+                    'BUG: Tried to create duplicate edge from %s to %s'
                     % (refPage.title(as_link=True), page.title(as_link=True)))
                 # duplicate edges would be bad because then get_edge() would
                 # give a list of edges, not a single edge when we handle the
@@ -229,7 +229,7 @@ class GraphDrawer(object):
 
         For more info see U{https://meta.wikimedia.org/wiki/Interwiki_graphs}
         """
-        pywikibot.output(u'Preparing graph for %s'
+        pywikibot.output('Preparing graph for %s'
                          % self.subject.originPage.title())
         # create empty graph
         self.graph = pydot.Dot()

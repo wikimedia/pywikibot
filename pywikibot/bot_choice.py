@@ -115,8 +115,9 @@ class StandardOption(Option):
         if self.shortcut == default:
             shortcut = self.shortcut.upper()
         if index >= 0:
-            return '{0}[{1}]{2}'.format(self.option[:index], shortcut,
-                                        self.option[index + len(self.shortcut):])
+            return '{0}[{1}]{2}'.format(
+                self.option[:index], shortcut,
+                self.option[index + len(self.shortcut):])
         else:
             return '{0} [{1}]'.format(self.option, shortcut)
 
@@ -182,7 +183,9 @@ class ContextOption(OutputOption, StandardOption):
 
     """An option to show more and more context."""
 
-    def __init__(self, option, shortcut, text, context, delta=100, start=0, end=0):
+    def __init__(
+        self, option, shortcut, text, context, delta=100, start=0, end=0
+    ):
         """Initializer."""
         super(ContextOption, self).__init__(option, shortcut, False)
         self.text = text

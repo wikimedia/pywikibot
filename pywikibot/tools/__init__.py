@@ -384,7 +384,7 @@ def empty_iterator():
 
 
 def py2_encode_utf_8(func):
-    """Decorator to optionally encode the string result of a function on Python 2.x."""
+    """Decorator to optionally encode the string result of func on Python 2."""
     if PY2:
         return lambda s: func(s).encode('utf-8')
     else:
@@ -542,9 +542,9 @@ class DotReadableDict(UnicodeMixin):
         if not PY2:
             return repr(self.__dict__)
         else:
-            _content = u', '.join(
-                u'{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
-            return u'{{{0}}}'.format(_content)
+            _content = ', '.join(
+                '{0}: {1}'.format(k, v) for k, v in self.__dict__.items())
+            return '{{{0}}}'.format(_content)
 
     def __repr__(self):
         """Return a more complete string representation."""
@@ -586,8 +586,8 @@ def concat_options(message, line_length, options):
     """Concatenate options."""
     indent = len(message) + 2
     line_length -= indent
-    option_msg = u''
-    option_line = u''
+    option_msg = ''
+    option_line = ''
     for option in options:
         if option_line:
             option_line += ', '
@@ -602,7 +602,7 @@ def concat_options(message, line_length, options):
         if option_msg:
             option_msg += '\n' + ' ' * indent
         option_msg += option_line
-    return u'{0} ({1}):'.format(message, option_msg)
+    return '{0} ({1}):'.format(message, option_msg)
 
 
 class LazyRegex(object):
@@ -834,7 +834,7 @@ class ThreadedGenerator(threading.Thread):
 
     """
 
-    def __init__(self, group=None, target=None, name="GeneratorThread",
+    def __init__(self, group=None, target=None, name='GeneratorThread',
                  args=(), kwargs=None, qsize=65536):
         """Initializer. Takes same keyword arguments as threading.Thread.
 
@@ -850,8 +850,8 @@ class ThreadedGenerator(threading.Thread):
             kwargs = {}
         if target:
             self.generator = target
-        if not hasattr(self, "generator"):
-            raise RuntimeError("No generator for ThreadedGenerator to run.")
+        if not hasattr(self, 'generator'):
+            raise RuntimeError('No generator for ThreadedGenerator to run.')
         self.args, self.kwargs = args, kwargs
         threading.Thread.__init__(self, group=group, name=name)
         self.queue = Queue.Queue(qsize)
@@ -927,7 +927,7 @@ def itergroup(iterable, size):
 
 
 def islice_with_ellipsis(iterable, *args, **kwargs):
-    u"""
+    """
     Generator which yields the first n elements of the iterable.
 
     If more elements are available and marker is True, it returns an extra
@@ -988,7 +988,7 @@ class ThreadList(list):
 
     """
 
-    _logger = "threadlist"
+    _logger = 'threadlist'
 
     def __init__(self, limit=128, *args):
         """Initializer."""
@@ -1022,10 +1022,10 @@ class ThreadList(list):
     def stop_all(self):
         """Stop all threads the pool."""
         if self:
-            debug(u'EARLY QUIT: Threads: %d' % len(self), self._logger)
+            debug('EARLY QUIT: Threads: %d' % len(self), self._logger)
         for thd in self:
             thd.stop()
-            debug(u'EARLY QUIT: Queue size left in %s: %s'
+            debug('EARLY QUIT: Queue size left in %s: %s'
                   % (thd, thd.queue.qsize()), self._logger)
 
 
@@ -1716,15 +1716,15 @@ def deprecated_args(**arg_pairs):
                 if old_arg in __kw:
                     if new_arg not in [True, False, None]:
                         if new_arg in __kw:
-                            warn(u"%(new_arg)s argument of %(name)s "
-                                 u"replaces %(old_arg)s; cannot use both."
+                            warn('%(new_arg)s argument of %(name)s '
+                                 'replaces %(old_arg)s; cannot use both.'
                                  % output_args,
                                  RuntimeWarning, depth)
                         else:
                             # If the value is positionally given this will
                             # cause a TypeError, which is intentional
-                            warn(u"%(old_arg)s argument of %(name)s "
-                                 u"is deprecated; use %(new_arg)s instead."
+                            warn('%(old_arg)s argument of %(name)s '
+                                 'is deprecated; use %(new_arg)s instead.'
                                  % output_args,
                                  DeprecationWarning, depth)
                             __kw[new_arg] = __kw[old_arg]
@@ -1733,7 +1733,7 @@ def deprecated_args(**arg_pairs):
                             cls = PendingDeprecationWarning
                         else:
                             cls = DeprecationWarning
-                        warn(u"%(old_arg)s argument of %(name)s is deprecated."
+                        warn('%(old_arg)s argument of %(name)s is deprecated.'
                              % output_args,
                              cls, depth)
                     del __kw[old_arg]
@@ -1814,8 +1814,8 @@ def remove_last_args(arg_names):
             if deprecated:
                 # sort them according to arg_names
                 deprecated = [arg for arg in arg_names if arg in deprecated]
-                warn(u"The trailing arguments ('{0}') of {1} are deprecated. "
-                     u"The value(s) provided for '{2}' have been dropped.".
+                warn("The trailing arguments ('{0}') of {1} are deprecated. "
+                     "The value(s) provided for '{2}' have been dropped.".
                      format("', '".join(arg_names),
                             name,
                             "', '".join(deprecated)),

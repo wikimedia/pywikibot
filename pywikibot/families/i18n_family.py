@@ -20,4 +20,4 @@ class Family(family.SingleSiteFamily):
 
     def protocol(self, code):
         """Return https as the protocol for this family."""
-        return "https"
+        return 'https'

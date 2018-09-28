@@ -41,7 +41,7 @@ if ip_address and ip_address.__module__ == 'ipaddress':
         # https://pypi.org/project/py2-ipaddress
         # It accepts u'1111' as a valid IP address.
         try:
-            ip_address(u'1111')
+            ip_address('1111')
             ip_address = None
             raise ImportError('ipaddress backport is broken; install ipaddr')
         except ValueError:

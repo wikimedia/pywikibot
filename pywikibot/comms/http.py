@@ -65,7 +65,7 @@ else:
 # 'certificate verify failed' is a commonly detectable string
 SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 
-_logger = "comm.http"
+_logger = 'comm.http'
 
 
 def mode_check_decorator(func):
@@ -223,7 +223,7 @@ def user_agent(site=None, format_string=None):
 
     formatted = _USER_AGENT_FORMATTER.format(format_string, **values)
     # clean up after any blank components
-    formatted = formatted.replace(u'()', u'').replace(u'  ', u' ').strip()
+    formatted = formatted.replace('()', '').replace('  ', ' ').strip()
     return formatted
 
 
@@ -263,7 +263,8 @@ def fake_user_agent():
         pass
 
     raise ImportError(  # Actually complain when neither is installed.
-        'Either browseragents or fake_useragent must be installed to get fake UAs.')
+        'Either browseragents or fake_useragent must be installed to get fake '
+        'UAs.')
 
 
 @deprecate_arg('ssl', None)
@@ -304,7 +305,7 @@ def request(site=None, uri=None, method='GET', params=None, body=None,
         r = fetch(uri, method, params, body, headers, **kwargs)
         return r.text
 
-    kwargs.setdefault("disable_ssl_certificate_validation",
+    kwargs.setdefault('disable_ssl_certificate_validation',
                       site.ignore_certificate_error())
 
     if not headers:
@@ -406,7 +407,7 @@ def error_handling_callback(request):
         raise request.data
 
     if request.status == 504:
-        raise Server504Error("Server %s timed out" % request.hostname)
+        raise Server504Error('Server %s timed out' % request.hostname)
 
     if request.status == 414:
         raise Server414Error('Too long GET request')
@@ -472,7 +473,7 @@ def _enqueue(uri, method='GET', params=None, body=None, headers=None,
     return request
 
 
-def fetch(uri, method="GET", params=None, body=None, headers=None,
+def fetch(uri, method='GET', params=None, body=None, headers=None,
           default_error_handling=True, use_fake_user_agent=False, data=None,
           **kwargs):
     """
@@ -513,7 +514,8 @@ def fetch(uri, method="GET", params=None, body=None, headers=None,
             headers['user-agent'] = fake_user_agent()
 
     request = _enqueue(uri, method, params, body, headers, **kwargs)
-    assert(request._data is not None)  # if there's no data in the answer we're in trouble
+    # if there's no data in the answer we're in trouble
+    assert request._data is not None
     # Run the error handling callback in the callers thread so exceptions
     # may be caught.
     if default_error_handling:

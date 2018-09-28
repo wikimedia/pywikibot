@@ -33,7 +33,7 @@ else:
     import urlparse
 
 
-logger = logging.getLogger("pywiki.wiki.family")
+logger = logging.getLogger('pywiki.wiki.family')
 
 # Legal characters for Family.name and Family.langs keys
 NAME_CHARACTERS = string.ascii_letters + string.digits
@@ -993,19 +993,19 @@ class Family(object):
             # TODO: use more specific filter, so that family classes can use
             #     RuntimeWarning's while loading.
             with warnings.catch_warnings():
-                warnings.simplefilter("ignore", RuntimeWarning)
+                warnings.simplefilter('ignore', RuntimeWarning)
                 sys.path.append(dirname(family_file))
                 mod = import_module(splitext(basename(family_file))[0])
         except ImportError:
-            raise UnknownFamily(u'Family %s does not exist' % fam)
+            raise UnknownFamily('Family %s does not exist' % fam)
         cls = mod.Family.instance
         if cls.name != fam:
-            warn(u'Family name %s does not match family module name %s'
+            warn('Family name %s does not match family module name %s'
                  % (cls.name, fam), FamilyMaintenanceWarning)
         # Family 'name' and the 'langs' codes must be ascii, and the
         # codes must be lower-case due to the Site loading algorithm.
         if not all(x in NAME_CHARACTERS for x in cls.name):
-            warn(u'Family name %s contains non-ascii characters' % cls.name,
+            warn('Family name %s contains non-ascii characters' % cls.name,
                  FamilyMaintenanceWarning)
         # FIXME: wikisource uses code '-' for www.wikisource.org
         for code in cls.langs.keys():
@@ -1045,19 +1045,19 @@ class Family(object):
             return self.linktrails[fallback]
         else:
             raise KeyError(
-                "ERROR: linktrail in language %(language_code)s unknown"
+                'ERROR: linktrail in language %(language_code)s unknown'
                 % {'language_code': code})
 
     def category_redirects(self, code, fallback='_default'):
         """Return list of category redirect templates."""
-        if not hasattr(self, "_catredirtemplates") or \
+        if not hasattr(self, '_catredirtemplates') or \
            code not in self._catredirtemplates:
             self._get_cr_templates(code, fallback)
         return self._catredirtemplates[code]
 
     def _get_cr_templates(self, code, fallback):
         """Build list of category redirect templates."""
-        if not hasattr(self, "_catredirtemplates"):
+        if not hasattr(self, '_catredirtemplates'):
             self._catredirtemplates = {}
         if code in self.category_redirect_templates:
             cr_template_tuple = self.category_redirect_templates[code]
@@ -1093,7 +1093,7 @@ class Family(object):
             return self.disambiguationTemplates[fallback]
         else:
             raise KeyError(
-                "ERROR: title for disambig template in language %s unknown"
+                'ERROR: title for disambig template in language %s unknown'
                 % code)
 
     # Methods
@@ -1196,7 +1196,7 @@ class Family(object):
 
     def rcstream_path(self, code):
         """Return path for RCStream."""
-        raise NotImplementedError("This family does not support RCStream")
+        raise NotImplementedError('This family does not support RCStream')
 
     def rcstream_port(self, code):
         """Return port for RCStream."""
@@ -1362,7 +1362,7 @@ class Family(object):
         Currently this is implemented as returning the minor version
         number; i.e., 'X' in version '1.X.Y'
         """
-        R = re.compile(r"(\d+).(\d+)")
+        R = re.compile(r'(\d+).(\d+)')
         M = R.search(self.version(code))
         if not M:
             # Version string malformatted; assume it should have been 1.10
@@ -1678,7 +1678,7 @@ class WikimediaFamily(Family):
             return 'wikimedia.org'
 
         raise NotImplementedError(
-            'Family %s needs to define property \'domain\'' % cls.name)
+            "Family %s needs to define property 'domain'" % cls.name)
 
     @classproperty
     def interwiki_removals(cls):
