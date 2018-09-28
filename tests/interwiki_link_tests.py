@@ -84,8 +84,8 @@ class TestInterwikiLinksToNonLocalSites(TestCase):
         link = Link('de:translatewiki:Main Page', self.get_site('wp'))
         self.assertRaisesRegex(
             InvalidTitle,
-            "de:translatewiki:Main Page links to a non local site i18n:i18n "
-            "via an interwiki link to wikipedia:de",
+            'de:translatewiki:Main Page links to a non local site i18n:i18n '
+            'via an interwiki link to wikipedia:de',
             link.parse)
 
 
