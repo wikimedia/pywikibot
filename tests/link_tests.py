@@ -76,21 +76,28 @@ class TestLink(DefaultDrySiteTestCase):
         self.assertEqual(Link('~', self.get_site()).title, '~')
         self.assertEqual(Link('"', self.get_site()).title, '"')
         self.assertEqual(Link('\'', self.get_site()).title, '\'')
-        self.assertEqual(Link('Talk:Sandbox', self.get_site()).title, 'Sandbox')
-        self.assertEqual(Link('Talk:Foo:Sandbox', self.get_site()).title, 'Foo:Sandbox')
-        self.assertEqual(Link('File:Example.svg', self.get_site()).title, 'Example.svg')
-        self.assertEqual(Link('File_talk:Example.svg', self.get_site()).title, 'Example.svg')
-        self.assertEqual(Link('Foo/.../Sandbox', self.get_site()).title, 'Foo/.../Sandbox')
-        self.assertEqual(Link('Sandbox/...', self.get_site()).title, 'Sandbox/...')
+        self.assertEqual(Link('Talk:Sandbox', self.get_site()).title,
+                         'Sandbox')
+        self.assertEqual(Link('Talk:Foo:Sandbox', self.get_site()).title,
+                         'Foo:Sandbox')
+        self.assertEqual(Link('File:Example.svg', self.get_site()).title,
+                         'Example.svg')
+        self.assertEqual(Link('File_talk:Example.svg', self.get_site()).title,
+                         'Example.svg')
+        self.assertEqual(Link('Foo/.../Sandbox', self.get_site()).title,
+                         'Foo/.../Sandbox')
+        self.assertEqual(Link('Sandbox/...', self.get_site()).title,
+                         'Sandbox/...')
         self.assertEqual(Link('A~~', self.get_site()).title, 'A~~')
         self.assertEqual(Link(':A', self.get_site()).title, 'A')
         # Length is 256 total, but only title part matters
-        self.assertEqual(Link('Category:' + 'X' * 248, self.get_site()).title, 'X' * 248)
+        self.assertEqual(Link('Category:' + 'X' * 248, self.get_site()).title,
+                         'X' * 248)
         self.assertEqual(Link('X' * 252, self.get_site()).title, 'X' * 252)
         self.assertEqual(Link('A%20B', self.get_site()).title, 'A B')
-        self.assertEqual(Link('A &eacute; B', self.get_site()).title, u'A é B')
-        self.assertEqual(Link('A &#233; B', self.get_site()).title, u'A é B')
-        self.assertEqual(Link('A &#x00E9; B', self.get_site()).title, u'A é B')
+        self.assertEqual(Link('A &eacute; B', self.get_site()).title, 'A é B')
+        self.assertEqual(Link('A &#233; B', self.get_site()).title, 'A é B')
+        self.assertEqual(Link('A &#x00E9; B', self.get_site()).title, 'A é B')
         self.assertEqual(Link('A &nbsp; B', self.get_site()).title, 'A B')
         self.assertEqual(Link('A &#160; B', self.get_site()).title, 'A B')
 
@@ -119,9 +126,8 @@ class TestLink(DefaultDrySiteTestCase):
         # Bad characters forbidden regardless of wgLegalTitleChars
         def generate_contains_illegal_chars_exc_regex(text):
             exc_regex = (
-                r'^(u|)\'%s\' contains illegal char\(s\) (u|)\'%s\'$' % (
-                    re.escape(text), re.escape(text[2])
-                ))
+                r'^(u|)\'{}\' contains illegal char\(s\) (u|)\'{}\'$'
+                .format(re.escape(text), re.escape(text[2])))
             return exc_regex
 
         texts_to_test = ['A [ B', 'A ] B', 'A { B', 'A } B', 'A < B', 'A > B']
@@ -149,10 +155,8 @@ class TestLink(DefaultDrySiteTestCase):
 
         # Directory navigation
         def generate_contains_dot_combinations_exc_regex(text):
-            exc_regex = (
-                r'^\(contains \. / combinations\): (u|)\'%s\'$' % re.escape(
-                    text)
-            )
+            exc_regex = (r'^\(contains \. / combinations\): (u|)\'{}\'$'
+                         .format(re.escape(text)))
             return exc_regex
 
         texts_to_test = ['.', '..', './Sandbox', '../Sandbox', 'Foo/./Sandbox',
@@ -192,7 +196,7 @@ class TestLink(DefaultDrySiteTestCase):
 
         # Namespace prefix without actual title
         def generate_has_no_title_exc_regex(text):
-            exc_regex = r'^(u|)\'%s\' has no title\.$' % re.escape(text)
+            exc_regex = r'^(u|)\'{}\' has no title\.$'.format(re.escape(text))
             return exc_regex
 
         texts_to_test = ['Talk:', 'Category: ', 'Category: #bar']
@@ -831,7 +835,7 @@ class TestFullyQualifiedImplicitLinkNoLangConfigFamilyParser(LinkTestCase):
         self.assertEqual(link.namespace, 4)
 
     def test_fully_qualified_NS1_code(self):
-        """Test 'en:wikipedia:Talk:Main Page' on wikidata is not namespace 1."""
+        """Test 'en:wikipedia:Talk:Main Page' on wikidata isn't namespace 1."""
         config.mylang = 'wikidata'
         config.family = 'wikidata'
         link = Link('en:wikipedia:Talk:Main Page')
@@ -984,7 +988,8 @@ class TestEmptyTitle(TestCase):
         """Test that Link doesn't allow empty."""
         link = Link('', self.get_site())
         self.assertRaisesRegex(
-            InvalidTitle, "The link does not contain a page title", link.parse)
+            InvalidTitle, 'The link does not contain a page title',
+            link.parse)
 
     def test_namespace_lookalike(self):
         """Test that Link does only detect valid namespaces."""

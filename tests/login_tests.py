@@ -27,17 +27,17 @@ from tests import mock
 class FakeFamily(object):
     """Mock."""
 
-    name = "~FakeFamily"
+    name = '~FakeFamily'
 
 
 class FakeSite(object):
     """Mock."""
 
-    code = "~FakeCode"
+    code = '~FakeCode'
     family = FakeFamily
 
 
-FakeUsername = "~FakeUsername"
+FakeUsername = '~FakeUsername'
 
 
 class FakeConfig(object):
@@ -47,8 +47,8 @@ class FakeConfig(object):
     usernames[FakeFamily.name] = {FakeSite.code: FakeUsername}
 
 
-@mock.patch("pywikibot.Site", FakeSite)
-@mock.patch("pywikibot.login.config", FakeConfig)
+@mock.patch('pywikibot.Site', FakeSite)
+@mock.patch('pywikibot.login.config', FakeConfig)
 class TestOfflineLoginManager(DefaultDrySiteTestCase):
     """Test offline operation of login.LoginManager."""
 
@@ -82,7 +82,7 @@ class TestOfflineLoginManager(DefaultDrySiteTestCase):
         self.assertEqual(lm.username, FakeUsername)
 
 
-@mock.patch("pywikibot.Site", FakeSite)
+@mock.patch('pywikibot.Site', FakeSite)
 class TestPasswordFile(DefaultDrySiteTestCase):
     """Test parsing password files."""
 
@@ -95,18 +95,18 @@ class TestPasswordFile(DefaultDrySiteTestCase):
     def setUp(self):
         """Patch a variety of dependencies."""
         super(TestPasswordFile, self).setUp()
-        self.config = self.patch("pywikibot.login.config")
+        self.config = self.patch('pywikibot.login.config')
         self.config.usernames = FakeConfig.usernames
-        self.config.password_file = "~FakeFile"
+        self.config.password_file = '~FakeFile'
         self.config.private_files_permission = 0o600
-        self.config.base_dir = ""  # ensure that no path modifies password_file
+        self.config.base_dir = ''  # ensure that no path modifies password_file
 
-        self.stat = self.patch("os.stat")
+        self.stat = self.patch('os.stat')
         self.stat.return_value.st_mode = 0o100600
 
-        self.chmod = self.patch("os.chmod")
+        self.chmod = self.patch('os.chmod')
 
-        self.open = self.patch("codecs.open")
+        self.open = self.patch('codecs.open')
         self.open.return_value = StringIO()
 
     def test_auto_chmod_OK(self):
@@ -142,43 +142,43 @@ class TestPasswordFile(DefaultDrySiteTestCase):
         """Test global username/password declaration."""
         self._test_pwfile("""
             ('~FakeUsername', '~FakePassword')
-            """, "~FakePassword")
+            """, '~FakePassword')
 
     def test_match_family_username(self):
         """Test matching by family."""
         self._test_pwfile("""
             ('~FakeFamily', '~FakeUsername', '~FakePassword')
-            """, "~FakePassword")
+            """, '~FakePassword')
 
     def test_match_code_username(self):
         """Test matching by full configuration."""
         self._test_pwfile("""
             ('~FakeCode', '~FakeFamily', '~FakeUsername', '~FakePassword')
-            """, "~FakePassword")
+            """, '~FakePassword')
 
     def test_ordering(self):
         """Test that the last matching password is selected."""
         self._test_pwfile("""
             ('~FakeCode', '~FakeFamily', '~FakeUsername', '~FakePasswordA')
             ('~FakeUsername', '~FakePasswordB')
-            """, "~FakePasswordB")
+            """, '~FakePasswordB')
 
         self._test_pwfile("""
             ('~FakeUsername', '~FakePasswordA')
             ('~FakeCode', '~FakeFamily', '~FakeUsername', '~FakePasswordB')
-            """, "~FakePasswordB")
+            """, '~FakePasswordB')
 
     def test_BotPassword(self):
         """Test BotPassword entries.
 
-        When a BotPassword is used, the login_name changes to contain a suffix,
-        while the password is read from an object (instead of being read from
-        the password file directly).
+        When a BotPassword is used, the login_name changes to contain a
+        suffix, while the password is read from an object (instead of being
+        read from the password file directly).
         """
         obj = self._test_pwfile("""
             ('~FakeUsername', BotPassword('~FakeSuffix', '~FakePassword'))
             """, '~FakePassword')
-        self.assertEqual(obj.login_name, "~FakeUsername@~FakeSuffix")
+        self.assertEqual(obj.login_name, '~FakeUsername@~FakeSuffix')
 
 
 if __name__ == '__main__':  # pragma: no cover
