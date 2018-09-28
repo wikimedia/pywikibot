@@ -173,7 +173,7 @@ def use_setuptools(
 
     try:
         import pkg_resources
-        pkg_resources.require("setuptools>=" + version)
+        pkg_resources.require('setuptools>=' + version)
         # a suitable version is already installed
         return
     except ImportError:
@@ -249,8 +249,8 @@ def download_file_powershell(url, target):
     """
     target = os.path.abspath(target)
     ps_cmd = (
-        "[System.Net.WebRequest]::DefaultWebProxy.Credentials = "
-        "[System.Net.CredentialCache]::DefaultCredentials; "
+        '[System.Net.WebRequest]::DefaultWebProxy.Credentials = '
+        '[System.Net.CredentialCache]::DefaultCredentials; '
         '(new-object System.Net.WebClient).DownloadFile("%(url)s", "%(target)s")'
         % locals()
     )
@@ -318,7 +318,7 @@ def download_file_insecure(url, target):
         src.close()
 
     # Write all the data in one block to avoid creating a partial file.
-    with open(target, "wb") as dst:
+    with open(target, 'wb') as dst:
         dst.write(data)
 download_file_insecure.viable = lambda: True
 
@@ -352,11 +352,11 @@ def download_setuptools(
     """
     # making sure we use the absolute path
     to_dir = os.path.abspath(to_dir)
-    zip_name = "setuptools-%s.zip" % version
+    zip_name = 'setuptools-%s.zip' % version
     url = download_base + zip_name
     saveto = os.path.join(to_dir, zip_name)
     if not os.path.exists(saveto):  # Avoid repeated downloads
-        log.warn("Downloading %s", url)
+        log.warn('Downloading %s', url)
         downloader = downloader_factory()
         downloader(url, saveto)
     return os.path.realpath(saveto)
@@ -378,7 +378,7 @@ def _parse_args():
         '--user', dest='user_install', action='store_true', default=False,
         help='install in user site package')
     parser.add_option(
-        '--download-base', dest='download_base', metavar="URL",
+        '--download-base', dest='download_base', metavar='URL',
         default=DEFAULT_URL,
         help='alternative URL from where to download the setuptools package')
     parser.add_option(

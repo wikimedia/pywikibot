@@ -41,7 +41,7 @@ except AttributeError:
 pywikibot_dir = sys.path[0]
 
 if console_encoding is None or sys.platform == 'cygwin':
-    console_encoding = "iso-8859-1"
+    console_encoding = 'iso-8859-1'
 
 USER_BASENAME = 'user-config.py'
 PASS_BASENAME = 'user-password.py'
@@ -50,24 +50,24 @@ PASS_BASENAME = 'user-password.py'
 def change_base_dir():
     """Create a new user directory."""
     while True:
-        new_base = pywikibot.input("New user directory? ")
+        new_base = pywikibot.input('New user directory? ')
         new_base = os.path.abspath(new_base)
         if os.path.exists(new_base):
             if os.path.isfile(new_base):
-                pywikibot.error("there is an existing file with that name.")
+                pywikibot.error('there is an existing file with that name.')
                 continue
             # make sure user can read and write this directory
             if not os.access(new_base, os.R_OK | os.W_OK):
-                pywikibot.error("directory access restricted")
+                pywikibot.error('directory access restricted')
                 continue
-            pywikibot.output("Using existing directory")
+            pywikibot.output('Using existing directory')
         else:
             try:
                 os.mkdir(new_base, pywikibot.config2.private_files_permission)
             except Exception as e:
                 pywikibot.error('directory creation failed: {0}'.format(e))
                 continue
-            pywikibot.output("Created new directory.")
+            pywikibot.output('Created new directory.')
         break
 
     if new_base == pywikibot.config2.get_base_dir(new_base):
@@ -83,7 +83,7 @@ set environment variables.""" % {'new_base': new_base}, width=76)
     pywikibot.output(msg)
     if pywikibot.input_yn('Is this OK?', default=False, automatic_quit=False):
         return new_base
-    pywikibot.output("Aborting changes.")
+    pywikibot.output('Aborting changes.')
     return False
 
 
@@ -115,14 +115,14 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
     if default_family not in known_families:
         default_family = None
     fam = pywikibot.bot.input_list_choice(
-        u"Select family of sites we are working on, "
-        u"just enter the number or name",
+        'Select family of sites we are working on, '
+        'just enter the number or name',
         known_families,
         force=force,
         default=default_family)
     fam = pywikibot.family.Family.load(fam)
-    if hasattr(fam, "langs"):
-        if hasattr(fam, "languages_by_size"):
+    if hasattr(fam, 'langs'):
+        if hasattr(fam, 'languages_by_size'):
             by_size = [code for code in fam.languages_by_size
                        if code in fam.langs.keys()]
         else:
@@ -140,8 +140,8 @@ def get_site_and_lang(default_family='wikipedia', default_lang='en',
         pywikibot.output('The only known language: {0}'.format(known_langs[0]))
         default_lang = known_langs[0]
     else:
-        pywikibot.output("This is the list of known languages:")
-        pywikibot.output(u", ".join(known_langs))
+        pywikibot.output('This is the list of known languages:')
+        pywikibot.output(', '.join(known_langs))
         if default_lang not in known_langs:
             if default_lang != 'en' and 'en' in known_langs:
                 default_lang = 'en'
@@ -356,7 +356,7 @@ def create_user_config(main_family, main_code, main_username, force=False):
 
     try:
         # Finally save user-config.py
-        with codecs.open(_fnc, "w", "utf-8") as f:
+        with codecs.open(_fnc, 'w', 'utf-8') as f:
             f.write(config_content.format(
                 main_family=main_family,
                 main_code=main_code,
@@ -365,7 +365,7 @@ def create_user_config(main_family, main_code, main_username, force=False):
                 botpasswords='password_file = ' + ('"{}"'.format(PASS_BASENAME)
                                                    if botpasswords
                                                    else 'None')))
-        pywikibot.output(u"'%s' written." % _fnc)
+        pywikibot.output("'%s' written." % _fnc)
     except BaseException:
         if os.path.exists(_fnc):
             os.remove(_fnc)
@@ -444,7 +444,7 @@ def main(*args):
     pywikibot.output('You can abort at any time by pressing ctrl-c')
     if config.mylang is not None:
         force = True
-        pywikibot.output(u'Automatically generating user-config.py')
+        pywikibot.output('Automatically generating user-config.py')
     else:
         force = False
         # Force default site of en.wikipedia
