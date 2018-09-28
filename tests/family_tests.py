@@ -30,7 +30,8 @@ class TestFamily(TestCase):
     FAMILY_TYPEERROR_RE = (
         'Family.obsolete not updatable; '
         'use Family.interwiki_removals and Family.interwiki_replacements')
-    FROZENSET_TYPEERROR_RE = '\'frozenset\' object does not support item assignment'
+    FROZENSET_TYPEERROR_RE = ("'frozenset' object does not support item "
+                              'assignment')
     net = False
 
     def test_family_load_valid(self):
@@ -240,9 +241,9 @@ class TestFamilyUrlRegex(PatchingTestCase):
             family = Family.load(family)
             for code in family.codes:
                 self.current_code = code
-                url = ('%s://%s%s/$1' % (family.protocol(code),
-                                         family.hostname(code),
-                                         family.path(code)))
+                url = ('{}://{}{}/$1'.format(family.protocol(code),
+                                             family.hostname(code),
+                                             family.path(code)))
                 # Families can switch off if they want to be detected using URL
                 # this applies for test:test (there is test:wikipedia)
                 if family._ignore_from_url or code in family._ignore_from_url:
@@ -275,7 +276,8 @@ class TestOldFamilyMethod(DeprecationTestCase):
         self.assertEqual(f.name, 'i18n')
         self.assertDeprecationParts('pywikibot.site.Family',
                                     'pywikibot.family.Family.load')
-        self.assertDeprecationParts('fatal argument of pywikibot.family.Family.load')
+        self.assertDeprecationParts(
+            'fatal argument of pywikibot.family.Family.load')
 
     def test_old_site_family_function_invalid(self):
         """Test that an invalid family raised UnknownFamily exception."""
@@ -295,7 +297,8 @@ class TestOldFamilyMethod(DeprecationTestCase):
             'unknown')
         self.assertDeprecationParts('pywikibot.site.Family',
                                     'pywikibot.family.Family.load')
-        self.assertDeprecationParts('fatal argument of pywikibot.family.Family.load')
+        self.assertDeprecationParts(
+            'fatal argument of pywikibot.family.Family.load')
 
 
 if __name__ == '__main__':  # pragma: no cover

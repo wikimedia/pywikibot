@@ -169,7 +169,8 @@ class TestFlowFactoryErrors(TestCase):
         real_topic = Topic(self.site, 'Topic:Slbktgav46omarsd')
         fake_topic = Topic(self.site, 'Topic:Abcdefgh12345678')
         # Topic.from_topiclist_data
-        self.assertRaises(TypeError, Topic.from_topiclist_data, self.site, '', {})
+        self.assertRaises(TypeError, Topic.from_topiclist_data, self.site,
+                          '', {})
         self.assertRaises(TypeError, Topic.from_topiclist_data, board, 521, {})
         self.assertRaises(TypeError, Topic.from_topiclist_data, board,
                           'slbktgav46omarsd', [0, 1, 2])

@@ -99,7 +99,7 @@ class TestShareFiles(TestCase):
         self.assertFalse(enwp_file.fileIsShared())
 
         page_doesnt_exist_exc_regex = re.escape(
-            'Page [[commons:%s]] doesn\'t exist.' % title)
+            "Page [[commons:{}]] doesn't exist.".format(title))
         with self.assertRaisesRegex(
                 pywikibot.NoPage,
                 page_doesnt_exist_exc_regex):
@@ -116,7 +116,7 @@ class TestShareFiles(TestCase):
             commons_file.get()
 
     def testOnBoth(self):
-        """Test fileIsShared() on file page with both local and shared file."""
+        """Test fileIsShared() on file page with local and shared file."""
         title = 'File:Pulsante spam.png'
 
         commons = self.get_site('commons')
@@ -170,19 +170,19 @@ class TestFilePage(TestCase):
     def test_file_info_with_no_page(self):
         """FilePage:latest_file_info raises NoPage for non existing pages."""
         site = self.get_site()
-        image = pywikibot.FilePage(site, u'File:NoPage')
+        image = pywikibot.FilePage(site, 'File:NoPage')
         self.assertFalse(image.exists())
 
         with self.assertRaisesRegex(
                 pywikibot.NoPage,
                 (r'Page \[\[(wikipedia\:|)test:File:NoPage\]\] '
-                 r'doesn\'t exist\.')):
+                 r"doesn't exist\.")):
             image = image.latest_file_info
 
     def test_file_info_with_no_file(self):
-        """FilePage:latest_file_info raises PagerelatedError if no file is present."""
+        """FilePage:latest_file_info raises PagerelatedError if no file."""
         site = self.get_site()
-        image = pywikibot.FilePage(site, u'File:Test with no image')
+        image = pywikibot.FilePage(site, 'File:Test with no image')
         self.assertTrue(image.exists())
         with self.assertRaisesRegex(
                 pywikibot.PageRelatedError,
@@ -227,9 +227,10 @@ class TestFilePageLatestFileInfo(TestCase):
         """Get File thumburl from width."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
-        self.assertEqual(self.image.get_file_url(url_width=100, url_param='1000px'),
-                         'https://upload.wikimedia.org/wikipedia/commons/thumb/'
-                         'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
+        self.assertEqual(
+            self.image.get_file_url(url_width=100, url_param='1000px'),
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+            'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
@@ -237,9 +238,10 @@ class TestFilePageLatestFileInfo(TestCase):
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
-        self.assertEqual(self.image.get_file_url(url_height=100, url_param='1000px'),
-                         'https://upload.wikimedia.org/wikipedia/commons/thumb/'
-                         'd/d3/Albert_Einstein_Head.jpg/75px-Albert_Einstein_Head.jpg')
+        self.assertEqual(
+            self.image.get_file_url(url_height=100, url_param='1000px'),
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+            'd/d3/Albert_Einstein_Head.jpg/75px-Albert_Einstein_Head.jpg')
         self.assertEqual(self.image.latest_file_info.thumbwidth, 75)
         self.assertEqual(self.image.latest_file_info.thumbheight, 100)
 
@@ -247,9 +249,10 @@ class TestFilePageLatestFileInfo(TestCase):
         """Get File thumburl from height."""
         self.assertTrue(self.image.exists())
         # url_param has no precedence over height/width.
-        self.assertEqual(self.image.get_file_url(url_param='100px'),
-                         'https://upload.wikimedia.org/wikipedia/commons/thumb/'
-                         'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
+        self.assertEqual(
+            self.image.get_file_url(url_param='100px'),
+            'https://upload.wikimedia.org/wikipedia/commons/thumb/'
+            'd/d3/Albert_Einstein_Head.jpg/100px-Albert_Einstein_Head.jpg')
         self.assertEqual(self.image.latest_file_info.thumbwidth, 100)
         self.assertEqual(self.image.latest_file_info.thumbheight, 133)
 
@@ -301,13 +304,14 @@ class TestFilePageDownload(TestCase):
 
     def test_not_existing_download(self):
         """Test not existing download."""
-        page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg_notexisting')
+        page = pywikibot.FilePage(self.site,
+                                  'File:Albert Einstein.jpg_notexisting')
         filename = join_images_path('Albert Einstein.jpg')
 
         with self.assertRaisesRegex(
                 pywikibot.NoPage,
                 re.escape('Page [[commons:File:Albert Einstein.jpg '
-                          'notexisting]] doesn\'t exist.')):
+                          "notexisting]] doesn't exist.")):
             page.download(filename)
 
 

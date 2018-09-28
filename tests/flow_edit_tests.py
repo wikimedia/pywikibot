@@ -75,7 +75,8 @@ class TestFlowReply(TestCase):
     def test_reply_to_topic_root(self):
         """Test replying to the topic's root post directly."""
         # Setup
-        content = "I am a reply to the topic's root post. Replying still works!"
+        content = ("I am a reply to the topic's root post. "
+                   'Replying still works!')
         topic = Topic(self.site, self._topic_title)
         topic_root = topic.root
         old_replies = topic_root.replies(force=True)[:]
@@ -114,7 +115,8 @@ class TestFlowReply(TestCase):
         """Test replying to a previous reply to a topic."""
         # Setup
         first_content = 'I am a reply to the topic with my own replies. Great!'
-        second_content = 'I am a nested reply. This conversation is getting pretty good!'
+        second_content = ('I am a nested reply. This conversation is '
+                          'getting pretty good!')
         topic = Topic(self.site, self._topic_title)
         topic_root = topic.root
         # First reply
@@ -145,7 +147,8 @@ class TestFlowReply(TestCase):
         # Test reply list in first reply
         # Broken due to current Flow reply structure (T105438)
         # new_nested_replies = first_reply_post.replies(force=True)
-        # self.assertEqual(len(new_nested_replies), len(old_nested_replies) + 1)
+        # self.assertEqual(len(new_nested_replies),
+        #                  len(old_nested_replies) + 1)
 
         # Current test for nested reply list
         self.assertListEqual(old_nested_replies, [])
