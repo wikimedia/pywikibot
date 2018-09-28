@@ -16,13 +16,6 @@ Tool to copy a flickr stream to Commons.
     * Filter the categories
   * Upload the image
 
-Todo
-----
-* Check if the image is already uploaded (SHA hash)
-* Check and prevent filename collisions
-  * Initial suggestion
-  * User input
-* Filter the categories
 """
 #
 # (C) Multichill, 2009
