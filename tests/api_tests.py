@@ -155,15 +155,15 @@ class TestDryApiFunctions(DefaultDrySiteTestCase):
                                                    'bar': 'test'})
         self.assertTrue(req)
         self.assertEqual(req.site, mysite)
-        self.assertIn("foo", req._params)
-        self.assertEqual(req["bar"], ["test"])
+        self.assertIn('foo', req._params)
+        self.assertEqual(req['bar'], ['test'])
         # test item assignment
-        req["one"] = "1"
-        self.assertEqual(req._params['one'], ["1"])
+        req['one'] = '1'
+        self.assertEqual(req._params['one'], ['1'])
         # test compliance with dict interface
-        # req.keys() should contain "action", "foo", "bar", "one"
+        # req.keys() should contain 'action', 'foo', 'bar', 'one'
         self.assertEqual(len(req.keys()), 4)
-        self.assertIn("test", req._encoded_items().values())
+        self.assertIn('test', req._encoded_items().values())
         for item in req.items():
             self.assertEqual(len(item), 2, item)
 
@@ -483,8 +483,8 @@ class TestParamInfo(DefaultSiteTestCase):
         site = self.get_site()
         if site.mw_version < '1.25wmf4':
             raise unittest.SkipTest(
-                "version %s doesn't support the new paraminfo api"
-                % site.mw_version)
+                "version {} doesn't support the new paraminfo api"
+                .format(site.mw_version))
         pi = api.ParamInfo(site, modules_only_mode=True)
         pi.fetch(['info'])
         self.assertIn('query+info', pi._paraminfo)
@@ -553,7 +553,8 @@ class TestOptionSet(TestCase):
         """Test OptionSet with initialised site."""
         options = api.OptionSet(self.get_site(), 'recentchanges', 'show')
         self.assertRaises(KeyError, options.__setitem__, 'invalid_name', True)
-        self.assertRaises(ValueError, options.__setitem__, 'anon', 'invalid_value')
+        self.assertRaises(ValueError, options.__setitem__,
+                          'anon', 'invalid_value')
         options['anon'] = True
         self.assertCountEqual(['anon'], options._enabled)
         self.assertEqual(set(), options._disabled)
@@ -602,7 +603,8 @@ class TestDryOptionSet(DefaultDrySiteTestCase):
         self.assertCountEqual(['a', 'b'], list(options.keys()))
         self.assertCountEqual([True, False], list(options.values()))
         self.assertEqual(set(), set(options.values()) - {True, False})
-        self.assertCountEqual([('a', True), ('b', False)], list(options.items()))
+        self.assertCountEqual([('a', True), ('b', False)],
+                              list(options.items()))
 
 
 class TestDryPageGenerator(TestCase):
@@ -616,35 +618,36 @@ class TestDryPageGenerator(TestCase):
 
     # api.py sorts 'pages' using the string key, which is not a
     # numeric comparison.
-    titles = ("Broadcaster (definition)", "Wiktionary", "Broadcaster.com",
-              "Wikipedia:Disambiguation")
+    titles = ('Broadcaster (definition)', 'Wiktionary', 'Broadcaster.com',
+              'Wikipedia:Disambiguation')
 
     def setUp(self):
         """Set up test case."""
         super(TestDryPageGenerator, self).setUp()
         mysite = self.get_site()
         self.gen = api.PageGenerator(site=mysite,
-                                     generator="links",
+                                     generator='links',
                                      parameters={'titles': "User:R'n'B"})
         # following test data is copied from an actual api.php response,
         # but that query no longer matches this dataset.
         # http://en.wikipedia.org/w/api.php?action=query&generator=links&titles=User:R%27n%27B
         self.gen.request.submit = types.MethodType(lambda self: {
-            "query": {"pages": {"296589": {"pageid": 296589,
-                                           "ns": 0,
-                                           "title": "Broadcaster.com"
+            'query': {'pages': {'296589': {'pageid': 296589,
+                                           'ns': 0,
+                                           'title': 'Broadcaster.com'
                                            },
-                                "13918157": {"pageid": 13918157,
-                                             "ns": 0,
-                                             "title": "Broadcaster (definition)"
+                                '13918157': {'pageid': 13918157,
+                                             'ns': 0,
+                                             'title': 'Broadcaster '
+                                                      '(definition)'
                                              },
-                                "156658": {"pageid": 156658,
-                                           "ns": 0,
-                                           "title": "Wiktionary"
+                                '156658': {'pageid': 156658,
+                                           'ns': 0,
+                                           'title': 'Wiktionary'
                                            },
-                                "47757": {"pageid": 47757,
-                                          "ns": 4,
-                                          "title": "Wikipedia:Disambiguation"
+                                '47757': {'pageid': 47757,
+                                          'ns': 4,
+                                          'title': 'Wikipedia:Disambiguation'
                                           }
                                 }
                       }
@@ -654,7 +657,8 @@ class TestDryPageGenerator(TestCase):
         # Add custom_name for this site namespace, to match the live site.
         if 'Wikipedia' not in self.site.namespaces:
             self.site.namespaces[4].custom_name = 'Wikipedia'
-            self.site.namespaces._namespace_names['wikipedia'] = self.site.namespaces[4]
+            self.site.namespaces._namespace_names['wikipedia'] = (
+                self.site.namespaces[4])
 
     def test_results(self):
         """Test that PageGenerator yields pages with expected attributes."""
@@ -724,7 +728,7 @@ class TestPropertyGenerator(TestCase):
         titles = [l.title(with_section=False)
                   for l in links]
         gen = api.PropertyGenerator(site=self.site,
-                                    prop="info",
+                                    prop='info',
                                     parameters={'titles': '|'.join(titles)})
 
         count = 0
@@ -742,7 +746,7 @@ class TestPropertyGenerator(TestCase):
         titles = [l.title(with_section=False)
                   for l in links]
         gen = api.PropertyGenerator(site=self.site,
-                                    prop="revisions",
+                                    prop='revisions',
                                     parameters={'titles': '|'.join(titles)})
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
@@ -762,7 +766,7 @@ class TestPropertyGenerator(TestCase):
         titles = [l.title(with_section=False)
                   for l in links]
         gen = api.PropertyGenerator(site=self.site,
-                                    prop="revisions|coordinates",
+                                    prop='revisions|coordinates',
                                     parameters={'titles': '|'.join(titles)})
         gen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
 
@@ -867,7 +871,7 @@ class TestDryListGenerator(TestCase):
             'namespace': {'multi': True}
         }
         mysite._paraminfo.query_modules_with_limits = {'allpages'}
-        self.gen = api.ListGenerator(listaction="allpages", site=mysite)
+        self.gen = api.ListGenerator(listaction='allpages', site=mysite)
 
     def test_namespace_none(self):
         """Test ListGenerator set_namespace with None."""
@@ -1159,7 +1163,7 @@ class TestLagpattern(DefaultSiteTestCase):
         for info, time in patterns.items():
             lag = api.lagpattern.search(info)
             self.assertIsNotNone(lag)
-            self.assertEqual(int(lag.group("lag")), time)
+            self.assertEqual(int(lag.group('lag')), time)
 
 
 if __name__ == '__main__':  # pragma: no cover
