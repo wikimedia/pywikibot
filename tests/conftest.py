@@ -11,5 +11,5 @@ import sys
 
 
 def pytest_configure(config):
-    """Set the sys._test_runner_pytest flag to True, if pytest is used to run tests."""
+    """Set the sys._test_runner_pytest flag to True, if pytest is used."""
     sys._test_runner_pytest = True

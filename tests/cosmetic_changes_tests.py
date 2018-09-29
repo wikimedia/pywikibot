@@ -60,7 +60,8 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
         """Test resolveHtmlEntities method."""
         self.assertEqual(
             '&amp;#&nbsp;# #0#&#62;#x',
-            self.cct.resolveHtmlEntities('&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
+            self.cct.resolveHtmlEntities(
+                '&amp;#&nbsp;#&#32;#&#48;#&#62;#&#120;'))
         self.assertEqual(
             '<code>&#32;</code>',
             self.cct.resolveHtmlEntities('<code>&#32;</code>'))
@@ -213,13 +214,17 @@ class TestDryCosmeticChanges(TestCosmeticChanges):
             '[[:Datei:Example.svg|Description]]\n',
             self.cct.fixSyntaxSave(
                 '[https://de.wikipedia.org/wiki/Kategorie:Example]\n'
-                '[https://de.wikipedia.org/wiki/Category:Example Description]\n'
+                '[https://de.wikipedia.org/wiki/Category:Example '
+                'Description]\n'
                 '[https://de.wikipedia.org/wiki/Datei:Example.svg]\n'
-                '[https://de.wikipedia.org/wiki/File:Example.svg Description]\n'
+                '[https://de.wikipedia.org/wiki/File:Example.svg '
+                'Description]\n'
                 '[[https://de.wikipedia.org/wiki/Category:Example]]\n'
-                '[[https://de.wikipedia.org/wiki/Kategorie:Example Description]]\n'
+                '[[https://de.wikipedia.org/wiki/Kategorie:Example '
+                'Description]]\n'
                 '[[https://de.wikipedia.org/wiki/File:Example.svg]]\n'
-                '[[https://de.wikipedia.org/wiki/Datei:Example.svg Description]]\n'
+                '[[https://de.wikipedia.org/wiki/Datei:Example.svg '
+                'Description]]\n'
             ))
         del self.cct.site._namespaces
 
@@ -438,8 +443,8 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         """
         Test cleanUpLinks method.
 
-        This method fails for the given samples from library. Either the method
-        has to be changed or the examples must be fixed.
+        This method fails for the given samples from library. Either
+        the method has to be changed or the examples must be fixed.
         """
         self.assertEqual('text [[title]] text',
                          self.cct.cleanUpLinks('text[[ title ]]text'))
@@ -454,8 +459,9 @@ class TestLiveCosmeticChanges(TestCosmeticChanges):
         """Test replaceDeprecatedTemplates method."""
         self.assertEqual('{{Belege fehlen}}',
                          self.cct.replaceDeprecatedTemplates('{{Belege}}'))
-        self.assertEqual('{{Belege fehlen|Test}}',
-                         self.cct.replaceDeprecatedTemplates('{{Quelle|Test}}'))
+        self.assertEqual(
+            '{{Belege fehlen|Test}}',
+            self.cct.replaceDeprecatedTemplates('{{Quelle|Test}}'))
 
 
 class TestCosmeticChangesPersian(TestCosmeticChanges):

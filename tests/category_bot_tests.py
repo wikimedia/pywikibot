@@ -26,25 +26,25 @@ class CfdActions(DefaultSiteTestCase):
     """Test CFD (Categories for deletion) actions."""
 
     def test_strip_cfd_templates_does_nothing_when_no_templates(self):
-        """Test that when there are no CFD templates, the page text is not changed."""
+        """Test when the're no CFD templates, the page text is not changed."""
         bot = CategoryMoveRobot(oldcat='Old', newcat='New')
-        bot.newcat.text = "Nothing should change.\n\nAnother line."
+        bot.newcat.text = 'Nothing should change.\n\nAnother line.'
         bot._strip_cfd_templates(commit=False)
         self.assertEqual(bot.newcat.text,
-                         "Nothing should change.\n\nAnother line.")
+                         'Nothing should change.\n\nAnother line.')
 
     def test_strip_cfd_templates_with_spaces_in_comments(self):
-        """Test that CFD templates with spaces in the syntax are removed properly."""
+        """Test CFD templates with spaces in the syntax are removed."""
         self._runtest_strip_cfd_templates('<!-- BEGIN CFD TEMPLATE -->',
                                           '<!-- END CFD TEMPLATE -->')
 
     def test_strip_cfd_templates_without_spaces_in_comments(self):
-        """Test that CFD templates without spaces in the syntax are removed properly."""
+        """Test CFD templates without spaces in the syntax are removed."""
         self._runtest_strip_cfd_templates('<!--BEGIN CFD TEMPLATE-->',
                                           '<!--END CFD TEMPLATE-->')
 
     def _runtest_strip_cfd_templates(self, template_start, template_end):
-        """Run a CFD template stripping test with the given CFD start/end templates."""
+        """Run a CFD template stripping test, given CFD start/end templates."""
         bot = CategoryMoveRobot(oldcat='Old', newcat='New')
         bot.newcat.text = '\n'.join((
             'Preamble',
