@@ -44,7 +44,8 @@ class TestSaveFailure(TestCase):
     def test_protected(self):
         """Test that protected titles raise the appropriate exception."""
         if self.site.has_group('sysop'):
-            raise unittest.SkipTest('Testing failure of edit protected with a sysop account')
+            raise unittest.SkipTest('Testing failure of edit protected with '
+                                    'a sysop account')
         page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
         self.assertRaises(LockedPage, page.save)
 
@@ -90,7 +91,7 @@ class TestSaveFailure(TestCase):
     def test_no_recreate(self):
         """Test that Page.save with recreate disabled fails if page existed."""
         page = pywikibot.Page(self.site, 'User:John_Vandenberg/no_recreate')
-        self.assertRaisesRegex(OtherPageSaveError, 'Page .* doesn\'t exist',
+        self.assertRaisesRegex(OtherPageSaveError, "Page .* doesn't exist",
                                page.save, recreate=False)
 
 
@@ -112,8 +113,8 @@ class TestActionFailure(TestCase):
             mysite.tokens['move']
         except KeyError:
             raise unittest.SkipTest(
-                "movepage test requires 'move' token not given to user on %s"
-                % self.site)
+                "movepage test requires 'move' token not given to user on {}"
+                .format(self.site))
 
         self.assertRaises(Error, mysite.movepage,
                           mainpage, mainpage.title(), 'test')
@@ -160,10 +161,11 @@ class TestWikibaseSaveTest(WikibaseTestCase):
             item.addClaim, claim)
 
     def test_WbMonolingualText_invalid_text(self):
-        """Attempt adding a monolingual text with an invalid non-string text."""
+        """Attempt adding a monolingual text with invalid non-string text."""
         repo = self.get_repo()
         item = pywikibot.ItemPage(repo, 'Q68')
-        claim = self._make_WbMonolingualText_claim(repo, text=123456, language='en')
+        claim = self._make_WbMonolingualText_claim(repo, text=123456,
+                                                   language='en')
         self.assertRaisesRegex(
             OtherPageSaveError,
             r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'

@@ -51,7 +51,7 @@ class TestDjVuFile(TestCase):
     def test_repr_method(self):
         """Test __repr__() method."""
         djvu = DjVuFile(self.file_djvu)
-        expected = "pywikibot.tools.djvu.DjVuFile('%s')" % self.file_djvu
+        expected = "pywikibot.tools.djvu.DjVuFile('{}')".format(self.file_djvu)
         if PY2:
             expected = expected.encode('utf-8')
         self.assertEqual(repr(djvu), expected)
@@ -59,7 +59,7 @@ class TestDjVuFile(TestCase):
     def test_str_method(self):
         """Test __str__() method."""
         djvu = DjVuFile(self.file_djvu)
-        expected = "DjVuFile('%s')" % self.file_djvu
+        expected = "DjVuFile('{}')".format(self.file_djvu)
         if PY2:
             expected = expected.encode('utf-8')
         self.assertEqual(str(djvu), expected)
@@ -67,7 +67,7 @@ class TestDjVuFile(TestCase):
     def test_unicode_method(self):
         """Test __unicode__() method."""
         djvu = DjVuFile(self.file_djvu)
-        expected = "DjVuFile('%s')" % self.file_djvu
+        expected = "DjVuFile('{}')".format(self.file_djvu)
         if PY2:
             self.assertEqual(unicode(djvu), expected)
         else:
