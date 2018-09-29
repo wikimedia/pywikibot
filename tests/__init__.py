@@ -61,7 +61,8 @@ def create_path_func(base_func, subpath):
 join_root_path.path = 'root'
 join_tests_path = create_path_func(join_root_path, 'tests')
 join_cache_path = create_path_func(join_tests_path,
-                                   'apicache-py%d' % PYTHON_VERSION[0])
+                                   'apicache-py{}'
+                                   .format(PYTHON_VERSION[0]))
 join_data_path = create_path_func(join_tests_path, 'data')
 join_pages_path = create_path_func(join_tests_path, 'pages')
 
@@ -203,18 +204,18 @@ def collector(loader=unittest.loader.defaultTestLoader):
     # discover() ordering of unit tests.
     if disabled_test_modules:
         unittest_print(
-            'Disabled test modules (to run: python -m unittest ...):\n  %s'
-            % ', '.join(disabled_test_modules))
+            'Disabled test modules (to run: python -m unittest ...):\n  {}'
+            .format(', '.join(disabled_test_modules)))
 
     if extra_test_modules:
         unittest_print(
-            'Extra test modules (run after library, before scripts):\n  %s'
-            % ', '.join(extra_test_modules))
+            'Extra test modules (run after library, before scripts):\n  {}'
+            .format(', '.join(extra_test_modules)))
 
     if disabled_tests:
         unittest_print(
-            'Skipping tests (to run: python -m unittest ...):\n  %r'
-            % disabled_tests)
+            'Skipping tests (to run: python -m unittest ...):\n  {!r}'
+            .format(disabled_tests))
 
     modules = [module
                for module in test_modules
@@ -264,7 +265,8 @@ CachedRequest._get_cache_dir = classmethod(
 if config.max_retries > 2:
     if 'PYWIKIBOT_TEST_QUIET' not in os.environ:
         unittest_print(
-            'tests: max_retries reduced from %d to 1' % config.max_retries)
+            'tests: max_retries reduced from {} to 1'
+            .format(config.max_retries))
     config.max_retries = 1
 
 # Raise CaptchaError if a test requires solving a captcha
