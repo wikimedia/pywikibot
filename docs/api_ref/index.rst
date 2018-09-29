@@ -20,8 +20,3 @@ Contents
    :glob:
 
    *
-
-Test documentation
-==================
-#. :doc:`tests/index`
-

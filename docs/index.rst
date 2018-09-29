@@ -53,7 +53,6 @@ For framework developers:
 .. toctree::
    :maxdepth: 1
 
-   api_ref/tests/index
    scripts/scripts.maintenance
 
 
