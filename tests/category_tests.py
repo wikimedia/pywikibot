@@ -36,7 +36,8 @@ class TestCategoryObject(TestCase):
         """Test if category is empty or not."""
         site = self.get_site()
         cat_empty = pywikibot.Category(site, 'Category:foooooo')
-        cat_not_empty = pywikibot.Category(site, 'Category:Wikipedia categories')
+        cat_not_empty = pywikibot.Category(site,
+                                           'Category:Wikipedia categories')
         self.assertTrue(cat_empty.isEmptyCategory())
         self.assertFalse(cat_not_empty.isEmptyCategory())
 
@@ -57,10 +58,12 @@ class TestCategoryObject(TestCase):
         self.assertTrue(categoryinfo['pages'] >= 0)
         self.assertTrue(categoryinfo['size'] > 0)
         self.assertTrue(categoryinfo['subcats'] > 0)
-        members_sum = categoryinfo['files'] + categoryinfo['pages'] + categoryinfo['subcats']
+        members_sum = (categoryinfo['files'] + categoryinfo['pages']
+                       + categoryinfo['subcats'])
         self.assertEqual(members_sum, categoryinfo['size'])
 
-        cat_files = pywikibot.Category(site, 'Category:Files lacking an author')
+        cat_files = pywikibot.Category(site,
+                                       'Category:Files lacking an author')
         categoryinfo2 = cat_files.categoryinfo
         self.assertTrue(categoryinfo2['files'] > 0)
 
@@ -152,7 +155,8 @@ class TestCategoryObject(TestCase):
 
         # Raise exception if target is fetched for non Category redirects.
         self.assertRaisesRegex(pywikibot.IsNotRedirectPage,
-                               self.NOREDIRECTPAGE_RE, cat2.getCategoryRedirectTarget)
+                               self.NOREDIRECTPAGE_RE,
+                               cat2.getCategoryRedirectTarget)
 
 
 class TestCategoryDryObject(TestCase):
@@ -222,20 +226,23 @@ class TestCategoryDryObject(TestCase):
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Wikipedia Categories')
         self.assertEqual(cat.title(as_link=True, insite=cat.site),
-                         u'[[Category:Wikipedia Categories]]')
-        cat_section = pywikibot.Category(site, 'Category:Wikipedia Categories#Foo')
+                         '[[Category:Wikipedia Categories]]')
+        cat_section = pywikibot.Category(site,
+                                         'Category:Wikipedia Categories#Foo')
         self.assertEqual(
             cat_section.title(as_link=True, insite=cat_section.site),
             '[[Category:Wikipedia Categories#Foo]]')
         cat_dup = pywikibot.Category(site, 'Category:Wikipedia:Test')
         self.assertEqual(cat_dup.title(as_link=True, insite=cat_dup.site),
-                         u'[[Category:Wikipedia:Test]]')
+                         '[[Category:Wikipedia:Test]]')
 
     def test_sortkey(self):
         """Test the sortKey attribute."""
         site = self.get_site()
-        cat = pywikibot.Category(site, 'Category:Wikipedia categories', 'Example')
-        self.assertEqual(cat.aslink(), '[[Category:Wikipedia categories|Example]]')
+        cat = pywikibot.Category(site, 'Category:Wikipedia categories',
+                                 'Example')
+        self.assertEqual(cat.aslink(),
+                         '[[Category:Wikipedia categories|Example]]')
         self.assertEqual(cat.aslink(sort_key='Foo'),
                          '[[Category:Wikipedia categories|Foo]]')
 
@@ -251,7 +258,7 @@ class CategoryNewestPages(TestCase):
 
     def test_newest_pages(self):
         """Test that the pages are getting older."""
-        cat = pywikibot.Category(self.get_site(), u'Catégorie:Yukon Quest 2015')
+        cat = pywikibot.Category(self.get_site(), 'Catégorie:Yukon Quest 2015')
         last = pywikibot.Timestamp.max
         count = 0
         for page in cat.newest_pages():
