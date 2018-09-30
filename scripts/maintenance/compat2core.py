@@ -117,12 +117,17 @@ warnings = (
      'by a direct site request'),
     ('.verbose',
      'verbose_output need "from pywikibot import config" first'),
+    ('templates(',
+     'returns a list of templage page objects, not a list of template titles.'
+     '\nPlease refer README-conversion.txt and the documentation.'),
     ('templatesWithParams(',
      'the first item of each template info is a Page object of the template,\n'
      'not the title. '
      'Please refer README-conversion.txt and the documentation.'),
-    ('templates(',
-     'returns a list of template title not a list of templage page objects.'),
+    ('linkedPages(',
+     'returns a PageGenerator of page objects of link targets, not a list\n'
+     'of link target strings. Please refer README-conversion.txt\n'
+     'and the documentation.'),
 )
 
 

@@ -384,10 +384,11 @@ class imageFetcher(threading.Thread):
 
         """
         for template in imagepage.templates():
-            if template in skipTemplates[imagepage.site.lang]:
+            template_title = template.title(with_ns=False)
+            if template_title in skipTemplates[imagepage.site.lang]:
                 pywikibot.output(
                     'Found {} which is on the template skip list'
-                    .format(template))
+                    .format(template_title))
                 return True
         return False
 
