@@ -30,10 +30,11 @@ class TestLogentriesBase(TestCase):
     """
     Base class for log entry tests.
 
-    It uses the German Wikipedia for a current representation of the log entries
-    and the test Wikipedia for the future representation. It also tests on a
-    wiki with MW 1.19 or older to check that it can still read the older format.
-    It currently uses lyricwiki which as of this commit uses 1.19.24.
+    It uses the German Wikipedia for a current representation of the
+    log entries and the test Wikipedia for the future representation.
+    It also tests on a wiki with MW 1.19 or older to check that it can
+    still read the older format. It currently uses lyricwiki which as of
+    this commit uses 1.19.24.
     """
 
     sites = {
@@ -123,7 +124,7 @@ class TestLogentriesMeta(MetaTestCaseClass):
 
         # create test methods for the support logtype classes
         for logtype in LogEntryFactory._logtypes:
-            cls.add_method(dct, 'test_%sEntry' % logtype.title(),
+            cls.add_method(dct, 'test_{}Entry'.format(logtype.title()),
                            test_method(logtype))
 
         return super(TestLogentriesMeta, cls).__new__(cls, name, bases, dct)
@@ -144,8 +145,8 @@ class TestSimpleLogentries(TestLogentriesBase):
     def test_simple_entries(self, key):
         """Test those entries which don't have an extra LogEntry subclass."""
         # Unfortunately it's not possible to use the metaclass to create a
-        # bunch of test methods for this too as the site instances haven't been
-        # initialized yet.
+        # bunch of test methods for this too as the site instances haven't
+        # been initialized yet.
         for simple_type in (self.site.logtypes
                             - set(LogEntryFactory._logtypes)):
             if not simple_type:
@@ -172,10 +173,13 @@ class TestLogentryParams(TestLogentriesBase):
                 # Check that there are no empty strings
                 self.assertTrue(all(logentry.flags()))
                 if logentry.expiry() is not None:
-                    self.assertIsInstance(logentry.expiry(), pywikibot.Timestamp)
-                    self.assertIsInstance(logentry.duration(), datetime.timedelta)
-                    self.assertEqual(logentry.timestamp() + logentry.duration(),
-                                     logentry.expiry())
+                    self.assertIsInstance(logentry.expiry(),
+                                          pywikibot.Timestamp)
+                    self.assertIsInstance(logentry.duration(),
+                                          datetime.timedelta)
+                    self.assertEqual(
+                        logentry.timestamp() + logentry.duration(),
+                        logentry.expiry())
                 else:
                     self.assertIsNone(logentry.duration())
                 break
@@ -305,8 +309,8 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         with self.assertRaises(pywikibot.NoPage):
             self.get_mainpage(site).getMovedTarget()
 
-        self.assertOneDeprecationParts('pywikibot.page.BasePage.getMovedTarget',
-                                       'moved_target()')
+        self.assertOneDeprecationParts(
+            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()')
 
     def test_moved_target_fail_de(self):
         """Test getMovedTarget method failing on de-wiki."""
@@ -314,8 +318,8 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         with self.assertRaises(pywikibot.NoPage):
             page.getMovedTarget()
 
-        self.assertOneDeprecationParts('pywikibot.page.BasePage.getMovedTarget',
-                                       'moved_target()')
+        self.assertOneDeprecationParts(
+            'pywikibot.page.BasePage.getMovedTarget', 'moved_target()')
 
 
 if __name__ == '__main__':  # pragma: no cover
