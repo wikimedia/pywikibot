@@ -194,8 +194,8 @@ class TestPagesFromPageidGenerator(TestCase):
     family = 'wikisource'
     code = 'en'
 
-    base_title = ('Page:06-24-1920 -The Story of the Jones County Calf'
-                  'Case.pdf/%s')
+    base_title = ('Page:06-24-1920 -The Story of the Jones County '
+                  'Calf Case.pdf/%s')
 
     def setUp(self):
         """Setup tests."""
