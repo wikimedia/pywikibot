@@ -37,15 +37,15 @@ class TestDateMeta(MetaTestCaseClass):
                     for value in range(start, stop, step):
                         self.assertTrue(
                             predicate(value),
-                            "date.formats['%s']['%s']:\ninvalid value %d"
-                            % (formatname, code, value))
+                            "date.formats['{}']['{}']:\ninvalid value {}"
+                            .format(formatname, code, value))
 
                         new_value = convert(convert(value))
                         self.assertEqual(
                             new_value, value,
-                            "date.formats['%s']['%s']:\n"
-                            "value %d does not match %s"
-                            % (formatname, code, new_value, value))
+                            "date.formats['{}']['{}']:\n"
+                            'value {} does not match {}'
+                            .format(formatname, code, new_value, value))
             return testMapEntry
 
         for formatname in date.formats:
@@ -73,26 +73,38 @@ class TestMonthDelta(TestCase):
 
     def test_apply_positive_delta(self):
         """Test adding months to a date."""
-        self.assertEqual(datetime(2012, 3, 10), date.apply_month_delta(datetime(2012, 1, 10), 2))
-        self.assertEqual(datetime(2012, 3, 31), date.apply_month_delta(datetime(2012, 1, 31), 2))
-        self.assertEqual(datetime(2012, 2, 29), date.apply_month_delta(datetime(2012, 1, 31)))
-        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 1, 31),
+        self.assertEqual(datetime(2012, 3, 10),
+                         date.apply_month_delta(datetime(2012, 1, 10), 2))
+        self.assertEqual(datetime(2012, 3, 31),
+                         date.apply_month_delta(datetime(2012, 1, 31), 2))
+        self.assertEqual(datetime(2012, 2, 29),
+                         date.apply_month_delta(datetime(2012, 1, 31)))
+        self.assertEqual(datetime(2012, 3, 2),
+                         date.apply_month_delta(datetime(2012, 1, 31),
                          add_overlap=True))
 
     def test_apply_negative_delta(self):
         """Test adding months to a date."""
-        self.assertEqual(datetime(2012, 1, 10), date.apply_month_delta(datetime(2012, 3, 10), -2))
-        self.assertEqual(datetime(2012, 1, 31), date.apply_month_delta(datetime(2012, 3, 31), -2))
-        self.assertEqual(datetime(2012, 2, 29), date.apply_month_delta(datetime(2012, 3, 31), -1))
-        self.assertEqual(datetime(2012, 3, 2), date.apply_month_delta(datetime(2012, 3, 31), -1,
+        self.assertEqual(datetime(2012, 1, 10),
+                         date.apply_month_delta(datetime(2012, 3, 10), -2))
+        self.assertEqual(datetime(2012, 1, 31),
+                         date.apply_month_delta(datetime(2012, 3, 31), -2))
+        self.assertEqual(datetime(2012, 2, 29),
+                         date.apply_month_delta(datetime(2012, 3, 31), -1))
+        self.assertEqual(datetime(2012, 3, 2),
+                         date.apply_month_delta(datetime(2012, 3, 31), -1,
                          add_overlap=True))
 
     def test_get_delta(self):
         """Test that the delta is calculated correctly."""
-        self.assertEqual(date.get_month_delta(datetime(2012, 1, 31), datetime(2012, 3, 31)), 2)
-        self.assertEqual(date.get_month_delta(datetime(2012, 3, 31), datetime(2012, 1, 31)), -2)
-        self.assertEqual(date.get_month_delta(datetime(2012, 3, 31), datetime(2013, 1, 31)), 10)
-        self.assertEqual(date.get_month_delta(datetime(2014, 3, 31), datetime(2013, 3, 31)), -12)
+        self.assertEqual(date.get_month_delta(datetime(2012, 1, 31),
+                         datetime(2012, 3, 31)), 2)
+        self.assertEqual(date.get_month_delta(datetime(2012, 3, 31),
+                         datetime(2012, 1, 31)), -2)
+        self.assertEqual(date.get_month_delta(datetime(2012, 3, 31),
+                         datetime(2013, 1, 31)), 10)
+        self.assertEqual(date.get_month_delta(datetime(2014, 3, 31),
+                         datetime(2013, 3, 31)), -12)
 
 
 if __name__ == '__main__':  # pragma: no cover

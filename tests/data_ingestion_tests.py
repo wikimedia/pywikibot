@@ -31,10 +31,14 @@ class TestPhoto(TestCase):
     def setUp(self):
         """Set up unit test."""
         super(TestPhoto, self).setUp()
+        url = ('http://upload.wikimedia.org/wikipedia/commons/f/'
+               'fc/MP_sounds.png')
+
+        meta_url = 'http://commons.wikimedia.org/wiki/File:Sound-icon.svg'
         self.obj = data_ingestion.Photo(
-            URL='http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png',
+            URL=url,
             metadata={'description.en': '"Sounds" icon',
-                      'source': 'http://commons.wikimedia.org/wiki/File:Sound-icon.svg',
+                      'source': meta_url,
                       'author': 'KDE artists | Silstor',
                       'license': 'LGPL',
                       'set': 'Crystal SVG icon set',
@@ -49,7 +53,8 @@ class TestPhoto(TestCase):
     def test_findDuplicateImages(self):
         """Test finding duplicates on Wikimedia Commons."""
         duplicates = self.obj.findDuplicateImages()
-        self.assertIn('MP sounds.png', [dup.replace("_", " ") for dup in duplicates])
+        self.assertIn('MP sounds.png',
+                      [dup.replace('_', ' ') for dup in duplicates])
 
     def test_getTitle(self):
         """Test getTitle()."""
@@ -86,8 +91,9 @@ class TestCSVReader(TestCase):
 
     def test_PhotoURL(self):
         """Test PhotoURL()."""
-        self.assertEqual(self.obj.URL,
-                         'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')
+        self.assertEqual(
+            self.obj.URL,
+            'http://upload.wikimedia.org/wikipedia/commons/f/fc/MP_sounds.png')
 
     def test_getTitle(self):
         """Test getTitle()."""

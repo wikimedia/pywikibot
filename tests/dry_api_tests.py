@@ -68,7 +68,8 @@ class DryCachedRequestTests(SiteAttributeTestCase):
     def test_expiry_formats(self):
         """Test using a timedelta as expiry."""
         self.assertEqual(self.req.expiry,
-                         CachedRequest(datetime.timedelta(days=1), site=self.basesite,
+                         CachedRequest(datetime.timedelta(days=1),
+                                       site=self.basesite,
                                        parameters=self.parms).expiry)
 
     def test_expired(self):
@@ -101,24 +102,31 @@ class DryCachedRequestTests(SiteAttributeTestCase):
 
     def test_create_file_name(self):
         """Test the file names for the cache."""
-        self.assertEqual(self.req._create_file_name(), self.req._create_file_name())
-        self.assertEqual(self.req._create_file_name(), self.expreq._create_file_name())
+        self.assertEqual(self.req._create_file_name(),
+                         self.req._create_file_name())
+        self.assertEqual(self.req._create_file_name(),
+                         self.expreq._create_file_name())
         self.assertEqual(self.req._create_file_name(),
                          self.deprecated_explicit._create_file_name())
         self.assertEqual(self.req._create_file_name(),
                          self.deprecated_asterisks._create_file_name())
-        self.assertNotEqual(self.req._create_file_name(), self.diffreq._create_file_name())
+        self.assertNotEqual(self.req._create_file_name(),
+                            self.diffreq._create_file_name())
 
     def test_cachefile_path(self):
         """Test the file paths for the cache."""
-        self.assertEqual(self.req._cachefile_path(), self.req._cachefile_path())
-        self.assertEqual(self.req._cachefile_path(), self.expreq._cachefile_path())
+        self.assertEqual(self.req._cachefile_path(),
+                         self.req._cachefile_path())
+        self.assertEqual(self.req._cachefile_path(),
+                         self.expreq._cachefile_path())
         self.assertEqual(self.req._cachefile_path(),
                          self.deprecated_explicit._cachefile_path())
         self.assertEqual(self.req._cachefile_path(),
                          self.deprecated_asterisks._cachefile_path())
-        self.assertNotEqual(self.req._cachefile_path(), self.diffreq._cachefile_path())
-        self.assertNotEqual(self.req._cachefile_path(), self.diffsite._cachefile_path())
+        self.assertNotEqual(self.req._cachefile_path(),
+                            self.diffreq._cachefile_path())
+        self.assertNotEqual(self.req._cachefile_path(),
+                            self.diffsite._cachefile_path())
 
 
 class MockCachedRequestKeyTests(TestCase):
@@ -169,21 +177,21 @@ class MockCachedRequestKeyTests(TestCase):
                 return self._siteinfo
 
             def __repr__(self):
-                return "MockSite()"
+                return 'MockSite()'
 
             def __getattr__(self, attr):
-                raise Exception("Attribute %r not defined" % attr)
+                raise Exception('Attribute {!r} not defined'.format(attr))
 
         self.mocksite = MockSite()
         super(MockCachedRequestKeyTests, self).setUp()
 
     def test_cachefile_path_different_users(self):
-        """Test and compare the file paths when different usernames are used."""
+        """Test and compare file paths when different usernames are used."""
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
         anonpath = req._cachefile_path()
 
-        self.mocksite._userinfo = {'name': u'MyUser'}
+        self.mocksite._userinfo = {'name': 'MyUser'}
         self.mocksite._loginstatus = 0
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
@@ -191,7 +199,7 @@ class MockCachedRequestKeyTests(TestCase):
 
         self.assertNotEqual(anonpath, userpath)
 
-        self.mocksite._userinfo = {'name': u'MySysop'}
+        self.mocksite._userinfo = {'name': 'MySysop'}
         self.mocksite._loginstatus = 1
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
@@ -202,19 +210,19 @@ class MockCachedRequestKeyTests(TestCase):
 
     def test_unicode(self):
         """Test caching with Unicode content."""
-        self.mocksite._userinfo = {'name': u'محمد الفلسطيني'}
+        self.mocksite._userinfo = {'name': 'محمد الفلسطيني'}
         self.mocksite._loginstatus = 0
 
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
         en_user_path = req._cachefile_path()
 
-        self.mocksite._namespaces = {2: [u'مستخدم']}
+        self.mocksite._namespaces = {2: ['مستخدم']}
 
         req = CachedRequest(expiry=1, site=self.mocksite,
                             parameters={'action': 'query', 'meta': 'siteinfo'})
 
-        expect = (u'MockSite()User(User:محمد الفلسطيني)' +
+        expect = ('MockSite()User(User:محمد الفلسطيني)' +
                   "[('action', 'query'), ('meta', 'siteinfo')]")
 
         self.assertEqual(repr(req._uniquedescriptionstr()), repr(expect))
@@ -315,53 +323,53 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
     """Test extracting data from the ParamInfo."""
 
     prop_info_param_data = {  # data from 1.25
-        "name": "info",
-        "classname": "ApiQueryInfo",
-        "path": "query+info",
-        "group": "prop",
-        "prefix": "in",
-        "parameters": [
+        'name': 'info',
+        'classname': 'ApiQueryInfo',
+        'path': 'query+info',
+        'group': 'prop',
+        'prefix': 'in',
+        'parameters': [
             {
-                "name": "prop",
-                "multi": "",
-                "limit": 500,
-                "lowlimit": 50,
-                "highlimit": 500,
-                "type": [
-                    "protection",
-                    "talkid",
-                    "watched",
-                    "watchers",
-                    "notificationtimestamp",
-                    "subjectid",
-                    "url",
-                    "readable",
-                    "preload",
-                    "displaytitle"
+                'name': 'prop',
+                'multi': '',
+                'limit': 500,
+                'lowlimit': 50,
+                'highlimit': 500,
+                'type': [
+                    'protection',
+                    'talkid',
+                    'watched',
+                    'watchers',
+                    'notificationtimestamp',
+                    'subjectid',
+                    'url',
+                    'readable',
+                    'preload',
+                    'displaytitle'
                 ]
             },
             {
-                "name": "token",
-                "deprecated": "",
-                "multi": "",
-                "limit": 500,
-                "lowlimit": 50,
-                "highlimit": 500,
-                "type": [
-                    "edit",
-                    "delete",
-                    "protect",
-                    "move",
-                    "block",
-                    "unblock",
-                    "email",
-                    "import",
-                    "watch"
+                'name': 'token',
+                'deprecated': '',
+                'multi': '',
+                'limit': 500,
+                'lowlimit': 50,
+                'highlimit': 500,
+                'type': [
+                    'edit',
+                    'delete',
+                    'protect',
+                    'move',
+                    'block',
+                    'unblock',
+                    'email',
+                    'import',
+                    'watch'
                 ]
             },
             {
-                "name": "continue",
-                "type": "string"
+                'name': 'continue',
+                'type': 'string'
             }
         ],
         "querytype": "prop"

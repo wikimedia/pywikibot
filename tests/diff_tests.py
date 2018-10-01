@@ -194,16 +194,17 @@ class TestCherryPick(TestCase):
     newtext = 'new'
 
     # output messages expected during testing
-    diff_message = '\x03{lightred}- old\n\x03{default}\x03{lightgreen}+ new\n\x03{default}'
+    diff_message = ('\x03{lightred}- old\n\x03{default}\x03{lightgreen}+ '
+                    'new\n\x03{default}')
     none_message = '\x03{{lightpurple}}{0: ^50}\x03{{default}}'.format('None.')
     header_base = '\n\x03{{lightpurple}}{0:*^50}\x03{{default}}\n'
     headers = ['  ALL CHANGES  ', '  REVIEW CHANGES  ', '  APPROVED CHANGES  ']
-    diff_by_letter_message = ("\x03{lightred}- o\n\x03{default}"
-                              "\x03{lightred}- l\n\x03{default}"
-                              "\x03{lightred}- d\n\x03{default}"
-                              "\x03{lightgreen}+ n\n\x03{default}"
-                              "\x03{lightgreen}+ e\n\x03{default}"
-                              "\x03{lightgreen}+ w\n\x03{default}")
+    diff_by_letter_message = ('\x03{lightred}- o\n\x03{default}'
+                              '\x03{lightred}- l\n\x03{default}'
+                              '\x03{lightred}- d\n\x03{default}'
+                              '\x03{lightgreen}+ n\n\x03{default}'
+                              '\x03{lightgreen}+ e\n\x03{default}'
+                              '\x03{lightgreen}+ w\n\x03{default}')
 
     def check_headers(self, mock):
         """Check if all headers were added to ouput."""
@@ -211,7 +212,8 @@ class TestCherryPick(TestCase):
             mock.assert_any_call(self.header_base.format(header))
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input', return_value='y')
+    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+           return_value='y')
     def test_accept(self, input, mock):
         """Check output of cherry_pick if changes accepted."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.newtext)
@@ -219,7 +221,8 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.diff_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input', return_value='n')
+    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+           return_value='n')
     def test_reject(self, input, mock):
         """Check output of cherry_pick if changes rejected."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
@@ -228,7 +231,8 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.none_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input', return_value='q')
+    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+           return_value='q')
     def test_quit(self, input, mock):
         """Check output of cherry_pick if quitted."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
@@ -237,18 +241,28 @@ class TestCherryPick(TestCase):
         mock.assert_any_call(self.none_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input', return_value='y')
+    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+           return_value='y')
     def test_by_letter_accept(self, input, mock):
-        """Check output of cherry_pick if by_letter diff is enabled and changes accepted."""
-        self.assertEqual(cherry_pick(self.oldtext, self.newtext, by_letter=True), self.newtext)
+        """Check cherry_pick output.
+
+        If by_letter diff is enabled and changes accepted.
+        """
+        self.assertEqual(cherry_pick(self.oldtext, self.newtext,
+                                     by_letter=True), self.newtext)
         self.check_headers(mock)
         mock.assert_any_call(self.diff_by_letter_message)
 
     @patch('pywikibot.output')
-    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input', return_value='q')
+    @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
+           return_value='q')
     def test_by_letter_quit(self, input, mock):
-        """Check output of cherry_pick if by_letter diff is enabled and quitted during review."""
-        self.assertEqual(cherry_pick(self.oldtext, self.newtext, by_letter=True), self.oldtext)
+        """Check cherry_pick output.
+
+        If by_letter diff is enabled and quitted during review.
+        """
+        self.assertEqual(cherry_pick(self.oldtext, self.newtext,
+                                     by_letter=True), self.oldtext)
         self.check_headers(mock)
         mock.assert_any_call(self.diff_by_letter_message)
         mock.assert_any_call(self.none_message)
