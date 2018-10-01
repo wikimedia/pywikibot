@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* pydot >= 1.2 is required for interwiki_graph
 * Enable start timestamp for EventStreams (T205121)
 * Re-enable notifications (T205184)
 * Use FutureWarning for warnings intended for end users (T191192)

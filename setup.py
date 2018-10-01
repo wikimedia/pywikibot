@@ -52,7 +52,7 @@ extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient>=0.0.18'],
     'isbn': ['python-stdnum'],
-    'Graphviz': ['pydot>=1.0.28'],
+    'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
     'IRC': ['irc'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
@@ -107,7 +107,6 @@ dependency_links = [
     'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
     'hg+https://bitbucket.org/TJG/pywin32#egg=pywin32',
     'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
-    'git+https://github.com/nlhepler/pydot#egg=pydot-1.0.29',
 ]
 
 if PYTHON_VERSION == (2, 7, 2):
