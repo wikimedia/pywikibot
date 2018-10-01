@@ -36,10 +36,11 @@ class MetaPluralRulesTest(MetaTestCaseClass):
                     index = rule['plural'](num)
                     self.assertLess(index, rule['nplurals'],
                                     msg='Plural for {0} created an index {1} '
-                                        '(greater than {2})'.format(num, index,
-                                                                    rule['nplurals']))
+                                        '(greater than {2})'
+                                        .format(num, index, rule['nplurals']))
                     num_plurals.add(index)
-                self.assertCountEqual(num_plurals, list(range(rule['nplurals'])))
+                self.assertCountEqual(num_plurals,
+                                      list(range(rule['nplurals'])))
 
             # Don't already fail on creation
             if callable(rule.get('plural')):

@@ -83,7 +83,7 @@ class MediaWikiKnownTypesTestCase(KnownTypesTestBase,
         if self.site.mw_version >= '1.24':
             types.append('unread')
 
-        known = types + ['!%s' % item for item in types]
+        known = types + ['!{}'.format(item) for item in types]
 
         self._check_param_subset(self.site, 'query+watchlist', 'show', known)
 

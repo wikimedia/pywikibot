@@ -55,7 +55,8 @@ class TestBasePageMethodsProofreadPage(BasePageMethodsTestBase):
         self._test_return_datatypes()
 
 
-class TestLoadRevisionsCachingProofreadPage(BasePageLoadRevisionsCachingTestBase):
+class TestLoadRevisionsCachingProofreadPage(
+        BasePageLoadRevisionsCachingTestBase):
 
     """Test site.loadrevisions() caching."""
 
@@ -143,11 +144,12 @@ class TestProofreadPageValidSite(TestCase):
         'index': 'Index:Popular Science Monthly Volume 1.djvu',
         'ql': 4,
         'user': 'T. Mazzei',
-        'header': u"{{rh|2|''THE POPULAR SCIENCE MONTHLY.''}}",
-        'footer': u'\n{{smallrefs}}',
-        'url_image': ('https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/'
-                      'Popular_Science_Monthly_Volume_1.djvu/'
-                      'page12-1024px-Popular_Science_Monthly_Volume_1.djvu.jpg'),
+        'header': "{{rh|2|''THE POPULAR SCIENCE MONTHLY.''}}",
+        'footer': '\n{{smallrefs}}',
+        'url_image': ('https://upload.wikimedia.org/wikipedia/commons/'
+                      'thumb/a/ac/Popular_Science_Monthly_Volume_1.djvu/'
+                      'page12-1024px-Popular_Science_Monthly_Volume_1.djvu'
+                      '.jpg'),
     }
 
     valid_redlink = {
@@ -200,7 +202,7 @@ class TestProofreadPageValidSite(TestCase):
         self.assertEqual(page.title(), fixed_source.title())
 
     def test_invalid_not_existing_page_source_wrong_ns(self):
-        """Test ProofreadPage from Page not existing in non-Page ns as source."""
+        """Test ProofreadPage from Page not existing in non-Page ns."""
         source = pywikibot.Page(self.site,
                                 self.not_existing_invalid['title1'])
         self.assertRaises(ValueError, ProofreadPage, source)
@@ -242,7 +244,8 @@ class TestProofreadPageValidSite(TestCase):
         # Fetch page text to instantiate page._full_header, in order to allow
         # for proper test result preparation.
         page.text
-        class_pagetext, div = self.class_pagetext_fmt[page._full_header._has_div]
+        class_pagetext, div = self.class_pagetext_fmt[
+            page._full_header._has_div]
         self.assertEqual(page.text,
                          self.fmt.format(user=self.site.username(),
                                          class_pagetext=class_pagetext,
@@ -253,7 +256,8 @@ class TestProofreadPageValidSite(TestCase):
         """Test ProofreadPage page decomposing/composing text."""
         page = ProofreadPage(self.site, 'Page:dummy test page')
         page.text = ''
-        class_pagetext, div = self.class_pagetext_fmt[page._full_header._has_div]
+        class_pagetext, div = self.class_pagetext_fmt[
+            page._full_header._has_div]
         self.assertEqual(page.text,
                          self.fmt.format(user=self.site.username(),
                                          class_pagetext=class_pagetext,
@@ -361,8 +365,10 @@ class TestProofreadPageIndexProperty(TestCase):
 
         # Page without Index.
         page = ProofreadPage(self.site, self.existing_multilinked['title'])
-        index_page_1 = IndexPage(self.site, self.existing_multilinked['index_1'])
-        index_page_2 = IndexPage(self.site, self.existing_multilinked['index_2'])
+        index_page_1 = IndexPage(self.site,
+                                 self.existing_multilinked['index_1'])
+        index_page_2 = IndexPage(self.site,
+                                 self.existing_multilinked['index_2'])
         self.assertEqual(page.index, index_page_1)
         self.assertNotEqual(page.index, index_page_2)
         self.assertEqual(page._index, (index_page_1, [index_page_2]))
@@ -610,7 +616,8 @@ class TestIndexPageMappings(IndexPageTestCase):
                              page_set)
 
         # Error if label does not exists.
-        self.assertRaises(KeyError, index_page.get_page_from_label, 'dummy label')
+        self.assertRaises(KeyError, index_page.get_page_from_label,
+                          'dummy label')
 
         # Test get_page.
         for n in num_set:
