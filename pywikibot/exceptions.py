@@ -143,7 +143,7 @@ class PageRelatedError(Error):
 
     # Preformatted UNICODE message where the page title will be inserted
     # Override this in subclasses.
-    # u"Oh noes! Page %s is too funky, we should not delete it ;("
+    # 'Oh noes! Page %s is too funky, we should not delete it ;('
     message = None
 
     def __init__(self, page, message=None):
