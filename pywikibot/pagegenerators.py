@@ -65,7 +65,7 @@ _logger = 'pagegenerators'
 # most of these functions just wrap a Site or Page method that returns
 # a generator
 
-parameterHelp = """ \
+parameterHelp = """\
 GENERATOR OPTIONS
 =================
 
@@ -250,7 +250,7 @@ GENERATOR OPTIONS
                     contain it.
                     Argument can be given as "-searchitem:text", where text
                     is the string to look for, or "-searchitem:lang:text",
-                    where lang is the langauge to search items in.
+                    where lang is the language to search items in.
 
 -wantedpages        Work on pages that are linked, but do not exist;
                     may be given as "-wantedpages:n" where n is the maximum
