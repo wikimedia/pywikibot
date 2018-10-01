@@ -168,10 +168,6 @@ class ParamInfo(Container):
 
     Provides cache aware fetching of parameter information.
 
-    Full support for MW 1.12+, when 'paraminfo' was introduced to the API.
-    Partially supports MW 1.11, using data extracted from API 'help'.
-    MW 1.10 not supported as module prefixes are not extracted from API 'help'.
-
     It does not support the format modules.
     """
 
@@ -239,7 +235,7 @@ class ParamInfo(Container):
         mw_ver = self.site.mw_version
 
         if mw_ver < '1.15':
-            self._parse_help(mw_ver)
+            self._parse_help()
 
         # The paraminfo api deprecated the old request syntax of
         # querymodules='info'; to avoid warnings sites with 1.25wmf4+
@@ -300,11 +296,8 @@ class ParamInfo(Container):
             'parameters': self._paraminfo['query']['parameters']
         }
 
-    def _parse_help(self, _mw_ver):
-        """Emulate paraminfo data using help."""
-        # 1.14 paraminfo 'main' module doesnt exist.
-        # paraminfo only exists 1.12+.
-
+    def _parse_help(self):
+        """Emulate paraminfo['main'] data using help for mw 1.14."""
         # Request need ParamInfo to determine use_get
         request = self.site._request(expiry=config.API_config_expiry,
                                      use_get=True,
@@ -352,181 +345,6 @@ class ParamInfo(Container):
                 },
             ],
         }
-
-        if _mw_ver >= '1.12':
-            return
-
-        query_help_list_prefix = "Values (separate with '|'): "
-
-        start = help_text.find('Which properties to get')
-        start = help_text.find(query_help_list_prefix, start)
-        start += len(query_help_list_prefix)
-        end = help_text.find('\n', start)
-
-        prop_modules = help_text[start:end].split(', ')
-
-        start = help_text.find('Which lists to get')
-        start = help_text.find(query_help_list_prefix, start)
-        start += len(query_help_list_prefix)
-        end = help_text.find('\n', start)
-
-        list_modules = help_text[start:end].split(', ')
-
-        start = help_text.find('Which meta data to get')
-        start = help_text.find(query_help_list_prefix, start)
-        start += len(query_help_list_prefix)
-        end = help_text.find('\n', start)
-
-        meta_modules = help_text[start:end].split(', ')
-
-        start = help_text.find('Use the output of a list as the input')
-        start = help_text.find('One value: ', start)
-        start += len('One value: ')
-        end = help_text.find('\n', start)
-
-        gen_modules = help_text[start:end].split(', ')
-
-        self._paraminfo['paraminfo'] = {
-            'name': 'paraminfo',
-            'path': 'paraminfo',
-            'classname': 'ApiParamInfo',
-            'prefix': '',
-            'readrights': '',
-            'helpurls': [],
-            'parameters': [
-                {
-                    'name': 'querymodules',
-                    'type': (prop_modules + list_modules
-                             + meta_modules + gen_modules),
-                    'limit': 50,
-                },
-            ],
-        }
-
-        self._paraminfo['query'] = {
-            'name': 'query',
-            'path': 'query',
-            'classname': 'ApiQuery',
-            'prefix': '',
-            'readrights': '',
-            'helpurls': [],
-            'parameters': [
-                {
-                    'name': 'prop',
-                    'type': prop_modules,
-                    'submodules': '',
-                },
-                {
-                    'name': 'list',
-                    'type': list_modules,
-                    'submodules': '',
-                },
-                {
-                    'name': 'meta',
-                    'type': meta_modules,
-                    'submodules': '',
-                },
-                {
-                    'name': 'generator',
-                    'type': gen_modules,
-                },
-            ],
-        }
-        # Converted entries added, now treat them like they have been fetched
-        self._generate_submodules(['main', 'query'])
-
-        # TODO: rewrite 'help' parser to determine prefix from the parameter
-        # names, as API 1.10 help does not include prefix on the first line.
-
-        for mod_type in ['action', 'prop', 'list', 'meta', 'generator']:
-            if mod_type == 'action':
-                submodules = self.parameter('main', mod_type)['type']
-                path_prefix = ''
-            else:
-                submodules = self.parameter('query', mod_type)
-                submodules = submodules['type']
-                path_prefix = 'query+'
-
-            for submodule in submodules:
-                mod_begin_string = '* %s=%s' % (mod_type, submodule)
-                start = help_text.find(mod_begin_string)
-                assert(start)
-                start += len(mod_begin_string)
-                end = help_text.find('\n*', start)
-
-                if help_text[start + 1] == '(' and help_text[start + 4] == ')':
-                    prefix = help_text[start + 2:start + 4]
-                else:
-                    prefix = ''
-
-                path = path_prefix + submodule
-
-                # query is added above; some query modules appear as both
-                # prop and generator, and the generator doesnt have a
-                # prefix in the help.
-                if path not in self._paraminfo:
-                    php_class = 'Api'
-                    if mod_type == 'action':
-                        php_class += 'Query'
-                    # This doesnt correctly derive PHP class names where there
-                    # are additional uppercase letters in the class name.
-                    php_class += submodule.title()
-
-                    self._paraminfo[path] = {
-                        'name': submodule,
-                        'path': path,
-                        'classname': php_class,
-                        'prefix': prefix,
-                        'readrights': '',
-                        'helpurls': [],
-                        'parameters': [],
-                    }
-
-                if not prefix:
-                    continue
-
-                params = {}
-
-                # Check existence of parameters used frequently by pywikibot.
-                # TODO: for each parameter, parse list of values ('type')
-                if prefix + 'limit' in help_text:
-                    params['limit'] = {
-                        'name': 'limit',
-                        'type': 'limit',
-                        'max': 50,
-                    }
-
-                if prefix + 'namespace' in help_text:
-                    params['namespace'] = {
-                        'name': 'namespace',
-                        'type': 'namespace',
-                    }
-                    if not submodule.startswith('all'):
-                        params['namespace']['multi'] = ''
-
-                for param_name in ['token', 'prop', 'type', 'show']:
-                    if prefix + param_name in help_text:
-                        params[param_name] = {
-                            'name': param_name,
-                            'type': [],
-                            'multi': '',
-                        }
-
-                self._paraminfo[path]['parameters'] = params.values()
-                if (help_text.find('\n\nThis module only accepts POST '
-                                   'requests.\n', start) < end):
-                    self._paraminfo[path]['mustbeposted'] = ''
-                # All actions which must be POSTed are write actions except for
-                # login. Because Request checks if the user is logged in when
-                # doing a write action the check would always fail on login.
-                # Purge is the only action which isn't POSTed but actually does
-                # require writerights. This was checked with the data from
-                # 1.25wmf22 on en.wikipedia.org.
-                if ('mustbeposted' in self._paraminfo[path]
-                        and path != 'login') or path == 'purge':
-                    self._paraminfo[path]['writerights'] = ''
-
-        self._emulate_pageset()
 
     @staticmethod
     def _modules_to_set(modules):
@@ -591,13 +409,6 @@ class ParamInfo(Container):
             return
 
         assert 'query' in self._modules or 'paraminfo' not in self._paraminfo
-
-        if self.site.mw_version < '1.12':
-            # When the help is parsed, all paraminfo should already be loaded
-            # and the caller is responsible for detecting missing modules.
-            pywikibot.log('ParamInfo did not detect modules: %s'
-                          % modules, _logger=_logger)
-            return
 
         # If something went wrong in a batch it can add each module to the
         # batch and the generator will on the next iteration yield each module

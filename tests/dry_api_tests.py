@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API tests which do not interact with a site."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -155,7 +155,7 @@ class MockCachedRequestKeyTests(TestCase):
                 self._siteinfo = DummySiteinfo({'case': 'first-letter'})
 
             def version(self):
-                return '1.13'  # pre 1.14
+                return '1.14'  # lowest supported release
 
             def protocol(self):
                 return 'http'
