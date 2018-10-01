@@ -320,8 +320,7 @@ Some configuration option can be used to change the working of this bot:
  interwiki_shownew:  should interwiki.py display every new link it discovers?
 
  interwiki_graph:    output a graph PNG file on conflicts? You need pydot for
-                     this: https://pypi.org/project/pydot/1.0.2
-                     https://code.google.com/p/pydot/
+                     this: https://pypi.org/project/pydot/
 
  interwiki_graph_format: the file format for interwiki graphs
 

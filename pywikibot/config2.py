@@ -577,8 +577,7 @@ interwiki_shownew = True
 
 # Should interwiki.py output a graph PNG file on conflicts?
 # You need pydot for this:
-# https://pypi.org/project/pydot/1.0.2
-# https://code.google.com/p/pydot/
+# https://pypi.org/project/pydot/
 interwiki_graph = False
 
 # Specifies that the robot should process that amount of subjects at a time,
