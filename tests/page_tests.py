@@ -782,7 +782,7 @@ class TestPageBotMayEdit(TestCase):
                         .format(page.text, page.botMayEdit(), user))
 
         # Ban all compliant bots not in the list, syntax for de wp.
-        page.text = '{{nobots|{}, HagermanBot,Werdnabot}}'.format(user)
+        page.text = '{{nobots|%s, HagermanBot,Werdnabot}}' % user
         self.assertFalse(page.botMayEdit(),
                          '{}: {} but user={}'
                          .format(page.text, page.botMayEdit(), user))
@@ -811,13 +811,13 @@ class TestPageBotMayEdit(TestCase):
                         .format(page.text, page.botMayEdit(), user))
 
         # Ban all compliant bots not in the list.
-        page.text = '{{bots|allow={}, HagermanBot}}'.format(user)
+        page.text = '{{bots|allow=%s, HagermanBot}}' % user
         self.assertTrue(page.botMayEdit(),
                         '{}: {} but user={}'
                         .format(page.text, page.botMayEdit(), user))
 
         # Ban all compliant bots in the list.
-        page.text = '{{bots|deny={}, HagermanBot}}'.format(user)
+        page.text = '{{bots|deny=%s, HagermanBot}}' % user
         self.assertFalse(page.botMayEdit(),
                          '{}: {} but user={}'
                          .format(page.text, page.botMayEdit(), user))
