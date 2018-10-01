@@ -1039,15 +1039,17 @@ class DisambiguationRobot(SingleSiteBot):
 
         """
         if disambPage.isRedirectPage() and not self.primary:
-            if (disambPage.site.lang in self.primary_redir_template
-                    and self.primary_redir_template[disambPage.site.lang]
-                    in disambPage.templates()):
+            primary = i18n.translate(disambPage.site,
+                                     self.primary_redir_template)
+            if primary:
+                primary_page = pywikibot.Page(disambPage.site,
+                                              'Template:' + primary)
+            if primary and primary_page in disambPage.templates():
                 baseTerm = disambPage.title()
-                for template in disambPage.templatesWithParams():
-                    if template[0] == self.primary_redir_template[
-                        disambPage.site.lang] \
-                            and len(template[1]) > 0:
-                        baseTerm = template[1][1]
+                for template, params in disambPage.templatesWithParams():
+                    if params and template == primary_page:
+                        baseTerm = params[1]
+                        break
                 disambTitle = primary_topic_format[self.mylang] % baseTerm
                 try:
                     disambPage2 = pywikibot.Page(

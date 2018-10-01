@@ -86,7 +86,9 @@ def categorizeImages(generator, onlyFilter, onlyUncat):
             imagepage = pywikibot.FilePage(page.site, page.title())
             pywikibot.output('Working on ' + imagepage.title())
 
-            if onlyUncat and not('Uncategorized' in imagepage.templates()):
+            if (onlyUncat and not pywikibot.Page(
+                    imagepage.site, 'Template:Uncategorized')
+                    in imagepage.templates()):
                 pywikibot.output('No Uncategorized template found')
             else:
                 currentCats = getCurrentCats(imagepage)

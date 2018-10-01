@@ -488,7 +488,8 @@ class CommonscatBot(Bot):
                 pywikibot.log('getCommonscat: The category is a redirect')
                 return self.checkCommonscatLink(
                     commonsPage.getRedirectTarget().title(with_ns=False))
-            elif 'Category redirect' in commonsPage.templates():
+            elif (pywikibot.Page(commonsPage.site,
+                  'Template:Category redirect') in commonsPage.templates()):
                 pywikibot.log(
                     'getCommonscat: The category is a category redirect')
                 for template in commonsPage.templatesWithParams():

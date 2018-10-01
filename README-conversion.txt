@@ -91,9 +91,13 @@ If you call them, they will print a warning and do nothing else:
 The following methods have had their outputs changed:
 
 - getVersionHistory(): Returns a pywikibot.Timestamp object instead of a MediaWiki one
+- templates(): Returns a list of Page objects of templates. In compat we have
+    a list of template title strings.
 - templatesWithParams(): Returns a list of tuples with two items. The first item is
     a Page object of the template, the second is a list of parameters. In compat we have
     a list of tuples with two items. The first item is the template title.
+- linkedPages(): Returns a PageGenerator of Page objects of link targets.
+    In compat we have a list of link target strings.
 
 === FilePage objects ===
 
