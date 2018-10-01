@@ -1034,7 +1034,10 @@ class TestSiteGenerators(DefaultSiteTestCase):
 
         pages = list(self.get_site().protectedpages(type='create', total=10))
         for page in pages:
-            self.assertFalse(page.exists())
+            self.assertFalse(
+                page.exists(),
+                '\n{page} does unexpectedly exit on site {page.site}'
+                .format(page=page))
         self.assertLessEqual(len(pages), 10)
 
     def test_protectedpages_edit(self):
