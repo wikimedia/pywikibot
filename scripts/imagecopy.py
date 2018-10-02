@@ -372,12 +372,13 @@ class imageTransfer(threading.Thread):
         return pageText
 
 
-# -label ok skip view
-# textarea
-archivo = config.datafilepath('Uploadbot.localskips.txt')
-if not path.exists(archivo):
-    with open(archivo, 'w') as tocreate:
-        tocreate.write('{{NowCommons')
+def load_global_archivo():
+    """Load/create Uploadbot.localskips.txt and save the path in `archivo`."""
+    global archivo
+    archivo = config.datafilepath('Uploadbot.localskips.txt')
+    if not path.exists(archivo):
+        with open(archivo, 'w') as tocreate:
+            tocreate.write('{{NowCommons')
 
 
 def getautoskip():
@@ -495,7 +496,6 @@ def doiskip(pagetext):
 
 def main(*args):
     """Process command line arguments and invoke bot."""
-    imagepage = None
     always = False
     category = ''
     delete_after_done = False
@@ -517,6 +517,8 @@ def main(*args):
     if not pregenerator:
         pywikibot.bot.suggest_help(missing_generator=True)
         return False
+
+    load_global_archivo()
 
     for page in pregenerator:
         skip = False
