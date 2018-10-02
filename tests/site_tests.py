@@ -1036,7 +1036,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for page in pages:
             self.assertFalse(
                 page.exists(),
-                '\n{page} does unexpectedly exit on site {page.site}'
+                '\n{page} does unexpectedly exist on site {page.site}'
                 .format(page=page))
         self.assertLessEqual(len(pages), 10)
 
