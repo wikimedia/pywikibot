@@ -372,7 +372,7 @@ class ParamInfoDictTests(DefaultDrySiteTestCase):
                 'type': 'string'
             }
         ],
-        "querytype": "prop"
+        'querytype': 'prop'
     }
 
     edit_action_param_data = {

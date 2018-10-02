@@ -555,7 +555,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test Site.categorymembers."""
         cats = list(self.site.pagecategories(self.mainpage))
         if len(cats) == 0:
-            self.skipTest("Main page is not in any categories.")
+            self.skipTest('Main page is not in any categories.')
         else:
             for cm in self.site.categorymembers(cats[0]):
                 self.assertIsInstance(cm, pywikibot.Page)
@@ -1440,7 +1440,7 @@ class TestRecentChanges(DefaultSiteTestCase):
             self.assertIn(':', title)
             prefix = title[:title.index(':')]
             self.assertIn(self.site.namespaces.lookup_name(prefix).id, [6, 7])
-            self.assertIn(change["ns"], [6, 7])
+            self.assertIn(change['ns'], [6, 7])
 
     def test_pagelist(self):
         """Test the site.recentchanges() with pagelist deprecated MW 1.14."""

@@ -90,7 +90,7 @@ class TestDryPageGenerators(TestCase):
 
     def test_NamespaceFilterPageGenerator(self):
         """Test NamespaceFilterPageGenerator."""
-        self.assertFunction("NamespaceFilterPageGenerator")
+        self.assertFunction('NamespaceFilterPageGenerator')
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 0, site)

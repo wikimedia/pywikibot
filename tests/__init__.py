@@ -275,7 +275,7 @@ config.solve_captcha = False
 cache_misses = 0
 cache_hits = 0
 
-warnings.filterwarnings("always")
+warnings.filterwarnings('always')
 
 
 class TestRequest(CachedRequest):

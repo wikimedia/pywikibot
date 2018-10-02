@@ -101,16 +101,16 @@ class ExportDotTenTestCase(XmlReaderTestCase):
         talks = entries[2:4]
 
         self.assertEqual(2, len(articles))
-        self.assertTrue(all(entry.id == "19252820" for entry in articles))
-        self.assertTrue(all(entry.title == u"Çullu, Agdam"
+        self.assertTrue(all(entry.id == '19252820' for entry in articles))
+        self.assertTrue(all(entry.title == 'Çullu, Agdam'
                             for entry in articles))
-        self.assertTrue(all(u'Çullu, Quzanlı' in entry.text
+        self.assertTrue(all('Çullu, Quzanlı' in entry.text
                             for entry in articles))
-        self.assertEqual(articles[0].text, u'#REDIRECT [[Çullu, Quzanlı]]')
+        self.assertEqual(articles[0].text, '#REDIRECT [[Çullu, Quzanlı]]')
 
         self.assertEqual(2, len(talks))
-        self.assertTrue(all(entry.id == "19252824" for entry in talks))
-        self.assertTrue(all(entry.title == u"Talk:Çullu, Agdam"
+        self.assertTrue(all(entry.id == '19252824' for entry in talks))
+        self.assertTrue(all(entry.title == 'Talk:Çullu, Agdam'
                             for entry in talks))
         self.assertEqual(talks[1].text, '{{DisambigProject}}')
         self.assertEqual(talks[1].comment, 'proj')
@@ -118,11 +118,12 @@ class ExportDotTenTestCase(XmlReaderTestCase):
     def test_edit_summary_decoding(self):
         """Test edit summaries are decoded."""
         entries = self._get_entries('pair-0.10.xml', allrevisions=True)
-        articles = [entry for entry in entries if entry.ns == "0"]
+        articles = [entry for entry in entries if entry.ns == '0']
 
         # It does not decode the edit summary
-        self.assertEqual(articles[0].comment,
-                         u'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]:&#32;dab')
+        self.assertEqual(
+            articles[0].comment,
+            'moved [[Çullu, Agdam]] to [[Çullu, Quzanlı]]:&#32;dab')
 
 
 if __name__ == '__main__':  # pragma: no cover

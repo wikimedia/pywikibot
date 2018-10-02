@@ -63,7 +63,7 @@ class TestSectionFunctions(TestCase):
 
     def testCurrentBehaviour(self):
         """Test that 'Editing' is found."""
-        self.assertContains("enwiki_help_editing", u"Editing")
+        self.assertContains('enwiki_help_editing', 'Editing')
 
     def testSpacesInSection(self):
         """Test with spaces in section."""

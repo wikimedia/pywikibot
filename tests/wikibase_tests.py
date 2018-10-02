@@ -142,9 +142,10 @@ class TestGeneral(WikidataTestCase):
         claim = pywikibot.Claim(repo, 'p21')
         regex = r' is not type .+\.$'
         with self.assertRaisesRegex(ValueError, regex):
-            claim.setTarget(value="test")
+            claim.setTarget(value='test')
         claim.setTarget(ItemPage(repo, 'q1'))
-        self.assertEqual(claim._formatValue(), {'entity-type': 'item', 'numeric-id': 1})
+        self.assertEqual(claim._formatValue(), {'entity-type': 'item',
+                                                'numeric-id': 1})
 
     def test_cmp(self):
         """Test WikibasePage.__cmp__."""
@@ -438,17 +439,17 @@ class TestWbQuantity(WbRepresentationTestCase):
         """Test WbQuantity formatting with bounds."""
         repo = self.get_repo()
         q = pywikibot.WbQuantity(amount='0.044405586', error='0', site=repo)
-        self.assertEqual("%s" % q,
+        self.assertEqual('%s' % q,
                          '{\n'
                          '    "amount": "+%(val)s",\n'
                          '    "lowerBound": "+%(val)s",\n'
                          '    "unit": "1",\n'
                          '    "upperBound": "+%(val)s"\n'
                          '}' % {'val': '0.044405586'})
-        self.assertEqual("%r" % q,
-                         "WbQuantity(amount=%(val)s, "
-                         "upperBound=%(val)s, lowerBound=%(val)s, "
-                         "unit=1)" % {'val': '0.044405586'})
+        self.assertEqual('%r' % q,
+                         'WbQuantity(amount=%(val)s, '
+                         'upperBound=%(val)s, lowerBound=%(val)s, '
+                         'unit=1)' % {'val': '0.044405586'})
 
     def test_WbQuantity_self_equality(self):
         """Test WbQuantity equality."""
@@ -529,17 +530,17 @@ class TestWbQuantityNonDry(WbRepresentationTestCase):
             raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
                                     'newer to support unbound uncertainties.')
         q = pywikibot.WbQuantity(amount='0.044405586', site=self.repo)
-        self.assertEqual("%s" % q,
+        self.assertEqual('%s' % q,
                          '{\n'
                          '    "amount": "+%(val)s",\n'
                          '    "lowerBound": null,\n'
                          '    "unit": "1",\n'
                          '    "upperBound": null\n'
                          '}' % {'val': '0.044405586'})
-        self.assertEqual("%r" % q,
-                         "WbQuantity(amount=%(val)s, "
-                         "upperBound=None, lowerBound=None, "
-                         "unit=1)" % {'val': '0.044405586'})
+        self.assertEqual('%r' % q,
+                         'WbQuantity(amount=%(val)s, '
+                         'upperBound=None, lowerBound=None, '
+                         'unit=1)' % {'val': '0.044405586'})
 
     def test_WbQuantity_fromWikibase_unbound(self):
         """Test WbQuantity.fromWikibase() instantiating without bounds."""
@@ -629,7 +630,8 @@ class TestWbMonolingualText(WbRepresentationTestCase):
 
     def test_WbMonolingualText_string(self):
         """Test WbMonolingualText string."""
-        q = pywikibot.WbMonolingualText(text='Test that basics work', language='en')
+        q = pywikibot.WbMonolingualText(text='Test that basics work',
+                                        language='en')
         q_dict = {'text': 'Test that basics work', 'language': 'en'}
         self.assertEqual(q.toWikibase(), q_dict)
 
@@ -641,7 +643,8 @@ class TestWbMonolingualText(WbRepresentationTestCase):
 
     def test_WbMonolingualText_equality(self):
         """Test WbMonolingualText equality."""
-        q = pywikibot.WbMonolingualText(text='Thou shall test this!', language='en-gb')
+        q = pywikibot.WbMonolingualText(text='Thou shall test this!',
+                                        language='en-gb')
         self.assertEqual(q, q)
 
     def test_WbMonolingualText_fromWikibase(self):
@@ -731,7 +734,7 @@ class TestWbGeoShapeNonDry(WbRepresentationTestCase):
         non_data_page = Page(self.commons, 'File:Foo.jpg')
         non_map_page = Page(self.commons, 'Data:TemplateData/TemplateData.tab')
         regex = r"^Page must be in 'Data:' namespace and end in '\.map' " + \
-                r"for geo-shape\.$"
+                r'for geo-shape\.$'
         with self.assertRaisesRegex(ValueError, regex):
             pywikibot.WbGeoShape(non_data_page, self.get_repo())
         with self.assertRaisesRegex(ValueError, regex):
