@@ -16,7 +16,7 @@ Parameters:
    -all         Try to log in on all sites where a username is defined in
                 user-config.py.
 
-   -logout      Log out of the curren site. Combine with -all to log out of
+   -logout      Log out of the current site. Combine with -all to log out of
                 all sites, or with -family and -lang to log out of a specific
                 site.
 
