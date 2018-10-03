@@ -71,11 +71,11 @@ class TestLink(DefaultDrySiteTestCase):
         """Test that valid titles are correctly normalized."""
         self.assertEqual(Link('Sandbox', self.get_site()).title, 'Sandbox')
         self.assertEqual(Link('A "B"', self.get_site()).title, 'A "B"')
-        self.assertEqual(Link('A \'B\'', self.get_site()).title, 'A \'B\'')
+        self.assertEqual(Link("A 'B'", self.get_site()).title, "A 'B'")
         self.assertEqual(Link('.com', self.get_site()).title, '.com')
         self.assertEqual(Link('~', self.get_site()).title, '~')
         self.assertEqual(Link('"', self.get_site()).title, '"')
-        self.assertEqual(Link('\'', self.get_site()).title, '\'')
+        self.assertEqual(Link("'", self.get_site()).title, "'")
         self.assertEqual(Link('Talk:Sandbox', self.get_site()).title,
                          'Sandbox')
         self.assertEqual(Link('Talk:Foo:Sandbox', self.get_site()).title,

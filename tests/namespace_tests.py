@@ -137,7 +137,7 @@ class TestNamespaceObject(TestCase):
 
     def testNamespaceCompare(self):
         """Test Namespace comparisons."""
-        a = Namespace(id=0, canonical_name=u'')
+        a = Namespace(id=0, canonical_name='')
 
         self.assertEqual(a, 0)
         self.assertEqual(a, '')

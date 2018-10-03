@@ -75,6 +75,7 @@ extra_deps = {
         'flake8-quotes',
         'flake8-string-format',
         'flake8-tuple>=0.2.8',
+        'flake8-no-u-prefixed-strings>=0.2',
         'pep8-naming>=0.7',
         'pyflakes>=1.1',
     ]

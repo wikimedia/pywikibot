@@ -47,7 +47,7 @@ class TestXMLPageGenerator(TestCase):
         """Test namespaces=[] processes all namespaces."""
         gen = XmlDumpPageGenerator(
             filename=join_xml_data_path('dummy-reflinks.xml'),
-            start=u'Fake page',
+            start='Fake page',
             namespaces=[],
             site=self.get_site())
         pages = list(gen)

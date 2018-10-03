@@ -346,7 +346,7 @@ class TestPageObject(DefaultSiteTestCase):
 
         # Test not valid source.
         self.assertRaisesRegex(pywikibot.Error,
-                               'Invalid argument type \'<\\w* \'\\w*\'>\' in '
+                               r"Invalid argument type '<\w* '\w*'>' in "
                                'Page initializer: dummy',
                                pywikibot.Page, 'dummy')
 
@@ -1064,13 +1064,13 @@ class TestPageProtect(TestCase):
         p1 = pywikibot.Page(site, 'User:Unicodesnowman/ProtectTest')
 
         p1.protect(protections={'edit': 'sysop', 'move': 'autoconfirmed'},
-                   reason=u'Pywikibot unit test')
+                   reason='Pywikibot unit test')
         self.assertEqual(p1.protection(),
                          {'edit': ('sysop', 'infinity'),
                           'move': ('autoconfirmed', 'infinity')})
 
         p1.protect(protections={'edit': '', 'move': ''},
-                   reason=u'Pywikibot unit test')
+                   reason='Pywikibot unit test')
         self.assertEqual(p1.protection(), {})
 
     def test_protect_alt(self):

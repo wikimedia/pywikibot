@@ -254,7 +254,7 @@ class TestTWNTranslate(TWNTestCaseBase, AutoDeprecationTestCase):
         self.assertEqual(
             i18n.twntranslate('de', 'test-multiple-plurals', 2)
             % {'action': 'Ändere', 'line': 'zwei'},
-            u'Bot: Ändere zwei Zeilen von mehreren Seiten.')
+            'Bot: Ändere zwei Zeilen von mehreren Seiten.')
         self.assertEqual(
             i18n.twntranslate('de', 'test-multiple-plurals', 3)
             % {'action': 'Ändere', 'line': 'drei'},
