@@ -107,7 +107,7 @@ class WikiStats(object):
         url = self.url + path
 
         if table not in self.ALL_KEYS:
-            pywikibot.warning('WikiStats unknown table %s' % table)
+            pywikibot.warning('WikiStats unknown table ' + table)
 
         if table in self.FAMILY_MAPPING:
             table = self.FAMILY_MAPPING[table]
