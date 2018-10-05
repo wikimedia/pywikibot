@@ -219,7 +219,7 @@ if __name__ == '__main__':
         print("""
 Usage: {module} <url> <short name>
 Example: {module} https://www.mywiki.bogus/wiki/Main_Page mywiki
-This will create the file families{sep}mywiki_family.py"""
+This will create the file mywiki_family.py in pywikibot{sep}families"""
               .format(module=sys.argv[0].strip('.' + os.sep),
                       sep=os.sep))
 
