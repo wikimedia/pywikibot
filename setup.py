@@ -105,7 +105,8 @@ if sys.platform.startswith('linux'):
 # The main pywinauto repository doesnt support Python 3.
 # The repositories used below have a Python 3 compliant setup.py
 dependency_links = [
-    'git+https://github.com/AlereDevices/lunatic-python.git#egg=lunatic-python',
+    'git+https://github.com/AlereDevices/lunatic-python.git#egg='
+    'lunatic-python',
     'hg+https://bitbucket.org/TJG/pywin32#egg=pywin32',
     'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
 ]
@@ -163,7 +164,6 @@ else:
 # Microsoft makes available a compiler for Python 2.7
 # http://www.microsoft.com/en-au/download/details.aspx?id=44266
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
-    # FIXME: tests/ui_tests.py suggests pywinauto 0.4.2
     # which isnt provided on pypi.
     test_deps += ['pywin32', 'pywinauto>=0.4.0']
 

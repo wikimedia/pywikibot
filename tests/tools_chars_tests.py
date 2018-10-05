@@ -24,8 +24,10 @@ class CharsTestCase(TestCase):
 
     def test_replace(self):
         """Test replace_invisible."""
-        self.assertEqual(chars.replace_invisible('Hello world!'), 'Hello world!')
-        self.assertEqual(chars.replace_invisible('\u200eRTL\u200f'), '<200e>RTL<200f>')
+        self.assertEqual(
+            chars.replace_invisible('Hello world!'), 'Hello world!')
+        self.assertEqual(
+            chars.replace_invisible('\u200eRTL\u200f'), '<200e>RTL<200f>')
 
     def test_contains(self):
         """Test contains_invisible."""
