@@ -222,6 +222,7 @@ netext = {
         'as': '{{subst:আদৰণি}} %s',
         'ba': '{{Hello}} %s',
         'bn': '{{subst:স্বাগতম/বট}} %s',
+        'bs': '{{Dobrodošlica}} %s',
         'da': '{{velkommen|%s}}',
         'en': '{{subst:welcome}} %s',
         'fa': '{{جا:خوشامد}} %s',
@@ -253,21 +254,25 @@ netext = {
         'zh-yue': '{{歡迎}}--%s',
     },
     'wikibooks': {
+        'bs': '{{Dobrodošlica}} %s',
         'es': '{{subst:bienivenido usuario}} %s',
     },
     'wikinews': {
         'ar': '{{subst:ترحيب}} %s',
+        'bs': '{{Dobrodošlica}} %s',
         'fa': '{{خوشامد۲|%s}}',
         'it': '{{subst:benvenuto}}',
         'zh': '{{subst:welcome}} %s',
     },
     'wikisource': {
         'bn': '{{subst:স্বাগতম}} %s',
+        'bs': '{{Dobrodošlica}} %s',
         'mr': '{{subst:Welcome}} %s',
     },
     'wiktionary': {
         'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম|%s}}',
+        'bs': '{{Dobrodošlica}} %s',
         'fa': '{{جا:خوشامد|%s}}',
         'it': '{{subst:Utente:Filnik/Benve|firma=%s}}',
         'ur': '{{جا:خوش آمدید}}%s',
@@ -340,6 +345,7 @@ report_text = {
     'wikipedia': {
         'am': '\n*[[User talk:%s]]' + timeselected,
         'ar': '\n*{{user13|%s}}' + timeselected,
+        'bs': '\n{{Korisnik|%s}}' + timeselected,
         'da': '\n*[[Bruger Diskussion:%s]] ' + timeselected,
         'de': '\n*[[Benutzer Diskussion:%s]] ' + timeselected,
         'en': '\n*{{Userlinks|%s}} ' + timeselected,
