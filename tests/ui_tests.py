@@ -9,11 +9,11 @@
 #
 # Windows UI tests have to be run using the tests\ui_tests.bat helper script.
 # This will set PYTHONPATH and PYWIKIBOT_DIR, and then run the tests. Do not
-# touch mouse or keyboard while the tests are running, as this might disturb the
-# interaction tests.
+# touch mouse or keyboard while the tests are running, as this might disturb
+# the interaction tests.
 #
-# The Windows tests were developed on a Dutch Windows 7 OS. You might need to adapt the
-# helper functions in TestWindowsTerminalUnicode for other versions.
+# The Windows tests were developed on a Dutch Windows 7 OS. You might need to
+# adapt the helper functions in TestWindowsTerminalUnicode for other versions.
 #
 # For the Windows-based tests, you need the following packages installed:
 #   - pywin32, for clipboard access, which can be downloaded here:
@@ -21,7 +21,7 @@
 #     make sure to download the package for the correct python version!
 #
 #   - pywinauto, to send keys to the terminal, which can be installed using:
-#     easy_install --upgrade https://pywinauto.googlecode.com/files/pywinauto-0.4.2.zip
+#     pip install -U pywinauto
 #
 #
 from __future__ import absolute_import, division, unicode_literals

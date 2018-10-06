@@ -73,7 +73,8 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         if 'P115' in item.claims:
             item.removeClaims(item.claims['P115'])
 
-        claim = pywikibot.page.Claim(testsite, 'P115', datatype='wikibase-item')
+        claim = pywikibot.page.Claim(
+            testsite, 'P115', datatype='wikibase-item')
         target = pywikibot.ItemPage(testsite, 'Q271')
         claim.setTarget(target)
 
@@ -94,7 +95,8 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
                 to_remove.append({'id': claim.toJSON()['id'], 'remove': ''})
             item.editEntity({'claims': to_remove})
 
-        claim = pywikibot.page.Claim(testsite, 'P115', datatype='wikibase-item')
+        claim = pywikibot.page.Claim(
+            testsite, 'P115', datatype='wikibase-item')
         target = pywikibot.ItemPage(testsite, 'Q271')
         claim.setTarget(target)
         item.editEntity({'claims': [claim.toJSON()]})
@@ -225,7 +227,8 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
         item = self._clean_item(testsite, 'P271')
 
         # set new claim
-        claim = pywikibot.page.Claim(testsite, 'P271', datatype='monolingualtext')
+        claim = pywikibot.page.Claim(
+            testsite, 'P271', datatype='monolingualtext')
         target = pywikibot.WbMonolingualText(text='Test this!', language='en')
         claim.setTarget(target)
         item.addClaim(claim)
@@ -378,7 +381,8 @@ class TestWikibaseRemoveQualifier(WikibaseTestCase):
         if 'P115' in item.claims:
             item.removeClaims(item.claims['P115'])
 
-        claim = pywikibot.page.Claim(testsite, 'P115', datatype='wikibase-item')
+        claim = pywikibot.page.Claim(
+            testsite, 'P115', datatype='wikibase-item')
         target = pywikibot.ItemPage(testsite, 'Q271')
         claim.setTarget(target)
         item.addClaim(claim)

@@ -56,7 +56,8 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
         """Test XmlDump correctly parsing whether a page is a redirect."""
         pages = self._get_entries('article-pyrus.xml', allrevisions=True)
         pages = [r for r in
-                 xmlreader.XmlDump(join_xml_data_path('article-pyrus.xml')).parse()]
+                 xmlreader.XmlDump(
+                     join_xml_data_path('article-pyrus.xml')).parse()]
         self.assertTrue(pages[0].isredirect)
 
     def _compare(self, previous, variant, all_revisions):

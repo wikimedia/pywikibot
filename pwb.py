@@ -185,8 +185,8 @@ except RuntimeError:
         run_python_file(os.path.join(_pwb_dir, 'generate_user_files.py'),
                         ['generate_user_files.py'],
                         ['generate_user_files.py'])
-        # because we have loaded pywikibot without user-config.py loaded, we need to re-start
-        # the entire process. Ask the user to do so.
+        # because we have loaded pywikibot without user-config.py loaded,
+        # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
 

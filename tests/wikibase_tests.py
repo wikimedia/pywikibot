@@ -1445,7 +1445,8 @@ class TestClaimSetValue(WikidataTestCase):
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P569')
         self.assertEqual(claim.type, 'time')
-        claim.setTarget(pywikibot.WbTime(year=2001, month=1, day=1, site=wikidata))
+        claim.setTarget(pywikibot.WbTime(
+            year=2001, month=1, day=1, site=wikidata))
         self.assertEqual(claim.target.year, 2001)
         self.assertEqual(claim.target.month, 1)
         self.assertEqual(claim.target.day, 1)
@@ -1676,7 +1677,8 @@ class TestPreloadingEntityGenerator(TestCase):
         """Test PreloadingEntityGenerator with ReferringPageGenerator."""
         site = self.get_site('wikidata')
         instance_of_page = pywikibot.Page(site, 'Property:P31')
-        ref_gen = pagegenerators.ReferringPageGenerator(instance_of_page, total=5)
+        ref_gen = pagegenerators.ReferringPageGenerator(
+            instance_of_page, total=5)
         gen = pagegenerators.PreloadingEntityGenerator(ref_gen)
         self.assertTrue(all(isinstance(item, ItemPage) for item in gen))
 

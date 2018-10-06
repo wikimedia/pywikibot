@@ -420,7 +420,8 @@ class DrySite(pywikibot.site.APISite):
         aliases = []
         for alias in ('PrefixIndex', ):
             # TODO: Not all follow that scheme (e.g. "BrokenRedirects")
-            aliases.append({'realname': alias.capitalize(), 'aliases': [alias]})
+            aliases.append(
+                {'realname': alias.capitalize(), 'aliases': [alias]})
         self._siteinfo._cache['specialpagealiases'] = (aliases, True)
         self._msgcache = {'*': 'dummy entry', 'hello': 'world'}
 
