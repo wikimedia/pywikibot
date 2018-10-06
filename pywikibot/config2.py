@@ -269,7 +269,7 @@ default_edit_summary = 'Pywikibot 3.0-dev'
 # stat.S_IROTH 0o004 read permission for others
 # stat.S_IWOTH 0o002 write permission for others
 # stat.S_IXOTH 0o001 execute permission for others
-private_files_permission = stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
+private_files_permission = stat.S_IRUSR | stat.S_IWUSR
 
 # Allow user to stop warnings about file security
 # by setting this to true.
