@@ -68,6 +68,7 @@ SSL_CERT_VERIFY_FAILED_MSG = 'certificate verify failed'
 _logger = 'comm.http'
 
 
+# Should be marked as deprecated after PywikibotCookieJar is removed.
 def mode_check_decorator(func):
     """Decorate load()/save() CookieJar methods."""
     def wrapper(cls, **kwargs):
@@ -84,7 +85,12 @@ def mode_check_decorator(func):
 # in PY2 cookielib.LWPCookieJar is not a new-style class.
 class PywikibotCookieJar(cookielib.LWPCookieJar, object):
 
-    """CookieJar which checks file permissions."""
+    """DEPRECATED. CookieJar which checks file permissions."""
+
+    @deprecated(since='20181007')
+    def __init__(self, *args, **kwargs):
+        """Initialize the class."""
+        super(PywikibotCookieJar, self).__init__(*args, **kwargs)
 
     @mode_check_decorator
     def load(self, **kwargs):
@@ -97,10 +103,12 @@ class PywikibotCookieJar(cookielib.LWPCookieJar, object):
         super(PywikibotCookieJar, self).save()
 
 
-cookie_jar = PywikibotCookieJar(config.datafilepath('pywikibot.lwp'))
+cookie_file_path = config.datafilepath('pywikibot.lwp')
+file_mode_checker(cookie_file_path, create=True)
+cookie_jar = cookielib.LWPCookieJar(cookie_file_path)
 try:
     cookie_jar.load()
-except (IOError, cookielib.LoadError):
+except cookielib.LoadError:
     debug('Loading cookies failed.', _logger)
 else:
     debug('Loaded cookies from file.', _logger)
