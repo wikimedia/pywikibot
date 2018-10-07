@@ -1997,17 +1997,27 @@ def open_compressed(filename, use_extension=False):
     return open_archive(filename, use_extension=use_extension)
 
 
-def file_mode_checker(filename, mode=0o600, quiet=False):
+def file_mode_checker(filename, mode=0o600, quiet=False, create=False):
     """Check file mode and update it, if needed.
 
     @param filename: filename path
     @type filename: basestring
     @param mode: requested file mode
     @type mode: int
-
+    @param quiet: warn about file mode change if False.
+    @type quiet: bool
+    @param create: create the file if it does not exist already
+    @type create: bool
+    @raise IOError: The file does not exist and `create` is False.
     """
+    try:
+        st_mode = os.stat(filename).st_mode
+    except OSError:  # file does not exist
+        if not create:
+            raise
+        os.close(os.open(filename, os.O_CREAT | os.O_EXCL, mode))
+        return
     warn_str = 'File {0} had {1:o} mode; converted to {2:o} mode.'
-    st_mode = os.stat(filename).st_mode
     if stat.S_ISREG(st_mode) and (st_mode - stat.S_IFREG != mode):
         os.chmod(filename, mode)
         # re-read and check changes
