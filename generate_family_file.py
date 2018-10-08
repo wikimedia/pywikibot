@@ -48,7 +48,7 @@ class FamilyFileGenerator(object):
         w = Wiki(self.base_url)
         self.wikis[w.lang] = w
         print('\n=================================='
-              '\napi url: {w.api}'
+              '\nAPI url: {w.api}'
               '\nMediaWiki version: {w.version}'
               '\n==================================\n'.format(w=w))
 
