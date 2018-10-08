@@ -310,9 +310,9 @@ class PatrolBot(SingleSiteBot):
                 self.load_whitelist()
                 self.repeat_start_ts = time.time()
 
-            if self.getOption('ask'):
-                verbose_output('User {0} has created or modified page {1}'
-                               .format(username, title))
+            if pywikibot.config.verbose_output or self.getOption('ask'):
+                pywikibot.output('User {0} has created or modified page {1}'
+                                 .format(username, title))
 
             if self.getOption('autopatroluserns') and (page['ns'] == 2 or
                                                        page['ns'] == 3):
