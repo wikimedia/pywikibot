@@ -785,7 +785,7 @@ def main(*args):
             pagelist.append(pywikibot.Page(site, pagename, ns=3))
         pagelist = sorted(pagelist)
         for pg in iter(pagelist):
-            pywikibot.output('Processing ' + pg)
+            pywikibot.output('Processing {}'.format(pg))
             # Catching exceptions, so that errors in one page do not bail out
             # the entire process
             try:
