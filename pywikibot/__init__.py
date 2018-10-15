@@ -1059,9 +1059,7 @@ class _WbDataPage(_WbRepresentation):
 
 
 class WbGeoShape(_WbDataPage):
-    """
-    A Wikibase geo-shape representation.
-    """
+    """A Wikibase geo-shape representation."""
 
     @classmethod
     def _get_data_site(cls, site):
@@ -1092,9 +1090,7 @@ class WbGeoShape(_WbDataPage):
 
 
 class WbTabularData(_WbDataPage):
-    """
-    A Wikibase tabular-data representation.
-    """
+    """A Wikibase tabular-data representation."""
 
     @classmethod
     def _get_data_site(cls, site):
