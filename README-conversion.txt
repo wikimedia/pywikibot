@@ -40,7 +40,7 @@ explicit edit summary message on each put() call.
 
 There is a helper script which does a lot of changes automatically.
 Just call it:
-pwb.py maintenance/compat2core [<script to convert>]
+pwb.py compat2core [<script to convert>]
 and follow the instructions and hints.
 
 == Python libraries ==
@@ -83,7 +83,7 @@ The following methods of the Page object have been obsoleted and no longer
 work (but these methods don't appear to be used anywhere in the code
 distributed with the bot framework). The functionality of the two obsolete
 methods is easily replaced by using standard search-and-replace techniques.
-If you call them, they will print a warning and do nothing else:
+If you call them, they will raise an NotImplementedError exception:
 
 - removeImage()
 - replaceImage()
