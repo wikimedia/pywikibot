@@ -43,6 +43,23 @@ Just call it:
 pwb.py compat2core [<script to convert>]
 and follow the instructions and hints.
 
+== Deprecated methods ==
+
+A lot of object methods have been deprecated; deprecated methods still work,
+but print a warning message in debug mode. You should follow the warning
+message and update your script accordingly because deprecated methods might
+be removed in future releases.
+
+To activate the debugging level just call your script with -debug option like
+-debug:bot or
+-debug:*
+
+Note: The -debug option does not warn when importing deprecated modules.
+A better ability is to set the debugging level in your user-config.py:
+debug_log = ['*'] or
+debug_log = ['bot'] or
+log += ['deprecation']
+
 == Python libraries ==
 
 [Note: the goal will be to package pywikibot with setuptools easy_install,
@@ -68,16 +85,6 @@ access to the wiki server.
 A third syntax allows easy conversion from a Page object to a FilePage or
 Category, or vice versa: e.g., Category(pageobj) converts a Page to a
 Category, as long as the page is in the category namespace.
-
-The following methods of the Page object have been deprecated (deprecated
-methods still work, but print a warning message in debug mode):
-
-- urlname(): replaced by Page.title(as_url=True)
-- titleWithoutNamespace(): replaced by Page.title(with_ns=False)
-- sectionFreeTitle(): replaced by Page.title(with_section=False)
-- aslink(): replaced by Page.title(as_link=True)
-- encoding(): replaced by Page.site.encoding()
-- put_async(): replaced by Page.put(asynchronous=True)
 
 The following methods of the Page object have been obsoleted and no longer
 work (but these methods don't appear to be used anywhere in the code
