@@ -446,11 +446,13 @@ def main(*args):
     recentchanges = False
     newpages = False
     repeat = False
-    gen_factory = pagegenerators.GeneratorFactory()
     options = {}
 
     # Parse command line arguments
-    for arg in pywikibot.handle_args(args):
+    local_args = pywikibot.handle_args(args)
+    site = pywikibot.Site()
+    gen_factory = pagegenerators.GeneratorFactory(site)
+    for arg in local_args:
         if arg.startswith('-ask'):
             options['ask'] = True
         elif arg.startswith('-autopatroluserns'):
@@ -474,9 +476,6 @@ def main(*args):
                 if ':' in arg:
                     m = arg.split(':')
                     options[m[0]] = m[1]
-
-    site = pywikibot.Site()
-    site.login()
 
     if usercontribs:
         user = pywikibot.User(site, usercontribs)
