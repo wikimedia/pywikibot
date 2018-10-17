@@ -192,7 +192,7 @@ class PatrolBot(SingleSiteBot):
                 if item.match(title):
                     return True
 
-            elif title_match(item, title):
+            elif title.startswith(item):
                 return True
         verbose_output('not found')
         return False
@@ -361,17 +361,6 @@ class PatrolBot(SingleSiteBot):
                              .format(title(as_link=True)))
 
 
-def title_match(prefix, title):
-    """Match title substring with given prefix."""
-    if pywikibot.config.verbose_output:
-        pywikibot.output('Matching {0} to prefix {1}'.format(title, prefix))
-    if title.startswith(prefix):
-        if pywikibot.config.verbose_output:
-            pywikibot.output('substr match')
-        return True
-    return
-
-
 class LinkedPagesRule(object):
 
     """Matches of page site title and linked pages title."""
@@ -414,7 +403,7 @@ class LinkedPagesRule(object):
         for p in self.linkedpages:
             if pywikibot.config.verbose_output:
                 pywikibot.output("Checking against '{0}'".format(p))
-            if title_match(p, page_title):
+            if page_title.startswith(p):
                 if pywikibot.config.verbose_output:
                     pywikibot.output('Matched.')
                 return p
