@@ -344,8 +344,7 @@ class PatrolBot(SingleSiteBot):
                 pywikibot.output('Patrolled {0} (rcid {1}) by user {2}'
                                  .format(title, rcid, username))
             else:
-                if pywikibot.config.verbose_output:
-                    pywikibot.output('Skipped')
+                verbose_output('Skipped')
 
             if rcid > self.highest_rcid:
                 self.highest_rcid = rcid
@@ -387,24 +386,19 @@ class LinkedPagesRule(object):
             raise Exception('This is a wikisource rule')
 
         if not self.linkedpages:
-            if pywikibot.config.verbose_output:
-                pywikibot.output('loading page links on ' + self.page_title)
+            verbose_output('loading page links on ' + self.page_title)
             p = pywikibot.Page(self.site, self.page_title)
             linkedpages = []
             for linkedpage in p.linkedPages():
                 linkedpages.append(linkedpage.title())
 
             self.linkedpages = linkedpages
-            if pywikibot.config.verbose_output:
-                pywikibot.output('Loaded {0} page links'
-                                 .format(len(linkedpages)))
+            verbose_output('Loaded {0} page links'.format(len(linkedpages)))
 
         for p in self.linkedpages:
-            if pywikibot.config.verbose_output:
-                pywikibot.output("Checking against '{0}'".format(p))
+            verbose_output("Checking against '{0}'".format(p))
             if page_title.startswith(p):
-                if pywikibot.config.verbose_output:
-                    pywikibot.output('Matched.')
+                verbose_output('Matched.')
                 return p
 
 
