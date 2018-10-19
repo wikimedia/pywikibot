@@ -172,12 +172,12 @@ class PatrolBot(SingleSiteBot):
 
         # quick check for exact match
         if title in pagelist:
-            return title
+            return True
 
         # quick check for wildcard
         if '' in pagelist:
             verbose_output('wildcarded')
-            return '.*'
+            return True
 
         for item in pagelist:
             verbose_output('checking against whitelist item = ' + item)
@@ -185,12 +185,12 @@ class PatrolBot(SingleSiteBot):
             if isinstance(item, LinkedPagesRule):
                 verbose_output('invoking programmed rule')
                 if item.match(title):
-                    return item
+                    return True
 
             elif title_match(item, title):
-                return item
-
+                return True
         verbose_output('not found')
+        return False
 
     def parse_page_tuples(self, wikitext, user=None):
         """Parse page details apart from 'user:' for use."""
