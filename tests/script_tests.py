@@ -378,6 +378,7 @@ class TestScriptHelp(PwbTestCase):
     # -help tests may pass even when packages are required
     _expected_failures.discard('imageharvest')
     _expected_failures.discard('isbn')
+    _expected_failures.discard('patrol')
     _expected_failures.discard('weblinkchecker')
     _allowed_failures = []
 
