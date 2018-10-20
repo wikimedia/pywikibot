@@ -4,7 +4,9 @@ Release history
 Current release
 ---------------
 
+* Make sure the cookie file is created with the right permissions (T206387)
 * pydot >= 1.2 is required for interwiki_graph
+* Move methods for simple claim adding/removing to WikibasePage (T113131)
 * Enable start timestamp for EventStreams (T205121)
 * Re-enable notifications (T205184)
 * Use FutureWarning for warnings intended for end users (T191192)
