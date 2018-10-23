@@ -89,7 +89,7 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
             _query = UnicodeType(_query, encoding='utf-8')
         _query = _query.strip()
         _query = '\n'.join('    {0}'.format(l) for l in _query.splitlines())
-        pywikibot.output('Executing query:\n%s' % _query)
+        pywikibot.output('Executing query:\n' + _query)
 
     cursor.execute(query, params)
 

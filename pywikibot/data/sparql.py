@@ -141,7 +141,7 @@ class SparqlQuery(object):
         @param query: Query text
         @type query: string
         """
-        url = '%s?query=%s' % (self.endpoint, quote(query))
+        url = '{0}?query={1}'.format(self.endpoint, quote(query))
         while True:
             try:
                 self.last_response = http.fetch(url, headers=headers)
