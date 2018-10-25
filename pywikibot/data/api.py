@@ -39,7 +39,7 @@ from pywikibot.exceptions import (
 )
 from pywikibot.tools import (
     MediaWikiVersion, deprecated, itergroup, ip, PY2, PYTHON_VERSION,
-    getargspec, UnicodeType
+    getargspec, UnicodeType, remove_last_args
 )
 from pywikibot.tools.formatter import color_format
 
@@ -3242,10 +3242,9 @@ class LoginManager(login.LoginManager):
 
     """Supply getCookie() method to use API interface."""
 
-    def getCookie(self, remember=True, captchaId=None, captchaAnswer=None):
+    @remove_last_args(arg_names=['remember, captchaId, captchaAnswer'])
+    def getCookie(self):
         """Login to the site.
-
-        Parameters are all ignored.
 
         Note, this doesn't actually return or do anything with cookies.
         The threadedhttp module takes care of all the cookie stuff,

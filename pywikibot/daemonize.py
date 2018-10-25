@@ -11,10 +11,13 @@ import codecs
 import os
 import sys
 
+from pywikibot.tools import deprecated_args
+
 is_daemon = False
 
 
-def daemonize(close_fd=True, chdir=True, write_pid=False, redirect_std=None):
+@deprecated_args(write_pid=None)
+def daemonize(close_fd=True, chdir=True, redirect_std=None):
     """
     Daemonize the current process.
 
@@ -25,8 +28,6 @@ def daemonize(close_fd=True, chdir=True, write_pid=False, redirect_std=None):
     @type close_fd: bool
     @param chdir: Change the current working directory to /
     @type chdir: bool
-    @param write_pid: Write the pid to sys.argv[0] + '.pid'
-    @type write_pid: bool
     @param redirect_std: Filename to redirect stdout and stdin to
     @type redirect_std: str
     """
@@ -54,7 +55,6 @@ def daemonize(close_fd=True, chdir=True, write_pid=False, redirect_std=None):
                 os.dup2(1, 2)
             if chdir:
                 os.chdir('/')
-            return
         else:
             # Write out the pid
             path = os.path.basename(sys.argv[0]) + '.pid'
