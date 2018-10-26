@@ -10,6 +10,9 @@
 .. image:: https://api.codeclimate.com/v1/badges/de6ca4c66e7c7bee4156/maintainability
    :alt: Maintainability
    :target: https://codeclimate.com/github/wikimedia/pywikibot/maintainability
+.. image:: https://img.shields.io/pypi/pyversions/pywikibot.svg
+   :alt: Python
+   :target: https://www.python.org/downloads/
 .. image:: https://img.shields.io/pypi/v/pywikibot.svg
    :alt: Pywikibot release
    :target: https://pypi.org/project/pywikibot/
