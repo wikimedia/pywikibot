@@ -8,10 +8,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
-try:
-    from scripts import patrol
-except ImportError:
-    patrol = None  # if mwparserfromhell is not installed
+from scripts import patrol
 
 from tests.aspects import require_modules, unittest, DefaultDrySiteTestCase
 
@@ -32,6 +29,15 @@ This is some text above the entries:
 """
 
 
+class DummyPatrolBot(patrol.PatrolBot):
+
+    """Dummy Patrol Bot for Tests."""
+
+    def load_whitelist(self):
+        """Do not try to load the whitelist."""
+        pass
+
+
 @require_modules('mwparserfromhell')
 class TestPatrolBot(DefaultDrySiteTestCase):
 
@@ -40,7 +46,7 @@ class TestPatrolBot(DefaultDrySiteTestCase):
     def setUp(self):
         """Create a bot dummy instance."""
         super(TestPatrolBot, self).setUp()
-        self.bot = patrol.PatrolBot(self.site)
+        self.bot = DummyPatrolBot(self.site)
 
     def test_parse_page_tuples(self):
         """Test parsing the page tuples from a dummy text."""
