@@ -2317,7 +2317,7 @@ class APISite(BaseSite):
         """Return true if the user has new messages, and false otherwise."""
         if not self.logged_in(sysop):
             self.login(sysop)
-        return 'hasmsg' in self._userinfo
+        return 'messages' in self._userinfo
 
     @need_extension('Echo')
     def notifications(self, **kwargs):
