@@ -231,9 +231,6 @@ class PatrolBot(SingleSiteBot):
                             page = prefix
                             verbose_output('Whitelist prefixindex hack for: '
                                            + page)
-                            # p = pywikibot.Page(self.site, obj.target[20:])
-                            # obj.namespace = p.namespace
-                            # obj.target = p.title()
 
                 elif obj.namespace == 2 and not current_user:
                     # if a target user hasn't been found yet, and the link is
