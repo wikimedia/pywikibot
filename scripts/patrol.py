@@ -207,10 +207,12 @@ class PatrolBot(SingleSiteBot):
             if isinstance(node, mwparserfromhell.nodes.tag.Tag):
                 if node.tag == 'li':
                     current_user = None
-            elif isinstance(node, mwparserfromhell.nodes.text.Text):
+                continue
+            if isinstance(node, mwparserfromhell.nodes.text.Text):
                 if node.endswith('\n'):
                     current_user = False
-            elif isinstance(node, mwparserfromhell.nodes.wikilink.Wikilink):
+                continue
+            if isinstance(node, mwparserfromhell.nodes.wikilink.Wikilink):
                 if current_user is False:
                     pywikibot.debug('Link to "{0}" ignored as outside '
                                     'list'.format(node.title), _logger)
