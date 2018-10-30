@@ -2141,7 +2141,7 @@ class WikidataBot(Bot, ExistingPageBot):
         data.setdefault('labels', {}).update({
             page.site.lang: {
                 'language': page.site.lang,
-                'value': page.title()
+                'value': page.title(without_brackets=page.namespace() == 0)
             }
         })
         pywikibot.output('Creating item for %s...' % page)

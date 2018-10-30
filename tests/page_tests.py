@@ -391,6 +391,18 @@ class TestPageObject(DefaultSiteTestCase):
                                   force_interwiki=True, insite=site),
                          '[[' + site.code + ':Test page|Test page]]')
 
+        title1 = 'Test Page (bracketed)'
+        title2 = 'Test Page (bracketed) (bracketed)'
+
+        self.assertEqual(
+            pywikibot.Page(site, title1).title(without_brackets=True),
+            'Test Page'
+        )
+        self.assertEqual(
+            pywikibot.Page(site, title2).title(without_brackets=True),
+            'Test Page (bracketed)'
+        )
+
     def testSection(self):
         """Test section() method."""
         # use same pages as in previous test
