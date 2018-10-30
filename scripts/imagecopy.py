@@ -533,7 +533,7 @@ def main(*args):
             else:
                 # The first upload is last in the list.
                 try:
-                    username = imagepage.getLatestUploader()[0]
+                    username = imagepage.latest_file_info.user
                 except NotImplementedError:
                     # No API, using the page file instead
                     (datetime, username, resolution, size,
