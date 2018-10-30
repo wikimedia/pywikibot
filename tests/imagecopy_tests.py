@@ -20,6 +20,7 @@ class CommonsHelperMethodTest(TestCase):
 
     hostname = 'https://tools.wmflabs.org/commonshelper/'
 
+    @unittest.expectedFailure  # T207579
     def test_pageTextPost(self):
         """Test scripts.imagecopy.pageTextPost() method."""
         parameters_dict = {
