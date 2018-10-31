@@ -1283,14 +1283,15 @@ class BaseSite(ComparableMixin):
             return http.request(self, path)
 
     @deprecated(since='20141225')
-    def postForm(self, address, predata, sysop=False, cookies=None):
+    @remove_last_args(['sysop', 'cookies'])
+    def postForm(self, address, predata):
         """DEPRECATED."""
         return self.getUrl(address, data=predata)
 
     @deprecated(since='20141225')
     @deprecated_args(contentType=None)
-    def postData(self, address, data, sysop=False,
-                 compress=True, cookies=None):
+    @remove_last_args(['sysop', 'compress', 'cookies'])
+    def postData(self, address, data):
         """DEPRECATED."""
         return self.getUrl(address, data=data)
 
