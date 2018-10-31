@@ -46,7 +46,7 @@ if not python_is_supported():
 
 test_deps = ['bz2file', 'mock']
 
-dependencies = ['requests>=2.9,!=2.18.2']
+dependencies = ['requests>=2.20.0']
 
 extra_deps = {
     # Core library dependencies
