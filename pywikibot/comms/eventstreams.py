@@ -36,7 +36,7 @@ from pywikibot.tools import deprecated_args, StringTypes
 if LooseVersion(requests.__version__) < LooseVersion('2.9'):
     raise ImportError(
         'requests >= 2.9 is required for EventStreams;\n'
-        "install it with 'pip install \"requests>=2.9,!=2.18.2\"'\n")
+        "install it with 'pip install \"requests>=2.20.0\"'\n")
 
 
 _logger = 'pywikibot.eventstreams'
