@@ -9,8 +9,6 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-import re
-
 import pywikibot
 from pywikibot import date
 
@@ -47,11 +45,8 @@ def translate(page=None, hints=(), auto=True, removebrackets=False,
             # we're currently working on ...
             if page is None:
                 continue
-            newname = page.title(with_ns=False)
-            # ... unless we do want brackets
-            if removebrackets:
-                newname = re.sub(re.compile(r'\W*?\(.*?\)\W*?',
-                                            re.UNICODE), ' ', newname)
+            newname = page.title(with_ns=False,
+                                 without_brackets=removebrackets)
         if codes.isdigit():
             codes = site.family.languages_by_size[:int(codes)]
         elif codes == 'all':

@@ -197,7 +197,7 @@ These arguments are useful to provide hints to the bot:
                    dates, only use found links and hints.
                    (note: without ending colon)
 
-    -hintnobracket used to make the bot strip everything in brackets,
+    -hintnobracket used to make the bot strip everything in last brackets,
                    and surrounding spaces from the page name, before it is
                    used in a -hint:xy: where the page name has been left out,
                    or -hint:all:, -hint:10:, etc. without a name, or
