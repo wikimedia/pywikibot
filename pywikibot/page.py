@@ -294,7 +294,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     def title(self, underscore=False, with_ns=True,
               with_section=True, as_url=False, as_link=False,
               allow_interwiki=True, force_interwiki=False, textlink=False,
-              as_filename=False, insite=None):
+              as_filename=False, insite=None, without_brackets=False):
         """
         Return the title of this Page, as a Unicode string.
 
@@ -318,6 +318,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param insite: (only used if as_link is true) a site object where the
             title is to be shown. default is the current family/lang given by
             -family and -lang option i.e. config.family and config.mylang
+        @param without_brackets: (cannot be used with as_link) if true, remove
+            the last pair of brackets(usually removes disambiguation brackets).
         @rtype: unicode
         """
         title = self._link.canonical_title()
@@ -357,6 +359,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
             title = label + section
         else:
             title += section
+        if without_brackets:
+            brackets_re = r'\s+\([^()]+?\)$'
+            title = re.sub(brackets_re, '', title)
         if underscore or as_url:
             title = title.replace(' ', '_')
         if as_url:
