@@ -30,7 +30,8 @@ from datetime import timedelta
 
 import pywikibot
 from pywikibot import pagegenerators, WikidataBot
-from pywikibot.exceptions import LockedPage, NoPage, PageNotSaved
+from pywikibot.exceptions import (LockedPage, NoCreateError, NoPage,
+                                  PageNotSaved)
 
 
 class NewItemRobot(WikidataBot):
@@ -68,7 +69,7 @@ class NewItemRobot(WikidataBot):
     def _touch_page(page):
         try:
             page.touch()
-        except NoPage:
+        except (NoCreateError, NoPage):
             pywikibot.error('Page {0} does not exist.'.format(
                 page.title(as_link=True)))
         except LockedPage:
