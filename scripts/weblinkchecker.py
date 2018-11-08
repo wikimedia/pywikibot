@@ -590,7 +590,7 @@ class LinkCheckThread(threading.Thread):
         }
         # identification for debugging purposes
         self.setName(('{0} - {1}'.format(page.title(),
-                                         url().encode('utf-8', 'replace'))))
+                                         url.encode('utf-8', 'replace'))))
         self.HTTPignore = HTTPignore
         self._use_fake_user_agent = config.fake_user_agent_default.get(
             'weblinkchecker', False)
