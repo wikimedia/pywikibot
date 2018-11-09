@@ -45,7 +45,7 @@ class TouchBot(MultipleSitesBot):
         """Touch the given page."""
         try:
             page.touch(botflag=self.getOption('botflag'))
-        except pywikibot.NoPage:
+        except (pywikibot.NoCreateError, pywikibot.NoPage):
             pywikibot.error('Page {0} does not exist.'
                             .format(page.title(as_link=True)))
         except pywikibot.LockedPage:

@@ -1428,7 +1428,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             self.save(summary='Pywikibot touch edit', watch='nochange',
                       minor=False, botflag=botflag, force=True,
                       asynchronous=False, callback=callback,
-                      apply_cosmetic_changes=False, **kwargs)
+                      apply_cosmetic_changes=False, nocreate=True, **kwargs)
         else:
             raise pywikibot.NoPage(self)
 
