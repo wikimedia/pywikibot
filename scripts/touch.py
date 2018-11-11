@@ -26,6 +26,8 @@ import pywikibot
 from pywikibot import pagegenerators
 
 from pywikibot.bot import MultipleSitesBot
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import issue_deprecation_warning
 
 docuReplacements = {'&params;': pagegenerators.parameterHelp}
 
@@ -87,8 +89,9 @@ def main(*args):
         if arg == '-purge':
             bot_class = PurgeBot
         elif arg == '-redir':
-            pywikibot.output('-redirect option is deprecated, '
-                             'do not use it anymore.')
+            issue_deprecation_warning(
+                '\n-redir', None, 1, ArgumentDeprecationWarning,
+                since='20150514')
         elif not gen_factory.handleArg(arg) and arg.startswith('-'):
             # -botflag
             options[arg[1:].lower()] = True
