@@ -4,6 +4,10 @@ Release history
 Current release
 ---------------
 
+* Prevent touch from re-creating pages (T193833)
+* New Page.title() parameter without_brackets; also used by titletranslate (T200399)
+* Security: require requests version 2.20.0 or later (T208296)
+* Check appropriate key in Site.messages (T163661)
 * Make sure the cookie file is created with the right permissions (T206387)
 * pydot >= 1.2 is required for interwiki_graph
 * Move methods for simple claim adding/removing to WikibasePage (T113131)
