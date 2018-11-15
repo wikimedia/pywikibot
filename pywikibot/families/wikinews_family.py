@@ -48,5 +48,11 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'uk', 'zh',
     ]
 
-    # TODO:
-    # Change site_tests.py when wikinews will have doc_subpage.
+    # Subpages for documentation.
+    # TODO: List is incomplete, to be completed for missing languages.
+    doc_subpages = {
+        '_default': (('/doc', ),
+                     ['en', ]
+                     ),
+        'it': ('/man', ),
+    }
