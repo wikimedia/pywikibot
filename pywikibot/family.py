@@ -1602,23 +1602,23 @@ class WikimediaFamily(Family):
     ]
 
     content_families = set(
-        multi_language_content_families +
-        wikimedia_org_content_families +
-        other_content_families
+        multi_language_content_families
+        + wikimedia_org_content_families
+        + other_content_families
     )
 
     wikimedia_org_families = set(
-        wikimedia_org_content_families +
-        wikimedia_org_meta_families +
-        wikimedia_org_other_families
+        wikimedia_org_content_families
+        + wikimedia_org_meta_families
+        + wikimedia_org_other_families
     )
 
     # CentralAuth cross avaliable projects.
     cross_projects = set(
-        multi_language_content_families +
-        wikimedia_org_content_families +
-        wikimedia_org_meta_families +
-        other_content_families
+        multi_language_content_families
+        + wikimedia_org_content_families
+        + wikimedia_org_meta_families
+        + other_content_families
     )
 
     # Code mappings which are only an alias, and there is no 'old' wiki.

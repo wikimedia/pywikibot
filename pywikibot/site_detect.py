@@ -105,8 +105,8 @@ class MWSite(object):
                 raise RuntimeError('Unable to determine articlepath: '
                                    '{0}'.format(self.fromurl))
 
-        if (not self.version or
-                self.version < MediaWikiVersion('1.14')):
+        if (not self.version
+                or self.version < MediaWikiVersion('1.14')):
             raise RuntimeError('Unsupported version: {0}'.format(self.version))
 
     def __repr__(self):
@@ -117,9 +117,9 @@ class MWSite(object):
     def langs(self):
         """Build interwikimap."""
         response = fetch(
-            self.api +
-            '?action=query&meta=siteinfo&siprop=interwikimap&sifilteriw=local'
-            '&format=json')
+            self.api
+            + '?action=query&meta=siteinfo&siprop=interwikimap'
+              '&sifilteriw=local&format=json')
         iw = json.loads(response.text)
         if 'error' in iw:
             raise RuntimeError('%s - %s' % (iw['error']['code'],
@@ -171,8 +171,8 @@ class MWSite(object):
         # remove preleading newlines and Byte Order Mark (BOM), see T128992
         content = response.text.strip().lstrip('\uFEFF')
         info = json.loads(content)
-        self.private_wiki = ('error' in info and
-                             info['error']['code'] == 'readapidenied')
+        self.private_wiki = ('error' in info
+                             and info['error']['code'] == 'readapidenied')
         if self.private_wiki:
             # user-config.py is not loaded because PYWIKIBOT_NO_USER_CONFIG
             # is set to '2' by generate_family_file.py.
@@ -202,8 +202,8 @@ class MWSite(object):
 
     def __eq__(self, other):
         """Return True if equal to other."""
-        return (self.server + self.scriptpath ==
-                other.server + other.scriptpath)
+        return (self.server + self.scriptpath
+                == other.server + other.scriptpath)
 
     def __hash__(self):
         """Get hashable representation."""
@@ -285,8 +285,8 @@ class WikiHTMLPageParser(HTMLParser):
                         return
 
                 # allow http://www.brickwiki.info/ vs http://brickwiki.info/
-                if (new_parsed_url.netloc in self._parsed_url.netloc or
-                        self._parsed_url.netloc in new_parsed_url.netloc):
+                if (new_parsed_url.netloc in self._parsed_url.netloc
+                        or self._parsed_url.netloc in new_parsed_url.netloc):
                     return
 
                 assert new_parsed_url == self._parsed_url, '{0} != {1}'.format(
