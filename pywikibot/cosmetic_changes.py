@@ -662,6 +662,10 @@ class CosmeticChangesToolkit(object):
 
     def removeEmptySections(self, text):
         """Cleanup empty sections."""
+        # userspace contains article stubs without nobots/in use templates
+        if self.namespace == 2:
+            return text
+
         skippings = ['comment', 'category']
         skip_regexes = _get_regexes(skippings, self.site)
         # site defined templates
