@@ -1787,8 +1787,8 @@ class TokenWallet(object):
                 "Requested token '{0}' is invalid on {1} wiki."
                 .format(key, self.site))
 
-        if (key not in user_tokens and
-                failed_cache_key not in self.failed_cache):
+        if (key not in user_tokens
+                and failed_cache_key not in self.failed_cache):
                     self.load_tokens([key], all=False if user_tokens else None)
 
         if key in user_tokens:
@@ -2281,11 +2281,12 @@ class APISite(BaseSite):
         """Validate iterating API parameters."""
         if reverse:
             if end < start:
-                raise Error(msg_prefix +
-                            ': end must be later than start with reverse=True')
+                raise Error(msg_prefix
+                            + ': end must be later than start'
+                              ' with reverse=True')
         elif start < end:
-            raise Error(msg_prefix +
-                        ': start must be later than end with reverse=False')
+            raise Error(msg_prefix
+                        + ': start must be later than end with reverse=False')
 
     def has_right(self, right, sysop=False):
         """Return true if and only if the user has a specific right.
@@ -2901,9 +2902,9 @@ class APISite(BaseSite):
             self._proofread_page_ns and self._proofread_levels.
         @rtype: Namespace, Namespace, dict
         """
-        if (not hasattr(self, '_proofread_index_ns') or
-                not hasattr(self, '_proofread_page_ns') or
-                not hasattr(self, '_proofread_levels')):
+        if (not hasattr(self, '_proofread_index_ns')
+                or not hasattr(self, '_proofread_page_ns')
+                or not hasattr(self, '_proofread_levels')):
 
             pirequest = self._request(
                 expiry=pywikibot.config.API_config_expiry
@@ -3475,9 +3476,9 @@ class APISite(BaseSite):
                                                    'type')['type']
             valid_types = [token for token in types if token in types_wiki]
             for token in types:
-                if (token not in valid_types and
-                        (token in types_wiki_old or
-                         token in types_wiki_action)):
+                if (token not in valid_types
+                        and (token in types_wiki_old or token
+                             in types_wiki_action)):
                     valid_types.append('csrf')
         return valid_types
 
@@ -4056,16 +4057,16 @@ class APISite(BaseSite):
         @raises ValueError: invalid startid/endid or starttime/endtime values
         @raises pywikibot.Error: revids belonging to a different page
         """
-        latest = (revids is None and
-                  startid is None and
-                  endid is None and
-                  starttime is None and
-                  endtime is None and
-                  rvdir is None and
-                  user is None and
-                  excludeuser is None and
-                  step is None and
-                  total is None)  # if True, retrieving current revision
+        latest = (revids is None
+                  and startid is None
+                  and endid is None
+                  and starttime is None
+                  and endtime is None
+                  and rvdir is None
+                  and user is None
+                  and excludeuser is None
+                  and step is None
+                  and total is None)  # if True, retrieving current revision
 
         # check for invalid argument combinations
         if (startid is not None or endid is not None) and \
@@ -4985,8 +4986,8 @@ class APISite(BaseSite):
                                 drprop='revid|user|comment|minor',
                                 total=total)
         if content:
-            drgen.request['drprop'] = (drgen.request['drprop'] +
-                                       ['content', 'token'])
+            drgen.request['drprop'] = (drgen.request['drprop']
+                                       + ['content', 'token'])
         if start is not None:
             drgen.request['drstart'] = start
         if end is not None:
@@ -6251,8 +6252,8 @@ class APISite(BaseSite):
             assert offset is False or file_size is not None
             if _verify_stash is None:
                 _verify_stash = True
-            if (offset is not False and offset is not True and
-                    offset > file_size):
+            if (offset is not False and offset is not True
+                    and offset > file_size):
                 raise ValueError(
                     'For the file key "{0}" the offset was set to {1} '
                     'while the file is only {2} bytes large.'.format(
@@ -7579,8 +7580,8 @@ class DataSite(APISite):
     # _get_propertyitem
     def _get_item(self, source, **params):
         assert set(params) <= {'props'}, \
-            'Only "props" is a valid kwarg, not {0}'.format(set(params) -
-                                                            {'props'})
+            'Only "props" is a valid kwarg, not {0}'.format(set(params)
+                                                            - {'props'})
         if isinstance(source, int) or \
            isinstance(source, basestring) and source.isdigit():
             ids = 'q' + str(source)
@@ -7939,9 +7940,8 @@ class DataSite(APISite):
                   'baserevid': self._get_baserevid(claim, baserevid),
                   'summary': summary, 'bot': bot}
 
-        if (not new and
-                hasattr(qualifier, 'hash') and
-                qualifier.hash is not None):
+        if (not new and hasattr(qualifier, 'hash')
+                and qualifier.hash is not None):
             params['snakhash'] = qualifier.hash
         params['token'] = self.tokens['edit']
         # build up the snak
