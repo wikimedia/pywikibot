@@ -356,8 +356,7 @@ class PatchManager(object):
                 # anything below 4 they share lines.
                 # not super_hunk == first hunk as any other super_hunk is
                 # created with one hunk
-                if (not super_hunk or
-                        hunk.pre_context <= self.context * 2):
+                if (not super_hunk or hunk.pre_context <= self.context * 2):
                     # previous hunk has shared/adjacent self.context lines
                     super_hunk += [hunk]
                 else:
@@ -500,9 +499,9 @@ class PatchManager(object):
                                        affix=''),
                                    mode, first)]
                     rng_width = max(len(hunk_list[-1][2]), rng_width)
-                line_template = ('{0}{1} {2: >' +
-                                 str(int(math.log10(len(super_hunks)) + 1)) +
-                                 '}: {3: <' + str(rng_width) + '} {4}{5}')
+                line_template = ('{0}{1} {2: >'
+                                 + str(int(math.log10(len(super_hunks)) + 1))
+                                 + '}: {3: <' + str(rng_width) + '} {4}{5}')
                 # the last entry is the first changed line which usually ends
                 # with a \n (only the last may not, which is covered by the
                 # if-condition following this block)
@@ -519,8 +518,8 @@ class PatchManager(object):
                     next_hunk_position = int(next_hunk) - 1
                 except ValueError:
                     next_hunk_position = False
-                if (next_hunk_position is not False and
-                        0 <= next_hunk_position < len(super_hunks)):
+                if (next_hunk_position is not False
+                        and 0 <= next_hunk_position < len(super_hunks)):
                     position = next_hunk_position
                 elif next_hunk:  # nothing entered is silently ignored
                     pywikibot.error(
@@ -534,9 +533,9 @@ class PatchManager(object):
             elif choice == 'K':
                 position -= 1
             elif choice == 's':
-                super_hunks = (super_hunks[:position] +
-                               super_hunks[position].split() +
-                               super_hunks[position + 1:])
+                super_hunks = (super_hunks[:position]
+                               + super_hunks[position].split()
+                               + super_hunks[position + 1:])
                 pywikibot.output(
                     'Split into {0} hunks'.format(len(super_hunk._hunks)))
             elif choice == '?':
