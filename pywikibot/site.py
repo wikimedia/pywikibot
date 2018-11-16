@@ -3370,7 +3370,13 @@ class APISite(BaseSite):
 
         rvprop = ['ids', 'flags', 'timestamp', 'user', 'comment', 'content']
 
-        for sublist in itergroup(pagelist, groupsize):
+        parameter = self._paraminfo.parameter('query+info', 'prop')
+        if self.logged_in() and self.has_right('apihighlimits'):
+            max_ids = int(parameter['highlimit'])
+        else:
+            max_ids = int(parameter['limit'])  # T78333, T161783
+
+        for sublist in itergroup(pagelist, min(groupsize, max_ids)):
             # Do not use p.pageid property as it will force page loading.
             pageids = [str(p._pageid) for p in sublist
                        if hasattr(p, '_pageid') and p._pageid > 0]
@@ -3387,12 +3393,6 @@ class APISite(BaseSite):
             next_prio = 0
             rvgen = api.PropertyGenerator(props, site=self)
             rvgen.set_maximum_items(-1)  # suppress use of "rvlimit" parameter
-
-            parameter = self._paraminfo.parameter('query+info', 'prop')
-            if self.logged_in() and self.has_right('apihighlimits'):
-                max_ids = int(parameter['highlimit'])
-            else:
-                max_ids = int(parameter['limit'])  # T78333, T161783
 
             if len(pageids) == len(sublist) and len(set(pageids)) <= max_ids:
                 # only use pageids if all pages have them
