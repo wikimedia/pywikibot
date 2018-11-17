@@ -226,8 +226,8 @@ class TestCaseBase(unittest.TestCase):
 
         if skip and set(page_namespaces) != namespaces:
             raise unittest.SkipTest('Pages in namespaces {!r} not found.'
-                                    .format(list(namespaces -
-                                                 set(page_namespaces))))
+                                    .format(list(namespaces
+                                                 - set(page_namespaces))))
         else:
             self.assertEqual(set(page_namespaces), namespaces)
 
@@ -333,8 +333,8 @@ def require_modules(*required_modules):
         if missing:
             skip_decorator = unittest.skip('{0} not installed'.format(
                 ', '.join(missing)))
-            if (inspect.isclass(obj) and issubclass(obj, TestCaseBase) and
-                    'nose' in sys.modules.keys()):
+            if (inspect.isclass(obj) and issubclass(obj, TestCaseBase)
+                    and 'nose' in sys.modules.keys()):
                 # There is a known bug in nosetests which causes setUpClass()
                 # to be called even if the unittest class is skipped.
                 # Here, we decorate setUpClass() as a patch to skip it
@@ -592,8 +592,8 @@ class SiteWriteMixin(TestCaseBase):
                 'Set {}=1 to enable.'
                 .format(cls.__name__, env_var))
 
-        if (not hasattr(site.family, 'test_codes') or
-                site.code not in site.family.test_codes):
+        if (not hasattr(site.family, 'test_codes')
+                or site.code not in site.family.test_codes):
             raise Exception(
                 '{} should only be run on test sites. '
                 "To run this test, add '{}' to the {} family "
@@ -735,8 +735,8 @@ class MetaTestCaseClass(type):
             for base in bases:
                 base_tests += [attr_name
                                for attr_name, attr in base.__dict__.items()
-                               if (attr_name.startswith('test') and
-                                   callable(attr))]
+                               if (attr_name.startswith('test')
+                                   and callable(attr))]
 
         dct['abstract_class'] = not tests and not base_tests
 
@@ -792,8 +792,8 @@ class MetaTestCaseClass(type):
         if 'dry' in dct and dct['dry'] is True:
             dct['net'] = False
 
-        if (('sites' not in dct and 'site' not in dct) or
-                ('site' in dct and not dct['site'])):
+        if (('sites' not in dct and 'site' not in dct)
+                or ('site' in dct and not dct['site'])):
             # Prevent use of pywikibot.Site
             bases = cls.add_base(bases, DisableSiteMixin)
 
@@ -850,8 +850,8 @@ class MetaTestCaseClass(type):
                 dct['user'] = True
             bases = cls.add_base(bases, SiteWriteMixin)
 
-        if (('user' in dct and dct['user']) or
-                ('sysop' in dct and dct['sysop'])):
+        if (('user' in dct and dct['user'])
+                or ('sysop' in dct and dct['sysop'])):
             bases = cls.add_base(bases, RequireUserMixin)
 
         for test in tests:
@@ -944,8 +944,8 @@ class TestCase(TestTimerMixin, TestCaseBase):
             interface = DrySite
 
         for data in cls.sites.values():
-            if ('code' in data and data['code'] in ('test', 'mediawiki') and
-                    'PYWIKIBOT_TEST_PROD_ONLY' in os.environ and not dry):
+            if ('code' in data and data['code'] in ('test', 'mediawiki')
+                    and 'PYWIKIBOT_TEST_PROD_ONLY' in os.environ and not dry):
                 raise unittest.SkipTest(
                     'Site code "{}" and PYWIKIBOT_TEST_PROD_ONLY is set.'
                     .format(data['code']))
@@ -1011,8 +1011,8 @@ class TestCase(TestTimerMixin, TestCaseBase):
 
         usernames = config.sysopnames if sysop else config.usernames
 
-        return (code in usernames[family] or '*' in usernames[family] or
-                code in usernames['*'] or '*' in usernames['*'])
+        return (code in usernames[family] or '*' in usernames[family]
+                or code in usernames['*'] or '*' in usernames['*'])
 
     def __init__(self, *args, **kwargs):
         """Initializer."""
@@ -1316,8 +1316,8 @@ class WikibaseTestCase(TestCase):
                         '{}: {!r} does not have data repository'
                         .format(cls.__name__, site))
 
-                if (hasattr(cls, 'repo') and
-                        cls.repo != site.data_repository()):
+                if (hasattr(cls, 'repo')
+                        and cls.repo != site.data_repository()):
                     raise Exception(
                         '{}: sites do not all have the same data repository'
                         .format(cls.__name__))
@@ -1585,8 +1585,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
             deprecation_messages = self.deprecation_messages
             for deprecation_message in deprecation_messages:
                 match = self._generic_match.match(deprecation_message)
-                if (match and bool(match.group(1)) == (msg is self.INSTEAD) or
-                        msg is None):
+                if (match and bool(match.group(1)) == (msg is self.INSTEAD)
+                        or msg is None):
                     break
             else:
                 self.fail('No generic deprecation message match found in '
@@ -1638,8 +1638,8 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
     def assertDeprecationFile(self, filename):
         """Assert that all deprecation warning are of one filename."""
         for item in self.warning_log:
-            if (self._ignore_unknown_warning_packages and
-                    'pywikibot' not in item.filename):
+            if (self._ignore_unknown_warning_packages
+                    and 'pywikibot' not in item.filename):
                 continue
 
             if item.filename != filename:
