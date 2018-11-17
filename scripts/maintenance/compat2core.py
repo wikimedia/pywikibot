@@ -50,9 +50,8 @@ replacements = (
     ('import wikipedia(?: as pywikibot)?', 'import pywikibot'),
     ('(?<!from pywikibot )import (config|pagegenerators)',
      r'from pywikibot import \1'),
-    ('(?<!from pywikibot.compat )import query',
-     'from pywikibot.compat import query'),
     # remove deprecated libs
+    ('(?:from pywikibot.compat )?import query', ''),
     ('import catlib\r?\n', ''),
     ('import userlib\r?\n', ''),
     # change wikipedia to pywikibot, exclude URLs
@@ -112,6 +111,9 @@ warnings = (
     ('from wikipedia import',
      '"wikipedia" library has been changed to "pywikibot". Please find the\n'
      'right way to import your object.'),
+    ('from pywikibot.compat import',
+     'compat module has been dropped. Please refer README-conversion.txt for\n'
+     'core implementation.'),
     ('query.GetData(',
      'query.GetData() should be replaced by pywikibot.data.api.Request or\n'
      'by a direct site request'),

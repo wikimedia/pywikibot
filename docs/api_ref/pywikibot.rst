@@ -12,7 +12,6 @@ Subpackages
 .. toctree::
 
     pywikibot.comms
-    pywikibot.compat
     pywikibot.data
     pywikibot.families
     pywikibot.tools
