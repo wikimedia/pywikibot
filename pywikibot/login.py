@@ -82,10 +82,7 @@ class LoginManager(object):
 
         @raises NoUsername: No username is configured for the requested site.
         """
-        if site is not None:
-            self.site = site
-        else:
-            self.site = pywikibot.Site()
+        self.site = site or pywikibot.Site()
         if user:
             self.username = user
         elif sysop:
@@ -193,7 +190,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         @return: cookie data if successful, None otherwise.
         """
-        # NOT IMPLEMENTED - see data/api.py for implementation
+        # THIS IS OVERRIDDEN IN data/api.py
+        return None
 
     def storecookiedata(self, data):
         """
@@ -230,12 +228,12 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
         Example::
 
-         ("my_username", "my_default_password")
-         ("my_sysop_user", "my_sysop_password")
-         ("wikipedia", "my_wikipedia_user", "my_wikipedia_pass")
-         ("en", "wikipedia", "my_en_wikipedia_user", "my_en_wikipedia_pass")
-         ("my_username", BotPassword(
-          "my_BotPassword_suffix", "my_BotPassword_password"))
+         ('my_username', 'my_default_password')
+         ('my_sysop_user', 'my_sysop_password')
+         ('wikipedia', 'my_wikipedia_user', 'my_wikipedia_pass')
+         ('en', 'wikipedia', 'my_en_wikipedia_user', 'my_en_wikipedia_pass')
+         ('my_username', BotPassword(
+          'my_BotPassword_suffix', 'my_BotPassword_password'))
         """
         # Set path to password file relative to the user_config
         # but fall back on absolute path for backwards compatibility
@@ -316,14 +314,14 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             if e.code == 'NotExists':
                 raise NoUsername("Username '%s' does not exist on %s"
                                  % (self.login_name, self.site))
-            elif e.code == 'Illegal':
+            if e.code == 'Illegal':
                 raise NoUsername("Username '%s' is invalid on %s"
                                  % (self.login_name, self.site))
-            elif e.code == 'readapidenied':
+            if e.code == 'readapidenied':
                 raise NoUsername(
                     'Username "{0}" does not have read permissions on '
                     '{1}'.format(self.login_name, self.site))
-            elif e.code == 'Failed':
+            if e.code == 'Failed':
                 raise NoUsername(
                     'Username "{0}" does not have read permissions on '
                     '{1}\n.{2}'.format(self.login_name, self.site, e.info))
