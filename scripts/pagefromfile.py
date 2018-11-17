@@ -153,9 +153,9 @@ class PageFromFileRobot(SingleSiteBot, CurrentPageBot):
                 return
             pagecontents = page.text
             nocontent = self.getOption('nocontent')
-            if nocontent and (
-                    nocontent in pagecontents or
-                    nocontent.lower() in pagecontents):
+            if (nocontent
+                    and (nocontent in pagecontents
+                         or nocontent.lower() in pagecontents)):
                 pywikibot.output('Page has {0} so it is skipped'
                                  .format(nocontent))
                 return

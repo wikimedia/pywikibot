@@ -284,8 +284,8 @@ def pywikibot_script_docstring_fixups(app, what, name, obj, options, lines):
         elif name == 'scripts.login' and '*' in line:
             # Escape star wildcard in scripts/login.py
             lines[index] = line.replace('*', '\\*')
-        elif (line.endswith(':') and not line.lstrip().startswith(':') and
-                'Traceback (most recent call last)' not in line):
+        elif (line.endswith(':') and not line.lstrip().startswith(':')
+                and 'Traceback (most recent call last)' not in line):
             # Initiate code block except pagegenerator arguments follows
             for afterline in lines[index + 1:]:
                 if afterline == '':

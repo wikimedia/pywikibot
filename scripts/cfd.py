@@ -144,14 +144,14 @@ def main(*args):
             thisDay = findDay(src, day)
             if mode == 'Move' and thisDay != 'None':
                 summary = (
-                    'Robot - Moving category ' + src + ' to [[:Category:' +
-                    dest + ']] per [[WP:CFD|CFD]] at ' + thisDay + '.')
+                    'Robot - Moving category ' + src + ' to [[:Category:'
+                    + dest + ']] per [[WP:CFD|CFD]] at ' + thisDay + '.')
                 action_summary = \
                     'Robot - Result of [[WP:CFD|CFD]] at ' + thisDay + '.'
             elif mode == 'Speedy':
                 summary = (
-                    'Robot - Speedily moving category ' + src +
-                    ' to [[:Category:' + dest + ']] per [[WP:CFDS|CFDS]].')
+                    'Robot - Speedily moving category ' + src
+                    + ' to [[:Category:' + dest + ']] per [[WP:CFDS|CFDS]].')
                 action_summary = 'Robot - Speedily moved per [[WP:CFDS|CFDS]].'
             else:
                 continue
