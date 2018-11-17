@@ -643,7 +643,10 @@ def execute(command, data_in=None, timeout=0, error=None):
             'please update your Python.'))
     # Any environment variables added on Windows must be of type
     # str() on Python 2.
-    env = os.environ.copy()
+    if OSWIN32 and PY2:
+        env = {str(k): str(v) for k, v in os.environ.items()}
+    else:
+        env = os.environ.copy()
 
     # Prevent output by test package; e.g. 'max_retries reduced from x to y'
     env[str('PYWIKIBOT_TEST_QUIET')] = str('1')
