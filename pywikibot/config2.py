@@ -332,13 +332,13 @@ def get_base_dir(test_directory=None):
             base_dir = os.path.expanduser(base_dir)
             break
     else:
-        if ('PYWIKIBOT_DIR' in environ and
-                exists(os.path.abspath(environ['PYWIKIBOT_DIR']))):
+        if ('PYWIKIBOT_DIR' in environ
+                and exists(os.path.abspath(environ['PYWIKIBOT_DIR']))):
             base_dir = os.path.abspath(environ['PYWIKIBOT_DIR'])
         elif exists('.'):
             base_dir = os.path.abspath('.')
-        elif ('PYWIKIBOT_DIR_PWB' in environ and
-                exists(os.path.abspath(environ['PYWIKIBOT_DIR_PWB']))):
+        elif ('PYWIKIBOT_DIR_PWB' in environ
+                and exists(os.path.abspath(environ['PYWIKIBOT_DIR_PWB']))):
             base_dir = os.path.abspath(environ['PYWIKIBOT_DIR_PWB'])
         else:
             base_dir_cand = []
@@ -1072,8 +1072,8 @@ class _DifferentTypeError(UserWarning, TypeError):
 
 def _assert_default_type(name, value, default_value):
     """Return the value if the old or new is None or both same type."""
-    if (value is None or default_value is None or
-            isinstance(value, type(default_value))):
+    if (value is None or default_value is None
+            or isinstance(value, type(default_value))):
         return value
     elif isinstance(value, int) and isinstance(default_value, float):
         return float(value)
@@ -1115,8 +1115,8 @@ _check_user_config_types(_uc, _glv, _imports)
 
 # Copy the user config settings into globals
 _modified = [_key for _key in _gl
-             if _uc[_key] != globals()[_key] or
-             _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
+             if _uc[_key] != globals()[_key]
+             or _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
 
 if ('user_agent_format' in _modified):
     _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
@@ -1176,13 +1176,13 @@ if family == 'wikipedia' and mylang == 'language':
 # Fix up socket_timeout
 # Older requests library expect a single value whereas newer versions also
 # accept a tuple (connect timeout, read timeout).
-if (isinstance(socket_timeout, tuple) and
-        StrictVersion(requests_version) < StrictVersion('2.4.0')):
+if (isinstance(socket_timeout, tuple)
+        and StrictVersion(requests_version) < StrictVersion('2.4.0')):
     socket_timeout = max(socket_timeout)
 
 # SECURITY WARNINGS
-if (not ignore_file_security_warnings and
-        private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
+if (not ignore_file_security_warnings
+        and private_files_permission & (stat.S_IRWXG | stat.S_IRWXO) != 0):
     error("CRITICAL SECURITY WARNING: 'private_files_permission' is set"
           ' to allow access from the group/others which'
           ' could give them access to the sensitive files.'

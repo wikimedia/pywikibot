@@ -835,8 +835,7 @@ def twget_keys(twtitle):
     # exclude languages does not have this specific message in that package
     # i.e. an incomplete set of translated messages.
     return [lang for lang in langs
-            if lang != 'qqq' and
-            _get_translation(lang, twtitle)]
+            if lang != 'qqq' and _get_translation(lang, twtitle)]
 
 
 def input(twtitle, parameters=None, password=False, fallback_prompt=None):
