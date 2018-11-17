@@ -279,6 +279,13 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
                 else:
                     warn('Invalid password format', _PasswordFileWarning)
 
+    _api_error = {
+        'NotExists': 'does not exist',
+        'Illegal': 'is invalid',
+        'readapidenied': 'does not have read permissions',
+        'Failed': 'does not have read permissions',
+    }
+
     def login(self, retry=False, autocreate=False):
         """
         Attempt to log into the server.
@@ -310,21 +317,15 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         try:
             cookiedata = self.getCookie()
         except pywikibot.data.api.APIError as e:
-            pywikibot.error('Login failed (%s).' % e.code)
-            if e.code == 'NotExists':
-                raise NoUsername("Username '%s' does not exist on %s"
-                                 % (self.login_name, self.site))
-            if e.code == 'Illegal':
-                raise NoUsername("Username '%s' is invalid on %s"
-                                 % (self.login_name, self.site))
-            if e.code == 'readapidenied':
-                raise NoUsername(
-                    'Username "{0}" does not have read permissions on '
-                    '{1}'.format(self.login_name, self.site))
-            if e.code == 'Failed':
-                raise NoUsername(
-                    'Username "{0}" does not have read permissions on '
-                    '{1}\n.{2}'.format(self.login_name, self.site, e.info))
+            error_code = e.code
+            pywikibot.error('Login failed ({}).'.format(error_code))
+            if error_code in self._api_error:
+                error_msg = 'Username "{}" {} on {}'.format(
+                    self.login_name, self._api_error[error_code], self.site)
+                if error_code == 'Failed':
+                    error_msg += '\n.{}'.format(e.info)
+                raise NoUsername(error_msg)
+
             # TODO: investigate other unhandled API codes (bug T75539)
             if retry:
                 self.password = None
