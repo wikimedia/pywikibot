@@ -426,8 +426,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                         'More opening than closing table tags. Skipping.')
                     return None, 0, 0
                 # if another table tag is opened before one is closed
-                elif (next_starting and
-                      next_starting.start() < next_ending.start()):
+                elif (next_starting
+                      and next_starting.start() < next_ending.start()):
                     offset += next_starting.end()
                     text = text[next_starting.end():]
                     depth += 1
@@ -508,8 +508,8 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 {'count': warnings}
             )
         self.put_current(new_text, summary=edit_summary,
-                         show_diff=not (self.getOption('quiet') and
-                                        self.getOption('always')))
+                         show_diff=not (self.getOption('quiet')
+                                        and self.getOption('always')))
 
 
 _marked_table_start_search = re.compile('<##table##', re.IGNORECASE).search

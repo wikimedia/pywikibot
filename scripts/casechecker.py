@@ -523,8 +523,8 @@ class CaseChecker(object):
                         c2 = self.lclToLatDict[co]
                     else:
                         c2 = None
-                    kw = [w for w in kw if p < len(w) and
-                          (w[p] == c or (c2 is not None and w[p] == c2))]
+                    kw = [w for w in kw if p < len(w)
+                          and (w[p] == c or (c2 is not None and w[p] == c2))]
                 if len(kw) > 1:
                     pywikibot.output("Word '{}' could be treated as more than "
                                      'one known words'.format(badWord))
