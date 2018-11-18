@@ -66,15 +66,15 @@ unrunnable_script_set = {
 def list_scripts(path, exclude=None):
     """Return list of scripts in given path."""
     scripts = [name[0:-3] for name in os.listdir(path)  # strip '.py'
-               if name.endswith('.py') and
-               not name.startswith('_') and  # skip __init__.py and _*
-               name != exclude]
+               if name.endswith('.py')
+               and not name.startswith('_')  # skip __init__.py and _*
+               and name != exclude]
     return scripts
 
 
-script_list = (['login'] +
-               list_scripts(scripts_path, 'login.py') +
-               list_scripts(archive_path))
+script_list = (['login']
+               + list_scripts(scripts_path, 'login.py')
+               + list_scripts(archive_path))
 
 runnable_script_list = (
     ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
@@ -184,24 +184,24 @@ def collector(loader=unittest.loader.defaultTestLoader):
                        '(set PYWIKIBOT_TEST_AUTORUN=1 to enable):\n  {!r}'
                        .format(auto_run_script_list))
 
-    tests = (['test__login'] +
-             ['test_' + name
-              for name in sorted(script_list)
-              if name != 'login'
-              and name not in unrunnable_script_set
-              ])
+    tests = (['test__login']
+             + ['test_' + name
+                 for name in sorted(script_list)
+                 if name != 'login'
+                 and name not in unrunnable_script_set
+                ])
 
     test_list = ['tests.script_tests.TestScriptHelp.' + name
                  for name in tests]
 
-    tests = (['test__login'] +
-             ['test_' + name
-              for name in sorted(script_list)
-              if name != 'login'
-              and name not in failed_dep_script_set
-              and name not in unrunnable_script_set
-              and (enable_autorun_tests or name not in auto_run_script_list)
-              ])
+    tests = (['test__login']
+             + ['test_' + name
+                 for name in sorted(script_list)
+                 if name != 'login'
+                 and name not in failed_dep_script_set
+                 and name not in unrunnable_script_set
+                 and (enable_autorun_tests or name not in auto_run_script_list)
+                ])
 
     test_list += ['tests.script_tests.TestScriptSimulate.' + name
                   for name in tests]
@@ -225,8 +225,8 @@ class TestScriptMeta(MetaTestCaseClass):
     def __new__(cls, name, bases, dct):
         """Create the new class."""
         def test_execution(script_name, args=[]):
-            is_autorun = ('-help' not in args and
-                          script_name in auto_run_script_list)
+            is_autorun = ('-help' not in args
+                          and script_name in auto_run_script_list)
 
             def test_skip_script(self):
                 raise unittest.SkipTest(
