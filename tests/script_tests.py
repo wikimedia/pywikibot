@@ -54,9 +54,9 @@ def check_script_deps(script_name):
     return True
 
 
-failed_dep_script_set = {}
+failed_dep_script_set = set()
 
-unrunnable_script_set = {}
+unrunnable_script_set = set()
 
 
 def list_scripts(path, exclude=None):
@@ -227,7 +227,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     stdout = None
                     error = None
 
-                test_overrides = {}
+                test_overrides = set()
                 if not hasattr(self, 'net') or not self.net:
                     test_overrides['pywikibot.Site'] = 'None'
 
@@ -366,7 +366,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
     user = True
 
-    _expected_failures = {}.union(failed_dep_script_set)
+    _expected_failures = set(failed_dep_script_set)
 
     _allowed_failures = []
 
