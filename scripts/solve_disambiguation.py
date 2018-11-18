@@ -867,8 +867,8 @@ class DisambiguationRobot(SingleSiteBot):
                 # how many bytes should be displayed around the current link
                 context = 60
                 # check if there's a dn-template here already
-                if (self.dnSkip and self.dn_template_str and
-                        self.dn_template_str[:-2] in text[
+                if (self.dnSkip and self.dn_template_str
+                        and self.dn_template_str[:-2] in text[
                             m.end():m.end() + len(self.dn_template_str) + 8]):
                     continue
 
@@ -952,9 +952,9 @@ class DisambiguationRobot(SingleSiteBot):
                     else:
                         position_split = 0
                     # insert dab needed template
-                    text = (text[:m.end() + position_split] +
-                            self.dn_template_str +
-                            text[m.end() + position_split:])
+                    text = (text[:m.end() + position_split]
+                            + self.dn_template_str
+                            + text[m.end() + position_split:])
                     dn = True
                     continue
                 elif answer == 'u':
@@ -995,12 +995,12 @@ class DisambiguationRobot(SingleSiteBot):
                     # check if we can create a link with trailing characters
                     # instead of a pipelink
                     elif (
-                        (len(new_page_title) <= len(link_text)) and
-                        (firstcap(link_text[:len(new_page_title)]) ==
-                         firstcap(new_page_title)) and
-                        (self.trailR.sub(
-                            '', link_text[len(new_page_title):]) == '') and
-                        (not section)
+                        (len(new_page_title) <= len(link_text))
+                        and (firstcap(link_text[:len(new_page_title)])
+                             == firstcap(new_page_title))
+                        and (self.trailR.sub(
+                            '', link_text[len(new_page_title):]) == '')
+                        and (not section)
                     ):
                         newlink = '[[{0}]]{1}'.format(
                             link_text[:len(new_page_title)],
@@ -1133,8 +1133,8 @@ or press enter to quit:""")
                                        'solve_disambiguation-unknown-page')
 
         # first check whether user has customized the edit comment
-        if (self.mysite.family.name in config.disambiguation_comment and
-                self.mylang in config.disambiguation_comment[
+        if (self.mysite.family.name in config.disambiguation_comment
+                and self.mylang in config.disambiguation_comment[
                     self.mysite.family.name]):
             try:
                 self.comment = i18n.translate(
