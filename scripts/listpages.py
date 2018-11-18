@@ -157,9 +157,9 @@ class Formatter(object):
         """Output formatted string."""
         fmt = self.fmt_options.get(fmt, fmt)
         # If selected format requires trs_title, outputlang must be set.
-        if (fmt in self.fmt_need_lang or
-                'trs_title' in fmt and
-                self.outputlang is None):
+        if (fmt in self.fmt_need_lang
+                or 'trs_title' in fmt
+                and self.outputlang is None):
             raise ValueError(
                 "Required format code needs 'outputlang' parameter set.")
         if num is None:

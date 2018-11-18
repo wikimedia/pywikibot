@@ -275,8 +275,8 @@ class NowCommonsDeleteBot(Bot):
                     continue
                 commonsImagePage = pywikibot.FilePage(commons, 'Image:'
                                                       + filenameOnCommons)
-                if (localImagePage.title(with_ns=False) !=
-                        commonsImagePage.title(with_ns=False)):
+                if (localImagePage.title(with_ns=False)
+                        != commonsImagePage.title(with_ns=False)):
                     usingPages = list(localImagePage.usingPages())
                     if usingPages and usingPages != [localImagePage]:
                         pywikibot.output(color_format(

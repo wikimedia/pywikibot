@@ -200,8 +200,8 @@ class ImageTransferBot(object):
                     # add the nowCommons template.
                     pywikibot.output('Adding nowCommons template to '
                                      + sourceImagePage.title())
-                    sourceImagePage.put(sourceImagePage.get() + '\n\n' +
-                                        nowCommonsTemplate[sourceSite.lang]
+                    sourceImagePage.put(sourceImagePage.get() + '\n\n'
+                                        + nowCommonsTemplate[sourceSite.lang]
                                         % targetFilename,
                                         summary=reason)
 
@@ -268,9 +268,9 @@ class ImageTransferBot(object):
                         break
                     todo = int(todo)
                 if todo in range(len(imagelist)):
-                    if (imagelist[todo].fileIsShared() and
-                            imagelist[todo].site.image_repository() ==
-                            self.targetSite.image_repository()):
+                    if (imagelist[todo].fileIsShared()
+                            and imagelist[todo].site.image_repository()
+                            == self.targetSite.image_repository()):
                         pywikibot.output(
                             'The image is already shared on {0}.'
                             .format(self.targetSite.image_repository()))
