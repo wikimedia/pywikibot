@@ -518,13 +518,13 @@ class GeneratorFactory(object):
                 if self.limit:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
-            if (self.titlefilter_list or
-                self.titlenotfilter_list or
-                self.articlefilter_list or
-                self.claimfilter_list or
-                self.catfilter_list or
-                self.subpage_max_depth is not None or
-                    self.qualityfilter_list):
+            if (self.titlefilter_list
+                or self.titlenotfilter_list
+                or self.articlefilter_list
+                or self.claimfilter_list
+                or self.catfilter_list
+                or self.subpage_max_depth is not None
+                    or self.qualityfilter_list):
                 pywikibot.warning(
                     'filter(s) specified but no generators.')
             return None

@@ -266,9 +266,9 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
 
             code, family, username, password = (
                 self.site.code, self.site.family.name)[:4 - len(entry)] + entry
-            if (normalize_username(username) == self.username and
-                    family == self.site.family.name and
-                    code == self.site.code):
+            if (normalize_username(username) == self.username
+                    and family == self.site.family.name
+                    and code == self.site.code):
                 if isinstance(password, basestring):
                     self.password = password
                     break
