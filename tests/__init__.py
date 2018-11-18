@@ -232,9 +232,9 @@ def collector(loader=unittest.loader.defaultTestLoader):
                 for test_func in cls:
                     if test_func._testMethodName not in disabled_tests[module]:
                         enabled_tests.append(
-                            module_class_name + '.' +
-                            test_func.__class__.__name__ + '.' +
-                            test_func._testMethodName)
+                            module_class_name + '.'
+                            + test_func.__class__.__name__ + '.'
+                            + test_func._testMethodName)
 
             test_list.extend(enabled_tests)
         else:

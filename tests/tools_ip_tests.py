@@ -700,15 +700,15 @@ class IPAddressModuleTestCase(TestIPBase):
         self._run_tests()
         self.assertEqual(self.fail, 0)
 
-    @expected_failure_if(ip.ip_address.__module__ == 'ipaddress' or
-                         ip.ip_address.__name__ == 'ip_address_patched')
+    @expected_failure_if(ip.ip_address.__module__ == 'ipaddress'
+                         or ip.ip_address.__name__ == 'ip_address_patched')
     def test_T76286_failures(self):
         """Test known bugs in the ipaddress module."""
         self._test_T76286_failures()
         self.assertEqual(self.fail, 0)
 
-    @expected_failure_if(ip.ip_address.__module__ == 'ipaddr' and
-                         ip._ipaddr_version == StrictVersion('2.1.10'))
+    @expected_failure_if(ip.ip_address.__module__ == 'ipaddr'
+                         and ip._ipaddr_version == StrictVersion('2.1.10'))
     def test_T105443_failures(self):
         """Test known bugs in the ipaddr module."""
         self._test_T105443_failures()

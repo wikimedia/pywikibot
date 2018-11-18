@@ -455,8 +455,8 @@ class TestTerminalOutputColorUnix(UITestCase):
             newstderr.getvalue(),
             'text light purple text text ***\n')
 
-    str2 = ('normal text \03{lightpurple} light purple ' +
-            '\03{lightblue} light blue \03{previous} light purple ' +
+    str2 = ('normal text \03{lightpurple} light purple '
+            '\03{lightblue} light blue \03{previous} light purple '
             '\03{default} normal text')
 
     def testOutputColorCascade_incorrect(self):
@@ -465,8 +465,8 @@ class TestTerminalOutputColorUnix(UITestCase):
         self.assertEqual(newstdout.getvalue(), '')
         self.assertEqual(
             newstderr.getvalue(),
-            'normal text \x1b[95m light purple ' +
-            '\x1b[94m light blue \x1b[95m light purple ' +
+            'normal text \x1b[95m light purple '
+            '\x1b[94m light blue \x1b[95m light purple '
             '\x1b[0m normal text\n')
 
 

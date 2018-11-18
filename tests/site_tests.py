@@ -699,8 +699,8 @@ class TestSiteGenerators(DefaultSiteTestCase):
         for page in mysite.allpages(maxsize=200, total=5):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertTrue(page.exists())
-            if (len(page.text.encode(mysite.encoding())) > 200 and
-                    mysite.data_repository() == mysite):
+            if (len(page.text.encode(mysite.encoding())) > 200
+                    and mysite.data_repository() == mysite):
                 unittest_print(
                     '{}.text is > 200 bytes while raw JSON is <= 200'
                     .format(page))
