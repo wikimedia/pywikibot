@@ -199,8 +199,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
             # copy all of source's attributes to this object
             # without overwriting non-None values
             self.__dict__.update((k, v) for k, v in source.__dict__.items()
-                                 if k not in self.__dict__ or
-                                 self.__dict__[k] is None)
+                                 if k not in self.__dict__
+                                 or self.__dict__[k] is None)
             if title:
                 # overwrite title
                 self._link = Link(title, source=source.site,
@@ -336,9 +336,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
                 target_code = config.mylang
                 target_family = config.family
             if force_interwiki or \
-               (allow_interwiki and
-                (self.site.family.name != target_family
-                 or self.site.code != target_code)):
+               (allow_interwiki
+                and (self.site.family.name != target_family
+                     or self.site.code != target_code)):
                 if self.site.family.name != target_family \
                    and self.site.family.name != self.site.code:
                     title = '%s:%s:%s' % (
@@ -425,8 +425,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def full_url(self):
         """Return the full URL."""
-        return self.site.base_url(self.site.article_path +
-                                  self.title(as_url=True))
+        return self.site.base_url(self.site.article_path
+                                  + self.title(as_url=True))
 
     def autoFormat(self):
         """
@@ -488,8 +488,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     def _latest_cached_revision(self):
         """Get the latest revision if cached and has text, otherwise None."""
-        if (hasattr(self, '_revid') and self._revid in self._revisions and
-                self._revisions[self._revid].text is not None):
+        if (hasattr(self, '_revid') and self._revid in self._revisions
+                and self._revisions[self._revid].text is not None):
             return self._revisions[self._revid]
         else:
             return None
@@ -1314,15 +1314,15 @@ class BasePage(UnicodeMixin, ComparableMixin):
             return summary
         family = self.site.family.name
         if config.cosmetic_changes_mylang_only:
-            cc = ((family == config.family and
-                   self.site.lang == config.mylang) or
-                  family in list(config.cosmetic_changes_enable.keys()) and
-                  self.site.lang in config.cosmetic_changes_enable[family])
+            cc = ((family == config.family
+                   and self.site.lang == config.mylang)
+                  or family in list(config.cosmetic_changes_enable.keys())
+                  and self.site.lang in config.cosmetic_changes_enable[family])
         else:
             cc = True
         cc = (cc and not
-              (family in list(config.cosmetic_changes_disable.keys()) and
-               self.site.lang in config.cosmetic_changes_disable[family]))
+              (family in list(config.cosmetic_changes_disable.keys())
+               and self.site.lang in config.cosmetic_changes_disable[family]))
         if not cc:
             return summary
 
@@ -4029,8 +4029,8 @@ class WikibasePage(BasePage):
 
             for prop in claims:
                 for claim in claims[prop]:
-                    if (prop not in diffto_claims or
-                            claim not in diffto_claims[prop]):
+                    if (prop not in diffto_claims
+                            or claim not in diffto_claims[prop]):
                         temp[prop].append(claim)
 
                     claim_ids.add(claim['id'])
@@ -5198,16 +5198,16 @@ class Claim(Property):
             false otherwise
         @rtype: bool
         """
-        if (isinstance(self.target, WikibasePage) and
-                isinstance(value, basestring)):
+        if (isinstance(self.target, WikibasePage)
+                and isinstance(value, basestring)):
             return self.target.id == value
 
-        if (isinstance(self.target, pywikibot.WbTime) and
-                not isinstance(value, pywikibot.WbTime)):
+        if (isinstance(self.target, pywikibot.WbTime)
+                and not isinstance(value, pywikibot.WbTime)):
             return self.target.year == int(value)
 
-        if (isinstance(self.target, pywikibot.Coordinate) and
-                isinstance(value, basestring)):
+        if (isinstance(self.target, pywikibot.Coordinate)
+                and isinstance(value, basestring)):
             coord_args = [float(x) for x in value.split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
@@ -5219,11 +5219,11 @@ class Claim(Property):
             except TypeError:
                 pass
 
-            return (abs(self.target.lat - coord_args[0]) <= precision and
-                    abs(self.target.lon - coord_args[1]) <= precision)
+            return (abs(self.target.lat - coord_args[0]) <= precision
+                    and abs(self.target.lon - coord_args[1]) <= precision)
 
-        if (isinstance(self.target, pywikibot.WbMonolingualText) and
-                isinstance(value, basestring)):
+        if (isinstance(self.target, pywikibot.WbMonolingualText)
+                and isinstance(value, basestring)):
             return self.target.text == value
 
         return self.target == value
@@ -5613,8 +5613,8 @@ class Link(ComparableMixin):
             prefix = self._text[old_position:colon_position].lower()
             # All spaces after a prefix are discarded
             colon_position += 1
-            while (len(self._text) > colon_position and
-                    self._text[colon_position] == ' '):
+            while (len(self._text) > colon_position
+                    and self._text[colon_position] == ' '):
                 colon_position += 1
             ns = self._site.namespaces.lookup_name(prefix)
             if ns:
