@@ -374,7 +374,7 @@ class TestScriptHelp(PwbTestCase):
 
     net = False
 
-    _expected_failures = failed_dep_script_set
+    _expected_failures = set(failed_dep_script_set)  # use a copy
     # -help tests may pass even when packages are required
     _expected_failures.discard('flickrripper')
     _expected_failures.discard('imageharvest')
