@@ -227,7 +227,7 @@ class TestScriptMeta(MetaTestCaseClass):
                     stdout = None
                     error = None
 
-                test_overrides = set()
+                test_overrides = {}
                 if not hasattr(self, 'net') or not self.net:
                     test_overrides['pywikibot.Site'] = 'None'
 
