@@ -83,8 +83,8 @@ def match_image_pages(imagePageA, imagePageB):
     bottomleftScore = match_images(imageA_bottomleft, imageB_bottomleft)
     bottomrightScore = match_images(imageA_bottomright, imageB_bottomright)
     centerScore = match_images(imageA_center, imageB_center)
-    averageScore = (wholeScore + topleftScore + toprightScore +
-                    bottomleftScore + bottomrightScore + centerScore) / 6
+    averageScore = (wholeScore + topleftScore + toprightScore
+                    + bottomleftScore + bottomrightScore + centerScore) / 6
 
     pywikibot.output('Whole image           {0:>7.2%}\n'
                      'Top left of image     {1:>7.2%}\n'

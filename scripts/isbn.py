@@ -1305,8 +1305,8 @@ class ISBN10(ISBN):
             sum += (i + 1) * int(self.digits()[i])
         checksum = sum % 11
         lastDigit = self.digits()[-1]
-        if not ((checksum == 10 and lastDigit in 'Xx') or
-                (lastDigit.isdigit() and checksum == int(lastDigit))):
+        if not (checksum == 10 and lastDigit in 'Xx'
+                or lastDigit.isdigit() and checksum == int(lastDigit)):
             raise InvalidIsbnException('The ISBN checksum of {0} is incorrect.'
                                        .format(self.code))
 
@@ -1653,9 +1653,9 @@ def main(*args):
     # FIXME: See T85483 and run() in WikidataBot
     site = pywikibot.Site()
     data_site = site.data_repository()
-    use_wikibase = (data_site is not None and
-                    data_site.family == site.family and
-                    data_site.code == site.code)
+    use_wikibase = (data_site is not None
+                    and data_site.family == site.family
+                    and data_site.code == site.code)
 
     for arg in local_args:
         if arg.startswith('-prop-isbn-10:'):

@@ -749,8 +749,8 @@ class checkImagesBot(object):
                                                      self.notification)
 
         # Check maximum number of notifications for this talk page
-        if (self.num_notify is not None and
-                self.num_notify[self.talk_page.title()] == 0):
+        if (self.num_notify is not None
+                and self.num_notify[self.talk_page.title()] == 0):
             pywikibot.output('Maximum notifications reached, skip.')
             return
 
@@ -872,13 +872,13 @@ class checkImagesBot(object):
             # It's not only on commons but the image needs a check
             # the second usually is a url or something like that.
             # Compare the two in equal way, both url.
-            repme = ((self.list_entry +
-                      "is also on '''Commons''': [[commons:File:%s]]")
+            repme = ((self.list_entry
+                      + "is also on '''Commons''': [[commons:File:%s]]")
                      % (self.imageName,
                         commons_image_with_this_hash.title(
                             with_ns=False)))
-            if (self.image.title(as_url=True) ==
-                    commons_image_with_this_hash.title(as_url=True)):
+            if (self.image.title(as_url=True)
+                    == commons_image_with_this_hash.title(as_url=True)):
                 repme += ' (same name)'
             self.report_image(self.imageName, self.rep_page, self.com, repme,
                               addings=False)
@@ -915,8 +915,8 @@ class checkImagesBot(object):
 
                 for dup_page in duplicates:
                     if (dup_page.title(as_url=True) != self.image.title(
-                        as_url=True) or
-                            self.timestamp is None):
+                        as_url=True)
+                            or self.timestamp is None):
                         try:
                             self.timestamp = (
                                 dup_page.latest_file_info.timestamp)
@@ -941,8 +941,8 @@ class checkImagesBot(object):
                     except pywikibot.NoPage:
                         continue
 
-                    if not (re.findall(dupRegex, DupPageText) or
-                            re.findall(dupRegex, older_page_text)):
+                    if not (re.findall(dupRegex, DupPageText)
+                            or re.findall(dupRegex, older_page_text)):
                         pywikibot.output(
                             '{} is a duplicate and has to be tagged...'
                             .format(dup_page))
@@ -1024,10 +1024,8 @@ class checkImagesBot(object):
                         % self.image.title(as_url=True))
 
                 for dup_page in duplicates:
-                    if (
-                        dup_page.title(as_url=True) ==
-                        self.image.title(as_url=True)
-                    ):
+                    if (dup_page.title(as_url=True)
+                            == self.image.title(as_url=True)):
                         # the image itself, not report also this as duplicate
                         continue
                     repme += '\n** [[:{}{}]]'.format(
@@ -1259,9 +1257,9 @@ class checkImagesBot(object):
             for template_selected in templatesInTheImageRaw:
                 tp = pywikibot.Page(self.site, template_selected)
                 for templateReal in self.licenses_found:
-                    if (tp.title(as_url=True, with_ns=False).lower() ==
-                            templateReal.title(as_url=True,
-                                               with_ns=False).lower()):
+                    if (tp.title(as_url=True, with_ns=False).lower()
+                            == templateReal.title(as_url=True,
+                                                  with_ns=False).lower()):
                         if templateReal not in self.allLicenses:
                             self.allLicenses.append(templateReal)
             break
@@ -1307,10 +1305,10 @@ class checkImagesBot(object):
                 self.some_problem = False
         else:
             if not self.seems_ok and self.license_found:
-                rep_text_license_fake = ((self.list_entry +
-                                          "seems to have a ''fake license'', "
-                                          'license detected: '
-                                          '<nowiki>%s</nowiki>') %
+                rep_text_license_fake = ((self.list_entry
+                                          + "seems to have a ''fake license'',"
+                                          ' license detected:'
+                                          ' <nowiki>%s</nowiki>') %
                                          (self.imageName, self.license_found))
                 printWithTimeZone(
                     '{} seems to have a fake license: {}, reporting...'
