@@ -680,15 +680,15 @@ def execute(command, data_in=None, timeout=0, error=None):
         # Generate a more informative error
         if OSWIN32 and PY2:
             unicode_env = [(k, v) for k, v in os.environ.items()
-                           if not isinstance(k, str) or
-                           not isinstance(v, str)]
+                           if not isinstance(k, str)
+                           or not isinstance(v, str)]
             if unicode_env:
                 raise TypeError(
                     '{}: unicode in os.environ: {!r}'.format(e, unicode_env))
 
             child_unicode_env = [(k, v) for k, v in env.items()
-                                 if not isinstance(k, str) or
-                                 not isinstance(v, str)]
+                                 if not isinstance(k, str)
+                                 or not isinstance(v, str)]
             if child_unicode_env:
                 raise TypeError(
                     '{}: unicode in child env: {!r}'
