@@ -54,13 +54,9 @@ def check_script_deps(script_name):
     return True
 
 
-failed_dep_script_set = {name for name in script_deps
-                         if not check_script_deps(name)}
+failed_dep_script_set = {}
 
-unrunnable_script_set = {
-    'version',  # does not use global args
-    'script_wui',  # depends on lua compiling
-}
+unrunnable_script_set = {}
 
 
 def list_scripts(path, exclude=None):
@@ -98,34 +94,7 @@ script_input = {
         '8/80/Wikipedia-logo-v2.svg\n\n\n',
 }
 
-auto_run_script_list = [
-    'blockpageschecker',
-    'casechecker',
-    'catall',
-    'category_redirect',
-    'cfd',
-    'checkimages',
-    'clean_sandbox',
-    'disambredir',
-    'featured',
-    'followlive',
-    'imagerecat',
-    'login',
-    'lonelypages',
-    'misspelling',
-    'revertbot',
-    'noreferences',
-    'nowcommons',
-    'patrol',
-    'script_wui',
-    'shell',
-    'standardize_interwiki',
-    'states_redirect',
-    'unusedfiles',
-    'upload',
-    'watchlist',
-    'welcome',
-]
+auto_run_script_list = []
 
 # Expected result for no arguments
 # Some of these are not pretty, but at least they are informative
@@ -374,13 +343,8 @@ class TestScriptHelp(PwbTestCase):
 
     net = False
 
-    _expected_failures = failed_dep_script_set
+    _expected_failures = set(failed_dep_script_set)
     # -help tests may pass even when packages are required
-    _expected_failures.discard('flickrripper')
-    _expected_failures.discard('imageharvest')
-    _expected_failures.discard('isbn')
-    _expected_failures.discard('patrol')
-    _expected_failures.discard('weblinkchecker')
     _allowed_failures = []
 
     _argument = 'help'
@@ -402,18 +366,9 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
 
     user = True
 
-    _expected_failures = {
-        'catall',          # stdout user interaction
-        'upload',          # raises custom ValueError
-    }.union(failed_dep_script_set)
+    _expected_failures = {}.union(failed_dep_script_set)
 
-    _allowed_failures = [
-        'disambredir',
-        'imageharvest',  # T167726
-        'misspelling',   # T94681
-        'watchlist',     # T77965
-        'lonelypages',   # T94680: uses exit code 1
-    ]
+    _allowed_failures = []
 
     _argument = 'simulate'
     _results = no_args_expected_results
