@@ -541,8 +541,8 @@ class CosmeticChangesToolkit(object):
                     if not trailingChars:
                         titleLength = len(titleWithSection)
                         titleWithSection = titleWithSection.rstrip()
-                        hadTrailingSpaces = (len(titleWithSection) !=
-                                             titleLength)
+                        hadTrailingSpaces = (len(titleWithSection)
+                                             != titleLength)
 
                     # Convert URL-encoded characters to unicode
                     from pywikibot.page import url2unicode
@@ -586,8 +586,9 @@ class CosmeticChangesToolkit(object):
                         newLink = '[[%s]]' % label
                     # Check if we can create a link with trailing characters
                     # instead of a pipelink
-                    elif (firstcase_label.startswith(firstcase_title) and
-                          trailR.sub('', label[len(titleWithSection):]) == ''):
+                    elif (firstcase_label.startswith(firstcase_title)
+                          and trailR.sub('',
+                                         label[len(titleWithSection):]) == ''):
                         newLink = '[[%s]]%s' % (
                             label[:len(titleWithSection)],
                             label[len(titleWithSection):])
@@ -627,8 +628,8 @@ class CosmeticChangesToolkit(object):
     # note that the definition of 'letter' varies from language to language.
         linkR = re.compile(
             r'(?P<newline>[\n]*)\[\[(?P<titleWithSection>[^\]\|]+)'
-            r'(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>' +
-            self.site.linktrail() + ')')
+            r'(\|(?P<label>[^\]\|]*))?\]\](?P<linktrail>'
+            + self.site.linktrail() + ')')
 
         text = textlib.replaceExcept(text, linkR, handleOneLink,
                                      ['comment', 'math', 'nowiki', 'pre',
@@ -792,8 +793,8 @@ class CosmeticChangesToolkit(object):
         def replace_link(match):
             """Create a string to replace a single link."""
             replacement = '[['
-            if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6]) +
-                        list(self.site.namespaces[14])) + '):',
+            if re.match(r'(?:' + '|'.join(list(self.site.namespaces[6])
+                        + list(self.site.namespaces[14])) + '):',
                         match.group('link')):
                 replacement += ':'
             replacement += match.group('link')
