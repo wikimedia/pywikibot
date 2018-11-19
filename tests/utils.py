@@ -23,6 +23,12 @@ except ImportError:  # Python 2.7
     from collections import Mapping
 from types import ModuleType
 
+try:
+    from cryptography import __version__ as cryptography_version
+    cryptography_version = list(map(int, cryptography_version.split('.')))
+except ImportError:
+    cryptography_version = None
+
 import pywikibot
 from pywikibot.comms import threadedhttp
 from pywikibot import config
@@ -641,6 +647,8 @@ def execute(command, data_in=None, timeout=0, error=None):
         command.insert(1, '-W ignore:{0}:DeprecationWarning'.format(
             'Pywikibot will soon drop support for Python 2.7.2 and 2.7.3, '
             'please update your Python.'))
+    if cryptography_version and cryptography_version < [1, 3, 4]:
+        command.insert(1, '-W ignore:Old version of cryptography:Warning')
     # Any environment variables added on Windows must be of type
     # str() on Python 2.
     if OSWIN32 and PY2:
