@@ -1859,8 +1859,9 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
     @deprecated_args(
         throttle=None, deleteAndMove='noredirect', movetalkpage='movetalk')
+    @remove_last_args(['safe'])
     def move(self, newtitle, reason=None, movetalk=True, sysop=False,
-             noredirect=False, safe=True):
+             noredirect=False):
         """
         Move this page to a new title.
 
@@ -1870,14 +1871,11 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param sysop: Try to move using sysop account, if available
         @param noredirect: if move succeeds, delete the old page
             (usually requires sysop privileges, depending on wiki settings)
-        @param safe: If false, attempt to delete existing page at newtitle
-            (if there is one) and then move this page to that title
         """
         if reason is None:
             pywikibot.output('Moving %s to [[%s]].'
                              % (self.title(as_link=True), newtitle))
             reason = pywikibot.input('Please enter a reason for the move:')
-        # TODO: implement "safe" parameter (Is this necessary ?)
         # TODO: implement "sysop" parameter
         return self.site.movepage(self, newtitle, reason,
                                   movetalk=movetalk,

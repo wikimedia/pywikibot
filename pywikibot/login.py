@@ -26,7 +26,8 @@ import pywikibot
 
 from pywikibot import config, __url__
 from pywikibot.exceptions import NoUsername
-from pywikibot.tools import deprecated_args, normalize_username, PY2
+from pywikibot.tools import (deprecated_args, remove_last_args,
+                             normalize_username, PY2)
 
 if not PY2:
     unicode = basestring = str
@@ -179,14 +180,10 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             # No bot policies on other sites
             return True
 
-    def getCookie(self, remember=True, captcha=None):
+    @remove_last_args(['remember', 'captcha'])
+    def getCookie(self):
         """
         Login to the site.
-
-        @param remember: Remember login (default: True)
-        @type remember: bool
-        @param captchaId: A dictionary containing the captcha id and answer,
-            if any
 
         @return: cookie data if successful, None otherwise.
         """

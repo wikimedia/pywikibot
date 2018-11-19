@@ -22,7 +22,7 @@ from pywikibot.comms.http import fetch
 from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning,
+    deprecated, deprecated_args, remove_last_args, issue_deprecation_warning,
     FrozenDict, classproperty
 )
 
@@ -1416,7 +1416,8 @@ class Family(object):
         return (None, None)
 
     # Deprecated via __getattribute__
-    def shared_data_repository(self, code, transcluded=False):
+    @remove_last_args(['transcluded'])
+    def shared_data_repository(self, code):
         """Return the shared Wikibase repository, if any."""
         repo = pywikibot.Site(code, self).data_repository()
         if repo is not None:
