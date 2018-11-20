@@ -205,7 +205,7 @@ class TestBaseSiteProperties(TestCase):
         'enwikinews': {
             'family': 'wikinews',
             'code': 'en',
-            'result': (),  # To be changed when wikinews will have doc_subpage.
+            'result': ('/doc',),
         },
         'enwikibooks': {
             'family': 'wikibooks',
