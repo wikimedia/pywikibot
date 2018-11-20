@@ -226,10 +226,9 @@ class _MultiTemplateMatchBuilder(object):
                 '{0!r} is not a valid template'.format(template))
 
         if namespace.case == 'first-letter':
-            pattern = '[' + \
-                      re.escape(old[0].upper()) + \
-                      re.escape(old[0].lower()) + \
-                      ']' + re.escape(old[1:])
+            pattern = '[{}{}]{}'.format(re.escape(old[0].upper()),
+                                        re.escape(old[0].lower()),
+                                        re.escape(old[1:]))
         else:
             pattern = re.escape(old)
         # namespaces may be any mixed case
@@ -237,9 +236,9 @@ class _MultiTemplateMatchBuilder(object):
                               for char in ns)
                       for ns in namespace]
         pattern = re.sub(r'_|\\ ', r'[_ ]', pattern)
-        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces) +
-                                   r':|[mM][sS][gG]:)?' + pattern +
-                                   r'(?P<parameters>\s*\|.+?|) *}}',
+        templateRegex = re.compile(r'\{\{ *(' + ':|'.join(namespaces)
+                                   + r':|[mM][sS][gG]:)?' + pattern
+                                   + r'(?P<parameters>\s*\|.+?|) *}}',
                                    flags)
         return templateRegex
 
@@ -421,8 +420,8 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
         for dontTouchR in dontTouchRegexes:
             excMatch = dontTouchR.search(text, index)
             if excMatch and (
-                    nextExceptionMatch is None or
-                    excMatch.start() < nextExceptionMatch.start()):
+                    nextExceptionMatch is None
+                    or excMatch.start() < nextExceptionMatch.start()):
                 nextExceptionMatch = excMatch
 
         if nextExceptionMatch is not None \
@@ -608,9 +607,9 @@ def expandmarker(text, marker='', separator=''):
         striploopcontinue = True
         while firstinseparator > 0 and striploopcontinue:
             striploopcontinue = False
-            if (firstinseparator >= lenseparator) and \
-               (separator == text[firstinseparator -
-                                  lenseparator:firstinseparator]):
+            if (firstinseparator >= lenseparator
+                and separator == text[firstinseparator
+                                      - lenseparator:firstinseparator]):
                 firstinseparator -= lenseparator
                 striploopcontinue = True
             elif text[firstinseparator - 1] < ' ':
@@ -1041,8 +1040,8 @@ def removeLanguageLinks(text, site=None, marker=''):
         site = pywikibot.Site()
     # This regular expression will find every interwiki link, plus trailing
     # whitespace.
-    languages = '|'.join(site.validLanguageLinks() +
-                         list(site.family.obsolete.keys()))
+    languages = '|'.join(site.validLanguageLinks()
+                         + list(site.family.obsolete.keys()))
     if not languages:
         return text
     interwikiR = re.compile(r'\[\[(%s)\s?:[^\[\]\n]*\]\][\s]*'
@@ -1137,9 +1136,8 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
             if '</noinclude>' in s2[firstafter:]:
                 if separatorstripped:
                     s = separator + s
-                newtext = (s2[:firstafter].replace(marker, '') +
-                           s +
-                           s2[firstafter:])
+                newtext = (s2[:firstafter].replace(marker, '')
+                           + s + s2[firstafter:])
             elif site.code in site.family.categories_last:
                 cats = getCategoryLinks(s2, site=site)
                 s2 = removeCategoryLinksAndSeparator(
@@ -1151,9 +1149,8 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
             # (not supported by rewrite - no API)
             elif site.family.name == 'wikitravel':
                 s = separator + s + separator
-                newtext = (s2[:firstafter].replace(marker, '') +
-                           s +
-                           s2[firstafter:])
+                newtext = (s2[:firstafter].replace(marker, '')
+                           + s + s2[firstafter:])
             else:
                 if template or template_subpage:
                     if template_subpage:
@@ -1172,10 +1169,9 @@ def replaceLanguageLinks(oldtext, new, site=None, addOnly=False,
                         newtext = regexp.sub(s + includeOff, s2)
                     else:
                         # Put the langlinks at the end, inside noinclude's
-                        newtext = (s2.replace(marker, '').strip() +
-                                   separator +
-                                   '%s\n%s%s\n' % (includeOn, s, includeOff)
-                                   )
+                        newtext = (s2.replace(marker, '').strip()
+                                   + separator
+                                   + '%s\n%s%s\n' % (includeOn, s, includeOff))
                 else:
                     newtext = s2.replace(marker, '').strip() + separator + s
     else:
@@ -1642,8 +1638,8 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     @return: list of template name and params
     @rtype: list of tuple
     """
-    use_mwparserfromhell = (config.use_mwparserfromhell and
-                            not isinstance(mwparserfromhell, Exception))
+    use_mwparserfromhell = (config.use_mwparserfromhell
+                            and not isinstance(mwparserfromhell, Exception))
 
     if remove_disabled_parts is None:
         remove_disabled_parts = not use_mwparserfromhell
@@ -2315,8 +2311,8 @@ class TimeStripper(object):
 
         # all fields matched -> date valid
         # groups are in a reasonable order.
-        if (all(g in dateDict for g in self.groups) and
-                self._valid_date_dict_positions(dateDict)):
+        if (all(g in dateDict for g in self.groups)
+                and self._valid_date_dict_positions(dateDict)):
             # remove 'time' key, now split in hour/minute and not needed
             # by datetime.
             del dateDict['time']
