@@ -84,6 +84,7 @@ import pywikibot
 from pywikibot import config, i18n, pagegenerators
 from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
+from pywikibot.tools import remove_last_args
 
 from scripts.image import ImageRobot
 
@@ -392,8 +393,8 @@ class TkdialogIC(Tkdialog):
 
     """The dialog window for image info."""
 
-    def __init__(self, image_title, content, uploader, url, templates,
-                 commonsconflict=0):
+    @remove_last_args(('commonsconflict',))
+    def __init__(self, image_title, content, uploader, url, templates):
         """Initializer."""
         # Check if `Tkinter` wasn't imported
         if isinstance(Tkinter, ImportError):
