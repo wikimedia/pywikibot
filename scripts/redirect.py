@@ -340,15 +340,14 @@ class RedirectGenerator(OptionHandler):
                             break
         elif self.xmlFilename:
             redict = self.get_redirects_from_dump()
-            num = 0
-            for (key, value) in redict.items():
-                num += 1
+            total = len(redict)
+            for num, (key, value) in enumerate(redict.items(), start=1):
                 # check if the value - that is, the redirect target - is a
                 # redirect as well
                 if num > self.offset and value in redict:
-                    yield key
                     pywikibot.output('\nChecking redirect {0} of {1}...'
-                                     .format(num + 1, len(redict)))
+                                     .format(num, total))
+                    yield key
         elif self.page_title:
             yield self.page_title
         else:
