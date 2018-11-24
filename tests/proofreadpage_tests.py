@@ -11,6 +11,7 @@ import json
 
 import pywikibot
 
+from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
 
@@ -361,6 +362,16 @@ class TestPageOCR(TestCase):
         ref_error, ref_text = self.data['hocr']
         self.assertEqual(error, ref_error)
         self.assertEqual(text, ref_text)
+
+    def test_do_ocr_phetools_raw_request(self):
+        """Test page._do_ocr connection with wmflabs."""
+        uri = ('https://tools.wmflabs.org/phetools/ocr.php?cmd=ocr'
+               '&url=https://upload.wikimedia.org/wikipedia/commons/'
+               'thumb/a/ac/Popular_Science_Monthly_Volume_1.djvu/'
+               'page10-1024px-Popular_Science_Monthly_Volume_1.djvu.jpg'
+               '&lang=en&user=None')
+        response = http.fetch(uri)
+        self.assertEqual(response.status, 200)
 
     def test_do_ocr_phetools(self):
         """Test page._do_ocr(ocr_tool='phetools')."""
