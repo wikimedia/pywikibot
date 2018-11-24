@@ -985,8 +985,8 @@ class Subject(interwiki_graph.Subject):
         if linkedPage in self.foundIn:
             # We have seen this page before, don't ask again.
             return False
-        elif (self.originPage and
-              self.originPage.namespace() != linkedPage.namespace()):
+        if (self.originPage
+                and self.originPage.namespace() != linkedPage.namespace()):
             # Allow for a mapping between different namespaces
             crossFrom = self.originPage.site.family.crossnamespace.get(
                 self.originPage.namespace(), {})
@@ -1060,9 +1060,9 @@ class Subject(interwiki_graph.Subject):
                 pywikibot.output('NOTE: Ignoring {} for {} in wiktionary mode'
                                  .format(page, self.originPage))
                 return True
-            elif (page.title() != self.originPage.title() and
-                  self.originPage.namespace().case == 'case-sensitive' and
-                  page.namespace().case == 'case-sensitive'):
+            if (page.title() != self.originPage.title()
+                and self.originPage.namespace().case == 'case-sensitive'
+                    and page.namespace().case == 'case-sensitive'):
                 pywikibot.output(
                     'NOTE: Ignoring {} for {} in wiktionary mode because both '
                     'languages are uncapitalized.'
@@ -1296,8 +1296,9 @@ class Subject(interwiki_graph.Subject):
                 elif page.isStaticRedirect():
                     self.conf.note('not following static {}redirects.'
                                    .format(redir))
-                elif (page.site.family == redirectTargetPage.site.family and
-                      not self.skipPage(page, redirectTargetPage, counter)):
+                elif (page.site.family == redirectTargetPage.site.family
+                      and not self.skipPage(page, redirectTargetPage,
+                                            counter)):
                     if self.addIfNew(redirectTargetPage, counter, page):
                         if config.interwiki_shownew:
                             pywikibot.output('{}: {} gives new {}redirect {}'
@@ -1626,8 +1627,9 @@ class Subject(interwiki_graph.Subject):
                    (not frgnSiteDone and site != lclSite and site in new):
                     if site == lclSite:
                         lclSiteDone = True   # even if we fail the update
-                    if (site.family.name in config.usernames and
-                            site.code in config.usernames[site.family.name]):
+                    if (site.family.name in config.usernames
+                            and site.code in config.usernames[
+                                site.family.name]):
                         try:
                             if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
@@ -1637,9 +1639,8 @@ class Subject(interwiki_graph.Subject):
                             notUpdatedSites.append(site)
                         except GiveUpOnPage:
                             break
-                elif (not self.conf.strictlimittwo and
-                      site in new and
-                      site != lclSite):
+                elif (not self.conf.strictlimittwo
+                      and site in new and site != lclSite):
                     old = {}
                     try:
                         for link in new[site].iterlanglinks():
@@ -1652,12 +1653,12 @@ class Subject(interwiki_graph.Subject):
                     mods, mcomment, adding, removing, modifying \
                         = compareLanguages(old, new, lclSite,
                                            self.conf.summary)
-                    if ((len(removing) > 0 and not self.conf.autonomous) or
-                        (len(modifying) > 0 and self.problemfound) or
-                        (len(old) == 0) or
-                        (self.conf.needlimit and
-                         len(adding) + len(modifying) >=
-                            self.conf.needlimit + 1)):
+                    if (len(removing) > 0 and not self.conf.autonomous
+                        or len(modifying) > 0 and self.problemfound
+                        or len(old) == 0
+                        or (self.conf.needlimit
+                            and len(adding) + len(modifying)
+                            >= self.conf.needlimit + 1)):
                         try:
                             if self.replaceLinks(new[site], new):
                                 updatedSites.append(site)
@@ -1809,8 +1810,8 @@ class Subject(interwiki_graph.Subject):
                 rmPage = old[rmsite]
                 # put it to new means don't delete it
                 if (
-                    not self.conf.cleanup or
-                    unicode(rmPage) not in self.conf.remove
+                    not self.conf.cleanup
+                    or unicode(rmPage) not in self.conf.remove
                 ):
                     new[rmsite] = rmPage
                     pywikibot.warning(
@@ -2426,8 +2427,8 @@ def main(*args):
         elif arg.startswith('-years'):
             # Look if user gave a specific year at which to start
             # Must be a natural number or negative integer.
-            if len(arg) > 7 and (arg[7:].isdigit() or
-                                 (arg[7] == '-' and arg[8:].isdigit())):
+            if len(arg) > 7 and (arg[7:].isdigit()
+                                 or (arg[7] == '-' and arg[8:].isdigit())):
                 startyear = int(arg[7:])
             else:
                 startyear = 1
