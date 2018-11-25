@@ -38,19 +38,28 @@ try:
     from bs4 import BeautifulSoup, FeatureNotFound
 except ImportError as e:
     BeautifulSoup = e
+
+    def _bs4_soup(*args, **kwargs):
+        """Raise BeautifulSoup when called, if bs4 is not available."""
+        raise BeautifulSoup
 else:
     try:
         BeautifulSoup('', 'lxml')
     except FeatureNotFound:
-        Soup = partial(BeautifulSoup, features='html.parser')
+        _bs4_soup = partial(BeautifulSoup, features='html.parser')
     else:
-        Soup = partial(BeautifulSoup, features='lxml')
+        _bs4_soup = partial(BeautifulSoup, features='lxml')
 
 import pywikibot
 from pywikibot.comms import http
 from pywikibot.data.api import Request
+from pywikibot.tools import ModuleDeprecationWrapper
 
 _logger = 'proofreadpage'
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('Soup', _bs4_soup, replacement_name='_bs4_soup',
+                             since='20181128')
 
 
 class FullHeader(object):
@@ -524,9 +533,10 @@ class ProofreadPage(pywikibot.Page):
         @rtype: str/unicode
 
         @raises Exception: in case of http errors
+        @raise ImportError: if bs4 is not installed, _bs4_soup() will raise
         @raises ValueError: in case of no prp_page_image src found for scan
         """
-        # wrong link fail with various possible Exceptions.
+        # wrong link fails with various possible Exceptions.
         if not hasattr(self, '_url_image'):
 
             if self.exists():
@@ -541,7 +551,7 @@ class ProofreadPage(pywikibot.Page):
                 pywikibot.error('Error fetching HTML for %s.' % self)
                 raise
 
-            soup = Soup(response.text)
+            soup = _bs4_soup(response.text)
 
             try:
                 self._url_image = soup.find(class_='prp-page-image')
@@ -623,10 +633,11 @@ class ProofreadPage(pywikibot.Page):
         This is the main method for 'phetools'.
         Fallback method is ocr.
 
+        @raise ImportError: if bs4 is not installed, _bs4_soup() will raise
         """
         def parse_hocr_text(txt):
             """Parse hocr text."""
-            soup = Soup(txt)
+            soup = _bs4_soup(txt)
 
             res = []
             for ocr_page in soup.find_all(class_='ocr_page'):
@@ -823,7 +834,7 @@ class IndexPage(pywikibot.Page):
             del self._parsed_text
 
         self._parsed_text = self._get_parsed_page()
-        self._soup = Soup(self._parsed_text)
+        self._soup = _bs4_soup(self._parsed_text)
         # Do not search for "new" here, to avoid to skip purging if links
         # to non-existing pages are present.
         attrs = {'class': re.compile('prp-pagequality')}
@@ -845,7 +856,7 @@ class IndexPage(pywikibot.Page):
             self.purge()
             del self._parsed_text
             self._parsed_text = self._get_parsed_page()
-            self._soup = Soup(self._parsed_text)
+            self._soup = _bs4_soup(self._parsed_text)
             if not self._soup.find_all('a', attrs=attrs):
                 raise ValueError(
                     'Missing class="qualityN prp-pagequality-N" or '
