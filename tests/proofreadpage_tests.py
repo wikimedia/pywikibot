@@ -321,6 +321,7 @@ class TestPageQuality(TestCase):
         self.assertEqual(page.quality_level, 0)
 
 
+@require_modules('bs4')
 class TestPageOCR(TestCase):
 
     """Test page ocr functions."""
