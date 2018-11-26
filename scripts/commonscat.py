@@ -352,8 +352,8 @@ class CommonscatBot(Bot):
         """Change the current commonscat template and target."""
         if oldcat == '3=S' or linktitle == '3=S':
             return  # TODO: handle additional param on de-wiki
-        if not linktitle and (page.title().lower() in oldcat.lower() or
-                              oldcat.lower() in page.title().lower()):
+        if not linktitle and (page.title().lower() in oldcat.lower()
+                              or oldcat.lower() in page.title().lower()):
             linktitle = oldcat
         if linktitle and newcat != page.title(with_ns=False):
             newtext = re.sub(r'(?i)\{\{%s\|?[^{}]*(?:\{\{.*\}\})?\}\}'

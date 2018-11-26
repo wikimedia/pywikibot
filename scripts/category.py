@@ -933,8 +933,8 @@ class CategoryListifyRobot(object):
 
         listString = ''
         for article in setOfArticles:
-            if (not article.is_filepage() or
-                    self.showImages) and not article.is_categorypage():
+            if (not article.is_filepage()
+                    or self.showImages) and not article.is_categorypage():
                 if self.talkPages and not article.isTalkPage():
                     listString += '* [[{0}]] -- [[{1}|talk]]\n'.format(
                         article.title(), article.toggleTalkPage().title())
@@ -1195,8 +1195,8 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             new_cat_title = pywikibot.input('Please enter the category '
                                             'the page should be moved to:',
                                             default=None)  # require an answer
-            new_cat = pywikibot.Category(pywikibot.Link('Category:' +
-                                                        new_cat_title))
+            new_cat = pywikibot.Category(pywikibot.Link('Category:'
+                                                        + new_cat_title))
             # recurse into chosen category
             self.move_to_category(member, original_cat, new_cat)
 

@@ -72,8 +72,8 @@ class IWBot(ExistingPageBot, SingleSiteBot):
 
     def treat_page(self):
         """Check page."""
-        if (self.current_page.namespace() not in namespaces and
-                not self.getOption('ignore_ns')):
+        if (self.current_page.namespace() not in namespaces
+                and not self.getOption('ignore_ns')):
             output('{page} is not in allowed namespaces, skipping'
                    .format(page=self.current_page.title(
                        as_link=True)))

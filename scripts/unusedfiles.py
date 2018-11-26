@@ -55,8 +55,8 @@ class UnusedFilesBot(Bot):
         self.template_user = i18n.translate(self.site,
                                             template_to_the_user)
         self.summary = i18n.twtranslate(self.site, 'unusedfiles-comment')
-        if not (self.template_image and
-                (self.template_user or self.getOption('nouserwarning'))):
+        if not (self.template_image
+                and (self.template_user or self.getOption('nouserwarning'))):
             raise pywikibot.Error('This script is not localized for {0} site.'
                                   .format(self.site))
 
@@ -68,8 +68,8 @@ class UnusedFilesBot(Bot):
             return
         # Use fileUrl() and fileIsShared() to confirm it is local media
         # rather than a local page with the same name as shared media.
-        if (image.fileUrl() and not image.fileIsShared() and
-                'http://' not in image.text):
+        if (image.fileUrl() and not image.fileIsShared()
+                and 'http://' not in image.text):
             if self.template_image in image.text:
                 pywikibot.output('{0} done already'
                                  .format(image.title(as_link=True)))

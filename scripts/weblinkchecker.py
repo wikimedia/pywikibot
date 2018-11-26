@@ -612,8 +612,8 @@ class LinkCheckThread(threading.Thread):
             pywikibot.output('Exception while processing URL {0} in page {1}'
                              .format(self.url, self.page.title()))
             raise
-        if (r.status == requests.codes.ok and
-                str(r.status) not in self.HTTPignore):
+        if (r.status == requests.codes.ok
+                and str(r.status) not in self.HTTPignore):
             ok = True
         else:
             message = '{0}'.format(r.status)

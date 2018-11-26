@@ -484,8 +484,8 @@ class imageFetcher(threading.Thread):
             date = self.getUploadDate(imagepage)
 
         # Author
-        if not (contents['author'] == '' or
-                contents['author'] == self.getAuthor(imagepage)):
+        if not (contents['author'] == ''
+                or contents['author'] == self.getAuthor(imagepage)):
             author = self.convertLinks(contents['author'], imagepage.site())
         else:
             author = self.getAuthorText(imagepage)
@@ -538,9 +538,10 @@ class imageFetcher(threading.Thread):
         """
         uploadtime = imagepage.getFileVersionHistory()[-1][0]
         uploadDatetime = datetime.strptime(uploadtime, '%Y-%m-%dT%H:%M:%SZ')
-        return ('{{Date|' + str(uploadDatetime.year) + '|' +
-                str(uploadDatetime.month) + '|' + str(uploadDatetime.day) +
-                '}} (original upload date)')
+        return ('{{Date|%s|%s|%s}} (original upload date)'
+                % (str(uploadDatetime.year),
+                   str(uploadDatetime.month,
+                   str(uploadDatetime.day))))
 
     def getSource(self, imagepage, source=''):
         """Get text to put in the source field of new information template."""
@@ -550,8 +551,8 @@ class imageFetcher(threading.Thread):
         if source == '':
             source = '{{Own}}'
 
-        return (source.strip() +
-                '<BR />Transferred from [http://%(lang)s.%(family)s.org '
+        return (source.strip()
+                + '<BR />Transferred from [http://%(lang)s.%(family)s.org '
                 '%(lang)s.%(family)s]') % {'lang': lang, 'family': family}
 
     def getAuthorText(self, imagepage):
@@ -991,8 +992,9 @@ class uploader(threading.Thread):
             if imagepage.site.lang in moveToCommonsTemplate:
                 for moveTemplate in moveToCommonsTemplate[
                         imagepage.site.lang]:
-                    imtxt = re.sub(r'(?i){{' + moveTemplate +
-                                   r'[^}]*}}', r'', imtxt)
+                    imtxt = re.sub(r'(?i){{' + moveTemplate + r'[^}]*}}',
+                                   r'',
+                                   imtxt)
 
             # add {{NowCommons}}
             if imagepage.site.lang in nowCommonsTemplate:

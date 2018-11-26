@@ -46,9 +46,9 @@ def main(*args):
     pywikibot.output('requests version: ' + requests.__version__)
 
     has_wikimedia_cert = False
-    if (not hasattr(requests, 'certs') or
-            not hasattr(requests.certs, 'where') or
-            not callable(requests.certs.where)):
+    if (not hasattr(requests, 'certs')
+            or not hasattr(requests.certs, 'where')
+            or not callable(requests.certs.where)):
         pywikibot.output('  cacerts: not defined')
     elif not os.path.isfile(requests.certs.where()):
         pywikibot.output('  cacerts: {} (missing)'.format(

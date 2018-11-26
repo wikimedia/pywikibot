@@ -117,8 +117,8 @@ class UploadTextBot(SingleSiteBot):
         # TODO: create i18 files
         # Get edit summary message if it's empty.
         if not self.getOption('summary'):
-            self.options['summary'] = i18n.twtranslate(
-                self.site, 'djvutext-creating')
+            self.options['summary'] = i18n.twtranslate(self.site,
+                                                       'djvutext-creating')
 
         if self.getOption('ocr'):
             self._num_threads = self.getOption('threads')

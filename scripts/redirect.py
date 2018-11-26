@@ -214,8 +214,8 @@ class RedirectGenerator(OptionHandler):
             if self.api_number:
                 gen.set_maximum_items(self.api_number)
             for p in gen:
-                done = (self.api_until and
-                        p.title(with_ns=False) >= self.api_until)
+                done = (self.api_until
+                        and p.title(with_ns=False) >= self.api_until)
                 if done:
                     return
                 yield p
@@ -360,8 +360,8 @@ class RedirectGenerator(OptionHandler):
         # this will run forever, until user interrupts it
         if self.offset <= 0:
             self.offset = 1
-        start = (datetime.datetime.utcnow() -
-                 datetime.timedelta(0, self.offset * 3600))
+        start = (datetime.datetime.utcnow()
+                 - datetime.timedelta(0, self.offset * 3600))
         # self.offset hours ago
         offset_time = start.strftime('%Y%m%d%H%M%S')
         pywikibot.output('Retrieving {0} moved pages...'

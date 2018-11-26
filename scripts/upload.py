@@ -185,8 +185,8 @@ def main(*args):
             pywikibot.output(error)
         url = pywikibot.input('URL, file or directory where files are now:')
 
-    if always and ((aborts is not True and ignorewarn is not True) or
-                   not description or url is None):
+    if always and (aborts is not True and ignorewarn is not True
+                   or not description or url is None):
         additional = ''
         missing = []
         if url is None:

@@ -198,8 +198,8 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         if self.getOption('undelete'):
             self.current_page.undelete(self.summary)
         else:
-            if (self.getOption('isorphan') is not False and
-                    not self.getOption('always')):
+            if (self.getOption('isorphan') is not False
+                    and not self.getOption('always')):
                 self.display_references()
 
             if self.getOption('orphansonly'):
