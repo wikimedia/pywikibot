@@ -217,6 +217,16 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
 
     """Verify Wikibase types using paraminfo."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class."""
+        super(WikibaseKnownTypesTests, cls).setUpClass()
+        for site in cls.sites.values():
+            if site['site'].family.name.endswith('beta'):
+                raise unittest.SkipTest(
+                    '{}: skipping {!r} due to Bug T210322'
+                    .format(cls.__name__, site['site']))
+
     def test_entities(self):
         """Test known entities."""
         unsupported = {'form', 'lexeme', 'sense'}  # T195435
