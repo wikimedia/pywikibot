@@ -219,6 +219,7 @@ netext = {
     'wikipedia': {
         'am': '{{subst:Welcome}} %s',
         'ar': '{{subst:ترحيب}} %s',
+        'arz': '{{subst:ترحيب}} %s',
         'as': '{{subst:আদৰণি}} %s',
         'ba': '{{Hello}} %s',
         'bn': '{{subst:স্বাগতম/বট}} %s',
@@ -255,6 +256,7 @@ netext = {
         'zh-yue': '{{歡迎}}--%s',
     },
     'wikibooks': {
+        'ar': '{{subst:ترحيب}} %s',
         'bs': '{{Dobrodošlica}} %s',
         'es': '{{subst:bienivenido usuario}} %s',
     },
@@ -266,6 +268,7 @@ netext = {
         'zh': '{{subst:welcome}} %s',
     },
     'wikisource': {
+        'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
         'bs': '{{Dobrodošlica}} %s',
         'mr': '{{subst:Welcome}} %s',
