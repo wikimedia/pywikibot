@@ -301,8 +301,8 @@ class Throttle(object):
         started = time.time()
         with self.lock:
             waittime = self.retry_after or lagtime or 5
-            # wait not more than 120 seconds
-            delay = min(waittime, 120)
+            # wait not more than retry_max seconds
+            delay = min(waittime, config.retry_max)
             # account for any time we waited while acquiring the lock
             wait = delay - (time.time() - started)
             self.wait(wait)

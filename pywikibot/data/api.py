@@ -1360,7 +1360,7 @@ class Request(MutableMapping):
                errors, defaults to config.max_retries.
         @param retry_wait: (optional) Minimum time in seconds to wait after an
                error, defaults to config.retry_wait seconds (doubles each retry
-               until max of 120 seconds is reached).
+               until config.retry_max seconds is reached).
         @param use_get: (optional) Use HTTP GET request if possible. If False
                it uses a POST request. If None, it'll try to determine via
                action=paraminfo if the action requires a POST.
@@ -2282,8 +2282,8 @@ class Request(MutableMapping):
         pywikibot.warning('Waiting %s seconds before retrying.'
                           % self.retry_wait)
         pywikibot.sleep(self.retry_wait)
-        # double the next wait, but do not exceed 120 seconds
-        self.retry_wait = min(120, self.retry_wait * 2)
+        # double the next wait, but do not exceed config.retry_max seconds
+        self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
 
 class CachedRequest(Request):
