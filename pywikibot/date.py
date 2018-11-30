@@ -384,9 +384,9 @@ def escapePattern2(pattern):
         for s in _reParameters.split(pattern):
             if s is None:
                 continue
-            if (len(s) in (2, 3) and s[0] == '%' and
-                    s[-1] in _digitDecoders and
-                    (len(s) == 2 or s[1] in _decimalDigits)):
+            if (len(s) in (2, 3) and s[0] == '%'
+                    and s[-1] in _digitDecoders
+                    and(len(s) == 2 or s[1] in _decimalDigits)):
                 # Must match a "%2d" or "%d" style
                 dec = _digitDecoders[s[-1]]
                 if isinstance(dec, basestring):
@@ -396,7 +396,7 @@ def escapePattern2(pattern):
                         'Invalid pattern {0}: Cannot use zero padding size '
                         'in {1}!'.format(pattern, s))
                     newPattern += re.escape(dec)
-                    strPattern += s         # Keep the original text
+                    strPattern += s  # Keep the original text
                 else:
                     if len(s) == 3:
                         # enforce mandatory field size

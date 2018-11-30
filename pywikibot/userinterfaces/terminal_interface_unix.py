@@ -61,9 +61,9 @@ class UnixUI(terminal_interface_base.UI):
         if sys.version_info[0] == 2:
             # .encoding does not mean we can write unicode
             # to the stream pre-2.7.
-            if (sys.version_info >= (2, 7) and
-                    hasattr(targetStream, 'encoding') and
-                    targetStream.encoding):
+            if (sys.version_info >= (2, 7)
+                    and hasattr(targetStream, 'encoding')
+                    and targetStream.encoding):
                 text = text.encode(targetStream.encoding, 'replace').decode(
                     targetStream.encoding)
             else:

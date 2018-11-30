@@ -1430,12 +1430,11 @@ def add_decorated_full_name(obj, stacklevel=1):
     frame = sys._getframe(stacklevel + 1)
     class_name = frame.f_code.co_name
     if class_name and class_name != '<module>':
-        obj.__full_name__ = (obj.__module__ + '.' +
-                             class_name + '.' +
-                             obj.__name__)
+        obj.__full_name__ = '{}.{}.{}'.format(
+            obj.__module__, class_name, obj.__name__)
     else:
-        obj.__full_name__ = (obj.__module__ + '.' +
-                             obj.__name__)
+        obj.__full_name__ = '{}.{}'.format(
+            obj.__module__, obj.__name__)
 
 
 def manage_wrapping(wrapper, obj):
@@ -1515,8 +1514,8 @@ def add_full_name(obj):
 
         # The decorator being decorated may have args, so both
         # syntax need to be supported.
-        if (len(outer_args) == 1 and len(outer_kwargs) == 0 and
-                callable(outer_args[0])):
+        if (len(outer_args) == 1 and len(outer_kwargs) == 0
+                and callable(outer_args[0])):
             add_decorated_full_name(outer_args[0])
             return obj(outer_args[0])
         else:
