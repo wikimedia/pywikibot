@@ -151,8 +151,8 @@ class _ColorFormatter(Formatter):
         @rtype: unicode
         """
         if self.colors.intersection(kwargs):  # kwargs use colors
-            raise ValueError('Keyword argument(s) use valid color(s): ' +
-                             '", "'.join(self.colors.intersection(kwargs)))
+            raise ValueError('Keyword argument(s) use valid color(s): '
+                             + '", "'.join(self.colors.intersection(kwargs)))
         if not isinstance(format_string, UnicodeType):
             raise TypeError('expected {0}, got {1}'
                             .format(type(''), type(format_string)))

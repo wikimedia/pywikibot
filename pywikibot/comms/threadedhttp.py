@@ -153,8 +153,10 @@ class HttpRequest(UnicodeMixin):
                 charset = 'latin1'
             else:
                 charset = self.charset
-            if (self.header_encoding and codecs.lookup(self.header_encoding) !=
-                    (codecs.lookup(charset) if charset else None)):
+            if (self.header_encoding
+                and codecs.lookup(
+                    self.header_encoding) != (
+                        codecs.lookup(charset) if charset else None)):
                 if charset:
                     pywikibot.warning(
                         'Encoding "{0}" requested but "{1}" '
@@ -171,8 +173,8 @@ class HttpRequest(UnicodeMixin):
             else:
                 self._encoding = None
 
-            if charset and (isinstance(self._encoding, Exception) or
-                            not self._encoding):
+            if charset and (isinstance(self._encoding, Exception)
+                            or not self._encoding):
                 try:
                     self.raw.decode(charset)
                 except UnicodeError as e:

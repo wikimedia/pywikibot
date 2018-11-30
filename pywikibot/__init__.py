@@ -575,8 +575,8 @@ class WbTime(_WbRepresentation):
 
         # if precision is given it overwrites the autodetection above
         if precision is not None:
-            if (isinstance(precision, int) and
-                    precision in self.PRECISION.values()):
+            if (isinstance(precision, int)
+                    and precision in self.PRECISION.values()):
                 self.precision = precision
             elif precision in self.PRECISION:
                 self.precision = self.PRECISION[precision]
