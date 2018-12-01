@@ -127,8 +127,8 @@ class StandardOption(Option):
 
     def test(self, value):
         """Return True whether this option applies."""
-        return (self.shortcut.lower() == value.lower() or
-                self.option.lower() == value.lower())
+        return (self.shortcut.lower() == value.lower()
+                or self.option.lower() == value.lower())
 
 
 class OutputProxyOption(OutputOption, StandardOption):
@@ -217,8 +217,8 @@ class IntegerOption(Option):
     def __init__(self, minimum=1, maximum=None, prefix=''):
         """Initializer."""
         super(IntegerOption, self).__init__()
-        if not ((minimum is None or isinstance(minimum, int)) and
-                (maximum is None or isinstance(maximum, int))):
+        if not ((minimum is None or isinstance(minimum, int))
+                and (maximum is None or isinstance(maximum, int))):
             raise ValueError(
                 'The minimum and maximum parameters must be int or None.')
         if minimum is not None and maximum is not None and minimum > maximum:
@@ -234,8 +234,8 @@ class IntegerOption(Option):
         except ValueError:
             return False
         else:
-            return ((self.minimum is None or value >= self.minimum) and
-                    (self.maximum is None or value <= self.maximum))
+            return ((self.minimum is None or value >= self.minimum)
+                    and (self.maximum is None or value <= self.maximum))
 
     @property
     def minimum(self):
@@ -323,9 +323,9 @@ class HighlightContextOption(ContextOption):
 
     def output_range(self, start, end):
         """Show normal context with a red center region."""
-        pywikibot.output(self.text[start:self.start] + '\03{lightred}' +
-                         self.text[self.start:self.end] + '\03{default}' +
-                         self.text[self.end:end])
+        pywikibot.output(self.text[start:self.start] + '\03{lightred}'
+                         + self.text[self.start:self.end] + '\03{default}'
+                         + self.text[self.end:end])
 
 
 class ChoiceException(StandardOption, Exception):
