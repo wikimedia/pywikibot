@@ -52,7 +52,7 @@ class SparqlQuery(object):
         @type max_retries: int
         @param retry_wait: (optional) Minimum time in seconds to wait after an
                error, defaults to config.retry_wait seconds (doubles each retry
-               until max of 120 seconds is reached).
+               until config.retry_max is reached).
         @type retry_wait: float
         """
         # default to Wikidata
@@ -162,8 +162,8 @@ class SparqlQuery(object):
             raise TimeoutError('Maximum retries attempted without success.')
         warning('Waiting {0} seconds before retrying.'.format(self.retry_wait))
         sleep(self.retry_wait)
-        # double the next wait, but do not exceed 120 seconds
-        self.retry_wait = min(120, self.retry_wait * 2)
+        # double the next wait, but do not exceed config.retry_max seconds
+        self.retry_wait = min(config.retry_max, self.retry_wait * 2)
 
     def ask(self, query, headers=DEFAULT_HEADERS):
         """
