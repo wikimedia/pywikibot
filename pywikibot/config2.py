@@ -640,9 +640,8 @@ upload_to_commons = False
 # but never more than 'maxthrottle' seconds. However - if you are running
 # more than one bot in parallel the times are lengthened.
 #
-# By default, the get_throttle is turned off, and 'maxlag' is used to
-# control the rate of server access. Set minthrottle to non-zero to use a
-# throttle on read access.
+# 'maxlag' is used to control the rate of server access (see below).
+# Set minthrottle to non-zero to use a throttle on read access.
 minthrottle = 0
 maxthrottle = 60
 
