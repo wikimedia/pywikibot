@@ -38,7 +38,7 @@ from pywikibot.exceptions import (
     Error, TimeoutError, InvalidTitle, UnsupportedPage
 )
 from pywikibot.tools import (
-    MediaWikiVersion, deprecated, itergroup, ip, PY2, PYTHON_VERSION,
+    deprecated, itergroup, ip, PY2, PYTHON_VERSION,
     getargspec, UnicodeType, remove_last_args
 )
 from pywikibot.tools.formatter import color_format
@@ -366,7 +366,7 @@ class ParamInfo(Container):
             ],
         }
 
-        if _mw_ver >= MediaWikiVersion('1.12'):
+        if _mw_ver >= '1.12':
             return
 
         query_help_list_prefix = "Values (separate with '|'): "
@@ -1692,14 +1692,11 @@ class Request(MutableMapping):
             # When neither 'continue' nor 'rawcontinue' is present and the
             # version number is at least 1.25wmf5 we add a dummy rawcontinue
             # parameter. Querying siteinfo is save as it adds 'continue'.
-            if ('continue' not in self._params and
-                    'rawcontinue' not in self._params and
-                    MediaWikiVersion(
-                        self.site.version()) >= MediaWikiVersion('1.25wmf5')):
+            if ('continue' not in self._params
+                and 'rawcontinue' not in self._params
+                    and self.site.mw_version >= '1.25wmf5'):
                 self._params['rawcontinue'] = ['']
-        elif (self.action == 'help'
-                and MediaWikiVersion(self.site.version())
-                > MediaWikiVersion('1.24')):
+        elif self.action == 'help' and self.site.mw_version > '1.24':
             self._params['wrap'] = ['']
 
         if 'maxlag' not in self._params and config.maxlag:
