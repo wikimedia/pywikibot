@@ -1322,7 +1322,7 @@ class Family(object):
     def version(self, code):
         """Return MediaWiki version number as a string.
 
-        Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
+        Use L{pywikibot.site.mw_version} to compare version strings.
         """
         # Here we return the latest mw release for downloading
         if not hasattr(self, '_version'):
@@ -1356,7 +1356,7 @@ class Family(object):
     def versionnumber(self, code):
         """DEPRECATED, use version() instead.
 
-        Use L{pywikibot.tools.MediaWikiVersion} to compare version strings.
+        Use L{pywikibot.site.mw_version} to compare version strings.
         Return an int identifying MediaWiki version.
 
         Currently this is implemented as returning the minor version
