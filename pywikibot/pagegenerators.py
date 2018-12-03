@@ -43,6 +43,7 @@ from pywikibot.tools import (
     issue_deprecation_warning,
     IteratorNextMixin,
     itergroup,
+    ModuleDeprecationWrapper,
     redirect_func,
 )
 
@@ -282,10 +283,6 @@ GENERATOR OPTIONS
                     doesn't give out license keys anymore. See google_key in
                     config.py for instructions.
                     Argument can also be given as "-google:searchstring".
-
--yahoo              Work on all pages that are found in a Yahoo search.
-                    Depends on python module pYsearch. See yahoo_appid in
-                    config.py for instructions.
 
 -page               Work on a single page. Argument can also be given as
                     "-page:pagetitle", and supplied multiple times for
@@ -1110,7 +1107,8 @@ class GeneratorFactory(object):
 
     def _handle_yahoo(self, value):
         """Handle `-yahoo` argument."""
-        return YahooSearchPageGenerator(value, site=self.site)
+        issue_deprecation_warning('-yahoo', None, 3,
+                                  ArgumentDeprecationWarning, since='20181125')
 
     @staticmethod
     def _handle_untagged(value):
@@ -2643,65 +2641,6 @@ def LiveRCPageGenerator(site=None, total=None):
 # following classes just ported from version 1 without revision; not tested
 
 
-class YahooSearchPageGenerator(object):
-
-    """
-    Page generator using Yahoo! search results.
-
-    To use this generator, you need to install the package 'pYsearch'.
-    https://pypi.org/project/pYsearch
-
-    To use this generator, install pYsearch
-    """
-
-    @deprecated_args(count='total')
-    def __init__(self, query=None, total=100, site=None):
-        """
-        Initializer.
-
-        @param site: Site for generator results.
-        @type site: L{pywikibot.site.BaseSite}
-        """
-        raise RuntimeError(
-            'pagegenerator YahooSearchPageGenerator is not functional.\n'
-            'See https://phabricator.wikimedia.org/T106085')
-
-        self.query = query or pywikibot.input('Please enter the search query:')
-        self.total = total
-        if site is None:
-            site = pywikibot.Site()
-        self.site = site
-
-    def queryYahoo(self, query):
-        """Perform a query using python package 'pYsearch'."""
-        try:
-            from yahoo.search.web import WebSearch
-        except ImportError:
-            pywikibot.error('ERROR: generator YahooSearchPageGenerator '
-                            "depends on package 'pYsearch'.\n"
-                            'To install, please run: pip install pYsearch')
-            exit(1)
-
-        srch = WebSearch(config.yahoo_appid, query=query, results=self.total)
-        dom = srch.get_results()
-        results = srch.parse_results(dom)
-        for res in results:
-            url = res.Url
-            yield url
-
-    def __iter__(self):
-        """Iterate results."""
-        # restrict query to local site
-        localQuery = '%s site:%s' % (self.query, self.site.hostname())
-        base = 'http://%s%s' % (self.site.hostname(),
-                                self.site.article_path)
-        for url in self.queryYahoo(localQuery):
-            if url[:len(base)] == base:
-                title = url[len(base):]
-                page = pywikibot.Page(pywikibot.Link(title, pywikibot.Site()))
-                yield page
-
-
 class GoogleSearchPageGenerator(object):
 
     """
@@ -3146,3 +3085,7 @@ WikidataItemGenerator = redirect_func(
 if __name__ == '__main__':
     pywikibot.output('Pagegenerators cannot be run as script - are you '
                      'looking for listpages.py?')
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('YahooSearchPageGenerator', replacement_name='',
+                             since='20181128')
