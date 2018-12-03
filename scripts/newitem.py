@@ -138,9 +138,7 @@ def main(*args):
 
     options = {}
     for arg in local_args:
-        if (
-                arg.startswith('-pageage:') or
-                arg.startswith('-lastedit:')):
+        if arg.startswith(('-pageage:', '-lastedit:')):
             key, val = arg.split(':', 1)
             options[key[1:]] = int(val)
         elif gen.handleArg(arg):

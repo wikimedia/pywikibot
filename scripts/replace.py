@@ -631,8 +631,8 @@ class ReplaceRobot(Bot):
         for replacement in self.replacements:
             if self.sleep is not None:
                 time.sleep(self.sleep)
-            if (replacement.container and
-                    replacement.container.name in skipped_containers):
+            if (replacement.container
+                    and replacement.container.name in skipped_containers):
                 continue
             elif page is not None and self.isTitleExcepted(
                     page.title(), replacement.exceptions):
@@ -1104,8 +1104,8 @@ def main(*args):
                 pywikibot.warning('The old string "{0}" contains formatting '
                                   'characters like U+200E'.format(
                                       chars.replace_invisible(replacement[0])))
-            if (not callable(replacement[1]) and
-                    chars.contains_invisible(replacement[1])):
+            if (not callable(replacement[1])
+                    and chars.contains_invisible(replacement[1])):
                 pywikibot.warning('The new string "{0}" contains formatting '
                                   'characters like U+200E'.format(
                                       chars.replace_invisible(replacement[1])))
@@ -1132,8 +1132,8 @@ def main(*args):
         else:
             missing_fixes_summaries += missing_fix_summaries
 
-    if ((not edit_summary or edit_summary is True) and
-            (missing_fixes_summaries or single_summary)):
+    if ((not edit_summary or edit_summary is True)
+            and (missing_fixes_summaries or single_summary)):
         if single_summary:
             pywikibot.output('The summary message for the command line '
                              'replacements will be something like: '

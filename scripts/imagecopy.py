@@ -276,10 +276,10 @@ class imageTransfer(threading.Thread):
 
         # I want every picture to be tagged with the bottemplate so i can check
         # my contributions later.
-        CH = ('\n\n{{BotMoveToCommons|' + self.imagePage.site.lang +
-              '.' + self.imagePage.site.family.name +
-              '|year={{subst:CURRENTYEAR}}|month={{subst:CURRENTMONTHNAME}}'
-              '|day={{subst:CURRENTDAY}}}}' + CH)
+        CH = ('\n\n{{BotMoveToCommons|%s.%s|year={{subst:CURRENTYEAR}}'
+              '|month={{subst:CURRENTMONTHNAME}}|day={{subst:CURRENTDAY}}}}'
+              % (self.imagePage.site.lang, self.imagePage.site.family.name)
+              + CH)
 
         if self.category:
             CH = CH.replace(
@@ -583,8 +583,8 @@ def main(*args):
                 imageTransfer(imagepage, newname, category,
                               delete_after_done).start()
 
-    pywikibot.output('Still ' + str(threading.activeCount()) +
-                     ' active threads, lets wait')
+    pywikibot.output('Still ' + str(threading.activeCount())
+                     + ' active threads, lets wait')
     for openthread in threading.enumerate():
         if openthread != threading.currentThread():
             openthread.join()

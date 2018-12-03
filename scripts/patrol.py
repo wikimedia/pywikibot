@@ -318,8 +318,8 @@ class PatrolBot(SingleSiteBot):
                 pywikibot.output('User {0} has created or modified page {1}'
                                  .format(username, title))
 
-            if self.getOption('autopatroluserns') and (page['ns'] == 2 or
-                                                       page['ns'] == 3):
+            if (self.getOption('autopatroluserns')
+                    and page['ns'] in (2, 3)):
                 # simple rule to whitelist any user editing their own userspace
                 if title.partition(':')[2].split('/')[0].startswith(username):
                     verbose_output('{0} is whitelisted to modify {1}'

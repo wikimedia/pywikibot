@@ -82,9 +82,10 @@ class OrphanTemplate(object):
                 pywikibot.warning('Orphan template alias "{0}" does not exist '
                                   'on "{1}"'.format(name, site))
         self.regex = re.compile(
-            r'\{\{(?:' + ':|'.join(template_ns) + '|)(' +
-            '|'.join(re.escape(name) for name in self._names) +
-            r')[\|\}]', re.I)
+            r'\{\{(?:'
+            + ':|'.join(template_ns) + '|)('
+            + '|'.join(re.escape(name) for name in self._names)
+            + r')[\|\}]', re.I)
 
 
 # The orphan template names in the different languages.

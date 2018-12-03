@@ -109,8 +109,8 @@ class DownloadDumpBot(Bot):
         for non_atomic in range(2):
             try:
                 if toolforge_dump_filepath:
-                    pywikibot.output('Symlinking file from ' +
-                                     toolforge_dump_filepath)
+                    pywikibot.output('Symlinking file from '
+                                     + toolforge_dump_filepath)
                     if non_atomic:
                         if os.path.exists(file_final_storepath):
                             remove(file_final_storepath)
@@ -144,16 +144,16 @@ class DownloadDumpBot(Bot):
                                     display = map(convert_from_bytes,
                                                   (downloaded, total))
                                     prior_display = display_string
-                                    display_string = ('\r|{0}{1}|' +
-                                                      ' ' * 5 +
-                                                      '{2}/{3}').format(
+                                    display_string = ('\r|{0}{1}|'
+                                                      '{2}{3}/{4}').format(
                                         '=' * done,
                                         '-' * (parts - done),
-                                        *display)
+                                        ' ' * 5,
+                                        * display)
                                     # Add whitespace to cover up prior bar
                                     display_string += ' ' * (
-                                        len(prior_display.rstrip()) -
-                                        len(display_string.rstrip()))
+                                        len(prior_display.rstrip())
+                                        - len(display_string.rstrip()))
 
                                     pywikibot.output(display_string,
                                                      newline=False)
@@ -187,7 +187,7 @@ class DownloadDumpBot(Bot):
                 # If the atomic download fails, try without a temporary file
                 # If the non-atomic download also fails, exit the script
                 if not non_atomic:
-                    pywikibot.output('Cannot make temporary file, ' +
+                    pywikibot.output('Cannot make temporary file, '
                                      'falling back to non-atomic download')
                     file_current_storepath = file_final_storepath
                 else:

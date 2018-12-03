@@ -90,8 +90,8 @@ class ImageRobot(ReplaceBot):
 
         namespace = self.site.namespaces[6]
         if namespace.case == 'first-letter':
-            case = re.escape(self.old_image[0].upper() +
-                             self.old_image[0].lower())
+            case = re.escape(self.old_image[0].upper()
+                             + self.old_image[0].lower())
             escaped = '[' + case + ']' + re.escape(self.old_image[1:])
         else:
             escaped = re.escape(self.old_image)

@@ -153,8 +153,8 @@ class CategoryRedirectBot(pywikibot.Bot):
                         'categorymembers', cmtitle=oldCat.title(),
                         cmprop='title|sortkey', cmnamespace='10',
                         cmlimit='max'):
-                    doc = pywikibot.Page(pywikibot.Link(item['title'] +
-                                                        '/doc', self.site))
+                    doc = pywikibot.Page(pywikibot.Link(item['title']
+                                                        + '/doc', self.site))
                     try:
                         doc.get()
                     except pywikibot.Error:

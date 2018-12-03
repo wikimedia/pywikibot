@@ -288,8 +288,8 @@ def main_script(page, rev=None, params=NotImplemented):
         pywikibot.output(
             'environment: garbage; %s / memory; %s / members; %s' % (
                 gc.collect(),
-                resource.getrusage(resource.RUSAGE_SELF).ru_maxrss *
-                resource.getpagesize(),
+                resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+                * resource.getpagesize(),
                 len(dir())))
     else:
         pywikibot.output(

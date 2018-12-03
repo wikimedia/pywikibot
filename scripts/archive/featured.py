@@ -565,17 +565,17 @@ class FeaturedBot(pywikibot.Bot):
                 pywikibot.output('(already added)')
             else:
                 # insert just before interwiki
-                if (not interactive or
-                    pywikibot.input_yn(
+                if (not interactive
+                    or pywikibot.input_yn(
                         'Connecting %s -> %s. Proceed?'
                         % (source.title(), dest.title()),
                         default=False, automatic_quit=False)):
                     if self.getOption('side'):
                         # Placing {{Link FA|xx}} right next to
                         # corresponding interwiki
-                        text = (text[:m1.end()] +
-                                ' {{%s|%s}}' % (add_tl[0], fromsite.code) +
-                                text[m1.end():])
+                        text = (text[:m1.end()]
+                                + ' {{%s|%s}}' % (add_tl[0], fromsite.code)
+                                + text[m1.end():])
                     else:
                         # Moving {{Link FA|xx}} to top of interwikis
                         iw = textlib.getLanguageLinks(text, tosite)
@@ -587,9 +587,9 @@ class FeaturedBot(pywikibot.Bot):
                     changed = True
         if remove_tl:
             if m2:
-                if (changed or  # Don't force the user to say "Y" twice
-                    not interactive or
-                    pywikibot.input_yn(
+                if (changed  # Don't force the user to say "Y" twice
+                    or not interactive
+                    or pywikibot.input_yn(
                         'Connecting %s -> %s. Proceed?'
                         % (source.title(), dest.title()),
                         default=False, automatic_quit=False)):
