@@ -20,7 +20,6 @@ def noop(foo=None):
     def decorator(obj):
         def wrapper(*args, **kwargs):
             raise Exception(obj.__full_name__)
-            return obj(*args, **kwargs)
         return wrapper
     return decorator
 
@@ -31,7 +30,6 @@ def noop2():
     def decorator(obj):
         def wrapper(*args, **kwargs):
             raise Exception(obj.__full_name__)
-            return obj(*args, **kwargs)
         return wrapper
     return decorator
 
