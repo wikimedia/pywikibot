@@ -154,11 +154,10 @@ def main(*args):
             chunk_size = get_chunk_size(match)
         elif arg == '-descfile':
             description_file = value
-        elif arg and not value:
-            if not url:
-                url = arg
-            else:
-                description.append(arg)
+        elif not url:
+            url = option
+        else:
+            description.append(option)
 
     description = ' '.join(description)
 
