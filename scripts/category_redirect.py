@@ -38,6 +38,7 @@ from datetime import timedelta
 import pywikibot
 
 from pywikibot import i18n, pagegenerators, config
+from pywikibot.bot import SingleSiteBot
 
 if sys.version_info[0] > 2:
     import pickle as cPickle
@@ -45,7 +46,7 @@ else:
     import cPickle
 
 
-class CategoryRedirectBot(pywikibot.Bot):
+class CategoryRedirectBot(SingleSiteBot):
 
     """Page category update bot."""
 
@@ -57,7 +58,6 @@ class CategoryRedirectBot(pywikibot.Bot):
         })
         super(CategoryRedirectBot, self).__init__(**kwargs)
         self.cooldown = self.getOption('delay')
-        self.site = pywikibot.Site()
         self.catprefix = self.site.namespace(14) + ':'
         self.log_text = []
         self.edit_requests = []
