@@ -1428,8 +1428,8 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
 
     def test_replace_tags_interwiki(self):
         """Test replacing not inside interwiki links."""
-        if ('es' not in self.site.family.langs or
-                'ey' in self.site.family.langs):
+        if ('es' not in self.site.family.langs
+                or 'ey' in self.site.family.langs):
             raise unittest.SkipTest("family {} doesn't have languages"
                                     .format(self.site))
 

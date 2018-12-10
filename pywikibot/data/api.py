@@ -802,9 +802,9 @@ class ParamInfo(Container):
                 if 'path' not in mod_data:
                     # query modules often contain 'ApiQuery' and have a suffix.
                     # 'ApiQuery' alone is the action 'query'
-                    if 'querytype' in mod_data or (
-                            php_class and len(php_class) > 8 and
-                            'ApiQuery' in php_class):
+                    if ('querytype' in mod_data
+                        or php_class and len(php_class) > 8
+                            and 'ApiQuery' in php_class):
                         mod_data['path'] = 'query+' + name
                     else:
                         mod_data['path'] = name
