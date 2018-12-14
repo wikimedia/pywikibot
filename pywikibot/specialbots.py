@@ -209,8 +209,8 @@ class UploadRobot(BaseBot):
         if self.aborts is not True:
             if warning in self.aborts:
                 return False
-        if self.ignoreWarning is True or (self.ignoreWarning is not False and
-                                          warning in self.ignoreWarning):
+        if self.ignoreWarning is True or (self.ignoreWarning is not False
+                                          and warning in self.ignoreWarning):
             return True
         return None if self.aborts is not True else False
 
@@ -418,8 +418,8 @@ class UploadRobot(BaseBot):
 
         success = False
         ignore_warnings = self.ignoreWarning is True or self._handle_warnings
-        if ('://' in file_url and
-                'upload_by_url' not in site.userinfo['rights']):
+        if ('://' in file_url
+                and 'upload_by_url' not in site.userinfo['rights']):
             file_url = self.read_file_content(file_url)
 
         try:

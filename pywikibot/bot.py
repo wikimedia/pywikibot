@@ -816,10 +816,10 @@ class InteractiveReplace(object):
             text = self.current_text
             # at the beginning of the link, start red color.
             # at the end of the link, reset the color to default
-            pywikibot.output(text[max(0, rng[0] - self.context): rng[0]] +
-                             color_format('{lightred}{0}{default}',
-                                          text[rng[0]: rng[1]]) +
-                             text[rng[1]: rng[1] + self.context])
+            pywikibot.output(text[max(0, rng[0] - self.context): rng[0]]
+                             + color_format('{lightred}{0}{default}',
+                                            text[rng[0]: rng[1]])
+                             + text[rng[1]: rng[1] + self.context])
             question = 'Should the link '
         else:
             question = 'Should the link {lightred}{0}{default} '
@@ -1601,8 +1601,8 @@ class Bot(BaseBot):
         # When in auto update mode, set the site when it changes,
         # so subclasses can hook onto changes to site.
         page = super(Bot, self).init_page(item)
-        if (self._auto_update_site and
-                (not self._site or page.site != self.site)):
+        if (self._auto_update_site
+                and (not self._site or page.site != self.site)):
             self.site = page.site
         return page
 
@@ -2098,10 +2098,10 @@ class WikidataBot(Bot, ExistingPageBot):
                     % (claim.getID(),))
                 log("Append 's' to -exists argument to override this behavior")
                 return False
-            if ('s' not in exists_arg and source and
-                    any(source.getID() in ref and
-                        all(snak.target_equals(source.getTarget())
-                            for snak in ref[source.getID()])
+            if ('s' not in exists_arg and source
+                and any(source.getID() in ref
+                        and all(snak.target_equals(source.getTarget())
+                                for snak in ref[source.getID()])
                         for ref in existing.sources)):
                 logger_callback(
                     'Skipping %s because claim with the same source already '
@@ -2169,8 +2169,8 @@ class WikidataBot(Bot, ExistingPageBot):
                 # FIXME: Hack because 'is_data_repository' doesn't work if
                 #        site is the APISite. See T85483
                 data_site = page.site.data_repository()
-                if (data_site.family == page.site.family and
-                        data_site.code == page.site.code):
+                if (data_site.family == page.site.family
+                        and data_site.code == page.site.code):
                     is_item = page.namespace() == data_site.item_namespace.id
                 else:
                     is_item = False
