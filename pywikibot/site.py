@@ -5814,9 +5814,9 @@ class APISite(BaseSite):
         if all(_ is None for _ in [rcid, revid, revision]):
             raise Error('No rcid, revid or revision provided.')
 
-        if isinstance(rcid, int) or isinstance(rcid, basestring):
+        if isinstance(rcid, (int, basestring)):
             rcid = {rcid}
-        if isinstance(revid, int) or isinstance(revid, basestring):
+        if isinstance(revid, (int, basestring)):
             revid = {revid}
         if isinstance(revision, pywikibot.page.Revision):
             revision = {revision}
