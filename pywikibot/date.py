@@ -16,6 +16,7 @@ from __future__ import absolute_import, division, unicode_literals
 import calendar
 import datetime
 import re
+from string import digits as _decimalDigits  # noqa: N812
 import sys
 
 from pywikibot.textlib import NON_LATIN_DIGITS
@@ -302,9 +303,6 @@ def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
     else:
         raise ValueError('string contains regular digits')
 
-
-# Decimal digits used for various matchings
-_decimalDigits = '0123456789'
 
 # Helper for roman numerals number representation
 _romanNumbers = ['-', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX',
