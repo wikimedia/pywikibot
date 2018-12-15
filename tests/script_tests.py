@@ -379,6 +379,7 @@ class TestScriptHelp(PwbTestCase):
     _expected_failures.discard('flickrripper')
     _expected_failures.discard('imageharvest')
     _expected_failures.discard('isbn')
+    _expected_failures.discard('match_images')
     _expected_failures.discard('patrol')
     _expected_failures.discard('states_redirect')
     _expected_failures.discard('weblinkchecker')

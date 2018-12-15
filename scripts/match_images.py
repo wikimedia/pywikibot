@@ -24,7 +24,7 @@ Expect the code to change a lot!
 """
 #
 # (c) Multichill, 2009
-# (c) Pywikibot team, 2009-2017
+# (c) Pywikibot team, 2009-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,11 +32,15 @@ from __future__ import absolute_import, division, unicode_literals
 
 import io
 
-from PIL import Image
-
 import pywikibot
 
+from pywikibot.bot import suggest_help
 from pywikibot.comms import http
+
+try:
+    from PIL import Image
+except ImportError as e:
+    Image = e
 
 
 def match_image_pages(imagePageA, imagePageB):
@@ -165,10 +169,13 @@ def main(*args):
         else:
             images.append(arg)
 
-    if len(images) != 2:
-        pywikibot.bot.suggest_help(
-            additional_text='Unable to execute script because it '
-                            'requires two images to work on.')
+    additional_text = ('Unable to execute script because it '
+                       'requires two images to work on.'
+                       if len(images) != 2 else None)
+    exception = Image if isinstance(Image, Exception) else None
+
+    if additional_text or exception:
+        suggest_help(exception=exception, additional_text=additional_text)
         return False
 
     imagePageA = pywikibot.page.FilePage(pywikibot.Site(),
