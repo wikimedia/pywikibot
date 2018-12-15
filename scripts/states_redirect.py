@@ -22,19 +22,16 @@ PRE-REQUISITE : Need to install python-pycountry library.
 from __future__ import absolute_import, division, unicode_literals
 
 import re
-import sys
 
 import pywikibot
 
+from pywikibot.bot import suggest_help
 from pywikibot import i18n
 
 try:
     import pycountry
-except ImportError:
-    pywikibot.error('This script requires the python-pycountry module')
-    pywikibot.error('See: https://pypi.org/project/pycountry')
-    pywikibot.exception()
-    sys.exit(1)
+except ImportError as e:
+    pycountry = e
 
 
 class StatesRedirectBot(pywikibot.Bot):
@@ -121,6 +118,7 @@ def main(*args):
     local_args = pywikibot.handle_args(args)
     start = None
     force = False
+    unknown_parameters = []
 
     # Parse command line arguments
     for arg in local_args:
@@ -129,8 +127,19 @@ def main(*args):
         elif arg == '-force':
             force = True
         else:
-            pywikibot.warning(
-                'argument "{0}" not understood; ignoring.'.format(arg))
+            unknown_parameters.append(arg)
+
+    if isinstance(pycountry, Exception):
+        additional_text = ('This script requires the python-pycountry module\n'
+                           'See: https://pypi.org/project/pycountry')
+        exception = pycountry
+    else:
+        additional_text = exception = None
+
+    if additional_text or exception or unknown_parameters:
+        suggest_help(unknown_parameters=unknown_parameters,
+                     exception=exception, additional_text=additional_text)
+        return
 
     bot = StatesRedirectBot(start, force)
     bot.run()
