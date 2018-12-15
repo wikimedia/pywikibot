@@ -22,7 +22,8 @@ Parameters:
 from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
 
 template_to_the_image = {
     'meta': '{{Orphan file}}',
@@ -38,23 +39,23 @@ template_to_the_user = {
 }
 
 
-class UnusedFilesBot(Bot):
+class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
 
     """Unused files bot."""
 
-    def __init__(self, site, **kwargs):
+    summary_key = 'unusedfiles-comment'
+
+    def __init__(self, **kwargs):
         """Initializer."""
         self.availableOptions.update({
             'nouserwarning': False  # do not warn uploader
         })
         super(UnusedFilesBot, self).__init__(**kwargs)
-        self.site = site
 
         self.template_image = i18n.translate(self.site,
                                              template_to_the_image)
         self.template_user = i18n.translate(self.site,
                                             template_to_the_user)
-        self.summary = i18n.twtranslate(self.site, 'unusedfiles-comment')
         if not (self.template_image
                 and (self.template_user or self.getOption('nouserwarning'))):
             raise pywikibot.Error('This script is not localized for {0} site.'
@@ -62,10 +63,6 @@ class UnusedFilesBot(Bot):
 
     def treat(self, image):
         """Process one image page."""
-        if not image.exists():
-            pywikibot.output("File '{0}' does not exist (see bug T71133)."
-                             .format(image.title()))
-            return
         # Use fileUrl() and fileIsShared() to confirm it is local media
         # rather than a local page with the same name as shared media.
         if (image.fileUrl() and not image.fileIsShared()
@@ -96,9 +93,9 @@ class UnusedFilesBot(Bot):
             else:
                 raise pywikibot.NoPage(page)
 
-        oldtext = text
         text += apptext
-        self.userPut(page, oldtext, text, summary=self.summary)
+        self.current_page = page
+        self.put_current(text)
 
 
 def main(*args):
@@ -126,7 +123,7 @@ def main(*args):
     gen = pagegenerators.UnusedFilesGenerator(total=total, site=site)
     gen = pagegenerators.PreloadingGenerator(gen)
 
-    bot = UnusedFilesBot(site, generator=gen, **options)
+    bot = UnusedFilesBot(site=site, generator=gen, **options)
     try:
         bot.run()
     except pywikibot.Error as e:
