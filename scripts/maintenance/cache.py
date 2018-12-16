@@ -78,6 +78,8 @@ from pywikibot.data import api
 from pywikibot.page import User
 from pywikibot.site import APISite, DataSite, LoginStatus
 
+from pywikibot.tools import PYTHON_VERSION
+
 __all__ = (
     'User', 'APISite', 'DataSite', 'LoginStatus',
     'ParseError', 'CacheEntry', 'process_entries', 'main',
@@ -232,7 +234,8 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
          - True  = always use
     """
     if not cache_path:
-        cache_path = os.path.join(pywikibot.config2.base_dir, 'apicache')
+        cache_path = os.path.join(pywikibot.config2.base_dir,
+                                  'apicache-py{0:d}'.format(PYTHON_VERSION[0]))
 
     if not os.path.exists(cache_path):
         pywikibot.error('%s: no such file or directory' % cache_path)
@@ -251,6 +254,21 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
             stinfo = os.stat(filepath)
 
         entry = CacheEntry(cache_dir, filename)
+
+        # Deletion is choosen only, abbreviate this request
+        if func is None and output_func is None \
+           and action_func == CacheEntry._delete:
+            action_func(entry)
+            continue
+
+        # Skip foreign python specific directory
+        _, _, version = cache_path.partition('-')
+        if version and version[-1] != str(PYTHON_VERSION[0]):
+            pywikibot.error(
+                "Skipping {0} directory, can't read content with python {1[0]}"
+                .format(cache_path, PYTHON_VERSION))
+            continue
+
         try:
             entry._load_cache()
         except ValueError as e:
@@ -387,7 +405,7 @@ def parameters(entry):
 
 def main():
     """Process command line arguments and invoke bot."""
-    local_args = pywikibot.handleArgs()
+    local_args = pywikibot.handle_args()
     cache_paths = None
     delete = False
     command = None
@@ -419,17 +437,21 @@ def main():
                 cache_paths.append(arg)
 
     if not cache_paths:
-        cache_paths = ['apicache', 'tests/apicache']
+        folders = ('apicache', 'apicache-py2', 'apicache-py3')
+        cache_paths = list(folders)
+        # Add tests folders
+        cache_paths += [os.path.join('tests', f) for f in folders]
 
         # Also process the base directory, if it isnt the current directory
         if os.path.abspath(os.getcwd()) != pywikibot.config2.base_dir:
             cache_paths += [
-                os.path.join(pywikibot.config2.base_dir, 'apicache')]
+                os.path.join(pywikibot.config2.base_dir, f) for f in folders]
 
         # Also process the user home cache, if it isnt the config directory
-        if os.path.expanduser('~/.pywikibot') != pywikibot.config2.base_dir:
+        userpath = os.path.expanduser(os.path.join('~', '.pywikibot'))
+        if userpath != pywikibot.config2.base_dir:
             cache_paths += [
-                os.path.join(os.path.expanduser('~/.pywikibot'), 'apicache')]
+                os.path.join(userpath, f) for f in folders]
 
     if delete:
         action_func = CacheEntry._delete
