@@ -990,7 +990,7 @@ class CosmeticChangesToolkit(object):
 
         # FIXME: split this function into two.
         # replace persian/arabic digits
-        # deactivated due to bug 55185
+        # deactivated due to bug T57185
         for i in range(0, 10):
             text = textlib.replaceExcept(text, old[i], new[i], exceptions)
         # do not change digits in class, style and table params
