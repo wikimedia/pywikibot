@@ -582,29 +582,6 @@ class FrozenDict(dict):
     __setitem__ = update
 
 
-def concat_options(message, line_length, options):
-    """Concatenate options."""
-    indent = len(message) + 2
-    line_length -= indent
-    option_msg = ''
-    option_line = ''
-    for option in options:
-        if option_line:
-            option_line += ', '
-        # +1 for ','
-        if len(option_line) + len(option) + 1 > line_length:
-            if option_msg:
-                option_msg += '\n' + ' ' * indent
-            option_msg += option_line[:-1]  # remove space
-            option_line = ''
-        option_line += option
-    if option_line:
-        if option_msg:
-            option_msg += '\n' + ' ' * indent
-        option_msg += option_line
-    return '{0} ({1}):'.format(message, option_msg)
-
-
 class LazyRegex(object):
 
     """
@@ -2104,6 +2081,30 @@ class ContextManagerWrapper(object):
     def __setattr__(self, name, value):
         """Set the attribute in the wrapped object."""
         setattr(self._wrapped, name, value)
+
+
+@deprecated('bot_choice.Option and its subclasses', since='20181217')
+def concat_options(message, line_length, options):
+    """DEPRECATED. Concatenate options."""
+    indent = len(message) + 2
+    line_length -= indent
+    option_msg = ''
+    option_line = ''
+    for option in options:
+        if option_line:
+            option_line += ', '
+        # +1 for ','
+        if len(option_line) + len(option) + 1 > line_length:
+            if option_msg:
+                option_msg += '\n' + ' ' * indent
+            option_msg += option_line[:-1]  # remove space
+            option_line = ''
+        option_line += option
+    if option_line:
+        if option_msg:
+            option_msg += '\n' + ' ' * indent
+        option_msg += option_line
+    return '{0} ({1}):'.format(message, option_msg)
 
 
 wrapper = ModuleDeprecationWrapper(__name__)
