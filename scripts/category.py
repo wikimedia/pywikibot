@@ -35,6 +35,8 @@ Options for "listify" action:
  * -showimages  - This displays images rather than linking them in the list.
  * -talkpages   - This outputs the links to talk pages of the pages to be
                   listified in addition to the pages themselves.
+ * -prefix:#    - You may specify a list prefix like "#" for a numbered list or
+                  any other prefix. Default is a bullet list with prefix "*".
 
 Options for "remove" action:
 
@@ -907,7 +909,7 @@ class CategoryListifyRobot(object):
 
     def __init__(self, catTitle, listTitle, editSummary, append=False,
                  overwrite=False, showImages=False, subCats=False,
-                 talkPages=False, recurse=False):
+                 talkPages=False, recurse=False, prefix='*'):
         """Initializer."""
         self.editSummary = editSummary
         self.append = append
@@ -919,6 +921,7 @@ class CategoryListifyRobot(object):
         self.subCats = subCats
         self.talkPages = talkPages
         self.recurse = recurse
+        self.prefix = prefix
 
     def run(self):
         """Start bot."""
@@ -936,16 +939,20 @@ class CategoryListifyRobot(object):
             if (not article.is_filepage()
                     or self.showImages) and not article.is_categorypage():
                 if self.talkPages and not article.isTalkPage():
-                    listString += '* [[{0}]] -- [[{1}|talk]]\n'.format(
-                        article.title(), article.toggleTalkPage().title())
+                    listString += '{0} [[{1}]] -- [[{2}|talk]]\n'.format(
+                        self.prefix, article.title(),
+                        article.toggleTalkPage().title())
                 else:
-                    listString += '* [[{0}]]\n'.format(article.title())
+                    listString += '{0} [[{1}]]\n'.format(self.prefix,
+                                                         article.title())
             else:
                 if self.talkPages and not article.isTalkPage():
-                    listString += '* [[:{0}]] -- [[{1}|talk]]\n'.format(
-                        article.title(), article.toggleTalkPage().title())
+                    listString += '{0} [[:{1}]] -- [[{2}|talk]]\n'.format(
+                        self.prefix, article.title(),
+                        article.toggleTalkPage().title())
                 else:
-                    listString += '* [[:{0}]]\n'.format(article.title())
+                    listString += '{0} [[:{1}]]\n'.format(self.prefix,
+                                                          article.title())
         if self.list.exists():
             if self.append:
                 # append content by default at the bottom
@@ -1351,6 +1358,7 @@ def main(*args):
     move_together = False
     keep_sortkey = None
     depth = 5
+    prefix = '*'
 
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)
@@ -1430,6 +1438,8 @@ def main(*args):
             depth = int(value)
         elif option == 'keepsortkey':
             keep_sortkey = True
+        elif option == 'prefix':
+            prefix = value
         else:
             gen_factory.handleArg(arg)
 
@@ -1515,7 +1525,8 @@ def main(*args):
                 'Please enter the name of the list to create:')
         bot = CategoryListifyRobot(old_cat_title, new_cat_title, summary,
                                    append, overwrite, showimages, subCats=True,
-                                   talkPages=talkpages, recurse=recurse)
+                                   talkPages=talkpages, recurse=recurse,
+                                   prefix=prefix)
 
     if bot:
         pywikibot.Site().login()
