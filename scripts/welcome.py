@@ -54,7 +54,7 @@ This script understands the following command-line arguments:
                    to give interactive users a chance to welcome the
                    new users (default: now)
                    Timezone is the server timezone, GMT for Wikimedia
-                   TIME format : yyyymmddhhmmss
+                   TIME format : yyyymmddhhmmss or yyyymmdd
 
    -timeoffset[:#] Skip the latest new users, accounts newer than
                    # minutes
@@ -172,6 +172,7 @@ from datetime import timedelta
 import locale
 import re
 import sys
+from textwrap import fill
 import time
 
 from random import choice
@@ -935,16 +936,17 @@ def main(*args):
             if not val:
                 val = pywikibot.input(
                     'Which time offset for new users would you like to use? '
-                    '(yyyymmddhhmmss)')
+                    '(yyyymmddhhmmss or yyyymmdd)')
             try:
                 globalvar.offset = pywikibot.Timestamp.fromtimestampformat(val)
             except ValueError:
                 # upon request, we could check for software version here
-                raise ValueError(
+                raise ValueError(fill(
                     'Mediawiki has changed, -offset:# is not supported '
-                    'anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP '
-                    'is yyyymmddhhmmss. -timeoffset is now also supported. '
-                    'Please read this script source header for documentation.')
+                    'anymore, but -offset:TIMESTAMP is, assuming TIMESTAMP is '
+                    'yyyymmddhhmmss or yyyymmdd. -timeoffset is now also '
+                    'supported. Please read this script source header for '
+                    'documentation.'))
         elif arg == '-file':
             globalvar.randomSign = True
             globalvar.signFileName = val or pywikibot.input(
