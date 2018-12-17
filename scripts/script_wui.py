@@ -304,11 +304,6 @@ def main_script(page, rev=None, params=NotImplemented):
 
 def wiki_logger(buffer, page, rev=None):
     """Log to wiki."""
-    # FIXME: what is this??
-    # (might be a problem here for TS and SGE, output string has another
-    # encoding)
-    if False:
-        buffer = buffer.decode(pywikibot.config.console_encoding)
     buffer = re.sub(r'\03\{(.*?)\}(.*?)\03\{default\}', r'\g<2>', buffer)
     if rev is None:
         rev = page.latestRevision()
