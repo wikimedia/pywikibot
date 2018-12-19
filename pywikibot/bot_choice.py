@@ -34,7 +34,6 @@ class Option(object):
 
     def __init__(self, stop=True):
         """Initializer."""
-        super(Option, self).__init__()
         self._stop = stop
 
     @staticmethod
@@ -102,9 +101,9 @@ class StandardOption(Option):
 
     """An option with a description and shortcut and returning the shortcut."""
 
-    def __init__(self, option, shortcut, stop=True):
+    def __init__(self, option, shortcut, **kwargs):
         """Initializer."""
-        super(StandardOption, self).__init__(stop)
+        super(StandardOption, self).__init__(**kwargs)
         self.option = option
         self.shortcut = shortcut.lower()
 
@@ -135,9 +134,9 @@ class OutputProxyOption(OutputOption, StandardOption):
 
     """An option which calls output of the given output class."""
 
-    def __init__(self, option, shortcut, output):
+    def __init__(self, option, shortcut, output, **kwargs):
         """Create a new option for the given sequence."""
-        super(OutputProxyOption, self).__init__(option, shortcut)
+        super(OutputProxyOption, self).__init__(option, shortcut, **kwargs)
         self._outputter = output
 
     def output(self):
@@ -156,7 +155,7 @@ class NestedOption(OutputOption, StandardOption):
 
     def __init__(self, option, shortcut, description, options):
         """Initializer."""
-        super(NestedOption, self).__init__(option, shortcut, False)
+        super(NestedOption, self).__init__(option, shortcut, stop=False)
         self.description = description
         self.options = options
 
@@ -187,7 +186,7 @@ class ContextOption(OutputOption, StandardOption):
         self, option, shortcut, text, context, delta=100, start=0, end=0
     ):
         """Initializer."""
-        super(ContextOption, self).__init__(option, shortcut, False)
+        super(ContextOption, self).__init__(option, shortcut, stop=False)
         self.text = text
         self.context = context
         self.delta = delta
@@ -214,9 +213,9 @@ class IntegerOption(Option):
 
     """An option allowing a range of integers."""
 
-    def __init__(self, minimum=1, maximum=None, prefix=''):
+    def __init__(self, minimum=1, maximum=None, prefix='', **kwargs):
         """Initializer."""
-        super(IntegerOption, self).__init__()
+        super(IntegerOption, self).__init__(**kwargs)
         if not ((minimum is None or isinstance(minimum, int))
                 and (maximum is None or isinstance(maximum, int))):
             raise ValueError(
@@ -291,11 +290,11 @@ class ListOption(IntegerOption):
 
     """An option to select something from a list."""
 
-    def __init__(self, sequence, prefix=''):
+    def __init__(self, sequence, prefix='', **kwargs):
         """Initializer."""
         self._list = sequence
         try:
-            super(ListOption, self).__init__(1, self.maximum, prefix)
+            super(ListOption, self).__init__(1, self.maximum, prefix, **kwargs)
         except ValueError:
             raise ValueError('The sequence is empty.')
         del self._max
@@ -315,6 +314,75 @@ class ListOption(IntegerOption):
     def result(self, value):
         """Return a tuple with the prefix and selected value."""
         return (self.prefix, self._list[self.parse(value) - 1])
+
+
+class ShowingListOption(ListOption, OutputOption):
+
+    """An option to show a list and select an item."""
+
+    before_question = True
+
+    def __init__(self, sequence, prefix='', pre=None, post=None, **kwargs):
+        """Initializer.
+
+        @param pre: Additional comment printed before the list.
+        @type pre: str
+        @param post: Additional comment printed after the list.
+        @type post: str
+        """
+        super(ShowingListOption, self).__init__(sequence, prefix, **kwargs)
+        self.pre = pre
+        self.post = post
+
+    @property
+    def stop(self):
+        """Return whether this option stops asking."""
+        return self._stop
+
+    def output(self):
+        """Output the enumerated list."""
+        if self.pre is not None:
+            pywikibot.output(self.pre)
+        width = len(str(self.maximum))
+        for i, item in enumerate(self._list, self.minimum):
+            pywikibot.output('{:>{width}} - {}'.format(i, item, width=width))
+        if self.post is not None:
+            pywikibot.output(self.post)
+
+
+class MultipleChoiceList(ListOption):
+
+    """An option to select multiple items from a list."""
+
+    def test(self, value):
+        """Return whether the values are int and in the specified range."""
+        try:
+            values = [self.parse(val) for val in value.split(',')]
+        except ValueError:
+            return False
+
+        for val in values:
+            if self.minimum is not None and val < self.minimum:
+                break
+            if self.maximum is not None and val > self.maximum:
+                break
+        else:
+            return True
+
+        return False
+
+    def result(self, value):
+        """Return a tuple with the prefix and selected values as a list."""
+        values = (self.parse(val) for val in value.split(','))
+        result = [self._list[val - 1] for val in values]
+        return (self.prefix, result)
+
+
+class ShowingMultipleChoiceList(ShowingListOption, MultipleChoiceList):
+
+    """An option to show a list and select multiple items."""
+
+    pass
 
 
 class HighlightContextOption(ContextOption):

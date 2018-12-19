@@ -61,7 +61,8 @@ __all__ = (
     'init_handlers', 'writelogheader',
     'input', 'input_choice', 'input_yn', 'inputChoice', 'input_list_choice',
     'Option', 'StandardOption', 'NestedOption', 'IntegerOption',
-    'ContextOption', 'ListOption', 'OutputProxyOption',
+    'ContextOption', 'ListOption', 'ShowingListOption', 'MultipleChoiceList',
+    'ShowingMultipleChoiceList', 'OutputProxyOption',
     'HighlightContextOption', 'ChoiceException', 'UnhandledAnswer',
     'Choice', 'AlwaysChoice',
     'QuitKeyboardInterrupt',
@@ -99,7 +100,8 @@ from pywikibot import i18n
 from pywikibot import version
 from pywikibot.bot_choice import (
     Option, StandardOption, NestedOption, IntegerOption, ContextOption,
-    ListOption, OutputProxyOption, HighlightContextOption,
+    ListOption, ShowingListOption, MultipleChoiceList,
+    ShowingMultipleChoiceList, OutputProxyOption, HighlightContextOption,
     ChoiceException, QuitKeyboardInterrupt,
 )
 from pywikibot.logging import (
