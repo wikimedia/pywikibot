@@ -722,7 +722,8 @@ class ProofreadPage(pywikibot.Page):
         if not error:
             return text
         else:
-            raise ValueError('%s: not possible to perform OCR.' % self)
+            raise ValueError(
+                '{0}: not possible to perform OCR. {1}'.format(self, text))
 
 
 class PurgeRequest(Request):
