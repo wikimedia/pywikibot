@@ -25,7 +25,7 @@ import re
 
 import pywikibot
 
-from pywikibot.bot import suggest_help
+from pywikibot.bot import SingleSiteBot, suggest_help
 from pywikibot import i18n
 
 try:
@@ -34,31 +34,34 @@ except ImportError as e:
     pycountry = e
 
 
-class StatesRedirectBot(pywikibot.Bot):
+class StatesRedirectBot(SingleSiteBot):
 
     """Bot class used for implementation of re-direction norms."""
 
     def __init__(self, start, force):
         """Initializer.
 
-        Parameters:
-            @param start:xxx Specify the place in the alphabet to start
-            searching.
-            @param force: Don't ask whether to create pages, just create
-            them.
+        @param start:xxx Specify the place in the alphabet to start searching.
+        @type start: str
+        @param force: Don't ask whether to create pages, just create them.
+        @type force: bool
         """
-        site = pywikibot.Site()
-        generator = site.allpages(start=start)
-        super(StatesRedirectBot, self).__init__(generator=generator)
-
+        super(StatesRedirectBot, self).__init__()
+        self.start = start
         self.force = force
 
-        # Created abbrev from pycountry data base
+    def setup(self):
+        """Create abbrev from pycountry data base."""
         self.abbrev = {}
         for subd in pycountry.subdivisions:
             # Used subd.code[3:] to extract the exact code for
             # subdivisional states(ignoring the country code).
             self.abbrev[subd.name] = subd.code[3:]
+
+    @property
+    def generator(self):
+        """Generator used by run() method."""
+        return self.site.allpages(start=self.start)
 
     def treat(self, page):
         """Re-directing process.
