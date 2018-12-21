@@ -828,9 +828,9 @@ formats = {
         'uk': lambda v: slh(v, ['січень', 'лютий', 'березень', 'квітень',
                                 'травень', 'червень', 'липень', 'серпень',
                                 'вересень', 'жовтень', 'листопад', 'грудень']),
-        'ur': lambda v: slh(v, ['جنوری', 'فروری', 'مارچ', 'اپريل', 'مئ', 'جون',
-                                'جولائ', 'اگست', 'ستمبر', 'اکتوبر', 'نومبر',
-                                'دسمبر']),
+        'ur': lambda v: slh(v, ['جنوری', 'فروری', 'مارچ',
+                                'اپريل', 'مئی', 'جون', 'جولائی', 'اگست',
+                                'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر']),
         'vec': lambda v: slh(v, ['genaro', 'febraro', 'marzso', 'apriłe',
                                  'majo', 'giugno', 'lujo', 'agosto',
                                  'setenbre', 'otobre', 'novenbre',
@@ -996,7 +996,7 @@ formats = {
         'tr': dh_simpleYearAD,
         'tt': dh_simpleYearAD,
         'uk': dh_simpleYearAD,
-        'ur': lambda v: dh_yearAD(v, '%dسبم'),
+        'ur': lambda v: dh_yearAD(v, '%dء'),
         'uz': dh_simpleYearAD,
         'vec': dh_simpleYearAD,
         'vi': dh_simpleYearAD,
@@ -1065,6 +1065,7 @@ formats = {
         'tr': lambda v: dh_yearBC(v, 'M.Ö. %d'),
         'tt': lambda v: dh_yearBC(v, 'MA %d'),
         'uk': lambda v: dh_yearBC(v, '%d до н. е.'),
+        'ur': lambda v: dh_yearBC(v, '%d ق م'),
         'uz': lambda v: dh_yearBC(v, 'Mil. av. %d'),
         'vec': lambda v: dh_yearBC(v, '%d a.C.'),
         'vo': lambda v: dh_yearBC(v, '%d b.K.'),
@@ -1210,7 +1211,7 @@ formats = {
              lambda p: p == 0 or (p % 100 == 40)),
             (lambda v: dh_decAD(v, '%d-ні'), lambda p: p % 1000 == 0),
             (lambda v: dh_decAD(v, '%d-ті'), alwaysTrue)]),
-        'ur': lambda v: dh_decAD(v, '%dدبم'),
+        'ur': lambda v: dh_decAD(v, '%d کی دہائی'),
         'wa': lambda v: dh_decAD(v, 'Anêyes %d'),
         'zh': lambda v: dh_decAD(v, '%d年代'),
         'nan': lambda v: dh_decAD(v, '%d nî-tāi'),
@@ -1271,6 +1272,7 @@ formats = {
             (lambda v: dh_decBC(v, '%d-ві до Р.Х.'),
              lambda p: p == 0 or (p % 100 == 40)),
             (lambda v: dh_decBC(v, '%d-ті до Р.Х.'), alwaysTrue)]),
+        'ur': lambda v: dh_decBC(v, '%d کی دہائی ق م'),
         'zh': lambda v: dh_decBC(v, '前%d年代'),
     },
 
@@ -1405,7 +1407,7 @@ formats = {
         'tr': lambda v: dh_centuryAD(v, '%d. yüzyıl'),
         'tt': lambda v: dh_centuryAD(v, '%d. yöz'),
         'uk': lambda v: dh_centuryAD(v, '%d століття'),
-        'ur': lambda v: dh_centuryAD(v, '%2d00صبم'),
+        'ur': lambda v: dh_centuryAD(v, '%d ویں صدی'),
         'vi': lambda v: dh_centuryAD(v, 'Thế kỷ %d'),
         'wa': lambda v: dh_centuryAD(v, '%dinme sieke'),
         'zh': lambda v: dh_centuryAD(v, '%d世纪'),
@@ -1743,6 +1745,7 @@ formats = {
         'tr': lambda v: dh_yearAD(v, '%d doğumlular'),
         'tt': lambda v: dh_yearAD(v, '%d елда туганнар'),
         'uk': lambda v: dh_yearAD(v, 'Народились %d'),
+        'ur': lambda v: dh_yearAD(v, '%dء کی پیدائشیں'),
         'vi': lambda v: dh_yearAD(v, 'Sinh %d'),
         'war': lambda v: dh_yearAD(v, 'Mga natawo han %d'),
         'yo': lambda v: dh_yearAD(v, 'Àwọn ọjọ́ìbí ní %d'),
@@ -1828,6 +1831,7 @@ formats = {
         'tr': lambda v: dh_yearAD(v, '%d yılında ölenler'),
         'tt': lambda v: dh_yearAD(v, '%d елда вафатлар'),
         'uk': lambda v: dh_yearAD(v, 'Померли %d'),
+        'ur': lambda v: dh_yearAD(v, '%dء کی وفیات'),
         'vi': lambda v: dh_yearAD(v, 'Mất %d'),
         'war': lambda v: dh_yearAD(v, 'Mga namatay han %d'),
         'yo': lambda v: dh_yearAD(v, 'Àwọn ọjọ́aláìsí ní %d'),
@@ -1896,7 +1900,7 @@ formats = {
         'tl': lambda v: dh_singVal(v, 'Kasalukuyang pangyayari'),
         'tr': lambda v: dh_singVal(v, 'Güncel olaylar'),
         'uk': lambda v: dh_singVal(v, 'Поточні події'),
-        'ur': lambda v: dh_singVal(v, 'حالات حاضرہ'),
+        'ur': lambda v: dh_singVal(v, 'حالیہ واقعات'),
         'vi': lambda v: dh_singVal(v, 'Thời sự'),
         'wa': lambda v: dh_singVal(v, 'Wikinoveles'),
         'yo': lambda v: dh_singVal(v, 'Current events'),
@@ -2122,9 +2126,10 @@ addFmt2('tt', False, '%%d. %s', True)
 addFmt1('uk', False, ['%d січня', '%d лютого', '%d березня', '%d квітня',
                       '%d травня', '%d червня', '%d липня', '%d серпня',
                       '%d вересня', '%d жовтня', '%d листопада', '%d грудня'])
-addFmt1('ur', False, ['%d جنوری', '%d فروری', '%d مارچ', '%d اپریل', '%d مئ',
-                      '%d جون', '%d جلائ', '%d اگست', '%d ستمب', '%d اکتوبر',
-                      '%d نومب', '%d دسمب'])
+addFmt1('ur', False, ['%d جنوری', '%d فروری', '%d مارچ',
+                      '%d اپریل', '%d مئی', '%d جون', '%d جولائی',
+                      '%d اگست', '%d ستمبر', '%d اکتوبر',
+                      '%d نومبر', '%d دسمبر'])
 addFmt2('vec', False, '%%d de %s', False)
 addFmt1('vi', False, makeMonthList('%%d tháng %d'))
 addFmt2('vo', False, '%s %%d', False)
@@ -2207,10 +2212,8 @@ addFmt2('sv', True, '%s %%d', True)
 addFmt2('th', True, '%s พ.ศ. %%T')
 addFmt2('tl', True, '%s %%d')
 addFmt2('tt', True, '%s, %%d', True)
-addFmt1('ur', True, ['%d01مبم', '%d02مبم', '%d03مبم', '%d04مبم', '%d05مبم',
-                     '%d06مبم', '%d07مبم', '%d08مبم', '%d09مبم', '%d10مبم',
-                     '%d11مبم', '%d12مبم'])
 addFmt2('uk', True, '%s %%d', True)
+addFmt2('ur', True, '%s %%d', True)
 addFmt1('vi', True, makeMonthList('Tháng %d năm %%d'))
 addFmt1('zh', True, makeMonthList('%%d年%d月'))
 addFmt1('nan', True, makeMonthList('%%d nî %d goe̍h'))
