@@ -87,6 +87,7 @@ templateSemiProtection = {
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)半保護'
            r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
     'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано-анон)\}\}'],
+    'ur': [r'\{\{(?:[Tt]emplate:|سانچہ:|)(نیم\sمحفوظ)\}\}']
 }
 # Regex to get the total-protection template
 templateTotalProtection = {
@@ -102,7 +103,8 @@ templateTotalProtection = {
            r'[Qq]uesta pagina'],
     'ja': [r'(?<!\<nowiki\>)\{\{(?:[Tt]emplate:|)保護(?:性急|)'
            r'(?:[Ss]|)(?:\|.+|)\}\}(?!\<\/nowiki\>)\s*'],
-    'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано)\}\}']
+    'sr': [r'\{\{(?:[Tt]emplate:|[Зз]акључано)\}\}'],
+    'ur': [r'\{\{(?:[Tt]emplate:|سانچہ:|)(محفوظ)\}\}']
 }
 
 # Regex to get the semi-protection move template
@@ -137,6 +139,7 @@ templateNoRegex = {
            '{{Protetta}}'],
     'ja': ['{{半保護}}', '{{保護}}', '{{移動半保護}}', '{{移動保護}}', None],
     'sr': ['{{Закључано-анон}}', '{{Закључано}}', None, None, None],
+    'ur': ['{{نیم محفوظ}}', '{{محفوظ}}', None, None, None],
 }
 
 # Category where the bot will check
@@ -165,7 +168,7 @@ categoryToCheck = {
 }
 
 # Check list to block the users that haven't set their preferences
-project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'sr', 'zh']
+project_inserted = ['cs', 'fr', 'it', 'ja', 'pt', 'sr', 'ur', 'zh']
 
 # END PREFERENCES
 
