@@ -80,7 +80,7 @@ class TestTimestamp(TestCase):
                          Timestamp.mediawikiTSFormat)
 
     def test_mediawiki_format(self):
-        """Test conversion from and to timestamp format."""
+        """Test conversion from and to Timestamp format."""
         t1 = Timestamp.utcnow()
         if not t1.microsecond:  # T191827: ensure microsecond is not 0
             t1 = t1.replace(microsecond=1000)
@@ -90,6 +90,15 @@ class TestTimestamp(TestCase):
         # MediaWiki timestamp format doesn't include microseconds
         self.assertNotEqual(t1, t2)
         t1 = t1.replace(microsecond=0)
+        self.assertEqual(t1, t2)
+        self.assertEqual(ts1, ts2)
+
+    def test_short_mediawiki_format(self):
+        """Test short mw timestamp conversion from and to Timestamp format."""
+        t1 = Timestamp(2018, 12, 17)
+        t2 = Timestamp.fromtimestampformat('20181217')  # short timestamp
+        ts1 = t1.totimestampformat()
+        ts2 = t2.totimestampformat()
         self.assertEqual(t1, t2)
         self.assertEqual(ts1, ts2)
 

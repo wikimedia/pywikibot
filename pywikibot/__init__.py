@@ -210,6 +210,8 @@ class Timestamp(datetime.datetime):
         # to create a clone.
         if isinstance(ts, cls):
             return ts.clone()
+        if len(ts) == 8:  # year, month and day are given only
+            ts += '000'
         return cls.strptime(ts, cls.mediawikiTSFormat)
 
     def isoformat(self, sep='T'):
