@@ -119,14 +119,11 @@ session.cookies = cookie_jar
 
 # Prepare flush on quit
 def _flush():
+    log('Closing network session.')
     session.close()
-    message = 'Closing network session.'
+
     if hasattr(sys, 'last_type'):
-        # we quit because of an exception
-        print(sys.last_type)
-        critical(message)
-    else:
-        log(message)
+        critical('Exiting due to uncaught exception {}'.format(sys.last_type))
 
     log('Network session closed.')
 
