@@ -815,8 +815,8 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         """Test ItemClaimFilterPageGenerator without qualifiers."""
         self._simple_claim_test('P474', '+91', None, True)
         self._simple_claim_test('P463', 'Q37470', None, True)
-        self._simple_claim_test('P625', '21,77', None, True)
-        self._simple_claim_test('P625', '21,78.05,0.01', None, False)
+        self._simple_claim_test('P1334', '28,97.4,0.1', None, True)
+        self._simple_claim_test('P1334', '28,96,0.01', None, False)
 
     def test_negative_filter(self):
         """Test negative ItemClaimFilterPageGenerator."""
