@@ -157,8 +157,8 @@ class EventStreams(object):
                          .format(host=self._site.eventstreams_host(),
                                  path=self._site.eventstreams_path(),
                                  streams=self._streams,
-                                 since=('?since=' + self._since)
-                                 if self._since else ''))
+                                 since=('?since=%s' % self._since
+                                        if self._since else '')))
         return self._url
 
     def set_maximum_items(self, value):
