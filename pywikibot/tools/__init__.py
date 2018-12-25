@@ -56,6 +56,11 @@ except ImportError as bz2_import_error:
         warn('package bz2 and bz2file were not found', ImportWarning)
         bz2 = bz2_import_error
 
+try:
+    import lzma
+except ImportError as lzma_import_error:
+    lzma = lzma_import_error
+
 
 if PYTHON_VERSION < (3, 5):
     # although deprecated in 3 completely no message was emitted until 3.5
@@ -1249,10 +1254,11 @@ def open_archive(filename, mode='rb', use_extension=True):
     """
     Open a file and uncompress it if needed.
 
-    This function supports bzip2, gzip and 7zip as compression containers. It
-    uses the packages available in the standard library for bzip2 and gzip so
-    they are always available. 7zip is only available when a 7za program is
-    available and only supports reading from it.
+    This function supports bzip2, gzip, 7zip, lzma, and xz as compression
+    containers. It uses the packages available in the standard library for
+    bzip2, gzip, lzma, and xz so they are always available. 7zip is only
+    available when a 7za program is available and only supports reading
+    from it.
 
     The compression is either selected via the magic number or file ending.
 
@@ -1274,6 +1280,11 @@ def open_archive(filename, mode='rb', use_extension=True):
     @raises OSError: When it's not a 7z archive but the file extension is 7z.
         It is also raised by bz2 when its content is invalid. gzip does not
         immediately raise that error but only on reading it.
+    @raises lzma.LZMAError: When error occurs during compression or
+        decompression or when initializing the state with lzma or xz.
+    @raises ImportError: When file is compressed with bz2 but neither bz2 nor
+        bz2file is importable, or when file is compressed with lzma or xz but
+        lzma is not importable.
     @return: A file-like object returning the uncompressed data in binary mode.
     @rtype: file-like object
     """
@@ -1297,6 +1308,9 @@ def open_archive(filename, mode='rb', use_extension=True):
             extension = 'gz'
         elif magic_number.startswith(b"7z\xBC\xAF'\x1C"):
             extension = '7z'
+        # Unfortunately, legacy LZMA container format has no magic number
+        elif magic_number.startswith(b'\xFD7zXZ\x00'):
+            extension = 'xz'
         else:
             extension = ''
 
@@ -1304,9 +1318,9 @@ def open_archive(filename, mode='rb', use_extension=True):
         if isinstance(bz2, ImportError):
             raise bz2
         return bz2.BZ2File(filename, mode)
-    elif extension == 'gz':
+    if extension == 'gz':
         return gzip.open(filename, mode)
-    elif extension == '7z':
+    if extension == '7z':
         if mode != 'rb':
             raise NotImplementedError('It is not possible to write a 7z file.')
 
@@ -1327,9 +1341,16 @@ def open_archive(filename, mode='rb', use_extension=True):
                     'Unexpected STDERR output from 7za {0}'.format(stderr))
             else:
                 return process.stdout
-    else:
-        # assume it's an uncompressed file
-        return open(filename, 'rb')
+    if extension == 'lzma':
+        if isinstance(lzma, ImportError):
+            raise lzma
+        return lzma.open(filename, mode, format=lzma.FORMAT_ALONE)
+    if extension == 'xz':
+        if isinstance(lzma, ImportError):
+            raise lzma
+        return lzma.open(filename, mode, format=lzma.FORMAT_XZ)
+    # assume it's an uncompressed file
+    return open(filename, 'rb')
 
 
 def merge_unique_dicts(*args, **kwargs):
