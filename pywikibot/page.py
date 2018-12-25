@@ -636,7 +636,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Update the current (edited) wikitext.
 
         @param value: New value or None
-        @param value: basestring
+        @type value: basestring
         """
         self._text = None if value is None else unicode(value)
         if hasattr(self, '_raw_extracted_templates'):
