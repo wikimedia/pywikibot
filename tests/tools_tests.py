@@ -138,7 +138,7 @@ class OpenArchiveTestCase(TestCase):
         """Test open_archive when bz2 and bz2file are not available."""
         old_bz2 = tools.bz2
         bz2_import_error = ('This is a fake exception message that is '
-                            'used when bz2 and bz2file is not importable')
+                            'used when bz2 and bz2file are not importable')
         try:
             tools.bz2 = ImportError(bz2_import_error)
             self.assertRaisesRegex(ImportError,
@@ -167,6 +167,38 @@ class OpenArchiveTestCase(TestCase):
                                self.base_file + '_invalid.7z',
                                use_extension=True)
 
+    def test_open_archive_lzma(self):
+        """Test open_archive with lzma compressor in the standard library."""
+        if isinstance(tools.lzma, ImportError):
+            raise unittest.SkipTest('lzma not importable')
+        self.assertEqual(
+            self._get_content(self.base_file + '.lzma'), self.original_content)
+        # Legacy LZMA container formet has no magic, skipping
+        # use_extension=False test here
+        self.assertEqual(
+            self._get_content(self.base_file + '.xz'), self.original_content)
+        self.assertEqual(
+            self._get_content(self.base_file + '.xz', use_extension=False),
+            self.original_content)
+
+    def test_open_archive_without_lzma(self):
+        """Test open_archive when lzma is not available."""
+        old_lzma = tools.lzma
+        lzma_import_error = ('This is a fake exception message that is '
+                             'used when lzma is not importable')
+        try:
+            tools.lzma = ImportError(lzma_import_error)
+            self.assertRaisesRegex(ImportError,
+                                   lzma_import_error,
+                                   self._get_content,
+                                   self.base_file + '.lzma')
+            self.assertRaisesRegex(ImportError,
+                                   lzma_import_error,
+                                   self._get_content,
+                                   self.base_file + '.xz')
+        finally:
+            tools.lzma = old_lzma
+
 
 class OpenCompressedTestCase(OpenArchiveTestCase, DeprecationTestCase):
 
@@ -176,9 +208,10 @@ class OpenCompressedTestCase(OpenArchiveTestCase, DeprecationTestCase):
 
     def _get_content(self, *args, **kwargs):
         """Use open_compressed and return content using a with-statement."""
-        # open_archive default is True, so if it's False it's not the default
-        # so use the non-default of open_compressed (which is True)
-        if kwargs.get('use_extension') is False:
+        # open_archive default is True, but open_compressed default is False.
+        # The test cases assumes a default of True and we need to make
+        # open_compressed acknowledge that.
+        if 'use_extension' not in kwargs:
             kwargs['use_extension'] = True
 
         with tools.open_compressed(*args, **kwargs) as f:
@@ -258,6 +291,23 @@ class OpenArchiveWriteTestCase(TestCase):
                                tools.open_archive,
                                '/dev/null.7z',
                                mode='wb')
+
+    def test_write_archive_lzma(self):
+        """Test writing a lzma archive."""
+        if isinstance(tools.lzma, ImportError):
+            raise unittest.SkipTest('lzma not importable')
+
+        content = self._write_content('.lzma')
+        with open(self.base_file + '.lzma', 'rb') as f:
+            self.assertEqual(content, f.read())
+
+    def test_write_archive_xz(self):
+        """Test writing a xz archive."""
+        if isinstance(tools.lzma, ImportError):
+            raise unittest.SkipTest('lzma not importable')
+
+        content = self._write_content('.xz')
+        self.assertEqual(content[:6], b'\xFD7zXZ\x00')
 
 
 class MergeUniqueDicts(TestCase):
