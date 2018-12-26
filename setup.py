@@ -51,7 +51,6 @@ extra_deps = {
     'isbn': ['python-stdnum'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
-    'IRC': ['irc'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
     'Tkinter': [pillow],
     'security': ['requests[security]', 'pycparser!=2.14'],

@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* botirc.IRCBot has been dropped
 * Bugfixes and improvements
 * Localisation updates
 

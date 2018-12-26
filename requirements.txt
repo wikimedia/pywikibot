@@ -52,9 +52,6 @@ sseclient >= 0.0.18,!=0.0.23
 # scripts/flickrripper.py
 flickrapi
 
-# incomplete core component botirc
-irc
-
 # textlib.py and patrol.py
 mwparserfromhell>=0.3.3
 
