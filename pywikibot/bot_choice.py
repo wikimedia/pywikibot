@@ -38,7 +38,16 @@ class Option(object):
 
     @staticmethod
     def formatted(text, options, default=None):
-        """Create a text with the options formatted into it."""
+        """
+        Create a text with the options formatted into it.
+
+        @param text: Text into which options are to be formatted
+        @type text: str
+        @param options: Option instances to be formatted
+        @type options: Iterable
+        @return: Text with the options formatted into it
+        @rtype: str
+        """
         formatted_options = []
         for option in options:
             formatted_options.append(option.format(default=default))
@@ -102,7 +111,14 @@ class StandardOption(Option):
     """An option with a description and shortcut and returning the shortcut."""
 
     def __init__(self, option, shortcut, **kwargs):
-        """Initializer."""
+        """
+        Initializer.
+
+        @param option: option string
+        @type option: str
+        @param shortcut: Shortcut of the option
+        @type shortcut: str
+        """
         super(StandardOption, self).__init__(**kwargs)
         self.option = option
         self.shortcut = shortcut.lower()
