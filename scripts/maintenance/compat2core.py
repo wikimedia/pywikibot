@@ -206,7 +206,7 @@ def main():
     warnonly = False
 
     # Parse command line arguments for -help option
-    for arg in pywikibot.handleArgs():
+    for arg in pywikibot.handle_args():
         if arg.startswith('-warnonly'):
             warnonly = True
         elif not arg.startswith('-'):
