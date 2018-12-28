@@ -681,7 +681,12 @@ class _InterwikiMap(object):
     """A representation of the interwiki map of a site."""
 
     def __init__(self, site):
-        """Create an empty uninitalized interwiki map for the given site."""
+        """
+        Create an empty uninitalized interwiki map for the given site.
+
+        @param site: Given site for which interwiki map is to be created
+        @type site: APISite
+        """
         super(_InterwikiMap, self).__init__()
         self._site = site
         self._map = None
@@ -701,7 +706,15 @@ class _InterwikiMap(object):
         return self._map
 
     def __getitem__(self, prefix):
-        """Return the site, locality and url for the requested prefix."""
+        """
+        Return the site, locality and url for the requested prefix.
+
+        @param prefix: Interwiki prefix
+        @type prefix: Dictionary key
+        @rtype: _IWEntry
+        @raises KeyError: Prefix is not a key
+        @raises TypeError: Site for the prefix is of wrong type
+        """
         if prefix not in self._iw_sites:
             raise KeyError("'{0}' is not an interwiki prefix.".format(prefix))
         if isinstance(self._iw_sites[prefix].site, BaseSite):
@@ -713,7 +726,13 @@ class _InterwikiMap(object):
                             % (prefix, type(self._iw_sites[prefix].site)))
 
     def get_by_url(self, url):
-        """Return a set of prefixes applying to the URL."""
+        """
+        Return a set of prefixes applying to the URL.
+
+        @param url: URL for the interwiki
+        @type url: str
+        @rtype: set
+        """
         return {prefix for prefix, iw_entry in self._iw_sites
                 if iw_entry.url == url}
 
