@@ -4,6 +4,13 @@ Release history
 Current release
 ---------------
 
+* Support adding new claims with qualifiers and/or references (T112577, T170432)
+* Support LZMA and XZ compression formats
+* Update correct-ar Typo corrections in fixes.py (T211492)
+* Enable MediaWiki timestamp with EventStreams (T212133)
+* Convert Timestamp.fromtimestampformat() if year, month and day are given only
+* tools.concat_options is deprecated
+* Additional ListOption subclasses ShowingListOption, MultipleChoiceList, ShowingMultipleChoiceList
 * Bugfixes and improvements
 * Localisation updates
 
