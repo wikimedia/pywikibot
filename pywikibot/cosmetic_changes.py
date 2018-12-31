@@ -137,18 +137,18 @@ moved_links = {
 # Use a list with two entries. The first entry will be replaced by the second.
 # Examples:
 # For removing {{Foo}}, the list must be:
-#           (u'Foo', None),
+#           ('Foo', None),
 #
 # The following also works:
-#           (u'Foo', ''),
+#           ('Foo', ''),
 #
 # For replacing {{Foo}} with {{Bar}} the list must be:
-#           (u'Foo', u'Bar'),
+#           ('Foo', 'Bar'),
 #
 # This also removes all template parameters of {{Foo}}
 # For replacing {{Foo}} with {{Bar}} but keep the template
 # parameters in its original order, please use:
-#           (u'Foo', u'Bar\g<parameters>'),
+#           ('Foo', 'Bar\\g<parameters>'),
 
 deprecatedTemplates = {
     'wikipedia': {
