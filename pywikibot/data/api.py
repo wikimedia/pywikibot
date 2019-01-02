@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Interface to Mediawiki's api.php."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -541,6 +541,17 @@ class ParamInfo(Container):
 
         self._emulate_pageset()
 
+    @staticmethod
+    def _modules_to_set(modules):
+        """Return modules as a set.
+
+        @type modules: iterable or basestring
+        @rtype: set
+        """
+        if isinstance(modules, basestring):
+            return set(modules.split('|'))
+        return set(modules)
+
     def fetch(self, modules):
         """
         Fetch paraminfo for multiple modules.
@@ -556,6 +567,8 @@ class ParamInfo(Container):
             # The first request should be 'paraminfo', so that
             # query modules can be prefixed with 'query+'
             self._init()
+
+        modules = self._modules_to_set(modules)
 
         if self._action_modules:
             # The query module may be added before the action modules have been
@@ -740,8 +753,7 @@ class ParamInfo(Container):
     def _normalize_modules(self, modules):
         """Add query+ to any query module name not also in action modules."""
         # Users will supply the wrong type, and expect it to work.
-        if isinstance(modules, basestring):
-            modules = set(modules.split('|'))
+        modules = self._modules_to_set(modules)
 
         assert(self._action_modules)
 
