@@ -17,6 +17,7 @@ coverage:
     - ez_setup.py
     - pywikibot/compat
     - pywikibot/backports.py
+    - pywikibot/families/__init__.py
     - scripts/archive
     - scripts/userscripts
     - tests/*edit*.py
