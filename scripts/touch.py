@@ -13,9 +13,11 @@ This script understands various command-line arguments:
 -purge                    Do not touch but purge the page
 
 Touch arguments:
+
 -botflag                  Force botflag in case of edits with changes.
 
 Purge arguments:
+
 -converttitles            Convert titles to other variants if necessary
 -forcelinkupdate          Update the links tables
 -forcerecursivelinkupdate Update the links table, and update the links tables
