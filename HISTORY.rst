@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Ensure "modules" parameter of ParamInfo._fetch is a set (T122763)
 * Support adding new claims with qualifiers and/or references (T112577, T170432)
 * Support LZMA and XZ compression formats
 * Update correct-ar Typo corrections in fixes.py (T211492)
