@@ -18,7 +18,7 @@ class TestUploadScript(TestCase):
 
     net = False
 
-    def match(self, value):
+    def match(self, value=''):
         """Create a match object and call get_chunk_site.
 
         @param value: a chunk size value
@@ -26,12 +26,15 @@ class TestUploadScript(TestCase):
         @return: chunk size in bytes
         @rtype: int
         """
-        option = '-chunked:' + value
+        option = '-chunked'
+        if value:
+            option += ':' + value
         match = CHUNK_SIZE_REGEX.match(option)
         return get_chunk_size(match)
 
     def test_regex(self):
         """Test CHUNK_SIZE_REGEX and get_chunk_size function."""
+        self.assertEqual(self.match(), 1024 ** 2)
         self.assertEqual(self.match('12345'), 12345)
         self.assertEqual(self.match('4567k'), 4567 * 1000)
         self.assertEqual(self.match('7890m'), 7890 * 10 ** 6)
