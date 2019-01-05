@@ -24,6 +24,36 @@ class TestUserClass(TestCase):
     family = 'wikipedia'
     code = 'de'
 
+    def _tests_unregistered_user(self, user, prop='invalid'):
+        """Proceed user tests."""
+        with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
+            self.assertEqual(user.name(), user.username)
+        self.assertEqual(user.title(with_ns=False), user.username)
+        self.assertFalse(user.isRegistered())
+        self.assertIsNone(user.registration())
+        self.assertFalse(user.isEmailable())
+        self.assertEqual(user.gender(), 'unknown')
+        self.assertFalse(user.is_thankable)
+        self.assertIn(prop, user.getprops())
+
+    def test_anonymous_user(self):
+        """Test registered user."""
+        user = User(self.site, '123.45.67.89')
+        self._tests_unregistered_user(user)
+        self.assertTrue(user.isAnonymous())
+
+    def test_unregistered_user(self):
+        """Test unregistered user."""
+        user = User(self.site, 'This user name is not registered yet')
+        self._tests_unregistered_user(user, prop='missing')
+        self.assertFalse(user.isAnonymous())
+
+    def test_invalid_user(self):
+        """Test invalid user."""
+        user = User(self.site, 'Invalid char\x9f in Name')
+        self._tests_unregistered_user(user)
+        self.assertFalse(user.isAnonymous())
+
     def test_registered_user(self):
         """Test registered user."""
         user = User(self.site, 'Xqt')
@@ -81,48 +111,6 @@ class TestUserClass(TestCase):
         self.assertEqual(user.gender(), 'female')
         self.assertIn('userid', user.getprops())
         self.assertTrue(user.is_thankable)
-
-    def test_anonymous_user(self):
-        """Test registered user."""
-        user = User(self.site, '123.45.67.89')
-        with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
-            self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(with_ns=False), user.username)
-        self.assertFalse(user.isRegistered())
-        self.assertTrue(user.isAnonymous())
-        self.assertIsNone(user.registration())
-        self.assertFalse(user.isEmailable())
-        self.assertEqual(user.gender(), 'unknown')
-        self.assertIn('invalid', user.getprops())
-        self.assertFalse(user.is_thankable)
-
-    def test_unregistered_user(self):
-        """Test unregistered user."""
-        user = User(self.site, 'This user name is not registered yet')
-        with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
-            self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(with_ns=False), user.username)
-        self.assertFalse(user.isRegistered())
-        self.assertFalse(user.isAnonymous())
-        self.assertIsNone(user.registration())
-        self.assertFalse(user.isEmailable())
-        self.assertEqual(user.gender(), 'unknown')
-        self.assertIn('missing', user.getprops())
-        self.assertFalse(user.is_thankable)
-
-    def test_invalid_user(self):
-        """Test invalid user."""
-        user = User(self.site, 'Invalid char\x9f in Name')
-        with suppress_warnings('pywikibot.page.User.name', DeprecationWarning):
-            self.assertEqual(user.name(), user.username)
-        self.assertEqual(user.title(with_ns=False), user.username)
-        self.assertFalse(user.isRegistered())
-        self.assertFalse(user.isAnonymous())
-        self.assertIsNone(user.registration())
-        self.assertFalse(user.isEmailable())
-        self.assertEqual(user.gender(), 'unknown')
-        self.assertIn('invalid', user.getprops())
-        self.assertFalse(user.is_thankable)
 
     def test_bot_user(self):
         """Test bot user."""
