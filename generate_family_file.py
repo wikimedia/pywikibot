@@ -3,7 +3,7 @@
 """This script generates a family file from a given URL."""
 #
 # (C) Merlijn van Deen, 2010-2013
-# (C) Pywikibot team, 2010-2018
+# (C) Pywikibot team, 2010-2019
 #
 # Distributed under the terms of the MIT license
 #
@@ -224,3 +224,6 @@ This will create the file mywiki_family.py in pywikibot{sep}families"""
                       sep=os.sep))
 
     FamilyFileGenerator(*sys.argv[1:]).run()
+else:
+    # for testing purposes
+    from pywikibot.site_detect import MWSite as Wiki  # noqa: E402
