@@ -52,7 +52,7 @@ parameter, and for a description.
 """
 #
 # (C) Rob W.W. Hooft, Andre Engels 2003-2004
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,6 +66,10 @@ import re
 import pywikibot
 from pywikibot.bot import suggest_help
 from pywikibot.specialbots import UploadRobot
+
+
+CHUNK_SIZE_REGEX = re.compile(
+    r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
 
 
 def get_chunk_size(match):
@@ -113,8 +117,6 @@ def main(*args):
     aborts = set()
     ignorewarn = set()
     chunk_size = 0
-    chunk_size_regex = re.compile(
-        r'^-chunked(?::(\d+(?:\.\d+)?)[ \t]*(k|ki|m|mi)?b?)?$', re.I)
     recursive = False
     description_file = None
 
@@ -150,7 +152,7 @@ def main(*args):
             else:
                 ignorewarn = True
         elif arg == '-chunked':
-            match = chunk_size_regex.match(option)
+            match = CHUNK_SIZE_REGEX.match(option)
             chunk_size = get_chunk_size(match)
         elif arg == '-descfile':
             description_file = value
