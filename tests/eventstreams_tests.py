@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -206,6 +206,16 @@ class TestEventStreamsFilterTests(TestCase):
         """Test EventStreams filter with assignment of a int value."""
         self.es.register_filter(foo=10)
         self.assertFalse(self.es.streamfilter(self.data))
+
+    def test_filter_sequence_false(self):
+        """Test EventStreams filter with assignment of a sequence."""
+        self.es.register_filter(bar=list('baz'))
+        self.assertFalse(self.es.streamfilter(self.data))
+
+    def test_filter_sequence_true(self):
+        """Test EventStreams filter with assignment of a sequence."""
+        self.es.register_filter(bar=('foo', 'bar', 'baz'))
+        self.assertTrue(self.es.streamfilter(self.data))
 
     def test_filter_multiple(self):
         """Test EventStreams filter with multiple arguments."""
