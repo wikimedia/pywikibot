@@ -3,7 +3,7 @@
 """This script generates a family file from a given URL."""
 #
 # (C) Merlijn van Deen, 2010-2013
-# (C) Pywikibot team, 2010-2018
+# (C) Pywikibot team, 2010-2019
 #
 # Distributed under the terms of the MIT license
 #
@@ -16,6 +16,7 @@ import os
 import sys
 
 from os import environ, getenv
+
 # creating & retrieving urls
 if sys.version_info[0] > 2:
     from urllib.parse import urlparse
@@ -30,6 +31,12 @@ class FamilyFileGenerator(object):
 
     def __init__(self, url=None, name=None, dointerwiki=None):
         """Initializer."""
+        # from pywikibot.site_detect import MWSite
+        # when required but disable user-config checks
+        # so the family can be created first,
+        # and then used when generating the user-config
+        self.Wiki = _import_with_no_user_config(
+            'pywikibot.site_detect').site_detect.MWSite
         if url is None:
             url = raw_input('Please insert URL to wiki: ')
         if name is None:
@@ -45,7 +52,7 @@ class FamilyFileGenerator(object):
         """Main method, generate family file."""
         print('Generating family file from ' + self.base_url)
 
-        w = Wiki(self.base_url)
+        w = self.Wiki(self.base_url)
         self.wikis[w.lang] = w
         print('\n=================================='
               '\nAPI url: {w.api}'
@@ -104,7 +111,7 @@ class FamilyFileGenerator(object):
             print('  * %s... ' % (lang['prefix']), end='')
             if lang['prefix'] not in self.wikis:
                 try:
-                    self.wikis[lang['prefix']] = Wiki(lang['url'])
+                    self.wikis[lang['prefix']] = self.Wiki(lang['url'])
                     print('downloaded')
                 except Exception as e:
                     print(e)
@@ -211,10 +218,6 @@ def _import_with_no_user_config(*import_args):
 
 
 if __name__ == '__main__':
-    # Disable user-config checks so the family can be created first,
-    # and then used when generating the user-config
-    Wiki = _import_with_no_user_config(
-        'pywikibot.site_detect').site_detect.MWSite
     if len(sys.argv) != 3:
         print("""
 Usage: {module} <url> <short name>
