@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 """Classes and functions for working with the Echo extension."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
+
+from pywikibot.tools import deprecated
 
 
 class Notification(object):
@@ -27,7 +29,7 @@ class Notification(object):
         """
         notif = cls(site)
 
-        notif.id = data['id']  # TODO: use numeric id ?
+        notif.event_id = int(data['id'])
         notif.type = data['type']
         notif.category = data['category']
         notif.timestamp = pywikibot.Timestamp.fromtimestampformat(
@@ -52,6 +54,16 @@ class Notification(object):
         notif.revid = data.get('revid', None)
 
         return notif
+
+    @property
+    @deprecated('event_id', since='20190106')
+    def id(self):
+        """
+        DEPRECATED: Return notification id as unicode.
+
+        @rtype: unicode
+        """
+        return str(self.event_id)
 
     def mark_as_read(self):
         """Mark the notification as read."""
