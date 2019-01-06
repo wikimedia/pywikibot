@@ -94,20 +94,20 @@ class TestDryPageGenerators(TestCase):
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 0, site)
-        self.assertEqual(len(tuple(gen)), 3)
+        self.assertLength(tuple(gen), 3)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 1, site)
-        self.assertEqual(len(tuple(gen)), 4)
+        self.assertLength(tuple(gen), 4)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, 10, site)
-        self.assertEqual(len(tuple(gen)), 6)
+        self.assertLength(tuple(gen), 6)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, (1, 10), site)
-        self.assertEqual(len(tuple(gen)), 10)
+        self.assertLength(tuple(gen), 10)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(
             gen, ('Talk', 'Template'), site)
-        self.assertEqual(len(tuple(gen)), 10)
+        self.assertLength(tuple(gen), 10)
 
     def test_RegexFilterPageGenerator(self):
         """Test RegexFilterPageGenerator."""
@@ -119,7 +119,7 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc',
                                                       quantifier='none')
-        self.assertEqual(len(tuple(gen)), 11)
+        self.assertLength(tuple(gen), 11)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'])
         self.assertPageTitlesEqual(gen,
@@ -130,7 +130,7 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='none')
-        self.assertEqual(len(tuple(gen)), 9)
+        self.assertLength(tuple(gen), 9)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='all')
@@ -152,7 +152,7 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.RegexFilterPageGenerator(
             gen, ['template', '/meta'], quantifier='any',
             ignore_namespace=False)
-        self.assertEqual(len(tuple(gen)), 6)
+        self.assertLength(tuple(gen), 6)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                       site=self.site)
         gen = pagegenerators.RegexFilterPageGenerator(
@@ -166,7 +166,7 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.RegexFilterPageGenerator(
             gen, ['template', '/meta'], quantifier='none',
             ignore_namespace=False)
-        self.assertEqual(len(tuple(gen)), 7)
+        self.assertLength(tuple(gen), 7)
 
     def test_RegexBodyFilterPageGenerator(self):
         """Test RegexBodyFilterPageGenerator."""
@@ -184,7 +184,7 @@ class TestDryPageGenerators(TestCase):
         self.assertPageTitlesEqual(gen, self.titles)
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'talk',
                                                           quantifier='none')
-        self.assertEqual(len(tuple(gen)), 9)
+        self.assertLength(tuple(gen), 9)
 
 
 class TestPagesFromPageidGenerator(TestCase):
@@ -240,7 +240,7 @@ class TestCategoryFilterPageGenerator(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.CategoryFilterPageGenerator(
             gen, self.catfilter_list, site)
-        self.assertEqual(len(tuple(gen)), 10)
+        self.assertLength(tuple(gen), 10)
 
 
 class TestQualityFilterPageGenerator(TestCase):
@@ -265,11 +265,11 @@ class TestQualityFilterPageGenerator(TestCase):
         site = self.site
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.QualityFilterPageGenerator(gen, [0])
-        self.assertEqual(len(tuple(gen)), 7)
+        self.assertLength(tuple(gen), 7)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
         gen = pagegenerators.NamespaceFilterPageGenerator(gen, [4])
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, site)
-        self.assertEqual(len(tuple(gen)), 10)
+        self.assertLength(tuple(gen), 10)
 
 
 class EdittimeFilterPageGeneratorTestCase(TestCase):
@@ -309,22 +309,22 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         gen = PagesFromTitlesGenerator(['Wikipedia:Sandbox'], self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_start=two_days_ago)
-        self.assertEqual(len(list(gen)), 1)
+        self.assertLength(list(gen), 1)
 
         gen = PagesFromTitlesGenerator(['Wikipedia:Sandbox'], self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_end=two_days_ago)
-        self.assertEqual(len(list(gen)), 0)
+        self.assertIsEmpty(list(gen))
 
         gen = PagesFromTitlesGenerator(['Template:Side box'], self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_end=nine_days_ago)
-        self.assertEqual(len(list(gen)), 1)
+        self.assertLength(list(gen), 1)
 
         gen = PagesFromTitlesGenerator(['Template:Side box'], self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, last_edit_start=nine_days_ago)
-        self.assertEqual(len(list(gen)), 0)
+        self.assertIsEmpty(list(gen))
 
 
 class SubpageFilterGeneratorTestCase(TestCase):
@@ -401,12 +401,12 @@ class TestRepeatingGenerator(RecentChangesTestCase):
                                               namespaces=[0],
                                               total=self.length)
         )
-        self.assertEqual(len(items), self.length)
+        self.assertLength(items, self.length)
         timestamps = [pywikibot.Timestamp.fromISOformat(item['timestamp'])
                       for item in items]
         self.assertEqual(sorted(timestamps), timestamps)
         self.assertTrue(all(item['ns'] == 0 for item in items))
-        self.assertEqual(len({item['revid'] for item in items}), self.length)
+        self.assertLength({item['revid'] for item in items}, self.length)
 
 
 class TestTextfilePageGenerator(DefaultSiteTestCase):
@@ -433,7 +433,7 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         filename = join_data_path('pagelist-brackets.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertEqual(len(titles), len(self.expected_titles))
+        self.assertLength(titles, self.expected_titles)
         expected_titles = [
             expected_title[self.title_columns[site.namespaces[page.namespace()]
                                               .case]]
@@ -445,7 +445,7 @@ class TestTextfilePageGenerator(DefaultSiteTestCase):
         filename = join_data_path('pagelist-lines.txt')
         site = self.get_site()
         titles = list(pagegenerators.TextfilePageGenerator(filename, site))
-        self.assertEqual(len(titles), len(self.expected_titles))
+        self.assertLength(titles, self.expected_titles)
         expected_titles = [
             expected_title[self.title_columns[site.namespaces[page.namespace()]
                                               .case]]
@@ -551,11 +551,11 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         for page in PreloadingGenerator(links, groupsize=20):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertEqual(len(page._revisions), 1)
+            self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
     def test_low_step(self):
         """Test PreloadingGenerator with a list of pages."""
@@ -566,11 +566,11 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         for page in PreloadingGenerator(links, groupsize=10):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertEqual(len(page._revisions), 1)
+            self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
     def test_order(self):
         """Test outcome is following same order of input."""
@@ -581,12 +581,12 @@ class TestPreloadingGenerator(DefaultSiteTestCase):
         for page in PreloadingGenerator(links, groupsize=10):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
-            self.assertEqual(len(page._revisions), 1)
+            self.assertLength(page._revisions, 1)
             self.assertIsNotNone(page._revisions[page._revid].text)
             self.assertFalse(hasattr(page, '_pageprops'))
             self.assertEqual(page, links[count])
             count += 1
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
 
 class TestDequePreloadingGenerator(DefaultSiteTestCase):
@@ -610,7 +610,7 @@ class TestDequePreloadingGenerator(DefaultSiteTestCase):
                                        pywikibot.Page) for page in pages_out))
         self.assertIn(mainpage, pages_out)
         self.assertIn(mainpage.toggleTalkPage(), pages_out)
-        self.assertEqual(len(pages_out), 2)
+        self.assertLength(pages_out, 2)
         self.assertTrue(pages_out[1].isTalkPage())
 
 
@@ -769,7 +769,10 @@ class TestItemClaimFilterPageGenerator(WikidataTestCase):
         gen = pagegenerators.ItemClaimFilterPageGenerator([item], prop, claim,
                                                           qualifiers, negate)
         pages = set(gen)
-        self.assertEqual(len(pages), 1 if valid else 0)
+        if valid:
+            self.assertLength(pages, 1)
+        else:
+            self.assertIsEmpty(pages)
 
     def _get_council_page(self):
         """Return United Nations Security Council Wikidata page."""
@@ -1053,7 +1056,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gf.handleArg('-limit:10')
         gen = gf.getCombinedGenerator()
         pages = list(gen)
-        self.assertEqual(len(pages), 10)
+        self.assertLength(pages, 10)
         # pipe-separated used as test reference.
         pageids = '|'.join(str(page.pageid) for page in pages)
 
@@ -1063,7 +1066,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages_from_pageid = list(gen)
-        self.assertEqual(len(pages_from_pageid), 10)
+        self.assertLength(pages_from_pageid, 10)
         for page_a, page_b in zip(pages, pages_from_pageid):
             self.assertIsInstance(page_a, pywikibot.Page)
             self.assertIsInstance(page_b, pywikibot.Page)
@@ -1083,7 +1086,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
-        self.assertEqual(len(pages), 1)
+        self.assertLength(pages, 1)
 
     def test_random_generator_ns(self):
         """Test random generator with namespace."""
@@ -1111,7 +1114,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
-        self.assertEqual(len(pages), 1)
+        self.assertLength(pages, 1)
 
     def test_randomredirect_generator_ns(self):
         """Test random generator with namespace."""
@@ -1300,7 +1303,7 @@ class TestFactoryGeneratorNewpages(TestCase):
             'pages. If not, create a new page on the site to make the test ' \
             'pass again.'.format(url=newpages_url)
 
-        self.assertGreater(len(pages), 0, failure_message)
+        self.assertIsNotEmpty(pages, msg=failure_message)
 
     def test_newpages_ns_default(self, key):
         """Test newpages generator with limit argument."""
@@ -1379,7 +1382,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
             'Metallurgy\\, and Materials'))
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        self.assertEqual(len(set(gen)), 1)
+        self.assertLength(set(gen), 1)
 
     def test_onlyifnot(self):
         """Test -onlyifnot without qualifiers."""
@@ -1389,7 +1392,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
                      'Metallurgy\\, and Materials')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        self.assertEqual(len(set(gen)), 0)
+        self.assertIsEmpty(set(gen))
 
     def test_onlyif_qualifiers(self):
         """Test -onlyif with qualifiers."""
@@ -1398,7 +1401,7 @@ class TestFactoryGeneratorWikibase(WikidataTestCase):
         gf.handleArg('-onlyif:P47=Q837,P805=Q3088768')
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
-        self.assertEqual(len(set(gen)), 1)
+        self.assertLength(set(gen), 1)
 
     def test_searchitem(self):
         """Test -searchitem."""
@@ -1484,7 +1487,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
-        self.assertGreater(len(pages), 0)
+        self.assertIsNotEmpty(pages)
         self.assertTrue(all(isinstance(item, pywikibot.User)
                             for item in pages))
 
@@ -1495,7 +1498,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
-        self.assertEqual(len(pages), 0)
+        self.assertIsEmpty(pages)
 
     def test_logevents_with_total(self):
         """Test -logevents which uses total."""
@@ -1504,7 +1507,7 @@ class TestLogeventsFactoryGenerator(DefaultSiteTestCase,
         gen = gf.getCombinedGenerator()
         self.assertIsNotNone(gen)
         pages = set(gen)
-        self.assertEqual(len(pages), 1)
+        self.assertLength(pages, 1)
         self.assertTrue(all(isinstance(item, pywikibot.User)
                             for item in pages))
 
@@ -1572,7 +1575,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         pagegenerator = pagegenerators.LiveRCPageGenerator(site,
                                                            total=self.length)
         entries = list(pagegenerator)
-        self.assertEqual(len(entries), self.length)
+        self.assertLength(entries, self.length)
 
         testentry = entries[0]
         self.assertEqual(testentry.site, site)

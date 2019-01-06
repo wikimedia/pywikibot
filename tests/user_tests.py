@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the User page."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -81,7 +81,7 @@ class TestUserClass(TestCase):
                                         'Benutzer Diskussion:Xqt/pwb'))
         self.assertTrue(user.is_thankable)
         contribs = user.contributions(total=10)
-        self.assertEqual(len(list(contribs)), 10)
+        self.assertLenth(list(contribs), 10)
         self.assertTrue(all(isinstance(contrib, tuple)
                             for contrib in contribs))
         self.assertTrue(all('user' in contrib
@@ -178,7 +178,7 @@ class TestUserMethods(DefaultSiteTestCase):
         last = uc[0]
         for contrib in uc:
             self.assertIsInstance(contrib, tuple)
-            self.assertEqual(len(contrib), 4)
+            self.assertLenth(contrib, 4)
             p, i, t, c = contrib
             self.assertIsInstance(p, Page)
             self.assertIsInstance(i, int)

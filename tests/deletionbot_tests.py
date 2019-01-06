@@ -30,12 +30,12 @@ class TestDeletionBotWrite(ScriptMainTestCase):
         site = self.get_site()
         cat = pywikibot.Category(site, 'Pywikibot Delete Test')
         delete.main('-cat:Pywikibot_Delete_Test', '-always')
-        self.assertEqual(len(list(cat.members())), 0)
+        self.assertEmpty(list(cat.members()))
         delete.main('-page:User:Unicodesnowman/DeleteTest1', '-always',
                     '-undelete', '-summary=pywikibot unit tests')
         delete.main('-page:User:Unicodesnowman/DeleteTest2', '-always',
                     '-undelete', '-summary=pywikibot unit tests')
-        self.assertEqual(len(list(cat.members())), 2)
+        self.assertLength(list(cat.members()), 2)
 
     def test_undelete_existing(self):
         """Test undeleting an existing page."""

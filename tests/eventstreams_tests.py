@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the eventstreams module."""
 #
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -154,7 +154,7 @@ class TestEventStreamsSettingTests(TestCase):
         self.es.register_filter(foo='bar')
         self.assertTrue(callable(self.es.filter['all'][0]))
         self.es.register_filter(bar='baz')
-        self.assertEqual(len(self.es.filter['all']), 2)
+        self.assertLength(self.es.filter['all'], 2)
 
 
 class TestEventStreamsFilterTests(TestCase):

@@ -678,7 +678,7 @@ class TestFilePage(DefaultSiteTestCase):
         page = pywikibot.FilePage(self.site, 'File:Example.jpg')
         gen = page.globalusage(total=3)
         pages = list(gen)
-        self.assertEqual(len(pages), 3)
+        self.assertLength(pages, 3)
         self.assertTrue(any(isinstance(p), pywikibot.Page) for p in pages)
         self.assertTrue(any(p.site != self.site for p in pages))
 
@@ -894,12 +894,12 @@ class TestPageHistory(DefaultSiteTestCase):
 
         top_two = cnt.most_common(2)
         self.assertIsInstance(top_two, list)
-        self.assertEqual(len(top_two), 2)
+        self.assertLength(top_two, 2)
         self.assertIsInstance(top_two[0], tuple)
         self.assertIsInstance(top_two[0][0], basestring)
         self.assertIsInstance(top_two[0][1], int)
         top_two_usernames = {top_two[0][0], top_two[1][0]}
-        self.assertEqual(len(top_two_usernames), 2)
+        self.assertLength(top_two_usernames, 2)
         top_two_counts = ([top_two[0][1], top_two[1][1]])
         top_two_edit_count = mp.revision_count(top_two_usernames)
         self.assertIsInstance(top_two_edit_count, int)
@@ -1023,7 +1023,7 @@ class TestPageDelete(TestCase):
                                p.markDeletedRevision, 123)
         p.undelete(reason='pywikibot unit test')
         revs = list(p.revisions())
-        self.assertEqual(len(revs), 2)
+        self.assertLength(revs, 2)
         self.assertEqual(revs[1].revid, revid)
 
 

@@ -404,7 +404,7 @@ class TestSiteObject(DefaultSiteTestCase):
         about_msgs = self.site.mediawiki_messages(msg)
         self.assertIsInstance(mysite.mediawiki_messages(msg), dict)
         self.assertTrue(mysite.mediawiki_messages(msg))
-        self.assertEqual(len(about_msgs), 2)
+        self.assertLength(about_msgs, 2)
         self.assertIn(msg[0], about_msgs)
 
         # mediawiki_messages must be given a list; using a string will split it
@@ -420,12 +420,11 @@ class TestSiteObject(DefaultSiteTestCase):
         self.assertRegex(ts, r'(19|20)\d\d[0-1]\d[0-3]\d[0-2]\d[0-5]\d[0-5]\d')
 
         self.assertIsInstance(mysite.months_names, list)
-        self.assertEqual(len(mysite.months_names), 12)
+        self.assertLength(mysite.months_names, 12)
         self.assertTrue(all(isinstance(month, tuple)
                             for month in mysite.months_names))
-        self.assertTrue(all(len(month) == 2
-                            for month in mysite.months_names))
-
+        for month in mysite.months_names:
+            self.assertLength(month, 2)
         self.assertEqual(mysite.list_to_text(('pywikibot',)), 'pywikibot')
 
     def test_english_specific_methods(self):
@@ -458,7 +457,7 @@ class TestSiteObject(DefaultSiteTestCase):
             self.assertRaises(pywikibot.IsNotRedirectPage,
                               mysite.getredirtarget, mainpage)
         a = list(mysite.preloadpages([mainpage]))
-        self.assertEqual(len(a), int(mainpage.exists()))
+        self.assertLength(a, int(mainpage.exists()))
         if a:
             self.assertEqual(a[0], mainpage)
 
@@ -2046,7 +2045,7 @@ class TestSiteSysopWrite(TestCase):
                                       '2014-12-21T06:07:31Z'])
 
         revs = list(p.revisions())
-        self.assertEqual(len(revs), 2)
+        self.assertLength(revs, 2)
         self.assertEqual(revs[0].revid, 219995)
         self.assertEqual(revs[1].revid, 219994)
 
@@ -2067,7 +2066,7 @@ class TestUsernameInUsers(DefaultSiteTestCase):
         """Test the site.users() method with bot username."""
         mysite = self.get_site()
         us = list(mysite.users(mysite.user()))
-        self.assertEqual(len(us), 1)
+        self.assertLength(us, 1)
         self.assertIsInstance(us[0], dict)
 
 
@@ -2161,7 +2160,7 @@ class SiteRandomTestCase(DefaultSiteTestCase):
             pages.append(rndpage)
             if len(pages) == 11:
                 break
-        self.assertEqual(len(pages), 11)
+        self.assertLength(pages, 11)
 
     def test_limit_10(self):
         """Test site.randompages() with limit."""
@@ -2372,25 +2371,25 @@ class TestSiteAPILimits(TestCase):
         gen = mysite.pagecategories(mypage, total=12)
         gen.set_query_increment = 5
         cats = [c for c in gen]
-        self.assertEqual(len(cats), 12)
+        self.assertLength(cats, 12)
 
         gen = mysite.categorymembers(mycat, total=12)
         gen.set_query_increment = 5
         cat_members = [cm for cm in gen]
-        self.assertEqual(len(cat_members), 12)
+        self.assertLength(cat_members, 12)
 
         gen = mysite.pageimages(mypage, total=5)
         gen.set_query_increment = 3
         images = [im for im in gen]
-        self.assertEqual(len(images), 5)
+        self.assertLength(images, 5)
 
         gen = mysite.pagetemplates(mypage, total=5)
         gen.set_query_increment = 3
         templates = [tl for tl in gen]
-        self.assertEqual(len(templates), 5)
+        self.assertLength(templates, 5)
 
         mysite.loadrevisions(mypage, step=5, total=12)
-        self.assertEqual(len(mypage._revisions), 12)
+        self.assertLength(mypage._revisions, 12)
 
 
 class TestSiteInfo(DefaultSiteTestCase):
@@ -2460,7 +2459,7 @@ class TestSiteInfo(DefaultSiteTestCase):
         mysite = self.site
         self.assertRaises(KeyError, mysite.siteinfo.__getitem__, not_exists)
         self.assertNotIn(not_exists, mysite.siteinfo)
-        self.assertEqual(len(mysite.siteinfo.get(not_exists)), 0)
+        self.assertIsEmpty(mysite.siteinfo.get(not_exists))
         self.assertFalse(entered_loop(mysite.siteinfo.get(not_exists)))
         if PY2:
             self.assertFalse(
@@ -2544,7 +2543,7 @@ class TestSiteLoadRevisions(TestCase):
         self.mysite.loadrevisions(self.mainpage, total=15)
         self.mysite.loadrevisions(self.mainpage)
         self.assertFalse(hasattr(self.mainpage, '_text'))
-        self.assertEqual(len(self.mainpage._revisions), 15)
+        self.assertLength(self.mainpage._revisions, 15)
         self.assertIn(self.mainpage._revid, self.mainpage._revisions)
         self.assertIsNone(self.mainpage._revisions[self.mainpage._revid].text)
         # The revision content will be loaded by .text
@@ -2583,17 +2582,17 @@ class TestSiteLoadRevisions(TestCase):
     def test_loadrevisions_querycontinue(self):
         """Test the site.loadrevisions() method with query-continue."""
         self.mysite.loadrevisions(self.mainpage, step=5, total=12)
-        self.assertEqual(len(self.mainpage._revisions), 12)
+        self.assertLength(self.mainpage._revisions, 12)
 
     def test_loadrevisions_revdir(self):
         """Test the site.loadrevisions() method with rvdir=True."""
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
-        self.assertEqual(len(self.mainpage._revisions), 15)
+        self.assertLength(self.mainpage._revisions, 15)
 
     def test_loadrevisions_timestamp(self):
         """Test the site.loadrevisions() method, listing based on timestamp."""
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
-        self.assertEqual(len(self.mainpage._revisions), 15)
+        self.assertLength(self.mainpage._revisions, 15)
         revs = self.mainpage._revisions
         timestamps = [str(revs[rev].timestamp) for rev in revs]
         self.assertTrue(all(ts < '2002-01-31T00:00:00Z' for ts in timestamps))
@@ -2615,7 +2614,7 @@ class TestSiteLoadRevisions(TestCase):
     def test_loadrevisions_rev_id(self):
         """Test the site.loadrevisions() method, listing based on rev_id."""
         self.mysite.loadrevisions(self.mainpage, rvdir=True, total=15)
-        self.assertEqual(len(self.mainpage._revisions), 15)
+        self.assertLength(self.mainpage._revisions, 15)
         revs = self.mainpage._revisions
         self.assertTrue(all(139900 <= rev <= 140100 for rev in revs))
 
@@ -2696,9 +2695,9 @@ class TestBacklinks(TestCase):
 
     def test_backlinks_redirects_length(self):
         """Test backlinks redirects length."""
-        self.assertEqual(len(self.backlinks), 1)
-        self.assertEqual(len(self.references), 1)
-        self.assertEqual(len(self.nofollow), 1)
+        self.assertLength(self.backlinks, 1)
+        self.assertLength(self.references, 1)
+        self.assertLength(self.nofollow, 1)
 
     def test_backlinks_redirects_status(self):
         """Test backlinks redirects statur."""
@@ -2779,10 +2778,10 @@ class TestNonEnglishWikipediaSite(TestCase):
         self.assertEqual(image_namespace.custom_prefix(), ':Fil:')
         self.assertEqual(image_namespace.canonical_prefix(), ':File:')
         self.assertEqual(sorted(image_namespace.aliases), ['Bilde', 'Image'])
-        self.assertEqual(len(image_namespace), 4)
+        self.assertLength(image_namespace, 4)
 
-        self.assertEqual(len(namespaces[1].aliases), 0)
-        self.assertEqual(len(namespaces[4].aliases), 1)
+        self.assertIsEmpty(namespaces[1].aliases)
+        self.assertLength(namespaces[4].aliases, 1)
         self.assertEqual(namespaces[4].aliases[0], 'WP')
         self.assertIn('WP', namespaces[4])
 
@@ -2943,7 +2942,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
                 self.assertTrue(hasattr(page, '_revid'))
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIn(page._revid, page._revisions)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
@@ -2969,7 +2968,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
@@ -2986,7 +2985,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
@@ -3012,7 +3011,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
@@ -3037,7 +3036,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
@@ -3065,7 +3064,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
@@ -3094,7 +3093,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
             count += 1
@@ -3135,7 +3134,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
                 self.assertTrue(hasattr(page, '_langlinks'))
@@ -3150,12 +3149,12 @@ class TestPagePreloading(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         links = list(mysite.pagelinks(mainpage, total=20))
         pages = list(mysite.preloadpages(links, groupsize=5, langlinks=True))
-        self.assertEqual(len(links), len(pages))
+        self.assertLength(links, pages)
         for page in pages:
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
         if pages:
@@ -3175,13 +3174,13 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
                 self.assertTrue(hasattr(page, '_langlinks'))
             count += 1
 
-        self.assertEqual(len(links), count)
+        self.assertLength(links, count)
 
     @allowed_failure
     def test_preload_templates(self):
@@ -3195,7 +3194,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
                 self.assertTrue(hasattr(page, '_templates'))
@@ -3215,7 +3214,7 @@ class TestPagePreloading(DefaultSiteTestCase):
             self.assertIsInstance(page, pywikibot.Page)
             self.assertIsInstance(page.exists(), bool)
             if page.exists():
-                self.assertEqual(len(page._revisions), 1)
+                self.assertLength(page._revisions, 1)
                 self.assertIsNotNone(page._revisions[page._revid].text)
                 self.assertFalse(hasattr(page, '_pageprops'))
                 self.assertTrue(hasattr(page, '_templates'))
@@ -3241,7 +3240,7 @@ class TestDataSitePreloading(WikidataTestCase):
             self.assertTrue(hasattr(item, '_content'))
             self.assertNotIn(item, seen)
             seen.append(item)
-        self.assertEqual(len(seen), 5)
+        self.assertLength(seen, 5)
 
     def test_item_as_page(self):
         """Test that ItemPage preloading works for Page objects."""
@@ -3256,7 +3255,7 @@ class TestDataSitePreloading(WikidataTestCase):
             self.assertTrue(hasattr(item, '_content'))
             self.assertNotIn(item, seen)
             seen.append(item)
-        self.assertEqual(len(seen), 5)
+        self.assertLength(seen, 5)
 
     def test_property(self):
         """Test that preloading works for properties."""

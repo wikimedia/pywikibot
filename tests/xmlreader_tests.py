@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for xmlreader module."""
 #
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,7 +34,7 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
     def test_XmlDumpAllRevs(self):
         """Test loading all revisions."""
         pages = self._get_entries('article-pear.xml', allrevisions=True)
-        self.assertEqual(4, len(pages))
+        self.assertLength(pages, 4)
         self.assertEqual('Automated conversion', pages[0].comment)
         self.assertEqual('Pear', pages[0].title)
         self.assertEqual('24278', pages[0].id)
@@ -45,7 +45,7 @@ class ExportDotThreeTestCase(XmlReaderTestCase):
     def test_XmlDumpFirstRev(self):
         """Test loading the first revision."""
         pages = self._get_entries('article-pear.xml', allrevisions=False)
-        self.assertEqual(1, len(pages))
+        self.assertLength(pages, 1)
         self.assertEqual('Automated conversion', pages[0].comment)
         self.assertEqual('Pear', pages[0].title)
         self.assertEqual('24278', pages[0].id)
@@ -93,7 +93,7 @@ class ExportDotTenTestCase(XmlReaderTestCase):
     def test_pair(self):
         """Test reading the main page/user talk page pair file."""
         entries = self._get_entries('pair-0.10.xml', allrevisions=True)
-        self.assertEqual(4, len(entries))
+        self.assertLength(entries, 4)
         self.assertTrue(all(entry.username == 'Carlossuarez46'
                             for entry in entries))
         self.assertTrue(all(entry.isredirect is False for entry in entries))
@@ -101,7 +101,7 @@ class ExportDotTenTestCase(XmlReaderTestCase):
         articles = entries[0:2]
         talks = entries[2:4]
 
-        self.assertEqual(2, len(articles))
+        self.assertLength(articles, 2)
         self.assertTrue(all(entry.id == '19252820' for entry in articles))
         self.assertTrue(all(entry.title == 'Çullu, Agdam'
                             for entry in articles))
@@ -109,7 +109,7 @@ class ExportDotTenTestCase(XmlReaderTestCase):
                             for entry in articles))
         self.assertEqual(articles[0].text, '#REDIRECT [[Çullu, Quzanlı]]')
 
-        self.assertEqual(2, len(talks))
+        self.assertLength(talks, 2)
         self.assertTrue(all(entry.id == '19252824' for entry in talks))
         self.assertTrue(all(entry.title == 'Talk:Çullu, Agdam'
                             for entry in talks))

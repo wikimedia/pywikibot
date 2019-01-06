@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the replace script and ReplaceRobot class."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -128,17 +128,17 @@ class TestReplacementsMain(TWNBotTestCase):
         self.assertIsInstance(replacement.fix_set, list)
         self.assertIn(replacement, replacement.fix_set)
         self.assertIs(replacement, replacement.fix_set[offset])
-        self.assertEqual(len(replacement.fix_set), length)
+        self.assertLength(replacement.fix_set, length)
 
     def _get_bot(self, only_confirmation, *args):
         """Run with arguments, assert and return one bot."""
         self.assertIsNone(self._run(*args))
-        self.assertEqual(len(self.bots), 1)
+        self.assertLength(self.bots, 1)
         bot = self.bots[0]
         if only_confirmation is not None:
             self.assertIn(self.SUMMARY_CONFIRMATION, self.inputs)
             if only_confirmation is True:
-                self.assertEqual(len(self.inputs), 1)
+                self.assertLength(self.inputs, 1)
         else:
             self.assertNotIn(self.SUMMARY_CONFIRMATION, self.inputs)
         self.assertEqual(bot.site, self.site)
@@ -164,38 +164,38 @@ class TestReplacementsMain(TWNBotTestCase):
     def test_only_cmd(self):
         """Test command line replacements only."""
         bot = self._get_bot(True, '1', '2')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_replacement(bot.replacements[0])
 
     def test_cmd_automatic(self):
         """Test command line replacements with automatic summary."""
         bot = self._get_bot(None, '1', '2', '-automaticsummary')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_replacement(bot.replacements[0])
         self.assertEqual(self.inputs, [])
 
     def test_only_fix_global_message(self):
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
 
     def test_only_fix_global_message_tw(self):
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg-tw')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
 
     def test_only_fix_no_message(self):
         """Test fixes replacements only."""
         bot = self._get_bot(True, '-fix:no-msg')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
 
     def test_only_fix_all_replacement_summary(self):
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:all-repl-msg')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0], msg=True)
 
     def test_only_fix_partial_replacement_summary(self):
@@ -203,26 +203,26 @@ class TestReplacementsMain(TWNBotTestCase):
         bot = self._get_bot(True, '-fix:partial-repl-msg')
         for offset, replacement in enumerate(bot.replacements):
             self._test_fix_replacement(replacement, 2, offset, offset == 0)
-        self.assertEqual(len(bot.replacements), 2)
+        self.assertLength(bot.replacements, 2)
 
     def test_only_fix_multiple(self):
         """Test fixes replacements only."""
         bot = self._get_bot(None, '-fix:has-msg-multiple')
         for offset, replacement in enumerate(bot.replacements):
             self._test_fix_replacement(replacement, 3, offset)
-        self.assertEqual(len(bot.replacements), 3)
+        self.assertLength(bot.replacements, 3)
 
     def test_cmd_and_fix(self):
         """Test command line and fix replacements together."""
         bot = self._get_bot(True, '1', '2', '-fix:has-msg')
-        self.assertEqual(len(bot.replacements), 2)
+        self.assertLength(bot.replacements, 2)
         self._test_replacement(bot.replacements[0])
         self._test_fix_replacement(bot.replacements[1])
 
     def test_except_title(self):
         """Test excepting and requiring a title specific to fix."""
         bot = self._get_bot(True, '-fix:no-msg-title-exceptions')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
         self.assertIn('title', bot.replacements[0].exceptions)
         self.assertIn('require-title', bot.replacements[0].exceptions)
@@ -233,7 +233,7 @@ class TestReplacementsMain(TWNBotTestCase):
     def test_fix_callable(self):
         """Test fix replacements using a callable."""
         bot = self._get_bot(True, '-fix:no-msg-callable')
-        self.assertEqual(len(bot.replacements), 1)
+        self.assertLength(bot.replacements, 1)
         self._test_fix_replacement(bot.replacements[0])
         self.assertTrue(callable(bot.replacements[0].new))
 

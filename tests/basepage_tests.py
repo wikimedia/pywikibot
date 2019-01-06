@@ -57,7 +57,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
 
         self.assertTrue(hasattr(page, '_revid'))
         self.assertTrue(hasattr(page, '_revisions'))
-        self.assertEqual(len(page._revisions), 1)
+        self.assertLength(page._revisions, 1)
         self.assertIn(page._revid, page._revisions)
 
         self.assertFalse(hasattr(page, '_text'))

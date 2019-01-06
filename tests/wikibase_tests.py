@@ -55,7 +55,7 @@ class WbRepresentationTestCase(WikidataTestCase):
     def _test_hashable(self, representation):
         """Test that the representation is hashable."""
         list_of_dupes = [representation, representation]
-        self.assertEqual(len(set(list_of_dupes)), 1)
+        self.assertLength(set(list_of_dupes), 1)
 
 
 class TestLoadRevisionsCaching(BasePageLoadRevisionsCachingTestBase,
@@ -1646,7 +1646,7 @@ class TestItemBasePageMethods(WikidataTestCase, BasePageMethodsTestBase):
     def test_item_is_hashable(self):
         """Ensure that ItemPages are hashable."""
         list_of_dupes = [self._page, self._page]
-        self.assertEqual(len(set(list_of_dupes)), 1)
+        self.assertLength(set(list_of_dupes), 1)
 
 
 class TestPageMethodsWithItemTitle(WikidataTestCase, BasePageMethodsTestBase):
@@ -1740,8 +1740,8 @@ class TestLinks(WikidataTestCase):
         wikilinks = list(self.wdp.iterlinks('wikipedia'))
         wvlinks = list(self.wdp.iterlinks('wikivoyage'))
 
-        self.assertEqual(len(wikilinks), 3)
-        self.assertEqual(len(wvlinks), 2)
+        self.assertLength(wikilinks, 3)
+        self.assertLength(wvlinks, 2)
 
 
 class TestWriteNormalizeLang(TestCase):
