@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20190106
+------------
+
 * Ensure "modules" parameter of ParamInfo._fetch is a set (T122763)
 * Support adding new claims with qualifiers and/or references (T112577, T170432)
 * Support LZMA and XZ compression formats
