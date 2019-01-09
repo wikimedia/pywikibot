@@ -6,9 +6,13 @@ This script can be used for reverting certain edits.
 The following command line parameters are supported:
 
 -username         Edits of which user need to be reverted.
+                  Default is bot's username (site.username())
 
 -rollback         Rollback edits instead of reverting them.
                   Note that in rollback, no diff would be shown.
+
+-limit:num        Use the last num contributions to be checked for revert.
+                  Default is 500.
 
 Users who want to customize the behaviour should subclass the `BaseRevertBot`
 and override its `callback` method. Here is a sample:
@@ -46,36 +50,44 @@ and override its `callback` method. Here is a sample:
 from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
+
+from pywikibot.bot import OptionHandler
 from pywikibot import i18n
+from pywikibot.tools import deprecate_arg
 from pywikibot.tools.formatter import color_format
 
 
-class BaseRevertBot(object):
+class BaseRevertBot(OptionHandler):
 
     """Base revert bot.
 
     Subclass this bot and override callback to get it to do something useful.
     """
 
-    def __init__(self, site, user=None, comment=None, rollback=False):
-        """Initializer."""
-        self.site = site
-        self.comment = comment
-        self.user = user
-        if not self.user:
-            self.user = self.site.username()
-        self.rollback = rollback
+    availableOptions = {
+        'comment': '',
+        'rollback': False,
+        'limit': 500
+    }
 
-    def get_contributions(self, max=500, ns=None):
+    def __init__(self, site=None, **kwargs):
+        """Initializer."""
+        self.site = site or pywikibot.Site()
+        self.user = kwargs.pop('user', self.site.username())
+        super(BaseRevertBot, self).__init__(**kwargs)
+
+    @deprecate_arg('max', 'total')
+    def get_contributions(self, total=500, ns=None):
         """Get contributions."""
-        return self.site.usercontribs(user=self.user, namespaces=ns, total=max)
+        return self.site.usercontribs(user=self.user, namespaces=ns,
+                                      total=total)
 
     def revert_contribs(self, callback=None):
         """Revert contributions."""
         if callback is None:
             callback = self.callback
 
-        for item in self.get_contributions():
+        for item in self.get_contributions(total=self.getOption('limit')):
             if callback(item):
                 result = self.revert(item)
                 if result:
@@ -97,22 +109,27 @@ class BaseRevertBot(object):
             rev = history[1]
         else:
             return False
+
         comment = i18n.twtranslate(
             self.site, 'revertbot-revert',
             {'revid': rev.revid,
              'author': rev.user,
              'timestamp': rev.timestamp})
-        if self.comment:
-            comment += ': ' + self.comment
+        additional_comment = self.getOption('comment')
+        if additional_comment:
+            comment += ': ' + additional_comment
+
         pywikibot.output(color_format(
             '\n\n>>> {lightpurple}{0}{default} <<<',
             page.title(as_link=True, force_interwiki=True, textlink=True)))
-        if not self.rollback:
+
+        if not self.getOption('rollback'):
             old = page.text
             page.text = page.getOldVersion(rev.revid)
             pywikibot.showDiff(old, page.text)
             page.save(comment)
             return comment
+
         try:
             pywikibot.data.api.Request(
                 self.site, parameters={'action': 'rollback',
@@ -148,18 +165,22 @@ def main(*args):
     @param args: command line arguments
     @type args: unicode
     """
-    user = None
-    rollback = False
+    options = {}
+
     for arg in pywikibot.handle_args(args):
-        if arg.startswith('-username'):
-            if len(arg) == 9:
-                user = pywikibot.input(
-                    'Please enter username of the person you want to revert:')
-            else:
-                user = arg[10:]
-        elif arg == '-rollback':
-            rollback = True
-    bot = myRevertBot(site=pywikibot.Site(), user=user, rollback=rollback)
+        opt, _, value = arg.partition(':')
+        if not opt.startswith('-'):
+            continue
+        opt = opt[1:]
+        if opt == 'username':
+            options['user'] = value or pywikibot.input(
+                'Please enter username of the person you want to revert:')
+        elif opt == 'rollback':
+            options[opt] = True
+        elif opt == 'limit':
+            options[opt] = int(value)
+
+    bot = myRevertBot(**options)
     bot.revert_contribs()
 
 
