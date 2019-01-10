@@ -72,8 +72,8 @@ and arguments can be:
 #
 # (C) Daniel Herding, 2004
 # (C) Purodha Blissenbach, 2009
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2004-2018
+# (C) xqt, 2009-2019
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -481,7 +481,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
                                               page.title(with_section=False))
                 content = content_page.get(get_redirect=True)
             content = self.sdtemplate + '\n' + content
-            self.userPut(page, content, page.text, summary=reason,
+            self.userPut(page, page.text, content, summary=reason,
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
 
