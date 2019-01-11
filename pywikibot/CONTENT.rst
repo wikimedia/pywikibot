@@ -147,8 +147,6 @@ The contents of the package
     +-----------------------------------------------------------------------------------+
     | User Interface                                                                    |
     +============================+======================================================+
-    | cgi_interface.py           | CGI user interface                                   |
-    +----------------------------+------------------------------------------------------+
     | gui.py                     | GUI with a unicode textfield where the user can edit |
     +----------------------------+------------------------------------------------------+
     | terminal_interface.py      | Platform independent terminal interface module       |

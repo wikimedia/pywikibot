@@ -456,7 +456,7 @@ transliteration_target = None
 # https://docs.python.org/3/library/codecs.html#standard-encodings
 textfile_encoding = 'utf-8'
 
-# tkinter isn't yet ready
+# currently terminal is the only userinterface supported
 userinterface = 'terminal'
 
 # this can be used to pass variables to the UI init function
