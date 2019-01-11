@@ -22,6 +22,11 @@ scripts.maintenance.compat2core script
 
 .. automodule:: scripts.maintenance.compat2core
 
+scripts.maintenance.interwikidumps script
+-----------------------------------------
+
+.. automodule:: scripts.maintenance.interwikidumps
+
 scripts.maintenance.make\_i18n\_dict script
 -------------------------------------------
 
