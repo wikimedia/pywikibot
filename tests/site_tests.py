@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -3401,7 +3401,7 @@ class TestObsoleteSite(TestCase):
 
 class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
 
-    """Test site without other production sites in its family."""
+    """Test single code family sites."""
 
     sites = {
         'wikia': {
@@ -3411,18 +3411,6 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         'lyricwiki': {
             'family': 'lyricwiki',
             'code': 'en',
-        },
-        'commons': {
-            'family': 'commons',
-            'code': 'commons',
-        },
-        'wikidata': {
-            'family': 'wikidata',
-            'code': 'wikidata',
-        },
-        'wikidatatest': {
-            'family': 'wikidata',
-            'code': 'test',
         },
     }
 
@@ -3477,6 +3465,30 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
                           'de', 'lyricwiki')
 
+
+class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
+
+    """Test site without other production sites in its family."""
+
+    sites = {
+        'commons': {
+            'family': 'commons',
+            'code': 'commons',
+        },
+        'beta': {
+            'family': 'commons',
+            'code': 'beta',
+        },
+        'wikidata': {
+            'family': 'wikidata',
+            'code': 'wikidata',
+        },
+        'wikidatatest': {
+            'family': 'wikidata',
+            'code': 'test',
+        },
+    }
+
     def test_commons(self):
         """Test Wikimedia Commons."""
         site = self.get_site('commons')
@@ -3485,29 +3497,19 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
 
-        self.assertEqual(site.family.hostname('en'), 'commons.wikimedia.org')
+        self.assertRaises(KeyError, site.family.hostname, 'en')
 
         pywikibot.config.family = 'commons'
         pywikibot.config.mylang = 'de'
 
-        site2 = pywikibot.Site('en', 'commons')
-        self.assertEqual(site2.code, 'commons')
+        site2 = pywikibot.Site('beta')
+        self.assertEqual(site2.hostname(),
+                         'commons.wikimedia.beta.wmflabs.org')
+        self.assertEqual(site2.code, 'beta')
         self.assertFalse(site2.obsolete)
-        self.assertEqual(site, site2)
-        self.assertEqual(pywikibot.config.mylang, 'de')
 
-        site2 = pywikibot.Site('really_invalid', 'commons')
-        self.assertEqual(site2.code, 'commons')
-        self.assertFalse(site2.obsolete)
-        self.assertEqual(site, site2)
-        self.assertEqual(pywikibot.config.mylang, 'de')
-
-        site2 = pywikibot.Site('de', 'commons')
-        self.assertEqual(site2.code, 'commons')
-        self.assertFalse(site2.obsolete)
-        self.assertEqual(site, site2)
-        # When the code is the same as config.mylang, Site() changes mylang
-        self.assertEqual(pywikibot.config.mylang, 'commons')
+        self.assertRaises(pywikibot.UnknownSite,
+                          pywikibot.Site)
 
     def test_wikidata(self):
         """Test Wikidata family, with sites for test and production."""
