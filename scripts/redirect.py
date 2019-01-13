@@ -55,7 +55,7 @@ and arguments can be:
 -until:title   The possible last page title in each namespace. Page needs not
                exist.
 
--total:n       The maximum count of redirects to work upon. If omitted, there
+-limit:n       The maximum count of redirects to work upon. If omitted, there
                is no limit.
 
 -delete        Prompt the user whether broken redirects should be deleted (or
@@ -87,7 +87,9 @@ import pywikibot
 from pywikibot import i18n, xmlreader
 from pywikibot.bot import (OptionHandler, SingleSiteBot, ExistingPageBot,
                            RedirectPageBot)
+from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
+from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -110,7 +112,7 @@ class RedirectGenerator(OptionHandler):
         'offset': -1,
         'page': None,
         'start': None,
-        'total': None,
+        'limit': None,
         'until': None,
         'xml': None,
     }
@@ -125,7 +127,7 @@ class RedirectGenerator(OptionHandler):
         self.offset = self.getOption('offset')
         self.page_title = self.getOption('page')
         self.api_start = self.getOption('start')
-        self.api_number = self.getOption('total')
+        self.api_number = self.getOption('limit')
         self.api_until = self.getOption('until')
         self.xmlFilename = self.getOption('xml')
 
@@ -404,7 +406,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
     def __init__(self, action, **kwargs):
         """Initializer."""
         self.availableOptions.update({
-            'total': float('inf'),
+            'limit': float('inf'),
             'delete': False,
             'sdtemplate': None,
         })
@@ -674,8 +676,8 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
 
     def treat(self, page):
         """Treat a page."""
-        if self._treat_counter >= self.getOption('total'):
-            pywikibot.output('\nNumber of pages reached the total limit. '
+        if self._treat_counter >= self.getOption('limit'):
+            pywikibot.output('\nNumber of pages reached the limit. '
                              'Script terminated.')
             self.stop()
         super(RedirectRobot, self).treat(page)
@@ -710,8 +712,6 @@ def main(*args):
             action = arg
         elif option in ('always', 'delete'):
             options[option] = True
-        elif option == 'total':
-            options[option] = gen_options[option] = int(value)
         elif option == 'sdtemplate':
             options['sdtemplate'] = value or pywikibot.input(
                 'Which speedy deletion template to use?')
@@ -742,6 +742,13 @@ def main(*args):
             gen_options[option] = int(value)
         elif option in ('page', 'start', 'until'):
             gen_options[option] = value
+        elif option in ('limit', 'total'):
+            option['limit'] = gen_options['limit'] = int(value)
+            if option == 'total':
+                issue_deprecation_warning('The usage of "{0}"'.format(arg),
+                                          '-limit', 2,
+                                          ArgumentDeprecationWarning,
+                                          since='20190120')
         else:
             pywikibot.output('Unknown argument: ' + arg)
 
