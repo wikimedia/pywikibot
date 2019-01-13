@@ -149,7 +149,14 @@ def stdout(text, decoder=None, newline=True, **kwargs):
 
 
 def warning(text, decoder=None, newline=True, **kwargs):
-    """Output a warning message to the user via the userinterface."""
+    """Output a warning message to the user via the userinterface,
+       when there's an unusual interrupt(software/hardware) occured. 
+       text : The message in quotes,the user wants to display.
+       decoder: When 'None', text should be in unicode standards or
+                else should be decoded accordingly.
+       newline: If 'True', a new line will be added after printing the text.
+       The keyword arguments for warning() can be found in the python documentation, here 
+       https://docs.python.org/2/howto/logging-cookbook.html#logging-cookbook"""
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
 
