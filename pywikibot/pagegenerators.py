@@ -604,7 +604,9 @@ class GeneratorFactory(object):
             issue_deprecation_warning(
                 'The usage of "{0}" as actual parameter of '
                 'pagegenerators.getCategory'.format(category),
-                categoryname, 2, ArgumentDeprecationWarning, since='20141019')
+                categoryname, depth=3,
+                warning_class=ArgumentDeprecationWarning,
+                since='20141019')
         else:
             categoryname = category
 
@@ -1132,20 +1134,26 @@ class GeneratorFactory(object):
             (temp[0][0], temp[0][1], dict(temp[1:]), ifnot))
         return True
 
-    def _handle_yahoo(self, value):
+    @staticmethod
+    def _handle_yahoo(value):
         """Handle `-yahoo` argument."""
-        issue_deprecation_warning('-yahoo', None, 3,
-                                  ArgumentDeprecationWarning, since='20181125')
+        issue_deprecation_warning('-yahoo', depth=3,
+                                  warning_class=ArgumentDeprecationWarning,
+                                  since='20181125')
 
     @staticmethod
     def _handle_untagged(value):
         """Handle `-untagged` argument."""
-        issue_deprecation_warning('-untagged', None, 3)
+        issue_deprecation_warning('-untagged', depth=3,
+                                  warning_class=ArgumentDeprecationWarning,
+                                  since='20161116')
 
     @staticmethod
     def _handle_wikidataquery(value):
         """Handle `-wikidataquery` argument."""
-        issue_deprecation_warning('-wikidataquery', None, 3)
+        issue_deprecation_warning('-wikidataquery', depth=3,
+                                  warning_class=ArgumentDeprecationWarning,
+                                  since='20170520')
 
     def _handle_sparqlendpoint(self, value):
         """Handle `-sparqlendpoint` argument."""

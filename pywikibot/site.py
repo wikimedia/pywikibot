@@ -1728,7 +1728,7 @@ class Siteinfo(Container):
     def __call__(self, key='general', force=False, dump=False):
         """DEPRECATED: Return the entry for key or dump the complete cache."""
         issue_deprecation_warning(
-            'Calling siteinfo', 'itself as a dictionary', 2, since='20161221'
+            'Calling siteinfo', 'itself as a dictionary', since='20161221'
         )
         if not dump:
             return self.get(key, expiry=0 if force else False)
@@ -2374,7 +2374,7 @@ class APISite(BaseSite):
         """
         if keys == '*' or keys == ['*']:
             issue_deprecation_warning('mediawiki_messages("*")',
-                                      'specific messages', 2, since='20150905')
+                                      'specific messages', since='20150905')
 
         if not all(_key in self._msgcache for _key in keys):
             parameters = {'meta': 'allmessages',
@@ -2479,7 +2479,7 @@ class APISite(BaseSite):
         if not args:
             return ''
         if PY2 and any(isinstance(arg, str) for arg in args):
-            issue_deprecation_warning('arg of type str', 'type unicode', 2,
+            issue_deprecation_warning('arg of type str', 'type unicode',
                                       since='20151014')
 
         args = [UnicodeType(e) for e in args]
@@ -4830,13 +4830,13 @@ class APISite(BaseSite):
                 searchstring = 'intitle:' + searchstring
                 issue_deprecation_warning(
                     "where='{0}'".format(where),
-                    "searchstring='{0}'".format(searchstring), 2,
+                    "searchstring='{0}'".format(searchstring),
                     since='20160224')
                 where = None  # default
             else:
                 if where == 'titles':
                     issue_deprecation_warning("where='titles'",
-                                              "where='title'", 2,
+                                              "where='title'",
                                               since='20160224')
                 where = 'title'
         if not namespaces and namespaces != 0:
@@ -7605,7 +7605,7 @@ class DataSite(APISite):
     def _get_baserevid(self, claim, baserevid):
         """Check that claim.on_item is set and matches baserevid if used."""
         if not claim.on_item:
-            issue_deprecation_warning('claim without on_item set', None, 3,
+            issue_deprecation_warning('claim without on_item set', depth=3,
                                       since='20160309')
             if not baserevid:
                 warn('Neither claim.on_item nor baserevid provided',
@@ -7616,7 +7616,7 @@ class DataSite(APISite):
             return claim.on_item.latest_revision_id
 
         issue_deprecation_warning(
-            'Site method with baserevid', 'claim with on_item set', 3,
+            'Site method with baserevid', 'claim with on_item set', depth=3,
             since='20150910')
         if baserevid != claim.on_item.latest_revision_id:
             warn('Using baserevid {0} instead of claim baserevid {1}'
@@ -7657,7 +7657,7 @@ class DataSite(APISite):
                 else:  # urls
                     instead = None
                 issue_deprecation_warning('DataSite.{0}()'.format(attr),
-                                          instead, 2, since='20151022')
+                                          instead, since='20151022')
                 if props == 'urls':
                     props = 'sitelinks/urls'
                 method = self._get_propertyitem

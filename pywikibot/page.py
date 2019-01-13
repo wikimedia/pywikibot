@@ -3861,7 +3861,7 @@ class WikibasePage(BasePage):
         """Low-level attribute getter. Deprecates lastrevid."""
         if name == 'lastrevid':
             issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id', 2,
+                'WikibasePage.lastrevid', 'latest_revision_id',
                 since='20150607')
             name = '_revid'
         return super(WikibasePage, self).__getattribute__(name)
@@ -3870,7 +3870,7 @@ class WikibasePage(BasePage):
         """Attribute setter. Deprecates lastrevid."""
         if attr == 'lastrevid':
             issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id', 2,
+                'WikibasePage.lastrevid', 'latest_revision_id',
                 since='20150607')
             attr = '_revid'
         return super(WikibasePage, self).__setattr__(attr, value)
@@ -3879,7 +3879,7 @@ class WikibasePage(BasePage):
         """Attribute deleter. Deprecates lastrevid."""
         if attr == 'lastrevid':
             issue_deprecation_warning(
-                'WikibasePage.lastrevid', 'latest_revision_id', 2,
+                'WikibasePage.lastrevid', 'latest_revision_id',
                 since='20150607')
             attr = '_revid'
         return super(WikibasePage, self).__delattr__(attr)

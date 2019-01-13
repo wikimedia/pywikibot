@@ -629,7 +629,7 @@ def translate(code, xdict, parameters=None, fallback=False):
         return trans
 
     if not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a mapping', None, 2,
+        issue_deprecation_warning('parameters not being a mapping',
                                   since='20151008')
         plural_parameters = _PluralMappingAlias(parameters)
     else:
@@ -778,7 +778,7 @@ def twtranslate(
         parameters = None
 
     if parameters is not None and not isinstance(parameters, Mapping):
-        issue_deprecation_warning('parameters not being a Mapping', None, 2,
+        issue_deprecation_warning('parameters not being a Mapping',
                                   since='20151008')
 
     if not only_plural and parameters:

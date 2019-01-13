@@ -1493,7 +1493,7 @@ class BaseBot(OptionHandler):
                     initialized_page = self.init_page(item)
                 except SkipPageError as e:
                     issue_deprecation_warning('Use of SkipPageError',
-                                              'BaseBot.skip_page() method', 2,
+                                              'BaseBot.skip_page() method',
                                               since='20180522')
                     pywikibot.warning('Skipped "{0}" due to: {1}'.format(
                                       item, e.reason))
