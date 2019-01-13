@@ -87,9 +87,7 @@ import pywikibot
 from pywikibot import i18n, xmlreader
 from pywikibot.bot import (OptionHandler, SingleSiteBot, ExistingPageBot,
                            RedirectPageBot)
-from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-from pywikibot.tools import issue_deprecation_warning
 
 if sys.version_info[0] > 2:
     basestring = (str, )
@@ -744,11 +742,6 @@ def main(*args):
             gen_options[option] = int(value)
         elif option in ('page', 'start', 'until'):
             gen_options[option] = value
-        # deprecated or unknown options
-        elif option == 'step':
-            issue_deprecation_warning('The usage of "{0}"'.format(arg),
-                                      2, ArgumentDeprecationWarning,
-                                      since='20160210')
         else:
             pywikibot.output('Unknown argument: ' + arg)
 
