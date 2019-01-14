@@ -173,19 +173,6 @@ class ParamInfo(Container):
     MW 1.10 not supported as module prefixes are not extracted from API 'help'.
 
     It does not support the format modules.
-
-    TODO: establish a data structure in the class which prefills
-        the param information available for a site given its
-        version, using the API information available for each
-        API version.
-
-    TODO: module aliases: in 1.25wmf
-        list=deletedrevs becomes list=alldeletedrevisions
-        prop=deletedrevs becomes prop=deletedrevisions
-
-    TODO: share API parameter information between sites using
-        similar versions of the API, especially all sites in the
-        same family.
     """
 
     paraminfo_keys = frozenset(['modules', 'querymodules', 'formatmodules',
