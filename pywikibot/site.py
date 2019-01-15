@@ -6,7 +6,7 @@ This module also includes functions to load families, which are
 groups of wikis on the same topic in different languages.
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -6606,6 +6606,23 @@ class APISite(BaseSite):
         """
         return self.newfiles(*args, **kwargs)
 
+    def querypage(self, special_page, total=None):
+        """Yield Page objects retrieved from Special:{special_page}.
+
+        Generic function for all special pages supported by the site MW API.
+
+        @param special_page: Special page to query
+        @param total: number of pages to return
+        @raise AssertionError: special_page is not supported in SpecialPages.
+        """
+        param = self._paraminfo.parameter('query+querypage', 'page')
+        assert special_page in param['type'], (
+            '{0} not in {1}'.format(special_page, param['type']))
+
+        return self._generator(api.PageGenerator,
+                               type_arg='querypage', gqppage=special_page,
+                               total=total)
+
     @deprecated_args(number='total', step=None, repeat=None)
     def longpages(self, total=None):
         """Yield Pages and lengths from Special:Longpages.
@@ -6642,9 +6659,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Deadendpages',
-                               total=total)
+        return self.querypage('Deadendpages', total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def ancientpages(self, total=None):
@@ -6665,9 +6680,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Lonelypages',
-                               total=total)
+        return self.querypage('Lonelypages', total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def unwatchedpages(self, total=None):
@@ -6675,9 +6688,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Unwatchedpages',
-                               total=total)
+        return self.querypage('Unwatchedpages', total)
 
     @need_version('1.18')
     @deprecated_args(step=None)
@@ -6686,9 +6697,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Wantedpages',
-                               total=total)
+        return self.querypage('Wantedpages', total)
 
     @need_version('1.18')
     def wantedfiles(self, total=None):
@@ -6696,9 +6705,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Wantedfiles',
-                               total=total)
+        return self.querypage('Wantedfiles', total)
 
     @need_version('1.18')
     def wantedtemplates(self, total=None):
@@ -6706,9 +6713,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Wantedtemplates',
-                               total=total)
+        return self.querypage('Wantedtemplates', total)
 
     @need_version('1.18')
     @deprecated_args(number='total', step=None, repeat=None)
@@ -6717,10 +6722,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Wantedcategories',
-                               total=total)
+        return self.querypage('Wantedcategories', total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def uncategorizedcategories(self, total=None):
@@ -6728,10 +6730,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Uncategorizedcategories',
-                               total=total)
+        return self.querypage('Uncategorizedcategories', total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def uncategorizedimages(self, total=None):
@@ -6739,10 +6738,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Uncategorizedimages',
-                               total=total)
+        return self.querypage('Uncategorizedimages', total)
 
     # synonym
     uncategorizedfiles = uncategorizedimages
@@ -6753,10 +6749,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Uncategorizedpages',
-                               total=total)
+        return self.querypage('Uncategorizedpages', total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def uncategorizedtemplates(self, total=None):
@@ -6764,10 +6757,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Uncategorizedtemplates',
-                               total=total)
+        return self.querypage('Uncategorizedtemplates', total)
 
     @deprecated_args(number='total', step=None, repeat=None)
     def unusedcategories(self, total=None):
@@ -6775,10 +6765,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Unusedcategories',
-                               total=total)
+        return self.querypage('Unusedcategories', total)
 
     @deprecated_args(extension=None, number='total', step=None, repeat=None)
     def unusedfiles(self, total=None):
@@ -6786,10 +6773,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Unusedimages',
-                               total=total)
+        return self.querypage('Unusedimages', total)
 
     @deprecated('Site().unusedfiles()', since='20140808')
     @deprecated_args(extension=None, number='total', step=None, repeat=None)
@@ -6806,10 +6790,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='Withoutinterwiki',
-                               total=total)
+        return self.querypage('Withoutinterwiki', total)
 
     @need_version('1.18')
     @deprecated_args(step=None)
@@ -6818,9 +6799,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='BrokenRedirects',
-                               total=total)
+        return self.querypage('BrokenRedirects', total)
 
     @need_version('1.18')
     @deprecated_args(step=None)
@@ -6829,9 +6808,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='DoubleRedirects',
-                               total=total)
+        return self.querypage('DoubleRedirects', total)
 
     @need_version('1.18')
     @deprecated_args(step=None)
@@ -6840,9 +6817,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage', gqppage='Listredirects',
-                               total=total)
+        return self.querypage('Listredirects', total)
 
     @deprecated_args(step=None)
     @need_extension('WikibaseClient')
@@ -6851,10 +6826,7 @@ class APISite(BaseSite):
 
         @param total: number of pages to return
         """
-        return self._generator(api.PageGenerator,
-                               type_arg='querypage',
-                               gqppage='UnconnectedPages',
-                               total=total)
+        return self.querypage('UnconnectedPages', total)
 
     @deprecated_args(lvl='level')
     def protectedpages(self, namespace=0, type='edit', level=False,

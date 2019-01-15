@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the site module."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -868,6 +868,14 @@ class TestSiteGenerators(DefaultSiteTestCase):
                             for tup in the_list))
         self.assertTrue(all(isinstance(tup[2], unicode) for tup in the_list))
         self.assertTrue(all(isinstance(tup[3], unicode) for tup in the_list))
+
+    def test_querypage(self):
+        """Test the site.querypage() method."""
+        mysite = self.get_site()
+        pages = list(mysite.querypage('Longpages', total=10))
+
+        self.assertTrue(all(isinstance(p, pywikibot.Page) for p in pages))
+        self.assertRaises(AssertionError, mysite.querypage, 'LongpageX')
 
     def test_longpages(self):
         """Test the site.longpages() method."""
