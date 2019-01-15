@@ -18,14 +18,14 @@ will be incremented when the archive reaches a certain size.
 Trancluded template may contain the following parameters:
 
  {{TEMPLATE_PAGE
- |archive             =
- |algo                =
- |counter             =
- |maxarchivesize      =
- |minthreadsleft      =
+ |archive =
+ |algo =
+ |counter =
+ |maxarchivesize =
+ |minthreadsleft =
  |minthreadstoarchive =
- |archiveheader       =
- |key                 =
+ |archiveheader =
+ |key =
  }}
 
 Meanings of parameters are:
@@ -91,7 +91,7 @@ Options (may be omitted):
 #
 # (C) Misza13, 2006-2010
 # (C) xqt, 2009-2018
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -104,6 +104,7 @@ import os
 import re
 import time
 
+from collections import OrderedDict
 from hashlib import md5
 from math import ceil
 
@@ -515,13 +516,12 @@ class PageArchiver(object):
         param force: override security value
         type force: bool
         """
-        self.attributes = {
-            'algo': ['old(24h)', False],
-            'archive': ['', False],
-            'maxarchivesize': ['1000M', False],
-            'counter': ['1', False],
-            'key': ['', False],
-        }
+        self.attributes = OrderedDict([
+            ('archive', ['', False]),
+            ('algo', ['old(24h)', False]),
+            ('counter', ['1', False]),
+            ('maxarchivesize', ['1000M', False]),
+        ])
         self.salt = salt
         self.force = force
         self.site = page.site
