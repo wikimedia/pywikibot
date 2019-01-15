@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test that each script can be compiled and executed."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -330,7 +330,7 @@ class TestScriptMeta(MetaTestCaseClass):
                 return test_skip_script
             return testScript
 
-        argument = '-' + dct['_argument']
+        arguments = dct['_arguments']
 
         for script_name in script_list:
             # force login to be the first, alphabetically, so the login
@@ -344,9 +344,9 @@ class TestScriptMeta(MetaTestCaseClass):
                 test_name = 'test_' + script_name
 
             cls.add_method(dct, test_name,
-                           test_execution(script_name, [argument]),
+                           test_execution(script_name, arguments.split()),
                            'Test running {} {}.'
-                           .format(script_name, argument))
+                           .format(script_name, arguments))
 
             if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
@@ -385,7 +385,7 @@ class TestScriptHelp(PwbTestCase):
     _expected_failures.discard('weblinkchecker')
     _allowed_failures = []
 
-    _argument = 'help'
+    _arguments = '-help'
     _results = None
 
 
@@ -417,7 +417,7 @@ class TestScriptSimulate(DefaultSiteTestCase, PwbTestCase):
         'lonelypages',   # T94680: uses exit code 1
     ]
 
-    _argument = 'simulate'
+    _arguments = '-simulate'
     _results = no_args_expected_results
 
 
