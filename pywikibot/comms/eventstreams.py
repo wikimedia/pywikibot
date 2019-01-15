@@ -51,7 +51,7 @@ class EventStreams(object):
 
     Usage:
 
-    >>> stream = EventStreams(stream='recentchange')
+    >>> stream = EventStreams(streams='recentchange')
     >>> stream.register_filter(type='edit', wiki='wikidatawiki')
     >>> change = next(iter(stream))
     >>> print('{type} on page {title} by {user}.'.format(**change))
