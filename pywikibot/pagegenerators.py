@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -305,6 +305,12 @@ GENERATOR OPTIONS
                     e.g. -linter:high/10000
 
                     -linter:show just shows available categories.
+
+-querypage:name     Work on pages provided by a QueryPage-based special page,
+                    see https://www.mediawiki.org/wiki/API:Querypage.
+                    (tip: use -limit:n to fetch only n pages).
+
+                    -querypage shows special pages available.
 
 
 FILTER OPTIONS
@@ -720,7 +726,7 @@ class GeneratorFactory(object):
                 for c in _list:
                     txt += '{indent}{cat}\n'.format(indent=2 * _i, cat=c)
             pywikibot.output('%s' % txt)
-            return True
+            sys.exit(0)
 
         if not cat:
             lint_cats = valid_cats
@@ -736,6 +742,27 @@ class GeneratorFactory(object):
         return self.site.linter_pages(
             lint_categories='|'.join(lint_cats), namespaces=self.namespaces,
             lint_from=lint_from)
+
+    def _handle_querypage(self, value):
+        """Handle `-querypage` argument."""
+        if value is None:  # Display special pages.
+            pages = self.site._paraminfo.parameter('query+querypage',
+                                                   'page')
+            pages = sorted(pages['type'])
+            limit = self.site._paraminfo.parameter('query+querypage',
+                                                   'limit')
+
+            max_w = max(len(p) for p in pages[::2]) + 4
+            txt = 'Available special pages:\n'
+            for a, b in itertools.zip_longest(pages[::2], pages[1::2],
+                                              fillvalue=''):
+                txt += '    {a:<{max_w}}{b}\n'.format(a=a, b=b, max_w=max_w)
+            txt += ('\nMaximum number of pages to return is {max} '
+                    '({highmax} for bots).\n'.format(**limit))
+            pywikibot.output('%s' % txt)
+            sys.exit(0)
+
+        return self.site.querypage(value)
 
     def _handle_unusedfiles(self, value):
         """Handle `-unusedfiles` argument."""

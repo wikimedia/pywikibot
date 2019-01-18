@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -1214,6 +1214,37 @@ class TestFactoryGenerator(DefaultSiteTestCase):
                 .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
+
+    def test_linter_generator_show(self):
+        """Test generator of pages with lint errors."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        with self.assertRaises(SystemExit) as cm:
+            gf.handleArg('-linter:show')
+        self.assertEqual(cm.exception.code, 0)
+
+    def test_querypage_generator_with_valid_page(self):
+        """Test generator of pages with lint errors."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        gf.handleArg('-querypage:Ancientpages')
+        gf.handleArg('-limit:5')
+        gen = gf.getCombinedGenerator()
+        self.assertIsNotNone(gen)
+        pages = list(gen)
+        self.assertLessEqual(len(pages), 5)
+        for page in pages:
+            self.assertIsInstance(page, pywikibot.Page)
+
+    def test_querypage_generator_with_invalid_page(self):
+        """Test generator of pages with lint errors."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        self.assertRaises(AssertionError, gf.handleArg, '-querypage:dummy')
+
+    def test_querypage_generator_with_no_page(self):
+        """Test generator of pages with lint errors."""
+        gf = pagegenerators.GeneratorFactory(site=self.site)
+        with self.assertRaises(SystemExit) as cm:
+            gf.handleArg('-querypage')
+        self.assertEqual(cm.exception.code, 0)
 
 
 class TestFactoryGeneratorNewpages(TestCase):
