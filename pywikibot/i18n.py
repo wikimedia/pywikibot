@@ -490,14 +490,15 @@ def _extract_plural(code, message, parameters):
             return specific_entries[num]
 
         index = plural_value(num)
-        if rule['nplurals'] == 1:
+        needed = rule['nplurals']
+        if needed == 1:
             assert index == 0
 
         if index >= len(plural_entries):
             raise IndexError(
-                'requested plural {0} for {1} but only {2} ("{3}") '
-                'provided'.format(
-                    index, selector, len(plural_entries),
+                'language "{}" requires {} plural variants for "{}" but '
+                'only {} ("{}") provided'.format(
+                    code, needed, selector, len(plural_entries),
                     '", "'.join(plural_entries)))
         return plural_entries[index]
 
