@@ -25,6 +25,7 @@ import pywikibot
 from pywikibot import pagegenerators
 from pywikibot.bot import (SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                            AutomaticTWSummaryBot, suggest_help)
+from pywikibot.exceptions import InvalidTitle
 from pywikibot.textlib import does_text_contain_section, isDisabled
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import first_lower, first_upper as firstcap
@@ -73,6 +74,11 @@ class FixingRedirectBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,
                 actualLinkPage = pywikibot.Page(
                     targetPage.site, m.group('title'))
                 # Check whether the link found is to page.
+                try:
+                    actualLinkPage.title()
+                except InvalidTitle:
+                    pywikibot.exception()
+                    continue
                 if actualLinkPage != linkedPage:
                     continue
 
