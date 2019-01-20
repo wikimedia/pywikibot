@@ -357,11 +357,8 @@ class TestParamInfo(DefaultSiteTestCase):
             pi.fetch('foobar')
             self.assertRaises(KeyError, pi.__getitem__, 'foobar')
             self.assertRaises(KeyError, pi.__getitem__, 'foobar+foobar')
-        # The warning message does not end with a '.' in older MW versions.
-        self.assertIn(
-            'API warning (paraminfo): '
-            'The module "main" does not have a submodule "foobar"',
-            w.call_args[0][0])
+        # The warning message may be different with older MW versions.
+        self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
         self.assertNotIn('foobar', pi._paraminfo)
         self.assertIn('main', pi._paraminfo)
@@ -389,11 +386,8 @@ class TestParamInfo(DefaultSiteTestCase):
 
         with patch.object(pywikibot, 'warning') as w:
             self.assertRaises(KeyError, pi.__getitem__, 'query+foobar')
-        # The warning message does not end with a '.' in older MW versions.
-        self.assertIn(
-            'API warning (paraminfo): '
-            'The module "query" does not have a submodule "foobar"',
-            w.call_args[0][0])
+        # The warning message may be different with older MW versions.
+        self.assertIn('API warning (paraminfo): ', w.call_args[0][0])
 
         self.assertRaises(KeyError, pi.submodules, 'edit')
 
@@ -1129,7 +1123,8 @@ class TestLagpattern(DefaultSiteTestCase):
     def test_valid_lagpattern(self):
         """Test whether api.lagpattern is valid."""
         mysite = self.get_site()
-        if mysite.siteinfo['dbrepllag'][0]['lag'] == -1:
+        if ('dbrepllag' not in mysite.siteinfo
+                or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
             raise unittest.SkipTest(
                 '{0} is not running on a replicated database cluster.'
                 .format(mysite)
