@@ -42,7 +42,7 @@ Meanings of parameters are:
                       variable. Will be actualized by bot. Initial value is 1.
  maxarchivesize       The maximum archive size before incrementing the counter.
                       Value can be given with appending letter like K or M
-                      which indicates KByte or MByte. Default value is 1000M.
+                      which indicates KByte or MByte. Default value is 200K.
  minthreadsleft       Minimum number of threads that should be left on a page.
                       Default value is 5.
  minthreadstoarchive  The minimum number of threads to archive at once. Default
@@ -90,7 +90,7 @@ Options (may be omitted):
 """
 #
 # (C) Misza13, 2006-2010
-# (C) xqt, 2009-2018
+# (C) xqt, 2009-2019
 # (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
@@ -520,7 +520,7 @@ class PageArchiver(object):
             ('archive', ['', False]),
             ('algo', ['old(24h)', False]),
             ('counter', ['1', False]),
-            ('maxarchivesize', ['1000M', False]),
+            ('maxarchivesize', ['200K', False]),
         ])
         self.salt = salt
         self.force = force
