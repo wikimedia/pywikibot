@@ -1862,7 +1862,7 @@ def redirect_func(target, source_module=None, target_module=None,
         target_module = target.__module__
     if target_module and target_module[-1] != '.':
         target_module += '.'
-    if source_module is '.':
+    if source_module == '.':
         source_module = target_module
     elif source_module and source_module[-1] != '.':
         source_module += '.'

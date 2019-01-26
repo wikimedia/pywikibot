@@ -1200,7 +1200,7 @@ class GeneratorFactory(object):
 
 def _int_none(v):
     """Return None if v is None or '' else return int(v)."""
-    return v if (v is None or v is '') else int(v)
+    return v if (v is None or v == '') else int(v)
 
 
 @deprecated('Site.allpages()', since='20180512')
