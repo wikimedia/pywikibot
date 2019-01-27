@@ -576,7 +576,10 @@ class TestSiteGenerators(DefaultSiteTestCase):
             'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                        'sha1', 'metadata'],
             'generator': ['templates'], 'action': ['query'],
-            'indexpageids': [True], 'continue': [True]}
+            'indexpageids': [True]}
+        if self.site.mw_version >= '1.21':
+            expected_params['continue'] = [True]
+
         self.assertEqual(tl_gen.request._params, expected_params)
 
         tl_gen = self.site.pagetemplates(self.mainpage, namespaces=[10])
@@ -607,11 +610,14 @@ class TestSiteGenerators(DefaultSiteTestCase):
             'iilimit': ['max'],
             'iiprop': ['timestamp', 'user', 'comment', 'url', 'size',
                        'sha1', 'metadata'], 'generator': ['links'],
-            'action': ['query'], 'indexpageids': [True], 'continue': [True]}
+            'action': ['query'], 'indexpageids': [True]}
         if 'pageids' in gen_params:
             expected_params['pageids'] = [str(self.mainpage.pageid)]
         else:
             expected_params['titles'] = [self.mainpage.title()]
+        if self.site.mw_version >= '1.21':
+            expected_params['continue'] = [True]
+
         self.assertEqual(gen_params, expected_params)
 
         links_gen = self.site.pagelinks(self.mainpage, namespaces=[0, 1])
