@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test pagegenerators module."""
 #
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -1135,6 +1135,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_pages_with_property_generator(self):
         """Test the pages_with_property_generator method."""
         mysite = self.get_site()
+        if mysite.mw_version < '1.21':
+            raise unittest.SkipTest('requires v1.21+')
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
