@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Logging functions."""
 #
-# (C) Pywikibot team, 2010-2018
+# (C) Pywikibot team, 2010-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -149,7 +149,18 @@ def stdout(text, decoder=None, newline=True, **kwargs):
 
 
 def warning(text, decoder=None, newline=True, **kwargs):
-    """Output a warning message to the user via the userinterface."""
+    """Output a warning message to the user via the userinterface.
+
+    @param text: the message the user wants to display.
+    @type text: str
+    @param decoder: If None, text should be a unicode string. Otherwise it
+        should be encoded in the given encoding.
+    @type decoder: str
+    @param newline: If True, a line feed will be added after printing the text.
+    @type newline: bool
+    @param kwargs: The keyword arguments can be found in the python doc:
+        https://docs.python.org/2/howto/logging-cookbook.html#logging-cookbook.
+    """
     logoutput(text, decoder, newline, WARNING, **kwargs)
 
 
