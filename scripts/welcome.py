@@ -160,8 +160,8 @@ badwords at all but can be used for some bad-nickname.
 # (C) Filnik, 2007-2011
 # (C) Daniel Herding, 2007
 # (C) Alex Shih-Han Lin, 2009-2010
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2008-2018
+# (C) xqt, 2009-2019
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -171,7 +171,6 @@ import codecs
 from datetime import timedelta
 import locale
 import re
-import sys
 from textwrap import fill
 import time
 
@@ -181,7 +180,12 @@ import pywikibot
 
 from pywikibot import config, i18n
 from pywikibot.tools.formatter import color_format
-from pywikibot.tools import issue_deprecation_warning, UnicodeType
+from pywikibot.tools import issue_deprecation_warning, PY2, UnicodeType
+
+if PY2:
+    import cPickle as pickle  # noqa: N813
+else:
+    import pickle
 
 locale.setlocale(locale.LC_ALL, '')
 
@@ -1011,13 +1015,9 @@ def main(*args):
         # If there is the savedata, the script must save the number_user.
         if globalvar.randomSign and globalvar.saveSignIndex and \
            bot.welcomed_users:
-            if sys.version_info[0] > 2:
-                import pickle as cPickle
-            else:
-                import cPickle
             with open(filename, 'wb') as f:
-                cPickle.dump(bot.welcomed_users, f,
-                             protocol=config.pickle_protocol)
+                pickle.dump(bot.welcomed_users, f,
+                            protocol=config.pickle_protocol)
 
 
 if __name__ == '__main__':

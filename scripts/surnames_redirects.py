@@ -16,7 +16,7 @@ Command-line arguments:
 Example: "python pwb.py surnames_redirects -start:B"
 """
 #
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -28,7 +28,7 @@ import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import FollowRedirectPageBot, ExistingPageBot
 
-docuReplacements = {'&params;': pagegenerators.parameterHelp}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class SurnamesBot(ExistingPageBot, FollowRedirectPageBot):

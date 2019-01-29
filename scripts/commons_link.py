@@ -24,7 +24,7 @@ and pagegenerator can be one of these:
 """
 #
 # (C) Leonardo Gregianin, 2006
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -39,9 +39,7 @@ import pywikibot
 
 from pywikibot import textlib, pagegenerators, i18n, Bot
 
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class CommonsLinkBot(Bot):

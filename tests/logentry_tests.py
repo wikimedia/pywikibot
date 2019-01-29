@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test logentries module."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ class TestLogentriesBase(TestCase):
         """Test a single logtype entry."""
         logentry = self._get_logentry(logtype)
         self.assertIn(logtype, logentry.__class__.__name__.lower())
-        self.assertEqual(logentry._expectedType, logtype)
+        self.assertEqual(logentry._expected_type, logtype)
         if logtype not in LogEntryFactory._logtypes:
             self.assertIsInstance(logentry, OtherLogEntry)
         if self.site_key == 'old':

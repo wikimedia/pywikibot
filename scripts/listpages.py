@@ -88,7 +88,7 @@ page object:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -101,7 +101,7 @@ import pywikibot
 from pywikibot import config2 as config, i18n
 from pywikibot.pagegenerators import GeneratorFactory, parameterHelp
 
-docuReplacements = {'&params;': parameterHelp}
+docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
 
 class Formatter(object):

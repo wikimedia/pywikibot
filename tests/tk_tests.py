@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Tk UI."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -16,9 +16,9 @@ from tests.aspects import unittest, TestCase, DefaultSiteTestCase
 
 if os.environ.get('PYWIKIBOT_TEST_GUI', '0') == '1':
     if not PY2:
-        import tkinter as Tkinter
+        import tkinter
     else:
-        import Tkinter
+        import Tkinter as tkinter  # noqa: N813
     from pywikibot.userinterfaces.gui import EditBoxWindow, Tkdialog
 
 
@@ -59,8 +59,8 @@ class TestTkinter(DefaultSiteTestCase):
 
     def testTkinter(self):
         """Test Tkinter window."""
-        root = Tkinter.Tk()
-        root.resizable(width=Tkinter.FALSE, height=Tkinter.FALSE)
+        root = tkinter.Tk()
+        root.resizable(width=tkinter.FALSE, height=tkinter.FALSE)
         root.title('pywikibot GUI')
         page = pywikibot.Page(pywikibot.Site(), 'Main Page')
         content = page.get()

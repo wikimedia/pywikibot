@@ -115,8 +115,8 @@ This will move all pages in the category US to the category United States.
 # (C) leogregianin, 2004-2008
 # (C) Ben McIlwain (CydeWeys), 2006-2015
 # (C) Anreas J Schwab, 2007
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2008-2018
+# (C) xqt, 2009-2019
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -151,9 +151,7 @@ if sys.version_info[0] > 2:
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 cfd_templates = {
     'wikipedia': {

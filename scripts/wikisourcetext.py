@@ -54,7 +54,7 @@ The following parameters are supported:
     -always     don't bother asking to confirm any of the changes.
 """
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import collections
 import itertools
-import sys
 import threading
 import time
 
@@ -72,11 +71,12 @@ from pywikibot import i18n
 
 from pywikibot.bot import SingleSiteBot
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
+from pywikibot.tools import PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     import queue
 else:
-    import Queue as queue
+    import Queue as queue  # noqa: N813
 
 
 class UploadTextBot(SingleSiteBot):

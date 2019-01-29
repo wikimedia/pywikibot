@@ -37,7 +37,7 @@ Copy the template "Query service" from the Toolserver wiki to wikitech:
 """
 #
 # (C) Merlijn van Deen, 2014
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,9 +46,7 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 from pywikibot import pagegenerators
 
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class WikiTransferException(Exception):

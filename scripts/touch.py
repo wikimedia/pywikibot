@@ -26,7 +26,7 @@ Purge arguments:
 
 """
 #
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,7 @@ from pywikibot.bot import MultipleSitesBot
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.tools import issue_deprecation_warning
 
-docuReplacements = {'&params;': pagegenerators.parameterHelp}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class TouchBot(MultipleSitesBot):

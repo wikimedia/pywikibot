@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -396,7 +396,7 @@ FILTER OPTIONS
                     expression does not match.
 """
 
-docuReplacements = {'&params;': parameterHelp}
+docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
 # if a bot uses GeneratorFactory, the module should include the line
 #   docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}

@@ -15,7 +15,7 @@ Usage:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of MIT License.
 #
@@ -25,7 +25,7 @@ import pywikibot
 
 from pywikibot import pagegenerators, WikidataBot
 
-docuReplacements = {'&params;': pywikibot.pagegenerators.parameterHelp}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class IllustrateRobot(WikidataBot):

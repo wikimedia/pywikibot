@@ -13,7 +13,7 @@ Syntax:
 """
 #
 # (C) Ben McIlwain, 2008
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,7 +32,7 @@ DEFAULT_CFD_PAGE = 'Wikipedia:Categories for discussion/Working'
 # A list of templates that are used on category pages as part of the CFD
 # process that contain information such as the link to the per-day discussion
 #  page.
-cfdTemplates = ['Cfd full', 'Cfr full']
+cfd_templates = ['Cfd full', 'Cfr full']
 
 # Regular expression declarations
 # See the en-wiki CFD working page at
@@ -221,7 +221,7 @@ def findDay(pageTitle, oldDay):
     # Try to parse day link from CFD template parameters.
     templates = page.templatesWithParams()
     for template, params in templates:
-        if template.title() in cfdTemplates:
+        if template.title() in cfd_templates:
             period = {'year': None, 'day': None, 'month': None}
             for param in params:
                 name, _, val = param.partition('=')

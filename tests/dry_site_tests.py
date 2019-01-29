@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests against a fake Site object."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -153,7 +153,7 @@ class TestMustBe(DebugOnlyTestCase):
         self.assertEqual(self._logged_in_as, 'sysop')
 
     # Test that setUp is actually called between each test
-    testMockInTestReset = testMockInTest
+    testMockInTestReset = testMockInTest  # noqa: N815
 
     @must_be('sysop')
     def call_this_sysop_req_function(self, *args, **kwargs):

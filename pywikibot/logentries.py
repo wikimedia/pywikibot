@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing Mediawiki log entries."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -51,13 +51,13 @@ class LogEntry(object):
     # Log type expected. None for every type, or one of the (letype) str :
     # block/patrol/etc...
     # Overridden in subclasses.
-    _expectedType = None
+    _expected_type = None
 
     def __init__(self, apidata, site):
         """Initialize object from a logevent dict returned by MW API."""
         self.data = LogDict(apidata)
         self.site = site
-        expected_type = self._expectedType
+        expected_type = self._expected_type
         if expected_type is not None and expected_type != self.type():
             raise Error('Wrong log type! Expecting %s, received %s instead.'
                         % (expected_type, self.type()))
@@ -95,7 +95,7 @@ class LogEntry(object):
         if 'params' in self.data:
             return self.data['params']
         else:  # try old mw style preceding mw 1.19
-            return self.data[self._expectedType]
+            return self.data[self._expected_type]
 
     def logid(self):
         """Return the id of the log entry."""
@@ -192,7 +192,7 @@ class BlockEntry(LogEntry):
     expiry and flags are not available on unblock log entries.
     """
 
-    _expectedType = 'block'
+    _expected_type = 'block'
 
     def __init__(self, apidata, site):
         """Initializer."""
@@ -272,7 +272,7 @@ class RightsEntry(LogEntry):
 
     """Rights log entry."""
 
-    _expectedType = 'rights'
+    _expected_type = 'rights'
 
     @property
     def oldgroups(self):
@@ -295,7 +295,7 @@ class UploadEntry(LogEntry):
 
     """Upload log entry."""
 
-    _expectedType = 'upload'
+    _expected_type = 'upload'
 
     def page(self):
         """
@@ -312,7 +312,7 @@ class MoveEntry(LogEntry):
 
     """Move log entry."""
 
-    _expectedType = 'move'
+    _expected_type = 'move'
 
     @deprecated('target_ns.id', since='20150518')
     def new_ns(self):
@@ -361,7 +361,7 @@ class PatrolEntry(LogEntry):
 
     """Patrol log entry."""
 
-    _expectedType = 'patrol'
+    _expected_type = 'patrol'
 
     @property
     def current_id(self):
@@ -471,7 +471,7 @@ class LogEntryFactory(object):
                             if logtype is not None
                             else OtherLogEntry.__name__)
             cls._logtypes[logtype] = type(
-                classname, bases, {'_expectedType': logtype})
+                classname, bases, {'_expected_type': logtype})
         return cls._logtypes[logtype]
 
     def _createFromData(self, logdata):

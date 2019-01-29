@@ -23,14 +23,13 @@ Usage:
 
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
 import re
-import sys
 import time
 
 from datetime import timedelta
@@ -39,11 +38,12 @@ import pywikibot
 
 from pywikibot import i18n, pagegenerators, config
 from pywikibot.bot import SingleSiteBot
+from pywikibot.tools import PY2
 
-if sys.version_info[0] > 2:
-    import pickle as cPickle
+if PY2:
+    import cPickle as pickle  # noqa: N813
 else:
-    import cPickle
+    import pickle
 
 
 class CategoryRedirectBot(SingleSiteBot):
@@ -301,12 +301,12 @@ class CategoryRedirectBot(SingleSiteBot):
                                                  .format(self.site.dbName()))
         try:
             with open(datafile, 'rb') as inp:
-                record = cPickle.load(inp)
+                record = pickle.load(inp)
         except IOError:
             record = {}
         if record:
             with open(datafile + '.bak', 'wb') as f:
-                cPickle.dump(record, f, protocol=config.pickle_protocol)
+                pickle.dump(record, f, protocol=config.pickle_protocol)
         # regex to match soft category redirects
         # TODO: enhance and use textlib._MultiTemplateMatchBuilder
         #  note that any templates containing optional "category:" are
@@ -476,7 +476,7 @@ class CategoryRedirectBot(SingleSiteBot):
                 pass
 
         with open(datafile, 'wb') as f:
-            cPickle.dump(record, f, protocol=config.pickle_protocol)
+            pickle.dump(record, f, protocol=config.pickle_protocol)
 
         self.log_text.sort()
         self.problems.sort()

@@ -22,7 +22,7 @@ OCR support of page scans via:
 
 """
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -140,9 +140,9 @@ class ProofreadPage(pywikibot.Page):
     _MULTI_PAGE_EXT = ['djvu', 'pdf']
 
     _PHETOOLS = 'phetools'
-    _googleOCR = 'googleOCR'
+    _GOOGLE_OCR = 'googleOCR'
     _OCR_CMDS = {_PHETOOLS: _OCR_CMD,
-                 _googleOCR: _GOCR_CMD,
+                 _GOOGLE_OCR: _GOCR_CMD,
                  }
     _OCR_METHODS = list(_OCR_CMDS.keys())
 

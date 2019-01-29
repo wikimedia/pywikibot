@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for thanks-related code."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -47,9 +47,12 @@ class TestThankRevision(TestCase):
         Revision._thank(revid, site, source='pywikibot test')
         log_entries = site.logevents(logtype='thanks', total=5, page=user,
                                      start=before_time, reverse=True)
-        for __ in log_entries:
+        try:
+            next(iter(log_entries))
+        except StopIteration:
+            found_log = False
+        else:
             found_log = True
-            break
         self.assertTrue(found_log)
 
     def test_self_thank(self):

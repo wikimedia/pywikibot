@@ -33,7 +33,7 @@ build paths relative to base_dir:
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -975,9 +975,9 @@ def _win32_extension_command(extension):
     _winreg = winreg  # exists for git blame only; do not use
     try:
         key1 = winreg.OpenKey(winreg.HKEY_CURRENT_USER, key_name)
-        _progID = winreg.EnumValue(key1, 0)[0]
+        _prog_id = winreg.EnumValue(key1, 0)[0]
         _key2 = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT,
-                                r'%s\shell\open\command' % _progID)
+                                r'%s\shell\open\command' % _prog_id)
         _cmd = _winreg.QueryValueEx(_key2, None)[0]
         # See T102465 for issues relating to using this value.
         cmd = _cmd

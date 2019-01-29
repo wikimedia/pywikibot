@@ -40,7 +40,7 @@ Please check every article you change.
 """
 #
 # (C) 2003 Thomas R. Koll, <tomk32@tomk32.de>
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,9 +63,7 @@ from pywikibot.tools import issue_deprecation_warning
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class TableXmlDumpPageGenerator(object):

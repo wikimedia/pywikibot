@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Functions for manipulating external links or querying third-party sites."""
 #
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -10,7 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import sys
 from time import sleep
-import xml.etree.ElementTree as ET
+from xml.etree import ElementTree
 
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
@@ -87,7 +87,7 @@ def getWebCitationURL(url, timestamp=None):
     uri = uri + urlencode(query)
     xmltext = http.fetch(uri).text
     if 'success' in xmltext:
-        data = ET.fromstring(xmltext)
+        data = ElementTree.fromstring(xmltext)
         return data.find('.//webcite_url').text
     else:
         return None

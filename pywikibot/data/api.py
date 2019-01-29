@@ -24,7 +24,7 @@ from email.mime.nonmultipart import MIMENonMultipart
 from warnings import warn
 
 try:
-    import cPickle as pickle
+    import cPickle as pickle  # noqa: N813
 except ImportError:
     import pickle
 

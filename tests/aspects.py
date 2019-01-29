@@ -265,7 +265,7 @@ class TestCaseBase(unittest.TestCase):
         gen_titles = self._get_gen_titles(gen, len(titles), site)
         self.assertCountEqual(gen_titles, titles)
 
-    assertPagelistTitles = assertPageTitlesEqual
+    assertPagelistTitles = assertPageTitlesEqual  # noqa: N815
 
     def assertAPIError(self, code, info=None, callable_obj=None, *args,
                        **kwargs):

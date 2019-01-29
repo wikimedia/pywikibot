@@ -99,7 +99,7 @@ Syntax examples:
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -151,9 +151,7 @@ else:
     import urllib
     import urlparse
 
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 ignorelist = [
     # Officially reserved for testing, documentation, etc. in

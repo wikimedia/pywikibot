@@ -340,8 +340,8 @@ that you have to break it off, use "-continue" next time.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 # (C) Yuri Astrakhan, 2005-2006
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2007-2018
+# (C) xqt, 2009-2019
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -453,7 +453,7 @@ class InterwikiBotConfig(object):
     lacklanguage = None
     minlinks = 0
     quiet = False
-    restoreAll = False
+    restore_all = False
     asynchronous = False
     summary = ''
     repository = False
@@ -2187,7 +2187,7 @@ class InterwikiBot(object):
                     else:
                         break
             # If we have a few, getting the home language is a good thing.
-            if not self.conf.restoreAll:
+            if not self.conf.restore_all:
                 try:
                     if self.counts[pywikibot.Site()] > 4:
                         return pywikibot.Site()
@@ -2450,8 +2450,8 @@ def main(*args):
             else:
                 newPages = 100
         elif arg.startswith('-restore'):
-            iwconf.restoreAll = arg[9:].lower() == 'all'
-            optRestore = not iwconf.restoreAll
+            iwconf.restore_all = arg[9:].lower() == 'all'
+            optRestore = not iwconf.restore_all
         elif arg == '-continue':
             optContinue = True
         elif arg == '-hintsonly':
@@ -2499,7 +2499,7 @@ def main(*args):
         hintlessPageGen = pagegenerators.NewpagesPageGenerator(total=newPages,
                                                                namespaces=ns)
 
-    elif optRestore or optContinue or iwconf.restoreAll:
+    elif optRestore or optContinue or iwconf.restore_all:
         dumpFileName = pywikibot.config.datafilepath(
             'data',
             'interwiki-dumps',
@@ -2552,7 +2552,7 @@ def main(*args):
         bot.add(singlePage, hints=iwconf.hints)
 
     try:
-        append = not (optRestore or optContinue or iwconf.restoreAll)
+        append = not (optRestore or optContinue or iwconf.restore_all)
         bot.run()
     except KeyboardInterrupt:
         dumpFileName = bot.dump(append)

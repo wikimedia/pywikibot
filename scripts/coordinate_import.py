@@ -29,7 +29,7 @@ The following command line parameters are supported:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of MIT License.
 #
@@ -39,7 +39,7 @@ import pywikibot
 from pywikibot import pagegenerators, WikidataBot
 from pywikibot.exceptions import CoordinateGlobeUnknownException
 
-docuReplacements = {'&params;': pagegenerators.parameterHelp}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class CoordImportRobot(WikidataBot):

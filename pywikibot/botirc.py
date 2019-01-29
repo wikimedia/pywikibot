@@ -7,7 +7,7 @@ http://python-irclib.sourceforge.net/
 """
 #
 # (C) Balasyum, 2008
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -53,8 +53,7 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
     # Only the keys of the dict can be passed as init options
     # The values are the default values
     # Extend this in subclasses!
-    availableOptions = {
-    }
+    availableOptions = {}  # noqa: N815
 
     def __init__(self, site, channel, nickname, server, port=6667, **kwargs):
         """Initializer."""

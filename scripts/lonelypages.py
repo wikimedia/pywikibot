@@ -34,7 +34,7 @@ Furthermore, the following command line parameters are supported:
 #
 # (C) Pietrodn, it.wiki 2006-2007
 # (C) Filnik, it.wiki 2007
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -49,9 +49,7 @@ from pywikibot.bot import suggest_help, SingleSiteBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class OrphanTemplate(object):

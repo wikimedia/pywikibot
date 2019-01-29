@@ -57,7 +57,7 @@ Example
 
 #
 # (C) Filnik, 2007-2010
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -74,9 +74,7 @@ from pywikibot import config, i18n, pagegenerators, textlib
 from pywikibot.bot_choice import QuitKeyboardInterrupt
 from pywikibot.tools.formatter import color_format
 
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 def get_text(page, old, create):

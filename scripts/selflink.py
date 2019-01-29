@@ -11,7 +11,7 @@ These command line parameters can be used to specify which pages to work on:
                   ATTENTION: Use this with care!
 """
 #
-# (C) Pywikibot team, 2006-2018
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,9 +25,7 @@ from pywikibot.specialbots import BaseUnlinkBot
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': parameterHelp,
-}
+docuReplacements = {'&params;': parameterHelp}  # noqa: N816
 
 
 class _BoldChoice(Choice):

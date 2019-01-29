@@ -53,7 +53,7 @@ Unprotect all pages listed in text file 'unprotect.txt' without prompting.
 # Written by https://it.wikisource.org/wiki/Utente:Qualc1
 # Created by modifying delete.py
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -66,9 +66,7 @@ from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class ProtectionRobot(SingleSiteBot):

@@ -29,7 +29,7 @@ The following parameters are supported:
                    the order which they are given
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -48,9 +48,7 @@ from pywikibot.tools import UnicodeType
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,

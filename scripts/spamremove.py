@@ -27,7 +27,7 @@ In addition, these arguments can be used to restrict changes to some pages:
 &params;
 """
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -41,9 +41,7 @@ from pywikibot.bot import (
 from pywikibot.editor import TextEditor
 from pywikibot.tools.formatter import color_format
 
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class SpamRemoveBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot,

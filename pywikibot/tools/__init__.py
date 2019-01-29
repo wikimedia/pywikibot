@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Miscellaneous helper functions (not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -37,12 +37,12 @@ PY2 = (PYTHON_VERSION[0] == 2)
 
 if not PY2:
     from itertools import zip_longest
-    import queue as Queue
+    import queue
     StringTypes = basestring = (str,)
     UnicodeType = unicode = str
 else:
     from itertools import izip_longest as zip_longest
-    import Queue
+    import Queue as queue  # noqa: N813
     StringTypes = types.StringTypes
     UnicodeType = types.UnicodeType
 
@@ -836,7 +836,7 @@ class ThreadedGenerator(threading.Thread):
             raise RuntimeError('No generator for ThreadedGenerator to run.')
         self.args, self.kwargs = args, kwargs
         threading.Thread.__init__(self, group=group, name=name)
-        self.queue = Queue.Queue(qsize)
+        self.queue = queue.Queue(qsize)
         self.finished = threading.Event()
 
     def __iter__(self):
@@ -847,7 +847,7 @@ class ThreadedGenerator(threading.Thread):
         while not self.finished.isSet():
             try:
                 yield self.queue.get(True, 0.25)
-            except Queue.Empty:
+            except queue.Empty:
                 pass
             except KeyboardInterrupt:
                 self.stop()
@@ -870,7 +870,7 @@ class ThreadedGenerator(threading.Thread):
                     return
                 try:
                     self.queue.put_nowait(result)
-                except Queue.Full:
+                except queue.Full:
                     time.sleep(0.25)
                     continue
                 break
@@ -1076,7 +1076,7 @@ def intersect_generators(genlist):
                 if active < n_gen and n_gen - max_cache > active:
                     thrlist.stop_all()
                     return
-            except Queue.Empty:
+            except queue.Empty:
                 pass
             except KeyboardInterrupt:
                 thrlist.stop_all()

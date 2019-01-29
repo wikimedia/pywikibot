@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Miscellaneous helper functions for mysql queries."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -15,7 +15,7 @@ try:
     import pymysql as mysqldb
 except ImportError:
     try:
-        import MySQLdb as mysqldb
+        import MySQLdb as mysqldb  # noqa: N813
     except ImportError:
         raise ImportError('No supported MySQL library installed. '
                           'Please install PyMySQL.')

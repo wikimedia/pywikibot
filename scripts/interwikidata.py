@@ -23,7 +23,7 @@ Furthermore, the following command line parameters are supported:
 -summary:         Use your own edit summary for cleaning the page.
 """
 
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -36,9 +36,7 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot, suggest_help
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 # Allowed namespaces. main, project, template, category
 namespaces = [0, 4, 10, 14]

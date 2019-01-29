@@ -12,7 +12,7 @@ This module also includes objects:
 
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -3045,8 +3045,8 @@ class Category(Page):
             authors = ', '.join(self.contributingUsers())
             creation_summary = message % (self.title(), authors)
             newtext = self.get()
-        for regexName in cfd_templates:
-            matchcfd = re.compile(r'{{%s.*?}}' % regexName, re.IGNORECASE)
+        for regex_name in cfd_templates:
+            matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
             newtext = matchcfd.sub('', newtext)
             matchcomment = re.compile(
                 r'<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->',

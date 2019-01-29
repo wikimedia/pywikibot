@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -462,7 +462,7 @@ class TestParamInfo(DefaultSiteTestCase):
             self.assertEqual(value, '')
 
     @patch.object(pywikibot, 'warning')  # ignore several warnings
-    def test_old_mode(self, _):
+    def test_old_mode(self, *args):
         """Test the old mode explicitly."""
         site = self.get_site()
         pi = api.ParamInfo(site, modules_only_mode=False)

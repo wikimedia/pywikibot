@@ -36,7 +36,7 @@ and override its `callback` method. Here is a sample:
 """
 #
 # (C) Bryan Tong Minh, 2008
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Ported by Geoffrey "GEOFBOT" Mon - User:Sn1per
 # for Google Code-In 2013
@@ -135,7 +135,8 @@ class BaseRevertBot(object):
         pywikibot.output(msg)
 
 
-myRevertBot = BaseRevertBot  # for compatibility only
+# for compatibility only
+myRevertBot = BaseRevertBot  # noqa: N816
 
 
 def main(*args):

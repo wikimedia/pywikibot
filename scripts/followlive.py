@@ -15,7 +15,7 @@ The following parameters are supported:
 &params;
 """
 #
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -32,9 +32,7 @@ __metaclass__ = type
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 # templates that can be used followed by the message used as comment
 # templates contains list of languages code

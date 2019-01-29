@@ -27,7 +27,7 @@ The following generators and filters are supported:
 """
 #
 # (C) Bináris, 2012
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -43,9 +43,7 @@ from pywikibot.tools.formatter import color_format
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 
 class DashRedirectBot(

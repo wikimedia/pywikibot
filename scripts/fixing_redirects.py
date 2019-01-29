@@ -13,7 +13,7 @@ options -file, -ref, -links, ...
 
 """
 #
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -31,9 +31,7 @@ from pywikibot.tools import first_lower, first_upper as firstcap
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
-docuReplacements = {
-    '&params;': pagegenerators.parameterHelp,
-}
+docuReplacements = {'&params;': pagegenerators.parameterHelp}  # noqa: N816
 
 # Featured articles categories
 featured_articles = 'Q4387444'
