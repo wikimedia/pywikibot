@@ -3045,9 +3045,9 @@ class Category(Page):
             authors = ', '.join(self.contributingUsers())
             creation_summary = message % (self.title(), authors)
             newtext = self.get()
-        for regex_name in cfd_templates:
-            matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
-            newtext = matchcfd.sub('', newtext)
+            for regex_name in cfd_templates:
+                matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
+                newtext = matchcfd.sub('', newtext)
             matchcomment = re.compile(
                 r'<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->',
                 re.IGNORECASE | re.MULTILINE | re.DOTALL)
