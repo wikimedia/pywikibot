@@ -471,9 +471,9 @@ What is it? """
             try:
                 choices = answer.split(',')
             except ValueError:
-                    # User entered wrong value
-                    pywikibot.error('"{}" is not valid'.format(answer))
-                    continue
+                # User entered wrong value
+                pywikibot.error('"{}" is not valid'.format(answer))
+                continue
             # test input
             for choice in choices:
                 try:

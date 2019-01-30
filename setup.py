@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Installer script for Pywikibot 3.0 framework."""
 #
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -61,7 +61,7 @@ extra_deps = {
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8>=3.6.0',
+        'flake8==3.6.0',  # T214962
         'pydocstyle',
         'hacking',
         'flake8-coding',

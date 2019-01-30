@@ -48,8 +48,8 @@ Please fix these if you are capable and motivated:
 #
 # (C) Wikipedian, 2006-2007
 # (C) Siebrand Mazeland, 2007-2008
-# (C) xqt, 2010-2018
-# (C) Pywikibot team, 2006-2018
+# (C) xqt, 2010-2019
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -285,36 +285,36 @@ class NowCommonsDeleteBot(Bot):
                             localImagePage.title(with_ns=False),
                             len(usingPages)))
                         if self.getOption('replace') is True:
-                                pywikibot.output(color_format(
-                                    'Replacing "{lightred}{0}{default}" by '
-                                    '"{lightgreen}{1}{default}\".',
-                                    localImagePage.title(with_ns=False),
-                                    commonsImagePage.title(with_ns=False)))
+                            pywikibot.output(color_format(
+                                'Replacing "{lightred}{0}{default}" by '
+                                '"{lightgreen}{1}{default}\".',
+                                localImagePage.title(with_ns=False),
+                                commonsImagePage.title(with_ns=False)))
+                            bot = ImageBot(
+                                pg.FileLinksGenerator(localImagePage),
+                                localImagePage.title(with_ns=False),
+                                commonsImagePage.title(with_ns=False),
+                                '', self.getOption('replacealways'),
+                                self.getOption('replaceloose'))
+                            bot.run()
+                            # If the image is used with the urlname the
+                            # previous function won't work
+                            is_used = bool(list(pywikibot.FilePage(
+                                self.site,
+                                page.title()).usingPages(total=1)))
+                            if is_used and self.getOption('replaceloose'):
                                 bot = ImageBot(
-                                    pg.FileLinksGenerator(localImagePage),
-                                    localImagePage.title(with_ns=False),
+                                    pg.FileLinksGenerator(
+                                        localImagePage),
+                                    localImagePage.title(
+                                        with_ns=False, as_url=True),
                                     commonsImagePage.title(with_ns=False),
                                     '', self.getOption('replacealways'),
                                     self.getOption('replaceloose'))
                                 bot.run()
-                                # If the image is used with the urlname the
-                                # previous function won't work
-                                is_used = bool(list(pywikibot.FilePage(
-                                    self.site,
-                                    page.title()).usingPages(total=1)))
-                                if is_used and self.getOption('replaceloose'):
-                                    bot = ImageBot(
-                                        pg.FileLinksGenerator(
-                                            localImagePage),
-                                        localImagePage.title(
-                                            with_ns=False, as_url=True),
-                                        commonsImagePage.title(with_ns=False),
-                                        '', self.getOption('replacealways'),
-                                        self.getOption('replaceloose'))
-                                    bot.run()
-                                # refresh because we want the updated list
-                                usingPages = len(list(pywikibot.FilePage(
-                                    self.site, page.title()).usingPages()))
+                            # refresh because we want the updated list
+                            usingPages = len(list(pywikibot.FilePage(
+                                self.site, page.title()).usingPages()))
 
                         else:
                             pywikibot.output('Please change them manually.')

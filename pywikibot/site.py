@@ -1809,7 +1809,7 @@ class TokenWallet(object):
 
         if (key not in user_tokens
                 and failed_cache_key not in self.failed_cache):
-                    self.load_tokens([key], all=False if user_tokens else None)
+            self.load_tokens([key], all=False if user_tokens else None)
 
         if key in user_tokens:
             return user_tokens[key]
@@ -3091,7 +3091,7 @@ class APISite(BaseSite):
         for pageitem in query:
             if not self.sametitle(pageitem['title'],
                                   page.title(with_section=False)):
-                    raise InconsistentTitleReceived(page, pageitem['title'])
+                raise InconsistentTitleReceived(page, pageitem['title'])
 
             api.update_page(page, pageitem, query.props)
 
