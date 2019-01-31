@@ -1656,8 +1656,8 @@ def UserContributionsGenerator(username, namespaces=None, site=None,
 
     user = pywikibot.User(site, username)
     if not (user.isAnonymous() or user.isRegistered()):
-            pywikibot.warning('User "{}" does not exist on site "{}".'
-                              .format(user.username, site))
+        pywikibot.warning('User "{}" does not exist on site "{}".'
+                          .format(user.username, site))
 
     gen = (contrib[0] for contrib in user.contributions(
         namespaces=namespaces, total=total))

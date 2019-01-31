@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for WOW Wiki."""
 #
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,12 +30,14 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
     # The interwikimap in this family map 'sv' to this empty wiki.
     @classproperty
     def langs(cls):
+        """Property listing family languages."""
         cls.langs = super(Family, cls).langs
         cls.langs['sv'] = 'sv.warcraft.wikia.com'
         return cls.langs
 
     @classproperty
     def disambiguationTemplates(cls):
+        """Property listing disambiguation templates."""
         cls.disambiguationTemplates = \
             super(Family, cls).disambiguationTemplates
         cls.disambiguationTemplates['en'] = ['disambig', 'disambig/quest',
@@ -45,6 +47,7 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
 
     @classproperty
     def disambcatname(cls):
+        """Property listing disambiguation category name."""
         cls.disambcatname = super(Family, cls).disambcatname
         cls.disambcatname['en'] = 'Disambiguations'
         return cls.disambcatname
@@ -52,6 +55,7 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
     # Wikia's default CategorySelect extension always puts categories last
     @classproperty
     def categories_last(cls):
+        """Property listing site keys for categories at last position."""
         return cls.langs.keys()
 
     @classproperty

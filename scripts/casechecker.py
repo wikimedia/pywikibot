@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Bot to find all pages on the wiki with mixed latin and cyrilic alphabets."""
 #
-# (C) Pywikibot team, 2006-2018
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -441,8 +441,8 @@ class CaseChecker(object):
                                                  .format(err[0]))
                     if pageObj is not None:
                         if self.PutNewPage(pageObj, pageTxt, msg):
-                                # done, no need to log anything
-                                foundSuggestions = False
+                            # done, no need to log anything
+                            foundSuggestions = False
 
                     if foundSuggestions:
                         self.AppendLineToLog(self.failedTitles, title)
