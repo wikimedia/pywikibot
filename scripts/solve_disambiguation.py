@@ -570,7 +570,7 @@ class ShowPageOption(StandardOption):
 
     def __init__(self, option, shortcut, start, page):
         """Initializer."""
-        super(ShowPageOption, self).__init__(option, shortcut, False)
+        super(ShowPageOption, self).__init__(option, shortcut, stop=False)
         self._start = start
         if page.isRedirectPage():
             page = page.getRedirectTarget()
@@ -590,7 +590,7 @@ class AliasOption(StandardOption):
 
     def __init__(self, option, shortcuts, stop=True):
         """Initializer."""
-        super(AliasOption, self).__init__(option, shortcuts[0], stop)
+        super(AliasOption, self).__init__(option, shortcuts[0], stop=stop)
         self._aliases = frozenset(s.lower() for s in shortcuts[1:])
 
     def test(self, value):
