@@ -48,7 +48,7 @@ test_deps = ['bz2file', 'mock']
 
 dependencies = ['requests>=2.20.0']
 
-pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle'
+pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle>=2.5.0'
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient>=0.0.18'],
@@ -62,7 +62,7 @@ extra_deps = {
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
-        'flake8==3.6.0',  # T214962
+        'flake8>=3.7.5',
         pydocstyle,
         'hacking',
         'flake8-coding',
@@ -70,14 +70,13 @@ extra_deps = {
         'flake8-docstrings>=1.1.0',
         'flake8-future-import',
         'flake8-mock>=0.3',
-        'flake8-per-file-ignores',
         'flake8-print>=2.0.1',
         'flake8-quotes',
         'flake8-string-format',
         'flake8-tuple>=0.2.8',
         'flake8-no-u-prefixed-strings>=0.2',
         'pep8-naming>=0.7',
-        'pyflakes>=1.1',
+        'pyflakes>=2.1.0',
     ]
 }
 
