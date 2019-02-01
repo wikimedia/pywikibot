@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -89,14 +89,14 @@ class TestFamily(TestCase):
         family = Family.load('wikipedia')
         other = 'wikipedia'
         self.assertEqual(family, other)
-        self.assertFalse(family != other)
+        self.assertFalse(family != other)  # noqa: H204
 
     def test_ne_family_with_string_repr_different_family(self):
         """Test that Family and string with different name are not equal."""
         family = Family.load('wikipedia')
         other = 'wikisource'
         self.assertNotEqual(family, other)
-        self.assertFalse(family == other)
+        self.assertFalse(family == other)  # noqa: H204
 
     def test_eq_family_with_string_repr_not_existing_family(self):
         """Test that Family and string with different name are not equal."""
@@ -115,9 +115,9 @@ class TestFamily(TestCase):
         # redirected code (see site tests test_alias_code_site)
         self.assertEqual(family.obsolete['dk'], 'da')
         # closed/locked site (see site tests test_locked_site)
-        self.assertEqual(family.obsolete['mh'], None)
+        self.assertIsNone(family.obsolete['mh'])
         # offline site (see site tests test_removed_site)
-        self.assertEqual(family.obsolete['ru-sib'], None)
+        self.assertIsNone(family.obsolete['ru-sib'])
 
     def test_get_obsolete_test(self):
         """Test WikimediaFamily default obsolete."""

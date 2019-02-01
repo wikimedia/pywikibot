@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for archivebot.py/Timestripper."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -95,8 +95,8 @@ class TestTimeStripperWithNoDigitsAsMonths(TestTimeStripperCase):
         txt_hour_in_range = '7 février 2010 à 23:00 (CET)'
         txt_hour_out_of_range = '7 février 2010 à 24:00 (CET)'
 
-        self.assertNotEqual(self.ts.timestripper(txt_hour_in_range), None)
-        self.assertEqual(self.ts.timestripper(txt_hour_out_of_range), None)
+        self.assertIsNotNone(self.ts.timestripper(txt_hour_in_range))
+        self.assertIsNone(self.ts.timestripper(txt_hour_out_of_range))
 
 
 class TestTimeStripperWithDigitsAsMonths(TestTimeStripperCase):
@@ -264,13 +264,13 @@ class TestTimeStripperLanguage(TestCase):
         else:
             txt_no_match = '3 March 2011 19:48 (UTC) 7 March 2010 19:48 (UTC)'
 
-        self.assertEqual(self.ts.timestripper(txt_no_match), None)
+        self.assertIsNone(self.ts.timestripper(txt_no_match))
 
         if 'nomatch1' not in self.sites[key]:
             return
 
         txt_no_match = self.sites[key]['nomatch1']
-        self.assertEqual(self.ts.timestripper(txt_no_match), None)
+        self.assertIsNone(self.ts.timestripper(txt_no_match))
 
 
 class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
@@ -354,7 +354,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
 
         txt_match = ('{}[http://example.com Here is long enough text]{}'
                      .format(self.date[:9], self.date[9:]))
-        self.assertEqual(ts(txt_match), None)
+        self.assertIsNone(ts(txt_match))
 
     def test_timestripper_match_wikilink_with_date(self):
         """Test that dates in wikilinks are correctly matched."""
@@ -378,7 +378,7 @@ class TestTimeStripperTreatSpecialText(TestTimeStripperCase):
 
         txt_match = ('{}[[Here is long enough text]]{}'
                      .format(self.date[:9], self.date[9:]))
-        self.assertEqual(ts(txt_match), None)
+        self.assertIsNone(ts(txt_match))
 
         txt_match = self.date[:9] + '[[foo]]' + self.date[9:]
         self.assertEqual(ts(txt_match), self.expected_date)

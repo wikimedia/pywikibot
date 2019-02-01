@@ -148,7 +148,7 @@ class TestMustBe(DebugOnlyTestCase):
 
     def testMockInTest(self):
         """Test that setUp and login work."""
-        self.assertEqual(self._logged_in_as, None)
+        self.assertIsNone(self._logged_in_as)
         self.login(True)
         self.assertEqual(self._logged_in_as, 'sysop')
 

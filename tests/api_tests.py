@@ -660,7 +660,7 @@ class TestDryPageGenerator(TestCase):
 
     def test_initial_limit(self):
         """Test the default limit."""
-        self.assertEqual(self.gen.limit, None)  # limit is initally None
+        self.assertIsNone(self.gen.limit)  # limit is initally None
 
     def test_set_limit_as_number(self):
         """Test setting the limit using an int."""

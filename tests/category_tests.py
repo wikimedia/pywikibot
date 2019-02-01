@@ -54,10 +54,10 @@ class TestCategoryObject(TestCase):
         site = self.get_site()
         cat = pywikibot.Category(site, 'Category:Female Wikipedians')
         categoryinfo = cat.categoryinfo
-        self.assertTrue(categoryinfo['files'] >= 0)
-        self.assertTrue(categoryinfo['pages'] >= 0)
-        self.assertTrue(categoryinfo['size'] > 0)
-        self.assertTrue(categoryinfo['subcats'] > 0)
+        self.assertGreaterEqual(categoryinfo['files'], 0)
+        self.assertGreaterEqual(categoryinfo['pages'], 0)
+        self.assertGreater(categoryinfo['size'], 0)
+        self.assertGreater(categoryinfo['subcats'], 0)
         members_sum = (categoryinfo['files'] + categoryinfo['pages']
                        + categoryinfo['subcats'])
         self.assertEqual(members_sum, categoryinfo['size'])
@@ -65,7 +65,7 @@ class TestCategoryObject(TestCase):
         cat_files = pywikibot.Category(site,
                                        'Category:Files lacking an author')
         categoryinfo2 = cat_files.categoryinfo
-        self.assertTrue(categoryinfo2['files'] > 0)
+        self.assertGreater(categoryinfo2['files'], 0)
 
     def test_members(self):
         """Test the members method."""
@@ -219,7 +219,7 @@ class TestCategoryDryObject(TestCase):
         cat = pywikibot.Category(site, 'Category:Foo#bar')
         self.assertEqual(cat.section(), 'bar')
         cat2 = pywikibot.Category(site, 'Category:Foo')
-        self.assertEqual(cat2.section(), None)
+        self.assertIsNone(cat2.section())
 
     def test_aslink(self):
         """Test the title method with as_link=True."""

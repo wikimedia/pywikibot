@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the proofreadpage module."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -450,7 +450,7 @@ class TestProofreadPageIndexProperty(TestCase):
 
         # Page without Index.
         page = ProofreadPage(self.site, self.existing_unlinked['title'])
-        self.assertIs(page.index, None)
+        self.assertIsNone(page.index)
         self.assertEqual(page._index, (None, []))
 
 

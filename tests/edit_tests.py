@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for editing pages."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -68,7 +68,7 @@ class TestGeneralWrite(TestCase):
         self.assertFalse(hasattr(p, '_text'))
         p = pywikibot.Page(self.site, 'User:John Vandenberg/appendtext test')
         self.assertTrue(p.text.endswith(ts))
-        self.assertTrue(p.text != ts)
+        self.assertNotEqual(p.text, ts)
 
 
 class TestSiteMergeHistory(TestCase):

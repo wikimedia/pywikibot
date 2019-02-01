@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the page module."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -410,7 +410,7 @@ class TestPageObject(DefaultSiteTestCase):
         p1 = pywikibot.Page(site, 'Help:Test page#Testing')
         p2 = pywikibot.Page(site, 'File:Jean-Léon Gérôme 003.jpg')
         self.assertEqual(p1.section(), 'Testing')
-        self.assertEqual(p2.section(), None)
+        self.assertIsNone(p2.section())
 
     def testIsTalkPage(self):
         """Test isTalkPage() method."""
@@ -419,10 +419,10 @@ class TestPageObject(DefaultSiteTestCase):
         p2 = pywikibot.Page(site, 'Talk:First page')
         p3 = pywikibot.Page(site, 'User:Second page')
         p4 = pywikibot.Page(site, 'User talk:Second page')
-        self.assertEqual(p1.isTalkPage(), False)
-        self.assertEqual(p2.isTalkPage(), True)
-        self.assertEqual(p3.isTalkPage(), False)
-        self.assertEqual(p4.isTalkPage(), True)
+        self.assertFalse(p1.isTalkPage())
+        self.assertTrue(p2.isTalkPage())
+        self.assertFalse(p3.isTalkPage())
+        self.assertTrue(p4.isTalkPage())
 
     def testIsCategory(self):
         """Test is_categorypage method."""

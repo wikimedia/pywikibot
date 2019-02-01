@@ -1939,7 +1939,7 @@ class TestSiteSysopWrite(TestCase):
                                       'move': 'autoconfirmed'},
                          page=p1,
                          reason='Pywikibot unit test')
-        self.assertEqual(r, None)
+        self.assertIsNone(r)
         self.assertEqual(site.page_restrictions(page=p1),
                          {'edit': ('sysop', 'infinity'),
                           'move': ('autoconfirmed', 'infinity')})
@@ -1968,7 +1968,7 @@ class TestSiteSysopWrite(TestCase):
                                       'move': 'autoconfirmed'},
                          page=p1,
                          reason='Pywikibot unit test')
-        self.assertEqual(r, None)
+        self.assertIsNone(r)
         self.assertEqual(site.page_restrictions(page=p1),
                          {'edit': ('sysop', 'infinity'),
                           'move': ('autoconfirmed', 'infinity')})
@@ -2024,7 +2024,7 @@ class TestSiteSysopWrite(TestCase):
         site.deletepage(p, reason='pywikibot unit tests')
         site.undelete_page(p, 'pywikibot unit tests')
         revs = list(p.revisions())
-        self.assertTrue(len(revs) > 2)
+        self.assertGreater(len(revs), 2)
 
 
 class TestUsernameInUsers(DefaultSiteTestCase):

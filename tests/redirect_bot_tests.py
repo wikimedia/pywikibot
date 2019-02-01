@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the redirect.py script."""
 #
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -42,7 +42,7 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
         with patch.object(pywikibot, 'warning') as w:
             bot = RedirectRobot('broken', delete=True)
         w.assert_called_with('No speedy deletion template available.')
-        self.assertEqual(bot.sdtemplate, None)
+        self.assertIsNone(bot.sdtemplate)
 
     def test_with_delete_and_non_existing_sdtemplate(self):
         """Test with delete and non-exisitng sdtemplate."""
@@ -51,7 +51,7 @@ class TestGetSDTemplateNoSysop(DefaultSiteTestCase):
             with patch.object(pywikibot, 'warning') as w:
                 bot = RedirectRobot('broken', **options)
         w.assert_called_with('No speedy deletion template "n" available.')
-        self.assertEqual(bot.sdtemplate, None)
+        self.assertIsNone(bot.sdtemplate)
 
 
 if __name__ == '__main__':  # pragma: no cover
