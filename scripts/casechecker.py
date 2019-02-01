@@ -373,8 +373,9 @@ class CaseChecker(object):
                                         src.title(with_ns=False),
                                         dst.title(with_ns=False),
                                         self.autonomous,
-                                        editSummary + ' ' +
-                                        self.MakeMoveSummary(title, newTitle),
+                                        editSummary + ' '
+                                        + self.MakeMoveSummary(title,
+                                                               newTitle),
                                         True)
                                     bot.run()
                                 else:

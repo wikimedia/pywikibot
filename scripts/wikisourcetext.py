@@ -199,8 +199,8 @@ class UploadTextBot(SingleSiteBot):
                 return
             page.body = _body
 
-        if (page.exists() and
-                not (self.getOption('ocr') and self.getOption('force'))):
+        if (page.exists()
+                and not (self.getOption('ocr') and self.getOption('force'))):
             pywikibot.output('Page {} already exists, not adding!'
                              .format(page))
         else:

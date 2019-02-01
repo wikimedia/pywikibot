@@ -18,7 +18,7 @@ A tool to transfer flickr photos to Wikimedia Commons.
 """
 #
 # (C) Multichill, 2009
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -254,9 +254,9 @@ def buildDescription(flinfoDescription='', flickrreview=False, reviewer='',
         if reviewer:
             description = description.replace(
                 '{{flickrreview}}',
-                '{{flickrreview|' + reviewer +
-                '|{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}'
-                '-{{subst:CURRENTDAY2}}}}')
+                '{{flickrreview|%s|'
+                '{{subst:CURRENTYEAR}}-{{subst:CURRENTMONTH}}-'
+                '{{subst:CURRENTDAY2}}}}' % reviewer)
     if addCategory:
         description = description.replace('{{subst:unc}}\n', '')
         description = description + '\n[[Category:' + addCategory + ']]\n'
