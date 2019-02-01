@@ -3038,26 +3038,26 @@ class Category(Page):
             pywikibot.warning('Target page %s already exists!'
                               % target_cat.title())
             return False
-        else:
-            pywikibot.output(
-                'Moving text from %s to %s.'
-                % (self.title(), target_cat.title()))
-            authors = ', '.join(self.contributingUsers())
-            creation_summary = message % (self.title(), authors)
-            newtext = self.get()
-            for regex_name in cfd_templates:
-                matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
-                newtext = matchcfd.sub('', newtext)
-            matchcomment = re.compile(
-                r'<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->',
-                re.IGNORECASE | re.MULTILINE | re.DOTALL)
-            newtext = matchcomment.sub('', newtext)
-            pos = 0
-            while (newtext[pos:pos + 1] == '\n'):
-                pos = pos + 1
-            newtext = newtext[pos:]
-            target_cat.put(newtext, creation_summary)
-            return True
+
+        pywikibot.output(
+            'Moving text from {} to {}.'
+            .format(self.title(), target_cat.title()))
+        authors = ', '.join(self.contributingUsers())
+        creation_summary = message % (self.title(), authors)
+        newtext = self.get()
+        for regex_name in cfd_templates:
+            matchcfd = re.compile(r'{{%s.*?}}' % regex_name, re.IGNORECASE)
+            newtext = matchcfd.sub('', newtext)
+        matchcomment = re.compile(
+            r'<!--BEGIN CFD TEMPLATE-->.*?<!--END CFD TEMPLATE-->',
+            re.IGNORECASE | re.MULTILINE | re.DOTALL)
+        newtext = matchcomment.sub('', newtext)
+        pos = 0
+        while (newtext[pos:pos + 1] == '\n'):
+            pos = pos + 1
+        newtext = newtext[pos:]
+        target_cat.put(newtext, creation_summary)
+        return True
 
     @property
     def categoryinfo(self):
