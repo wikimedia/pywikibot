@@ -108,10 +108,11 @@ class FamilyFileGenerator(object):
         """Load other language pages."""
         print('Loading wikis... ')
         for lang in self.langs:
-            print('  * %s... ' % (lang['prefix']), end='')
-            if lang['prefix'] not in self.wikis:
+            key = lang['prefix']
+            print('  * {}... '.format(key), end='')
+            if key not in self.wikis:
                 try:
-                    self.wikis[lang['prefix']] = self.Wiki(lang['url'])
+                    self.wikis[key] = self.Wiki(lang['url'])
                     print('downloaded')
                 except Exception as e:
                     print(e)
