@@ -4,6 +4,11 @@ Release history
 Current release
 ---------------
 
+* Support python version 3.7
+* pagegenerators.py: add -querypage parameter to yield pages provided by any special page (T214234)
+* Fix comparison of str, bytes and int literal with
+* site.py: add generic self.querypage() to query SpecialPages
+* echo.Notification has a new event_id property as integer
 * Bugfixes and improvements
 * Localisation updates
 
