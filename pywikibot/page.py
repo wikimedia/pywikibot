@@ -29,18 +29,17 @@ from collections import Counter, defaultdict, namedtuple, OrderedDict
 from warnings import warn
 
 import pywikibot
+from pywikibot import config, i18n, textlib
 from pywikibot.comms import http
-from pywikibot import config
+from pywikibot.data.api import APIError
 from pywikibot.exceptions import (
     AutoblockUser,
     NotEmailableError,
     SiteDefinitionError,
     UserRightsError,
 )
-from pywikibot.data.api import APIError
 from pywikibot.family import Family
 from pywikibot.site import DataSite, Namespace, need_version
-from pywikibot import textlib
 from pywikibot.tools import (
     compute_file_hash,
     UnicodeMixin, ComparableMixin, DotReadableDict,
@@ -49,8 +48,7 @@ from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
     first_upper, redirect_func, remove_last_args,
 )
-from pywikibot.tools.ip import ip_regexp
-from pywikibot.tools.ip import is_IP
+from pywikibot.tools.ip import is_IP, ip_regexp
 
 if not PY2:
     unicode = basestring = str
@@ -1338,7 +1336,6 @@ class BasePage(UnicodeMixin, ComparableMixin):
         self.text = cc_toolkit.change(old)
         if summary and old.strip().replace(
                 '\r\n', '\n') != self.text.strip().replace('\r\n', '\n'):
-            from pywikibot import i18n
             summary += i18n.twtranslate(self.site, 'cosmetic_changes-append')
         return summary
 
@@ -1425,7 +1422,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         if self.exists():
             # ensure always get the page text and not to change it.
             del self.text
-            self.save(summary='Pywikibot touch edit', watch='nochange',
+            summary = i18n.twtranslate(self.site, 'pywikibot-touch')
+            self.save(summary=summary, watch='nochange',
                       minor=False, botflag=botflag, force=True,
                       asynchronous=False, callback=callback,
                       apply_cosmetic_changes=False, nocreate=True, **kwargs)
