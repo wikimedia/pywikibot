@@ -7,22 +7,12 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
--xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see https://dumps.wikimedia.org).
-                  Argument can also be given as "-xml:filename".
-
--page             Only edit a specific page.
-                  Argument can also be given as "-page:pagetitle". You can
-                  give this parameter multiple times to edit multiple pages.
-
 Furthermore, the following command line parameters are supported:
 
 -enable:          Enable or disable the bot via a Wiki Page.
 
 -disambig:        Set a page where the bot saves the name of the disambig
                   pages found (default: skip the pages)
-
--limit:           Set how many pages check.
 
 -always           Always say yes, won't ask
 
@@ -143,7 +133,7 @@ class LonelyPagesBot(SingleSiteBot):
             try:
                 self.disambigtext = self.disambigpage.get()
             except pywikibot.NoPage:
-                pywikibot.output("{0} doesn't esist, skip!"
+                pywikibot.output("{0} doesn't exist, skip!"
                                  .format(self.disambigpage.title()))
                 self.disambigtext = ''
             except pywikibot.IsRedirectPage:
@@ -164,7 +154,7 @@ class LonelyPagesBot(SingleSiteBot):
                 getenable = enable.get()
             except pywikibot.NoPage:
                 pywikibot.output(
-                    "{0} doesn't esist, I use the page as if it was blank!"
+                    "{0} doesn't exist, I use the page as if it was blank!"
                     .format(enable.title()))
                 getenable = ''
             except pywikibot.IsRedirectPage:
