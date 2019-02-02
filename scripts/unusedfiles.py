@@ -7,15 +7,15 @@ Parameters:
 
 -always         Don't be asked every time.
 -nouserwarning  Do not warn uploader about orphaned file.
--total          Specify number of pages to work on with "-total:n" where
+-limit          Specify number of pages to work on with "-limit:n" where
                 n is the maximum number of articles to work on.
                 If not used, all pages are used.
 """
 #
 # (C) Leonardo Gregianin, 2007
 # (C) Filnik, 2008
-# (c) xqt, 2011-2018
-# (C) Pywikibot team, 2013-2018
+# (c) xqt, 2011-2019
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -24,6 +24,8 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import issue_deprecation_warning
 
 template_to_the_image = {
     'meta': '{{Orphan file}}',
@@ -114,8 +116,13 @@ def main(*args):
 
     for arg in local_args:
         arg, sep, value = arg.partition(':')
-        if arg == '-total':
+        if arg == '-limit':
             total = value
+        elif arg == '-total':
+            total = value
+            issue_deprecation_warning('The usage of "{0}"'.format(arg),
+                                      '-limit', 2, ArgumentDeprecationWarning,
+                                      since='20190120')
         else:
             options[arg[1:]] = True
 
