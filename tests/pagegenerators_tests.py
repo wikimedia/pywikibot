@@ -1220,9 +1220,12 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_show(self):
         """Test generator of pages with lint errors."""
         gf = pagegenerators.GeneratorFactory(site=self.site)
-        with self.assertRaises(SystemExit) as cm:
-            gf.handleArg('-linter:show')
-        self.assertEqual(cm.exception.code, 0)
+        if self.site.has_extension('Linter'):
+            with self.assertRaises(SystemExit) as cm:
+                gf.handleArg('-linter:show')
+            self.assertEqual(cm.exception.code, 0)
+        else:
+            self.assertRaises(UnknownExtension, gf.handleArg, '-linter:show')
 
     def test_querypage_generator_with_valid_page(self):
         """Test generator of pages with lint errors."""
