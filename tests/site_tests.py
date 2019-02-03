@@ -1708,6 +1708,16 @@ class TestUserContribsWithoutUser(DefaultSiteTestCase):
 
     """Test site method site.usercontribs() without bot user."""
 
+    @classmethod
+    def setUpClass(cls):
+        """Skip tests for wikia (T214263)."""
+        super(TestUserContribsWithoutUser, cls).setUpClass()
+        mysite = cls.get_site()
+        if mysite.sitename == 'wikia:wikia':
+            raise unittest.SkipTest(
+                'Skipping site_tests.TestUserContribsWithoutUser tests for '
+                'Wikia due to T214263')
+
     def test_user_prefix(self):
         """Test the site.usercontribs() method with userprefix."""
         mysite = self.get_site()
