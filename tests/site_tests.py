@@ -775,63 +775,6 @@ class TestSiteGenerators(DefaultSiteTestCase):
             self.assertIsInstance(cat, pywikibot.Category)
             self.assertLessEqual(cat.title(with_ns=False), 'Hij')
 
-    def test_botusers(self):
-        """Test the site.botusers() method."""
-        mysite = self.get_site()
-        bu = list(mysite.botusers(total=10))
-        self.assertLessEqual(len(bu), 10)
-        for botuser in bu:
-            self.assertIsInstance(botuser, dict)
-            self.assertIn('name', botuser)
-            self.assertIn('userid', botuser)
-            self.assertIn('editcount', botuser)
-            self.assertIn('registration', botuser)
-            self.assertIn('bot', botuser['groups'])
-
-    def test_allusers(self):
-        """Test the site.allusers() method."""
-        mysite = self.get_site()
-        au = list(mysite.allusers(total=10))
-        self.assertLessEqual(len(au), 10)
-        for user in au:
-            self.assertIsInstance(user, dict)
-            self.assertIn('name', user)
-            self.assertIn('editcount', user)
-            self.assertIn('registration', user)
-            self.assertIn('user', user['groups'])
-
-    def test_allusers_with_start(self):
-        """Test the site.allusers(start=..) method."""
-        mysite = self.get_site()
-        for user in mysite.allusers(start='B', total=5):
-            self.assertIsInstance(user, dict)
-            self.assertIn('name', user)
-            self.assertGreaterEqual(user['name'], 'B')
-            self.assertIn('editcount', user)
-            self.assertIn('registration', user)
-
-    def test_allusers_with_prefix(self):
-        """Test the site.allusers(prefix=..) method."""
-        mysite = self.get_site()
-        for user in mysite.allusers(prefix='C', total=5):
-            self.assertIsInstance(user, dict)
-            self.assertIn('name', user)
-            self.assertTrue(user['name'].startswith('C'))
-            self.assertIn('editcount', user)
-            self.assertIn('registration', user)
-
-    def _test_allusers_with_group(self):
-        """Test the site.allusers(group=..) method."""
-        mysite = self.get_site()
-        for user in mysite.allusers(prefix='D', group='bot', total=5):
-            self.assertIsInstance(user, dict)
-            self.assertIn('name', user)
-            self.assertTrue(user['name'].startswith('D'))
-            self.assertIn('editcount', user)
-            self.assertIn('registration', user)
-            self.assertIn('groups' in user)
-            self.assertIn('sysop' in user['groups'])
-
     def test_all_images(self):
         """Test the site.allimages() method."""
         mysite = self.get_site()
@@ -1124,6 +1067,85 @@ class TestSiteGenerators(DefaultSiteTestCase):
                 'generator': ['querypage'], 'action': ['query'],
                 'indexpageids': [True], 'continue': [True]})
         self.assertLessEqual(len(tuple(upgen)), 3)
+
+
+class TestSiteGeneratorsUsers(DefaultSiteTestCase):
+    """Test cases for Site methods with users."""
+
+    cached = True
+
+    @classmethod
+    def setUpClass(cls):
+        """Skip tests for wikia (T214263)."""
+        super(TestSiteGeneratorsUsers, cls).setUpClass()
+        mysite = cls.get_site()
+        if mysite.sitename == 'wikia:wikia':
+            raise unittest.SkipTest(
+                'Skipping site_tests.TestSiteGeneratorsUsers tests for '
+                'Wikia due to T214265')
+
+    def setUp(self):
+        """Initialize self.site and self.mainpage."""
+        super(TestSiteGeneratorsUsers, self).setUp()
+        self.site = self.get_site()
+        self.mainpage = self.get_mainpage()
+
+    def test_botusers(self):
+        """Test the site.botusers() method."""
+        mysite = self.get_site()
+        bu = list(mysite.botusers(total=10))
+        self.assertLessEqual(len(bu), 10)
+        for botuser in bu:
+            self.assertIsInstance(botuser, dict)
+            self.assertIn('name', botuser)
+            self.assertIn('userid', botuser)
+            self.assertIn('editcount', botuser)
+            self.assertIn('registration', botuser)
+            self.assertIn('bot', botuser['groups'])
+
+    def test_allusers(self):
+        """Test the site.allusers() method."""
+        mysite = self.get_site()
+        au = list(mysite.allusers(total=10))
+        self.assertLessEqual(len(au), 10)
+        for user in au:
+            self.assertIsInstance(user, dict)
+            self.assertIn('name', user)
+            self.assertIn('editcount', user)
+            self.assertIn('registration', user)
+            self.assertIn('user', user['groups'])
+
+    def test_allusers_with_start(self):
+        """Test the site.allusers(start=..) method."""
+        mysite = self.get_site()
+        for user in mysite.allusers(start='B', total=5):
+            self.assertIsInstance(user, dict)
+            self.assertIn('name', user)
+            self.assertGreaterEqual(user['name'], 'B')
+            self.assertIn('editcount', user)
+            self.assertIn('registration', user)
+
+    def test_allusers_with_prefix(self):
+        """Test the site.allusers(prefix=..) method."""
+        mysite = self.get_site()
+        for user in mysite.allusers(prefix='C', total=5):
+            self.assertIsInstance(user, dict)
+            self.assertIn('name', user)
+            self.assertTrue(user['name'].startswith('C'))
+            self.assertIn('editcount', user)
+            self.assertIn('registration', user)
+
+    def _test_allusers_with_group(self):
+        """Test the site.allusers(group=..) method."""
+        mysite = self.get_site()
+        for user in mysite.allusers(prefix='D', group='bot', total=5):
+            self.assertIsInstance(user, dict)
+            self.assertIn('name', user)
+            self.assertTrue(user['name'].startswith('D'))
+            self.assertIn('editcount', user)
+            self.assertIn('registration', user)
+            self.assertIn('groups' in user)
+            self.assertIn('sysop' in user['groups'])
 
 
 class TestLinterPages(DefaultSiteTestCase):
