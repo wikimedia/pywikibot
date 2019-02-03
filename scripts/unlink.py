@@ -21,7 +21,7 @@ Example:
         descriptions.
 """
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,17 +38,17 @@ class UnlinkBot(SingleSiteBot, BaseUnlinkBot):
 
     summary_key = 'unlink-unlinking'
 
-    @property
-    def summary_parameters(self):
-        """Return the title parameter."""
-        return {'title': self.pageToUnlink.title()}
-
     def __init__(self, pageToUnlink, **kwargs):
         """Initialize a UnlinkBot instance with the given page to unlink."""
         super(UnlinkBot, self).__init__(**kwargs)
         self.pageToUnlink = pageToUnlink
         self.generator = pageToUnlink.getReferences(
             namespaces=self.getOption('namespaces'), content=True)
+
+    @property
+    def summary_parameters(self):
+        """Return the title parameter."""
+        return {'title': self.pageToUnlink.title()}
 
     def treat_page(self):
         """Remove links pointing to the configured page from the given page."""
