@@ -163,6 +163,15 @@ matrix:
       env: LANGUAGE=de FAMILY=wikipedia
       dist: xenial
       sudo: required
+    - python: '3.8-dev'
+      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1
+      dist: xenial
+      sudo: required
+  allow_failures:
+    - python: '3.8-dev'
+      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1
+      dist: xenial
+      sudo: required
 
 notifications:
   email:
