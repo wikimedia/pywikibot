@@ -66,7 +66,9 @@ class DownloadDumpBot(Bot):
         """Check if dump file exists locally in a Toolforge server."""
         db_path = '/public/dumps/public/{0}/'.format(db_name)
         if os.path.isdir(db_path):
-            dates = map(int, os.listdir(db_path))
+            dirs = [directory for directory in os.listdir(db_path) if
+                    directory.isdigit()]
+            dates = map(int, dirs)
             dates = sorted(dates, reverse=True)
             for date in dates:
                 dump_filepath = ('/public/dumps/public/{0}/{1}/{2}-{3}-{4}'
