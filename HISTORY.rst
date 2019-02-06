@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20190204
+------------
+
 * Support python version 3.7
 * pagegenerators.py: add -querypage parameter to yield pages provided by any special page (T214234)
 * Fix comparison of str, bytes and int literal with
