@@ -15,7 +15,7 @@ threshold are then moved to another page (the archive), which can be named
 either basing on the thread's name or then name can contain a counter which
 will be incremented when the archive reaches a certain size.
 
-Trancluded template may contain the following parameters:
+Transcluded template may contain the following parameters:
 
  {{TEMPLATE_PAGE
  |archive =
@@ -33,13 +33,13 @@ Meanings of parameters are:
  archive              Name of the page to which archived threads will be put.
                       Must be a subpage of the current page. Variables are
                       supported.
- algo                 specifies the maximum age of a thread. Must be
+ algo                 Specifies the maximum age of a thread. Must be
                       in the form old(<delay>) where <delay> specifies
                       the age in seconds (s), hours (h), days (d),
-                      weeks(w), or years (y) like 24h or 5d. Default is
+                      weeks (w), or years (y) like 24h or 5d. Default is
                       old(24h).
  counter              The current value of a counter which could be assigned as
-                      variable. Will be actualized by bot. Initial value is 1.
+                      variable. Will be updated by bot. Initial value is 1.
  maxarchivesize       The maximum archive size before incrementing the counter.
                       Value can be given with appending letter like K or M
                       which indicates KByte or MByte. Default value is 200K.
@@ -50,7 +50,7 @@ Meanings of parameters are:
  archiveheader        Content that will be put on new archive pages as the
                       header. This parameter supports the use of variables.
                       Default value is {{talkarchive}}
- key                  A secret key that (if valid) allows archives to not be
+ key                  A secret key that (if valid) allows archives not to be
                       subpages of the page being archived.
 
 Variables below can be used in the value for "archive" in the template above:
@@ -259,6 +259,8 @@ def str2size(string):
 
     """
     r = re.search(r'(\d+) *([BkKMT]?)', string)
+    if not r:
+        raise MalformedConfigError("Couldn't parse size: {}".format(string))
     val, unit = (int(r.group(1)), r.group(2))
     if unit == 'M':
         val *= 1024
@@ -463,7 +465,7 @@ class DiscussionPage(pywikibot.Page):
         # This extra info is not desirable when run under the unittest
         # framework, which may be run either directly or via setup.py
         if pywikibot.calledModuleName() not in ['archivebot_tests', 'setup']:
-            pywikibot.output('{} Threads found on {}'
+            pywikibot.output('{} thread(s) found on {}'
                              .format(len(self.threads), self))
 
     def feed_thread(self, thread, max_archive_size=(250 * 1024, 'B')):
@@ -579,22 +581,19 @@ class PageArchiver(object):
             raise MissingConfigError('Missing or malformed template')
         if not self.get_attr('algo', ''):
             raise MissingConfigError('Missing argument "algo" in template')
+        if not self.get_attr('archive', ''):
+            raise MissingConfigError('Missing argument "archive" in template')
 
     def feed_archive(self, archive, thread, max_archive_size, params=None):
         """
         Feed the thread to one of the archives.
 
         If it doesn't exist yet, create it.
-        If archive name is an empty string (or None),
-        discard the thread.
-        Also checks for security violations.
+        Also check for security violations.
         """
         title = archive.title()
         page_title = self.page.title()
-        if not title:
-            return
-        if not (self.force
-                or page_title + '/' == title[:len(page_title) + 1]
+        if not (self.force or title.startswith(page_title + '/')
                 or self.key_ok()):
             raise ArchiveSecurityError(
                 'Archive page {} does not start with page title ({})!'
@@ -609,7 +608,7 @@ class PageArchiver(object):
         arch_counter = int(self.get_attr('counter', '1'))
         oldthreads = self.page.threads
         self.page.threads = []
-        whys = []
+        whys = set()
         pywikibot.output('Processing {} threads'.format(len(oldthreads)))
         for t in oldthreads:
             if len(oldthreads) - self.archived_threads \
@@ -646,11 +645,11 @@ class PageArchiver(object):
                 if self.feed_archive(archive, t, max_arch_size, params):
                     arch_counter += 1
                     self.set_attr('counter', str(arch_counter))
-                whys.append(why)
+                whys.add(why)
                 self.archived_threads += 1
             else:
                 self.page.threads.append(t)
-        return set(whys)
+        return whys
 
     def run(self):
         """Process a single DiscussionPage object."""
