@@ -41,7 +41,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'co', 'mn', 'pnb', 'ka', 'nds', 'sl', 'sq', 'lb', 'bs', 'nah', 'sa',
         'kk', 'tk', 'sm', 'mk', 'km', 'hsb', 'be', 'ms', 'vec', 'ga', 'an',
         'wo', 'ang', 'tt', 'mt', 'yue', 'sd', 'gn', 'mr', 'ie', 'so', 'gd',
-        'csb', 'ug', 'st', 'roa-rup', 'si', 'ia', 'hif', 'mi', 'ay', 'kl',
+        'csb', 'ug', 'st', 'roa-rup', 'ia', 'si', 'hif', 'mi', 'ay', 'kl',
         'fo', 'jbo', 'ln', 'zu', 'na', 'gu', 'gv', 'kw', 'rw', 'ts', 'ne',
         'om', 'qu', 'su', 'ss', 'ha', 'iu', 'am', 'dv', 'tpi', 'yi', 'ti',
         'sg', 'tn', 'ks',
