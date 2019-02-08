@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Configuration file for Sphinx."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -62,7 +62,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Pywikibot'
-copyright = '2003-2018, Pywikibot team'
+copyright = '2003-2019, Pywikibot team'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
