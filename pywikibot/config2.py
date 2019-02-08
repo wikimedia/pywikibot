@@ -108,10 +108,10 @@ class _ConfigurationDeprecationWarning(UserWarning):
 # variables that are intended only for internal use and not to be exported
 # to other modules.
 
-_private_values = ['authenticate', 'proxy', 'db_password']
-_deprecated_variables = ['use_SSL_onlogin', 'use_SSL_always',
+_private_values = {'authenticate', 'proxy', 'db_password'}
+_deprecated_variables = {'use_SSL_onlogin', 'use_SSL_always',
                          'available_ssl_project', 'fake_user_agent',
-                         'special_page_limit']
+                         'special_page_limit'}
 
 # ############# ACCOUNT SETTINGS ##############
 
@@ -1013,27 +1013,24 @@ def _detect_win32_editor():
 
 # System-level and User-level changes.
 # Store current variables and their types.
-_glv = {_key: _val for _key, _val in globals().items()
-        if _key[0] != '_' and _key not in _imports}
-_gl = list(_glv.keys())
-_tp = {}
-for _key in _gl:
-    _tp[_key] = type(globals()[_key])
+_public_globals = {
+    _key: _val for _key, _val in globals().items()
+    if _key[0] != '_' and _key not in _imports}
 
 # Create an environment for user-config.py which is
 # a shallow copy of the core config settings, so that
 # we can detect modified config items easily.
-_uc = {}
-for _key, _val in _glv.items():
+_exec_globals = {}
+for _key, _val in _public_globals.items():
     if isinstance(_val, dict):
         if isinstance(_val, collections.defaultdict):
-            _uc[_key] = collections.defaultdict(dict)
+            _exec_globals[_key] = collections.defaultdict(dict)
         else:
-            _uc[_key] = {}
+            _exec_globals[_key] = {}
         if len(_val) > 0:
-            _uc[_key].update(_val)
+            _exec_globals[_key].update(_val)
     else:
-        _uc[_key] = _val
+        _exec_globals[_key] = _val
 
 # Get the user files
 if __no_user_config:
@@ -1048,7 +1045,7 @@ else:
         if OSWIN32 or _fileuid in [os.getuid(), 0]:
             if OSWIN32 or _filemode & 0o02 == 0:
                 with open(_filename, 'rb') as f:
-                    exec(compile(f.read(), _filename, 'exec'), _uc)
+                    exec(compile(f.read(), _filename, 'exec'), _exec_globals)
             else:
                 warning("Skipped '%(fn)s': writeable by others."
                         % {'fn': _filename})
@@ -1109,26 +1106,26 @@ def _check_user_config_types(user_config, default_values, skipped):
                  .format(name), UserWarning)
 
 
-_check_user_config_types(_uc, _glv, _imports)
+_check_user_config_types(_exec_globals, _public_globals, _imports)
 
 
 # Copy the user config settings into globals
-_modified = [_key for _key in _gl
-             if _uc[_key] != globals()[_key]
-             or _key in ('usernames', 'sysopnames', 'disambiguation_comment')]
+_modified = {_key for _key in _public_globals.keys()
+             if _exec_globals[_key] != globals()[_key]
+             or _key in {'usernames', 'sysopnames', 'disambiguation_comment'}}
 
-if ('user_agent_format' in _modified):
+if 'user_agent_format' in _modified:
     _right_user_agent_format = re.sub(r'{httplib2(:|})', r'{http_backend\1',
-                                      _uc['user_agent_format'])
-    if _right_user_agent_format != _uc['user_agent_format']:
+                                      _exec_globals['user_agent_format'])
+    if _right_user_agent_format != _exec_globals['user_agent_format']:
         warn('`{httplib2}` in user_agent_format is deprecated, '
              'will replace `{httplib2}` with `{http_backend}`',
              _ConfigurationDeprecationWarning)
-        _uc['user_agent_format'] = _right_user_agent_format
+        _exec_globals['user_agent_format'] = _right_user_agent_format
     del _right_user_agent_format
 
 for _key in _modified:
-    globals()[_key] = _uc[_key]
+    globals()[_key] = _exec_globals[_key]
 
     if _key in _deprecated_variables:
         warn('"{0}" present in our user-config.py is no longer a supported '
