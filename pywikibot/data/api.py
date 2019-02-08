@@ -1426,7 +1426,8 @@ class Request(MutableMapping):
             'wbsetaliases', 'wblinktitles', 'wbsetsitelink',
             'wbcreateclaim', 'wbremoveclaims', 'wbsetclaimvalue',
             'wbsetreference', 'wbremovereferences', 'wbsetclaim',
-            'wbcreateredirect',
+            'wbcreateredirect', 'wbmergeitems', 'wbsetqualifier',
+            'wbremovequalifiers',
             'thank', 'flowthank'
         )
         # Client side verification that the request is being performed
