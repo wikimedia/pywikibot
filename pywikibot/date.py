@@ -7,7 +7,7 @@
 # (C) Andre Engels, 2004-2005
 # (C) Yuri Astrakhan, 2005-2006 (<Firstname><Lastname>@gmail.com)
 #       (years/decades/centuries/millenniums str <=> int conversions)
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -376,7 +376,7 @@ def escapePattern2(pattern):
     Returns a compiled regex object and a list of digit decoders.
     """
     if pattern not in _escPtrnCache2:
-        newPattern = '^'  # begining of the string
+        newPattern = '^'  # beginning of the string
         strPattern = ''
         decoders = []
         for s in _reParameters.split(pattern):
@@ -2140,7 +2140,7 @@ addFmt1('zh', False, makeMonthList('%d月%%d日'))
 waMonthNames = ['djanvî', 'fevrî', 'måss', 'avri', 'may', 'djun', 'djulete',
                 'awousse', 'setimbe', 'octôbe', 'nôvimbe', 'decimbe']
 
-# For month names begining with a consonant...
+# For month names beginning with a consonant...
 for i in (0, 1, 2, 4, 5, 6, 8, 10, 11):
     formats[dayMnthFmts[i]]['wa'] = eval(
         'lambda m: multi(m, ['
@@ -2150,7 +2150,7 @@ for i in (0, 1, 2, 4, 5, 6, 8, 10, 11):
         '(lambda v: dh_dayOfMnth(v, "%%d di %s"), alwaysTrue)])'
         % (waMonthNames[i], waMonthNames[i], waMonthNames[i]))
 
-# For month names begining with a vowel...
+# For month names beginning with a vowel...
 for i in (3, 7, 9):
     formats[dayMnthFmts[i]]['wa'] = eval(
         'lambda m: multi(m, ['

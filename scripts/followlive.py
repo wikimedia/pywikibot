@@ -458,7 +458,7 @@ What is it? """
                                       {'content': self.content}))
                 except pywikibot.EditConflict:
                     pywikibot.output(
-                        'An edit conflict occured! Automatically retrying')
+                        'An edit conflict occurred! Automatically retrying')
                     self.handle_bad_page(self)
                 return
             if answer == '':
@@ -526,7 +526,7 @@ What is it? """
         @type page: pywikibot.Page
         @ivar date: creation date
         @type date: str in ISO8601 format
-        @ivar length: content lenght
+        @ivar length: content length
         @type length: int
         @ivar user: creator of page
         @type user: pywikibot.User

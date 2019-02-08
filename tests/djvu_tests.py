@@ -3,7 +3,7 @@
 """Unit tests for djvu.py."""
 
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -73,7 +73,7 @@ class TestDjVuFile(TestCase):
         else:
             self.assertEqual(djvu.__unicode__(), expected)
 
-    def test_file_existance(self):
+    def test_file_existence(self):
         """Test file existence checks."""
         djvu = DjVuFile(self.file_djvu)
         self.assertEqual(os.path.abspath(self.file_djvu), djvu.file)

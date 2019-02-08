@@ -48,7 +48,7 @@ L{CurrentPageBot} and automatically defines the summary when C{put_current} is
 used.
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1071,7 +1071,7 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     """
     messages = []
     if exception:
-        messages.append('An error occured: "{}".'.format(exception))
+        messages.append('An error occurred: "{}".'.format(exception))
     if missing_generator:
         messages.append(
             'Unable to execute script because no generator was defined.')

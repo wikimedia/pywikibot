@@ -103,7 +103,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
 
         If the table already is a
         wiki table or contains a nested wiki table, tries to beautify it.
-        Returns the converted table, the number of warnings that occured and
+        Returns the converted table, the number of warnings that occurred and
         a list containing these warnings.
         Hint: if you give an entire page text as a parameter instead of a table
         only, this function will convert all HTML tables and will also try to
@@ -177,7 +177,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n! \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                'WARNING: found <th> without </th>. ({0} occurences)\n'
+                'WARNING: found <th> without </th>. ({0} occurrences)\n'
                 .format(n))
             warnings += n
 
@@ -187,7 +187,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\n!\g<attr> | \g<header>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                'WARNING: found <th ...> without </th>. ({0} occurences\n)'
+                'WARNING: found <th ...> without </th>. ({0} occurrences\n)'
                 .format(n))
             warnings += n
 
@@ -222,7 +222,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n| \g<cell>\r\n', new_table)
         if n > 0:
             warning_messages.append(
-                '<td> used where </td> was expected. ({0} occurences)\n'
+                '<td> used where </td> was expected. ({0} occurrences)\n'
                 .format(n))
             warnings += n
 
@@ -233,7 +233,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         if n > 0:
             warning_messages.append(
                 "WARNING: (sorry, bot code unreadable (1). I don't know why "
-                'this warning is given.) ({0} occurences)\n'.format(n))
+                'this warning is given.) ({0} occurrences)\n'.format(n))
 
         # fail save. sometimes people forget </td>
         # <td> without arguments, with missing </td>
@@ -441,7 +441,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         Convert all HTML tables in text to wiki syntax.
 
         Returns the converted text, the number of converted tables and the
-        number of warnings that occured.
+        number of warnings that occurred.
         """
         text = self.markActiveTables(text)
 

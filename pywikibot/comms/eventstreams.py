@@ -9,7 +9,7 @@ This module requires sseclient to be installed:
 """
 #
 # (C) xqt, 2017-2018
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -321,7 +321,7 @@ class EventStreams(object):
             elif event.event == 'error':
                 warning('Encountered error: {0}'.format(event.data))
             else:
-                warning('Unknown event {0} occured.'.format(event.event))
+                warning('Unknown event {0} occurred.'.format(event.event))
         else:
             debug('{0}: Stopped iterating due to '
                   'exceeding item limit.'

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test for site detection."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -266,7 +266,7 @@ class OtherSiteTestCase(SiteDetectionTestCase):
     def test_musicbrainz(self):
         """Test http://musicbrainz.org/doc/ which has a page 'api.php'.
 
-        Possible false positive caused by the existance of a page called
+        Possible false positive caused by the existence of a page called
         http://musicbrainz.org/doc/api.php.
         """
         self.assertNoSite('http://musicbrainz.org/doc/$1')

@@ -137,7 +137,7 @@ the top of the help.
 """
 #
 # (C) Daniel Herding, 2004-2012
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -672,7 +672,7 @@ class ReplaceRobot(Bot):
         return new_text
 
     def _count_changes(self, page, err):
-        """Count succesfully changed pages; log changed titles for display."""
+        """Count successfully changed pages; log changed titles for display."""
         # This is an async put callback
         if not isinstance(err, Exception):
             self.changed_pages += 1
@@ -890,7 +890,7 @@ def main(*args):
         'text-contains': [],
         'inside': [],
         'inside-tags': [],
-        'require-title': [],  # using a seperate requirements dict needs some
+        'require-title': [],  # using a separate requirements dict needs some
     }                        # major refactoring of code.
 
     # Should the elements of 'replacements' and 'exceptions' be interpreted

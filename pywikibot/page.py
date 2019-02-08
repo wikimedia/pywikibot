@@ -2722,7 +2722,7 @@ class FilePage(Page):
             return sha1 == revision.sha1
         else:
             pywikibot.warning(
-                'Unsuccesfull request (%s): %s' % (req.status, req.uri))
+                'Unsuccessfull request (%s): %s' % (req.status, req.uri))
             return False
 
     def globalusage(self, total=None):

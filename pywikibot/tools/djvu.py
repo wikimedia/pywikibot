@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Wrapper around djvulibre to access djvu files properties and content."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,7 +63,7 @@ class DjVuFile(object):
 
     """Wrapper around djvulibre to access djvu files properties and content.
 
-    Perform file existance checks.
+    Perform file existence checks.
 
     Control characters in djvu text-layer are converted for convenience
     (see http://djvu.sourceforge.net/doc/man/djvused.html for control chars
