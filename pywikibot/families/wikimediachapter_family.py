@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikimedia chapter, thematic organisation and WUG wikis."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -23,7 +23,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     codes = [
         'am', 'ar', 'bd', 'be', 'br', 'ca', 'cn', 'co', 'dk', 'ec', 'et', 'fi',
         'id', 'il', 'mai', 'mk', 'mx', 'nl', 'no', 'nyc', 'pl', 'pt', 'rs',
-        'ru', 'se', 'tr', 'ua', 'uk', 've', 'wb', 'wikimania',
+        'ru', 'se', 'tr', 'ua', 'uk', 've', 'wb',
     ]
 
     @classproperty
