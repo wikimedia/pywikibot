@@ -40,6 +40,8 @@ argument as both local and global, the local argument overrides the global one
                   has the imported property with the imported value and
                   some qualifiers.
 
+-multi            If set, try to match multiple values from parameter.
+
 Examples:
 
     python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
@@ -75,10 +77,18 @@ Examples:
     page won't be skipped if the item already has that property but there is
     not the new value.
 
+    python pwb.py harvest_template -lang:en -family:wikipedia -namespace:0 \
+        -template:"Infobox musical artist" current_members P527 -exists:p \
+        -multi
+
+    will import band members from the "current_members" parameter of "Infobox
+    musical artist" on English Wikipedia as Wikidata property "P527" (has
+    part). This will only extract multiple band members if each is linked, and
+    will not add duplicate claims for the same member.
 """
 #
 # (C) Multichill, Amir, 2013
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of MIT License.
 #
@@ -114,8 +124,9 @@ class PropertyOptionHandler(OptionHandler):
     """Class holding options for a param-property pair."""
 
     availableOptions = {
-        'islink': False,
         'exists': '',
+        'islink': False,
+        'multi': False,
     }
 
 
@@ -140,12 +151,16 @@ class HarvestRobot(WikidataBot):
         @keyword exists: pattern for merging existing claims with harvested
             values
         @type exists: str
+        @keyword multi: Whether multiple values should be extracted from a
+            single parameter
+        @type multi: bool
         """
         self.availableOptions.update({
             'always': True,
             'create': False,
             'exists': '',
             'islink': False,
+            'multi': False,
         })
         super(HarvestRobot, self).__init__(**kwargs)
         self.generator = generator
@@ -261,22 +276,42 @@ class HarvestRobot(WikidataBot):
                 # This field contains something useful for us
                 prop, options = self.fields[field]
                 claim = pywikibot.Claim(self.repo, prop)
+                exists_arg = self._get_option_with_fallback(options, 'exists')
                 if claim.type == 'wikibase-item':
+                    do_multi = self._get_option_with_fallback(
+                        options, 'multi')
+                    matched = False
                     # Try to extract a valid page
-                    match = pywikibot.link_regex.search(value)
-                    if match:
+                    for match in pywikibot.link_regex.finditer(value):
+                        matched = True
                         link_text = match.group(1)
-                    else:
-                        if self._get_option_with_fallback(options, 'islink'):
-                            link_text = value
-                        else:
-                            pywikibot.output(
-                                '{} field {} value {} is not a wikilink. '
-                                'Skipping.'
-                                .format(claim.getID(), field, value))
-                            continue
+                        linked_item = self._template_link_target(
+                            item, link_text)
+                        added = False
+                        if linked_item:
+                            claim.setTarget(linked_item)
+                            added = self.user_add_claim_unless_exists(
+                                item, claim, exists_arg, page.site,
+                                pywikibot.output)
+                            claim = pywikibot.Claim(self.repo, prop)
+                        # stop after the first match if not supposed to add
+                        # multiple values
+                        if not do_multi:
+                            break
+                        # update exists_arg, so we can add more values
+                        if 'p' not in exists_arg and added:
+                            exists_arg += 'p'
 
-                    linked_item = self._template_link_target(item, link_text)
+                    if matched:
+                        continue
+
+                    if not self._get_option_with_fallback(options, 'islink'):
+                        pywikibot.output(
+                            '{} field {} value {} is not a wikilink. Skipping.'
+                            .format(claim.getID(), field, value))
+                        continue
+
+                    linked_item = self._template_link_target(item, value)
                     if not linked_item:
                         continue
 
@@ -308,9 +343,7 @@ class HarvestRobot(WikidataBot):
 
                 # A generator might yield pages from multiple sites
                 self.user_add_claim_unless_exists(
-                    item, claim, self._get_option_with_fallback(
-                        options, 'exists'),
-                    page.site, pywikibot.output)
+                    item, claim, exists_arg, page.site, pywikibot.output)
 
 
 def main(*args):
