@@ -26,6 +26,7 @@ import sys
 import unicodedata
 
 from collections import Counter, defaultdict, namedtuple, OrderedDict
+from itertools import chain
 from warnings import warn
 
 import pywikibot
@@ -4870,6 +4871,21 @@ class Claim(Property):
         """Return the representation string."""
         return '{cls_name}.fromJSON({0}, {1})'.format(
             repr(self.repo), self.toJSON(), cls_name=type(self).__name__)
+
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+
+        for attr in ('id', 'snaktype', 'target'):
+            if getattr(self, attr) != getattr(other, attr):
+                return False
+
+        my_qualifiers = set(chain.from_iterable(self.qualifiers.values()))
+        other_qualifiers = set(chain.from_iterable(other.qualifiers.values()))
+        return my_qualifiers == other_qualifiers
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
 
     @classmethod
     def fromJSON(cls, site, data):
