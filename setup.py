@@ -48,6 +48,7 @@ test_deps = ['bz2file', 'mock']
 
 dependencies = ['requests>=2.20.0']
 
+pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle'
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient>=0.0.18'],
@@ -62,7 +63,7 @@ extra_deps = {
     'html': ['BeautifulSoup4'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8==3.6.0',  # T214962
-        'pydocstyle',
+        pydocstyle,
         'hacking',
         'flake8-coding',
         'flake8-comprehensions',
