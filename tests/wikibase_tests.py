@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Wikidata parts of the page module."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1281,7 +1281,7 @@ class TestItemLoad(WikidataTestCase):
             ItemPage.from_entity_uri(repo, entity_uri)
 
     def test_from_entity_uri_no_item(self):
-        """Test ItemPage.from_entity_uri with non-exitent item."""
+        """Test ItemPage.from_entity_uri with non-existent item."""
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
         regex = r"^Page .+ doesn't exist\.$"
@@ -1289,7 +1289,7 @@ class TestItemLoad(WikidataTestCase):
             ItemPage.from_entity_uri(repo, entity_uri)
 
     def test_from_entity_uri_no_item_lazy(self):
-        """Test ItemPage.from_entity_uri with lazy loaded non-exitent item."""
+        """Test ItemPage.from_entity_uri with lazy loaded non-existent item."""
         repo = self.get_repo()
         entity_uri = 'http://www.wikidata.org/entity/Q999999999999999999'
         expected_item = ItemPage(repo, 'Q999999999999999999')
@@ -1393,6 +1393,166 @@ class TestPropertyPage(WikidataTestCase):
         self.assertEqual(claim.target, property_page)
 
 
+class TestClaim(WikidataTestCase):
+
+    """Test Claim object functionality."""
+
+    def test_claim_eq_simple(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and value, they are equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        self.assertEqual(claim1, claim2)
+        self.assertEqual(claim2, claim1)
+
+    def test_claim_eq_simple_different_value(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and different values,
+        they are not equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q1'))
+        self.assertNotEqual(claim1, claim2)
+        self.assertNotEqual(claim2, claim1)
+
+    def test_claim_eq_simple_different_rank(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and value and different ranks,
+        they are equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        claim1.setRank('preferred')
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        self.assertEqual(claim1, claim2)
+        self.assertEqual(claim2, claim1)
+
+    def test_claim_eq_simple_different_snaktype(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and different snaktypes,
+        they are not equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setSnakType('novalue')
+        self.assertNotEqual(claim1, claim2)
+        self.assertNotEqual(claim2, claim1)
+
+    def test_claim_eq_simple_different_property(self):
+        """
+        Test comparing two claims.
+
+        If they have the same value and different properties,
+        they are not equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        claim2 = pywikibot.Claim(wikidata, 'P21')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        self.assertNotEqual(claim1, claim2)
+        self.assertNotEqual(claim2, claim1)
+
+    def test_claim_eq_with_qualifiers(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property, value and qualifiers, they are equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        qualifier1 = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier1.setTarget('foo')
+        claim1.addQualifier(qualifier1)
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        qualifier2 = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier2.setTarget('foo')
+        claim2.addQualifier(qualifier2)
+        self.assertEqual(claim1, claim2)
+        self.assertEqual(claim2, claim1)
+
+    def test_claim_eq_with_different_qualifiers(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and value and different qualifiers,
+        they are not equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        qualifier1 = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier1.setTarget('foo')
+        claim1.addQualifier(qualifier1)
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        qualifier2 = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier2.setTarget('bar')
+        claim2.addQualifier(qualifier2)
+        self.assertNotEqual(claim1, claim2)
+        self.assertNotEqual(claim2, claim1)
+
+    def test_claim_eq_one_without_qualifiers(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and value and one of them has
+        no qualifiers while the other one does, they are not equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        qualifier = pywikibot.Claim(wikidata, 'P214', is_qualifier=True)
+        qualifier.setTarget('foo')
+        claim1.addQualifier(qualifier)
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        self.assertNotEqual(claim1, claim2)
+        self.assertNotEqual(claim2, claim1)
+
+    def test_claim_eq_with_different_sources(self):
+        """
+        Test comparing two claims.
+
+        If they have the same property and value and different sources,
+        they are equal.
+        """
+        wikidata = self.get_repo()
+        claim1 = pywikibot.Claim(wikidata, 'P31')
+        claim1.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        source1 = pywikibot.Claim(wikidata, 'P143', is_reference=True)
+        source1.setTarget(pywikibot.ItemPage(wikidata, 'Q328'))
+        claim1.addSource(source1)
+        claim2 = pywikibot.Claim(wikidata, 'P31')
+        claim2.setTarget(pywikibot.ItemPage(wikidata, 'Q5'))
+        source2 = pywikibot.Claim(wikidata, 'P143', is_reference=True)
+        source2.setTarget(pywikibot.ItemPage(wikidata, 'Q48183'))
+        claim2.addSource(source2)
+        self.assertEqual(claim1, claim2)
+        self.assertEqual(claim2, claim1)
+
+
 class TestClaimSetValue(WikidataTestCase):
 
     """Test setting claim values."""
@@ -1437,8 +1597,8 @@ class TestClaimSetValue(WikidataTestCase):
         wikidata = self.get_repo()
         claim = pywikibot.Claim(wikidata, 'P214')
         self.assertEqual(claim.type, 'external-id')
-        claim.setTarget('Any string is avalid identifier')
-        self.assertEqual(claim.target, 'Any string is avalid identifier')
+        claim.setTarget('Any string is a valid identifier')
+        self.assertEqual(claim.target, 'Any string is a valid identifier')
 
     def test_set_date(self):
         """Test setting claim of time type."""

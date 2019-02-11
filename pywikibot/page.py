@@ -4878,9 +4878,17 @@ class Claim(Property):
             if getattr(self, attr) != getattr(other, attr):
                 return False
 
-        my_qualifiers = set(chain.from_iterable(self.qualifiers.values()))
-        other_qualifiers = set(chain.from_iterable(other.qualifiers.values()))
-        return my_qualifiers == other_qualifiers
+        my_qualifiers = list(chain.from_iterable(self.qualifiers.values()))
+        other_qualifiers = list(chain.from_iterable(other.qualifiers.values()))
+        if len(my_qualifiers) != len(other_qualifiers):
+            return False
+        for q in my_qualifiers:
+            if q not in other_qualifiers:
+                return False
+        for q in other_qualifiers:
+            if q not in my_qualifiers:
+                return False
+        return True
 
     def __ne__(self, other):
         return not self.__eq__(other)
