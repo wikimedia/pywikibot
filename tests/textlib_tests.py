@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test textlib module."""
 #
-# (C) Pywikibot team, 2011-2018
+# (C) Pywikibot team, 2011-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -1221,6 +1221,11 @@ class TestReplaceExcept(DefaultDrySiteTestCase):
         self.assertEqual(textlib.replaceExcept('\n==x==\n', 'x', 'y',
                                                ['header'], site=self.site),
                          '\n==x==\n')
+        self.assertEqual(textlib.replaceExcept('\n<!--'
+                                               '\ncomment-->==x==<!--comment'
+                                               '\n-->\n', 'x', 'y',
+                                               ['header'], site=self.site),
+                         '\n<!--\ncomment-->==x==<!--comment\n-->\n')
         self.assertEqual(textlib.replaceExcept('<pre>x</pre>', 'x', 'y',
                                                ['pre'], site=self.site),
                          '<pre>x</pre>')

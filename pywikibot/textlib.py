@@ -7,7 +7,7 @@ and return a unicode string.
 
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -280,7 +280,7 @@ def _create_default_regexes():
         'file': (FILE_LINK_REGEX, lambda site: '|'.join(site.namespaces[6])),
         # section headers
         'header': re.compile(
-            r'(?:(?<=\n)|\A)'
+            r'(?:(?<=\n)|\A)(?:<!--[\s\S]*?-->)*'
             r'=(?:.|<!--[\s\S]*?-->)+='
             r' *(?:<!--[\s\S]*?--> *)*(?=\n|\Z)'),
         # external links
