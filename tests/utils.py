@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2019
+# (C) Pywikibot team, 2013-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -317,7 +317,7 @@ class DryParamInfo(dict):
 
     def parameter(self, module, param_name):
         """Load dry data."""
-        return self[module].get(param_name)
+        return self[module][param_name]
 
     def __getitem__(self, name):
         """Return dry data or a dummy parameter block."""

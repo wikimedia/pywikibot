@@ -2799,21 +2799,6 @@ class QueryGenerator(_RequestWrapper):
                                                       self.api_limit),
                 _logger)
 
-    def support_namespace(self):
-        """Check if namespace is a supported parameter on this query.
-
-        Note: this function will be removed when self.set_namespace() will
-              throw TypeError() instead of just giving a warning.
-              See T196619.
-
-        @return: True if yes, False otherwise
-        @rtype: bool
-        """
-        assert(self.limited_module)  # some modules do not have a prefix
-        return bool(
-            self.site._paraminfo.parameter('query+' + self.limited_module,
-                                           'namespace'))
-
     def set_namespace(self, namespaces):
         """Set a namespace filter on this query.
 
@@ -2823,12 +2808,9 @@ class QueryGenerator(_RequestWrapper):
             list of namespace identifiers. An empty iterator clears any
             namespace restriction.
         @raises KeyError: a namespace identifier was not resolved
-
-        # TODO: T196619
-        # @raises TypeError: module does not support a namespace parameter
-        #    or a namespace identifier has an inappropriate
-        #    type such as NoneType or bool, or more than one namespace
-        #    if the API module does not support multiple namespaces
+        @raises TypeError: a namespace identifier has an inappropriate
+            type such as NoneType or bool, or more than one namespace
+            if the API module does not support multiple namespaces
         """
         assert(self.limited_module)  # some modules do not have a prefix
         param = self.site._paraminfo.parameter('query+' + self.limited_module,
@@ -2836,16 +2818,7 @@ class QueryGenerator(_RequestWrapper):
         if not param:
             pywikibot.warning('{0} module does not support a namespace '
                               'parameter'.format(self.limited_module))
-            warn('set_namespace() will be modified to raise TypeError '
-                 'when namespace parameter is not supported. '
-                 'It will be a Breaking Change, please update your code '
-                 'ASAP, due date July, 31st 2019.', FutureWarning, 2)
-
-            # TODO: T196619
-            # raise TypeError('{0} module does not support a namespace '
-            #                 'parameter'.format(self.limited_module))
-
-            return False
+            return
 
         if isinstance(namespaces, basestring):
             namespaces = namespaces.split('|')
@@ -2866,8 +2839,6 @@ class QueryGenerator(_RequestWrapper):
             self.request[self.prefix + 'namespace'] = namespaces
         elif self.prefix + 'namespace' in self.request:
             del self.request[self.prefix + 'namespace']
-
-        return None
 
     def _query_continue(self):
         if all(key not in self.data[self.continue_name]
