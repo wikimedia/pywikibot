@@ -344,6 +344,7 @@ class TestPageOCR(TestCase):
                                  'the year 1572,\nBY D. APPLETON & CO.\n'
                                  'In the Office of the Librarian of '
                                  'Congress, at Washington.\n4 334\n'),
+            'ws_ocr_daemon_msg': 'ws_ocr_daemon robot is not running.',
             }
 
     def setUp(self):
@@ -374,10 +375,19 @@ class TestPageOCR(TestCase):
         response = http.fetch(uri)
         self.assertEqual(response.status, 200)
 
+        # Check that ws_ocr_daemon robot is running, otherwise skip test.
+        data = json.loads(response.text)
+        if data['text'].startswith(self.data['ws_ocr_daemon_msg']):
+            self.skipTest(self.data['ws_ocr_daemon_msg'])
+
     def test_do_ocr_phetools(self):
         """Test page._do_ocr(ocr_tool='phetools')."""
         error, text = self.page._do_ocr(ocr_tool='phetools')
         ref_error, ref_text = self.data['ocr']
+
+        # Check that ws_ocr_daemon robot is running, otherwise skip test.
+        if text.startswith(self.data['ws_ocr_daemon_msg']):
+            self.skipTest(self.data['ws_ocr_daemon_msg'])
         self.assertEqual(error, ref_error)
         self.assertEqual(text, ref_text)
 
