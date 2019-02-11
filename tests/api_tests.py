@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2019
+# (C) Pywikibot team, 2007-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -852,84 +852,6 @@ class TestPropertyGenerator(TestCase):
         self.assertEqual(len(links), count)
 
 
-class TestDryQueryGeneratorNamespaceParam(TestCase):
-
-    """Test setting of namespace param with ListGenerator.
-
-    Generators with different characteristics are used.
-    site._paraminfo is not always faithful to API, but serves the purpose
-    here.
-    """
-
-    family = 'wikipedia'
-    code = 'en'
-
-    dry = True
-
-    def setUp(self):
-        """Set up test case."""
-        super(TestDryQueryGeneratorNamespaceParam, self).setUp()
-        self.site = self.get_site()
-        self.site._paraminfo['query+querypage'] = {
-            'prefix': 'qp',
-            'limit': {'max': 10},
-        }
-        self.site._paraminfo['query+allpages'] = {
-            'prefix': 'ap',
-            'limit': {'max': 10},
-            'namespace': {'multi': True}
-        }
-        self.site._paraminfo['query+alllinks'] = {
-            'prefix': 'al',
-            'limit': {'max': 10},
-            'namespace': {'default': 0}
-        }
-        self.site._paraminfo['query+links'] = {
-            'prefix': 'pl',
-        }
-        self.site._paraminfo.query_modules_with_limits = {'querypage',
-                                                          'allpages',
-                                                          'alllinks'}
-
-    def test_namespace_for_module_with_no_limit(self):
-        """Test PageGenerator set_namespace."""
-        self.gen = api.PageGenerator(site=self.site,
-                                     generator='links',
-                                     parameters={'titles': 'test'})
-        self.assertRaises(AssertionError, self.gen.set_namespace, 0)
-        self.assertRaises(AssertionError, self.gen.set_namespace, 1)
-        self.assertRaises(AssertionError, self.gen.set_namespace, None)
-
-    def test_namespace_param_is_not_settable(self):
-        """Test ListGenerator support_namespace."""
-        self.gen = api.ListGenerator(listaction='querypage', site=self.site)
-        self.assertFalse(self.gen.support_namespace())
-        self.assertFalse(self.gen.set_namespace([0, 1]))
-
-    def test_namespace_none(self):
-        """Test ListGenerator set_namespace with None."""
-        self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        self.assertRaises(TypeError, self.gen.set_namespace, None)
-
-    def test_namespace_non_multi(self):
-        """Test ListGenerator set_namespace when non multi."""
-        self.gen = api.ListGenerator(listaction='alllinks', site=self.site)
-        self.assertRaises(TypeError, self.gen.set_namespace, [0, 1])
-        self.assertIsNone(self.gen.set_namespace(0))
-
-    def test_namespace_multi(self):
-        """Test ListGenerator set_namespace when multi."""
-        self.gen = api.ListGenerator(listaction='allpages', site=self.site)
-        self.assertTrue(self.gen.support_namespace())
-        self.assertIsNone(self.gen.set_namespace([0, 1]))
-
-    def test_namespace_resolve_failed(self):
-        """Test ListGenerator set_namespace when resolve fails."""
-        self.gen = api.ListGenerator(listaction='allpages', site=self.site)
-        self.assertTrue(self.gen.support_namespace())
-        self.assertRaises(KeyError, self.gen.set_namespace, 10000)
-
-
 class TestDryListGenerator(TestCase):
 
     """Test ListGenerator."""
@@ -957,7 +879,7 @@ class TestDryListGenerator(TestCase):
 
     def test_namespace_zero(self):
         """Test ListGenerator set_namespace with 0."""
-        self.assertIsNone(self.gen.set_namespace(0))
+        self.gen.set_namespace(0)
 
 
 class TestCachedRequest(DefaultSiteTestCase):

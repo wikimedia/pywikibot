@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2018
 #
 # Distributed under the terms of the MIT license.
 #
@@ -504,13 +504,8 @@ class GeneratorFactory(object):
 
         for i in range(len(self.gens)):
             if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
-                if (self.namespaces
-                        and self.gens[i].support_namespace()):
-                            self.gens[i].set_namespace(self.namespaces)
-                # QueryGenerator does not support namespace param.
-                else:
-                    self.gens[i] = NamespaceFilterPageGenerator(
-                        self.gens[i], self.namespaces, self.site)
+                if self.namespaces:
+                    self.gens[i].set_namespace(self.namespaces)
                 if self.limit:
                     self.gens[i].set_maximum_items(self.limit)
             else:
@@ -1018,7 +1013,8 @@ class GeneratorFactory(object):
 
     def _handle_unconnectedpages(self, value):
         """Handle `-unconnectedpages` argument."""
-        return self.site.unconnected_pages(total=_int_none(value))
+        # T196619 don't use QueryGenerator due to namespace filtering
+        return (p for p in self.site.unconnected_pages(total=_int_none(value)))
 
     def _handle_imagesused(self, value):
         """Handle `-imagesused` argument."""
