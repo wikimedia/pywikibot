@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the category bot script."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -85,13 +85,13 @@ class TestPreprocessingCategory(TestCase):
         bot = CategoryPreprocess()
         bot.site = self.site
         new_page = bot.determine_type_target(page)
-        self.assertEqual(new_page, None)
+        self.assertIsNone(new_page)
 
         page = pywikibot.Page(self.site, 'Template:Baz')
         bot = CategoryPreprocess()
         bot.site = self.site
         new_page = bot.determine_type_target(page)
-        self.assertEqual(new_page, None)
+        self.assertIsNone(new_page)
 
     def test_determine_template_target(self):
         """Test determining template target."""

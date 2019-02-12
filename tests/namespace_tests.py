@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Namespace class."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -141,9 +141,9 @@ class TestNamespaceObject(TestCase):
 
         self.assertEqual(a, 0)
         self.assertEqual(a, '')
-        self.assertFalse(a < 0)
-        self.assertFalse(a > 0)
-        self.assertNotEqual(a, None)
+        self.assertFalse(a < 0)  # noqa: H205
+        self.assertFalse(a > 0)  # noqa: H205
+        self.assertNotEqual(a, None)  # noqa: H203
 
         self.assertGreater(a, -1)
 
@@ -170,8 +170,8 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(x, 'image')
         self.assertEqual(x, 'Image')
 
-        self.assertFalse(x < 6)
-        self.assertFalse(x > 6)
+        self.assertFalse(x < 6)  # noqa: H205
+        self.assertFalse(x > 6)  # noqa: H205
 
         self.assertEqual(y, 'ملف')
 

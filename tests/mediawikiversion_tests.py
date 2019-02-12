@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the tools.MediaWikiVersion class."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -30,7 +30,6 @@ class TestMediaWikiVersion(TestCase):
     def test_normal_versions(self):
         """Test comparison between release versions."""
         self.assertGreater(self._make('1.23'), self._make('1.22.0'))
-        self.assertTrue(self._make('1.23') == self._make('1.23'))
         self.assertEqual(self._make('1.23'), self._make('1.23'))
 
     def test_wmf_versions(self):
