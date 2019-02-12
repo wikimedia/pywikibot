@@ -35,7 +35,7 @@ before_install:
       export USE_PYTEST=1 ;
     fi
 
-  - if [[ "$SITE_ONLY" == '1' ]]; then
+  - if [[ "$PYWIKIBOT_SITE_ONLY" == "1" ]]; then
       echo "Running site tests only code ${LANGUAGE} on family ${FAMILY}" ;
     fi
 
@@ -98,13 +98,13 @@ script:
 
   - if [[ "$USE_NOSE" == "1" ]]; then
       nosetests --version ;
-      if [[ "$SITE_ONLY" == "1" ]]; then
+      if [[ "$PYWIKIBOT_SITE_ONLY" == "1" ]]; then
         python setup.py nosetests --tests tests --verbosity=2 -a "family=$FAMILY,code=$LANGUAGE" --with-trim --with-coverage --cover-package=. ;
       else
         python setup.py nosetests --tests tests --verbosity=2 --with-trim --with-coverage --cover-package=. ;
       fi ;
     elif [[ "$USE_PYTEST" == "1" ]]; then
-      if [[ "$SITE_ONLY" == "1" ]]; then
+      if [[ "$PYWIKIBOT_SITE_ONLY" == "1" ]]; then
         python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -a \"family=='$FAMILY' and code=='$LANGUAGE'\"" ;
       else
         python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=." ;
@@ -142,34 +142,34 @@ matrix:
             - liblua5.1-0-dev
             - python-ipaddr
     - python: '2.7'
-      env: LANGUAGE=en FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
+      env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
     - python: '3.6'
-      env: LANGUAGE=zh FAMILY=wpbeta SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
+      env: LANGUAGE=zh FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
     - python: '3.4'
-      env: LANGUAGE=en FAMILY=wsbeta SITE_ONLY=1 PYWIKIBOT_NO_L10N_TESTS=0
+      env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1 PYWIKIBOT_NO_L10N_TESTS=0
     - python: '2.7'
       env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT_TEST_NO_RC=1
     - python: '3.5'
-      env: LANGUAGE=en FAMILY=musicbrainz SITE_ONLY=1
+      env: LANGUAGE=en FAMILY=musicbrainz PYWIKIBOT_SITE_ONLY=1
     - python: '3.4'
-      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="test.wikipedia.org"
     - python: '3.4'
-      env: LANGUAGE=test FAMILY=wikidata SITE_ONLY=1
+      env: LANGUAGE=test FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.4'
       env: LANGUAGE=ar FAMILY=wiktionary PYWIKIBOT_TEST_NO_RC=1
     - python: '3.6'
-      env: LANGUAGE=wikidata FAMILY=wikidata SITE_ONLY=1
+      env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.7'
       env: LANGUAGE=de FAMILY=wikipedia
       dist: xenial
       sudo: required
     - python: '3.8-dev'
-      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
       dist: xenial
       sudo: required
   allow_failures:
     - python: '3.8-dev'
-      env: LANGUAGE=test FAMILY=wikipedia SITE_ONLY=1
+      env: LANGUAGE=test FAMILY=wikipedia PYWIKIBOT_SITE_ONLY=1
       dist: xenial
       sudo: required
 
