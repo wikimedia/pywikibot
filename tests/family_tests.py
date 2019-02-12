@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the family module."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -238,7 +238,7 @@ class TestFamilyUrlRegex(PatchingTestCase):
         """Test each family builds a working regex."""
         for family in pywikibot.config.family_files:
             if family == 'wowwiki':
-                raise unittest.SkipTest(
+                self.skipTest(
                     'Family.from_url() does not work for wowwiki (T215077)')
             self.current_family = family
             family = Family.load(family)

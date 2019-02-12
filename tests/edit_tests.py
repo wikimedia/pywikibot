@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for editing pages."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -88,8 +88,8 @@ class TestSiteMergeHistory(TestCase):
 
         # Make sure the wiki supports action=mergehistory
         if site.mw_version < '1.27.0-wmf.13':
-            raise unittest.SkipTest('Wiki version must be 1.27.0-wmf.13 or '
-                                    'newer to support the history merge API.')
+            self.skipTest('Wiki version must be 1.27.0-wmf.13 or newer to '
+                          'support the history merge API.')
 
         if source.exists():
             source.delete('Pywikibot merge history unit test')

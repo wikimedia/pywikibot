@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -158,7 +158,7 @@ class OpenArchiveTestCase(TestCase):
         try:
             subprocess.Popen(['7za'], stdout=subprocess.PIPE).stdout.close()
         except OSError:
-            raise unittest.SkipTest('7za not installed')
+            self.skipTest('7za not installed')
         self.assertEqual(
             self._get_content(self.base_file + '.7z'), self.original_content)
         self.assertRaisesRegex(OSError,
@@ -170,7 +170,7 @@ class OpenArchiveTestCase(TestCase):
     def test_open_archive_lzma(self):
         """Test open_archive with lzma compressor in the standard library."""
         if isinstance(tools.lzma, ImportError):
-            raise unittest.SkipTest('lzma not importable')
+            self.skipTest('lzma not importable')
         self.assertEqual(
             self._get_content(self.base_file + '.lzma'), self.original_content)
         # Legacy LZMA container formet has no magic, skipping
@@ -295,7 +295,7 @@ class OpenArchiveWriteTestCase(TestCase):
     def test_write_archive_lzma(self):
         """Test writing a lzma archive."""
         if isinstance(tools.lzma, ImportError):
-            raise unittest.SkipTest('lzma not importable')
+            self.skipTest('lzma not importable')
 
         content = self._write_content('.lzma')
         with open(self.base_file + '.lzma', 'rb') as f:
@@ -304,7 +304,7 @@ class OpenArchiveWriteTestCase(TestCase):
     def test_write_archive_xz(self):
         """Test writing a xz archive."""
         if isinstance(tools.lzma, ImportError):
-            raise unittest.SkipTest('lzma not importable')
+            self.skipTest('lzma not importable')
 
         content = self._write_content('.xz')
         self.assertEqual(content[:6], b'\xFD7zXZ\x00')

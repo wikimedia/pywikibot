@@ -463,7 +463,7 @@ class TestYearPageGenerator(DefaultSiteTestCase):
         # Some languages are missing (T85681)
         if (site.lang not in date.formats['YearBC']
                 or site.lang not in date.formats['YearAD']):
-            raise unittest.SkipTest(
+            self.skipTest(
                 'Date formats for this language are missing from date.py')
         start = -20
         end = 2026
@@ -1136,7 +1136,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
         """Test the pages_with_property_generator method."""
         mysite = self.get_site()
         if mysite.mw_version < '1.21':
-            raise unittest.SkipTest('requires v1.21+')
+            self.skipTest('requires v1.21+')
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
                      'hiddencat', 'invalid_property'):
             if item in mysite.get_property_names():
@@ -1192,9 +1192,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_ns_valid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            raise unittest.SkipTest(
-                'The site {0} does not use Linter extension'
-                .format(self.site))
+            self.skipTest('The site {0} does not use Linter extension'
+                          .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-ns:1')
         gf.handleArg('-limit:3')
@@ -1211,9 +1210,8 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_linter_generator_invalid_cat(self):
         """Test generator of pages with lint errors."""
         if not self.site.has_extension('Linter'):
-            raise unittest.SkipTest(
-                'The site {0} does not use Linter extension'
-                .format(self.site))
+            self.skipTest('The site {0} does not use Linter extension'
+                          .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         self.assertRaises(ValueError, gf.handleArg, '-linter:dummy')
 
@@ -1598,7 +1596,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
     def test_unconnected_with_repo(self):
         """Test UnconnectedPageGenerator."""
         if not self.site.data_repository():
-            raise unittest.SkipTest('Site is not using a Wikibase repository')
+            self.skipTest('Site is not using a Wikibase repository')
         with suppress_warnings(
                 'pywikibot.pagegenerators.UnconnectedPageGenerator is '
                 'deprecated', DeprecationWarning):
@@ -1618,7 +1616,7 @@ class TestUnconnectedPageGenerator(DefaultSiteTestCase):
     def test_unconnected_without_repo(self):
         """Test that it raises a ValueError on sites without repository."""
         if self.site.data_repository():
-            raise unittest.SkipTest('Site is using a Wikibase repository')
+            self.skipTest('Site is using a Wikibase repository')
         with self.assertRaises(ValueError):
             for page in pagegenerators.UnconnectedPageGenerator(self.site,
                                                                 total=5):
