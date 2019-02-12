@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """API test module."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -405,8 +405,9 @@ class TestParamInfo(DefaultSiteTestCase):
         site = self.get_site()
         pi = api.ParamInfo(site)
         with suppress_warnings(
-            r'pywikibot\.data\.api\.ParamInfo.modules is deprecated; '
-            r'use submodules\(\) or module_paths instead\.', DeprecationWarning
+            r'pywikibot\.data\.api\.ParamInfo.modules is deprecated for '
+            r'[\w ]+; use submodules\(\) or module_paths instead\.',
+            DeprecationWarning
         ):
             self.assertIn('revisions', pi.modules)
             self.assertIn('help', pi.modules)
@@ -428,10 +429,10 @@ class TestParamInfo(DefaultSiteTestCase):
         site = self.get_site()
         pi = api.ParamInfo(site)
         with suppress_warnings(
-            r'pywikibot.data.api.ParamInfo.prefixes is deprecated; '
-            r'|pywikibot.data.api.ParamInfo.module_attribute_map is deprecated'
-            r'|pywikibot.data.api.ParamInfo.modules is deprecated',
-            DeprecationWarning,
+            r'pywikibot.data.api.ParamInfo.'
+            r'(?:prefixes|module_attribute_map|modules) '
+            r'is deprecated for [\w ]+; ',
+            DeprecationWarning
         ):
             self.assertIn('revisions', pi.prefixes)
             self.assertIn('login', pi.prefixes)
