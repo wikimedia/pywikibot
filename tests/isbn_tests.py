@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for isbn script."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -255,8 +255,8 @@ class TestIsbnWikibaseBot(ScriptMainTestCase, WikibaseTestCase,
                     prop_page = pywikibot.PropertyPage(cls.get_repo(),
                                                        claim.getID())
                     prop_page.get()
-                    if ('ISBN-10' in prop_page.labels.values() and
-                            claim.getTarget() == '097522980x'):
+                    if ('ISBN-10' in prop_page.labels.values()
+                            and claim.getTarget() == '097522980x'):
                         return
             raise unittest.SkipTest(
                 '{}: "ISBN-10" property was not found in '

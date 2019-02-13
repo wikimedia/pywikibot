@@ -396,8 +396,8 @@ class ParamInfo(Container):
             'parameters': [
                 {
                     'name': 'querymodules',
-                    'type': (prop_modules + list_modules +
-                             meta_modules + gen_modules),
+                    'type': (prop_modules + list_modules
+                             + meta_modules + gen_modules),
                     'limit': 50,
                 },
             ],
@@ -522,8 +522,8 @@ class ParamInfo(Container):
                 # Purge is the only action which isn't POSTed but actually does
                 # require writerights. This was checked with the data from
                 # 1.25wmf22 on en.wikipedia.org.
-                if ('mustbeposted' in self._paraminfo[path] and
-                        path != 'login') or path == 'purge':
+                if ('mustbeposted' in self._paraminfo[path]
+                        and path != 'login') or path == 'purge':
                     self._paraminfo[path]['writerights'] = ''
 
         self._emulate_pageset()
@@ -694,8 +694,8 @@ class ParamInfo(Container):
                 # This is supplying submodules even if they aren't submodules
                 # of the given module so skip those
                 for param in parameters:
-                    if ((module == 'main' and param['name'] == 'format') or
-                            'submodules' not in param):
+                    if ((module == 'main' and param['name'] == 'format')
+                            or 'submodules' not in param):
                         continue
                     for submodule in param['submodules'].values():
                         if '+' in submodule:
@@ -720,8 +720,9 @@ class ParamInfo(Container):
 
                 for param in parameters:
                     # Do not add format modules
-                    if 'submodules' in param and (module != 'main' or
-                                                  param['name'] != 'format'):
+                    if ('submodules' in param
+                        and (module != 'main'
+                             or param['name'] != 'format')):
                         submodules |= set(param['type'])
 
             if submodules:
@@ -1114,8 +1115,8 @@ class OptionSet(MutableMapping):
             self._enabled &= self._valid_enable
             self._disabled &= self._valid_disable
         else:
-            invalid_names = ((self._enabled - self._valid_enable) |
-                             (self._disabled - self._valid_disable))
+            invalid_names = ((self._enabled - self._valid_enable)
+                             | (self._disabled - self._valid_disable))
             if invalid_names:
                 raise KeyError('OptionSet already contains invalid name(s) '
                                '"{0}"'.format('", "'.join(invalid_names)))
@@ -1149,8 +1150,8 @@ class OptionSet(MutableMapping):
                 raise ValueError('Dict contains invalid value "{0}"'.format(
                     value))
         invalid_names = (
-            (enabled - self._valid_enable) | (disabled - self._valid_disable) |
-            (removed - self._valid_enable - self._valid_disable)
+            (enabled - self._valid_enable) | (disabled - self._valid_disable)
+            | (removed - self._valid_enable - self._valid_disable)
         )
         if invalid_names and self._site_set:
             raise ValueError('Dict contains invalid name(s) "{0}"'.format(
@@ -1176,8 +1177,8 @@ class OptionSet(MutableMapping):
             self._disabled.add(name)
             self._enabled.discard(name)
         elif value is None:
-            if self._site_set and (name not in self._valid_enable or
-                                   name not in self._valid_disable):
+            if self._site_set and (name not in self._valid_enable
+                                   or name not in self._valid_disable):
                 raise KeyError('Invalid name "{0}"'.format(name))
             self._enabled.discard(name)
             self._disabled.discard(name)
@@ -1196,13 +1197,12 @@ class OptionSet(MutableMapping):
         """
         if name in self._enabled:
             return True
-        elif name in self._disabled:
+        if name in self._disabled:
             return False
-        elif (self._site_set or name in self._valid_enable or
-                name in self._valid_disable):
+        if (self._site_set or name in self._valid_enable
+                or name in self._valid_disable):
             return None
-        else:
-            raise KeyError('Invalid name "{0}"'.format(name))
+        raise KeyError('Invalid name "{0}"'.format(name))
 
     def __delitem__(self, name):
         """Remove the item by setting it to None."""
@@ -1533,10 +1533,10 @@ class Request(MutableMapping):
                       if name in args or name == 'self'}
             kwargs['parameters'] = parameters
             # Make sure that all arguments have remained
-            assert(old_kwargs | {'parameters'} ==
-                   set(kwargs) | set(kwargs['parameters']))
-            assert(('parameters' in old_kwargs) is
-                   ('parameters' in kwargs['parameters']))
+            assert(old_kwargs | {'parameters'}
+                   == set(kwargs) | set(kwargs['parameters']))
+            assert(('parameters' in old_kwargs)
+                   is ('parameters' in kwargs['parameters']))
             cls._warn_kwargs()
         else:
             kwargs = dict(kwargs)
@@ -2033,8 +2033,8 @@ class Request(MutableMapping):
                     continue
                 # multiple warnings are in text separated by a newline
                 for single_warning in text.splitlines():
-                    if (not callable(self._warning_handler) or
-                            not self._warning_handler(mod, single_warning)):
+                    if (not callable(self._warning_handler)
+                            or not self._warning_handler(mod, single_warning)):
                         pywikibot.warning('API warning ({}): {}'
                                           .format(mod, single_warning))
 
@@ -3347,8 +3347,8 @@ def encode_url(query):
 
     # parameters ending on 'token' should go last
     # wpEditToken should go very last
-    query.sort(key=lambda x: x[0].lower().endswith('token') +
-               (x[0] == 'wpEditToken'))
+    query.sort(key=lambda x: x[0].lower().endswith('token')
+               + (x[0] == 'wpEditToken'))
     return urlencode(query)
 
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Objects representing WikiStats API."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -11,8 +11,9 @@ from io import BytesIO, StringIO
 
 import pywikibot
 from pywikibot.comms import http
+from pywikibot.tools import PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     import csv
     unicode = str
 else:
@@ -79,8 +80,8 @@ class WikiStats(object):
         'sourceforge',
     }
 
-    ALL_TABLES = ({MISC_SITES_TABLE} | WMF_MULTILANG_TABLES |
-                  OTHER_MULTILANG_TABLES | OTHER_TABLES)
+    ALL_TABLES = ({MISC_SITES_TABLE} | WMF_MULTILANG_TABLES
+                  | OTHER_MULTILANG_TABLES | OTHER_TABLES)
 
     ALL_KEYS = set(FAMILY_MAPPING.keys()) | ALL_TABLES
 
