@@ -13,17 +13,6 @@ import sys
 
 from setuptools import find_packages, setup
 
-if sys.version_info[:3] < (2, 7, 4):
-    try:
-        # Work around a traceback on Python < 2.7.4
-        # http://bugs.python.org/issue15881#msg170215
-        import multiprocessing
-    except ImportError:
-        pass
-    else:
-        _unused = multiprocessing  # pyflakes workaround
-
-
 PYTHON_VERSION = sys.version_info[:3]
 PY2 = (PYTHON_VERSION[0] == 2)
 
@@ -31,14 +20,14 @@ versions_required_message = """
 Pywikibot is not available on:
 {version}
 
-This version of Pywikibot only supports Python 2.7.2+ or 3.4+.
+This version of Pywikibot only supports Python 2.7.4+ or 3.4+.
 """
 
 
 def python_is_supported():
     """Check that Python is supported."""
     # Any change to this must be copied to pwb.py
-    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 2)
+    return PYTHON_VERSION >= (3, 4, 0) or PY2 and PYTHON_VERSION >= (2, 7, 4)
 
 
 if not python_is_supported():
@@ -110,15 +99,6 @@ dependency_links = [
     'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
 ]
 
-if PYTHON_VERSION == (2, 7, 2):
-    # work around distutils hardcoded unittest dependency
-    # work around T106512
-    import unittest
-    _unused = unittest
-    if 'test' in sys.argv:
-        import unittest2
-        sys.modules['unittest'] = unittest2
-
 if PY2:
     # tools.ip does not have a hard dependency on an IP address module,
     # as it falls back to using regexes if one is not available.
@@ -129,9 +109,6 @@ if PY2:
     # Other backports are likely broken.
     # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
-
-    if PYTHON_VERSION == (2, 7, 2):
-        dependencies.append('future>=0.15.0')  # Bug fixes for HTMLParser
 
     if (2, 7, 6) < PYTHON_VERSION < (2, 7, 9):
         # Python versions before 2.7.9 will cause urllib3 to trigger
@@ -240,7 +217,7 @@ setup(
     packages=[str(name)] + [package
                             for package in find_packages()
                             if package.startswith('pywikibot.')],
-    python_requires='>=2.7.2, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
+    python_requires='>=2.7.4, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=dependencies,
     dependency_links=dependency_links,
     extras_require=extra_deps,

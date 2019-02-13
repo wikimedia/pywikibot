@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test utilities."""
 #
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -643,10 +643,6 @@ def execute(command, data_in=None, timeout=0, error=None):
     @param command: executable to run and arguments to use
     @type command: list of unicode
     """
-    if PYTHON_VERSION[:2] == (2, 7) and PYTHON_VERSION[2] in (2, 3):
-        command.insert(1, '-W ignore:{0}:DeprecationWarning'.format(
-            'Pywikibot will soon drop support for Python 2.7.2 and 2.7.3, '
-            'please update your Python.'))
     if cryptography_version and cryptography_version < [1, 3, 4]:
         command.insert(1, '-W ignore:Old version of cryptography:Warning')
     # Any environment variables added on Windows must be of type
