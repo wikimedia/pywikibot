@@ -1353,7 +1353,8 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
         self.assertLessEqual(len(le), 10)
         for entry in le:
             self.assertIsInstance(entry, tuple)
-            self.assertIsInstance(entry[0], pywikibot.Page)
+            if not isinstance(entry[0], int):  # autoblock removal entry
+                self.assertIsInstance(entry[0], pywikibot.Page)
             self.assertIsInstance(entry[1], basestring)
             self.assertIsInstance(
                 entry[2], long if PY2 and entry[2] > sys.maxint else int)
@@ -1363,6 +1364,8 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
         """Test the deprecated site.logpages() when namespace is a list."""
         le = list(self.site.logpages(namespace=[2, 3], number=10))
         for entry in le:
+            if isinstance(entry[0], int):  # autoblock removal entry
+                continue
             try:
                 self.assertIn(entry[0].namespace(), [2, 3])
             except HiddenKeyError as e:
