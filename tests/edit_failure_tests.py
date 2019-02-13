@@ -168,8 +168,7 @@ class TestWikibaseSaveTest(WikibaseTestCase):
                                                    language='en')
         self.assertRaisesRegex(
             OtherPageSaveError,
-            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:\n'
-            r'invalid-snak: Invalid snak data.',
+            r'Edit to page \[\[(wikidata:test:)?Q68]] failed:',
             item.addClaim, claim)
 
     def test_math_invalid_function(self):
