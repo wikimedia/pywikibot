@@ -86,7 +86,7 @@ class TestDryPageGenerators(TestCase):
         """Test PagesFromTitlesGenerator."""
         self.assertFunction('PagesFromTitlesGenerator')
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
-        self.assertPagelistTitles(gen, self.titles)
+        self.assertPageTitlesEqual(gen, self.titles)
 
     def test_NamespaceFilterPageGenerator(self):
         """Test NamespaceFilterPageGenerator."""
@@ -114,19 +114,19 @@ class TestDryPageGenerators(TestCase):
         self.assertFunction('RegexFilterPageGenerator')
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc')
-        self.assertPagelistTitles(gen,
-                                  ('Template:!/Doc', 'Template:Template/Doc'))
+        self.assertPageTitlesEqual(gen,
+                                   ('Template:!/Doc', 'Template:Template/Doc'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, '/doc',
                                                       quantifier='none')
         self.assertEqual(len(tuple(gen)), 11)
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'])
-        self.assertPagelistTitles(gen,
-                                  ('Template:!/Doc',
-                                   'Template:!/Meta',
-                                   'Template:Template/Doc',
-                                   'Template:Template/Meta'))
+        self.assertPageTitlesEqual(gen,
+                                   ('Template:!/Doc',
+                                    'Template:!/Meta',
+                                    'Template:Template/Doc',
+                                    'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='none')
@@ -134,19 +134,19 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(gen, ['/doc', '/meta'],
                                                       quantifier='all')
-        self.assertPagelistTitles(gen, [])
+        self.assertPageTitlesEqual(gen, [])
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(
             gen, ['Template', '/meta'], quantifier='all')
-        self.assertPagelistTitles(gen, ('Template:Template/Meta', ))
+        self.assertPageTitlesEqual(gen, ('Template:Template/Meta', ))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.RegexFilterPageGenerator(
             gen, ['template', '/meta'], quantifier='any')
-        self.assertPagelistTitles(gen,
-                                  ('Template:Template',
-                                   'Template:!/Meta',
-                                   'Template:Template/Doc',
-                                   'Template:Template/Meta'))
+        self.assertPageTitlesEqual(gen,
+                                   ('Template:Template',
+                                    'Template:!/Meta',
+                                    'Template:Template/Doc',
+                                    'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                       site=self.site)
         gen = pagegenerators.RegexFilterPageGenerator(
@@ -158,9 +158,9 @@ class TestDryPageGenerators(TestCase):
         gen = pagegenerators.RegexFilterPageGenerator(
             gen, ['template', '/meta'], quantifier='all',
             ignore_namespace=False)
-        self.assertPagelistTitles(gen,
-                                  ('Template:!/Meta',
-                                   'Template:Template/Meta'))
+        self.assertPageTitlesEqual(gen,
+                                   ('Template:!/Meta',
+                                    'Template:Template/Meta'))
         gen = pagegenerators.PagesFromTitlesGenerator(self.titles,
                                                       site=self.site)
         gen = pagegenerators.RegexFilterPageGenerator(
@@ -178,10 +178,10 @@ class TestDryPageGenerators(TestCase):
             p.text = 'This is the content of {} as a sample'.format(p.title())
             pages.append(p)
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), '/doc')
-        self.assertPagelistTitles(gen,
-                                  ('Template:!/Doc', 'Template:Template/Doc'))
+        self.assertPageTitlesEqual(gen,
+                                   ('Template:!/Doc', 'Template:Template/Doc'))
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'This')
-        self.assertPagelistTitles(gen, self.titles)
+        self.assertPageTitlesEqual(gen, self.titles)
         gen = pagegenerators.RegexBodyFilterPageGenerator(iter(pages), 'talk',
                                                           quantifier='none')
         self.assertEqual(len(tuple(gen)), 9)
@@ -212,7 +212,7 @@ class TestPagesFromPageidGenerator(TestCase):
             pageids.append(page.pageid)
 
         gen = pagegenerators.PagesFromPageidGenerator(pageids, self.site)
-        self.assertPagelistTitles(gen, self.titles)
+        self.assertPageTitlesEqual(gen, self.titles)
 
 
 class TestCategoryFilterPageGenerator(TestCase):
@@ -291,7 +291,7 @@ class EdittimeFilterPageGeneratorTestCase(TestCase):
         gen = PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
             gen, first_edit_end=datetime.datetime(2006, 1, 1))
-        self.assertPagelistTitles(gen, titles=expect, site=self.site)
+        self.assertPageTitlesEqual(gen, titles=expect, site=self.site)
 
         gen = PagesFromTitlesGenerator(self.titles, self.site)
         gen = pagegenerators.EdittimeFilterPageGenerator(
@@ -342,7 +342,7 @@ class SubpageFilterGeneratorTestCase(TestCase):
         gen = CategorizedPageGenerator(test_cat)
         gen = pagegenerators.SubpageFilterGenerator(gen, 0)
         expect_0 = ('/home/test',)
-        self.assertPagelistTitles(gen, titles=expect_0, site=site)
+        self.assertPageTitlesEqual(gen, titles=expect_0, site=site)
 
         gen = CategorizedPageGenerator(test_cat)
         gen = pagegenerators.SubpageFilterGenerator(gen, 3)
@@ -351,7 +351,7 @@ class SubpageFilterGeneratorTestCase(TestCase):
             'User:Sn1per/ProtectTest1/test',
             'User:Sn1per/ProtectTest1/test/test',
         )
-        self.assertPagelistTitles(gen, titles=expect_3, site=site)
+        self.assertPageTitlesEqual(gen, titles=expect_3, site=site)
 
 
 class PetScanPageGeneratorTestCase(TestCase):
@@ -367,7 +367,7 @@ class PetScanPageGeneratorTestCase(TestCase):
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'],
                                                   True, None, site)
         try:
-            self.assertPagelistTitles(gen, titles=(
+            self.assertPageTitlesEqual(gen, titles=(
                 'User:Sn1per/ProtectTest1', 'User:Sn1per/ProtectTest2'),
                 site=site)
         except ServerError as e:
@@ -375,16 +375,16 @@ class PetScanPageGeneratorTestCase(TestCase):
 
         gen = pagegenerators.PetScanPageGenerator(['Pywikibot Protect Test'],
                                                   False, None, site)
-        self.assertPagelistTitles(gen, titles=('User:Sn1per/ProtectTest1',
-                                               'User:Sn1per/ProtectTest2'),
-                                  site=site)
+        self.assertPageTitlesEqual(gen, titles=('User:Sn1per/ProtectTest1',
+                                                'User:Sn1per/ProtectTest2'),
+                                   site=site)
 
         gen = pagegenerators.PetScanPageGenerator(
             ['Pywikibot PetScan Test',
              'Pywikibot Category That Needs&ToBe!Encoded',
              'Test'], True, None, site)
-        self.assertPagelistTitles(gen, titles=('User:Sn1per/PetScanTest1',),
-                                  site=site)
+        self.assertPageTitlesEqual(gen, titles=('User:Sn1per/PetScanTest1', ),
+                                   site=site)
 
 
 class TestRepeatingGenerator(RecentChangesTestCase):
