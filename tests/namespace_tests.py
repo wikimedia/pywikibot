@@ -19,7 +19,8 @@ from pywikibot.tools import (
     UnicodeType as unicode,
 )
 
-from tests.aspects import unittest, TestCase, AutoDeprecationTestCase
+from tests.aspects import (CapturingTestCase, DeprecationTestCase,
+                           TestCase, unittest)
 
 # Default namespaces which should work in any MW wiki
 _base_builtin_ns = {
@@ -230,7 +231,7 @@ class TestNamespaceObject(TestCase):
         self.assertEqual(a, b)
 
 
-class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
+class TestNamespaceDictDeprecated(CapturingTestCase, DeprecationTestCase):
 
     """Test static/classmethods in Namespace replaced by NamespacesDict."""
 
@@ -316,17 +317,13 @@ class TestNamespaceDictDeprecated(AutoDeprecationTestCase):
 
     def test_lookup_name(self):
         """Test Namespace.lookup_name."""
-        file_nses = Namespace.builtin_namespaces(use_image_name=False)
-        image_nses = Namespace.builtin_namespaces(use_image_name=True)
+        file_nses = Namespace.builtin_namespaces()
 
         for name, ns_id in builtin_ns.items():
             file_ns = Namespace.lookup_name(name, file_nses)
             self.assertIsInstance(file_ns, Namespace)
-            image_ns = Namespace.lookup_name(name, image_nses)
-            self.assertIsInstance(image_ns, Namespace)
             with self.disable_assert_capture():
                 self.assertEqual(file_ns.id, ns_id)
-                self.assertEqual(image_ns.id, ns_id)
 
 
 class TestNamespaceCollections(TestCase):

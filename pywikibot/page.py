@@ -2954,7 +2954,6 @@ class Category(Page):
                         if total == 0:
                             return
 
-    @need_version('1.13')
     def isEmptyCategory(self):
         """
         Return True if category has no members (including subcategories).
@@ -2964,7 +2963,6 @@ class Category(Page):
         ci = self.categoryinfo
         return sum(ci[k] for k in ['files', 'pages', 'subcats']) == 0
 
-    @need_version('1.11')
     def isHiddenCategory(self):
         """
         Return True if the category is hidden.

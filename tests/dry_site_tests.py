@@ -140,7 +140,7 @@ class TestMustBe(DebugOnlyTestCase):
         self._logged_in_as = None
         self.obsolete = False
         super(TestMustBe, self).setUp()
-        self.version = lambda: '1.13'  # pre 1.14
+        self.version = lambda: '1.14'  # lowest supported release
 
     def login(self, sysop):
         """Fake the log in and just store who logged in."""
@@ -213,43 +213,43 @@ class TestNeedVersion(DeprecationTestCase):
     def setUp(self):
         """Set up test method."""
         super(TestNeedVersion, self).setUp()
-        self.version = lambda: '1.13'
+        self.version = lambda: '1.23'
 
-    @need_version('1.14')
+    @need_version('1.24')
     def too_new(self):
         """Method which is to new."""
         return True
 
-    @need_version('1.13')
+    @need_version('1.23')
     def old_enough(self):
         """Method which is as new as the server."""
         return True
 
-    @need_version('1.12')
+    @need_version('1.22')
     def older(self):
         """Method which is old enough."""
         return True
 
-    @need_version('1.14')
+    @need_version('1.24')
     @deprecated
     def deprecated_unavailable_method(self):
         """Method which is to new and then deprecated."""
         return True
 
     @deprecated
-    @need_version('1.14')
+    @need_version('1.24')
     def deprecated_unavailable_method2(self):
         """Method which is deprecated first and then to new."""
         return True
 
-    @need_version('1.12')
+    @need_version('1.22')
     @deprecated
     def deprecated_available_method(self):
         """Method which is old enough and then deprecated."""
         return True
 
     @deprecated
-    @need_version('1.12')
+    @need_version('1.22')
     def deprecated_available_method2(self):
         """Method which is deprecated first and then old enough."""
         return True

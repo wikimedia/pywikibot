@@ -194,9 +194,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        if self.site.mw_version >= '1.12':
-            self.assertEqual(len(pi),
-                             len(pi.preloaded_modules))
+        self.assertEqual(len(pi), len(pi.preloaded_modules))
 
         self.assertIn('info', pi.query_modules)
         self.assertIn('login', pi._action_modules)
@@ -233,9 +231,6 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
         self.assertIn('pageset', pi._paraminfo)
-
-        if self.site.mw_version < '1.12':
-            return
 
         if 'query' in pi.preloaded_modules:
             self.assertIn('query', pi._paraminfo)
@@ -281,9 +276,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        if self.site.mw_version >= '1.12':
-            self.assertEqual(len(pi),
-                             1 + len(pi.preloaded_modules))
+        self.assertEqual(len(pi), 1 + len(pi.preloaded_modules))
 
         self.assertEqual(pi['info']['prefix'], 'in')
 
@@ -294,9 +287,6 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('deprecated', param)
 
         self.assertIsInstance(param['type'], list)
-
-        if self.site.mw_version < '1.12':
-            return
 
         self.assertIn('protection', param['type'])
 
@@ -310,9 +300,7 @@ class TestParamInfo(DefaultSiteTestCase):
 
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
-        if self.site.mw_version >= '1.12':
-            self.assertEqual(len(pi),
-                             1 + len(pi.preloaded_modules))
+        self.assertEqual(len(pi), 1 + len(pi.preloaded_modules))
 
         self.assertEqual(pi['revisions']['prefix'], 'rv')
 
@@ -323,9 +311,6 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertNotIn('deprecated', param)
 
         self.assertIsInstance(param['type'], list)
-
-        if self.site.mw_version < '1.12':
-            return
 
         self.assertIn('user', param['type'])
 
@@ -341,11 +326,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        if self.site.mw_version < '1.12':
-            return
-
-        self.assertEqual(len(pi),
-                         2 + len(pi.preloaded_modules))
+        self.assertEqual(len(pi), 2 + len(pi.preloaded_modules))
 
     def test_with_invalid_module(self):
         """Test requesting different kind of invalid modules."""
@@ -364,11 +345,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        if self.site.mw_version < '1.12':
-            return
-
-        self.assertEqual(len(pi),
-                         len(pi.preloaded_modules))
+        self.assertEqual(len(pi), len(pi.preloaded_modules))
 
     def test_submodules(self):
         """Test another module apart from query having submodules."""
@@ -467,9 +444,7 @@ class TestParamInfo(DefaultSiteTestCase):
         self.assertIn('main', pi._paraminfo)
         self.assertIn('paraminfo', pi._paraminfo)
 
-        if self.site.mw_version >= '1.12':
-            self.assertEqual(len(pi),
-                             1 + len(pi.preloaded_modules))
+        self.assertEqual(len(pi), 1 + len(pi.preloaded_modules))
 
         self.assertIn('query+revisions', pi.prefix_map)
 

@@ -159,10 +159,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
          namespace alias*]
 
     If the canonical_name is not provided for a namespace between -2
-    and 15, the MediaWiki 1.14+ built-in names are used.
-    Enable use_image_name to use built-in names from MediaWiki 1.13
-    and earlier as the details.
-
+    and 15, the MediaWiki built-in names are used.
     Image and File are aliases of each other by default.
 
     If only one of canonical_name and custom_name are available, both
@@ -212,8 +209,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         15: 'Category talk',
     }
 
+    @deprecated_args(use_image_name=None)
     def __init__(self, id, canonical_name=None, custom_name=None,
-                 aliases=None, use_image_name=False, **kwargs):
+                 aliases=None, **kwargs):
         """Initializer.
 
         @param custom_name: Name defined in server LocalSettings.php
@@ -222,27 +220,9 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         @type canonical_name: str
         @param aliases: Aliases
         @type aliases: list of unicode
-        @param use_image_name: Use 'Image' as default canonical
-                               for 'File' namespace
-        @param use_image_name: bool
-
         """
         self.id = id
-
-        if aliases is None:
-            self.aliases = []
-        else:
-            self.aliases = aliases
-
-        if not canonical_name and id in self.canonical_namespaces:
-            if use_image_name:
-                if id == 6:
-                    canonical_name = 'Image'
-                elif id == 7:
-                    canonical_name = 'Image talk'
-
-            if not canonical_name:
-                canonical_name = self.canonical_namespaces[id]
+        canonical_name = canonical_name or self.canonical_namespaces.get(id)
 
         assert custom_name is not None or canonical_name is not None, \
             'Namespace needs to have at least one name'
@@ -252,19 +232,15 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         self.canonical_name = canonical_name \
             if canonical_name is not None else custom_name
 
-        if not aliases:
-            if id in (6, 7):
-                if use_image_name:
-                    alias = 'File'
-                else:
-                    alias = 'Image'
-                if id == 7:
-                    alias += ' talk'
-                self.aliases = [alias]
-            else:
-                self.aliases = []
-        else:
+        if aliases:
             self.aliases = aliases
+        elif id in (6, 7):
+            alias = 'Image'
+            if id == 7:
+                alias += ' talk'
+            self.aliases = [alias]
+        else:
+            self.aliases = []
 
         for key, value in kwargs.items():
             setattr(self, key, value)
@@ -422,10 +398,16 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
             return default_case
 
     @classmethod
-    def builtin_namespaces(cls, use_image_name=False, case='first-letter'):
+    @deprecated_args(use_image_name=None)
+    def builtin_namespaces(cls, use_image_name=None, case='first-letter'):
         """Return a dict of the builtin namespaces."""
-        return {i: cls(i, use_image_name=use_image_name,
-                       case=cls.default_case(i, case)) for i in range(-2, 16)}
+        if use_image_name is not None:
+            issue_deprecation_warning(
+                'positional argument of "use_image_name"', None, 3,
+                DeprecationWarning, since='20181015')
+
+        return {i: cls(i, case=cls.default_case(i, case))
+                for i in range(-2, 16)}
 
     @staticmethod
     def normalize_name(name):
@@ -1032,9 +1014,7 @@ class BaseSite(ComparableMixin):
 
     def _build_namespaces(self):
         """Create default namespaces."""
-        use_image_name = MediaWikiVersion(
-            self.version()) < MediaWikiVersion('1.14')
-        return Namespace.builtin_namespaces(use_image_name)
+        return Namespace.builtin_namespaces()
 
     @property
     def namespaces(self):
@@ -2530,7 +2510,6 @@ class APISite(BaseSite):
         return msgs['comma-separator'].join(
             args[:-2] + [concat.join(args[-2:])])
 
-    @need_version('1.12')
     @deprecated_args(string='text')
     def expand_text(self, text, title=None, includecomments=None):
         """Parse the given text for preprocessing and rendering.
@@ -2603,7 +2582,6 @@ class APISite(BaseSite):
     getcurrenttime = redirect_func(server_time, old_name='getcurrenttime',
                                    class_name='APISite', since='20141225')
 
-    @need_version('1.14')
     def getmagicwords(self, word):
         """Return list of localized "word" magic words for the site."""
         if not hasattr(self, '_magicwords'):
@@ -2660,12 +2638,6 @@ class APISite(BaseSite):
     def _build_namespaces(self):
         _namespaces = {}
 
-        # In MW 1.14, API siprop 'namespaces' added 'canonical',
-        # and Image became File with Image as an alias.
-        # For versions lower than 1.14, APISite needs to override
-        # the defaults defined in Namespace.
-        is_mw114 = self.mw_version >= '1.14'
-
         for nsdata in self.siteinfo.get('namespaces', cache=False).values():
             ns = nsdata.pop('id')
             custom_name = None
@@ -2675,8 +2647,7 @@ class APISite(BaseSite):
                 custom_name = canonical_name
             else:
                 custom_name = nsdata.pop('*')
-                if is_mw114:
-                    canonical_name = nsdata.pop('canonical')
+                canonical_name = nsdata.pop('canonical')
 
             if 'content' not in nsdata:  # mw < 1.16
                 nsdata['content'] = ns == 0
@@ -2688,9 +2659,7 @@ class APISite(BaseSite):
                 assert default_case == nsdata['case'], \
                     'Default case is not consistent'
 
-            namespace = Namespace(ns, canonical_name, custom_name,
-                                  use_image_name=not is_mw114,
-                                  **nsdata)
+            namespace = Namespace(ns, canonical_name, custom_name, **nsdata)
             _namespaces[ns] = namespace
 
         for item in self.siteinfo.get('namespacealiases'):
@@ -2706,7 +2675,6 @@ class APISite(BaseSite):
 
         return _namespaces
 
-    @need_version('1.14')
     @deprecated('has_extension', since='20140819')
     def hasExtension(self, name, unknown=None):
         """Determine whether extension `name` is loaded.
@@ -2729,7 +2697,6 @@ class APISite(BaseSite):
                 return True
         return False
 
-    @need_version('1.14')
     def has_extension(self, name):
         """Determine whether extension `name` is loaded.
 
@@ -3566,7 +3533,7 @@ class APISite(BaseSite):
             # patrol token require special handling.
             # TODO: try to catch exceptions?
             if 'patrol' in valid_tokens:
-                if '1.14' <= mw_ver < '1.17':
+                if mw_ver < '1.17':
                     if 'edit' in user_tokens:
                         user_tokens['patrol'] = user_tokens['edit']
                 else:
@@ -3947,10 +3914,7 @@ class APISite(BaseSite):
         if isinstance(member_type, basestring):
             member_type = {member_type}
 
-        if member_type and (sortby == 'timestamp' or self.mw_version < '1.12'):
-            # Retrofit cmtype/member_type, available on MW API 1.12+,
-            # to use namespaces available on earlier versions.
-
+        if member_type and sortby == 'timestamp':
             # Covert namespaces to a known type
             namespaces = set(self.namespaces.resolve(namespaces or []))
 
@@ -4840,10 +4804,7 @@ class APISite(BaseSite):
                     issue_deprecation_warning("where='titles'",
                                               "where='title'", 2,
                                               since='20160224')
-                if self.mw_version < '1.11':
-                    where = 'titles'
-                else:
-                    where = 'title'
+                where = 'title'
         if not namespaces and namespaces != 0:
             namespaces = [ns_id for ns_id in self.namespaces if ns_id >= 0]
         srgen = self._generator(api.PageGenerator, type_arg='search',
@@ -5887,7 +5848,6 @@ class APISite(BaseSite):
 
             yield result['patrol']
 
-    @need_version('1.12')
     @must_be(group='sysop')
     def blockuser(self, user, expiry, reason, anononly=True, nocreate=True,
                   autoblock=True, noemail=False, reblock=False):
@@ -5939,7 +5899,6 @@ class APISite(BaseSite):
         data = req.submit()
         return data
 
-    @need_version('1.12')
     @must_be(group='sysop')
     def unblockuser(self, user, reason=None):
         """
