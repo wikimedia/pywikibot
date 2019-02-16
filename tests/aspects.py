@@ -7,7 +7,7 @@ such as API result caching and excessive test durations. An unused
 mixin to show cache usage is included.
 """
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -264,8 +264,6 @@ class TestCaseBase(unittest.TestCase):
         titles = self._get_canonical_titles(titles, site)
         gen_titles = self._get_gen_titles(gen, len(titles), site)
         self.assertCountEqual(gen_titles, titles)
-
-    assertPagelistTitles = assertPageTitlesEqual  # noqa: N815
 
     def assertAPIError(self, code, info=None, callable_obj=None, *args,
                        **kwargs):

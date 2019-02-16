@@ -657,7 +657,7 @@ class TestDryPageGenerator(TestCase):
 
     def test_results(self):
         """Test that PageGenerator yields pages with expected attributes."""
-        self.assertPagelistTitles(self.gen, self.titles)
+        self.assertPageTitlesEqual(self.gen, self.titles)
 
     def test_initial_limit(self):
         """Test the default limit."""
@@ -685,22 +685,22 @@ class TestDryPageGenerator(TestCase):
     def test_limit_equal_total(self):
         """Test that PageGenerator yields the requested amount of pages."""
         self.gen.set_maximum_items(4)
-        self.assertPagelistTitles(self.gen, self.titles)
+        self.assertPageTitlesEqual(self.gen, self.titles)
 
     def test_limit_one(self):
         """Test that PageGenerator yields the requested amount of pages."""
         self.gen.set_maximum_items(1)
-        self.assertPagelistTitles(self.gen, self.titles[0:1])
+        self.assertPageTitlesEqual(self.gen, self.titles[0:1])
 
     def test_limit_zero(self):
         """Test that a limit of zero is the same as limit None."""
         self.gen.set_maximum_items(0)
-        self.assertPagelistTitles(self.gen, self.titles)
+        self.assertPageTitlesEqual(self.gen, self.titles)
 
     def test_limit_omit(self):
         """Test that limit omitted is the same as limit None."""
         self.gen.set_maximum_items(-1)
-        self.assertPagelistTitles(self.gen, self.titles)
+        self.assertPageTitlesEqual(self.gen, self.titles)
 
     def test_namespace(self):
         """Test PageGenerator set_namespace."""
