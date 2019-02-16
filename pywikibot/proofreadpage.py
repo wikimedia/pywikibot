@@ -608,6 +608,9 @@ class ProofreadPage(pywikibot.Page):
                                 _logger)
                 break
 
+        if 400 <= response.status < 600:
+            return (True, 'Http response status {0}'.format(response.status))
+
         data = json.loads(response.text)
 
         if ocr_tool == self._PHETOOLS:  # phetools

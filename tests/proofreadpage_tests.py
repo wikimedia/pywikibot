@@ -11,7 +11,6 @@ import json
 
 import pywikibot
 
-from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.proofreadpage import IndexPage, ProofreadPage
 
@@ -344,7 +343,6 @@ class TestPageOCR(TestCase):
                                  'the year 1572,\nBY D. APPLETON & CO.\n'
                                  'In the Office of the Librarian of '
                                  'Congress, at Washington.\n4 334\n'),
-            'ws_ocr_daemon_msg': 'ws_ocr_daemon robot is not running.',
             }
 
     def setUp(self):
@@ -361,48 +359,39 @@ class TestPageOCR(TestCase):
     def test_do_hocr(self):
         """Test page._do_hocr()."""
         error, text = self.page._do_hocr()
+        if error:
+            self.skipTest(text)
         ref_error, ref_text = self.data['hocr']
         self.assertEqual(error, ref_error)
         self.assertEqual(text, ref_text)
-
-    def test_do_ocr_phetools_raw_request(self):
-        """Test page._do_ocr connection with wmflabs."""
-        uri = ('https://tools.wmflabs.org/phetools/ocr.php?cmd=ocr'
-               '&url=https://upload.wikimedia.org/wikipedia/commons/'
-               'thumb/a/ac/Popular_Science_Monthly_Volume_1.djvu/'
-               'page10-1024px-Popular_Science_Monthly_Volume_1.djvu.jpg'
-               '&lang=en&user=None')
-        response = http.fetch(uri)
-        self.assertEqual(response.status, 200)
-
-        # Check that ws_ocr_daemon robot is running, otherwise skip test.
-        data = json.loads(response.text)
-        if data['text'].startswith(self.data['ws_ocr_daemon_msg']):
-            self.skipTest(self.data['ws_ocr_daemon_msg'])
 
     def test_do_ocr_phetools(self):
         """Test page._do_ocr(ocr_tool='phetools')."""
         error, text = self.page._do_ocr(ocr_tool='phetools')
         ref_error, ref_text = self.data['ocr']
-
-        # Check that ws_ocr_daemon robot is running, otherwise skip test.
-        if text.startswith(self.data['ws_ocr_daemon_msg']):
-            self.skipTest(self.data['ws_ocr_daemon_msg'])
+        if error:
+            self.skipTest(text)
         self.assertEqual(error, ref_error)
         self.assertEqual(text, ref_text)
 
     def test_do_ocr_googleocr(self):
         """Test page._do_ocr(ocr_tool='googleOCR')."""
         error, text = self.page._do_ocr(ocr_tool='googleOCR')
+        if error:
+            self.skipTest(text)
         ref_error, ref_text = self.data['googleOCR']
         self.assertEqual(error, ref_error)
         self.assertEqual(text, ref_text)
 
     def test_ocr_googleocr(self):
         """Test page.ocr(ocr_tool='googleOCR')."""
-        text = self.page.ocr(ocr_tool='googleOCR')
-        ref_error, ref_text = self.data['googleOCR']
-        self.assertEqual(text, ref_text)
+        try:
+            text = self.page.ocr(ocr_tool='googleOCR')
+        except Exception as exc:
+            self.assertIsInstance(exc, ValueError)
+        else:
+            ref_error, ref_text = self.data['googleOCR']
+            self.assertEqual(text, ref_text)
 
 
 @require_modules('bs4')
