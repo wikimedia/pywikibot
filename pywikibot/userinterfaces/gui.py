@@ -8,19 +8,17 @@ Useful for editing the contents of an article.
 # (C) Rob W.W. Hooft, 2003
 # (C) Daniel Herding, 2004
 #     Wikiwichtel
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
-import sys
-
 import pywikibot
 from pywikibot import __url__
-from pywikibot.tools import PY2, UnicodeType
+from pywikibot.tools import PY2, PYTHON_VERSION, UnicodeType
 
-if sys.version_info[0] > 2:
+if not PY2:
     import tkinter as Tkinter
     from tkinter.scrolledtext import ScrolledText
     from tkinter import simpledialog as tkSimpleDialog
@@ -31,7 +29,7 @@ else:
     from ScrolledText import ScrolledText
 
 # T164163: Fix idlelib import in Python 3.6
-if sys.version_info > (3, 5):
+if PYTHON_VERSION >= (3, 6):
     from idlelib import (
         search as SearchDialog,
         replace as ReplaceDialog,
