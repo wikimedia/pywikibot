@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 """User interface for unix terminals."""
 #
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
 import re
-import sys
+
+from pywikibot.tools import PY2
 
 from pywikibot.userinterfaces import terminal_interface_base
 
@@ -57,15 +58,10 @@ class UnixUI(terminal_interface_base.UI):
 
     def _write(self, text, target_stream):
         """Optionally encode and write the text to the target stream."""
-        targetStream = target_stream
-        if sys.version_info[0] == 2:
-            # .encoding does not mean we can write unicode
-            # to the stream pre-2.7.
-            if (sys.version_info >= (2, 7)
-                    and hasattr(targetStream, 'encoding')
-                    and targetStream.encoding):
-                text = text.encode(targetStream.encoding, 'replace').decode(
-                    targetStream.encoding)
+        if PY2:
+            encoding = getattr(target_stream, 'encoding', None)
+            if encoding:
+                text = text.encode(encoding, 'replace').decode(encoding)
             else:
                 text = text.encode(self.encoding, 'replace')
-        targetStream.write(text)
+        target_stream.write(text)
