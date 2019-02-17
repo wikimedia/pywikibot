@@ -8,7 +8,7 @@ usage:
     python pwb.py data_ingestion -csvdir:local_dir/ -page:config_page
 """
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -20,23 +20,19 @@ import hashlib
 import io
 import os
 import posixpath
-import sys
 from warnings import warn
 
 import pywikibot
 from pywikibot.comms.http import fetch
 from pywikibot import pagegenerators
 from pywikibot.specialbots import UploadRobot
-from pywikibot.tools import deprecated, deprecated_args
+from pywikibot.tools import deprecated, deprecated_args, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     import csv
-else:
-    import unicodecsv as csv
-
-if sys.version_info[0] > 2:
     from urllib.parse import urlparse
 else:
+    import unicodecsv as csv
     from urlparse import urlparse
 
 

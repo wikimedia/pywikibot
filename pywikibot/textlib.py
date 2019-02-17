@@ -20,7 +20,6 @@ except ImportError:  # Python 2.7
     from collections import Sequence
 import datetime
 import re
-import sys
 
 import pywikibot
 from pywikibot import config2 as config
@@ -32,10 +31,11 @@ from pywikibot.tools import (
     DeprecatedRegex,
     StringTypes,
     UnicodeType,
-    issue_deprecation_warning
+    issue_deprecation_warning,
+    PY2,
 )
 
-if sys.version_info[0] > 2:
+if not PY2:
     from html.parser import HTMLParser
     basestring = (str,)
     unicode = str

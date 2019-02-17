@@ -7,13 +7,11 @@
 #
 from __future__ import absolute_import, division, unicode_literals
 
-import sys
-
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import deprecated, classproperty
+from pywikibot.tools import deprecated, classproperty, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     basestring = (str, )
 
 _logger = 'wiki'

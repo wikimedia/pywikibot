@@ -17,12 +17,11 @@ import calendar
 import datetime
 import re
 from string import digits as _decimalDigits  # noqa: N812
-import sys
 
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper, deprecated
+from pywikibot.tools import first_lower, first_upper, deprecated, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     unicode = str
     basestring = (str,)
 

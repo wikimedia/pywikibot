@@ -18,7 +18,7 @@ Syntax example:
 """
 #
 # (C) Dr. Trigon, 2012-2014
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -87,10 +87,10 @@ import crontab
 import pywikibot
 # pywikibot.botirc depends on https://pypi.org/project/irc
 import pywikibot.botirc
-
 from pywikibot.tools.formatter import color_format
+from pywikibot.tools import PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     import _thread as thread
 else:
     import thread  # noqa: H237 (module does not exist in Python 3)

@@ -28,19 +28,19 @@ import base64
 import hashlib
 import io
 import re
-import sys
 
 import pywikibot
 from pywikibot import config, textlib
 from pywikibot.comms.http import fetch
 from pywikibot.specialbots import UploadRobot
+from pywikibot.tools import PY2
 
 try:
     from pywikibot.userinterfaces.gui import Tkdialog
 except ImportError as _tk_error:
     Tkdialog = _tk_error
 
-if sys.version_info[0] > 2:
+if not PY2:
     from urllib.parse import urlencode
 else:
     from urllib import urlencode

@@ -5863,7 +5863,7 @@ class Link(ComparableMixin):
             return '[[%s:%s]]' % (self.site.code, title)
         return '[[%s:%s:%s]]' % (self.site.family.name, self.site.code, title)
 
-    if sys.version_info[0] > 2:
+    if not PY2:
         def __str__(self):
             """Return a string representation."""
             return self.__unicode__()

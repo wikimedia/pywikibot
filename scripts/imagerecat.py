@@ -27,7 +27,7 @@ The following command line parameters are supported:
 """
 #
 # (C) Multichill, 2008-2011
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -35,16 +35,15 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 import socket
-import sys
 import xml.etree.ElementTree
 
 import pywikibot
 
 from pywikibot import pagegenerators, textlib
 from pywikibot.comms.http import fetch
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     from urllib.parse import urlencode
 else:
     from urllib import urlencode

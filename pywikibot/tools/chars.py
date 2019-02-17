@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Character based helper functions(not wiki-dependent)."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,10 +9,10 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 
-from pywikibot.tools import LazyRegex
+from pywikibot.tools import LazyRegex, PY2
 
 
-if sys.version_info[0] > 2:
+if not PY2:
     unicode = str
 
 

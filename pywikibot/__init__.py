@@ -15,7 +15,6 @@ import datetime
 from decimal import Decimal
 import math
 import re
-import sys
 import threading
 import time
 
@@ -72,7 +71,7 @@ from pywikibot.tools import (
 from pywikibot.tools.formatter import color_format
 
 
-if sys.version_info[0] > 2:
+if not PY2:
     from queue import Queue
     long = int
     basestring = str

@@ -80,7 +80,6 @@ and arguments can be:
 from __future__ import absolute_import, division, unicode_literals
 
 import datetime
-import sys
 
 import pywikibot
 
@@ -89,9 +88,9 @@ from pywikibot.bot import (OptionHandler, SingleSiteBot, ExistingPageBot,
                            RedirectPageBot)
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     basestring = (str, )
 
 

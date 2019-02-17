@@ -110,7 +110,6 @@ import datetime
 import pickle
 import re
 import socket
-import sys
 import threading
 import time
 
@@ -134,12 +133,12 @@ from pywikibot.bot import ExistingPageBot, SingleSiteBot
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools import deprecated
+from pywikibot.tools import deprecated, PY2
 from pywikibot.tools.formatter import color_format
 
 import requests
 
-if sys.version_info[0] > 2:
+if not PY2:
     import http.client as httplib
     import urllib.parse as urlparse
     import urllib.request as urllib

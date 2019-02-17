@@ -149,7 +149,6 @@ try:
 except ImportError:  # Python 2.7
     from collections import Sequence
 import re
-import sys
 import time
 import warnings
 
@@ -164,17 +163,16 @@ from pywikibot.tools import (
     deprecated,
     deprecated_args,
     issue_deprecation_warning,
+    PY2,
 )
 from pywikibot.tools.formatter import color_format
 
-if sys.version_info[0] > 2:
+if not PY2:
     from queue import Queue
     long = int
+    basestring = (str, )
 else:
     from Queue import Queue
-
-if sys.version_info[0] > 2:
-    basestring = (str, )
 
 
 # This is required for the text that is shown when you run this script

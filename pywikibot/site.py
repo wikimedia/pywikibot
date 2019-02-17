@@ -21,7 +21,6 @@ import json
 import mimetypes
 import os
 import re
-import sys
 import threading
 import time
 import uuid
@@ -81,7 +80,7 @@ from pywikibot.tools import (
 )
 from pywikibot.tools.ip import is_IP
 
-if sys.version_info[0] > 2:
+if not PY2:
     from itertools import zip_longest
     from urllib.parse import urlencode, urlparse
 

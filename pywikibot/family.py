@@ -23,11 +23,10 @@ from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     deprecated, deprecated_args, remove_last_args, issue_deprecation_warning,
-    FrozenDict, classproperty
+    FrozenDict, classproperty, PY2
 )
 
-PY3 = sys.version_info[0] > 2
-if PY3:
+if not PY2:
     import urllib.parse as urlparse
 else:
     import urlparse

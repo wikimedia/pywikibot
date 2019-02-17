@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Diff module."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -9,7 +9,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import difflib
 import math
-import sys
 
 try:
     from collections.abc import Sequence
@@ -18,11 +17,10 @@ except ImportError:  # Python 2.7
 from difflib import _format_range_unified as format_range_unified
 
 import pywikibot
-from pywikibot.tools import chars
-from pywikibot.tools import deprecated_args
+from pywikibot.tools import chars, deprecated_args, PY2
 from pywikibot.tools.formatter import color_format
 
-if sys.version_info[0] > 2:
+if not PY2:
     from itertools import zip_longest
 else:
     from itertools import izip_longest as zip_longest

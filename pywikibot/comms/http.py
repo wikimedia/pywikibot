@@ -12,7 +12,7 @@ This module is responsible for
     - Basic HTTP error handling
 """
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -52,7 +52,7 @@ try:
 except ImportError as e:
     requests_oauthlib = e
 
-if sys.version_info[0] > 2:
+if not PY2:
     from http import cookiejar as cookielib
     from urllib.parse import quote, urlparse
 else:

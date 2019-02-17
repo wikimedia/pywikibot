@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """SPARQL Query interface."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2019
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import sys
 
 from requests.exceptions import Timeout
 
 from pywikibot import config, warning, Site, sleep
 from pywikibot.comms import http
-from pywikibot.tools import UnicodeMixin, py2_encode_utf_8
+from pywikibot.tools import UnicodeMixin, PY2, py2_encode_utf_8
 from pywikibot.exceptions import Error, TimeoutError
 
-if sys.version_info[0] > 2:
+if not PY2:
     from urllib.parse import quote
 else:
     from urllib2 import quote
