@@ -3,7 +3,14 @@ Release history
 
 Current release
 ---------------
+
+* Fix version comparison (T164163)
+* Remove pre MediaWiki 1.14 code
 * Dropped support for py2.7.2 and py2.7.3 (T191192)
+* Fix header regex beginning with a comment (T209712)
+* Implement Claim.__eq__ (T766159
+* cleanup config2.py
+* Add missing Wikibase API write actions
 * Bugfixes and improvements
 * Localisation updates
 
