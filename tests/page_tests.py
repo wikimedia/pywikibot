@@ -972,6 +972,18 @@ class TestPageUserAction(DefaultSiteTestCase):
 
     user = True
 
+    @classmethod
+    def setUpClass(cls):
+        """Set up the test class.
+
+        Check whether the site is write protected and skip the tests then.
+        """
+        super(TestPageUserAction, cls).setUpClass()
+        site = cls.get_site()
+        if site.siteinfo['readonly']:
+            raise unittest.SkipTest('Site {} has readonly state: {}'.format(
+                site, site.siteinfo.get('readonlyreason', '')))
+
     def test_purge(self):
         """Test purging the mainpage."""
         mainpage = self.get_mainpage()
