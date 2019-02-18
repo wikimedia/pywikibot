@@ -29,7 +29,8 @@ the Arabic Wiktionary, adding "Wiktionary:Import enwp/" as prefix:
     python pwb.py transferbot -family:wikipedia -lang:en -cat:"Query service" \
         -tofamily:wiktionary -tolang:ar -prefix:"Wiktionary:Import enwp/"
 
-Copy the template "Query service" from the Toolserver wiki to wikitech:
+Copy the template "Query service" from the English Wikipedia to the
+Arabic Wiktionary:
 
     python pwb.py transferbot -family:wikipedia -lang:en \
         -tofamily:wiktionary -tolang:ar -page:"Template:Query service"
