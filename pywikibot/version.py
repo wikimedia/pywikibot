@@ -2,7 +2,7 @@
 """Module to determine the pywikibot version (tag, revision and date)."""
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
-# (C) xqt, 2010-2018
+# (C) xqt, 2010-2019
 # (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
@@ -32,6 +32,14 @@ except ImportError:
         from setuptools_svn import svn_utils
     except ImportError as e:
         svn_utils = e
+
+try:
+    import pathlib
+except ImportError:
+    try:
+        import pathlib2 as pathlib
+    except ImportError as e:
+        pathlib = e
 
 import pywikibot
 
@@ -567,8 +575,19 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
     # Remove any pywikibot sub-modules which were loaded as a package.
     # e.g. 'wikipedia_family.py' is loaded as 'wikipedia'
     _program_dir = _get_program_dir()
+    if isinstance(pathlib, Exception):
+        dir_parts = _program_dir.split(os.sep)
+    else:
+        dir_parts = pathlib.Path(_program_dir).parts
+    length = len(dir_parts)
     for path, name in paths.items():
-        if _program_dir in path:
+        if isinstance(pathlib, Exception):
+            lib_parts = os.path.normpath(path).split(os.sep)
+        else:
+            lib_parts = pathlib.Path(path).parts
+        if dir_parts != lib_parts[:length]:
+            continue
+        if lib_parts[length] != '.tox':
             del data[name]
 
     return data
