@@ -81,6 +81,7 @@ __all__ = (
 
 import codecs
 import datetime
+from importlib import import_module
 import json
 import logging
 import logging.handlers
@@ -1035,7 +1036,7 @@ def showHelp(module_name=None):
 
     global_help = _GLOBAL_HELP % module_name
     try:
-        module = __import__('%s' % module_name)
+        module = import_module('%s' % module_name)
         help_text = module.__doc__
         if PY2 and isinstance(help_text, bytes):
             help_text = help_text.decode('utf-8')

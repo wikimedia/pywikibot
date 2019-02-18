@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test tools package alone which don't fit into other tests."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -13,6 +13,7 @@ except ImportError:  # Python 2.7
     from collections import Mapping
 from collections import OrderedDict
 import decimal
+from importlib import import_module
 import inspect
 import os.path
 import subprocess
@@ -125,7 +126,7 @@ class OpenArchiveTestCase(TestCase):
         """Test open_archive when bz2file library."""
         old_bz2 = tools.bz2
         try:
-            tools.bz2 = __import__('bz2file')
+            tools.bz2 = import_module('bz2file')
             self.assertEqual(self._get_content(self.base_file + '.bz2'),
                              self.original_content)
             self.assertEqual(self._get_content(self.base_file + '.bz2',
