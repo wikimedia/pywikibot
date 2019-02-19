@@ -11,14 +11,14 @@ Syntax:
 
 Command line options:
 
-    -all  -  Reloads watchlists for all wikis where a watchlist is already
+-all         Reloads watchlists for all wikis where a watchlist is already
              present
-    -new  -  Load watchlists for all wikis where accounts is setting in
+-new         Load watchlists for all wikis where accounts is setting in
              user-config.py
 """
 #
 # (C) Daniel Herding, 2005
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
