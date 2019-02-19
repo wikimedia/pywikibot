@@ -627,23 +627,29 @@ class RequireUserMixin(TestCaseBase):
 
         sysop = hasattr(cls, 'sysop') and cls.sysop
 
-        for site in cls.sites.values():
-            cls.require_site_user(site['family'], site['code'], sysop)
+        for site_dict in cls.sites.values():
+            cls.require_site_user(
+                site_dict['family'], site_dict['code'], sysop)
 
             if hasattr(cls, 'oauth') and cls.oauth:
                 continue
 
+            site = site_dict['site']
+
+            if site.siteinfo['readonly']:
+                raise unittest.SkipTest(
+                    'Site {} has readonly state: {}'.format(
+                        site, site.siteinfo.get('readonlyreason', '')))
+
             try:
-                site['site'].login(sysop)
+                site.login(sysop)
             except NoUsername:
                 pass
 
-            if not site['site'].user():
+            if not site.user():
                 raise unittest.SkipTest(
                     '{}: Not able to login to {} as {}'
-                    .format(cls.__name__,
-                            'sysop' if sysop else 'bot',
-                            site['site']))
+                    .format(cls.__name__, 'sysop' if sysop else 'bot', site))
 
     def setUp(self):
         """
