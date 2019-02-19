@@ -14,29 +14,25 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
--xml              Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see https://dumps.wikimedia.org).
-                  Argument can also be given as "-xml:filename".
-
--protectedpages:  Check all the blocked pages; useful when you have not
-                  categories or when you have problems with them. (add the
-                  namespace after ":" where you want to check - default checks
-                  all protected pages.)
-
--moveprotected:   Same as -protectedpages, for moveprotected pages
-
 Furthermore, the following command line parameters are supported:
 
--always         Doesn't ask every time whether the bot should make the change.
-                Do it always.
+-protectedpages  Check all the blocked pages; useful when you have not
+                 categories or when you have problems with them. (add the
+                 namespace after ":" where you want to check - default checks
+                 all protected pages.)
 
--show           When the bot can't delete the template from the page (wrong
-                regex or something like that) it will ask you if it should show
-                the page on your browser.
-                (attention: pages included may give false positives!)
+-moveprotected   Same as -protectedpages, for moveprotected pages
 
--move           The bot will check if the page is blocked also for the move
-                option, not only for edit
+-always          Doesn't ask every time whether the bot should make the change.
+                 Do it always.
+
+-show            When the bot can't delete the template from the page (wrong
+                 regex or something like that) it will ask you if it should
+                 show the page on your browser.
+                 (attention: pages included may give false positives!)
+
+-move            The bot will check if the page is blocked also for the move
+                 option, not only for edit
 
 --- Example of how to use the script ---
 
@@ -51,7 +47,7 @@ Furthermore, the following command line parameters are supported:
 # (C) Monobi a.k.a. Wikihermit, 2007
 # (C) Filnik, 2007-2011
 # (C) Nicolas Dumazet (NicDumZ), 2008-2009
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
