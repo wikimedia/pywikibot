@@ -11,19 +11,15 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
-    -xml          Retrieve information from a local XML dump (pages-articles
-                  or pages-meta-current, see https://dumps.wikimedia.org).
-                  Argument can also be given as "-xml:filename".
+Furthermore, the following command line parameters are supported:
 
-    -namespace:n  Number or name of namespace to process. The parameter can be
-                  used multiple times. It works in combination with all other
-                  parameters, except for the -start parameter. If you e.g.
-                  want to iterate over all categories starting at M, use
-                  -start:Category:M.
+-xml          Retrieve information from a local XML dump (pages-articles
+              or pages-meta-current, see https://dumps.wikimedia.org).
+              Argument can also be given as "-xml:filename".
 
-    -always       Don't prompt you for each replacement.
+-always       Don't prompt you for each replacement.
 
-    -quiet        Use this option to get less output
+-quiet        Use this option to get less output
 
 If neither a page title nor a page generator is given, it takes all pages from
 the default maintenance category.
@@ -34,7 +30,7 @@ bandwidth. Instead, use the -xml parameter, or use another way to generate
 a list of affected articles
 """
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
