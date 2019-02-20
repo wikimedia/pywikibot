@@ -743,7 +743,7 @@ def main(*args):
         elif option in ('page', 'start', 'until'):
             gen_options[option] = value
         elif option in ('limit', 'total'):
-            option['limit'] = gen_options['limit'] = int(value)
+            options['limit'] = gen_options['limit'] = int(value)
             if option == 'total':
                 issue_deprecation_warning('The usage of "{0}"'.format(arg),
                                           '-limit', 2,
