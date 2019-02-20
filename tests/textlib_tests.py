@@ -1060,6 +1060,51 @@ class TestReplaceLinks(TestCase):
             ValueError, r'unicode \(str.*bytes \(str',
             textlib.replace_links, self.text, callback, self.wp_site)
 
+    def test_replace_interwiki_links(self):
+        """Make sure interwiki links can not be replaced."""
+        link = '[[fr:how]]'
+        self.assertEqual(
+            textlib.replace_links(link, ('fr:how', 'de:are'), self.wp_site),
+            link)
+        self.assertEqual(
+            textlib.replace_links(link, (':fr:how', ':de:are'), self.wp_site),
+            link)
+        self.assertEqual(
+            textlib.replace_links(link, ('how', 'de:are'), self.wp_site),
+            link)
+        self.assertEqual(
+            textlib.replace_links(link, ('de:how', 'de:are'), self.wp_site),
+            link)
+
+
+class TestReplaceLinksNonDry(TestCase):
+    """Test the replace_links function in textlib non-dry."""
+
+    family = 'wikipedia'
+    code = 'en'
+
+    cached = True
+
+    def test_replace_interlanguage_links(self):
+        """Test replacing interlanguage links."""
+        link = '[[:fr:how]]'
+        self.assertEqual(
+            textlib.replace_links(link, (':fr:how', ':de:are'),
+                                  self.wp_site),
+            '[[:de:are]]')
+        self.assertEqual(
+            textlib.replace_links(link, ('fr:how', 'de:are'),
+                                  self.wp_site),
+            '[[:de:are]]')
+        self.assertEqual(
+            textlib.replace_links(link, ('how', ':de:are'),
+                                  self.wp_site),
+            link)
+        self.assertEqual(
+            textlib.replace_links(link, (':de:how', ':de:are'),
+                                  self.wp_site),
+            link)
+
 
 class TestLocalDigits(TestCase):
 
