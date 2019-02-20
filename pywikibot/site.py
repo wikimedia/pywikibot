@@ -2742,7 +2742,7 @@ class APISite(BaseSite):
         Return live project version number as a string.
 
         This overwrites the corresponding family method for APISite class. Use
-        L{pywikibot.tools.MediaWikiVersion} to compare MediaWiki versions.
+        L{pywikibot.site.mw_version} to compare MediaWiki versions.
         """
         version = self.force_version()
         if not version:

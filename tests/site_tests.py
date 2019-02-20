@@ -25,7 +25,6 @@ from pywikibot.comms import http
 from pywikibot.data import api
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools import (
-    MediaWikiVersion,
     PY2,
     StringTypes as basestring,
     suppress_warnings,
@@ -2227,12 +2226,12 @@ class TestSiteTokens(DefaultSiteTestCase):
 
     def _test_tokens(self, version, test_version, additional_token):
         """Test tokens."""
-        if version and self._version < MediaWikiVersion(version):
+        if version and self._version < version:
             raise unittest.SkipTest(
                 'Site {} version {} is too low for this tests.'
                 .format(self.mysite, self._version))
 
-        if version and self._version < MediaWikiVersion(test_version):
+        if version and self._version < test_version:
             raise unittest.SkipTest(
                 'Site {} version {} is too low for this tests.'
                 .format(self.mysite, self._version))
