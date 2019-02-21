@@ -626,7 +626,7 @@ class DisambiguationRobot(SingleSiteBot):
     }
 
     def __init__(self, always, alternatives, getAlternatives, dnSkip,
-                 generator, primary, main_only, first_only, minimum=0):
+                 generator, primary, main_only, first_only=False, minimum=0):
         """Initializer."""
         super(DisambiguationRobot, self).__init__()
         self.always = always
