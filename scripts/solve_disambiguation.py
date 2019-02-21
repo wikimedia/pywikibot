@@ -738,7 +738,9 @@ class DisambiguationRobot(SingleSiteBot):
         @type disambPage: pywikibot.Page
         @param refPage: a page linking to disambPage
         @type refPage: pywikibot.Page
-        @rtype: None
+        @return: Return whether continue with next page (True)
+            or next disambig (False)
+        @rtype: bool
 
         """
         nochange = True
@@ -748,12 +750,15 @@ class DisambiguationRobot(SingleSiteBot):
         ):
             treat_result = self.treat_disamb_only(refPage, page)
             if treat_result == 'nextpage':
-                return
+                return True
+            if treat_result == 'nextdisambig':
+                return False
             if treat_result == 'done':
                 nochange = False
 
         if nochange:
             pywikibot.output('No changes necessary in ' + refPage.title())
+        return True
 
     def treat_disamb_only(self, refPage, disambPage):
         """Resolve the links to disambPage but don't look for its redirects.
@@ -881,6 +886,7 @@ class DisambiguationRobot(SingleSiteBot):
                            StandardOption('skip link', 's'),
                            edit,
                            StandardOption('next page', 'n'),
+                           StandardOption('next disambig', 'g'),
                            StandardOption('unlink', 'u')]
                 if self.dn_template_str:
                     # '?', '/' for old choice
@@ -921,6 +927,8 @@ class DisambiguationRobot(SingleSiteBot):
                         # occurrence next time.
                         self.primaryIgnoreManager.ignore(refPage)
                     return 'nextpage'
+                elif answer == 'g':
+                    return 'nextdisambig'
 
                 # The link looks like this:
                 # [[page_title|link_text]]trailing_chars
@@ -1208,7 +1216,8 @@ or press enter to quit:""")
         preloadingGen = pagegenerators.PreloadingGenerator(gen)
         for refPage in preloadingGen:
             if not self.primaryIgnoreManager.isIgnored(refPage):
-                self.treat_links(refPage, page)
+                if not self.treat_links(refPage, page):
+                    break  # next disambig
 
         # clear alternatives before working on next disambiguation page
         self.alternatives = []
