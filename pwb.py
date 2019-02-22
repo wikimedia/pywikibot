@@ -95,7 +95,7 @@ def run_python_file(filename, argv, argvu, package=None):
     main_mod = types.ModuleType(str('__main__'))
     sys.modules['__main__'] = main_mod
     main_mod.__file__ = filename
-    if sys.version_info[0] > 2:
+    if not PY2:
         main_mod.__builtins__ = sys.modules['builtins']
     else:
         main_mod.__builtins__ = sys.modules['__builtin__']
@@ -166,16 +166,15 @@ else:
 args = sys.argv[(2 if filename else 1):]
 
 # Search for user-config.py before creating one.
+# If successful, user-config.py already exists in one of the candidate
+# directories. See config2.py for details on search order.
+# Use env var to communicate to config2.py pwb.py location (bug T74918).
+_pwb_dir = os.path.split(__file__)[0]
+if sys.platform == 'win32' and PY2:
+    _pwb_dir = str(_pwb_dir)
+os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
 try:
-    # If successful, user-config.py already exists in one of the candidate
-    # directories. See config2.py for details on search order.
-    # Use env var to communicate to config2.py pwb.py location (bug T74918).
-    _pwb_dir = os.path.split(__file__)[0]
-    if sys.platform == 'win32' and sys.version_info[0] < 3:
-        _pwb_dir = str(_pwb_dir)
-    os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
     import pywikibot
-    pwb = pywikibot
 except RuntimeError:
     # user-config.py to be created
     if filename is not None and not (filename.startswith('generate_')
@@ -189,6 +188,7 @@ except RuntimeError:
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
+pwb = pywikibot
 
 
 def main():
