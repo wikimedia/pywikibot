@@ -188,7 +188,8 @@ except RuntimeError:
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-pwb = pywikibot
+else:
+    pwb = pywikibot
 
 
 def main():
