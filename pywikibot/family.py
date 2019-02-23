@@ -1138,6 +1138,12 @@ class Family(object):
         The default value is the one used on Wikimedia Foundation wikis,
         but needs to be overridden in the family file for any wiki that
         uses a different value.
+
+        @param code: Site code
+        @type code: str
+        @raises KeyError: code is not recognised
+        @return: URL path without ending '/'
+        @rtype str
         """
         return '/w'
 
@@ -1161,10 +1167,12 @@ class Family(object):
         Prefix uri with port and hostname.
 
         @param code: The site code
+        @type code: str
         @param uri: The absolute path after the hostname
+        @type uri: str
         @param protocol: The protocol which is used. If None it'll determine
             the protocol from the code.
-        @return: The full URL
+        @return: The full URL ending with uri
         @rtype: str
         """
         protocol, host = self._hostname(code, protocol)

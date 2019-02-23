@@ -756,8 +756,8 @@ class BaseSite(ComparableMixin):
                 self.__code = self.__family.obsolete[self.__code]
                 # Note the Site function in __init__ emits a UserWarning
                 # for this condition, showing the callers file and line no.
-                pywikibot.log('Site %s instantiated using code %s'
-                              % (self, code))
+                pywikibot.log('Site {} instantiated using aliases code of {}'
+                              .format(self, code))
             else:
                 # no such language anymore
                 self.obsolete = True
