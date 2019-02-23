@@ -20,11 +20,11 @@ import pywikibot
 from pywikibot import i18n
 
 from pywikibot.data import api
-from pywikibot.tools import first_lower, first_upper, formatter
+from pywikibot.tools import first_lower, first_upper, formatter, PY2
 
 from scripts.category import CategoryMoveRobot as CategoryMoveBot
 
-if sys.version_info[0] > 2:
+if not PY2:
     xrange = range
 
 

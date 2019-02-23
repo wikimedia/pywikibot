@@ -6,7 +6,6 @@
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
 
-import sys
 from io import BytesIO, StringIO
 
 import pywikibot
@@ -149,7 +148,7 @@ class WikiStats(object):
 
         data = self.raw_cached(table, 'csv')
 
-        if sys.version_info[0] > 2:
+        if not PY2:
             f = StringIO(data.decode('utf8'))
         else:
             f = BytesIO(data)

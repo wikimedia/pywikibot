@@ -14,7 +14,7 @@ These parameters are supported to specify which pages titles to print:
 &params;
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -56,8 +56,9 @@ from pywikibot.exceptions import (
     UnknownExtension,
 )
 from pywikibot.proofreadpage import ProofreadPage
+from pywikibot.tools import PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     basestring = (str, )
     from itertools import zip_longest
 else:

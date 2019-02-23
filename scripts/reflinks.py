@@ -35,7 +35,7 @@ pdfinfo is needed for parsing pdf titles.
                   one from i18n/reflinks.py
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -46,7 +46,6 @@ import os
 import re
 import socket
 import subprocess
-import sys
 import tempfile
 
 from functools import partial
@@ -58,13 +57,13 @@ from pywikibot import config2 as config
 from pywikibot.pagegenerators import (
     XMLDumpPageGenerator as _XMLDumpPageGenerator,
 )
-from pywikibot.tools.formatter import color_format
+from pywikibot.tools.formatter import color_format, PY2
 
 import requests
 
 from scripts import noreferences
 
-if sys.version_info[0] > 2:
+if not PY2:
     import http.client as httplib
     from urllib.error import URLError
 else:

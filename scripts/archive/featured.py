@@ -56,8 +56,8 @@ Option commands:
 #
 # (C) Maxim Razin, 2005
 # (C) Leonardo Gregianin, 2005-2008
-# (C) xqt, 2009-2018
-# (C) Pywikibot team, 2005-2018
+# (C) xqt, 2009-2019
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -65,7 +65,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import pickle
 import re
-import sys
 
 import pywikibot
 
@@ -73,9 +72,9 @@ from pywikibot import i18n, textlib, config
 
 from pywikibot.pagegenerators import PreloadingGenerator
 from pywikibot.tools.formatter import color_format
-from pywikibot.tools import issue_deprecation_warning
+from pywikibot.tools import issue_deprecation_warning, PY2
 
-if sys.version_info[0] > 2:
+if not PY2:
     unichr = chr
 
 

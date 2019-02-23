@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Http backend layer, formerly providing a httplib2 wrapper."""
 #
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -13,12 +13,11 @@ __docformat__ = 'epytext'
 # standard python libraries
 import codecs
 import re
-import sys
 
 import pywikibot
-from pywikibot.tools import deprecated, UnicodeMixin
+from pywikibot.tools import deprecated, PY2, UnicodeMixin
 
-if sys.version_info[0] > 2:
+if not PY2:
     from urllib.parse import urlparse
 else:
     from urlparse import urlparse

@@ -129,7 +129,6 @@ import math
 import os
 import pickle
 import re
-import sys
 
 from operator import methodcaller
 
@@ -144,11 +143,11 @@ from pywikibot.bot import (
 )
 from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import (
-    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive
+    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive, PY2
 )
 from pywikibot.tools.formatter import color_format
 
-if sys.version_info[0] > 2:
+if not PY2:
     basestring = (str, )
 
 # This is required for the text that is shown when you run this script
