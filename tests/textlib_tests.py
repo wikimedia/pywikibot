@@ -1090,19 +1090,19 @@ class TestReplaceLinksNonDry(TestCase):
         link = '[[:fr:how]]'
         self.assertEqual(
             textlib.replace_links(link, (':fr:how', ':de:are'),
-                                  self.site),
+                                  self.wp_site),
             '[[:de:are]]')
         self.assertEqual(
             textlib.replace_links(link, ('fr:how', 'de:are'),
-                                  self.site),
+                                  self.wp_site),
             '[[:de:are]]')
         self.assertEqual(
             textlib.replace_links(link, ('how', ':de:are'),
-                                  self.site),
+                                  self.wp_site),
             link)
         self.assertEqual(
             textlib.replace_links(link, (':de:how', ':de:are'),
-                                  self.site),
+                                  self.wp_site),
             link)
 
 
