@@ -3,7 +3,7 @@
 #
 # (C) Merlijn 'valhallasw' van Deen, 2007-2014
 # (C) xqt, 2010-2018
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -11,6 +11,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import codecs
 import datetime
+from importlib import import_module
 import json
 import os
 import socket
@@ -515,8 +516,8 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
 
     for name in root_packages:
         try:
-            package = __import__(name, level=0)
-        except Exception as e:
+            package = import_module(name)
+        except ImportError as e:
             data[name] = {'name': name, 'err': e}
             continue
 

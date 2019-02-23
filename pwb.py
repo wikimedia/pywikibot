@@ -16,6 +16,7 @@ search paths so the package does not need to be installed, etc.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
+from importlib import import_module
 import os
 import sys
 import types
@@ -216,7 +217,7 @@ def main():
 
         if file_package and file_package not in sys.modules:
             try:
-                __import__(file_package)
+                import_module(file_package)
             except ImportError as e:
                 warn('Parent module %s not found: %s'
                      % (file_package, e), ImportWarning)

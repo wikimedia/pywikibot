@@ -10,6 +10,7 @@ from __future__ import absolute_import, division, unicode_literals
 import collections
 import gzip
 import hashlib
+from importlib import import_module
 import inspect
 import itertools
 import os
@@ -374,7 +375,7 @@ class NotImplementedClass(object):
 def has_module(module):
     """Check whether a module can be imported."""
     try:
-        __import__(module)
+        import_module(module)
     except ImportError:
         return False
     else:
@@ -1974,7 +1975,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
             elif '.' in self._deprecated[attr][0]:
                 try:
                     package_name = self._deprecated[attr][0].split('.', 1)[0]
-                    module = __import__(package_name)
+                    module = import_module(package_name)
                     context = {package_name: module}
                     replacement = eval(self._deprecated[attr][0], context)
                     self._deprecated[attr] = (

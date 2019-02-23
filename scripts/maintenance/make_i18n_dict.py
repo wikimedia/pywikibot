@@ -25,8 +25,8 @@ instantiating the bot. It also calls C{bot.run()} to create the dictionaries:
 >>> bot.to_json()
 """
 #
-# (C) xqt, 2013-2018
-# (C) Pywikibot team, 2013-2018
+# (C) xqt, 2013-2019
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -34,6 +34,7 @@ from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
 import codecs
+from importlib import import_module
 import json
 import os
 
@@ -48,7 +49,7 @@ class i18nBot(object):  # noqa: N801
         """Initializer."""
         modules = script.split('.')
         self.scriptname = modules[0]
-        self.script = __import__('scripts.' + self.scriptname)
+        self.script = import_module('scripts.' + self.scriptname)
         for m in modules:
             self.script = getattr(self.script, m)
         self.messages = {}
