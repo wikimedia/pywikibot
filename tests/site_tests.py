@@ -989,11 +989,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
             raise unittest.SkipTest('requires v1.15+')
 
         pages = list(self.get_site().protectedpages(type='create', total=10))
-        for page in pages:
-            self.assertFalse(
-                page.exists(),
-                '\n{page} does unexpectedly exist on site {page.site}'
-                .format(page=page))
+        # Do not check for the existence of pages as they might exist (T205883)
         self.assertLessEqual(len(pages), 10)
 
     def test_protectedpages_edit(self):
