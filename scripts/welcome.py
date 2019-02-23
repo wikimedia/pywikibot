@@ -276,6 +276,7 @@ netext = {
         'ar': '{{subst:ترحيب}} %s',
         'bn': '{{subst:স্বাগতম}} %s',
         'bs': '{{Dobrodošlica}} %s',
+        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'mr': '{{subst:Welcome}} %s',
     },
     'wiktionary': {
@@ -283,6 +284,7 @@ netext = {
         'bn': '{{subst:স্বাগতম|%s}}',
         'bs': '{{Dobrodošlica}} %s',
         'fa': '{{جا:خوشامد|%s}}',
+        'kn': '{{subst:ಸುಸ್ವಾಗತ}} %s',
         'it': '{{subst:Utente:Filnik/Benve|firma=%s}}',
         'ur': '{{جا:خوش آمدید}}%s',
     },
