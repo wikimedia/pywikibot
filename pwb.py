@@ -46,30 +46,6 @@ if not python_is_supported():
 pwb = None
 
 
-def remove_modules():
-    """Remove pywikibot modules."""
-    for name in list(sys.modules):
-        if name.startswith('pywikibot'):
-            del sys.modules[name]
-
-
-def tryimport_pwb():
-    """Try to import pywikibot.
-
-    If so, we need to patch pwb.argvu, too.
-    If pywikibot is not available, we create a mock object to remove the
-    need for if statements further on.
-    """
-    global pwb
-    try:
-        import pywikibot
-    except RuntimeError:
-        remove_modules()
-        os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
-        import pywikibot
-    pwb = pywikibot
-
-
 # The following snippet was developed by Ned Batchelder (and others)
 # for coverage [1], with python 3 support [2] added later,
 # and is available under the BSD license (see [3])
@@ -87,8 +63,6 @@ def run_python_file(filename, argv, argvu, package=None):
     `args` is the argument array to present as sys.argv, as unicode strings.
 
     """
-    tryimport_pwb()
-
     # Create a module to serve as __main__
     old_main_mod = sys.modules['__main__']
     # it's explicitly using str() to bypass unicode_literals in Python 2
@@ -174,8 +148,10 @@ if sys.platform == 'win32' and PY2:
     _pwb_dir = str(_pwb_dir)
 os.environ['PYWIKIBOT_DIR_PWB'] = _pwb_dir
 try:
-    import pywikibot
+    import pywikibot as pwb
 except RuntimeError:
+    os.environ['PYWIKIBOT_NO_USER_CONFIG'] = '2'
+    import pywikibot as pwb
     # user-config.py to be created
     if filename is not None and not (filename.startswith('generate_')
                                      or filename == 'version.py'):
@@ -188,8 +164,6 @@ except RuntimeError:
         # we need to re-start the entire process. Ask the user to do so.
         print('Now, you have to re-execute the command to start your script.')
         sys.exit(1)
-else:
-    pwb = pywikibot
 
 
 def main():
@@ -197,7 +171,6 @@ def main():
     global filename
     if filename:
         file_package = None
-        tryimport_pwb()
         argvu = pwb.argvu[1:]
         if not os.path.exists(filename):
             script_paths = ['scripts',
