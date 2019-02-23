@@ -710,13 +710,8 @@ def replace_links(text, replace, site=None):
         m = link_pattern.search(text, pos=curpos)
         if not m:
             break
-        # Ignore links to sections of the same page
+        # ignore links to sections of the same page
         if not m.group('title').strip():
-            curpos = m.end()
-            continue
-        # Ignore interwiki links
-        if (site.isInterwikiLink(m.group('title').strip())
-                and not m.group('title').strip().startswith(':')):
             curpos = m.end()
             continue
         groups = m.groupdict()
@@ -743,6 +738,10 @@ def replace_links(text, replace, site=None):
                 label=groups['label'])
         except pywikibot.SiteDefinitionError:
             # unrecognized iw prefix
+            curpos = end
+            continue
+        # ignore interwiki links
+        if link.site != site:
             curpos = end
             continue
 
@@ -793,9 +792,6 @@ def replace_links(text, replace, site=None):
             is_link = False
 
         new_title = new_link.canonical_title()
-        # Make correct langlink if needed
-        if not new_link.site == site:
-            new_title = ':' + new_link.site.code + ':' + new_title
 
         if is_link:
             # Use link's label
