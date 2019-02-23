@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the user interface."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -834,7 +834,7 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
     net = False
 
     expected = 'Hello world you!'
-    ui_class = terminal_interface_win32.Win32CtypesUI
+    ui_class = terminal_interface_win32.Win32UI
 
     def setUp(self):
         """Patch the ctypes import and initialize a stream and UI instance."""

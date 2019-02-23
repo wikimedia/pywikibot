@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 """User interface for Win32 terminals."""
 #
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
 from __future__ import absolute_import, division, unicode_literals
+
+from pywikibot.tools import ModuleDeprecationWrapper
 
 from pywikibot.userinterfaces import (
     terminal_interface_base,
     win32_unicode,
 )
 
-try:
-    import ctypes
-    ctypes_found = True
-except ImportError:
-    ctypes_found = False
+import ctypes
 
 windowsColors = {
     'default':     7,
@@ -39,24 +37,23 @@ windowsColors = {
 }
 
 
-# Compat for python <= 2.5
 class Win32BaseUI(terminal_interface_base.UI):
 
-    """User interface for Win32 terminals without ctypes."""
+    """DEPRECATED. User interface for Win32 terminals without ctypes."""
 
     def __init__(self):
         """Initializer."""
-        terminal_interface_base.UI.__init__(self)
+        super(Win32BaseUI, self).__init__()
         self.encoding = 'ascii'
 
 
-class Win32CtypesUI(Win32BaseUI):
+class Win32UI(terminal_interface_base.UI):
 
     """User interface for Win32 terminals using ctypes."""
 
     def __init__(self):
         """Initializer."""
-        Win32BaseUI.__init__(self)
+        super(Win32CtypesUI, self).__init__()
         (stdin, stdout, stderr, argv) = win32_unicode.get_unicode_console()
         self.stdin = stdin
         self.stdout = stdout
@@ -87,7 +84,12 @@ class Win32CtypesUI(Win32BaseUI):
         return data.strip()
 
 
-if ctypes_found:
-    Win32UI = Win32CtypesUI
-else:
-    Win32UI = Win32BaseUI
+Win32CtypesUI = Win32UI
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('Win32CtypesUI',
+                             replacement_name='Win32UI',
+                             since='20190217')
+wrapper._add_deprecated_attr('Win32BaseUI',
+                             replacement_name='Win32UI',
+                             since='20190217')
