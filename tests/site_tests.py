@@ -65,7 +65,7 @@ class TokenTestBase(TestCaseBase):
                 unicode(error_msg),
                 "Action '[a-z]+' is not allowed for user .* on .* wiki.")
             self.assertNotIn(self.token_type, self.site.tokens)
-            raise unittest.SkipTest(error_msg)
+            self.skipTest(error_msg)
 
         self.token = token
         self._orig_wallet = self.site.tokens
@@ -112,7 +112,7 @@ class TestSiteObjectDeprecatedFunctions(DefaultSiteTestCase,
     def test_siteinfo_normal_call(self):
         """Test calling the Siteinfo without setting dump."""
         if self.site.mw_version < '1.16':
-            raise unittest.SkipTest('requires v1.16+')
+            self.skipTest('requires v1.16+')
 
         old = self.site.siteinfo('general')
         self.assertIn('time', old)
@@ -432,7 +432,7 @@ class TestSiteObject(DefaultSiteTestCase):
         """Test Site methods using English specific inputs and outputs."""
         mysite = self.get_site()
         if mysite.lang != 'en':
-            raise unittest.SkipTest(
+            self.skipTest(
                 'English-specific tests not valid on {}'.format(mysite))
 
         self.assertEqual(mysite.months_names[4], ('May', 'May'))
@@ -676,7 +676,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
         """Test allpages with langlinks enabled."""
         mysite = self.get_site()
         if mysite.family.name in ('wpbeta', 'wsbeta'):
-            raise unittest.SkipTest('Test fails on betawikis; T199085')
+            self.skipTest('Test fails on betawikis; T199085')
         for page in mysite.allpages(
                 filterlanglinks=True, total=3, namespace=4):
             self.assertIsInstance(page, pywikibot.Page)
@@ -729,7 +729,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_all_links(self):
         """Test the site.alllinks() method."""
         if self.site.family.name == 'wsbeta':
-            raise unittest.SkipTest('Test fails on betawiki; T69931')
+            self.skipTest('Test fails on betawiki; T69931')
 
         mysite = self.get_site()
         fwd = list(mysite.alllinks(total=10))
@@ -875,7 +875,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
                               'gqpspecialpage-cantexecute'):
                 # User must have correct permissions to use
                 # Special:UnwatchedPages
-                raise unittest.SkipTest(error)
+                self.skipTest(error)
             raise
 
         # Make sure each object returned by site.unwatchedpages() is a
@@ -986,7 +986,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_protectedpages_create(self):
         """Test that protectedpages returns protected page titles."""
         if self.site.mw_version < '1.15':
-            raise unittest.SkipTest('requires v1.15+')
+            self.skipTest('requires v1.15+')
 
         pages = list(self.get_site().protectedpages(type='create', total=10))
         # Do not check for the existence of pages as they might exist (T205883)
@@ -1010,8 +1010,9 @@ class TestSiteGenerators(DefaultSiteTestCase):
             if list(site.protectedpages(type='edit', level=level, total=1)):
                 levels.add(level)
         if not levels:
-            raise unittest.SkipTest('The site "{0}" has no protected pages in '
-                                    'main namespace.'.format(site))
+            self.skipTest(
+                'The site "{0}" has no protected pages in main namespace.'
+                .format(site))
         # select one level which won't yield all pages from above
         level = next(iter(levels))
         if len(levels) == 1:
@@ -1029,7 +1030,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_pages_with_property(self):
         """Test pages_with_property method."""
         if self.site.mw_version < '1.21':
-            raise unittest.SkipTest('requires v1.21+')
+            self.skipTest('requires v1.21+')
         mysite = self.get_site()
         pnames = mysite.get_property_names()
         for item in ('defaultsort', 'disambiguation', 'displaytitle',
@@ -1049,7 +1050,7 @@ class TestSiteGenerators(DefaultSiteTestCase):
     def test_unconnected(self):
         """Test site.unconnected_pages method."""
         if not self.site.data_repository():
-            raise unittest.SkipTest('Site is not using a Wikibase repository')
+            self.skipTest('Site is not using a Wikibase repository')
         upgen = self.site.unconnected_pages(total=3)
         self.assertDictEqual(
             upgen.request._params, {
@@ -1151,7 +1152,7 @@ class TestLinterPages(DefaultSiteTestCase):
         """Skip tests if Linter extension is missing."""
         super(TestLinterPages, self).setUp()
         if not self.site.has_extension('Linter'):
-            raise unittest.SkipTest(
+            self.skipTest(
                 'The site {0} does not use Linter extension'.format(self.site))
 
     def test_linter_pages(self):
@@ -1364,7 +1365,7 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
             try:
                 self.assertIn(entry[0].namespace(), [2, 3])
             except HiddenKeyError as e:
-                raise unittest.SkipTest(
+                self.skipTest(
                     'Log entry {entry} is hidden:\n{entry.data}\n{error!r}'
                     .format(entry=entry, error=e))
 
@@ -1463,7 +1464,7 @@ class TestRecentChanges(DefaultSiteTestCase):
     def test_ns_file(self):
         """Test the site.recentchanges() method with File: and File talk:."""
         if self.site.code == 'wikidata':
-            raise unittest.SkipTest(
+            self.skipTest(
                 'MediaWiki bug frequently occurring on Wikidata. T101502')
         mysite = self.site
         for change in mysite.recentchanges(namespaces=[6, 7], total=5):
@@ -1592,9 +1593,8 @@ class SearchTestCase(DefaultSiteTestCase):
         """Skip tests for Wikia Search extension."""
         super(SearchTestCase, self).setUp()
         if self.site.has_extension('Wikia Search'):
-            raise unittest.SkipTest(
-                'The site {!r} does not use MediaWiki search'
-                .format(self.site))
+            self.skipTest('The site {!r} does not use MediaWiki search'
+                          .format(self.site))
 
     def test_search(self):
         """Test the site.search() method."""
@@ -1620,9 +1620,8 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.assertEqual(hit.namespace(), 0)
         except pywikibot.data.api.APIError as e:
             if e.code == 'gsrsearch-error' and 'timed out' in e.info:
-                raise unittest.SkipTest(
-                    'gsrsearch returned timeout on site: {!r}'
-                    .format(e))
+                self.skipTest('gsrsearch returned timeout on site: {!r}'
+                              .format(e))
             raise
 
     @suppress_warnings("where='title' is deprecated", DeprecationWarning)
@@ -1651,7 +1650,7 @@ class SearchTestCase(DefaultSiteTestCase):
                 self.assertEqual(hit.namespace(), 0)
         except pywikibot.data.api.APIError as e:
             if e.code in ('search-title-disabled', 'gsrsearch-title-disabled'):
-                raise unittest.SkipTest(
+                self.skipTest(
                     'Title search disabled on site: {0}'.format(self.site))
             raise
 
@@ -1892,7 +1891,7 @@ class SiteSysopTestCase(DefaultSiteTestCase):
         for dr in gen:
             break
         else:
-            raise unittest.SkipTest(
+            self.skipTest(
                 '{0} contains no deleted revisions.'.format(mainpage))
         self.assertLessEqual(len(dr['revisions']), 10)
         self.assertTrue(all(isinstance(rev, dict)
@@ -2089,7 +2088,7 @@ class TestUserList(DefaultSiteTestCase):
                             in ['Jimbo Wales', 'Brion VIBBER', 'Tim Starling'])
             cnt += 1
         if not cnt:
-            raise unittest.SkipTest('Test usernames not found')
+            self.skipTest('Test usernames not found')
 
 
 class PatrolTestCase(TokenTestBase, TestCase):
@@ -2109,7 +2108,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
 
         rc = list(mysite.recentchanges(total=1))
         if not rc:
-            raise unittest.SkipTest('no recent changes to patrol')
+            self.skipTest('no recent changes to patrol')
 
         rc = rc[0]
 
@@ -2119,12 +2118,11 @@ class PatrolTestCase(TokenTestBase, TestCase):
             result = list(mysite.patrol(rcid=rc['rcid']))
         except api.APIError as error:
             if error.code == 'permissiondenied':
-                raise unittest.SkipTest(error)
+                self.skipTest(error)
             raise
 
         if hasattr(mysite, '_patroldisabled') and mysite._patroldisabled:
-            raise unittest.SkipTest('Patrolling is disabled on {} wiki.'
-                                    .format(mysite))
+            self.skipTest('Patrolling is disabled on {} wiki.'.format(mysite))
 
         result = result[0]
         self.assertIsInstance(result, dict)
@@ -2138,7 +2136,7 @@ class PatrolTestCase(TokenTestBase, TestCase):
             result = list(mysite.patrol(**params))
         except api.APIError as error:
             if error.code == 'badtoken':
-                raise unittest.SkipTest(error)
+                self.skipTest(error)
         except pywikibot.Error:
             # expected result
             pass
@@ -2424,7 +2422,7 @@ class TestSiteInfo(DefaultSiteTestCase):
     def test_siteinfo_v1_16(self):
         """Test v.16+ siteinfo values."""
         if self.site.mw_version < '1.16':
-            raise unittest.SkipTest('requires v1.16+')
+            self.skipTest('requires v1.16+')
 
         mysite = self.get_site()
         self.assertIsInstance(
@@ -3005,7 +3003,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         # for the test to be useful.
         link_count = len(list(mysite.pagelinks(mainpage, total=10)))
         if link_count < 2:
-            raise unittest.SkipTest('insufficient links on main page')
+            self.skipTest('insufficient links on main page')
 
         # get a fresh generator; we now know how many results it will have,
         # if it is less than 10.
@@ -3030,7 +3028,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         # for the test to be useful.
         link_count = len(list(mysite.pagelinks(mainpage, total=10)))
         if link_count < 2:
-            raise unittest.SkipTest('insufficient links on main page')
+            self.skipTest('insufficient links on main page')
 
         # get a fresh generator; we now know how many results it will have,
         # if it is less than 10.
@@ -3052,7 +3050,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
-            raise unittest.SkipTest('insufficient links on main page')
+            self.skipTest('insufficient links on main page')
 
         # change the title of the page, to test sametitle().
         # preloadpages will send the page ids, as they have already been loaded
@@ -3081,7 +3079,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
-            raise unittest.SkipTest('insufficient links on main page')
+            self.skipTest('insufficient links on main page')
 
         # change the title of the page _and_ delete the pageids.
         # preloadpages can only send the titles, and preloadpages should
@@ -3110,7 +3108,7 @@ class TestPagePreloading(DefaultSiteTestCase):
         count = 0
         links = list(mysite.pagelinks(mainpage, total=10))
         if len(links) < 2:
-            raise unittest.SkipTest('insufficient links on main page')
+            self.skipTest('insufficient links on main page')
 
         for page in links:
             page._link._text += ' foobar'

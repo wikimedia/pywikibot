@@ -212,7 +212,7 @@ class TestLogentryParams(TestLogentriesBase):
         # main page was moved around
         mainpage = self.get_mainpage(self.site)
         if self.sites[key]['target'] is None:
-            raise unittest.SkipTest('No moved target')
+            self.skipTest('No moved target')
         target = mainpage.moved_target()
         self.assertIsInstance(target, pywikibot.Page)
         self.assertEqual(target.title(),
@@ -291,7 +291,7 @@ class TestDeprecatedMethods(TestLogentriesBase, DeprecationTestCase):
         """Test getMovedTarget method."""
         # main page was moved around
         if self.sites[key]['target'] is None:
-            raise unittest.SkipTest('No moved target')
+            self.skipTest('No moved target')
         mainpage = self.get_mainpage(self.site)
         target = mainpage.getMovedTarget()
         self.assertIsInstance(target, pywikibot.Page)

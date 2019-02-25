@@ -452,7 +452,7 @@ class TestParamInfo(DefaultSiteTestCase):
         """Test the new modules-only mode explicitly."""
         site = self.get_site()
         if site.mw_version < '1.25wmf4':
-            raise unittest.SkipTest(
+            self.skipTest(
                 "version {} doesn't support the new paraminfo api"
                 .format(site.mw_version))
         pi = api.ParamInfo(site, modules_only_mode=True)
@@ -1101,7 +1101,7 @@ class TestLagpattern(DefaultSiteTestCase):
         mysite = self.get_site()
         if ('dbrepllag' not in mysite.siteinfo
                 or mysite.siteinfo['dbrepllag'][0]['lag'] == -1):
-            raise unittest.SkipTest(
+            self.skipTest(
                 '{0} is not running on a replicated database cluster.'
                 .format(mysite)
             )

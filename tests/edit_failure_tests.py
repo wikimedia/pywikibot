@@ -8,7 +8,7 @@ unless something has broken badly.
 These tests use special code 'write = -1' for edit failures.
 """
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -44,8 +44,8 @@ class TestSaveFailure(TestCase):
     def test_protected(self):
         """Test that protected titles raise the appropriate exception."""
         if self.site.has_group('sysop'):
-            raise unittest.SkipTest('Testing failure of edit protected with '
-                                    'a sysop account')
+            self.skipTest(
+                'Testing failure of edit protected with a sysop account')
         page = pywikibot.Page(self.site, 'Wikipedia:Create a new page')
         self.assertRaises(LockedPage, page.save)
 
@@ -109,10 +109,8 @@ class TestActionFailure(TestCase):
         """Test that site.movepage raises the appropriate exceptions."""
         mysite = self.get_site()
         mainpage = self.get_mainpage()
-        try:
-            mysite.tokens['move']
-        except KeyError:
-            raise unittest.SkipTest(
+        if 'move' not in mysite.tokens:
+            self.skipTest(
                 "movepage test requires 'move' token not given to user on {}"
                 .format(self.site))
 

@@ -473,8 +473,8 @@ class TestPageObject(DefaultSiteTestCase):
         mainpage = self.get_mainpage()
         maintalk = mainpage.toggleTalkPage()
         if not maintalk.exists():
-            raise unittest.SkipTest("No talk page for {}'s main page"
-                                    .format(self.get_site()))
+            self.skipTest("No talk page for {}'s main page"
+                          .format(self.get_site()))
         self.assertIsInstance(maintalk.get(get_redirect=True), unicode)
         self.assertEqual(mainpage.toggleTalkPage(), maintalk)
         self.assertEqual(maintalk.toggleTalkPage(), mainpage)
@@ -488,8 +488,7 @@ class TestPageObject(DefaultSiteTestCase):
         """Test the integration with Extension:Disambiguator."""
         site = self.get_site()
         if not site.has_extension('Disambiguator'):
-            raise unittest.SkipTest(
-                'Disambiguator extension not loaded on test site')
+            self.skipTest('Disambiguator extension not loaded on test site')
         pg = pywikibot.Page(site, 'Random')
         pg._pageprops = {'disambiguation', ''}
         self.assertTrue(pg.isDisambig())
@@ -522,7 +521,7 @@ class TestPageObject(DefaultSiteTestCase):
     def testLinks(self):
         """Test the different types of links from a page."""
         if self.site.family.name in ('wpbeta', 'wsbeta'):
-            raise unittest.SkipTest('Test fails on betawiki; T69931; T160308')
+            self.skipTest('Test fails on betawiki; T69931; T160308')
         mainpage = self.get_mainpage()
         for p in mainpage.linkedPages():
             self.assertIsInstance(p, pywikibot.Page)
@@ -559,8 +558,7 @@ class TestPageObject(DefaultSiteTestCase):
         for page in site.allpages(filterredir=True, total=1):
             break
         else:
-            raise unittest.SkipTest('No redirect pages on site {0!r}'
-                                    .format(site))
+            self.skipTest('No redirect pages on site {0!r}'.format(site))
         # This page is already initialised
         self.assertTrue(hasattr(page, '_isredir'))
         # call api.update_page without prop=info
@@ -779,7 +777,7 @@ class TestPageBotMayEdit(TestCase):
 
         page = pywikibot.Page(site, 'not_existent_page_for_pywikibot_tests')
         if page.exists():
-            raise unittest.SkipTest(
+            self.skipTest(
                 'Page {} exists! Change page name in tests/page_tests.py'
                 .format(page.title()))
 

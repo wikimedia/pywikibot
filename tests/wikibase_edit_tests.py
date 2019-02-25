@@ -6,7 +6,7 @@ Tests which should fail should instead be in the TestWikibaseSaveTest
 class in edit_failiure_tests.py
 """
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -245,8 +245,8 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
 
         # Make sure the wiki supports wikibase-conceptbaseuri
         if testsite.mw_version < '1.29.0-wmf.2':
-            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
-                                    'newer to support unbound uncertainties.')
+            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
+                          'support unbound uncertainties.')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P20480',
@@ -269,8 +269,8 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
 
         # Make sure the wiki supports unbound uncertainties
         if testsite.mw_version < '1.29.0-wmf.2':
-            raise unittest.SkipTest('Wiki version must be 1.29.0-wmf.2 or '
-                                    'newer to support unbound uncertainties.')
+            self.skipTest('Wiki version must be 1.29.0-wmf.2 or newer to '
+                          'support unbound uncertainties.')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')
@@ -291,8 +291,8 @@ class TestWikibaseMakeClaim(WikibaseTestCase):
 
         # Make sure the wiki supports wikibase-conceptbaseuri
         if testsite.mw_version < '1.28-wmf.23':
-            raise unittest.SkipTest('Wiki version must be 1.28-wmf.23 or '
-                                    'newer to expose wikibase-conceptbaseuri.')
+            self.skipTest('Wiki version must be 1.28-wmf.23 or newer to '
+                          'expose wikibase-conceptbaseuri.')
 
         # set new claim
         claim = pywikibot.page.Claim(testsite, 'P69', datatype='quantity')
