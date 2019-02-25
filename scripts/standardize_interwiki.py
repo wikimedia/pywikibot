@@ -17,30 +17,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 
-from pywikibot import textlib
-
-# The summary that the Bot will use.
-comment = {
-    'ar': 'روبوت: توحيد قياسي للإنترويكي',
-    'cs': 'Robot: standardizace interwiki',
-    'de': 'Bot: Interwikilinks standardisieren',
-    'en': 'Robot: Interwiki standardization',
-    'fa': 'ربات: تصحیح جایگذاری میان‌ویکی‌ها',
-    'fr': 'Robot : Standardisation des interwikis',
-    'he': 'בוט: מסדר את האינטרוויקי',
-    'hi': 'बॉट: अंतरविकि मानकीकरण',
-    'it': 'Bot: Standardizzo interwiki',
-    'ja': 'ロボットによる: 言語間リンクを標準化',
-    'ksh': 'Bot: Engerwiki Lengks opprüühme',
-    'ml': 'യന്ത്രം: അന്തർവിക്കി ക്രമവൽക്കരണം',
-    'nds': 'Bot: Links twüschen Wikis standardisseern',
-    'nl': 'Bot: standaardisatie interwikiverwijzingen',
-    'no': 'bot: Språklenkestandardisering',
-    'ro': 'Robot: Standardizare interwiki',
-    'sr': 'Бот: Стандардизација међувикија',
-    'ur': 'خودکار: بین الویکی روابط کی معیار بندی',
-    'zh': '機器人: 跨語連結標準化',
-}
+from pywikibot import i18n, textlib
 
 
 def main(*args):
@@ -55,7 +32,7 @@ def main(*args):
             else:
                 start = arg[7:]
     site = pywikibot.Site()
-    comm = pywikibot.translate(site, comment)
+    comm = i18n.twtranslate(site, 'standardize_interwiki-comment')
     for pl in site.allpages(start):
         plname = pl.title()
         pywikibot.output('\nLoading {0}...'.format(plname))
