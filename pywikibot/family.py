@@ -1143,7 +1143,7 @@ class Family(object):
         @type code: str
         @raises KeyError: code is not recognised
         @return: URL path without ending '/'
-        @rtype str
+        @rtype: str
         """
         return '/w'
 
