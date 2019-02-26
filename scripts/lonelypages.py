@@ -84,10 +84,12 @@ _templates = {
     'ca': ('Orfe', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}'),
     'en': ('Orphan', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}',
            ['wi']),
+    'kn': ('Orphan', 'date={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}'),
     'it': ('O', '||mese={{subst:CURRENTMONTHNAME}} {{subst:CURRENTYEAR}}',
            ['a']),
     'ja': ('孤立', '{{subst:DATE}}'),
     'ko': ('외톨이', '{{{{{|안전풀기:}}}#timel:Y-m-d|now}}'),
+    'test': ('Orphan', ''),
     'zh': ('Orphan/auto', '', ['orphan'], True),
 }
 
