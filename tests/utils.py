@@ -317,7 +317,7 @@ class DryParamInfo(dict):
 
     def parameter(self, module, param_name):
         """Load dry data."""
-        return self[module][param_name]
+        return self[module].get(param_name)
 
     def __getitem__(self, name):
         """Return dry data or a dummy parameter block."""

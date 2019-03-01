@@ -513,16 +513,19 @@ class GeneratorFactory(object):
             self.gens.insert(0, gen)
 
         for i in range(len(self.gens)):
-            if isinstance(self.gens[i], pywikibot.data.api.QueryGenerator):
-                if self.namespaces:
+            if self.namespaces:
+                if (isinstance(self.gens[i], pywikibot.data.api.QueryGenerator)
+                        and self.gens[i].support_namespace()):
                     self.gens[i].set_namespace(self.namespaces)
-                if self.limit:
-                    self.gens[i].set_maximum_items(self.limit)
-            else:
-                if self.namespaces:
+                # QueryGenerator does not support namespace param.
+                else:
                     self.gens[i] = NamespaceFilterPageGenerator(
                         self.gens[i], self.namespaces, self.site)
-                if self.limit:
+
+            if self.limit:
+                try:
+                    self.gens[i].set_maximum_items(self.limit)
+                except AttributeError:
                     self.gens[i] = itertools.islice(self.gens[i], self.limit)
         if len(self.gens) == 0:
             if (self.titlefilter_list
@@ -1043,8 +1046,7 @@ class GeneratorFactory(object):
 
     def _handle_unconnectedpages(self, value):
         """Handle `-unconnectedpages` argument."""
-        # T196619 don't use QueryGenerator due to namespace filtering
-        return (p for p in self.site.unconnected_pages(total=_int_none(value)))
+        return self.site.unconnected_pages(total=_int_none(value))
 
     def _handle_imagesused(self, value):
         """Handle `-imagesused` argument."""
