@@ -644,8 +644,8 @@ def replace_links(text, replace, site=None):
         in that case it will apply the second value from the sequence.
     @type replace: sequence of pywikibot.Page/pywikibot.Link/str or
         callable
-    @param site: a Site object to use if replace is not a sequence or the link
-        to be replaced is not a Link or Page instance.
+    @param site: a Site object to use. It should match the origin
+        or target site of the text
     @type site: pywikibot.APISite
     """
     def to_link(source):
@@ -689,14 +689,14 @@ def replace_links(text, replace, site=None):
             if isinstance(replace_list[1], basestring):
                 replace_list[1] = pywikibot.Page(site, replace_list[1])
             check_classes(replace_list[0])
-            if replace_list[0].site != replace_list[1].site:
-                raise ValueError('Both pages in the "replace" argument '
-                                 'must belong to the same site.')
-        site = replace_list[0].site
         replace = replace_callable
+        if site is None:
+            issue_deprecation_warning(
+                'site=None',
+                'a valid site for list or tuple parameter "replace"',
+                2, since='20190223')
     elif site is None:
-        raise ValueError('If "replace" is not a tuple or list of pages, '
-                         'the "site" argument must be provided.')
+        raise ValueError('The "site" argument must be provided.')
 
     linktrail = site.linktrail()
     link_pattern = re.compile(
@@ -710,8 +710,13 @@ def replace_links(text, replace, site=None):
         m = link_pattern.search(text, pos=curpos)
         if not m:
             break
-        # ignore links to sections of the same page
+        # Ignore links to sections of the same page
         if not m.group('title').strip():
+            curpos = m.end()
+            continue
+        # Ignore interwiki links
+        if (site.isInterwikiLink(m.group('title').strip())
+                and not m.group('title').strip().startswith(':')):
             curpos = m.end()
             continue
         groups = m.groupdict()
@@ -738,10 +743,6 @@ def replace_links(text, replace, site=None):
                 label=groups['label'])
         except pywikibot.SiteDefinitionError:
             # unrecognized iw prefix
-            curpos = end
-            continue
-        # ignore interwiki links
-        if link.site != site:
             curpos = end
             continue
 
@@ -792,6 +793,9 @@ def replace_links(text, replace, site=None):
             is_link = False
 
         new_title = new_link.canonical_title()
+        # Make correct langlink if needed
+        if not new_link.site == site:
+            new_title = ':' + new_link.site.code + ':' + new_title
 
         if is_link:
             # Use link's label
