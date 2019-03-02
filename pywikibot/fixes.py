@@ -172,7 +172,7 @@ fixes = {
                 r'(?i)\[\[(Bild|Image|Media):.+?\|',  # Dateinamen auslassen
                 r'{{bgc\|.*?}}',                      # Hintergrundfarbe
                 r'<sup>\d+m</sup>',                   # bei chemischen Formeln
-                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*'
+                r'\([A-Z][A-Za-z]*(,[A-Z][A-Za-z]*',
                 r'(<sup>.*?</sup>|<sub>.*?</sub>|))+\)'
                 # chemische Formel, z. B. AuPb(Pb,Sb,Bi)Te.
                 # Hier sollen keine Leerzeichen hinter die Kommata.
