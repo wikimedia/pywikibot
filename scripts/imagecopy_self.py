@@ -540,8 +540,8 @@ class imageFetcher(threading.Thread):
         uploadDatetime = datetime.strptime(uploadtime, '%Y-%m-%dT%H:%M:%SZ')
         return ('{{Date|%s|%s|%s}} (original upload date)'
                 % (str(uploadDatetime.year),
-                   str(uploadDatetime.month,
-                   str(uploadDatetime.day))))
+                   str(uploadDatetime.month),
+                   str(uploadDatetime.day)))
 
     def getSource(self, imagepage, source=''):
         """Get text to put in the source field of new information template."""
