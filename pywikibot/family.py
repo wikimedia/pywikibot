@@ -65,8 +65,8 @@ class Family(object):
             cls.__init__ = deprecated(cls.__dict__['__init__'])
 
             # Invoke initializer immediately and make initializer no-op.
-            # This is to avoid repeated initializer invokation on repeated
-            # invokations of the metaclass's __call__.
+            # This is to avoid repeated initializer invocation on repeated
+            # invocations of the metaclass's __call__.
             cls.instance.__init__()
             cls.__init__ = lambda self: None  # no-op
 
@@ -1621,7 +1621,7 @@ class WikimediaFamily(Family):
         + wikimedia_org_other_families
     )
 
-    # CentralAuth cross avaliable projects.
+    # CentralAuth cross available projects.
     cross_projects = set(
         multi_language_content_families
         + wikimedia_org_content_families

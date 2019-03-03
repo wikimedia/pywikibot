@@ -33,7 +33,7 @@ class TestPwb(PwbTestCase):
 
     # site must be explicitly set for pwb tests. This test does not require
     # network access, because tests/pwb/print_locals.py does not use
-    # handle_args, etc. so version.py doesnt talk on the network.
+    # handle_args, etc. so version.py doesn't talk on the network.
     site = False
     net = False
 

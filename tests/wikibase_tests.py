@@ -987,7 +987,7 @@ class TestItemLoad(WikidataTestCase):
         self.assertEqual(item.title(), 'Q5296')
 
         # This del has no effect on the test; it is here to demonstrate that
-        # it doesnt help to clear this piece of saved state.
+        # it doesn't help to clear this piece of saved state.
         del item._content
         # The labels are not updated; assertion showing undesirable behaviour:
         self.assertEqual(item.labels['en'], 'New York City')
@@ -1176,7 +1176,7 @@ class TestItemLoad(WikidataTestCase):
                     with self.assertRaisesRegex(pywikibot.NoPage, regex):
                         getattr(item, method)()
 
-                # The invocation above of a fetching method shouldnt change
+                # The invocation above of a fetching method shouldn't change
                 # the local item, but it does! The title changes to '-1'.
                 #
                 # However when identifying the item for 'en:Test page'

@@ -66,7 +66,7 @@ PyMySQL
 # scripts/script_wui.py depends on Lua, which is not available using pip
 # but can be obtained from: https://github.com/bastibe/lunatic-python
 # However, a better fork is: https://github.com/AlereDevices/lunatic-python
-# Also script_wui.py is not currently functional, so it isnt installed here.
+# Also script_wui.py is not currently functional, so it isn't installed here.
 
 # core HTML comparison parser in diff module
 beautifulsoup4

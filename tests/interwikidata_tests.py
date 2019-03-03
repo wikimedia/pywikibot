@@ -62,7 +62,7 @@ class TestInterwikidataBot(SiteAttributeTestCase):
         page = pywikibot.Page(self.en, 'User:Ladsgroup')
         text = page.get()
 
-        # The page looks as excpected.
+        # The page looks as expected.
         self.assertEqual(len(page.langlinks()), 1)
         iw_link = page.langlinks()[0]
         self.assertIsInstance(iw_link, Link)

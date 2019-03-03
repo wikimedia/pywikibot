@@ -133,7 +133,7 @@ class TWNTestCaseBase(TWNSetMessagePackageBase):
                             .format(cls.__name__))
         # The call to set_messages_package below exists only to confirm
         # that the package exists and messages are available, so
-        # that tests can be skipped if the i18n data doesnt exist.
+        # that tests can be skipped if the i18n data doesn't exist.
         cls.orig_messages_package_name = i18n._messages_package_name
         i18n.set_messages_package(cls.message_package)
         has_messages = i18n.messages_available()
@@ -390,7 +390,7 @@ class MissingPackageTestCase(TWNSetMessagePackageBase,
                              UserInterfaceLangTestCase,
                              DefaultSiteTestCase):
 
-    """Test misssing messages package."""
+    """Test missing messages package."""
 
     message_package = 'scripts.foobar.i18n'
 

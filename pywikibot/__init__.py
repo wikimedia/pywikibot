@@ -188,7 +188,7 @@ class Timestamp(datetime.datetime):
         @return: Timestamp object
         @rtype: Timestamp
         """
-        # If inadvertantly passed a Timestamp object, use replace()
+        # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
             return ts.clone()
@@ -197,7 +197,7 @@ class Timestamp(datetime.datetime):
     @classmethod
     def fromtimestampformat(cls, ts):
         """Convert a MediaWiki internal timestamp to a Timestamp object."""
-        # If inadvertantly passed a Timestamp object, use replace()
+        # If inadvertently passed a Timestamp object, use replace()
         # to create a clone.
         if isinstance(ts, cls):
             return ts.clone()
@@ -237,7 +237,7 @@ class Timestamp(datetime.datetime):
             return newdt
 
     def __sub__(self, other):
-        """Perform substraction, returning a Timestamp instead of datetime."""
+        """Perform subtraction, returning a Timestamp instead of datetime."""
         newdt = super(Timestamp, self).__sub__(other)
         if isinstance(newdt, datetime.datetime):
             return Timestamp(newdt.year, newdt.month, newdt.day, newdt.hour,
@@ -1246,7 +1246,7 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     sysop = sysop or code_to_sysop.get(code) or code_to_sysop.get('*')
 
     if not isinstance(interface, type):
-        # If it isnt a class, assume it is a string
+        # If it isn't a class, assume it is a string
         try:
             tmp = __import__('pywikibot.site', fromlist=[interface])
         except ImportError:

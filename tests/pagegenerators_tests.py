@@ -877,7 +877,7 @@ class TestFactoryGenerator(DefaultSiteTestCase):
     def test_regexfilter_default(self):
         """Test allpages generator with titleregex filter."""
         gf = pagegenerators.GeneratorFactory()
-        # Matches titles with the same two or more continous characters
+        # Matches titles with the same two or more continuous characters
         self.assertTrue(gf.handleArg('-start'))
         self.assertTrue(gf.handleArg('-titleregex:(.)\\1+'))
         gf.handleArg('-limit:10')

@@ -50,14 +50,14 @@ These parameters are supported to specify which pages titles to print:
 
 -save       Save Page content to a file named as page.title(as_filename=True).
             Directory can be set with -save:dir_name
-            If no dir is specified, current direcory will be used.
+            If no dir is specified, current directory will be used.
 
 -encode     File encoding can be specified with '-encode:name' (name must be
             a valid python encoding: utf-8, etc.).
             If not specified, it defaults to config.textfile_encoding.
 
 -put:       Save the list to the defined page of the wiki. By default it does
-            not overwrite an exisiting page.
+            not overwrite an existing page.
 
 -overwrite  Overwrite the page if it exists. Can only by applied with -put.
 

@@ -53,7 +53,7 @@ def multi(value, tuplst):
 
     For example: 1st century, 2nd century, etc.
 
-    The tuplst is a list of tupples. Each tupple must contain two functions:
+    The tuplst is a list of tuples. Each tuple must contain two functions:
     first to encode/decode a single value (e.g. simpleInt), second is a
     predicate function with an integer parameter that returns true or false.
     When the 2nd function evaluates to true, the 1st function is used.
@@ -329,7 +329,7 @@ _digitDecoders = {
     '%': '%',
     # %d is a decimal
     'd': (_decimalDigits, unicode, int),
-    # %R is a roman numeral. This allows for only the simpliest linear
+    # %R is a roman numeral. This allows for only the simplest linear
     # conversions based on a list of numbers
     'R': ('IVX', intToRomanNum, romanNumToInt),
     # %K is a number in KN::
@@ -511,7 +511,7 @@ def MakeParameter(decoder, param):
 # All years/decades/centuries/millenniums are designed in such a way
 # as to allow for easy date to string and string to date conversion.
 # For example, using any map with either an integer or a string will produce
-# its oposite value:
+# its opposite value:
 #        Usage scenarios:
 #            formats['DecadeAD']['en'](1980) => '1980s'
 #            formats['DecadeAD']['en']('1980s') => 1980
@@ -1953,7 +1953,7 @@ def makeMonthList(pattern):
 def makeMonthNamedList(lang, pattern, makeUpperCase=None):
     """Create a list of 12 elements based on the name of the month.
 
-    The language-dependent month name is used as a formating argument to the
+    The language-dependent month name is used as a formatting argument to the
     pattern. The pattern must be have one %s that will be replaced by the
     localized month name.
     Use %%d for any other parameters that should be preserved.
@@ -2282,7 +2282,7 @@ def getNumberOfDaysInMonth(month):
     """
     Return the maximum number of days in a given month, 1 being January, etc.
 
-    For February alway 29 will be given, even it is not a leap year.
+    For February always 29 will be given, even it is not a leap year.
     """
     # use year 2000 which is a leap year
     return calendar.monthrange(2000, month)[1]

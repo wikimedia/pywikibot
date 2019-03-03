@@ -765,14 +765,14 @@ class FakeUITest(TestCase):
         self.assertEqual(self._getvalue(), self.expected)
 
     def test_stack_with_pop_color(self):
-        """Test using stacked colors and just poping the latest color."""
+        """Test using stacked colors and just popping the latest color."""
         self._colors = (('red', 6), ('yellow', 6), ('red', 3), ('default', 1))
         self.ui_obj._print('Hello \03{red}world \03{yellow}you\03{previous}!',
                            self.stream)
         self.assertEqual(self._getvalue(), self.expected)
 
     def test_stack_implicit_color(self):
-        """Test using stacked colors without poping any."""
+        """Test using stacked colors without popping any."""
         self._colors = (('red', 6), ('yellow', 6), ('default', 4))
         self.ui_obj._print('Hello \03{red}world \03{yellow}you!', self.stream)
         self.assertEqual(self._getvalue(), self.expected)

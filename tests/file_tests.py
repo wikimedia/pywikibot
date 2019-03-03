@@ -287,7 +287,7 @@ class TestDeprecatedFilePage(DeprecationTestCase):
 
 class TestFilePageDownload(TestCase):
 
-    """Test dowload fo FilePage to local file."""
+    """Test download of FilePage to local file."""
 
     family = 'commons'
     code = 'commons'

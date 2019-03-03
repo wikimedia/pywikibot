@@ -129,7 +129,7 @@ class LogEntry(object):
         return self._page
 
     def type(self):
-        """The type of thie logentry."""
+        """The type of this logentry."""
         return self.data['type']
 
     def action(self):

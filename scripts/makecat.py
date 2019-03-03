@@ -298,7 +298,7 @@ def main(*args):
 
     # Fetch articles in category, and mark as already checked (seen)
     # If category is empty, ask user if they want to look for pages
-    # in a diferent category.
+    # in a different category.
     articles = list(workingcat.articles(content=True))
     if not articles:
         pywikibot.output('Category {} does not exist or is empty. '

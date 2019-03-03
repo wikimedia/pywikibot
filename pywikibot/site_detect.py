@@ -149,7 +149,7 @@ class MWSite(object):
                 try:
                     d = json.loads(d)
                 except ValueError:
-                    # Fallback for old versions which didnt wrap help in json
+                    # Fallback for old versions which didn't wrap help in json
                     d = {'error': {'*': d}}
 
                 self.version = list(filter(

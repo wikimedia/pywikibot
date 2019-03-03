@@ -944,7 +944,7 @@ class DisambiguationRobot(SingleSiteBot):
                     assert self.dn_template_str
                     # small chunk of text to search
                     search_text = text[m.end():m.end() + context]
-                    # figure out where the link (and sentance) ends, put note
+                    # figure out where the link (and sentence) ends, put note
                     # there
                     end_of_word_match = re.search(r'\s', search_text)
                     if end_of_word_match:

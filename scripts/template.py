@@ -39,7 +39,7 @@ Command line options:
 
 -timestamp:  (With -onlyuser or -skipuser). Only check for a user where his
              edit is not older than the given timestamp. Timestamp must be
-             writen in MediaWiki timestamp format which is "%Y%m%d%H%M%S".
+             written in MediaWiki timestamp format which is "%Y%m%d%H%M%S".
              If this parameter is missed, all edits are checked but this is
              restricted to the last 100 edits.
 

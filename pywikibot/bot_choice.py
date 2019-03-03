@@ -102,7 +102,7 @@ class OutputOption(Option):
         self.output()
 
     def output(self):
-        """Output a string when selected and possibily before the question."""
+        """Output a string when selected and possibly before the question."""
         raise NotImplementedError()
 
 
@@ -181,7 +181,7 @@ class NestedOption(OutputOption, StandardOption):
         return super(NestedOption, self).format(default=default)
 
     def handled(self, value):
-        """Return itself if it applies or the appling sub option."""
+        """Return itself if it applies or the applying sub option."""
         for option in self.options:
             handled = option.handled(value)
             if handled is not None:

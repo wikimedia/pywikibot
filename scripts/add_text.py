@@ -241,7 +241,7 @@ def main(*args):
     @param args: command line arguments
     @type args: unicode
     """
-    # If none, the var is setted only for check purpose.
+    # If none, the var is set only for check purpose.
     summary = None
     addText = None
     regexSkip = None

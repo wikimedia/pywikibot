@@ -42,7 +42,7 @@ if not PY2:
     basestring = (str, )
 
 HELP_MSG = """\n
-mispelling.py does not support site {site}.
+misspelling.py does not support site {site}.
 
 Help Pywikibot team to provide support for your wiki by submitting
 a bug to:

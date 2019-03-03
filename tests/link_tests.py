@@ -612,7 +612,7 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
-# ---- Tests of a Link without colons, which shouldnt be interwikis, follow.
+# ---- Tests of a Link without colons, which shouldn't be interwikis, follow.
 
 
 class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):

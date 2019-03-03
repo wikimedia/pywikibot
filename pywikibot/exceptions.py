@@ -73,7 +73,7 @@ be aware of its status.
   - tools._NotImplementedWarning: do not use
   - NotImplementedWarning: functionality not implemented
 
-UserWarning: warnings targetted at users
+UserWarning: warnings targeted at users
 
   - config2._ConfigurationDeprecationWarning: user configuration file problems
   - login._PasswordFileWarning: password file problems

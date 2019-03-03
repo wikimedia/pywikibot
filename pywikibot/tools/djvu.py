@@ -336,7 +336,7 @@ class DjVuFile(object):
         # ref page info.
         if n_tot > 2:
             assert self.number_of_images(force=True) == n_tot - 1
-            # cahce cleared above
+            # cache cleared above
             assert self.page_info(new_ref_page) == info_ref_page
         else:
             # If djvu has only one page, FORM:DJVU line in djvudump has no id

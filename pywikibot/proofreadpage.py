@@ -188,12 +188,12 @@ class ProofreadPage(pywikibot.Page):
 
         E.g. for title 'Page:Popular Science Monthly Volume 1.djvu/12':
         - base = 'Popular Science Monthly Volume 1.djvu'
-        - extenstion = 'djvu'
+        - extension = 'djvu'
         - number = 12
 
         E.g. for title 'Page:Original Waltzing Matilda manuscript.jpg':
         - base = 'Original Waltzing Matilda manuscript.jpg'
-        - extenstion = 'jpg'
+        - extension = 'jpg'
         - number = None
 
         @return: (base, ext, num).

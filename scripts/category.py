@@ -1112,7 +1112,7 @@ class CategoryTidyRobot(Bot, CategoryPreprocess):
             pywikibot.output('Page {} not found.'.format(member.title()))
             return
 
-        # skip initial templates, images and coments for articles.
+        # skip initial templates, images and comments for articles.
         if member.namespace() == member.site.namespaces.MAIN:
             excludes = ('template', 'file', 'comment')
             regexes = textlib._get_regexes(excludes, member.site)

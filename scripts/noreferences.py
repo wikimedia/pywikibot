@@ -652,7 +652,7 @@ class NoReferencesBot(Bot):
             else:
                 break
         pywikibot.output(
-            'Found no section that can be preceeded by a new references '
+            'Found no section that can be preceded by a new references '
             'section.\nPlacing it before interwiki links, categories, and '
             'bottom templates.')
         index = len(tmpText)

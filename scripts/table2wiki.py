@@ -277,7 +277,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             r'\r\n!\1\2', new_table)
 
         ##################
-        # kills indention within tables. Be warned, it might seldom bring
+        # kills indentation within tables. Be warned, it might seldom bring
         # bad results.
         # True by default. Set 'deIndentTables = False' in user-config.py
         if config.deIndentTables:
@@ -327,7 +327,7 @@ class Table2WikiRobot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         while num != 0:
             # The same for header and cell tags ( ! or | ), but for these tags
             # the attribute part is finished by a | character. We don't want to
-            # change cell contents which accidentially contain an equal sign.
+            # change cell contents which accidentally contain an equal sign.
             # Group 1 and 2 are anologously to the previous regular expression,
             # group 3 are the remaining attribute key - value pairs.
             new_table, num = re.subn(

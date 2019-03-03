@@ -102,7 +102,7 @@ The contents of the package
     +------------------------++--------------------------------------------------------+
     | harvest_template.py    | [IMPROV] Reduce maximum line length to 130              |
     +------------------------+---------------------------------------------------------+
-    | illustrate_wikidata.py | Dont use 'gen' to refer to the generator factory        |
+    | illustrate_wikidata.py | Don't use 'gen' to refer to the generator factory       |
     +------------------------+---------------------------------------------------------+
     | image.py               | This script can be used to change one image to another  |
     |                        | or remove an image entirely.                            |

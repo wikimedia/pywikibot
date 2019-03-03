@@ -230,7 +230,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
     @param use_accesstime: Whether access times should be used.
     @type use_accesstime: bool tristate:
          - None  = detect
-         - False = dont use
+         - False = don't use
          - True  = always use
     """
     if not cache_path:
@@ -255,7 +255,7 @@ def process_entries(cache_path, func, use_accesstime=None, output_func=None,
 
         entry = CacheEntry(cache_dir, filename)
 
-        # Deletion is choosen only, abbreviate this request
+        # Deletion is chosen only, abbreviate this request
         if func is None and output_func is None \
            and action_func == CacheEntry._delete:
             action_func(entry)
@@ -442,12 +442,12 @@ def main():
         # Add tests folders
         cache_paths += [os.path.join('tests', f) for f in folders]
 
-        # Also process the base directory, if it isnt the current directory
+        # Also process the base directory, if it isn't the current directory
         if os.path.abspath(os.getcwd()) != pywikibot.config2.base_dir:
             cache_paths += [
                 os.path.join(pywikibot.config2.base_dir, f) for f in folders]
 
-        # Also process the user home cache, if it isnt the config directory
+        # Also process the user home cache, if it isn't the config directory
         userpath = os.path.expanduser(os.path.join('~', '.pywikibot'))
         if userpath != pywikibot.config2.base_dir:
             cache_paths += [

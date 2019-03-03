@@ -127,7 +127,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         Check that the username exists on the site.
 
-        @raises NoUsername: Username doesnt exist in user list.
+        @raises NoUsername: Username doesn't exist in user list.
         """
         # convert any Special:BotPassword usernames to main account equivalent
         main_username = self.username

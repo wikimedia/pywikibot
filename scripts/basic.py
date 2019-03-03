@@ -18,7 +18,7 @@ The following parameters are supported:
 
 -text:            Use this text to be added; otherwise 'Test' is used
 
--replace:         Dont add text but replace it
+-replace:         Don't add text but replace it
 
 -top              Place additional text on top of the page
 

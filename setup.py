@@ -90,7 +90,7 @@ if sys.platform.startswith('linux'):
 # The main pywin32 repository contains a Python 2 only setup.py with a small
 # wrapper setup3.py for Python 3.
 # http://pywin32.hg.sourceforge.net:8000/hgroot/pywin32/pywin32
-# The main pywinauto repository doesnt support Python 3.
+# The main pywinauto repository doesn't support Python 3.
 # The repositories used below have a Python 3 compliant setup.py
 dependency_links = [
     'git+https://github.com/AlereDevices/lunatic-python.git#egg='
@@ -135,12 +135,12 @@ else:
 # to set the console font and copy and paste, achieved using pywinauto
 # which depends on pywin32.
 # These tests may be disabled because pywin32 depends on VC++, is time
-# comsuming to build, and the console window cant be accessed during appveyor
+# consuming to build, and the console window can't be accessed during appveyor
 # builds.
 # Microsoft makes available a compiler for Python 2.7
 # http://www.microsoft.com/en-au/download/details.aspx?id=44266
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
-    # which isnt provided on pypi.
+    # which isn't provided on pypi.
     test_deps += ['pywin32', 'pywinauto>=0.4.0']
 
 extra_deps.update(script_deps)

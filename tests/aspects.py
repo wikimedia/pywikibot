@@ -284,7 +284,7 @@ class TestCaseBase(unittest.TestCase):
             a context manager like L{assertRaises}.
         @type callable_obj: callable
         @param args: The positional arguments forwarded to the callable object.
-        @param kwargs: The keyword arguments forwared to the callable object.
+        @param kwargs: The keyword arguments forwarded to the callable object.
         @return: Context manager if callable_obj is None and None otherwise.
         @rtype: None or context manager
         """
@@ -669,7 +669,7 @@ class RequireUserMixin(TestCaseBase):
         """Login to all sites."""
         sysop = hasattr(self, 'sysop') and self.sysop
 
-        # There may be many sites, and setUp doesnt know
+        # There may be many sites, and setUp doesn't know
         # which site is to be tested; ensure they are all
         # logged in.
         for site in self.sites.values():
@@ -1421,7 +1421,7 @@ class PwbTestCase(TestCase):
     The flag 'pwb' is used by the TestCase metaclass to check that a test site
     is set declared in the class properties, or that 'site = False' is added
     to the class properties in the unlikely scenario that the test case
-    uses pwb in a way that doesnt use a site.
+    uses pwb in a way that doesn't use a site.
 
     If a test class is marked as 'site = False', the metaclass will also check
     that the 'net' flag is explicitly set.

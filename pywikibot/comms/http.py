@@ -208,7 +208,7 @@ def user_agent(site=None, format_string=None):
         script_comments.append(str(site))
 
         # TODO: there are several ways of identifying a user, and username
-        # is not the best for a HTTP header if the username isnt ASCII.
+        # is not the best for a HTTP header if the username isn't ASCII.
         if site.username():
             username = user_agent_username(site.username())
             script_comments.append(

@@ -207,7 +207,7 @@ class TestCherryPick(TestCase):
                               '\x03{lightgreen}+ w\n\x03{default}')
 
     def check_headers(self, mock):
-        """Check if all headers were added to ouput."""
+        """Check if all headers were added to output."""
         for header in self.headers:
             mock.assert_any_call(self.header_base.format(header))
 
@@ -234,7 +234,7 @@ class TestCherryPick(TestCase):
     @patch('pywikibot.userinterfaces.terminal_interface_base.UI.input',
            return_value='q')
     def test_quit(self, input, mock):
-        """Check output of cherry_pick if quitted."""
+        """Check output of cherry_pick if quit."""
         self.assertEqual(cherry_pick(self.oldtext, self.newtext), self.oldtext)
         self.check_headers(mock)
         mock.assert_any_call(self.diff_message)
@@ -259,7 +259,7 @@ class TestCherryPick(TestCase):
     def test_by_letter_quit(self, input, mock):
         """Check cherry_pick output.
 
-        If by_letter diff is enabled and quitted during review.
+        If by_letter diff is enabled and quit during review.
         """
         self.assertEqual(cherry_pick(self.oldtext, self.newtext,
                                      by_letter=True), self.oldtext)

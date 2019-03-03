@@ -559,7 +559,7 @@ def package_versions(modules=None, builtins=False, standard_lib=None):
             if 'ver' in info:
                 data[name] = info
             else:
-                # Remove the entry from paths, so it isnt processed below
+                # Remove the entry from paths, so it isn't processed below
                 del paths[info['path']]
         else:
             data[name] = info

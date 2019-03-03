@@ -124,7 +124,7 @@ MW_KEYS = FrozenDict({
     'd': 'days',
     'w': 'weeks',
     'y': 'years',
-    # 'months' and 'minutes' were removed because confusion outweights merit
+    # 'months' and 'minutes' were removed because confusion outweighs merit
 }, 'MW_KEYS is a dict constant')
 
 
@@ -190,7 +190,7 @@ def str2time(string, timestamp=None):
         2w - 2 weeks (14 days)
         1y - 1 year
     @type string: str
-    @param timestamp: a timestamp to calulate a more accurate duration offset
+    @param timestamp: a timestamp to calculate a more accurate duration offset
         used by years
     @type timestamp: datetime.datetime
     @return: the corresponding timedelta object

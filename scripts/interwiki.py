@@ -61,7 +61,7 @@ These command-line arguments can be used to specify which pages to work on:
                    against the live wiki is using the warnfile.py
                    script.
 
-Additionaly, these arguments can be used to restrict the bot to certain pages:
+Additionally, these arguments can be used to restrict the bot to certain pages:
 
     -namespace:n   Number or name of namespace to process. The parameter can be
                    used multiple times. It works in combination with all other
@@ -95,7 +95,7 @@ Additionaly, these arguments can be used to restrict the bot to certain pages:
                    like -lack:xx:nn, so that the bot only works on pages with
                    at least nn interwiki links (the default value for nn is 1).
 
-These arguments control miscellanous bot behaviour:
+These arguments control miscellaneous bot behaviour:
 
     -quiet         Use this option to get less output
                    (note: without ending colon)
@@ -104,7 +104,7 @@ These arguments control miscellanous bot behaviour:
                    enables loading pages during saving throtteling and gives a
                    better performance.
                    NOTE: For post-processing it always assumes that saving the
-                   the pages was sucessful.
+                   the pages was successful.
                    (note: without ending colon)
 
     -summary:      Set an additional action summary message for the edit. This
@@ -935,7 +935,7 @@ class Subject(interwiki_graph.Subject):
 
     def addIfNew(self, page, counter, linkingPage):
         """
-        Add the pagelink given to the todo list, if it hasnt been seen yet.
+        Add the pagelink given to the todo list, if it hasn't been seen yet.
 
         If it is added, update the counter accordingly.
 
@@ -1324,7 +1324,7 @@ class Subject(interwiki_graph.Subject):
                 self.conf.note('{} is a page section. Skipping.'.format(page))
                 continue
 
-            # Page exists, isnt a redirect, and is a plain link (no section)
+            # Page exists, isn't a redirect, and is a plain link (no section)
             if self.originPage is None:
                 # the 1st existig page becomes the origin page, if none was
                 # supplied
@@ -2347,7 +2347,7 @@ def botMayEdit(page):
 
 
 def readWarnfile(filename, bot):
-    """Read old interlanguage conficts."""
+    """Read old interlanguage conflicts."""
     import warnfile
     reader = warnfile.WarnfileReader(filename)
     # we won't use removeHints

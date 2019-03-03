@@ -252,7 +252,7 @@ CachedRequest._get_cache_dir = classmethod(
 
 
 # Travis-CI builds are set to retry twice, which aims to reduce the number
-# of 'red' builds caused by intermittant server problems, while also avoiding
+# of 'red' builds caused by intermittent server problems, while also avoiding
 # the builds taking a long time due to retries.
 # The following allows builds to retry twice, but higher default values are
 # overridden here to restrict retries to only 1, so developer builds fail more
@@ -299,7 +299,7 @@ class TestRequest(CachedRequest):
             return False
 
         # tokens need careful management in the cache
-        # and cant be aggressively cached.
+        # and can't be aggressively cached.
         # FIXME: remove once 'badtoken' is reliably handled in api.py
         if 'intoken' in self._uniquedescriptionstr():
             self._data = None

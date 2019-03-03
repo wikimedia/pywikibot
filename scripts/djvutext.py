@@ -161,7 +161,7 @@ def main(*args):
         pywikibot.bot.suggest_help(missing_parameters=['-index'])
         return False
 
-    # If djvu_path is not a fle, build djvu_path from dir+index.
+    # If djvu_path is not a file, build djvu_path from dir+index.
     djvu_path = os.path.expanduser(djvu_path)
     djvu_path = os.path.abspath(djvu_path)
     if not os.path.exists(djvu_path):

@@ -3,7 +3,7 @@
 """
 A bot to remove stale protection templates from pages that are not protected.
 
-Very often sysops block the pages for a setted time but then the forget to
+Very often sysops block the pages for a set time but then the forget to
 remove the warning! This script is useful if you want to remove those useless
 warning left in these pages.
 
@@ -284,7 +284,7 @@ def main(*args):
     if not generator:
         generator = []
         pywikibot.output('Loading categories...')
-        # Define the category if no other generator has been setted
+        # Define the category if no other generator has been set
         for CAT in categories:
             cat = pywikibot.Category(site, CAT)
             # Define the generator
@@ -381,7 +381,7 @@ def main(*args):
                     text, changes = re.subn(TemplateInThePage[1], TNR[1], text)
 
         elif TSP or TU:
-            # implicitely editRestr[0] = 'autoconfirmed', edit-Semi-protection
+            # implicitly editRestr[0] = 'autoconfirmed', edit-Semi-protection
             if TemplateInThePage[0] == 'autoconfirmed-total' or \
                TemplateInThePage[0] == 'unique':
                 msg = 'The page is editable only for the autoconfirmed users'
@@ -448,7 +448,7 @@ def main(*args):
                                                 text)
 
             elif TSMP or TU:
-                # implicitely moveRestr[0] = 'autoconfirmed',
+                # implicitly moveRestr[0] = 'autoconfirmed',
                 # move-semi-protection
                 if TemplateInThePage[0] == 'autoconfirmed-move' or \
                    TemplateInThePage[0] == 'unique':

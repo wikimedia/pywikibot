@@ -69,7 +69,7 @@ class BasePageLoadRevisionsCachingTestBase(BasePageTestBase):
         self.assertFalse(hasattr(page, '_text'))
         self.assertIsNotNone(page._latest_cached_revision())
 
-        # Verify that calling .text doesnt call loadrevisions again
+        # Verify that calling .text doesn't call loadrevisions again
         loadrevisions = self.site.loadrevisions
         try:
             self.site.loadrevisions = None
