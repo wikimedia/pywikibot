@@ -22,7 +22,7 @@ This script understands various command-line arguments:
 """
 #
 # (C) Multichill, 2014
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -156,7 +156,7 @@ def main(*args):
         return False
 
     bot = NewItemRobot(generator, **options)
-    user = pywikibot.User(bot.site, bot.site.username)
+    user = pywikibot.User(bot.site, bot.site.username())
     if bot.getOption('touch') == 'newly' \
             and 'autoconfirmed' not in user.groups():
         pywikibot.warning(fill(
