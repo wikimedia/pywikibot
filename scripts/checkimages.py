@@ -150,6 +150,7 @@ txt_find = {
     'ja': ['{{no source', '{{unknown',
            '{{non free', '<!--削除についての議論が終了するまで'],
     'ko': ['{{출처 없음', '{{라이선스 없음', '{{Unknown'],
+    'sr': ['{{датотека без лиценце'],
     'ta': ['{{no source', '{{nld', '{{no license'],
     'ur': ['{{ناحوالہ', '{{اجازہ نامعلوم', '{{Di-no'],
     'zh': ['{{no source', '{{unknown', '{{No license'],
@@ -172,6 +173,7 @@ empty = {
           '<!-- fine template di benvenuto -->',
     'ja': '{{subst:Welcome/intro}}\n{{subst:welcome|--~~~~}}\n',
     'ko': '{{환영}}--~~~~\n',
+    'sr': '{{dd}}--~~~~\n',
     'ta': '{{welcome}}\n~~~~\n',
     'ur': '{{خوش آمدید}}\n~~~~\n',
     'zh': '{{subst:welcome|sign=~~~~}}',
@@ -191,6 +193,8 @@ delete_immediately = {
     'it': '{{cancella subito|motivo=Il file ha come estensione ".%s"}}',
     'ja': '{{db|知らないファイルフォーマット %s}}',
     'ko': '{{delete|잘못된 파일 형식 (.%s)}}',
+    'sr': '{{speedy|Ова датотека садржи екстензију %s. '
+               'Молим вас да проверите да ли је у складу са правилима.}}',
     'ta': '{{delete|'
           'இந்தக் கோப்பு .%s என்றக் கோப்பு நீட்சியைக் கொண்டுள்ளது.}}',
     'ur': '{{سریع حذف شدگی|اس ملف میں .%s بطور توسیع موجود ہے۔ }}',
@@ -207,6 +211,7 @@ delete_immediately_head = {
     'hu': 'Ismeretlen kiterjesztésű fájl',
     'it': 'File non specificato',
     'ko': '잘못된 파일 형식',
+    'sr': 'Непозната екстензија!',
     'ta': 'இனங்காணப்படாத கோப்பு நீட்சி!',
     'ur': 'نامعلوم توسیع!',
     'zh': '您上載的檔案格式可能有誤',
@@ -227,6 +232,7 @@ delete_immediately_notification = {
           "al mio programmatore. Grazie per l'attenzione. "
           '<u>Questo è un messaggio automatico di</u>',
     'ko': '%(file)s의 파일 형식이 잘못되었습니다. 확인 바랍니다.',
+    'sr': 'Изгледа да датотека %(file)s садржи погрешну екстензију.',
     'ta': '%(file)s இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு '
           'செய்து ஒரு முறை சரி பார்க்கவும்',
     'ur': 'ملف %(file)s کی توسیع شاید درست نہیں ہے، براہ کرم جانچ لیں۔',
@@ -246,6 +252,7 @@ msg_del_comm = {
     'it': 'Bot: Aggiungo %(adding)s',
     'ja': 'ロボットによる: 追加 %(adding)s',
     'ko': '로봇 : %(adding)s 추가',
+    'sr': 'Бот: Додато %(adding)s',
     'ta': 'Bot: Adding %(adding)s',
     'ur': 'روبالہ: اضافہ %(adding)s',
     'zh': '機器人: 正在新增 %(adding)s',
@@ -262,6 +269,7 @@ nothing_head = {
     'fr': 'Fichier sans licence',
     'hu': 'Licenc nélküli kép',
     'it': 'File senza licenza',
+    'sr': 'Датотека без лиценце',
     'ur': 'تصویر بدون اجازہ',
 }
 # That's the text that the bot will add if it doesn't find the license.
@@ -287,6 +295,7 @@ nothing_notification = {
           '%s|~~~}} --~~~~',
     'ja': '\n{{subst:Image copyright|File:%s}}--~~~~',
     'ko': '\n{{subst:User:Kwjbot IV/untagged|%s}} --~~~~',
+    'sr': '\n{{subst:Обавештење о датотеци без лиценце|%s}} --~~~~',
     'ta': '\n{{subst:Di-no license-notice|படிமம்:%s}} ~~~~',
     'ur': '{{subst:ماخذ تصویر|File:%s}}--~~~~',
     'zh': '\n{{subst:Uploadvionotice|File:%s}} ~~~~',
@@ -305,6 +314,7 @@ bot_list = {
     'it': ['Filbot', 'Nikbot', '.snoopyBot.'],
     'ja': ['Alexbot'],
     'ko': ['Kwjbot IV'],
+    'sr': ['ZoranBot'],
     'ta': ['TrengarasuBOT'],
     'ur': ['Shuaib-bot', 'Tahir-bot', 'SAMI.bot'],
     'zh': ['Alexbot'],
@@ -327,6 +337,7 @@ second_message_without_license = {
 page_with_settings = {
     'commons': 'User:Filbot/Settings',
     'it': 'Progetto:Coordinamento/Immagini/Bot/Settings#Settings',
+    'sr': 'User:ZoranBot/checkimages.py/подешавања',
     'zh': 'User:Alexbot/cisettings#Settings',
 }
 
@@ -343,6 +354,7 @@ report_page = {
     'it': 'Progetto:Coordinamento/Immagini/Bot/Report',
     'ja': 'User:Alexbot/report',
     'ko': 'User:Kwjbot IV/Report',
+    'sr': 'User:ZoranBot/checkimages.py/дневник',
     'ta': 'User:Trengarasu/commonsimages',
     'ur': 'صارف:محمد شعیب/درخواست تصویر',
     'zh': 'User:Alexsh/checkimagereport',
@@ -360,6 +372,7 @@ msg_comm10 = {
     'it': 'Bot: Aggiorno il log',
     'ja': 'ロボットによる:更新',
     'ko': '로봇:로그 업데이트',
+    'sr': 'Бот: Ажурирање дневника',
     'ta': 'தானியங்கி:பட்டியலை இற்றைப்படுத்தல்',
     'ur': 'روبالہ: تجدید نوشتہ',
     'zh': '機器人:更新記錄',
@@ -391,6 +404,7 @@ HiddenTemplate = {
            'Template:Permissionotrs'],
     'ja': ['Template:Information'],
     'ko': ['Template:그림 정보'],
+    'sr': ['Шаблон:Информација'],
     'ta': ['Template:Information'],
     'ur': ['Template:معلومات'],
     'zh': ['Template:Information'],
@@ -401,6 +415,7 @@ PageWithHiddenTemplates = {
     'commons': 'User:Filbot/White_templates#White_templates',
     'it': 'Progetto:Coordinamento/Immagini/Bot/WhiteTemplates',
     'ko': 'User:Kwjbot_IV/whitetemplates/list',
+    'sr': 'User:ZoranBot/checkimages.py/дозвољенишаблони',
 }
 
 # A page where there's a list of template to consider as licenses.
@@ -409,6 +424,7 @@ PageWithAllowedTemplates = {
     'de': 'Benutzer:Xqbot/Lizenzvorlagen',
     'it': 'Progetto:Coordinamento/Immagini/Bot/AllowedTemplates',
     'ko': 'User:Kwjbot_IV/AllowedTemplates',
+    'sr': 'User:ZoranBot/checkimages.py/дозвољенишаблони',
 }
 
 # Template added when the bot finds only an hidden template and nothing else.
@@ -437,6 +453,7 @@ duplicatesText = {
     'de': '{{NowCommons}}',
     'it': '\n{{Progetto:Coordinamento/Immagini/Bot/Template duplicati|'
           '__images__}}',
+    'sr': '{{NowCommons|__image__}}',
 }
 
 # Head of the message given to the author
@@ -444,6 +461,7 @@ duplicate_user_talk_head = {
     'de': 'Datei-Duplikat',
     'en': 'Duplicate file',
     'it': 'File doppio',
+    'sr': 'Дупликат датотеке',
 }
 
 # Message to put in the talk
@@ -458,15 +476,17 @@ duplicates_comment_talk = {
     'en': 'Bot: Notify that the file already exists on Commons',
     'fa': 'ربات: تصویر تکراری یافت شد',
     'it': 'Bot: Notifico il file doppio trovato',
+    'sr': 'Бот: Обавештење да датотека већ постоји на Остави',
 }
 
 # Comment used by the bot while it reports the problem in the image
 duplicates_comment_image = {
+    'ar': 'بوت: وسم ملف مكرر',
     'de': 'Bot: Datei liegt auf Commons',
     'en': 'Bot: File already on Commons, may be deleted',
-    'ar': 'بوت: وسم ملف مكرر',
     'fa': 'ربات: برچسب زدن بر تصویر تکراری',
     'it': 'Bot: File doppio, da cancellare',
+    'sr': 'Бот: Датотека већ постоји на Остави',
 }
 
 # Regex to detect the template put in the image's description to find the dupe
@@ -476,6 +496,7 @@ duplicatesRegex = {
     'de': r'\{\{[nN](?:C|ow(?: c|[cC])ommons)[\|\}',
     'it': r'\{\{(?:[Tt]emplate:|)[Pp]rogetto:[Cc]oordinamento/Immagini/Bot/'
           r'Template duplicati[|}]',
+    'sr': r'\{\{[nN](?:C|ow(?: c|[cC])ommons)[\|\}',
 }
 
 # Category with the licenses and / or with subcategories with the other
@@ -491,6 +512,7 @@ category_with_licenses = {
     'it': 'Categoria:Template Licenze copyright',
     'ja': 'Category:画像の著作権表示テンプレート',
     'ko': '분류:위키백과 그림 저작권 틀',
+    'sr': 'Категорија:Шаблони за слике',
     'ta': 'Category:காப்புரிமை வார்ப்புருக்கள்',
     'ur': 'زمرہ:ویکیپیڈیا سانچہ جات حقوق تصاویر',
     'zh': 'Category:版權申告模板',
@@ -524,7 +546,7 @@ serviceTemplates = {
 
 # Add your project (in alphabetical order) if you want that the bot starts
 project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
-                    'ko', 'meta', 'ta', 'ur', 'zh']
+                    'ko', 'meta', 'sr', 'ta', 'ur', 'zh']
 
 # END OF CONFIGURATION.
 
@@ -1121,7 +1143,7 @@ class checkImagesBot(object):
 
                     if not self.settingsData:
                         pywikibot.output(
-                            "Yo've set wrongly your settings, please take a "
+                            "You've set wrongly your settings, please take a "
                             'look to the relative page. (run without them)')
                         self.settingsData = None
                 except pywikibot.NoPage:
