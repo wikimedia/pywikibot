@@ -358,6 +358,7 @@ referencesSections = {
         ],
         'sr': [
             'Референце',
+            'Извори',
         ],
         'szl': [
             'Przipisy',
