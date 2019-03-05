@@ -124,7 +124,7 @@ from pywikibot.tools._logging import (
 from pywikibot.tools.formatter import color_format
 
 
-# Note: all output goes thru python std library "logging" module
+# Note: all output goes through python std library "logging" module
 _logger = 'bot'
 
 if not PY2:
@@ -1448,7 +1448,7 @@ class BaseBot(OptionHandler):
                                   % self.__class__.__name__)
 
     def setup(self):
-        """Some inital setup before run operation starts.
+        """Some initial setup before run operation starts.
 
         This can be used for reading huge parts from life wiki or file
         operation which is more than just initialize the instance.
@@ -1536,7 +1536,7 @@ class Bot(BaseBot):
     """
 
     def __init__(self, site=None, **kwargs):
-        """Create a Bot instance and initalize cached sites."""
+        """Create a Bot instance and initialize cached sites."""
         # TODO: add warning if site is specified and generator
         # contains pages from a different site.
         # Do not set self._site to None if we already have it
@@ -1587,7 +1587,7 @@ class Bot(BaseBot):
         # self.site causes bugs in subclasses.
         # If the subclass has set self.site before run(), it may be that the
         # bot processes pages on sites other than self.site, and therefore
-        # this method cant alter self.site. To use this functionality, don't
+        # this method can't alter self.site. To use this functionality, don't
         # set self.site in __init__, and use page.site in treat().
         self._auto_update_site = not self._site
         if not self._auto_update_site:

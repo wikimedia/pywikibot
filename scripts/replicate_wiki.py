@@ -40,7 +40,7 @@ The following parameters are supported:
 """
 #
 # (C) Kasper Souren, 2012-2013
-# (C) Pywikibot team, 2013-2018
+# (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -189,7 +189,7 @@ class SyncSites(object):
             sync_overview_page.save(self.put_message(site))
 
     def put_message(self, site):
-        """Return synchonization message."""
+        """Return synchronization message."""
         return ('{0} replicate_wiki.py synchronization from {1}'
                 .format(site.user(), str(self.original)))
 

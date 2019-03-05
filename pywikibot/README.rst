@@ -48,7 +48,7 @@ in your current directory. It asks for the family and language code you are
 working on and at least for the bot's user name; this will be used to identify
 you when the robot is making changes, in case you are not logged in. You may
 choose to create a small or extended version of the config file with further
-informations. Other variables that can be set in the configuration file, please
+information. Other variables that can be set in the configuration file, please
 check config.py for ideas.
 
 

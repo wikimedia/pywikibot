@@ -244,7 +244,7 @@ available_ssl_project = []
 # the permissions given to a bot. When using BotPasswords, each instance gets
 # keys. This combination can only access the API, not the normal web interface.
 # See https://www.mediawiki.org/wiki/Manual:Pywikibot/BotPasswords to know how
-# use them. In this case, the password file should contein a BotPassword object
+# use them. In this case, the password file should contain a BotPassword object
 # in the following format:
 # (username, BotPassword(botname, botpassword))
 password_file = None
@@ -983,7 +983,7 @@ def _win32_extension_command(extension):
         cmd = _cmd
         if cmd.find('%1'):
             cmd = cmd[:cmd.find('%1')]
-            # Remove any trailing characher, which should be a quote or space
+            # Remove any trailing character, which should be a quote or space
             # and then remove all whitespace.
             return cmd[:-1].strip()
     except WindowsError as e:
@@ -1151,7 +1151,7 @@ if OSWIN32 and editor:
         warning(
             'The editor path contains probably invalid escaped '
             'characters. Make sure to use a raw-string (r"..." or '
-            "r'...'), forward slashs as a path delimiter or to escape the "
+            "r'...'), forward slashes as a path delimiter or to escape the "
             'normal path delimiter.')
 
 if userinterface_lang is None:

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test Link functionality."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -612,7 +612,7 @@ class TestFullyQualifiedOneSiteFamilyExplicitLinkParser(LinkTestCase):
         self.assertEqual(link.namespace, 1)
 
 
-# ---- Tests of a Link without colons, which shouldnt be interwikis, follow.
+# ---- Tests of a Link without colons, which shouldn't be interwikis, follow.
 
 
 class TestPartiallyQualifiedImplicitLinkSameSiteParser(LinkTestCase):

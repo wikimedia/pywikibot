@@ -601,7 +601,7 @@ class TestTemplateParams(TestCase):
                                              ('2', 'c}}}'),
                                              ('3', 'd')]))])
 
-        # Safe fallback to handle arbitary template levels
+        # Safe fallback to handle arbitrary template levels
         # by merging top level templates together.
         # i.e. 'b' is not recognised as a template, and 'foo' is also
         # consumed as part of 'a'.

@@ -13,7 +13,7 @@ If you have more than one message dictionary, give all these names to the bot:
 >>> bot = i18nBot('<scriptname>', '<msg dict1>', '<msg dict2>', '<msg dict3>')
 
 If you want to rename the message index use keyword arguments. This may be
-mixed with preleading positonal argumens:
+mixed with preleading positonal arguments:
 >>> bot = i18nBot('<scriptname>', '<msg dict1>', the_other_msg='<msg dict2>')
 
 If you have the messages as instance constants you may call the bot as follows:

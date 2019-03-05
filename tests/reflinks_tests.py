@@ -126,7 +126,7 @@ class TestReferencesBotConstructor(ScriptMainTestCase):
     """
     Test reflinks with run() removed.
 
-    These tests cant verify the order of the pages in the XML
+    These tests can't verify the order of the pages in the XML
     as the constructor is given a preloading generator.
     See APISite.preloadpages for details.
     """

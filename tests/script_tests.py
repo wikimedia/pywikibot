@@ -24,7 +24,7 @@ archive_path = join_root_path('scripts', 'archive')
 # These dependencies are not always the package name which is in setup.py.
 # e.g. 'PIL.ImageTk' is a object provided by several different pypi packages,
 # and setup.py requests that 'Pillow' is installed to provide 'PIL.ImageTk'.
-# Here, it doesnt matter which pypi package was requested and installed.
+# Here, it doesn't matter which pypi package was requested and installed.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
     'script_wui': ['crontab', 'lua'],
@@ -151,7 +151,7 @@ no_args_expected_results = {
     'unusedfiles': ('Working on', None),
     'watchlist': 'Retrieving watchlist',
 
-    # The following auto-run and typically cant be validated,
+    # The following auto-run and typically can't be validated,
     # however these strings are very likely to exist within
     # the timeout of 5 seconds.
     'revertbot': 'Fetching new batch of contributions',
@@ -310,7 +310,7 @@ class TestScriptMeta(MetaTestCaseClass):
                                  result['stderr'])
                 self.assertNotIn('deprecated', result['stderr'].lower())
 
-                # If stdout doesnt include global help..
+                # If stdout doesn't include global help..
                 if global_args not in result['stdout']:
                     # Specifically look for deprecated
                     self.assertNotIn('deprecated', result['stdout'].lower())

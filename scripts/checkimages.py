@@ -81,7 +81,7 @@ Todo
 # (C) Kyle/Orgullomoore, 2006-2007 (newimage.py)
 # (C) Siebrand Mazeland, 2007-2010
 # (C) Filnik, 2007-2011
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -469,7 +469,7 @@ duplicates_comment_image = {
     'it': 'Bot: File doppio, da cancellare',
 }
 
-# Regex to detect the template put in the image's decription to find the dupe
+# Regex to detect the template put in the image's description to find the dupe
 duplicatesRegex = {
     'commons': r'\{\{(?:[Tt]emplate:|)(?:[Dd]up(?:licat|)e|[Bb]ad[ _][Nn]ame)'
                r'[|}]',

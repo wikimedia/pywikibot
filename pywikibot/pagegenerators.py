@@ -663,11 +663,11 @@ class GeneratorFactory(object):
             compatibility, this can also be the total amount of pages
             that should be returned. It is taken as 'total' if the value does
             not have 8 digits.
-        @type start: str convertable to Timestamp in the format YYYYMMDD. If
+        @type start: str convertible to Timestamp in the format YYYYMMDD. If
             the length is not 8: for backward compatibility to use this as
             'total', it can also be a str (castable to int) or int (positive).
         @param end: Timestamp to end listing at
-        @type end: str convertable to Timestamp in the format YYYYMMDD
+        @type end: str convertible to Timestamp in the format YYYYMMDD
         @return: The generator or None if invalid 'total' value.
         @rtype: LogeventsPageGenerator
         """
@@ -1720,7 +1720,7 @@ def NamespaceFilterPageGenerator(generator, namespaces, site=None):
         type such as NoneType or bool, or more than one namespace
         if the API module does not support multiple namespaces
     """
-    # As site was only required if the namespaces contain strings, dont
+    # As site was only required if the namespaces contain strings, don't
     # attempt to use the config selected site unless the initial attempt
     # at resolving the namespaces fails.
     if not site:
@@ -1890,7 +1890,7 @@ class RegexFilter(object):
     def __filter_match(cls, regex, string, quantifier):
         """Return True if string matches precompiled regex list.
 
-        @param quantifier: a qualifer
+        @param quantifier: a qualifier
         @type quantifier: str of 'all', 'any' or 'none'
         @rtype: bool
         """
@@ -1907,7 +1907,7 @@ class RegexFilter(object):
         if not isinstance(regex, list):
             regex = [regex]
         # Test if regex is already compiled.
-        # We assume that all list componets have the same type
+        # We assume that all list components have the same type
         if isinstance(regex[0], basestring):
             regex = [re.compile(r, flag) for r in regex]
         return regex
@@ -2708,7 +2708,7 @@ class GoogleSearchPageGenerator(object):
         The terms of service as at June 2014 give two conditions that
         may apply to use of search:
 
-            1. Dont access [Google Services] using a method other than
+            1. Don't access [Google Services] using a method other than
                the interface and the instructions that [they] provide.
             2. Don't remove, obscure, or alter any legal notices
                displayed in or along with [Google] Services.

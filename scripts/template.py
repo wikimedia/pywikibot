@@ -39,7 +39,7 @@ Command line options:
 
 -timestamp:  (With -onlyuser or -skipuser). Only check for a user where his
              edit is not older than the given timestamp. Timestamp must be
-             writen in MediaWiki timestamp format which is "%Y%m%d%H%M%S".
+             written in MediaWiki timestamp format which is "%Y%m%d%H%M%S".
              If this parameter is missed, all edits are checked but this is
              restricted to the last 100 edits.
 
@@ -108,7 +108,7 @@ user talk pages (namespace #3):
 # (C) Daniel Herding, 2004
 # (C) Rob W.W. Hooft, 2003-2005
 # (C) xqt, 2009-2018
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #

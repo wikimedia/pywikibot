@@ -12,7 +12,7 @@ the site commons should be given and not a Wikipedia or similar.
 """
 #
 # (C) Multichill, 2008
-# (C) Pywikibot team, 2009-2018
+# (C) Pywikibot team, 2009-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -38,7 +38,7 @@ ignoreCategories = ['[[Category:CC-BY-SA-3.0]]',
                     '[[Category:Media lacking a description]]',
                     '[[Category:Self-published work]]']
 
-# Dont bother to put the template on a image with one of these templates
+# Don't bother to put the template on a image with one of these templates
 skipTemplates = ['Delete',
                  'Nocat',
                  'No license',

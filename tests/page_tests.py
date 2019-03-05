@@ -637,7 +637,7 @@ class TestPageDeprecation(DefaultSiteTestCase, DeprecationTestCase):
 
 class TestPageBaseUnicode(DefaultDrySiteTestCase):
 
-    """Base class for tests requring a page using a unicode title."""
+    """Base class for tests requiring a page using a unicode title."""
 
     @classmethod
     def setUpClass(cls):

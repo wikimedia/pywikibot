@@ -44,7 +44,7 @@ class TestGenerateFamilyFiles(DefaultSiteTestCase):
             url=self.site.base_url(''), name='gff-test', dointerwiki='y')
 
     def test_initial_attributes(self):
-        """Test inital FamilyFileGenerator attributes."""
+        """Test initial FamilyFileGenerator attributes."""
         self.assertEqual(self.generator_instance.base_url,
                          self.site.base_url(''))
         self.assertEqual(self.generator_instance.name, 'gff-test')

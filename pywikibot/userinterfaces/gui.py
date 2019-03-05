@@ -447,7 +447,7 @@ class ListBoxWindow(object):
         self.parent.destroy()
 
     def __init__(self, parent=None):
-        """Constuctor."""
+        """Initializer."""
         if parent is None:
             # create a new window
             parent = Tkinter.Tk()

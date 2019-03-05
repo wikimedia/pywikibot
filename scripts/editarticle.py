@@ -23,7 +23,7 @@ The following parameters are supported:
 """
 #
 # (C) Gerrit Holl, 2004
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,7 +79,7 @@ class ArticleEditor(object):
             self.page = self.page.getRedirectTarget()
 
     def handle_edit_conflict(self, new):
-        """When an edit conflict occures save the new text to a file."""
+        """When an edit conflict occurs save the new text to a file."""
         fn = os.path.join(tempfile.gettempdir(), self.page.title())
         with open(fn, 'w') as fp:
             fp.write(new)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Bot tests."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -77,7 +77,7 @@ class FakeSaveBotTestCase(TestCase):
         self._old_counter = self._bot._save_counter
 
     def setUp(self):
-        """Set up test by reseting the counters."""
+        """Set up test by resetting the counters."""
         super(FakeSaveBotTestCase, self).setUp()
         self.assert_saves = getattr(self, 'default_assert_saves', 1)
         self.save_called = 0

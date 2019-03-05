@@ -160,7 +160,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             try:
                 self.refs[item].get(force=True)   # load all page contents
             except pywikibot.NoPage:
-                pywikibot.error("The configuation page {0} doesn't exists"
+                pywikibot.error("The configuration page {0} doesn't exists"
                                 .format(self.refs[item].title(as_link=True)))
                 raise
         # init background timer
@@ -256,7 +256,7 @@ def main_script(page, rev=None, params=NotImplemented):
     sys.stdout = buffer
     sys.stderr = buffer
 
-    # all output to logging and stdout/stderr is catched BUT NOT lua output (!)
+    # all output to logging and stdout/stderr is caught BUT NOT lua output (!)
     if rev is None:
         code = page.get()               # shell; "on demand"
     else:

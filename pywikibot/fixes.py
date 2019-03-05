@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """File containing all standard fixes."""
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -404,15 +404,15 @@ fixes = {
             # superfluous word "number"
             (r'ISBN(?: [Nn]umber| [Nn]o\.?|-Nummer|-Nr\.):? (\d+)',
              r'ISBN \1'),
-            # Space, minus, dot, hypen, en dash, em dash, etc. instead of
+            # Space, minus, dot, hyphen, en dash, em dash, etc. instead of
             # hyphen-minus as separator,
             # or spaces between digits and separators.
             # Note that these regular expressions also match valid ISBNs, but
             # these won't be changed.
             # These two regexes don't verify that the ISBN is of a valid format
-            # but just change separators into normal hypens. The isbn script
+            # but just change separators into normal hyphens. The isbn script
             # does checks and similar but does only match ISBNs with digits and
-            # hypens (and optionally a X/x at the end).
+            # hyphens (and optionally a X/x at the end).
             (r'ISBN (978|979) *[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d+) '
              r'*[\- −.‐-―] *(\d+) *[\- −.‐-―] *(\d)(?!\d)',
              r'ISBN \1-\2-\3-\4-\5'),  # ISBN-13

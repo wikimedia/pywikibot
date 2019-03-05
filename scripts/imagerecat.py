@@ -146,7 +146,7 @@ def getCommonshelperCats(imagepage):
              'cl': hint_wiki,
              'w': lang})
     else:
-        # Cant handle other sites atm
+        # Can't handle other sites atm
         return [], [], []
 
     commonsenseRe = re.compile(

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Module containing various formatting related utilities."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -111,7 +111,7 @@ class _ColorFormatter(Formatter):
         Override original `_vformat` to prevent that it changes into `bytes`.
 
         The original `_vformat` is returning `bytes` under certain
-        curcumstances. It happens when the `format_string` is empty, when there
+        circumstances. It happens when the `format_string` is empty, when there
         is no literal text around it or when the field value is not a `unicode`
         already.
 

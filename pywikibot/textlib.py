@@ -77,7 +77,7 @@ TEMP_REGEX = DeprecatedRegex(
 
 # The regex below collects nested templates, providing simpler
 # identification of templates used at the top-level of wikitext.
-# It doesnt match {{{1|...}}}, however it also does not match templates
+# It doesn't match {{{1|...}}}, however it also does not match templates
 # with a numerical name. e.g. {{1|..}}. It will correctly match {{{x}} as
 # being {{x}} with leading '{' left in the wikitext.
 # Prefix msg: is not included in the 'name' group, but all others are

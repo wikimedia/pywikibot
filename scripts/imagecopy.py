@@ -64,7 +64,7 @@ By default the bot works on your home wiki (set in user-config)
 #
 # Another rewrite by:
 # (C) Multichill 2008-2011
-# (C) Pywikibot team, 2007-2018
+# (C) Pywikibot team, 2007-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -296,7 +296,7 @@ class imageTransfer(threading.Thread):
         # Should check if the image actually was uploaded
         if pywikibot.Page(self.image_repo,
                           'Image:' + self.newname).exists():
-            # Get a fresh copy, force to get the page so we dont run into edit
+            # Get a fresh copy, force to get the page so we don't run into edit
             # conflicts
             imtxt = self.imagePage.get(force=True)
 
@@ -548,7 +548,7 @@ def main(*args):
                         skip = True
                 else:
                     while True:
-                        # Do the TkdialogIC to accept/reject and change te name
+                        # Do TkdialogIC to accept/reject and change the name
                         newname, skip = TkdialogIC(
                             imagepage.title(with_ns=False),
                             imagepage.get(), username,
@@ -576,7 +576,7 @@ def main(*args):
                             pywikibot.output(
                                 'Image already exists, pick another name or '
                                 'skip this image')
-                        # We dont overwrite images, pick another name, go to
+                        # We don't overwrite images, pick another name, go to
                         # the start of the loop
 
             if not skip:

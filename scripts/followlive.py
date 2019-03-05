@@ -398,7 +398,7 @@ What is it? """
         self.generator = self.site.newpages()
 
     def show_page_info(self):
-        """Display informations about an article."""
+        """Display information about an article."""
         pywikibot.output('Date:   {info.date}\n'
                          'Length: {info.length} bytes\n'
                          'User:   {info.user.username}'

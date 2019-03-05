@@ -663,7 +663,7 @@ class _InterwikiMap(object):
 
     def __init__(self, site):
         """
-        Create an empty uninitalized interwiki map for the given site.
+        Create an empty uninitialized interwiki map for the given site.
 
         @param site: Given site for which interwiki map is to be created
         @type site: APISite
@@ -875,7 +875,7 @@ class BaseSite(ComparableMixin):
         del new['_pagemutex']
         if '_throttle' in new:
             del new['_throttle']
-        # site cache contains exception information, which cant be pickled
+        # site cache contains exception information, which can't be pickled
         if '_iw_sites' in new:
             del new['_iw_sites']
         return new
@@ -1597,8 +1597,8 @@ class Siteinfo(Container):
         @param expiry: If the cache is older than the expiry it ignores the
             cache and queries the server to get the newest value.
         @type expiry: int (days), L{datetime.timedelta}, False (never)
-        @return: If that property was retrived via this method. Returns None if
-            the key was not in the retreived values.
+        @return: If that property was retrieved via this method. Returns None
+            if the key was not in the retrieved values.
         @rtype: various (the value), bool (if the default value is used)
         """
         if 'general' not in self._cache:
@@ -1640,7 +1640,7 @@ class Siteinfo(Container):
         @type key: str
         @param get_default: Whether to throw an KeyError if the key is invalid.
         @type get_default: bool
-        @param cache: Caches the result interally so that future accesses via
+        @param cache: Caches the result internally so that future accesses via
             this method won't query the server.
         @type cache: bool
         @param expiry: If the cache is older than the expiry it ignores the
@@ -5806,7 +5806,7 @@ class APISite(BaseSite):
         revid = revid or set()
         revision = revision or set()
 
-        # TODO: remove exeception for mw < 1.22
+        # TODO: remove exception for mw < 1.22
         if (revid or revision) and self.mw_version < '1.22':
             raise NotImplementedError(
                 'Support of "revid" parameter\n'

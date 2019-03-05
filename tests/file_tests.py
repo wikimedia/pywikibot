@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """FilePage tests."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -287,7 +287,7 @@ class TestDeprecatedFilePage(DeprecationTestCase):
 
 class TestFilePageDownload(TestCase):
 
-    """Test dowload fo FilePage to local file."""
+    """Test download of FilePage to local file."""
 
     family = 'commons'
     code = 'commons'

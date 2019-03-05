@@ -73,7 +73,7 @@ be aware of its status.
   - tools._NotImplementedWarning: do not use
   - NotImplementedWarning: functionality not implemented
 
-UserWarning: warnings targetted at users
+UserWarning: warnings targeted at users
 
   - config2._ConfigurationDeprecationWarning: user configuration file problems
   - login._PasswordFileWarning: password file problems
@@ -81,7 +81,7 @@ UserWarning: warnings targetted at users
   - FamilyMaintenanceWarning: missing information in family definition
 """
 #
-# (C) Pywikibot team, 2008-2018
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #

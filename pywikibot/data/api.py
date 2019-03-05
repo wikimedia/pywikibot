@@ -245,7 +245,7 @@ class ParamInfo(Container):
             if self.modules_only_mode:
                 self.paraminfo_keys = frozenset(['modules'])
 
-        # v1.18 and earlier paraminfo doesnt include modules; must use 'query'
+        # v1.18 and earlier paraminfo doesn't include modules; must use 'query'
         # Assume that by v1.26, it will be desirable to prefetch 'query'
         if mw_ver > '1.26' or mw_ver < '1.19':
             self.preloaded_modules |= {'query'}
@@ -282,7 +282,7 @@ class ParamInfo(Container):
 
     def _emulate_pageset(self):
         """Emulate the pageset module, which existed in MW 1.15-1.24."""
-        # pageset isnt a module in the new system, so it is emulated, with
+        # pageset isn't a module in the new system, so it is emulated, with
         # the paraminfo from the query module.
         assert('query' in self._paraminfo)
 
@@ -679,7 +679,7 @@ class ParamInfo(Container):
         @rtype: dict or None
         """
         # TODO: the 'description' field of each parameter is not in the default
-        # output of v1.25, and cant removed from previous API versions.
+        # output of v1.25, and can't removed from previous API versions.
         # There should be an option to remove this verbose data from the cached
         # version, for earlier versions of the API, and/or extract any useful
         # data and discard the entire received paraminfo structure. There are
@@ -703,7 +703,7 @@ class ParamInfo(Container):
 
         assert(len(param_data) == 1)
         param_data = param_data[0]
-        # pre 1.14 doesnt provide limit attribute on parameters
+        # pre 1.14 doesn't provide limit attribute on parameters
         if 'multi' in param_data and 'limit' not in param_data:
             param_data['limit'] = self._limit
         return param_data
@@ -1438,7 +1438,7 @@ class Request(MutableMapping):
         return iter(self._params.items())
 
     def items(self):
-        """Return a list of tuples containg the parameters in any order."""
+        """Return a list of tuples containing the parameters in any order."""
         return list(self._params.items())
 
     @property
@@ -2168,7 +2168,7 @@ class CachedRequest(Request):
                 'name' in self.site._userinfo:
             # This uses the format of Page.__repr__, without performing
             # config.console_encoding as done by Page.__repr__.
-            # The returned value cant be encoded to anything other than
+            # The returned value can't be encoded to anything other than
             # ascii otherwise it creates an exception when _create_file_name()
             # tries to encode it as utf-8.
             user_key = 'User(User:%s)' % self.site._userinfo['name']
@@ -2184,7 +2184,7 @@ class CachedRequest(Request):
         """
         Return a unique ascii identifier for the cache entry.
 
-        @rtype: str (hexademical; i.e. characters 0-9 and a-f only)
+        @rtype: str (hexadecimal; i.e. characters 0-9 and a-f only)
         """
         return hashlib.sha256(
             self._uniquedescriptionstr().encode('utf-8')

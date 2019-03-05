@@ -44,7 +44,7 @@ check it yourself.
 # English Wikipedia specific bot by:
 # (C) Multichill 2010-2012
 #
-# (C) Pywikibot team, 2010-2018
+# (C) Pywikibot team, 2010-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -493,7 +493,7 @@ class imageFetcher(threading.Thread):
         # Permission
         # Still have to filter out crap like "see below" or "yes"
         if contents['permission']:
-            # Strip of the license temlate if it's in the permission section
+            # Strip of the license template if it's in the permission section
             for (regex, repl) in licenseTemplates[imagepage.site.lang]:
                 contents['permission'] = re.sub(regex, '',
                                                 contents['permission'],
@@ -657,7 +657,7 @@ class userInteraction(threading.Thread):
                 return False
         else:
             while True:
-                # Do the TkdialogICS to accept/reject and change te name
+                # Do the TkdialogICS to accept/reject and change the name
                 fields = TkdialogICS(fields).getnewmetadata()
 
                 if fields.get('skip'):
@@ -674,7 +674,7 @@ class userInteraction(threading.Thread):
                 else:
                     pywikibot.output('Image already exists, pick another name '
                                      'or skip this image')
-                    # We dont overwrite images, pick another name, go to the
+                    # We don't overwrite images, pick another name, go to the
                     # start of the loop
 
         # Put the fields in the queue to be uploaded
@@ -984,7 +984,7 @@ class uploader(threading.Thread):
         """Tagged the imag which has been moved to Commons for deletion."""
         if pywikibot.Page(pywikibot.Site('commons', 'commons'),
                           'File:' + filename).exists():
-            # Get a fresh copy, force to get the page so we dont run into edit
+            # Get a fresh copy, force to get the page so we don't run into edit
             # conflicts
             imtxt = imagepage.get(force=True)
 

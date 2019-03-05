@@ -44,7 +44,7 @@ Commandline parameters
 
 """
 #
-# (C) Pywikibot team, 2011-2018
+# (C) Pywikibot team, 2011-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -166,7 +166,7 @@ class PatrolBot(SingleSiteBot):
             self.whitelist_ts = whitelist_page.editTime()
             self.whitelist_load_ts = time.time()
         except Exception as e:
-            # cascade if there isnt a whitelist to fallback on
+            # cascade if there isn't a whitelist to fallback on
             if not self.whitelist:
                 raise
             pywikibot.error('{0}'.format(e))
@@ -221,7 +221,7 @@ class PatrolBot(SingleSiteBot):
                 obj = pywikibot.Link(node.title, self.site)
                 if obj.namespace == -1:
                     # the parser accepts 'special:prefixindex/' as a wildcard
-                    # this allows a prefix that doesnt match an existing page
+                    # this allows a prefix that doesn't match an existing page
                     # to be a blue link, and can be clicked to see what pages
                     # will be included in the whitelist
                     name, sep, prefix = obj.title.partition('/')
@@ -299,7 +299,7 @@ class PatrolBot(SingleSiteBot):
         try:
             # page: title, date, username, comment, loginfo, rcid, token
             username = page['user']
-            # when the feed isnt from the API, it used to contain
+            # when the feed isn't from the API, it used to contain
             # '(not yet written)' or '(page does not exist)' when it was
             # a redlink
             rcid = page['rcid']

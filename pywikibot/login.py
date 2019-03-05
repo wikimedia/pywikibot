@@ -3,7 +3,7 @@
 """Library to log the bot in to a wiki account."""
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -127,7 +127,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         Check that the username exists on the site.
 
-        @raises NoUsername: Username doesnt exist in user list.
+        @raises NoUsername: Username doesn't exist in user list.
         """
         # convert any Special:BotPassword usernames to main account equivalent
         main_username = self.username

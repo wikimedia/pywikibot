@@ -400,7 +400,7 @@ def py2_encode_utf_8(func):
 class classproperty(object):  # noqa: N801
 
     """
-    Descriptor class to accesss a class method as a property.
+    Descriptor class to access a class method as a property.
 
     This class may be used as a decorator::
 
@@ -1176,7 +1176,7 @@ class EmptyDefault(str, Mapping):
     A default for a not existing siteinfo property.
 
     It should be chosen if there is no better default known. It acts like an
-    empty collections, so it can be iterated through it savely if treated as a
+    empty collections, so it can be iterated through it safely if treated as a
     list, tuple, set or dictionary. It is also basically an empty string.
 
     Accessing a value via __getitem__ will result in an combined KeyError and

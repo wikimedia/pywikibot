@@ -951,7 +951,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Return True if this is a disambiguation page, False otherwise.
 
         By default, it uses the the Disambiguator extension's result. The
-        identification relies on the presense of the __DISAMBIG__ magic word
+        identification relies on the presence of the __DISAMBIG__ magic word
         which may also be transcluded.
 
         If the Disambiguator extension isn't activated for the given site,
@@ -1827,7 +1827,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
     @deprecated_args(limit='total')
     def getLatestEditors(self, total=1):
         """
-        Get a list of revision informations of the last total edits.
+        Get a list of revision information of the last total edits.
 
         DEPRECATED: Use Page.revisions.
 

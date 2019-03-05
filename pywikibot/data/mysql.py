@@ -46,7 +46,7 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
 
     @param query: MySQL query to execute
     @type query: str (unicode in py2)
-    @param params: input parametes for the query, if needed
+    @param params: input parameters for the query, if needed
         if list or tuple, %s shall be used as placeholder in the query string.
         if a dict, %(key)s shall be used as placeholder in the query string.
     @type params: tuple, list or dict of str (unicode in py2)

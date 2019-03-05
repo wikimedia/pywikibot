@@ -3570,7 +3570,7 @@ class TestProductionAndTestSite(AlteredDefaultSiteTestCase):
         self.assertEqual(site2.hostname(), 'test.wikidata.org')
         self.assertEqual(site2.code, 'test')
 
-        # Languages cant be used due to T71255
+        # Languages can't be used due to T71255
         self.assertRaises(pywikibot.UnknownSite,
                           pywikibot.Site, 'en', 'wikidata')
 

@@ -448,7 +448,7 @@ _MSGS = {
 
 class FilenameNotSet(pywikibot.Error):
 
-    """An exception indicating that a signature filename was not specifed."""
+    """An exception indicating that a signature filename was not specified."""
 
 
 class Global(object):
@@ -574,7 +574,7 @@ class WelcomeBot(object):
                     pywikibot.output("The whitelist's page doesn't exist!")
             else:
                 showStatus(4)
-                pywikibot.warning("The whitelist hasn't been setted!")
+                pywikibot.warning("The whitelist hasn't been set!")
 
             # Join the whitelist words.
             self._whitelist = list_white + whitelist_default
