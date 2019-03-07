@@ -38,7 +38,7 @@ This script understands the following command-line arguments:
 
 -skip[:#]           The bot skip the first [:#] images (default: 0)
 
--start[:#]          Use allpages() as generator
+-start[:#]          Use allimages() as generator
                     (it starts already from File:[:#])
 
 -cat[:#]            Use a category as generator
@@ -93,11 +93,12 @@ import time
 
 import pywikibot
 
-from pywikibot import i18n
-from pywikibot import pagegenerators as pg
-
+from pywikibot.bot import suggest_help
 from pywikibot.exceptions import ArgumentDeprecationWarning, NotEmailableError
 from pywikibot.family import Family
+from pywikibot import i18n
+from pywikibot import pagegenerators as pg
+from pywikibot.site import Namespace
 from pywikibot.tools import issue_deprecation_warning
 
 ###############################################################################
@@ -1528,9 +1529,12 @@ def main(*args):
     sendemailActive = False  # Use the send-email
     logFullError = True  # Raise an error when the log is full
     generator = None
+    unknown = []  # unknown parameters
 
-    # Here below there are the parameters.
-    for arg in pywikibot.handle_args(args):
+    local_args = pywikibot.handle_args(args)
+    site = pywikibot.Site()
+    # Here below there are the local parameters.
+    for arg in local_args:
         if arg.startswith('-limit'):
             if len(arg) == 6:
                 limit = int(pywikibot.input(
@@ -1597,9 +1601,11 @@ def main(*args):
                     'From which page do you want to start?')
             elif len(arg) > 6:
                 firstPageTitle = arg[7:]
-            firstPageTitle = firstPageTitle.split(':')[1:]
-            generator = pywikibot.Site().allpages(start=firstPageTitle,
-                                                  namespace=6)
+            namespaces = tuple(ns + ':'
+                               for ns in site.namespace(Namespace.FILE, all))
+            if firstPageTitle.startswith(namespaces):
+                firstPageTitle = firstPageTitle.split(':')[1]
+            generator = site.allimages(start=firstPageTitle)
             repeat = False
         elif arg.startswith('-page'):
             if len(arg) == 5:
@@ -1631,7 +1637,7 @@ def main(*args):
                 catName = str(pywikibot.input('In which category do I work?'))
             elif len(arg) > 4:
                 catName = str(arg[5:])
-            catSelected = pywikibot.Category(pywikibot.Site(),
+            catSelected = pywikibot.Category(site,
                                              'Category:{}'.format(catName))
             generator = catSelected.articles(namespaces=[6])
             repeat = False
@@ -1641,23 +1647,28 @@ def main(*args):
                     'The references of what page should I parse?'))
             elif len(arg) > 4:
                 refName = str(arg[5:])
-            ref = pywikibot.Page(pywikibot.Site(), refName)
+            ref = pywikibot.Page(site, refName)
             generator = ref.getReferences(namespaces=[6])
             repeat = False
+        else:
+            unknown.append(arg)
 
     if not generator:
         normal = True
 
-    site = pywikibot.Site()
     skip = skip_number > 0
 
-    # A little block-statement to ensure that the bot will not start with
-    # en-parameters
+    # Ensure that the bot is localized and right command args are given
     if site.code not in project_inserted:
-        pywikibot.output('Your project is not supported by this script.\n'
-                         'To allow your project in the script you have to '
-                         'add a localization into the script and add your '
-                         'project to the "project_inserted" list!')
+        additional_text = ('Your project is not supported by this script.\n'
+                           'To allow your project in the script you have to '
+                           'add a localization into the script and add your '
+                           'project to the "project_inserted" list!')
+    else:
+        additional_text = ''
+    if unknown or additional_text:
+        suggest_help(unknown_parameters=unknown,
+                     additional_text=additional_text)
         return False
 
     # Reading the log of the new images if another generator is not given.
@@ -1716,6 +1727,7 @@ def main(*args):
             pywikibot.sleep(time_sleep)
         else:
             break
+    return True
 
 
 if __name__ == '__main__':
