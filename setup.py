@@ -110,6 +110,10 @@ if PY2:
     # ipaddr 2.1.10+ is distributed with Debian and Fedora. See T105443.
     dependencies.append('ipaddr>=2.1.10')
 
+    # version.package_version() uses pathlib which is a python 3 library.
+    # pathlib2 is required for python 2.7
+    dependencies.append('pathlib2')
+
     if (2, 7, 6) < PYTHON_VERSION < (2, 7, 9):
         # Python versions before 2.7.9 will cause urllib3 to trigger
         # InsecurePlatformWarning warnings for all HTTPS requests. By
