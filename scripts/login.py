@@ -56,7 +56,7 @@ subdirectory.
 """
 #
 # (C) Rob W.W. Hooft, 2003
-# (C) Pywikibot team, 2003-2018
+# (C) Pywikibot team, 2003-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -151,9 +151,8 @@ def main(*args):
         else:
             unknown_args += [arg]
 
-    if unknown_args:
-        pywikibot.bot.suggest_help(unknown_parameters=unknown_args)
-        return False
+    if pywikibot.bot.suggest_help(unknown_parameters=unknown_args):
+        return
 
     if password is not None:
         pywikibot.warning('The -pass argument is not implemented yet. See: '

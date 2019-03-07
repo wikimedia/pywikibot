@@ -159,14 +159,14 @@ def main(*args):
     # index is mandatory.
     if not index:
         pywikibot.bot.suggest_help(missing_parameters=['-index'])
-        return False
+        return
 
     # If djvu_path is not a file, build djvu_path from dir+index.
     djvu_path = os.path.expanduser(djvu_path)
     djvu_path = os.path.abspath(djvu_path)
     if not os.path.exists(djvu_path):
         pywikibot.error('No such file or directory: ' + djvu_path)
-        return False
+        return
     if os.path.isdir(djvu_path):
         djvu_path = os.path.join(djvu_path, index)
 
@@ -176,7 +176,7 @@ def main(*args):
     if not djvu.has_text():
         pywikibot.error('No text layer in djvu file {}'
                         .format(djvu.file_djvu))
-        return False
+        return
 
     # Parse pages param.
     pages = pages.split(',')
@@ -193,7 +193,7 @@ def main(*args):
     if not site.has_extension('ProofreadPage'):
         pywikibot.error('Site {} must have ProofreadPage extension.'
                         .format(site))
-        return False
+        return
 
     index_page = pywikibot.Page(site, index, ns=site.proofread_index_ns)
 

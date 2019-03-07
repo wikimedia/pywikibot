@@ -357,6 +357,7 @@ def main(*args):
     except BaseException:
         bot.t.cancel()
         raise
+    return True
 
 
 if __name__ == '__main__':

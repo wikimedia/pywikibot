@@ -814,13 +814,12 @@ def main(*args):
         generator = gen_factory.getCombinedGenerator()
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
     if not gen_factory.nopreload:
         generator = pagegenerators.PreloadingGenerator(generator)
     generator = pagegenerators.RedirectFilterPageGenerator(generator)
     bot = ReferencesRobot(generator, **options)
     bot.run()
-    return True
 
 
 if __name__ == '__main__':

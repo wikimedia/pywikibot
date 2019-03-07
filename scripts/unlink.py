@@ -88,10 +88,8 @@ def main(*args):
         page = pywikibot.Page(pywikibot.Site(), page_title)
         bot = UnlinkBot(page, **options)
         bot.run()
-        return True
     else:
         pywikibot.bot.suggest_help(missing_parameters=['page title'])
-        return False
 
 
 if __name__ == '__main__':

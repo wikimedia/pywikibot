@@ -1554,10 +1554,8 @@ def main(*args):
         finally:
             if cat_db:
                 cat_db.dump()
-        return True
     else:
         suggest_help(missing_action=True, unknown_parameters=unknown)
-        return False
 
 
 if __name__ == '__main__':

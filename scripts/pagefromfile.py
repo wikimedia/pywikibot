@@ -62,7 +62,7 @@ can be added between them by specifying '\n' as a value.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -344,7 +344,6 @@ def main(*args):
     # or User quit.
     if failed_filename:
         pywikibot.bot.suggest_help(missing_parameters=['-file'])
-        return False
     else:
         reader = PageFromFileReader(filename, **r_options)
         bot = PageFromFileRobot(generator=reader, **options)

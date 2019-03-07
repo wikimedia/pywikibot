@@ -161,10 +161,8 @@ def main(*args):
         bot = ImageRobot(preloading_gen, old_image, new_image,
                          site=site, **options)
         bot.run()
-        return True
     else:
         pywikibot.bot.suggest_help(missing_parameters=['old image'])
-        return False
 
 
 if __name__ == '__main__':

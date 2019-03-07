@@ -175,7 +175,7 @@ def main(*args):
 
     if not operation:
         pywikibot.bot.suggest_help(missing_parameters=['operation'])
-        return False
+        return
 
     robot = TemplateCountRobot()
     if not args_list:

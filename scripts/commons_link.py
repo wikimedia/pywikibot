@@ -138,14 +138,12 @@ def main(*args):
             gen_factory.handleArg(arg)
 
     gen = gen_factory.getCombinedGenerator(preload=True)
-    if 'action' in options and gen:
-        bot = CommonsLinkBot(gen, **options)
-        bot.run()
-        return True
+    if pywikibot.bot.suggest_help(missing_action='action' not in options,
+                                  missing_generator=not gen):
+        return
 
-    pywikibot.bot.suggest_help(missing_action='action' not in options,
-                               missing_generator=not gen)
-    return False
+    bot = CommonsLinkBot(gen, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

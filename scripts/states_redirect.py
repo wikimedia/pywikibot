@@ -17,7 +17,7 @@ PRE-REQUISITE : Need to install python-pycountry library.
 """
 #
 # (C) Andre Engels, 2004
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -139,9 +139,8 @@ def main(*args):
     else:
         missing_dependencies = None
 
-    if missing_dependencies or unknown_parameters:
-        suggest_help(unknown_parameters=unknown_parameters,
-                     missing_dependencies=missing_dependencies)
+    if suggest_help(unknown_parameters=unknown_parameters,
+                    missing_dependencies=missing_dependencies):
         return
 
     bot = StatesRedirectBot(start, force)

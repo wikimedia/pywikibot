@@ -168,10 +168,8 @@ def main(*args):
         # pass generator and private options to the bot
         bot = BasicBot(gen, **options)
         bot.run()  # guess what it does
-        return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

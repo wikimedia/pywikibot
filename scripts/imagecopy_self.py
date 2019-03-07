@@ -56,6 +56,7 @@ import threading
 import webbrowser
 
 from datetime import datetime
+from textwrap import fill
 
 import pywikibot
 
@@ -1045,18 +1046,16 @@ def main(*args):
             genFactory.handleArg(arg)
 
     pregenerator = genFactory.getCombinedGenerator(preload=True)
-    if not pregenerator:
-        pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+    additional_text = ('' if supportedSite()
+                       else 'Sorry, this site is not supported (yet).')
+    if pywikibot.bot.suggest_help(missing_generator=not pregenerator,
+                                  additional_text=additional_text):
+        return
 
-    if not supportedSite():
-        pywikibot.output('Sorry, this site is not supported (yet).')
-        return False
-
-    pywikibot.warning('This is an experimental bot')
-    pywikibot.warning('It will only work on self published work images')
-    pywikibot.warning('This bot is still full of bugs')
-    pywikibot.warning('Use at your own risk!')
+    pywikibot.warning(fill('This is an experimental bot. '
+                           'It will only work on self published work images. '
+                           'This bot is still full of bugs. '
+                           'Use at your own risk!'))
 
     prefetchQueue = Queue(maxsize=50)
     uploadQueue = Queue(maxsize=200)

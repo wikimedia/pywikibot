@@ -246,10 +246,8 @@ def main(*args):
                 'Enter a reason for the protection change:')
         bot = ProtectionRobot(generator, combined_protections, site, **options)
         bot.run()
-        return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

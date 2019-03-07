@@ -171,10 +171,9 @@ def main(*args):
     missing_dependencies = ('Pillow',) if isinstance(
         Image, ImportError) else None
 
-    if additional_text or missing_dependencies:
-        suggest_help(missing_dependencies=missing_dependencies,
-                     additional_text=additional_text)
-        return False
+    if suggest_help(missing_dependencies=missing_dependencies,
+                    additional_text=additional_text):
+        return
 
     imagePageA = pywikibot.page.FilePage(pywikibot.Site(),
                                          images[0])

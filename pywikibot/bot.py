@@ -1081,6 +1081,8 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     @param missing_dependencies: A list of dependencies which can not
         be imported.
     @type missing_dependencies: list of str
+    @return: True if an error message was printed, False otherwise
+    @rtype: bool
     """
     messages = []
     if exception:
@@ -1108,6 +1110,8 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     if messages:
         messages.append('Use -help for further information.')
         error('\n'.join(messages))
+        return True
+    return False
 
 
 def writeToCommandLogFile():

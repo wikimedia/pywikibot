@@ -326,7 +326,7 @@ def main(*args):
         pywikibot.bot.suggest_help(
             missing_parameters=['page'],
             additional_text='and no other generator was defined.')
-        return False
+        return
 
     site = pywikibot.Site()
     if not targetLang and not targetFamily:

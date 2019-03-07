@@ -1044,10 +1044,8 @@ def main(*args):
                     bot.history.reportThread.kill()
             pywikibot.output('Saving history...')
             bot.history.save()
-        return True
     else:
         suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

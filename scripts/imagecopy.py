@@ -518,7 +518,7 @@ def main(*args):
     pregenerator = genFactory.getCombinedGenerator(preload=True)
     if not pregenerator:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
 
     load_global_archivo()
 

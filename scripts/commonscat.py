@@ -525,10 +525,8 @@ def main(*args):
             generator = pagegenerators.PreloadingGenerator(generator)
         bot = CommonscatBot(generator=generator, **options)
         bot.run()
-        return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

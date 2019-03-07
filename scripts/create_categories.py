@@ -128,14 +128,12 @@ def main(*args):
                if arg not in options]
 
     generator = gen_factory.getCombinedGenerator()
-    if generator and not missing:
-        bot = CreateCategoriesBot(generator=generator, **options)
-        bot.run()
-        return True
-    else:
-        pywikibot.bot.suggest_help(missing_parameters=missing,
-                                   missing_generator=not generator)
-        return False
+    if pywikibot.bot.suggest_help(missing_parameters=missing,
+                                  missing_generator=not generator):
+        return
+
+    bot = CreateCategoriesBot(generator=generator, **options)
+    bot.run()
 
 
 if __name__ == '__main__':

@@ -578,10 +578,8 @@ WHERE old_text LIKE '%<table%'
             gen = pagegenerators.PreloadingGenerator(gen)
         bot = Table2WikiRobot(generator=gen, **options)
         bot.run()
-        return True
     else:
         suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

@@ -96,11 +96,10 @@ def main(*args):
     gen = gen_factory.getCombinedGenerator(preload=True)
     if not gen:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
 
     bot = SelflinkBot(gen, **bot_args)
     bot.run()
-    return True
 
 
 if __name__ == '__main__':

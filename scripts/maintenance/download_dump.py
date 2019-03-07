@@ -235,18 +235,15 @@ def main(*args):
     if 'filename' not in opts:
         missing += ['-filename']
 
-    if missing or unknown_args:
-        pywikibot.bot.suggest_help(missing_parameters=missing,
-                                   unknown_parameters=unknown_args)
-        return 1
+    if pywikibot.bot.suggest_help(missing_parameters=missing,
+                                  unknown_parameters=unknown_args):
+        return
 
     site = pywikibot.Site()
     opts['wikiname'] = site.dbName()
 
     bot = DownloadDumpBot(**opts)
     bot.run()
-
-    return 0
 
 
 if __name__ == '__main__':

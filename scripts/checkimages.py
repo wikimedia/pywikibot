@@ -1673,9 +1673,8 @@ def main(*args):
                            'project to the "project_inserted" list!')
     else:
         additional_text = ''
-    if unknown or additional_text:
-        suggest_help(unknown_parameters=unknown,
-                     additional_text=additional_text)
+    if suggest_help(unknown_parameters=unknown,
+                    additional_text=additional_text):
         return False
 
     # Reading the log of the new images if another generator is not given.

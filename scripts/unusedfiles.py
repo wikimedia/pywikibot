@@ -149,9 +149,6 @@ def main(*args):
         bot.run()
     except pywikibot.Error as e:
         pywikibot.bot.suggest_help(exception=e)
-        return False
-    else:
-        return True
 
 
 if __name__ == '__main__':

@@ -1193,7 +1193,7 @@ LIMIT 200""" % (whereClause, exceptClause)
 
     if not gen:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
 
     bot = ReplaceRobot(gen, replacements, exceptions,
                        allowoverlap, recursive, add_cat, sleep, edit_summary,

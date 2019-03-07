@@ -247,24 +247,24 @@ def main(*args):
     # index is mandatory.
     if not index:
         pywikibot.bot.suggest_help(missing_parameters=['-index'])
-        return False
+        return
 
     # '-force' can be used with '-ocr' only.
     if 'force' in options and 'ocr' not in options:
         pywikibot.error("'-force' can be used with '-ocr' option only.")
-        return False
+        return
 
     site = pywikibot.Site()
     if not site.has_extension('ProofreadPage'):
         pywikibot.error('Site {} must have ProofreadPage extension.'
                         .format(site))
-        return False
+        return
 
     index = IndexPage(site, index)
 
     if not index.exists():
         pywikibot.error("Page {} doesn't exist.".format(index))
-        return False
+        return
 
     # Parse pages param.
     # Create a list of (start, end) tuples.

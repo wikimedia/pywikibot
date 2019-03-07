@@ -763,7 +763,7 @@ def main(*args):
     if calc:
         if not salt:
             pywikibot.bot.suggest_help(missing_parameters=['-salt'])
-            return False
+            return
         page = pywikibot.Page(site, calc)
         if page.exists():
             calc = page.title()
@@ -777,7 +777,7 @@ def main(*args):
     if not templates:
         pywikibot.bot.suggest_help(
             additional_text='No template was specified.')
-        return False
+        return
 
     for template_name in templates:
         pagelist = []

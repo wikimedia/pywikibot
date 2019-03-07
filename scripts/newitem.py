@@ -153,7 +153,7 @@ def main(*args):
     generator = gen.getCombinedGenerator(preload=True)
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
 
     bot = NewItemRobot(generator, **options)
     user = pywikibot.User(bot.site, bot.site.username())
@@ -168,7 +168,6 @@ def main(*args):
             .format(user.username, bot.site.sitename)))
         bot.options['touch'] = False
     bot.run()
-    return True
 
 
 if __name__ == '__main__':

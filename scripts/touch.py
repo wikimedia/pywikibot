@@ -122,10 +122,8 @@ def main(*args):
         bot = bot_class(generator=gen, **options)
         pywikibot.Site().login()
         bot.run()
-        return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

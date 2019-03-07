@@ -1292,7 +1292,7 @@ def main(*args):
 
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
 
     site.login()
 

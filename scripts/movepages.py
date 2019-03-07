@@ -258,13 +258,8 @@ def main(*args):
     if gen:
         bot = MovePagesBot(gen, **options)
         bot.run()
-        return True
-
-    if not fromToPairs:
+    elif not fromToPairs:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
-    else:
-        return True
 
 
 if __name__ == '__main__':

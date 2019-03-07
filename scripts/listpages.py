@@ -277,10 +277,8 @@ def main(*args):
             page_target.save(summary=summary)
         pywikibot.stdout(text)
         pywikibot.output('{0} page(s) found'.format(i))
-        return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

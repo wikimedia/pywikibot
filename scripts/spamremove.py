@@ -146,7 +146,7 @@ def main(*args):
 
     if not spam_external_url:
         pywikibot.bot.suggest_help(missing_parameters=['spam site'])
-        return False
+        return
 
     link_search = pagegenerators.LinksearchPageGenerator(spam_external_url,
                                                          protocol=protocol)

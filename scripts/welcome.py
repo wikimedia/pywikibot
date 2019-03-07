@@ -1026,7 +1026,7 @@ def main(*args):
     except KeyError as error:
         # site not managed by welcome.py
         pywikibot.bot.suggest_help(exception=error)
-        return False
+        return
 
     try:
         bot.run()

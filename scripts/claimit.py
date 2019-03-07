@@ -155,11 +155,10 @@ def main(*args):
     generator = gen.getCombinedGenerator()
     if not generator:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
+        return
 
     bot = ClaimRobot(generator, claims, exists_arg)
     bot.run()
-    return True
 
 
 if __name__ == '__main__':

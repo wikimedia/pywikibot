@@ -29,7 +29,7 @@ For further information see pywikibot/cosmetic_changes.py
 """
 #
 # (C) xqt, 2009-2018
-# (C) Pywikibot team, 2006-2018
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -130,10 +130,8 @@ def main(*args):
             site.login()
             bot = CosmeticChangesBot(gen, **options)
             bot.run()
-        return True
     else:
         pywikibot.bot.suggest_help(missing_generator=True)
-        return False
 
 
 if __name__ == '__main__':

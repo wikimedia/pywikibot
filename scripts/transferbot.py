@@ -103,10 +103,9 @@ def main(*args):
 
     gen = gen_factory.getCombinedGenerator()
 
-    suggest_help(missing_generator=not gen,
-                 additional_text=additional_text,
-                 unknown_parameters=unknown_args)
-    if additional_text or not gen or unknown_args:
+    if suggest_help(missing_generator=not gen,
+                    additional_text=additional_text,
+                    unknown_parameters=unknown_args):
         return
 
     gen_args = ' '.join(gen_args)

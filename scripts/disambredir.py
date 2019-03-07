@@ -77,7 +77,7 @@ def main(*args):
         mysite.disambcategory()
     except pywikibot.Error as e:
         pywikibot.bot.suggest_help(exception=e)
-        return False
+        return
 
     generator = pagegenerators.CategorizedPageGenerator(
         mysite.disambcategory(), start=start, content=True, namespaces=[0])
