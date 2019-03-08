@@ -1582,7 +1582,7 @@ class EventStreamsPageGeneratorTestCase(RecentChangesTestCase):
         self.assertEqual(rcinfo['server_name'], site.hostname())
         self.assertEqual(rcinfo['wiki'], site.dbName())
 
-        for key in ['id', 'type', 'namespace', 'title', 'comment',
+        for key in ['type', 'namespace', 'title', 'comment',
                     'timestamp', 'user', 'bot']:
             self.assertIn(key, rcinfo.keys())
 
