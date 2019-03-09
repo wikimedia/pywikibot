@@ -16,6 +16,7 @@ search paths so the package does not need to be installed, etc.
 from __future__ import (absolute_import, division,
                         print_function, unicode_literals)
 
+from difflib import get_close_matches
 from importlib import import_module
 import os
 import sys
@@ -195,6 +196,23 @@ def main():
             else:
                 print('ERROR: {} not found! Misspelling?'.format(filename),
                       file=sys.stderr)
+
+                scripts = []
+                for file_package in script_paths:
+                    path = file_package.split('.')
+                    for script_name in os.listdir(os.path.join(*path)):
+                        if script_name.endswith('.py'):
+                            scripts.append(script_name)
+
+                similar_scripts = get_close_matches(filename, scripts,
+                                                    n=10, cutoff=0.7)
+
+                if similar_scripts:
+                    print(
+                        '\nThe most similar {}:'
+                        .format('script is' if len(similar_scripts) == 1
+                                else 'scripts are'))
+                    print('\t' + '\n\t'.join(similar_scripts))
                 return True
 
         # When both pwb.py and the filename to run are within the current
