@@ -110,7 +110,8 @@ content = {
     'simple': '{{subst:/Text}}',
     'sco': '{{subst:Saundbox}}',
     'shn': '{{subst:Sandbox reset}}',
-    'sr': '{{песак}}\n<!-- Молимо, испробавајте испод ове линије. Хвала. -->',
+    'sr': '{{песак}}\n'
+          '<!-- Молимо, увежбавајте уређивање испод ове линије. Хвала. -->',
     'sv': '{{subst:Sandlådan}}',
     'th': '{{กระบะทราย}}\n<!-- กรุณาอย่าแก้ไขบรรทัดนี้ ขอบคุณครับ/ค่ะ -- '
           'Please leave this line as they are. Thank you! -->',
