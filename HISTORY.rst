@@ -4,6 +4,8 @@ Release history
 Current release
 ---------------
 
+* pagengenerators.py no more support 'oursql' or 'MySQLdb'. It now solely
+  support PyMySQL https://pypi.org/project/PyMySQL/ (T243154, T89976)
 * Bugfixes and improvements
 * Localisation updates
 

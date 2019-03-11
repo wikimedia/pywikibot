@@ -9,21 +9,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 
-# Requires PyMySql as first choice or
-# MySQLdb <https://sourceforge.net/projects/mysql-python/>
 try:
-    import pymysql as mysqldb
+    import pymysql
 except ImportError:
-    try:
-        import MySQLdb as mysqldb  # noqa: N813
-    except ImportError:
-        raise ImportError('No supported MySQL library installed. '
-                          'Please install PyMySQL.')
-    else:
-        pywikibot.warning("PyMySQL not found. It'll fallback "
-                          'on the deprecated library MySQLdb.')
-else:
-    mysqldb.install_as_MySQLdb()
+    raise ImportError('MySQL python module not found. Please install PyMySQL.')
+
 
 from pywikibot import config2 as config
 from pywikibot.tools import deprecated_args, UnicodeType
@@ -67,7 +57,7 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
     else:
         credentials = {'read_default_file': config.db_connect_file}
 
-    conn = mysqldb.connect(config.db_hostname,
+    conn = pymysql.connect(config.db_hostname,
                            db=config.db_name_format.format(dbname),
                            port=config.db_port,
                            charset='utf8',
@@ -76,14 +66,7 @@ def mysql_query(query, params=None, dbname=None, verbose=None):
     cursor = conn.cursor()
 
     if verbose:
-        try:
-            _query = cursor.mogrify(query, params)
-        except AttributeError:  # if MySQLdb is used.
-            # Not exactly the same encoding handling as cursor.execute()
-            # Here it is just for the sake of verbose.
-            _query = query
-            if params is not None:
-                _query = query.format(params)
+        _query = cursor.mogrify(query, params)
 
         if not isinstance(_query, UnicodeType):
             _query = UnicodeType(_query, encoding='utf-8')
