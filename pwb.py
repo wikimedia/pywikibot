@@ -168,6 +168,42 @@ except RuntimeError:
         sys.exit(1)
 
 
+def find_alternates(filename, script_paths):
+    """Search for similar filenames in the given script paths."""
+    from pywikibot import input_choice
+    from pywikibot.bot import ShowingListOption, QuitKeyboardInterrupt
+
+    print('ERROR: {} not found! Misspelling?'.format(filename),
+          file=sys.stderr)
+
+    scripts = {}
+    for file_package in script_paths:
+        path = file_package.split('.')
+        for script_name in os.listdir(os.path.join(*path)):
+            # remove .py for better matching
+            name, _, suffix = script_name.rpartition('.')
+            if suffix == 'py' and not name.startswith('__'):
+                scripts[name] = os.path.join(*(path + [script_name]))
+
+    filename = filename[:-3]
+    similar_scripts = get_close_matches(filename, scripts, n=10, cutoff=0.7)
+    if not similar_scripts:
+        return None
+
+    msg = '\nThe most similar script{}:'.format(
+        ' is' if len(similar_scripts) == 1 else 's are')
+    alternatives = ShowingListOption(similar_scripts, pre=msg, post='')
+
+    try:
+        prefix, script = input_choice('Which script to be run:',
+                                      alternatives, default='1')
+    except QuitKeyboardInterrupt:
+        return None
+
+    print()
+    return scripts[script[0]]
+
+
 def find_filename(filename):
     """Search for the filename in the given script paths."""
     from pywikibot import config
@@ -191,27 +227,7 @@ def find_filename(filename):
             filename = testpath
             break
     else:
-        print('ERROR: {} not found! Misspelling?'.format(filename),
-              file=sys.stderr)
-
-        scripts = {}
-        for file_package in script_paths:
-            path = file_package.split('.')
-            for script_name in os.listdir(os.path.join(*path)):
-                if (script_name.endswith('.py')
-                        and not script_name.startswith('__')):
-                    # remove .py for better matching
-                    scripts[script_name[:-3]] = os.path.join(
-                        *(path + [script_name]))
-
-        similar_scripts = get_close_matches(filename[:-3], scripts,
-                                            n=10, cutoff=0.7)
-        if similar_scripts:
-            print('\nThe most similar script{}:'
-                  .format(' is' if len(similar_scripts) == 1
-                          else 's are'))
-            print('\t' + '.py\n\t'.join(similar_scripts) + '.py')
-        return None
+        filename = find_alternates(filename, script_paths)
     return filename
 
 
