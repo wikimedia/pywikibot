@@ -73,7 +73,6 @@ if PY2:
     # Additional core library dependencies which are only available on Python 2
     extra_deps.update({
         'csv': ['unicodecsv'],
-        'MySQL': ['oursql'],
     })
 
 script_deps = {
@@ -153,8 +152,6 @@ extra_deps.update(script_deps)
 # so all scripts can be compiled for script_tests, etc.
 if 'PYSETUP_TEST_EXTRAS' in os.environ:
     test_deps += [i for k, v in extra_deps.items() if k != 'flake8' for i in v]
-    if 'oursql' in test_deps and os.name == 'nt':
-        test_deps.remove('oursql')  # depends on Cython
 
     if 'requests[security]' in test_deps:
         # Bug T105767 on Python 2.7 release 9+
