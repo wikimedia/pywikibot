@@ -723,8 +723,8 @@ class CosmeticChangesToolkit(object):
         front of a percent sign, so it is no longer required to place it
         manually.
         """
-        text = textlib.replaceExcept(text, r'(\d)&nbsp;%', r'\1 %',
-                                     ['timeline'])
+        text = textlib.replaceExcept(
+            text, r'(\d)&(?:nbsp|#160|#x[Aa]0);%', r'\1 %', ['timeline'])
         return text
 
     def cleanUpSectionHeaders(self, text):
