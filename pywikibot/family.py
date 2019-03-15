@@ -1382,7 +1382,7 @@ class Family(object):
 
     def code2encodings(self, code):
         """Return list of historical encodings for a specific language Wiki."""
-        return self.code2encoding(code),
+        return (self.code2encoding(code), )
 
     # aliases
     def encoding(self, code):

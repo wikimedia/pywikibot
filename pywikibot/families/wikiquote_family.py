@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Wikiquote."""
 #
-# (C) Pywikibot team, 2005-2018
+# (C) Pywikibot team, 2005-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -79,4 +79,4 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
             return 'utf-8', 'iso8859-2'
         if code == 'ru':
             return 'utf-8', 'iso8859-5'
-        return self.code2encoding(code),
+        return (self.code2encoding(code), )
