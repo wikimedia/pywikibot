@@ -2754,7 +2754,7 @@ def MySQLPageGenerator(query, site=None, verbose=None):
 
         SELECT
          page_namespace,
-         page_title,
+         page_title
         FROM page
         WHERE page_namespace = 0;
 
@@ -2766,7 +2766,7 @@ def MySQLPageGenerator(query, site=None, verbose=None):
     @param verbose: if True, print query to be executed;
         if None, config.verbose_output will be used.
     @type verbose: None or bool
-    @return: generator which yield pywikibot.Page
+    @return: generator which yields pywikibot.Page
     """
     from pywikibot.data import mysql
 
