@@ -206,6 +206,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'fa': ('ویرایش',),
         'fr': ('En cours', 'Plusieurs en cours', 'Correction en cours',
                'Inuse', 'Remix',),
+        'he': ('בעבודה',),
         'hr': ('Radovi',),
         'sr': ('Радови у току', 'Рут',),
         'ur': ('زیر ترمیم',),
