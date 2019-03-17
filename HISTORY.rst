@@ -4,6 +4,11 @@ Release history
 Current release
 ---------------
 
+* Remove deprecated ez_setup.py
+* Changed requirements for sseclient (T219024)
+* Set optional parameter namespace to None in site.logpages (T217664)
+* Add ability to display similar scripts when misspelled (T217195)
+* Check if QueryGenerator supports namespaces (T198452)
 * Bugfixes and improvements
 * Localisation updates
 
@@ -11,7 +16,7 @@ Current release
 ------------
 * Fix version comparison (T164163)
 * Remove pre MediaWiki 1.14 code
-* Dropped support for py2.7.2 and py2.7.3 (T191192)
+* Dropped support for Python 2.7.2 and 2.7.3 (T191192)
 * Fix header regex beginning with a comment (T209712)
 * Implement Claim.__eq__ (T76615)
 * cleanup config2.py
