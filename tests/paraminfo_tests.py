@@ -239,7 +239,9 @@ class WikibaseKnownTypesTests(KnownTypesTestBase,
     def test_datatypes(self):
         """Test that all encountered datatypes are known."""
         unsupported = {
-            'wikibase-form', 'wikibase-lexeme', 'wikibase-sense'}  # T194890
+            'wikibase-form', 'wikibase-lexeme', 'wikibase-sense',  # T194890
+            'musical-notation',  # T218506
+        }
         known = set(Property.types) | unsupported
         self._check_param_superset(
             self.repo, 'wbformatvalue', 'datatype', known)
