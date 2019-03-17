@@ -14,10 +14,10 @@ in pagegenerators which will use i18 messages if they can be loaded.
 The default message location may be changed by calling
 L{set_message_package} with a package name. The package must contain
 an __init__.py, and a message bundle called 'pywikibot' containing
-messages. See L{twntranslate} for more information on the messages.
+messages. See L{twtranslate} for more information on the messages.
 """
 #
-# (C) Pywikibot team, 2004-2018
+# (C) Pywikibot team, 2004-2019
 #
 # Distributed under the terms of the MIT license.
 #
