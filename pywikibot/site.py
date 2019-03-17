@@ -2375,6 +2375,8 @@ class APISite(BaseSite):
 
         The returned dict uses each key to store the associated message.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Allmessages}
+
         @param keys: MediaWiki messages to fetch
         @type keys: set of str, '*' or ['*']
 
@@ -2979,7 +2981,10 @@ class APISite(BaseSite):
             api.update_page(page, pageitem, query.props)
 
     def loadpageinfo(self, page, preload=False):
-        """Load page info from api and store in page attributes."""
+        """Load page info from api and store in page attributes.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Info}
+        """
         title = page.title(with_section=False)
         inprop = 'protection'
         if preload:
@@ -3127,6 +3132,8 @@ class APISite(BaseSite):
         Load Flow-related information about a given page.
 
         Assumes that the Flow extension is installed.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Flowinfo}
 
         @raises APIError: Flow extension is not installed
         """
@@ -3491,6 +3498,8 @@ class APISite(BaseSite):
              For v1.17-19, the patrol token must be obtained from the query
              list recentchanges.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Tokens}
+
         @param types: the types of token (e.g., "edit", "move", "delete");
             see API documentation for full list of types
         @type types: iterable
@@ -3625,6 +3634,8 @@ class APISite(BaseSite):
     ):
         """Iterate all pages that link to the given page.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Backlinks}
+
         @param page: The Page to get links to.
         @param follow_redirects: Also return links to redirects pointing to
             the given page.
@@ -3684,6 +3695,8 @@ class APISite(BaseSite):
     def page_embeddedin(self, page, filter_redirects=None, namespaces=None,
                         total=None, content=False):
         """Iterate all pages that embedded the given page as a template.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Embeddedin}
 
         @param page: The Page to get inclusions for.
         @param filter_redirects: If True, only return redirects that embed
@@ -3752,6 +3765,8 @@ class APISite(BaseSite):
                   total=None, content=False):
         """Iterate internal wikilinks contained (or transcluded) on page.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Links}
+
         @param namespaces: Only iterate pages in these namespaces
             (default: all)
         @type namespaces: iterable of basestring or Namespace key,
@@ -3781,6 +3796,8 @@ class APISite(BaseSite):
     def pagecategories(self, page, total=None, content=False):
         """Iterate categories to which page belongs.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Categories}
+
         @param content: if True, load the current content of each iterated page
             (default False); note that this means the contents of the
             category description page, not the pages contained in the category
@@ -3799,6 +3816,8 @@ class APISite(BaseSite):
     def pageimages(self, page, total=None, content=False):
         """Iterate images used (not just linked) on the page.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Images}
+
         @param content: if True, load the current content of each iterated page
             (default False); note that this means the content of the image
             description page, not the image itself
@@ -3812,6 +3831,8 @@ class APISite(BaseSite):
     @deprecated_args(step=None)
     def pagetemplates(self, page, namespaces=None, total=None, content=False):
         """Iterate templates transcluded (not just linked) on the page.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Templates}
 
         @param namespaces: Only iterate pages in these namespaces
         @type namespaces: iterable of basestring or Namespace key,
@@ -3837,6 +3858,8 @@ class APISite(BaseSite):
                         startprefix=None, endprefix=None,
                         ):
         """Iterate members of specified category.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Categorymembers}
 
         @param category: The Category to iterate.
         @param namespaces: If present, only return category members from
@@ -4015,6 +4038,8 @@ class APISite(BaseSite):
         endid if both are specified; likewise, starttime must be greater
         than endtime. If rvdir is True, these relationships are reversed.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Revisions}
+
         @param page: retrieve revisions of this Page and hold the data.
         @type page: pywikibot.Page
         @param content: if True, retrieve the wiki-text of each revision;
@@ -4131,7 +4156,10 @@ class APISite(BaseSite):
 
     # TODO: expand support to other parameters of action=parse?
     def get_parsed_page(self, page):
-        """Retrieve parsed text of the page using action=parse."""
+        """Retrieve parsed text of the page using action=parse.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Parse}
+        """
         req = self._simple_request(action='parse', page=page)
         data = req.submit()
         assert 'parse' in data, "API parse response lacks 'parse' key"
@@ -4142,6 +4170,8 @@ class APISite(BaseSite):
     @deprecated_args(step=None)
     def pagelanglinks(self, page, total=None, include_obsolete=False):
         """Iterate all interlanguage links on page, yielding Link objects.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Langlinks}
 
         @param include_obsolete: if true, yield even Link objects whose
                                  site is obsolete
@@ -4167,7 +4197,10 @@ class APISite(BaseSite):
 
     @deprecated_args(step=None)
     def page_extlinks(self, page, total=None):
-        """Iterate all external links on page, yielding URL strings."""
+        """Iterate all external links on page, yielding URL strings.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Extlinks}
+        """
         eltitle = page.title(with_section=False)
         elquery = self._generator(api.PropertyGenerator, type_arg='extlinks',
                                   titles=eltitle.encode(self.encoding()),
@@ -4181,7 +4214,10 @@ class APISite(BaseSite):
                 yield linkdata['*']
 
     def getcategoryinfo(self, category):
-        """Retrieve data on contents of category."""
+        """Retrieve data on contents of category.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Categoryinfo}
+        """
         cititle = category.title(with_section=False)
         ciquery = self._generator(api.PropertyGenerator,
                                   type_arg='categoryinfo',
@@ -4205,6 +4241,8 @@ class APISite(BaseSite):
                  protect_type=None, protect_level=None, reverse=False,
                  total=None, content=False):
         """Iterate pages in a single namespace.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Allpages}
 
         @param start: Start at this title (page need not exist).
         @param prefix: Only yield pages starting with this string.
@@ -4295,6 +4333,8 @@ class APISite(BaseSite):
         been deleted may not have been removed from the links table, so this
         method can return false positives.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Alllinks}
+
         @param start: Start at this title (page need not exist).
         @param prefix: Only yield pages starting with this string.
         @param namespace: Iterate pages from this (single) namespace
@@ -4331,6 +4371,8 @@ class APISite(BaseSite):
         Iterator yields Category objects. Note that, in practice, links that
         were found on pages that have been deleted may not have been removed
         from the database table, so this method can return false positives.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Allcategories}
 
         @param start: Start at this category title (category need not exist).
         @param prefix: Only yield categories starting with this string.
@@ -4392,6 +4434,8 @@ class APISite(BaseSite):
         be a list of unicodes; all the other values are unicodes and should
         always be present.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Allusers}
+
         @param start: start at this username (name need not exist)
         @param prefix: only iterate usernames starting with this substring
         @param group: only iterate users that are members of this group
@@ -4413,6 +4457,8 @@ class APISite(BaseSite):
         """Iterate all images, ordered by image title.
 
         Yields FilePages, but these pages need not exist on the wiki.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Allimages}
 
         @param start: start at this title (name need not exist)
         @param prefix: only iterate titles starting with this substring
@@ -4517,6 +4563,8 @@ class APISite(BaseSite):
                     total=None, content=False):
         """Iterate Pages that contain links to the given URL.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Exturlusage}
+
         @param url: The URL to search for (without the protocol prefix);
             this may include a '*' as a wildcard, only at the start of the
             hostname
@@ -4532,6 +4580,8 @@ class APISite(BaseSite):
     def imageusage(self, image, namespaces=None, filterredir=None,
                    total=None, content=False):
         """Iterate Pages that contain links to the given FilePage.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Imageusage}
 
         @param image: the image to search for (FilePage need not exist on
             the wiki)
@@ -4566,6 +4616,8 @@ class APISite(BaseSite):
     def logevents(self, logtype=None, user=None, page=None, namespace=None,
                   start=None, end=None, reverse=False, tag=None, total=None):
         """Iterate all log entries.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Logevents}
 
         @note: logevents with logtype='block' only logs user blocks whereas
             site.blocks iterates all blocks including IP ranges.
@@ -4670,6 +4722,8 @@ class APISite(BaseSite):
                       total=None, user=None, excludeuser=None, tag=None):
         """Iterate recent changes.
 
+        @see: U{https://www.mediawiki.org/wiki/API:RecentChanges}
+
         @param start: Timestamp to start listing from
         @type start: pywikibot.Timestamp
         @param end: Timestamp to end listing at
@@ -4766,6 +4820,8 @@ class APISite(BaseSite):
         Note that this may include non-existing Pages if the wiki's database
         table contains outdated entries.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Search}
+
         @param searchstring: the text to search for
         @type searchstring: unicode
         @param where: Where to search; value must be "text", "title" or
@@ -4821,6 +4877,8 @@ class APISite(BaseSite):
         """Iterate contributions by a particular user.
 
         Iterated values are in the same format as recentchanges.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Usercontribs}
 
         @param user: Iterate contributions by this user (name or IP)
         @param userprefix: Iterate contributions by all users whose names
@@ -4878,6 +4936,8 @@ class APISite(BaseSite):
 
         Iterated values will be in same format as recentchanges.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Watchlist}
+
         @param start: Iterate revisions starting at this Timestamp
         @param end: Iterate revisions ending at this Timestamp
         @param reverse: Iterate oldest revisions first (default: newest)
@@ -4926,6 +4986,8 @@ class APISite(BaseSite):
         whose value is a list of revisions in the same format as
         recentchanges (plus a 'content' element if requested). If get_text
         is true, the toplevel dict will contain a 'token' key as well.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Deletedrevs}
 
         @param page: The page to check for deleted revisions
         @param start: Iterate revisions starting at this Timestamp
@@ -4979,6 +5041,8 @@ class APISite(BaseSite):
     def users(self, usernames):
         """Iterate info about a list of users by name or IP.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Users}
+
         @param usernames: a list of user names
         @type usernames: list, or other iterable, of unicodes
         """
@@ -5016,6 +5080,8 @@ class APISite(BaseSite):
     def randompages(self, total=None, namespaces=None,
                     redirects=False, content=False):
         """Iterate a number of random pages.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Random}
 
         Pages are listed in a fixed sequence, only the starting point is
         random.
@@ -5093,6 +5159,8 @@ class APISite(BaseSite):
                  bot=True, recreate=True, createonly=False, nocreate=False,
                  watch=None, **kwargs):
         """Submit an edit to be saved to the wiki.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Edit}
 
         @param page: The Page to be saved.
             By default its .text property will be used
@@ -5309,6 +5377,8 @@ class APISite(BaseSite):
     def merge_history(self, source, dest, timestamp=None, reason=None):
         """Merge revisions from one page into another.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Mergehistory}
+
         Revisions dating up to the given timestamp in the source will be
         moved into the destination page history. History merge fails if
         the timestamps of source and dest revisions overlap (all source
@@ -5427,6 +5497,8 @@ class APISite(BaseSite):
                  noredirect=False):
         """Move a Page to a new title.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Move}
+
         @param page: the Page to be moved (must exist)
         @param newtitle: the new title for the Page
         @type newtitle: unicode
@@ -5527,6 +5599,8 @@ class APISite(BaseSite):
     def rollbackpage(self, page, **kwargs):
         """Roll back page to version before last user's edits.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Rollback}
+
         The keyword arguments are those supported by the rollback API.
 
         As a precaution against errors, this method will fail unless
@@ -5591,6 +5665,8 @@ class APISite(BaseSite):
     def deletepage(self, page, reason):
         """Delete page from the wiki. Requires appropriate privilege level.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Delete}
+
         @param page: Page to be deleted.
         @type page: Page
         @param reason: Deletion reason.
@@ -5626,6 +5702,8 @@ class APISite(BaseSite):
     @deprecate_arg('summary', 'reason')
     def undelete_page(self, page, reason, revisions=None):
         """Undelete page from the wiki. Requires appropriate privilege level.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Undelete}
 
         @param page: Page to be deleted.
         @type page: pywikibot.BasePage
@@ -5698,6 +5776,8 @@ class APISite(BaseSite):
     def protect(self, page, protections, reason, expiry=None, **kwargs):
         """(Un)protect a wiki page. Requires administrator status.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Protect}
+
         @param protections: A dict mapping type of protection to protection
             level of that type. Valid types of protection are 'edit', 'move',
             'create', and 'upload'. Valid protection levels (in MediaWiki 1.12)
@@ -5764,6 +5844,8 @@ class APISite(BaseSite):
     @deprecated_args(token=None)
     def patrol(self, rcid=None, revid=None, revision=None):
         """Return a generator of patrolled pages.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Patrol}
 
         Pages to be patrolled are identified by rcid, revid or revision.
         At least one of the parameters is mandatory.
@@ -5853,6 +5935,8 @@ class APISite(BaseSite):
         """
         Block a user for certain amount of time and for a certain reason.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Block}
+
         @param user: The username/IP to be blocked without a namespace.
         @type user: L{pywikibot.User}
         @param expiry: The length or date/time when the block expires. If
@@ -5903,6 +5987,8 @@ class APISite(BaseSite):
         """
         Remove the block for the user.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Block}
+
         @param user: The username/IP without a namespace.
         @type user: L{pywikibot.User}
         @param reason: Reason for the unblock.
@@ -5919,6 +6005,8 @@ class APISite(BaseSite):
     @must_be(group='user')
     def watch(self, pages, unwatch=False):
         """Add or remove pages from watchlist.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Watch}
 
         @param pages: A single page or a sequence of pages.
         @type pages: A page object, a page-title string, or sequence of them.
@@ -5985,6 +6073,8 @@ class APISite(BaseSite):
     def purgepages(self, pages, **kwargs):
         """
         Purge the server's cache for one or multiple pages.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Purge}
 
         @param pages: list of Page objects
         @return: True if API returned expected response; False otherwise
@@ -6079,7 +6169,10 @@ class APISite(BaseSite):
                 return self._uploaddisabled
 
     def stash_info(self, file_key, props=False):
-        """Get the stash info for a given file key."""
+        """Get the stash info for a given file key.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Stashimageinfo}
+        """
         if not props:
             props = False
         req = self._simple_request(
@@ -6094,6 +6187,8 @@ class APISite(BaseSite):
                report_success=None):
         """
         Upload a file to the wiki.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Upload}
 
         Either source_filename or source_url, but not both, must be provided.
 
@@ -6567,6 +6662,8 @@ class APISite(BaseSite):
     def querypage(self, special_page, total=None):
         """Yield Page objects retrieved from Special:{special_page}.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Querypage}
+
         Generic function for all special pages supported by the site MW API.
 
         @param special_page: Special page to query
@@ -6795,6 +6892,8 @@ class APISite(BaseSite):
         For protection types which aren't 'create' it uses L{APISite.allpages},
         while it uses for 'create' the 'query+protectedtitles' module.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Protectedtitles}
+
         @param namespaces: The searched namespace.
         @type namespaces: int or Namespace or str
         @param type: The protection type to search for (default 'edit').
@@ -6826,6 +6925,8 @@ class APISite(BaseSite):
         """
         Get property names for pages_with_property().
 
+        @see: U{https://www.mediawiki.org/wiki/API:Pagepropnames}
+
         @param force: force to retrieve userinfo ignoring cache
         @type force: bool
         """
@@ -6837,6 +6938,8 @@ class APISite(BaseSite):
     @need_version('1.21')
     def pages_with_property(self, propname, total=None):
         """Yield Page objects from Special:PagesWithProp.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Pageswithprop}
 
         @param propname: must be a valid property.
         @type propname: str
@@ -6855,6 +6958,8 @@ class APISite(BaseSite):
     def compare(self, old, diff):
         """
         Corresponding method to the 'action=compare' API action.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Compare}
 
         See: https://en.wikipedia.org/w/api.php?action=help&modules=compare
         Use pywikibot.diff's html_comparator() method to parse result.
@@ -7330,6 +7435,8 @@ class APISite(BaseSite):
     def watched_pages(self, sysop=False, force=False, total=None):
         """
         Return watchlist.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Watchlistraw}
 
         @param sysop: Returns watchlist of sysop user if true
         @type sysop: bool
