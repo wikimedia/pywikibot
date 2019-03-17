@@ -18,7 +18,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikiversity'
 
     languages_by_size = [
-        'de', 'en', 'fr', 'ru', 'it', 'cs', 'zh', 'beta', 'pt', 'es', 'ar',
+        'de', 'en', 'fr', 'ru', 'it', 'zh', 'cs', 'beta', 'pt', 'es', 'ar',
         'sv', 'sl', 'fi', 'el', 'hi', 'ko', 'ja',
     ]
 
