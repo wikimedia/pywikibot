@@ -386,7 +386,12 @@ class UploadRobot(BaseBot):
             return warn_code in self.aborts
 
     def ignore_on_warn(self, warn_code):
-        """Determine if the warning message should be ignored."""
+        """
+        Determine if the warning message should be ignored.
+
+        @param warn_code: The warning message
+        @type warn_code: string
+        """
         if self.ignoreWarning is True:
             return True
         else:
@@ -400,7 +405,10 @@ class UploadRobot(BaseBot):
 
     @deprecated_args(debug=None)
     def upload_file(self, file_url, _file_key=None, _offset=0):
-        """Upload the image at file_url to the target wiki.
+        """
+        Upload the image at file_url to the target wiki.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Upload}
 
         Return the filename that was used to upload the image.
         If the upload fails, ask the user whether to try again or not.
