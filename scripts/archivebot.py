@@ -584,14 +584,12 @@ class PageArchiver(object):
         if not self.get_attr('archive', ''):
             raise MissingConfigError('Missing argument "archive" in template')
 
-    def get_archive(self, archive, params=None):
+    def feed_archive(self, archive, thread, max_archive_size, params=None):
         """
-        Get the archive for the given page.
+        Feed the thread to one of the archives.
 
         If it doesn't exist yet, create it.
         Also check for security violations.
-
-        @rtype: DiscussionPage
         """
         title = archive.title()
         page_title = self.page.title()
@@ -602,17 +600,7 @@ class PageArchiver(object):
                 .format(archive, page_title))
         if title not in self.archives:
             self.archives[title] = DiscussionPage(archive, self, params)
-        return self.archives[title]
-
-    def feed_archive(self, archive, thread, max_archive_size, params=None):
-        """
-        Feed the thread to the archive.
-
-        @return: whether the archive is full
-        @rtype: bool
-        """
-        return self.get_archive(archive, params).feed_thread(
-            thread, max_archive_size)
+        return self.archives[title].feed_thread(thread, max_archive_size)
 
     def analyze_page(self):
         """Analyze DiscussionPage."""
@@ -631,7 +619,7 @@ class PageArchiver(object):
             # archived.
             why = t.should_be_archived(self)
             if why:
-                archive_pattern = self.get_attr('archive')
+                archive = self.get_attr('archive')
                 lang = self.site.lang
                 params = {
                     'counter': to_local_digits(arch_counter, lang),
@@ -653,38 +641,14 @@ class PageArchiver(object):
                         int(time.strftime('%W',
                                           t.timestamp.timetuple())), lang),
                 }
-                archive_title = archive_pattern % params
-                archive_page = pywikibot.Page(self.site, archive_title)
-                archive = self.get_archive(archive_page, params)
-                new_params = dict(params)
-                new_params.update({
-                    'counter': to_local_digits(arch_counter + 1, lang),
-                })
-                new_archive_title = archive_pattern % new_params
-                counter_matters = (new_archive_title != archive_title)
-                if (counter_matters
-                        and arch_counter > 1 and not archive.exists()):
-                    # the above may happen because a new year/month etc.
-                    # or simply because of the increment
-                    new_params.update({
-                        'counter': to_local_digits(1, lang),
-                    })
-                    archive_page = pywikibot.Page(
-                        self.site, archive_pattern % new_params)
-                    new_archive = self.get_archive(archive_page, new_params)
-                    if not new_archive.exists():
-                        # reset counter and update vars
-                        arch_counter = 1
-                        archive = new_archive
-                        params = new_params
+                archive = pywikibot.Page(self.site, archive % params)
                 if self.feed_archive(archive, t, max_arch_size, params):
-                    if counter_matters:
-                        arch_counter += 1
+                    arch_counter += 1
+                    self.set_attr('counter', str(arch_counter))
                 whys.add(why)
                 self.archived_threads += 1
             else:
                 self.page.threads.append(t)
-            self.set_attr('counter', str(arch_counter))
         return whys
 
     def run(self):
