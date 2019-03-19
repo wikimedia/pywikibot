@@ -33,6 +33,7 @@ try:
     from collections.abc import Mapping
 except ImportError:  # Python 2.7
     from collections import Mapping
+from textwrap import fill
 from warnings import warn
 
 import pywikibot
@@ -749,12 +750,12 @@ def twtranslate(
         if trans:
             break
     else:
-        raise TranslationError(
-            'No %s translation has been defined for TranslateWiki key %r\n'
-            'It can happen due to lack of i18n submodule or files. See '
-            '%s/i18n'
-            % ('English' if 'en' in langs else "'%s'" % lang,
-               twtitle, __url__))
+        raise TranslationError(fill(
+            'No {} translation has been defined for TranslateWiki key "{}". '
+            'It can happen due to lack of i18n submodule or files or an '
+            'outdated submodule. See {}/i18n'
+            .format('English' if 'en' in langs else "'{}'".format(lang),
+                    twtitle, __url__)))
     # send the language code back via the given mutable list parameter
     if source_needed:
         source.append(alt)
