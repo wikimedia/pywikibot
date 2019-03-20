@@ -1358,6 +1358,10 @@ class TestLogPages(DefaultSiteTestCase, DeprecationTestCase):
 
     def test_list_namespace(self):
         """Test the deprecated site.logpages() when namespace is a list."""
+        if self.site.mw_version <= '1.19.24':  # T217664
+            self.skipTest(
+                'logevents does not support namespace parameter with MediaWiki'
+                ' {}.'.format(self.site.mw_version))
         le = list(self.site.logpages(namespace=[2, 3], number=10))
         for entry in le:
             if isinstance(entry[0], int):  # autoblock removal entry
