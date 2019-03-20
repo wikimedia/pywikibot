@@ -223,7 +223,8 @@ class BlockEntry(LogEntry):
 
         It raises an Error if the entry is an unblocking log entry.
 
-        @rtype: list of flag strings
+        @return: list of flags strings
+        @rtype: list
         """
         if self.action() == 'unblock':
             return []
@@ -340,7 +341,11 @@ class MoveEntry(LogEntry):
 
     @property
     def target_page(self):
-        """Return target page object."""
+        """
+        Return target page object.
+
+        @rtype: pywikibot.Page
+        """
         if not hasattr(self, '_target_page'):
             self._target_page = pywikibot.Page(self.site, self.target_title)
         return self._target_page
@@ -363,7 +368,11 @@ class PatrolEntry(LogEntry):
 
     @property
     def current_id(self):
-        """Return the current id."""
+        """
+        Return the current id.
+
+        @rtype: int
+        """
         # key has been changed in mw 1.19; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['curid']
@@ -371,7 +380,11 @@ class PatrolEntry(LogEntry):
 
     @property
     def previous_id(self):
-        """Return the previous id."""
+        """
+        Return the previous id.
+
+        @rtype: int
+        """
         # key has been changed in mw 1.19; try the new mw style first
         # sometimes it returns strs sometimes ints
         return int(self._params['previd']
