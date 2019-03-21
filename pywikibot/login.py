@@ -127,6 +127,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
         """
         Check that the username exists on the site.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Users}
+
         @raises NoUsername: Username doesn't exist in user list.
         """
         # convert any Special:BotPassword usernames to main account equivalent
@@ -184,6 +186,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
     def getCookie(self):
         """
         Login to the site.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Login}
 
         @return: cookie data if successful, None otherwise.
         """
@@ -286,6 +290,8 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
     def login(self, retry=False, autocreate=False):
         """
         Attempt to log into the server.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Login}
 
         @param retry: infinitely retry if the API returns an unknown error
         @type retry: bool
@@ -415,6 +421,8 @@ class OauthLoginManager(LoginManager):
         """
         Attempt to log into the server.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Login}
+
         @param retry: infinitely retry if exception occurs during
             authentication.
         @type retry: bool
@@ -454,6 +462,8 @@ class OauthLoginManager(LoginManager):
         """
         Return OAuth consumer key token and secret token.
 
+        @see: U{https://www.mediawiki.org/wiki/API:Tokens}
+
         @rtype: tuple of two str
         """
         return self._consumer_token
@@ -462,6 +472,8 @@ class OauthLoginManager(LoginManager):
     def access_token(self):
         """
         Return OAuth access key token and secret token.
+
+        @see: U{https://www.mediawiki.org/wiki/API:Tokens}
 
         @rtype: tuple of two str
         """
