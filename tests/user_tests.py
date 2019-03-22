@@ -104,7 +104,7 @@ class TestUserClass(TestCase):
 
     def test_female_user(self):
         """Test female user."""
-        user = User(self.site, 'Alraunenstern')
+        user = User(self.site, 'Catrin')
         self.assertTrue(user.isRegistered())
         self.assertFalse(user.isAnonymous())
         self.assertGreater(user.editCount(), 0)
