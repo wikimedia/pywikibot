@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test valid templates."""
 #
-# (C) Pywikibot team, 2015-2018
+# (C) Pywikibot team, 2015-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -40,7 +40,7 @@ class TestValidTemplateMeta(MetaTestCaseClass):
                     # check whether the message contains a template
                     templates = extract_templates_and_params_regex_simple(msg)
                     self.assertIsInstance(templates, list)
-                    self.assertGreater(len(templates), 0)
+                    self.assertIsNotEmpty(templates)
 
                     # known problem
                     if site.code == 'simple':

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Tests for the Category class."""
 #
-# (C) Pywikibot team, 2014-2018
+# (C) Pywikibot team, 2014-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -91,7 +91,7 @@ class TestCategoryObject(TestCase):
         self.assertNotIn(p3, members_namespace)
 
         members_total = list(cat.members(total=2))
-        self.assertEqual(len(members_total), 2)
+        self.assertLength(members_total, 2)
 
     def test_subcategories(self):
         """Test the subcategories method."""
@@ -105,7 +105,7 @@ class TestCategoryObject(TestCase):
         self.assertNotIn(c2, subcategories)
 
         subcategories_total = list(cat.subcategories(total=2))
-        self.assertEqual(len(subcategories_total), 2)
+        self.assertLength(subcategories_total, 2)
 
     def test_subcategories_recurse(self):
         """Test the subcategories method with recurse=True."""
@@ -138,7 +138,7 @@ class TestCategoryObject(TestCase):
         self.assertNotIn(p2, articles_namespace)
 
         articles_total = list(cat.articles(total=2))
-        self.assertEqual(len(articles_total), 2)
+        self.assertLength(articles_total, 2)
 
     def test_redirects(self):
         """Test the redirects method."""

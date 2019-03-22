@@ -362,7 +362,7 @@ class TestIsSliceWithEllipsis(TestCase):
         """Test marker is shown without kwargs."""
         stop = 2
         it = list(tools.islice_with_ellipsis(self.it, stop))
-        self.assertEqual(len(it), stop + 1)  # +1 to consider marker.
+        self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[:stop])
         self.assertEqual(it[-1], '…')
 
@@ -370,7 +370,7 @@ class TestIsSliceWithEllipsis(TestCase):
         """Test correct marker is shown with kwargs.."""
         stop = 2
         it = list(tools.islice_with_ellipsis(self.it, stop, marker='new'))
-        self.assertEqual(len(it), stop + 1)  # +1 to consider marker.
+        self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[:stop])
         self.assertNotEqual(it[-1], '…')
         self.assertEqual(it[-1], 'new')
@@ -380,7 +380,7 @@ class TestIsSliceWithEllipsis(TestCase):
         start = 1
         stop = 3
         it = list(tools.islice_with_ellipsis(self.it, start, stop))
-        self.assertEqual(len(it), stop - start + 1)  # +1 to consider marker.
+        self.assertLength(it, stop - start + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[start:stop])
         self.assertEqual(it[-1], '…')
 
@@ -390,7 +390,7 @@ class TestIsSliceWithEllipsis(TestCase):
         stop = 3
         it = list(tools.islice_with_ellipsis(
             self.it, start, stop, marker='new'))
-        self.assertEqual(len(it), stop - start + 1)  # +1 to consider marker.
+        self.assertLength(it, stop - start + 1)  # +1 to consider marker.
         self.assertEqual(it[:-1], self.it[start:stop])
         self.assertNotEqual(it[-1], '…')
         self.assertEqual(it[-1], 'new')
@@ -399,14 +399,14 @@ class TestIsSliceWithEllipsis(TestCase):
         """Test marker is shown with stop for non empty iterable."""
         stop = 0
         it = list(tools.islice_with_ellipsis(self.it, stop))
-        self.assertEqual(len(it), stop + 1)  # +1 to consider marker.
+        self.assertLength(it, stop + 1)  # +1 to consider marker.
         self.assertEqual(it[-1], '…')
 
     def test_do_not_show_marker_with_stop_zero(self):
         """Test marker is shown with stop for empty iterable."""
         stop = 0
         it = list(tools.islice_with_ellipsis(self.it_null, stop))
-        self.assertEqual(len(it), stop)
+        self.assertLength(it, stop)
 
     def test_do_not_show_marker(self):
         """Test marker is not shown when no marker is specified."""
@@ -420,7 +420,7 @@ class TestIsSliceWithEllipsis(TestCase):
         """Test marker is not shown when all elements are retrieved."""
         stop = None
         it = list(tools.islice_with_ellipsis(self.it, stop))
-        self.assertEqual(len(it), len(self.it))
+        self.assertLength(it, len(self.it))
         self.assertEqual(it, self.it)
         self.assertNotEqual(it[-1], '…')
 
@@ -507,7 +507,7 @@ class TestFilterUnique(TestCase):
         if not key:
             key = passthrough
 
-        self.assertEqual(len(deduped), 0)
+        self.assertIsEmpty(deduped)
 
         self.assertEqual(next(deduper), 1)
         self.assertEqual(next(deduper), 3)
@@ -538,7 +538,7 @@ class TestFilterUnique(TestCase):
         if not key:
             key = passthrough
 
-        self.assertEqual(len(deduped), 0)
+        self.assertIsEmpty(deduped)
 
         self.assertEqual(next(deduper), '1')
         self.assertEqual(next(deduper), '3')
@@ -607,7 +607,7 @@ class TestFilterUnique(TestCase):
         # Two objects which may be equal do not necessary have the same id.
         deduped = set()
         deduper = tools.filter_unique(self.decs, container=deduped, key=id)
-        self.assertEqual(len(deduped), 0)
+        self.assertIsEmpty(deduped)
         for _ in self.decs:
             self.assertEqual(id(next(deduper)), deduped.pop())
         self.assertRaises(StopIteration, next, deduper)

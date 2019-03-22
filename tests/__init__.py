@@ -22,6 +22,7 @@ import warnings
 # - mwparserfromhell is optional, so is only imported in textlib_tests
 import requests
 import unittest
+from unittest.util import safe_repr
 
 from pywikibot import config
 import pywikibot.data.api
@@ -30,6 +31,7 @@ from pywikibot.data.api import Request as _original_Request
 from pywikibot import i18n
 from pywikibot.tools import PYTHON_VERSION
 
+
 try:
     import unittest.mock as mock
     from unittest.mock import MagicMock, Mock, patch
@@ -37,6 +39,7 @@ except ImportError:
     import mock
     from mock import MagicMock, Mock, patch
 
+assert safe_repr  # pyflakes workaround
 _root_dir = os.path.split(os.path.split(__file__)[0])[0]
 
 

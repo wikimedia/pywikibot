@@ -38,7 +38,8 @@ from pywikibot.tools import PY2, StringTypes
 
 import tests
 
-from tests import unittest, patch_request, unpatch_request, unittest_print
+from tests import (
+    safe_repr, unittest, patch_request, unpatch_request, unittest_print)
 from tests.utils import (
     add_metaclass, execute_pwb, DrySite, DryRequest,
     WarningSourceSkipContextManager, AssertAPIErrorContextManager,
@@ -98,6 +99,32 @@ class TestCaseBase(unittest.TestCase):
             assertItemsEqual is removed in Python 3.
             """
             return self.assertItemsEqual(*args, **kwargs)
+
+    def assertIsEmpty(self, seq, msg=None):
+        """Check that the sequence is empty."""
+        if seq:
+            msg = self._formatMessage(msg, '%s is not empty' % safe_repr(seq))
+            raise self.failureException(msg)
+
+    def assertIsNotEmpty(self, seq, msg=None):
+        """Check that the sequence is not empty."""
+        if not seq:
+            msg = self._formatMessage(msg, '%s is empty' % safe_repr(seq))
+            raise self.failureException(msg)
+
+    def assertLength(self, seq, other, msg=None):
+        """Verify that a sequence expr has the length of other."""
+        # the other parameter may be given as a sequence too
+        first_len = len(seq)
+        try:
+            second_len = len(other)
+        except TypeError:
+            second_len = other
+
+        if first_len != second_len:
+            msg = self._formatMessage(
+                msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
+            raise self.failureException(msg)
 
     def _addUnexpectedSuccess(self, result):
         """Report and ignore."""

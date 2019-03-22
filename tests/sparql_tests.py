@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Test cases for the SPARQL API."""
 #
-# (C) Pywikibot team, 2016-2018
+# (C) Pywikibot team, 2016-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -102,7 +102,7 @@ class TestSparql(WikidataTestCase):
         q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }')
         self.assertIsInstance(res, list, 'Result is not a list')
-        self.assertEqual(len(res), 2)
+        self.assertLength(res, 2)
 
         self.assertDictEqual(
             res[0],
@@ -124,7 +124,7 @@ class TestSparql(WikidataTestCase):
         q = sparql.SparqlQuery()
         res = q.select('SELECT * WHERE { ?x ?y ?z }', full_data=True)
         self.assertIsInstance(res, list, 'Result is not a list')
-        self.assertEqual(len(res), 2)
+        self.assertLength(res, 2)
 
         self.assertIsInstance(res[0]['cat'], sparql.URI, 'Wrong type for URI')
         self.assertEqual(repr(res[0]['cat']),

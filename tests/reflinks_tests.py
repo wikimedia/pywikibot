@@ -30,7 +30,7 @@ class TestXMLPageGenerator(TestCase):
             namespaces=[0, 1],
             site=self.get_site())
         pages = list(gen)
-        self.assertEqual(len(pages), 0)
+        self.assertIsEmpty(pages)
 
     def test_simple_bare_refs(self):
         """Test simple bare references in multiple namespaces."""

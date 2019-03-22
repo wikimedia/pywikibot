@@ -288,7 +288,7 @@ class TestTerminalOutput(UITestCase):
         with warnings.catch_warnings(record=True) as w:
             pywikibot.output('output', toStdout=True)
             self.assertEqual(newstdout.getvalue(), 'output\n')
-            self.assertEqual(len(w), 1)
+            self.assertLength(w, 1)
             self.assertEqual(w[0].category, DeprecationWarning)
             message = str(w[0].message)
             self.assertStringMethod(str.startswith, message,
@@ -817,8 +817,8 @@ class FakeUnixTest(FakeUIColorizedTestBase, FakeUITest):
         expected_color = self._colors[self._index][0]
         self._index += 1
         self.assertEqual(color, expected_color)
-        self.assertEqual(len(self.stream.getvalue()),
-                         sum(e[1] for e in self._colors[:self._index]))
+        self.assertLength(self.stream.getvalue(),
+                          sum(e[1] for e in self._colors[:self._index]))
 
 
 class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
@@ -861,8 +861,8 @@ class FakeWin32Test(FakeUIColorizedTestBase, FakeUITest):
         self._index += 1
         color = terminal_interface_win32.windowsColors[color]
         self.assertEqual(attribute, color)
-        self.assertEqual(len(self.stream.getvalue()),
-                         sum(e[1] for e in self._colors[:self._index]))
+        self.assertLength(self.stream.getvalue(),
+                          sum(e[1] for e in self._colors[:self._index]))
 
 
 class FakeWin32UncolorizedTest(FakeWin32Test):

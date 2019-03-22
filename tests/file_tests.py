@@ -280,7 +280,7 @@ class TestDeprecatedFilePage(DeprecationTestCase):
         page = pywikibot.FilePage(self.site, 'File:Albert Einstein.jpg')
         latest = page.getLatestUploader()
         self.assertOneDeprecation()
-        self.assertEqual(len(latest), 2)
+        self.assertLength(latest, 2)
         self.assertIsInstance(latest[0], unicode)
         self.assertIsInstance(latest[1], unicode)
 

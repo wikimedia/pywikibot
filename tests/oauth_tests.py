@@ -42,7 +42,7 @@ class OAuthSiteTestCase(TestCase):
         tokens = self._get_oauth_tokens()
         if tokens is None:
             self.skipTest('OAuth tokens not set')
-        self.assertEqual(len(tokens), 4)
+        self.assertLength(tokens, 4)
         self.consumer_token = tokens[:2]
         self.access_token = tokens[2:]
 

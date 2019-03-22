@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """Test IP module/regex."""
 #
-# (C) Pywikibot team, 2012-2018
+# (C) Pywikibot team, 2012-2019
 #
 # Distributed under the terms of the MIT license.
 from __future__ import absolute_import, division, unicode_literals
@@ -676,7 +676,7 @@ class IPRegexTestCase(TestIPBase, DeprecationTestCase):
         self._test_T105443_failures()
         self.assertEqual(self.fail, 0)
         self.assertDeprecationParts('page.ip_regexp', 'tools.ip.is_IP')
-        self.assertEqual(self.total, len(self.deprecation_messages))
+        self.assertLength(self.deprecation_messages, self.total)
 
 
 class IPAddressModuleTestCase(TestIPBase):

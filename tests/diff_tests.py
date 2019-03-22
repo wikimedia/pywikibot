@@ -80,8 +80,8 @@ class TestHTMLComparator(TestCase):
         site = self.get_site()
         diff_html = site.compare(139992, 139993)
         output = html_comparator(diff_html)
-        self.assertEqual(len(output['added-context']), 1)
-        self.assertEqual(len(output['deleted-context']), 1)
+        self.assertLength(output['added-context'], 1)
+        self.assertLength(output['deleted-context'], 1)
 
 
 @patch('{0}.__import__'.format('__builtin__' if PY2 else 'builtins'),

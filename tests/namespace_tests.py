@@ -96,7 +96,7 @@ class TestNamespaceObject(TestCase):
         self.assertIn('Image', y.aliases)
         self.assertIn('Immagine', y.aliases)
 
-        self.assertEqual(len(y), 4)
+        self.assertLength(y, 4)
         self.assertEqual(list(y), ['dummy', 'File', 'Image', 'Immagine'])
         self.assertEqual(y.case, 'first-letter')
 
@@ -343,7 +343,7 @@ class TestNamespaceCollections(TestCase):
 
         namespaces_set = set(namespaces)
 
-        self.assertEqual(len(namespaces), len(namespaces_set))
+        self.assertLength(namespaces, namespaces_set)
         self.assertTrue(all(isinstance(x, int) for x in namespaces_set))
 
     def test_set_minus(self):
@@ -354,8 +354,8 @@ class TestNamespaceCollections(TestCase):
 
         positive_namespaces = set(namespaces) - excluded_namespaces
 
-        self.assertEqual(len(namespaces),
-                         len(positive_namespaces) + len(excluded_namespaces))
+        self.assertLength(namespaces,
+                          len(positive_namespaces) + len(excluded_namespaces))
 
 
 class TestNamespacesDictLookupName(TestCase):

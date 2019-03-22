@@ -63,7 +63,7 @@ class TestInterwikidataBot(SiteAttributeTestCase):
         text = page.get()
 
         # The page looks as expected.
-        self.assertEqual(len(page.langlinks()), 1)
+        self.assertLength(page.langlinks(), 1)
         iw_link = page.langlinks()[0]
         self.assertIsInstance(iw_link, Link)
         self.assertEqual(iw_link.canonical_title(), 'کاربر:Ladsgroup')
