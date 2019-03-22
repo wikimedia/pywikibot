@@ -40,7 +40,7 @@ dependencies = ['requests>=2.20.0']
 pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle>=2.5.0'
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient>=0.0.18'],
+    'eventstreams': ['sseclient>=0.0.18,!=0.0.23'],
     'isbn': ['python-stdnum'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],
