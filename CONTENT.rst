@@ -16,9 +16,6 @@ The contents of the package
     +---------------------------+------------------------------------------------------+
     | Dockerfile                | assemble an image, install all dependencies via pip  |
     +---------------------------+------------------------------------------------------+
-    | ez_setup.py               | Bootstrap distribute installation file, can also be  |
-    |                           | run to install or upgrade setuptools.                |
-    +---------------------------+------------------------------------------------------+
     | generate_family_file.py   | Creates a new family file.                           |
     +---------------------------+------------------------------------------------------+
     | generate_user_files.py    | Creates user-config.py or user-fixes.py              |
