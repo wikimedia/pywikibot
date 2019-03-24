@@ -39,8 +39,8 @@ PY2 = (PYTHON_VERSION[0] == 2)
 if not PY2:
     from itertools import zip_longest
     import queue
-    StringTypes = basestring = (str,)
-    UnicodeType = unicode = str
+    StringTypes = (str, bytes)
+    UnicodeType = str
 else:
     from itertools import izip_longest as zip_longest
     import Queue as queue  # noqa: N813
@@ -776,7 +776,7 @@ class MediaWikiVersion(Version):
         return '.'.join(str(v) for v in self.version) + self.suffix
 
     def _cmp(self, other):
-        if isinstance(other, basestring):
+        if isinstance(other, StringTypes):
             other = MediaWikiVersion(other)
 
         if self.version > other.version:
@@ -1369,7 +1369,7 @@ def merge_unique_dicts(*args, **kwargs):
         result.update(arg)
     if conflicts:
         raise ValueError('Multiple dicts contain the same keys: {0}'
-                         .format(', '.join(sorted(unicode(key)
+                         .format(', '.join(sorted(UnicodeType(key)
                                                   for key in conflicts))))
     return result
 
@@ -1895,7 +1895,7 @@ class ModuleDeprecationWrapper(types.ModuleType):
         @param module: The module name or instance
         @type module: str or module
         """
-        if isinstance(module, basestring):
+        if isinstance(module, StringTypes):
             module = sys.modules[module]
         super(ModuleDeprecationWrapper, self).__setattr__('_deprecated', {})
         super(ModuleDeprecationWrapper, self).__setattr__('_module', module)

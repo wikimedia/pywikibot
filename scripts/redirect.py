@@ -88,10 +88,7 @@ from pywikibot.bot import (OptionHandler, SingleSiteBot, ExistingPageBot,
                            RedirectPageBot)
 from pywikibot.exceptions import ArgumentDeprecationWarning
 from pywikibot.textlib import extract_templates_and_params_regex_simple
-from pywikibot.tools import issue_deprecation_warning, PY2
-
-if not PY2:
-    basestring = (str, )
+from pywikibot.tools import issue_deprecation_warning, UnicodeType
 
 
 def space_to_underscore(link):
@@ -455,7 +452,7 @@ class RedirectRobot(SingleSiteBot, ExistingPageBot, RedirectPageBot):
 
     def init_page(self, item):
         """Ensure that we process page objects."""
-        if isinstance(item, basestring):
+        if isinstance(item, UnicodeType):
             item = pywikibot.Page(self.site, item)
         elif isinstance(item, tuple):
             redir_name, code, target, final = item

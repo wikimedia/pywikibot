@@ -9,10 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import pywikibot
 from pywikibot.exceptions import Error, HiddenKeyError
-from pywikibot.tools import deprecated, classproperty, PY2
-
-if not PY2:
-    basestring = (str, )
+from pywikibot.tools import deprecated, classproperty, UnicodeType
 
 _logger = 'wiki'
 
@@ -231,7 +228,7 @@ class BlockEntry(LogEntry):
         if not hasattr(self, '_flags'):
             self._flags = self._params['flags']
             # pre mw 1.19 returned a delimited string.
-            if isinstance(self._flags, basestring):
+            if isinstance(self._flags, UnicodeType):
                 if self._flags:
                     self._flags = self._flags.split(',')
                 else:

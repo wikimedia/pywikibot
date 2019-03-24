@@ -19,11 +19,7 @@ import re
 from string import digits as _decimalDigits  # noqa: N812
 
 from pywikibot.textlib import NON_LATIN_DIGITS
-from pywikibot.tools import first_lower, first_upper, deprecated, PY2
-
-if not PY2:
-    unicode = str
-    basestring = (str,)
+from pywikibot.tools import first_lower, first_upper, deprecated, UnicodeType
 
 #
 # Different collections of well known formats
@@ -59,7 +55,7 @@ def multi(value, tuplst):
     When the 2nd function evaluates to true, the 1st function is used.
 
     """
-    if isinstance(value, basestring):
+    if isinstance(value, UnicodeType):
         # Try all functions, and test result against predicates
         for func, pred in tuplst:
             try:
@@ -214,7 +210,7 @@ def slh(value, lst):
         formats['MonthName']['en']('anything else') => raise ValueError
 
     """
-    if isinstance(value, basestring):
+    if isinstance(value, UnicodeType):
         return lst.index(value) + 1
     else:
         return lst[value - 1]
@@ -232,7 +228,7 @@ def dh_constVal(value, ind, match):
     formats['CurrEvents']['en']('Current Events') => ind
 
     """
-    if isinstance(value, basestring):
+    if isinstance(value, UnicodeType):
         if value == match:
             return ind
         else:
@@ -264,33 +260,33 @@ def monthName(lang, ind):
 
 # Helper for KN: digits representation
 _knDigits = NON_LATIN_DIGITS['kn']
-_knDigitsToLocal = {ord(unicode(i)): _knDigits[i] for i in range(10)}
-_knLocalToDigits = {ord(_knDigits[i]): unicode(i) for i in range(10)}
+_knDigitsToLocal = {ord(UnicodeType(i)): _knDigits[i] for i in range(10)}
+_knLocalToDigits = {ord(_knDigits[i]): UnicodeType(i) for i in range(10)}
 
 # Helper for Urdu/Persian languages
 _faDigits = NON_LATIN_DIGITS['fa']
-_faDigitsToLocal = {ord(unicode(i)): _faDigits[i] for i in range(10)}
-_faLocalToDigits = {ord(_faDigits[i]): unicode(i) for i in range(10)}
+_faDigitsToLocal = {ord(UnicodeType(i)): _faDigits[i] for i in range(10)}
+_faLocalToDigits = {ord(_faDigits[i]): UnicodeType(i) for i in range(10)}
 
 # Helper for HI:, MR:
 _hiDigits = NON_LATIN_DIGITS['hi']
-_hiDigitsToLocal = {ord(unicode(i)): _hiDigits[i] for i in range(10)}
-_hiLocalToDigits = {ord(_hiDigits[i]): unicode(i) for i in range(10)}
+_hiDigitsToLocal = {ord(UnicodeType(i)): _hiDigits[i] for i in range(10)}
+_hiLocalToDigits = {ord(_hiDigits[i]): UnicodeType(i) for i in range(10)}
 
 # Helper for BN:
 _bnDigits = NON_LATIN_DIGITS['bn']
-_bnDigitsToLocal = {ord(unicode(i)): _bnDigits[i] for i in range(10)}
-_bnLocalToDigits = {ord(_bnDigits[i]): unicode(i) for i in range(10)}
+_bnDigitsToLocal = {ord(UnicodeType(i)): _bnDigits[i] for i in range(10)}
+_bnLocalToDigits = {ord(_bnDigits[i]): UnicodeType(i) for i in range(10)}
 
 # Helper for GU:
 _guDigits = NON_LATIN_DIGITS['gu']
-_guDigitsToLocal = {ord(unicode(i)): _guDigits[i] for i in range(10)}
-_guLocalToDigits = {ord(_guDigits[i]): unicode(i) for i in range(10)}
+_guDigitsToLocal = {ord(UnicodeType(i)): _guDigits[i] for i in range(10)}
+_guLocalToDigits = {ord(_guDigits[i]): UnicodeType(i) for i in range(10)}
 
 
 def intToLocalDigitsStr(value, digitsToLocalDict):
     """Encode an integer value into a textual form."""
-    return unicode(value).translate(digitsToLocalDict)
+    return UnicodeType(value).translate(digitsToLocalDict)
 
 
 def localDigitsStrToInt(value, digitsToLocalDict, localToDigitsDict):
@@ -328,7 +324,7 @@ _digitDecoders = {
     # %% is a %
     '%': '%',
     # %d is a decimal
-    'd': (_decimalDigits, unicode, int),
+    'd': (_decimalDigits, UnicodeType, int),
     # %R is a roman numeral. This allows for only the simplest linear
     # conversions based on a list of numbers
     'R': ('IVX', intToRomanNum, romanNumToInt),
@@ -353,7 +349,8 @@ _digitDecoders = {
           lambda v: localDigitsStrToInt(v, _guDigitsToLocal,
                                         _guLocalToDigits)),
     # %T is a year in TH: -- all years are shifted: 2005 => 'พ.ศ. 2548'
-    'T': (_decimalDigits, lambda v: unicode(v + 543), lambda v: int(v) - 543),
+    'T': (_decimalDigits, lambda v: UnicodeType(v + 543),
+          lambda v: int(v) - 543),
 }
 
 # Allows to search for '(%%)|(%d)|(%R)|...", and allows one digit 1-9 to set
@@ -386,7 +383,7 @@ def escapePattern2(pattern):
                     and(len(s) == 2 or s[1] in _decimalDigits)):
                 # Must match a "%2d" or "%d" style
                 dec = _digitDecoders[s[-1]]
-                if isinstance(dec, basestring):
+                if isinstance(dec, UnicodeType):
                     # Special case for strings that are replaced instead of
                     # decoded
                     assert len(s) < 3, (
@@ -447,7 +444,7 @@ def dh(value, pattern, encf, decf, filter=None):
 
     """
     compPattern, strPattern, decoders = escapePattern2(pattern)
-    if isinstance(value, basestring):
+    if isinstance(value, UnicodeType):
         m = compPattern.match(value)
         if m:
             # decode each found value using provided decoder
@@ -455,7 +452,7 @@ def dh(value, pattern, encf, decf, filter=None):
                       for i, decoder in enumerate(decoders)]
             decValue = decf(values)
 
-            assert not isinstance(decValue, basestring), \
+            assert not isinstance(decValue, UnicodeType), \
                 'Decoder must not return a string!'
 
             # recursive call to re-encode and see if we get the original

@@ -10,11 +10,10 @@ from io import BytesIO, StringIO
 
 import pywikibot
 from pywikibot.comms import http
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, UnicodeType
 
 if not PY2:
     import csv
-    unicode = str
 else:
     try:
         import unicodecsv as csv
@@ -185,8 +184,8 @@ class WikiStats(object):
             site = {}
 
             for field in row.findall('field'):
-                name = unicode(field.get('name'))
-                site[name] = unicode(field.text)
+                name = UnicodeType(field.get('name'))
+                site[name] = UnicodeType(field.text)
 
             data.append(site)
 

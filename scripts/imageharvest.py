@@ -38,8 +38,6 @@ from pywikibot.tools import PY2
 if not PY2:
     import urllib
     from urllib.request import URLopener
-
-    basestring = (str,)
 else:
     from urllib import URLopener
 

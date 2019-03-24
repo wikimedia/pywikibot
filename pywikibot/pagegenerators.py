@@ -56,10 +56,9 @@ from pywikibot.exceptions import (
     UnknownExtension,
 )
 from pywikibot.proofreadpage import ProofreadPage
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, UnicodeType
 
 if not PY2:
-    basestring = (str, )
     from itertools import zip_longest
 else:
     from itertools import izip_longest as zip_longest
@@ -676,7 +675,7 @@ class GeneratorFactory(object):
         # 'start or None', because start might be an empty string
         total = None
         start = start or None
-        if isinstance(start, basestring) and len(start) == 8:
+        if isinstance(start, UnicodeType) and len(start) == 8:
             start = pywikibot.Timestamp.strptime(start, '%Y%m%d')
         elif start is not None:
             try:
@@ -1646,7 +1645,7 @@ def PagesFromTitlesGenerator(iterable, site=None):
     if site is None:
         site = pywikibot.Site()
     for title in iterable:
-        if not isinstance(title, basestring):
+        if not isinstance(title, UnicodeType):
             break
         yield pywikibot.Page(pywikibot.Link(title, site))
 
@@ -1908,7 +1907,7 @@ class RegexFilter(object):
             regex = [regex]
         # Test if regex is already compiled.
         # We assume that all list components have the same type
-        if isinstance(regex[0], basestring):
+        if isinstance(regex[0], UnicodeType):
             regex = [re.compile(r, flag) for r in regex]
         return regex
 
@@ -2099,7 +2098,7 @@ def UserEditFilterGenerator(generator, username, timestamp=None, skip=False,
     @type show_filtered: bool
     """
     if timestamp:
-        if isinstance(timestamp, basestring):
+        if isinstance(timestamp, UnicodeType):
             ts = pywikibot.Timestamp.fromtimestampformat(timestamp)
         else:
             ts = timestamp

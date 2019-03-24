@@ -34,12 +34,9 @@ import pywikibot
 
 from pywikibot import i18n, pagegenerators
 
-from pywikibot.tools import PY2
+from pywikibot.tools import UnicodeType
 
 from scripts.solve_disambiguation import DisambiguationRobot
-
-if not PY2:
-    basestring = (str, )
 
 HELP_MSG = """\n
 misspelling.py does not support site {site}.
@@ -86,7 +83,7 @@ class MisspellingRobot(DisambiguationRobot):
         mycode = self.site.code
         if mycode in self.misspellingCategory:
             categories = self.misspellingCategory[mycode]
-            if isinstance(categories, basestring):
+            if isinstance(categories, UnicodeType):
                 categories = (categories, )
             generators = (
                 pagegenerators.CategorizedPageGenerator(
@@ -95,7 +92,7 @@ class MisspellingRobot(DisambiguationRobot):
                 for misspellingCategoryTitle in categories)
         elif mycode in self.misspellingTemplate:
             templates = self.misspellingTemplate[mycode]
-            if isinstance(templates, basestring):
+            if isinstance(templates, UnicodeType):
                 templates = (templates, )
             generators = (
                 pagegenerators.ReferringPageGenerator(
@@ -129,7 +126,7 @@ class MisspellingRobot(DisambiguationRobot):
             return True
         if self.misspellingTemplate.get(disambPage.site.code) is not None:
             templates = self.misspellingTemplate[disambPage.site.code]
-            if isinstance(templates, basestring):
+            if isinstance(templates, UnicodeType):
                 templates = (templates, )
             for template, params in disambPage.templatesWithParams():
                 if template.title(with_ns=False) in templates:

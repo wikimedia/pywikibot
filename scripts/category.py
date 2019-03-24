@@ -143,12 +143,10 @@ from pywikibot.bot import (
 )
 from pywikibot.cosmetic_changes import moved_links
 from pywikibot.tools import (
-    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive, PY2
+    deprecated_args, deprecated, ModuleDeprecationWrapper, open_archive,
+    UnicodeType
 )
 from pywikibot.tools.formatter import color_format
-
-if not PY2:
-    basestring = (str, )
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -627,7 +625,7 @@ class CategoryMoveRobot(CategoryPreprocess):
                                             'category-removing',
                                             template_vars)
         # Set deletion reason for category page and talkpage.
-        if isinstance(deletion_comment, basestring):
+        if isinstance(deletion_comment, UnicodeType):
             # Deletion comment is set to given string.
             self.deletion_comment = deletion_comment
         elif deletion_comment == self.DELETION_COMMENT_SAME_AS_EDIT_COMMENT:

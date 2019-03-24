@@ -77,15 +77,13 @@ from pywikibot.tools import (
     merge_unique_dicts,
     PY2,
     filter_unique,
+    UnicodeType
 )
 from pywikibot.tools.ip import is_IP
 
 if not PY2:
     from itertools import zip_longest
     from urllib.parse import urlencode, urlparse
-
-    basestring = (str,)
-    unicode = str
 else:
     from itertools import izip_longest as zip_longest
     from urllib import urlencode
@@ -344,7 +342,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
             return self.id == other
         elif isinstance(other, Namespace):
             return self.id == other.id
-        elif isinstance(other, basestring):
+        elif isinstance(other, UnicodeType):
             return other in self
 
     def __ne__(self, other):
@@ -605,7 +603,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
     # Temporary until Namespace.resolve can be removed
     @staticmethod
     def _resolve(identifiers, namespaces):
-        if isinstance(identifiers, (basestring, Namespace)):
+        if isinstance(identifiers, (UnicodeType, Namespace)):
             identifiers = [identifiers]
         else:
             # convert non-iterators to single item list
@@ -618,7 +616,7 @@ class NamespacesDict(Mapping, SelfCallMixin):
         # int(None) raises TypeError; however, bool needs special handling.
         result = [NotImplemented if isinstance(ns, bool) else
                   NamespacesDict._lookup_name(ns, namespaces)
-                  if isinstance(ns, basestring)
+                  if isinstance(ns, UnicodeType)
                   and not ns.lstrip('-').isdigit() else
                   namespaces[int(ns)] if int(ns) in namespaces
                   else None
@@ -744,7 +742,7 @@ class BaseSite(ComparableMixin):
             pywikibot.log('BaseSite: code "%s" contains invalid characters'
                           % code)
         self.__code = code
-        if isinstance(fam, basestring) or fam is None:
+        if isinstance(fam, UnicodeType) or fam is None:
             self.__family = pywikibot.family.Family.load(fam)
         else:
             self.__family = fam
@@ -1275,7 +1273,7 @@ class BaseSite(ComparableMixin):
                  UserWarning)
         from pywikibot.comms import http
         if data:
-            if not isinstance(data, basestring):
+            if not isinstance(data, UnicodeType):
                 data = urlencode(data)
             return http.request(self, path, method='PUT', body=data)
         else:
@@ -1518,7 +1516,7 @@ class Siteinfo(Container):
             else:
                 return False
 
-        if isinstance(prop, basestring):
+        if isinstance(prop, UnicodeType):
             props = [prop]
         else:
             props = prop
@@ -2492,7 +2490,7 @@ class APISite(BaseSite):
             issue_deprecation_warning('arg of type str', 'type unicode', 2,
                                       since='20151014')
 
-        args = [unicode(e) for e in args]
+        args = [UnicodeType(e) for e in args]
         try:
             msgs = self.mediawiki_messages(needed_mw_messages)
         except KeyError:
@@ -2505,7 +2503,7 @@ class APISite(BaseSite):
                     # v1.14 defined and as ',&#32;and'; fixed in v1.15
                     msgs['and'] = ' and'
                 else:
-                    msgs[key] = pywikibot.html2unicode(value)
+                    msgs[key] = pywikibot.html2UnicodeType(value)
 
         concat = msgs['and'] + msgs['word-separator']
         return msgs['comma-separator'].join(
@@ -2528,7 +2526,7 @@ class APISite(BaseSite):
         @type includecomments: bool
         @rtype: unicode
         """
-        if not isinstance(text, basestring):
+        if not isinstance(text, UnicodeType):
             raise ValueError('text must be a string')
         if not text:
             return ''
@@ -3289,7 +3287,7 @@ class APISite(BaseSite):
         """
         if not pageids:
             return
-        if isinstance(pageids, basestring):
+        if isinstance(pageids, UnicodeType):
             pageids = pageids.replace('|', ',')
             pageids = pageids.split(',')
             pageids = [p.strip() for p in pageids]
@@ -3533,7 +3531,7 @@ class APISite(BaseSite):
             query.request._warning_handler = warn_handler
 
             for item in query:
-                pywikibot.debug(unicode(item), _logger)
+                pywikibot.debug(UnicodeType(item), _logger)
                 for tokentype in valid_tokens:
                     if (tokentype + 'token') in item:
                         user_tokens[tokentype] = item[tokentype + 'token']
@@ -3556,7 +3554,7 @@ class APISite(BaseSite):
                         data = data['query']
                     if 'recentchanges' in data:
                         item = data['recentchanges'][0]
-                        pywikibot.debug(unicode(item), _logger)
+                        pywikibot.debug(UnicodeType(item), _logger)
                         if 'patroltoken' in item:
                             user_tokens['patrol'] = item['patroltoken']
         else:
@@ -3933,7 +3931,7 @@ class APISite(BaseSite):
             raise ValueError(
                 'categorymembers: startsort must be less than endsort')
 
-        if isinstance(member_type, basestring):
+        if isinstance(member_type, UnicodeType):
             member_type = {member_type}
 
         if member_type and sortby == 'timestamp':
@@ -4106,7 +4104,7 @@ class APISite(BaseSite):
         if content:
             rvargs['rvprop'].append('content')
             if section is not None:
-                rvargs['rvsection'] = unicode(section)
+                rvargs['rvsection'] = UnicodeType(section)
         if rollback:
             self.login(sysop=sysop)
             rvargs['rvtoken'] = 'rollback'
@@ -4114,10 +4112,10 @@ class APISite(BaseSite):
             rvtitle = page.title(with_section=False).encode(self.encoding())
             rvargs['titles'] = rvtitle
         else:
-            if isinstance(revids, (int, basestring)):
-                ids = unicode(revids)
+            if isinstance(revids, (int, UnicodeType)):
+                ids = UnicodeType(revids)
             else:
-                ids = '|'.join(unicode(r) for r in revids)
+                ids = '|'.join(UnicodeType(r) for r in revids)
             rvargs['revids'] = ids
 
         if rvdir:
@@ -4301,9 +4299,9 @@ class APISite(BaseSite):
             apgen.request['gapminsize'] = str(minsize)
         if isinstance(maxsize, int):
             apgen.request['gapmaxsize'] = str(maxsize)
-        if isinstance(protect_type, basestring):
+        if isinstance(protect_type, UnicodeType):
             apgen.request['gapprtype'] = protect_type
-            if isinstance(protect_level, basestring):
+            if isinstance(protect_level, UnicodeType):
                 apgen.request['gapprlevel'] = protect_level
         if reverse:
             apgen.request['gapdir'] = 'descending'
@@ -4547,7 +4545,7 @@ class APISite(BaseSite):
         if blockids:
             bkgen.request['bkids'] = blockids
         if users:
-            if isinstance(users, basestring):
+            if isinstance(users, UnicodeType):
                 users = users.split('|')
             # actual IPv6 addresses (anonymous users) are uppercase, but they
             # have never a :: in the username (so those are registered users)
@@ -5275,7 +5273,7 @@ class APISite(BaseSite):
                             'logged in' % err.code,
                             _logger)
                     if err.code in self._ep_errors:
-                        if isinstance(self._ep_errors[err.code], basestring):
+                        if isinstance(self._ep_errors[err.code], UnicodeType):
                             errdata = {
                                 'site': self,
                                 'title': page.title(with_section=False),
@@ -5876,9 +5874,9 @@ class APISite(BaseSite):
         if all(_ is None for _ in [rcid, revid, revision]):
             raise Error('No rcid, revid or revision provided.')
 
-        if isinstance(rcid, (int, basestring)):
+        if isinstance(rcid, (int, UnicodeType)):
             rcid = {rcid}
-        if isinstance(revid, (int, basestring)):
+        if isinstance(revid, (int, UnicodeType)):
             revid = {revid}
         if isinstance(revision, pywikibot.page.Revision):
             revision = {revision}
@@ -6972,7 +6970,7 @@ class APISite(BaseSite):
         """
         # check old and diff types
         def get_param(item):
-            if isinstance(item, basestring):
+            if isinstance(item, UnicodeType):
                 return 'title', item
             elif isinstance(item, pywikibot.Page):
                 return 'title', item.title()
@@ -7033,13 +7031,13 @@ class APISite(BaseSite):
                                 namespaces=namespaces)
 
         if lint_categories:
-            if isinstance(lint_categories, basestring):
+            if isinstance(lint_categories, UnicodeType):
                 lint_categories = lint_categories.split('|')
                 lint_categories = [p.strip() for p in lint_categories]
             query.request['lntcategories'] = '|'.join(lint_categories)
 
         if pageids:
-            if isinstance(pageids, basestring):
+            if isinstance(pageids, UnicodeType):
                 pageids = pageids.split('|')
                 pageids = [p.strip() for p in pageids]
             # Validate pageids.
@@ -7640,7 +7638,7 @@ class DataSite(APISite):
             'Only "props" is a valid kwarg, not {0}'.format(set(params)
                                                             - {'props'})
         if isinstance(source, int) or \
-           isinstance(source, basestring) and source.isdigit():
+           isinstance(source, UnicodeType) and source.isdigit():
             ids = 'q' + str(source)
             params = merge_unique_dicts(params, action='wbgetentities',
                                         ids=ids)

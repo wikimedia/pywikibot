@@ -164,13 +164,13 @@ from pywikibot.tools import (
     deprecated_args,
     issue_deprecation_warning,
     PY2,
+    UnicodeType
 )
 from pywikibot.tools.formatter import color_format
 
 if not PY2:
     from queue import Queue
     long = int
-    basestring = (str, )
 else:
     from Queue import Queue
 
@@ -1073,7 +1073,7 @@ def main(*args):
                               '"{0}"'.format(fix_name))
             continue
         if 'msg' in fix:
-            if isinstance(fix['msg'], basestring):
+            if isinstance(fix['msg'], UnicodeType):
                 set_summary = i18n.twtranslate(site, str(fix['msg']))
             else:
                 set_summary = i18n.translate(site, fix['msg'], fallback=True)
@@ -1081,7 +1081,7 @@ def main(*args):
             set_summary = None
         if not generators_given and 'generator' in fix:
             gen_args = fix['generator']
-            if isinstance(gen_args, basestring):
+            if isinstance(gen_args, UnicodeType):
                 gen_args = [gen_args]
             for gen_arg in gen_args:
                 genFactory.handleArg(gen_arg)
