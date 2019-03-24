@@ -1334,7 +1334,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments.
-    @type args: unicode
+    @type args: str
     """
     from_given = False
     to_given = False

@@ -388,7 +388,8 @@ class CommonscatBot(Bot):
         In Pywikibot >=2.0, page.interwiki() now returns Link objects,
         not Page objects
 
-        @rtype: unicode, name of a valid commons category
+        @return: name of a valid commons category
+        @rtype: str
         """
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
@@ -515,7 +516,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     options = {}
     checkcurrent = False

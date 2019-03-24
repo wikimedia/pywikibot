@@ -313,7 +313,7 @@ def get_base_dir(test_directory=None):
         directory. Used to test whether placing a user config file in this
         directory will cause it to be selected as the base directory.
     @type test_directory: str or None
-    @rtype: unicode
+    @rtype: str
     """
     def exists(directory):
         directory = os.path.abspath(directory)

@@ -414,7 +414,7 @@ def getfileversion(filename):
     returned. Because it doesn't import it, the version can
     be retrieved from any file.
     @param filename: Name of the file to get version
-    @type filename: string
+    @type filename: str
     """
     _program_dir = _get_program_dir()
     __version__ = None

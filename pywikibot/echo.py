@@ -61,7 +61,7 @@ class Notification(object):
         """
         DEPRECATED: Return notification id as unicode.
 
-        @rtype: unicode
+        @rtype: str
         """
         return str(self.event_id)
 

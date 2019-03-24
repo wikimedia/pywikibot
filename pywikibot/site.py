@@ -214,7 +214,7 @@ class Namespace(Iterable, ComparableMixin, UnicodeMixin):
         """Initializer.
 
         @param custom_name: Name defined in server LocalSettings.php
-        @type custom_name: unicode
+        @type custom_name: str
         @param canonical_name: Canonical name
         @type canonical_name: str
         @param aliases: Aliases
@@ -1000,7 +1000,7 @@ class BaseSite(ComparableMixin):
         Return the Namespace for a given namespace name.
 
         @param namespace: name
-        @type namespace: unicode
+        @type namespace: str
         @return: The matching Namespace object on this Site
         @rtype: Namespace, or None if invalid
         """
@@ -1027,7 +1027,7 @@ class BaseSite(ComparableMixin):
         Return canonical local form of namespace name.
 
         @param value: A namespace name
-        @type value: unicode
+        @type value: str
 
         """
         index = self.namespaces.lookup_name(value)
@@ -1126,11 +1126,11 @@ class BaseSite(ComparableMixin):
         """DEPRECATED. Return a wikilink to a page.
 
         @param title: Title of the page to link to
-        @type title: unicode
+        @type title: str
         @param othersite: Generate a interwiki link for use on this site.
         @type othersite: BaseSite or None
 
-        @rtype: unicode
+        @rtype: str
         """
         return pywikibot.Link(title, self).astext(othersite)
 
@@ -1361,7 +1361,7 @@ def need_extension(extension):
     """Decorator to require a certain MediaWiki extension.
 
     @param extension: the MediaWiki extension required
-    @type extension: unicode
+    @type extension: str
     @return: a decorator to make sure the requirement is satisfied when
         the decorated function is called.
     """
@@ -2483,7 +2483,7 @@ class APISite(BaseSite):
         @param args: text to be expanded
         @type args: typing.Iterable[unicode]
 
-        @rtype: unicode
+        @rtype: str
         """
         needed_mw_messages = ('and', 'comma-separator', 'word-separator')
         if not args:
@@ -2521,12 +2521,12 @@ class APISite(BaseSite):
         magic parser words like {{CURRENTTIMESTAMP}}.
 
         @param text: text to be expanded
-        @type text: unicode
+        @type text: str
         @param title: page title without section
-        @type title: unicode
+        @type title: str
         @param includecomments: if True do not strip comments
         @type includecomments: bool
-        @rtype: unicode
+        @rtype: str
         """
         if not isinstance(text, basestring):
             raise ValueError('text must be a string')
@@ -3902,7 +3902,8 @@ class APISite(BaseSite):
         @param member_type: member type; if member_type includes 'page' and is
             used in conjunction with sortby="timestamp", the API may limit
             results to only pages in the first 50 namespaces.
-        @type member_type: str or iterable of str; values: page, subcat, file
+        @type member_type: str or iterable of str;
+            values: page, subcat, file
 
         @raises KeyError: a namespace identifier was not resolved
         @raises NotImplementedError: startprefix or endprefix parameters are
@@ -4823,7 +4824,7 @@ class APISite(BaseSite):
         @see: U{https://www.mediawiki.org/wiki/API:Search}
 
         @param searchstring: the text to search for
-        @type searchstring: unicode
+        @type searchstring: str
         @param where: Where to search; value must be "text", "title" or
             "nearmatch" (many wikis do not support title or nearmatch search)
         @param namespaces: search only in these namespaces (defaults to all)
@@ -5183,14 +5184,14 @@ class APISite(BaseSite):
             * nochange: don't change the watchlist
         @param bot: if True, mark edit with bot flag
         @kwarg text: Overrides Page.text
-        @type text: unicode
+        @type text: str
         @kwarg section: Edit an existing numbered section or
             a new section ('new')
         @type section: int or str
         @kwarg prependtext: Prepend text. Overrides Page.text
-        @type text: unicode
+        @type text: str
         @kwarg appendtext: Append text. Overrides Page.text.
-        @type text: unicode
+        @type text: str
         @kwarg undo: Revision id to undo. Overrides Page.text
         @type undo: int
         @return: True if edit succeeded, False if it failed
@@ -5501,7 +5502,7 @@ class APISite(BaseSite):
 
         @param page: the Page to be moved (must exist)
         @param newtitle: the new title for the Page
-        @type newtitle: unicode
+        @type newtitle: str
         @param summary: edit summary (required!)
         @param movetalk: if True (default), also move the talk page if possible
         @param noredirect: if True, suppress creation of a redirect from the
@@ -7178,9 +7179,9 @@ class APISite(BaseSite):
         @param page: A Flow topic
         @type page: Topic
         @param post_id: The UUID of the Post
-        @type post_id: unicode
+        @type post_id: str
         @param format: The content format used for the returned content
-        @type format: unicode (either 'wikitext', 'html', or 'fixed-html')
+        @type format: str (either 'wikitext', 'html', or 'fixed-html')
         @return: A dict representing the post data for the given UUID.
         @rtype: dict
         """
@@ -7199,11 +7200,11 @@ class APISite(BaseSite):
         @param page: A Flow board
         @type page: Board
         @param title: The title of the new topic (must be in plaintext)
-        @type title: unicode
+        @type title: str
         @param content: The content of the topic's initial post
-        @type content: unicode
+        @type content: str
         @param format: The content format of the value supplied for content
-        @type format: unicode (either 'wikitext' or 'html')
+        @type format: str (either 'wikitext' or 'html')
         @return: The metadata of the new topic
         @rtype: dict
         """
@@ -7223,11 +7224,11 @@ class APISite(BaseSite):
         @param page: A Flow topic
         @type page: Topic
         @param reply_to_uuid: The UUID of the Post to create a reply to
-        @type reply_to_uuid: unicode
+        @type reply_to_uuid: str
         @param content: The content of the reply
-        @type content: unicode
+        @type content: str
         @param format: The content format used for the supplied content
-        @type format: unicode (either 'wikitext' or 'html')
+        @type format: str (either 'wikitext' or 'html')
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7250,7 +7251,7 @@ class APISite(BaseSite):
         @param lock: Whether to lock or unlock the topic
         @type lock: bool (True corresponds to locking the topic.)
         @param reason: The reason to lock or unlock the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7274,7 +7275,7 @@ class APISite(BaseSite):
         @param state: The new moderation state
         @type state: str
         @param reason: The reason to moderate the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7295,7 +7296,7 @@ class APISite(BaseSite):
         @param page: A Flow topic
         @type page: Topic
         @param reason: The reason to delete the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7310,7 +7311,7 @@ class APISite(BaseSite):
         @param page: A Flow topic
         @type page: Topic
         @param reason: The reason to hide the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7325,7 +7326,7 @@ class APISite(BaseSite):
         @param page: A Flow topic
         @type page: Topic
         @param reason: The reason to suppress the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7340,7 +7341,7 @@ class APISite(BaseSite):
         @param page: A Flow topic
         @type page: Topic
         @param reason: The reason to restore the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7357,7 +7358,7 @@ class APISite(BaseSite):
         @param state: The new moderation state
         @type state: str
         @param reason: The reason to moderate the topic
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7380,7 +7381,7 @@ class APISite(BaseSite):
         @param post: A Flow post
         @type post: Post
         @param reason: The reason to delete the post
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7395,7 +7396,7 @@ class APISite(BaseSite):
         @param post: A Flow post
         @type post: Post
         @param reason: The reason to hide the post
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7410,7 +7411,7 @@ class APISite(BaseSite):
         @param post: A Flow post
         @type post: Post
         @param reason: The reason to suppress the post
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """
@@ -7425,7 +7426,7 @@ class APISite(BaseSite):
         @param post: A Flow post
         @type post: Post
         @param reason: The reason to restore the post
-        @type reason: unicode
+        @type reason: str
         @return: Metadata returned by the API
         @rtype: dict
         """

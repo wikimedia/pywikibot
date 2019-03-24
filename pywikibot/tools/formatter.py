@@ -115,7 +115,7 @@ class _ColorFormatter(Formatter):
         is no literal text around it or when the field value is not a `unicode`
         already.
 
-        @rtype: unicode
+        @rtype: str
         """
         result = super(_ColorFormatter, self)._vformat(*args, **kwargs)
         if isinstance(result, tuple):
@@ -142,13 +142,13 @@ class _ColorFormatter(Formatter):
         Return the normal format result but verify no colors are keywords.
 
         @param format_string: The format template string
-        @type format_string: unicode
+        @type format_string: str
         @param args: The positional field values
         @type args: typing.Sequence
         @param kwargs: The named field values
         @type kwargs: dict
         @return: The formatted string
-        @rtype: unicode
+        @rtype: str
         """
         if self.colors.intersection(kwargs):  # kwargs use colors
             raise ValueError('Keyword argument(s) use valid color(s): '
@@ -171,8 +171,8 @@ def color_format(text, *args, **kwargs):
     parameter color.
 
     @param text: The format template string
-    @type text: unicode
+    @type text: str
     @return: The formatted string
-    @rtype: unicode
+    @rtype: str
     """
     return _ColorFormatter().format(text, *args, **kwargs)

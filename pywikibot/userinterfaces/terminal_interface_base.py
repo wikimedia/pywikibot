@@ -268,7 +268,7 @@ class UI(object):
         @type default: basestring
         @param force: Automatically use the default
         @type force: bool
-        @rtype: unicode
+        @rtype: str
         """
         assert(not password or not default)
         end_marker = ':'
@@ -442,14 +442,14 @@ class UI(object):
         Uses a Tkinter edit box because we don't have a console editor
 
         @param text: the text to be edited
-        @type text: unicode
+        @type text: str
         @param jumpIndex: position at which to put the caret
         @type jumpIndex: int
         @param highlight: each occurrence of this substring will be highlighted
-        @type highlight: unicode
+        @type highlight: str
         @return: the modified text, or None if the user didn't save the text
             file in his text editor
-        @rtype: unicode or None
+        @rtype: str or None
         """
         try:
             from pywikibot.userinterfaces import gui

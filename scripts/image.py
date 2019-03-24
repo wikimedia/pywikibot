@@ -64,10 +64,10 @@ class ImageRobot(ReplaceBot):
         @param generator: the pages to work on
         @type generator: iterable
         @param old_image: the title of the old image (without namespace)
-        @type old_image: unicode
+        @type old_image: str
         @param new_image: the title of the new image (without namespace), or
                           None if you want to remove the image
-        @type new_image: unicode or None
+        @type new_image: str or None
         """
         self.availableOptions.update({
             'summary': None,
@@ -131,7 +131,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     old_image = None
     new_image = None

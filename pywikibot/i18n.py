@@ -408,7 +408,7 @@ def _altlang(lang):
     This code is used by other translating methods below.
 
     @param lang: The language code
-    @type lang: string
+    @type lang: str
     @return: language codes
     @rtype: list of str
     """
@@ -455,7 +455,7 @@ def _extract_plural(code, message, parameters):
     """Check for the plural variants in message and replace them.
 
     @param message: the message to be replaced
-    @type message: unicode string
+    @type message: str string
     @param parameters: plural parameters passed from other methods
     @type parameters: Mapping of str to int
     @return: The message with the plural instances replaced
@@ -574,7 +574,7 @@ def translate(code, xdict, parameters=None, fallback=False):
     For PLURAL support have a look at the twtranslate method.
 
     @param code: The language code
-    @type code: string or Site object
+    @type code: str or Site object
     @param xdict: dictionary with language codes as keys or extended dictionary
                   with family names as keys containing language dictionaries or
                   a single (unicode) string. May contain PLURAL tags as
@@ -854,7 +854,7 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
     @param parameters: The values which will be applied to the translated text
     @param password: Hides the user's input (for password entry)
     @param fallback_prompt: The English prompt if i18n is not available.
-    @rtype: unicode string
+    @rtype: str string
     """
     if not messages_available():
         if not fallback_prompt:

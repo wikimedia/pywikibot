@@ -364,14 +364,14 @@ class EditBoxWindow(Tkinter.Frame):
         Provide user with editor to modify text.
 
         @param text: the text to be edited
-        @type text: unicode
+        @type text: str
         @param jumpIndex: position at which to put the caret
         @type jumpIndex: int
         @param highlight: each occurrence of this substring will be highlighted
-        @type highlight: unicode
+        @type highlight: str
         @return: the modified text, or None if the user didn't save the text
             file in his text editor
-        @rtype: unicode or None
+        @rtype: str or None
         """
         self.text = None
         # put given text into our textarea

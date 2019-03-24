@@ -1103,9 +1103,9 @@ class Family(object):
         May be overridden to return 'https'. Other protocols are not supported.
 
         @param code: language code
-        @type code: string
+        @type code: str
         @return: protocol that this family uses
-        @rtype: string
+        @rtype: str
         """
         return 'http'
 
@@ -1114,7 +1114,7 @@ class Family(object):
         Return whether a HTTPS certificate error should be ignored.
 
         @param code: language code
-        @type code: string
+        @type code: str
         @return: flag to allow access if certificate has an error.
         @rtype: bool
         """

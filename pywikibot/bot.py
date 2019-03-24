@@ -451,7 +451,7 @@ def input(question, password=False, default='', force=False):
 
     @param question: a string that will be shown to the user. Don't add a
         space after the question mark/colon, this method will do this for you.
-    @type question: unicode
+    @type question: str
     @param password: if True, hides the user's input (for password entry).
     @type password: bool
     @param default: The default answer if none was entered. None to require
@@ -459,7 +459,7 @@ def input(question, password=False, default='', force=False):
     @type default: basestring
     @param force: Automatically use the default
     @type force: bool
-    @rtype: unicode
+    @rtype: str
     """
     # make sure logging system has been initialized
     if not _handlers_initialized:
@@ -875,7 +875,7 @@ def calledModuleName():
     This is required because the -help option loads the module's docstring
     and because the module name will be used for the filename of the log.
 
-    @rtype: unicode
+    @rtype: str
     """
     # get commandline arguments
     called = pywikibot.argvu[0].strip()

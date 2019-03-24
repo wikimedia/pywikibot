@@ -105,9 +105,9 @@ class Photo(pywikibot.FilePage):
         a MediaWiki page title, and cause an API exception when used.
 
         @param fmt: format string
-        @type fmt: unicode
+        @type fmt: str
         @return: formatted string
-        @rtype: unicode
+        @rtype: str
         """
         # FIXME: normalise the title so it is usable as a MediaWiki title.
         return fmt % self.metadata
@@ -246,7 +246,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     # Process global args and prepare generator args parser
     local_args = pywikibot.handle_args(args)

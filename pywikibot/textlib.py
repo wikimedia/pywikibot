@@ -164,7 +164,7 @@ def to_local_digits(phrase, lang):
     @param phrase: The phrase to convert to localized numerical
     @param lang: language code
     @return: The localized version
-    @rtype: unicode
+    @rtype: str
     """
     digits = NON_LATIN_DIGITS.get(lang)
     if not digits:
@@ -364,7 +364,7 @@ def replaceExcept(text, old, new, exceptions, caseInsensitive=False,
     regex matching. If allowoverlap is true, overlapping occurrences are all
     replaced (watch out when using this, it might lead to infinite loops!).
 
-    @type text: unicode
+    @type text: str
     @param old: a compiled or uncompiled regular expression
     @param new: a unicode string (which can contain regular
         expression references), or a function which takes
@@ -1208,7 +1208,7 @@ def interwikiFormat(links, insite=None):
     @type insite: BaseSite
     @return: string including wiki links formatted for inclusion
         in insite
-    @rtype: unicode
+    @rtype: str
     """
     if insite is None:
         insite = pywikibot.Site()
@@ -1362,7 +1362,7 @@ def replaceCategoryInPlace(oldtext, oldcat, newcat, site=None,
     @param add_only: If add_only is True, the old category won't
         be replaced and the category given will be added after it.
     @return: the modified text
-    @rtype: unicode
+    @rtype: str
     """
     if site is None:
         site = pywikibot.Site()
@@ -1616,7 +1616,7 @@ def extract_templates_and_params(text, remove_disabled_parts=None, strip=None):
     To replicate that behaviour, enable both remove_disabled_parts and strip.
 
     @param text: The wikitext from which templates are extracted
-    @type text: unicode or string
+    @type text: str
     @param remove_disabled_parts: Remove disabled wikitext such as comments
         and pre. If None (default), this is enabled when mwparserfromhell
         is not available or is disabled in the config, and disabled if
@@ -1660,7 +1660,7 @@ def extract_templates_and_params_mwpfh(text, strip=False):
     config.mwparserfromhell.
 
     @param text: The wikitext from which templates are extracted
-    @type text: unicode or string
+    @type text: str
     @return: list of template name and params
     @rtype: list of tuple
     """
@@ -1699,7 +1699,7 @@ def extract_templates_and_params_regex(text, remove_disabled_parts=True,
     is not used.
 
     @param text: The wikitext from which templates are extracted
-    @type text: unicode or string
+    @type text: str
     @return: list of template name and params
     @rtype: list of tuple
     """
@@ -1855,7 +1855,7 @@ def extract_templates_and_params_regex_simple(text):
     argument value contains a '|', such as {{template|a={{b|c}} }}.
 
     @param text: The wikitext from which templates are extracted
-    @type text: unicode or string
+    @type text: str
     @return: list of template name and params
     @rtype: list of tuple of name and OrderedDict
     """
@@ -2016,9 +2016,9 @@ def does_text_contain_section(pagetext, section):
     text link e.g. for categories and files.
 
     @param pagetext: The wikitext of a page
-    @type pagetext: unicode or string
+    @type pagetext: str
     @param section: a section of a page including wikitext markups
-    @type section: unicode or string
+    @type section: str
 
     """
     # match preceding colon for text links

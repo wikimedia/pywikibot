@@ -409,7 +409,7 @@ class LinkChecker(object):
         If useHEAD is true, uses the HTTP HEAD method, which saves bandwidth
         by not downloading the body. Otherwise, the HTTP GET method is used.
 
-        @rtype: unicode or None
+        @rtype: str or None
         """
         conn = self.getConnection()
         try:
@@ -953,7 +953,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     gen = None
     xmlFilename = None

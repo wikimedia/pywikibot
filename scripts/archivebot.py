@@ -381,7 +381,7 @@ class DiscussionThread(object):
         Check whether thread has to be archived.
 
         @return: archiving reason i18n string or empty string.
-        @rtype: string
+        @rtype: str
         """
         algo = archiver.get_attr('algo')
         re_t = re.search(r'^old\((.*)\)$', algo)
@@ -705,7 +705,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     filename = None
     pagename = None

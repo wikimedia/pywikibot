@@ -42,7 +42,7 @@ class FlowPage(BasePage):
         @param source: A Flow-enabled site or a Link or Page on such a site
         @type source: Site, Link, or Page
         @param title: normalized title of the page
-        @type title: unicode
+        @type title: str
 
         @raises TypeError: incorrect use of parameters
         @raises ValueError: use of non-Flow-enabled Site
@@ -61,7 +61,7 @@ class FlowPage(BasePage):
         """Return the UUID of the page.
 
         @return: UUID of the page
-        @rtype: unicode
+        @rtype: str
         """
         if not hasattr(self, '_uuid'):
             self._load_uuid()
@@ -141,11 +141,11 @@ class Board(FlowPage):
         """Create and return a Topic object for a new topic on this Board.
 
         @param title: The title of the new topic (must be in plaintext)
-        @type title: unicode
+        @type title: str
         @param content: The content of the topic's initial post
-        @type content: unicode
+        @type content: str
         @param format: The content format of the value supplied for content
-        @type format: unicode (either 'wikitext' or 'html')
+        @type format: str (either 'wikitext' or 'html')
         @return: The new topic
         @rtype: Topic
         """
@@ -173,11 +173,11 @@ class Topic(FlowPage):
         @param board: The topic's parent board
         @type board: Board
         @param title: The title of the new topic (must be in plaintext)
-        @type title: unicode
+        @type title: str
         @param content: The content of the topic's initial post
-        @type content: unicode
+        @type content: str
         @param format: The content format of the value supplied for content
-        @type format: unicode (either 'wikitext' or 'html')
+        @type format: str (either 'wikitext' or 'html')
         @return: The new topic
         @rtype: Topic
         """
@@ -191,7 +191,7 @@ class Topic(FlowPage):
         @param board: The topic's parent Flow board
         @type board: Board
         @param root_uuid: The UUID of the topic and its root post
-        @type root_uuid: unicode
+        @type root_uuid: str
         @param topiclist_data: The data returned by view-topiclist
         @type topiclist_data: dict
         @return: A Topic object derived from the supplied data
@@ -242,7 +242,7 @@ class Topic(FlowPage):
         """A convenience method to reply to this topic's root post.
 
         @param content: The content of the new post
-        @type content: unicode
+        @type content: str
         @param format: The format of the given content
         @type format: str ('wikitext' or 'html')
         @return: The new reply to this topic's root post
@@ -255,7 +255,7 @@ class Topic(FlowPage):
         """Lock this topic.
 
         @param reason: The reason for locking this topic
-        @type reason: unicode
+        @type reason: str
         """
         self.site.lock_topic(self, True, reason)
         self._reload()
@@ -264,7 +264,7 @@ class Topic(FlowPage):
         """Unlock this topic.
 
         @param reason: The reason for unlocking this topic
-        @type reason: unicode
+        @type reason: str
         """
         self.site.lock_topic(self, False, reason)
         self._reload()
@@ -273,7 +273,7 @@ class Topic(FlowPage):
         """Delete this topic through the Flow moderation system.
 
         @param reason: The reason for deleting this topic.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.delete_topic(self, reason)
         self._reload()
@@ -282,7 +282,7 @@ class Topic(FlowPage):
         """Hide this topic.
 
         @param reason: The reason for hiding this topic.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.hide_topic(self, reason)
         self._reload()
@@ -291,7 +291,7 @@ class Topic(FlowPage):
         """Suppress this topic.
 
         @param reason: The reason for suppressing this topic.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.suppress_topic(self, reason)
         self._reload()
@@ -300,7 +300,7 @@ class Topic(FlowPage):
         """Restore this topic.
 
         @param reason: The reason for restoring this topic.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.restore_topic(self, reason)
         self._reload()
@@ -318,7 +318,7 @@ class Post(object):
         @param page: Flow topic
         @type page: Topic
         @param uuid: UUID of a Flow post
-        @type uuid: unicode
+        @type uuid: str
 
         @raises TypeError: incorrect types of parameters
         """
@@ -342,7 +342,7 @@ class Post(object):
         @param page: A Flow topic
         @type page: Topic
         @param post_uuid: The UUID of the post
-        @type post_uuid: unicode
+        @type post_uuid: str
         @param data: The JSON data returned from the API
         @type data: dict
 
@@ -397,7 +397,7 @@ class Post(object):
         """Return the UUID of the post.
 
         @return: UUID of the post
-        @rtype: unicode
+        @rtype: str
         """
         return self._uuid
 
@@ -444,9 +444,9 @@ class Post(object):
         @param sysop: Whether to load using sysop rights. Implies force.
         @type sysop: bool
         @param format: Content format to return contents in
-        @type format: unicode
+        @type format: str
         @return: The contents of the post in the given content format
-        @rtype: unicode
+        @rtype: str
         @raises NotImplementedError: use of 'sysop'
         """
         if sysop:
@@ -486,7 +486,7 @@ class Post(object):
         """Reply to this post.
 
         @param content: The content of the new post
-        @type content: unicode
+        @type content: str
         @param format: The format of the given content
         @type format: str ('wikitext' or 'html')
         @return: The new reply post
@@ -512,7 +512,7 @@ class Post(object):
         """Delete this post through the Flow moderation system.
 
         @param reason: The reason for deleting this post.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.delete_post(self, reason)
         self._load()
@@ -521,7 +521,7 @@ class Post(object):
         """Hide this post.
 
         @param reason: The reason for hiding this post.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.hide_post(self, reason)
         self._load()
@@ -530,7 +530,7 @@ class Post(object):
         """Suppress this post.
 
         @param reason: The reason for suppressing this post.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.suppress_post(self, reason)
         self._load()
@@ -539,7 +539,7 @@ class Post(object):
         """Restore this post.
 
         @param reason: The reason for restoring this post.
-        @type reason: unicode
+        @type reason: str
         """
         self.site.restore_post(self, reason)
         self._load()

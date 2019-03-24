@@ -182,7 +182,7 @@ class Timestamp(datetime.datetime):
         """Convert an ISO 8601 timestamp to a Timestamp object.
 
         @param ts: ISO 8601 timestamp or a Timestamp object already
-        @type ts: str ot Timestamp
+        @type ts: str or Timestamp
         @param sep: one-character separator, placed between the date and time
         @type sep: str
         @return: Timestamp object
@@ -772,7 +772,7 @@ class WbQuantity(_WbRepresentation):
         Create a new WbQuantity object.
 
         @param amount: number representing this quantity
-        @type amount: string or Decimal. Other types are accepted, and
+        @type amount: str or Decimal. Other types are accepted, and
             converted via str to Decimal.
         @param unit: the Wikibase item for the unit or the entity URI of this
             Wikibase item.
@@ -1164,7 +1164,7 @@ def _code_fam_from_url(url):
 
     Site helper method.
     @param url: The site URL to get code and family
-    @type url: string
+    @type url: str
     @raises SiteDefinitionError: Unknown URL
     """
     if url not in _url_cache:
@@ -1197,19 +1197,19 @@ def Site(code=None, fam=None, user=None, sysop=None, interface=None, url=None):
     using the method parameters.
 
     @param code: language code (override config.mylang)
-    @type code: string
+    @type code: str
     @param fam: family name or object (override config.family)
-    @type fam: string or Family
+    @type fam: str or Family
     @param user: bot user name to use on this site (override config.usernames)
-    @type user: unicode
+    @type user: str
     @param sysop: sysop user to use on this site (override config.sysopnames)
-    @type sysop: unicode
+    @type sysop: str
     @param interface: site class or name of class in pywikibot.site
         (override config.site_interface)
     @type interface: subclass of L{pywikibot.site.BaseSite} or string
     @param url: Instead of code and fam, does try to get a Site based on the
         URL. Still requires that the family supporting that URL exists.
-    @type url: string
+    @type url: str
     @rtype: pywikibot.site.APISite
     @raises ValueError: URL and pair of code and family given
     @raises ValueError: Invalid interface name

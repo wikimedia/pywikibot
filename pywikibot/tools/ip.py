@@ -97,7 +97,7 @@ def is_IP(IP):
     No logging is performed. Use ip_address instead to catch errors.
 
     @param IP: IP address
-    @type IP: unicode
+    @type IP: str
     @rtype: bool
     """
     try:

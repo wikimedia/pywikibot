@@ -1607,7 +1607,7 @@ def TextfilePageGenerator(filename=None, site=None):
 
     @param filename: the name of the file that should be read. If no name is
                      given, the generator prompts the user.
-    @type filename: unicode
+    @type filename: str
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
 
@@ -1933,7 +1933,7 @@ class RegexFilter(object):
             'all' - yields page if title is matched by all regexes
             'any' - yields page if title is matched by any regexes
             'none' - yields page if title is NOT matched by any regexes
-        @type quantifier: string of ('all', 'any', 'none')
+        @type quantifier: str of ('all', 'any', 'none')
         @param ignore_namespace: ignore the namespace when matching the title
         @type ignore_namespace: bool
         @return: return a page depending on the matching parameters
@@ -2951,9 +2951,9 @@ def WikidataSPARQLPageGenerator(query, site=None,
     @param site: Site for generator results.
     @type site: L{pywikibot.site.BaseSite}
     @param endpoint: SPARQL endpoint URL
-    @type endpoint: string
+    @type endpoint: str
     @param entity_url: URL prefix for any entities returned in a query.
-    @type entity_url: string
+    @type entity_url: str
     @param result_type: type of the iterable in which
              SPARQL results are stored (default set)
     @type result_type: iterable

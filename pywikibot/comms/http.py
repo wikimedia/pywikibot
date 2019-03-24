@@ -191,7 +191,7 @@ def user_agent(site=None, format_string=None):
         str.format. Is using config.user_agent_format when it is None.
     @type format_string: basestring
     @return: The formatted user agent
-    @rtype: unicode
+    @rtype: str
     """
     values = USER_AGENT_PRODUCTS.copy()
 

@@ -1272,7 +1272,7 @@ def open_archive(filename, mode='rb', use_extension=True):
     @param mode: The mode in which the file should be opened. It may either be
         'r', 'rb', 'a', 'ab', 'w' or 'wb'. All modes open the file in binary
         mode. It defaults to 'rb'.
-    @type mode: string
+    @type mode: str
     @raises ValueError: When 7za is not available or the opening mode is
         unknown or it tries to write a 7z archive.
     @raises FileNotFoundError: When the filename doesn't exist and it tries
@@ -1590,10 +1590,10 @@ def deprecated(*args, **kwargs):
     """Decorator to output a deprecation warning.
 
     @kwarg instead: if provided, will be used to specify the replacement
-    @type instead: string
+    @type instead: str
     @kwarg since: a timestamp string of the date when the method was
         deprecated (form 'YYYYMMDD') or a version string.
-    @type since: string
+    @type since: str
     """
     def decorator(obj):
         """Outer wrapper.

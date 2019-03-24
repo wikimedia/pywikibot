@@ -30,7 +30,7 @@ def _call_cmd(args, lib='djvulibre'):
     @type args: typing.Sequence[string]
 
     @param library: library to be logged in logging messages
-    @type library: string
+    @type library: str
 
     @param log: log process output; errors are always logged.
     @type library: bool
@@ -77,7 +77,7 @@ class DjVuFile(object):
         Initializer.
 
         @param file: filename (including path) to djvu file
-        @type file: string/unicode
+        @type file: str
         """
         self._filename = file
         filename = os.path.expanduser(file)

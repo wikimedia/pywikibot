@@ -51,19 +51,19 @@ class UploadRobot(BaseBot):
 
         @param url: path to url or local file (deprecated), or list of urls or
             paths to local files.
-        @type url: string (deprecated) or list
+        @type url: str (deprecated) or list
         @param description: Description of file for its page. If multiple files
             are uploading the same description is used for every file.
-        @type description: string
+        @type description: str
         @param useFilename: Specify title of the file's page. If multiple
             files are uploading it asks to change the name for second, third,
             etc. files, otherwise the last file will overwrite the other.
-        @type useFilename: string
+        @type useFilename: str
         @param keepFilename: Set to True to keep original names of urls and
             files, otherwise it will ask to enter a name for each file.
         @type keepFilename: bool
         @param summary: Summary of the upload
-        @type summary: string
+        @type summary: str
         @param verifyDescription: Set to True to proofread the description.
         @type verifyDescription: bool
         @param ignoreWarning: Set this to True to upload even if another file
@@ -82,7 +82,7 @@ class UploadRobot(BaseBot):
         @type chunk_size: integer
         @param filename_prefix: Specify prefix for the title of every
             file's page.
-        @type filename_prefix: string
+        @type filename_prefix: str
         @param always: Disables any input, requires that either ignoreWarning
             or aborts are set to True and that the description is also set. It
             overwrites verifyDescription to False and keepFilename to True.
@@ -390,7 +390,7 @@ class UploadRobot(BaseBot):
         Determine if the warning message should be ignored.
 
         @param warn_code: The warning message
-        @type warn_code: string
+        @type warn_code: str
         """
         if self.ignoreWarning is True:
             return True

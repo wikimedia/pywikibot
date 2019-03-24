@@ -135,7 +135,7 @@ class DeletionRobot(MultipleSitesBot, CurrentPageBot):
         @param generator: the pages to work on
         @type generator: iterable
         @param summary: the reason for the (un)deletion
-        @type summary: unicode
+        @type summary: str
         """
         self.availableOptions.update({
             'undelete': False,
@@ -225,7 +225,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     page_name = ''
     summary = None

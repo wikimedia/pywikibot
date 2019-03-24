@@ -1610,7 +1610,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         @param msg: Either the specific message or None to allow any generic
             message. When set to C{INSTEAD} it only counts those supplying an
             alternative and when C{NO_INSTEAD} only those not supplying one.
-        @type msg: string or None or INSTEAD or NO_INSTEAD
+        @type msg: str or None or INSTEAD or NO_INSTEAD
         """
         if msg is None or msg is self.INSTEAD or msg is self.NO_INSTEAD:
             deprecation_messages = self.deprecation_messages

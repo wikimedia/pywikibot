@@ -988,7 +988,7 @@ class IndexPage(pywikibot.Page):
 
         @param page: Page instance
         @return: page label
-        @rtype: unicode string
+        @rtype: str string
         """
         try:
             return self._labels_from_page[page]
@@ -1003,7 +1003,7 @@ class IndexPage(pywikibot.Page):
 
         @param page_number: int
         @return: page label
-        @rtype: unicode string
+        @rtype: str string
         """
         try:
             return self._labels_from_page_number[page_number]

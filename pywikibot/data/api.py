@@ -877,10 +877,10 @@ class OptionSet(MutableMapping):
         @type site: APISite
         @param module: The module name which is used by paraminfo. (Ignored
             when site is None)
-        @type module: string
+        @type module: str
         @param param: The parameter name inside the module. That parameter must
             have a 'type' entry. (Ignored when site is None)
-        @type param: string
+        @type param: str
         @param dict: The initializing dict which is used for L{from_dict}.
         @type dict: dict
         """
@@ -901,10 +901,10 @@ class OptionSet(MutableMapping):
         @param site: The associated site
         @type site: APISite
         @param module: The module name which is used by paraminfo.
-        @type module: string
+        @type module: str
         @param param: The parameter name inside the module. That parameter must
             have a 'type' entry.
-        @type param: string
+        @type param: str
         @param clear_invalid: Instead of throwing a KeyError, invalid names are
             silently removed from the options (disabled by default).
         @type clear_invalid: bool
@@ -1389,7 +1389,7 @@ class Request(MutableMapping):
 
         @param value: param value(s)
 
-        @type value: unicode or str in site encoding
+        @type value: str in site encoding
             (string types may be a `|`-separated list)
             iterable, where items are converted to unicode
             with special handling for datetime.datetime to convert it to a
@@ -2159,7 +2159,7 @@ class CachedRequest(Request):
         scripts/maintenance/cache.py to support
         the new key and all previous keys.
 
-        @rtype: unicode
+        @rtype: str
         """
         login_status = self.site._loginstatus
 

@@ -183,7 +183,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @type source: Link, Page (or subclass), or Site
         @param title: normalized title of the page; required if source is a
             Site, ignored otherwise
-        @type title: unicode
+        @type title: str
         @param ns: namespace number; required if source is a Site, ignored
             otherwise
         @type ns: int
@@ -319,7 +319,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             -family and -lang option i.e. config.family and config.mylang
         @param without_brackets: (cannot be used with as_link) if true, remove
             the last pair of brackets(usually removes disambiguation brackets).
-        @rtype: unicode
+        @rtype: str
         """
         title = self._link.canonical_title()
         label = self._link.title
@@ -382,7 +382,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         The section is the part of the title following a '#' character, if
         any. If no section is present, return None.
 
-        @rtype: unicode
+        @rtype: str
         """
         return self._link.section
 
@@ -473,7 +473,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param sysop:           if the user has a sysop account, use it to
                                 retrieve this page
 
-        @rtype: unicode
+        @rtype: str
         """
         if force:
             del self.latest_revision_id
@@ -525,7 +525,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Return text of an old revision of this page; same options as get().
 
         @param oldid: The revid of the revision desired.
-        @rtype: unicode
+        @rtype: str
         """
         if force or oldid not in self._revisions \
                 or self._revisions[oldid].text is None:
@@ -544,7 +544,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             without title uncoded.
         @param with_protocol: if true, http or https prefixes will be
             included before the double slash.
-        @rtype: unicode
+        @rtype: str
         """
         if percent_encoded:
             title = self.title(as_url=True)
@@ -619,7 +619,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Return the current (edited) wikitext, loading it if necessary.
 
         @return: text of the page
-        @rtype: unicode
+        @rtype: str
         """
         if not hasattr(self, '_text') or self._text is None:
             try:
@@ -660,7 +660,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         Application: on Wikisource wikis, text can be preloaded even if
         a page does not exist, if an Index page is present.
 
-        @rtype: unicode
+        @rtype: str
         """
         self.site.loadpageinfo(self, preload=True)
         return self._preloadedtext
@@ -691,7 +691,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param force: force updating from the live site
 
-        @rtype: unicode or None
+        @rtype: str or None
         """
         return self.properties(force=force).get('defaultsort')
 
@@ -721,7 +721,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         Return name or IP address of last user to edit page.
 
-        @rtype: unicode
+        @rtype: str
         """
         return self.latest_revision.user
 
@@ -744,7 +744,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         i.e. which is not returned by Site.botusers(), it will be returned
         as a non-bot edit.
 
-        @rtype: unicode
+        @rtype: str
         """
         if hasattr(self, '_lastNonBotUser'):
             return self._lastNonBotUser
@@ -1232,7 +1232,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
 
         @param summary: The edit summary for the modification (optional, but
             most wikis strongly encourage its use)
-        @type summary: unicode
+        @type summary: str
         @param watch: Specify how the watchlist is affected by this edit, set
             to one of "watch", "unwatch", "preferences", "nochange":
             * watch: add the page to the watchlist
@@ -1244,7 +1244,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
             For backward compatibility watch parameter may also be boolean:
             if True, add or if False, remove this Page to/from bot
             user's watchlist.
-        @type watch: string, bool (deprecated) or None
+        @type watch: str, bool (deprecated) or None
         @param minor: if True, mark this edit as minor
         @type minor: bool
         @param botflag: if True, mark this edit as made by a bot (default:
@@ -1353,7 +1353,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         docs for all parameters not listed here.
 
         @param newtext: The complete text of the revised page.
-        @type newtext: unicode
+        @type newtext: str
         """
         self.text = newtext
         self.save(summary=summary, watch=watch, minor=minor, botflag=botflag,
@@ -2511,7 +2511,7 @@ class FilePage(Page):
         @param url_height: see iiurlheigth in [1]
         @param url_param: see iiurlparam in [1]
         @return: latest file url or thumburl
-        @rtype: unicode
+        @rtype: str
         """
         # Plain url is requested.
         if url_width is None and url_height is None and url_param is None:
@@ -2976,11 +2976,11 @@ class Category(Page):
         Copy text of category page to a new page. Does not move contents.
 
         @param cat: New category title (without namespace) or Category object
-        @type cat: unicode or Category
+        @type cat: str or Category
         @param message: message to use for category creation message
             If two %s are provided in message, will be replaced
             by (self.title, authorsList)
-        @type message: unicode
+        @type message: str
         @return: True if copying was successful, False if target page
             already existed.
         @rtype: bool
@@ -3203,7 +3203,7 @@ class User(Page):
 
         DEPRECATED: use username instead.
 
-        @rtype: unicode
+        @rtype: str
         """
         return self.username
 
@@ -3215,7 +3215,7 @@ class User(Page):
         Convenience method that returns the title of the page with
         namespace prefix omitted, which is the username.
 
-        @rtype: unicode
+        @rtype: str
         """
         if self._isAutoblock:
             return '#' + self.title(with_ns=False)
@@ -3376,7 +3376,7 @@ class User(Page):
 
         @param subpage: subpage part to be appended to the main
                             page title (optional)
-        @type subpage: unicode
+        @type subpage: str
         @return: Page object of user page or user subpage
         @rtype: Page
         """
@@ -3395,7 +3395,7 @@ class User(Page):
 
         @param subpage: subpage part to be appended to the main
                             talk page title (optional)
-        @type subpage: unicode
+        @type subpage: str
         @return: Page object of user talk page or user talk subpage
         @rtype: Page
         """
@@ -3414,9 +3414,9 @@ class User(Page):
         Send an email to this user via MediaWiki's email interface.
 
         @param subject: the subject header of the mail
-        @type subject: unicode
+        @type subject: str
         @param text: mail body
-        @type text: unicode
+        @type text: str
         @param ccme: if True, sends a copy of this email to the bot
         @type ccme: bool
         @raises NotEmailableError: the user of this User is not emailable
@@ -3455,9 +3455,9 @@ class User(Page):
         Outputs 'Email sent' if the email was sent.
 
         @param subject: the subject header of the mail
-        @type subject: unicode
+        @type subject: str
         @param text: mail body
-        @type text: unicode
+        @type text: str
         @param ccme: if True, sends a copy of this email to the bot
         @type ccme: bool
         @raises NotEmailableError: the user of this User is not emailable
@@ -3672,7 +3672,7 @@ class WikibasePage(BasePage):
         @param site: Wikibase data site
         @type site: DataSite
         @param title: normalized title of the page
-        @type title: unicode
+        @type title: str
         @kwarg ns: namespace
         @type ns: Namespace instance, or int
         @kwarg entity_type: Wikibase entity type
@@ -4532,7 +4532,7 @@ class ItemPage(WikibasePage):
         @type site: pywikibot.Site or database name
         @param force: override caching
 
-        @rtype: unicode
+        @rtype: str
         """
         if force or not hasattr(self, '_content'):
             self.get(force=force)
@@ -5076,7 +5076,7 @@ class Claim(Property):
         Return the type of snak.
 
         @return: str ('value', 'somevalue' or 'novalue')
-        @rtype: unicode
+        @rtype: str
         """
         return self.snaktype
 
@@ -5339,25 +5339,25 @@ class Revision(DotReadableDict):
         @param revid: Revision id number
         @type revid: int
         @param text: Revision wikitext.
-        @type text: unicode, or None if text not yet retrieved
+        @type text: str, or None if text not yet retrieved
         @param timestamp: Revision time stamp
         @type timestamp: pywikibot.Timestamp
         @param user: user who edited this revision
-        @type user: unicode
+        @type user: str
         @param anon: user is unregistered
         @type anon: bool
         @param comment: edit comment text
-        @type comment: unicode
+        @type comment: str
         @param minor: edit flagged as minor
         @type minor: bool
         @param rollbacktoken: rollback token
-        @type rollbacktoken: unicode
+        @type rollbacktoken: str
         @param parentid: id of parent Revision (v1.16+)
         @type parentid: long
         @param contentmodel: content model label (v1.21+)
-        @type contentmodel: unicode
+        @type contentmodel: str
         @param sha1: sha1 of revision text (v1.19+)
-        @type sha1: unicode
+        @type sha1: str
         """
         self.revid = revid
         self.text = text
@@ -5512,7 +5512,7 @@ class Link(ComparableMixin):
 
         @param text: the link text (everything appearing between [[ and ]]
             on a wiki page)
-        @type text: unicode
+        @type text: str
         @param source: the Site on which the link was found (not necessarily
             the site to which the link refers)
         @type source: Site or BasePage
@@ -5771,7 +5771,7 @@ class Link(ComparableMixin):
         """
         Return the title of the link.
 
-        @rtype: unicode
+        @rtype: str
         """
         if not hasattr(self, '_title'):
             self.parse()
@@ -5782,7 +5782,7 @@ class Link(ComparableMixin):
         """
         Return the section of the link.
 
-        @rtype: unicode
+        @rtype: str
         """
         if not hasattr(self, '_section'):
             self.parse()
@@ -5793,7 +5793,7 @@ class Link(ComparableMixin):
         """
         Return the anchor of the link.
 
-        @rtype: unicode
+        @rtype: str
         """
         if not hasattr(self, '_anchor'):
             self.parse()
@@ -5887,7 +5887,7 @@ class Link(ComparableMixin):
         """
         Return a unicode string representation.
 
-        @rtype: unicode
+        @rtype: str
         """
         return self.astext()
 
@@ -5929,7 +5929,7 @@ class Link(ComparableMixin):
         @param lang: target site code (language)
         @type lang: str
         @param title: target Page
-        @type title: unicode
+        @type title: str
         @param source: Link from site source
         @param source: Site
 
@@ -6039,7 +6039,7 @@ def html2unicode(text, ignore=None, exceptions=None):
     @param ignore: HTML entities to ignore
     @param ignore: list of int
 
-    @rtype: unicode
+    @rtype: str
     """
     if ignore is None:
         ignore = []
@@ -6101,7 +6101,7 @@ def unicode2html(x, encoding):
     into HTML &#; entities. If it does work, return it unchanged.
 
     @param x: String to update
-    @type x: unicode
+    @type x: str
     @param encoding: Encoding to use
     @type encoding: str
 
@@ -6125,7 +6125,7 @@ def url2unicode(title, encodings='utf-8'):
     @type title: str
     @param encodings: Encodings to attempt to use during conversion.
     @type encodings: str, list or Site
-    @rtype: unicode
+    @rtype: str
 
     @raise UnicodeError: Could not convert using any encoding.
     """

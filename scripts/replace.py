@@ -617,7 +617,7 @@ class ReplaceRobot(Bot):
         """
         Apply all replacements to the given text.
 
-        @rtype: unicode, set
+        @rtype: str, set
         """
         if page is None:
             pywikibot.warn(
@@ -871,7 +871,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     add_cat = None
     gen = None

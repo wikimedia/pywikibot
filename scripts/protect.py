@@ -118,7 +118,7 @@ def check_protection_level(operation, level, levels, default=None):
     """Check if the protection level is valid or ask if necessary.
 
     @return: a valid protection level
-    @rtype: string
+    @rtype: str
     """
     if level not in levels:
         first_char = []
@@ -151,7 +151,7 @@ def main(*args):
     If args is an empty list, sys.argv is used.
 
     @param args: command line arguments
-    @type args: unicode
+    @type args: str
     """
     options = {}
     message_properties = {}

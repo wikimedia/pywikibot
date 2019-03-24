@@ -39,9 +39,9 @@ class SparqlQuery(object):
         Create endpoint.
 
         @param endpoint: SPARQL endpoint URL
-        @type endpoint: string
+        @type endpoint: str
         @param entity_url: URL prefix for any entities returned in a query.
-        @type entity_url: string
+        @type entity_url: str
         @param repo: The Wikibase site which we want to run queries on. If
             provided this overrides any value in endpoint and entity_url.
             Defaults to Wikidata.
@@ -105,7 +105,7 @@ class SparqlQuery(object):
         https://www.w3.org/TR/2013/REC-sparql11-results-json-20130321/
 
         @param query: Query text
-        @type query: string
+        @type query: str
         @param full_data: Whether return full data objects or only values
         @type full_data: bool
         @return: List of query results or None if query failed
@@ -138,7 +138,7 @@ class SparqlQuery(object):
         Run SPARQL query and return parsed JSON result.
 
         @param query: Query text
-        @type query: string
+        @type query: str
         """
         url = '{0}?query={1}'.format(self.endpoint, quote(query))
         while True:
@@ -169,7 +169,7 @@ class SparqlQuery(object):
         Run SPARQL ASK query and return boolean result.
 
         @param query: Query text
-        @type query: string
+        @type query: str
         @rtype: bool
         """
         data = self.query(query, headers=headers)

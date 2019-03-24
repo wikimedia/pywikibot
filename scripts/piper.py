@@ -80,7 +80,7 @@ class PiperBot(MultipleSitesBot, ExistingPageBot, NoRedirectPageBot,
         """Pipe a given text through a given program.
 
         @return: processed text after piping
-        @rtype: unicode
+        @rtype: str
         """
         if not isinstance(text, str):  # py2-py3 compatibility
             text = text.encode('utf-8')
