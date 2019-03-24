@@ -14,7 +14,6 @@ coverage:
         enabled: yes
 
   ignore:
-    - ez_setup.py
     - pywikibot/compat
     - pywikibot/backports.py
     - pywikibot/data/mysql.py
