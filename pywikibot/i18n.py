@@ -455,7 +455,7 @@ def _extract_plural(code, message, parameters):
     """Check for the plural variants in message and replace them.
 
     @param message: the message to be replaced
-    @type message: str string
+    @type message: str
     @param parameters: plural parameters passed from other methods
     @type parameters: Mapping of str to int
     @return: The message with the plural instances replaced
@@ -854,7 +854,7 @@ def input(twtitle, parameters=None, password=False, fallback_prompt=None):
     @param parameters: The values which will be applied to the translated text
     @param password: Hides the user's input (for password entry)
     @param fallback_prompt: The English prompt if i18n is not available.
-    @rtype: str string
+    @rtype: str
     """
     if not messages_available():
         if not fallback_prompt:
