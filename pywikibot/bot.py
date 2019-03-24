@@ -127,9 +127,6 @@ from pywikibot.tools.formatter import color_format
 # Note: all output goes through python std library "logging" module
 _logger = 'bot'
 
-if not PY2:
-    unicode = str
-
 # User interface initialization
 # search for user interface module in the 'userinterfaces' subdirectory
 uiModule = __import__('pywikibot.userinterfaces.%s_interface'

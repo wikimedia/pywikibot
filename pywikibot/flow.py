@@ -11,11 +11,9 @@ import logging
 
 from pywikibot.exceptions import NoPage, UnknownExtension, LockedPage
 from pywikibot.page import BasePage, User
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, UnicodeType
 
 if not PY2:
-    unicode = str
-    basestring = (str,)
     from urllib.parse import urlparse, parse_qs
 else:
     from urlparse import urlparse, parse_qs
@@ -201,7 +199,7 @@ class Topic(FlowPage):
         """
         if not isinstance(board, Board):
             raise TypeError('board must be a pywikibot.flow.Board object.')
-        if not isinstance(root_uuid, basestring):
+        if not isinstance(root_uuid, UnicodeType):
             raise TypeError('Topic/root UUID must be a string.')
 
         topic = cls(board.site, 'Topic:' + root_uuid)
@@ -326,7 +324,7 @@ class Post(object):
             raise TypeError('Page must be a Topic object')
         if not page.exists():
             raise NoPage(page, 'Topic must exist: %s')
-        if not isinstance(uuid, basestring):
+        if not isinstance(uuid, UnicodeType):
             raise TypeError('Post UUID must be a string')
 
         self._page = page
@@ -379,7 +377,7 @@ class Post(object):
         if 'content' in self._current_revision:
             content = self._current_revision.pop('content')
             assert isinstance(content, dict)
-            assert isinstance(content['content'], unicode)
+            assert isinstance(content['content'], UnicodeType)
             self._content[content['format']] = content['content']
 
     def _load(self, format='wikitext', load_from_topic=False):

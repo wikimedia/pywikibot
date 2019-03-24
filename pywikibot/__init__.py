@@ -67,6 +67,7 @@ from pywikibot.tools import (
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
     PY2,
     UnicodeMixin,
+    UnicodeType
 )
 from pywikibot.tools.formatter import color_format
 
@@ -74,7 +75,6 @@ from pywikibot.tools.formatter import color_format
 if not PY2:
     from queue import Queue
     long = int
-    basestring = str
 else:
     from Queue import Queue
 
@@ -791,7 +791,7 @@ class WbQuantity(_WbRepresentation):
         self.site = site or Site().data_repository()
 
         # also allow entity URIs to be provided via unit parameter
-        if isinstance(unit, basestring) and \
+        if isinstance(unit, UnicodeType) and \
                 unit.partition('://')[0] not in ('http', 'https'):
             raise ValueError("'unit' must be an ItemPage or entity uri.")
 
@@ -833,7 +833,7 @@ class WbQuantity(_WbRepresentation):
         @type lazy_load: bool
         @return: pywikibot.ItemPage
         """
-        if not isinstance(self._unit, basestring):
+        if not isinstance(self._unit, UnicodeType):
             return self._unit
 
         repo = repo or self.site

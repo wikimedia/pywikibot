@@ -44,10 +44,7 @@ except ImportError:
 import pywikibot
 
 from pywikibot import config2 as config
-from pywikibot.tools import deprecated, PY2, PYTHON_VERSION
-
-if not PY2:
-    basestring = (str, )
+from pywikibot.tools import deprecated, PY2, PYTHON_VERSION, UnicodeType
 
 cache = None
 _logger = 'version'
@@ -140,7 +137,7 @@ def getversiondict():
         pywikibot.debug('version algorithm exceptions:\n%r'
                         % exceptions, _logger)
 
-    if isinstance(date, basestring):
+    if isinstance(date, UnicodeType):
         datestring = date
     elif isinstance(date, time.struct_time):
         datestring = time.strftime('%Y/%m/%d, %H:%M:%S', date)

@@ -14,15 +14,12 @@ import os
 import subprocess
 
 from pywikibot.tools.djvu import DjVuFile
-from pywikibot.tools import PY2
+from pywikibot.tools import PY2, UnicodeType
 
 from tests import join_data_path, create_path_func
 from tests.aspects import unittest, TestCase
 
 join_djvu_data_path = create_path_func(join_data_path, 'djvu')
-
-if not PY2:
-    unicode = str
 
 
 class TestDjVuFile(TestCase):
@@ -69,7 +66,7 @@ class TestDjVuFile(TestCase):
         djvu = DjVuFile(self.file_djvu)
         expected = "DjVuFile('{}')".format(self.file_djvu)
         if PY2:
-            self.assertEqual(unicode(djvu), expected)
+            self.assertEqual(UnicodeType(djvu), expected)
         else:
             self.assertEqual(djvu.__unicode__(), expected)
 

@@ -9,11 +9,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 
-from pywikibot.tools import LazyRegex, PY2
-
-
-if not PY2:
-    unicode = str
+from pywikibot.tools import LazyRegex
 
 
 # All characters in the Cf category in a static list. When testing each Unicode

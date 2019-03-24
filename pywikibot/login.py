@@ -27,10 +27,7 @@ import pywikibot
 from pywikibot import config, __url__
 from pywikibot.exceptions import NoUsername
 from pywikibot.tools import (deprecated_args, remove_last_args,
-                             normalize_username, PY2)
-
-if not PY2:
-    unicode = basestring = str
+                             normalize_username, UnicodeType)
 
 
 class OAuthImpossible(ImportError):
@@ -270,7 +267,7 @@ usernames['%(fam_name)s']['%(wiki_code)s'] = 'myUsername'"""
             if (normalize_username(username) == self.username
                     and family == self.site.family.name
                     and code == self.site.code):
-                if isinstance(password, basestring):
+                if isinstance(password, UnicodeType):
                     self.password = password
                     break
                 elif isinstance(password, BotPassword):

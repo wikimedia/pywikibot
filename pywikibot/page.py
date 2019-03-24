@@ -47,12 +47,11 @@ from pywikibot.tools import (
     deprecated, deprecate_arg, deprecated_args, issue_deprecation_warning,
     add_full_name, manage_wrapping,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper, PY2,
-    first_upper, redirect_func, remove_last_args,
+    first_upper, redirect_func, remove_last_args, UnicodeType
 )
 from pywikibot.tools.ip import is_IP, ip_regexp
 
 if not PY2:
-    unicode = basestring = str
     long = int
     from html import entities as htmlentitydefs
     from urllib.parse import quote_from_bytes, unquote_to_bytes
@@ -637,7 +636,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @param value: New value or None
         @type value: basestring
         """
-        self._text = None if value is None else unicode(value)
+        self._text = None if value is None else UnicodeType(value)
         if hasattr(self, '_raw_extracted_templates'):
             del self._raw_extracted_templates
 
@@ -1821,7 +1820,7 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @rtype: tuple(username, Timestamp)
         """
         result = self.oldest_revision
-        return result.user, unicode(result.timestamp.isoformat())
+        return result.user, UnicodeType(result.timestamp.isoformat())
 
     @deprecated('contributors() or revisions()', since='20150206')
     @deprecated_args(limit='total')
@@ -1836,7 +1835,8 @@ class BasePage(UnicodeMixin, ComparableMixin):
         @rtype: list
         """
         return [
-            {'user': rev.user, 'timestamp': unicode(rev.timestamp.isoformat())}
+            {'user': rev.user,
+             'timestamp': UnicodeType(rev.timestamp.isoformat())}
             for rev in self.revisions(total=total)]
 
     def merge_history(self, dest, timestamp=None, reason=None):
@@ -2373,7 +2373,7 @@ class Page(BasePage):
         @param kwargs: Arguments which are used for saving the page directly
             afterwards, like 'summary' for edit summary.
         """
-        if isinstance(target_page, basestring):
+        if isinstance(target_page, UnicodeType):
             target_page = pywikibot.Page(self.site, target_page)
         elif self.site != target_page.site:
             raise pywikibot.InterwikiRedirectPage(self, target_page)
@@ -2571,7 +2571,7 @@ class FilePage(Page):
         For compatibility with compat only.
         """
         return [self.oldest_file_info.user,
-                unicode(self.oldest_file_info.timestamp.isoformat())]
+                UnicodeType(self.oldest_file_info.timestamp.isoformat())]
 
     @deprecated('FilePage.latest_file_info.user', since='20141106')
     def getLatestUploader(self):
@@ -2581,7 +2581,7 @@ class FilePage(Page):
         For compatibility with compat only.
         """
         return [self.latest_file_info.user,
-                unicode(self.latest_file_info.timestamp.isoformat())]
+                UnicodeType(self.latest_file_info.timestamp.isoformat())]
 
     @deprecated('FilePage.get_file_history()', since='20141106')
     def getFileVersionHistory(self):
@@ -3629,7 +3629,7 @@ class User(Page):
             return
         for item in self.logevents(logtype='upload', total=total):
             yield (item.page(),
-                   unicode(item.timestamp()),
+                   UnicodeType(item.timestamp()),
                    item.comment(),
                    item.pageid() > 0
                    )
@@ -4124,7 +4124,7 @@ class WikibasePage(BasePage):
                 continue
             data[prop] = cls._normalizeLanguages(data[prop])
             for key, value in data[prop].items():
-                if isinstance(value, basestring):
+                if isinstance(value, UnicodeType):
                     data[prop][key] = {'language': key, 'value': value}
 
         if 'aliases' in data:
@@ -4133,7 +4133,7 @@ class WikibasePage(BasePage):
                 if isinstance(values, list):
                     strings = []
                     for value in values:
-                        if isinstance(value, basestring):
+                        if isinstance(value, UnicodeType):
                             strings.append({'language': key, 'value': value})
                         else:
                             strings.append(value)
@@ -4621,7 +4621,7 @@ class ItemPage(WikibasePage):
             is not redirect.
         @type force: bool
         """
-        if isinstance(target_page, basestring):
+        if isinstance(target_page, UnicodeType):
             target_page = pywikibot.ItemPage(self.repo, target_page)
         elif self.repo != target_page.repo:
             raise pywikibot.InterwikiRedirectPage(self, target_page)
@@ -4665,15 +4665,15 @@ class Property(object):
 
     types = {'wikibase-item': ItemPage,
              # 'wikibase-property': PropertyPage, must be declared first
-             'string': basestring,
+             'string': UnicodeType,
              'commonsMedia': FilePage,
              'globe-coordinate': pywikibot.Coordinate,
-             'url': basestring,
+             'url': UnicodeType,
              'time': pywikibot.WbTime,
              'quantity': pywikibot.WbQuantity,
              'monolingualtext': pywikibot.WbMonolingualText,
-             'math': basestring,
-             'external-id': basestring,
+             'math': UnicodeType,
+             'external-id': UnicodeType,
              'geo-shape': pywikibot.WbGeoShape,
              'tabular-data': pywikibot.WbTabularData,
              }
@@ -5228,7 +5228,7 @@ class Claim(Property):
         @rtype: bool
         """
         if (isinstance(self.target, WikibasePage)
-                and isinstance(value, basestring)):
+                and isinstance(value, UnicodeType)):
             return self.target.id == value
 
         if (isinstance(self.target, pywikibot.WbTime)
@@ -5236,7 +5236,7 @@ class Claim(Property):
             return self.target.year == int(value)
 
         if (isinstance(self.target, pywikibot.Coordinate)
-                and isinstance(value, basestring)):
+                and isinstance(value, UnicodeType)):
             coord_args = [float(x) for x in value.split(',')]
             if len(coord_args) >= 3:
                 precision = coord_args[2]
@@ -5252,7 +5252,7 @@ class Claim(Property):
                     and abs(self.target.lon - coord_args[1]) <= precision)
 
         if (isinstance(self.target, pywikibot.WbMonolingualText)
-                and isinstance(value, basestring)):
+                and isinstance(value, UnicodeType)):
             return self.target.text == value
 
         return self.target == value
@@ -6129,7 +6129,7 @@ def url2unicode(title, encodings='utf-8'):
 
     @raise UnicodeError: Could not convert using any encoding.
     """
-    if isinstance(encodings, basestring):
+    if isinstance(encodings, UnicodeType):
         encodings = [encodings]
     elif isinstance(encodings, pywikibot.site.BaseSite):
         # create a list of all possible encodings for both hint sites

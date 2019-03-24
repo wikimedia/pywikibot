@@ -24,14 +24,12 @@ from pywikibot.bot import (
 )
 from pywikibot.editor import TextEditor
 from pywikibot.textlib import replace_links
-from pywikibot.tools import PY2, deprecated, deprecated_args
+from pywikibot.tools import PY2, deprecated, deprecated_args, UnicodeType
 from pywikibot.tools.formatter import color_format
 
 if not PY2:
     from urllib.parse import urlparse
     from urllib.request import URLopener
-
-    basestring = (str,)
 else:
     from urllib import URLopener
     from urlparse import urlparse
@@ -101,7 +99,7 @@ class UploadRobot(BaseBot):
             raise ValueError('When always is set to True, the description '
                              'must be set.')
         self.url = url
-        if isinstance(self.url, basestring):
+        if isinstance(self.url, UnicodeType):
             pywikibot.warning('url as string is deprecated. '
                               'Use an iterable instead.')
         self.urlEncoding = urlEncoding
@@ -474,7 +472,7 @@ class UploadRobot(BaseBot):
             return
 
         try:
-            if isinstance(self.url, basestring):
+            if isinstance(self.url, UnicodeType):
                 self._treat_counter = 1
                 return self.upload_file(self.url)
             for file_url in self.url:

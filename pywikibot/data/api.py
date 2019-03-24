@@ -49,9 +49,7 @@ if not PY2:
     # The following solution might be removed if/once the bug is fixed,
     # unless the fix is not backported to py3.x versions that should
     # instead support PWB.
-    basestring = (str, )
     from urllib.parse import urlencode, unquote
-    unicode = str
 
     from io import BytesIO
 
@@ -105,7 +103,7 @@ class APIError(Error):
         self.code = code
         self.info = info
         self.other = kwargs
-        self.unicode = unicode(self.__str__())
+        self.unicode = UnicodeType(self.__str__())
 
     def __repr__(self):
         """Return internal representation."""
@@ -309,7 +307,7 @@ class ParamInfo(Container):
         assert('mime' in result['help'])
         assert(result['help']['mime'] == 'text/plain')
         assert('help' in result['help'])
-        assert(isinstance(result['help']['help'], basestring))
+        assert(isinstance(result['help']['help'], UnicodeType))
 
         help_text = result['help']['help']
 
@@ -353,7 +351,7 @@ class ParamInfo(Container):
         @type modules: iterable or basestring
         @rtype: set
         """
-        if isinstance(modules, basestring):
+        if isinstance(modules, UnicodeType):
             return set(modules.split('|'))
         return set(modules)
 
@@ -1374,7 +1372,7 @@ class Request(MutableMapping):
             assert(value.site == self.site)
             return value.title(with_section=False)
         else:
-            return unicode(value)
+            return UnicodeType(value)
 
     def __getitem__(self, key):
         """Implement dict interface."""
@@ -1399,7 +1397,7 @@ class Request(MutableMapping):
         if isinstance(value, bytes):
             value = value.decode(self.site.encoding())
 
-        if isinstance(value, unicode):
+        if isinstance(value, UnicodeType):
             value = value.split('|')
 
         if hasattr(value, 'api_iter'):
@@ -1778,7 +1776,7 @@ class Request(MutableMapping):
         @raises APIError: unknown action found
         @raises APIError: unknown query result type
         """
-        if not isinstance(data, unicode):
+        if not isinstance(data, UnicodeType):
             data = data.decode(self.site.encoding())
         pywikibot.debug(('API response received from {}:\n'
                          .format(self.site)) + data, _logger)
@@ -2005,7 +2003,7 @@ class Request(MutableMapping):
                 if key in ('error', 'warnings'):
                     continue
                 assert key not in error
-                assert isinstance(result[key], basestring), \
+                assert isinstance(result[key], UnicodeType), \
                     'Unexpected %s: %r' % (key, result[key])
                 error[key] = result[key]
 
@@ -2658,7 +2656,7 @@ class QueryGenerator(_RequestWrapper):
 
             return False
 
-        if isinstance(namespaces, basestring):
+        if isinstance(namespaces, UnicodeType):
             namespaces = namespaces.split('|')
 
         # Use Namespace id (int) here; Request will cast int to str
@@ -2832,7 +2830,7 @@ class QueryGenerator(_RequestWrapper):
                 if 'query' not in self.data:
                     pywikibot.log("%s: 'query' not found in api response." %
                                   self.__class__.__name__)
-                    pywikibot.log(unicode(self.data))
+                    pywikibot.log(UnicodeType(self.data))
                 # if (query-)continue is present, self.resultkey might not have
                 # been fetched yet
                 if self.continue_name not in self.data:
