@@ -575,6 +575,10 @@ class CategoryMoveRobot(CategoryPreprocess):
         self.site = pywikibot.Site()
         self.can_move_cats = (
             'move-categorypages' in self.site.userinfo['rights'])
+        self.noredirect = (
+            delete_oldcat
+            and 'suppressredirect' in self.site.userinfo['rights']
+        )
         # Create attributes for the categories and their talk pages.
         self.oldcat = self._makecat(oldcat)
         self.oldtalk = self.oldcat.toggleTalkPage()
@@ -678,7 +682,8 @@ class CategoryMoveRobot(CategoryPreprocess):
                     old_cat_text = self.oldcat.text
                     self.newcat = self.oldcat.move(self.newcat.title(),
                                                    reason=self.move_comment,
-                                                   movetalk=can_move_talk)
+                                                   movetalk=can_move_talk,
+                                                   noredirect=self.noredirect)
                     # Copy over the article text so it can be stripped of
                     # CFD templates and re-saved. This is faster than
                     # reloading the article in place.
@@ -714,12 +719,11 @@ class CategoryMoveRobot(CategoryPreprocess):
         Do not use this function from outside the class. Automatically marks
         the pages if they can't be removed due to missing permissions.
         """
-        if moved_page:
-            self.oldcat.delete(self.deletion_comment,
-                               not self.batch, mark=True)
-        if moved_talk:
-            self.oldtalk.delete(self.deletion_comment,
-                                not self.batch,
+        if moved_page and self.oldcat.exists():
+            self.oldcat.delete(self.deletion_comment, not self.batch,
+                               mark=True)
+        if moved_talk and self.oldtalk.exists():
+            self.oldtalk.delete(self.deletion_comment, not self.batch,
                                 mark=True)
 
     def _change(self, gen):
