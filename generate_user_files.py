@@ -18,8 +18,6 @@ from textwrap import fill
 
 from generate_family_file import _import_with_no_user_config
 
-from pywikibot.tools import file_mode_checker
-
 # DISABLED_SECTIONS cannot be copied; variables must be set manually
 DISABLED_SECTIONS = {'USER INTERFACE SETTINGS',  # uses sys
                      'EXTERNAL EDITOR SETTINGS',  # uses os
@@ -380,10 +378,11 @@ def create_user_config(main_family, main_code, main_username, force=False):
             # in it
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write('')
-                file_mode_checker(_fncpass, mode=0o600, quiet=True)
+                pywikibot.tools.file_mode_checker(_fncpass, mode=0o600,
+                                                  quiet=True)
             with codecs.open(_fncpass, 'w', 'utf-8') as f:
                 f.write(PASSFILE_CONFIG.format(botpasswords=botpasswords))
-                file_mode_checker(_fncpass, mode=0o600)
+                pywikibot.tools.file_mode_checker(_fncpass, mode=0o600)
                 pywikibot.output("'{0}' written.".format(_fncpass))
         except EnvironmentError:
             os.remove(_fncpass)
