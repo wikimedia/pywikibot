@@ -2684,9 +2684,7 @@ class TestBacklinks(TestCase):
     def setUp(self):
         """Setup tests."""
         super(TestBacklinks, self).setUp()
-        self.page = pywikibot.Page(
-            self.site,
-            'File:Băieţi de Cartier - La Familia cover.jpg')
+        self.page = pywikibot.Page(self.site, 'File:BoA – Woman.png')
         self.backlinks = list(self.page.backlinks(follow_redirects=False,
                                                   filter_redirects=True,
                                                   total=5))
@@ -2715,11 +2713,11 @@ class TestBacklinks(TestCase):
     def test_backlinks_redirects_pageid(self):
         """Test backlinks redirects pageid."""
         for page in self.backlinks:
-            self.assertEqual(page.pageid, 45341783)
+            self.assertEqual(page.pageid, 58874049)
         for page in self.references:
-            self.assertEqual(page.pageid, 45341783)
+            self.assertEqual(page.pageid, 58874049)
         for page in self.nofollow:
-            self.assertEqual(page.pageid, 45341783)
+            self.assertEqual(page.pageid, 58874049)
 
 
 class TestCommonsSite(TestCase):
