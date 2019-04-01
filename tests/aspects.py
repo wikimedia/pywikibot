@@ -249,14 +249,14 @@ class TestCaseBase(unittest.TestCase):
         else:
             assert isinstance(namespaces, set)
 
-        page_namespaces = [page.namespace() for page in gen]
+        page_namespaces = {page.namespace() for page in gen}
 
-        if skip and set(page_namespaces) != namespaces:
+        if skip and page_namespaces != namespaces:
             raise unittest.SkipTest('Pages in namespaces {!r} not found.'
-                                    .format(list(namespaces
-                                                 - set(page_namespaces))))
+                                    .format(
+                                        list(namespaces - page_namespaces)))
         else:
-            self.assertEqual(set(page_namespaces), namespaces)
+            self.assertEqual(page_namespaces, namespaces)
 
     def assertPageTitlesEqual(self, gen, titles, site=None):
         """
