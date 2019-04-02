@@ -87,6 +87,22 @@ class TestTranslate(TestCase):
                          'test-no-english JA')
 
 
+class TestTranslateNonDry(TestCase):
+
+    """Test translate method."""
+
+    family = 'wikipedia'
+    code = 'cs'
+
+    msg_localized = {'en': 'Universe', 'de': 'Universum'}
+
+    def testWikibaseFallback(self):
+        """Test Wikibase item fallback."""
+        self.assertEqual(i18n.translate(self.code, self.msg_localized,
+                                        fallback='Q1'),
+                         'Vesmír')
+
+
 class UserInterfaceLangTestCase(TestCase):
 
     """Base class for tests using config.userinterface_lang."""

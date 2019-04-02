@@ -43,7 +43,8 @@ from pywikibot import config2 as config
 from pywikibot.exceptions import Error
 from pywikibot.plural import plural_rules
 from pywikibot.tools import (
-    deprecated, deprecated_args, issue_deprecation_warning, StringTypes)
+    deprecated, deprecated_args, issue_deprecation_warning, StringTypes,
+    UnicodeType)
 
 PLURAL_PATTERN = r'{{PLURAL:(?:%\()?([^\)]*?)(?:\)d)?\|(.*?)}}'
 
@@ -583,8 +584,9 @@ def translate(code, xdict, parameters=None, fallback=False):
     @param parameters: For passing (plural) parameters
     @type parameters: dict, string, unicode, int
     @param fallback: Try an alternate language code. If it's iterable it'll
-        also try those entries and choose the first match.
-    @type fallback: boolean or iterable
+        also try those entries and choose the first match. If it's wikibase
+        item, it'll try to load local page title from here.
+    @type fallback: bool, iterable or str
     @raise IndexError: If the language supports and requires more plurals than
         defined for the given translation template.
     """
@@ -610,7 +612,7 @@ def translate(code, xdict, parameters=None, fallback=False):
         codes = [code]
         if fallback is True:
             codes += _altlang(code) + ['_default', 'en']
-        elif fallback is not False:
+        elif fallback is not False and not isinstance(fallback, UnicodeType):
             codes += list(fallback)
         for code in codes:
             if code in xdict:
@@ -618,11 +620,17 @@ def translate(code, xdict, parameters=None, fallback=False):
                 break
         else:
             if fallback is not True:
-                # this shouldn't simply return "any one" code but when fallback
-                # was True before 65518573d2b0, it did just that. When False it
-                # did just return None. It's now also returning None in the new
-                # iterable mode.
-                return
+                if isinstance(fallback, UnicodeType):
+                    r_page = pywikibot.Site(code, family).page_from_repository(
+                        fallback)
+                    trans = r_page.title()
+                else:
+                    # this shouldn't simply return "any one" code
+                    # but when fallback was True before 65518573d2b0,
+                    # it did just that. When False it did just return
+                    # None. It's now also returning None in the new
+                    # iterable mode.
+                    return
             code = list(xdict.keys())[0]
             trans = xdict[code]
     if trans is None:
