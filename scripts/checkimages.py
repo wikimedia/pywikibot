@@ -201,77 +201,6 @@ delete_immediately = {
     'zh': '{{delete|未知檔案格式%s}}',
 }
 
-# The header of the Unknown extension's message.
-delete_immediately_head = {
-    'ar': 'امتداد غير معروف!',
-    'en': 'Unknown extension!',
-    'fa': 'بارگذاری تصاویر موجود در انبار',
-    'ga': 'Iarmhír neamhaithnid!',
-    'fr': 'Extension inconnue',
-    'hu': 'Ismeretlen kiterjesztésű fájl',
-    'it': 'File non specificato',
-    'ko': '잘못된 파일 형식',
-    'sr': 'Непозната екстензија!',
-    'ta': 'இனங்காணப்படாத கோப்பு நீட்சி!',
-    'ur': 'نامعلوم توسیع!',
-    'zh': '您上載的檔案格式可能有誤',
-}
-
-# Text that will be add if the bot find a unknown extension.
-delete_immediately_notification = {
-    'ar': 'الملف %(file)s يبدو أن امتداده خاطيء, من فضلك تحقق.',
-    'en': 'The %(file)s file seems to have a wrong extension, please check.',
-    'fa': 'به نظر می‌آید تصویر %(file)s'
-          'مسیر نادرستی داشته باشد لطفا بررسی کنید.',
-    'ga': "Tá iarmhír mícheart ar an comhad %(file)s, scrúdaigh le d'thoil.",
-    'fr': 'Le fichier %(file)s semble avoir une mauvaise extension, '
-          'veuillez vérifier.',
-    'hu': 'A %(file)s fájlnak rossz a kiterjesztése, kérlek ellenőrízd.',
-    'it': 'A quanto ci risulta, %(file)s sembra non essere un file utile '
-          "all'enciclopedia. Se così non fosse, e' consigliato che tu scriva "
-          "al mio programmatore. Grazie per l'attenzione. "
-          '<u>Questo è un messaggio automatico di</u>',
-    'ko': '%(file)s의 파일 형식이 잘못되었습니다. 확인 바랍니다.',
-    'sr': 'Изгледа да датотека %(file)s садржи погрешну екстензију.',
-    'ta': '%(file)s இனங்காணப்படாத கோப்பு நீட்சியை கொண்டுள்ளது தயவு '
-          'செய்து ஒரு முறை சரி பார்க்கவும்',
-    'ur': 'ملف %(file)s کی توسیع شاید درست نہیں ہے، براہ کرم جانچ لیں۔',
-    'zh': '您好，你上傳的%(file)s無法被識別，請檢查您的檔案，謝謝。',
-}
-
-# Summary of the delete immediately.
-# (e.g: Adding {{db-meta|The file has .%s as extension.}})
-msg_del_comm = {
-    'ar': 'بوت: إضافة %(adding)s',
-    'en': 'Bot: Adding %(adding)s',
-    'fa': 'ربات: اضافه کردن %(adding)s',
-    'ga': 'Róbó: Cuir %(adding)s leis',
-    'fr': 'Robot : Ajouté %(adding)s',
-    'hr': 'Bot: Dodato %(adding)s',
-    'hu': 'Robot:"%(adding)s" hozzáadása',
-    'it': 'Bot: Aggiungo %(adding)s',
-    'ja': 'ロボットによる: 追加 %(adding)s',
-    'ko': '로봇 : %(adding)s 추가',
-    'sr': 'Бот: Додато %(adding)s',
-    'ta': 'Bot: Adding %(adding)s',
-    'ur': 'روبالہ: اضافہ %(adding)s',
-    'zh': '機器人: 正在新增 %(adding)s',
-}
-
-# This is the most important header, because it will be used a lot. That's the
-# header that the bot will add if the image hasn't the license.
-nothing_head = {
-    'ar': 'صورة بدون ترخيص',
-    'de': 'Bild ohne Lizenz',
-    'en': 'Image without license',
-    'fa': 'تصویر بدون اجازہ',
-    'ga': 'Comhad gan ceadúnas',
-    'fr': 'Fichier sans licence',
-    'hu': 'Licenc nélküli kép',
-    'it': 'File senza licenza',
-    'sr': 'Датотека без лиценце',
-    'ur': 'تصویر بدون اجازہ',
-}
 # That's the text that the bot will add if it doesn't find the license.
 # Note: every __botnick__ will be repleaced with your bot's nickname
 # (feel free not to use if you don't need it)
@@ -360,24 +289,6 @@ report_page = {
     'zh': 'User:Alexsh/checkimagereport',
 }
 
-# The summary of the report
-msg_comm10 = {
-    'ar': 'بوت: تحديث السجل',
-    'de': 'Bot: schreibe Log',
-    'en': 'Bot: Updating the log',
-    'fa': 'ربات: به‌روزرسانی سیاهه',
-    'fr': 'Robot: Mise à jour du journal',
-    'ga': 'Róbó: Log a thabhairt suas chun dáta',
-    'hu': 'Robot: A napló frissítése',
-    'it': 'Bot: Aggiorno il log',
-    'ja': 'ロボットによる:更新',
-    'ko': '로봇:로그 업데이트',
-    'sr': 'Бот: Ажурирање дневника',
-    'ta': 'தானியங்கி:பட்டியலை இற்றைப்படுத்தல்',
-    'ur': 'روبالہ: تجدید نوشتہ',
-    'zh': '機器人:更新記錄',
-}
-
 # If a template isn't a license but it's included on a lot of images, that can
 # be skipped to analyze the image without taking care of it. (the template must
 # be in a list)
@@ -456,37 +367,10 @@ duplicatesText = {
     'sr': '{{NowCommons|__image__}}',
 }
 
-# Head of the message given to the author
-duplicate_user_talk_head = {
-    'de': 'Datei-Duplikat',
-    'en': 'Duplicate file',
-    'it': 'File doppio',
-    'sr': 'Дупликат датотеке',
-}
-
 # Message to put in the talk
 duplicates_user_talk_text = {
     'it': '{{subst:Progetto:Coordinamento/Immagini/Bot/Messaggi/Duplicati|'
           '%s|%s|~~~}} --~~~~',
-}
-
-# Comment used by the bot while it reports the problem in the uploader's talk
-duplicates_comment_talk = {
-    'ar': 'بوت: ملف مكرر تم العثور عليه',
-    'en': 'Bot: Notify that the file already exists on Commons',
-    'fa': 'ربات: تصویر تکراری یافت شد',
-    'it': 'Bot: Notifico il file doppio trovato',
-    'sr': 'Бот: Обавештење да датотека већ постоји на Остави',
-}
-
-# Comment used by the bot while it reports the problem in the image
-duplicates_comment_image = {
-    'ar': 'بوت: وسم ملف مكرر',
-    'de': 'Bot: Datei liegt auf Commons',
-    'en': 'Bot: File already on Commons, may be deleted',
-    'fa': 'ربات: برچسب زدن بر تصویر تکراری',
-    'it': 'Bot: File doppio, da cancellare',
-    'sr': 'Бот: Датотека већ постоји на Остави',
 }
 
 # Regex to detect the template put in the image's description to find the dupe
@@ -587,7 +471,10 @@ class checkImagesBot(object):
         self.rep_page = i18n.translate(self.site, report_page)
         self.image_namespace = site.namespaces.FILE.custom_name + ':'
         self.list_entry = '\n* [[:{0}%s]] '.format(self.image_namespace)
-        self.com = i18n.translate(self.site, msg_comm10, fallback=True)
+
+        # The summary of the report
+        self.com = i18n.twtranslate(self.site, 'checkimages-log-comment')
+
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
         self.hiddentemplates = {
             pywikibot.Page(self.site, tmp, ns=self.site.namespaces.TEMPLATE)
@@ -910,13 +797,17 @@ class checkImagesBot(object):
         """Function to check the duplicated files."""
         dupText = i18n.translate(self.site, duplicatesText)
         dupRegex = i18n.translate(self.site, duplicatesRegex)
-        dupTalkHead = i18n.translate(self.site, duplicate_user_talk_head,
-                                     fallback=True)
         dupTalkText = i18n.translate(self.site, duplicates_user_talk_text)
-        dupComment_talk = i18n.translate(self.site, duplicates_comment_talk,
-                                         fallback=True)
-        dupComment_image = i18n.translate(self.site, duplicates_comment_image,
-                                          fallback=True)
+
+        # Head of the message given to the author
+        dupTalkHead = i18n.twtranslate(self.site, 'checkimages-doubles-head')
+        # Comment while bot reports the problem in the uploader's talk
+        dupComment_talk = i18n.twtranslate(self.site,
+                                           'checkimages-doubles-talk-comment')
+        # Comment used by the bot while it reports the problem in the image
+        dupComment_image = i18n.twtranslate(self.site,
+                                            'checkimages-doubles-file-comment')
+
         imagePage = pywikibot.FilePage(self.site, self.imageName)
         hash_found = imagePage.latest_file_info.sha1
         duplicates = list(self.site.allimages(sha1=hash_found))
@@ -1501,12 +1392,18 @@ class checkImagesBot(object):
         HiddenTN = i18n.translate(self.site, HiddenTemplateNotification)
         self.unvertext = i18n.translate(self.site, n_txt)
         di = i18n.translate(self.site, delete_immediately)
-        dih = i18n.translate(self.site, delete_immediately_head, fallback=True)
-        din = i18n.translate(self.site, delete_immediately_notification,
-                             fallback=True) + ' ~~~~'
-        nh = i18n.translate(self.site, nothing_head, fallback=True)
+
+        # The header of the Unknown extension's message.
+        dih = i18n.twtranslate(self.site, 'checkimages-unknown-extension-head')
+        # Text that will be add if the bot find a unknown extension.
+        din = i18n.twtranslate(self.site,
+                               'checkimages-unknown-extension-msg') + ' ~~~~'
+        # Header that the bot will add if the image hasn't the license.
+        nh = i18n.twtranslate(self.site, 'checkimages-no-license-head')
+        # Summary of the delete immediately.
+        dels = i18n.twtranslate(self.site, 'checkimages-deletion-comment')
+
         nn = i18n.translate(self.site, nothing_notification)
-        dels = i18n.translate(self.site, msg_del_comm, fallback=True)
         smwl = i18n.translate(self.site, second_message_without_license)
 
         try:
