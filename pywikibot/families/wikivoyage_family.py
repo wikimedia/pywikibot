@@ -18,7 +18,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     name = 'wikivoyage'
 
     languages_by_size = [
-        'en', 'de', 'fa', 'it', 'fr', 'pl', 'ru', 'nl', 'pt', 'zh', 'es', 'he',
+        'en', 'de', 'fa', 'it', 'pl', 'fr', 'ru', 'nl', 'pt', 'zh', 'es', 'he',
         'fi', 'vi', 'sv', 'el', 'ro', 'uk', 'bn', 'ps', 'hi',
     ]
 
