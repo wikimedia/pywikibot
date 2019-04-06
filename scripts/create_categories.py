@@ -10,8 +10,6 @@ The following command line parameters are supported:
 
 -always         Don't ask, just do the edit.
 
--overwrite      (not implemented yet).
-
 -parent         The name of the parent category.
 
 -basename       The base to be used for the new category names.
@@ -32,8 +30,8 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 """
 #
 # (C) Multichill, 2011
-# (C) xqt, 2011-2018
-# (c) Pywikibot team, 2013-2018
+# (C) xqt, 2011-2019
+# (c) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -71,7 +69,6 @@ class CreateCategoriesBot(Bot):
                          ignore_save_related_errors=True,
                          ignore_server_errors=True)
         else:
-            # FIXME: Add overwrite option
             pywikibot.output('{} already exists, skipping'
                              .format(newpage.title()))
 
