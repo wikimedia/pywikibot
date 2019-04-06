@@ -32,8 +32,8 @@ to create [[Category:Cultural heritage monuments in Hensies]].
 """
 #
 # (C) Multichill, 2011
-# (C) xqt, 2011-2018
-# (c) Pywikibot team, 2013-2018
+# (C) xqt, 2011-2019
+# (c) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -110,7 +110,7 @@ def main(*args):
         missing.add('-basename')
 
     generator = gen_factory.getCombinedGenerator()
-    if generator and missing:
+    if generator and not missing:
         bot = CreateCategoriesBot(generator, parent, basename, **options)
         bot.run()
         pywikibot.output('All done')
