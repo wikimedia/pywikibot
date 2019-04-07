@@ -234,6 +234,7 @@ netext = {
         'fa': '{{جا:خوشامد}} %s',
         'fr': '{{subst:Discussion Projet:Aide/Bienvenue}} %s',
         'ga': '{{subst:fáilte}} %s',
+        'gor': '{{subst:Welcome}} %s',
         'he': '{{ס:ברוך הבא}} %s',
         'hr': '{{subst:dd}} %s',
         'id': '{{subst:sdbot2}}\n%s',
