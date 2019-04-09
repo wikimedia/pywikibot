@@ -29,9 +29,9 @@ Furthermore, the following command line parameters are supported:
 # (C) Wikipedian, 2006-2007
 # (C) Andre Engels, 2007
 # (C) Siebrand Mazeland, 2007
-# (C) xqt, 2009-2018
+# (C) xqt, 2009-2019
 # (C) Dr. Trigon, 2012
-# (C) Pywikibot team, 2010-2018
+# (C) Pywikibot team, 2010-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -219,7 +219,7 @@ class SandboxBot(Bot):
                                 .format(edit_delta.seconds / 60.0))
                             pywikibot.output('Sleeping for {} minutes.'
                                              .format(delta.seconds // 60))
-                            time.sleep(delta.seconds)
+                            pywikibot.sleep(delta.seconds)
                             wait = True
                 except pywikibot.EditConflict:
                     pywikibot.output(
@@ -238,7 +238,7 @@ class SandboxBot(Bot):
                 else:
                     pywikibot.output('\nSleeping {} hours, now {}'
                                      .format(self.getOption('hours'), now))
-                time.sleep(self.getOption('hours') * 60 * 60)
+                pywikibot.sleep(self.getOption('hours') * 60 * 60)
 
 
 def main(*args):
