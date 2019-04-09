@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Character based helper functions(not wiki-dependent)."""
+"""Character based helper functions (not wiki-dependent)."""
 #
 # (C) Pywikibot team, 2015-2019
 #
