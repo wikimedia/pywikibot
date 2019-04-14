@@ -147,8 +147,6 @@ matrix:
       env: LANGUAGE=zh FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="zh.wikipedia.beta.wmflabs.org"
     - python: '3.4'
       env: LANGUAGE=en FAMILY=wsbeta PYWIKIBOT_SITE_ONLY=1 PYWIKIBOT_NO_L10N_TESTS=0
-    - python: '2.7'
-      env: LANGUAGE=wikia FAMILY=wikia PYWIKIBOT_TEST_NO_RC=1
     - python: '3.5'
       env: LANGUAGE=en FAMILY=musicbrainz PYWIKIBOT_SITE_ONLY=1
     - python: '3.4'

@@ -1069,16 +1069,6 @@ class TestSiteGeneratorsUsers(DefaultSiteTestCase):
 
     cached = True
 
-    @classmethod
-    def setUpClass(cls):
-        """Skip tests for wikia (T214263)."""
-        super(TestSiteGeneratorsUsers, cls).setUpClass()
-        mysite = cls.get_site()
-        if mysite.sitename == 'wikia:wikia':
-            raise unittest.SkipTest(
-                'Skipping site_tests.TestSiteGeneratorsUsers tests for '
-                'Wikia due to T214265')
-
     def setUp(self):
         """Initialize self.site and self.mainpage."""
         super(TestSiteGeneratorsUsers, self).setUp()
@@ -1592,13 +1582,6 @@ class SearchTestCase(DefaultSiteTestCase):
 
     """Test search method."""
 
-    def setUp(self):
-        """Skip tests for Wikia Search extension."""
-        super(SearchTestCase, self).setUp()
-        if self.site.has_extension('Wikia Search'):
-            self.skipTest('The site {!r} does not use MediaWiki search'
-                          .format(self.site))
-
     def test_search(self):
         """Test the site.search() method."""
         mysite = self.site
@@ -1707,16 +1690,6 @@ class TestUserContribsAsUser(DefaultSiteTestCase):
 class TestUserContribsWithoutUser(DefaultSiteTestCase):
 
     """Test site method site.usercontribs() without bot user."""
-
-    @classmethod
-    def setUpClass(cls):
-        """Skip tests for wikia (T214263)."""
-        super(TestUserContribsWithoutUser, cls).setUpClass()
-        mysite = cls.get_site()
-        if mysite.sitename == 'wikia:wikia':
-            raise unittest.SkipTest(
-                'Skipping site_tests.TestUserContribsWithoutUser tests for '
-                'Wikia due to T214263')
 
     def test_user_prefix(self):
         """Test the site.usercontribs() method with userprefix."""
@@ -3447,49 +3420,11 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
     """Test single code family sites."""
 
     sites = {
-        'wikia': {
-            'family': 'wikia',
-            'code': 'wikia',
-        },
         'omegawiki': {
             'family': 'omegawiki',
             'code': 'omegawiki',
         },
     }
-
-    def test_wikia(self):
-        """Test www.wikia.com."""
-        url = 'www.wikia.com'
-        site = self.get_site('wikia')
-        self.assertEqual(site.hostname(), url)
-        self.assertEqual(site.code, 'wikia')
-        self.assertIsInstance(site.namespaces, Mapping)
-        self.assertFalse(site.obsolete)
-        self.assertEqual(site.family.hostname('en'), url)
-        self.assertEqual(site.family.hostname('wikia'), url)
-        self.assertEqual(site.family.hostname('www'), url)
-
-        pywikibot.config.family = 'wikia'
-        pywikibot.config.mylang = 'de'
-
-        site2 = pywikibot.Site('www', 'wikia')
-        self.assertEqual(site2.code, 'wikia')
-        self.assertFalse(site2.obsolete)
-        self.assertEqual(site, site2)
-        self.assertEqual(pywikibot.config.mylang, 'de')
-
-        site2 = pywikibot.Site('really_invalid', 'wikia')
-        self.assertEqual(site2.code, 'wikia')
-        self.assertFalse(site2.obsolete)
-        self.assertEqual(site, site2)
-        self.assertEqual(pywikibot.config.mylang, 'de')
-
-        site2 = pywikibot.Site('de', 'wikia')
-        self.assertEqual(site2.code, 'wikia')
-        self.assertFalse(site2.obsolete)
-        self.assertEqual(site, site2)
-        # When the code is the same as config.mylang, Site() changes mylang
-        self.assertEqual(pywikibot.config.mylang, 'wikia')
 
     def test_omega(self):
         """Test www.omegawiki.org."""
@@ -3512,7 +3447,7 @@ class TestSubdomainFamilySite(TestCase):
     family = 'lyricwiki'
 
     def test_lyrics(self):
-        """Test lyrics.wikia.com."""
+        """Test lyrics.fandom.com."""
         url = 'lyrics.fandom.com'
         site = self.site
         self.assertEqual(site.hostname(), url)

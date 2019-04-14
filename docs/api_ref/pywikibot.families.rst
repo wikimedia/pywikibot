@@ -113,14 +113,6 @@ pywikibot.families.vikidia\_family module
     :undoc-members:
     :show-inheritance:
 
-pywikibot.families.wikia\_family module
----------------------------------------
-
-.. automodule:: pywikibot.families.wikia_family
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 pywikibot.families.wikibooks\_family module
 -------------------------------------------
 

@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Remove wikia family file (T220921)
 * Remove deprecated ez_setup.py
 * Changed requirements for sseclient (T219024)
 * Set optional parameter namespace to None in site.logpages (T217664)
