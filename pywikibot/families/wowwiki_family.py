@@ -68,7 +68,7 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
         return '1.19.24'
 
     def protocol(self, code):
-        """Return 'https' as the protocol."""
+        """Return the protocol for this family."""
         return 'http' if code == 'uk' else 'https'
 
     def scriptpath(self, code):
