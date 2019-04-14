@@ -66,7 +66,6 @@ from __future__ import absolute_import, division, unicode_literals
 import codecs
 import re
 import sys
-import time
 
 import pywikibot
 
@@ -110,7 +109,7 @@ def put_text(page, new, summary, count, asynchronous=False):
     except pywikibot.ServerError:
         if count <= config.max_retries:
             pywikibot.output('Server Error! Wait..')
-            time.sleep(config.retry_wait)
+            pywikibot.sleep(config.retry_wait)
             return None
         else:
             raise pywikibot.ServerError(

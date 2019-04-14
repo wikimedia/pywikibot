@@ -149,7 +149,6 @@ try:
 except ImportError:  # Python 2.7
     from collections import Sequence
 import re
-import time
 import warnings
 
 import pywikibot
@@ -627,8 +626,8 @@ class ReplaceRobot(Bot):
         exceptions = _get_text_exceptions(self.exceptions)
         skipped_containers = set()
         for replacement in self.replacements:
-            if self.sleep is not None:
-                time.sleep(self.sleep)
+            if self.sleep:
+                pywikibot.sleep(self.sleep)
             if (replacement.container
                     and replacement.container.name in skipped_containers):
                 continue

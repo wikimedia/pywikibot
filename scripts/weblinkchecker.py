@@ -114,7 +114,6 @@ import threading
 import time
 
 from functools import partial
-from time import sleep
 from warnings import warn
 
 try:
@@ -197,7 +196,7 @@ def _get_closest_memento_url(url, when=None, timegate_uri=None):
         except (requests.ConnectionError, MementoClientException) as e:
             error = e
             retry_count += 1
-            sleep(config2.retry_wait)
+            pywikibot.sleep(config2.retry_wait)
     else:
         raise error
 
@@ -894,7 +893,7 @@ class WeblinkCheckerRobot(SingleSiteBot, ExistingPageBot):
                 # Limit the number of threads started at the same time. Each
                 # thread will check one page, then die.
                 while threading.activeCount() >= config.max_external_links:
-                    time.sleep(config.retry_wait)
+                    pywikibot.sleep(config.retry_wait)
                 thread = LinkCheckThread(page, url, self.history,
                                          self.HTTPignore, self.day)
                 # thread dies when program terminates
