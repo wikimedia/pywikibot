@@ -3451,22 +3451,23 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
             'family': 'wikia',
             'code': 'wikia',
         },
-        'lyricwiki': {
-            'family': 'lyricwiki',
-            'code': 'en',
+        'omegawiki': {
+            'family': 'omegawiki',
+            'code': 'omegawiki',
         },
     }
 
     def test_wikia(self):
         """Test www.wikia.com."""
+        url = 'www.wikia.com'
         site = self.get_site('wikia')
-        self.assertEqual(site.hostname(), 'www.wikia.com')
+        self.assertEqual(site.hostname(), url)
         self.assertEqual(site.code, 'wikia')
         self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
-        self.assertEqual(site.family.hostname('en'), 'www.wikia.com')
-        self.assertEqual(site.family.hostname('wikia'), 'www.wikia.com')
-        self.assertEqual(site.family.hostname('www'), 'www.wikia.com')
+        self.assertEqual(site.family.hostname('en'), url)
+        self.assertEqual(site.family.hostname('wikia'), url)
+        self.assertEqual(site.family.hostname('www'), url)
 
         pywikibot.config.family = 'wikia'
         pywikibot.config.mylang = 'de'
@@ -3490,21 +3491,40 @@ class TestSingleCodeFamilySite(AlteredDefaultSiteTestCase):
         # When the code is the same as config.mylang, Site() changes mylang
         self.assertEqual(pywikibot.config.mylang, 'wikia')
 
+    def test_omega(self):
+        """Test www.omegawiki.org."""
+        url = 'www.omegawiki.org'
+        site = self.get_site('omegawiki')
+        self.assertEqual(site.hostname(), url)
+        self.assertEqual(site.code, 'omegawiki')
+        self.assertIsInstance(site.namespaces, Mapping)
+        self.assertFalse(site.obsolete)
+        self.assertEqual(site.family.hostname('en'), url)
+        self.assertEqual(site.family.hostname('omega'), url)
+        self.assertEqual(site.family.hostname('omegawiki'), url)
+
+
+class TestSubdomainFamilySite(TestCase):
+
+    """Test subdomain family site."""
+
+    code = 'en'
+    family = 'lyricwiki'
+
     def test_lyrics(self):
         """Test lyrics.wikia.com."""
-        site = self.get_site('lyricwiki')
-        self.assertEqual(site.hostname(), 'lyrics.wikia.com')
+        url = 'lyrics.fandom.com'
+        site = self.site
+        self.assertEqual(site.hostname(), url)
         self.assertEqual(site.code, 'en')
         self.assertIsInstance(site.namespaces, Mapping)
         self.assertFalse(site.obsolete)
-        self.assertEqual(site.family.hostname('en'), 'lyrics.wikia.com')
+        self.assertEqual(site.family.hostname('en'), url)
 
-        self.assertEqual(site.family.hostname('lyrics'), 'lyrics.wikia.com')
-        self.assertEqual(site.family.hostname('lyricwiki'), 'lyrics.wikia.com')
-
+        self.assertRaises(KeyError, site.family.hostname, 'lyrics')
+        self.assertRaises(KeyError, site.family.hostname, 'lyricwiki')
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
                           'lyricwiki', 'lyricwiki')
-
         self.assertRaises(pywikibot.UnknownSite, pywikibot.Site,
                           'de', 'lyricwiki')
 

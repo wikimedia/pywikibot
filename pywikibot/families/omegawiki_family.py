@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Family module for Omega Wiki."""
 #
-# (C) Pywikibot team, 2006-2018
+# (C) Pywikibot team, 2006-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -25,11 +25,3 @@ class Family(family.SingleSiteFamily):
     def scriptpath(self, code):
         """Return the script path for this family."""
         return ''
-
-    def protocol(self, code):
-        """Return https as the protocol for this family."""
-        return 'https'
-
-    def ignore_certificate_error(self, code):
-        """Ignore certificate errors."""
-        return True  # has an expired certificate.
