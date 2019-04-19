@@ -17,12 +17,13 @@ Todo: The following rules can be added in the future:
         python release.
 """
 #
-# (C) Pywikibot team, 2017-2018
+# (C) Pywikibot team, 2017-2019
 #
 # Distributed under the terms of the MIT license.
 #
 
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import (
+    absolute_import, division, print_function, unicode_literals)
 
 from re import compile as re_compile, IGNORECASE
 from subprocess import check_output
@@ -61,7 +62,7 @@ def get_latest_patchset():
 
 def print_error(path, line_no, col_no, error):
     """Print the error."""
-    print('{0}:{1}:{2}: {3}'.format(path, line_no, col_no, error))
+    print('{}:{}:{}: {}'.format(path, line_no, col_no, error))  # noqa: T001
 
 
 def check_quotes(match, file_path, start):
