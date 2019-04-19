@@ -271,6 +271,35 @@ class TestDiscussionPageObject(TestCase):
         page.load_page()
         self.assertEqual([x.title for x in page.threads], ['A', 'B'])
 
+    def testThreadsWithSubsections(self):
+        """Test recognizing threads with subsections.
+
+        Talk:For-pywikibot-archivebot/subsections must have::
+
+         {{User:MiszaBot/config
+         |archive = Talk:Main_Page/archive
+         |algo = old(30d)
+         }}
+         = Front matter =
+         placeholder
+         == A ==
+         foo bar
+         === A1 ===
+         foo bar bar
+         ==== A11 ====
+         foo
+         == B ==
+         foo bar bar bar
+        """
+        site = self.get_site()
+        page = pywikibot.Page(site, 'Talk:For-pywikibot-archivebot/testcase2')
+        tmpl = pywikibot.Page(site, 'User:MiszaBot/config')
+        archiver = archivebot.PageArchiver(
+            page=page, template=tmpl, salt='', force=False)
+        page = archivebot.DiscussionPage(page, archiver)
+        page.load_page()
+        self.assertEqual([x.title for x in page.threads], ['A', 'B'])
+
 
 if __name__ == '__main__':  # pragma: no cover
     try:

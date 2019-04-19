@@ -441,10 +441,11 @@ class DiscussionPage(pywikibot.Page):
         self.archives = {}
         self.archived_threads = 0
 
-        # Exclude non-thread headings
+        # Exclude unsupported headings (h1, h3, etc):
+        # adding the marker will make them ignored by extract_sections()
         text = self.get()
         marker = findmarker(text)
-        text = re.sub(r'^===', marker + r'===', text, flags=re.M)
+        text = re.sub(r'^((=|={3,})[^=])', marker + r'\1', text, flags=re.M)
 
         # Find threads, avoid archiving categories or interwiki
         header, threads, footer = extract_sections(text, self.site)
