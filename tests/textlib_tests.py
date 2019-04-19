@@ -1739,6 +1739,35 @@ class TestExtractSections(DefaultDrySiteTestCase):
             ('text\n\n', [('==title==', '\ncontent\n')], '[[Category:A]]\n')
         )
 
+    def test_with_h1_and_h2_sections(self):
+        """Test for text having h1 and h2 sections."""
+        self.assertEqual(
+            extract_sections(
+                'text\n\n'
+                '=first level=\n'
+                'foo\n'
+                '==title==\n'
+                'bar',
+                self.site),
+            ('text\n\n',
+             [('=first level=', '\nfoo\n'), ('==title==', '\nbar')],
+             '')
+        )
+
+    def test_with_h4_and_h2_sections(self):
+        """Test for text having h4 and h2 sections."""
+        self.assertEqual(
+            extract_sections(
+                'text\n\n'
+                '====title====\n'
+                '==title 2==\n'
+                'content',
+                self.site),
+            ('text\n\n',
+             [('====title====', '\n'), ('==title 2==', '\ncontent')],
+             '')
+        )
+
 
 if __name__ == '__main__':  # pragma: no cover
     try:
