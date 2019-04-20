@@ -1,6 +1,7 @@
 # This is a PIP 6+ requirements file for development dependencies
 #
-pytest>=3.6.0
+pytest>=3.6.0,<5.0.0 ; python_full_version < 3.5
+pytest>=3.6.0 ; python_full_version >= 3.5
 pytest-timeout
 pytest-runner
 pytest-cov>=2.6.1
