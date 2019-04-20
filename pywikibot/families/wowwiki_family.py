@@ -11,7 +11,7 @@ from pywikibot import family
 from pywikibot.tools import deprecated, classproperty
 
 
-class Family(family.SubdomainFamily, family.WikiaFamily):
+class Family(family.SubdomainFamily, family.FandomFamily):
 
     """Family class for WOW Wiki."""
 
@@ -73,4 +73,6 @@ class Family(family.SubdomainFamily, family.WikiaFamily):
 
     def scriptpath(self, code):
         """Return the script path for this family."""
-        return '' if code in ('en', 'uk') else ('/' + code)
+        if code == 'uk':
+            return ''
+        return super(Family, self).scriptpath(code)
