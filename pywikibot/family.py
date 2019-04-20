@@ -933,6 +933,10 @@ class Family(object):
     #       'pt': { '_default': [0]}
     #   }
 
+    # Some wiki farms have UrlShortener extension enabled only on the main
+    # site. This value can specify this last one with (lang, family) tuple.
+    shared_urlshortner_wiki = None
+
     _families = {}
 
     def __getattribute__(self, name):
@@ -1675,6 +1679,10 @@ class WikimediaFamily(Family):
     # disambiguation pages for the various languages. We need the
     # wikibase code and item number:
     disambcatname = {'wikidata': 'Q1982926'}
+
+    # UrlShortener extension is only usable on metawiki, and this wiki can
+    # process links to all WM domains.
+    shared_urlshortner_wiki = ('meta', 'meta')
 
     @classproperty
     def domain(cls):
