@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Implement create_short_link Page method to use Extension:UrlShortener (T220876)
 * Remove wikia family file (T220921)
 * Remove deprecated ez_setup.py
 * Changed requirements for sseclient (T219024)
