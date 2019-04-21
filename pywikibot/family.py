@@ -23,7 +23,7 @@ from pywikibot import config
 from pywikibot.exceptions import UnknownFamily, FamilyMaintenanceWarning
 from pywikibot.tools import (
     deprecated, deprecated_args, remove_last_args, issue_deprecation_warning,
-    FrozenDict, classproperty, PY2
+    ModuleDeprecationWrapper, FrozenDict, classproperty, PY2
 )
 
 if not PY2:
@@ -1575,13 +1575,13 @@ class SubdomainFamily(Family):
         return [cls.domain]
 
 
-class WikiaFamily(Family):
+class FandomFamily(Family):
 
-    """Common features of Wikia families."""
+    """Common features of Fandom families."""
 
     def scriptpath(self, code):
         """Return the script path for this family."""
-        return ''
+        return '' if code == 'en' else ('/' + code)
 
 
 class WikimediaFamily(Family):
@@ -1770,3 +1770,8 @@ def AutoFamily(name, url):
     # str() used because py2 can't accept a unicode as the name of a class
     AutoFamily = type(str('AutoFamily'), (SingleSiteFamily,), locals())
     return AutoFamily()
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr('WikiaFamily', replacement=FandomFamily,
+                             since='20190420')
