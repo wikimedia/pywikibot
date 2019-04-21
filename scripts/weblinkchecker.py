@@ -1031,7 +1031,7 @@ def main(*args):
                 # wait until the report thread is shut down; the user can
                 # interrupt it by pressing CTRL-C.
                 try:
-                    while bot.history.reportThread.isAlive():
+                    while bot.history.reportThread.is_alive():
                         time.sleep(0.1)
                 except KeyboardInterrupt:
                     pywikibot.output('Report thread interrupted.')

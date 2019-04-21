@@ -842,7 +842,7 @@ class ThreadedGenerator(threading.Thread):
 
     def __iter__(self):
         """Iterate results from the queue."""
-        if not self.isAlive() and not self.finished.isSet():
+        if not self.is_alive() and not self.finished.isSet():
             self.start()
         # if there is an item in the queue, yield it, otherwise wait
         while not self.finished.isSet():
@@ -985,7 +985,7 @@ class ThreadList(list):
         """Return the number of alive threads and delete all non-alive ones."""
         cnt = 0
         for item in self[:]:
-            if item.isAlive():
+            if item.is_alive():
                 cnt += 1
             else:
                 self.remove(item)
