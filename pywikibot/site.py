@@ -7454,6 +7454,23 @@ class APISite(BaseSite):
         gen.set_maximum_items(total)
         return gen
 
+    @need_extension('UrlShortener')
+    def create_short_link(self, url):
+        """
+        Return a shortened link.
+
+        Note that on Wikimedia wikis only metawiki supports this action,
+        and this wiki can process links to all WM domains.
+
+        @param url: The link to reduce, with propotol prefix.
+        @type url: str
+        @return: The reduced link, without protocol prefix.
+        @rtype: str
+        """
+        req = self._simple_request(action='shortenurl', url=url)
+        data = req.submit()
+        return data['shortenurl']['shorturl']
+
     # aliases for backwards compatibility
     isBlocked = redirect_func(is_blocked, old_name='isBlocked',
                               class_name='APISite', since='20141218')

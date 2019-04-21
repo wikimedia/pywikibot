@@ -2212,6 +2212,33 @@ class BasePage(UnicodeMixin, ComparableMixin):
         """
         return self.content_model == 'flow-board'
 
+    def create_short_link(self, permalink=False, with_protocol=False):
+        """
+        Return a shortened link that points to that page.
+
+        If shared_urlshortner_wiki is defined in family config, it'll use
+        that site to create the link instead of the current wiki.
+
+        @param permalink: If true, the link will point to the actual revision
+        of the page.
+        @type permalink: bool
+        @param with_protocol: If true, the link will have https propotol
+        prepend.
+        @type with_protocol: bool
+        @return: The reduced link.
+        @rtype: str
+        """
+        wiki = self.site
+        if self.site.family.shared_urlshortner_wiki:
+            wiki = pywikibot.Site(*self.site.family.shared_urlshortner_wiki)
+
+        url = self.permalink() if permalink else self.full_url()
+
+        link = wiki.create_short_link(url)
+        if with_protocol:
+            return '{}://{}'.format(wiki.protocol(), link)
+        return link
+
 # ####### DEPRECATED METHODS ########
 
     @deprecated('Site.encoding()', since='20090307')
