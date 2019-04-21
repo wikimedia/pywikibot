@@ -1175,6 +1175,22 @@ class TestPermalink(DefaultSiteTestCase):
                          'Framawiki%2Fpwb_tests%2Fpermalink&oldid=340685')
 
 
+class TestShortLink(DefaultSiteTestCase):
+    """Test that short link management is correct."""
+
+    family = 'test'
+    code = 'test'
+
+    def test_create_short_link(self):
+        """Test create_short_link function."""
+        site = self.get_site()
+        p1 = pywikibot.Page(site, 'User:Framawiki/pwb_tests/shortlink')
+        self.assertEqual(p1.create_short_link(), 'w.wiki/3Cy')
+        self.assertEqual(p1.create_short_link(with_protocol=True),
+                         'https://w.wiki/3Cy')
+        self.assertEqual(p1.create_short_link(permalink=True), 'w.wiki/3Cz')
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()
