@@ -1366,7 +1366,7 @@ def _flush(stop=True):
             '{lightblue}Waiting for {num} pages to be put. '
             'Estimated time remaining: {sec}{default}', num=num, sec=sec))
 
-    while _putthread.isAlive() and page_put_queue.qsize() > 0:
+    while _putthread.is_alive() and page_put_queue.qsize() > 0:
         try:
             _putthread.join(1)
         except KeyboardInterrupt:
@@ -1400,7 +1400,7 @@ def async_manager():
 
 def async_request(request, *args, **kwargs):
     """Put a request on the queue, and start the daemon if necessary."""
-    if not _putthread.isAlive():
+    if not _putthread.is_alive():
         try:
             page_put_queue.mutex.acquire()
             try:
