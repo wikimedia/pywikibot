@@ -399,7 +399,11 @@ family_files = {}
 
 
 def register_family_file(family_name, file_path):
-    """Register a single family class file."""
+    """Register a single family class file.
+
+    Parameter file_path may be a path or an url.
+    family.AutoFamily function is used when the url is given.
+    """
     usernames[family_name] = {}
     sysopnames[family_name] = {}
     disambiguation_comment[family_name] = {}
@@ -418,7 +422,6 @@ def register_families_folder(folder_path):
 # Get the names of all known families, and initialize with empty dictionaries.
 # ‘families/’ is a subdirectory of the directory in which config2.py is found.
 register_families_folder(os.path.join(os.path.dirname(__file__), 'families'))
-register_family_file('wikiapiary', 'https://wikiapiary.com')
 
 # Set to True to override the {{bots}} exclusion protocol (at your own risk!)
 ignore_bot_templates = False
