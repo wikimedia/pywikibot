@@ -18,13 +18,19 @@ class Family(family.SubdomainFamily, family.FandomFamily):
     name = 'wowwiki'
     domain = 'wowwiki.fandom.com'
 
-    languages_by_size = [
+    codes = (
         'ar', 'cs', 'da', 'de', 'el', 'en', 'es', 'et', 'fa', 'fi', 'fr', 'he',
         'hu', 'is', 'it', 'ja', 'ko', 'lt', 'lv', 'nl', 'nn', 'no', 'pl', 'pt',
         'pt-br', 'ru', 'sk', 'tr', 'uk', 'zh', 'zh-tw'
-    ]
+    )
 
     interwiki_removals = ['hr', 'ro', 'sr', 'sv']
+
+    @classproperty
+    @deprecated('codes attribute', since='20190422')
+    def languages_by_size(cls):
+        """DEPRECATED. languages_by_size property for compatibility purpose."""
+        return list(cls.codes)
 
     @classproperty
     def langs(cls):
