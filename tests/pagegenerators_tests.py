@@ -1015,6 +1015,9 @@ class TestFactoryGenerator(DefaultSiteTestCase):
 
     def test_recentchanges_default(self):
         """Test recentchanges generator with default namespace setting."""
+        if self.site.family.name in ('wpbeta', 'wsbeta'):
+            self.skipTest('Skipping {} due to too many autoblocked users'
+                          .format(self.site))
         gf = pagegenerators.GeneratorFactory(site=self.site)
         gf.handleArg('-recentchanges:50')
         gen = gf.getCombinedGenerator()
