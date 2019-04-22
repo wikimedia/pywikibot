@@ -38,6 +38,13 @@ test_deps = ['bz2file', 'mock']
 dependencies = ['requests>=2.20.0']
 
 pydocstyle = 'pydocstyle<=3.0.0' if PY2 else 'pydocstyle>=2.5.0'
+if PY2:
+    pillow = 'Pillow<7.0.0'
+elif PYTHON_VERSION < (3, 5):
+    pillow = 'Pillow<6.0.0'
+else:
+    pillow = 'Pillow'
+
 extra_deps = {
     # Core library dependencies
     'eventstreams': ['sseclient>=0.0.18,!=0.0.23'],
@@ -46,7 +53,7 @@ extra_deps = {
     'Google': ['google>=1.7'],
     'IRC': ['irc'],
     'mwparserfromhell': ['mwparserfromhell>=0.3.3'],
-    'Tkinter': ['Pillow'],
+    'Tkinter': [pillow],
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
@@ -76,7 +83,7 @@ if PY2:
     })
 
 script_deps = {
-    'flickrripper.py': ['flickrapi', 'Pillow'],
+    'flickrripper.py': ['flickrapi', pillow],
     'states_redirect.py': ['pycountry'],
     'weblinkchecker.py': ['memento_client>=0.5.1,!=0.6.0'],
     'patrol.py': ['mwparserfromhell>=0.3.3'],

@@ -41,7 +41,9 @@ unicodecsv ; python_version < '3'
 python-stdnum
 
 # GUI
-Pillow
+Pillow < 7.0.0 ; python_version < '3'
+Pillow < 6.0.0 ; python_version > '2' and python_full_version < '3.5'
+Pillow ; python_full_version >= '3.5'
 
 # core pagegenerators
 google >= 1.7
