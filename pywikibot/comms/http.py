@@ -16,8 +16,7 @@ This module is responsible for
 #
 # Distributed under the terms of the MIT license.
 #
-from __future__ import (absolute_import, division,
-                        print_function, unicode_literals)
+from __future__ import absolute_import, division, unicode_literals
 
 
 __docformat__ = 'epytext'
@@ -409,6 +408,7 @@ def error_handling_callback(request):
 
     # if all else fails
     if isinstance(request.data, Exception):
+        error('An error occurred for uri ' + request.uri)
         raise request.data
 
     if request.status == 504:
