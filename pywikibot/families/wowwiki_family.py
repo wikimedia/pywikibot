@@ -35,13 +35,13 @@ class Family(family.SubdomainFamily, family.FandomFamily):
     @classproperty
     def langs(cls):
         """Property listing family languages."""
-        cls.langs = {code: cls.domain for code in cls.codes}
+        cls.langs = super(Family, cls).langs
         cls.langs.update({code: cls.domains[1] for code in ('es', 'et')})
         cls.langs['uk'] = 'uk.' + cls.domains[2]
         return cls.langs
 
     @classproperty
-    def disambiguationTemplates(cls):
+    def disambiguationTemplates(cls):  # noqa: N802
         """Property listing disambiguation templates."""
         cls.disambiguationTemplates = \
             super(Family, cls).disambiguationTemplates
@@ -68,14 +68,11 @@ class Family(family.SubdomainFamily, family.FandomFamily):
         """List of domains used by family wowwiki."""
         return [cls.domain, 'worldofwarcraft.fandom.com', 'warcraft.wikia.com']
 
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        """Return the version for this family."""
-        return '1.19.24'
-
     def protocol(self, code):
         """Return the protocol for this family."""
-        return 'http' if code == 'uk' else 'https'
+        if code == 'uk':
+            return 'http'
+        return super(Family, self).protocol(code)
 
     def scriptpath(self, code):
         """Return the script path for this family."""

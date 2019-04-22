@@ -8,7 +8,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from pywikibot import family
-from pywikibot.tools import classproperty, deprecated
 
 
 # The LyricWiki family
@@ -22,16 +21,3 @@ class Family(family.SubdomainFamily, family.FandomFamily):
     name = 'lyricwiki'
     domain = 'lyrics.fandom.com'
     codes = ('en', 'ru')
-
-    @deprecated('APISite.version()', since='20141225')
-    def version(self, code):
-        return '1.19.24'
-
-    def protocol(self, code):
-        """Return 'https' as the protocol."""
-        return 'https'
-
-    @classproperty
-    def langs(cls):
-        """Property listing family languages."""
-        return {code: cls.domain for code in cls.codes}
