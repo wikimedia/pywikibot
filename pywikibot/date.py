@@ -2360,7 +2360,7 @@ def apply_month_delta(date, month_delta=1, add_overlap=False):
     @return: The end date
     @rtype: type of date
     """
-    if int(month_delta) != month_delta:
+    if not isinstance(month_delta, int):
         raise ValueError('Month delta must be an integer')
     month = (date.month - 1) + month_delta
     year = date.year + month // 12
