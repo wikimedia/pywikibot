@@ -33,14 +33,6 @@ scripts.maintenance.compat2core script
     :undoc-members:
     :show-inheritance:
 
-scripts.maintenance.diff\_checker script
-----------------------------------------
-
-.. automodule:: scripts.maintenance.diff_checker
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 scripts.maintenance.download\_dump script
 -----------------------------------------
 
