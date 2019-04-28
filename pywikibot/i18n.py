@@ -499,11 +499,9 @@ def _extract_plural(code, message, parameters):
             assert index == 0
 
         if index >= len(plural_entries):
-            raise IndexError(
-                'language "{}" requires {} plural variants for "{}" but '
-                'only {} ("{}") provided'.format(
-                    code, needed, selector, len(plural_entries),
-                    '", "'.join(plural_entries)))
+            # take the last entry in that case, see
+            # https://translatewiki.net/wiki/Plural#Plural_syntax_in_MediaWiki
+            index = -1
         return plural_entries[index]
 
     assert isinstance(parameters, Mapping), \

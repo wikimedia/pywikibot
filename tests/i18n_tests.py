@@ -452,8 +452,11 @@ class TestExtractPlural(TestCase):
         self.assertEqual(
             i18n._extract_plural('en', '{{PLURAL:foo|one|}}', {'foo': 1}),
             'one')
-        with self.assertRaises(IndexError):
-            i18n._extract_plural('en', '{{PLURAL:foo|one}}', {'foo': 0})
+
+        # two variants expected but only one given
+        self.assertEqual(
+            i18n._extract_plural('en', '{{PLURAL:foo|one}}', {'foo': 0}),
+            'one')
 
     def test_specific(self):
         """Test using a specific plural."""
@@ -465,6 +468,28 @@ class TestExtractPlural(TestCase):
             i18n._extract_plural('en', '{{PLURAL:foo|one|other|12=dozen}}',
                                  {'foo': 12}),
             'dozen')
+
+    def test_more(self):
+        """Test the number of plurals are more than expected."""
+        test = [(0, 2), (1, 0), (2, 1), (3, 2), (4, 2), (7, 2), (8, 3)]
+        for num, result in test:
+            self.assertEqual(
+                i18n._extract_plural(
+                    'cy',
+                    '{{PLURAL:num|0|1|2|3|4|5}}',
+                    {'num': num}),
+                str(result))
+
+    def test_less(self):
+        """Test the number of plurals are less than expected."""
+        test = [(0, 2), (1, 0), (2, 1), (3, 2), (4, 2), (7, 2), (8, 3)]
+        for num, result in test:
+            self.assertEqual(
+                i18n._extract_plural(
+                    'cy',
+                    '{{PLURAL:num|0|1}}',
+                    {'num': num}),
+                str(min(result, 1)))
 
 
 if __name__ == '__main__':  # pragma: no cover
