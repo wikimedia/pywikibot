@@ -3956,16 +3956,6 @@ class WikibasePage(BasePage):
                 'claims': self.claims,
                 }
 
-    def get_data_for_new_entity(self):
-        """
-        Return data required for creation of new page.
-
-        Override it if you need.
-
-        @rtype: dict
-        """
-        return {}
-
     def _diff_to(self, type_key, key_name, value_name, diffto, data):
         assert type_key not in data, 'Key type must be defined in data'
         source = self._normalizeLanguages(getattr(self, type_key)).copy()
@@ -4196,7 +4186,7 @@ class WikibasePage(BasePage):
         else:
             data = WikibasePage._normalizeData(data)
 
-        updates = self.repo.editEntity(self, data,
+        updates = self.repo.editEntity(self._defined_by(singular=True), data,
                                        baserevid=baserevid, **kwargs)
         self.latest_revision_id = updates['entity']['lastrevid']
 
@@ -4761,43 +4751,29 @@ class PropertyPage(WikibasePage, Property):
     A Wikibase entity in the property namespace.
 
     Should be created as::
+
         PropertyPage(DataSite, 'P21')
-    or
-        PropertyPage(DataSite, datatype='url')
     """
 
     _cache_attrs = WikibasePage._cache_attrs + ('_type',)
     entity_type = 'property'
-    title_pattern = r'^(P[1-9]\d*|-1)$'
+    title_pattern = r'^P[1-9]\d*$'
 
-    def __init__(self, source, title=None, datatype=None):
+    def __init__(self, source, title=''):
         """
         Initializer.
 
         @param source: data repository property is on
         @type source: pywikibot.site.DataSite
-        @param title: page name of property, like "P##",
-                      "-1" or None for an empty property.
+        @param title: page name of property, like "P##"
         @type title: str
-        @param datatype: Datatype for a new property.
-        @type datatype: str
         """
-        # Special case for new property.
-        if title is None or title == '-1':
-            if not datatype:
-                raise TypeError('"datatype" is required for new property.')
-            WikibasePage.__init__(self, source, '-1',
-                                  ns=source.property_namespace)
-            Property.__init__(self, source, '-1', datatype=datatype)
-            assert self.id == '-1'
-        else:
-            if not title:
-                raise pywikibot.InvalidTitle(
-                    "Property's title cannot be empty")
+        if not title:
+            raise pywikibot.InvalidTitle("Property's title cannot be empty")
 
-            WikibasePage.__init__(self, source, title,
-                                  ns=source.property_namespace)
-            Property.__init__(self, source, self.id)
+        WikibasePage.__init__(self, source, title,
+                              ns=source.property_namespace)
+        Property.__init__(self, source, self.id)
 
     def get(self, force=False, *args, **kwargs):
         """
@@ -4825,10 +4801,6 @@ class PropertyPage(WikibasePage, Property):
         """
         return Claim(self.site, self.getID(), datatype=self.type,
                      *args, **kwargs)
-
-    def get_data_for_new_entity(self):
-        """Return data required for creation of new property."""
-        return {'datatype': self.type}
 
 
 # Add PropertyPage to the class attribute "types" after its declaration.

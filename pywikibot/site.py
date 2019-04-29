@@ -7785,17 +7785,13 @@ class DataSite(APISite):
 
         return dtype
 
-    @deprecated_args(identification='entity')
     @must_be(group='user')
-    def editEntity(self, entity, data, bot=True, **kwargs):
+    def editEntity(self, identification, data, bot=True, **kwargs):
         """
         Edit entity.
 
-        Note: This method is unable to create entities other than 'item'
-              if dict with API parameters was passed to 'entity' parameter.
-        @param entity: Page to edit, or dict with API parameters
-                       to use for entity identification
-        @type entity: WikibasePage or dict
+        @param identification: API parameters to use for entity identification
+        @type identification: dict
         @param data: data updates
         @type data: dict
         @param bot: Whether to mark the edit as a bot edit
@@ -7803,23 +7799,11 @@ class DataSite(APISite):
         @return: New entity data
         @rtype: dict
         """
-        # this changes the reference to a new object
-        data = dict(data)
-        if isinstance(entity, pywikibot.page.WikibasePage):
-            params = entity._defined_by(singular=True)
-            if 'id' in params and params['id'] == '-1':
-                del params['id']
-            if not params:
-                params['new'] = entity.entity_type
-                data_for_new_entity = entity.get_data_for_new_entity()
-                data.update(data_for_new_entity)
-        else:
-            if 'id' in entity and entity['id'] == '-1':
-                del entity['id']
-            params = dict(entity)
-            if not params:  # If no identification was provided
-                params['new'] = 'item'
-
+        if 'id' in identification and identification['id'] == '-1':
+            del identification['id']
+        params = dict(**identification)
+        if not params:  # If no identification was provided
+            params['new'] = 'item'  # TODO create properties+queries
         params['action'] = 'wbeditentity'
         if bot:
             params['bot'] = 1
@@ -7828,7 +7812,7 @@ class DataSite(APISite):
         params['token'] = self.tokens['edit']
 
         for arg in kwargs:
-            if arg in ['clear', 'summary']:
+            if arg in ['clear', 'data', 'summary']:
                 params[arg] = kwargs[arg]
             elif arg != 'baserevid':
                 warn('Unknown wbeditentity parameter {0} ignored'.format(arg),
