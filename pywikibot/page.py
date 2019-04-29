@@ -3910,6 +3910,11 @@ class WikibasePage(BasePage):
         @param force: override caching
         @type force: bool
         @raise NotImplementedError: a value in args or kwargs
+        @return: actual data which entity holds
+        @rtype: dict
+        @note: dicts returned by this method are references to content of this
+            entity and their modifying may indirectly cause unwanted change to
+            the live content
         """
         if args or kwargs:
             raise NotImplementedError(
@@ -3945,37 +3950,33 @@ class WikibasePage(BasePage):
         if 'pageid' in self._content:
             self._pageid = self._content['pageid']
 
-        # aliases
-        self.aliases = {}
-        if 'aliases' in self._content:
-            for lang in self._content['aliases']:
-                self.aliases[lang] = []
-                for value in self._content['aliases'][lang]:
-                    self.aliases[lang].append(value['value'])
-
         # labels
         self.labels = {}
-        if 'labels' in self._content:
-            for lang in self._content['labels']:
-                if 'removed' not in self._content['labels'][lang]:  # T56767
-                    self.labels[lang] = self._content['labels'][lang]['value']
+        for lang in self._content.get('labels', {}):
+            if 'removed' not in self._content['labels'][lang]:  # T56767
+                self.labels[lang] = self._content['labels'][lang]['value']
 
         # descriptions
         self.descriptions = {}
-        if 'descriptions' in self._content:
-            for lang in self._content['descriptions']:
-                self.descriptions[lang] = self._content[
-                    'descriptions'][lang]['value']
+        for lang in self._content.get('descriptions', {}):
+            self.descriptions[lang] = self._content[
+                'descriptions'][lang]['value']
+
+        # aliases
+        self.aliases = {}
+        for lang in self._content.get('aliases', {}):
+            self.aliases[lang] = []
+            for value in self._content['aliases'][lang]:
+                self.aliases[lang].append(value['value'])
 
         # claims
         self.claims = {}
-        if 'claims' in self._content:
-            for pid in self._content['claims']:
-                self.claims[pid] = []
-                for claim in self._content['claims'][pid]:
-                    c = Claim.fromJSON(self.repo, claim)
-                    c.on_item = self
-                    self.claims[pid].append(c)
+        for pid in self._content.get('claims', {}):
+            self.claims[pid] = []
+            for claim in self._content['claims'][pid]:
+                c = Claim.fromJSON(self.repo, claim)
+                c.on_item = self
+                self.claims[pid].append(c)
 
         return {'aliases': self.aliases,
                 'labels': self.labels,
@@ -4489,6 +4490,11 @@ class ItemPage(WikibasePage):
                              redirect, do not raise an exception.
         @type get_redirect: bool
         @raise NotImplementedError: a value in args or kwargs
+        @return: actual data which entity holds
+        @rtype: dict
+        @note: dicts returned by this method are references to content of this
+            entity and their modifying may indirectly cause unwanted change to
+            the live content
         """
         data = super(ItemPage, self).get(force, *args, **kwargs)
 
@@ -4497,10 +4503,9 @@ class ItemPage(WikibasePage):
 
         # sitelinks
         self.sitelinks = {}
-        if 'sitelinks' in self._content:
-            for dbname in self._content['sitelinks']:
-                self.sitelinks[dbname] = self._content[
-                    'sitelinks'][dbname]['title']
+        for dbname in self._content.get('sitelinks', {}):
+            self.sitelinks[dbname] = self._content[
+                'sitelinks'][dbname]['title']
 
         data['sitelinks'] = self.sitelinks
         return data
@@ -4833,6 +4838,11 @@ class PropertyPage(WikibasePage, Property):
         @param force: override caching
         @type force: bool
         @raise NotImplementedError: a value in args or kwargs
+        @return: actual data which entity holds
+        @rtype: dict
+        @note: dicts returned by this method are references to content of this
+            entity and their modifying may indirectly cause unwanted change to
+            the live content
         """
         if args or kwargs:
             raise NotImplementedError(
