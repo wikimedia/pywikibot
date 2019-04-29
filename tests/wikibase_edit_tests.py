@@ -128,6 +128,27 @@ class TestWikibaseWriteGeneral(WikibaseTestCase):
         item = pywikibot.ItemPage(testsite)
         item.editEntity(data)
 
+    def test_edit_entity_new_property(self):
+        """Test creating a new property using C{PropertyPage.editEntity}."""
+        testsite = self.get_repo()
+        ts = str(time.time())
+        data = {
+            'labels': {
+                'en': {
+                    'language': 'en',
+                    'value': 'Pywikibot test new property',
+                }
+            },
+            'descriptions': {
+                'en': {
+                    'language': 'en',
+                    'value': 'Pywikibot test new property - ' + ts,
+                }
+            }
+        }
+        prop = pywikibot.PropertyPage(testsite, datatype='string')
+        prop.editEntity(data)
+
     def test_edit_entity_new_linked_item(self):
         """Test linking a page using a new item."""
         ts = str(time.time())
