@@ -2220,10 +2220,10 @@ class BasePage(UnicodeMixin, ComparableMixin):
         that site to create the link instead of the current wiki.
 
         @param permalink: If true, the link will point to the actual revision
-        of the page.
+            of the page.
         @type permalink: bool
         @param with_protocol: If true, the link will have https propotol
-        prepend.
+            prepend.
         @type with_protocol: bool
         @return: The reduced link.
         @rtype: str
