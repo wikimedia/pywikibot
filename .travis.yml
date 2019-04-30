@@ -155,9 +155,8 @@ matrix:
       env: LANGUAGE=test FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.4'
       env: LANGUAGE=ar FAMILY=wiktionary PYWIKIBOT_TEST_NO_RC=1
-    # T220999
-    # - python: '3.6'
-    #   env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
+    - python: '3.6'
+      env: LANGUAGE=wikidata FAMILY=wikidata PYWIKIBOT_SITE_ONLY=1
     - python: '3.7'
       env: LANGUAGE=de FAMILY=wikipedia
       dist: xenial
