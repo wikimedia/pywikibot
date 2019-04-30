@@ -4,6 +4,12 @@ Release history
 Current release
 ---------------
 
+* Bugfixes and improvements
+* Localisation updates
+
+3.0.20190430
+------------
+
 * Don't fail if the number of forms of a plural string is less than required (T99057, T219097)
 * Implement create_short_link Page method to use Extension:UrlShortener (T220876)
 * Remove wikia family file (T220921)
