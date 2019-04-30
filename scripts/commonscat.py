@@ -52,8 +52,8 @@ For example to go through all categories:
 # November 2013
 #
 # (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2018
-# (C) Pywikibot team, 2008-2018
+# (C) Xqt, 2009-2019
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -63,7 +63,8 @@ import re
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import SingleSiteBot
 
 from scripts.add_text import add_text
 
@@ -225,18 +226,16 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(Bot):
+class CommonscatBot(SingleSiteBot):
 
     """Commons categorisation bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, **kwargs):
         """Initializer."""
         self.availableOptions.update({
             'summary': None,
         })
         super(CommonscatBot, self).__init__(**kwargs)
-        self.generator = generator
-        self.site = pywikibot.Site()
 
     def treat(self, page):
         """Load the given page, do some changes, and save it."""
@@ -553,7 +552,7 @@ def main(*args):
     if generator:
         if not genFactory.nopreload:
             generator = pagegenerators.PreloadingGenerator(generator)
-        bot = CommonscatBot(generator, **options)
+        bot = CommonscatBot(generator=generator, **options)
         bot.run()
         return True
     else:
