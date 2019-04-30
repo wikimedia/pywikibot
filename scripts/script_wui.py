@@ -234,7 +234,6 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
 # Define a function for the thread
 
-# pylint: disable=unused-argument
 def main_script(page, rev=None, params=NotImplemented):
     """Main thread."""
     # http://opensourcehacker.com/2011/02/23/temporarily-capturing-python-logging-output-to-a-string-buffer/

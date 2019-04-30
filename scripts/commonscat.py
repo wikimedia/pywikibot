@@ -52,8 +52,8 @@ For example to go through all categories:
 # November 2013
 #
 # (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2018
-# (C) Pywikibot team, 2008-2018
+# (C) Xqt, 2009-2019
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -348,7 +348,7 @@ class CommonscatBot(Bot):
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
             newtemplate='', newcat='', linktitle='',
-            description=NotImplemented):  # pylint: disable=unused-argument
+            description=NotImplemented):
         """Change the current commonscat template and target."""
         if oldcat == '3=S' or linktitle == '3=S':
             return  # TODO: handle additional param on de-wiki

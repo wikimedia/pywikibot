@@ -88,7 +88,7 @@ def CAT(site, name, hide):
             yield article
 
 
-def BACK(site, name, hide):  # pylint: disable=unused-argument
+def BACK(site, name, hide):
     p = pywikibot.Page(site, name, ns=10)
     return [page for page in p.getReferences(follow_redirects=False,
                                              only_template_inclusion=True)]
@@ -111,7 +111,7 @@ def DATA(site, name, hide):
 
 
 # not implemented yet
-def TMPL(site, name, hide):  # pylint: disable=unused-argument
+def TMPL(site, name, hide):
     return
 
 

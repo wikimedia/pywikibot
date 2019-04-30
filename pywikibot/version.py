@@ -363,7 +363,7 @@ def getversion_nightly(path=None):
     return (tag, rev, date, hsh)
 
 
-def getversion_package(path=None):  # pylint: disable=unused-argument
+def getversion_package(path=None):
     """Get version info for an installed package.
 
     @param path: Unused argument
