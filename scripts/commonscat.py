@@ -526,16 +526,15 @@ def main(*args):
     genFactory = pagegenerators.GeneratorFactory()
 
     for arg in local_args:
-        if arg.startswith('-summary'):
-            if len(arg) == 8:
-                options['summary'] = pywikibot.input(
-                    'What summary do you want to use?')
-            else:
-                options['summary'] = arg[9:]
-        elif arg.startswith('-checkcurrent'):
+        opt, _, value = arg.partition(':')
+        option = opt[1:] if opt[0] == '-' else None
+        if option == 'summary':
+            options[option] = value or pywikibot.input(
+                'What summary do you want to use?')
+        elif option == 'checkcurrent':
             checkcurrent = True
-        elif arg == '-always':
-            options['always'] = True
+        elif option == 'always':
+            options[option] = True
         else:
             genFactory.handleArg(arg)
 
