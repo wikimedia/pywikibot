@@ -179,6 +179,7 @@ from random import choice
 import pywikibot
 
 from pywikibot import config, i18n
+from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import issue_deprecation_warning, PY2, UnicodeType
 
@@ -723,7 +724,12 @@ class WelcomeBot(object):
                                       start=start):
             if ue.action() == 'create' or (
                     ue.action() == 'autocreate' and globalvar.welcomeAuto):
-                yield ue.page()
+                try:
+                    user = ue.page()
+                except HiddenKeyError:
+                    pywikibot.exception()
+                else:
+                    yield user
 
     def defineSign(self, force=False):
         """Setup signature."""
