@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Don't fail if the number of forms of a plural string is less than required (T99057, T219097)
 * Implement create_short_link Page method to use Extension:UrlShortener (T220876)
 * Remove wikia family file (T220921)
 * Remove deprecated ez_setup.py
