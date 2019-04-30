@@ -63,7 +63,8 @@ import re
 
 import pywikibot
 
-from pywikibot import i18n, pagegenerators, Bot
+from pywikibot import i18n, pagegenerators
+from pywikibot.bot import SingleSiteBot
 
 from scripts.add_text import add_text
 
@@ -226,18 +227,16 @@ ignoreTemplates = {
 }
 
 
-class CommonscatBot(Bot):
+class CommonscatBot(SingleSiteBot):
 
     """Commons categorisation bot."""
 
-    def __init__(self, generator, **kwargs):
+    def __init__(self, **kwargs):
         """Initializer."""
         self.availableOptions.update({
             'summary': None,
         })
         super(CommonscatBot, self).__init__(**kwargs)
-        self.generator = generator
-        self.site = pywikibot.Site()
 
     def treat(self, page):
         """Load the given page, do some changes, and save it."""
@@ -554,7 +553,7 @@ def main(*args):
     if generator:
         if not genFactory.nopreload:
             generator = pagegenerators.PreloadingGenerator(generator)
-        bot = CommonscatBot(generator, **options)
+        bot = CommonscatBot(generator=generator, **options)
         bot.run()
         return True
     else:
