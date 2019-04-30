@@ -52,8 +52,8 @@ For example to go through all categories:
 # November 2013
 #
 # (C) Multichill, 2008-2009
-# (C) Xqt, 2009-2018
-# (C) Pywikibot team, 2008-2018
+# (C) Xqt, 2009-2019
+# (C) Pywikibot team, 2008-2019
 #
 # Distributed under the terms of the MIT license.
 #
@@ -78,7 +78,7 @@ commonscatTemplates = {
     'af': ('CommonsKategorie', ['commonscat']),
     'an': ('Commonscat', ['Commons cat']),
     'ar': ('تصنيف كومنز',
-           ['Commonscat', 'تصنيف كومونز', 'Commons cat', 'CommonsCat']),
+           ['Commonscat', 'تصنيف كومونز', 'تك', 'Commons cat', 'CommonsCat']),
     'arz': ('Commons cat', ['Commoncat']),
     'az': ('CommonsKat', ['Commonscat']),
     'bn': ('কমন্সক্যাট', ['Commonscat']),
