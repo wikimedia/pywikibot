@@ -1343,11 +1343,18 @@ class TestPropertyPage(WikidataTestCase):
     """Test PropertyPage."""
 
     def test_property_empty_property(self):
+        """Test creating a PropertyPage without a title and datatype."""
+        wikidata = self.get_repo()
+        regex = r'^"datatype" is required for new property\.$'
+        with self.assertRaisesRegex(TypeError, regex):
+            PropertyPage(wikidata)
+
+    def test_property_empty_title(self):
         """Test creating a PropertyPage without a title."""
         wikidata = self.get_repo()
         regex = r"^Property's title cannot be empty$"
         with self.assertRaisesRegex(pywikibot.InvalidTitle, regex):
-            PropertyPage(wikidata)
+            PropertyPage(wikidata, title='')
 
     @suppress_warnings('pywikibot.page.Property.getType is deprecated')
     def test_globe_coordinate(self):
