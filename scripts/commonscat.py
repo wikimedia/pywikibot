@@ -239,10 +239,6 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             return True
         return super(CommonscatBot, self).skip_page(page)
 
-    def treat_page(self):
-        """Load the given page, do some changes, and save it."""
-        self.addCommonscat(self.current_page)
-
     def skipPage(self, page):
         """Determine if the page should be skipped."""
         if page.site.code in ignoreTemplates:
@@ -260,15 +256,15 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                             return True
         return False
 
-    def addCommonscat(self, page):
+    def treat_page(self):
         """
         Add CommonsCat template to page.
 
         Take a page. Go to all the interwiki page looking for a commonscat
         template. When all the interwiki's links are checked and a proper
         category is found add it to the page.
-
         """
+        page = self.current_page
         # Get the right templates for this page
         primaryCommonscat, commonscatAlternatives = i18n.translate(
             page.site.code, commonscatTemplates,
