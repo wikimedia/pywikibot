@@ -33,22 +33,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# TODO:
-# *Update interwiki's at commons
-# *Collect all possibilities also if local wiki already has link.
-# *Better support for other templates (translations) / redundant templates.
-# *Check mode, only check pages which already have the template
-# *More efficient like interwiki.py
-# *Possibility to update other languages in the same run
-#
-# Porting notes:
-#
-# *Ported from compat to core
-# *Replaced now-deprecated Page methods
-# *Fixed way of finding interlanguage links in findCommonscatLink()
-# *Removed unused and now possibly broken updateInterwiki() method
-#
-# Ported by Allen Guo <Guoguo12@gmail.com>
+# Ported from compat to core by Allen Guo <Guoguo12@gmail.com>
 # November 2013
 #
 # (C) Multichill, 2008-2009
