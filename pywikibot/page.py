@@ -4107,7 +4107,8 @@ class WikibasePage(BasePage):
         if not hasattr(cls, 'title_pattern'):
             return True
 
-        return bool(re.match(cls.title_pattern, entity_id))
+        # todo: use re.fullmatch when Python 3.4+ required
+        return bool(re.match(cls.title_pattern + '$', entity_id))
 
     @property
     def latest_revision_id(self):
@@ -4340,7 +4341,7 @@ class ItemPage(WikibasePage):
 
     _cache_attrs = WikibasePage._cache_attrs + ('sitelinks',)
     entity_type = 'item'
-    title_pattern = r'^(Q[1-9]\d*|-1)$'
+    title_pattern = r'(Q[1-9]\d*|-1)'
 
     def __init__(self, site, title=None, ns=None):
         """
@@ -4795,7 +4796,7 @@ class PropertyPage(WikibasePage, Property):
 
     _cache_attrs = WikibasePage._cache_attrs + ('_type',)
     entity_type = 'property'
-    title_pattern = r'^(P[1-9]\d*|-1)$'
+    title_pattern = r'(P[1-9]\d*|-1)'
 
     def __init__(self, source, title=None, datatype=None):
         """
