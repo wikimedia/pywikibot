@@ -279,34 +279,36 @@ class CommonscatBot(SingleSiteBot):
              currentCommonscatTarget, LinkText, Note) = commonscatLink
             checkedCommonscatTarget = self.checkCommonscatLink(
                 currentCommonscatTarget)
+
             if (currentCommonscatTarget == checkedCommonscatTarget):
                 # The current commonscat link is good
                 pywikibot.output('Commonscat link at {} to Category:{} is ok'
                                  .format(page.title(),
                                          currentCommonscatTarget))
                 return True
-            elif checkedCommonscatTarget != '':
+
+            if checkedCommonscatTarget:
                 # We have a new Commonscat link, replace the old one
                 self.changeCommonscat(page, currentCommonscatTemplate,
                                       currentCommonscatTarget,
                                       primaryCommonscat,
                                       checkedCommonscatTarget, LinkText, Note)
                 return True
-            else:
-                # Commonscat link is wrong
-                commonscatLink = self.findCommonscatLink(page)
-                if (commonscatLink != ''):
-                    self.changeCommonscat(page, currentCommonscatTemplate,
-                                          currentCommonscatTarget,
-                                          primaryCommonscat, commonscatLink)
-                # TODO: if the commonsLink == '', should it be removed?
+
+            # Commonscat link is wrong
+            commonscatLink = self.findCommonscatLink(page)
+            if commonscatLink:
+                self.changeCommonscat(page, currentCommonscatTemplate,
+                                      currentCommonscatTarget,
+                                      primaryCommonscat, commonscatLink)
+            # TODO: if the commonsLink == '', should it be removed?
 
         elif self.skipPage(page):
             pywikibot.output('Found a template in the skip list. Skipping '
                              + page.title())
         else:
             commonscatLink = self.findCommonscatLink(page)
-            if (commonscatLink != ''):
+            if commonscatLink:
                 if commonscatLink == page.title():
                     textToAdd = '{{%s}}' % primaryCommonscat
                 else:
@@ -379,7 +381,7 @@ class CommonscatBot(SingleSiteBot):
                  possibleCommonscat, linkText, Note) = commonscatLink
                 checkedCommonscat = self.checkCommonscatLink(
                     possibleCommonscat)
-                if (checkedCommonscat != ''):
+                if checkedCommonscat:
                     pywikibot.output(
                         'Found link for {} at [[{}:{}]] to {}.'
                         .format(page.title(), ipage.site.code, ipage.title(),
