@@ -1778,7 +1778,22 @@ class AutomaticTWSummaryBot(CurrentPageBot):
     @property
     def summary_parameters(self):
         """A dictionary of all parameters for i18n."""
+        if hasattr(self, '_summary_parameters'):
+            return self._summary_parameters
         return {}
+
+    @summary_parameters.setter
+    def summary_parameters(self, value):
+        """Set the i18n dictionary."""
+        if not isinstance(value, dict):
+            raise TypeError('"value" must be a dict but {} was found.'
+                            .format(type(value).__name__))
+        self._summary_parameters = value
+
+    @summary_parameters.deleter
+    def summary_parameters(self):
+        """Delete the i18n dictionary."""
+        del self._summary_parameters
 
     def put_current(self, *args, **kwargs):
         """Defining a summary if not already defined and then call original."""
