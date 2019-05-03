@@ -240,18 +240,6 @@ class CommonscatBot(SingleSiteBot):
         else:
             self.addCommonscat(page)
 
-    @classmethod
-    def getCommonscatTemplate(cls, code=None):
-        """Get the template name of a site. Expects the site code.
-
-        Return as tuple containing the primary template and its alternatives.
-
-        """
-        if code in commonscatTemplates:
-            return commonscatTemplates[code]
-        else:
-            return commonscatTemplates['_default']
-
     def skipPage(self, page):
         """Determine if the page should be skipped."""
         if page.site.code in ignoreTemplates:
@@ -280,8 +268,9 @@ class CommonscatBot(SingleSiteBot):
         """
         self.current_page = page
         # Get the right templates for this page
-        primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
-            page.site.code)
+        primaryCommonscat, commonscatAlternatives = i18n.translate(
+            page.site.code, commonscatTemplates,
+            fallback=i18n.DEFAULT_FALLBACK)
         commonscatLink = self.getCommonscatLink(page)
         if commonscatLink:
             pywikibot.output('Commonscat template is already on '
@@ -406,8 +395,9 @@ class CommonscatBot(SingleSiteBot):
 
         @rtype: tuple of (<templatename>, <target>, <linktext>, <note>)
         """
-        primaryCommonscat, commonscatAlternatives = self.getCommonscatTemplate(
-            wikipediaPage.site.code)
+        primaryCommonscat, commonscatAlternatives = i18n.translate(
+            wikipediaPage.site.code, commonscatTemplates,
+            fallback=i18n.DEFAULT_FALLBACK)
         commonscatTemplate = ''
         commonscatTarget = ''
         commonscatLinktext = ''
@@ -526,9 +516,8 @@ def main(*args):
 
     if checkcurrent:
         site = pywikibot.Site()
-        primaryCommonscat, commonscatAlternatives = \
-            CommonscatBot.getCommonscatTemplate(
-                site.code)
+        primaryCommonscat, commonscatAlternatives = i18n.translate(
+            site.code, commonscatTemplates, fallback=i18n.DEFAULT_FALLBACK)
         template_page = pywikibot.Page(site, 'Template:' + primaryCommonscat)
         generator = template_page.getReferences(namespaces=14,
                                                 only_template_inclusion=True)
