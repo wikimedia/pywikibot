@@ -620,11 +620,11 @@ def translate(code, xdict, parameters=None, fallback=False):
                 # was True before 65518573d2b0, it did just that. When False it
                 # did just return None. It's now also returning None in the new
                 # iterable mode.
-                return
+                return None
             code = list(xdict.keys())[0]
             trans = xdict[code]
     if trans is None:
-        return  # return None if we have no translation found
+        return None  # return None if we have no translation found
     if parameters is None:
         return trans
 
