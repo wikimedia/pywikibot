@@ -1293,12 +1293,11 @@ class Family(object):
         """
         if self._ignore_from_url is True:
             return None
-        else:
-            ignored = self._ignore_from_url
 
         parsed = urlparse.urlparse(url)
-        if not re.match('^(https?)?$', parsed.scheme):
+        if not re.match('(https?)?$', parsed.scheme):
             return None
+
         path = parsed.path
         if parsed.query:
             path += '?' + parsed.query
@@ -1309,35 +1308,36 @@ class Family(object):
             raise ValueError('Text after the $1 placeholder is not supported '
                              '(T111513).')
 
-        matched_sites = []
         for domain in self.domains:
             if domain in parsed.netloc:
                 break
         else:
-            domain = False
-        if domain is not False:
-            for code in chain(self.codes, getattr(self, 'test_codes', ())):
-                if code in ignored:
-                    continue
-                if self._hostname(code)[1] == parsed.netloc:
-                    # Use the code and family instead of the url
-                    # This is only creating a Site instance if domain matches
-                    site = pywikibot.Site(code, self.name)
-                    pywikibot.log('Found candidate {0}'.format(site))
+            return None
 
-                    for iw_url in site._interwiki_urls():
-                        if path.startswith(iw_url):
-                            matched_sites += [site]
-                            break
+        matched_sites = []
+        for code in chain(self.codes, getattr(self, 'test_codes', ())):
+            if code in self._ignore_from_url:
+                continue
+            if self._hostname(code)[1] == parsed.netloc:
+                # Use the code and family instead of the url
+                # This is only creating a Site instance if domain matches
+                site = pywikibot.Site(code, self.name)
+                pywikibot.log('Found candidate {0}'.format(site))
+
+                for iw_url in site._interwiki_urls():
+                    if path.startswith(iw_url):
+                        matched_sites += [site]
+                        break
 
         if len(matched_sites) == 1:
             return matched_sites[0].code
-        elif not matched_sites:
+
+        if not matched_sites:
             return None
-        else:
-            raise RuntimeError(
-                'Found multiple matches for URL "{0}": {1}'
-                .format(url, ', '.join(str(s) for s in matched_sites)))
+
+        raise RuntimeError(
+            'Found multiple matches for URL "{0}": {1}'
+            .format(url, ', '.join(str(s) for s in matched_sites)))
 
     def maximum_GET_length(self, code):
         """Return the maximum URL length for GET instead of POST."""
