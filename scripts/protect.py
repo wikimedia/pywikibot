@@ -62,7 +62,8 @@ from __future__ import absolute_import, division, unicode_literals
 import pywikibot
 from pywikibot import i18n, pagegenerators
 from pywikibot.bot import SingleSiteBot
-from pywikibot.tools.formatter import color_format
+from pywikibot.exceptions import ArgumentDeprecationWarning
+from pywikibot.tools import issue_deprecation_warning
 
 # This is required for the text that is shown when you run this script
 # with the parameter -help.
@@ -192,9 +193,9 @@ def main(*args):
             else:
                 options['expiry'] = arg[len('-expiry:'):]
         elif arg.startswith('-images'):
-            pywikibot.output(color_format(
-                '\n{lightred}-image option is deprecated. '
-                'Please use -imagelinks instead.{default}\n'))
+            issue_deprecation_warning('-image', '-imagelinks', 2,
+                                      ArgumentDeprecationWarning,
+                                      since='20140213')
             local_args.append('-imagelinks' + arg[7:])
         elif arg.startswith('-unprotect'):
             default_level = 'all'
