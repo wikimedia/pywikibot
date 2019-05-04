@@ -1113,7 +1113,7 @@ formats = {
             (lambda v: dh(v, 'שנות ה־%d',
                           lambda i: encDec0(i) % 100,
                           lambda ii: 1900 + ii[0]),
-             lambda p: p >= 1900 and p < 2000),
+             lambda p: 1900 <= p < 2000),
             # This is a dummy value, just to avoid validation testing.
             (lambda v: dh_decAD(v, '%dth decade'),
              alwaysTrue)]),  # ********** ERROR!!!
@@ -1176,7 +1176,7 @@ formats = {
         'pl': lambda m: multi(m, [
             (lambda v: dh(v, 'Lata %d-%d',
                           lambda i: (encDec0(i), encDec0(i) + 9), decSinglVal),
-             lambda p: p % 100 >= 0 and p % 100 < 20),
+             lambda p: 0 <= p % 100 < 20),
             (lambda v: dh(v, 'Lata %d. %R wieku',
                           lambda i: (encDec0(i) % 100, encDec0(i) // 100 + 1),
                           lambda ii: (ii[1] - 1) * 100 + ii[0]),
@@ -2226,32 +2226,32 @@ addFmt1('nan', True, makeMonthList('%%d nî %d goe̍h'))
 # used exclusively by DecadeAD and DecadeBC to increment by 10 years.
 # "and v%10==0" should be added to the limitation predicate for those two.
 formatLimits = {
-    'MonthName': (lambda v: 1 <= v and v < 13, 1, 13),
-    'Number': (lambda v: 0 <= v and v < 1000000, 0, 1001),
-    'YearAD': (lambda v: 0 <= v and v < 2501, 0, 2501),
+    'MonthName': (lambda v: 1 <= v < 13, 1, 13),
+    'Number': (lambda v: 0 <= v < 1000000, 0, 1001),
+    'YearAD': (lambda v: 0 <= v < 2501, 0, 2501),
     # zh: has years as old as 前1700年
-    'YearBC': (lambda v: 0 <= v and v < 4001, 0, 501),
-    'DecadeAD': (lambda v: 0 <= v and v < 2501, 0, 2501),
+    'YearBC': (lambda v: 0 <= v < 4001, 0, 501),
+    'DecadeAD': (lambda v: 0 <= v < 2501, 0, 2501),
     # zh: has decades as old as 前1700年代
-    'DecadeBC': (lambda v: 0 <= v and v < 4001, 0, 501),
+    'DecadeBC': (lambda v: 0 <= v < 4001, 0, 501),
 
     # Some centuries use Roman numerals or a given list
     # do not exceed them in testing
-    'CenturyAD': (lambda v: 1 <= v and v < 41, 1, 23),
-    'CenturyBC': (lambda v: 1 <= v and v < 91, 1, 23),
-    'CenturyAD_Cat': (lambda v: 1 <= v and v < 41, 1, 23),
-    'CenturyBC_Cat': (lambda v: 1 <= v and v < 41, 1, 23),
+    'CenturyAD': (lambda v: 1 <= v < 41, 1, 23),
+    'CenturyBC': (lambda v: 1 <= v < 91, 1, 23),
+    'CenturyAD_Cat': (lambda v: 1 <= v < 41, 1, 23),
+    'CenturyBC_Cat': (lambda v: 1 <= v < 41, 1, 23),
 
     # For millenniums, only test first 3 AD Millenniums and 1 BC Millennium
-    'MillenniumAD': (lambda v: 1 <= v and v < 6, 1, 4),
-    'MillenniumBC': (lambda v: 1 <= v and v < 20, 1, 2),
+    'MillenniumAD': (lambda v: 1 <= v < 6, 1, 4),
+    'MillenniumBC': (lambda v: 1 <= v < 20, 1, 2),
 
-    'Cat_Year_MusicAlbums': (lambda v: 1950 <= v and v < 2021, 1950, 2021),
-    'Cat_BirthsAD': (lambda v: 0 <= v and v < 2501, 0, 2501),
-    'Cat_DeathsAD': (lambda v: 0 <= v and v < 2501, 0, 2501),
-    'Cat_BirthsBC': (lambda v: 0 <= v and v < 4001, 0, 501),
-    'Cat_DeathsBC': (lambda v: 0 <= v and v < 4001, 0, 501),
-    'CurrEvents': (lambda v: 0 <= v and v < 1, 0, 1),
+    'Cat_Year_MusicAlbums': (lambda v: 1950 <= v < 2021, 1950, 2021),
+    'Cat_BirthsAD': (lambda v: 0 <= v < 2501, 0, 2501),
+    'Cat_DeathsAD': (lambda v: 0 <= v < 2501, 0, 2501),
+    'Cat_BirthsBC': (lambda v: 0 <= v < 4001, 0, 501),
+    'Cat_DeathsBC': (lambda v: 0 <= v < 4001, 0, 501),
+    'CurrEvents': (lambda v: 0 <= v < 1, 0, 1),
 }
 
 # All month of year articles are in the same format
