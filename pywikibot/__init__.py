@@ -65,7 +65,7 @@ from pywikibot.tools import (
     MediaWikiVersion as _MediaWikiVersion,
     redirect_func,
     ModuleDeprecationWrapper as _ModuleDeprecationWrapper,
-    PY2,
+    PY2, PYTHON_VERSION,
     UnicodeMixin,
     UnicodeType
 )
@@ -121,6 +121,15 @@ __all__ += textlib_methods
 if PY2:
     # T111615: Python 2 requires __all__ is bytes
     globals()['__all__'] = tuple(bytes(item) for item in __all__)
+
+    import sys
+    warn("""
+Python {version} will be dropped {when}.
+It is recommended to use Python 3.5 or above.
+See T213287 for further information.
+""".format(version=sys.version.split(None, 1)[0],
+           when='soon' if PYTHON_VERSION < (2, 7, 9) else 'in 2020'),
+         FutureWarning)
 
 for _name in textlib_methods:
     target = getattr(textlib, _name)

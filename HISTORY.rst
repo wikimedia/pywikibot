@@ -4,6 +4,7 @@ Release history
 Current release
 ---------------
 
+* Deprecation warning: support for Python 2 will be dropped (T213287)
 * botirc.IRCBot has been dropped
 * Avoid using outdated browseragents (T222959)
 * textlib: avoid infinite execution of regex (T222671)
