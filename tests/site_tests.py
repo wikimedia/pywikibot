@@ -3713,10 +3713,12 @@ class TestLoginLogout(DefaultSiteTestCase):
         loginstatus = pywikibot.site.LoginStatus
 
         self.assertFalse(site.logged_in())
+        self.assertEqual(site._loginstatus, loginstatus.NOT_ATTEMPTED)
 
         site.login()
         self.assertTrue(site.logged_in())
-        self.assertGreaterEqual(site._loginstatus, loginstatus.AS_USER)
+        self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
+                                          loginstatus.AS_USER))
         self.assertIn('_userinfo', site.__dict__.keys())
 
         self.assertIsNone(site.login())
