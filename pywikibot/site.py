@@ -7808,9 +7808,10 @@ class DataSite(APISite):
         Edit entity.
 
         Note: This method is unable to create entities other than 'item'
-              if dict with API parameters was passed to 'entity' parameter.
+        if dict with API parameters was passed to 'entity' parameter.
+
         @param entity: Page to edit, or dict with API parameters
-                       to use for entity identification
+            to use for entity identification
         @type entity: WikibasePage or dict
         @param data: data updates
         @type data: dict
