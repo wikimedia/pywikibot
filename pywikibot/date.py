@@ -372,7 +372,7 @@ def escapePattern2(pattern):
     Returns a compiled regex object and a list of digit decoders.
     """
     if pattern not in _escPtrnCache2:
-        newPattern = '^'  # beginning of the string
+        newPattern = ''  # match starts at the beginning of the string
         strPattern = ''
         decoders = []
         for s in _reParameters.split(pattern):

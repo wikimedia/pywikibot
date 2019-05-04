@@ -730,7 +730,7 @@ class MediaWikiVersion(Version):
     """
 
     MEDIAWIKI_VERSION = re.compile(
-        r'^(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
+        r'(\d+(?:\.\d+)+)(-?wmf\.?(\d+)|alpha|beta(\d+)|-?rc\.?(\d+)|.*)?$')
 
     @classmethod
     def from_generator(cls, generator):
