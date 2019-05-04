@@ -219,7 +219,6 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'cs': ('Archiv', 'Archiv Wikipedie', 'Archiv diskuse',
                'Archivace start', 'Posloupnost archivů',
                'Rfa-archiv-start', 'Rfc-archiv-start',),
-        'de': ('Archiv',),
     }
 
     def get_known_families(self, site):
