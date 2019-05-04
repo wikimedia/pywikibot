@@ -248,7 +248,7 @@ def main(*args):
                                 'replace the content of this page.'
                                 .format(page_target.title(as_link=True)))
             return False
-        if re.match('^[a-z_-]+$', summary):
+        if re.match('[a-z_-]+$', summary):
             summary = i18n.twtranslate(site, summary)
 
     gen = gen_factory.getCombinedGenerator()

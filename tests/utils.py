@@ -87,7 +87,7 @@ def allowed_failure(func):
         except AssertionError:
             tb = traceback.extract_tb(sys.exc_info()[2])
             for depth, line in enumerate(tb):
-                if re.match('^assert[A-Z]', line[2]):
+                if re.match('assert[A-Z]', line[2]):
                     break
             tb = traceback.format_list(tb[:depth])
             pywikibot.error('\n' + ''.join(tb)[:-1])  # remove \n at the end
