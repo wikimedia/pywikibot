@@ -3703,6 +3703,33 @@ class TestCategoryFromWikibase(DefaultSiteTestCase):
         self.assertIsNone(page)
 
 
+class TestLoginLogout(DefaultSiteTestCase):
+
+    """Test for login and logout methods."""
+
+    def test_login_logout(self):
+        """Validate login and logout methods by toggling the state."""
+        site = self.get_site()
+        loginstatus = pywikibot.site.LoginStatus
+
+        self.assertFalse(site.logged_in())
+
+        site.login()
+        self.assertTrue(site.logged_in())
+        self.assertGreaterEqual(site._loginstatus, loginstatus.AS_USER)
+        self.assertIn('_userinfo', site.__dict__.keys())
+
+        self.assertIsNone(site.login())
+
+        site.logout()
+        self.assertFalse(site.logged_in())
+        self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)
+        self.assertNotIn('_userinfo', site.__dict__.keys())
+
+        self.assertRaisesRegexp(AssertionError,
+                                'User must login in this site', site.logout)
+
+
 if __name__ == '__main__':  # pragma: no cover
     try:
         unittest.main()

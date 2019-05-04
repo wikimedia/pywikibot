@@ -2118,9 +2118,8 @@ class APISite(BaseSite):
         from the site.
         """
         del self._userinfo
-        old_status = self._loginstatus
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
-        self.login(old_status)
+        self.login()
 
     def logout(self):
         """
@@ -2133,10 +2132,11 @@ class APISite(BaseSite):
         """
         if self.is_oauth_token_available():
             pywikibot.warning('Using OAuth suppresses logout function')
-        uirequest = self._simple_request(action='logout')
+        uirequest = self._simple_request(action='logout',
+                                         token=self.tokens['csrf'])
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
-        self.getuserinfo(force=True)
+        del self._userinfo
 
     def getuserinfo(self, force=False):
         """Retrieve userinfo from site and store in _userinfo attribute.
