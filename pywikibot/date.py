@@ -2259,19 +2259,23 @@ _formatLimit_MonthOfYear = (lambda v: 1 <= 1900 and v < 2051, 1900, 2051)
 for month in yrMnthFmts:
     formatLimits[month] = _formatLimit_MonthOfYear
 
-_formatLimit_DayOfMonth31 = (lambda v: 1 <= v and v < 32, 1, 32)
-_formatLimit_DayOfMonth30 = (lambda v: 1 <= v and v < 31, 1, 31)
-_formatLimit_DayOfMonth29 = (lambda v: 1 <= v and v < 30, 1, 30)
+
+def _format_limit_dom(days):
+    """Return day of month format limit."""
+    assert days in range(29, 32)
+    return lambda v: 1 <= v <= days, 1, days + 1
+
+
 for monthId in range(12):
     if (monthId + 1) in (1, 3, 5, 7, 8, 10, 12):
         # 31 days a month
-        formatLimits[dayMnthFmts[monthId]] = _formatLimit_DayOfMonth31
+        formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(31)
     elif (monthId + 1) == 2:  # February
         # 29 days a month
-        formatLimits[dayMnthFmts[monthId]] = _formatLimit_DayOfMonth29
+        formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(29)
     else:
         # 30 days a month
-        formatLimits[dayMnthFmts[monthId]] = _formatLimit_DayOfMonth30
+        formatLimits[dayMnthFmts[monthId]] = _format_limit_dom(30)
 
 
 @deprecated('calendar.monthrange', since='20150707')
