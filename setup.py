@@ -93,18 +93,6 @@ script_deps = {
 if sys.platform.startswith('linux'):
     script_deps['script_wui.py'] = ['irc', 'lunatic-python', 'crontab']
 
-# The main pywin32 repository contains a Python 2 only setup.py with a small
-# wrapper setup3.py for Python 3.
-# http://pywin32.hg.sourceforge.net:8000/hgroot/pywin32/pywin32
-# The main pywinauto repository doesn't support Python 3.
-# The repositories used below have a Python 3 compliant setup.py
-dependency_links = [
-    'git+https://github.com/AlereDevices/lunatic-python.git#egg='
-    'lunatic-python',
-    'hg+https://bitbucket.org/TJG/pywin32#egg=pywin32',
-    'git+https://github.com/vasily-v-ryabov/pywinauto-64#egg=pywinauto',
-]
-
 if PY2:
     # tools.ip does not have a hard dependency on an IP address module,
     # as it falls back to using regexes if one is not available.
@@ -150,8 +138,13 @@ else:
 # Microsoft makes available a compiler for Python 2.7
 # http://www.microsoft.com/en-au/download/details.aspx?id=44266
 if os.name == 'nt' and os.environ.get('PYSETUP_TEST_NO_UI', '0') != '1':
-    # which isn't provided on pypi.
-    test_deps += ['pywin32', 'pywinauto>=0.4.0']
+    if PYTHON_VERSION >= (3, 5, 0) or PY2:
+        pywinauto = 'pywinauto>0.6.4'
+        pywin32 = 'pywin32>220'
+    else:  # Python 3.4
+        pywinauto = 'pywinauto<=0.6.4'
+        pywin32 = 'pywin32<=220'
+    test_deps += [pywin32, pywinauto]
 
 extra_deps.update(script_deps)
 
@@ -227,7 +220,6 @@ setup(
                             if package.startswith('pywikibot.')],
     python_requires='>=2.7.4, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*',
     install_requires=dependencies,
-    dependency_links=dependency_links,
     extras_require=extra_deps,
     url='https://www.mediawiki.org/wiki/Manual:Pywikibot',
     download_url='https://tools.wmflabs.org/pywikibot/',
