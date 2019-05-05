@@ -2057,9 +2057,11 @@ class WikidataBot(Bot, ExistingPageBot):
                     'Skipping %s because claim with same property '
                     'already exists' % (claim.getID(),))
                 log('Use -exists:p option to override this behavior')
-                return False
+                break
+
             if not existing.target_equals(claim.getTarget()):
                 continue
+
             # If some attribute of the claim being added
             # matches some attribute in an existing claim of
             # the same property, skip the claim, unless the
@@ -2069,19 +2071,22 @@ class WikidataBot(Bot, ExistingPageBot):
                     'Skipping %s because claim with same target already exists'
                     % (claim.getID(),))
                 log("Append 't' to -exists argument to override this behavior")
-                return False
+                break
+
             if 'q' not in exists_arg and not existing.qualifiers:
                 logger_callback(
                     'Skipping %s because claim without qualifiers already '
                     'exists' % (claim.getID(),))
                 log("Append 'q' to -exists argument to override this behavior")
-                return False
+                break
+
             if ('s' not in exists_arg or not source) and not existing.sources:
                 logger_callback(
                     'Skipping %s because claim without source already exists'
                     % (claim.getID(),))
                 log("Append 's' to -exists argument to override this behavior")
-                return False
+                break
+
             if ('s' not in exists_arg and source
                 and any(source.getID() in ref
                         and all(snak.target_equals(source.getTarget())
@@ -2091,9 +2096,11 @@ class WikidataBot(Bot, ExistingPageBot):
                     'Skipping %s because claim with the same source already '
                     'exists' % (claim.getID(),))
                 log("Append 's' to -exists argument to override this behavior")
-                return False
+                break
+        else:
+            return self.user_add_claim(item, claim, source, **kwargs)
 
-        return self.user_add_claim(item, claim, source, **kwargs)
+        return False
 
     def create_item_for_page(self, page, data=None, summary=None, **kwargs):
         """
