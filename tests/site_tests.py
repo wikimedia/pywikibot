@@ -3723,13 +3723,23 @@ class TestLoginLogout(DefaultSiteTestCase):
 
         self.assertIsNone(site.login())
 
-        site.logout()
-        self.assertFalse(site.logged_in())
-        self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)
-        self.assertNotIn('_userinfo', site.__dict__.keys())
+        if site.is_oauth_token_available():
+            self.assertRaisesRegexp(api.APIError, 'cannotlogout.*OAuth',
+                                    site.logout)
+            self.assertTrue(site.logged_in())
+            self.assertIn(site._loginstatus, (loginstatus.IN_PROGRESS,
+                                              loginstatus.AS_USER))
+            self.assertIn('_userinfo', site.__dict__.keys())
 
-        self.assertRaisesRegexp(AssertionError,
-                                'User must login in this site', site.logout)
+        else:
+            site.logout()
+            self.assertFalse(site.logged_in())
+            self.assertEqual(site._loginstatus, loginstatus.NOT_LOGGED_IN)
+            self.assertNotIn('_userinfo', site.__dict__.keys())
+
+            self.assertRaisesRegexp(AssertionError,
+                                    'User must login in this site',
+                                    site.logout)
 
 
 if __name__ == '__main__':  # pragma: no cover
