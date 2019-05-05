@@ -35,7 +35,7 @@ For example to go through all categories:
 # *Found one template. Add this template
 # *Found more templates. Ask the user <- still have to implement this
 #
-# (C) Pywikibot team, 2008-2019
+# (C) Pywikibot team, 2008-2020
 #
 # Distributed under the terms of the MIT license.
 #
@@ -50,6 +50,11 @@ from scripts.add_text import add_text
 
 docuReplacements = {
     '&params;': pagegenerators.parameterHelp
+}
+
+# wikibase property containing the wikibase category
+wikibase_property = {
+    'wikidata:wikidata': 'P373',
 }
 
 # Primary template, list of alternatives
@@ -293,7 +298,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 return
 
             # Commonscat link is wrong
-            commonscatLink = self.findCommonscatLink(page)
+            commonscatLink = self.find_commons_category(page)
             if commonscatLink:
                 self.changeCommonscat(page, currentCommonscatTemplate,
                                       currentCommonscatTarget,
@@ -304,7 +309,7 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
             pywikibot.output('Found a template in the skip list. Skipping '
                              + page.title())
         else:
-            commonscatLink = self.findCommonscatLink(page)
+            commonscatLink = self.find_commons_category(page)
             if commonscatLink:
                 if commonscatLink == page.title():
                     textToAdd = '{{%s}}' % primaryCommonscat
@@ -355,14 +360,10 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
         self.userPut(page, page.text, newtext, summary=comment,
                      ignore_save_related_errors=True)
 
-    def findCommonscatLink(self, page=None):
+    def findCommonscatLink(self, page) -> str:
         """Find CommonsCat template on interwiki pages.
 
-        In Pywikibot >=2.0, page.interwiki() now returns Link objects,
-        not Page objects
-
         @return: name of a valid commons category
-        @rtype: str
         """
         for ipageLink in page.langlinks():
             ipage = pywikibot.page.Page(ipageLink)
@@ -371,23 +372,45 @@ class CommonscatBot(SingleSiteBot, ExistingPageBot, NoRedirectPageBot):
                 if (not ipage.exists() or ipage.isRedirectPage()
                         or ipage.isDisambig()):
                     continue
+
                 commonscatLink = self.getCommonscatLink(ipage)
                 if not commonscatLink:
                     continue
-                (currentTemplate,
-                 possibleCommonscat, linkText, Note) = commonscatLink
+
                 checkedCommonscat = self.checkCommonscatLink(
-                    possibleCommonscat)
+                    commonscatLink[1])
+
                 if checkedCommonscat:
                     pywikibot.output(
                         'Found link for {} at [[{}:{}]] to {}.'
                         .format(page.title(), ipage.site.code, ipage.title(),
                                 checkedCommonscat))
                     return checkedCommonscat
+
             except pywikibot.BadTitle:
                 # The interwiki was incorrect
-                return ''
+                break
         return ''
+
+    def find_commons_category(self, page) -> str:
+        """Find CommonsCat template on wikibase repository.
+
+        Use wikibase property to get the category if possible.
+        Otherwise check all langlinks to find it.
+
+        @return: name of a valid commons category
+        """
+        data_repo = page.site.data_repository()
+        cat_property = wikibase_property.get(data_repo.sitename)
+        if cat_property:
+            claim = page.get_best_claim(cat_property)
+            if claim:
+                category = claim.getTarget()
+                if category:
+                    return category
+
+        # fallback to interwiki pages
+        return self.findCommonscatLink(page)
 
     def getCommonscatLink(self, wikipediaPage=None):
         """Find CommonsCat template on page.

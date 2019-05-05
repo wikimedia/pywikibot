@@ -39,6 +39,7 @@ from pywikibot.exceptions import (
     AutoblockUser,
     NotEmailableError,
     SiteDefinitionError,
+    UnknownExtension,
     UserRightsError,
 )
 from pywikibot.family import Family
@@ -2328,6 +2329,45 @@ class Page(BasePage):
         self.text = prefix + target_link + suffix
         if save:
             self.save(**kwargs)
+
+    def get_best_claim(self, prop: str):
+        """
+        Return the first best Claim for this page.
+
+        Return the first 'preferred' ranked Claim specified by wikibase
+        property or the first 'normal' one otherwise.
+
+        @param prop: property id, "P###"
+        @return: Claim object given by wikibase property number
+            for this page object.
+        @rtype: pywikibot.Claim or None
+
+        @raises UnknownExtension: site has no wikibase extension
+        """
+        def find_best_claim(claims):
+            """Find the first best ranked claim."""
+            index = None
+            for i, claim in enumerate(claims):
+                if claim.rank == 'preferred':
+                    return claim
+                if index is None and claim.rank == 'normal':
+                    index = i
+            if index is None:
+                index = 0
+            return claims[index]
+
+        if not self.site.has_data_repository:
+            raise UnknownExtension(
+                'Wikibase is not implemented for {}.'.format(self.site))
+        try:
+            item_page = pywikibot.ItemPage.fromPage(self)
+        except pywikibot.NoPage:
+            pass
+        else:
+            item_page.get()
+            if prop in item_page.claims:
+                return find_best_claim(item_page.claims[prop])
+        return None
 
 
 class FilePage(Page):
