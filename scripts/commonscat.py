@@ -285,7 +285,7 @@ class CommonscatBot(SingleSiteBot):
                 pywikibot.output('Commonscat link at {} to Category:{} is ok'
                                  .format(page.title(),
                                          currentCommonscatTarget))
-                return True
+                return
 
             if checkedCommonscatTarget:
                 # We have a new Commonscat link, replace the old one
@@ -293,7 +293,7 @@ class CommonscatBot(SingleSiteBot):
                                       currentCommonscatTarget,
                                       primaryCommonscat,
                                       checkedCommonscatTarget, LinkText, Note)
-                return True
+                return
 
             # Commonscat link is wrong
             commonscatLink = self.findCommonscatLink(page)
@@ -314,12 +314,10 @@ class CommonscatBot(SingleSiteBot):
                 else:
                     textToAdd = '{{%s|%s}}' % (primaryCommonscat,
                                                commonscatLink)
-                rv = add_text(page, textToAdd,
-                              self.getOption('summary'),
-                              always=self.getOption('always'))
-                self.options['always'] = rv[2]
-                return True
-        return True
+                _, _, always = add_text(page, textToAdd,
+                                        self.getOption('summary'),
+                                        always=self.getOption('always'))
+                self.options['always'] = always
 
     def changeCommonscat(
             self, page=None, oldtemplate='', oldcat='',
