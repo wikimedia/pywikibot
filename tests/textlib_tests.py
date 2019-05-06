@@ -1768,6 +1768,22 @@ class TestExtractSections(DefaultDrySiteTestCase):
              '')
         )
 
+    def test_long_comment(self):
+        r"""Test for text having a long expanse of white space.
+
+        This is to catch certain regex issues caused by patterns like
+        r'(\s+)*$' (as found in older versions of extract_section).
+        They may not halt.
+
+        c.f.
+        https://www.regular-expressions.info/catastrophic.html
+        """
+        text = '<!--                                         -->'
+        self.assertEqual(
+            extract_sections(text, self.site),
+            (text, [], '')
+        )
+
 
 if __name__ == '__main__':  # pragma: no cover
     try:

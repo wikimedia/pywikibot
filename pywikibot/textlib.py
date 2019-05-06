@@ -913,7 +913,7 @@ def extract_sections(text, site=None):
     langlink_pattern = interwiki_regex.pattern.replace(':?', '')
     last_section_content = sections[-1].content if sections else header
     footer = re.search(
-        r'(%s)*\Z' % r'|'.join((langlink_pattern, cat_regex.pattern, r'\s+')),
+        r'(%s)*\Z' % r'|'.join((langlink_pattern, cat_regex.pattern, r'\s')),
         last_section_content).group().lstrip()
     if footer:
         if sections:
