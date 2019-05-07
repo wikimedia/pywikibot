@@ -490,14 +490,6 @@ scripts.revertbot script
     :undoc-members:
     :show-inheritance:
 
-scripts.script\_wui script
---------------------------
-
-.. automodule:: scripts.script_wui
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 scripts.selflink script
 -----------------------
 

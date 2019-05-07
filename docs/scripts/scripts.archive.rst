@@ -17,4 +17,12 @@ scripts.archive.featured script
     :undoc-members:
     :show-inheritance:
 
+scripts.archive.script\_wui script
+----------------------------------
+
+.. automodule:: scripts.archive.script_wui
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 

@@ -49,9 +49,6 @@ Pillow ; python_version >= '3.5'
 google >= 1.7
 sseclient >= 0.0.18,!=0.0.23
 
-# scripts/script_wui.py:
-crontab
-
 # scripts/flickrripper.py
 flickrapi
 
@@ -64,11 +61,6 @@ mwparserfromhell>=0.3.3
 # The mysql generator in pagegenerators depends on either PyMySQL or MySQLdb
 # pywikibot prefers PyMySQL over MySQLdb (Python 2 only)
 PyMySQL
-
-# scripts/script_wui.py depends on Lua, which is not available using pip
-# but can be obtained from: https://github.com/bastibe/lunatic-python
-# However, a better fork is: https://github.com/AlereDevices/lunatic-python
-# Also script_wui.py is not currently functional, so it isn't installed here.
 
 # core HTML comparison parser in diff module
 beautifulsoup4

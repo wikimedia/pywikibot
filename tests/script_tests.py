@@ -19,16 +19,12 @@ from tests.utils import allowed_failure, execute_pwb, add_metaclass
 
 scripts_path = join_root_path('scripts')
 
-archive_path = join_root_path('scripts', 'archive')
-
 # These dependencies are not always the package name which is in setup.py.
 # e.g. 'PIL.ImageTk' is a object provided by several different pypi packages,
 # and setup.py requests that 'Pillow' is installed to provide 'PIL.ImageTk'.
 # Here, it doesn't matter which pypi package was requested and installed.
 # Here, the name given to the module which will be imported is required.
 script_deps = {
-    'script_wui': ['crontab', 'lua'],
-    # Note: package 'lunatic-python' provides module 'lua'
     'flickrripper': ['flickrapi', 'Pillow'],
     'imageharvest': ['bs4'],
     'isbn': ['python-stdnum'],
@@ -59,7 +55,6 @@ failed_dep_script_set = {name for name in script_deps
 
 unrunnable_script_set = {
     'version',  # does not use global args
-    'script_wui',  # depends on lua compiling
 }
 
 
@@ -73,8 +68,7 @@ def list_scripts(path, exclude=None):
 
 
 script_list = (['login']
-               + list_scripts(scripts_path, 'login.py')
-               + list_scripts(archive_path))
+               + list_scripts(scripts_path, 'login.py'))
 
 runnable_script_list = (
     ['login'] + sorted(set(script_list) - {'login'} - unrunnable_script_set))
@@ -107,7 +101,6 @@ auto_run_script_list = [
     'checkimages',
     'clean_sandbox',
     'disambredir',
-    'featured',
     'followlive',
     'imagerecat',
     'login',
@@ -117,7 +110,6 @@ auto_run_script_list = [
     'noreferences',
     'nowcommons',
     'patrol',
-    'script_wui',
     'shell',
     'standardize_interwiki',
     'states_redirect',
@@ -134,7 +126,6 @@ no_args_expected_results = {
     # TODO: until done here, remember to set editor = None in user-config.py
     'checkimages': 'Execution time: 0 seconds',
     'editarticle': 'Nothing changed',
-    'featured': '0 pages written.',
     'freebasemappingupload': 'Cannot find ',
     'harvest_template': 'ERROR: Please specify',
     'imageuncat':
@@ -145,7 +136,6 @@ no_args_expected_results = {
     'login': 'Logged in on ',
     'pagefromfile': 'Please enter the file name',
     'replace': 'Press Enter to use this automatic message',
-    'script_wui': 'Pre-loading all relevant page contents',
     'shell': ('>>> ', 'Welcome to the'),
     'transferbot': 'Target site not different from source site',
     'unusedfiles': ('Working on', None),

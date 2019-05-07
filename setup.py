@@ -89,9 +89,6 @@ script_deps = {
     'patrol.py': ['mwparserfromhell>=0.3.3'],
 }
 
-# lunatic-python is only available for Linux
-if sys.platform.startswith('linux'):
-    script_deps['script_wui.py'] = ['irc', 'lunatic-python', 'crontab']
 
 if PY2:
     # tools.ip does not have a hard dependency on an IP address module,

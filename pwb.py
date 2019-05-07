@@ -177,7 +177,6 @@ def main():
         if not os.path.exists(filename):
             script_paths = ['scripts',
                             'scripts.maintenance',
-                            'scripts.archive',
                             'scripts.userscripts']
             from pywikibot import config
             if config.user_script_paths:
