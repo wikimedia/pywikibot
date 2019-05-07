@@ -179,6 +179,7 @@ from random import choice
 import pywikibot
 
 from pywikibot import config, i18n
+from pywikibot.bot import SingleSiteBot
 from pywikibot.exceptions import HiddenKeyError
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import issue_deprecation_warning, PY2, UnicodeType
@@ -475,13 +476,13 @@ class Global(object):
     quiet = False           # Users without contributions aren't displayed
 
 
-class WelcomeBot(object):
+class WelcomeBot(SingleSiteBot):
 
     """Bot to add welcome messages on User pages."""
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         """Initializer."""
-        self.site = pywikibot.Site()
+        super(WelcomeBot, self).__init__(**kwargs)
         self.check_managed_sites()
         self.bname = {}
 
