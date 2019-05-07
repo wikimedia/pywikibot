@@ -718,7 +718,8 @@ class WelcomeBot(SingleSiteBot):
                 break
         return True
 
-    def parseNewUserLog(self):
+    @property
+    def generator(self):
         """Retrieve new users."""
         if globalvar.timeoffset != 0:
             start = self.site.server_time() - timedelta(
@@ -816,7 +817,7 @@ class WelcomeBot(SingleSiteBot):
         """Run the bot."""
         while True:
             welcomed_count = 0
-            for users in self.parseNewUserLog():
+            for users in self.generator:
                 if self.skip_page(users):
                     continue
 
