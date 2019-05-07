@@ -487,7 +487,10 @@ class WelcomeBot(object):
 
         self._totallyCount = 0
         self.welcomed_users = []
+        self.log_name = i18n.translate(self.site, logbook)
 
+        if not self.log_name:
+            globalvar.makeWelcomeLog = False
         if globalvar.randomSign:
             self.defineSign(True)
 
@@ -667,21 +670,15 @@ class WelcomeBot(object):
 
     def makelogpage(self, queue=None):
         """Make log page."""
-        if queue is None:
-            queue = []
-        if not globalvar.makeWelcomeLog or len(queue) == 0:
-            return
+        if not globalvar.makeWelcomeLog or not queue:
+            return False
 
-        text = ''
-        logg = i18n.translate(self.site, logbook)
-        if not logg:
-            return
-
-        target = logg + '/' + time.strftime('%Y/%m/%d',
-                                            time.localtime(time.time()))
         if self.site.code == 'it':
-            target = logg + '/' + time.strftime('%d/%m/%Y',
-                                                time.localtime(time.time()))
+            pattern = '%d/%m/%Y'
+        else:
+            pattern = '%Y/%m/%d'
+        target = self.log_name + '/' + time.strftime(
+            pattern, time.localtime(time.time()))
 
         log_page = pywikibot.Page(self.site, target)
         if log_page.exists():
@@ -697,21 +694,25 @@ class WelcomeBot(object):
             text += '\n!' + str.capitalize(
                 self.site.mediawiki_message('contribslink'))
 
-        for result in queue:
-            # Adding the log... (don't take care of the variable's name...).
-            luser = pywikibot.url2link(result.username, self.site, self.site)
-            text += '\n{{WLE|user=%s|contribs=%d}}' % (
-                luser, result.editCount())
+        # Adding the log... (don't take care of the variable's name...).
+        text += '\n'
+        text += '\n'.join(
+            '{{WLE|user=%s|contribs=%d}}' % (
+                user.title(as_url=True, with_ns=False), user.editCount())
+            for user in queue)
+
         # update log page.
         while True:
             try:
-                log_page.put(text, i18n.twtranslate(
-                    self.site, 'welcome-updating'))
-                return True
+                log_page.put(text, i18n.twtranslate(self.site,
+                                                    'welcome-updating'))
             except pywikibot.EditConflict:
                 pywikibot.output('An edit conflict has occurred. Pausing for '
                                  '10 seconds before continuing.')
                 time.sleep(10)
+            else:
+                break
+        return True
 
     def parseNewUserLog(self):
         """Retrieve new users."""
@@ -837,8 +838,7 @@ class WelcomeBot(object):
                             pywikibot.output('An edit conflict has occurred, '
                                              'skipping this user.')
 
-                    if globalvar.makeWelcomeLog and \
-                       i18n.translate(self.site, logbook):
+                    if globalvar.makeWelcomeLog:
                         showStatus(5)
                         if welcomed_count == 1:
                             pywikibot.output('One user has been welcomed.')
@@ -867,8 +867,7 @@ class WelcomeBot(object):
                                                  users.editCount()))
                     # That user mustn't be welcomed.
                     continue
-            if globalvar.makeWelcomeLog and i18n.translate(
-                    self.site, logbook) and welcomed_count > 0:
+            if globalvar.makeWelcomeLog and welcomed_count > 0:
                 showStatus()
                 if welcomed_count == 1:
                     pywikibot.output('Putting the log of the latest user...')
