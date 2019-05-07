@@ -777,26 +777,48 @@ class WelcomeBot(object):
         self._randomSignature = creg.findall(sign_text)
         return self._randomSignature
 
+    def skip_page(self, users):
+        """Check whether the user is to be skipped."""
+        if users.isBlocked():
+            showStatus(3)
+            pywikibot.output('{} has been blocked!'
+                             .format(users.username))
+
+        elif 'bot' in users.groups():
+            showStatus(3)
+            pywikibot.output('{} is a bot!'
+                             .format(users.username))
+
+        elif 'bot' in users.username.lower():
+            showStatus(3)
+            pywikibot.output('{} might be a global bot!'
+                             .format(users.username))
+
+        elif users.editCount() == 0:
+            if not globalvar.quiet:
+                showStatus(1)
+                pywikibot.output('{} has no contributions.'
+                                 .format(users.username))
+
+        elif users.editCount() < globalvar.attachEditCount:
+            showStatus(1)
+            pywikibot.output('{0} has only {1} contributions.'
+                             .format(users.username,
+                                     users.editCount()))
+
+        else:
+            return super(WelcomeBot, self).skip_page(users)
+
+        return True
+
     def run(self):
         """Run the bot."""
         while True:
             welcomed_count = 0
             for users in self.parseNewUserLog():
-                if users.isBlocked():
-                    showStatus(3)
-                    pywikibot.output('{} has been blocked!'
-                                     .format(users.username))
+                if self.skip_page(users):
                     continue
-                if 'bot' in users.groups():
-                    showStatus(3)
-                    pywikibot.output('{} is a bot!'
-                                     .format(users.username))
-                    continue
-                if 'bot' in users.username.lower():
-                    showStatus(3)
-                    pywikibot.output('{} might be a global bot!'
-                                     .format(users.username))
-                    continue
+
                 if users.editCount() >= globalvar.attachEditCount:
                     showStatus(2)
                     pywikibot.output('{} has enough edits to be welcomed.'
@@ -854,19 +876,7 @@ class WelcomeBot(object):
                             else:
                                 continue
                     # If we haven't to report, do nothing.
-                else:
-                    if users.editCount() == 0:
-                        if not globalvar.quiet:
-                            showStatus(1)
-                            pywikibot.output('{} has no contributions.'
-                                             .format(users.username))
-                    else:
-                        showStatus(1)
-                        pywikibot.output('{0} has only {1} contributions.'
-                                         .format(users.username,
-                                                 users.editCount()))
-                    # That user mustn't be welcomed.
-                    continue
+
             if globalvar.makeWelcomeLog and welcomed_count > 0:
                 showStatus()
                 if welcomed_count == 1:
