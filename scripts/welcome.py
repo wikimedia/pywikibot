@@ -485,7 +485,6 @@ class WelcomeBot(object):
         self.check_managed_sites()
         self.bname = {}
 
-        self._totallyCount = 0
         self.welcomed_users = []
 
         if globalvar.randomSign:
@@ -830,7 +829,6 @@ class WelcomeBot(object):
                             ustp.put(welcome_text, welcome_comment,
                                      minor=False)
                             welcomed_count += 1
-                            self._totallyCount += 1
                             self.welcomed_users.append(users)
                         except pywikibot.EditConflict:
                             showStatus(4)
