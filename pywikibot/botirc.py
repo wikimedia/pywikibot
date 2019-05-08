@@ -23,7 +23,7 @@ import re
 import pywikibot
 
 try:
-    from ircbot import SingleServerIRCBot
+    from irc.bot import SingleServerIRCBot
 except ImportError as e:
     ircbot_import_error = e
 

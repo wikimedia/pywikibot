@@ -1,64 +1,63 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """
-Bot which runs python framework scripts as (sub-)bot.
+A script to run Pywikibot shell with Lua support from wiki page.
 
-It provides a WikiUserInterface (WUI) with Lua support for bot operators.
+@deprecated: This method is not supported anymore. Use
+    U{PAWS<https://www.mediawiki.org/wiki/Manual:Pywikibot/PAWS>}
+    instead.
 
-This script needs external libraries (see imports and comments there)
-in order to run properly. Most of them can be checked-out at:
-    https://gerrit.wikimedia.org/r/#/admin/projects/?filter=pywikibot
-(some code might get compiled on-the-fly, so a GNU compiler along
-with library header files is needed too)
+This script runs in the background and tracks changes in the predefined
+wiki page for shell – WikiUserInterface (WUI). When a change
+is recorded, the contents of the page is interpreted as Pywikibot shell
+commands and executed.
 
-Syntax example:
+The predefined wiki page for crontab sets the shell page contents to
+a specified revision in the specified interval.
 
-    python pwb.py script_wui -dir:.
-        Default operating mode.
+Usage
+~~~~~
+
+It needs Lua or LuaJIT installed and also external PyPI packages
+crontab, irc and lupa in order to run properly. Some code might
+get compiled on-the-fly, so a GNU compiler along with library
+header files is needed too.
+
+You will need to create the following pages on your wiki:
+
+:User:{username}/script_wui-crontab.css:
+    This page specifies the commands to execute, one command per line.
+    See [[de:Benutzer:DrTrigon/DrTrigonBot/script_wui-shell.css]]
+    for example.
+:User:{username}/script_wui-shell.css:
+    This page specifies the schedule to execute specific page revision.
+    The following format can be used: revision, timestamp
+    See [[de:Benutzer:DrTrigon/DrTrigonBot/script_wui-crontab.css]]
+    for example.
+
+Tips for writing code in Wikipedia:
+
+ # patches to keep code running
+ builtin_raw_input = __builtin__.raw_input
+ # overwrite 'raw_input' to run bot non-blocking and simulation mode
+ __builtin__.raw_input = lambda: 'n'
+
+ # backup sys.argv; not recommended, if possible manipulate
+ # pywikibot.config instead
+ sys_argv = copy.deepcopy( sys.argv )
+
+@todo: Simulationen werden ausgeführt und das Resultat mit eindeutiger
+    Id (rev-id) auf Ausgabeseite geschrieben, damit kann der Befehl
+    (durch Angabe der Sim-Id) ausgeführt werden -> crontab (!)
+    [ shell (rev-id) -> output mit shell rev-id ]
+    [ shell rev-id (eindeutige job/task-config bzw. script) -> crontab ]
+@todo: Bei jeder Botbearbeitung wird der Name des Auftraggebers vermerkt
 """
 #
 # (C) Dr. Trigon, 2012-2014
 # (C) Pywikibot team, 2013-2019
 #
 # Distributed under the terms of the MIT license.
-#
-#  @package script_wui
-#  @brief   Script WikiUserInterface (WUI) Bot
-#
-#  @copyright Dr. Trigon, 2012
-#
-#  @section FRAMEWORK
-#
-#  Python wikipedia bot framework, DrTrigonBot.
-#  @see https://www.mediawiki.org/wiki/Manual:Pywikibot
-#  @see https://de.wikipedia.org/wiki/Benutzer:DrTrigonBot
-#
-#  @section LICENSE
-#
-#  Distributed under the terms of the MIT license.
-#  @see https://de.wikipedia.org/wiki/MIT-Lizenz
-#
-# --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-#  @todo Simulationen werden ausgeführt und das Resultat mit eindeutiger
-#        Id (rev-id) auf Ausgabeseite geschrieben, damit kann der Befehl
-#        (durch Angabe der Sim-Id) ausgeführt werden -> crontab (!)
-#        [ shell (rev-id) -> output mit shell rev-id ]
-#        [ shell rev-id (eindeutige job/task-config bzw. script) -> crontab ]
-#  @todo Bei jeder Botbearbeitung wird der Name des Auftraggebers vermerkt
-# --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-#  Writing code in Wikipedia:
-#
-#  # patches to keep code running
-#  builtin_raw_input = __builtin__.raw_input
-#  # overwrite 'raw_input' to run bot non-blocking and simulation mode
-#  __builtin__.raw_input = lambda: 'n'
-#
-#  # backup sys.argv; depreciated: if possible manipulate pywikibot.config
-#    instead
-#  sys_argv = copy.deepcopy( sys.argv )
-#
-#  ...
-# --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 #
 from __future__ import absolute_import, division, unicode_literals
 
@@ -72,20 +71,16 @@ import traceback
 
 from io import StringIO
 
-# https://labix.org/lunatic-python is bit-rotting, and there are maintained
-# versions on github:
-# https://github.com/bastibe/lunatic-python.git
-# https://github.com/AlereDevices/lunatic-python.git
-import lua
+from lupa import LuaRuntime
+lua = LuaRuntime(unpack_returned_tuples=True)
 
-# The crontab package is https://github.com/josiahcarlson/parse-crontab
-# version 0.20 installs a package called 'tests' which conflicts with our
-# test suite. The patch to fix this has been merged, but is not released.
-# TODO: Use https://github.com/jayvdb/parse-crontab until it is fixed.
+# The 'crontab' PyPI package versions 0.20 and 0.20.1 installs
+# a package called 'tests' which conflicts with our test suite.
+# The patch to fix this has been released in version 0.20.2.
 import crontab
 
 import pywikibot
-# pywikibot.botirc depends on https://pypi.org/project/irc
+# pywikibot.botirc depends on 'irc' PyPI package
 import pywikibot.botirc
 from pywikibot.tools.formatter import color_format
 from pywikibot.tools import PY2
@@ -93,7 +88,7 @@ from pywikibot.tools import PY2
 if not PY2:
     import _thread as thread
 else:
-    import thread  # noqa: H237 (module does not exist in Python 3)
+    import thread
 
 try:
     import resource
@@ -107,7 +102,7 @@ bot_config = {
     'ConfCSScrontab': 'User:{username}/script_wui-crontab.css',
     'ConfCSSoutput': 'User:{username}/Simulation',
 
-    'CRONMaxDelay': 5 * 60.0,       # check all ~5 minutes
+    'CRONMaxDelay': 5 * 60.0,  # check all ~5 minutes
 
     # forbidden parameters
     # (at the moment none, but consider e.g. '-always' or allow it with
@@ -133,10 +128,10 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         # - Lua -
         pywikibot.output('** Redirecting Lua print in order to catch it')
         lua.execute('__print = print')
-        lua.execute('print = python.globals().pywikibot.output')
+        lua.execute('print = python.eval("pywikibot.output")')
         # It may be useful in debugging to install the 'print' builtin
         # as the 'print' function in lua. To do this:
-        # lua.execute('print = python.builtins().print')
+        # lua.execute('print = python.builtins.print')
 
         # init constants
         templ = pywikibot.Page(self.site, bot_config['ConfCSSshell'])
@@ -151,14 +146,14 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         for item in self.refs:
             # First check if page is protected, reject any data if not
             parts = self.refs[item].title().lower().rsplit('.')
-            if len(parts) == 1 or parts[1] not in ['.css', '.js']:
+            if len(parts) == 1 or parts[1] not in ['css', 'js']:
                 raise ValueError('{0} config {1} = {2} is not a secure page; '
                                  'it should be a css or js userpage which are '
                                  'automatically semi-protected.'
                                  .format(self.__class__.__name__, item,
                                          self.refs[item]))
             try:
-                self.refs[item].get(force=True)   # load all page contents
+                self.refs[item].get(force=True)  # load all page contents
             except pywikibot.NoPage:
                 pywikibot.error("The configuration page {0} doesn't exists"
                                 .format(self.refs[item].title(as_link=True)))
@@ -168,17 +163,17 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         self.on_timer()
 
     def on_pubmsg(self, c, e):
-        match = self.re_edit.match(e.arguments()[0])
+        match = self.re_edit.match(e.arguments[0])
         if not match:
             return
-        user = match.group('user').decode(self.site.encoding())
+        user = match.group('user')
         if user == bot_config['BotName']:
             return
         # test actual page against (template incl.) list
-        page = match.group('page').decode(self.site.encoding())
+        page = match.group('page')
         if page in self.refs:
             pywikibot.output('RELOAD: ' + page)
-            self.refs[page].get(force=True)   # re-load (refresh) page content
+            self.refs[page].get(force=True)  # re-load (refresh) page content
         if page == self.templ:
             pywikibot.output('SHELL: ' + page)
             self.do_check(page)
@@ -196,7 +191,7 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
         ctab = self.refs[self.cron].get()
         # extract 'rev' and 'timestmp' from 'crontab' page text ...
 
-        # hacky/ugly/cheap; already better done in trunk dtbext
+        # hacky/ugly/cheap
         for line in ctab.splitlines():
             (rev, timestmp) = [item.strip() for item in line[1:].split(',')]
 
@@ -221,8 +216,8 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
             thread.start_new_thread(main_script, (self.refs[page_title], rev,
                                                   params))
         except Exception:
-            # (done according to subster in trunk and submit in
-            # rewrite/.../data/api.py)
+            # (done according to subster.py from compat and submitted in
+            # pywikibot/data/api.py)
             # TODO: is this error handling here needed at all??!?
 
             # secure traceback print (from api.py submit)
@@ -263,8 +258,8 @@ def main_script(page, rev=None, params=NotImplemented):
     try:
         exec(code)
     except Exception:
-        # (done according to subster in trunk and submit in
-        # rewrite/.../data/api.py)
+        # (done according to subster.py from compat and submitted in
+        # pywikibot/data/api.py)
 
         # secure traceback print (from api.py submit)
         pywikibot.exception(tb=True)
@@ -309,7 +304,7 @@ def wiki_logger(buffer, page, rev=None):
         link = page.permalink(oldid=rev)
     # append to page
     outpage = pywikibot.Page(pywikibot.Site(), bot_config['ConfCSSoutput'])
-    text = outpage.get()
+    text = outpage.text
     outpage.put(
         text + ('\n== Simulation vom %s mit [%s code:%s] =='
                 '\n<pre>\n%s</pre>\n\n')
