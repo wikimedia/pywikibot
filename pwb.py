@@ -171,79 +171,79 @@ except RuntimeError:
 def main():
     """Command line entry point."""
     global filename
-    if filename:
-        file_package = None
-        argvu = pwb.argvu[1:]
-        if not os.path.exists(filename):
-            script_paths = ['scripts',
-                            'scripts.maintenance',
-                            'scripts.userscripts']
-            from pywikibot import config
-            if config.user_script_paths:
-                if isinstance(config.user_script_paths, (tuple, list)):
-                    script_paths = config.user_script_paths + script_paths
-                else:
-                    warn("'user_script_paths' must be a list or tuple,\n"
-                         'found: {0}. Ignoring this setting.'
-                         ''.format(type(config.user_script_paths)))
-            for file_package in script_paths:
-                paths = file_package.split('.') + [filename]
-                testpath = os.path.join(_pwb_dir, *paths)
-                if os.path.exists(testpath):
-                    filename = testpath
-                    break
-            else:
-                print('ERROR: {} not found! Misspelling?'.format(filename),
-                      file=sys.stderr)
-
-                scripts = {}
-                for file_package in script_paths:
-                    path = file_package.split('.')
-                    for script_name in os.listdir(os.path.join(*path)):
-                        if (script_name.endswith('.py')
-                                and not script_name.startswith('__')):
-                            # remove .py for better matching
-                            scripts[script_name[:-3]] = os.path.join(
-                                *(path + [script_name]))
-
-                similar_scripts = get_close_matches(filename[:-3], scripts,
-                                                    n=10, cutoff=0.7)
-                if similar_scripts:
-                    print('\nThe most similar script{}:'
-                          .format(' is' if len(similar_scripts) == 1
-                                  else 's are'))
-                    print('\t' + '.py\n\t'.join(similar_scripts) + '.py')
-                return True
-
-        # When both pwb.py and the filename to run are within the current
-        # working directory:
-        # a) set __package__ as if called using python -m scripts.blah.foo
-        # b) set __file__ to be relative, so it can be relative in backtraces,
-        #    and __file__ *appears* to be an unstable path to load data from.
-        # This is a rough (and quick!) emulation of 'package name' detection.
-        # a much more detailed implementation is in coverage's find_module.
-        # https://bitbucket.org/ned/coveragepy/src/default/coverage/execfile.py
-        cwd = abspath(os.getcwd())
-        if absolute_path == cwd:
-            absolute_filename = abspath(filename)[:len(cwd)]
-            if absolute_filename == cwd:
-                relative_filename = os.path.relpath(filename)
-                # remove the filename, and use '.' instead of path separator.
-                file_package = os.path.dirname(
-                    relative_filename).replace(os.sep, '.')
-                filename = os.path.join(os.curdir, relative_filename)
-
-        if file_package and file_package not in sys.modules:
-            try:
-                import_module(file_package)
-            except ImportError as e:
-                warn('Parent module %s not found: %s'
-                     % (file_package, e), ImportWarning)
-
-        run_python_file(filename, [filename] + args, argvu, file_package)
-        return True
-    else:
+    if not filename:
         return False
+
+    file_package = None
+    argvu = pwb.argvu[1:]
+    if not os.path.exists(filename):
+        script_paths = ['scripts',
+                        'scripts.maintenance',
+                        'scripts.userscripts']
+        from pywikibot import config
+        if config.user_script_paths:
+            if isinstance(config.user_script_paths, (tuple, list)):
+                script_paths = config.user_script_paths + script_paths
+            else:
+                warn("'user_script_paths' must be a list or tuple,\n"
+                     'found: {0}. Ignoring this setting.'
+                     ''.format(type(config.user_script_paths)))
+        for file_package in script_paths:
+            paths = file_package.split('.') + [filename]
+            testpath = os.path.join(_pwb_dir, *paths)
+            if os.path.exists(testpath):
+                filename = testpath
+                break
+        else:
+            print('ERROR: {} not found! Misspelling?'.format(filename),
+                  file=sys.stderr)
+
+            scripts = {}
+            for file_package in script_paths:
+                path = file_package.split('.')
+                for script_name in os.listdir(os.path.join(*path)):
+                    if (script_name.endswith('.py')
+                            and not script_name.startswith('__')):
+                        # remove .py for better matching
+                        scripts[script_name[:-3]] = os.path.join(
+                            *(path + [script_name]))
+
+            similar_scripts = get_close_matches(filename[:-3], scripts,
+                                                n=10, cutoff=0.7)
+            if similar_scripts:
+                print('\nThe most similar script{}:'
+                      .format(' is' if len(similar_scripts) == 1
+                              else 's are'))
+                print('\t' + '.py\n\t'.join(similar_scripts) + '.py')
+            return True
+
+    # When both pwb.py and the filename to run are within the current
+    # working directory:
+    # a) set __package__ as if called using python -m scripts.blah.foo
+    # b) set __file__ to be relative, so it can be relative in backtraces,
+    #    and __file__ *appears* to be an unstable path to load data from.
+    # This is a rough (and quick!) emulation of 'package name' detection.
+    # a much more detailed implementation is in coverage's find_module.
+    # https://bitbucket.org/ned/coveragepy/src/default/coverage/execfile.py
+    cwd = abspath(os.getcwd())
+    if absolute_path == cwd:
+        absolute_filename = abspath(filename)[:len(cwd)]
+        if absolute_filename == cwd:
+            relative_filename = os.path.relpath(filename)
+            # remove the filename, and use '.' instead of path separator.
+            file_package = os.path.dirname(
+                relative_filename).replace(os.sep, '.')
+            filename = os.path.join(os.curdir, relative_filename)
+
+    if file_package and file_package not in sys.modules:
+        try:
+            import_module(file_package)
+        except ImportError as e:
+            warn('Parent module %s not found: %s'
+                 % (file_package, e), ImportWarning)
+
+    run_python_file(filename, [filename] + args, argvu, file_package)
+    return True
 
 
 if __name__ == '__main__':
