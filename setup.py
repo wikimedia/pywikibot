@@ -47,7 +47,7 @@ else:
 
 extra_deps = {
     # Core library dependencies
-    'eventstreams': ['sseclient>=0.0.18,!=0.0.23'],
+    'eventstreams': ['sseclient>=0.0.18,!=0.0.23,!=0.0.24'],
     'isbn': ['python-stdnum'],
     'Graphviz': ['pydot>=1.2'],
     'Google': ['google>=1.7'],

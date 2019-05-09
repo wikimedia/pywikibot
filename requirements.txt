@@ -47,7 +47,7 @@ Pillow ; python_version >= '3.5'
 
 # core pagegenerators
 google >= 1.7
-sseclient >= 0.0.18,!=0.0.23
+sseclient >= 0.0.18,!=0.0.23,!=0.0.24
 
 # scripts/flickrripper.py
 flickrapi
