@@ -16,10 +16,8 @@ To get started on proper usage of the bot framework, please refer to:
 
 **External software can be used with Pywikibot:**
   * Pydot, Pyparsing and Graphviz for use with interwiki_graph.py
-  * JSON for use with site.py, bot.py
-  * MySQLdb to access MySQL database for use with pagegenerators.py
-  * PyGoogle to access Google Web API and PySearch to access Yahoo! Search
-    Web Services for use with pagegenerators.py
+  * PyMySQL to access MySQL database for use with pagegenerators.py
+  * google to access Google Web API for use with pagegenerators.py
 
 
 Pywikibot makes use of some modules that are part of python, but that
@@ -30,11 +28,11 @@ are not installed by default on some Linux distributions:
   * python-tkinter (optional, used by some experimental GUI stuff)
 
 
-You need to have at least python version `2.7.4 <http://www.python.org/download/>`_
+You need to have at least Python version `2.7.4 <http://www.python.org/download/>`_
 or newer installed on your computer to be able to run any of the code in this
-package, but not 3.0-3.3. It works fine with 3.4+ versions of python installed.
-Support for older versions of python is not planned. Some scripts could run with
-older python releases. Please refer the manual at mediawiki for further details
+package, but not 3.0-3.3. Support for older versions of Python is not planned
+and version 2.7 may be dropped soon as well. It works fine with 3.4+ versions
+of Python installed. Please refer the manual at mediawiki for further details
 and restrictions.
 
 
