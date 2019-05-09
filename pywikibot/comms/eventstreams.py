@@ -344,7 +344,7 @@ def site_rc_listener(site, total=None):
         raise ImportError('sseclient is required for EventStreams;\n'
                           'install it with "pip install sseclient"\n')
 
-    stream = EventStreams(stream='recentchange', site=site)
+    stream = EventStreams(streams='recentchange', site=site)
     stream.set_maximum_items(total)
     stream.register_filter(server_name=site.hostname())
     return stream
