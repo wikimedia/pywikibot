@@ -127,11 +127,11 @@ def main(*args):
     Source: %(fromsite)r
     Target: %(tosite)r
 
-    Pages to transfer: %(gen_args)s
+    Generator of pages to transfer: %(gen_args)s
 
     Prefix for transferred pages: %(prefix)s
     """ % {'fromsite': fromsite, 'tosite': tosite,
-           'gen_args': gen_args, 'prefix': prefix})
+           'gen_args': gen_args, 'prefix': prefix if prefix else '(none)'})
 
     for page in gen:
         target_title = (prefix + page.namespace().canonical_prefix()
@@ -142,14 +142,15 @@ def main(*args):
         if targetpage.exists() and not overwrite:
             pywikibot.output(
                 'Skipped {0} (target page {1} exists)'.format(
-                    page.title(as_link=True),
+                    page.title(as_link=True, force_interwiki=True),
                     targetpage.title(as_link=True)
                 )
             )
             continue
 
         pywikibot.output('Moving {0} to {1}...'
-                         .format(page.title(as_link=True),
+                         .format(page.title(as_link=True,
+                                            force_interwiki=True),
                                  targetpage.title(as_link=True)))
 
         pywikibot.log('Getting page text.')
