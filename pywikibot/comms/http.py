@@ -255,20 +255,11 @@ def fake_user_agent():
     @rtype: str
     """
     try:
-        import browseragents
-        return browseragents.core.random()
-    except ImportError:
-        pass
-
-    try:
         import fake_useragent
         return fake_useragent.fake.UserAgent().random
     except ImportError:
-        pass
-
-    raise ImportError(  # Actually complain when neither is installed.
-        'Either browseragents or fake_useragent must be installed to get fake '
-        'UAs.')
+        raise ImportError(  # Actually complain when fake_useragent is missing.
+            'fake_useragent must be installed to get fake UAs.')
 
 
 @deprecate_arg('ssl', None)
