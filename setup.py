@@ -57,6 +57,7 @@ extra_deps = {
     'security': ['requests[security]', 'pycparser!=2.14'],
     'mwoauth': ['mwoauth>=0.2.4,!=0.3.1'],
     'html': ['BeautifulSoup4'],
+    'http': ['browseragents', 'fake_useragent'],
     'flake8': [  # Due to incompatibilities between packages the order matters.
         'flake8>=3.7.5',
         pydocstyle,
