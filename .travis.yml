@@ -105,9 +105,9 @@ script:
       fi ;
     elif [[ "$USE_PYTEST" == "1" ]]; then
       if [[ "$PYWIKIBOT_SITE_ONLY" == "1" ]]; then
-        python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -a \"family=='$FAMILY' and code=='$LANGUAGE'\"" ;
+        python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -rsxX -a \"family=='$FAMILY' and code=='$LANGUAGE'\"" ;
       else
-        python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=." ;
+        python setup.py pytest --addopts="-vvv -s --timeout=$TEST_TIMEOUT --cov=. -rsxX" ;
       fi
     else
       coverage run setup.py test ;
