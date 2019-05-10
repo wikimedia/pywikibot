@@ -14,6 +14,7 @@ A sysop account on the local wiki is required if you want all features of
 this script to work properly.
 
 This script understands various command-line arguments:
+
     -always         run automatically, do not ask any questions. All files
                     that qualify for deletion are deleted. Reduced screen
                     output.

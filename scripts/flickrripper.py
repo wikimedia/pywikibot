@@ -3,6 +3,8 @@
 """
 A tool to transfer flickr photos to Wikimedia Commons.
 
+The following parameters are supported:
+
  -group_id:         specify group ID of the pool
  -photoset_id:      specify a photoset id
  -user_id:          give the user id of the flickrriper user

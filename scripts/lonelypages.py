@@ -17,7 +17,7 @@ Furthermore, the following command line parameters are supported:
 -always           Always say yes, won't ask
 
 
---- Examples ---
+Example:
 
     python pwb.py lonelypages -enable:User:Bot/CheckBot -always
 """

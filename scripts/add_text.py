@@ -37,18 +37,17 @@ Furthermore, the following command line parameters are supported:
 
 Example
 -------
-1.
-# This is a script to add a template to the top of the pages with
-# category:catname
-# Warning! Put it in one line, otherwise it won't work correctly.
+
+1. This is a script to add a template to the top of the pages with
+category:catname
+Warning! Put it in one line, otherwise it won't work correctly:
 
     python pwb.py add_text -cat:catname -summary:"Bot: Adding a template" \
         -text:"{{Something}}" -except:"\{\{([Tt]emplate:|)[Ss]omething" -up
 
-2.
-# Command used on it.wikipedia to put the template in the page without any
-# category.
-# Warning! Put it in one line, otherwise it won't work correctly.
+2. Command used on it.wikipedia to put the template in the page without any
+category.
+Warning! Put it in one line, otherwise it won't work correctly:
 
     python pwb.py add_text -except:"\{\{([Tt]emplate:|)[Cc]ategorizzare" \
         -text:"{{Categorizzare}}" -excepturl:"class='catlinks'>" -uncat \

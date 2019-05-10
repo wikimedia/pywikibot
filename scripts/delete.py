@@ -31,10 +31,12 @@ Furthermore, the following command line parameters are supported:
 -orphansonly:     Specified namespaces. Separate multiple namespace
                   numbers or names with commas.
                   Examples:
+
                   -orphansonly:0,2,4
                   -orphansonly:Help,MediaWiki
 
                   Note that Main ns can be indicated either with a 0 or a ',':
+
                   -orphansonly:0,1
                   -orphansonly:,Talk
 
@@ -45,7 +47,7 @@ Usage:
 Examples
 --------
 
-Delete everything in the category "To delete" without prompting.
+Delete everything in the category "To delete" without prompting:
 
     python pwb.py delete -cat:"To delete" -always
 """

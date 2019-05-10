@@ -9,6 +9,7 @@ This bot uses a graphical interface and may not work from commandline
 only environment.
 
 Examples
+--------
 
 Work on a single file:
 

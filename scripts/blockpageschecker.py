@@ -7,9 +7,6 @@ Very often sysops block the pages for a set time but then the forget to
 remove the warning! This script is useful if you want to remove those useless
 warning left in these pages.
 
-Parameters
-----------
-
 These command line parameters can be used to specify which pages to work on:
 
 &params;
@@ -34,7 +31,7 @@ Furthermore, the following command line parameters are supported:
 -move            The bot will check if the page is blocked also for the move
                  option, not only for edit
 
---- Example of how to use the script ---
+Examples:
 
     python pwb.py blockpageschecker -always
 

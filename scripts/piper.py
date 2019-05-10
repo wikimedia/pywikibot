@@ -20,13 +20,15 @@ it with tr(1) and upper case it again with tr(1)
 
 The following parameters are supported:
 
-&params;
-
     -always        Always commit changes without asking you to accept them
 
     -filter:       Filter the article text through this program, can be
                    given multiple times to filter through multiple programs in
                    the order which they are given
+
+The following generators and filters are supported:
+
+&params;
 """
 #
 # (C) Pywikibot team, 2008-2019

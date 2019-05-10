@@ -10,9 +10,8 @@ whatever way you want.
 Use global -simulate option for test purposes. No changes to live wiki
 will be done.
 
-The following parameters are supported:
 
-&params;
+The following parameters are supported:
 
 -always           The bot won't ask for confirmation when putting a page
 
@@ -23,6 +22,11 @@ The following parameters are supported:
 -top              Place additional text on top of the page
 
 -summary:         Set the action summary message for the edit.
+
+
+The following generators and filters are supported:
+
+&params;
 """
 #
 # (C) Pywikibot team, 2006-2019

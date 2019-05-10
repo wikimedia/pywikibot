@@ -10,7 +10,7 @@ Syntax:
 
     python pwb.py redirect action [-arguments ...]
 
-where action can be one of these:
+where action can be one of these
 
 :double:       Shortcut: **do**. Fix redirects which point to other redirects.
 

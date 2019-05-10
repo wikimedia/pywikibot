@@ -7,8 +7,6 @@ The changes are not supposed to change the look of the rendered wiki page.
 
 The following parameters are supported:
 
-&params;
-
 -always           Don't prompt you for each replacement. Warning (see below)
                   has not to be confirmed. ATTENTION: Use this with care!
 
@@ -20,6 +18,10 @@ The following parameters are supported:
 
 -ignore:          Ignores if an error occurred and either skips the page or
                   only that method. It can be set to 'page' or 'method'.
+
+The following generators and filters are supported:
+
+&params;
 
 &warning;
 

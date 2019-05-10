@@ -6,7 +6,7 @@ Script to log the bot in to a wiki account.
 Suggestion is to make a special account to use for bot use only. Make
 sure this bot account is well known on your home wiki before using.
 
-Parameters:
+The following parameters are supported:
 
    -family:FF
    -lang:LL     Log in to the LL language of the FF family.

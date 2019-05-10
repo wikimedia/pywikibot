@@ -5,8 +5,10 @@ Very simple script to replace a template with another one.
 
 It also converts the old MediaWiki boilerplate format to the new format.
 
-Syntax: python pwb.py template [-remove] [xml[:filename]] oldTemplate \
-            [newTemplate]
+Syntax:
+
+    python pwb.py template [-remove] [xml[:filename]] oldTemplate \
+        [newTemplate]
 
 Specify the template on the command line. The program will pick up the template
 page, and look for all pages using it. It will then automatically loop over
@@ -55,7 +57,6 @@ Command line options:
 
 other:       First argument is the old template name, second one is the new
              name.
-
              If you want to address a template which has spaces, put quotation
              marks around it, or use underscores.
 
@@ -63,7 +64,7 @@ Examples
 --------
 
 If you have a template called [[Template:Cities in Washington]] and want to
-change it to [[Template:Cities in Washington state]], start
+change it to [[Template:Cities in Washington state]], start:
 
     python pwb.py template "Cities in Washington" "Cities in Washington state"
 
@@ -80,7 +81,7 @@ Note that -namespace: is a global Pywikibot parameter
 
 This next example substitutes the template lived with a supplied edit summary.
 It only performs substitutions in main article namespace and doesn't prompt to
-start replacing. Note that -putthrottle: is a global Pywikibot parameter.
+start replacing. Note that -putthrottle: is a global Pywikibot parameter:
 
     python pwb.py template -putthrottle:30 -namespace:0 lived -subst -always \
         -summary:"BOT: Substituting {{lived}}, see [[WP:SUBST]]."

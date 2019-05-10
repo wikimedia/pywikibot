@@ -12,7 +12,7 @@ Ensure you have community support before running this bot!
 Everything that needs customisation to support additional projects is
 indicated by comments.
 
-Description of basic functionality:
+Description of basic functionality
 
  * Request a list of new users every period (default: 3600 seconds)
    You can choose to break the script after the first check (see arguments)
@@ -29,7 +29,8 @@ Description of basic functionality:
  * If no log page exists, create a header for the log page first.
 
 This script (by default not yet implemented) uses two templates that need to
-be on the local wiki:
+be on the local wiki
+
 * {{WLE}}: contains mark up code for log entries (just copy it from Commons)
 * {{welcome}}: contains the information for new users
 
@@ -96,7 +97,7 @@ This script understands the following command-line arguments:
     of the whitelist is in the username. If yes it remove the word and
     recheck in the bad word list to see if there are other badword in the
     username.
-    Example:
+    Example
 
         * dio is a badword
         * Claudio is a normal name
@@ -105,14 +106,16 @@ This script understands the following command-line arguments:
         * The Bot finds Claudio and sets "ok"
         * The Bot finds fuck at the end and sets "warning"
         * Result: The username is reported.
-4)  When a user is reported you have to check him and do:
+4)  When a user is reported you have to check him and do
+
         * If he's ok, put the {{welcome}}
         * If he's not, block him
         * You can decide to put a "you are blocked, change another username"
           template or not.
         * Delete the username from the page.
 
-        IMPORTANT : The Bot check the user in this order:
+        IMPORTANT : The Bot check the user in this order
+
             * Search if he has a talkpage (if yes, skip)
             * Search if he's blocked, if yes he will be skipped
             * Search if he's in the report page, if yes he will be skipped
@@ -132,10 +135,11 @@ some of these messages from newbies.
     <NEW LINE>
 
 Example:
-<pre>
-* [[User:Filnik|Filnik]]
-* [[User:Rock|Rock]]
-</pre>
+
+ <pre>
+ * [[User:Filnik|Filnik]]
+ * [[User:Rock|Rock]]
+ </pre>
 
 NOTE: The white space and <pre></pre> aren't required but I suggest you to
       use them.

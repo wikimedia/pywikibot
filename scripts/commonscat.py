@@ -8,10 +8,7 @@ another language page, the bot will use it.
 
 You could probably use it at articles as well, but this isn't tested.
 
-This bot uses pagegenerators to get a list of pages. The following options are
-supported:
-
-&params;
+The following parameters are supported:
 
 -always           Don't prompt you for each replacement. Warning message
                   has not to be confirmed. ATTENTION: Use this with care!
@@ -21,6 +18,11 @@ supported:
 
 -checkcurrent     Work on all category pages that use the primary commonscat
                   template.
+
+This bot uses pagegenerators to get a list of pages. The following options are
+supported:
+
+&params;
 
 For example to go through all categories:
 

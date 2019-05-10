@@ -14,11 +14,13 @@ This script understands this command-line argument:
 Any other parameter will be regarded as the title of the page
 that should be unlinked.
 
-Example:
+Example
+-------
+
+Removes links to the page [[Foo bar]] in articles and image
+descriptions:
 
     python pwb.py unlink "Foo bar" -namespace:0 -namespace:6
-        Removes links to the page [[Foo bar]] in articles and image
-        descriptions.
 """
 #
 # (C) Pywikibot team, 2007-2019

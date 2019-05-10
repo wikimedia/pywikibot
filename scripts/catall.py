@@ -3,12 +3,12 @@
 """
 This script shows the categories on each page and lets you change them.
 
-For each page in the target wiki:
+For each page in the target wiki
 
-- If the page contains no categories, you can specify a list of categories to
-  add to the page.
-- If the page already contains one or more categories, you can specify a new
-  list of categories to replace the current list of categories of the page.
+ - If the page contains no categories, you can specify a list of categories to
+   add to the page.
+ - If the page already contains one or more categories, you can specify a new
+   list of categories to replace the current list of categories of the page.
 
 Usage:
 
@@ -17,6 +17,7 @@ Usage:
 If no starting name is provided, the bot starts at 'A'.
 
 Options:
+
 -onlynew : Only run on pages that do not yet have a category.
 """
 #

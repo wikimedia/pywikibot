@@ -19,8 +19,6 @@ write him in German and English.
 
 Command line options:
 
-&params;
-
 -always      Skip the GUI validation
 
 -setcat:     Set the category of the copied image
@@ -29,27 +27,30 @@ Command line options:
              only work if the user has sysops privileges, otherwise the image
              will only be marked for deletion.
 
-Examples
+&params;
 
-Work on a single image::
+Examples
+--------
+
+Work on a single image:
 
     python pwb.py imagecopy -page:Image:<imagename>
 
-Work on the 100 newest images::
+Work on the 100 newest images:
 
     python pwb.py imagecopy -newimages:100
 
-Work on all images in a category:<cat>::
+Work on all images in a category:<cat>:
 
     python pwb.py imagecopy -cat:<cat>
 
-Work on all images which transclude a template::
+Work on all images which transclude a template:
 
     python pwb.py imagecopy -transcludes:<template>
 
 Work on a single image and deletes the image when the transfer is complete
 (only works if the user has sysops privilege, otherwise it will be marked for
-deletion)::
+deletion):
 
     python pwb.py imagecopy -page:Image:<imagename> -delete
 

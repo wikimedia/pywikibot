@@ -12,8 +12,6 @@ original page will be automatically updated and the modified page uploaded.
 
 These command-line arguments can be used to specify which pages to work on:
 
-&params;
-
     -days:         Like -years, but runs through all date pages. Stops at
                    Dec 31. If the argument is given in the form -days:X,
                    it will start at month no. X through Dec 31. If the
@@ -60,6 +58,8 @@ These command-line arguments can be used to specify which pages to work on:
                    implement warnfile suggestions without verifying them
                    against the live wiki is using the warnfile.py
                    script.
+
+&params;
 
 Additionally, these arguments can be used to restrict the bot to certain pages:
 

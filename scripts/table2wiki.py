@@ -7,6 +7,8 @@ These command line parameters can be used to specify which pages to work on:
 
 &params;
 
+The following parameters are supported:
+
 -always           The bot won't ask for confirmation when putting
                   a page.
 
@@ -31,10 +33,12 @@ Example:
     python pwb.py table2wiki -xml:20050713_pages_current.xml -lang:de
 
 FEATURES
+
 Save against missing </td>
 Corrects attributes of tags
 
 KNOWN BUGS
+
 Broken HTML tables will most likely result in broken wiki tables!
 Please check every article you change.
 """

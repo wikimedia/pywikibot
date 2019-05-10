@@ -4,7 +4,8 @@ Server-Sent Events client.
 
 This file is part of the Pywikibot framework.
 
-This module requires sseclient to be installed:
+This module requires sseclient to be installed::
+
     pip install sseclient
 """
 #

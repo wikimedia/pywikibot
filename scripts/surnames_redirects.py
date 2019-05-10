@@ -8,12 +8,14 @@ version of a given page where title consists of 2 or 3 titlecased words.
 
 Command-line arguments:
 
-&params;
-
 -surnames_last    Creates a "Given Names Surnames" redirect version of a
                   given page where title is "Surnames, Given Names".
 
-Example: "python pwb.py surnames_redirects -start:B"
+&params;
+
+Example:
+
+    python pwb.py surnames_redirects -start:B
 """
 #
 # (C) Pywikibot team, 2017-2019

@@ -12,6 +12,8 @@ If no directory are specified, it will detect the API caches.
 If no command is specified, it will print the filename of all entries.
 If only -delete is specified, it will delete all entries.
 
+The following parameters are supported:
+
 -delete           Delete each command filtered. If that option is set the
                   default output will be nothing.
 
@@ -22,6 +24,7 @@ If only -delete is specified, it will delete all entries.
                   True. If it returns None it won't output anything.
 
 Example commands:
+
   Print the filename of any entry with 'wikidata' in the key:
 
     -c "wikidata" in entry._uniquedescriptionstr()
@@ -42,6 +45,7 @@ Example commands:
     -o uniquedesc
 
 Available filter commands:
+
     has_password(entry)
     is_logout(entry)
     empty_response(entry)

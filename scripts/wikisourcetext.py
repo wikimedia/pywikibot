@@ -14,7 +14,7 @@ https://tools.wmflabs.org/phetools OCR tool will be used to get text.
 In this case, also already existing pages with quality value 'Not Proofread'
 can be treated. '-force' will override existing page in this case.
 
-# TODO: update params + handle quality level
+TODO: update params + handle quality level
 
 The following parameters are supported:
 

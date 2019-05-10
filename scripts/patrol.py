@@ -7,7 +7,7 @@ This bot obtains a list of recent changes and newpages and marks the
 edits as patrolled based on a whitelist.
 
 Whitelist format
-================
+~~~~~~~~~~~~~~~~
 
 The whitelist is formatted as a number of list entries. Any links outside of
 lists are ignored and can be used for documentation. In a list the first link
@@ -26,8 +26,7 @@ case it'll also patrol pages which are linked from that page.
 An example can be found at
 https://en.wikisource.org/wiki/User:Wikisource-bot/patrol_whitelist
 
-Commandline parameters
-======================
+Commandline parameters:
 
 -namespace         Filter the page generator to only yield pages in
                    specified namespaces
