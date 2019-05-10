@@ -112,6 +112,7 @@ from pywikibot.tools import issue_deprecation_warning
 n_txt = {
     'commons': '{{subst:nld}}',
     'meta': '{{No license}}',
+    'test': '{{No license}}',
     'ar': '{{subst:لم}}',
     'de': '{{Dateiüberprüfung}}',
     'en': '{{subst:nld}}',
@@ -139,6 +140,7 @@ txt_find = {
     'commons': ['{{no license', '{{no license/en',
                 '{{nld', '{{no permission', '{{no permission since'],
     'meta': ['{{no license', '{{nolicense', '{{nld'],
+    'test': ['{{no license'],
     'ar': ['{{لت', '{{لا ترخيص'],
     'de': ['{{DÜP', '{{Düp', '{{Dateiüberprüfung'],
     'en': ['{{nld', '{{no license'],
@@ -346,6 +348,7 @@ page_with_settings = {
 report_page = {
     'commons': 'User:Filbot/Report',
     'meta': 'User:MABot/Report',
+    'test': 'User:Pywikibot-test/Report',
     'de': 'Benutzer:Xqbot/Report',
     'en': 'User:Filnik/Report',
     'fa': 'کاربر:Amirobot/گزارش تصویر',
@@ -391,6 +394,7 @@ HiddenTemplate = {
     # Put the other in the page on the project defined below
     'commons': ['Template:Information'],
     'meta': ['Template:Information'],
+    'test': ['Template:Information'],
     'ar': ['Template:معلومات'],
     'de': ['Template:Information'],
     'en': ['Template:Information'],
@@ -504,6 +508,7 @@ duplicatesRegex = {
 category_with_licenses = {
     'commons': 'Category:License tags',
     'meta': 'Category:License templates',
+    'test': 'Category:CC license tags',
     'ar': 'تصنيف:قوالب حقوق الصور',
     'de': 'Kategorie:Vorlage:Lizenz für Bilder',
     'en': 'Category:Wikipedia file copyright templates',
@@ -546,7 +551,7 @@ serviceTemplates = {
 
 # Add your project (in alphabetical order) if you want that the bot starts
 project_inserted = ['ar', 'commons', 'de', 'en', 'fa', 'ga', 'hu', 'it', 'ja',
-                    'ko', 'meta', 'sr', 'ta', 'ur', 'zh']
+                    'ko', 'meta', 'sr', 'ta', 'test', 'ur', 'zh']
 
 # END OF CONFIGURATION.
 
@@ -585,10 +590,18 @@ class checkImagesBot(object):
         self.logFullError = logFullError
         self.logFulNumber = logFulNumber
         self.rep_page = i18n.translate(self.site, report_page)
+        if not self.rep_page:
+            raise i18n.TranslationError(
+                'No report page provided in "report_page" dict '
+                'for your project!')
         self.image_namespace = site.namespaces.FILE.custom_name + ':'
         self.list_entry = '\n* [[:{0}%s]] '.format(self.image_namespace)
         self.com = i18n.translate(self.site, msg_comm10, fallback=True)
         hiddentemplatesRaw = i18n.translate(self.site, HiddenTemplate)
+        if not hiddentemplatesRaw:
+            raise i18n.TranslationError(
+                'No non-license templates provided in "HiddenTemplate" dict '
+                'for your project!')
         self.hiddentemplates = {
             pywikibot.Page(self.site, tmp, ns=self.site.namespaces.TEMPLATE)
             for tmp in hiddentemplatesRaw}
@@ -628,6 +641,10 @@ class checkImagesBot(object):
         """Function to make the reports easier."""
         self.image_to_report = image_to_report
         self.newtext = newtext
+        if not newtext:
+            raise i18n.TranslationError(
+                'No no-license template provided in "n_txt" dict '
+                'for your project!')
         self.head = head or ''
         self.notification = notification
         self.notification2 = notification2
@@ -1168,9 +1185,9 @@ class checkImagesBot(object):
         """Load the list of the licenses."""
         catName = i18n.translate(self.site, category_with_licenses)
         if not catName:
-            raise pywikibot.Error(
-                'No licenses allowed provided, add that option to the code to '
-                'make the script working correctly')
+            raise i18n.TranslationError(
+                'No allowed licenses category provided in '
+                '"category_with_licenses" dict for your project!')
         pywikibot.output('\nLoading the allowed licenses...\n')
         cat = pywikibot.Category(self.site, catName)
         list_licenses = list(cat.articles())
@@ -1271,9 +1288,9 @@ class checkImagesBot(object):
             self.allLicenses = []
 
             if not self.list_licenses:
-                raise pywikibot.Error(
-                    'No licenses allowed provided, add that option to the '
-                    'code to make the script working correctly')
+                raise i18n.TranslationError(
+                    'No allowed licenses found in "category_with_licenses" '
+                    'category for your project!')
 
             # Found the templates ONLY in the image's description
             for template_selected in templatesInTheImageRaw:
@@ -1413,7 +1430,12 @@ class checkImagesBot(object):
         """Understand if a file is already tagged or not."""
         # TODO: enhance and use textlib._MultiTemplateMatchBuilder
         # Is the image already tagged? If yes, no need to double-check, skip
-        for i in i18n.translate(self.site, txt_find):
+        no_license = i18n.translate(self.site, txt_find)
+        if not no_license:
+            raise i18n.TranslationError(
+                'No no-license templates provided in "txt_find" dict '
+                'for your project!')
+        for i in no_license:
             # If there are {{ use regex, otherwise no (if there's not the
             # {{ may not be a template and the regex will be wrong)
             if '{{' in i:
@@ -1736,7 +1758,9 @@ def main(*args):
     # en-parameters
     if site.code not in project_inserted:
         pywikibot.output('Your project is not supported by this script.\n'
-                         'You have to edit the script and add it!')
+                         'To allow your project in the script you have to '
+                         'add a localization into the script and add your '
+                         'project to the "project_inserted" list!')
         return False
 
     # Reading the log of the new images if another generator is not given.
