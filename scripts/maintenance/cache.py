@@ -23,7 +23,8 @@ The following parameters are supported:
 -o                Output command which is output when the filter evaluated to
                   True. If it returns None it won't output anything.
 
-Example commands:
+Examples
+--------
 
   Print the filename of any entry with 'wikidata' in the key:
 
@@ -34,7 +35,7 @@ Example commands:
     -c entry.site.code == "ar"
     -o uniquedesc(entry)
 
-  Or the state of the login
+  Or the state of the login:
 
     -c entry.site._loginstatus == LoginStatus.NOT_ATTEMPTED
     -o uniquedesc(entry)
@@ -55,6 +56,7 @@ Available filter commands:
     recent(entry)
 
   There are helper functions which can be part of a command:
+
     older_than(entry, interval)
     newer_than(entry, interval)
 

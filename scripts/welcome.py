@@ -134,7 +134,7 @@ some of these messages from newbies.
     *<SPACE>SIGNATURE
     <NEW LINE>
 
-Example:
+Example of signatures:
 
  <pre>
  * [[User:Filnik|Filnik]]

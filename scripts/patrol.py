@@ -6,8 +6,7 @@ The bot is meant to mark the edits based on info obtained by whitelist.
 This bot obtains a list of recent changes and newpages and marks the
 edits as patrolled based on a whitelist.
 
-Whitelist format
-~~~~~~~~~~~~~~~~
+WHITELIST FORMAT
 
 The whitelist is formatted as a number of list entries. Any links outside of
 lists are ignored and can be used for documentation. In a list the first link
