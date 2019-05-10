@@ -38,6 +38,7 @@ Furthermore, the following command line parameters are supported:
 from __future__ import absolute_import, division, unicode_literals
 
 import datetime
+import sys
 import time
 
 import pywikibot
@@ -46,6 +47,8 @@ from pywikibot import i18n, Bot, pagegenerators
 
 content = {
     'commons': '{{Sandbox}}\n<!-- Please edit only below this line. -->',
+    'test': '<noinclude>{{Sandbox}}</noinclude>\n'
+            '== Please start your testing below this line ==',
     'wikidata': '{{Please leave this line alone (sandbox heading)}}',
     'wikivoyage': {
         'es': '<!--No borres este mensaje-->'
@@ -155,8 +158,8 @@ class SandboxBot(Bot):
         self.translated_content = self.getOption('text') or i18n.translate(
             self.site, content)
         if not self.translated_content:
-            pywikibot.error('No content is given for pages, exiting.')
-            raise RuntimeError
+            raise RuntimeError(
+                'No content is given for sandbox pages, exiting.')
         if not self.generator:
             pages = []
             for item in sandbox_titles:
@@ -165,7 +168,7 @@ class SandboxBot(Bot):
                     pages.append(p)
             if not pages:
                 pywikibot.bot.suggest_help(missing_generator=True)
-                raise RuntimeError
+                sys.exit()
             self.generator = pages
 
     def run(self):
