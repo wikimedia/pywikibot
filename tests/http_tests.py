@@ -310,9 +310,9 @@ class DryFakeUserAgentTestCase(TestCase):
 
     """Test the generation of fake user agents.
 
-    If the method cannot import either browseragents or fake_useragent,
-    the default user agent will be returned, causing tests to fail.
-    Therefore tests will skip if neither is present.
+    If the method cannot import fake_useragent, the default user agent
+    will be returned, causing tests to fail. Therefore tests will skip
+    if fake_useragent is missing.
     """
 
     net = False
@@ -320,11 +320,6 @@ class DryFakeUserAgentTestCase(TestCase):
     def _test_fake_user_agent_randomness(self):
         """Test if user agent returns are randomized."""
         self.assertNotEqual(http.fake_user_agent(), http.fake_user_agent())
-
-    @require_modules('browseragents')
-    def test_with_browseragents(self):
-        """Test fake user agent generation with browseragents module."""
-        self._test_fake_user_agent_randomness()
 
     @require_modules('fake_useragent')
     def test_with_fake_useragent(self):
@@ -375,11 +370,6 @@ class LiveFakeUserAgentTestCase(HttpbinTestCase):
             self.get_httpbin_url('/status/200'), use_fake_user_agent=False)
         self.assertEqual(r.headers['user-agent'], 'OVERRIDDEN')
 
-    @require_modules('browseragents')
-    def test_fetch_with_browseragents(self):
-        """Test method with browseragents module."""
-        self._test_fetch_use_fake_user_agent()
-
     @require_modules('fake_useragent')
     def test_fetch_with_fake_useragent(self):
         """Test method with fake_useragent module."""
@@ -421,12 +411,6 @@ class GetFakeUserAgentTestCase(TestCase):
         self.assertEqual(http.get_fake_user_agent(), http.user_agent())
         config.fake_user_agent = 'ARBITRARY'
         self.assertEqual(http.get_fake_user_agent(), 'ARBITRARY')
-
-    @require_modules('browseragents')
-    def test_with_browseragents(self):
-        """Test method with browseragents module."""
-        self._test_fake_user_agent_randomness()
-        self._test_config_settings()
 
     @require_modules('fake_useragent')
     def test_with_fake_useragent(self):
