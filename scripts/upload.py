@@ -3,7 +3,7 @@
 """
 Script to upload images to wikipedia.
 
-Arguments:
+The following parameters are supported:
 
   -keep         Keep the filename as is
   -filename:    Target filename without the namespace prefix

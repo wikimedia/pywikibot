@@ -9,18 +9,18 @@ language (standard language in Commons). If the name of
 an article in Commons will not be in English but with
 redirect, this also functions.
 
-Run:
 Syntax:
 
     python pwb.py commons_link [action] [pagegenerator]
 
-where action can be one of these:
+where action can be one of these
+
  * pages      : Run over articles, include {{commons}}
  * categories : Run over categories, include {{commonscat}}
 
 and pagegenerator can be one of these:
-&params;
 
+&params;
 """
 #
 # (C) Leonardo Gregianin, 2006

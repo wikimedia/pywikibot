@@ -3,11 +3,13 @@
 """
 Edit a Wikipedia article with your favourite editor.
 
- TODO: - non existing pages
-       - edit conflicts
-       - minor edits
-       - watch/unwatch
-       - ...
+TODO:
+
+ - non existing pages
+ - edit conflicts
+ - minor edits
+ - watch/unwatch
+ - ...
 
 The following parameters are supported:
 

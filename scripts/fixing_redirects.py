@@ -3,11 +3,11 @@
 """
 Correct all redirect links in featured pages or only one page of each wiki.
 
-Can be using with:
-&params;
+Can be used with:
 
 -featured         Run over featured pages (for some wikimedia wikis only)
 
+&params;
 """
 #
 # (C) Pywikibot team, 2004-2019

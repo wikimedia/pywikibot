@@ -9,12 +9,14 @@ Usage:
 
 It will use Special:Linksearch to find the pages on the wiki that link to
 that site, then for each page make a proposed change consisting of removing
-all the lines where that url occurs. You can choose to:
+all the lines where that url occurs. You can choose to
+
 * accept the changes as proposed
 * edit the page yourself to remove the offending link
 * not change the page in question
 
 Command line options:
+
 -always           Do not ask, but remove the lines automatically. Be very
                   careful in using this option!
 

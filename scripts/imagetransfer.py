@@ -7,7 +7,7 @@ Syntax:
 
     python pwb.py imagetransfer {<pagename>|<generator>} [<options>]
 
-Arguments:
+The following parameters are supported:
 
   -interwiki   Look for images in pages found through interwiki links.
 

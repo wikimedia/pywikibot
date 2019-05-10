@@ -36,16 +36,18 @@ level. This is "sysop" or "all" if -unprotect was selected. If multiple
 parameters -unprotect or -default are used, only the last occurrence
 is applied.
 
-Usage: python protect.py <OPTIONS>
+Usage:
+
+    python pwb.py protect <OPTIONS>
 
 Examples
 --------
 
-Protect everything in the category 'To protect' prompting.
+Protect everything in the category 'To protect' prompting:
 
     python pwb.py protect -cat:"To protect"
 
-Unprotect all pages listed in text file 'unprotect.txt' without prompting.
+Unprotect all pages listed in text file 'unprotect.txt' without prompting:
 
     python pwb.py protect -file:unprotect.txt -unprotect -always
 """

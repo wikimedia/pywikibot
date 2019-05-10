@@ -5,6 +5,8 @@ This script transfers pages from a source wiki to a target wiki.
 
 It also copies edit history to a subpage.
 
+The following parameters are supported:
+
 -tolang:          The target site code.
 
 -tofamily:        The target site family.

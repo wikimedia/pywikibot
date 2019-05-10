@@ -13,6 +13,7 @@ with the variable part replaced by '$' (if that character occurs in the URL
 itself, you will have to change the bot code, my apologies).
 
 Other options:
+
 -shown      Choose images shown on the page as well as linked from it
 -justshown  Choose _only_ images shown on the page, not those linked
 """

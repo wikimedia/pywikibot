@@ -8,13 +8,13 @@ word is uppercase and the remaining characters and words are lowercase.
 
 Command-line arguments:
 
-&params;
-
 -always           Don't prompt to make changes, just do them.
 
 -titlecase        creates a titlecased redirect version of a given page
                   where all words of the title start with an uppercase
                   character and the remaining characters are lowercase.
+
+&params;
 
 Example:
 

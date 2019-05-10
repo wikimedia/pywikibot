@@ -10,6 +10,8 @@ A log is written under <userpage>/category_redirect_log. Only category pages
 that haven't been edited for a certain cooldown period (currently 7 days)
 are taken into account.
 
+The following parameters are supported:
+
 -delay:#          Set an amount of days. If the category is edited more recenty
                   than given days, ignore it. Default is 7.
 

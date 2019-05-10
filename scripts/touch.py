@@ -8,9 +8,9 @@ working.
 
 This script understands various command-line arguments:
 
-&params;
-
 -purge                    Do not touch but purge the page
+
+&params;
 
 Touch arguments:
 

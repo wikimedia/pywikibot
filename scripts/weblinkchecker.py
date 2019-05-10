@@ -32,8 +32,6 @@ When a link is found alive, it will be removed from the .dat file.
 
 These command line parameters can be used to specify which pages to work on:
 
-&params;
-
 -repeat      Work on all pages were dead links were found before. This is
              useful to confirm that the links are dead after some time (at
              least one week), which is required before the script will report
@@ -49,6 +47,8 @@ These command line parameters can be used to specify which pages to work on:
 
 -ignore      HTTP return codes to ignore. Can be provided several times :
                 -ignore:401 -ignore:500
+
+&params;
 
 Furthermore, the following command line parameters are supported:
 
@@ -79,23 +79,30 @@ The following config variables are supported:
  weblink_dead_days          sets the timespan (default: one week) after which
                             a dead link will be reported
 
-Syntax examples:
+Examples
+--------
+
+Loads all wiki pages in alphabetical order using the Special:Allpages
+feature:
+
     python pwb.py weblinkchecker -start:!
-        Loads all wiki pages in alphabetical order using the Special:Allpages
-        feature.
+
+Loads all wiki pages using the Special:Allpages feature, starting at
+"Example page":
 
     python pwb.py weblinkchecker -start:Example_page
-        Loads all wiki pages using the Special:Allpages feature, starting at
-        "Example page"
+
+Loads all wiki pages that link to www.example.org:
 
     python pwb.py weblinkchecker -weblink:www.example.org
-        Loads all wiki pages that link to www.example.org
+
+Only checks links found in the wiki page "Example page":
 
     python pwb.py weblinkchecker Example page
-        Only checks links found in the wiki page "Example page"
+
+Loads all wiki pages where dead links were found during a prior run:
 
     python pwb.py weblinkchecker -repeat
-        Loads all wiki pages where dead links were found during a prior run
 """
 #
 # (C) Daniel Herding, 2005

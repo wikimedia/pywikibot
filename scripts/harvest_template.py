@@ -5,11 +5,11 @@ Template harvesting script.
 
 Usage (see below for explanations and examples):
 
-- python pwb.py harvest_template -transcludes:"..." \
+ python pwb.py harvest_template -transcludes:"..." \
     [default optional arguments] \
     template_parameter PID [local optional arguments] \
     [template_parameter PID [local optional arguments]]
-- python pwb.py harvest_template [generators] -template:"..." \
+ python pwb.py harvest_template [generators] -template:"..." \
     [default optional arguments] \
     template_parameter PID [local optional arguments] \
     [template_parameter PID [local optional arguments]]
@@ -30,7 +30,7 @@ If you specify them before all parameters, they are global and are applied to
 all param-property pairs. If you specify them after a param-property pair,
 they are local and are only applied to this pair. If you specify the same
 argument as both local and global, the local argument overrides the global one
-(see also examples).
+(see also examples):
 
 -islink           Treat plain text values as links ("text" -> "[[text]]").
 

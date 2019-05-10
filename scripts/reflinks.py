@@ -19,7 +19,7 @@ not work.
 
 pdfinfo is needed for parsing pdf titles.
 
-&params;
+The following parameters are supported:
 
 -limit:n          Stops after n edits
 
@@ -33,6 +33,10 @@ pdfinfo is needed for parsing pdf titles.
 
 -summary          Use a custom edit summary. Otherwise it uses the default
                   one from i18n/reflinks.py
+
+The following generators and filters are supported:
+
+&params;
 """
 # (C) Nicolas Dumazet (NicDumZ), 2008
 # (C) Pywikibot team, 2008-2019

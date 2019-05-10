@@ -4794,8 +4794,11 @@ class PropertyPage(WikibasePage, Property):
     A Wikibase entity in the property namespace.
 
     Should be created as::
+
         PropertyPage(DataSite, 'P21')
-    or
+
+    or::
+
         PropertyPage(DataSite, datatype='url')
     """
 

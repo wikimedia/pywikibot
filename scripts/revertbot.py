@@ -17,8 +17,6 @@ The following command line parameters are supported:
 Users who want to customize the behaviour should subclass the `BaseRevertBot`
 and override its `callback` method. Here is a sample:
 
-.. code-block::
-
     class myRevertBot(BaseRevertBot):
 
         '''Example revert bot.'''

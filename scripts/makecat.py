@@ -25,13 +25,13 @@ The following command line parameters are supported:
 -all         Work on all pages (default: only main namespace)
 
 When running the bot, you will get one by one a number by pages.
-You can choose:
+You can choose
 
 * [y]es      - include the page
 * [n]o       - do not include the page or
 * [i]gnore   - do not include the page, but if you meet it again, ask again.
 
-Other possibilities:
+Other possibilities
 
 * [m]ore     - show more content of the page starting from the beginning
 * sort [k]ey - add with sort key like [[Category|Title]]

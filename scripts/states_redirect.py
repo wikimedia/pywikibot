@@ -6,10 +6,12 @@ Check if they are in the form Something, State, and if so, create a redirect
 from Something, ST.
 
 Specific arguments:
+
 -start:xxx Specify the place in the alphabet to start searching
 -force: Don't ask whether to create pages, just create them.
 
 PRE-REQUISITE : Need to install python-pycountry library.
+
 * Follow the instructions at: https://www.versioneye.com/python/pycountry/0.16
 * Install with pip: pip install pycountry
 """
