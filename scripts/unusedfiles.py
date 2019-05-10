@@ -29,6 +29,7 @@ from pywikibot.tools import issue_deprecation_warning
 
 template_to_the_image = {
     'meta': '{{Orphan file}}',
+    'test': '{{Orphan file}}',
     'it': '{{immagine orfana}}',
     'fa': '{{تصاویر بدون استفاده}}',
     'ur': '{{غیر مستعمل تصاویر}}',
@@ -60,8 +61,8 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
                                             template_to_the_user)
         if not (self.template_image
                 and (self.template_user or self.getOption('nouserwarning'))):
-            raise pywikibot.Error('This script is not localized for {0} site.'
-                                  .format(self.site))
+            raise i18n.TranslationError('This script is not localized for {0} '
+                                        'site.'.format(self.site))
 
     def treat(self, image):
         """Process one image page."""
