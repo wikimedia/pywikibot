@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-User-interface related functions for building bots.
+WARNING: THIS MODULE EXISTS SOLELY TO PROVIDE BACKWARDS-COMPATIBILITY.
 
-Note: the script requires the Python IRC library
-http://python-irclib.sourceforge.net/
+IT MAY BE REMOVED SOON.
+
+Deprecated user-interface related functions for building bots.
+
+@note: the script requires the irc library
 """
 #
 # (C) Balasyum, 2008
@@ -13,14 +16,10 @@ http://python-irclib.sourceforge.net/
 #
 from __future__ import absolute_import, division, unicode_literals
 
-# Note: the intention is to develop this module (at some point) into a Bot
-# class definition that can be subclassed to create new, functional bot
-# scripts, instead of writing each one from scratch.
-
-
 import re
 
 import pywikibot
+from pywikibot.tools import ModuleDeprecationWrapper
 
 try:
     from irc.bot import SingleServerIRCBot
@@ -37,6 +36,7 @@ except ImportError as e:
 
 
 _logger = 'botirc'
+__all__ = ('IRCBot',)
 
 
 class IRCBot(pywikibot.Bot, SingleServerIRCBot):
@@ -50,9 +50,8 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
     """
 
     # Bot configuration.
-    # Only the keys of the dict can be passed as init options
+    # Only the keys of the dict can be passed as keyword arguments
     # The values are the default values
-    # Extend this in subclasses!
     availableOptions = {}  # noqa: N815
 
     def __init__(self, site, channel, nickname, server, port=6667, **kwargs):
@@ -127,3 +126,11 @@ class IRCBot(pywikibot.Bot, SingleServerIRCBot):
     def on_quit(self, e, cmd):
         """Ignore quit request."""
         pass
+
+
+wrapper = ModuleDeprecationWrapper(__name__)
+wrapper._add_deprecated_attr(
+    'IRCBot',
+    replacement_name=('irc.bot.SingleServerIRCBot from irc library '
+                      'or EventStreams'),
+    since='20190509')
