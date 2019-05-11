@@ -4,4 +4,3 @@
 
 sphinx >= 1.8
 sphinx-epytext>=0.0.4
-unidiff

@@ -15,21 +15,20 @@ commands and executed.
 The predefined wiki page for crontab sets the shell page contents to
 a specified revision in the specified interval.
 
-Usage
-~~~~~
+USAGE
 
 It needs Lua or LuaJIT installed and also external PyPI packages
 crontab, irc and lupa in order to run properly. Some code might
 get compiled on-the-fly, so a GNU compiler along with library
 header files is needed too.
 
-You will need to create the following pages on your wiki:
+You will need to create the following pages on your wiki.
 
-:User:{username}/script_wui-crontab.css:
+- User:{username}/script_wui-crontab.css
     This page specifies the commands to execute, one command per line.
     See [[de:Benutzer:DrTrigon/DrTrigonBot/script_wui-shell.css]]
     for example.
-:User:{username}/script_wui-shell.css:
+- User:{username}/script_wui-shell.css
     This page specifies the schedule to execute specific page revision.
     The following format can be used: revision, timestamp
     See [[de:Benutzer:DrTrigon/DrTrigonBot/script_wui-crontab.css]]
@@ -71,13 +70,19 @@ import traceback
 
 from io import StringIO
 
-from lupa import LuaRuntime
-lua = LuaRuntime(unpack_returned_tuples=True)
+try:
+    from lupa import LuaRuntime
+    lua = LuaRuntime(unpack_returned_tuples=True)
+except ImportError:
+    lua = None
 
 # The 'crontab' PyPI package versions 0.20 and 0.20.1 installs
 # a package called 'tests' which conflicts with our test suite.
 # The patch to fix this has been released in version 0.20.2.
-import crontab
+try:
+    import crontab
+except ImportError:
+    crontab = None
 
 import pywikibot
 # pywikibot.botirc depends on 'irc' PyPI package
@@ -126,12 +131,13 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
         # init environment with minimal changes (try to do as less as possible)
         # - Lua -
-        pywikibot.output('** Redirecting Lua print in order to catch it')
-        lua.execute('__print = print')
-        lua.execute('print = python.eval("pywikibot.output")')
-        # It may be useful in debugging to install the 'print' builtin
-        # as the 'print' function in lua. To do this:
-        # lua.execute('print = python.builtins.print')
+        if lua:
+            pywikibot.output('** Redirecting Lua print in order to catch it')
+            lua.execute('__print = print')
+            lua.execute('print = python.eval("pywikibot.output")')
+            # It may be useful in debugging to install the 'print' builtin
+            # as the 'print' function in lua. To do this:
+            # lua.execute('print = python.builtins.print')
 
         # init constants
         templ = pywikibot.Page(self.site, bot_config['ConfCSSshell'])
@@ -197,6 +203,10 @@ class ScriptWUIBot(pywikibot.botirc.IRCBot):
 
             # [min] [hour] [day of month] [month] [day of week]
             # (date supported only, thus [min] and [hour] dropped)
+            if not crontab:
+                pywikibot.error(
+                    '"crontab" library is needed to run the script properly.')
+                return None
             entry = crontab.CronTab(timestmp)
             # find the delay from current minute
             # (does not return 0.0 - but next)
