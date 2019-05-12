@@ -126,12 +126,6 @@ class TestCaseBase(unittest.TestCase):
                 msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
             raise self.failureException(msg)
 
-    def _addUnexpectedSuccess(self, result):
-        """Report and ignore."""
-        unittest_print(' unexpected success ', end='')
-        sys.stdout.flush()
-        result.addSuccess(self)
-
     def assertMethod(self, method, *args):
         """Generic method assertion."""
         if not method(*args):
