@@ -36,6 +36,7 @@ from pywikibot.data.api import CachedRequest, APIError
 from pywikibot.data.api import Request as _original_Request
 from pywikibot.site import Namespace
 from pywikibot.tools import (
+    deprecated,
     PY2, PYTHON_VERSION,
     UnicodeType as unicode,
 )
@@ -70,6 +71,7 @@ def expected_failure_if(expect):
         return lambda orig: orig
 
 
+@deprecated('unittest.expectedFailure', since='20190512')
 def allowed_failure(func):
     """
     Unit test decorator to allow failure.
@@ -96,9 +98,14 @@ def allowed_failure(func):
             pywikibot.exception(tb=True)
             raise unittest.SkipTest('Test is allowed to fail.')
     wrapper.__name__ = func.__name__
-    return wrapper
+
+    if PY2:
+        return unittest.expectedFailure(func)
+    else:
+        return wrapper
 
 
+@deprecated('expected_failure_if', since='20190512')
 def allowed_failure_if(expect):
     """
     Unit test decorator to allow failure under conditions.
