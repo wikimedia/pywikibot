@@ -23,14 +23,14 @@ class Compat2CoreTests(TestCase):
     def test_replacements(self):
         """Test compat2core replacements."""
         for item in c2c.replacements:
-            self.assertEqual(len(item), 2)
+            self.assertLength(item, 2)
             self.assertIsInstance(item[0], StringTypes)
             self.assertIsInstance(item[1], StringTypes)
 
     def test_warnings(self):
         """Test compat2core warnings."""
         for item in c2c.warnings:
-            self.assertEqual(len(item), 2)
+            self.assertLength(item, 2)
             self.assertIsInstance(item[0], StringTypes)
             self.assertIsInstance(item[1], StringTypes)
 

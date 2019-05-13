@@ -22,6 +22,10 @@ import time
 import warnings
 
 from contextlib import contextmanager
+try:
+    from collections.abc import Sized
+except ImportError:  # Python 2.7
+    from collections import Sized
 
 import pywikibot
 
@@ -102,19 +106,25 @@ class TestCaseBase(unittest.TestCase):
 
     def assertIsEmpty(self, seq, msg=None):
         """Check that the sequence is empty."""
+        self.assertIsInstance(
+            seq, Sized, 'seq argument is not a Sized class containing __len__')
         if seq:
             msg = self._formatMessage(msg, '%s is not empty' % safe_repr(seq))
-            raise self.failureException(msg)
+            self.fail(msg)
 
     def assertIsNotEmpty(self, seq, msg=None):
         """Check that the sequence is not empty."""
+        self.assertIsInstance(
+            seq, Sized, 'seq argument is not a Sized class containing __len__')
         if not seq:
             msg = self._formatMessage(msg, '%s is empty' % safe_repr(seq))
-            raise self.failureException(msg)
+            self.fail(msg)
 
     def assertLength(self, seq, other, msg=None):
         """Verify that a sequence expr has the length of other."""
         # the other parameter may be given as a sequence too
+        self.assertIsInstance(
+            seq, Sized, 'seq argument is not a Sized class containing __len__')
         first_len = len(seq)
         try:
             second_len = len(other)
@@ -124,7 +134,7 @@ class TestCaseBase(unittest.TestCase):
         if first_len != second_len:
             msg = self._formatMessage(
                 msg, 'len(%s) != %s' % (safe_repr(seq), second_len))
-            raise self.failureException(msg)
+            self.fail(msg)
 
     def _addUnexpectedSuccess(self, result):
         """Report and ignore."""
@@ -1651,7 +1661,7 @@ class DeprecationTestCase(DebugOnlyTestCase, TestCase):
         # deprecation message from the set.
         self.assertCountEqual(set(self.deprecation_messages),
                               [self.deprecation_messages[0]])
-        self.assertEqual(len(self.deprecation_messages), count)
+        self.assertLength(self.deprecation_messages, count)
         self._reset_messages()
 
     def assertNoDeprecation(self, msg=None):

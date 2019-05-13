@@ -2639,7 +2639,7 @@ class TestSiteLoadRevisionsSysop(DefaultSiteTestCase):
         """Test the site.loadrevisions() method with rollback."""
         mainpage = self.get_mainpage()
         self.site.loadrevisions(mainpage, total=12, rollback=True, sysop=True)
-        self.assertGreater(len(mainpage._revisions), 0)
+        self.assertIsNotEmpty(mainpage._revisions)
         self.assertLessEqual(len(mainpage._revisions), 12)
         self.assertTrue(all(rev.rollbacktoken is not None
                             for rev in mainpage._revisions.values()))
