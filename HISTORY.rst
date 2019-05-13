@@ -5,6 +5,12 @@ Current release
 ---------------
 
 * botirc.IRCBot has been dropped
+* Avoid using outdated browseragents (T222959)
+* textlib: avoid infinite execution of regex (T222671)
+* Add CSRF token in sitelogout() api call (T222508)
+* Refactor WikibasePage.get and overriding methods and improve documentation
+* Improve title patterns of WikibasePage extensions
+* Add support for property creation (T160402)
 * Bugfixes and improvements
 * Localisation updates
 
