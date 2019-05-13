@@ -172,10 +172,12 @@ def main(*args):
     additional_text = ('Unable to execute script because it '
                        'requires two images to work on.'
                        if len(images) != 2 else None)
-    exception = Image if isinstance(Image, Exception) else None
+    missing_dependencies = ('Pillow',) if isinstance(
+        Image, ImportError) else None
 
-    if additional_text or exception:
-        suggest_help(exception=exception, additional_text=additional_text)
+    if additional_text or missing_dependencies:
+        suggest_help(missing_dependencies=missing_dependencies,
+                     additional_text=additional_text)
         return False
 
     imagePageA = pywikibot.page.FilePage(pywikibot.Site(),

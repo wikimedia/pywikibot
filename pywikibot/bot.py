@@ -1050,7 +1050,8 @@ def showHelp(module_name=None):
 
 def suggest_help(missing_parameters=[], missing_generator=False,
                  unknown_parameters=[], exception=None,
-                 missing_action=False, additional_text=''):
+                 missing_action=False, additional_text='',
+                 missing_dependencies=[]):
     """
     Output error message to use -help with additional text before it.
 
@@ -1066,6 +1067,9 @@ def suggest_help(missing_parameters=[], missing_generator=False,
     @type missing_action: bool
     @param additional_text: Additional text added to the end.
     @type additional_text: str
+    @param missing_dependencies: A list of dependencies which can not
+        be imported.
+    @type missing_dependencies: list of str
     """
     messages = []
     if exception:
@@ -1083,6 +1087,11 @@ def suggest_help(missing_parameters=[], missing_generator=False,
         messages.append('Unknown parameter{s} "{params}".'
                         .format(s='s' if len(unknown_parameters) > 1 else '',
                                 params='", "'.join(unknown_parameters)))
+    if missing_dependencies:
+        messages.append('Missing dependenc{s} "{deps}".'
+                        .format(
+                            s='ies' if len(missing_dependencies) > 1 else 'y',
+                            deps='", "'.join(missing_dependencies)))
     if additional_text:
         messages.append(additional_text.strip())
     if messages:

@@ -154,7 +154,10 @@ def main(*args):
     desc = ' '.join(desc)
 
     mysite = pywikibot.Site()
-    run_bot(url, image_url, desc)
+    try:
+        run_bot(url, image_url, desc)
+    except ImportError:
+        pywikibot.bot.suggest_help(missing_dependencies=('beautifulsoup4',))
 
 
 if __name__ == '__main__':
