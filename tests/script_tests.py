@@ -366,15 +366,9 @@ class TestScriptHelp(PwbTestCase):
 
     net = False
 
-    _expected_failures = set(failed_dep_script_set)  # use a copy
-    # -help tests may pass even when packages are required
-    _expected_failures.discard('flickrripper')
-    _expected_failures.discard('imageharvest')
-    _expected_failures.discard('isbn')
-    _expected_failures.discard('match_images')
-    _expected_failures.discard('patrol')
-    _expected_failures.discard('states_redirect')
-    _expected_failures.discard('weblinkchecker')
+    # Here come scripts requiring and missing dependencies, that haven't been
+    # fixed to output -help in that case.
+    _expected_failures = set()
     _allowed_failures = []
 
     _arguments = '-help'
