@@ -33,7 +33,7 @@ class DisambiguationRedirectBot(MultipleSitesBot, AutomaticTWSummaryBot):
 
     def _create_callback(self, old, new):
         replace_callback = InteractiveReplace(
-            old, new, default='n', automatic_quit=False)
+            old, new, default='n')
         replace_callback.allow_replace = True
         replace_callback.allow_replace_label = True
         replace_callback.allow_replace_section = True
