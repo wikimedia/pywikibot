@@ -380,23 +380,22 @@ class DiscussionThread(object):
         """
         Check whether thread has to be archived.
 
-        @return: archiving reason i18n string or empty string.
-        @rtype: str
+        @return: the archivation reason as a dict of localization args
+        @rtype: dict
         """
+        # Archived by timestamp
         algo = archiver.get_attr('algo')
         re_t = re.search(r'^old\((.*)\)$', algo)
         if re_t:
             if not self.timestamp:
-                return ''
-            # TODO: handle this:
-            # return 'unsigned'
+                return None
+            # TODO: handle unsigned
             maxage = str2time(re_t.group(1), self.timestamp)
             if self.now - self.timestamp > maxage:
                 duration = str2localized_duration(archiver.site, re_t.group(1))
-                return i18n.twtranslate(self.code,
-                                        'archivebot-older-than',
-                                        {'duration': duration})
-        return ''
+                return {'duration': duration}
+        # TODO: handle marked with template
+        return None
 
 
 class DiscussionPage(pywikibot.Page):
@@ -692,7 +691,18 @@ class PageArchiver(object):
             self.comment_params['archives'] \
                 = comma.join(a.title(as_link=True)
                              for a in self.archives.values())
-            self.comment_params['why'] = comma.join(whys)
+            # Find out the reasons and return them localized
+            translated_whys = set()
+            for why, arg in whys.items():
+                # Archived by timestamp
+                if why == 'duration':
+                    translated_whys.add(
+                        i18n.twtranslate(self.site.code,
+                                         'archivebot-older-than',
+                                         {'duration': arg,
+                                          'count': self.archived_threads}))
+                # TODO: handle unsigned or archived by template
+            self.comment_params['why'] = comma.join(translated_whys)
             comment = i18n.twtranslate(self.site.code,
                                        'archivebot-page-summary',
                                        self.comment_params)
