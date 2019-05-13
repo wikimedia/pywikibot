@@ -15,7 +15,7 @@ from pywikibot.tools import has_module, PY2, StringTypes
 from tests import join_root_path, unittest_print
 from tests.aspects import (unittest, DefaultSiteTestCase, MetaTestCaseClass,
                            PwbTestCase)
-from tests.utils import allowed_failure, execute_pwb, add_metaclass
+from tests.utils import execute_pwb, add_metaclass
 
 scripts_path = join_root_path('scripts')
 
@@ -341,7 +341,9 @@ class TestScriptMeta(MetaTestCaseClass):
             if script_name in dct['_expected_failures']:
                 dct[test_name] = unittest.expectedFailure(dct[test_name])
             elif script_name in dct['_allowed_failures']:
-                dct[test_name] = allowed_failure(dct[test_name])
+                dct[test_name] = unittest.skip(
+                    '{} is in _allowed_failures list'
+                    .format(script_name))(dct[test_name])
 
             # Disable test by default in nosetests
             if script_name in unrunnable_script_set:
