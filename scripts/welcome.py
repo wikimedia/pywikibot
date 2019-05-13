@@ -818,10 +818,8 @@ class WelcomeBot(object):
                             if (self.site.family.name != 'wiktionary'
                                     or self.site.code != 'it'):
                                 welcome_text += timeselected
-                        elif (self.site.family.name != 'wikinews'
-                              and self.site.code != 'it'):
-                            welcome_text = (welcome_text
-                                            % globalvar.defaultSign)
+                        elif self.site.sitename != 'wikinews:it':
+                            welcome_text = welcome_text % globalvar.defaultSign
                         final_text = i18n.translate(
                             self.site, final_new_text_additions)
                         if final_text:
