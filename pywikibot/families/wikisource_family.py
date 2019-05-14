@@ -36,6 +36,9 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'bs', 'sah', 'gl', 'lt', 'sk', 'eu', 'cy', 'pa', 'zh-min-nan', 'fo',
     ]
 
+    # Sites we want to edit but not count as real languages
+    test_codes = ['beta']
+
     category_redirect_templates = {
         '_default': (),
         'ar': ('قالب:تحويل تصنيف',),
@@ -51,9 +54,10 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
     def langs(cls):
         cls.langs = super(Family, cls).langs
         cls.langs['mul'] = cls.domain
+        cls.langs['beta'] = 'en.wikisource.beta.wmflabs.org'
         return cls.langs
 
-    languages_by_size.append('mul')
+    languages_by_size += ['mul', 'beta']
 
     # Global bot allowed languages on
     # https://meta.wikimedia.org/wiki/BPI#Current_implementation
@@ -91,6 +95,7 @@ class Family(family.SubdomainFamily, family.WikimediaFamily):
         'tr': [100],
         'vi': [102],
         'zh': [102],
+        'beta': [102],
     }
 
     # Subpages for documentation.
