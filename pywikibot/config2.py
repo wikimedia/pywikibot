@@ -482,6 +482,19 @@ userinterface_lang = None
 # Currently only works if interface 'terminal' is set.
 transliterate = True
 
+# The pwb.py wrapper calls the script given as parameter in this way
+# python pwb.py <name_of_script> <options>
+# If there is a misspelling in <name_of_script> the most similar script
+# scripts are displayed or if only one is found, it will be started.
+# There are some configuration values to change the behavior
+#
+# pwb_close_matches: the maximum number of simular scripts to be found
+pwb_close_matches = 10  # must be greater than 0
+# pwb_cut_off: similarity of scripts to be found
+pwb_cut_off = 0.7  # must be a float in the range [0, 1]
+# pwb_autostart_waittime: wait time until the most similar script starts
+pwb_autostart_waittime = 5.0
+
 # Should the system bell ring if the bot expects user input?
 ring_bell = False
 

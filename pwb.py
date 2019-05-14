@@ -171,9 +171,14 @@ except RuntimeError:
 
 def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
-    from pywikibot import input_choice, output
+    from pywikibot import config, input_choice, output
     from pywikibot.bot import ShowingListOption, QuitKeyboardInterrupt
     from pywikibot.tools.formatter import color_format
+
+    assert config.pwb_close_matches > 0, \
+        'config.pwb_close_matches must be greater than 0'
+    assert 0.0 < config.pwb_cut_off < 1.0, \
+        'config.pwb_cut_off must be a float in range [0, 1]'
 
     print('ERROR: {} not found! Misspelling?'.format(filename),
           file=sys.stderr)
@@ -188,13 +193,15 @@ def find_alternates(filename, script_paths):
                 scripts[name] = os.path.join(*(path + [script_name]))
 
     filename = filename[:-3]
-    similar_scripts = get_close_matches(filename, scripts, n=10, cutoff=0.7)
+    similar_scripts = get_close_matches(filename, scripts,
+                                        config.pwb_close_matches,
+                                        config.pwb_cut_off)
     if not similar_scripts:
         return None
 
     if len(similar_scripts) == 1:
         script = similar_scripts[0]
-        wait_time = 5
+        wait_time = config.pwb_autostart_waittime
         output(color_format(
             'NOTE: Starting the most similar script '
             '{lightyellow}{}.py{default}\n'
