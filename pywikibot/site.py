@@ -2136,7 +2136,11 @@ class APISite(BaseSite):
                                          token=self.tokens['csrf'])
         uirequest.submit()
         self._loginstatus = LoginStatus.NOT_LOGGED_IN
+
+        # Reset tokens and user properties
         del self._userinfo
+        self.tokens = TokenWallet(self)
+        self._paraminfo = api.ParamInfo(self)
 
     def getuserinfo(self, force=False):
         """Retrieve userinfo from site and store in _userinfo attribute.
