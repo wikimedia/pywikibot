@@ -35,7 +35,9 @@ families_list = [
     'wiktionary',
 ]
 
-exceptions = ['-', 'mul']
+exceptions = {
+    'wikisource': ['-', 'mul', 'beta']
+}
 
 
 def update_family(families):
@@ -45,7 +47,7 @@ def update_family(families):
         pywikibot.output('\nChecking family %s:' % family)
 
         original = Family.load(family).languages_by_size
-        for code in exceptions:
+        for code in exceptions.get(family, []):
             if code in original:
                 original.remove(code)
         obsolete = Family.load(family).obsolete
@@ -53,7 +55,7 @@ def update_family(families):
         new = []
         table = ws.languages_by_size(family)
         for code in table:
-            if not (code in obsolete or code in exceptions):
+            if not (code in obsolete or code in exceptions.get(family, [])):
                 new.append(code)
 
         # put the missing languages to the right place
