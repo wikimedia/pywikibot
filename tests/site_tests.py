@@ -3707,7 +3707,7 @@ class TestLoginLogout(DefaultSiteTestCase):
 
     """Test for login and logout methods."""
 
-    @unittest.skipIf(os.environ.get('APPVEYOR', 'false') == 'true',
+    @unittest.skipIf(os.environ.get('APPVEYOR', 'false') in ('true', 'True'),
                      'No user defined for APPVEYOR tests')
     def test_login_logout(self):
         """Validate login and logout methods by toggling the state."""
