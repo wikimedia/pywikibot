@@ -62,7 +62,9 @@ class FlowPage(BasePage):
     def get(self, force=False, get_redirect=False):
         """Get the page's content."""
         if get_redirect or force:
-            raise NotImplementedError
+            raise NotImplementedError(
+                "Neither 'force' nor 'get_redirect' parameter is implemented "
+                'in {}.get()'.format(self.__class__.__name__))
 
         # TODO: Return more useful data
         return self._data
