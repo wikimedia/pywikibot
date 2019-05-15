@@ -1121,7 +1121,7 @@ class CapturingTestCase(TestCase):
 
     @contextmanager
     def disable_assert_capture(self):
-        """A context manager which preventing that asssertions are patched."""
+        """A context manager preventing that assertions are patched."""
         nested = self._patched  # Don't reset if it was set before
         self._patched = True
         yield
