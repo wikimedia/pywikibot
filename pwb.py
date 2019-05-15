@@ -168,6 +168,53 @@ except RuntimeError:
         sys.exit(1)
 
 
+def find_filename(filename):
+    """Search for the filename in the given script paths."""
+    from pywikibot import config
+
+    script_paths = ['scripts',
+                    'scripts.maintenance',
+                    'scripts.userscripts']
+
+    if config.user_script_paths:
+        if isinstance(config.user_script_paths, (tuple, list)):
+            script_paths = config.user_script_paths + script_paths
+        else:
+            warn("'user_script_paths' must be a list or tuple,\n"
+                 'found: {0}. Ignoring this setting.'
+                 .format(type(config.user_script_paths)))
+
+    for file_package in script_paths:
+        paths = file_package.split('.') + [filename]
+        testpath = os.path.join(_pwb_dir, *paths)
+        if os.path.exists(testpath):
+            filename = testpath
+            break
+    else:
+        print('ERROR: {} not found! Misspelling?'.format(filename),
+              file=sys.stderr)
+
+        scripts = {}
+        for file_package in script_paths:
+            path = file_package.split('.')
+            for script_name in os.listdir(os.path.join(*path)):
+                if (script_name.endswith('.py')
+                        and not script_name.startswith('__')):
+                    # remove .py for better matching
+                    scripts[script_name[:-3]] = os.path.join(
+                        *(path + [script_name]))
+
+        similar_scripts = get_close_matches(filename[:-3], scripts,
+                                            n=10, cutoff=0.7)
+        if similar_scripts:
+            print('\nThe most similar script{}:'
+                  .format(' is' if len(similar_scripts) == 1
+                          else 's are'))
+            print('\t' + '.py\n\t'.join(similar_scripts) + '.py')
+        return None
+    return filename
+
+
 def main():
     """Command line entry point."""
     global filename
@@ -176,45 +223,10 @@ def main():
 
     file_package = None
     argvu = pwb.argvu[1:]
+
     if not os.path.exists(filename):
-        script_paths = ['scripts',
-                        'scripts.maintenance',
-                        'scripts.userscripts']
-        from pywikibot import config
-        if config.user_script_paths:
-            if isinstance(config.user_script_paths, (tuple, list)):
-                script_paths = config.user_script_paths + script_paths
-            else:
-                warn("'user_script_paths' must be a list or tuple,\n"
-                     'found: {0}. Ignoring this setting.'
-                     ''.format(type(config.user_script_paths)))
-        for file_package in script_paths:
-            paths = file_package.split('.') + [filename]
-            testpath = os.path.join(_pwb_dir, *paths)
-            if os.path.exists(testpath):
-                filename = testpath
-                break
-        else:
-            print('ERROR: {} not found! Misspelling?'.format(filename),
-                  file=sys.stderr)
-
-            scripts = {}
-            for file_package in script_paths:
-                path = file_package.split('.')
-                for script_name in os.listdir(os.path.join(*path)):
-                    if (script_name.endswith('.py')
-                            and not script_name.startswith('__')):
-                        # remove .py for better matching
-                        scripts[script_name[:-3]] = os.path.join(
-                            *(path + [script_name]))
-
-            similar_scripts = get_close_matches(filename[:-3], scripts,
-                                                n=10, cutoff=0.7)
-            if similar_scripts:
-                print('\nThe most similar script{}:'
-                      .format(' is' if len(similar_scripts) == 1
-                              else 's are'))
-                print('\t' + '.py\n\t'.join(similar_scripts) + '.py')
+        filename = find_filename(filename)
+        if filename is None:
             return True
 
     # When both pwb.py and the filename to run are within the current
