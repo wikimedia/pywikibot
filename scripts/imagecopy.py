@@ -539,7 +539,7 @@ def main(*args):
                 except NotImplementedError:
                     # No API, using the page file instead
                     (datetime, username, resolution, size,
-                     comment) = imagepage.getFileVersionHistory().pop()
+                     comment) = imagepage.get_file_history().pop()
                 if always:
                     newname = imagepage.title(with_ns=False)
                     CommonsPage = pywikibot.Page(pywikibot.Site('commons',

@@ -330,7 +330,7 @@ class NowCommonsDeleteBot(Bot):
                     if sha1 == commonsImagePage.latest_file_info.sha1:
                         pywikibot.output(
                             'The image is identical to the one on Commons.')
-                        if len(localImagePage.getFileVersionHistory()) > 1:
+                        if len(localImagePage.get_file_history()) > 1:
                             pywikibot.output(
                                 'This image has a version history. Please '
                                 'delete it manually after making sure that '
