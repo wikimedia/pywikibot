@@ -2626,7 +2626,7 @@ class FilePage(Page):
     def getFileVersionHistoryTable(self):
         """Return the version history in the form of a wiki table."""
         lines = []
-        for info in self.getFileVersionHistory():
+        for info in self.get_file_history():
             dimension = '{width}×{height} px ({size} bytes)'.format(**info)
             lines.append('| {timestamp} || {user} || {dimension} |'
                          '| <nowiki>{comment}</nowiki>'

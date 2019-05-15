@@ -536,7 +536,7 @@ class imageFetcher(threading.Thread):
         information template. If we really have nothing better.
 
         """
-        uploadtime = imagepage.getFileVersionHistory()[-1][0]
+        uploadtime = imagepage.get_file_history()[-1][0]
         uploadDatetime = datetime.strptime(uploadtime, '%Y-%m-%dT%H:%M:%SZ')
         return ('{{Date|%s|%s|%s}} (original upload date)'
                 % (str(uploadDatetime.year),
@@ -569,7 +569,7 @@ class imageFetcher(threading.Thread):
 
     def getAuthor(self, imagepage):
         """Get the first uploader."""
-        return imagepage.getFileVersionHistory()[-1][1].strip()
+        return imagepage.get_file_history()[-1][1].strip()
 
     def convertLinks(self, text, sourceSite):
         """Convert links from the current wiki to Commons."""
@@ -947,7 +947,7 @@ class uploader(threading.Thread):
         @param imagepage: The file page to retrieve the log.
         @type imagepage: pywikibot.FilePage
         """
-        filehistory = imagepage.getFileVersionHistory()
+        filehistory = imagepage.get_file_history()
         filehistory.reverse()
 
         site = imagepage.site()

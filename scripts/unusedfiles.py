@@ -78,7 +78,7 @@ class UnusedFilesBot(SingleSiteBot, AutomaticTWSummaryBot, ExistingPageBot):
             self.append_text(image, '\n\n' + self.template_image)
             if self.getOption('nouserwarning'):
                 return
-            uploader = image.getFileVersionHistory().pop(0)['user']
+            uploader = image.get_file_history().pop(0)['user']
             user = pywikibot.User(image.site, uploader)
             usertalkpage = user.getUserTalkPage()
             msg2uploader = self.template_user % {'title': image.title()}
