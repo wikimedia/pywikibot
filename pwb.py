@@ -20,6 +20,7 @@ from difflib import get_close_matches
 from importlib import import_module
 import os
 import sys
+from time import sleep
 import types
 
 from warnings import warn
@@ -170,8 +171,9 @@ except RuntimeError:
 
 def find_alternates(filename, script_paths):
     """Search for similar filenames in the given script paths."""
-    from pywikibot import input_choice
+    from pywikibot import input_choice, output
     from pywikibot.bot import ShowingListOption, QuitKeyboardInterrupt
+    from pywikibot.tools.formatter import color_format
 
     print('ERROR: {} not found! Misspelling?'.format(filename),
           file=sys.stderr)
@@ -190,16 +192,27 @@ def find_alternates(filename, script_paths):
     if not similar_scripts:
         return None
 
-    msg = '\nThe most similar script{}:'.format(
-        ' is' if len(similar_scripts) == 1 else 's are')
-    alternatives = ShowingListOption(similar_scripts, pre=msg, post='')
+    if len(similar_scripts) == 1:
+        script = similar_scripts[0]
+        wait_time = 5
+        output(color_format(
+            'NOTE: Starting the most similar script '
+            '{lightyellow}{}.py{default}\n'
+            '      in {} seconds; type CTRL-C to stop.',
+            script, wait_time))
+        try:
+            sleep(wait_time)  # Wait a bit to let it be cancelled
+        except KeyboardInterrupt:
+            return None
+        return scripts[script]
 
+    msg = '\nThe most similar scripts are:'
+    alternatives = ShowingListOption(similar_scripts, pre=msg, post='')
     try:
         prefix, script = input_choice('Which script to be run:',
                                       alternatives, default='1')
     except QuitKeyboardInterrupt:
         return None
-
     print()
     return scripts[script[0]]
 
