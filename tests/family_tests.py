@@ -237,23 +237,25 @@ class TestFamilyUrlRegex(PatchingTestCase):
     def test_each_family(self):
         """Test each family builds a working regex."""
         for family in pywikibot.config.family_files:
-            if family in ('wowwiki', 'lyricwiki'):
-                self.skipTest(
-                    'Family.from_url() does not work for {} (T215077)'
-                    .format(family))
-            self.current_family = family
-            family = Family.load(family)
-            for code in family.codes:
-                self.current_code = code
-                url = ('{}://{}{}/$1'.format(family.protocol(code),
-                                             family.hostname(code),
-                                             family.path(code)))
-                # Families can switch off if they want to be detected using URL
-                # this applies for test:test (there is test:wikipedia)
-                if family._ignore_from_url or code in family._ignore_from_url:
-                    self.assertIsNone(family.from_url(url))
-                else:
-                    self.assertEqual(family.from_url(url), code)
+            with self.subTest(family=family):
+                if family in ('wowwiki', 'lyricwiki'):
+                    self.skipTest(
+                        'Family.from_url() does not work for {} (T215077)'
+                        .format(family))
+                self.current_family = family
+                family = Family.load(family)
+                for code in family.codes:
+                    self.current_code = code
+                    url = ('{}://{}{}/$1'.format(family.protocol(code),
+                                                 family.hostname(code),
+                                                 family.path(code)))
+                    # Families can switch off if they want to be detected using
+                    # URL. This applies for test:test (there is test:wikipedia)
+                    if (family._ignore_from_url
+                            or code in family._ignore_from_url):
+                        self.assertIsNone(family.from_url(url))
+                    else:
+                        self.assertEqual(family.from_url(url), code)
 
 
 class TestOldFamilyMethod(DeprecationTestCase):
