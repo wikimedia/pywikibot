@@ -63,6 +63,12 @@ class TestCaseBase(unittest.TestCase):
 
     """Base class for all tests."""
 
+    if not hasattr(unittest.TestCase, 'subTest'):
+        @contextmanager
+        def subTest(self, *args, **kwargs):
+            """Dummy subTest context manager for Python 2 that does nothing."""
+            yield
+
     if not hasattr(unittest.TestCase, 'assertRaisesRegex'):
         def assertRaisesRegex(self, *args, **kwargs):
             """
