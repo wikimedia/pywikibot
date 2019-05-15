@@ -38,9 +38,9 @@ from pywikibot.tools import PY2
 
 if not PY2:
     import urllib
-    from urllib.request import URLopener
+    from urllib.request import urlopen
 else:
-    from urllib import URLopener
+    from urllib import urlopen
 
 fileformats = ('jpg', 'jpeg', 'png', 'gif', 'svg', 'ogg')
 
@@ -52,9 +52,8 @@ def get_imagelinks(url):
         raise BeautifulSoup
 
     links = []
-    uo = URLopener()
-    with uo.open(url) as f:
-        soup = BeautifulSoup(f.read())
+    with urlopen(url) as f:
+        soup = BeautifulSoup(f.read(), 'html.parser')
 
     if not shown:
         tagname = 'a'
