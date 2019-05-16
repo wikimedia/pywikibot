@@ -1607,25 +1607,25 @@ class Request(MutableMapping):
             return {action: {'result': 'Success', 'nochange': ''}}
 
     def _is_wikibase_error_retryable(self, error):
-        ERR_MSG = 'edit-already-exists'
+        ERR_MSG = (
+            'edit-already-exists',
+            'actionthrottledtext',  # T192912
+        )
         messages = error.pop('messages', None)
+        message = None
         # bug T68619; after Wikibase breaking change 1ca9cee change we have a
         # list of messages
         if isinstance(messages, list):
             for item in messages:
                 message = item['name']
-                if message == ERR_MSG:
-                    break
-            else:  # no break
-                message = None
+                if message in ERR_MSG:
+                    return True
         elif isinstance(messages, dict):
-            try:  # behaviour before gerrit 124323 braking change
+            try:  # behaviour before gerrit 124323 breaking change
                 message = messages['0']['name']
             except KeyError:  # unsure the new output is always a list
                 message = messages['name']
-        else:
-            message = None
-        return message == ERR_MSG
+        return message in ERR_MSG
 
     @staticmethod
     def _generate_MIME_part(key, content, keytype=None, headers=None):
