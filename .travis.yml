@@ -20,7 +20,6 @@ addons:
     packages:
       - libssl1.0.0
       - djvulibre-bin
-      - liblua5.1-0-dev
 
 before_install:
   # When PYSETUP_TEST_EXTRAS is not enabled, do not allow the
@@ -139,7 +138,6 @@ matrix:
           packages:
             - djvulibre-bin
             - graphviz
-            - liblua5.1-0-dev
             - python-ipaddr
     - python: '2.7'
       env: LANGUAGE=en FAMILY=wpbeta PYWIKIBOT_SITE_ONLY=1 OAUTH_DOMAIN="en.wikipedia.beta.wmflabs.org"
