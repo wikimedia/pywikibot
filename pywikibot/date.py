@@ -226,18 +226,13 @@ def dh_constVal(value, ind, match):
 
     formats['CurrEvents']['en'](ind) => 'Current Events'
     formats['CurrEvents']['en']('Current Events') => ind
-
     """
     if isinstance(value, UnicodeType):
         if value == match:
             return ind
-        else:
-            raise ValueError()
-    else:
-        if value == ind:
-            return match
-        else:
-            raise ValueError('unknown value %d' % value)
+    elif value == ind:
+        return match
+    raise ValueError('unknown value {}'.format(value))
 
 
 def alwaysTrue(x):
