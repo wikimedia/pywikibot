@@ -133,4 +133,5 @@ wrapper._add_deprecated_attr(
     'IRCBot',
     replacement_name=('irc.bot.SingleServerIRCBot from irc library '
                       'or EventStreams'),
-    since='20190509')
+    since='20190509',
+    future_warning=True)
